@@ -14,14 +14,14 @@ HEADERS += mthread.h mthreadpool.h
 HEADERS += mythsocket.h mythsocket_cb.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
-HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
+HEADERS += mythobservable.h mythevent.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h logging.h loggingserver.h
 HEADERS += mythcorecontext.h mythsystem.h mythlocale.h storagegroup.h
 HEADERS += mythcoreutil.h mythdownloadmanager.h mythtranslation.h
 HEADERS += unzip.h unzip_p.h zipentry_p.h iso639.h iso3166.h mythmedia.h
 HEADERS += mythmiscutil.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
-HEADERS += mythhttppool.h mythhttphandler.h mythdeque.h mythlogging.h
+HEADERS += mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
 HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
@@ -31,18 +31,25 @@ HEADERS += ffmpeg-mmx.h
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
 SOURCES += mythdbcon.cpp mythdb.cpp mythdbparams.cpp oldsettings.cpp
-SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
+SOURCES += mythobservable.cpp mythevent.cpp
 SOURCES += mythtimer.cpp mythsignalingtimer.cpp mythdirs.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp
 SOURCES += mythcorecontext.cpp mythsystem.cpp mythlocale.cpp storagegroup.cpp
 SOURCES += mythcoreutil.cpp mythdownloadmanager.cpp mythtranslation.cpp
 SOURCES += unzip.cpp iso639.cpp iso3166.cpp mythmedia.cpp mythmiscutil.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp dbutil.cpp
-SOURCES += mythhttppool.cpp mythhttphandler.cpp logging.cpp loggingserver.cpp
+SOURCES += logging.cpp loggingserver.cpp
 SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 SOURCES += mythplugin.cpp
+
+# This stuff is not Qt5 compatible..
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+HEADERS += httpcomms.h mcodecs.h mythhttppool.h mythhttphandler.h
+SOURCES += httpcomms.cpp mcodecs.cpp mythhttppool.cpp mythhttphandler.cpp 
+inc.files += httpcomms.h mythhttppool.h
+}
 
 unix {
     SOURCES += system-unix.cpp
@@ -56,15 +63,15 @@ mingw {
 
 # Install headers to same location as libmyth to make things easier
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
+inc.files += mythdbcon.h mythdbparams.h mythbaseexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
-inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h verbosedefs.h
+inc.files += mythobservable.h mythevent.h mcodecs.h verbosedefs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h mythlogging.h
 inc.files += mythcorecontext.h mythsystem.h storagegroup.h loggingserver.h
 inc.files += mythcoreutil.h mythlocale.h mythdownloadmanager.h
 inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h
-inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythhttppool.h mythdeque.h
+inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythdeque.h
 inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
