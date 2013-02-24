@@ -545,7 +545,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
         // Create a fake media device just to lookup mount map:
         else
         {
-            pMedia = MythCDROM::get(NULL, devPath.toAscii(), true, false);
+            pMedia = MythCDROM::get(NULL, devPath.toLatin1(), true, false);
             if (pMedia && pMedia->findMountPath())
                 mountPath = pMedia->getMountPath();
             else

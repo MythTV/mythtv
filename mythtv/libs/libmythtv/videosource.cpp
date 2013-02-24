@@ -790,7 +790,7 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
                 continue;
 
             // if the driver returns any info add this device to our list
-            QByteArray tmp = filepath.toAscii();
+            QByteArray tmp = filepath.toLatin1();
             int videofd = open(tmp.constData(), O_RDWR);
             if (videofd >= 0)
             {
@@ -860,7 +860,7 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
             QFileInfo &fi = *it;
 
             QString    device = fi.absoluteFilePath();
-            QByteArray adevice = device.toAscii();
+            QByteArray adevice = device.toLatin1();
             int vbifd = open(adevice.constData(), O_RDWR);
             if (vbifd < 0)
                 continue;
@@ -2084,7 +2084,7 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 {
     QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
 
-    QByteArray adevice = device.toAscii();
+    QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
     if (videofd >= 0)
     {
@@ -2128,7 +2128,7 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
 {
     QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
 
-    QByteArray adevice = device.toAscii();
+    QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
     if (videofd >= 0)
     {

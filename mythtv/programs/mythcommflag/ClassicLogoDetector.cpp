@@ -409,7 +409,7 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
     for(unsigned int y = logoMinY - 2; y <= (logoMaxY + 2); y++)
     {
         QString tmp = QString("%1: ").arg(y, 3);
-        QString ba = tmp.toAscii();
+        QString ba = tmp.toLatin1();
         cerr << ba.constData();
         for(unsigned int x = logoMinX - 2; x <= (logoMaxX + 2); x++)
         {

@@ -38,7 +38,7 @@
 AudioInputOSS::AudioInputOSS(const QString &device) : AudioInput(device)
 {
     if (!device.isEmpty())
-        m_device_name = QByteArray(device.toAscii());
+        m_device_name = QByteArray(device.toLatin1());
     else
         m_device_name = QByteArray();
     dsp_fd = -1;

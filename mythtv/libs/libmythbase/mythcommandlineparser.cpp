@@ -1875,7 +1875,7 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                 }
                 else
                 {
-                    QByteArray tmp = filename.toAscii();
+                    QByteArray tmp = filename.toLatin1();
                     cerr << "Failed to open the override settings file: '"
                          << tmp.constData() << "'" << endl;
                 }
@@ -2613,7 +2613,7 @@ bool openPidfile(ofstream &pidfs, const QString &pidfile)
 {
     if (!pidfile.isEmpty())
     {
-        pidfs.open(pidfile.toAscii().constData());
+        pidfs.open(pidfile.toLatin1().constData());
         if (!pidfs)
         {
             cerr << "Could not open pid file: " << ENO_STR << endl;

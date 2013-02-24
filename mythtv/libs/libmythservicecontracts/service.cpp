@@ -51,8 +51,8 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
     {
         case QMetaType::Bool        : *(( bool           *)pParam) = ToBool( sValue );         break;
 
-        case QMetaType::Char        : *(( char           *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toAscii() : 0; break;
-        case QMetaType::UChar       : *(( unsigned char  *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toAscii() : 0; break;
+        case QMetaType::Char        : *(( char           *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toLatin1() : 0; break;
+        case QMetaType::UChar       : *(( unsigned char  *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toLatin1() : 0; break;
         case QMetaType::QChar       : *(( QChar          *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 )           : 0; break;
 
         case QMetaType::Short       : *(( short          *)pParam) = sValue.toShort     (); break;

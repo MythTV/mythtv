@@ -154,7 +154,7 @@ bool AudioOutputJACK::OpenDevice()
     for (i = 0; i < channels; i++)
     {
         QString port_name = QString("out_%1").arg(i);
-        ports[i] = jack_port_register(client, port_name.toAscii().constData(),
+        ports[i] = jack_port_register(client, port_name.toLatin1().constData(),
                                       JACK_DEFAULT_AUDIO_TYPE,
                                       JackPortIsOutput, 0);
         if (!ports[i])
@@ -559,7 +559,7 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
         (jack_options_t)(JackUseExactName | JackNoStartServer);
     jack_status_t open_status;
 
-    client = jack_client_open(client_name.toAscii().constData(),
+    client = jack_client_open(client_name.toLatin1().constData(),
                               open_options, &open_status);
 
     return client;
@@ -574,7 +574,7 @@ const char** AudioOutputJACK::_jack_get_ports(void)
     // Have we been given a target port to connect to
     if (!main_device.isEmpty())
     {
-        port_name = main_device.toAscii().constData();
+        port_name = main_device.toLatin1().constData();
     }
     else
     {

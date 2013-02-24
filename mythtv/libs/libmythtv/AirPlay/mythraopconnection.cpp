@@ -938,7 +938,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         uint8_t *to = new uint8_t[tosize];
         
         QByteArray challenge =
-        QByteArray::fromBase64(tags["Apple-Challenge"].toAscii());
+        QByteArray::fromBase64(tags["Apple-Challenge"].toLatin1());
         int challenge_size = challenge.size();
         if (challenge_size != 16)
         {
@@ -1023,7 +1023,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             if (line.startsWith("a=rsaaeskey:"))
             {
                 QString key = line.mid(12).trimmed();
-                QByteArray decodedkey = QByteArray::fromBase64(key.toAscii());
+                QByteArray decodedkey = QByteArray::fromBase64(key.toLatin1());
                 LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("RSAAESKey: %1 (decoded size %2)")
                     .arg(key).arg(decodedkey.size()));
@@ -1053,7 +1053,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             else if (line.startsWith("a=aesiv:"))
             {
                 QString aesiv = line.mid(8).trimmed();
-                m_AESIV = QByteArray::fromBase64(aesiv.toAscii());
+                m_AESIV = QByteArray::fromBase64(aesiv.toLatin1());
                 LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     QString("AESIV: %1 (decoded size %2)")
                     .arg(aesiv).arg(m_AESIV.size()));

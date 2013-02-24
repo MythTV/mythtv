@@ -419,7 +419,7 @@ QVariant PList::ParseBinaryString(quint8 *data)
     if (!count)
         return result;
 
-    result = QString::fromAscii((const char*)data, count);
+    result = QString::fromLatin1((const char*)data, count);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("ASCII String: %1").arg(result));
     return QVariant(result);
 }

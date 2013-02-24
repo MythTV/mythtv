@@ -234,9 +234,9 @@ bool MediaMonitorUnix::CheckMountable(void)
 
                 MythMediaDevice* pDevice;
                 if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
-                    pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
+                    pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
                 else
-                    pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
+                    pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
                 if (pDevice && !AddDevice(pDevice))
                     pDevice->deleteLater();
@@ -332,7 +332,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     if (udev != NULL)
     {
         struct udev_device *device =
-            udev_device_new_from_syspath(udev, sysfs.toAscii().constData());
+            udev_device_new_from_syspath(udev, sysfs.toLatin1().constData());
         if (device != NULL)
         {
             const char *name = udev_device_get_devnode(device);
@@ -533,7 +533,7 @@ static void LookupModel(MythMediaDevice* device)
 
     LOG(VB_MEDIA, LOG_DEBUG, QString("LookupModel '%1' -> '%2'")
              .arg(device->getRealDevice()).arg(desc) );
-    device->setDeviceModel(desc.toAscii().constData());
+    device->setDeviceModel(desc.toLatin1().constData());
 }
 
 /**
@@ -714,9 +714,9 @@ void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
 
         MythMediaDevice* pDevice;
         if (DeviceProperty(o, "DeviceIsRemovable").toBool())
-            pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
+            pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
         else
-            pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
+            pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
         if (pDevice && !AddDevice(pDevice))
             pDevice->deleteLater();
@@ -804,13 +804,13 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     {
         // found cdrom device
             pDevice = MythCDROM::get(
-                this, device_file.toAscii().constData(), false, m_AllowEject);
+                this, device_file.toLatin1().constData(), false, m_AllowEject);
     }
     else
     {
         // found block or partition device
             pDevice = MythHDD::Get(
-                this, device_file.toAscii().constData(), false, false);
+                this, device_file.toLatin1().constData(), false, false);
     }
 
     if (AddDevice(pDevice))

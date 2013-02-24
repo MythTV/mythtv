@@ -94,7 +94,7 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     if (id < 0 || id >= num_fifos)
         return false;
 
-    QByteArray  fname = name.toAscii();
+    QByteArray  fname = name.toLatin1();
     const char *aname = fname.constData();
     if (mkfifo(aname, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH) == -1)
     {
@@ -155,7 +155,7 @@ void FIFOWriter::FIFOWriteThread(int id)
             break;
         if (fd < 0)
         {
-            QByteArray fname = filename[id].toAscii();
+            QByteArray fname = filename[id].toLatin1();
             fd = open(fname.constData(), O_WRONLY| O_SYNC);
         }
         if (fd >= 0)

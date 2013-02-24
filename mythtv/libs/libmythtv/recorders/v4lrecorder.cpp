@@ -114,7 +114,7 @@ int V4LRecorder::OpenVBIDevice(void)
     struct vbi     *pal_tt = NULL;
     uint width = 0, start_line = 0, line_count = 0;
 
-    QByteArray vbidev = vbidevice.toAscii();
+    QByteArray vbidev = vbidevice.toLatin1();
     if (VBIMode::PAL_TT == vbimode)
     {
         pal_tt = vbi_open(vbidev.constData(), NULL, 99, -1);

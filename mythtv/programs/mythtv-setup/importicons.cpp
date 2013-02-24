@@ -519,7 +519,7 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
 
 QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
 {
-    QByteArray raw(strParam.toAscii());
+    QByteArray raw(strParam.toLatin1());
     QBuffer data(&raw);
     QHttpRequestHeader header;
 

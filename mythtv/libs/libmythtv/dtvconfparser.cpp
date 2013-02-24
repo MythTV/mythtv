@@ -241,7 +241,7 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
     while (!params.isEmpty())
     {
         QString ori = params;
-        int s = (int) (params.toAscii().constData()[0]);
+        int s = (int) (params.toLatin1().constData()[0]);
         params = params.mid(1);
         switch (s)
         {

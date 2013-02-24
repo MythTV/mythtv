@@ -124,7 +124,7 @@ bool SOAPClient::GetNodeValue(
     if (sValue.isEmpty())
         return bDefault;
 
-    char ret = sValue[0].toAscii();
+    char ret = sValue[0].toLatin1();
     switch (ret)
     {
         case 't': case 'T': case 'y': case 'Y': case '1':

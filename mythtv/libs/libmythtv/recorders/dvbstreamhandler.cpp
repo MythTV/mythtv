@@ -133,7 +133,7 @@ void DVBStreamHandler::run(void)
  */
 void DVBStreamHandler::RunTS(void)
 {
-    QByteArray dvr_dev_path = _dvr_dev_path.toAscii();
+    QByteArray dvr_dev_path = _dvr_dev_path.toLatin1();
     int dvr_fd;
     for (int tries = 1; ; ++tries)
     {
@@ -566,7 +566,7 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
             return *it;
     }
 
-    QByteArray dvr_dev_path = _dvr_dev_path.toAscii();
+    QByteArray dvr_dev_path = _dvr_dev_path.toLatin1();
     int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
@@ -603,7 +603,7 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
     }
 
     QString demux_fn = CardUtil::GetDeviceName(DVB_DEV_DEMUX, dvb_dev);
-    QByteArray demux_ba = demux_fn.toAscii();
+    QByteArray demux_ba = demux_fn.toLatin1();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Opening filter for pid 0x%1")
             .arg(_pid, 0, 16));
@@ -745,7 +745,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // Open the demux device
     QString dvbdev = CardUtil::GetDeviceName(
         DVB_DEV_DEMUX, _card_number_option);
-    QByteArray dev = dvbdev.toAscii();
+    QByteArray dev = dvbdev.toLatin1();
 
     int fd_tmp = open(dev.constData(), O_RDWR);
     if (fd_tmp < 0)

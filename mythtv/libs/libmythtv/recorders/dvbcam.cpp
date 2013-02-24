@@ -67,7 +67,7 @@ DVBCam::DVBCam(const QString &aDevice)
       pmt_updated(false),     pmt_added(false)
 {
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
-    QByteArray dev = dvbdev.toAscii();
+    QByteArray dev = dvbdev.toLatin1();
     int cafd = open(dev.constData(), O_RDWR);
     if (cafd >= 0)
     {
@@ -94,7 +94,7 @@ bool DVBCam::Start(void)
     pmt_added    = false;
 
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
-    QByteArray dev = dvbdev.toAscii();
+    QByteArray dev = dvbdev.toLatin1();
     ciHandler = cCiHandler::CreateCiHandler(dev.constData());
     if (!ciHandler)
     {

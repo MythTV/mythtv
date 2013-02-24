@@ -635,7 +635,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
         for (uint i=0; i<CountryCount(); i++)
         {
             if (i!=0) countries.append(" ");
-            countries.append(QString::fromAscii(
+            countries.append(QString::fromLatin1(
                                  (const char *)_data+(3*(i+1)), 3));
         };
         return countries;
@@ -2025,7 +2025,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
     QString ContentId(void) const
     {
-        return QString::fromAscii((const char *)_data+4, _data[3]);
+        return QString::fromLatin1((const char *)_data+4, _data[3]);
     }
 };
 
@@ -2041,7 +2041,7 @@ class DefaultAuthorityDescriptor : public MPEGDescriptor
 
     QString DefaultAuthority(void) const
     {
-        return QString::fromAscii((const char *)_data+2, _data[1]);
+        return QString::fromLatin1((const char *)_data+2, _data[1]);
     }
 
     QString toString(void) const

@@ -316,14 +316,14 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 {
                     QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b%1%/%2fps")
                         .arg(percentage, 3).arg((int)flagFPS, 3);
-                    QByteArray ba = tmp.toAscii();
+                    QByteArray ba = tmp.toLatin1();
                     cerr << ba.constData() << flush;
                 }
                 else
                 {
                     QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b\b\b%1/%2fps")
                         .arg(currentFrameNumber, 6).arg((int)flagFPS, 3);
-                    QByteArray ba = tmp.toAscii();
+                    QByteArray ba = tmp.toLatin1();
                     cerr << ba.constData() << flush;
                 }
                 cerr.flush();

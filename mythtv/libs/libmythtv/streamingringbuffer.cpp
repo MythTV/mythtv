@@ -58,7 +58,7 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         url.setScheme("hls+http");
     }
 
-    int res = ffurl_open(&m_context, url.toString().toAscii(), AVIO_FLAG_READ,
+    int res = ffurl_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ,
                          NULL, NULL);
     if (res >=0 && m_context &&
         !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)

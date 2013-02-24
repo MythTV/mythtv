@@ -700,7 +700,7 @@ bool MythPopupBox::showOkPopup(
     if (button_msg.isEmpty())
         button_msg = QObject::tr("OK");
 
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
 
     popup->addLabel(message, MythPopupBox::Medium, true);
     QAbstractButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
@@ -716,7 +716,7 @@ bool MythPopupBox::showOkPopup(
 bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
                                     QString message, QString& text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
 
     popup->addLabel(message, Medium, true);
 
@@ -763,7 +763,7 @@ DialogCode MythPopupBox::ShowButtonPopup(
     const QStringList &buttonmsgs,
     DialogCode         default_button)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
 
     popup->addLabel(message, Medium, true);
     popup->addLabel("");

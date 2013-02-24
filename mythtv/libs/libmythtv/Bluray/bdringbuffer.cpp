@@ -305,7 +305,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         close();
 
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
-    QByteArray keyarray = keyfile.toAscii();
+    QByteArray keyarray = keyfile.toLatin1();
     const char *keyfilepath = keyarray.data();
 
     bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);

@@ -359,7 +359,7 @@ void MpegRecorder::SetStrOption(RecordingProfile *profile, const QString &name)
 
 bool MpegRecorder::OpenMpegFileAsInput(void)
 {
-    QByteArray vdevice = videodevice.toAscii();
+    QByteArray vdevice = videodevice.toLatin1();
     chanfd = readfd = open(vdevice.constData(), O_RDONLY);
 
     if (readfd < 0)
@@ -377,7 +377,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     // open implicitly starts encoding, so we need the lock..
     QMutexLocker locker(&start_stop_encoding_lock);
 
-    QByteArray vdevice = videodevice.toAscii();
+    QByteArray vdevice = videodevice.toLatin1();
     chanfd = open(vdevice.constData(), O_RDWR);
     if (chanfd < 0)
     {
@@ -973,7 +973,7 @@ void MpegRecorder::run(void)
         StartEncoding();
     }
 
-    QByteArray vdevice = videodevice.toAscii();
+    QByteArray vdevice = videodevice.toLatin1();
     while (IsRecordingRequested() && !IsErrored())
     {
         if (PauseAndWait(100))
@@ -1277,7 +1277,7 @@ bool MpegRecorder::StartEncoding(void)
 
     if (readfd < 0)
     {
-        readfd = open(videodevice.toAscii().constData(), O_RDWR | O_NONBLOCK);
+        readfd = open(videodevice.toLatin1().constData(), O_RDWR | O_NONBLOCK);
         if (readfd < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1313,7 +1313,7 @@ bool MpegRecorder::StartEncoding(void)
 
     if (_device_read_buffer)
     {
-        _device_read_buffer->Reset(videodevice.toAscii().constData(), readfd);
+        _device_read_buffer->Reset(videodevice.toLatin1().constData(), readfd);
         _device_read_buffer->SetRequestPause(false);
         _device_read_buffer->Start();
     }

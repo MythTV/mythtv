@@ -451,7 +451,7 @@ bool PreviewGenerator::event(QEvent *e)
 
     size_t     length     = me->ExtraData(4).toULongLong();
     quint16    checksum16 = me->ExtraData(5).toUInt();
-    QByteArray data       = QByteArray::fromBase64(me->ExtraData(6).toAscii());
+    QByteArray data       = QByteArray::fromBase64(me->ExtraData(6).toLatin1());
     if ((size_t) data.size() < length)
     {   // (note data.size() may be up to 3
         //  bytes longer after decoding

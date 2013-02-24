@@ -823,7 +823,7 @@ void MythRenderOpenGL2::DeleteDefaultShaders(void)
 uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
 {
     uint result = m_glCreateShader(type);
-    QByteArray src = source.toAscii();
+    QByteArray src = source.toLatin1();
     const char* tmp[1] = { src.constData() };
     m_glShaderSource(result, 1, tmp, NULL);
     m_glCompileShader(result);

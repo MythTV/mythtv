@@ -216,7 +216,7 @@ void IPTVStreamHandler::run(void)
             struct ip_mreq imr;
             memset(&imr, 0, sizeof(struct ip_mreq));
             imr.imr_multiaddr.s_addr = inet_addr(
-                dest_addr.toString().toAscii().constData());
+                dest_addr.toString().toLatin1().constData());
             imr.imr_interface.s_addr = htonl(INADDR_ANY);
             if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                            &imr, sizeof(imr)) < 0)

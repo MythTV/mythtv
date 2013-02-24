@@ -96,7 +96,7 @@ bool MythXDisplay::Open(void)
     QString dispStr = GetMythUI()->GetX11Display();
     const char *dispCStr = NULL;
     if (!dispStr.isEmpty())
-        dispCStr = dispStr.toAscii().constData();
+        dispCStr = dispStr.toLatin1().constData();
 
     m_disp = XOpenDisplay(dispCStr);
     if (!m_disp)

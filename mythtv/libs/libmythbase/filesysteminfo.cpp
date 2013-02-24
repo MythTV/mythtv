@@ -230,7 +230,7 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
 void FileSystemInfo::PopulateDiskSpace(void)
 {
     int64_t total = -1, used = -1;
-    getDiskSpace(getPath().toAscii().constData(), total, used);
+    getDiskSpace(getPath().toLatin1().constData(), total, used);
     setTotalSpace(total);
     setUsedSpace(used);
 }

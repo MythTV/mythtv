@@ -510,7 +510,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
         av_free(mpa_vidctx);
     mpa_vidctx = NULL;
 
-    QByteArray vcodec = videocodec.toAscii();
+    QByteArray vcodec = videocodec.toLatin1();
     mpa_vidcodec = avcodec_find_encoder_by_name(vcodec.constData());
 
     if (!mpa_vidcodec)
@@ -756,7 +756,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (!skipdevice)
     {
-        audio_device = AudioInput::CreateDevice(audiodevice.toAscii());
+        audio_device = AudioInput::CreateDevice(audiodevice.toLatin1());
         if (!audio_device)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -833,7 +833,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
     int init_fd = fd;
     if (init_fd < 0)
     {
-        QByteArray vdevice = videodevice.toAscii();
+        QByteArray vdevice = videodevice.toLatin1();
         init_fd = open(vdevice.constData(), O_RDWR);
         we_opened_fd = true;
 
@@ -990,7 +990,7 @@ bool NuppelVideoRecorder::Open(void)
         return true;
 
     int retries = 0;
-    QByteArray vdevice = videodevice.toAscii();
+    QByteArray vdevice = videodevice.toLatin1();
     fd = open(vdevice.constData(), O_RDWR);
     while (fd < 0)
     {

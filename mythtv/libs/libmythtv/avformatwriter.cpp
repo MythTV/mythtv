@@ -98,7 +98,7 @@ AVFormatWriter::~AVFormatWriter()
 
 bool AVFormatWriter::Init(void)
 {
-    AVOutputFormat *fmt = av_guess_format(m_container.toAscii().constData(),
+    AVOutputFormat *fmt = av_guess_format(m_container.toLatin1().constData(),
                                           NULL, NULL);
     if (!fmt)
     {
@@ -113,7 +113,7 @@ bool AVFormatWriter::Init(void)
     if (m_width && m_height)
     {
         m_avVideoCodec = avcodec_find_encoder_by_name(
-            m_videoCodec.toAscii().constData());
+            m_videoCodec.toLatin1().constData());
         if (!m_avVideoCodec)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
@@ -127,7 +127,7 @@ bool AVFormatWriter::Init(void)
         m_fmt.video_codec = AV_CODEC_ID_NONE;
 
     m_avAudioCodec = avcodec_find_encoder_by_name(
-        m_audioCodec.toAscii().constData());
+        m_audioCodec.toLatin1().constData());
     if (!m_avAudioCodec)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
@@ -151,7 +151,7 @@ bool AVFormatWriter::Init(void)
         m_ctx->packet_size = 2324;
 
     snprintf(m_ctx->filename, sizeof(m_ctx->filename), "%s",
-             m_filename.toAscii().constData());
+             m_filename.toLatin1().constData());
 
     if (m_fmt.video_codec != AV_CODEC_ID_NONE)
         m_videoStream = AddVideoStream();
@@ -193,7 +193,7 @@ bool AVFormatWriter::OpenFile(void)
 {
     if (!(m_fmt.flags & AVFMT_NOFILE))
     {
-        if (avio_open(&m_ctx->pb, m_filename.toAscii().constData(),
+        if (avio_open(&m_ctx->pb, m_filename.toLatin1().constData(),
                       AVIO_FLAG_WRITE) < 0)
         {
             LOG(VB_RECORD, LOG_ERR, LOC + "OpenFile(): avio_open() failed");

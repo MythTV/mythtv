@@ -353,7 +353,7 @@ bool MythUIFileBrowser::IsImage(QString extension)
 
     QList<QByteArray> formats = QImageReader::supportedImageFormats();
 
-    if (formats.contains(extension.toAscii()))
+    if (formats.contains(extension.toLatin1()))
         return true;
 
     return false;
