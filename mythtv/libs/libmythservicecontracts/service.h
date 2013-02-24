@@ -71,6 +71,8 @@ class SERVICE_PUBLIC Service : public QObject
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_DECLARE_METATYPE( QFileInfo  )
+#endif
 
 #endif
