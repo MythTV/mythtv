@@ -811,6 +811,8 @@ class MPUBLIC PMapDBReplacement
     QMap<MarkTypes,frm_pos_map_t> map;
 };
 
+MPUBLIC QString format_season_and_episode(int seasEp, int digits = -1);
+
 Q_DECLARE_METATYPE(ProgramInfo*)
 
 #endif // MYTHPROGRAM_H_

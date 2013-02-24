@@ -9,7 +9,6 @@
 #include "mythrssmanager.h"
 
 // Generic Data Formatting
-MPUBLIC QString GetDisplaySeasonEpisode(int seasEp, int digits = -1);
 MPUBLIC QString GetDownloadFilename(QString title, QString url);
 
 // Tree DB Utils

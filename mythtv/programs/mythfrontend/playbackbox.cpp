@@ -33,7 +33,6 @@
 #include "remoteutil.h"
 #include "mythdbcon.h"
 #include "playgroup.h"
-#include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythdate.h"
@@ -4725,14 +4724,14 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         QString episode;
         if (newSeason > 0 || newEpisode > 0)
         {
-            season = GetDisplaySeasonEpisode(newSeason, 1);
-            episode = GetDisplaySeasonEpisode(newEpisode, 1);
-            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                                (newSeason, 2))
-                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                                (newSeason, 1))
-                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            season = format_season_and_episode(newSeason, 1);
+            episode = format_season_and_episode(newEpisode, 1);
+            seasone = QString("s%1e%2")
+                .arg(format_season_and_episode(newSeason, 2))
+                .arg(format_season_and_episode(newEpisode, 2));
+            seasonx = QString("%1x%2")
+                .arg(format_season_and_episode(newSeason, 1))
+                .arg(format_season_and_episode(newEpisode, 2));
         }
 
         item->SetText(tempSubTitle, "titlesubtitle");
