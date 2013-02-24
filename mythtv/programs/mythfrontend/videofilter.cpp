@@ -523,7 +523,7 @@ void VideoFilterSettings::setTextFilter(QString val)
         QStringList list = re_date.capturedTexts();
         int modnr = list[1].toInt();
         QDate testdate = MythDate::current().date();
-        switch(list[2].at(0).toAscii())
+        switch(list[2].at(0).toLatin1())
         {
             case 'm': testdate = testdate.addMonths(-modnr);break;
             case 'd': testdate = testdate.addDays(-modnr);break;

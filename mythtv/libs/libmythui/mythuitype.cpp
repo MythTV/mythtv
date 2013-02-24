@@ -144,7 +144,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
  */
 MythUIType *MythUIType::GetChild(const QString &name) const
 {
-    QObject *ret = qChildHelper(name.toAscii().constData(), NULL, true, children());
+    QObject *ret = qChildHelper(name.toLatin1().constData(), NULL, true, children());
 
     if (ret)
         return dynamic_cast<MythUIType *>(ret);

@@ -28,7 +28,7 @@
 
 AudioInput::AudioInput(const QString &device)
 {
-    m_audio_device = QByteArray(device.toAscii());
+    m_audio_device = QByteArray(device.toLatin1());
     m_audio_channels = 0;
     m_audio_sample_bits = 0;
     m_audio_sample_rate = 0;

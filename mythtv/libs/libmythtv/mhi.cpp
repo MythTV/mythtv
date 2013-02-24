@@ -79,25 +79,25 @@ MHIContext::MHIContext(InteractiveTV *parent)
 bool MHIContext::LoadFont(QString name)
 {
     QString fullnameA = GetConfDir() + "/" + name;
-    QByteArray fnameA = fullnameA.toAscii();
+    QByteArray fnameA = fullnameA.toLatin1();
     FT_Error errorA = FT_New_Face(ft_library, fnameA.constData(), 0, &m_face);
     if (!errorA)
         return true;
 
     QString fullnameB = GetFontsDir() + name;
-    QByteArray fnameB = fullnameB.toAscii();
+    QByteArray fnameB = fullnameB.toLatin1();
     FT_Error errorB = FT_New_Face(ft_library, fnameB.constData(), 0, &m_face);
     if (!errorB)
         return true;
 
     QString fullnameC = GetShareDir() + "themes/" + name;
-    QByteArray fnameC = fullnameC.toAscii();
+    QByteArray fnameC = fullnameC.toLatin1();
     FT_Error errorC = FT_New_Face(ft_library, fnameC.constData(), 0, &m_face);
     if (!errorC)
         return true;
 
     QString fullnameD = name;
-    QByteArray fnameD = fullnameD.toAscii();
+    QByteArray fnameD = fullnameD.toLatin1();
     FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
     if (!errorD)
         return true;

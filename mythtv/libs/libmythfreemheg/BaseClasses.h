@@ -120,7 +120,7 @@ class MHOctetString
     const unsigned char *Bytes() const { return m_pChars; } // Read-only pointer to the buffer.
     void Append(const MHOctetString &str); // Add text to the end of the string.
 
-    QString Printable() const { return QString::fromAscii((const char*)m_pChars, m_nLength); }
+    QString Printable() const { return QString::fromLatin1((const char*)m_pChars, m_nLength); }
 
     void PrintMe(FILE *fd, int nTabs) const;
 

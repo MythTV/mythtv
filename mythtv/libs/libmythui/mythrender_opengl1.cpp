@@ -121,7 +121,7 @@ uint MythRenderOpenGL1::CreateShaderObject(const QString &vert, const QString &f
 
     makeCurrent();
 
-    QByteArray tmp = frag.toAscii();
+    QByteArray tmp = frag.toLatin1();
 
     GLuint glfp;
     m_glGenProgramsARB(1, &glfp);

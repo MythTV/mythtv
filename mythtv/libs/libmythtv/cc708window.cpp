@@ -352,8 +352,8 @@ void CC708Window::AddChar(QChar ch)
         return;
 
     QString dbg_char = ch;
-    if (ch.toAscii() < 32)
-        dbg_char = QString("0x%1").arg( (int)ch.toAscii(), 0,16);
+    if (ch.toLatin1() < 32)
+        dbg_char = QString("0x%1").arg( (int)ch.toLatin1(), 0,16);
 
     if (!IsPenValid())
     {
@@ -364,7 +364,7 @@ void CC708Window::AddChar(QChar ch)
         return;
     }
 
-    if (ch.toAscii() == 0x0D)
+    if (ch.toLatin1() == 0x0D)
     {
         Scroll(pen.row + 1, 0);
         changed = true;
@@ -372,7 +372,7 @@ void CC708Window::AddChar(QChar ch)
     }
     QMutexLocker locker(&lock);
 
-    if (ch.toAscii() == 0x08)
+    if (ch.toLatin1() == 0x08)
     {
         DecrPenLocation();
         CC708Character& chr = GetCCChar();

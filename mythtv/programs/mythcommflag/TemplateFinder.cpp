@@ -646,7 +646,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         return false;
     }
 
-    QByteArray tmfile = tmplfile.toAscii();
+    QByteArray tmfile = tmplfile.toLatin1();
     if (pgm_read(tmpl->data[0], *pwidth, *pheight, tmfile.constData()))
     {
         avpicture_free(tmpl);
@@ -674,7 +674,7 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
 {
     QFile tfile(tmplfile);
 
-    QByteArray tmfile = tmplfile.toAscii();
+    QByteArray tmfile = tmplfile.toLatin1();
     if (pgm_write(tmpl->data[0], width, height, tmfile.constData()))
         return false;
 

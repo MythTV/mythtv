@@ -503,7 +503,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                 // Check for a DVD/BD disk by reading the UDF root dir.
                 // This allows DVD's to play immediately upon insertion without
                 // calling mount, which either needs pmount or changes to fstab.
-                udf_t *pUdf = udf_open(m_DevicePath.toAscii());
+                udf_t *pUdf = udf_open(m_DevicePath.toLatin1());
                 if (NULL != pUdf)
                 {
                     udf_dirent_t *pUdfRoot = udf_get_root(pUdf, true, 0);

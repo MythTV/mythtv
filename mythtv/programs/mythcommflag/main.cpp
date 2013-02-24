@@ -769,7 +769,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 if (!skipTypes->contains(val))
                 {
                     cerr << "Failed to decode --method option '"
-                         << val.toAscii().constData()
+                         << val.toLatin1().constData()
                          << "'" << endl;
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
@@ -997,7 +997,7 @@ static int FlagCommercials(QString filename, int jobid,
     if (progress)
     {
         cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl
-             << "    " << filename.toAscii().constData() << endl;
+             << "    " << filename.toLatin1().constData() << endl;
     }
 
     ProgramInfo pginfo(filename);
@@ -1069,7 +1069,7 @@ static int RebuildSeekTable(QString filename, int jobid)
     if (progress)
     {
         cerr << "MythTV Commercial Flagger, building seek table for:" << endl
-             << "    " << filename.toAscii().constData() << endl;
+             << "    " << filename.toLatin1().constData() << endl;
     }
     ProgramInfo pginfo(filename);
     return RebuildSeekTable(&pginfo, jobid);

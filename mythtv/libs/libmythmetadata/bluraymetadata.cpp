@@ -30,7 +30,7 @@ bool BlurayMetadata::OpenDisc(void)
         return true;
 
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
-    QByteArray keyarray = keyfile.toAscii();
+    QByteArray keyarray = keyfile.toLatin1();
     const char *keyfilepath = keyarray.data();
 
     m_bdnav = bd_open(m_path.toLatin1().data(), keyfilepath);

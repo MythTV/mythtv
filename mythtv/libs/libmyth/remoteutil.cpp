@@ -271,7 +271,7 @@ QDateTime RemoteGetPreviewIfModified(
 
     size_t  length     = strlist[1].toULongLong();
     quint16 checksum16 = strlist[2].toUInt();
-    QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
+    QByteArray data = QByteArray::fromBase64(strlist[3].toLatin1());
     if ((size_t) data.size() < length)
     { // (note data.size() may be up to 3 bytes longer after decoding
         LOG(VB_GENERAL, LOG_ERR, loc +

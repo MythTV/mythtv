@@ -31,7 +31,7 @@ AudioInputALSA::AudioInputALSA(const QString &device):
     period_size(0),
     myth_block_bytes(0)
 {
-    alsa_device = device.right(device.size()-5).toAscii();
+    alsa_device = device.right(device.size()-5).toLatin1();
 }
 
 bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)

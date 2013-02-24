@@ -817,7 +817,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
     AVProbeData probe;
 
-    QByteArray fname = filename.toAscii();
+    QByteArray fname = filename.toLatin1();
     probe.filename = fname.constData();
     probe.buf = (unsigned char *)testbuf;
     probe.buf_size = testbufsize;
@@ -950,7 +950,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     AVInputFormat *fmt      = NULL;
     QString        fnames   = ringBuffer->GetFilename();
-    QByteArray     fnamea   = fnames.toAscii();
+    QByteArray     fnamea   = fnames.toLatin1();
     const char    *filename = fnamea.constData();
 
     AVProbeData probe;

@@ -569,19 +569,19 @@ DataDirectProcessor::~DataDirectProcessor()
 
     if (!m_tmpPostFile.isEmpty())
     {
-        QByteArray tmp = m_tmpPostFile.toAscii();
+        QByteArray tmp = m_tmpPostFile.toLatin1();
         unlink(tmp.constData());
     }
 
     if (!m_tmpResultFile.isEmpty())
     {
-        QByteArray tmp = m_tmpResultFile.toAscii();
+        QByteArray tmp = m_tmpResultFile.toLatin1();
         unlink(tmp.constData());
     }
 
     if (!m_cookieFile.isEmpty())
     {
-        QByteArray tmp = m_cookieFile.toAscii();
+        QByteArray tmp = m_cookieFile.toLatin1();
         unlink(tmp.constData());
     }
 
@@ -591,13 +591,13 @@ DataDirectProcessor::~DataDirectProcessor()
     for (uint i = 0; i < d.count(); i++)
     {
         QString    tmps = QString(m_tmpDir + "/" + d[i]);
-        QByteArray tmpa = tmps.toAscii();
+        QByteArray tmpa = tmps.toLatin1();
         unlink(tmpa.constData());
     }
 
     if (m_tmpDir != "/tmp")
     {
-        QByteArray tmp = m_tmpDir.toAscii();
+        QByteArray tmp = m_tmpDir.toLatin1();
         rmdir(tmp.constData());
     }
 }
@@ -1161,7 +1161,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
 
     if (m_cacheData)
     {
-        QByteArray userid = GetUserID().toAscii();
+        QByteArray userid = GetUserID().toLatin1();
         cache_dd_data = m_tmpDir +
             QString("/mythtv_dd_cache_%1_%2_UTC_%3_to_%4")
             .arg(GetListingsProvider())
@@ -1530,7 +1530,7 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
 bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 {
     QString fn = get_cache_filename(lineupid);
-    QByteArray fna = fn.toAscii();
+    QByteArray fna = fn.toLatin1();
     QFile lfile(fna.constData());
     if (!lfile.open(QIODevice::WriteOnly))
     {

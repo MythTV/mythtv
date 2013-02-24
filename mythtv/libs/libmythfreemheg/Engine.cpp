@@ -1521,7 +1521,7 @@ FILE *__mhlogStream = NULL;
 // The MHEG engine calls this when it needs to log something.
 void __mhlog(QString logtext)
 {
-    QByteArray tmp = logtext.toAscii();
+    QByteArray tmp = logtext.toLatin1();
     fprintf(__mhlogStream, "[freemheg] %s\n", tmp.constData());
 }
 

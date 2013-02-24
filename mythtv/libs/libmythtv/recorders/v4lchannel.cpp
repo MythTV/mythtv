@@ -71,7 +71,7 @@ bool V4LChannel::Open(void)
     if (videofd >= 0)
         return true;
 
-    QByteArray ascii_device = device.toAscii();
+    QByteArray ascii_device = device.toLatin1();
     videofd = open(ascii_device.constData(), O_RDWR);
     if (videofd < 0)
     {

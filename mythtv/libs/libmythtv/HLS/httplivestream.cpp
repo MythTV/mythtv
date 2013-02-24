@@ -347,7 +347,7 @@ bool HTTPLiveStream::WriteHTML(void)
         "  </body>\n"
         "</html>\n"
         ).arg(m_sourceFile).arg(m_outBaseEncoded)
-         .toAscii());
+         .toLatin1());
 
     file.close();
 
@@ -382,7 +382,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
         "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
         "%2.m3u8\n"
         ).arg((int)((m_bitrate + m_audioBitrate) * 1.1))
-         .arg(m_outFileEncoded).toAscii());
+         .arg(m_outFileEncoded).toLatin1());
 
     if (m_audioOnlyBitrate)
     {
@@ -390,7 +390,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
             "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
             "%2.m3u8\n"
             ).arg((int)((m_audioOnlyBitrate) * 1.1))
-             .arg(m_audioOutFileEncoded).toAscii());
+             .arg(m_audioOutFileEncoded).toLatin1());
     }
 
     file.close();
@@ -431,7 +431,7 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
         "#EXTM3U\n"
         "#EXT-X-TARGETDURATION:%1\n"
         "#EXT-X-MEDIA-SEQUENCE:%2\n"
-        ).arg(m_segmentSize).arg(m_startSegment).toAscii());
+        ).arg(m_segmentSize).arg(m_startSegment).toLatin1());
 
     if (writeEndTag)
         file.write("#EXT-X-ENDLIST\n");
@@ -450,14 +450,14 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
             "#EXTINF:%1,\n"
             "%2\n"
             ).arg(m_segmentSize)
-             .arg(GetFilename(segmentid + i, true, audioOnly, true)).toAscii());
+             .arg(GetFilename(segmentid + i, true, audioOnly, true)).toLatin1());
 
         ++i;
     }
 
     file.close();
 
-    rename(tmpFile.toAscii().constData(), outFile.toAscii().constData());
+    rename(tmpFile.toLatin1().constData(), outFile.toLatin1().constData());
 
     return true;
 }

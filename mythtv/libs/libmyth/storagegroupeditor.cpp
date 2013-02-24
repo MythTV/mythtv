@@ -28,7 +28,7 @@ class StorageGroupPopup
 SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
                                  QString title, QString message, QString& text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
     popup->addLabel(message);
 
     MythLineEdit *textEdit = new MythLineEdit(popup, "chooseEdit");

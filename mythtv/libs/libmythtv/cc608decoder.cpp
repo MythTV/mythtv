@@ -1031,7 +1031,7 @@ static bool is_better(const QString &newStr, const QString &oldStr)
 
         // check if the string contains any bogus characters
         for (int i = 0; i < newStr.length(); i++)
-            if (newStr[i].toAscii() < 0x20)
+            if (newStr[i].toLatin1() < 0x20)
                 return false;
 
         return true;

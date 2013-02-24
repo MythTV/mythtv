@@ -892,7 +892,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     Colormap cmap = XDefaultColormap(disp->GetDisplay(), disp->GetScreen());
     XColor colour, colour_exact;
     QString name = toXString(db_letterbox_colour);
-    QByteArray ascii_name =  name.toAscii();
+    QByteArray ascii_name =  name.toLatin1();
     const char *cname = ascii_name.constData();
     if (XAllocNamedColor(disp->GetDisplay(), cmap, cname, &colour, &colour_exact))
         XJ_letterbox_colour = colour.pixel;
@@ -1847,7 +1847,7 @@ int VideoOutputXv::SetPictureAttribute(
 int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValue)
 {
     QString attrName = toXVString(attribute);
-    QByteArray ascii_attr_name =  attrName.toAscii();
+    QByteArray ascii_attr_name =  attrName.toLatin1();
     const char *cname = ascii_attr_name.constData();
 
     if (attrName.isEmpty())
@@ -1895,7 +1895,7 @@ void VideoOutputXv::InitPictureAttributes(void)
         for (uint i = 0; i < kPictureAttribute_MAX; i++)
         {
             QString attrName = toXVString((PictureAttribute)i);
-            QByteArray ascii_attr_name =  attrName.toAscii();
+            QByteArray ascii_attr_name =  attrName.toLatin1();
             const char *cname = ascii_attr_name.constData();
 
             if (attrName.isEmpty())

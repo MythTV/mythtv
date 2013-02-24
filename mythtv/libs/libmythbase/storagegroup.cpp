@@ -426,7 +426,7 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
         while (query.next())
         {
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * uses QString::fromLatin1() for toString(). Explicitly convert the
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
@@ -543,7 +543,7 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
         do
         {
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * uses QString::fromLatin1() for toString(). Explicitly convert the
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());
@@ -730,7 +730,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     {
         m_groupname = query.value(0).toString();
         /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-         * uses QString::fromAscii() for toString(). Explicitly convert the
+         * uses QString::fromLatin1() for toString(). Explicitly convert the
          * value using QString::fromUtf8() to prevent corruption. */
         dirname = QString::fromUtf8(query.value(1)
                                     .toByteArray().constData());
@@ -819,7 +819,7 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
         while (query.next())
         {
             /* The storagegroup.dirname column uses utf8_bin collation, so Qt
-             * uses QString::fromAscii() for toString(). Explicitly convert the
+             * uses QString::fromLatin1() for toString(). Explicitly convert the
              * value using QString::fromUtf8() to prevent corruption. */
             dirname = QString::fromUtf8(query.value(0)
                                         .toByteArray().constData());

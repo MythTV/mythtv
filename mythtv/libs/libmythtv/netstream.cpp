@@ -184,7 +184,7 @@ bool NetStream::Request(const QUrl& url)
         m_request.setRawHeader(ua, "UK-MHEG/2 MYT001/001 MHGGNU/001");
 
     if (m_pos > 0 || m_size >= 0)
-        m_request.setRawHeader("Range", QString("bytes=%1-").arg(m_pos).toAscii());
+        m_request.setRawHeader("Range", QString("bytes=%1-").arg(m_pos).toLatin1());
 
 #ifndef QT_NO_OPENSSL
 #if 1 // The BBC use a self certified cert so don't verify it

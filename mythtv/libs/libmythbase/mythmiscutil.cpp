@@ -371,7 +371,7 @@ QString createTempFile(QString name_template, bool dir)
     }
     QString tmpFileName(tempfilename);
 #else
-    QByteArray safe_name_template = name_template.toAscii();
+    QByteArray safe_name_template = name_template.toLatin1();
     const char *tmp = safe_name_template.constData();
     char *ctemplate = strdup(tmp);
 
@@ -423,7 +423,7 @@ QString createTempFile(QString name_template, bool dir)
  */
 void makeFileAccessible(QString filename)
 {
-    QByteArray fname = filename.toAscii();
+    QByteArray fname = filename.toLatin1();
     chmod(fname.constData(), 0666);
 }
 
@@ -936,8 +936,8 @@ void setHttpProxy(void)
             url = "http://%1:%2";
 
         url = url.arg(p.hostName()).arg(p.port());
-        setenv("HTTP_PROXY", url.toAscii(), 1);
-        setenv("http_proxy", url.toAscii(), 0);
+        setenv("HTTP_PROXY", url.toLatin1(), 1);
+        setenv("http_proxy", url.toLatin1(), 0);
 
         return;
     }

@@ -84,7 +84,7 @@ void restore_port_attributes(int port, bool clear)
     for (it  = open_xv_ports[port].attribs.begin();
          it != open_xv_ports[port].attribs.end(); ++it)
     {
-        QByteArray ascii_name =  it.key().toAscii();
+        QByteArray ascii_name =  it.key().toLatin1();
         const char *cname = ascii_name.constData();
         xv_set_attrib(disp, port, cname, it.value());
     }

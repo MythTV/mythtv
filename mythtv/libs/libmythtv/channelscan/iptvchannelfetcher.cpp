@@ -242,7 +242,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                 .arg(redirected_url));
     }
 
-    return QString::fromUtf8(tmp.toAscii().constData());
+    return QString::fromUtf8(tmp.toLatin1().constData());
 }
 
 static uint estimate_number_of_channels(const QString &rawdata)

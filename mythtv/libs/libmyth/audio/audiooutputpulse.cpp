@@ -470,7 +470,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
 {
     QString fn_log_tag = "ChooseHost, ";
     char *pulse_host = NULL;
-    char *device = strdup(main_device.toAscii().constData());
+    char *device = strdup(main_device.toLatin1().constData());
     const char *host;
 
     for (host=device; host && *host != ':' && *host != 0; host++);

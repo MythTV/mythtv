@@ -58,7 +58,7 @@ enum
 
 static QString decoded_URI(const QString uri)
 {
-    QByteArray ba   = uri.toAscii();
+    QByteArray ba   = uri.toLatin1();
     QUrl url        = QUrl::fromEncoded(ba);
     return url.toString();
 }
@@ -826,7 +826,7 @@ public:
         }
         int padding = max(0, AES_BLOCK_SIZE - (line.size() - 2));
         QByteArray ba = QByteArray(padding, 0x0);
-        ba.append(QByteArray::fromHex(QByteArray(line.toAscii().constData() + 2)));
+        ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
         memcpy(m_AESIV, ba.constData(), ba.size());
         m_ivloaded = true;
         return true;
@@ -1727,7 +1727,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString filename)
 
     // Do a peek on the URL to test the format
     RingBuffer::AVFormatInitNetwork();
-    int ret = ffurl_open(&context, filename.toAscii(),
+    int ret = ffurl_open(&context, filename.toLatin1(),
                          AVIO_FLAG_READ, NULL, NULL);
     if (ret >= 0)
     {
@@ -2579,7 +2579,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 bool HLSRingBuffer::SaveToDisk(const QString filename, int segstart, int segend)
 {
     // download it all
-    FILE *fp = fopen(filename.toAscii().constData(), "w");
+    FILE *fp = fopen(filename.toLatin1().constData(), "w");
     if (fp == NULL)
         return false;
     int count = NumSegments();

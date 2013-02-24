@@ -850,7 +850,7 @@ void MHSendEvent::Initialise(MHParseNode *p, MHEngine *engine)
 void MHSendEvent::PrintArgs(FILE *fd, int) const
 {
     m_EventSource.PrintMe(fd, 0);
-    QByteArray tmp = MHLink::EventTypeToString(m_EventType).toAscii();
+    QByteArray tmp = MHLink::EventTypeToString(m_EventType).toLatin1();
     fprintf(fd, "%s", tmp.constData());
     fprintf(fd, " ");
 

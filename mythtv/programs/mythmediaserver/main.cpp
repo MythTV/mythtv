@@ -45,7 +45,7 @@ static void cleanup(void)
 
     if (pidfile.size())
     {
-        unlink(pidfile.toAscii().constData());
+        unlink(pidfile.toLatin1().constData());
         pidfile.clear();
     }
 

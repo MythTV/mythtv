@@ -64,7 +64,7 @@ bool CetonRTSP::ProcessRequest(
 
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("write: %1").arg(request));
-    socket.write(request.toAscii());
+    socket.write(request.toLatin1());
 
     _responseHeaders.clear();
     _responseContent.clear();

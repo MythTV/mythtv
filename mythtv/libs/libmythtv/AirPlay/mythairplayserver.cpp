@@ -151,21 +151,21 @@ QByteArray DigestMd5Response(QString response, QString option,
 {
     int authStart       = response.indexOf("response=\"") + 10;
     int authLength      = response.indexOf("\"", authStart) - authStart;
-    auth                = response.mid(authStart, authLength).toAscii();
+    auth                = response.mid(authStart, authLength).toLatin1();
 
     int uriStart        = response.indexOf("uri=\"") + 5;
     int uriLength       = response.indexOf("\"", uriStart) - uriStart;
-    QByteArray uri      = response.mid(uriStart, uriLength).toAscii();
+    QByteArray uri      = response.mid(uriStart, uriLength).toLatin1();
 
     int userStart       = response.indexOf("username=\"") + 10;
     int userLength      = response.indexOf("\"", userStart) - userStart;
-    QByteArray user     = response.mid(userStart, userLength).toAscii();
+    QByteArray user     = response.mid(userStart, userLength).toLatin1();
 
     int realmStart      = response.indexOf("realm=\"") + 7;
     int realmLength     = response.indexOf("\"", realmStart) - realmStart;
-    QByteArray realm    = response.mid(realmStart, realmLength).toAscii();
+    QByteArray realm    = response.mid(realmStart, realmLength).toLatin1();
 
-    QByteArray passwd   = password.toAscii();
+    QByteArray passwd   = password.toLatin1();
 
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(user);
@@ -178,7 +178,7 @@ QByteArray DigestMd5Response(QString response, QString option,
 
     // calculate H(A2)
     hash.reset();
-    hash.addData(option.toAscii());
+    hash.addData(option.toLatin1());
     hash.addData(":", 1);
     hash.addData(uri);
     QByteArray ha2 = hash.result().toHex();
@@ -187,7 +187,7 @@ QByteArray DigestMd5Response(QString response, QString option,
     hash.reset();
     hash.addData(ha1);
     hash.addData(":", 1);
-    hash.addData(nonce.toAscii());
+    hash.addData(nonce.toLatin1());
     hash.addData(":", 1);
     hash.addData(ha2);
     return hash.result().toHex();
@@ -583,7 +583,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     if (session.size() == 0)
     {
         // No session ID, use IP address instead
-        session = addr.toString().toAscii();
+        session = addr.toString().toLatin1();
     }
     if (!m_connections.contains(session))
     {
@@ -662,7 +662,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             m_nonce = GenerateNonce();
         }
         header = QString("WWW-Authenticate: Digest realm=\"AirPlay\", "
-                         "nonce=\"%1\"\r\n").arg(m_nonce).toAscii();
+                         "nonce=\"%1\"\r\n").arg(m_nonce).toLatin1();
         if (!req->GetHeaders().contains("Authorization"))
         {
             SendResponse(socket, HTTP_STATUS_UNAUTHORIZED,

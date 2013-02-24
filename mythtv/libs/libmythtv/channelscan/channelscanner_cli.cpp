@@ -100,10 +100,10 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
                     status_complete, status_snr,
                     (status_lock) ? "l" : "L",
-                    status_text.toAscii().constData(),
-                    status_last_log.toAscii().constData(), "");
+                    status_text.toLatin1().constData(),
+                    status_last_log.toLatin1().constData(), "");
     }
-    //cout<<msg.toAscii().constData()<<endl;
+    //cout<<msg.toLatin1().constData()<<endl;
 
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
@@ -118,7 +118,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     {
         if (msg.length() > 80)
             msg = msg.left(77) + "...";
-        cout<<"\r"<<msg.toAscii().constData()<<"\r";
+        cout<<"\r"<<msg.toLatin1().constData()<<"\r";
         cout<<flush;
     }
 }
@@ -127,7 +127,7 @@ void ChannelScannerCLI::InformUser(const QString &error)
 {
     if (VERBOSE_LEVEL_NONE)
     {
-        cerr<<"ERROR: "<<error.toAscii().constData()<<endl;
+        cerr<<"ERROR: "<<error.toLatin1().constData()<<endl;
     }
     else
     {
