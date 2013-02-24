@@ -581,7 +581,7 @@
             <state name="inactive" from="active" />
         </statetype>
         <imagetype name="cursor">
-            <filename>cursor.png</filename>
+            <filename>ui/cursor.png</filename>
         </imagetype>
         <textarea name="text">
             <area>12,12,-12,-12</area>
@@ -613,7 +613,7 @@
             <state name="inactive" from="active" />
         </statetype>
         <imagetype name="cursor">
-            <filename>cursor.png</filename>
+            <filename>ui/cursor.png</filename>
         </imagetype>
         <textarea name="text">
             <area>12,12,-12,-12</area>
