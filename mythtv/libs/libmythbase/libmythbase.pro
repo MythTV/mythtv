@@ -48,7 +48,6 @@ SOURCES += mythplugin.cpp
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 HEADERS += httpcomms.h mcodecs.h mythhttppool.h mythhttphandler.h
 SOURCES += httpcomms.cpp mcodecs.cpp mythhttppool.cpp mythhttphandler.cpp 
-inc.files += httpcomms.h mythhttppool.h
 }
 
 unix {
@@ -76,6 +75,11 @@ inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h
+
+# This stuff is not Qt5 compatible..
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+inc.files += httpcomms.h mythhttppool.h
+}
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase

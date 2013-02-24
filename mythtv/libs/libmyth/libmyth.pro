@@ -36,8 +36,7 @@ HEADERS += remoteutil.h
 HEADERS += rawsettingseditor.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
-HEADERS += mythrssmanager.h       netgrabbermanager.h
-HEADERS += rssparse.h             netutils.h
+HEADERS += rssparse.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h uitypes.h xmlparse.h
@@ -63,12 +62,18 @@ SOURCES += remoteutil.cpp
 SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
-SOURCES += mythrssmanager.cpp     netgrabbermanager.cpp
-SOURCES += rssparse.cpp           netutils.cpp
+SOURCES += rssparse.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp uitypes.cpp xmlparse.cpp
 
+# This stuff is not Qt5 compatible..
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+HEADERS += mythrssmanager.h             netutils.h
+HEADERS += netgrabbermanager.h
+SOURCES += mythrssmanager.cpp           netutils.cpp
+SOURCES += netgrabbermanager.cpp
+}
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
@@ -115,8 +120,13 @@ inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h       remoteutil.h
 inc.files += programinfo.h
 inc.files += programtypes.h       recordingtypes.h
-inc.files += mythrssmanager.h     netgrabbermanager.h
-inc.files += rssparse.h           netutils.h
+inc.files += rssparse.h
+
+# This stuff is not Qt5 compatible..
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+inc.files += mythrssmanager.h     netutils.h
+inc.files += netgrabbermanager.h
+}
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h xmlparse.h
