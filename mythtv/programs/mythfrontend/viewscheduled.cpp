@@ -15,6 +15,7 @@
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
+#include "guidegrid.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
@@ -170,6 +171,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             upcomingScheduled();
         else if (action == "DETAILS" || action == "INFO")
             details();
+        else if (action == "GUIDE")
+            showGuide();
         else if (action == "1")
             setShowAll(true);
         else if (action == "2")
@@ -212,6 +215,7 @@ void ViewScheduled::ShowMenu(void)
         else
             menuPopup->AddButton(tr("Show All"));
         menuPopup->AddButton(tr("Program Details"));
+        menuPopup->AddButton(tr("Program Guide"));
         menuPopup->AddButton(tr("Upcoming by title"));
         menuPopup->AddButton(tr("Upcoming scheduled"));
         menuPopup->AddButton(tr("Custom Edit"));
@@ -577,6 +581,22 @@ void ViewScheduled::deleteRule()
         delete okPopup;
 }
 
+void ViewScheduled::showGuide()
+{
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+
+    QString startchannel = pginfo->GetChanNum();
+    uint startchanid = pginfo->GetChanID();
+    QDateTime starttime = pginfo->GetScheduledStartTime();
+    GuideGrid::RunProgramGuide(startchanid, startchannel, starttime,
+                               m_player, this, -2);
+}
+
 void ViewScheduled::upcoming()
 {
     MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
@@ -732,6 +752,10 @@ void ViewScheduled::customEvent(QEvent *event)
             else if (resulttext == tr("Program Details"))
             {
                 details();
+            }
+            else if (resulttext == tr("Program Guide"))
+            {
+                showGuide();
             }
             else if (resulttext == tr("Upcoming by title"))
             {

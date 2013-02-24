@@ -41,6 +41,7 @@ class ViewScheduled : public ScheduleCommon
 
   protected slots:
     void ChangeGroup(MythUIButtonListItem *item);
+    void showGuide();
     void edit();
     void customEdit();
     void deleteRule();

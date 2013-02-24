@@ -8538,6 +8538,7 @@ void TV::DoEditSchedule(int editType)
     const ProgramInfo pginfo(*actx->playingInfo);
     uint    chanid  = pginfo.GetChanID();
     QString channum = pginfo.GetChanNum();
+    QDateTime starttime = pginfo.GetScheduledStartTime();
     actx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     ClearOSD(actx);
@@ -8598,7 +8599,7 @@ void TV::DoEditSchedule(int editType)
         case kScheduleProgramGuide:
         {
             isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
-            RunProgramGuidePtr(chanid, channum, this,
+            RunProgramGuidePtr(chanid, channum, starttime, this,
                                isEmbedded, true, channelGroupId);
             ignoreKeyPresses = true;
             break;

@@ -84,6 +84,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     // Use this function to instantiate a guidegrid instance.
     static void RunProgramGuide(uint           startChanId,
                                 const QString &startChanNum,
+                                const QDateTime startTime,
                                 TV            *player = NULL,
                                 bool           embedVideo = false,
                                 bool           allowFinder = true,
@@ -133,8 +134,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
   protected:
     GuideGrid(MythScreenStack *parentStack,
-              uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool embedVideo = false,
+              uint chanid, QString channum,
+              const QDateTime startTime,
+              TV *player = NULL,
+              bool embedVideo = false,
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
