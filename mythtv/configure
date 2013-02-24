@@ -820,6 +820,13 @@ check_cxx(){
     check_cmd $cxx $CPPFLAGS $CXXFLAGS "$@" $CXX_C -o $TMPO $TMPCPP
 }
 
+check_ecxx(){
+    log check_cxx "$@"
+    cat > $TMPCPP
+    log_file $TMPCPP
+    check_cmd $cxx $CPPFLAGS $CXXFLAGS $ECXXFLAGS "$@" $CXX_C -o $TMPO $TMPCPP
+}
+
 check_cpp(){
     log check_cpp "$@"
     cat > $TMPC
@@ -5100,7 +5107,7 @@ fi
 if $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
-    check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
+    check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 int main(void){ return 0; }
 EOF
@@ -5111,7 +5118,7 @@ enabled qtwebkit || die "Error! QtWebkit headers not found"
 if $(pkg-config --exists QtScript) ; then
     enable qtscript
 else
-    check_cxx ${qt_inc} <<EOF && enable qtscript
+    check_ecxx ${qt_inc} <<EOF && enable qtscript
 #include <QtScript/QtScript>
 int main(void){ return 0; }
 EOF
@@ -5124,7 +5131,7 @@ if ! disabled qtdbus; then
     if $(pkg-config --exists QtDBus) ; then
         enable qtdbus
     else
-        check_cxx ${qt_inc} <<EOF && enable qtdbus
+        check_ecxx ${qt_inc} <<EOF && enable qtdbus
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusInterface>
 int main(void)
