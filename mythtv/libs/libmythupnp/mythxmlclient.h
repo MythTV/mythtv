@@ -15,8 +15,6 @@
 
 #include <QDomDocument>
 
-#include "httpcomms.h"
-
 #include "upnpexp.h"
 
 #include "mythdbparams.h"
