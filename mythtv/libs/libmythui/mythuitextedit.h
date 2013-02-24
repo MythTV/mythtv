@@ -49,7 +49,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
     void SetMaxLength(const int length);
 
-    enum MoveDirection { MoveLeft, MoveRight, MoveUp, MoveDown, MoveEnd };
+    enum MoveDirection { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
     bool MoveCursor(MoveDirection);
 
     void SetKeyboardPosition(PopupPosition pos) { m_keyboardPosition = pos; }

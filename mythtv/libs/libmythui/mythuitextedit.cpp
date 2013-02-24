@@ -324,7 +324,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             break;
         case MoveUp:
         {
-            int newPos = m_Text->MoveCursor(true);
+            int newPos = m_Text->MoveCursor(-1);
             if (newPos == -1)
                 return false;
             m_Position = newPos - 1;
@@ -332,7 +332,25 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         }
         case MoveDown:
         {
-            int newPos = m_Text->MoveCursor(false);
+            int newPos = m_Text->MoveCursor(1);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MovePageUp:
+        {
+            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
+            int newPos = m_Text->MoveCursor(-lines);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MovePageDown:
+        {
+            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
+            int newPos = m_Text->MoveCursor(lines);
             if (newPos == -1)
                 return false;
             m_Position = newPos - 1;
@@ -491,6 +509,14 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         else if (action == "DOWN")
         {
             handled = MoveCursor(MoveDown);
+        }
+        else if (action == "PAGEUP")
+        {
+            handled = MoveCursor(MovePageUp);
+        }
+        else if (action == "PAGEDOWN")
+        {
+            handled = MoveCursor(MovePageDown);
         }
         else if (action == "DELETE")
         {

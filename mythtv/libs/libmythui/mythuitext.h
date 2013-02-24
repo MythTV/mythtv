@@ -50,7 +50,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 
     virtual void Pulse(void);
     QPoint CursorPosition(int text_offset);
-    int MoveCursor(bool up);
+    int MoveCursor(int lines);
 
     // StorageUser
     void SetDBValue(const QString &text) { SetText(text); }
