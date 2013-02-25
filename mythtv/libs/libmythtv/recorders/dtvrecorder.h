@@ -183,9 +183,12 @@ class DTVRecorder :
     mutable QAtomicInt _continuity_error_count;
     unsigned long long _frames_seen_count;
     unsigned long long _frames_written_count;
-    double _frame_interval; // usec
-    double _frame_duration; // usec
     double _total_duration; // usec
+    // Calculate _total_duration as
+    // _td_base + (_td_tick_count * _td_tick_framerate / 2)
+    double _td_base;
+    uint64_t _td_tick_count;
+    FrameRate _td_tick_framerate;
 
     // constants
     /// If the number of regular frames detected since the last

@@ -82,8 +82,10 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _packet_count(0),
     _continuity_error_count(0),
     _frames_seen_count(0),          _frames_written_count(0),
-    _frame_interval(0),             _frame_duration(0),
-    _total_duration(0)
+    _total_duration(0),
+    _td_base(0),
+    _td_tick_count(0),
+    _td_tick_framerate(0)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
@@ -159,7 +161,7 @@ void DTVRecorder::FinishRecording(void)
         if (ringBuffer)
             curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
-        curRecording->SaveTotalDuration((int64_t)_total_duration);
+        curRecording->SaveTotalDuration((int64_t)(_total_duration * 1000));
         curRecording->SaveTotalFrames(_frames_written_count);
     }
 }
@@ -218,6 +220,9 @@ void DTVRecorder::ClearStatistics(void)
     _frames_seen_count          = 0;
     _frames_written_count       = 0;
     _total_duration             = 0;
+    _td_base                    = 0;
+    _td_tick_count              = 0;
+    _td_tick_framerate          = FrameRate(0);
 }
 
 // documented in recorderbase.h
@@ -367,9 +372,13 @@ static QDateTime ts_to_qdatetime(
     return dt.addMSecs((pts - pts_first)/90);
 }
 
-static const uint frameRateMap[16] = {
-    0, 23796, 24000, 25000, 29970, 30000, 50000, 59940, 60000,
-    0, 0, 0, 0, 0, 0, 0
+static const FrameRate frameRateMap[16] = {
+    FrameRate(0),  FrameRate(24000, 1001), FrameRate(24),
+    FrameRate(25), FrameRate(30000, 1001), FrameRate(30),
+    FrameRate(50), FrameRate(60000, 1001), FrameRate(60),
+    FrameRate(0),  FrameRate(0),           FrameRate(0),
+    FrameRate(0),  FrameRate(0),           FrameRate(0),
+    FrameRate(0)
 };
 
 /** \fn DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
@@ -420,7 +429,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     uint aspectRatio = 0;
     uint height = 0;
     uint width = 0;
-    uint frameRate = 0;
+    FrameRate frameRate(0);
 
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
@@ -580,12 +589,13 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         ResolutionChange(width, height, _frames_written_count);
     }
 
-    if (frameRate && frameRate != m_frameRate)
+    if (frameRate.isNonzero() && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("FindMPEG2Keyframes: frame rate = %1") .arg(frameRate));
-        FrameRateChange(frameRate, _frames_written_count);
+            QString("FindMPEG2Keyframes: frame rate = %1")
+            .arg(frameRate.toDouble() * 1000));
+        FrameRateChange(frameRate.toDouble() * 1000, _frames_written_count);
     }
 
     return _first_keyframe >= 0;
@@ -660,15 +670,31 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
 void DTVRecorder::UpdateFramesWritten(void)
 {
     _frames_written_count++;
-    if (m_frameRate > 0)
+    if (!_td_tick_framerate.isNonzero())
+        _td_tick_framerate = m_frameRate;
+    if (_td_tick_framerate != m_frameRate)
     {
-        // m_frameRate is frames per 1000 seconds, e.g. 29970 for
-        // 29.97 fps.  Calculate usec values.
-        _frame_interval = 1000000000.0 / m_frameRate;
-        _frame_duration = _frame_interval +
-            (_repeat_pict * _frame_interval * 0.5f);
-        _total_duration += _frame_duration;
+        _td_base = _total_duration;
+        _td_tick_count = 0;
+        _td_tick_framerate = m_frameRate;
     }
+    _td_tick_count += (2 + _repeat_pict);
+    if (_td_tick_framerate.isNonzero())
+    {
+        _total_duration = _td_base + (int64_t) 500 * _td_tick_count *
+            _td_tick_framerate.getDen() / (double) _td_tick_framerate.getNum();
+    }
+
+    if (_frames_written_count < 2000 || _frames_written_count % 1000 == 0)
+        LOG(VB_RECORD, LOG_DEBUG,
+            QString("count=%1 m_frameRate=%2 tick_frameRate=%3 "
+                    "tick_cnt=%4 tick_base=%5 _total_dur=%6")
+            .arg(_frames_written_count)
+            .arg(m_frameRate.toString())
+            .arg(_td_tick_framerate.toString())
+            .arg(_td_tick_count)
+            .arg(_td_base)
+            .arg(_total_duration));
 }
 
 bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
@@ -759,8 +785,8 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
         {
             positionMapDelta[frameNum] = startpos;
             positionMap[frameNum]      = startpos;
-            durationMap[frameNum]      = _total_duration / 1000;
-            durationMapDelta[frameNum] = _total_duration / 1000;
+            durationMap[frameNum]      = _total_duration + 0.5;
+            durationMapDelta[frameNum] = _total_duration + 0.5;
         }
     }
     positionMapLock.unlock();
@@ -793,7 +819,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     uint aspectRatio = 0;
     uint height = 0;
     uint width = 0;
-    uint frameRate = 0;
+    FrameRate frameRate(0);
 
     bool hasFrame = false;
     bool hasKeyFrame = false;
@@ -885,7 +911,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 width = m_h264_parser.pictureWidth();
                 height = m_h264_parser.pictureHeight();
                 aspectRatio = m_h264_parser.aspectRatio();
-                frameRate = m_h264_parser.frameRate();
+                m_h264_parser.getFrameRate(frameRate);
             }
         }
     } // for (; i < TSPacket::kSize; ++i)
@@ -938,15 +964,15 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         ResolutionChange(width, height, _frames_written_count);
     }
 
-    if (frameRate != 0 && frameRate != m_frameRate)
+    if (frameRate.isNonzero() && frameRate != m_frameRate)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("FindH264Keyframes: timescale: %1, tick: %2, framerate: %3")
                       .arg( m_h264_parser.GetTimeScale() )
                       .arg( m_h264_parser.GetUnitsInTick() )
-                      .arg( frameRate ) );
+                      .arg( frameRate.toDouble() * 1000 ) );
         m_frameRate = frameRate;
-        FrameRateChange(frameRate, _frames_written_count);
+        FrameRateChange(frameRate.toDouble() * 1000, _frames_written_count);
     }
 
     return _seen_sps;
@@ -978,8 +1004,8 @@ void DTVRecorder::HandleH264Keyframe(void)
     {
         positionMapDelta[frameNum] = startpos;
         positionMap[frameNum]      = startpos;
-        durationMap[frameNum]      = _total_duration / 1000;
-        durationMapDelta[frameNum] = _total_duration / 1000;
+        durationMap[frameNum]      = _total_duration + 0.5;
+        durationMapDelta[frameNum] = _total_duration + 0.5;
     }
     positionMapLock.unlock();
 }
@@ -995,7 +1021,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
     uint aspectRatio = 0;
     uint height = 0;
     uint width = 0;
-    uint frameRate = 0;
+    FrameRate frameRate(0);
 
     uint skip = std::max(_audio_bytes_remaining, _other_bytes_remaining);
     while (bufptr + skip < bufend)
@@ -1119,12 +1145,13 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             ResolutionChange(width, height, _frames_written_count);
         }
 
-        if (frameRate && frameRate != m_frameRate)
+        if (frameRate.isNonzero() && frameRate != m_frameRate)
         {
             m_frameRate = frameRate;
             LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("FindPSKeyFrames: frame rate = %1").arg(frameRate));
-            FrameRateChange(frameRate, _frames_written_count);
+                QString("FindPSKeyFrames: frame rate = %1")
+                .arg(frameRate.toDouble() * 1000));
+            FrameRateChange(frameRate.toDouble() * 1000, _frames_written_count);
         }
 
         if (hasKeyFrame || hasFrame)

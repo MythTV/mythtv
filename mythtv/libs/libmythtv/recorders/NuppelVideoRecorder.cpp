@@ -681,13 +681,13 @@ void NuppelVideoRecorder::UpdateResolutions(void)
                    break;
     }
 
-    uint frameRate = (den * 1000) / num;
-    if (frameRate && frameRate != m_frameRate)
+    FrameRate frameRate(den, num);
+    if (frameRate.isNonzero() && frameRate != m_frameRate)
     {
         m_frameRate = frameRate;
         LOG(VB_RECORD, LOG_INFO, LOC + QString("NVR: frame rate = %1")
-                .arg(frameRate));
-        FrameRateChange(frameRate, 0);
+            .arg(frameRate.toDouble() * 1000));
+        FrameRateChange(frameRate.toDouble() * 1000, 0);
     }
 }
 

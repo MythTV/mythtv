@@ -44,7 +44,7 @@ RecorderBase::RecorderBase(TVRec *rec)
       ntsc(true),               ntsc_framerate(true),
       video_frame_rate(29.97),
       m_videoAspect(0),         m_videoHeight(0),
-      m_videoWidth(0),          m_frameRate(0.0),
+      m_videoWidth(0),          m_frameRate(0),
       curRecording(NULL),
       request_pause(false),     paused(false),
       request_recording(false), recording(false),
@@ -353,7 +353,7 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         ResetForNewFile();
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
-        m_frameRate = 0.0;
+        m_frameRate = FrameRate(0);
 
         SetRingBuffer(nextRingBuffer);
         SetRecording(nextRecording);

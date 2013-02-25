@@ -27,6 +27,24 @@ class ChannelBase;
 class RingBuffer;
 class TVRec;
 
+class FrameRate
+{
+public:
+    FrameRate(uint n, uint d=1) : num(n), den(d) {}
+    double toDouble(void) const { return num / (double)den; }
+    bool isNonzero(void) const { return num; }
+    uint getNum(void) const { return num; }
+    uint getDen(void) const { return den; }
+    QString toString(void) const { return QString("%1/%2").arg(num).arg(den); }
+    bool operator==(const FrameRate &other) {
+        return num == other.num && den == other.den;
+    }
+    bool operator!=(const FrameRate &other) { return !(*this == other); }
+private:
+    uint num;
+    uint den;
+};
+
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting
  *         recorder hardware.
@@ -191,7 +209,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief Returns the latest frame rate.
      */
-    double GetFrameRate(void) { return m_frameRate / 1000; }
+    double GetFrameRate(void) const { return m_frameRate.toDouble(); }
 
     /** \brief If requested, switch to new RingBuffer/ProgramInfo objects
      */
@@ -272,7 +290,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     uint           m_videoHeight;
     uint           m_videoWidth;
-    double         m_frameRate;
+    FrameRate      m_frameRate;
 
     RecordingInfo *curRecording;
 

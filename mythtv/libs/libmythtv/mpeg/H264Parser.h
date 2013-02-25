@@ -48,6 +48,8 @@ extern "C" {
 #include "libavcodec/get_bits.h"
 }
 
+class FrameRate;
+
 class H264Parser {
   public:
 
@@ -138,7 +140,8 @@ class H264Parser {
     /** \brief Computes aspect ratio from picture size and sample aspect ratio
      */
     uint aspectRatio(void) const;
-    uint frameRate(void) const;
+    double frameRate(void) const;
+    void getFrameRate(FrameRate &result) const;
 
     uint64_t frameAUstreamOffset(void) const {return frame_start_offset;}
     uint64_t keyframeAUstreamOffset(void) const {return keyframe_start_offset;}

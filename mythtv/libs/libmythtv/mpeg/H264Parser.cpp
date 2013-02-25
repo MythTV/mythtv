@@ -2,6 +2,7 @@
 #include "H264Parser.h"
 #include <iostream>
 #include "mythlogging.h"
+#include "recorders/dtvrecorder.h" // for FrameRate
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -1223,15 +1224,25 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     }
 }
 
-uint H264Parser::frameRate(void) const
+double H264Parser::frameRate(void) const
 {
     uint64_t    num;
-    uint64_t    fps;
+    double      fps;
 
     num   = 500 * (uint64_t)timeScale; /* 1000 * 0.5 */
-    fps   = ( unitsInTick != 0 ? num / unitsInTick : 0 );
+    fps   = ( unitsInTick != 0 ? num / (double)unitsInTick : 0 ) / 1000;
 
-    return (uint)fps;
+    return fps;
+}
+
+void H264Parser::getFrameRate(FrameRate &result) const
+{
+    if (unitsInTick == 0)
+        result = FrameRate(0);
+    else if (timeScale & 0x1)
+        result = FrameRate(timeScale, unitsInTick * 2);
+    else
+        result = FrameRate(timeScale / 2, unitsInTick);
 }
 
 uint H264Parser::aspectRatio(void) const
