@@ -100,8 +100,6 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     inuse_timer.start();
     save_timer.start();
 
-    DecoderGetFrame(kDecodeNothing,true);
-
     decoder->TrackTotalDuration(true);
 
     if (showPercentage)

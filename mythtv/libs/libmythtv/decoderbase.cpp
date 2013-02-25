@@ -27,7 +27,8 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       current_aspect(1.33333), fps(29.97),
       bitrate(4000),
 
-      framesPlayed(0), framesRead(0), totalDuration(0),
+      framesPlayed(0), framesRead(0),
+      totalDuration(AVRationalInit(0)),
       lastKey(0), keyframedist(-1), indexOffset(0),
       trackTotalDuration(false),
 
@@ -85,7 +86,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
         ResetPosMap();
         framesPlayed = 0;
         framesRead = 0;
-        totalDuration = 0;
+        totalDuration = AVRationalInit(0);
         dontSyncPositionMap = false;
     }
 
@@ -891,7 +892,7 @@ void DecoderBase::FileChanged(void)
     ResetPosMap();
     framesPlayed = 0;
     framesRead = 0;
-    totalDuration = 0;
+    totalDuration = AVRationalInit(0);
 
     waitingForChange = false;
     justAfterChange = true;
@@ -1201,10 +1202,10 @@ QString toString(AudioTrackType type)
 
 void DecoderBase::SaveTotalDuration(void)
 {
-    if (!m_playbackinfo || !totalDuration)
+    if (!m_playbackinfo || av_q2d(totalDuration) == 0)
         return;
 
-    m_playbackinfo->SaveTotalDuration(totalDuration);
+    m_playbackinfo->SaveTotalDuration(1000 * av_q2d(totalDuration));
 }
 
 void DecoderBase::SaveTotalFrames(void)

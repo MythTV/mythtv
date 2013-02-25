@@ -2960,7 +2960,9 @@ void AvFormatDecoder::HandleGopStart(
             m_positionMap.push_back(entry);
             if (trackTotalDuration)
             {
-                m_frameToDurMap[framesRead] = totalDuration / 1000;
+                m_frameToDurMap[framesRead] =
+                    (int64_t)totalDuration.num * 1000.0 / totalDuration.den
+                    + 0.5;
                 m_durToFrameMap[m_frameToDurMap[framesRead]] = framesRead;
             }
         }
@@ -3251,8 +3253,16 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     framesRead += num_frames;
 
     if (trackTotalDuration)
-        totalDuration +=
-            av_q2d(curstream->time_base) * pkt->duration * 1000000; // usec
+    {
+        // The ffmpeg libraries represent a frame interval of a
+        // 59.94fps video as 1501/90000 seconds, when it should
+        // actually be 1501.5/90000 seconds.
+        AVRational pkt_dur = AVRationalInit(pkt->duration);
+        pkt_dur = av_mul_q(pkt_dur, curstream->time_base);
+        if (pkt_dur.num == 1501 && pkt_dur.den == 90000)
+            pkt_dur = AVRationalInit(1001, 60000); // 1501.5/90000
+        totalDuration = av_add_q(totalDuration, pkt_dur);
+    }
 
     justAfterChange = false;
 
