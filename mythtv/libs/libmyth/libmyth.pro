@@ -1,5 +1,10 @@
 include ( ../../settings.pro )
 
+QT += network xml sql script
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 TEMPLATE = lib
 TARGET = myth-$$LIBVERSION
 CONFIG += thread dll
@@ -7,13 +12,18 @@ target.path = $${LIBDIR}
 INSTALLS = target
 DEFINES += MYTH_API
 
-
-QT += network xml sql script
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
-}
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
+POSTINC =
+
+contains(INCLUDEPATH, /usr/include) {
+  POSTINC += /usr/include
+  INCLUDEPATH -= /usr/include
+}
+contains(INCLUDEPATH, /usr/local/include) {
+  POSTINC += /usr/local/include
+  INCLUDEPATH -= /usr/local/include
+}
 
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
