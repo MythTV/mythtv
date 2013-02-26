@@ -2,8 +2,29 @@
 #define MYTHUI_WEBBROWSER_H_
 
 #include <QtGlobal>
-#include <QString>
 #include <QUrl>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include "mythuitype.h"
+class QString;
+class MUI_PUBLIC MythUIWebBrowser : public MythUIType
+{
+  Q_OBJECT
+
+  public:
+    MythUIWebBrowser(MythUIType *parent, const QString &name) :
+    MythUIType(parent, name) {}
+    ~MythUIWebBrowser() {}
+    void SetHtml(const QString &, const QUrl &baseUrl = QUrl()) {}
+    void SetZoom(float) {}
+    float GetZoom(void) { return 1.0; }
+    void ZoomIn(void) {}
+    void ZoomOut(void) {}
+};
+#warning MythUIWebBrowser has not yet been ported to Qt5
+#else
+
+#include <QString>
 #include <QTime>
 #include <QColor>
 #include <QIcon>
@@ -232,5 +253,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     MythUIAnimation  m_scrollAnimation;
     QPoint           m_destinationScrollPos;
 };
+
+#endif // QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 
 #endif
