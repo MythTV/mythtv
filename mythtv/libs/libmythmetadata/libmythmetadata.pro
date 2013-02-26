@@ -1,5 +1,10 @@
 include ( ../../settings.pro )
 
+QT += network xml sql
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 TEMPLATE = lib
 TARGET = mythmetadata-$$LIBVERSION
 CONFIG += thread dll
@@ -69,8 +74,6 @@ INSTALLS += inc
 macx {
     using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 }
-
-QT += network xml sql
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

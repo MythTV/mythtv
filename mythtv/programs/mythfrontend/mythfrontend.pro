@@ -2,11 +2,18 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql webkit script
+QT += network xml sql script
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+QT += webkit
+using_qtdbus: CONFIG += qdbus
+}
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+using_qtdbus: QT += dbus
+}
 
 TEMPLATE = app
 CONFIG += thread
-using_qtdbus: CONFIG += qdbus
 TARGET = mythfrontend
 target.path = $${PREFIX}/bin
 INSTALLS = target
