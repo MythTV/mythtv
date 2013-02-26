@@ -3,6 +3,10 @@ include ( ../../version.pro)
 include ( ../programs-libs.pro)
 
 QT += sql network
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 CONFIG -= opengl
 
 TEMPLATE = app

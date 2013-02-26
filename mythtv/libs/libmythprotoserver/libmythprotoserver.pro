@@ -1,6 +1,9 @@
 include ( ../../settings.pro )
 
 QT += network sql
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 TEMPLATE = lib
 TARGET = mythprotoserver-$$LIBVERSION
