@@ -1705,8 +1705,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 /// \brief Returns length of program/recording in seconds.
 uint ProgramInfo::GetSecondsInRecording(void) const
 {
-    int recsecs = recstartts.secsTo(endts);
-    return (uint) ((recsecs>0) ? recsecs : max(startts.secsTo(endts),0));
+    int64_t recsecs = recstartts.secsTo(endts);
+    int64_t duration = startts.secsTo(endts);
+    return (uint) ((recsecs>0) ? recsecs : max(duration,int64_t(0)));
 }
 
 /// \brief Returns last frame in position map or 0
