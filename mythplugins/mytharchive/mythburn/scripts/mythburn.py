@@ -4345,7 +4345,7 @@ def getStreamList(folder):
 def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
 
-    if string.lower(getVideoCodec(folder)) != "mpeg2video (main)":
+    if not string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
         return False
 
 #    if string.lower(getAudioCodec(folder)) != "ac3" and encodeToAC3:
