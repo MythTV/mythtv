@@ -37,15 +37,7 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ConnectionInfo   >();
-            qRegisterMetaType< ConnectionInfo*  >();
-
-            VersionInfo ::InitializeCustomTypes();
-            DatabaseInfo::InitializeCustomTypes();
-            WOLInfo     ::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -87,5 +79,18 @@ typedef ConnectionInfo* ConnectionInfoPtr;
 
 Q_DECLARE_METATYPE( DTC::ConnectionInfo  )
 Q_DECLARE_METATYPE( DTC::ConnectionInfo* )
+
+namespace DTC
+{
+inline void ConnectionInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ConnectionInfo   >();
+    qRegisterMetaType< ConnectionInfo*  >();
+
+    VersionInfo ::InitializeCustomTypes();
+    DatabaseInfo::InitializeCustomTypes();
+    WOLInfo     ::InitializeCustomTypes();
+}
+}
 
 #endif

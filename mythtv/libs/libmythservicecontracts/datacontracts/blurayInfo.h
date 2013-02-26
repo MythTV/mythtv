@@ -70,11 +70,7 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< BlurayInfo  >();
-            qRegisterMetaType< BlurayInfo* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -107,5 +103,14 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::BlurayInfo  )
 Q_DECLARE_METATYPE( DTC::BlurayInfo* )
+
+namespace DTC
+{
+inline void BlurayInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< BlurayInfo  >();
+    qRegisterMetaType< BlurayInfo* >();
+}
+}
 
 #endif

@@ -47,13 +47,7 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< VideoMultiplexList   >();
-            qRegisterMetaType< VideoMultiplexList*  >();
-
-            VideoMultiplex::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -93,5 +87,16 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
 
 Q_DECLARE_METATYPE( DTC::VideoMultiplexList  )
 Q_DECLARE_METATYPE( DTC::VideoMultiplexList* )
+
+namespace DTC
+{
+inline void VideoMultiplexList::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoMultiplexList   >();
+    qRegisterMetaType< VideoMultiplexList*  >();
+
+    VideoMultiplex::InitializeCustomTypes();
+}
+}
 
 #endif

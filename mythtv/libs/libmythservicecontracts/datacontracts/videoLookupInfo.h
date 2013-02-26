@@ -41,11 +41,7 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ArtworkItem    >();
-            qRegisterMetaType< ArtworkItem*   >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -128,13 +124,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< VideoLookup  >();
-            qRegisterMetaType< VideoLookup* >();
-
-            ArtworkItem::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -184,5 +174,22 @@ Q_DECLARE_METATYPE( DTC::VideoLookup  )
 Q_DECLARE_METATYPE( DTC::VideoLookup* )
 Q_DECLARE_METATYPE( DTC::ArtworkItem  )
 Q_DECLARE_METATYPE( DTC::ArtworkItem* )
+
+namespace DTC
+{
+inline void ArtworkItem::InitializeCustomTypes()
+{
+    qRegisterMetaType< ArtworkItem    >();
+    qRegisterMetaType< ArtworkItem*   >();
+}
+
+inline void VideoLookup::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoLookup  >();
+    qRegisterMetaType< VideoLookup* >();
+
+    ArtworkItem::InitializeCustomTypes();
+}
+}
 
 #endif

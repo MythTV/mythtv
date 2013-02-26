@@ -35,11 +35,7 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< TimeZoneInfo  >();
-            qRegisterMetaType< TimeZoneInfo* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -68,5 +64,14 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::TimeZoneInfo )
 Q_DECLARE_METATYPE( DTC::TimeZoneInfo* )
+
+namespace DTC
+{
+inline void TimeZoneInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< TimeZoneInfo  >();
+    qRegisterMetaType< TimeZoneInfo* >();
+}
+}
 
 #endif

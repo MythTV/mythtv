@@ -38,11 +38,7 @@ class SERVICE_PUBLIC WOLInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< WOLInfo   >();
-            qRegisterMetaType< WOLInfo*  >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -75,5 +71,13 @@ typedef WOLInfo* WOLInfoPtr;
 Q_DECLARE_METATYPE( DTC::WOLInfo  )
 Q_DECLARE_METATYPE( DTC::WOLInfo* )
 
+namespace DTC
+{
+inline void WOLInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< WOLInfo   >();
+    qRegisterMetaType< WOLInfo*  >();
+}
+}
 
 #endif

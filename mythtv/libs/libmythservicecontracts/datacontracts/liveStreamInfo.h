@@ -67,11 +67,7 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< LiveStreamInfo   >();
-            qRegisterMetaType< LiveStreamInfo*  >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -132,5 +128,14 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::LiveStreamInfo  )
 Q_DECLARE_METATYPE( DTC::LiveStreamInfo* )
+
+namespace DTC
+{
+inline void LiveStreamInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< LiveStreamInfo   >();
+    qRegisterMetaType< LiveStreamInfo*  >();
+}
+}
 
 #endif

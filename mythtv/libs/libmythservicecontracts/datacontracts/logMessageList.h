@@ -34,14 +34,7 @@ class SERVICE_PUBLIC LogMessageList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< LogMessageList   >();
-            qRegisterMetaType< LogMessageList*  >();
-
-            LabelValue::InitializeCustomTypes();
-            LogMessage::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -104,5 +97,17 @@ class SERVICE_PUBLIC LogMessageList : public QObject
 
 Q_DECLARE_METATYPE( DTC::LogMessageList  )
 Q_DECLARE_METATYPE( DTC::LogMessageList* )
+
+namespace DTC
+{
+inline void LogMessageList::InitializeCustomTypes()
+{
+    qRegisterMetaType< LogMessageList   >();
+    qRegisterMetaType< LogMessageList*  >();
+
+    LabelValue::InitializeCustomTypes();
+    LogMessage::InitializeCustomTypes();
+}
+}
 
 #endif

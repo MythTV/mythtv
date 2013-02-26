@@ -99,14 +99,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< VideoMetadataInfo  >();
-            qRegisterMetaType< VideoMetadataInfo* >();
-
-            if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
-                ArtworkInfoList::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -147,5 +140,17 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::VideoMetadataInfo  )
 Q_DECLARE_METATYPE( DTC::VideoMetadataInfo* )
+
+namespace DTC
+{
+inline void VideoMetadataInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoMetadataInfo  >();
+    qRegisterMetaType< VideoMetadataInfo* >();
+
+    if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
+        ArtworkInfoList::InitializeCustomTypes();
+}
+}
 
 #endif

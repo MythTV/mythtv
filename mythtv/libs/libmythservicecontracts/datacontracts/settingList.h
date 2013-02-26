@@ -38,11 +38,7 @@ class SERVICE_PUBLIC SettingList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< SettingList  >();
-            qRegisterMetaType< SettingList* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -62,5 +58,14 @@ class SERVICE_PUBLIC SettingList : public QObject
 
 Q_DECLARE_METATYPE( DTC::SettingList  )
 Q_DECLARE_METATYPE( DTC::SettingList* )
+
+namespace DTC
+{
+inline void SettingList::InitializeCustomTypes()
+{
+    qRegisterMetaType< SettingList  >();
+    qRegisterMetaType< SettingList* >();
+}
+}
 
 #endif
