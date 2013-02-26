@@ -80,11 +80,7 @@ class SERVICE_PUBLIC CaptureCard : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< CaptureCard  >();
-            qRegisterMetaType< CaptureCard* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -139,5 +135,14 @@ class SERVICE_PUBLIC CaptureCard : public QObject
 
 Q_DECLARE_METATYPE( DTC::CaptureCard  )
 Q_DECLARE_METATYPE( DTC::CaptureCard* )
+
+namespace DTC
+{
+inline void CaptureCard::InitializeCustomTypes()
+{
+    qRegisterMetaType< CaptureCard  >();
+    qRegisterMetaType< CaptureCard* >();
+}
+}
 
 #endif

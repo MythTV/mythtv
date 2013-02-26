@@ -54,13 +54,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ProgramList  >();
-            qRegisterMetaType< ProgramList* >();
-
-            Program::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -106,5 +100,16 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
 Q_DECLARE_METATYPE( DTC::ProgramList  )
 Q_DECLARE_METATYPE( DTC::ProgramList* )
+
+namespace DTC
+{
+inline void ProgramList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ProgramList  >();
+    qRegisterMetaType< ProgramList* >();
+
+    Program::InitializeCustomTypes();
+}
+}
 
 #endif

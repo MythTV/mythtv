@@ -46,13 +46,7 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ChannelInfoList   >();
-            qRegisterMetaType< ChannelInfoList*  >();
-
-            ChannelInfo::InitializeCustomTypes();
-        }
+        static void InitializeCustomTypes();
 
     public:
 
@@ -98,5 +92,16 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
 Q_DECLARE_METATYPE( DTC::ChannelInfoList  )
 Q_DECLARE_METATYPE( DTC::ChannelInfoList* )
+
+namespace DTC
+{
+inline void ChannelInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelInfoList   >();
+    qRegisterMetaType< ChannelInfoList*  >();
+
+    ChannelInfo::InitializeCustomTypes();
+}
+}
 
 #endif

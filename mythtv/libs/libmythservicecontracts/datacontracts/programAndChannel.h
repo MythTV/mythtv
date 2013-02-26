@@ -222,20 +222,7 @@ class SERVICE_PUBLIC Program : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< Program  >();
-            qRegisterMetaType< Program* >();
-
-            if (QMetaType::type( "DTC::ChannelInfo" ) == 0)
-                ChannelInfo::InitializeCustomTypes();
-
-            if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
-                RecordingInfo::InitializeCustomTypes();
-
-            if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
-                ArtworkInfoList::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -318,6 +305,16 @@ inline Program *ChannelInfo::AddNewProgram()
     return pObject;
 }
 
+} // namespace DTC
+
+Q_DECLARE_METATYPE( DTC::Program  )
+Q_DECLARE_METATYPE( DTC::Program* )
+
+Q_DECLARE_METATYPE( DTC::ChannelInfo  )
+Q_DECLARE_METATYPE( DTC::ChannelInfo* )
+
+namespace DTC
+{
 inline void ChannelInfo::InitializeCustomTypes()
 {
     qRegisterMetaType< ChannelInfo  >();
@@ -327,13 +324,20 @@ inline void ChannelInfo::InitializeCustomTypes()
         Program::InitializeCustomTypes();
 }
 
+inline void Program::InitializeCustomTypes()
+{
+    qRegisterMetaType< Program  >();
+    qRegisterMetaType< Program* >();
 
-} // namespace DTC
+    if (QMetaType::type( "DTC::ChannelInfo" ) == 0)
+        ChannelInfo::InitializeCustomTypes();
 
-Q_DECLARE_METATYPE( DTC::Program  )
-Q_DECLARE_METATYPE( DTC::Program* )
+    if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
+        RecordingInfo::InitializeCustomTypes();
 
-Q_DECLARE_METATYPE( DTC::ChannelInfo  )
-Q_DECLARE_METATYPE( DTC::ChannelInfo* )
+    if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
+        ArtworkInfoList::InitializeCustomTypes();
+}
+}
 
 #endif

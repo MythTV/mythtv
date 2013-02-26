@@ -38,11 +38,7 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ArtworkInfo  >();
-            qRegisterMetaType< ArtworkInfo* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -69,5 +65,14 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::ArtworkInfo  )
 Q_DECLARE_METATYPE( DTC::ArtworkInfo* )
+
+namespace DTC
+{
+inline void ArtworkInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ArtworkInfo  >();
+    qRegisterMetaType< ArtworkInfo* >();
+}
+}
 
 #endif

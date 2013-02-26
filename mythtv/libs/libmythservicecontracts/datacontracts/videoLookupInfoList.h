@@ -48,13 +48,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< VideoLookupList  >();
-            qRegisterMetaType< VideoLookupList* >();
-
-            VideoLookup::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -96,5 +90,16 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
 
 Q_DECLARE_METATYPE( DTC::VideoLookupList  )
 Q_DECLARE_METATYPE( DTC::VideoLookupList* )
+
+namespace DTC
+{
+inline void VideoLookupList::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoLookupList  >();
+    qRegisterMetaType< VideoLookupList* >();
+
+    VideoLookup::InitializeCustomTypes();
+}
+}
 
 #endif

@@ -1,5 +1,7 @@
 include ( ../../settings.pro )
 
+QT += script
+
 TEMPLATE = lib
 TARGET = mythservicecontracts-$$LIBVERSION
 CONFIG += thread dll

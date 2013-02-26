@@ -18,11 +18,7 @@ namespace DTC
         PROPERTYIMP_RO_REF(QVariantMap, ActionList)
 
       public:
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType<FrontendActionList>();
-            qRegisterMetaType<FrontendActionList*>();
-        }
+        static inline void InitializeCustomTypes();
 
       public:
         FrontendActionList(QObject *parent = 0) : QObject(parent)
@@ -43,5 +39,14 @@ namespace DTC
 
 Q_DECLARE_METATYPE(DTC::FrontendActionList)
 Q_DECLARE_METATYPE(DTC::FrontendActionList*)
+
+namespace DTC
+{
+inline void FrontendActionList::InitializeCustomTypes()
+{
+    qRegisterMetaType<FrontendActionList>();
+    qRegisterMetaType<FrontendActionList*>();
+}
+}
 
 #endif // FRONTENDACTIONLIST_H

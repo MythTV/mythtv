@@ -73,13 +73,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ProgramGuide  >();
-            qRegisterMetaType< ProgramGuide* >();
-
-            ChannelInfo::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -131,5 +125,16 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
 Q_DECLARE_METATYPE( DTC::ProgramGuide  )
 Q_DECLARE_METATYPE( DTC::ProgramGuide* )
+
+namespace DTC
+{
+inline void ProgramGuide::InitializeCustomTypes()
+{
+    qRegisterMetaType< ProgramGuide  >();
+    qRegisterMetaType< ProgramGuide* >();
+
+    ChannelInfo::InitializeCustomTypes();
+}
+}
 
 #endif

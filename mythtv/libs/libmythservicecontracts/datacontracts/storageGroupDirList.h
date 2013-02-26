@@ -27,13 +27,7 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< StorageGroupDirList   >();
-            qRegisterMetaType< StorageGroupDirList*  >();
-
-            StorageGroupDir::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -69,5 +63,16 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
 Q_DECLARE_METATYPE( DTC::StorageGroupDirList  )
 Q_DECLARE_METATYPE( DTC::StorageGroupDirList* )
+
+namespace DTC
+{
+inline void StorageGroupDirList::InitializeCustomTypes()
+{
+    qRegisterMetaType< StorageGroupDirList   >();
+    qRegisterMetaType< StorageGroupDirList*  >();
+
+    StorageGroupDir::InitializeCustomTypes();
+}
+}
 
 #endif
