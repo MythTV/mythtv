@@ -95,7 +95,7 @@ VideoOutWindow::VideoOutWindow() :
     db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
 
     QDesktopWidget *desktop = NULL;
-    if (QApplication::type() == QApplication::GuiClient)
+    if (qobject_cast<QApplication*>(qApp))
         desktop = QApplication::desktop();
 
     if (desktop)
