@@ -184,8 +184,10 @@ void ClassicCommDetector::Init()
     height = video_disp_dim.height();
     fps = player->GetFrameRate();
 
-    preRoll  = (long long)(max(0,recordingStartedAt.secsTo(startedAt)) * fps);
-    postRoll = (long long)(max(0,stopsAt.secsTo(recordingStopsAt)) * fps);
+    preRoll  = (long long)(
+        max(int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt))) * fps);
+    postRoll = (long long)(
+        max(int64_t(0), int64_t(stopsAt.secsTo(recordingStopsAt))) * fps);
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(width, height);
@@ -319,7 +321,8 @@ bool ClassicCommDetector::go()
         logoDetector = new ClassicLogoDetector(this, width, height,
             commDetectBorder, horizSpacing, vertSpacing);
 
-        requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
+        requiredHeadStart += max(
+            int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt)));
         requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
 
         emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
