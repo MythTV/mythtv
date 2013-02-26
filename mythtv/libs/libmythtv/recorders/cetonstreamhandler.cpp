@@ -15,8 +15,11 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QHttp>
 #include <QUrl>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include <QHttp>
+#endif
 
 // MythTV headers
 #include "cetonstreamhandler.h"
@@ -525,6 +528,7 @@ bool CetonStreamHandler::HttpRequest(
     const QString &method, const QString &script, const QUrl &params,
     QString &response, uint &status_code) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QHttp http;
     http.setHost(_ip_address);
 
@@ -569,4 +573,8 @@ bool CetonStreamHandler::HttpRequest(
     status_code = resp_header.statusCode();
     response = QString(http.readAll());
     return true;
+#else
+#warning CetonStreamHandler::HttpRequest() not yet ported to Qt5
+    return false;
+#endif
 }
