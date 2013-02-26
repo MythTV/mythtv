@@ -101,7 +101,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Headers needed by frontend & backend
 HEADERS += filter.h                 format.h
-HEADERS += frame.h                  compat.h
+HEADERS += frame.h
 
 # LZO used by NuppelDecoder & NuppelVideoRecorder
 HEADERS += lzoconf.h
@@ -350,14 +350,15 @@ using_frontend {
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h          util-osd.h
     HEADERS += videooutwindow.h         videocolourspace.h
-    HEADERS += videovisual.h            videovisualdefs.h
+    HEADERS += visualisations/videovisual.h
+    HEADERS += visualisations/videovisualdefs.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
     SOURCES += videooutwindow.cpp       util-osd.cpp
     SOURCES += videocolourspace.cpp
-    SOURCES += videovisual.cpp
+    SOURCES += visualisations/videovisual.cpp
 
    using_opengl | using_vdpau {
         # Goom
@@ -373,8 +374,8 @@ using_frontend {
 
     using_libfftw3 {
         DEFINES += FFTW3_SUPPORT
-        HEADERS += videovisualspectrum.h
-        SOURCES += videovisualspectrum.cpp
+        HEADERS += visualisations/videovisualspectrum.h
+        SOURCES += visualisations/videovisualspectrum.cpp
         using_opengl: HEADERS += videovisualcircles.h
         using_opengl: SOURCES += videovisualcircles.cpp
     }
