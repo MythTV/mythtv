@@ -10,12 +10,15 @@
 
 // MythTV headers
 #include "mythcontext.h"
-#include "httpcomms.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "mythlogging.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include "httpcomms.h"
+#endif
 
 #define LOC QString("IPTVChanFetch: ")
 
@@ -230,11 +233,16 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
     // Use Myth HttpComms for http URLs
     QString redirected_url = url;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QString tmp = HttpComms::getHttp(
         redirected_url,
         10000 /* ms        */, 3     /* retries      */,
         3     /* redirects */, true  /* allow gzip   */,
         NULL  /* login     */, inQtThread);
+#else
+#warning IPTVChannelFetcher::DownloadPlaylist not yet ported to Qt5.
+    QString tmp("");
+#endif
 
     if (redirected_url != url)
     {
