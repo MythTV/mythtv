@@ -372,7 +372,12 @@ void DTVSignalMonitor::HandlePMT(uint, const ProgramMapTable *pmt)
     {
         if (pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()) &&
             !ignore_encrypted)
+        {
+            DVBChannel *dvbchannel = GetDVBChannel();
+            if (dvbchannel)
+                dvbchannel->SetPMT(pmt);
             AddFlags(kDTVSigMon_WaitForCrypt);
+        }
 
         AddFlags(kDTVSigMon_PMTMatch);
     }
@@ -544,6 +549,11 @@ const DVBStreamData *DTVSignalMonitor::GetDVBStreamData() const
 const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 {
     return dynamic_cast<const ScanStreamData*>(stream_data);
+}
+
+DVBChannel *DTVSignalMonitor::GetDVBChannel(void)
+{
+    return dynamic_cast<DVBChannel*>(channel);
 }
 
 bool DTVSignalMonitor::IsAllGood(void) const

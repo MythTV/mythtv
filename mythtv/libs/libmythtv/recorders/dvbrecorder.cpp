@@ -181,7 +181,8 @@ QString DVBRecorder::GetSIStandard(void) const
 
 void DVBRecorder::SetCAMPMT(const ProgramMapTable *pmt)
 {
-    _channel->SetPMT(pmt);
+    if (pmt->IsEncrypted(_channel->GetSIStandard()))
+        _channel->SetPMT(pmt);
 }
 
 void DVBRecorder::UpdateCAMTimeOffset(void)

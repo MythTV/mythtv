@@ -272,8 +272,6 @@ bool DVBChannel::Open(DVBChannel *who)
             diseqc_tree->Open(fd_frontend);
     }
 
-    dvbcam->Start();
-
     first_tune = true;
 
     if (!InitializeInputs())
@@ -464,7 +462,7 @@ bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
 }
 
 /**
- *  \brief Return true iff modulation is supported modulation on the frontend
+ *  \brief Return true if modulation is supported modulation on the frontend
  */
 bool DVBChannel::CheckModulation(DTVModulation modulation) const
 {
@@ -491,6 +489,8 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
  */
 void DVBChannel::SetPMT(const ProgramMapTable *pmt)
 {
+    if (!dvbcam->IsRunning())
+        dvbcam->Start();
     if (pmt && dvbcam->IsRunning())
         dvbcam->SetPMT(this, pmt);
 }
