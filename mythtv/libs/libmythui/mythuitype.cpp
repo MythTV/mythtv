@@ -24,7 +24,6 @@
 #include "mythuitextedit.h"
 #include "mythuiprogressbar.h"
 #include "mythuispinbox.h"
-#include "mythuiwebbrowser.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent)
