@@ -11,7 +11,6 @@ using namespace std;
 #include "streamlisteners.h"
 
 class DTVChannel;
-class DVBChannel;
 
 class DTVSignalMonitor : public SignalMonitor,
                          public MPEGStreamListener,
@@ -104,7 +103,6 @@ class DTVSignalMonitor : public SignalMonitor,
 
   protected:
     DTVChannel *GetDTVChannel(void);
-    DVBChannel *GetDVBChannel(void);
     void UpdateMonitorValues(void);
     void UpdateListeningForEIT(void);
 

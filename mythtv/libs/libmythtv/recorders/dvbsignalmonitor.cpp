@@ -17,6 +17,7 @@
 #include "cardutil.h"
 
 #include "dvbtypes.h"
+#include "dvbchannel.h"
 #include "dvbrecorder.h"
 #include "dvbstreamhandler.h"
 
@@ -171,6 +172,13 @@ QStringList DVBSignalMonitor::GetStatusList(void) const
 void DVBSignalMonitor::HandlePMT(uint program_num, const ProgramMapTable *pmt)
 {
     DTVSignalMonitor::HandlePMT(program_num, pmt);
+
+    if (pmt->ProgramNumber() == (uint)programNumber)
+    {
+        DVBChannel *dvbchannel = GetDVBChannel();
+        if (dvbchannel)
+            dvbchannel->SetPMT(pmt);
+    }
 }
 
 void DVBSignalMonitor::HandleSTT(const SystemTimeTable *stt)
