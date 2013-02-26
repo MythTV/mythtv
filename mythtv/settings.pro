@@ -171,3 +171,7 @@ EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
 EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
 macx:using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE
+}
