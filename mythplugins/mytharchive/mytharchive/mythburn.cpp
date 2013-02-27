@@ -551,7 +551,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     EncoderProfile *profile = NULL;
 
     // is the file an mpeg2 file?
-    if (item->videoCodec.toLower() == "mpeg2video")
+    if (item->videoCodec.toLower() == "mpeg2video (main)")
     {
         // does the file already have a valid DVD resolution?
         if (gCoreContext->GetSetting("MythArchiveVideoFormat", "pal").toLower()
