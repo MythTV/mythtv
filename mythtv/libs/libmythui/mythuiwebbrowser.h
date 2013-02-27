@@ -3,10 +3,10 @@
 
 #include <QtGlobal>
 #include <QUrl>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include "mythuitype.h"
-class QString;
+#include "mythuiexp.h"
+
+#if QT_VERSION >= 0x050000
 class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT
@@ -32,8 +32,6 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 #include <QWebView>
 #include <QWebPage>
 #include <QNetworkReply>
-
-#include "mythuitype.h"
 
 class MythUIScrollBar;
 class MythUIWebBrowser;
@@ -254,6 +252,6 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QPoint           m_destinationScrollPos;
 };
 
-#endif // QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#endif // version check
 
 #endif
