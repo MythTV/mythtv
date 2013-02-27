@@ -462,7 +462,7 @@ bool DVBChannel::CheckCodeRate(DTVCodeRate rate) const
 }
 
 /**
- *  \brief Return true if modulation is supported modulation on the frontend
+ *  \brief Return true iff modulation is supported modulation on the frontend
  */
 bool DVBChannel::CheckModulation(DTVModulation modulation) const
 {
