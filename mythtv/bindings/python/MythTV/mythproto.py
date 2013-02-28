@@ -228,7 +228,12 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                       FileTransfer(host, file, storagegroup, mode, db)
 
     # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
-    match = reuri.match(file)
+    match = None
+    try:
+        match = reuri.match(file)
+    except:
+        pass
+
     if match:
         host = match.group('host')
         filename = match.group('file')
