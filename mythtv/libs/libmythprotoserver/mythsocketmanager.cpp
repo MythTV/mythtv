@@ -50,7 +50,7 @@ MythServer::MythServer(QObject *parent) : ServerPool(parent)
 {
 }
 
-void MythServer::newTcpConnection(int socket)
+void MythServer::newTcpConnection(qt_socket_fd_t socket)
 {
     emit newConnection(socket);
 }
@@ -97,12 +97,17 @@ bool MythSocketManager::Listen(int port)
         return false;
     }
 
+#if (QT_VERSION >= 0x050000)
+    connect(m_server, &MythServer::newConnection,
+            this,     &MythSocketManager::newConnection);
+#else
     connect(m_server, SIGNAL(newConnection(int)),
             this,     SLOT(newConnection(int)));
+#endif
     return true;
 }
 
-void MythSocketManager::newConnection(int sd)
+void MythSocketManager::newConnection(qt_socket_fd_t sd)
 {
     QMutexLocker locker(&m_socketListLock);
     m_socketList.insert(new MythSocket(sd, this));

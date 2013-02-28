@@ -30,6 +30,7 @@
 #include <QList>
 
 // MythTV headers
+#include "mythqtcompat.h"
 #include "serverpool.h"
 #include "httprequest.h"
 #include "mthreadpool.h"
@@ -106,7 +107,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 
     QScriptEngine *ScriptEngine(void);
 
-    virtual void newTcpConnection(int socket); // QTcpServer
+    virtual void newTcpConnection(qt_socket_fd_t socket); // QTcpServer
 
     QString GetSharePath(void) const
     { // never modified after creation, so no need to lock
@@ -135,13 +136,14 @@ class UPNP_PUBLIC HttpServer : public ServerPool
 class HttpWorker : public QRunnable
 {
   public:
-    HttpWorker(HttpServer &httpServer, int sock);
+
+    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock);
 
     virtual void run(void);
 
   protected:
     HttpServer &m_httpServer; 
-    int         m_socket;
+    qt_socket_fd_t m_socket;
     int         m_socketTimeout;
 };
 

@@ -122,7 +122,7 @@ QScriptEngine* HttpServer::ScriptEngine()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpServer::newTcpConnection(int nSocket)
+void HttpServer::newTcpConnection(qt_socket_fd_t nSocket)
 {
     m_threadPool.startReserved(
         new HttpWorker(*this, nSocket),
@@ -238,7 +238,7 @@ void HttpServer::DelegateRequest(HTTPRequest *pRequest)
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-HttpWorker::HttpWorker(HttpServer &httpServer, int sock) :
+HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock) :
     m_httpServer(httpServer), m_socket(sock), m_socketTimeout(10000)
 {
     m_socketTimeout = 1000 *
