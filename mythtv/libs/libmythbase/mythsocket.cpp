@@ -73,7 +73,8 @@ static QString to_sample(const QByteArray &payload)
     return sample;
 }
 
-MythSocket::MythSocket(int socket, MythSocketCBs *cb, bool use_shared_thread) :
+MythSocket::MythSocket(
+    qt_socket_fd_t socket, MythSocketCBs *cb, bool use_shared_thread) :
     ReferenceCounter(QString("MythSocket(%1)").arg(socket)),
     m_tcpSocket(new QTcpSocket()),
     m_thread(NULL),
@@ -112,7 +113,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb, bool use_shared_thread) :
             this, SLOT(CallReadyReadHandler()),
             Qt::QueuedConnection);
 
-    if (socket > -1)
+    if (socket != -1)
     {
         m_tcpSocket->setSocketDescriptor(
             socket, QAbstractSocket::ConnectedState,

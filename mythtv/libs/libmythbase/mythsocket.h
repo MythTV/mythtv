@@ -10,6 +10,7 @@
 
 #include "referencecounter.h"
 #include "mythsocket_cb.h"
+#include "mythqtcompat.h"
 #include "mythbaseexp.h"
 #include "mthread.h"
 
@@ -29,7 +30,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     friend class MythSocketManager;
 
   public:
-    MythSocket(int socket = -1, MythSocketCBs *cb = NULL,
+    MythSocket(qt_socket_fd_t socket = -1, MythSocketCBs *cb = NULL,
                bool use_shared_thread = false);
 
     bool ConnectToHost(const QString &hostname, quint16 port);
@@ -98,7 +99,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     QTcpSocket     *m_tcpSocket; // only set in ctor
     MThread        *m_thread; // only set in ctor
     mutable QMutex  m_lock;
-    int             m_socketDescriptor; // protected by m_lock
+    qt_socket_fd_t  m_socketDescriptor; // protected by m_lock
     QHostAddress    m_peerAddress; // protected by m_lock
     int             m_peerPort; // protected by m_lock
     MythSocketCBs  *m_callback; // only set in ctor
