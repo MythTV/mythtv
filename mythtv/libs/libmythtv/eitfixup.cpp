@@ -106,6 +106,7 @@ EITFixUp::EITFixUp()
       m_nlRepeat("herh."),
       m_nlHD("\\sHD$"),
       m_nlSub("\\sAfl\\.:\\s([^\\.]+)\\."),
+      m_nlSub2("\\s\"([^\"]+)\""),
       m_nlActors("\\sMet:\\s.+e\\.a\\."),
       m_nlPres("\\sPresentatie:\\s([^\\.]+)\\."),
       m_nlPersSeparator("(, |\\sen\\s)"),
@@ -1574,6 +1575,12 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.categoryType = kCategoryNone;
     }
 
+    // Film - categories are usually not Films
+    if (event.category.startsWith("Film -"))
+    {
+        event.categoryType = kCategorySeries;
+    }
+
     // Get stereo info
     int position;
     if ((position = fullinfo.indexOf(m_Stereo)) != -1)
@@ -1608,7 +1615,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.title = event.title.replace(m_nlHD, "");
     }
 
-    // Try to make subtitle
+    // Try to make subtitle from Afl.:
     QRegExp tmpSub = m_nlSub;
     QString tmpSubString;
     if (tmpSub.indexIn(fullinfo) != -1)
@@ -1618,6 +1625,18 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.subtitle = tmpSubString.left(tmpSubString.length() -1);
         fullinfo = fullinfo.replace(tmpSub.cap(0), "");
     }
+
+    // Try to make subtitle from " "
+    QRegExp tmpSub2 = m_nlSub2;
+    //QString tmpSubString2;
+    if (tmpSub2.indexIn(fullinfo) != -1)
+    {
+        tmpSubString = tmpSub2.cap(0);
+        tmpSubString = tmpSubString.right(tmpSubString.length() - 2);
+        event.subtitle = tmpSubString.left(tmpSubString.length() -1);
+        fullinfo = fullinfo.replace(tmpSub2.cap(0), "");
+    }
+
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk

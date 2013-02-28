@@ -965,8 +965,16 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
     fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
 
-    // Netherlands
+    // Netherlands DVB-C
     fix[ 1000U << 16] = EITFixUp::kFixNL;
+    // Canal Digitaal DVB-S 19.2 Dutch/Belgian ONID 53 covers all CanalDigitaal TiD
+    fix[   53U << 16] = EITFixUp::kFixNL;
+    // Canal Digitaal DVB-S 23.5 Dutch/Belgian
+    fix[  3202LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3208LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3211LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3222LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3225LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
 
     // Finland
     fix[      8438U << 16] = // DVB-T Espoo

@@ -183,6 +183,7 @@ class EITFixUp
     const QRegExp m_nlRepeat;
     const QRegExp m_nlHD;
     const QRegExp m_nlSub;
+    const QRegExp m_nlSub2;
     const QRegExp m_nlActors;
     const QRegExp m_nlPres;
     const QRegExp m_nlPersSeparator;
