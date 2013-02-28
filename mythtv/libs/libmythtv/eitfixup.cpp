@@ -116,6 +116,7 @@ EITFixUp::EITFixUp()
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
       m_noRerun("\\(R\\)"),
+      m_noHD("[\\(\\[]HD[\\)\\]]"),
       m_noColonSubtitle("^([^:]+): (.+)"),
       m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
                         "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
@@ -1736,6 +1737,20 @@ void EITFixUp::FixNO(DBEventEIT &event) const
     {
       event.previouslyshown = true;
       event.title = event.title.replace(m_noRerun, "");
+    }
+    // Check for "subtitle (HD)" in the subtitle
+    position = event.subtitle.indexOf(m_noHD);
+    if (position != -1)
+    {
+      event.videoProps |= VID_HDTV;
+      event.subtitle = event.subtitle.replace(m_noHD, "");
+    }
+   // Check for "description (HD)" in the description
+    position = event.description.indexOf(m_noHD);
+    if (position != -1)
+    {
+      event.videoProps |= VID_HDTV;
+      event.description = event.description.replace(m_noHD, "");
     }
 }
 
