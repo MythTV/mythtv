@@ -193,6 +193,7 @@ class EITFixUp
     const QRegExp m_nlCat;
     const QRegExp m_nlOmroep;
     const QRegExp m_noRerun;
+    const QRegExp m_noHD;
     const QRegExp m_noColonSubtitle;
     const QRegExp m_noNRKCategories;
     const QRegExp m_noPremiere;
