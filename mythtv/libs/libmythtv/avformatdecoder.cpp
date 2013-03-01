@@ -1327,8 +1327,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         FlagIsSet(kDecodeFewBlocks) || FlagIsSet(kDecodeNoLoopFilter)   ||
         FlagIsSet(kDecodeNoDecode))
     {
-        enc->flags2 |= CODEC_FLAG2_FAST;
-
         if ((CODEC_ID_MPEG2VIDEO == codec->id) ||
             (CODEC_ID_MPEG1VIDEO == codec->id))
         {
