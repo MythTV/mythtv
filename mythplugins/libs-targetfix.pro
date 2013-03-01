@@ -16,4 +16,4 @@ mingw {
 DEPENDPATH = $${INCLUDEPATH}
 
 # Trigger rebuilds if installed MythTV libs have changed
-include (../../targetdep.pro)
+include (targetdep.pro)
