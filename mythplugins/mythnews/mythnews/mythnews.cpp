@@ -5,7 +5,7 @@
 #include <cmath>
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
 #include <QTimer>
