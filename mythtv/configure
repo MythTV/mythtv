@@ -4384,7 +4384,7 @@ if ! is_qmake5 $qmake ; then
       die "Qt4.8 or newer is required to build MythTV."
   fi
 else
-    check_cxxflags -DHAVE_QT5
+    check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
 fi
 
 if test x"$qmakespecs" != x; then
