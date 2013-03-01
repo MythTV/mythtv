@@ -1,5 +1,4 @@
 // QT Headers
-#include <QApplication>
 #include <QStringList>
 #include <QFile>
 
