@@ -89,7 +89,9 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_lastNav(NULL),    m_part(0), m_lastPart(0),
     m_title(0),         m_lastTitle(0),   m_playerWait(false),
     m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
-    m_currentTitleAngleCount(0), m_newSequence(false),
+    m_currentTitleAngleCount(0),
+    m_endPts(0),        m_timeDiff(0),
+    m_newSequence(false),
     m_still(0), m_lastStill(0),
     m_audioStreamsChanged(false),
     m_dvdWaiting(false),
@@ -109,6 +111,10 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_currentTime(0),
     m_parent(NULL),
     m_forcedAspect(-1.0f),
+    m_processState(PROCESS_NORMAL),
+    m_dvdStat(DVDNAV_STATUS_OK),
+    m_dvdEvent(0),
+    m_dvdEventSize(0),
 
     // Menu/buttons
     m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
@@ -400,6 +406,9 @@ bool DVDRingBuffer::StartFromBeginning(void)
         m_audioStreamsChanged = true;
     }
 
+    m_endPts = 0;
+    m_timeDiff = 0;
+
     return m_dvdnav;
 }
 
@@ -489,14 +498,12 @@ void DVDRingBuffer::WaitForPlayer(void)
 
 int DVDRingBuffer::safe_read(void *data, uint sz)
 {
-    dvdnav_status_t dvdStat;
     unsigned char  *blockBuf     = NULL;
     uint            tot          = 0;
-    int32_t         dvdEvent     = 0;
-    int32_t         dvdEventSize = 0;
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
+    bool            bReprocessing = false;
 
     if (m_gotStop)
     {
@@ -508,14 +515,24 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     if (readaheadrunning)
         LOG(VB_GENERAL, LOG_ERR, LOC + "read ahead thread running.");
 
-    while (needed)
+    while ((m_processState != PROCESS_WAIT) && needed)
     {
         blockBuf = m_dvdBlockWriteBuf;
 
-        dvdStat = dvdnav_get_next_cache_block(
-            m_dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
+        if (m_processState == PROCESS_REPROCESS)
+        {
+            m_processState = PROCESS_NORMAL;
+            bReprocessing = true;
+        }
+        else
+        {
+            m_dvdStat = dvdnav_get_next_cache_block(
+                m_dvdnav, &blockBuf, &m_dvdEvent, &m_dvdEventSize);
 
-        if (dvdStat == DVDNAV_STATUS_ERR)
+            bReprocessing = false;
+        }
+
+        if (m_dvdStat == DVDNAV_STATUS_ERR)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to read block: %1")
                     .arg(dvdnav_err_to_string(m_dvdnav)));
@@ -523,7 +540,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             return -1;
         }
 
-        switch (dvdEvent)
+        switch (m_dvdEvent)
         {
             // Standard packet for decoding
             case DVDNAV_BLOCK_OK:
@@ -723,6 +740,30 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             case DVDNAV_NAV_PACKET:
             {
                 QMutexLocker lock(&m_seekLock);
+
+                pci_t *pci = dvdnav_get_current_nav_pci(m_dvdnav);
+
+                // If the start PTS of this block is not the
+                // same as the end PTS of the last block,
+                // we've got a timestamp discontinuity
+                int64_t diff = (int64_t)pci->pci_gi.vobu_s_ptm - m_endPts;
+                if (diff != 0)
+                {
+                    if (!bReprocessing && !m_skipstillorwait)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PTS discontinuity - waiting for decoder: this %1, last %2, diff %3")
+                            .arg(pci->pci_gi.vobu_s_ptm)
+                            .arg(m_endPts)
+                            .arg(diff));
+
+                        m_processState = PROCESS_WAIT;
+                        break;
+                    }
+
+                    m_timeDiff += diff;
+                }
+
+                m_endPts = pci->pci_gi.vobu_e_ptm;
 
                 // get the latest nav
                 m_lastNav = (dvdnav_t *)blockBuf;
@@ -930,7 +971,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             default:
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Unknown DVD event: %1").arg(dvdEvent));
+                    QString("Unknown DVD event: %1").arg(m_dvdEvent));
             }
             break;
         }
@@ -939,7 +980,15 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         offset = tot;
     }
 
-    return tot;
+    if (m_processState == PROCESS_WAIT)
+    {
+        errno = EAGAIN;
+        return 0;
+    }
+    else
+    {
+        return tot;
+    }
 }
 
 bool DVDRingBuffer::playTrack(int track)

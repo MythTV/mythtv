@@ -12,6 +12,10 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual void UpdateFramesPlayed(void);
     virtual bool GetFrame(DecodeType decodetype); // DecoderBase
 
+  protected:
+    int64_t AdjustTimestamp(int64_t timestamp);
+    virtual int  ReadPacket(AVFormatContext *ctx, AVPacket *pkt);
+
   private:
     virtual bool DoRewindSeek(long long desiredFrame);
     virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
