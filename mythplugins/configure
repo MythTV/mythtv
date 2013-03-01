@@ -520,6 +520,10 @@ EOF
     die "Sanity test failed."
 fi
 
+is_qmake5(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
+}
+
 is_qmake4(){
     $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
 }
@@ -558,12 +562,13 @@ OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
-if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
-fi
-
-if ! expr $($qmake -query QT_VERSION) : "4\.[8-9]\.[0-9]" >/dev/null; then
-    die "Qt4.8 or newer is required to build MythTV."
+if ! is_qmake5 $qmake ; then
+  if ! is_qmake4 $qmake; then
+      is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+  fi
+  if ! expr $($qmake -query QT_VERSION) : "4\.[8-9]\.[0-9]" >/dev/null; then
+      die "Qt4.8 or newer is required to build MythTV."
+  fi
 fi
 
 # rely on what was discover during MythTV configure
