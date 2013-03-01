@@ -1,10 +1,6 @@
 
 #include <unistd.h>
 
-// QT headers
-#include <QApplication>
-#include <QDir>
-
 // MythTV headers
 #include <lcddevice.h>
 #include <mythcontext.h>
