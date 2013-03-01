@@ -471,6 +471,59 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 if (EITFixUp::kFixDish & fix)
                     category  = content.GetCategory();
             }
+            else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble1(0))
+                {
+                    case 0x01: 
+                        category = "Movie"; 
+                        break;
+                    case 0x02: 
+                        category = "News"; 
+                        break;
+                    case 0x03: 
+                        category = "Entertainment"; 
+                        break;
+                    case 0x04: 
+                        category = "Sport"; 
+                        break;
+                    case 0x05: 
+                        category = "Children"; 
+                        break;
+                    case 0x06: 
+                        category = "Music"; 
+                        break;
+                    case 0x07: 
+                        category = "Arts/Culture"; 
+                        break;
+                    case 0x08: 
+                        category = "Current Affairs"; 
+                        break;
+                    case 0x09: 
+                        category = "Education"; 
+                        break;
+                    case 0x0A: 
+                        category = "Infotainment"; 
+                        break;
+                    case 0x0B: 
+                        category = "Special"; 
+                        break;
+                    case 0x0C: 
+                        category = "Comedy"; 
+                        break;
+                    case 0x0D: 
+                        category = "Drama"; 
+                        break;
+                    case 0x0E: 
+                        category = "Documentary"; 
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(0);
+            }
             else
             {
                 ContentDescriptor content(content_data);
@@ -492,7 +545,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
                     programId = desc.ContentId();
                 else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
+                {
                     seriesId = desc.ContentId();
+                    category_type = kCategorySeries;
+                }
             }
         }
 
@@ -939,8 +995,17 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[40999U << 16 | 1069] = EITFixUp::kFixSubtitle;
 
     // Australia
-    fix[ 4096U << 16] = EITFixUp::kFixAUStar;
-    fix[ 4096U << 16] = EITFixUp::kFixAUStar;
+    fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
+    fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
+    fix[ 4112U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview; // ABC Brisbane
+    fix[ 4114U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview | EITFixUp::kFixAUNine;; // Nine Brisbane
+    fix[ 4115U  << 16] = EITFixUp::kFixAUDescription | EITFixUp::kFixAUSeven; //Seven
+    fix[ 4116U  << 16] = EITFixUp::kFixAUDescription; //Ten
+    fix[ 12801U << 16] = EITFixUp::kFixAUFreeview | EITFixUp::kFixAUDescription; //ABC
+    fix[ 12802U << 16] = EITFixUp::kFixAUDescription; //SBS
+    fix[ 12803U << 16] = EITFixUp::kFixAUFreeview | EITFixUp::kFixAUDescription | EITFixUp::kFixAUNine; //Nine
+    fix[ 12842U << 16] = EITFixUp::kFixAUDescription; // 31 Brisbane
+    fix[ 12862U  << 16] = EITFixUp::kFixAUDescription; //WestTV
 
     // MultiChoice Africa
     fix[ 6144U << 16] = EITFixUp::kFixMCA;
