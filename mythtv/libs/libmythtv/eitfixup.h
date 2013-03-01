@@ -52,6 +52,11 @@ class EITFixUp
         kFixNRK_DVBT   = 0x20000,
         kFixDish       = 0x40000,
         kFixDK         = 0x80000,
+        kFixAUFreeview    = 0x100000,
+        kFixAUDescription = 0x200000,
+        kFixAUNine        = 0x400000,
+        kFixAUSeven       = 0x800000,
+
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
@@ -84,6 +89,10 @@ class EITFixUp
     void FixComHem(DBEventEIT &event,
                    bool parse_subtitle) const;      // Sweden DVB-C
     void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
+    void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
+    void FixAUNine(DBEventEIT &event) const;    
+    void FixAUSeven(DBEventEIT &event) const;    
+    void FixAUDescription(DBEventEIT &event) const;
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
@@ -217,6 +226,10 @@ class EITFixUp
     const QRegExp m_dkPersonsSeparator;
     const QRegExp m_dkDirector;
     const QRegExp m_dkYear;
+    const QRegExp m_AUFreeviewSY;//subtitle, year
+    const QRegExp m_AUFreeviewY;//year
+    const QRegExp m_AUFreeviewYC;//year, cast
+    const QRegExp m_AUFreeviewSYC;//subtitle, year, cast
 };
 
 #endif // EITFIXUP_H

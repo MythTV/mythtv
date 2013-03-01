@@ -142,7 +142,11 @@ EITFixUp::EITFixUp()
       m_dkActors("(?:Medvirkende: |Medv\\.: )(.+)"),
       m_dkPersonsSeparator("(, )|(og )"),
       m_dkDirector("(?:Instr.: |Instrukt.r: )(.+)$"),
-      m_dkYear(" fra ([0-9]{4})[ \\.]")
+      m_dkYear(" fra ([0-9]{4})[ \\.]"),
+      m_AUFreeviewSY("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\)$"),
+      m_AUFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
+      m_AUFreeviewYC("(.*) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
+      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$")
 {
 }
 
@@ -181,6 +185,18 @@ void EITFixUp::Fix(DBEventEIT &event) const
     if (kFixAUStar & event.fixup)
         FixAUStar(event);
 
+    if (kFixAUDescription & event.fixup)
+        FixAUDescription(event);
+        
+    if (kFixAUFreeview & event.fixup)
+        FixAUFreeview(event);
+        
+    if (kFixAUNine & event.fixup)
+        FixAUNine(event);
+        
+    if (kFixAUSeven & event.fixup)
+        FixAUSeven(event);
+    
     if (kFixMCA & event.fixup)
         FixMCA(event);
 
@@ -1175,6 +1191,141 @@ void EITFixUp::FixAUStar(DBEventEIT &event) const
         const QString stmp   = event.description;
         event.subtitle       = stmp.left(position);
         event.description    = stmp.right(stmp.length() - position - 2);
+    }
+}
+
+/** \fn EITFixUp::FixAUDescription(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (fix common annoyances common to most networks)
+ */
+void EITFixUp::FixAUDescription(DBEventEIT &event) const
+{
+    if (event.description.startsWith("[Program data ") || event.description.startsWith("[Program info "))//TEN
+    {
+        event.description = "";//event.subtitle;
+    }
+    if (event.description.endsWith("Copyright West TV Ltd. 2011)"))
+        event.description.resize(event.description.length()-40);
+    
+    if (event.description.isEmpty() && !event.subtitle.isEmpty())//due to ten's copyright info, this won't be caught before
+    {
+        event.description = event.subtitle;
+        event.subtitle = QString::null;
+    }
+    if (event.description.startsWith(event.title+" - "))
+        event.description.remove(0,event.title.length()+3);
+    if (event.title.startsWith("LIVE: ", Qt::CaseInsensitive))
+    {
+        event.title.remove(0, 6);
+        event.description.prepend("(Live) ");
+    }
+}
+/** \fn EITFixUp::FixAUNine(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (Nine network)
+ */
+void EITFixUp::FixAUNine(DBEventEIT &event) const
+{
+    QRegExp rating("\\((G|PG|M|MA)\\)");
+    if (rating.indexIn(event.description) == 0)
+    {
+      EventRating prograting;
+      prograting.system="AU"; prograting.rating = rating.cap(1);
+      event.ratings.push_back(prograting);
+      event.description.remove(0,rating.matchedLength()+1);
+    }
+    if (event.description.startsWith("[HD]"))
+    {
+      event.videoProps |= VID_HDTV;
+      event.description.remove(0,5);
+    }
+    if (event.description.startsWith("[CC]"))
+    {
+      event.subtitleType |= SUB_NORMAL;
+      event.description.remove(0,5);
+    }
+    if (event.subtitle == "Movie")
+    {
+        event.subtitle = QString::null;
+        event.categoryType = kCategoryMovie;
+    }
+    if (event.description.startsWith(event.title))
+      event.description.remove(0,event.title.length()+1);
+}
+/** \fn EITFixUp::FixAUSeven(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (Seven network)
+ */
+void EITFixUp::FixAUSeven(DBEventEIT &event) const
+{
+    if (event.description.endsWith(" Rpt"))
+    {
+        event.previouslyshown = true;
+        event.description.resize(event.description.size()-4);
+    }
+    QRegExp year("(\\d{4})$");
+    if (year.indexIn(event.description) != -1)
+    {
+        event.airdate = year.cap(3).toUInt();
+        event.description.resize(event.description.size()-5);
+    }
+    if (event.description.endsWith(" CC"))
+    {
+      event.subtitleType |= SUB_NORMAL;
+      event.description.resize(event.description.size()-3);
+    }
+    QString advisories;//store the advisories to append later
+    QRegExp adv("(\\([A-Z,]+\\))$");
+    if (adv.indexIn(event.description) != -1)
+    {
+        advisories = adv.cap(1);
+        event.description.resize(event.description.size()-(adv.matchedLength()+1));
+    }
+    QRegExp rating("(C|G|PG|M|MA)$");
+    if (rating.indexIn(event.description) != -1)
+    {
+        EventRating prograting;
+        prograting.system=""; prograting.rating = rating.cap(1);
+        if (!advisories.isEmpty())
+            prograting.rating.append(" ").append(advisories);
+        event.ratings.push_back(prograting);
+        event.description.resize(event.description.size()-(rating.matchedLength()+1));
+    }
+}
+/** \fn EITFixUp::FixAUFreeview(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (generic freeview - extra info in brackets at end of desc)
+ */
+void EITFixUp::FixAUFreeview(DBEventEIT &event) const
+{
+    if (event.description.endsWith(".."))//has been truncated to fit within the 'subtitle' eit field, so none of the following will work (ABC)
+        return;
+
+    if (m_AUFreeviewSY.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        if (event.subtitle.isEmpty())//nine sometimes has an actual subtitle field and the brackets thingo)
+            event.subtitle = m_AUFreeviewSY.cap(2);
+        event.airdate = m_AUFreeviewSY.cap(3).toUInt();
+        event.description = m_AUFreeviewSY.cap(1);
+    }
+    else if (m_AUFreeviewY.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        event.airdate = m_AUFreeviewY.cap(2).toUInt();
+        event.description = m_AUFreeviewY.cap(1);
+    }
+    else if (m_AUFreeviewSYC.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        if (event.subtitle.isEmpty())
+            event.subtitle = m_AUFreeviewSYC.cap(2);
+        event.airdate = m_AUFreeviewSYC.cap(3).toUInt();
+        QStringList actors = m_AUFreeviewSYC.cap(4).split("/");
+        for (int i = 0; i < actors.size(); ++i)
+            event.AddPerson(DBPerson::kActor, actors.at(i));
+        event.description = m_AUFreeviewSYC.cap(1);
+    }
+    else if (m_AUFreeviewYC.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        event.airdate = m_AUFreeviewYC.cap(2).toUInt();
+        QStringList actors = m_AUFreeviewYC.cap(3).split("/");
+        for (int i = 0; i < actors.size(); ++i)
+            event.AddPerson(DBPerson::kActor, actors.at(i));
+        event.description = m_AUFreeviewYC.cap(1);
     }
 }
 
