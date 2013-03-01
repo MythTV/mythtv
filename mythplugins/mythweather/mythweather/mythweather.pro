@@ -3,6 +3,9 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
 QT += sql xml network
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 TEMPLATE = lib
 CONFIG += plugin thread 
