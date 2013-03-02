@@ -9,10 +9,10 @@
 #error You need Qt version >= 4.6.0 to compile MythTV.
 #endif
 
-/// Update this whenever the plug-in API changes.
+/// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
-/// libmythui class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.27.20130224-1"
+/// libmythui class methods in exported headers.
+#define MYTH_BINARY_VERSION "0.27.20130301-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
