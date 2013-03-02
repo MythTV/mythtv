@@ -390,8 +390,8 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         connect(server, &PrivTcpServer::newConnection,
                 this,   &ServerPool::newTcpConnection);
 #else
-        connect(server, SIGNAL(newConnection(int)),
-                this,   SLOT(newTcpConnection(int)));
+        connect(server, SIGNAL(newConnection(qt_socket_fd_t)),
+                this,   SLOT(newTcpConnection(qt_socket_fd_t)));
 #endif
         if (server->listen(*it, m_port))
         {
