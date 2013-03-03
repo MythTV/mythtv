@@ -95,8 +95,9 @@ class MPEGSingleProgramStreamListener
   protected:
     virtual ~MPEGSingleProgramStreamListener() {}
   public:
-    virtual void HandleSingleProgramPAT(ProgramAssociationTable*) = 0;
-    virtual void HandleSingleProgramPMT(ProgramMapTable*) = 0;
+    virtual void HandleSingleProgramPAT(ProgramAssociationTable*,
+                                        bool insert) = 0;
+    virtual void HandleSingleProgramPMT(ProgramMapTable*, bool insert) = 0;
 };
 
 class ATSCMainStreamListener

@@ -28,6 +28,7 @@ class DVBRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const;
     void Close(void);
+    void StartNewFile(void);
 
   private:
     bool PauseAndWait(int timeout = 100);

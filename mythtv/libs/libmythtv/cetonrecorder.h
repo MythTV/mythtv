@@ -26,6 +26,7 @@ class CetonRecorder : public DTVRecorder
 
     bool Open(void);
     void Close(void);
+    void StartNewFile(void);
 
     bool IsOpen(void) const { return _stream_handler; }
 
