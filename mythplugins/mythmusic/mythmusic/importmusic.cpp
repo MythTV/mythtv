@@ -554,7 +554,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
     if (!d.exists())
         return;
 
-    d.setFilter(QDir::NoDotAndDotDot);
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     const QFileInfoList list = d.entryInfoList();
     if (list.isEmpty())
         return;
@@ -1028,6 +1028,7 @@ void ImportCoverArtDialog::scanDirectory()
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     QFileInfoList list = d.entryInfoList(nameFilter.split(";"),
+                                         QDir::Files | QDir::Dirs |
                                          QDir::NoDotAndDotDot);
     if (list.isEmpty())
         return;
