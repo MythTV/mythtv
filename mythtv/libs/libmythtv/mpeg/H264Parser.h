@@ -136,6 +136,8 @@ class H264Parser {
 
     uint pictureWidth(void) const { return pic_width; }
     uint pictureHeight(void) const { return pic_height; }
+    uint pictureWidthCropped(void) const;
+    uint pictureHeightCropped(void) const;
 
     /** \brief Computes aspect ratio from picture size and sample aspect ratio
      */
@@ -229,6 +231,7 @@ class H264Parser {
     int8_t     frame_mbs_only_flag;
     int8_t     pic_order_present_flag;
     int8_t     redundant_pic_cnt_present_flag;
+    int8_t     chroma_format_idc;
 
     uint       num_ref_frames;
     uint       redundant_pic_cnt;
