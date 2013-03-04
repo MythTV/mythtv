@@ -130,6 +130,7 @@ void H264Parser::Reset(void)
 
     delta_pic_order_always_zero_flag = 0;
     separate_colour_plane_flag = 0;
+    chroma_format_idc = 1;
     frame_mbs_only_flag = -1;
     pic_order_present_flag = -1;
     redundant_pic_cnt_present_flag = 0;
@@ -758,7 +759,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
  */
 void H264Parser::decode_SPS(GetBitContext * gb)
 {
-    int profile_idc, chroma_format_idc;
+    int profile_idc;
 
     seen_sps = true;
 
@@ -1339,4 +1340,28 @@ uint H264Parser::aspectRatio(void) const
         return 4;
 
     return aspect * 1000000;
+}
+
+// Following the lead of libavcodec, ignore the left cropping.
+uint H264Parser::pictureWidthCropped(void) const
+{
+    uint ChromaArrayType = separate_colour_plane_flag ? 0 : chroma_format_idc;
+    uint CropUnitX = 1;
+    uint SubWidthC = chroma_format_idc == 3 ? 1 : 2;
+    if (ChromaArrayType != 0)
+        CropUnitX = SubWidthC;
+    uint crop = CropUnitX * frame_crop_right_offset;
+    return pic_width - crop;
+}
+
+// Following the lead of libavcodec, ignore the top cropping.
+uint H264Parser::pictureHeightCropped(void) const
+{
+    uint ChromaArrayType = separate_colour_plane_flag ? 0 : chroma_format_idc;
+    uint CropUnitY = 2 - frame_mbs_only_flag;
+    uint SubHeightC = chroma_format_idc <= 1 ? 2 : 1;
+    if (ChromaArrayType != 0)
+        CropUnitY *= SubHeightC;
+    uint crop = CropUnitY * frame_crop_bottom_offset;
+    return pic_height - crop;
 }
