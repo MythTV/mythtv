@@ -21,7 +21,9 @@ class VideoOutputVDPAU : public VideoOutput
     static void GetRenderOptions(render_opts &opts);
     VideoOutputVDPAU();
     ~VideoOutputVDPAU();
-    bool Init(int width, int height, float aspect,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
     bool SetDeinterlacingEnabled(bool interlaced);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
@@ -34,7 +36,8 @@ class VideoOutputVDPAU : public VideoOutput
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
     void ClearAfterSeek(void);
-    bool InputChanged(const QSize &input_size,
+    bool InputChanged(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,

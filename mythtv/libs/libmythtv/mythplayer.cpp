@@ -484,7 +484,7 @@ bool MythPlayer::InitVideo(void)
                     decoder->GetCodecDecoderName(),
                     decoder->GetVideoCodecID(),
                     decoder->GetVideoCodecPrivate(),
-                    pipState, video_disp_dim, video_aspect,
+                    pipState, video_dim, video_disp_dim, video_aspect,
                     parentWidget, embedRect,
                     video_frame_rate, (uint)playerFlags);
 
@@ -588,7 +588,7 @@ void MythPlayer::ReinitVideo(void)
         videoOutput->SetVideoFrameRate(video_frame_rate);
         float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
-        if (!videoOutput->InputChanged(video_disp_dim, aspect,
+        if (!videoOutput->InputChanged(video_dim, video_disp_dim, aspect,
                                        decoder->GetVideoCodecID(),
                                        decoder->GetVideoCodecPrivate(),
                                        aspect_only))

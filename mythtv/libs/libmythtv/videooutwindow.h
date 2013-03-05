@@ -22,12 +22,14 @@ class VideoOutWindow
   public:
     VideoOutWindow();
 
-    bool Init(const QSize &new_video_dim, float aspect,
+    bool Init(const QSize &new_video_dim_buf,
+              const QSize &new_video_dim_disp, float aspect,
               const QRect &new_display_visible_rect,
               AspectOverrideMode aspectoverride,
               AdjustFillMode adjustfill);
 
-    bool InputChanged(const QSize &input_size, float aspect,
+    bool InputChanged(const QSize &input_size_buf,
+                      const QSize &input_size_disp, float aspect,
                       MythCodecID myth_codec_id, void *codec_private);
     void VideoAspectRatioChanged(float aspect);
 

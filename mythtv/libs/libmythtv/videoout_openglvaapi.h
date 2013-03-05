@@ -13,7 +13,9 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     VideoOutputOpenGLVAAPI();
    ~VideoOutputOpenGLVAAPI();
 
-    bool  Init(int width, int height, float aspect, WId winid,
+    bool  Init(const QSize &video_dim_buf,
+               const QSize &video_dim_disp,
+               float aspect, WId winid,
                const QRect &win_rect, MythCodecID codec_id);
     bool  CreateVAAPIContext(QSize size);
     void  DeleteVAAPIContext(void);
@@ -22,7 +24,9 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
     uint8_t* GetSurfaceIDPointer(void* buf);
     void  SetProfile(void);
     void  TearDown(void);
-    bool  InputChanged(const QSize &input_size, float aspect,
+    bool  InputChanged(const QSize &video_dim_buf,
+                       const QSize &video_dim_disp,
+                       float aspect,
                        MythCodecID  av_codec_id, void *codec_private,
                        bool &aspect_only);
     virtual void UpdatePauseFrame(int64_t &disp_timecode);

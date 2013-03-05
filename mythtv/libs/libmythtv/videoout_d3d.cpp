@@ -131,7 +131,8 @@ void VideoOutputD3D::WindowResized(const QSize &new_size)
     */
 }
 
-bool VideoOutputD3D::InputChanged(const QSize &input_size,
+bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
+                                  const QSize &video_dim_disp,
                                   float        aspect,
                                   MythCodecID  av_codec_id,
                                   void        *codec_private,
@@ -145,12 +146,12 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
         QString("InputChanged from %1: %2x%3 aspect %4 to %5: %6x%7 aspect %9")
             .arg(toString(video_codec_id)).arg(cursize.width())
             .arg(cursize.height()).arg(window.GetVideoAspect())
-            .arg(toString(av_codec_id)).arg(input_size.width())
-            .arg(input_size.height()).arg(aspect));
+            .arg(toString(av_codec_id)).arg(video_dim_disp.width())
+            .arg(video_dim_disp.height()).arg(aspect));
 
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != cursize;
+    bool res_changed = video_dim_disp != cursize;
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
@@ -166,7 +167,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
-    if (Init(input_size.width(), input_size.height(),
+    if (Init(video_dim_buf, video_dim_disp,
              aspect, m_hWnd, disp, av_codec_id))
     {
         BestDeint();
@@ -199,7 +200,9 @@ bool VideoOutputD3D::SetupContext()
     return true;
 }
 
-bool VideoOutputD3D::Init(int width, int height, float aspect, WId winid,
+bool VideoOutputD3D::Init(const QSize &video_dim_buf,
+                          const QSize &video_dim_disp,
+                          float aspect, WId winid,
                           const QRect &win_rect,MythCodecID codec_id)
 {
     MythPainter *painter = GetMythPainter();
@@ -210,7 +213,8 @@ bool VideoOutputD3D::Init(int width, int height, float aspect, WId winid,
     m_hWnd      = winid;
     window.SetAllowPreviewEPG(true);
 
-    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
+    VideoOutput::Init(video_dim_buf, video_dim_disp,
+                      aspect, winid, win_rect, codec_id);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
                          .arg(toString(codec_id)));
@@ -218,7 +222,8 @@ bool VideoOutputD3D::Init(int width, int height, float aspect, WId winid,
 
     bool success = true;
     success &= SetupContext();
-    InitDisplayMeasurements(width, height, false);
+    InitDisplayMeasurements(video_dim_disp.width(), video_dim_disp.height(),
+                            false);
 
     if (codec_is_dxva2(video_codec_id))
     {
@@ -539,6 +544,8 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
         }
         pauseframe = true;
     }
+
+    CropToDisplay(frame);
 
     if (frame)
         dummy = frame->dummy;

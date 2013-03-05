@@ -76,7 +76,8 @@ void VideoOutputNull::CreatePauseFrame(void)
     clear(&av_pause_frame);
 }
 
-bool VideoOutputNull::InputChanged(const QSize &input_size,
+bool VideoOutputNull::InputChanged(const QSize &video_dim_buf,
+                                   const QSize &video_dim_disp,
                                    float        aspect,
                                    MythCodecID  av_codec_id,
                                    void        *codec_private,
@@ -84,8 +85,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 {
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("InputChanged(WxH = %1x%2, aspect = %3)")
-            .arg(input_size.width())
-            .arg(input_size.height()).arg(aspect));
+            .arg(video_dim_disp.width())
+            .arg(video_dim_disp.height()).arg(aspect));
 
     if (!codec_is_std(av_codec_id))
     {
@@ -97,14 +98,15 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&global_lock);
 
-    if (input_size == window.GetActualVideoDim())
+    if (video_dim_disp == window.GetActualVideoDim())
     {
         vbuffers.Clear();
         MoveResize();
         return true;
     }
 
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+    VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
+                              aspect, av_codec_id, codec_private,
                               aspect_only);
     vbuffers.DeleteBuffers();
 
@@ -131,10 +133,12 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     return ok;
 }
 
-bool VideoOutputNull::Init(int width, int height, float aspect, WId winid,
+bool VideoOutputNull::Init(const QSize &video_dim_buf,
+                           const QSize &video_dim_disp,
+                           float aspect, WId winid,
                            const QRect &win_rect, MythCodecID codec_id)
 {
-    if ((width <= 0) || (height <= 0))
+    if ((video_dim_disp.width() <= 0) || (video_dim_disp.height() <= 0))
         return false;
 
     if (!codec_is_std(codec_id))
@@ -147,12 +151,14 @@ bool VideoOutputNull::Init(int width, int height, float aspect, WId winid,
 
     QMutexLocker locker(&global_lock);
 
-    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
+    VideoOutput::Init(video_dim_buf, video_dim_disp,
+                      aspect, winid, win_rect, codec_id);
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
 
+    // XXX should this be GetActualVideoDim() ?
     const QSize video_dim = window.GetVideoDim();
 
     if (!vbuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height()))

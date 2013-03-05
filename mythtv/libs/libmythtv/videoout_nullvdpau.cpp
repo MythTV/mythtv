@@ -44,12 +44,15 @@ void VideoOutputNullVDPAU::TearDown(void)
     DeleteRender();
 }
 
-bool VideoOutputNullVDPAU::Init(int width, int height, float aspect,
+bool VideoOutputNullVDPAU::Init(const QSize &video_dim_buf,
+                                const QSize &video_dim_disp,
+                                float aspect,
                                 WId winid, const QRect &win_rect,
                                 MythCodecID codec_id)
 {
     QMutexLocker locker(&m_lock);
-    bool ok = VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
+    bool ok = VideoOutput::Init(video_dim_buf, video_dim_disp,
+                                aspect, winid, win_rect, codec_id);
     if (!codec_is_vdpau_hw(video_codec_id))
         return false;
 
@@ -516,7 +519,8 @@ void VideoOutputNullVDPAU::ReleaseFrame(VideoFrame *frame)
     VideoOutput::ReleaseFrame(frame);
 }
 
-bool VideoOutputNullVDPAU::InputChanged(const QSize &input_size,
+bool VideoOutputNullVDPAU::InputChanged(const QSize &video_dim_buf,
+                                        const QSize &video_dim_disp,
                                         float        aspect,
                                         MythCodecID  av_codec_id,
                                         void        *codec_private,
@@ -524,13 +528,14 @@ bool VideoOutputNullVDPAU::InputChanged(const QSize &input_size,
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged(%1,%2,%3) '%4'->'%5'")
-            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(video_dim_disp.width()).arg(video_dim_disp.height())
+            .arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetActualVideoDim();
 
     if (!res_changed && !cid_changed)
     {
@@ -540,7 +545,7 @@ bool VideoOutputNullVDPAU::InputChanged(const QSize &input_size,
 
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
-    if (Init(input_size.width(), input_size.height(),
+    if (Init(video_dim_buf, video_dim_disp,
              aspect, 0, disp, av_codec_id))
     {
         return true;

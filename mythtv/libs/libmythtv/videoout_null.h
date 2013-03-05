@@ -12,14 +12,17 @@ class VideoOutputNull : public VideoOutput
     VideoOutputNull();
    ~VideoOutputNull();
 
-    bool Init(int width, int height, float aspect,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
     bool SetupDeinterlace(bool, const QString &ovrf = "")
         { (void)ovrf; return false; } // we don't deinterlace in null output..
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void Show(FrameScanType );
     void CreatePauseFrame(void);
-    bool InputChanged(const QSize &input_size,
+    bool InputChanged(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,
