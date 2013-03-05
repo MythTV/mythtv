@@ -42,7 +42,6 @@ extern "C" {
 
 #include "filtermanager.h"
 
-static QSize fix_1080i(QSize raw);
 static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
@@ -484,7 +483,8 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
     }
 }
 
-bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
+bool VideoOutWindow::Init(const QSize &new_video_dim_buf,
+                          const QSize &new_video_dim_disp, float new_video_aspect,
                           const QRect &new_display_visible_rect,
                           AspectOverrideMode new_aspectoverride,
                           AdjustFillMode new_adjustfill)
@@ -499,9 +499,9 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
     if (pip_state == kPBPRight)
             display_visible_rect.moveLeft(pbp_width);
 
-    video_dim_act  = new_video_dim;
-    video_disp_dim = fix_1080i(new_video_dim);
-    video_dim = fix_alignment(new_video_dim);
+    video_dim_act  = new_video_dim_disp;
+    video_disp_dim = new_video_dim_disp;
+    video_dim = new_video_dim_buf;
     video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
 
     if (pip_state > kPIPOff)
@@ -601,15 +601,16 @@ void VideoOutWindow::VideoAspectRatioChanged(float aspect)
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-bool VideoOutWindow::InputChanged(const QSize &input_size, float aspect,
+bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
+                                  const QSize &input_size_disp, float aspect,
                                   MythCodecID myth_codec_id, void *codec_private)
 {
     (void) myth_codec_id;
     (void) codec_private;
 
-    video_dim_act  = input_size;
-    video_disp_dim = fix_1080i(input_size);
-    video_dim = fix_alignment(input_size);
+    video_dim_act  = input_size_disp;
+    video_disp_dim = input_size_disp;
+    video_dim = input_size_buf;
 
     /*    if (db_vdisp_profile)
           db_vdisp_profile->SetInput(video_dim);*///done in videooutput
@@ -966,16 +967,6 @@ void VideoOutWindow::SetPIPState(PIPState setting)
         QString("VideoOutWindow::SetPIPState. pip_state: %1]") .arg(setting));
 
     pip_state = setting;
-}
-
-/// Correct for a 1920x1080 frames reported as 1920x1088
-static QSize fix_1080i(QSize raw)
-{
-    if (QSize(1920, 1088) == raw)
-        return QSize(1920, 1080);
-    if (QSize(1440, 1088) == raw)
-        return QSize(1440, 1080);
-    return raw;
 }
 
 /// Correct for underalignment

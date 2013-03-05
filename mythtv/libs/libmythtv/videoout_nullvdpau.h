@@ -35,9 +35,12 @@ class VideoOutputNullVDPAU : public VideoOutput
     VideoOutputNullVDPAU();
    ~VideoOutputNullVDPAU();
 
-    virtual bool Init(int width, int height, float aspect, WId winid,
+    virtual bool Init(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
+                      float aspect, WId winid,
                       const QRect &win_rect, MythCodecID codec_id);
-    virtual bool InputChanged(const QSize &input_size,
+    virtual bool InputChanged(const QSize &video_dim_buf,
+                              const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  av_codec_id,
                               void        *codec_private,

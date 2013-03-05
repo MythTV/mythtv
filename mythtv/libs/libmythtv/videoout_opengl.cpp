@@ -174,14 +174,17 @@ void VideoOutputOpenGL::DestroyVideoResources(void)
     gl_context_lock.unlock();
 }
 
-bool VideoOutputOpenGL::Init(int width, int height, float aspect, WId winid,
+bool VideoOutputOpenGL::Init(const QSize &video_dim_buf,
+                             const QSize &video_dim_disp,
+                             float aspect, WId winid,
                              const QRect &win_rect, MythCodecID codec_id)
 {
     QMutexLocker locker(&gl_context_lock);
     bool success = true;
     window.SetAllowPreviewEPG(true);
     gl_parent_win = winid;
-    success &= VideoOutput::Init(width, height, aspect, winid,
+    success &= VideoOutput::Init(video_dim_buf, video_dim_disp,
+                                 aspect, winid,
                                  win_rect, codec_id);
     SetProfile();
     InitPictureAttributes();
@@ -214,14 +217,16 @@ void VideoOutputOpenGL::SetProfile(void)
     }
 }
 
-bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
+bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
+                                     const QSize &video_dim_disp,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
                                      void        *codec_private,
                                      bool        &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
-            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(video_dim_disp.width()).arg(video_dim_disp.height())
+            .arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&gl_context_lock);
@@ -245,7 +250,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
     }
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetActualVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
@@ -267,7 +272,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         DestroyCPUResources();
 
     QRect disp = window.GetDisplayVisibleRect();
-    if (Init(input_size.width(), input_size.height(),
+    if (Init(video_dim_buf, video_dim_disp,
              aspect, gl_parent_win, disp, av_codec_id))
     {
         if (wasembedding)
@@ -471,6 +476,8 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(vbuffers.GetScratchFrame(), &av_pause_frame);
         pauseframe = true;
     }
+
+    CropToDisplay(frame);
 
     bool dummy = frame->dummy;
     if (filterList && sw_frame && !dummy)

@@ -33,7 +33,9 @@ class VideoOutputXv : public VideoOutput
     VideoOutputXv();
    ~VideoOutputXv();
 
-    bool Init(int width, int height, float aspect,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
 
     bool SetDeinterlacingEnabled(bool);
@@ -53,7 +55,8 @@ class VideoOutputXv : public VideoOutput
     void WindowResized(const QSize &new_size);
 
     void MoveResize(void);
-    bool InputChanged(const QSize &input_size,
+    bool InputChanged(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,

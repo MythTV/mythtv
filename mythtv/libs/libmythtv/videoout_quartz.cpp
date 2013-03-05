@@ -1176,7 +1176,8 @@ void VideoOutputQuartz::ToggleAspectOverride(AspectOverrideMode aspectMode)
     MoveResize();
 }
 
-bool VideoOutputQuartz::InputChanged(const QSize &input_size,
+bool VideoOutputQuartz::InputChanged(const QSize &video_dim_buf,
+                                     const QSize &video_dim_disp,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
                                      void        *codec_private,
@@ -1184,14 +1185,15 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged(WxH = %1x%2, aspect=%3")
-            .arg(input_size.width())
-            .arg(input_size.height()).arg(aspect));
+            .arg(video_dim_disp.width())
+            .arg(video_dim_disp.height()).arg(aspect));
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetActualVideoDim();
     bool asp_changed = aspect != window.GetVideoAspect();
 
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+    VideoOutput::InputChanged(video_dim_buf, video_dim_disp,
+                              aspect, av_codec_id, codec_private,
                               aspect_only);
 
     if (!res_changed && !cid_changed)
@@ -1228,21 +1230,24 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     return true;
 }
 
-bool VideoOutputQuartz::Init(int width, int height, float aspect,
+bool VideoOutputQuartz::Init(const QSize &video_dim_buf,
+                             const QSize &video_dim_disp,
+                             float aspect,
                              WId winid, const QRect &win_rect,
                              MythCodecID codec_id)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Init(WxH %1x%2, aspect=%3, winid=%4\n\t\t\t"
                 "win_bounds(x %5, y%6, WxH %7x%8))")
-            .arg(width).arg(height).arg(aspect).arg(winid)
+            .arg(video_dim_disp.width()).arg(video_dim_disp.height())
+            .arg(aspect).arg(winid)
             .arg(win_rect.x()).arg(win_rect.y())
             .arg(win_rect.width()).arg(win_rect.height()));
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
                   kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
-    VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
+    VideoOutput::Init(video_dim_buf, video_dim_disp, aspect, winid, win_rect, codec_id);
 
     const QSize video_dim = window.GetVideoDim();
     data->srcWidth  = video_dim.width();
@@ -1680,6 +1685,8 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         frame = vbuffers.GetScratchFrame();
         CopyFrame(vbuffers.GetScratchFrame(), &pauseFrame);
     }
+
+    CropToDisplay(frame);
 
     if (filterList)
         filterList->ProcessFrame(frame);

@@ -13,7 +13,9 @@ class VideoOutputOpenGL : public VideoOutput
     VideoOutputOpenGL(const QString &profile = QString());
     virtual ~VideoOutputOpenGL();
 
-    virtual bool Init(int width, int height, float aspect,
+    virtual bool Init(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
+                      float aspect,
                       WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void SetProfile(void);
     virtual void TearDown(void);
@@ -24,7 +26,9 @@ class VideoOutputOpenGL : public VideoOutput
                               const PIPMap &pipPlayers,
                               FrameScanType scan);
     virtual void Show(FrameScanType );
-    virtual bool InputChanged(const QSize &input_size, float aspect,
+    virtual bool InputChanged(const QSize &video_dim_buf,
+                              const QSize &video_dim_disp,
+                              float aspect,
                               MythCodecID  av_codec_id, void *codec_private,
                               bool &aspect_only);
     virtual void UpdatePauseFrame(int64_t &disp_timecode);
