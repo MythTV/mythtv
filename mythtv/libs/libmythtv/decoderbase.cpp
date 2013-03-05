@@ -1205,7 +1205,7 @@ void DecoderBase::SaveTotalDuration(void)
     if (!m_playbackinfo || av_q2d(totalDuration) == 0)
         return;
 
-    m_playbackinfo->SaveTotalDuration(1000 * av_q2d(totalDuration));
+    m_playbackinfo->SaveTotalDuration(1000000 * av_q2d(totalDuration));
 }
 
 void DecoderBase::SaveTotalFrames(void)
