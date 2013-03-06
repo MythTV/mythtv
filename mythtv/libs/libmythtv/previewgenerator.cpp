@@ -548,16 +548,6 @@ bool PreviewGenerator::SavePreview(QString filename,
     if (!data || !width || !height)
         return false;
 
-    if( height == 1088 )
-    {
-        // Remove the extra 8 pixels at the bottom of 1080i recordings that
-        // decode to 1088 rows as these are bogus pixels and make the previews
-        // look a bit wrong.  The worst offender seems to be H.264 captures
-        // from HDPVR.  Apparently, BBC HD also may exhibit the same behavior
-        // in the UK, although with a different width.
-        height = 1080;
-    }
-
     const QImage img((unsigned char*) data,
                      width, height, QImage::Format_RGB32);
 
