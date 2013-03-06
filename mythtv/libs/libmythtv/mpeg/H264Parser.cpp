@@ -1252,7 +1252,7 @@ uint H264Parser::aspectRatio(void) const
     double aspect = 0.0;
 
     if (pic_height)
-        aspect = pic_width / (double)pic_height;
+        aspect = pictureWidthCropped() / (double)pictureHeightCropped();
 
     switch (aspect_ratio_idc)
     {
