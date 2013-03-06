@@ -4624,8 +4624,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             {
                 // no need to buffer audio or video if we
                 // only care about building a keyframe map.
+                // NB but allow for data only (MHEG) streams
                 allowedquit = true;
-                continue;
             }
             else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
                      (storedPackets.count() < max_video_queue_size) &&
