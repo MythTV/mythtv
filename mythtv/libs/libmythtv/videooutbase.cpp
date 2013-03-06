@@ -1697,8 +1697,13 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
             return;
     }
 
+#if 0
+    // width and height should already be the properly cropped
+    // versions, and therefore height should not need this manual
+    // truncation.  Delete this code if no problems crop up.
     if ((width == 1920 || width == 1440) && height == 1088)
         height = 1080; // ATSC 1920x1080
+#endif
 
     float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
     if (display_res && display_res->SwitchToVideo(width, height, rate))
