@@ -364,42 +364,42 @@ Compruebe que el URL sea correcto.</translation>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="947"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1119"/>
+        <location filename="../mythmusic/importmusic.cpp" line="946"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1117"/>
         <source>Front Cover</source>
         <translation>Portada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="949"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
+        <location filename="../mythmusic/importmusic.cpp" line="948"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1119"/>
         <source>Back Cover</source>
         <translation>Contraportada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="951"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1125"/>
+        <location filename="../mythmusic/importmusic.cpp" line="950"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="953"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
+        <location filename="../mythmusic/importmusic.cpp" line="952"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
         <source>Inlay</source>
         <translation>Interior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="955"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1127"/>
+        <location filename="../mythmusic/importmusic.cpp" line="954"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1125"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Desconocido&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1094"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1092"/>
         <source>File Already Exists</source>
         <translation>El Archivo Ya Existe</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1096"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1094"/>
         <source>New File</source>
         <translation>Nuevo Archivo</translation>
     </message>
@@ -446,43 +446,43 @@ No fue posible copiar el archivo a: %1</translation>
         <translation>Se añadieron %1 pistas nuevas a la base de datos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="649"/>
+        <location filename="../mythmusic/importmusic.cpp" line="648"/>
         <source>Save Defaults</source>
         <translation>Guardar Valores por Defecto</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="653"/>
+        <location filename="../mythmusic/importmusic.cpp" line="652"/>
         <source>Change Compilation Flag</source>
         <translatorcomment>¿Mejor &quot;Recopilación&quot;?</translatorcomment>
         <translation>Cambiar Marca de Compilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="654"/>
+        <location filename="../mythmusic/importmusic.cpp" line="653"/>
         <source>Change Compilation Artist</source>
         <translation>Cambiar Intérprete de Recopilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="656"/>
+        <location filename="../mythmusic/importmusic.cpp" line="655"/>
         <source>Change Artist</source>
         <translation>Cambiar Intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="657"/>
+        <location filename="../mythmusic/importmusic.cpp" line="656"/>
         <source>Change Album</source>
         <translation>Cambiar Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="658"/>
+        <location filename="../mythmusic/importmusic.cpp" line="657"/>
         <source>Change Genre</source>
         <translation>Cambiar Género</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="659"/>
+        <location filename="../mythmusic/importmusic.cpp" line="658"/>
         <source>Change Year</source>
         <translation>Cambiar Año</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="660"/>
+        <location filename="../mythmusic/importmusic.cpp" line="659"/>
         <source>Change Rating</source>
         <translation>Cambiar Puntuación</translation>
     </message>
@@ -1399,13 +1399,13 @@ Nombre: %1</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="569"/>
+        <location filename="../mythmusic/filescanner.cpp" line="568"/>
         <location filename="../mythmusic/importmusic.cpp" line="511"/>
         <source>Searching for music files</source>
         <translation>Buscando archivos de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="587"/>
+        <location filename="../mythmusic/filescanner.cpp" line="586"/>
         <source>Updating music database</source>
         <translation>Actualizando la base de datos de música</translation>
     </message>
@@ -1511,7 +1511,7 @@ Nombre: %1</translation>
         <translation>Pista %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="661"/>
+        <location filename="../mythmusic/filescanner.cpp" line="660"/>
         <source>Scanning music files</source>
         <translation>Explorando archivos de música</translation>
     </message>
@@ -1531,12 +1531,12 @@ Nombre: %1</translation>
         <translation>Explorando CD. Por favor, espere...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="334"/>
+        <location filename="../mythmusic/filescanner.cpp" line="333"/>
         <source>Cleaning music database</source>
         <translation>Vaciando base de datos de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="743"/>
+        <location filename="../mythmusic/filescanner.cpp" line="742"/>
         <source>Scanning Album Artwork</source>
         <translation>Explorando Arte del Álbum</translation>
     </message>
@@ -1697,16 +1697,16 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SearchStream</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="779"/>
-        <location filename="../mythmusic/streamview.cpp" line="851"/>
-        <location filename="../mythmusic/streamview.cpp" line="872"/>
+        <location filename="../mythmusic/streamview.cpp" line="778"/>
+        <location filename="../mythmusic/streamview.cpp" line="850"/>
+        <location filename="../mythmusic/streamview.cpp" line="871"/>
         <source>&lt;All Stations&gt;</source>
         <translation>&lt;Todas las Estaciones&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="780"/>
-        <location filename="../mythmusic/streamview.cpp" line="861"/>
-        <location filename="../mythmusic/streamview.cpp" line="873"/>
+        <location filename="../mythmusic/streamview.cpp" line="779"/>
+        <location filename="../mythmusic/streamview.cpp" line="860"/>
+        <location filename="../mythmusic/streamview.cpp" line="872"/>
         <source>&lt;All Genres&gt;</source>
         <translation>&lt;Todos los Géneros&gt;</translation>
     </message>
@@ -1920,35 +1920,35 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>StreamView</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="88"/>
+        <location filename="../mythmusic/streamview.cpp" line="87"/>
         <source>Stream Actions</source>
         <translation>Acciones sobre la Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="89"/>
-        <location filename="../mythmusic/streamview.cpp" line="297"/>
+        <location filename="../mythmusic/streamview.cpp" line="88"/>
+        <location filename="../mythmusic/streamview.cpp" line="296"/>
         <source>Add Stream</source>
         <translation>Añadir Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="93"/>
-        <location filename="../mythmusic/streamview.cpp" line="311"/>
+        <location filename="../mythmusic/streamview.cpp" line="92"/>
+        <location filename="../mythmusic/streamview.cpp" line="310"/>
         <source>Edit Stream</source>
         <translation>Editar Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="94"/>
-        <location filename="../mythmusic/streamview.cpp" line="307"/>
+        <location filename="../mythmusic/streamview.cpp" line="93"/>
+        <location filename="../mythmusic/streamview.cpp" line="306"/>
         <source>Remove Stream</source>
         <translation>Eliminar Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="97"/>
+        <location filename="../mythmusic/streamview.cpp" line="96"/>
         <source>More Options</source>
         <translation>Más Opciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="389"/>
+        <location filename="../mythmusic/streamview.cpp" line="388"/>
         <source>Are you sure you want to delete this Stream?
 Station: %1 - Channel: %2</source>
         <translation>¿Seguro que desea eliminar esta Emisión?

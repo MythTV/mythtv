@@ -684,36 +684,36 @@ Introduzca un DVD virgen en la unidad y elija una opción entre las siguientes.<
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="134"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="133"/>
         <source>Retrieving Recording List.
 Please Wait...</source>
         <translation>Recuperando la lista de grabaciones.
 Por favor, espere...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="214"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="213"/>
         <source>Clear All</source>
         <translation>Desmarcar todas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="215"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="214"/>
         <source>Select All</source>
         <translation>Seleccionar todas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="113"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="421"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="526"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="112"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="420"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="525"/>
         <source>All Recordings</source>
         <translation>Todas las grabaciones</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="158"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="157"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>¡No tiene grabaciones o no están disponibles localmente!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="207"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="206"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>

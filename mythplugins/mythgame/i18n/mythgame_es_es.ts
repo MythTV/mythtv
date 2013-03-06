@@ -134,7 +134,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="232"/>
-        <location filename="../mythgame/gamehandler.cpp" line="618"/>
+        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -145,7 +145,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="234"/>
-        <location filename="../mythgame/gamehandler.cpp" line="619"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>Yes</source>
         <translation>Sí</translation>
     </message>
@@ -167,13 +167,13 @@ Remove it from the database?</source>
         <translation>Verificando %1 archivos...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="612"/>
+        <location filename="../mythgame/gamehandler.cpp" line="607"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Esto eliminará de la base de datos todos los metadatos de los juegos. ¿Seguro que desea hacerlo?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="717"/>
-        <location filename="../mythgame/gamehandler.cpp" line="745"/>
+        <location filename="../mythgame/gamehandler.cpp" line="707"/>
+        <location filename="../mythgame/gamehandler.cpp" line="735"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Buscando juegos de %1...</translation>
