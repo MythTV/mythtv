@@ -1790,7 +1790,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     bool unknownbitrate = false;
     int scanerror = 0;
     bitrate       = 0;
-    fps           = 0;
 
     tracks[kTrackTypeAttachment].clear();
     tracks[kTrackTypeAudio].clear();
@@ -1803,6 +1802,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         // we will rescan video streams
         tracks[kTrackTypeVideo].clear();
         selectedTrack[kTrackTypeVideo].av_stream_index = -1;
+        fps = 0;
     }
     map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
