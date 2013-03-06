@@ -78,19 +78,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="47"/>
         <source>Weather forecasts</source>
         <translation>Pronósticos del tiempo</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="53"/>
+        <location filename="../mythweather/main.cpp" line="49"/>
         <source>Pause current page</source>
         <translation>Pausa en la página actual</translation>
     </message>
     <message>
+        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="53"/>
         <location filename="../mythweather/main.cpp" line="55"/>
-        <location filename="../mythweather/main.cpp" line="57"/>
-        <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Lista de Búsqueda</translation>
     </message>
