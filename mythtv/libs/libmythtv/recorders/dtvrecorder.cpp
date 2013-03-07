@@ -717,6 +717,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
         if (!_frames_seen_count)
             _audio_timer.start();
 
+        _buffer_packets = false;
         _frames_seen_count++;
 
         if (1 == (_frames_seen_count & 0x7))
@@ -1335,8 +1336,6 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         // if audio/video key-frames have been found
         if (_wait_for_keyframe_option && _first_keyframe < 0)
             return true;
-
-        _buffer_packets = true;
     }
 
     BufferedWrite(tspacket);
