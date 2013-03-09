@@ -271,7 +271,10 @@ void ChannelRecPriority::FillList(void)
             chaninfo->channum = result.value(1).toString();
             chaninfo->sourceid = result.value(2).toInt();
             chaninfo->callsign = result.value(3).toString();
-            chaninfo->icon = result.value(4).toString();
+            QString iconurl = result.value(4).toString();
+            if (!iconurl.isEmpty())
+                iconurl = gCoreContext->GetMasterHostPrefix( "ChannelIcons", iconurl);
+            chaninfo->icon = iconurl;
             chaninfo->recpriority = result.value(5).toInt();
             chaninfo->name = result.value(6).toString();
 
