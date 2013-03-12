@@ -156,10 +156,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="Three Day Forecast">
@@ -265,10 +270,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="Six Day Forecast">
@@ -428,10 +438,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="Static Map">
@@ -447,10 +462,15 @@
         </imagetype>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="Animated Map">
@@ -467,10 +487,15 @@
         </imagetype>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="Severe Weather Alerts">
@@ -488,10 +513,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="18 Hour Forecast">
@@ -652,10 +682,15 @@
         </textarea>
 
         <textarea name="copyright" from="basetextarea">
-            <area>70,640,1140,40</area>
+            <area>70,640,850,40</area>
             <align>left,vcenter</align>
             <font>basesmaller</font>
         </textarea>
+
+        <imagetype name="copyrightlogo">
+            <area>940,617,240,60</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
     </window>
 
     <window name="global-setup">
