@@ -1240,7 +1240,8 @@ void DVDRingBuffer::ActivateButton(void)
 
 /** \brief get SPU pkt from dvd menu subtitle stream
  */
-void DVDRingBuffer::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
+void DVDRingBuffer::GetMenuSPUPkt(uint8_t *buf, int buf_size,
+                                  int stream_id, uint32_t startTime)
 {
     if (buf_size < 4)
         return;
@@ -1266,7 +1267,7 @@ void DVDRingBuffer::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
     {
         int32_t gotbutton;
         m_buttonExists = DecodeSubtitles(&m_dvdMenuButton, &gotbutton,
-                                        m_menuSpuPkt, m_menuBuflength);
+                                        m_menuSpuPkt, m_menuBuflength, startTime);
     }
 }
 
@@ -1311,7 +1312,7 @@ QRect DVDRingBuffer::GetButtonCoords(void)
  * code obtained from ffmpeg project
  */
 bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
-                                    const uint8_t *spu_pkt, int buf_size)
+                                    const uint8_t *spu_pkt, int buf_size, uint32_t startTime)
 {
     #define GETBE16(p) (((p)[0] << 8) | (p)[1])
 
@@ -1350,12 +1351,14 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             {
                 case 0x00:
                     force_subtitle_display = true;
+                    sub->start_display_time = startTime;
+                    sub->end_display_time   = 0xFFFFFFFF;
                 break;
                 case 0x01:
-                    sub->start_display_time = (date << 10) / 90;
+                    sub->start_display_time = ((date << 10) / 90) + startTime;
                 break;
                 case 0x02:
-                    sub->end_display_time = (date << 10) / 90;
+                    sub->end_display_time = ((date << 10) / 90) + startTime;
                 break;
                 case 0x03:
                 {

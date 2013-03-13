@@ -526,21 +526,43 @@ void MythDVDPlayer::DisplayDVDButton(void)
     AVSubtitle *dvdSubtitle = player_ctx->buffer->DVD()->GetMenuSubtitle(buttonversion);
     bool numbuttons    = player_ctx->buffer->DVD()->NumMenuButtons();
 
+    bool expired = false;
+
+    VideoFrame *currentFrame = videoOutput ? videoOutput->GetLastShownFrame() : NULL;
+
+    if (!currentFrame)
+    {
+        player_ctx->buffer->DVD()->ReleaseMenuButton();
+        return;
+    }
+
+    if (dvdSubtitle &&
+        (dvdSubtitle->end_display_time < currentFrame->timecode))
+    {
+        expired = true;
+    }
+
     // nothing to do
-    if (buttonversion == ((uint)m_buttonVersion))
+    if (!expired && (buttonversion == ((uint)m_buttonVersion)))
     {
         player_ctx->buffer->DVD()->ReleaseMenuButton();
         return;
     }
 
     // clear any buttons
-    if (!numbuttons || !dvdSubtitle || (buttonversion == 0))
+    if (!numbuttons || !dvdSubtitle || (buttonversion == 0) || expired)
     {
         osdLock.lock();
         if (osd)
             osd->ClearSubtitles();
         osdLock.unlock();
         m_buttonVersion = 0;
+        player_ctx->buffer->DVD()->ReleaseMenuButton();
+        return;
+    }
+
+    if (currentFrame->timecode && (dvdSubtitle->start_display_time > currentFrame->timecode))
+    {
         player_ctx->buffer->DVD()->ReleaseMenuButton();
         return;
     }

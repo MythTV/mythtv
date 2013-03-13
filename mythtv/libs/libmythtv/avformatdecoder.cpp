@@ -3699,7 +3699,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         if (ringBuffer->DVD()->NumMenuButtons() > 0)
         {
             ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
-                                             curstream->id);
+                                             curstream->id, pts);
         }
         else
         {
@@ -3707,7 +3707,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
             {
                 QMutexLocker locker(avcodeclock);
                 ringBuffer->DVD()->DecodeSubtitles(&subtitle, &gotSubtitles,
-                                                   pkt->data, pkt->size);
+                                                   pkt->data, pkt->size, pts);
             }
         }
     }
@@ -3716,14 +3716,15 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
         QMutexLocker locker(avcodeclock);
         avcodec_decode_subtitle2(curstream->codec, &subtitle, &gotSubtitles,
                                  pkt);
+
+        subtitle.start_display_time += pts;
+        subtitle.end_display_time += pts;
     }
 
     if (gotSubtitles)
     {
         if (isForcedTrack)
             subtitle.forced = true;
-        subtitle.start_display_time += pts;
-        subtitle.end_display_time += pts;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
             QString("subtl timecode %1 %2 %3 %4")
                 .arg(pkt->pts).arg(pkt->dts)
