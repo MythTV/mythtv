@@ -99,9 +99,11 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 
     m_skipstillorwait(true),
     m_cellstartPos(0), m_buttonSelected(false),
-    m_buttonExists(false), m_cellid(0),
-    m_lastcellid(0), m_vobid(0),
-    m_lastvobid(0), m_cellRepeated(false),
+    m_buttonExists(false),
+    m_buttonSeenInCell(false), m_lastButtonSeenInCell(false),
+    m_cellid(0), m_lastcellid(0),
+    m_vobid(0), m_lastvobid(0),
+    m_cellRepeated(false),
 
     m_curAudioTrack(0),
     m_curSubtitleTrack(0),
@@ -638,9 +640,11 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 // clear menus/still frame selections
                 m_lastvobid = m_vobid;
                 m_lastcellid = m_cellid;
+                m_lastButtonSeenInCell = m_buttonSeenInCell;
                 m_buttonSelected = false;
                 m_vobid = m_cellid = 0;
                 m_cellRepeated = false;
+                m_buttonSeenInCell = false;
 
                 IncrementButtonVersion;
                 if (m_inMenu)
@@ -680,21 +684,6 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // clear any existing subs/buttons
                 IncrementButtonVersion;
-
-                // update the stream number
-                if (m_inMenu || NumMenuButtons() > 0)
-                {
-                    m_buttonStreamID = 32;
-                    int aspect = dvdnav_get_video_aspect(m_dvdnav);
-
-                    // workaround where dvd menu is
-                    // present in VTS_DOMAIN. dvdnav adds 0x80 to stream id
-                    // proper fix should be put in dvdnav sometime
-                    int physical_wide = (spu->physical_wide & 0xF);
-
-                    if (aspect != 0 && physical_wide > 0)
-                        m_buttonStreamID += physical_wide;
-                }
 
                 // not sure
                 if (m_autoselectsubtitle)
@@ -775,15 +764,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // if we are in a looping menu, we don't want to reset the
                 // selected button when we restart
-                if (m_vobid == 0 && m_cellid == 0)
+                m_vobid  = dsi->dsi_gi.vobu_vob_idn;
+                m_cellid = dsi->dsi_gi.vobu_c_idn;
+                if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
+                     && m_lastButtonSeenInCell)
                 {
-                    m_vobid  = dsi->dsi_gi.vobu_vob_idn;
-                    m_cellid = dsi->dsi_gi.vobu_c_idn;
-                    if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
-                         && m_inMenu)
-                    {
-                        m_cellRepeated = true;
-                    }
+                    m_cellRepeated = true;
                 }
 
                 // update our status
@@ -804,6 +790,24 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     {
                         dvdnav_relative_time_search(m_dvdnav, relativetime * 2);
                     }
+                }
+
+                // update the button stream number if this is the
+                // first NAV pack containing button information
+                if ( (pci->hli.hl_gi.hli_ss & 0x03) == 0x01 )
+                {
+                    m_buttonStreamID = 32;
+                    int aspect = dvdnav_get_video_aspect(m_dvdnav);
+
+                    // workaround where dvd menu is
+                    // present in VTS_DOMAIN. dvdnav adds 0x80 to stream id
+                    // proper fix should be put in dvdnav sometime
+                    int8_t spustream = dvdnav_get_active_spu_stream(m_dvdnav) & 0x7f;
+
+                    if (aspect != 0 && spustream > 0)
+                        m_buttonStreamID += spustream;
+
+                    m_buttonSeenInCell = true;
                 }
 
                 // debug
@@ -857,6 +861,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 {
                     m_audioStreamsChanged = true;
                 }
+
+                // Make sure we know we're not staying in the
+                // same cell (same vobid/cellid values can
+                // occur in every VTS)
+                m_lastvobid  = m_vobid  = 0;
+                m_lastcellid = m_cellid = 0;
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)

@@ -183,6 +183,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     long long      m_cellstartPos;
     bool           m_buttonSelected;
     bool           m_buttonExists;
+    bool           m_buttonSeenInCell;
+    bool           m_lastButtonSeenInCell;
     int            m_cellid;
     int            m_lastcellid;
     int            m_vobid;
