@@ -1332,8 +1332,8 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     bool force_subtitle_display = false;
     sub->rects = NULL;
     sub->num_rects = 0;
-    sub->start_display_time = 0;
-    sub->end_display_time = 0;
+    sub->start_display_time = startTime;
+    sub->end_display_time = 0xFFFFFFFF;
 
     cmd_pos = GETBE16(spu_pkt + 2);
     while ((cmd_pos + 4) < buf_size)
@@ -1351,8 +1351,6 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             {
                 case 0x00:
                     force_subtitle_display = true;
-                    sub->start_display_time = startTime;
-                    sub->end_display_time   = 0xFFFFFFFF;
                 break;
                 case 0x01:
                     sub->start_display_time = ((date << 10) / 90) + startTime;
@@ -1401,6 +1399,14 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                     offset1 = GETBE16(spu_pkt + pos);
                     offset2 = GETBE16(spu_pkt + pos + 2);
                     pos +=4;
+                }
+                break;
+                case 0x07:
+                {
+                    if ((buf_size - pos) < 2)
+                        goto fail;
+
+                    pos += GETBE16(spu_pkt + pos);
                 }
                 break;
                 case 0xff:
