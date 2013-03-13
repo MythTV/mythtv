@@ -1526,7 +1526,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (videoBuffer)
     {
         videoBuffer->stop();
-        delete videoBuffer;
     }
 
     av_free(newFrame);
