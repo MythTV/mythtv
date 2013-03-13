@@ -1790,7 +1790,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     bool unknownbitrate = false;
     int scanerror = 0;
     bitrate       = 0;
-    fps           = 0;
 
     tracks[kTrackTypeAttachment].clear();
     tracks[kTrackTypeAudio].clear();
@@ -1803,6 +1802,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         // we will rescan video streams
         tracks[kTrackTypeVideo].clear();
         selectedTrack[kTrackTypeVideo].av_stream_index = -1;
+        fps = 0;
     }
     map<int,uint> lang_sub_cnt;
     uint subtitleStreamCount = 0;
@@ -3019,6 +3019,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             uint  height = seq->height() >> context->lowres;
             current_aspect = seq->aspect(context->codec_id ==
                                          AV_CODEC_ID_MPEG1VIDEO);
+            if (stream->sample_aspect_ratio.num)
+                current_aspect = av_q2d(stream->sample_aspect_ratio) *
+                    width / height;
             if (aspect_override > 0.0f)
                 current_aspect = aspect_override;
             float seqFPS = seq->fps();
