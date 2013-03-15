@@ -106,9 +106,11 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         virtual bool                DownloadFile        ( const QString   &URL,
                                                           const QString   &StorageGroup ) = 0;
 
-        virtual bool                DeleteFile          ( const QString   &FileName ) = 0;
+        virtual bool                DeleteFile          ( const QString   &StorageGroup,
+                                                          const QString   &FileName ) = 0;
 
-        virtual bool                RenameFile          ( const QString   &FileName,
+        virtual bool                RenameFile          ( const QString   &StorageGroup,
+                                                          const QString   &FileName,
                                                           const QString   &NewName ) = 0;
 
         virtual DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
