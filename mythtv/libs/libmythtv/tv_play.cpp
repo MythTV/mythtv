@@ -4169,13 +4169,13 @@ bool TV::SubtitleDelayHandleAction(PlayerContext *ctx,
     bool handled = true;
 
     if (has_action(ACTION_LEFT, actions))
-        ChangeSubtitleDelay(ctx, -1);
+        ChangeSubtitleDelay(ctx, -5);
     else if (has_action(ACTION_RIGHT, actions))
-        ChangeSubtitleDelay(ctx, 1);
+        ChangeSubtitleDelay(ctx, 5);
     else if (has_action(ACTION_UP, actions))
-        ChangeSubtitleDelay(ctx, -10);
+        ChangeSubtitleDelay(ctx, -25);
     else if (has_action(ACTION_DOWN, actions))
-        ChangeSubtitleDelay(ctx, 10);
+        ChangeSubtitleDelay(ctx, 25);
     else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions))
         ClearOSD(ctx);
     else
