@@ -201,7 +201,7 @@ QString StorageGroup::GetFirstDir(bool appendSlash) const
 }
 
 QStringList StorageGroup::GetDirFileList(QString dir, QString base,
-                                         bool recursive)
+                                         bool recursive, bool onlyDirs)
 {
     QStringList files;
     QDir d(dir);
@@ -228,21 +228,42 @@ QStringList StorageGroup::GetDirFileList(QString dir, QString base,
         {
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("GetDirFileList: Dir: %1/%2").arg(base).arg(*p));
-            files << GetDirFileList(dir + "/" + *p, base + *p, true);
+
+            if (onlyDirs)
+                files.append(base + *p);
+
+            files << GetDirFileList(dir + "/" + *p, base + *p, true, onlyDirs);
         }
     }
 
-    QStringList list = d.entryList(QDir::Files|QDir::Readable);
-    for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+    if (!onlyDirs)
     {
-        LOG(VB_FILE, LOG_DEBUG, LOC +
-            QString("GetDirFileList: File: %1%2").arg(base).arg(*p));
-        if (recursive)
-            files.append(base + *p);
-        else
-            files.append(*p);
+        QStringList list = d.entryList(QDir::Files|QDir::Readable);
+        for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+        {
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("GetDirFileList: File: %1%2").arg(base).arg(*p));
+            if (recursive)
+                files.append(base + *p);
+            else
+                files.append(*p);
+        }
     }
+    return files;
+}
 
+QStringList StorageGroup::GetDirList(QString Path, bool recursive)
+{
+    QStringList files;
+    QString tmpDir;
+    QDir d;
+    for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+    {
+        tmpDir = *it + Path;
+        d.setPath(tmpDir);
+        if (d.exists())
+            files << GetDirFileList(tmpDir, Path, recursive, true);
+    }
     return files;
 }
 
@@ -258,7 +279,7 @@ QStringList StorageGroup::GetFileList(QString Path, bool recursive)
 
         d.setPath(tmpDir);
         if (d.exists())
-            files << GetDirFileList(tmpDir, Path, recursive);
+            files << GetDirFileList(tmpDir, Path, recursive, false);
     }
 
     return files;
