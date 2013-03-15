@@ -65,6 +65,7 @@ void ImageProperties::Init()
     preserveAspect = false;
     isGreyscale = false;
     isReflected = false;
+    isRotated = false;
     isMasked = false;
     reflectAxis = ReflectVertical;
     reflectScale = 100;
@@ -85,6 +86,7 @@ void ImageProperties::Copy(const ImageProperties &other)
     preserveAspect = other.preserveAspect;
     isGreyscale = other.isGreyscale;
     isReflected = other.isReflected;
+    isRotated = other.isRotated;
     isMasked = other.isMasked;
 
     reflectAxis = other.reflectAxis;
@@ -182,6 +184,12 @@ class ImageLoader
         if (imProps.isReflected)
             s_Attrib += "reflected";
 
+        if (imProps.isRotated)
+        {
+            s_Attrib += "rotated";
+            s_Attrib += QString("%1").arg(imProps.rotationAngle);
+        }
+
         if (imProps.isGreyscale)
             s_Attrib += "greyscale";
 
@@ -266,6 +274,9 @@ class ImageLoader
             if (imProps.isReflected)
                 image->setIsReflected(true);
 
+            if (imProps.isRotated)
+                image->setIsRotated(true);
+
             bFoundInCache = true;
         }
         else
@@ -320,6 +331,9 @@ class ImageLoader
                 image->Reflect(imProps.reflectAxis, imProps.reflectShear,
                                imProps.reflectScale, imProps.reflectLength,
                                imProps.reflectSpacing);
+
+            if (imProps.isRotated)
+                image->Rotate(imProps.rotationAngle, imProps.forceSize);
 
             if (imProps.isGreyscale)
                 image->ToGreyscale();
@@ -759,6 +773,11 @@ void MythUIImage::SetImage(MythImage *img)
                      m_imageProperties.reflectLength,
                      m_imageProperties.reflectSpacing);
 
+    if (m_imageProperties.isRotated && !img->IsRotated() &&
+        m_imageProperties.rotationAngle != 0)
+        img->Rotate(m_imageProperties.rotationAngle,
+                    m_imageProperties.forceSize);
+
     if (m_imageProperties.isGreyscale && !img->isGrayscale())
         img->ToGreyscale();
 
@@ -819,6 +838,11 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
                         m_imageProperties.reflectScale,
                         m_imageProperties.reflectLength,
                         m_imageProperties.reflectSpacing);
+
+        if (m_imageProperties.isRotated && !im->IsRotated() &&
+            m_imageProperties.rotationAngle != 0)
+            im->Rotate(m_imageProperties.rotationAngle,
+                       m_imageProperties.forceSize);
 
         if (m_imageProperties.isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
@@ -888,6 +912,15 @@ void MythUIImage::ForceSize(const QSize &size)
 
     Load();
     return;
+}
+
+/**
+ *  \brief Rotates the first image in the widget
+ */
+void MythUIImage::SetRotation(int rotationAngle)
+{
+    m_imageProperties.isRotated = true;
+    m_imageProperties.rotationAngle = rotationAngle;
 }
 
 /**
@@ -1386,6 +1419,13 @@ bool MythUIImage::ParseElement(
              element.tagName() == "greyscale")
     {
         m_imageProperties.isGreyscale = parseBool(element);
+    }
+    else if (element.tagName() == "rotate")
+    {
+        m_imageProperties.isRotated = true;
+        QString tmp = element.attribute("angle");
+        if (!tmp.isEmpty())
+            m_imageProperties.rotationAngle = tmp.toInt();
     }
     else
     {
