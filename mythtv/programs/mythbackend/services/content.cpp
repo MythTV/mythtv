@@ -206,6 +206,26 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QStringList Content::GetDirList( const QString &sStorageGroup )
+{
+
+    if (sStorageGroup.isEmpty())
+    {
+        QString sMsg( "GetDirList - StorageGroup missing.");
+        LOG(VB_UPNP, LOG_ERR, sMsg);
+
+        throw sMsg;
+    }
+
+    StorageGroup sgroup(sStorageGroup);
+
+    return sgroup.GetDirList("", true);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QStringList Content::GetFileList( const QString &sStorageGroup )
 {
 
@@ -785,6 +805,64 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
         return true;
 
     return false;
+}
+
+/** \fn     Content::DeleteImage(const QString &sFileName )
+ *  \brief  Permanently deletes the given file from the disk.
+ *  \param  sFileName The full filename that shall be deleted
+ *  \return bool True if deletion was successful, otherwise false
+ */
+bool Content::DeleteFile( const QString &sFileName )
+{
+    if (sFileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "DeleteFile - FileName is missing");
+        return false;
+    }
+
+    if (!QFile::exists( sFileName ))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "DeleteFile - FileName does not exist.");
+        return false;
+    }
+    return QFile::remove( sFileName );
+}
+
+/** \fn     Content::RenameFile(const QString &sFileName,
+ *                              const QString &sNewFile)
+ *  \brief  Renames the file to the new name.
+ *  \param  sFileName The full filename that shall be deleted
+ *  \param  sNewName  The new name of the file (only the name, no path)
+ *  \return bool True if renaming was successful, otherwise false
+ */
+bool Content::RenameFile( const QString &sFileName,
+                          const QString &sNewName)
+{
+    if (sFileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RenameFile - FileName is missing");
+        return false;
+    }
+
+    if (!QFile::exists( sFileName ))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RenameFile - FileName does not exist.");
+        return false;
+    }
+
+    QFileInfo fileInfo(sFileName);
+    QString sNewFileName = fileInfo.path() + "/" + sNewName;
+    if (QFile::exists( sNewFileName ))
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("RenameFile - New file %1 would overwrite "
+                    "existing one, not renaming.").arg(sNewFileName));
+        return false;
+    }
+
+    // If the path of the new filename is not the same
+    // as the original one, then the renaming will fail.
+    return QFile::rename( sFileName, sNewFileName );
 }
 
 /////////////////////////////////////////////////////////////////////////////
