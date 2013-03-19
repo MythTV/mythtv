@@ -484,6 +484,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         temp->frameBuffers.clear();
         temp->frameBufferTextures.clear();
         filters[filter] = temp;
+        temp = NULL;
         success &= OptimiseFilters();
     }
 
