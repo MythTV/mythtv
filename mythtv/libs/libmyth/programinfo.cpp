@@ -1936,7 +1936,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
              query.value(31).toInt() == COMM_FLAG_DONE);
     set_flag(programflags, FL_COMMPROCESSING ,
              query.value(31).toInt() == COMM_FLAG_PROCESSING);
-    set_flag(programflags, FL_REPEAT,        query.value(29).toBool());
+    set_flag(programflags, FL_REPEAT,        query.value(32).toBool());
     set_flag(programflags, FL_TRANSCODED,
              query.value(34).toInt() == TRANSCODING_COMPLETE);
     set_flag(programflags, FL_DELETEPENDING, query.value(35).toBool());
