@@ -8,7 +8,6 @@ MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
 
 MythUIEditBar::~MythUIEditBar(void)
 {
-    ReleaseImages();
 }
 
 void MythUIEditBar::ReleaseImages(void)
