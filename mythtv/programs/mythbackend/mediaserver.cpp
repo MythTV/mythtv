@@ -27,6 +27,7 @@
 #include "serviceHosts/channelServiceHost.h"
 #include "serviceHosts/videoServiceHost.h"
 #include "serviceHosts/captureServiceHost.h"
+#include "serviceHosts/imageServiceHost.h"
 
 #ifdef USING_LIBDNS_SD
 #include "bonjourregister.h"
@@ -123,6 +124,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     m_pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
     m_pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
+    m_pHttpServer->RegisterExtension( new ImageServiceHost  ( m_sSharePath ));
 
     QString sIP = g_pConfig->GetValue( "BackendServerIP"  , ""   );
     if (sIP.isEmpty())
@@ -159,6 +161,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
          pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
      pEngine->globalObject().setProperty("Capture"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableCapture   >() );
+     pEngine->globalObject().setProperty("Image"  ,
+         pEngine->scriptValueFromQMetaObject< Image             >() );
 
     // ------------------------------------------------------------------
 
