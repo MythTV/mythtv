@@ -454,7 +454,7 @@
 
         <!-- the shape where the imagelist is displayed -->
         <shape name="galleryconfig_background">
-            <area>160,170,960,410</area>
+            <area>160,170,960,460</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="130" />
             <line color="#AAAAAA" alpha="150" width="1" />
@@ -486,6 +486,10 @@
             <position>180,440</position>
             <value>Show files that are marked as hidden:</value>
         </textarea>
+        <textarea name="cleardatabase_label" from="sgname_label">
+            <position>180,490</position>
+            <value>Clear database contents (Resync required):</value>
+        </textarea>
 
         <textedit name="storagegroupname" from="basetextedit">
             <position>730,190</position>
@@ -505,19 +509,36 @@
         <checkbox name="showhiddenfiles" from="basecheckbox">
             <position>730,445</position>
         </checkbox>
+        <button name="cleardatabase" from="basebutton">
+            <area>730,495,40,40</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="selected">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="disabled">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="pushed">
+                    <area>0,0,40,40</area>
+                </state>
+            </statetype>
+        </button>
 
         <shape name="description_separator">
-            <area>180,500,920,1</area>
+            <area>180,550,920,1</area>
             <type>box</type>
             <line color="#AAAAAA" alpha="150" width="1" />
         </shape>
 
         <button name="save" from="basebutton">
-            <position>450,520</position>
+            <position>450,570</position>
             <value>Save</value>
         </button>
         <button name="cancel" from="basebutton">
-            <position>680,520</position>
+            <position>680,570</position>
             <value>Cancel</value>
         </button>
 
