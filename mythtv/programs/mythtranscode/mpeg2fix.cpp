@@ -806,10 +806,12 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
                 break;
 
             case AVMEDIA_TYPE_AUDIO:
-                if (!allaudio && inputFC->streams[i]->codec->channels == 0)
+                if (!allaudio && ext_count > 0 &&
+                    inputFC->streams[i]->codec->channels < 2 &&
+                    inputFC->streams[i]->codec->sample_rate < 100000)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
-                        QString("Skipping invalid audio stream: %1").arg(i));
+                        QString("Skipping audio stream: %1").arg(i));
                     break;
                 }
                 if (inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_AC3 ||
