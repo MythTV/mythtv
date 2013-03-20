@@ -330,7 +330,7 @@
     <window name="visualizerview">
 
         <video name="visualizer">
-            <area>0,0,1280,720,</area>
+            <area>0,0,1280,720</area>
         </video>
 
     </window>
