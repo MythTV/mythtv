@@ -8,24 +8,12 @@
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
+#include "mythdialogbox.h"
+#include "mythscreentype.h"
 
 #include "galleryconfig.h"
+#include "gallerydatabasehelper.h"
 #include "gallerytypedefs.h"
-
-
-
-enum FileSortOrder {
-    kSortByNameAsc     = 0,
-    kSortByNameDesc    = 1,
-    kSortByModTimeAsc  = 2,
-    kSortByModTimeDesc = 3,
-    kSortByExtAsc      = 4,
-    kSortByExtDesc     = 5,
-    kSortBySizeAsc     = 6,
-    kSortBySizeDesc    = 7,
-    kSortByDateAsc     = 8,
-    kSortByDateDesc    = 9
-};
 
 
 
@@ -44,7 +32,8 @@ GalleryConfig::GalleryConfig(MythScreenStack *parent, const char *name)
       m_transitionTime(NULL),
       m_showHiddenFiles(NULL),
       m_saveButton(NULL),
-      m_cancelButton(NULL)
+      m_cancelButton(NULL),
+      m_clearDbButton(NULL)
 {
     // preset or load all variables
     m_sortOrder = 0;
@@ -83,6 +72,7 @@ bool GalleryConfig::Create()
 
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
+    UIUtilW::Assign(this, m_clearDbButton, "cleardatabase", &err);
 
     // check if all widgets are present
     if (err)
@@ -97,6 +87,9 @@ bool GalleryConfig::Create()
     // connect the widgets to their methods
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(Save()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Exit()));
+
+    if (m_clearDbButton)
+        connect(m_clearDbButton, SIGNAL(Clicked()), this, SLOT(ConfirmClearDatabase()));
 
     BuildFocusList();
 
@@ -124,6 +117,37 @@ bool GalleryConfig::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+
+
+/** \fn     GalleryView::customEvent(QEvent *)
+ *  \brief  Translates the keypresses to specific actions within the plugin
+ *  \param  event The custom event
+ *  \return void
+ */
+void GalleryConfig::customEvent(QEvent *event)
+{
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
+
+        // Confirm current file deletion
+        if (resultid == "confirmdelete")
+        {
+            switch (buttonnum)
+            {
+            case 0 :
+                break;
+            case 1 :
+                ClearDatabase();
+                break;
+            }
+        }
+    }
 }
 
 
@@ -210,5 +234,45 @@ void GalleryConfig::Save()
  */
 void GalleryConfig::Exit()
 {
+    Close();
+}
+
+
+
+/** \fn     GalleryConfig::ConfirmClearDatabase()
+ *  \brief  Asks the user to confirm the removal of
+ *          all image related contents from the database
+ *  \return void
+ */
+void GalleryConfig::ConfirmClearDatabase()
+{
+    QString msg = QString("Do you want to clear all database contents?");
+    MythScreenStack         *m_popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog  *m_confirmPopup = new MythConfirmationDialog(m_popupStack, msg, true);
+
+    if (m_confirmPopup->Create())
+    {
+        m_confirmPopup->SetReturnEvent(this, "confirmdelete");
+        m_popupStack->AddScreen(m_confirmPopup);
+    }
+    else
+        delete m_confirmPopup;
+}
+
+
+
+/** \fn     GalleryConfig::ClearDatabase()
+ *  \brief  Clears all image related contents from the database
+ *  \return void
+ */
+void GalleryConfig::ClearDatabase()
+{
+    GalleryDatabaseHelper *m_dbHelper = new GalleryDatabaseHelper();
+    m_dbHelper->ClearDatabase();
+    delete m_dbHelper;
+
+    // tell the main view to reload the images
+    // because the storage group dir might have changed
+    emit configSaved();
     Close();
 }
