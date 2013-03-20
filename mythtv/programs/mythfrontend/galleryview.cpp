@@ -823,8 +823,8 @@ void GalleryView::MenuMetadata(MythMenu *mainMenu)
             menu->AddItem(tr("Rotate CCW"), SLOT(FileRotateCCW()));
             menu->AddItem(tr("Flip Horizontal"), SLOT(FileFlipHorizontal()));
             menu->AddItem(tr("Flip Vertical"), SLOT(FileFlipVertical()));
-            menu->AddItem(tr("Zoom In"), SLOT(FileZoomIn()));
-            menu->AddItem(tr("Zoom Out"), SLOT(FileZoomOut()));
+            // menu->AddItem(tr("Zoom In"), SLOT(FileZoomIn()));
+            // menu->AddItem(tr("Zoom Out"), SLOT(FileZoomOut()));
 
             mainMenu->AddItem(tr("Meta Data Menu"), NULL, menu);
         }
