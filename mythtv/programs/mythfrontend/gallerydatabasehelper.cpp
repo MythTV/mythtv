@@ -653,3 +653,23 @@ QString GalleryDatabaseHelper::GetSortOrder()
 
     return sort;
 }
+
+
+
+/** \fn     GalleryDatabaseHelper::ClearDatabase()
+ *  \brief  Removes all contents from the gallery_directories and gallery_files tables.
+ *  \return void
+ */
+void GalleryDatabaseHelper::ClearDatabase()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("TRUNCATE gallery_directories;"));
+
+    if (!query.exec())
+        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
+
+    query.prepare(QString("TRUNCATE gallery_files;"));
+
+    if (!query.exec())
+        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
+}

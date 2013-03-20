@@ -17,6 +17,7 @@ public:
 
     bool Create();
     bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent*);
 
 signals:
     void configSaved();
@@ -31,11 +32,14 @@ private:
 
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
+    MythUIButton       *m_clearDbButton;
 
 private slots:
     void Save();
     void Exit();
     void Load();
+    void ConfirmClearDatabase();
+    void ClearDatabase();
 };
 
 #endif // GALLERYCONFIG_H

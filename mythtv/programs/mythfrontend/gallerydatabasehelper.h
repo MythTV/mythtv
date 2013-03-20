@@ -34,6 +34,8 @@ public:
     void UpdateData(ImageMetadata *);
     void RemoveData(ImageMetadata *);
 
+    void ClearDatabase();
+
 private:
     void LoadDirectoryValues(MSqlQuery &, ImageMetadata *);
     void LoadFileValues(MSqlQuery &, ImageMetadata *);
