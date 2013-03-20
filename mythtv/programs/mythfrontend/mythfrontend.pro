@@ -47,6 +47,10 @@ HEADERS += videofilter.h                videolist.h
 HEADERS += videoplayersettings.h        videodlg.h
 HEADERS += videoglobalsettings.h        upnpscanner.h
 HEADERS += commandlineparser.h          idlescreen.h
+HEADERS += galleryview.h                galleryviewhelper.h
+HEADERS += galleryconfig.h              galleryfilehelper.h
+HEADERS += gallerydatabasehelper.h      gallerywidget.h
+HEADERS += gallerythumbgenthread.h      gallerytypedefs.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -68,6 +72,10 @@ SOURCES += videofilter.cpp              videolist.cpp
 SOURCES += videoplayersettings.cpp      videodlg.cpp
 SOURCES += videoglobalsettings.cpp      upnpscanner.cpp
 SOURCES += commandlineparser.cpp        idlescreen.cpp
+SOURCES += galleryview.cpp              gallerywidget.cpp
+SOURCES += galleryviewhelper.cpp        galleryconfig.cpp
+SOURCES += gallerydatabasehelper.cpp    gallerythumbgenthread.cpp
+SOURCES += galleryfilehelper.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
