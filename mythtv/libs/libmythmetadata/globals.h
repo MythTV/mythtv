@@ -29,6 +29,8 @@ META_PUBLIC extern const QString JUMP_VIDEO_TREE;
 META_PUBLIC extern const QString JUMP_VIDEO_GALLERY;
 META_PUBLIC extern const QString JUMP_VIDEO_DEFAULT;
 
+META_PUBLIC extern const QString JUMP_GALLERY_DEFAULT;
+
 META_PUBLIC extern const QString DEFAULT_VIDEOSTARTUP_DIR;
 
 #endif // GLOBALS_H_
