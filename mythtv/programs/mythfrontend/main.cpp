@@ -87,6 +87,9 @@ using namespace std;
 #include "videometadatasettings.h"
 #include "videolist.h"
 
+// Gallery
+#include "galleryview.h"
+
 // DVD
 #include "DVD/dvdringbuffer.h"
 
@@ -677,6 +680,21 @@ static void jumpScreenVideoBrowser() { RunVideoScreen(VideoDialog::DLG_BROWSER, 
 static void jumpScreenVideoTree()    { RunVideoScreen(VideoDialog::DLG_TREE, true);    }
 static void jumpScreenVideoGallery() { RunVideoScreen(VideoDialog::DLG_GALLERY, true); }
 static void jumpScreenVideoDefault() { RunVideoScreen(VideoDialog::DLG_DEFAULT, true); }
+
+static void RunGallery()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    GalleryView *galleryView = new GalleryView(mainStack, "galleryview");
+    if (galleryView->Create())
+    {
+        mainStack->AddScreen(galleryView);
+        galleryView->LoadData();
+    }
+    else
+    {
+        delete galleryView;
+    }
+}
 
 static void playDisc()
 {
@@ -1347,6 +1365,11 @@ static void InitJumpPoints(void)
      REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Reset All Keys"),
          QT_TRANSLATE_NOOP("MythControls", "Reset all keys to defaults"),
          "", resetAllKeys, false);
+
+     // Gallery
+
+     REG_JUMP(JUMP_GALLERY_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
+         "The Gallery Default View"), "", RunGallery);
 }
 
 static void ReloadJumpPoints(void)
@@ -1378,6 +1401,36 @@ static void InitKeys(void)
          "Go to the first video"), "Home");
      REG_KEY("Video","END", QT_TRANSLATE_NOOP("MythControls",
          "Go to the last video"), "End");
+
+     // Gallery keybindings
+     REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
+         "Start Slideshow"), "P");
+     REG_KEY("Images", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
+         "Pause Slideshow"), "Ctrl+P");
+     REG_KEY("Images", "STOP", QT_TRANSLATE_NOOP("MythControls",
+         "Stop Slideshow"), "Alt+P");
+     REG_KEY("Images", "HOME", QT_TRANSLATE_NOOP("MythControls",
+         "Go to the first image in thumbnail view"), "Home");
+     REG_KEY("Images", "END", QT_TRANSLATE_NOOP("MythControls",
+         "Go to the last image in thumbnail view"), "End");
+     REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
+         "Start Slideshow in thumbnail view"), "S");
+     REG_KEY("Images", "RANDOMSHOW", QT_TRANSLATE_NOOP("MythControls",
+         "Start Random Slideshow in thumbnail view"), "R");
+     REG_KEY("Images", "ROTRIGHT", QT_TRANSLATE_NOOP("MythControls",
+         "Rotate image right 90 degrees"), "],3");
+     REG_KEY("Images", "ROTLEFT", QT_TRANSLATE_NOOP("MythControls",
+         "Rotate image left 90 degrees"), "[,1");
+     REG_KEY("Images", "ZOOMOUT", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image out"), "7");
+     REG_KEY("Images", "ZOOMIN", QT_TRANSLATE_NOOP("MythControls",
+         "Zoom image in"), "9");
+     REG_KEY("Images", "FLIPHORIZONTAL", QT_TRANSLATE_NOOP("MythControls",
+         "Flip image horizontally"), "");
+     REG_KEY("Images", "FLIPVERTICAL", QT_TRANSLATE_NOOP("MythControls",
+         "Flip image vertically"), "");
+     REG_KEY("Images", "MARK", QT_TRANSLATE_NOOP("MythControls",
+         "Mark image"), "T");
 }
 
 static void ReloadKeys(void)
