@@ -66,11 +66,13 @@ void ImageProperties::Init()
     isGreyscale = false;
     isReflected = false;
     isMasked = false;
+    isOriented = false;
     reflectAxis = ReflectVertical;
     reflectScale = 100;
     reflectLength = 100;
     reflectShear = 0;
-    reflectSpacing = 0,
+    reflectSpacing = 0;
+    orientation = 1;
     maskImage = NULL;
 }
 
@@ -86,12 +88,14 @@ void ImageProperties::Copy(const ImageProperties &other)
     isGreyscale = other.isGreyscale;
     isReflected = other.isReflected;
     isMasked = other.isMasked;
+    isOriented = other.isOriented;
 
     reflectAxis = other.reflectAxis;
     reflectScale = other.reflectScale;
     reflectLength = other.reflectLength;
     reflectShear = other.reflectShear;
     reflectSpacing = other.reflectSpacing;
+    orientation = other.orientation;
 
     SetMaskImage(other.maskImage);
 }
@@ -185,6 +189,12 @@ class ImageLoader
         if (imProps.isGreyscale)
             s_Attrib += "greyscale";
 
+        if (imProps.isOriented)
+        {
+            s_Attrib += "orientation";
+            s_Attrib += QString("%1").arg(imProps.orientation);
+        }
+
         int w = -1;
         int h = -1;
         if (!imProps.forceSize.isNull())
@@ -266,6 +276,9 @@ class ImageLoader
             if (imProps.isReflected)
                 image->setIsReflected(true);
 
+            if (imProps.isOriented)
+                image->setIsOriented(true);
+
             bFoundInCache = true;
         }
         else
@@ -333,6 +346,9 @@ class ImageLoader
 
             if (imProps.isGreyscale)
                 image->ToGreyscale();
+
+            if (imProps.isOriented)
+                image->Orientation(imProps.orientation);
 
             if (!imageReader)
                 GetMythUI()->CacheImage(cacheKey, image);
@@ -763,6 +779,11 @@ void MythUIImage::SetImage(MythImage *img)
     Clear();
     m_Delay = -1;
 
+    if (m_imageProperties.isOriented && !img->IsOriented() &&
+        (m_imageProperties.orientation >= 1 &&
+         m_imageProperties.orientation <= 8))
+        img->Orientation(m_imageProperties.orientation);
+
     if (m_imageProperties.forceSize.isNull())
         SetSize(img->size());
 
@@ -823,6 +844,11 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
         if (m_imageProperties.isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
+
+        if (m_imageProperties.isOriented && !im->IsOriented() &&
+            (m_imageProperties.orientation >= 1 &&
+             m_imageProperties.orientation <= 8))
+            im->Orientation(m_imageProperties.orientation);
 
         m_ImagesLock.lock();
         m_Images[m_Images.size()] = im;
@@ -889,6 +915,15 @@ void MythUIImage::ForceSize(const QSize &size)
 
     Load();
     return;
+}
+
+/**
+ *  \brief Saves the exif orientation value of the first image in the widget
+ */
+void MythUIImage::SetOrientation(int orientation)
+{
+    m_imageProperties.isOriented = true;
+    m_imageProperties.orientation = orientation;
 }
 
 /**

@@ -41,6 +41,7 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
     m_gradAlpha = 255;
     m_gradDirection = FillTopToBottom;
 
+    m_isOriented = false;
     m_isReflected = false;
     m_isYUV = false;
 
@@ -110,6 +111,65 @@ void MythImage::Assign(const QImage &img)
 void MythImage::Assign(const QPixmap &pix)
 {
     Assign(pix.toImage());
+}
+
+/**
+ * Changes the orientation angle of the image according to
+ * the exif rotation values. The image will be rotated accordingly.
+ * @brief MythImage::Orientation
+ * @param orientation
+ */
+void MythImage::Orientation(int orientation)
+{
+    if (m_isOriented)
+        return;
+
+    QMatrix matrix;
+    switch (orientation)
+    {
+    case 1: // If the image is in its original state
+        break;
+
+    case 2: // The image is horizontally flipped
+        Assign(mirrored(true, false));
+        break;
+
+    case 3: // The image is rotated 180°
+        matrix.rotate(180);
+        Assign(transformed(matrix, Qt::SmoothTransformation));
+        break;
+
+    case 4: // The image is vertically flipped
+        Assign(mirrored(false, true));
+        break;
+
+    case 5: // The image is transposed (rotated 90° CW flipped horizontally)
+        matrix.rotate(90);
+        Assign(transformed(matrix, Qt::SmoothTransformation));
+        Assign(mirrored(true, false));
+        break;
+
+    case 6: // The image is rotated 90° CCW
+        matrix.rotate(270);
+        Assign(transformed(matrix, Qt::SmoothTransformation));
+        break;
+
+    case 7: // The image is transversed  (rotated 90° CW and flipped vertically)
+        matrix.rotate(90);
+        Assign(transformed(matrix, Qt::SmoothTransformation));
+        Assign(mirrored(false, true));
+        break;
+
+    case 8: // The image is rotated 90° CW
+        matrix.rotate(90);
+        Assign(transformed(matrix, Qt::SmoothTransformation));
+        break;
+
+    default:
+        break;
+    }
+
+    m_isOriented = true;
 }
 
 void MythImage::Resize(const QSize &newSize, bool preserveAspect)
