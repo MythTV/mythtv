@@ -5214,6 +5214,7 @@ void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 // Called from the interactiveTV (MHIContext) thread
 void MythPlayer::SetVideoResize(const QRect &videoRect)
 {
+    QMutexLocker locker(&osdLock);
     if (videoOutput)
         videoOutput->SetVideoResize(videoRect);
 }
