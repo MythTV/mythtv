@@ -776,7 +776,7 @@ LogServerThread::~LogServerThread()
 
 /// \brief Run the logging thread.  This thread reads from ZeroMQ (TCP:35327)
 ///        and handles distributing the LoggingItems to each logger instance
-///        vi ZeroMQ (inproc).
+///        via ZeroMQ (inproc).
 void LogServerThread::run(void)
 {
     RunProlog();
