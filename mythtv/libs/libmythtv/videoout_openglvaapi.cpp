@@ -240,6 +240,7 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     if (vbuffers.size(kVideoBuffer_used))
     {
         VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        CopyFrame(&av_pause_frame, frame);
         m_pauseBuffer = frame->buf;
         disp_timecode = frame->disp_timecode;
     }
