@@ -1,6 +1,5 @@
 // POSIX headers
 #include <unistd.h>
-#include <iostream>
 
 // C headers
 #include <cmath>
