@@ -65,7 +65,6 @@ using namespace std;
 #include <mythsystem.h>
 #include <mythdate.h>
 #include <mythlogging.h>
-#include <storagegroup.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
