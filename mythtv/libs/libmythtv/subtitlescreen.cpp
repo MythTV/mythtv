@@ -557,6 +557,7 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
 {
     if (forced_only)
     {
+        SetElementDeleted();
         SetVisible(true);
         SetArea(MythRect());
         return;
@@ -576,18 +577,20 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
     ClearAllSubtitles();
     SetVisible(m_subtitleType != kDisplayNone);
     SetArea(MythRect());
-    m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
     switch (m_subtitleType)
     {
     case kDisplayTextSubtitle:
     case kDisplayRawTextSubtitle:
         m_family = kSubFamilyText;
+        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
         break;
     case kDisplayCC608:
         m_family = kSubFamily608;
+        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
         break;
     case kDisplayCC708:
         m_family = kSubFamily708;
+        m_textFontZoom  = gCoreContext->GetNumSetting("OSDCC708TextZoom", 100);
         break;
     case kDisplayAVSubtitle:
         m_family = kSubFamilyAV;

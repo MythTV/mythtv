@@ -32,6 +32,48 @@ bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
     return AvFormatDecoder::GetFrame( kDecodeAV );
 }
 
+int64_t AvFormatDecoderDVD::AdjustTimestamp(int64_t timestamp)
+{
+    int64_t newTimestamp = timestamp;
+
+    if (newTimestamp != AV_NOPTS_VALUE)
+    {
+        int64_t timediff = ringBuffer->DVD()->GetTimeDiff();
+        if (newTimestamp >= timediff)
+        {
+            newTimestamp -= timediff;
+        }
+    }
+
+    return newTimestamp;
+}
+
+int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
+{
+    int result = av_read_frame(ctx, pkt);
+
+    while (result == AVERROR_EOF && errno == EAGAIN)
+    {
+        if (ringBuffer->DVD()->IsReadingBlocked())
+        {
+            ringBuffer->DVD()->UnblockReading();
+            result = av_read_frame(ctx, pkt);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (result >= 0)
+    {
+        pkt->dts = AdjustTimestamp(pkt->dts);
+        pkt->pts = AdjustTimestamp(pkt->pts);
+    }
+
+    return result;
+}
+
 void AvFormatDecoderDVD::PostProcessTracks(void)
 {
     if (!ringBuffer)

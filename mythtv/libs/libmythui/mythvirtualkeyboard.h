@@ -23,6 +23,12 @@ struct KeyDefinition
     QString up, down, left, right;
 };
 
+struct KeyEventDefinition
+{
+    int keyCode;
+    Qt::KeyboardModifiers modifiers;
+};
+
 /** \class MythUIVirtualKeyboard
  *
  * \brief A popup onscreen keyboard for easy alphanumeric and text entry using
@@ -64,6 +70,7 @@ class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
     void updateKeys(bool connectSignals = false);
     QString decodeChar(QString c);
     QString getKeyText(KeyDefinition key);
+    void loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action);
 
     MythUITextEdit *m_parentEdit;
     PopupPosition   m_preferredPos;
@@ -82,6 +89,12 @@ class MUI_PUBLIC MythUIVirtualKeyboard : public MythScreenType
 
     bool          m_composing;
     QString       m_composeStr;
+
+    KeyEventDefinition m_upKey;
+    KeyEventDefinition m_downKey;
+    KeyEventDefinition m_leftKey;
+    KeyEventDefinition m_rightKey;
+    KeyEventDefinition m_newlineKey;
 };
 
 #endif

@@ -1707,7 +1707,6 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
         write("Using cutlist: %s" % cutlist_s)
 
     if (localfile != ""):
-        localfile = quoteFilename(localfile)
         if usecutlist == True:
             command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, quoteCmdArg(localfile), quoteCmdArg(destination))
         else:

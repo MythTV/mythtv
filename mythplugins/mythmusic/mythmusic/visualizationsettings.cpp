@@ -37,6 +37,12 @@ bool VisualizationSettings::Create()
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'visualizationsettings'");
+        return false;
+    }
+
     int changeOnSongChange = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
     if (changeOnSongChange == 1)
         m_changeOnSongChange->SetCheckState(MythUIStateType::Full);

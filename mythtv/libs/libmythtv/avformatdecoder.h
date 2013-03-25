@@ -264,6 +264,9 @@ class AvFormatDecoder : public DecoderBase
 
     int DecodeAudio(AVCodecContext *ctx, uint8_t *buffer, int &data_size,
                     AVPacket *pkt);
+
+    virtual int ReadPacket(AVFormatContext *ctx, AVPacket* pkt);
+
     PrivateDecoder *private_dec;
 
     bool is_db_ignored;

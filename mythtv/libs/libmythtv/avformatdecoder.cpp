@@ -4637,7 +4637,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
 
             int retval = 0;
-            if (!ic || ((retval = av_read_frame(ic, pkt)) < 0))
+            if (!ic || ((retval = ReadPacket(ic, pkt)) < 0))
             {
                 if (retval == -EAGAIN)
                     continue;
@@ -4810,6 +4810,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         delete pkt;
 
     return true;
+}
+
+int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt)
+{
+    return av_read_frame(ctx, pkt);
 }
 
 bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)

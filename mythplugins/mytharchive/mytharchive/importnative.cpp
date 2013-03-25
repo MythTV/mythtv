@@ -449,16 +449,12 @@ void ImportNative::finishedPressed()
 
     QString logDir = tempDir + "logs";
 
-    // remove existing progress.log if prescent
-    if (QFile::exists(logDir + "/progress.log"))
-        QFile::remove(logDir + "/progress.log");
+    // remove any existing logs
+    myth_system("rm -f " + logDir + "/*.log");
 
-    commandline = "mytharchivehelper --importarchive --infile \"" + m_xmlFile +
+    commandline = "mytharchivehelper --logpath " + logDir + " --importarchive "
+                  "--infile \"" + m_xmlFile +
                   "\" --chanid " + chanID;
-    commandline += logPropagateArgs;
-    if (!logPropagateQuiet())
-        commandline += " --quiet";
-    commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs |
                  kMSDontDisableDrawing;

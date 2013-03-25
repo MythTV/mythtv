@@ -78,6 +78,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id);
+    int64_t GetTimeDiff(void)      const { return m_timeDiff; }
 
     // Public menu/button stuff
     AVSubtitle *GetMenuSubtitle(uint &version);
@@ -119,6 +120,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void SkipStillFrame(void);
     void WaitSkip(void);
     void SkipDVDWaitingForPlayer(void)    { m_playerWait = false;           }
+    void UnblockReading(void)             { m_processState = PROCESS_REPROCESS; }
+    bool IsReadingBlocked(void)           { return (m_processState == PROCESS_WAIT); }
     bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
@@ -137,6 +140,14 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void SetParent(MythDVDPlayer *p) { m_parent = p; }
 
   protected:
+
+    typedef enum
+    {
+        PROCESS_NORMAL,
+        PROCESS_REPROCESS,
+        PROCESS_WAIT
+    }processState_t;
+
     dvdnav_t      *m_dvdnav;
     unsigned char  m_dvdBlockWriteBuf[DVD_BLOCK_SIZE];
     unsigned char *m_dvdBlockReadBuf;
@@ -159,6 +170,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool           m_gotStop;
     int            m_currentAngle;
     int            m_currentTitleAngleCount;
+    int64_t        m_endPts;
+    int64_t        m_timeDiff;
 
     bool           m_newSequence;
     int            m_still;
@@ -170,6 +183,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     long long      m_cellstartPos;
     bool           m_buttonSelected;
     bool           m_buttonExists;
+    bool           m_buttonSeenInCell;
+    bool           m_lastButtonSeenInCell;
     int            m_cellid;
     int            m_lastcellid;
     int            m_vobid;
@@ -190,6 +205,11 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 
     MythDVDPlayer *m_parent;
     float          m_forcedAspect;
+
+    processState_t  m_processState;
+    dvdnav_status_t m_dvdStat;
+    int32_t        m_dvdEvent;
+    int32_t        m_dvdEventSize;
 
     // Private menu/button stuff
     void ActivateButton(void);

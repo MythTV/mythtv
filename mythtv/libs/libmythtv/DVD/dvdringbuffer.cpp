@@ -89,7 +89,9 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_lastNav(NULL),    m_part(0), m_lastPart(0),
     m_title(0),         m_lastTitle(0),   m_playerWait(false),
     m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
-    m_currentTitleAngleCount(0), m_newSequence(false),
+    m_currentTitleAngleCount(0),
+    m_endPts(0),        m_timeDiff(0),
+    m_newSequence(false),
     m_still(0), m_lastStill(0),
     m_audioStreamsChanged(false),
     m_dvdWaiting(false),
@@ -97,9 +99,11 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
 
     m_skipstillorwait(true),
     m_cellstartPos(0), m_buttonSelected(false),
-    m_buttonExists(false), m_cellid(0),
-    m_lastcellid(0), m_vobid(0),
-    m_lastvobid(0), m_cellRepeated(false),
+    m_buttonExists(false),
+    m_buttonSeenInCell(false), m_lastButtonSeenInCell(false),
+    m_cellid(0), m_lastcellid(0),
+    m_vobid(0), m_lastvobid(0),
+    m_cellRepeated(false),
 
     m_curAudioTrack(0),
     m_curSubtitleTrack(0),
@@ -109,6 +113,10 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_currentTime(0),
     m_parent(NULL),
     m_forcedAspect(-1.0f),
+    m_processState(PROCESS_NORMAL),
+    m_dvdStat(DVDNAV_STATUS_OK),
+    m_dvdEvent(0),
+    m_dvdEventSize(0),
 
     // Menu/buttons
     m_inMenu(false), m_buttonVersion(1), m_buttonStreamID(0),
@@ -352,14 +360,9 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             "http://code.mythtv.org/trac");
     }
 
-    dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
     dvdnav_get_title_string(m_dvdnav, &m_dvdname);
     dvdnav_get_serial_string(m_dvdnav, &m_serialnumber);
-    dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
     SetDVDSpeed();
-
-    // Populate the chapter list for this title, used in the OSD menu
-    GetChapterTimes(m_title);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("DVD Serial Number %1").arg(m_serialnumber));
@@ -401,6 +404,9 @@ bool DVDRingBuffer::StartFromBeginning(void)
         dvdnav_first_play(m_dvdnav);
         m_audioStreamsChanged = true;
     }
+
+    m_endPts = 0;
+    m_timeDiff = 0;
 
     return m_dvdnav;
 }
@@ -491,14 +497,12 @@ void DVDRingBuffer::WaitForPlayer(void)
 
 int DVDRingBuffer::safe_read(void *data, uint sz)
 {
-    dvdnav_status_t dvdStat;
     unsigned char  *blockBuf     = NULL;
     uint            tot          = 0;
-    int32_t         dvdEvent     = 0;
-    int32_t         dvdEventSize = 0;
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
+    bool            bReprocessing = false;
 
     if (m_gotStop)
     {
@@ -510,14 +514,24 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     if (readaheadrunning)
         LOG(VB_GENERAL, LOG_ERR, LOC + "read ahead thread running.");
 
-    while (needed)
+    while ((m_processState != PROCESS_WAIT) && needed)
     {
         blockBuf = m_dvdBlockWriteBuf;
 
-        dvdStat = dvdnav_get_next_cache_block(
-            m_dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
+        if (m_processState == PROCESS_REPROCESS)
+        {
+            m_processState = PROCESS_NORMAL;
+            bReprocessing = true;
+        }
+        else
+        {
+            m_dvdStat = dvdnav_get_next_cache_block(
+                m_dvdnav, &blockBuf, &m_dvdEvent, &m_dvdEventSize);
 
-        if (dvdStat == DVDNAV_STATUS_ERR)
+            bReprocessing = false;
+        }
+
+        if (m_dvdStat == DVDNAV_STATUS_ERR)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to read block: %1")
                     .arg(dvdnav_err_to_string(m_dvdnav)));
@@ -525,7 +539,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             return -1;
         }
 
-        switch (dvdEvent)
+        switch (m_dvdEvent)
         {
             // Standard packet for decoding
             case DVDNAV_BLOCK_OK:
@@ -575,7 +589,15 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
                 dvdnav_get_number_of_parts(m_dvdnav, m_title, &m_titleParts);
                 dvdnav_get_position(m_dvdnav, &pos, &length);
-                m_titleLength = length *DVD_BLOCK_SIZE;
+                dvdnav_get_angle_info(m_dvdnav, &m_currentAngle, &m_currentTitleAngleCount);
+
+                if (m_title != m_lastTitle)
+                {
+                    // Populate the chapter list for this title, used in the OSD menu
+                    GetChapterTimes(m_title);
+                }
+
+                m_titleLength = length * DVD_BLOCK_SIZE;
                 if (!m_seeking)
                     m_cellstartPos = GetReadPosition();
 
@@ -621,9 +643,11 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 // clear menus/still frame selections
                 m_lastvobid = m_vobid;
                 m_lastcellid = m_cellid;
+                m_lastButtonSeenInCell = m_buttonSeenInCell;
                 m_buttonSelected = false;
                 m_vobid = m_cellid = 0;
                 m_cellRepeated = false;
+                m_buttonSeenInCell = false;
 
                 IncrementButtonVersion;
                 if (m_inMenu)
@@ -663,21 +687,6 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // clear any existing subs/buttons
                 IncrementButtonVersion;
-
-                // update the stream number
-                if (m_inMenu || NumMenuButtons() > 0)
-                {
-                    m_buttonStreamID = 32;
-                    int aspect = dvdnav_get_video_aspect(m_dvdnav);
-
-                    // workaround where dvd menu is
-                    // present in VTS_DOMAIN. dvdnav adds 0x80 to stream id
-                    // proper fix should be put in dvdnav sometime
-                    int physical_wide = (spu->physical_wide & 0xF);
-
-                    if (aspect != 0 && physical_wide > 0)
-                        m_buttonStreamID += physical_wide;
-                }
 
                 // not sure
                 if (m_autoselectsubtitle)
@@ -726,6 +735,30 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             {
                 QMutexLocker lock(&m_seekLock);
 
+                pci_t *pci = dvdnav_get_current_nav_pci(m_dvdnav);
+
+                // If the start PTS of this block is not the
+                // same as the end PTS of the last block,
+                // we've got a timestamp discontinuity
+                int64_t diff = (int64_t)pci->pci_gi.vobu_s_ptm - m_endPts;
+                if (diff != 0)
+                {
+                    if (!bReprocessing && !m_skipstillorwait)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PTS discontinuity - waiting for decoder: this %1, last %2, diff %3")
+                            .arg(pci->pci_gi.vobu_s_ptm)
+                            .arg(m_endPts)
+                            .arg(diff));
+
+                        m_processState = PROCESS_WAIT;
+                        break;
+                    }
+
+                    m_timeDiff += diff;
+                }
+
+                m_endPts = pci->pci_gi.vobu_e_ptm;
+
                 // get the latest nav
                 m_lastNav = (dvdnav_t *)blockBuf;
 
@@ -734,15 +767,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // if we are in a looping menu, we don't want to reset the
                 // selected button when we restart
-                if (m_vobid == 0 && m_cellid == 0)
+                m_vobid  = dsi->dsi_gi.vobu_vob_idn;
+                m_cellid = dsi->dsi_gi.vobu_c_idn;
+                if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
+                     && m_lastButtonSeenInCell)
                 {
-                    m_vobid  = dsi->dsi_gi.vobu_vob_idn;
-                    m_cellid = dsi->dsi_gi.vobu_c_idn;
-                    if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
-                         && m_inMenu)
-                    {
-                        m_cellRepeated = true;
-                    }
+                    m_cellRepeated = true;
                 }
 
                 // update our status
@@ -765,8 +795,32 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     }
                 }
 
+                // update the button stream number if this is the
+                // first NAV pack containing button information
+                if ( (pci->hli.hl_gi.hli_ss & 0x03) == 0x01 )
+                {
+                    m_buttonStreamID = 32;
+                    int aspect = dvdnav_get_video_aspect(m_dvdnav);
+
+                    // workaround where dvd menu is
+                    // present in VTS_DOMAIN. dvdnav adds 0x80 to stream id
+                    // proper fix should be put in dvdnav sometime
+                    int8_t spustream = dvdnav_get_active_spu_stream(m_dvdnav) & 0x7f;
+
+                    if (aspect != 0 && spustream > 0)
+                        m_buttonStreamID += spustream;
+
+                    m_buttonSeenInCell = true;
+                }
+
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_NAV_PACKET");
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_NAV_PACKET - time:%1, pos:%2, vob:%3, cell:%4, seeking:%5, seektime:%6")
+                    .arg(m_currentTime)
+                    .arg(m_currentpos)
+                    .arg(m_vobid)
+                    .arg(m_cellid)
+                    .arg(m_seeking)
+                    .arg(m_seektime));
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
@@ -816,6 +870,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 {
                     m_audioStreamsChanged = true;
                 }
+
+                // Make sure we know we're not staying in the
+                // same cell (same vobid/cellid values can
+                // occur in every VTS)
+                m_lastvobid  = m_vobid  = 0;
+                m_lastcellid = m_cellid = 0;
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
@@ -932,7 +992,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             default:
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Unknown DVD event: %1").arg(dvdEvent));
+                    QString("Unknown DVD event: %1").arg(m_dvdEvent));
             }
             break;
         }
@@ -941,7 +1001,15 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
         offset = tot;
     }
 
-    return tot;
+    if (m_processState == PROCESS_WAIT)
+    {
+        errno = EAGAIN;
+        return 0;
+    }
+    else
+    {
+        return tot;
+    }
 }
 
 bool DVDRingBuffer::playTrack(int track)

@@ -35,8 +35,8 @@
     <fontdef name="baselarge" from="basemedium">
         <pixelsize>30</pixelsize>
         <shadowcolor>#000000</shadowcolor>
-        <shadowoffset>4,4</shadowoffset>
-        <shadowalpha>64</shadowalpha>
+        <shadowoffset>2,2</shadowoffset>
+        <shadowalpha>100</shadowalpha>
         <weight>bold</weight>
     </fontdef>
 
@@ -581,7 +581,7 @@
             <state name="inactive" from="active" />
         </statetype>
         <imagetype name="cursor">
-            <filename>cursor.png</filename>
+            <filename>ui/cursor.png</filename>
         </imagetype>
         <textarea name="text">
             <area>12,12,-12,-12</area>
@@ -613,7 +613,7 @@
             <state name="inactive" from="active" />
         </statetype>
         <imagetype name="cursor">
-            <filename>cursor.png</filename>
+            <filename>ui/cursor.png</filename>
         </imagetype>
         <textarea name="text">
             <area>12,12,-12,-12</area>
@@ -926,7 +926,6 @@
             <area>4,70,500,440</area>
             <layout>grid</layout>
             <buttonarea>0,0,500,430</buttonarea>
-            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <area>0,0,166,106</area>
                 <state name="active">

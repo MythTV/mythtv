@@ -322,6 +322,40 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
                 return false;
             m_Position++;
             break;
+        case MoveUp:
+        {
+            int newPos = m_Text->MoveCursor(-1);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MoveDown:
+        {
+            int newPos = m_Text->MoveCursor(1);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MovePageUp:
+        {
+            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
+            int newPos = m_Text->MoveCursor(-lines);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
+        case MovePageDown:
+        {
+            int lines = m_Text->m_Area.height() / (m_Text->m_lineHeight + m_Text->m_Leading);
+            int newPos = m_Text->MoveCursor(lines);
+            if (newPos == -1)
+                return false;
+            m_Position = newPos - 1;
+            break;
+        }
         case MoveEnd:
             m_Position = m_Message.size() - 1;
             break;
@@ -468,6 +502,22 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         {
             MoveCursor(MoveRight);
         }
+        else if (action == "UP")
+        {
+            handled = MoveCursor(MoveUp);
+        }
+        else if (action == "DOWN")
+        {
+            handled = MoveCursor(MoveDown);
+        }
+        else if (action == "PAGEUP")
+        {
+            handled = MoveCursor(MovePageUp);
+        }
+        else if (action == "PAGEDOWN")
+        {
+            handled = MoveCursor(MovePageDown);
+        }
         else if (action == "DELETE")
         {
             RemoveCharacter(m_Position + 1);
@@ -475,6 +525,13 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         else if (action == "BACKSPACE")
         {
             RemoveCharacter(m_Position);
+        }
+        else if (action == "NEWLINE")
+        {
+            QString newmessage = m_Message;
+            newmessage.insert(m_Position + 1, '\n');
+            SetText(newmessage, false);
+            MoveCursor(MoveRight);
         }
         else if (action == "SELECT" && keynum != Qt::Key_Space
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)

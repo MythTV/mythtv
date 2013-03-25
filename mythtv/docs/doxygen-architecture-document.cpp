@@ -11,7 +11,7 @@ with it to get familiar with different aspects of the code base.
 
 If you are just looking for the code formatting standards,
 see the official %MythTV wiki article
-<a href="http://www.mythtv.org/wiki/index.php/Coding_Standards">
+<a href="http://www.mythtv.org/wiki/Coding_Standards">
 coding standards</a>. If you are looking for the
 <a href="http://code.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
 it can be found on the official pages.
@@ -570,7 +570,7 @@ any of the query or file streaming commands will silently fail.
 The following summarises some of these commands.
 For a full understanding of all the commands, either read the source code
 (programs/mythbackend/mainserver.cpp), or look on the Wiki
-(http://www.mythtv.org/wiki/index.php/Myth_Protocol_Command_List).
+(http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands).
 
  */
 
@@ -667,7 +667,7 @@ so that the languages which contain accents and multi-byte strings
 are not corrupted.
 
 This page:
-http://www.mythtv.org/wiki/index.php/Translation
+http://www.mythtv.org/wiki/Translation
 on the Wiki explains how to update an existing translation.
 
 To add a new language, look up the ISO 639-1 language code,
