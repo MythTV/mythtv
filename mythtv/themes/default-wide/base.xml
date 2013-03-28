@@ -675,6 +675,20 @@
         </shape>
     </scrollbar>
 
+    <!-- Base definition of a webbrowser -->
+    <webbrowser name="basewebbrowser">
+        <area>20,20,1240,500</area>
+        <browserarea>0,0,100%-16,100%-16</browserarea>
+        <zoom>1.0</zoom>
+        <scrollduration>500</scrollduration>
+        <scrollbar name="vertscrollbar" from="basevertscrollbar">
+            <area>100%-14,0,14,100%-14</area>
+        </scrollbar>
+        <scrollbar name="horizscrollbar" from="basehorizscrollbar">
+            <area>0,100%-14,100%-14,14</area>
+        </scrollbar>
+    </webbrowser>
+
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">
         <area>0,0,10,10</area>
