@@ -62,7 +62,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
 \section libs Libraries
 
-%MythTV is divided up into 20 libraries:
+%MythTV is divided up into over 20 libraries:
 <dl>
   <dt>\ref libmythbase "libmythbase"
   <dd>Lowest-level %MythTV library. Used by the Plugins.
@@ -135,15 +135,6 @@ There are also a few simple \ref testing "testing shortcuts".
 
       These libraries do not depend on any of our libraries.
 
-  <dt>libmythhdhomerun
-      <dd>Interface to the SiliconDust HDHomeRun EtherNet connected TV tuner
-      products.
-
-      <a href="http://www.silicondust.com/hdhomerun/hdhomerun_development.pdf">
-      Documented externally</a>.
-
-      This library does not depend on any of our libraries.
-
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">Documented externally</a>.
       This is offered as
@@ -186,6 +177,15 @@ There are also a few simple \ref testing "testing shortcuts".
       This library does not depend on any of our libraries.
 
   <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device.
+
+      This library does not depend on any of our libraries.
+
+  <dt>libmythhdhomerun
+      <dd>Interface to the SiliconDust HDHomeRun EtherNet connected TV tuner
+      products.
+
+      <a href="http://www.silicondust.com/hdhomerun/hdhomerun_development.pdf">
+      Documented externally</a>.
 
       This library does not depend on any of our libraries.
 
