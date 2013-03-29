@@ -235,6 +235,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     MythWebView *m_browser;
     MythRect     m_browserArea;
+    MythRect     m_actualBrowserArea;
 
     MythImage   *m_image;
 
