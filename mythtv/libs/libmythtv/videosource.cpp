@@ -2261,40 +2261,43 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
+    
+#ifdef USING_DVB
+    addTarget("DVB",       new DVBConfigurationGroup(parent));
+#endif // USING_DVB
 
 #ifdef USING_V4L2
-    addTarget("V4L",       new V4LConfigurationGroup(parent));
-# ifdef USING_IVTV
-    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
-# endif // USING_IVTV
 # ifdef USING_HDPVR
     addTarget("HDPVR",     new HDPVRConfigurationGroup(parent));
 # endif // USING_HDPVR
 #endif // USING_V4L2
 
-#ifdef USING_DVB
-    addTarget("DVB",       new DVBConfigurationGroup(parent));
-#endif // USING_DVB
+#ifdef USING_HDHOMERUN
+    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
+#endif // USING_HDHOMERUN
 
 #ifdef USING_FIREWIRE
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
 
-#ifdef USING_HDHOMERUN
-    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
-#endif // USING_HDHOMERUN
+#ifdef USING_CETON
+    addTarget("CETON",     new CetonConfigurationGroup(parent));
+#endif // USING_CETON
 
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
-
+    
+#ifdef USING_V4L2
+    addTarget("V4L",       new V4LConfigurationGroup(parent));
+# ifdef USING_IVTV
+    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
+# endif // USING_IVTV
+#endif // USING_V4L2
+    
 #ifdef USING_ASI
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
-
-#ifdef USING_CETON
-    addTarget("CETON",     new CetonConfigurationGroup(parent));
-#endif // USING_CETON
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
