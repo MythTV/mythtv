@@ -214,6 +214,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotIconChanged(void);
     void slotLinkClicked(const QUrl &url);
     void slotTopScreenChanged(MythScreenType *screen);
+    void slotScrollBarShowing(void);
+    void slotScrollBarHiding(void);
 
   protected:
     void Finalize(void);
@@ -222,6 +224,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void SetBackgroundColor(QColor color);
     void ResetScrollBars(void);
     void UpdateScrollBars(void);
+    bool IsOnTopScreen(void);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);

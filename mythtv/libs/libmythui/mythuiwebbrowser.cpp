@@ -889,12 +889,20 @@ void MythUIWebBrowser::Init(void)
     {
         QWebFrame* frame = m_browser->page()->currentFrame();
         frame->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+        connect(m_horizontalScrollbar, SIGNAL(Hiding()),
+                this, SLOT(slotScrollBarHiding()));
+        connect(m_horizontalScrollbar, SIGNAL(Showing()),
+                this, SLOT(slotScrollBarShowing()));
     }
 
     if (m_verticalScrollbar)
     {
         QWebFrame* frame = m_browser->page()->currentFrame();
         frame->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+        connect(m_verticalScrollbar, SIGNAL(Hiding()),
+                this, SLOT(slotScrollBarHiding()));
+        connect(m_verticalScrollbar, SIGNAL(Showing()),
+                this, SLOT(slotScrollBarShowing()));
     }
 
     // if we have a valid css URL use that ...
@@ -1347,14 +1355,39 @@ void MythUIWebBrowser::slotIconChanged(void)
     emit iconChanged();
 }
 
+void MythUIWebBrowser::slotScrollBarShowing(void)
+{
+    bool wasActive = (m_wasActive | m_active);
+    SetActive(false);
+    m_wasActive = wasActive;
+}
+
+void MythUIWebBrowser::slotScrollBarHiding(void)
+{
+    SetActive(m_wasActive);
+    slotTopScreenChanged(NULL);
+}
+
 void MythUIWebBrowser::slotTopScreenChanged(MythScreenType *screen)
 {
     (void) screen;
 
-    if (!m_parentScreen)
-        return;
+    if (IsOnTopScreen())
+        SetActive(m_wasActive);
+    else
+    {
+        bool wasActive = (m_wasActive | m_active);
+        SetActive(false);
+        m_wasActive = wasActive;
+    }
+}
 
-    // is our containing screen the top screen?
+/// is our containing screen the top screen?
+bool MythUIWebBrowser::IsOnTopScreen(void)
+{
+     if (!m_parentScreen)
+        return false;
+
     for (int x = GetMythMainWindow()->GetStackCount() - 1; x >= 0; x--)
     {
         MythScreenStack *stack = GetMythMainWindow()->GetStackAt(x);
@@ -1363,19 +1396,10 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType *screen)
         if (!stack->GetTopScreen())
             continue;
 
-        if (stack->GetTopScreen() == m_parentScreen)
-        {
-            SetActive(m_wasActive);
-            break;
-        }
-        else
-        {
-            bool wasActive = (m_wasActive | m_active);
-            SetActive(false);
-            m_wasActive = wasActive;
-            break;
-        }
+        return (stack->GetTopScreen() == m_parentScreen);
     }
+
+    return false;
 }
 
 
