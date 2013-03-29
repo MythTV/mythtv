@@ -883,6 +883,8 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->setCheck( hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
             ++i;
         }
+        
+        node->sortByString(); // Case-insensitive sort
     }
     else if (node->getAction() == "artists")
     {
@@ -915,6 +917,8 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }
+        
+        node->sortByString(); // Case-insensitive sort
     }
     else if (node->getAction() == "compartists")
     {
@@ -950,6 +954,8 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }
+        
+        node->sortByString(); // Case-insensitive sort
     }
     else if (node->getAction() == "albums")
     {
@@ -982,7 +988,8 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }
-
+        
+        node->sortByString(); // Case-insensitive sort
     }
     else if (node->getAction() == "genres")
     {
@@ -1015,6 +1022,8 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }
+        
+        node->sortByString(); // Case-insensitive sort
     }
     else if (node->getAction() == "ratings")
     {
