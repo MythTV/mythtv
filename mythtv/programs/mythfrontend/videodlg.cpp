@@ -1162,7 +1162,7 @@ void VideoDialog::loadData()
                                 // check if the node name is the same as the currently selected
                                 // one in the saved tree list. if yes then we are on the right
                                 // way down the video tree to find the last saved position
-                                if (node->getString().compare(lastTreeNodePath.at(i)) == 0)
+                                if (node->GetText().compare(lastTreeNodePath.at(i)) == 0)
                                 {
                                     // set the folder as the new node so we can travel further down
                                     // dont do this if its the last part of the saved video path tree
@@ -1235,14 +1235,14 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *parent = node->getParent();
 
-    if (parent && metadata && ((QString::compare(parent->getString(),
+    if (parent && metadata && ((QString::compare(parent->GetText(),
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-                            parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
+                            parent->GetText().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
     else if (metadata && !metadata->GetSubtitle().isEmpty())
         item->SetText(QString("%1: %2").arg(metadata->GetTitle()).arg(metadata->GetSubtitle()));
     else
-        item->SetText(metadata ? metadata->GetTitle() : node->getString());
+        item->SetText(metadata ? metadata->GetTitle() : node->GetText());
 
     QString coverimage = GetCoverImage(node);
     QString screenshot = GetScreenshot(node);
@@ -1250,9 +1250,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     QString fanart     = GetFanart(node);
 
     if (!screenshot.isEmpty() && parent && metadata &&
-        ((QString::compare(parent->getString(),
+        ((QString::compare(parent->GetText(),
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-            parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
+            parent->GetText().startsWith(tr("Season"), Qt::CaseInsensitive)))
     {
         item->SetImage(screenshot);
     }
@@ -1289,14 +1289,14 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
         item->DisplayState("subfolder", "nodetype");
-        item->SetText(node->getString(), "title");
-        item->SetText(node->getString());
+        item->SetText(node->GetText(), "title");
+        item->SetText(node->GetText());
     }
     else if (nodeInt == kUpFolder)
     {
         item->DisplayState("upfolder", "nodetype");
-        item->SetText(node->getString(), "title");
-        item->SetText(node->getString());
+        item->SetText(node->GetText(), "title");
+        item->SetText(node->GetText());
     }
 
     if (item == GetItemCurrent())
@@ -1325,8 +1325,6 @@ void VideoDialog::fetchVideos()
     }
 
     m_d->m_treeLoaded = true;
-
-    m_d->m_rootNode->setOrderingIndex(kNodeSort);
 
     // Move a node down if there is a single directory item here...
     if (m_d->m_rootNode->childCount() == 1)
@@ -1870,7 +1868,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                 if (levels < maxRecurse)
                 {
                     test_file = GetFirstImage(subDirs[i], type,
-                                     node->getString(), levels + 1);
+                                     node->GetText(), levels + 1);
                     if (!test_file.isEmpty())
                     {
                         icon_file = test_file;
@@ -2144,7 +2142,7 @@ void VideoDialog::searchComplete(QString string)
     for (it = children->begin(); it != children->end(); ++it)
     {
         MythGenericTree *child = *it;
-        QString title = child->getString();
+        QString title = child->GetText();
         int id = child->getPosition();
         idTitle.insert(id, title);
     }
@@ -2182,7 +2180,7 @@ void VideoDialog::searchStart(void)
     for (it = children->begin(); it != children->end(); ++it)
     {
         MythGenericTree *child = *it;
-        childList << child->getString();
+        childList << child->GetText();
     }
 
     MythScreenStack *popupStack =
@@ -2310,7 +2308,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     if (m_d->m_currentNode)
     {
         CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
-        CheckedSet(this, "foldername", m_d->m_currentNode->getString());
+        CheckedSet(this, "foldername", m_d->m_currentNode->GetText());
     }
 
     if (node && node->getInt() == kSubFolder)
@@ -3377,7 +3375,7 @@ void VideoDialog::VideoAutoSearch(MythGenericTree *node)
     MGTreeChildList *lchildren = node->getAllChildren();
 
     LOG(VB_GENERAL, LOG_DEBUG,
-        QString("Fetching details in %1").arg(node->getString()));
+        QString("Fetching details in %1").arg(node->GetText()));
 
     for (MGTreeChildList::const_iterator p = lchildren->begin();
             p != lchildren->end(); ++p)

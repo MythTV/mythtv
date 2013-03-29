@@ -283,14 +283,6 @@ struct to_metadata_ptr
     }
 };
 
-// TODO: AEW We don't actually use this now
-// Ordering of items on a tree level (low -> high)
-enum NodeOrder {
-    kOrderUp,
-    kOrderSub,
-    kOrderItem
-};
-
 static MythGenericTree *AddDirNode(
     MythGenericTree *where_to_add,
     QString name, QString fqPath, bool add_up_dirs,
@@ -299,8 +291,6 @@ static MythGenericTree *AddDirNode(
     // Add the subdir node...
     MythGenericTree *sub_node =
         where_to_add->addNode(name, kSubFolder, false);
-    sub_node->setAttribute(kNodeSort, kOrderSub);
-    sub_node->setOrderingIndex(kNodeSort);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
     sub_node->SetText(name, "title");
     sub_node->DisplayState("subfolder", "nodetype");
@@ -309,10 +299,8 @@ static MythGenericTree *AddDirNode(
     if (add_up_dirs)
     {
         MythGenericTree *up_node =
-            sub_node->addNode(where_to_add->getString(), kUpFolder,
+            sub_node->addNode(where_to_add->GetText(), kUpFolder,
                               true, false);
-        up_node->setAttribute(kNodeSort, kOrderUp);
-        up_node->setOrderingIndex(kNodeSort);
         up_node->DisplayState("subfolder", "nodetype");
     }
 
@@ -323,8 +311,6 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
                        VideoMetadata *metadata)
 {
     MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
-    sub_node->setAttribute(kNodeSort, kOrderItem);
-    sub_node->setOrderingIndex(kNodeSort);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
 
     // Text

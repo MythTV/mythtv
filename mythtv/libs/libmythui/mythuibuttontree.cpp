@@ -303,7 +303,7 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
 
     if (!route.isEmpty())
     {
-        if (route[0] == m_rootNode->getString())
+        if (route[0] == m_rootNode->GetText())
         {
             if (route.size() > 1)
             {

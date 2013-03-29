@@ -42,8 +42,6 @@ class MUI_PUBLIC MythGenericTree
     MythGenericTree *nextSibling(int number_down);
     MythGenericTree *prevSibling(int number_up);
 
-    QList<MythGenericTree*>::iterator getFirstChildIterator() const;
-
     MythGenericTree *getSelectedChild(bool onlyVisible = false) const;
     MythGenericTree *getVisibleChildAt(uint reference) const;
     MythGenericTree *getChildAt(uint reference) const;
@@ -64,11 +62,6 @@ class MUI_PUBLIC MythGenericTree
 
     void setParent(MythGenericTree* a_parent) { m_parent = a_parent; }
     MythGenericTree *getParent(void) const;
-
-    // Deprecated
-    const QString getString(void) const { return m_text; }
-    void setString(const QString &str) { m_text = str; }
-    // End deprecated
 
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
@@ -101,27 +94,12 @@ class MUI_PUBLIC MythGenericTree
     void IncVisibleCount() { m_visibleCount++; }
     void DecVisibleCount() { m_visibleCount--; }
 
-    void setAttribute(uint attribute_position, int value_of_attribute);
-    int getAttribute(uint which_one) const;
-    IntVector *getAttributes(void) const { return m_attributes; }
-
-    void setOrderingIndex(int ordering_index);
-    int getOrderingIndex(void) const { return m_currentOrderingIndex; }
-
     void becomeSelectedChild(void);
-    void setSelectedChild(MythGenericTree* a_node) { m_selected_subnode = a_node; }
-
-    void addYourselfIfSelectable(QList<MythGenericTree*> *flat_list);
-    void buildFlatListOfSubnodes(bool scrambled_parents);
-
-    MythGenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around,
-                                      MythGenericTree *active) const;
+    void setSelectedChild(MythGenericTree* a_node) { m_selectedSubnode = a_node; }
 
     void sortByString();
-    void sortByAttributeThenByString(int which_attribute);
     void sortBySelectable();
     void deleteAllChildren();
-    void reOrderAsSorted();
 
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(MythGenericTree *item, bool flag);
@@ -140,16 +118,12 @@ class MUI_PUBLIC MythGenericTree
     uint m_visibleCount;
 
     SortableMythGenericTreeList *m_subnodes;
-    SortableMythGenericTreeList *m_ordered_subnodes;
-    SortableMythGenericTreeList *m_flatenedSubnodes;
 
-    MythGenericTree *m_selected_subnode;
-    IntVector *m_attributes;
+    MythGenericTree *m_selectedSubnode;
     MythGenericTree *m_parent;
 
     bool m_selectable;
     bool m_visible;
-    int m_currentOrderingIndex;
 };
 
 Q_DECLARE_METATYPE(MythGenericTree*)
