@@ -1187,6 +1187,9 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         EITFixUp::kFixRTL;
     fix[ 9999 << 16 |   191LL << 32 | 11102 ] = // DAS VIERTE
         EITFixUp::kEFixForceISO8859_15;
+    // on this transport are only HD services, two TBD, arte and ServusTV, I think arte properly signals HD!
+    fix[ 9999 << 16 |   401LL << 32 | 29109 ] = // ServusTV HD
+        EITFixUp::kFixHDTV;
 
     // DVB-S Astra 19.2E DMAX Germany
     fix[  1113LL << 32 | 1 << 16 | 12602] = EITFixUp::kEFixForceISO8859_15;
