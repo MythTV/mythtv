@@ -938,6 +938,9 @@ void LogServerThread::stop(void)
 
 /// \brief  Entry point to start logging for the application.  This will
 ///         start up all of the threads needed.
+/// \return TRUE on success, FALSE on failure
+///
+/// \todo   Implement the following parameters to customise behaviour?...
 /// \param  logfile Filename of the logfile to create.  Empty if no file.
 /// \param  progress    non-zero if progress output will be sent to the console.
 ///                     This squelches all messages less important than LOG_ERR
@@ -948,7 +951,6 @@ void LogServerThread::stop(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-/// \return TRUE on success, FALSE on failure
 bool logServerStart(void)
 {
     if (logServerThread && logServerThread->isRunning())

@@ -279,15 +279,15 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
         item->DisplayState("subfolder", "nodetype");
-        item->SetText(node->getString(), "title");
-        item->SetText(node->getString());
+        item->SetText(node->GetText(), "title");
+        item->SetText(node->GetText());
         item->SetImage(node->GetData().toString());
     }
     else if (nodeInt == kUpFolder)
     {
         item->DisplayState("upfolder", "nodetype");
-        item->SetText(node->getString(), "title");
-        item->SetText(node->getString());
+        item->SetText(node->GetText(), "title");
+        item->SetText(node->GetText());
     }
 
     if (site)
@@ -326,7 +326,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     }
     else
     {
-        item->SetText(node->getString());
+        item->SetText(node->GetText());
         if (!node->GetData().toString().isEmpty())
         {
             QString tpath = node->GetData().toString();
@@ -339,11 +339,11 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                     pos = m_siteButtonList->GetItemPos(item);
 
                 QString dlfile = GetThumbnailFilename(tpath,
-                                                      node->getString());
+                                                      node->GetText());
                 if (QFile::exists(dlfile))
                     item->SetImage(dlfile);
                 else
-                    m_imageDownload->addThumb(node->getString(), tpath,
+                    m_imageDownload->addThumb(node->GetText(), tpath,
                                               qVariantFromValue<uint>(pos));
             }
             else if (tpath != "0")
@@ -1259,7 +1259,7 @@ void NetTree::customEvent(QEvent *event)
 
         if (m_type == DLG_TREE)
         {
-            if (title == m_siteMap->GetCurrentNode()->getString() &&
+            if (title == m_siteMap->GetCurrentNode()->GetText() &&
                 m_thumbImage)
             {
                 m_thumbImage->SetFilename(file);

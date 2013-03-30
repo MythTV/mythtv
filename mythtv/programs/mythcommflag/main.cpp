@@ -1217,7 +1217,7 @@ int main(int argc, char *argv[])
         else
             JobQueue::ChangeJobStatus(jobID, JOB_FINISHED,
                 QCoreApplication::translate("(mythcommflag)",
-                                            "%1 commercial break(s)"
+                                            "%1 commercial break(s)",
                                             "Job status").arg(ret));
     }
     else if (cmdline.toBool("video"))

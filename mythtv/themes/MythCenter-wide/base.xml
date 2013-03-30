@@ -637,6 +637,60 @@
         </imagetype>
     </progressbar>
 
+    <!-- Base definition of a vertical scrollbar -->
+    <scrollbar name="basevertscrollbar">
+        <area>1114,0,14,970</area>
+        <layout>vertical</layout>
+        <hidedelay>0</hidedelay>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <line color="#aaaaaa" alpha="255" width="1" />
+            <fill style="gradient">
+                <gradient direction="diagonal">
+                    <stop position="0" color="#999999" alpha="255" />
+                    <stop position="100" color="#999999" alpha="120" />
+                </gradient>
+            </fill>
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="slider">
+            <area>0,0,14,40</area>
+            <type>roundbox</type>
+            <line color="#0895f8" alpha="255" width="1" />
+            <fill style="gradient">
+                <gradient direction="diagonal">
+                    <stop position="0" color="#0767AB" alpha="255" />
+                    <stop position="100" color="#0767AB" alpha="120" />
+                </gradient>
+            </fill>
+            <cornerradius>12</cornerradius>
+        </shape>
+    </scrollbar>
+
+    <!-- Base definition of a horizontal scrollbar -->
+    <scrollbar name="basehorizscrollbar" from="basevertscrollbar">
+        <area>20,1030,1880,14</area>
+        <layout>horizontal</layout>
+        <shape name="slider">
+            <area>0,0,40,14</area>
+        </shape>
+    </scrollbar>
+
+    <!-- Base definition of a webbrowser -->
+    <webbrowser name="basewebbrowser">
+        <area>20,20,1240,500</area>
+        <browserarea>0,0,100%-16,100%-16</browserarea>
+        <zoom>1.0</zoom>
+        <scrollduration>500</scrollduration>
+        <scrollbar name="vertscrollbar" from="basevertscrollbar">
+            <area>100%-14,0,14,100%-14</area>
+        </scrollbar>
+        <scrollbar name="horizscrollbar" from="basehorizscrollbar">
+            <area>0,100%-14,100%-14,14</area>
+        </scrollbar>
+    </webbrowser>
+
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">
         <area>0,0,0,0</area>

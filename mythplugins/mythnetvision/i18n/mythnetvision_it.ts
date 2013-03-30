@@ -241,7 +241,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="527"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="528"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Esssre sicuri veramente di rimuove la sottoscrizione da questo feed?</translation>
     </message>
@@ -334,7 +334,7 @@ Per nuove sottoscrizioni, inserire semplicemente l&apos;URL e clic &quot;salvare
         <location filename="themestrings.h" line="24"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
         <translatorcomment>Fix case on sites...</translatorcomment>
-        <translation>Non si sono aggiunti siti/feed RSS ora!. Per aggiungere un sito, premere MENÙ, poi scegliere &quot;scansione/gestione sottoscrizioni&quot;, poi &quot;Gestione sottoscrizioni sito&quot;.</translation>
+        <translation>Non si sono aggiunti siti/feed RSS ora!. Per aggiungere un sito, premere MENÙ, poi scegliere &quot;Scansione/gestione sottoscrizioni&quot;, poi &quot;Gestione sottoscrizioni sito.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>

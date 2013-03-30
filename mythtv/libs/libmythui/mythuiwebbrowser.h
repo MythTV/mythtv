@@ -73,6 +73,16 @@ class BrowserApi : public QObject
     QString    m_answer;
 };
 
+class MythNetworkAccessManager : public QNetworkAccessManager
+{
+  Q_OBJECT
+  public:
+    MythNetworkAccessManager();
+
+  protected:
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = 0);
+};
+
 class MythWebPage : public QWebPage
 {
   Q_OBJECT
@@ -204,6 +214,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotIconChanged(void);
     void slotLinkClicked(const QUrl &url);
     void slotTopScreenChanged(MythScreenType *screen);
+    void slotScrollBarShowing(void);
+    void slotScrollBarHiding(void);
 
   protected:
     void Finalize(void);
@@ -212,6 +224,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void SetBackgroundColor(QColor color);
     void ResetScrollBars(void);
     void UpdateScrollBars(void);
+    bool IsOnTopScreen(void);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
@@ -225,6 +238,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     MythWebView *m_browser;
     MythRect     m_browserArea;
+    MythRect     m_actualBrowserArea;
 
     MythImage   *m_image;
 

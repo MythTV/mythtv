@@ -71,7 +71,7 @@
         <location filename="../mythgame/gamehandler.cpp" line="418"/>
         <source>19xx</source>
         <comment>Default game year</comment>
-        <translation>V</translation>
+        <translation>19xx</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="152"/>
@@ -134,7 +134,7 @@ Rimuoverlo dal database?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="232"/>
-        <location filename="../mythgame/gamehandler.cpp" line="618"/>
+        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -145,7 +145,7 @@ Rimuoverlo dal database?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="234"/>
-        <location filename="../mythgame/gamehandler.cpp" line="619"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>Yes</source>
         <translation>Si</translation>
     </message>
@@ -167,13 +167,13 @@ Rimuoverlo dal database?</translation>
         <translation>Verificando %1 file...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="612"/>
+        <location filename="../mythgame/gamehandler.cpp" line="607"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Questo cancellerà tutti i metadati del gioco dal database. Essere sicuri di volerlo fare?</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="717"/>
-        <location filename="../mythgame/gamehandler.cpp" line="745"/>
+        <location filename="../mythgame/gamehandler.cpp" line="707"/>
+        <location filename="../mythgame/gamehandler.cpp" line="735"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Scansione per %1 giochi...</translation>

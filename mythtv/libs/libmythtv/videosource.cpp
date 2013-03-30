@@ -2252,40 +2252,43 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
+    
+#ifdef USING_DVB
+    addTarget("DVB",       new DVBConfigurationGroup(parent));
+#endif // USING_DVB
 
 #ifdef USING_V4L2
-    addTarget("V4L",       new V4LConfigurationGroup(parent));
-# ifdef USING_IVTV
-    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
-# endif // USING_IVTV
 # ifdef USING_HDPVR
     addTarget("HDPVR",     new HDPVRConfigurationGroup(parent));
 # endif // USING_HDPVR
 #endif // USING_V4L2
 
-#ifdef USING_DVB
-    addTarget("DVB",       new DVBConfigurationGroup(parent));
-#endif // USING_DVB
+#ifdef USING_HDHOMERUN
+    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
+#endif // USING_HDHOMERUN
 
 #ifdef USING_FIREWIRE
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
 
-#ifdef USING_HDHOMERUN
-    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
-#endif // USING_HDHOMERUN
+#ifdef USING_CETON
+    addTarget("CETON",     new CetonConfigurationGroup(parent));
+#endif // USING_CETON
 
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
-
+    
+#ifdef USING_V4L2
+    addTarget("V4L",       new V4LConfigurationGroup(parent));
+# ifdef USING_IVTV
+    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
+# endif // USING_IVTV
+#endif // USING_V4L2
+    
 #ifdef USING_ASI
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
-
-#ifdef USING_CETON
-    addTarget("CETON",     new CetonConfigurationGroup(parent));
-#endif // USING_CETON
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
@@ -2451,54 +2454,54 @@ CardType::CardType(const CaptureCard &parent) :
 
 void CardType::fillSelections(SelectSetting* setting)
 {
+#ifdef USING_DVB
+    setting->addSelection(
+        QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
+#endif // USING_DVB
+
 #ifdef USING_V4L2
-    setting->addSelection(
-        QObject::tr("Analog V4L capture card"), "V4L");
-    setting->addSelection(
-        QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
-# ifdef USING_IVTV
-    setting->addSelection(
-        QObject::tr("MPEG-2 encoder card"), "MPEG");
-# endif // USING_IVTV
 # ifdef USING_HDPVR
     setting->addSelection(
-        QObject::tr("H.264 encoder card (HD-PVR)"), "HDPVR");
+        QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
 # endif // USING_HDPVR
 #endif // USING_V4L2
 
-#ifdef USING_DVB
+#ifdef USING_HDHOMERUN
     setting->addSelection(
-        QObject::tr("DVB DTV capture card (v3.x)"), "DVB");
-#endif // USING_DVB
-
+        QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
+#endif // USING_HDHOMERUN
+    
 #ifdef USING_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
 #endif // USING_FIREWIRE
 
-#ifdef USING_V4L2
+#ifdef USING_CETON
     setting->addSelection(
-        QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
-        "GO7007");
-#endif // USING_V4L2
-
-#ifdef USING_HDHOMERUN
-    setting->addSelection(
-        QObject::tr("HDHomeRun DTV tuner box"), "HDHOMERUN");
-#endif // USING_HDHOMERUN
+        QObject::tr("Ceton Cablecard tuner"), "CETON");
+#endif // USING_CETON
 
 #ifdef USING_IPTV
     setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
 #endif // USING_IPTV
 
+#ifdef USING_V4L2
+# ifdef USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
+# endif // USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)"),
+        "GO7007");
+    setting->addSelection(
+        QObject::tr("Analog capture card"), "V4L");
+#endif // USING_V4L2
+
 #ifdef USING_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
-
-#ifdef USING_CETON
-    setting->addSelection(
-        QObject::tr("Ceton Cablecard tuner "), "CETON");
-#endif // USING_CETON
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");

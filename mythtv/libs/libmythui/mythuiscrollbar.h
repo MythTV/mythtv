@@ -27,6 +27,9 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     void SetSliderPosition(int);
     void SetMaximum(int);
 
+  protected slots:
+    void DoneFading(void);
+
   protected:
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);

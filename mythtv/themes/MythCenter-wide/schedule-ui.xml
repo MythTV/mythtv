@@ -1134,7 +1134,7 @@
             <fill color="#131564"/>
         </shape>
 
-        <webbrowser name="browser">
+        <webbrowser name="browser" from="basewebbrowser">
             <area>80,70,1120,580</area>
             <zoom>1.0</zoom>
             <background color="#131564"/>

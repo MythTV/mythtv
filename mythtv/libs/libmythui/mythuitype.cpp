@@ -435,6 +435,7 @@ void MythUIType::HandleAlphaPulse(void)
         {
             m_AlphaChangeMode = 0;
             m_AlphaChange = 0;
+            emit FinishedFading();
         }
     }
 
