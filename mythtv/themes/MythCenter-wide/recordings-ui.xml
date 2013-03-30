@@ -488,82 +488,81 @@
         </button>
     </window>
 
-    <window name="editmetadata">
-        <area>-1,-1,500,500</area>
+     <window name="editmetadata">
+        <area>-1,-1,800,600</area>
 
         <imagetype name="backimg">
+            <area>0,0,100%,100%</area>
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,60</area>
+            <area>20,10,100%-20,60</area>
+            <font>baselarge</font>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>8,120,90,30</area>
+            <area>8,100,150,30</area>
             <align>right,vcenter</align>
             <value>Title:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>105,110</position>
+            <area>165,90,570,50</area>
         </textedit>
 
-        <textarea name="subtitlelabel" from="basetextarea">
-            <area>8,180,90,30</area>
-            <align>right,vcenter</align>
+        <textarea name="subtitlelabel" from="titlelabel">
+            <position>8,160</position>
             <value>Subtitle:</value>
         </textarea>
 
-        <textedit name="subtitle" from="basetextedit">
-            <position>105,170</position>
+        <textedit name="subtitle" from="title">
+            <position>165,150</position>
         </textedit>
 
-        <textarea name="inetreflabel" from="basetextarea">
-            <area>8,240,90,30</area>
-            <align>right,vcenter</align>
+        <textarea name="inetreflabel" from="titlelabel">
+            <position>8,220</position>
             <value>Inetref:</value>
         </textarea>
 
         <textedit name="inetref" from="basetextedit">
-            <position>105,230</position>
+           <position>165,210</position>
         </textedit>
 
-        <textarea name="seaslabel" from="basetextarea">
-            <area>8,300,90,30</area>
-            <align>right,vcenter</align>
-            <value>Season:</value>
+        <textarea name="seaslabel" from="titlelabel">
+           <position>8,275</position>
+           <value>Season:</value>
         </textarea>
 
         <spinbox name="season" from="basespinbox">
-            <position>105,290</position>
+            <position>165,270</position>
         </spinbox>
 
         <textarea name="eplabel" from="basetextarea">
-            <area>208,300,90,30</area>
+            <area>258,275,90,30</area>
             <align>right,vcenter</align>
             <value>Episode:</value>
         </textarea>
 
         <spinbox name="episode" from="basespinbox">
-            <position>305,290</position>
+            <position>355,270</position>
         </spinbox>
 
-        <textarea name="descriptionlabel" from="basetextarea">
-            <area>8,360,90,30</area>
+        <textarea name="descriptionlabel" from="titlelabel">
+            <position>8,340</position>
             <align>right,vcenter</align>
             <value>Plot:</value>
         </textarea>
 
-        <textedit name="description" from="basetextedit">
-            <position>105,350</position>
+        <textedit name="description" from="basemultilinetextedit">
+            <area>165,330,570,190</area>
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>175,434</position>
+            <position>50%-77,534</position>
             <value>OK</value>
         </button>
     </window>
