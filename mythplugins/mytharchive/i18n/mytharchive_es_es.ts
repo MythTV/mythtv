@@ -94,7 +94,7 @@
         <translation>Eliminar elemento</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="536"/>
+        <location filename="../mytharchive/exportnative.cpp" line="531"/>
         <source>You don&apos;t have any videos!</source>
         <translation>¡No tiene ningún vídeo!</translation>
     </message>
@@ -135,27 +135,27 @@
         <translation>¡Debe seleccionar un ID de canal válido!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="468"/>
+        <location filename="../mytharchive/importnative.cpp" line="464"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>No fue posible importar el archivo.  Ocurrió un error al ejecutar &apos;mytharchivehelper&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="598"/>
+        <location filename="../mytharchive/importnative.cpp" line="594"/>
         <source>Select a channel id</source>
         <translation>Seleccionar ID de canal</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="624"/>
+        <location filename="../mytharchive/importnative.cpp" line="620"/>
         <source>Select a channel number</source>
         <translation>Seleccionar un número de canal</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="650"/>
+        <location filename="../mytharchive/importnative.cpp" line="646"/>
         <source>Select a channel name</source>
         <translation>Seleccionar un nombre de canal</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="676"/>
+        <location filename="../mytharchive/importnative.cpp" line="672"/>
         <source>Select a Callsign</source>
         <translation>Seleccionar ID de emisora</translation>
     </message>
@@ -163,27 +163,27 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="316"/>
+        <location filename="../mytharchive/logviewer.cpp" line="365"/>
         <source>Show Progress Log</source>
         <translation>Mostrar registro de progreso</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="317"/>
+        <location filename="../mytharchive/logviewer.cpp" line="366"/>
         <source>Show Full Log</source>
         <translation>Mostrar registro completo</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="312"/>
+        <location filename="../mytharchive/logviewer.cpp" line="361"/>
         <source>Don&apos;t Auto Update</source>
         <translation>No actualizar automáticamente</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="314"/>
+        <location filename="../mytharchive/logviewer.cpp" line="363"/>
         <source>Auto Update</source>
         <translation>Actualizar automáticamente</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="304"/>
+        <location filename="../mytharchive/logviewer.cpp" line="353"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>
@@ -259,7 +259,7 @@
         <translation>Editar miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="966"/>
+        <location filename="../mytharchive/mythburn.cpp" line="965"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>No fue posible crear el DVD. Ha ocurrido un error al ejecutar los guiones</translation>
     </message>
@@ -415,7 +415,7 @@
         <translation>Órdenes externas de MythArchive (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="177"/>
+        <location filename="../mytharchive/logviewer.cpp" line="214"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Se ha solicitado detener la creación en segundo plano.
@@ -614,12 +614,12 @@ Have you set the correct path in the settings?</source>
 ¿Ha seleccionado la ruta correcta en la configuración?</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="500"/>
+        <location filename="../mytharchive/exportnative.cpp" line="495"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>No fue posible crear el DVD. Ocurrió un error al ejecutar los guiones</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="39"/>
+        <location filename="../mytharchive/logviewer.cpp" line="76"/>
         <source>Cannot find any logs to show!</source>
         <translation>¡No pudo encontrarse ningún registro para mostrar!</translation>
     </message>
@@ -641,42 +641,42 @@ Eliminando el fichero de bloqueo abandonado.</translation>
         <translation>La última ejecución no logró crear un DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1009"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
         <source>You don&apos;t have any videos!</source>
         <translation>¡No tiene ningún vídeo!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1156"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>No se pudo grabar el DVD.
 La última ejecución no logró crear un DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
         <source>Burn DVD</source>
         <translation>Grabar DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1163"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Introduzca un DVD virgen en la unidad y elija una opción entre las siguientes.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
         <source>Burn DVD Rewritable</source>
         <translation>Grabar DVD reescribible</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1176"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>Grabar DVD reescribible (forzar borrado)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1232"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>No fue posible ejecutar mytharchivehelper para grabar el DVD.</translation>
     </message>
