@@ -330,7 +330,7 @@ void GalleryThumbGenThread::cancel()
 
 
 /** \fn     GalleryThumbGenThread::Pause()
- *  \brief  Stoppes the thumbnail generation
+ *  \brief  Pauses the thumbnail generation
  *  \return void
  */
 void GalleryThumbGenThread::Pause()

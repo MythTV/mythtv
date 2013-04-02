@@ -935,7 +935,7 @@ void GalleryView::MenuSettings()
 
 
 
-/** \fn     GalleryView::ItemSelect(MythUIButtonListItem *)
+/** \fn     GalleryView::ItemSelected(MythUIButtonListItem *)
  *  \brief  A new MythUIButtonListItem has been selected
  *  \param  item The given button item that has been selected
  *  \return void
@@ -984,7 +984,7 @@ void GalleryView::ShowFiles()
 
 
 
-/** \fn     GalleryView::ShowFiles()
+/** \fn     GalleryView::ShowRandomFiles()
  *  \brief  Starts a slide show with the images in random order
  *  \return void
  */
@@ -1093,7 +1093,7 @@ void GalleryView::FileSelectOne()
 
 
 
-/** \fn     GalleryView::FileSelectOne()
+/** \fn     GalleryView::FileDeselectOne()
  *  \brief  Marks a single file as not selected
  *  \return void
  */
@@ -1109,7 +1109,7 @@ void GalleryView::FileDeselectOne()
 
 
 
-/** \fn     GalleryView::FileSelectOne()
+/** \fn     GalleryView::FileSelectAll()
  *  \brief  Marks all files as selected
  *  \return void
  */
@@ -1369,6 +1369,7 @@ void GalleryView::FileRenameInput()
 /** \fn     GalleryView::FileRename(QString &)
  *  \brief  Renames the current filename to the new filename
             if the new filename does not exist already.
+ *  \param  New name of the file with the full path
  *  \return void
  */
 void GalleryView::FileRename(QString &newName)

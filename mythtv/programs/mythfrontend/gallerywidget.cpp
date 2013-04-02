@@ -334,7 +334,7 @@ void GalleryWidget::customEvent(QEvent *event)
 
 
 
-/** \fn     GalleryView::MenuInformation()
+/** \fn     GalleryView::MenuMain()
  *  \brief  Shows a dialog popup with the main menu
  *  \return void
  */
@@ -574,7 +574,7 @@ void GalleryWidget::LoadFile()
  */
 QString GalleryWidget::CreateImageUrl(QString &fileName)
 {
-    // TODO another way to get the images could be changin the
+    // TODO another way to get the images could be changing the
     //      myth://SGNAME@host:Port/filename request to
     //      http://host:Port/StorageGroup/SGNAME/filename
 

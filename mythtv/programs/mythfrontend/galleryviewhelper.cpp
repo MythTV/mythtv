@@ -195,8 +195,9 @@ void GalleryViewHelper::LoadTreeNodeData(QList<ImageMetadata *> *list,
 
 
 
-/** \fn     GalleryViewHelper::RenameCurrentNode()
+/** \fn     GalleryViewHelper::RenameCurrentNode(QString &)
  *  \brief  Renames the file that belongs to the node and updates the database
+ *  \param  New name of the file with the full path
  *  \return void
  */
 void GalleryViewHelper::RenameCurrentNode(QString &newName)
@@ -525,7 +526,7 @@ void GalleryViewHelper::SetPreviewImageSize(MythUIButtonList *imageList)
 
 
 
-/** \fn     DataSyncThread::DataSyncThread()
+/** \fn     GallerySyncStatusThread::GallerySyncStatusThread()
  *  \brief  Constructor
  *  \return void
  */
@@ -536,7 +537,7 @@ GallerySyncStatusThread::GallerySyncStatusThread()
 
 /**
  * @brief GallerySyncStatusThread::isSyncRunning
- * @return
+ * @return void
  */
 bool GallerySyncStatusThread::isSyncRunning()
 {
@@ -551,7 +552,7 @@ bool GallerySyncStatusThread::isSyncRunning()
     return status.running;
 }
 
-/** \fn     DataSyncThread::run()
+/** \fn     GallerySyncStatusThread::run()
  *  \brief  Called when the thread is started. Calls the service
             api to start the syncing and checks the status every 2s.
  *  \return void

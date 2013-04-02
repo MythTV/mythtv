@@ -47,7 +47,7 @@ GalleryFileHelper::~GalleryFileHelper()
 
 
 
-/** \fn     GalleryFileHelper::SyncImages()
+/** \fn     GalleryFileHelper::StartSyncImages()
  *  \brief  Starts the image syncronization from the backend
  *  \return void
  */
@@ -62,7 +62,7 @@ void GalleryFileHelper::StartSyncImages()
 
 
 
-/** \fn     GalleryFileHelper::SyncImages()
+/** \fn     GalleryFileHelper::StopSyncImages()
  *  \brief  Starts the image syncronization from the backend
  *  \return void
  */
@@ -123,7 +123,7 @@ GallerySyncStatus GalleryFileHelper::GetSyncStatus()
 
 /** \fn     GalleryFileHelper::RenameFile(const int &, const QString &)
  *  \brief  Renames the file via the service api
- *  \param  id The database id of the file that shall be renamed
+ *  \param  im The image metadata object that contains all required information
  *  \param  name The new name of the file (only the filename, no path)
  *  \return True if removal was successful, otherwise false
  */
@@ -165,9 +165,9 @@ bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
 
 
 
-/** \fn     GalleryFileHelper::RemoveFile(const int &)
+/** \fn     GalleryFileHelper::RemoveFile(ImageMetadata *)
  *  \brief  Deletes the file via the service api
-*  \param   id The database id of the file that shall be renamed
+ *  \param  im The image metadata object that contains all required information
  *  \return True if removal was successful, otherwise false
  */
 bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
@@ -207,11 +207,9 @@ bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
 
 
 
-/** \fn     GalleryFileHelper::SetExifOrientation(const QString &, const long , bool *)
+/** \fn     GalleryFileHelper::SetImageOrientation(ImageMetadata *)
  *  \brief  Saves the given value in the orientation exif tag
- *  \param  fileName The filename that holds the exif data
- *  \param  orientation The value that shall be saved in the exif data
- *  \param  ok Will be set to true if the update was ok, otherwise false
+ *  \param  im The image metadata object that contains all required information
  *  \return True if saving the orientation was successful, otherwise false
  */
 bool GalleryFileHelper::SetImageOrientation(ImageMetadata *im)
@@ -257,10 +255,10 @@ bool GalleryFileHelper::SetImageOrientation(ImageMetadata *im)
 
 
 
-/** \fn     GalleryFileHelper::GetExifValues(const int id)
+/** \fn     GalleryFileHelper::GetExifValues(ImageMetadata *)
  *  \brief  Returns the XML data that contains all available exif header
             tags and values from the image specified by the id.
- *  \param  id The database id of the file
+ *  \param  im The image metadata object that contains all required information
  *  \return The returned XML data
  */
 QByteArray GalleryFileHelper::GetExifValues(ImageMetadata *im)

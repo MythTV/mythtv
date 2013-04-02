@@ -200,9 +200,9 @@ DTC::ImageMetadataInfoList* Image::GetImageInfoList( int id )
 
 
 
-/** \fn     Image::GetImageInfoList(int id)
+/** \fn     Image::GetImageInfoListByFileName(QString &fileName)
  *  \brief  Returns all values from all available exif tags
- *  \param  id The database id of the file
+ *  \param  fileName The name of the file
  *  \return DTC::ImageMetadataInfoList The list with all exif values
  */
 DTC::ImageMetadataInfoList* Image::GetImageInfoListByFileName( const QString &fileName )
