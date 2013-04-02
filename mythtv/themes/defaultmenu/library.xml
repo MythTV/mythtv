@@ -67,8 +67,7 @@
         <type>IMAGES</type>
         <text>New Image Gallery</text>
         <description>Look at Pictures</description>
-        <action>PLUGIN mythimage</action>
-        <depends>mythimage</depends>
+        <action>JUMP Gallery Default</action>
     </button>
     
     <button>
