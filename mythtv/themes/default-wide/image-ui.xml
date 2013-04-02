@@ -47,23 +47,19 @@
 
         <!-- optional - shows current position in grid eg '1 of 123' -->
         <textarea name="position" from="basetextarea">
-            <area>985,80,250,30</area>
+            <area>1055,80,180,30</area>
             <align>right,vcenter</align>
         </textarea>
 
         <!-- shows path to current image -->
         <textarea name="breadcrumbs" from="basetextarea">
-            <area>45,120,1000,20</area>
+            <area>45,120,900,20</area>
             <font>text_very_small</font>
             <cutdown>yes</cutdown>
         </textarea>
 
-        <progressbar name="thumbprogressbar" from="baseprogressbar">
-            <area>550,75,536,38</area>
-        </progressbar>
-
         <textarea name="thumbprogresstext" from="basetextarea">
-            <area>440,85,100,20</area>
+            <area>950,85,100,20</area>
             <align>right,vcenter</align>
         </textarea>
 
