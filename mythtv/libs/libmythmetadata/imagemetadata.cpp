@@ -24,7 +24,7 @@ ImageMetadata::ImageMetadata()
     m_angle = 0;
     m_orientation = 0;
     m_date = 0;
-    m_zoom = 0;
+    m_zoom = 100;
     m_isHidden = false;
 
     m_selected = false;
