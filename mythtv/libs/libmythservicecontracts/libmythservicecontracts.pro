@@ -21,6 +21,7 @@ HEADERS += services/contentServices.h services/dvrServices.h
 HEADERS += services/channelServices.h services/videoServices.h
 HEADERS += services/captureServices.h
 HEADERS += services/frontendServices.h
+HEADERS += services/imageServices.h
 
 HEADERS += datacontracts/connectionInfo.h        datacontracts/databaseInfo.h
 HEADERS += datacontracts/programAndChannel.h     datacontracts/programGuide.h
@@ -42,6 +43,8 @@ HEADERS += datacontracts/frontendActionList.h
 HEADERS += datacontracts/liveStreamInfo.h        datacontracts/liveStreamInfoList.h
 HEADERS += datacontracts/labelValue.h
 HEADERS += datacontracts/logMessage.h            datacontracts/logMessageList.h
+HEADERS += datacontracts/imageMetadataInfoList.h datacontracts/imageMetadataInfo.h
+HEADERS += datacontracts/imageSyncInfo.h
 
 SOURCES += service.cpp
 
@@ -63,6 +66,7 @@ incServices.files += services/contentServices.h services/dvrServices.h
 incServices.files += services/channelServices.h services/videoServices.h
 incServices.files += services/captureServices.h
 incServices.files += services/frontendServices.h
+incServices.files += services/imageServices.h
 
 incDatacontracts.path = $${PREFIX}/include/mythtv/libmythservicecontracts/datacontracts/
 incDatacontracts.files  = datacontracts/connectionInfo.h      datacontracts/databaseInfo.h
@@ -82,6 +86,8 @@ incDatacontracts.files += datacontracts/frontendStatus.h      datacontracts/fron
 incDatacontracts.files += datacontracts/liveStreamInfo.h      datacontracts/liveStreamInfoList.h
 incDatacontracts.files += datacontracts/labelValue.h
 incDatacontracts.files += datacontracts/logMessage.h          datacontracts/logMessageList.h
+incDatacontracts.files += datacontracts/imageMetadataInfoList.h datacontracts/imageMetadataInfo.h
+incDatacontracts.files += datacontracts/imageSyncInfo.h
 
 INSTALLS += inc incServices incDatacontracts
 

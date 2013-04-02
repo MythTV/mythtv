@@ -2563,6 +2563,7 @@ enable xv
 disable indevs
 disable sdl
 enable libfftw3
+enable exiv2
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -5278,6 +5279,9 @@ EOF
 # Check that all MythTV build "requirements" are met:
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
+
+enabled exiv2 && $(pkg-config --exists exiv2) ||
+    die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
 
 # Qt dependency checks
 if test $target_os = mingw32 ; then

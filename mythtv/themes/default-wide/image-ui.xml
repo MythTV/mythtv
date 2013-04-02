@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<mythuitheme>
+
+    <window name="gallery">
+
+        <!-- The heading (name) of the screen -->
+        <textarea name="heading" from="basetextarea">
+            <position>0,0</position>
+            <textarea name="text">
+            <value>Image Gallery</value>
+            </textarea>
+        </textarea>
+
+        <!-- The clock that is shown at the top right of each screen -->
+        <shape name="clock_background">
+            <area>0,-4,244,36</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="130" />
+            <line color="#AAAAAA" alpha="150" width="1" />
+            <cornerradius>2</cornerradius>
+        </shape>
+        <clock name="text">
+            <area>0,0,244,30</area>
+            <font>text</font>
+            <template>%DATE%, %TIME%</template>
+            <align>allcenter</align>
+            <alpha>255</alpha>
+        </clock>
+
+        <!-- the shape where the imagelist is displayed -->
+        <shape name="gallerybackground">
+            <area>25,60,1230,633</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="130" />
+            <line color="#AAAAAA" alpha="150" width="1" />
+            <cornerradius>2</cornerradius>
+        </shape>
+
+        <!-- shows the name of the folder or image -->
+        <textarea name="title" from="basetextarea">
+            <area>45,80,900,30</area>
+            <cutdown>yes</cutdown>
+            <font>title</font>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <!-- optional - shows current position in grid eg '1 of 123' -->
+        <textarea name="position" from="basetextarea">
+            <area>1055,80,180,30</area>
+            <align>right,vcenter</align>
+        </textarea>
+
+        <!-- shows path to current image -->
+        <textarea name="breadcrumbs" from="basetextarea">
+            <area>45,120,900,20</area>
+            <font>text_very_small</font>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="thumbprogresstext" from="basetextarea">
+            <area>950,85,100,20</area>
+            <align>right,vcenter</align>
+        </textarea>
+
+        <!-- the list that shows the images in the screen -->
+        <buttonlist name="images">
+            <area>45,155,1170,535</area>
+            <buttonarea>0,0,1190,535</buttonarea>
+            <wrapstyle>flowing</wrapstyle>
+            <layout>grid</layout>
+            <spacing>7</spacing>
+            <statetype name="buttonitem">
+
+                <state name="active">
+                    <area>0,0,164,124</area>
+
+                    <!-- This is the dark background behind each image -->
+                    <shape name="buttonimage_background_shape">
+                        <area>0,0,164,124</area>
+                        <type>box</type>
+                        <line color="#000000" alpha="0" width="1" />
+                        <fill color="#000000" alpha="130" />
+                    </shape>
+
+                    <!-- Show an additional background image if required. This is
+                    primarily useful when the item is a folder and a folder background
+                    image shall be shown behind the small preview thumbnail images -->
+                    <statetype name="buttonbackground">
+                        <position>0,0</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>2,2,160,120</area>
+                                <filename>gallery-folder-reg.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>2,2,160,120</area>
+                                <filename>gallery-folder-reg.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="image">
+                        </state>
+                        <state name="video">
+                        </state>
+                    </statetype>
+
+                    <!-- this shows the actual image -->
+                    <imagetype name="buttonimage">
+                        <area>2,2,160,120</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+
+                    <imagetype name="thumbimage1">
+                        <area>2,2,80,60</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage2">
+                        <area>82,2,80,60</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage3">
+                        <area>82,62,80,60</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage4">
+                        <area>2,62,80,60</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+
+                    <!-- This is the border around the image. Its placed here
+                         draw over the edges of the image -->
+                    <shape name="buttonimage_border_shape">
+                        <area>0,0,164,124</area>
+                        <type>box</type>
+                        <fill color="#000000" alpha="0" />
+                        <line color="#AAAAAA" alpha="150" width="1" />
+                    </shape>
+
+                    <!-- shows that the image was marked/selected and
+                        might be manipulated with other images -->
+                    <statetype name="buttoncheck">
+                        <position>2,2</position>
+                        <state type="full">
+                            <shape name="marked_background">
+                                <area>0,0,33,33</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="marked">
+                                <filename>gallery-mark.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                    <!-- Shows an indication if a file or folder is hidden
+                         or not. It will be marked and darkened -->
+                    <statetype name="buttonstate">
+                        <position>0,0</position>
+                        <state name="hidden">
+                            <shape name="hidden_background_shape">
+                                <area>1,1,162,122</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="210" />
+                            </shape>
+                        </state>
+                        <state name="visible">
+                        </state>
+                    </statetype>
+
+                    <!-- show additional information about the selected item.
+                         Shows a small folder or video icon -->
+                    <statetype name="buttontype">
+                        <position>0,0</position>
+                        <state name="subfolder">
+                            <shape name="buttonimage_shape">
+                                <area>1,93,162,30</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="icon">
+                                <area>7,97,24,24</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <shape name="buttonimage_shape">
+                                <area>1,93,162,30</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="icon">
+                                <area>7,97,24,24</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="video">
+                            <shape name="buttonimage_shape">
+                                <area>120,80,43,43</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="icon">
+                                <area>122,83,37,37</area>
+                                <filename>gallery-moviethumb.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="image">
+                        </state>
+                    </statetype>
+
+                    <!-- show how many images / directories are in this directory -->
+                    <textarea name="childcount" from="basetextarea">
+                        <area>37,95,90,30</area>
+                        <font>text_small</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+
+                <state name="selectedactive">
+                    <area>-38,-28,240,180</area>
+
+                    <shape name="buttonimage_background_shape">
+                        <area>0,0,240,180</area>
+                        <type>box</type>
+                        <line color="#000000" alpha="0" width="1" />
+                        <fill color="#000000" alpha="130" />
+                    </shape>
+-
+                    <statetype name="buttonbackground">
+                        <position>0,0</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>2,2,235,176</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>2,2,235,176</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="image">
+                        </state>
+                        <state name="video">
+                        </state>
+                    </statetype>
+
+                    <imagetype name="buttonimage">
+                        <area>2,2,235,176</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+
+                    <imagetype name="thumbimage1">
+                        <area>2,2,117,88</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage2">
+                        <area>119,2,117,88</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage3">
+                        <area>119,90,117,88</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+                    <imagetype name="thumbimage4">
+                        <area>2,90,117,88</area>
+                        <preserveaspect>false</preserveaspect>
+                    </imagetype>
+
+                    <shape name="buttonimage_border_shape">
+                        <area>0,0,240,180</area>
+                        <type>box</type>
+                        <fill color="#000000" alpha="0" />
+                        <line color="#AAAAAA" alpha="150" width="2" />
+                    </shape>
+
+                    <statetype name="buttoncheck">
+                        <position>2,2</position>
+                        <state type="full">
+                            <shape name="marked_background">
+                                <area>0,0,33,33</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="210" />
+                            </shape>
+                            <imagetype name="marked">
+                                <filename>gallery-mark.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                    <statetype name="buttonstate">
+                        <position>0,0</position>
+                        <state name="hidden">
+                            <shape name="hidden_background_shape">
+                                <area>1,1,162,122</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="210" />
+                            </shape>
+                        </state>
+                        <state name="visible">
+                        </state>
+                    </statetype>
+
+                    <statetype name="buttontype">
+                        <position>0,0</position>
+                        <state name="subfolder">
+                            <shape name="buttonimage_shape">
+                                <area>1,139,238,40</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="icon">
+                                <area>9,144,32,32</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <shape name="buttonimage_shape">
+                                <area>1,139,238,40</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />
+                            </shape>
+                            <imagetype name="icon">
+                                <area>9,144,32,32</area>
+                                <filename>gallery-folder-sel.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="video">
+                            <shape name="buttonimage_shape">
+                                <area>181,121,58,58</area>
+                                <type>box</type>
+                                <line color="#000000" alpha="0" width="1" />
+                                <fill color="#000000" alpha="130" />v
+                            </shape>
+                            <imagetype name="icon">
+                                <area>183,124,52,52</area>
+                                <filename>gallery-moviethumb.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="image">
+                        </state>
+                    </statetype>
+
+                    <textarea name="childcount" from="basetextarea">
+                        <area>49,145,90,30</area>
+                        <font>text_small</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+
+                </state>
+            </statetype>
+
+            <!-- Show the arrow image that indicates that there are
+                more menu entries above the first visible menu -->
+            <statetype name="upscrollarrow">
+                <position>1135,-20</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+
+            <!-- Show the arrow image that indicates that there are
+                more menu entries below the last visible menu -->
+            <statetype name="downscrollarrow">
+                <position>1160,-20</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+
+        </buttonlist>
+
+        <!-- shows a message when no images are available
+             in the current directory -->
+         <textarea name="noimages" from="basetextarea">
+             <area>225,60,830,633</area>
+             <align>allcenter</align>
+         </textarea>
+
+    </window>
+
+
+
+
+
+
+    <!-- Configuration dialog. This is currently
+         used by the MythImage plugin only -->
+    <window name="galleryconfig">
+
+        <!-- The heading (name) of the screen -->
+        <textarea name="heading" from="basetextarea">
+            <position>0,0</position>
+            <textarea name="text">
+            <value>Gallery Settings</value>
+            </textarea>
+        </textarea>
+
+        <!-- The clock that is shown at the top right of each screen -->
+        <shape name="clock_background">
+            <area>0,-4,244,36</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="130" />
+            <line color="#AAAAAA" alpha="150" width="1" />
+            <cornerradius>2</cornerradius>
+        </shape>
+        <clock name="text">
+            <area>0,0,244,30</area>
+            <font>text</font>
+            <template>%DATE%, %TIME%</template>
+            <align>allcenter</align>
+            <alpha>255</alpha>
+        </clock>
+
+        <!-- the shape where the imagelist is displayed -->
+        <shape name="galleryconfig_background">
+            <area>160,170,960,460</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="130" />
+            <line color="#AAAAAA" alpha="150" width="1" />
+            <cornerradius>2</cornerradius>
+        </shape>
+
+        <textarea name="sgname_label" from="basetextarea">
+            <area>180,190,540,40</area>
+            <align>right,vcenter</align>
+            <value>Name of the storage group for the images:</value>
+        </textarea>
+        <textarea name="sortorder_label" from="sgname_label">
+            <position>180,240</position>
+            <value>Sorting order of the shown images:</value>
+        </textarea>
+        <textarea name="slideshowtime_label" from="sgname_label">
+            <position>180,290</position>
+            <value>Time to display each image during a slideshow (ms):</value>
+        </textarea>
+        <textarea name="transitiontype_label" from="sgname_label">
+            <position>180,340</position>
+            <value>Type of transition between two images:</value>
+        </textarea>
+        <textarea name="transitiontime_label" from="sgname_label">
+            <position>180,390</position>
+            <value>Duration of an image transition (ms):</value>
+        </textarea>
+        <textarea name="showhiddenfiles_label" from="sgname_label">
+            <position>180,440</position>
+            <value>Show files that are marked as hidden:</value>
+        </textarea>
+        <textarea name="cleardatabase_label" from="sgname_label">
+            <position>180,490</position>
+            <value>Clear database contents (Resync required):</value>
+        </textarea>
+
+        <textedit name="storagegroupname" from="basetextedit">
+            <position>730,190</position>
+        </textedit>
+        <buttonlist name="sortorder" from="basewideselector">
+            <position>730,240</position>
+        </buttonlist>
+        <spinbox name="slideshowtime" from="basespinbox">
+            <position>730,290</position>
+        </spinbox>
+        <buttonlist name="transitiontype" from="baseselector">
+            <position>730,340</position>
+        </buttonlist>
+        <spinbox name="transitiontime" from="basespinbox">
+            <position>730,390</position>
+        </spinbox>
+        <checkbox name="showhiddenfiles" from="basecheckbox">
+            <position>730,445</position>
+        </checkbox>
+        <button name="cleardatabase" from="basebutton">
+            <area>730,495,40,40</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="selected">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="disabled">
+                    <area>0,0,40,40</area>
+                </state>
+                <state name="pushed">
+                    <area>0,0,40,40</area>
+                </state>
+            </statetype>
+        </button>
+
+        <shape name="description_separator">
+            <area>180,550,920,1</area>
+            <type>box</type>
+            <line color="#AAAAAA" alpha="150" width="1" />
+        </shape>
+
+        <button name="save" from="basebutton">
+            <position>450,570</position>
+            <value>Save</value>
+        </button>
+        <button name="cancel" from="basebutton">
+            <position>680,570</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
+
+
+
+
+
+    <!-- Slideshow window which shows the a single image only or a slideshow.
+         This is currently used by the MythImage plugin only -->
+    <window name="slideshow">
+
+        <!-- the background behind the images (black) -->
+        <shape name="background_shape">
+            <area>0,0,1280,720</area>
+            <fill color="#000000" alpha="255" />
+            <line color="#000000" alpha="255" />
+            <type>roundbox</type>
+            <cornerradius>2</cornerradius>
+        </shape>
+
+        <!-- this is the image that shown in the foreground.
+             when fading is enabled this image is faded out. -->
+        <imagetype name="first_image">
+            <area>-2,-2,1284,724</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+
+        <!-- this is the image that shown in the background
+             when fading is enabled this image is faded in. -->
+        <imagetype name="second_image">
+            <area>-2,-2,1284,724</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+
+        <!-- shows some information if required -->
+        <textarea name="status" from="basetextarea">
+            <area>500,-4,280,30</area>
+            <shape name="background">
+                <area>0,0,280,40</area>
+                <fill color="#000000" alpha="255" />
+                <line color="#000000" alpha="255" />
+                <type>roundbox</type>
+                <cornerradius>2</cornerradius>
+            </shape>
+            <textarea name="status_text" from="basetextarea">
+                <area>0,0,280,40</area>
+                <align>allcenter</align>
+                <value>Image Loading...</value>
+            </textarea>
+        </textarea>
+
+
+        <!-- This list shows all the file information -->
+        <buttonlist name="infolist">
+            <area>315,180,650,348</area>
+            <layout>vertical</layout>
+            <spacing>5</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <shape name="buttonbackground">
+                        <area>0,0,650,40</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                        </fill>
+                    </shape>
+                    <textarea name="name" from="basetextarea">
+                        <area>8,5,250,30</area>
+                    </textarea>
+                    <textarea name="value" from="basetextarea">
+                        <area>270,5,370,30</area>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active"/>
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <area>0,0,650,40</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <area>0,0,650,40</area>
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+                </state>
+            </statetype>
+        </buttonlist>
+
+    </window>
+
+</mythuitheme>
+
+
