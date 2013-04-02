@@ -21,9 +21,11 @@
 
 //#define DEBUG
 
+#include "libavutil/bprint.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "png.h"
 #include "pngdsp.h"
 
@@ -187,7 +189,7 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w
     if(bpp >= 2) g = dst[1];\
     if(bpp >= 3) b = dst[2];\
     if(bpp >= 4) a = dst[3];\
-    for(; i < size; i+=bpp) {\
+    for(; i <= size - bpp; i+=bpp) {\
         dst[i+0] = r = op(r, src[i+0], last[i+0]);\
         if(bpp == 1) continue;\
         dst[i+1] = g = op(g, src[i+1], last[i+1]);\
@@ -203,13 +205,9 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w
     else if(bpp == 2) UNROLL1(2, op)\
     else if(bpp == 3) UNROLL1(3, op)\
     else if(bpp == 4) UNROLL1(4, op)\
-    else {\
-        for (; i < size; i += bpp) {\
-            int j;\
-            for (j = 0; j < bpp; j++)\
-                dst[i+j] = op(dst[i+j-bpp], src[i+j], last[i+j]);\
-        }\
-    }
+    for (; i < size; i++) {\
+        dst[i] = op(dst[i-bpp], src[i], last[i]);\
+    }\
 
 /* NOTE: 'dst' can be equal to 'last' */
 static void png_filter_row(PNGDSPContext *dsp, uint8_t *dst, int filter_type,
@@ -386,8 +384,124 @@ static int png_decode_idat(PNGDecContext *s, int length)
     return 0;
 }
 
+static int decode_zbuf(AVBPrint *bp, const uint8_t *data,
+                       const uint8_t *data_end)
+{
+    z_stream zstream;
+    unsigned char *buf;
+    unsigned buf_size;
+    int ret;
+
+    zstream.zalloc = ff_png_zalloc;
+    zstream.zfree  = ff_png_zfree;
+    zstream.opaque = NULL;
+    if (inflateInit(&zstream) != Z_OK)
+        return AVERROR_EXTERNAL;
+    zstream.next_in  = (unsigned char *)data;
+    zstream.avail_in = data_end - data;
+    av_bprint_init(bp, 0, -1);
+
+    while (zstream.avail_in > 0) {
+        av_bprint_get_buffer(bp, 1, &buf, &buf_size);
+        if (!buf_size) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+        zstream.next_out  = buf;
+        zstream.avail_out = buf_size;
+        ret = inflate(&zstream, Z_PARTIAL_FLUSH);
+        if (ret != Z_OK && ret != Z_STREAM_END) {
+            ret = AVERROR_EXTERNAL;
+            goto fail;
+        }
+        bp->len += zstream.next_out - buf;
+        if (ret == Z_STREAM_END)
+            break;
+    }
+    inflateEnd(&zstream);
+    bp->str[bp->len] = 0;
+    return 0;
+
+fail:
+    inflateEnd(&zstream);
+    av_bprint_finalize(bp, NULL);
+    return ret;
+}
+
+static uint8_t *iso88591_to_utf8(const uint8_t *in, size_t size_in)
+{
+    size_t extra = 0, i;
+    uint8_t *out, *q;
+
+    for (i = 0; i < size_in; i++)
+        extra += in[i] >= 0x80;
+    if (size_in == SIZE_MAX || extra > SIZE_MAX - size_in - 1)
+        return NULL;
+    q = out = av_malloc(size_in + extra + 1);
+    if (!out)
+        return NULL;
+    for (i = 0; i < size_in; i++) {
+        if (in[i] >= 0x80) {
+            *(q++) = 0xC0 | (in[i] >> 6);
+            *(q++) = 0x80 | (in[i] & 0x3F);
+        } else {
+            *(q++) = in[i];
+        }
+    }
+    *(q++) = 0;
+    return out;
+}
+
+static int decode_text_chunk(PNGDecContext *s, uint32_t length, int compressed,
+                             AVDictionary **dict)
+{
+    int ret, method;
+    const uint8_t *data        = s->gb.buffer;
+    const uint8_t *data_end    = data + length;
+    const uint8_t *keyword     = data;
+    const uint8_t *keyword_end = memchr(keyword, 0, data_end - keyword);
+    uint8_t *kw_utf8 = NULL, *text, *txt_utf8 = NULL;
+    unsigned text_len;
+    AVBPrint bp;
+
+    if (!keyword_end)
+        return AVERROR_INVALIDDATA;
+    data = keyword_end + 1;
+
+    if (compressed) {
+        if (data == data_end)
+            return AVERROR_INVALIDDATA;
+        method = *(data++);
+        if (method)
+            return AVERROR_INVALIDDATA;
+        if ((ret = decode_zbuf(&bp, data, data_end)) < 0)
+            return ret;
+        text_len = bp.len;
+        av_bprint_finalize(&bp, (char **)&text);
+        if (!text)
+            return AVERROR(ENOMEM);
+    } else {
+        text = (uint8_t *)data;
+        text_len = data_end - text;
+    }
+
+    kw_utf8  = iso88591_to_utf8(keyword, keyword_end - keyword);
+    txt_utf8 = iso88591_to_utf8(text, text_len);
+    if (text != data)
+        av_free(text);
+    if (!(kw_utf8 && txt_utf8)) {
+        av_free(kw_utf8);
+        av_free(txt_utf8);
+        return AVERROR(ENOMEM);
+    }
+
+    av_dict_set(dict, kw_utf8, txt_utf8,
+                AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
+    return 0;
+}
+
 static int decode_frame(AVCodecContext *avctx,
-                        void *data, int *data_size,
+                        void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -395,6 +509,7 @@ static int decode_frame(AVCodecContext *avctx,
     PNGDecContext * const s = avctx->priv_data;
     AVFrame *picture = data;
     AVFrame *p;
+    AVDictionary *metadata = NULL;
     uint8_t *crow_buf_base = NULL;
     uint32_t tag, length;
     int64_t sig;
@@ -467,6 +582,18 @@ static int decode_frame(AVCodecContext *avctx,
                     s->width, s->height, s->bit_depth, s->color_type,
                     s->compression_type, s->filter_type, s->interlace_type);
             break;
+        case MKTAG('p', 'H', 'Y', 's'):
+            if (s->state & PNG_IDAT) {
+                av_log(avctx, AV_LOG_ERROR, "pHYs after IDAT\n");
+                goto fail;
+            }
+            avctx->sample_aspect_ratio.num = bytestream2_get_be32(&s->gb);
+            avctx->sample_aspect_ratio.den = bytestream2_get_be32(&s->gb);
+            if (avctx->sample_aspect_ratio.num < 0 || avctx->sample_aspect_ratio.den < 0)
+                avctx->sample_aspect_ratio = (AVRational){ 0, 1 };
+            bytestream2_skip(&s->gb, 1); /* unit specifier */
+            bytestream2_skip(&s->gb, 4); /* crc */
+            break;
         case MKTAG('I', 'D', 'A', 'T'):
             if (!(s->state & PNG_IHDR)) {
                 av_log(avctx, AV_LOG_ERROR, "IDAT without IHDR\n");
@@ -484,30 +611,30 @@ static int decode_frame(AVCodecContext *avctx,
 
                 if ((s->bit_depth == 2 || s->bit_depth == 4 || s->bit_depth == 8) &&
                     s->color_type == PNG_COLOR_TYPE_RGB) {
-                    avctx->pix_fmt = PIX_FMT_RGB24;
+                    avctx->pix_fmt = AV_PIX_FMT_RGB24;
                 } else if ((s->bit_depth == 2 || s->bit_depth == 4 || s->bit_depth == 8) &&
                            s->color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-                    avctx->pix_fmt = PIX_FMT_RGBA;
+                    avctx->pix_fmt = AV_PIX_FMT_RGBA;
                 } else if ((s->bit_depth == 2 || s->bit_depth == 4 || s->bit_depth == 8) &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
-                    avctx->pix_fmt = PIX_FMT_GRAY8;
+                    avctx->pix_fmt = AV_PIX_FMT_GRAY8;
                 } else if (s->bit_depth == 16 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
-                    avctx->pix_fmt = PIX_FMT_GRAY16BE;
+                    avctx->pix_fmt = AV_PIX_FMT_GRAY16BE;
                 } else if (s->bit_depth == 16 &&
                            s->color_type == PNG_COLOR_TYPE_RGB) {
-                    avctx->pix_fmt = PIX_FMT_RGB48BE;
+                    avctx->pix_fmt = AV_PIX_FMT_RGB48BE;
                 } else if (s->bit_depth == 16 &&
                            s->color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-                    avctx->pix_fmt = PIX_FMT_RGBA64BE;
+                    avctx->pix_fmt = AV_PIX_FMT_RGBA64BE;
                 } else if ((s->bits_per_pixel == 1 || s->bits_per_pixel == 2 || s->bits_per_pixel == 4 || s->bits_per_pixel == 8) &&
                            s->color_type == PNG_COLOR_TYPE_PALETTE) {
-                    avctx->pix_fmt = PIX_FMT_PAL8;
+                    avctx->pix_fmt = AV_PIX_FMT_PAL8;
                 } else if (s->bit_depth == 1) {
-                    avctx->pix_fmt = PIX_FMT_MONOBLACK;
+                    avctx->pix_fmt = AV_PIX_FMT_MONOBLACK;
                 } else if (s->bit_depth == 8 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
-                    avctx->pix_fmt = PIX_FMT_Y400A;
+                    avctx->pix_fmt = AV_PIX_FMT_Y400A;
                 } else {
                     av_log(avctx, AV_LOG_ERROR, "unsupported bit depth %d "
                                                 "and color type %d\n",
@@ -518,7 +645,7 @@ static int decode_frame(AVCodecContext *avctx,
                     avctx->release_buffer(avctx, p);
 
                 p->reference= 3;
-                if(avctx->get_buffer(avctx, p) < 0){
+                if(ff_get_buffer(avctx, p) < 0){
                     av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
                     goto fail;
                 }
@@ -541,7 +668,7 @@ static int decode_frame(AVCodecContext *avctx,
                 s->image_buf = p->data[0];
                 s->image_linesize = p->linesize[0];
                 /* copy the palette if needed */
-                if (avctx->pix_fmt == PIX_FMT_PAL8)
+                if (avctx->pix_fmt == AV_PIX_FMT_PAL8)
                     memcpy(p->data[1], s->palette, 256 * sizeof(uint32_t));
                 /* empty row is used if differencing to the first row */
                 s->last_row = av_mallocz(s->row_size);
@@ -580,10 +707,10 @@ static int decode_frame(AVCodecContext *avctx,
                     r = bytestream2_get_byte(&s->gb);
                     g = bytestream2_get_byte(&s->gb);
                     b = bytestream2_get_byte(&s->gb);
-                    s->palette[i] = (0xff << 24) | (r << 16) | (g << 8) | b;
+                    s->palette[i] = (0xFFU << 24) | (r << 16) | (g << 8) | b;
                 }
                 for(;i<256;i++) {
-                    s->palette[i] = (0xff << 24);
+                    s->palette[i] = (0xFFU << 24);
                 }
                 s->state |= PNG_PLTE;
                 bytestream2_skip(&s->gb, 4); /* crc */
@@ -604,6 +731,16 @@ static int decode_frame(AVCodecContext *avctx,
                 }
                 bytestream2_skip(&s->gb, 4); /* crc */
             }
+            break;
+        case MKTAG('t', 'E', 'X', 't'):
+            if (decode_text_chunk(s, length, 0, &metadata) < 0)
+                av_log(avctx, AV_LOG_WARNING, "Broken tEXt chunk\n");
+            bytestream2_skip(&s->gb, length + 4);
+            break;
+        case MKTAG('z', 'T', 'X', 't'):
+            if (decode_text_chunk(s, length, 1, &metadata) < 0)
+                av_log(avctx, AV_LOG_WARNING, "Broken zTXt chunk\n");
+            bytestream2_skip(&s->gb, length + 4);
             break;
         case MKTAG('I', 'E', 'N', 'D'):
             if (!(s->state & PNG_ALLIMAGE))
@@ -643,15 +780,22 @@ static int decode_frame(AVCodecContext *avctx,
         int i, j;
         uint8_t *pd = s->current_picture->data[0];
         for(j=0; j < s->height; j++) {
+            i = s->width/4;
             if (s->color_type == PNG_COLOR_TYPE_PALETTE){
-            for(i=s->width/4-1; i>=0; i--) {
+                if ((s->width&3) >= 3) pd[4*i+2]= (pd[i]>>2)&3;
+                if ((s->width&3) >= 2) pd[4*i+1]= (pd[i]>>4)&3;
+                if ((s->width&3) >= 1) pd[4*i+0]=  pd[i]>>6;
+                for(i--; i>=0; i--) {
                 pd[4*i+3]=  pd[i]    &3;
                 pd[4*i+2]= (pd[i]>>2)&3;
                 pd[4*i+1]= (pd[i]>>4)&3;
                 pd[4*i+0]=  pd[i]>>6;
             }
             } else {
-                for(i=s->width/4-1; i>=0; i--) {
+                if ((s->width&3) >= 3) pd[4*i+2]= ((pd[i]>>2)&3)*0x55;
+                if ((s->width&3) >= 2) pd[4*i+1]= ((pd[i]>>4)&3)*0x55;
+                if ((s->width&3) >= 1) pd[4*i+0]= ( pd[i]>>6   )*0x55;
+                for(i--; i>=0; i--) {
                     pd[4*i+3]= ( pd[i]    &3)*0x55;
                     pd[4*i+2]= ((pd[i]>>2)&3)*0x55;
                     pd[4*i+1]= ((pd[i]>>4)&3)*0x55;
@@ -665,13 +809,16 @@ static int decode_frame(AVCodecContext *avctx,
         int i, j;
         uint8_t *pd = s->current_picture->data[0];
         for(j=0; j < s->height; j++) {
+            i=s->width/2;
             if (s->color_type == PNG_COLOR_TYPE_PALETTE){
-            for(i=s->width/2-1; i>=0; i--) {
+                if (s->width&1) pd[2*i+0]= pd[i]>>4;
+                for(i--; i>=0; i--) {
                 pd[2*i+1]= pd[i]&15;
                 pd[2*i+0]= pd[i]>>4;
             }
             } else {
-                for(i=s->width/2-1; i>=0; i--) {
+                if (s->width&1) pd[2*i+0]= (pd[i]>>4)*0x11;
+                for(i--; i>=0; i--) {
                     pd[2*i+1]= (pd[i]&15)*0x11;
                     pd[2*i+0]= (pd[i]>>4)*0x11;
                 }
@@ -685,6 +832,7 @@ static int decode_frame(AVCodecContext *avctx,
          if(   !(avpkt->flags & AV_PKT_FLAG_KEY)
             && s->last_picture->width == s->current_picture->width
             && s->last_picture->height== s->current_picture->height
+            && s->last_picture->format== s->current_picture->format
          ) {
             int i, j;
             uint8_t *pd = s->current_picture->data[0];
@@ -700,8 +848,10 @@ static int decode_frame(AVCodecContext *avctx,
         }
     }
 
+    s->current_picture->metadata = metadata;
+    metadata = NULL;
     *picture= *s->current_picture;
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
 
     ret = bytestream2_tell(&s->gb);
  the_end:
@@ -712,6 +862,7 @@ static int decode_frame(AVCodecContext *avctx,
     av_freep(&s->tmp_row);
     return ret;
  fail:
+    av_dict_free(&metadata);
     ret = -1;
     goto the_end;
 }

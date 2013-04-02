@@ -24,6 +24,7 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "libavutil/bswap.h"
 #include "libavutil/imgutils.h"
 #include "libavcodec/dsputil.h"
@@ -262,7 +263,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ctx->avctx     = avctx;
     ctx->version   = !avctx->extradata_size;
 
-    avctx->pix_fmt = ctx->version ? PIX_FMT_RGB565 : PIX_FMT_PAL8;
+    avctx->pix_fmt = ctx->version ? AV_PIX_FMT_RGB565 : AV_PIX_FMT_PAL8;
 
     init_sizes(ctx, avctx->width, avctx->height);
     if (init_buffers(ctx)) {
@@ -285,7 +286,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
         ctx->subversion = AV_RL16(avctx->extradata);
         for (i = 0; i < 256; i++)
-            ctx->pal[i] = 0xFF << 24 | AV_RL32(avctx->extradata + 2 + i * 4);
+            ctx->pal[i] = 0xFFU << 24 | AV_RL32(avctx->extradata + 2 + i * 4);
     }
 
     return 0;
@@ -414,6 +415,11 @@ static int old_codec37(SANMVideoContext *ctx, int top,
     bytestream2_skip(&ctx->gb, 4);
     flags        = bytestream2_get_byte(&ctx->gb);
     bytestream2_skip(&ctx->gb, 3);
+
+    if (decoded_size > ctx->height * stride - left - top * stride) {
+        decoded_size = ctx->height * stride - left - top * stride;
+        av_log(ctx->avctx, AV_LOG_WARNING, "decoded size is too large\n");
+    }
 
     ctx->rotate_code = 0;
 
@@ -638,8 +644,8 @@ static int old_codec47(SANMVideoContext *ctx, int top,
     decoded_size = bytestream2_get_le32(&ctx->gb);
     bytestream2_skip(&ctx->gb, 8);
 
-    if (decoded_size > height * stride - left - top * stride) {
-        decoded_size = height * stride - left - top * stride;
+    if (decoded_size > ctx->height * stride - left - top * stride) {
+        decoded_size = ctx->height * stride - left - top * stride;
         av_log(ctx->avctx, AV_LOG_WARNING, "decoded size is too large\n");
     }
 
@@ -811,7 +817,7 @@ static int draw_glyph(SANMVideoContext *ctx, uint16_t *dst, int index, uint16_t 
     uint16_t colors[2] = { fg_color, bg_color };
     int x, y;
 
-    if (index > NGLYPHS) {
+    if (index >= NGLYPHS) {
         av_log(ctx->avctx, AV_LOG_ERROR, "ignoring nonexistent glyph #%u\n", index);
         return AVERROR_INVALIDDATA;
     }
@@ -1131,7 +1137,7 @@ static int copy_output(SANMVideoContext *ctx, SANMFrameHeader *hdr)
     int ret, dstpitch, height = ctx->height;
     int srcpitch = ctx->pitch * (hdr ? sizeof(ctx->frm0[0]) : 1);
 
-    if ((ret = ctx->avctx->get_buffer(ctx->avctx, ctx->output)) < 0) {
+    if ((ret = ff_get_buffer(ctx->avctx, ctx->output)) < 0) {
         av_log(ctx->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -1181,7 +1187,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                     return AVERROR_INVALIDDATA;
                 }
                 for (i = 0; i < 256; i++)
-                    ctx->pal[i] = 0xFF << 24 | bytestream2_get_be24u(&ctx->gb);
+                    ctx->pal[i] = 0xFFU << 24 | bytestream2_get_be24u(&ctx->gb);
                 break;
             case MKBETAG('F', 'O', 'B', 'J'):
                 if (size < 16)
@@ -1199,7 +1205,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                             int t = (ctx->pal[i] >> (16 - j * 8)) & 0xFF;
                             tmp[j] = av_clip_uint8((t * 129 + ctx->delta_pal[i * 3 + j]) >> 7);
                         }
-                        ctx->pal[i] = 0xFF << 24 | AV_RB24(tmp);
+                        ctx->pal[i] = 0xFFU << 24 | AV_RB24(tmp);
                     }
                 } else {
                     if (size < 768 * 2 + 4) {
@@ -1212,7 +1218,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                         ctx->delta_pal[i] = bytestream2_get_le16u(&ctx->gb);
                     if (size >= 768 * 5 + 4) {
                         for (i = 0; i < 256; i++)
-                            ctx->pal[i] = 0xFF << 24 | bytestream2_get_be24u(&ctx->gb);
+                            ctx->pal[i] = 0xFFU << 24 | bytestream2_get_be24u(&ctx->gb);
                     } else {
                         memset(ctx->pal, 0, sizeof(ctx->pal));
                     }

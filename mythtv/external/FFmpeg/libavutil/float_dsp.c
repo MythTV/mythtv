@@ -39,10 +39,28 @@ static void vector_fmac_scalar_c(float *dst, const float *src, float mul,
         dst[i] += src[i] * mul;
 }
 
+static void vector_fmul_scalar_c(float *dst, const float *src, float mul,
+                                 int len)
+{
+    int i;
+    for (i = 0; i < len; i++)
+        dst[i] = src[i] * mul;
+}
+
+static void vector_dmul_scalar_c(double *dst, const double *src, double mul,
+                                 int len)
+{
+    int i;
+    for (i = 0; i < len; i++)
+        dst[i] = src[i] * mul;
+}
+
 void avpriv_float_dsp_init(AVFloatDSPContext *fdsp, int bit_exact)
 {
     fdsp->vector_fmul = vector_fmul_c;
     fdsp->vector_fmac_scalar = vector_fmac_scalar_c;
+    fdsp->vector_fmul_scalar = vector_fmul_scalar_c;
+    fdsp->vector_dmul_scalar = vector_dmul_scalar_c;
 
 #if ARCH_ARM
     ff_float_dsp_init_arm(fdsp);
@@ -50,5 +68,7 @@ void avpriv_float_dsp_init(AVFloatDSPContext *fdsp, int bit_exact)
     ff_float_dsp_init_ppc(fdsp, bit_exact);
 #elif ARCH_X86
     ff_float_dsp_init_x86(fdsp);
+#elif ARCH_MIPS
+    ff_float_dsp_init_mips(fdsp);
 #endif
 }

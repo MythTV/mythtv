@@ -56,14 +56,14 @@ static av_cold int msrle_decode_init(AVCodecContext *avctx)
 
     switch (avctx->bits_per_coded_sample) {
     case 1:
-        avctx->pix_fmt = PIX_FMT_MONOWHITE;
+        avctx->pix_fmt = AV_PIX_FMT_MONOWHITE;
         break;
     case 4:
     case 8:
-        avctx->pix_fmt = PIX_FMT_PAL8;
+        avctx->pix_fmt = AV_PIX_FMT_PAL8;
         break;
     case 24:
-        avctx->pix_fmt = PIX_FMT_BGR24;
+        avctx->pix_fmt = AV_PIX_FMT_BGR24;
         break;
     default:
         av_log(avctx, AV_LOG_ERROR, "unsupported bits per sample\n");
@@ -73,15 +73,15 @@ static av_cold int msrle_decode_init(AVCodecContext *avctx)
     avcodec_get_frame_defaults(&s->frame);
     s->frame.data[0] = NULL;
 
-    if (avctx->extradata_size >= AVPALETTE_SIZE)
-        for (i = 0; i < AVPALETTE_SIZE/4; i++)
-            s->pal[i] = 0xFF<<24 | AV_RL32(avctx->extradata+4*i);
+    if (avctx->extradata_size >= 4)
+        for (i = 0; i < FFMIN(avctx->extradata_size, AVPALETTE_SIZE)/4; i++)
+            s->pal[i] = 0xFFU<<24 | AV_RL32(avctx->extradata+4*i);
 
     return 0;
 }
 
 static int msrle_decode_frame(AVCodecContext *avctx,
-                              void *data, int *data_size,
+                              void *data, int *got_frame,
                               AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -136,7 +136,7 @@ static int msrle_decode_frame(AVCodecContext *avctx,
         ff_msrle_decode(avctx, (AVPicture*)&s->frame, avctx->bits_per_coded_sample, &s->gb);
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = s->frame;
 
     /* report that the buffer was completely consumed */

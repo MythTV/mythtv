@@ -27,12 +27,14 @@
 #include <stdint.h>
 
 #include "avcodec.h"
-#include "dsputil.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/channel_layout.h"
 #include "get_bits.h"
+#include "internal.h"
 #include "libavutil/crc.h"
 #include "parser.h"
 #include "mlp_parser.h"
+#include "mlpdsp.h"
 #include "mlp.h"
 
 /** number of bits used for VLC lookup - longest Huffman code is 9 */
@@ -55,6 +57,8 @@ typedef struct SubStream {
     uint8_t     max_matrix_channel;
     /// For each channel output by the matrix, the output channel to map it to
     uint8_t     ch_assign[MAX_CHANNELS];
+    /// The channel layout for this substream
+    uint64_t    ch_layout;
 
     /// Channel coding parameters for channels in the substream
     ChannelParams channel_params[MAX_CHANNELS];
@@ -145,8 +149,38 @@ typedef struct MLPDecodeContext {
     int8_t      bypassed_lsbs[MAX_BLOCKSIZE][MAX_CHANNELS];
     int32_t     sample_buffer[MAX_BLOCKSIZE][MAX_CHANNELS];
 
-    DSPContext  dsp;
+    MLPDSPContext dsp;
 } MLPDecodeContext;
+
+static const uint64_t thd_channel_order[] = {
+    AV_CH_FRONT_LEFT, AV_CH_FRONT_RIGHT,                     // LR
+    AV_CH_FRONT_CENTER,                                      // C
+    AV_CH_LOW_FREQUENCY,                                     // LFE
+    AV_CH_SIDE_LEFT, AV_CH_SIDE_RIGHT,                       // LRs
+    AV_CH_TOP_FRONT_LEFT, AV_CH_TOP_FRONT_RIGHT,             // LRvh
+    AV_CH_FRONT_LEFT_OF_CENTER, AV_CH_FRONT_RIGHT_OF_CENTER, // LRc
+    AV_CH_BACK_LEFT, AV_CH_BACK_RIGHT,                       // LRrs
+    AV_CH_BACK_CENTER,                                       // Cs
+    AV_CH_TOP_CENTER,                                        // Ts
+    AV_CH_SURROUND_DIRECT_LEFT, AV_CH_SURROUND_DIRECT_RIGHT, // LRsd
+    AV_CH_WIDE_LEFT, AV_CH_WIDE_RIGHT,                       // LRw
+    AV_CH_TOP_FRONT_CENTER,                                  // Cvh
+    AV_CH_LOW_FREQUENCY_2,                                   // LFE2
+};
+
+static uint64_t thd_channel_layout_extract_channel(uint64_t channel_layout,
+                                                   int index)
+{
+    int i;
+
+    if (av_get_channel_layout_nb_channels(channel_layout) <= index)
+        return 0;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(thd_channel_order); i++)
+        if (channel_layout & thd_channel_order[i] && !index--)
+            return thd_channel_order[i];
+    return 0;
+}
 
 static VLC huff_vlc[3];
 
@@ -235,7 +269,7 @@ static av_cold int mlp_decode_init(AVCodecContext *avctx)
     m->avctx = avctx;
     for (substr = 0; substr < MAX_SUBSTREAMS; substr++)
         m->substream[substr].lossless_check_data = 0xffffffff;
-    ff_dsputil_init(&m->dsp, avctx);
+    ff_mlpdsp_init(&m->dsp);
 
     avcodec_get_frame_defaults(&m->frame);
     avctx->coded_frame = &m->frame;
@@ -327,31 +361,32 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
     for (substr = 0; substr < MAX_SUBSTREAMS; substr++)
         m->substream[substr].restart_seen = 0;
 
-    if (mh.stream_type == 0xbb) {
-        /* MLP stream */
-        m->avctx->channel_layout = ff_mlp_layout[mh.channels_mlp];
-    } else { /* mh.stream_type == 0xba */
-        /* TrueHD stream */
-        if (mh.channels_thd_stream2) {
-            m->avctx->channel_layout = ff_truehd_layout(mh.channels_thd_stream2);
-        } else {
-            m->avctx->channel_layout = ff_truehd_layout(mh.channels_thd_stream1);
-        }
-        if (m->avctx->channels<=2 && m->avctx->channel_layout == AV_CH_LAYOUT_MONO && m->max_decoded_substream == 1) {
+    /* Set the layout for each substream. When there's more than one, the first
+     * substream is Stereo. Subsequent substreams' layouts are indicated in the
+     * major sync. */
+    if (m->avctx->codec_id == AV_CODEC_ID_MLP) {
+        if ((substr = (mh.num_substreams > 1)))
+            m->substream[0].ch_layout = AV_CH_LAYOUT_STEREO;
+        m->substream[substr].ch_layout = mh.channel_layout_mlp;
+    } else {
+        if ((substr = (mh.num_substreams > 1)))
+            m->substream[0].ch_layout = AV_CH_LAYOUT_STEREO;
+        if (mh.num_substreams > 2)
+            if (mh.channel_layout_thd_stream2)
+                m->substream[2].ch_layout = mh.channel_layout_thd_stream2;
+            else
+                m->substream[2].ch_layout = mh.channel_layout_thd_stream1;
+        m->substream[substr].ch_layout = mh.channel_layout_thd_stream1;
+
+        if (m->avctx->channels<=2 && m->substream[substr].ch_layout == AV_CH_LAYOUT_MONO && m->max_decoded_substream == 1) {
             av_log(m->avctx, AV_LOG_DEBUG, "Mono stream with 2 substreams, ignoring 2nd\n");
             m->max_decoded_substream = 0;
             if (m->avctx->channels==2)
                 m->avctx->channel_layout = AV_CH_LAYOUT_STEREO;
         }
-        if (m->avctx->channels &&
-            !m->avctx->request_channels && !m->avctx->request_channel_layout &&
-            av_get_channel_layout_nb_channels(m->avctx->channel_layout) != m->avctx->channels) {
-            m->avctx->channel_layout = 0;
-            av_log_ask_for_sample(m->avctx, "Unknown channel layout.");
-        }
     }
 
-    m->needs_reordering = mh.channels_mlp >= 18 && mh.channels_mlp <= 20;
+    m->needs_reordering = mh.channel_arrangement >= 18 && mh.channel_arrangement <= 20;
 
     return 0;
 }
@@ -459,6 +494,12 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
 
     for (ch = 0; ch <= s->max_matrix_channel; ch++) {
         int ch_assign = get_bits(gbp, 6);
+        if (m->avctx->codec_id == AV_CODEC_ID_TRUEHD) {
+            uint64_t channel = thd_channel_layout_extract_channel(s->ch_layout,
+                                                                  ch_assign);
+            ch_assign = av_get_channel_layout_channel_index(s->ch_layout,
+                                                            channel);
+        }
         if (ch_assign > s->max_matrix_channel) {
             av_log_ask_for_sample(m->avctx,
                    "Assignment of matrix channel %d to invalid output channel %d.\n",
@@ -479,20 +520,6 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
             FFSWAP(int, s->ch_assign[2], s->ch_assign[4]);
             FFSWAP(int, s->ch_assign[3], s->ch_assign[5]);
         }
-    }
-    if (m->avctx->codec_id == AV_CODEC_ID_TRUEHD &&
-        (m->avctx->channel_layout == AV_CH_LAYOUT_7POINT1 ||
-        m->avctx->channel_layout == AV_CH_LAYOUT_7POINT1_WIDE)) {
-        FFSWAP(int, s->ch_assign[4], s->ch_assign[6]);
-        FFSWAP(int, s->ch_assign[5], s->ch_assign[7]);
-    } else if (m->avctx->codec_id == AV_CODEC_ID_TRUEHD &&
-        (m->avctx->channel_layout == AV_CH_LAYOUT_6POINT1 ||
-        m->avctx->channel_layout == (AV_CH_LAYOUT_6POINT1 | AV_CH_TOP_CENTER) ||
-        m->avctx->channel_layout == (AV_CH_LAYOUT_6POINT1 | AV_CH_TOP_FRONT_CENTER))) {
-        int i = s->ch_assign[6];
-        s->ch_assign[6] = s->ch_assign[5];
-        s->ch_assign[5] = s->ch_assign[4];
-        s->ch_assign[4] = i;
     }
 
     checksum = ff_mlp_restart_checksum(buf, get_bits_count(gbp) - start_count);
@@ -523,8 +550,10 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
         cp->huff_lsbs        = 24;
     }
 
-    if (substr == m->max_decoded_substream)
-        m->avctx->channels = s->max_matrix_channel + 1;
+    if (substr == m->max_decoded_substream) {
+        m->avctx->channels       = s->max_matrix_channel + 1;
+        m->avctx->channel_layout = s->ch_layout;
+    }
 
     return 0;
 }
@@ -716,6 +745,7 @@ static int read_channel_params(MLPDecodeContext *m, unsigned int substr,
 
     if (cp->huff_lsbs > 24) {
         av_log(m->avctx, AV_LOG_ERROR, "Invalid huff_lsbs.\n");
+        cp->huff_lsbs = 0;
         return AVERROR_INVALIDDATA;
     }
 
@@ -979,9 +1009,14 @@ static int output_data(MLPDecodeContext *m, unsigned int substr,
         return AVERROR_INVALIDDATA;
     }
 
+    if (!s->blockpos) {
+        av_log(avctx, AV_LOG_ERROR, "No samples to output.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     /* get output buffer */
     m->frame.nb_samples = s->blockpos;
-    if ((ret = avctx->get_buffer(avctx, &m->frame)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &m->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }

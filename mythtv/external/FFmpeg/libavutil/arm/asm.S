@@ -46,20 +46,13 @@
 
 #if   HAVE_NEON
         .fpu            neon
-#elif HAVE_ARMVFP
+#elif HAVE_VFP
         .fpu            vfp
 #endif
 
         .syntax unified
 T       .thumb
-
-.macro  require8 val=1
-ELF     .eabi_attribute 24, \val
-.endm
-
-.macro  preserve8 val=1
-ELF     .eabi_attribute 25, \val
-.endm
+ELF     .eabi_attribute 25, 1           @ Tag_ABI_align_preserved
 
 .macro  function name, export=0
         .set            .Lpic_idx, 0
@@ -96,7 +89,7 @@ ELF     .size   \name, . - \name
 \name:
 .endm
 
-#if !HAVE_ARMV6T2
+#if !HAVE_ARMV6T2_EXTERNAL
 .macro  movw    rd, val
         mov     \rd, \val &  255
         orr     \rd, \val & ~255
@@ -104,7 +97,7 @@ ELF     .size   \name, . - \name
 #endif
 
 .macro  mov32   rd, val
-#if HAVE_ARMV6T2
+#if HAVE_ARMV6T2_EXTERNAL
         movw            \rd, #(\val) & 0xffff
     .if (\val) >> 16
         movt            \rd, #(\val) >> 16
@@ -141,7 +134,9 @@ ELF     .size   \name, . - \name
         ldr             \rd, .Lpicoff\@
 .Lpic\@:
     .if \indir
-        ldr             \rd, [pc, \rd]
+A       ldr             \rd, [pc, \rd]
+T       add             \rd, pc
+T       ldr             \rd, [\rd]
     .else
         add             \rd, pc
     .endif
@@ -151,7 +146,7 @@ ELF     .size   \name, . - \name
 .macro  movrel rd, val
 #if CONFIG_PIC
         ldpic           \rd, \val
-#elif HAVE_ARMV6T2 && !defined(__APPLE__)
+#elif HAVE_ARMV6T2_EXTERNAL && !defined(__APPLE__)
         movw            \rd, #:lower16:\val
         movt            \rd, #:upper16:\val
 #else

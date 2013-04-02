@@ -14,6 +14,7 @@ HEADERS = adler32.h                                                     \
           blowfish.h                                                    \
           bprint.h                                                      \
           bswap.h                                                       \
+          channel_layout.h                                              \
           common.h                                                      \
           cpu.h                                                         \
           crc.h                                                         \
@@ -27,11 +28,11 @@ HEADERS = adler32.h                                                     \
           intreadwrite.h                                                \
           lfg.h                                                         \
           log.h                                                         \
-          lzo.h                                                         \
           mathematics.h                                                 \
           md5.h                                                         \
           mem.h                                                         \
           dict.h                                                        \
+          old_pix_fmts.h                                                \
           opt.h                                                         \
           parseutils.h                                                  \
           pixdesc.h                                                     \
@@ -46,6 +47,8 @@ HEADERS = adler32.h                                                     \
           version.h                                                     \
           xtea.h                                                        \
 
+HEADERS-$(CONFIG_LZO)                   += lzo.h
+
 ARCH_HEADERS = bswap.h                                                  \
                intmath.h                                                \
                intreadwrite.h                                           \
@@ -56,11 +59,11 @@ BUILT_HEADERS = avconfig.h
 OBJS = adler32.o                                                        \
        aes.o                                                            \
        audio_fifo.o                                                     \
-       audioconvert.o                                                   \
        avstring.o                                                       \
        base64.o                                                         \
        blowfish.o                                                       \
        bprint.o                                                         \
+       channel_layout.o                                                 \
        cpu.o                                                            \
        crc.o                                                            \
        des.o                                                            \
@@ -71,11 +74,11 @@ OBJS = adler32.o                                                        \
        float_dsp.o                                                      \
        imgutils.o                                                       \
        intfloat_readwrite.o                                             \
-       inverse.o                                                        \
+       intmath.o                                                        \
        lfg.o                                                            \
        lls.o                                                            \
        log.o                                                            \
-       lzo.o                                                            \
+       log2_tab.o                                                       \
        mathematics.o                                                    \
        md5.o                                                            \
        mem.o                                                            \
@@ -92,11 +95,14 @@ OBJS = adler32.o                                                        \
        timecode.o                                                       \
        tree.o                                                           \
        utils.o                                                          \
+       xga_font_data.o                                                  \
        xtea.o                                                           \
 
-OBJS-$(HAVE_BROKEN_SNPRINTF) += ../compat/msvcrt/snprintf.o
+OBJS-$(CONFIG_LZO)                      += lzo.o
 
-OBJS-$(HAVE_MSVCRT) += ../compat/strtod.o
+OBJS += $(COMPAT_OBJS:%=../compat/%)
+
+SKIPHEADERS          = old_pix_fmts.h
 
 TESTPROGS = adler32                                                     \
             aes                                                         \
@@ -125,6 +131,6 @@ TESTPROGS = adler32                                                     \
 
 TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 
-TOOLS = ffeval
+TOOLS = ffeval ffescape
 
 $(SUBDIR)lzo-test$(EXESUF): ELIBS = -llzo2

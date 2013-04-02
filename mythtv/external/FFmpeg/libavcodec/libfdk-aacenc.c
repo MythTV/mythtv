@@ -21,12 +21,12 @@
 
 #include <fdk-aac/aacenc_lib.h>
 
+#include "libavutil/channel_layout.h"
+#include "libavutil/common.h"
+#include "libavutil/opt.h"
 #include "avcodec.h"
 #include "audio_frame_queue.h"
 #include "internal.h"
-#include "libavutil/audioconvert.h"
-#include "libavutil/common.h"
-#include "libavutil/opt.h"
 
 typedef struct AACContext {
     const AVClass *class;
@@ -257,7 +257,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         }
         if ((err = aacEncoder_SetParam(s->handle, AACENC_BANDWIDTH,
                                        avctx->cutoff)) != AACENC_OK) {
-            av_log(avctx, AV_LOG_ERROR, "Unable to set the encoder bandwith to %d: %s\n",
+            av_log(avctx, AV_LOG_ERROR, "Unable to set the encoder bandwidth to %d: %s\n",
                    avctx->cutoff, aac_get_error(err));
             goto error;
         }

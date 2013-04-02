@@ -24,11 +24,12 @@
  * MPEG Audio decoder
  */
 
-#include "libavutil/audioconvert.h"
 #include "libavutil/avassert.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/libm.h"
 #include "avcodec.h"
 #include "get_bits.h"
+#include "internal.h"
 #include "mathops.h"
 #include "mpegaudiodsp.h"
 #include "dsputil.h"
@@ -95,7 +96,8 @@ typedef struct MPADecodeContext {
 #   define MULH3(x, y, s) ((s)*(y)*(x))
 #   define MULLx(x, y, s) ((y)*(x))
 #   define RENAME(a) a ## _float
-#   define OUT_FMT AV_SAMPLE_FMT_FLT
+#   define OUT_FMT   AV_SAMPLE_FMT_FLT
+#   define OUT_FMT_P AV_SAMPLE_FMT_FLTP
 #else
 #   define SHR(a,b)       ((a)>>(b))
 /* WARNING: only correct for positive numbers */
@@ -105,7 +107,8 @@ typedef struct MPADecodeContext {
 #   define MULH3(x, y, s) MULH((s)*(x), y)
 #   define MULLx(x, y, s) MULL(x,y,s)
 #   define RENAME(a)      a ## _fixed
-#   define OUT_FMT AV_SAMPLE_FMT_S16
+#   define OUT_FMT   AV_SAMPLE_FMT_S16
+#   define OUT_FMT_P AV_SAMPLE_FMT_S16P
 #endif
 
 /****************/
@@ -205,6 +208,8 @@ static void ff_compute_band_indexes(MPADecodeContext *s, GranuleDef *g)
 {
     if (g->block_type == 2) {
         if (g->switch_point) {
+            if(s->sample_rate_index == 8)
+                av_log_ask_for_sample(s->avctx, "switch point in 8khz\n");
             /* if switched mode, we handle the 36 first samples as
                 long blocks.  For 8000Hz, we handle the 72 first
                 exponents as long blocks */
@@ -266,7 +271,7 @@ static inline int l3_unscale(int value, int exponent)
     e -= exponent >> 2;
 #ifdef DEBUG
     if(e < 1)
-        av_log(0, AV_LOG_WARNING, "l3_unscale: e is %d\n", e);
+        av_log(NULL, AV_LOG_WARNING, "l3_unscale: e is %d\n", e);
 #endif
     if (e > 31)
         return 0;
@@ -439,7 +444,11 @@ static av_cold int decode_init(AVCodecContext * avctx)
     ff_mpadsp_init(&s->mpadsp);
     ff_dsputil_init(&s->dsp, avctx);
 
-    avctx->sample_fmt= OUT_FMT;
+    if (avctx->request_sample_fmt == OUT_FMT &&
+        avctx->codec_id != AV_CODEC_ID_MP3ON4)
+        avctx->sample_fmt = OUT_FMT;
+    else
+        avctx->sample_fmt = OUT_FMT_P;
     s->err_recognition = avctx->err_recognition;
 
     if (avctx->codec_id == AV_CODEC_ID_MP3ADU)
@@ -890,9 +899,7 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
             int pos = get_bits_count(&s->gb);
 
             if (pos >= end_pos){
-//                av_log(NULL, AV_LOG_ERROR, "pos: %d %d %d %d\n", pos, end_pos, end_pos2, s_index);
                 switch_buffer(s, &pos, &end_pos, &end_pos2);
-//                av_log(NULL, AV_LOG_ERROR, "new pos: %d %d\n", pos, end_pos);
                 if (pos >= end_pos)
                     break;
             }
@@ -966,9 +973,7 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
                     s_index=0;
                 break;
             }
-//                av_log(NULL, AV_LOG_ERROR, "pos2: %d %d %d %d\n", pos, end_pos, end_pos2, s_index);
             switch_buffer(s, &pos, &end_pos, &end_pos2);
-//                av_log(NULL, AV_LOG_ERROR, "new pos2: %d %d %d\n", pos, end_pos, s_index);
             if (pos >= end_pos)
                 break;
         }
@@ -991,7 +996,6 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
     }
     /* skip extension bits */
     bits_left = end_pos2 - get_bits_count(&s->gb);
-//av_log(NULL, AV_LOG_ERROR, "left:%d buf:%p\n", bits_left, s->in_gb.buffer);
     if (bits_left < 0 && (s->err_recognition & (AV_EF_BUFFER|AV_EF_COMPLIANT))) {
         av_log(s->avctx, AV_LOG_ERROR, "bits_left=%d\n", bits_left);
         s_index=0;
@@ -1404,8 +1408,8 @@ static int mp_decode_layer3(MPADecodeContext *s)
         int extrasize = av_clip(get_bits_left(&s->gb) >> 3, 0, EXTRABYTES);
         av_assert1((get_bits_count(&s->gb) & 7) == 0);
         /* now we get bits from the main_data_begin offset */
-        av_dlog(s->avctx, "seekback: %d\n", main_data_begin);
-    //av_log(NULL, AV_LOG_ERROR, "backstep:%d, lastbuf:%d\n", main_data_begin, s->last_buf_size);
+        av_dlog(s->avctx, "seekback:%d, lastbuf:%d\n",
+                main_data_begin, s->last_buf_size);
 
         memcpy(s->last_buf + s->last_buf_size, ptr, extrasize);
         s->in_gb = s->gb;
@@ -1419,6 +1423,7 @@ static int mp_decode_layer3(MPADecodeContext *s)
                 g = &s->granules[ch][gr];
                 s->last_buf_size += g->part2_3_length;
                 memset(g->sb_hybrid, 0, sizeof(g->sb_hybrid));
+                compute_imdct(s, g, &s->sb_samples[ch][18 * gr][0], s->mdct_buf[ch]);
             }
         }
         skip = s->last_buf_size - 8 * main_data_begin;
@@ -1566,7 +1571,7 @@ static int mp_decode_layer3(MPADecodeContext *s)
     return nb_granules * 18;
 }
 
-static int mp_decode_frame(MPADecodeContext *s, OUT_INT *samples,
+static int mp_decode_frame(MPADecodeContext *s, OUT_INT **samples,
                            const uint8_t *buf, int buf_size)
 {
     int i, nb_frames, ch, ret;
@@ -1619,27 +1624,36 @@ static int mp_decode_frame(MPADecodeContext *s, OUT_INT *samples,
         s->last_buf_size += i;
     }
 
+    if(nb_frames < 0)
+        return nb_frames;
+
     /* get output buffer */
     if (!samples) {
         s->frame.nb_samples = s->avctx->frame_size;
-        if ((ret = s->avctx->get_buffer(s->avctx, &s->frame)) < 0) {
+        if ((ret = ff_get_buffer(s->avctx, &s->frame)) < 0) {
             av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return ret;
         }
-        samples = (OUT_INT *)s->frame.data[0];
+        samples = (OUT_INT **)s->frame.extended_data;
     }
 
     /* apply the synthesis filter */
     for (ch = 0; ch < s->nb_channels; ch++) {
-        samples_ptr = samples + ch;
+        int sample_stride;
+        if (s->avctx->sample_fmt == OUT_FMT_P) {
+            samples_ptr   = samples[ch];
+            sample_stride = 1;
+        } else {
+            samples_ptr   = samples[0] + ch;
+            sample_stride = s->nb_channels;
+        }
         for (i = 0; i < nb_frames; i++) {
-            RENAME(ff_mpa_synth_filter)(
-                         &s->mpadsp,
-                         s->synth_buf[ch], &(s->synth_buf_offset[ch]),
-                         RENAME(ff_mpa_synth_window), &s->dither_state,
-                         samples_ptr, s->nb_channels,
-                         s->sb_samples[ch][i]);
-            samples_ptr += 32 * s->nb_channels;
+            RENAME(ff_mpa_synth_filter)(&s->mpadsp, s->synth_buf[ch],
+                                        &(s->synth_buf_offset[ch]),
+                                        RENAME(ff_mpa_synth_window),
+                                        &s->dither_state, samples_ptr,
+                                        sample_stride, s->sb_samples[ch][i]);
+            samples_ptr += 32 * sample_stride;
         }
     }
 
@@ -1653,7 +1667,7 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
     int buf_size        = avpkt->size;
     MPADecodeContext *s = avctx->priv_data;
     uint32_t header;
-    int out_size;
+    int ret;
 
     while(buf_size && !*buf){
         buf++;
@@ -1696,31 +1710,36 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
         buf_size= s->frame_size;
     }
 
-    out_size = mp_decode_frame(s, NULL, buf, buf_size);
-    if (out_size >= 0) {
+    ret = mp_decode_frame(s, NULL, buf, buf_size);
+    if (ret >= 0) {
         *got_frame_ptr   = 1;
         *(AVFrame *)data = s->frame;
         avctx->sample_rate = s->sample_rate;
         //FIXME maybe move the other codec info stuff from above here too
     } else {
         av_log(avctx, AV_LOG_ERROR, "Error while decoding MPEG audio frame.\n");
-        /* Only return an error if the bad frame makes up the whole packet.
-           If there is more data in the packet, just consume the bad frame
-           instead of returning an error, which would discard the whole
-           packet. */
+        /* Only return an error if the bad frame makes up the whole packet or
+         * the error is related to buffer management.
+         * If there is more data in the packet, just consume the bad frame
+         * instead of returning an error, which would discard the whole
+         * packet. */
         *got_frame_ptr = 0;
-        if (buf_size == avpkt->size)
-            return out_size;
+        if (buf_size == avpkt->size || ret != AVERROR_INVALIDDATA)
+            return ret;
     }
     s->frame_size = 0;
     return buf_size;
 }
 
+static void mp_flush(MPADecodeContext *ctx)
+{
+    memset(ctx->synth_buf, 0, sizeof(ctx->synth_buf));
+    ctx->last_buf_size = 0;
+}
+
 static void flush(AVCodecContext *avctx)
 {
-    MPADecodeContext *s = avctx->priv_data;
-    memset(s->synth_buf, 0, sizeof(s->synth_buf));
-    s->last_buf_size = 0;
+    mp_flush(avctx->priv_data);
 }
 
 #if CONFIG_MP3ADU_DECODER || CONFIG_MP3ADUFLOAT_DECODER
@@ -1731,7 +1750,7 @@ static int decode_frame_adu(AVCodecContext *avctx, void *data,
     int buf_size        = avpkt->size;
     MPADecodeContext *s = avctx->priv_data;
     uint32_t header;
-    int len;
+    int len, ret;
     int av_unused out_size;
 
     len = buf_size;
@@ -1763,10 +1782,10 @@ static int decode_frame_adu(AVCodecContext *avctx, void *data,
 
     s->frame_size = len;
 
-    out_size = mp_decode_frame(s, NULL, buf, buf_size);
-    if (out_size < 0) {
+    ret = mp_decode_frame(s, NULL, buf, buf_size);
+    if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Error while decoding MPEG audio frame.\n");
-        return AVERROR_INVALIDDATA;
+        return ret;
     }
 
     *got_frame_ptr   = 1;
@@ -1787,7 +1806,6 @@ typedef struct MP3On4DecodeContext {
     int syncword;                   ///< syncword patch
     const uint8_t *coff;            ///< channel offsets in output buffer
     MPADecodeContext *mp3decctx[5]; ///< MPADecodeContext for every decoder instance
-    OUT_INT *decoded_buf;           ///< output buffer for decoded samples
 } MP3On4DecodeContext;
 
 #include "mpeg4audio.h"
@@ -1828,8 +1846,6 @@ static av_cold int decode_close_mp3on4(AVCodecContext * avctx)
 
     for (i = 0; i < s->frames; i++)
         av_free(s->mp3decctx[i]);
-
-    av_freep(&s->decoded_buf);
 
     return 0;
 }
@@ -1891,14 +1907,6 @@ static int decode_init_mp3on4(AVCodecContext * avctx)
         s->mp3decctx[i]->mpadsp = s->mp3decctx[0]->mpadsp;
     }
 
-    /* Allocate buffer for multi-channel output if needed */
-    if (s->frames > 1) {
-        s->decoded_buf = av_malloc(MPA_FRAME_SIZE * MPA_MAX_CHANNELS *
-                                   sizeof(*s->decoded_buf));
-        if (!s->decoded_buf)
-            goto alloc_fail;
-    }
-
     return 0;
 alloc_fail:
     decode_close_mp3on4(avctx);
@@ -1911,11 +1919,8 @@ static void flush_mp3on4(AVCodecContext *avctx)
     int i;
     MP3On4DecodeContext *s = avctx->priv_data;
 
-    for (i = 0; i < s->frames; i++) {
-        MPADecodeContext *m = s->mp3decctx[i];
-        memset(m->synth_buf, 0, sizeof(m->synth_buf));
-        m->last_buf_size = 0;
-    }
+    for (i = 0; i < s->frames; i++)
+        mp_flush(s->mp3decctx[i]);
 }
 
 
@@ -1928,24 +1933,21 @@ static int decode_frame_mp3on4(AVCodecContext *avctx, void *data,
     MPADecodeContext *m;
     int fsize, len = buf_size, out_size = 0;
     uint32_t header;
-    OUT_INT *out_samples;
-    OUT_INT *outptr, *bp;
-    int fr, j, n, ch, ret;
+    OUT_INT **out_samples;
+    OUT_INT *outptr[2];
+    int fr, ch, ret;
 
     /* get output buffer */
-    s->frame->nb_samples = s->frames * MPA_FRAME_SIZE;
-    if ((ret = avctx->get_buffer(avctx, s->frame)) < 0) {
+    s->frame->nb_samples = MPA_FRAME_SIZE;
+    if ((ret = ff_get_buffer(avctx, s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
-    out_samples = (OUT_INT *)s->frame->data[0];
+    out_samples = (OUT_INT **)s->frame->extended_data;
 
     // Discard too short frames
     if (buf_size < HEADER_SIZE)
         return AVERROR_INVALIDDATA;
-
-    // If only one decoder interleave is not needed
-    outptr = s->frames == 1 ? out_samples : s->decoded_buf;
 
     avctx->bit_rate = 0;
 
@@ -1967,34 +1969,24 @@ static int decode_frame_mp3on4(AVCodecContext *avctx, void *data,
 
         avpriv_mpegaudio_decode_header((MPADecodeHeader *)m, header);
 
-        if (ch + m->nb_channels > avctx->channels) {
+        if (ch + m->nb_channels > avctx->channels || s->coff[fr] + m->nb_channels > avctx->channels) {
             av_log(avctx, AV_LOG_ERROR, "frame channel count exceeds codec "
                                         "channel count\n");
             return AVERROR_INVALIDDATA;
         }
         ch += m->nb_channels;
 
-        out_size += mp_decode_frame(m, outptr, buf, fsize);
+        outptr[0] = out_samples[s->coff[fr]];
+        if (m->nb_channels > 1)
+            outptr[1] = out_samples[s->coff[fr] + 1];
+
+        if ((ret = mp_decode_frame(m, outptr, buf, fsize)) < 0)
+            return ret;
+
+        out_size += ret;
         buf      += fsize;
         len      -= fsize;
 
-        if (s->frames > 1) {
-            n = m->avctx->frame_size*m->nb_channels;
-            /* interleave output data */
-            bp = out_samples + s->coff[fr];
-            if (m->nb_channels == 1) {
-                for (j = 0; j < n; j++) {
-                    *bp = s->decoded_buf[j];
-                    bp += avctx->channels;
-                }
-            } else {
-                for (j = 0; j < n; j++) {
-                    bp[0] = s->decoded_buf[j++];
-                    bp[1] = s->decoded_buf[j];
-                    bp   += avctx->channels;
-                }
-            }
-        }
         avctx->bit_rate += m->bit_rate;
     }
 
@@ -2021,6 +2013,9 @@ AVCodec ff_mp1_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .flush          = flush,
     .long_name      = NULL_IF_CONFIG_SMALL("MP1 (MPEG audio layer 1)"),
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+                                                      AV_SAMPLE_FMT_S16,
+                                                      AV_SAMPLE_FMT_NONE },
 };
 #endif
 #if CONFIG_MP2_DECODER
@@ -2034,6 +2029,9 @@ AVCodec ff_mp2_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .flush          = flush,
     .long_name      = NULL_IF_CONFIG_SMALL("MP2 (MPEG audio layer 2)"),
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+                                                      AV_SAMPLE_FMT_S16,
+                                                      AV_SAMPLE_FMT_NONE },
 };
 #endif
 #if CONFIG_MP3_DECODER
@@ -2047,6 +2045,9 @@ AVCodec ff_mp3_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .flush          = flush,
     .long_name      = NULL_IF_CONFIG_SMALL("MP3 (MPEG audio layer 3)"),
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+                                                      AV_SAMPLE_FMT_S16,
+                                                      AV_SAMPLE_FMT_NONE },
 };
 #endif
 #if CONFIG_MP3ADU_DECODER
@@ -2060,6 +2061,9 @@ AVCodec ff_mp3adu_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .flush          = flush,
     .long_name      = NULL_IF_CONFIG_SMALL("ADU (Application Data Unit) MP3 (MPEG audio layer 3)"),
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+                                                      AV_SAMPLE_FMT_S16,
+                                                      AV_SAMPLE_FMT_NONE },
 };
 #endif
 #if CONFIG_MP3ON4_DECODER
@@ -2074,6 +2078,8 @@ AVCodec ff_mp3on4_decoder = {
     .capabilities   = CODEC_CAP_DR1,
     .flush          = flush_mp3on4,
     .long_name      = NULL_IF_CONFIG_SMALL("MP3onMP4"),
+    .sample_fmts    = (const enum AVSampleFormat[]) { AV_SAMPLE_FMT_S16P,
+                                                      AV_SAMPLE_FMT_NONE },
 };
 #endif
 #endif

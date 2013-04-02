@@ -25,6 +25,7 @@
 #include "dsputil.h"
 #include "binkdata.h"
 #include "binkdsp.h"
+#include "internal.h"
 #include "mathops.h"
 
 #define BITSTREAM_READER_LE
@@ -169,7 +170,7 @@ static void init_lengths(BinkContext *c, int width, int bw)
  *
  * @param c decoder context
  */
-static av_cold void init_bundles(BinkContext *c)
+static av_cold int init_bundles(BinkContext *c)
 {
     int bw, bh, blocks;
     int i;
@@ -180,8 +181,12 @@ static av_cold void init_bundles(BinkContext *c)
 
     for (i = 0; i < BINKB_NB_SRC; i++) {
         c->bundle[i].data = av_malloc(blocks * 64);
+        if (!c->bundle[i].data)
+            return AVERROR(ENOMEM);
         c->bundle[i].data_end = c->bundle[i].data + blocks * 64;
     }
+
+    return 0;
 }
 
 /**
@@ -674,6 +679,10 @@ static int read_dct_coeffs(GetBitContext *gb, int32_t block[64], const uint8_t *
         quant_idx = get_bits(gb, 4);
     } else {
         quant_idx = q;
+        if (quant_idx > 15U) {
+            av_log(NULL, AV_LOG_ERROR, "quant_index %d out of range\n", quant_idx);
+            return AVERROR_INVALIDDATA;
+        }
     }
 
     quant = quant_matrices[quant_idx];
@@ -1165,7 +1174,7 @@ static int bink_decode_plane(BinkContext *c, GetBitContext *gb, int plane_idx,
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *pkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame, AVPacket *pkt)
 {
     BinkContext * const c = avctx->priv_data;
     GetBitContext gb;
@@ -1176,7 +1185,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         if(c->pic.data[0])
             avctx->release_buffer(avctx, &c->pic);
 
-        if(avctx->get_buffer(avctx, &c->pic) < 0){
+        if(ff_get_buffer(avctx, &c->pic) < 0){
             av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
             return -1;
         }
@@ -1212,7 +1221,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     }
     emms_c();
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = c->pic;
 
     if (c->version > 'b')
@@ -1228,41 +1237,28 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
 static av_cold void binkb_calc_quant(void)
 {
     uint8_t inv_bink_scan[64];
-    double s[64];
+    static const int s[64]={
+        1073741824,1489322693,1402911301,1262586814,1073741824, 843633538, 581104888, 296244703,
+        1489322693,2065749918,1945893874,1751258219,1489322693,1170153332, 806015634, 410903207,
+        1402911301,1945893874,1832991949,1649649171,1402911301,1102260336, 759250125, 387062357,
+        1262586814,1751258219,1649649171,1484645031,1262586814, 992008094, 683307060, 348346918,
+        1073741824,1489322693,1402911301,1262586814,1073741824, 843633538, 581104888, 296244703,
+         843633538,1170153332,1102260336, 992008094, 843633538, 662838617, 456571181, 232757969,
+         581104888, 806015634, 759250125, 683307060, 581104888, 456571181, 314491699, 160326478,
+         296244703, 410903207, 387062357, 348346918, 296244703, 232757969, 160326478,  81733730,
+    };
     int i, j;
-
-    for (j = 0; j < 8; j++) {
-        for (i = 0; i < 8; i++) {
-            if (j && j != 4)
-               if (i && i != 4)
-                   s[j*8 + i] = cos(j * M_PI/16.0) * cos(i * M_PI/16.0) * 2.0;
-               else
-                   s[j*8 + i] = cos(j * M_PI/16.0) * sqrt(2.0);
-            else
-               if (i && i != 4)
-                   s[j*8 + i] = cos(i * M_PI/16.0) * sqrt(2.0);
-               else
-                   s[j*8 + i] = 1.0;
-        }
-    }
-
+#define C (1LL<<30)
     for (i = 0; i < 64; i++)
         inv_bink_scan[bink_scan[i]] = i;
 
     for (j = 0; j < 16; j++) {
         for (i = 0; i < 64; i++) {
             int k = inv_bink_scan[i];
-            if (s[i] == 1.0) {
-                binkb_intra_quant[j][k] = (1L << 12) * binkb_intra_seed[i] *
-                                          binkb_num[j]/binkb_den[j];
-                binkb_inter_quant[j][k] = (1L << 12) * binkb_inter_seed[i] *
-                                          binkb_num[j]/binkb_den[j];
-            } else {
-                binkb_intra_quant[j][k] = (1L << 12) * binkb_intra_seed[i] * s[i] *
-                                          binkb_num[j]/(double)binkb_den[j];
-                binkb_inter_quant[j][k] = (1L << 12) * binkb_inter_seed[i] * s[i] *
-                                          binkb_num[j]/(double)binkb_den[j];
-            }
+            binkb_intra_quant[j][k] = binkb_intra_seed[i] * (int64_t)s[i] *
+                                        binkb_num[j]/(binkb_den[j] * (C>>12));
+            binkb_inter_quant[j][k] = binkb_inter_seed[i] * (int64_t)s[i] *
+                                        binkb_num[j]/(binkb_den[j] * (C>>12));
         }
     }
 }
@@ -1272,7 +1268,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     BinkContext * const c = avctx->priv_data;
     static VLC_TYPE table[16 * 128][2];
     static int binkb_initialised = 0;
-    int i;
+    int i, ret;
     int flags;
 
     c->version = avctx->codec_tag >> 24;
@@ -1301,13 +1297,16 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return 1;
     }
 
-    avctx->pix_fmt = c->has_alpha ? PIX_FMT_YUVA420P : PIX_FMT_YUV420P;
+    avctx->pix_fmt = c->has_alpha ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P;
 
     avctx->idct_algo = FF_IDCT_BINK;
     ff_dsputil_init(&c->dsp, avctx);
     ff_binkdsp_init(&c->bdsp);
 
-    init_bundles(c);
+    if ((ret = init_bundles(c)) < 0) {
+        free_bundles(c);
+        return ret;
+    }
 
     if (c->version == 'b') {
         if (!binkb_initialised) {
@@ -1341,4 +1340,5 @@ AVCodec ff_bink_decoder = {
     .close          = decode_end,
     .decode         = decode_frame,
     .long_name      = NULL_IF_CONFIG_SMALL("Bink video"),
+    .capabilities   = CODEC_CAP_DR1,
 };

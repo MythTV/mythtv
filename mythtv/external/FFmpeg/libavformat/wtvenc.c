@@ -52,12 +52,6 @@ static const uint8_t legacy_attrib[] =
 
 static const ff_asf_guid sub_wtv_guid =
     {0x8C,0xC3,0xD2,0xC2,0x7E,0x9A,0xDA,0x11,0x8B,0xF7,0x00,0x07,0xE9,0x5E,0xAD,0x8D};
-static const ff_asf_guid stream1_guid =
-    {0xA1,0xC3,0xD2,0xC2,0x7E,0x9A,0xDA,0x11,0x8B,0xF7,0x00,0x07,0xE9,0x5E,0xAD,0x8D};
-static const ff_asf_guid sync_guid =
-    {0x97,0xC3,0xD2,0xC2,0x7E,0x9A,0xDA,0x11,0x8B,0xF7,0x00,0x07,0xE9,0x5E,0xAD,0x8D};
-static const ff_asf_guid index_guid =
-    {0x96,0xc3,0xd2,0xc2,0x7e,0x9a,0xda,0x11,0x8b,0xf7,0x00,0x07,0xe9,0x5e,0xad,0x8d};
 
 enum WtvFileIndex {
     WTV_TIMELINE_TABLE_0_HEADER_EVENTS = 0,
@@ -86,17 +80,42 @@ typedef struct {
 } WtvChunkEntry;
 
 typedef struct {
+    int64_t serial;
+    int64_t value;
+} WtvSyncEntry;
+
+typedef struct {
     int64_t timeline_start_pos;
     WtvFile file[WTV_FILES];
     int64_t serial;         /** chunk serial number */
     int64_t last_chunk_pos; /** last chunk position */
-    int64_t frame_nb;
+    int64_t last_timestamp_pos; /** last timestamp chunk position */
+    int64_t first_index_pos;    /** first index_chunk position */
 
     WtvChunkEntry index[MAX_NB_INDEX];
     int nb_index;
     int first_video_flag;
-    int64_t sync_pos;
+
+    WtvSyncEntry *st_pairs; /* (serial, timestamp) pairs */
+    int nb_st_pairs;
+    WtvSyncEntry *sp_pairs; /* (serial, position) pairs */
+    int nb_sp_pairs;
+
+    int64_t last_pts;
+    int64_t last_serial;
 } WtvContext;
+
+
+static void add_serial_pair(WtvSyncEntry ** list, int * count, int64_t serial, int64_t value)
+{
+    int new_count = *count + 1;
+    WtvSyncEntry *new_list = av_realloc(*list, new_count * sizeof(WtvSyncEntry));
+    if (!new_list)
+        return;
+    new_list[*count] = (WtvSyncEntry){serial, value};
+    *list  = new_list;
+    *count = new_count;
+}
 
 typedef int WTVHeaderWriteFunc(AVIOContext *pb);
 
@@ -137,7 +156,7 @@ static void write_chunk_header(AVFormatContext *s, const ff_asf_guid *guid, int 
     avio_wl32(pb, stream_id);
     avio_wl64(pb, wctx->serial);
 
-    if ((stream_id & 0x80000000) && guid != &index_guid) {
+    if ((stream_id & 0x80000000) && guid != &ff_index_guid) {
         WtvChunkEntry *t = wctx->index + wctx->nb_index;
         av_assert0(wctx->nb_index < MAX_NB_INDEX);
         t->pos       = wctx->last_chunk_pos;
@@ -179,7 +198,7 @@ static void write_index(AVFormatContext *s)
     WtvContext *wctx = s->priv_data;
     int i;
 
-    write_chunk_header2(s, &index_guid, 0x80000000);
+    write_chunk_header2(s, &ff_index_guid, 0x80000000);
     avio_wl32(pb, 0);
     avio_wl32(pb, 0);
 
@@ -193,6 +212,9 @@ static void write_index(AVFormatContext *s)
     }
     wctx->nb_index = 0;   // reset index
     finish_chunk_noindex(s);
+
+    if (!wctx->first_index_pos)
+        wctx->first_index_pos = wctx->last_chunk_pos;
 }
 
 static void finish_chunk(AVFormatContext *s)
@@ -263,7 +285,7 @@ static int write_stream_codec(AVFormatContext *s, AVStream * st)
 {
     AVIOContext *pb = s->pb;
     int ret;
-    write_chunk_header2(s, &stream1_guid, 0x80000000 | 0x01);
+    write_chunk_header2(s, &ff_stream1_guid, 0x80000000 | 0x01);
 
     avio_wl32(pb,  0x01);
     write_pad(pb, 4);
@@ -284,41 +306,28 @@ static void write_sync(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     WtvContext *wctx = s->priv_data;
     int64_t last_chunk_pos = wctx->last_chunk_pos;
-    wctx->sync_pos = avio_tell(pb) - wctx->timeline_start_pos;
 
-    write_chunk_header(s, &sync_guid, 0x18, 0);
-    write_pad(pb, 24);
+    write_chunk_header(s, &ff_sync_guid, 0x18, 0);
+    avio_wl64(pb, wctx->first_index_pos);
+    avio_wl64(pb, wctx->last_timestamp_pos);
+    avio_wl64(pb, 0);
 
     finish_chunk(s);
+    add_serial_pair(&wctx->sp_pairs, &wctx->nb_sp_pairs, wctx->serial, wctx->last_chunk_pos);
 
     wctx->last_chunk_pos = last_chunk_pos;
 }
 
-static void write_DSATTRIB_TRANSPORT_PROPERTIES_init(AVFormatContext *s, int stream_index)
-{
-    AVIOContext *pb = s->pb;
-    write_chunk_header2(s, &ff_DSATTRIB_TRANSPORT_PROPERTIES, 0x80000000 | stream_index);
-    avio_wl64(pb, stream_index);
-    avio_wl64(pb, -1);
-    avio_wl64(pb, 0);
-    finish_chunk(s);
-}
-
-static int write_stream_data(AVFormatContext *s, AVStream *st, int flag)
+static int write_stream_data(AVFormatContext *s, AVStream *st)
 {
     AVIOContext *pb = s->pb;
     int ret;
 
-    if (!flag) {
-        write_chunk_header2(s, &ff_stream_guid, 0x80000000 | (st->index + INDEX_BASE));
-        avio_wl32(pb, 0x00000001);
-        avio_wl32(pb, st->index + INDEX_BASE); //stream_id
-        avio_wl32(pb, 0x00000001);
-        write_pad(pb, 8);
-    } else {
-        write_chunk_header2(s, &ff_stream2_guid, 0x80000000 | (st->index + INDEX_BASE));
-        write_pad(pb, 4);
-    }
+    write_chunk_header2(s, &ff_SBE2_STREAM_DESC_EVENT, 0x80000000 | (st->index + INDEX_BASE));
+    avio_wl32(pb, 0x00000001);
+    avio_wl32(pb, st->index + INDEX_BASE); //stream_id
+    avio_wl32(pb, 0x00000001);
+    write_pad(pb, 8);
 
     ret = write_stream_codec_info(s, st);
     if (ret < 0) {
@@ -339,6 +348,9 @@ static int write_header(AVFormatContext *s)
     int i, pad, ret;
     AVStream *st;
 
+    wctx->last_chunk_pos     = -1;
+    wctx->last_timestamp_pos = -1;
+
     ff_put_guid(pb, &ff_wtv_guid);
     ff_put_guid(pb, &sub_wtv_guid);
 
@@ -357,6 +369,7 @@ static int write_header(AVFormatContext *s)
 
     pad = (1 << WTV_SECTOR_BITS) - avio_tell(pb);
     write_pad(pb, pad);
+
     wctx->timeline_start_pos = avio_tell(pb);
 
     wctx->serial = 1;
@@ -370,27 +383,18 @@ static int write_header(AVFormatContext *s)
             av_log(s, AV_LOG_ERROR, "write stream codec failed codec_type(0x%x)\n", st->codec->codec_type);
             return -1;
         }
-        if (i + 1 < s->nb_streams) {
+        if (!i)
             write_sync(s);
-        }
     }
 
     for (i = 0; i < s->nb_streams; i++) {
         st = s->streams[i];
-        ret  = write_stream_data(s, st, 0);
+        ret  = write_stream_data(s, st);
         if (ret < 0) {
             av_log(s, AV_LOG_ERROR, "write stream data failed codec_type(0x%x)\n", st->codec->codec_type);
             return -1;
         }
-        ret = write_stream_data(s, st, 1);
-        if (ret < 0) {
-            av_log(s, AV_LOG_ERROR, "write stream2 data failed codec_type(0x%x)\n", st->codec->codec_type);
-            return -1;
-        }
     }
-
-    for (i = 0; i < s->nb_streams; i++)
-        write_DSATTRIB_TRANSPORT_PROPERTIES_init(s, INDEX_BASE + i);
 
     if (wctx->nb_index)
         write_index(s);
@@ -403,29 +407,36 @@ static void write_timestamp(AVFormatContext *s, AVPacket *pkt)
     AVIOContext *pb = s->pb;
     WtvContext  *wctx = s->priv_data;
     AVCodecContext *enc = s->streams[pkt->stream_index]->codec;
-    int flag = 0;
-    int64_t frame_number = 0;
 
-    if (enc->codec_type == AVMEDIA_TYPE_VIDEO) {
-        wctx->frame_nb++;
-        frame_number = wctx->frame_nb;
-        flag = pkt->flags & AV_PKT_FLAG_KEY ? 1 : 0;
-    }
     write_chunk_header(s, &ff_timestamp_guid, 56, 0x40000000 | (INDEX_BASE + pkt->stream_index));
     write_pad(pb, 8);
     avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
     avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
+    avio_wl64(pb, pkt->pts == AV_NOPTS_VALUE ? -1 : pkt->pts);
+    avio_wl64(pb, 0);
+    avio_wl64(pb, enc->codec_type == AVMEDIA_TYPE_VIDEO && (pkt->flags & AV_PKT_FLAG_KEY) ? 1 : 0);
+    avio_wl64(pb, 0);
 
-    avio_wl64(pb, frame_number);
-    avio_wl64(pb, 0);
-    avio_wl64(pb, flag);
-    avio_wl64(pb, 0);
+    wctx->last_timestamp_pos = wctx->last_chunk_pos;
 }
 
 static int write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVIOContext *pb = s->pb;
     WtvContext  *wctx = s->priv_data;
+
+    /* emit sync chunk and 'timeline.table.0.entries.Event' record every 50 frames */
+    if (wctx->serial - (wctx->nb_sp_pairs ? wctx->sp_pairs[wctx->nb_sp_pairs - 1].serial : 0) >= 50)
+        write_sync(s);
+
+    /* emit 'table.0.entries.time' record every 500ms */
+    if (pkt->pts != AV_NOPTS_VALUE && pkt->pts - (wctx->nb_st_pairs ? wctx->st_pairs[wctx->nb_st_pairs - 1].value : 0) >= 5000000)
+        add_serial_pair(&wctx->st_pairs, &wctx->nb_st_pairs, wctx->serial, pkt->pts);
+
+    if (pkt->pts != AV_NOPTS_VALUE && pkt->pts > wctx->last_pts) {
+        wctx->last_pts = pkt->pts;
+        wctx->last_serial = wctx->serial;
+    }
 
     // write timestamp chunk
     write_timestamp(s, pkt);
@@ -439,7 +450,7 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
-static int write_table0_header_envents(AVIOContext *pb)
+static int write_table0_header_events(AVIOContext *pb)
 {
     avio_wl32(pb, 0x10);
     write_pad(pb, 84);
@@ -468,7 +479,7 @@ static int write_table0_header_time(AVIOContext *pb)
 }
 
 static const WTVRootEntryTable wtv_root_entry_table[] = {
-    { timeline_table_0_header_events,          sizeof(timeline_table_0_header_events),          write_table0_header_envents},
+    { timeline_table_0_header_events,          sizeof(timeline_table_0_header_events),          write_table0_header_events},
     { ff_timeline_table_0_entries_Events_le16, sizeof(ff_timeline_table_0_entries_Events_le16), NULL},
     { ff_timeline_le16,                        sizeof(ff_timeline_le16),                        NULL},
     { table_0_header_legacy_attrib,            sizeof(table_0_header_legacy_attrib),            write_table0_header_legacy_attrib},
@@ -535,7 +546,7 @@ static void write_fat(AVIOContext *pb, int start_sector, int nb_sectors, int shi
     write_pad(pb, WTV_SECTOR_SIZE - ((nb_sectors << 2) % WTV_SECTOR_SIZE));
 }
 
-static int write_fat_sector(AVFormatContext *s, int64_t start_pos, int nb_sectors, int sector_bits, int depth)
+static int64_t write_fat_sector(AVFormatContext *s, int64_t start_pos, int nb_sectors, int sector_bits, int depth)
 {
     int64_t start_sector = start_pos >> WTV_SECTOR_BITS;
     int shift = sector_bits - WTV_SECTOR_BITS;
@@ -559,10 +570,24 @@ static void write_table_entries_events(AVFormatContext *s)
 {
     AVIOContext *pb = s->pb;
     WtvContext *wctx = s->priv_data;
+    int i;
+    for (i = 0; i < wctx->nb_sp_pairs; i++) {
+        avio_wl64(pb, wctx->sp_pairs[i].serial);
+        avio_wl64(pb, wctx->sp_pairs[i].value);
+    }
+}
 
-    //FIXME: output frame_nb, position pairs.
-    //We only set the first sync_chunk position here.
-    avio_wl64(pb, 0x2);   avio_wl64(pb, wctx->sync_pos);
+static void write_table_entries_time(AVFormatContext *s)
+{
+    AVIOContext *pb = s->pb;
+    WtvContext *wctx = s->priv_data;
+    int i;
+    for (i = 0; i < wctx->nb_st_pairs; i++) {
+        avio_wl64(pb, wctx->st_pairs[i].value);
+        avio_wl64(pb, wctx->st_pairs[i].serial);
+    }
+    avio_wl64(pb, wctx->last_pts);
+    avio_wl64(pb, wctx->last_serial);
 }
 
 static void write_tag(AVIOContext *pb, const char *key, const char *value)
@@ -647,11 +672,10 @@ static int finish_file(AVFormatContext *s, enum WtvFileIndex index, int64_t star
 
     //write fat table
     if (w->depth > 0) {
-        w->first_sector = write_fat_sector(s, start_pos, nb_sectors, sector_bits, w->depth);
+        w->first_sector = write_fat_sector(s, start_pos, nb_sectors, sector_bits, w->depth) >> WTV_SECTOR_BITS;
     } else {
-        w->first_sector = start_pos;
+        w->first_sector = start_pos >> WTV_SECTOR_BITS;
     }
-    w->first_sector >>= WTV_SECTOR_BITS;
 
     w->length |= 1ULL<<60;
     if (sector_bits == WTV_SECTOR_BITS)
@@ -687,7 +711,7 @@ static int write_trailer(AVFormatContext *s)
         return -1;
 
     start_pos = avio_tell(pb);
-    //FIXME: output timestamp, frame_nb pairs here.
+    write_table_entries_time(s);
     if (finish_file(s, WTV_TABLE_0_ENTRIES_TIME, start_pos) < 0)
         return -1;
 
@@ -705,6 +729,9 @@ static int write_trailer(AVFormatContext *s)
     avio_wl32(pb, file_end_pos >> WTV_SECTOR_BITS);
 
     avio_flush(pb);
+
+    av_free(wctx->sp_pairs);
+    av_free(wctx->st_pairs);
     return 0;
 }
 

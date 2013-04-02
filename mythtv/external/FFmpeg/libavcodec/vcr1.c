@@ -26,6 +26,7 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
+#include "internal.h"
 #include "libavutil/internal.h"
 
 typedef struct VCR1Context {
@@ -48,8 +49,12 @@ static av_cold int vcr1_decode_init(AVCodecContext *avctx)
 {
     vcr1_common_init(avctx);
 
-    avctx->pix_fmt = PIX_FMT_YUV410P;
+    avctx->pix_fmt = AV_PIX_FMT_YUV410P;
 
+    if (avctx->width % 8 || avctx->height%4) {
+        av_log_ask_for_sample(avctx, "odd dimensions are not supported\n");
+        return AVERROR_PATCHWELCOME;
+    }
     return 0;
 }
 
@@ -64,7 +69,7 @@ static av_cold int vcr1_decode_end(AVCodecContext *avctx)
 }
 
 static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
-                             int *data_size, AVPacket *avpkt)
+                             int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf        = avpkt->data;
     int buf_size              = avpkt->size;
@@ -83,7 +88,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     p->reference = 0;
-    if (avctx->get_buffer(avctx, p) < 0) {
+    if (ff_get_buffer(avctx, p) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
@@ -138,7 +143,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     *picture   = a->picture;
-    *data_size = sizeof(AVPicture);
+    *got_frame = 1;
 
     return buf_size;
 }

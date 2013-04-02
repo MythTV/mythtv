@@ -29,10 +29,10 @@ static int loas_probe(AVProbeData *p)
 {
     int max_frames = 0, first_frames = 0;
     int fsize, frames;
-    uint8_t *buf0 = p->buf;
-    uint8_t *buf2;
-    uint8_t *buf;
-    uint8_t *end = buf0 + p->buf_size - 3;
+    const uint8_t *buf0 = p->buf;
+    const uint8_t *buf2;
+    const uint8_t *buf;
+    const uint8_t *end = buf0 + p->buf_size - 3;
     buf = buf0;
 
     for(; buf < end; buf= buf2+1) {
@@ -55,7 +55,6 @@ static int loas_probe(AVProbeData *p)
     if   (first_frames>=3) return AVPROBE_SCORE_MAX/2+1;
     else if(max_frames>100)return AVPROBE_SCORE_MAX/2;
     else if(max_frames>=3) return AVPROBE_SCORE_MAX/4;
-    else if(max_frames>=1) return 1;
     else                   return 0;
 }
 

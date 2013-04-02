@@ -62,13 +62,13 @@ typedef struct HintSample {
     int own_data;
 } HintSample;
 
-typedef struct {
+typedef struct HintSampleQueue {
     int size;
     int len;
     HintSample *samples;
 } HintSampleQueue;
 
-typedef struct {
+typedef struct MOVFragmentInfo {
     int64_t offset;
     int64_t time;
     int64_t duration;
@@ -165,6 +165,8 @@ typedef struct MOVMuxContext {
     int max_fragment_size;
     int ism_lookahead;
     AVIOContext *mdat_buf;
+
+    int use_editlist;
 } MOVMuxContext;
 
 #define FF_MOV_FLAG_RTP_HINT 1

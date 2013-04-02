@@ -86,7 +86,7 @@ static av_cold int h261_decode_init(AVCodecContext *avctx){
 
     s->out_format = FMT_H261;
     s->low_delay= 1;
-    avctx->pix_fmt= PIX_FMT_YUV420P;
+    avctx->pix_fmt= AV_PIX_FMT_YUV420P;
 
     s->codec_id= avctx->codec->id;
 
@@ -551,7 +551,7 @@ static int get_consumed_bytes(MpegEncContext *s, int buf_size){
 }
 
 static int h261_decode_frame(AVCodecContext *avctx,
-                             void *data, int *data_size,
+                             void *data, int *got_frame,
                              AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -636,7 +636,7 @@ retry:
     *pict = s->current_picture_ptr->f;
     ff_print_debug_info(s, pict);
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
 
     return get_consumed_bytes(s, buf_size);
 }

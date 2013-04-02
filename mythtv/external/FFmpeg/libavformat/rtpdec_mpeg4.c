@@ -32,9 +32,8 @@
 #include "libavutil/avstring.h"
 #include "libavcodec/get_bits.h"
 
-/** Structure listing useful vars to parse RTP packet payload*/
-struct PayloadContext
-{
+/** Structure listing useful vars to parse RTP packet payload */
+struct PayloadContext {
     int sizelength;
     int indexlength;
     int indexdeltalength;
@@ -69,8 +68,7 @@ typedef struct {
 /* All known fmtp parameters and the corresponding RTPAttrTypeEnum */
 #define ATTR_NAME_TYPE_INT 0
 #define ATTR_NAME_TYPE_STR 1
-static const AttrNameMap attr_names[]=
-{
+static const AttrNameMap attr_names[] = {
     { "SizeLength",       ATTR_NAME_TYPE_INT,
       offsetof(PayloadContext, sizelength) },
     { "IndexLength",      ATTR_NAME_TYPE_INT,
@@ -91,22 +89,14 @@ static PayloadContext *new_context(void)
     return av_mallocz(sizeof(PayloadContext));
 }
 
-static void free_context(PayloadContext * data)
+static void free_context(PayloadContext *data)
 {
-    int i;
-    for (i = 0; i < data->nb_au_headers; i++) {
-         /* according to rtp_parse_mp4_au, we treat multiple
-          * au headers as one, so nb_au_headers is always 1.
-          * loop anyway in case this changes.
-          * (note: changes done carelessly might lead to a double free)
-          */
-       av_free(&data->au_headers[i]);
-    }
+    av_free(data->au_headers);
     av_free(data->mode);
     av_free(data);
 }
 
-static int parse_fmtp_config(AVCodecContext * codec, char *value)
+static int parse_fmtp_config(AVCodecContext *codec, char *value)
 {
     /* decode the hexa encoded parameter */
     int len = ff_hex_to_data(NULL, value);
@@ -167,12 +157,10 @@ static int rtp_parse_mp4_au(PayloadContext *data, const uint8_t *buf)
 
 
 /* Follows RFC 3640 */
-static int aac_parse_packet(AVFormatContext *ctx,
-                            PayloadContext *data,
-                            AVStream *st,
-                            AVPacket *pkt,
-                            uint32_t *timestamp,
-                            const uint8_t *buf, int len, int flags)
+static int aac_parse_packet(AVFormatContext *ctx, PayloadContext *data,
+                            AVStream *st, AVPacket *pkt, uint32_t *timestamp,
+                            const uint8_t *buf, int len, uint16_t seq,
+                            int flags)
 {
     if (rtp_parse_mp4_au(data, buf))
         return -1;

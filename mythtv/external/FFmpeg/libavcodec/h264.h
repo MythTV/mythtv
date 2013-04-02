@@ -98,12 +98,6 @@
 #define IS_REF0(a)         ((a) & MB_TYPE_REF0)
 #define IS_8x8DCT(a)       ((a) & MB_TYPE_8x8DCT)
 
-/**
- * Value of Picture.reference when Picture is not a reference picture, but
- * is held for delayed output.
- */
-#define DELAYED_PIC_REF 4
-
 #define QP_MAX_NUM (51 + 6*6)           // The maximum supported qp
 
 /* NAL unit types */
@@ -121,7 +115,8 @@ enum {
     NAL_END_STREAM,
     NAL_FILLER_DATA,
     NAL_SPS_EXT,
-    NAL_AUXILIARY_SLICE = 19
+    NAL_AUXILIARY_SLICE = 19,
+    NAL_FF_IGNORE       = 0xff0f001,
 };
 
 /**
@@ -130,6 +125,7 @@ enum {
 typedef enum {
     SEI_BUFFERING_PERIOD            = 0,   ///< buffering period (H.264, D.1.1)
     SEI_TYPE_PIC_TIMING             = 1,   ///< picture timing
+    SEI_TYPE_USER_DATA_ITU_T_T35    = 4,   ///< user data registered by ITU-T Recommendation T.35
     SEI_TYPE_USER_DATA_UNREGISTERED = 5,   ///< unregistered user data
     SEI_TYPE_RECOVERY_POINT         = 6    ///< recovery point (frame # to decoder sync)
 } SEI_Type;
@@ -206,6 +202,7 @@ typedef struct SPS {
     int bit_depth_chroma;                 ///< bit_depth_chroma_minus8 + 8
     int residual_color_transform_flag;    ///< residual_colour_transform_flag
     int constraint_set_flags;             ///< constraint_set[0-3]_flag
+    int new;                              ///< flag to keep track if the decoder context needs re-init due to changed SPS
 } SPS;
 
 /**
@@ -332,6 +329,7 @@ typedef struct H264Context {
     int emu_edge_width;
     int emu_edge_height;
 
+    unsigned current_sps_id; ///< id of the current SPS
     SPS sps; ///< current sps
 
     /**
@@ -370,7 +368,7 @@ typedef struct H264Context {
     int direct_spatial_mv_pred;
     int col_parity;
     int col_fieldoff;
-    int dist_scale_factor[16];
+    int dist_scale_factor[32];
     int dist_scale_factor_field[2][32];
     int map_col_to_list0[2][16 + 32];
     int map_col_to_list0_field[2][2][16 + 32];
@@ -453,6 +451,8 @@ typedef struct H264Context {
     int is_avc;           ///< this flag is != 0 if codec is avc1
     int nal_length_size;  ///< Number of bytes used for nal length (1, 2 or 4)
     int got_first;        ///< this flag is != 0 if we've parsed a frame
+
+    int context_reinitialized;
 
     SPS *sps_buffers[MAX_SPS_COUNT];
     PPS *pps_buffers[MAX_PPS_COUNT];
@@ -593,6 +593,7 @@ typedef struct H264Context {
     int initial_cpb_removal_delay[32];  ///< Initial timestamps for CPBs
 
     int cur_chroma_format_idc;
+    uint8_t *bipred_scratchpad;
 
     int16_t slice_row[MAX_SLICES]; ///< to detect when MAX_SLICES is too low
 

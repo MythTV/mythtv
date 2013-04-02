@@ -356,7 +356,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     if (s->flags & FLAG_SPRITE) {
         av_log_ask_for_sample(s->avctx, "SPRITE frame found.\n");
         /* FIXME header.width, height, xoffset and yoffset aren't initialized */
-        return -1;
+        return AVERROR_PATCHWELCOME;
     } else {
         s->w = header.xsize;
         s->h = header.ysize;
@@ -390,10 +390,10 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     }
 
     if (compression_types[header.compression].algorithm == ALGO_RGB24H) {
-        new_pix_fmt = PIX_FMT_RGB32;
+        new_pix_fmt = AV_PIX_FMT_RGB32;
         width_shift = 1;
     } else
-        new_pix_fmt = PIX_FMT_RGB555; // RGB565 is supported as well
+        new_pix_fmt = AV_PIX_FMT_RGB555; // RGB565 is supported as well
 
     s->w >>= width_shift;
     if (av_image_check_size(s->w, s->h, 0, s->avctx) < 0)
@@ -419,7 +419,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
         if (compression_types[header.compression].algorithm == ALGO_RGB24H)
             gen_vector_table24(s, sel_vector_table);
         else
-        if (s->avctx->pix_fmt == PIX_FMT_RGB555)
+        if (s->avctx->pix_fmt == AV_PIX_FMT_RGB555)
             gen_vector_table15(s, sel_vector_table);
         else
             gen_vector_table16(s, sel_vector_table);
@@ -464,9 +464,9 @@ static av_cold int truemotion1_decode_init(AVCodecContext *avctx)
 
     // FIXME: it may change ?
 //    if (avctx->bits_per_sample == 24)
-//        avctx->pix_fmt = PIX_FMT_RGB24;
+//        avctx->pix_fmt = AV_PIX_FMT_RGB24;
 //    else
-//        avctx->pix_fmt = PIX_FMT_RGB555;
+//        avctx->pix_fmt = AV_PIX_FMT_RGB555;
 
     avcodec_get_frame_defaults(&s->frame);
     s->frame.data[0] = NULL;
@@ -856,7 +856,7 @@ static void truemotion1_decode_24bit(TrueMotion1Context *s)
 
 
 static int truemotion1_decode_frame(AVCodecContext *avctx,
-                                    void *data, int *data_size,
+                                    void *data, int *got_frame,
                                     AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -883,7 +883,7 @@ static int truemotion1_decode_frame(AVCodecContext *avctx,
         truemotion1_decode_16bit(s);
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = s->frame;
 
     /* report that the buffer was completely consumed */

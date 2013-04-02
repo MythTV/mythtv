@@ -33,12 +33,12 @@
 #include <string.h>
 
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "avcodec.h"
 #include "bytestream.h"
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
-// for av_memcpy_backptr
-#include "libavutil/lzo.h"
+#include "internal.h"
 
 #define RUNTIME_GAMMA 0
 
@@ -79,7 +79,7 @@ static av_cold int xan_decode_init(AVCodecContext *avctx)
     s->avctx = avctx;
     s->frame_size = 0;
 
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
     s->buffer1_size = avctx->width * avctx->height;
     s->buffer1 = av_malloc(s->buffer1_size);
@@ -360,17 +360,29 @@ static int xan_wc3_decode_frame(XanContext *s) {
 
         case 9:
         case 19:
+            if (buf_end - size_segment < 1) {
+                av_log(s->avctx, AV_LOG_ERROR, "size_segment overread\n");
+                return AVERROR_INVALIDDATA;
+            }
             size = *size_segment++;
             break;
 
         case 10:
         case 20:
+            if (buf_end - size_segment < 2) {
+                av_log(s->avctx, AV_LOG_ERROR, "size_segment overread\n");
+                return AVERROR_INVALIDDATA;
+            }
             size = AV_RB16(&size_segment[0]);
             size_segment += 2;
             break;
 
         case 11:
         case 21:
+            if (buf_end - size_segment < 3) {
+                av_log(s->avctx, AV_LOG_ERROR, "size_segment overread\n");
+                return AVERROR_INVALIDDATA;
+            }
             size = AV_RB24(size_segment);
             size_segment += 3;
             break;
@@ -500,78 +512,77 @@ static const uint8_t gamma_lookup[256] = {
 #endif
 
 static int xan_decode_frame(AVCodecContext *avctx,
-                            void *data, int *data_size,
+                            void *data, int *got_frame,
                             AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int ret, buf_size = avpkt->size;
     XanContext *s = avctx->priv_data;
+    const uint8_t *buf_end = buf + buf_size;
+    int tag = 0;
 
-    if (avctx->codec->id == AV_CODEC_ID_XAN_WC3) {
-        const uint8_t *buf_end = buf + buf_size;
-        int tag = 0;
-        while (buf_end - buf > 8 && tag != VGA__TAG) {
-            unsigned *tmpptr;
-            uint32_t new_pal;
-            int size;
-            int i;
-            tag  = bytestream_get_le32(&buf);
-            size = bytestream_get_be32(&buf);
-            if(size < 0) {
-                av_log(avctx, AV_LOG_ERROR, "Invalid tag size %d\n", size);
-                return AVERROR_INVALIDDATA;
-            }
-            size = FFMIN(size, buf_end - buf);
-            switch (tag) {
-            case PALT_TAG:
-                if (size < PALETTE_SIZE)
-                    return AVERROR_INVALIDDATA;
-                if (s->palettes_count >= PALETTES_MAX)
-                    return AVERROR_INVALIDDATA;
-                tmpptr = av_realloc(s->palettes,
-                                    (s->palettes_count + 1) * AVPALETTE_SIZE);
-                if (!tmpptr)
-                    return AVERROR(ENOMEM);
-                s->palettes = tmpptr;
-                tmpptr += s->palettes_count * AVPALETTE_COUNT;
-                for (i = 0; i < PALETTE_COUNT; i++) {
-#if RUNTIME_GAMMA
-                    int r = gamma_corr(*buf++);
-                    int g = gamma_corr(*buf++);
-                    int b = gamma_corr(*buf++);
-#else
-                    int r = gamma_lookup[*buf++];
-                    int g = gamma_lookup[*buf++];
-                    int b = gamma_lookup[*buf++];
-#endif
-                    *tmpptr++ = (0xFFU << 24) | (r << 16) | (g << 8) | b;
-                }
-                s->palettes_count++;
-                break;
-            case SHOT_TAG:
-                if (size < 4)
-                    return AVERROR_INVALIDDATA;
-                new_pal = bytestream_get_le32(&buf);
-                if (new_pal < s->palettes_count) {
-                    s->cur_palette = new_pal;
-                } else
-                    av_log(avctx, AV_LOG_ERROR, "Invalid palette selected\n");
-                break;
-            case VGA__TAG:
-                break;
-            default:
-                buf += size;
-                break;
-            }
+    while (buf_end - buf > 8 && tag != VGA__TAG) {
+        unsigned *tmpptr;
+        uint32_t new_pal;
+        int size;
+        int i;
+        tag  = bytestream_get_le32(&buf);
+        size = bytestream_get_be32(&buf);
+        if(size < 0) {
+            av_log(avctx, AV_LOG_ERROR, "Invalid tag size %d\n", size);
+            return AVERROR_INVALIDDATA;
         }
-        buf_size = buf_end - buf;
+        size = FFMIN(size, buf_end - buf);
+        switch (tag) {
+        case PALT_TAG:
+            if (size < PALETTE_SIZE)
+                return AVERROR_INVALIDDATA;
+            if (s->palettes_count >= PALETTES_MAX)
+                return AVERROR_INVALIDDATA;
+            tmpptr = av_realloc(s->palettes,
+                                (s->palettes_count + 1) * AVPALETTE_SIZE);
+            if (!tmpptr)
+                return AVERROR(ENOMEM);
+            s->palettes = tmpptr;
+            tmpptr += s->palettes_count * AVPALETTE_COUNT;
+            for (i = 0; i < PALETTE_COUNT; i++) {
+#if RUNTIME_GAMMA
+                int r = gamma_corr(*buf++);
+                int g = gamma_corr(*buf++);
+                int b = gamma_corr(*buf++);
+#else
+                int r = gamma_lookup[*buf++];
+                int g = gamma_lookup[*buf++];
+                int b = gamma_lookup[*buf++];
+#endif
+                *tmpptr++ = (0xFFU << 24) | (r << 16) | (g << 8) | b;
+            }
+            s->palettes_count++;
+            break;
+        case SHOT_TAG:
+            if (size < 4)
+                return AVERROR_INVALIDDATA;
+            new_pal = bytestream_get_le32(&buf);
+            if (new_pal < s->palettes_count) {
+                s->cur_palette = new_pal;
+            } else
+                av_log(avctx, AV_LOG_ERROR, "Invalid palette selected\n");
+            break;
+        case VGA__TAG:
+            break;
+        default:
+            buf += size;
+            break;
+        }
     }
+    buf_size = buf_end - buf;
+
     if (s->palettes_count <= 0) {
         av_log(s->avctx, AV_LOG_ERROR, "No palette found\n");
         return AVERROR_INVALIDDATA;
     }
 
-    if ((ret = avctx->get_buffer(avctx, &s->current_frame))) {
+    if ((ret = ff_get_buffer(avctx, &s->current_frame))) {
         av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -593,7 +604,7 @@ static int xan_decode_frame(AVCodecContext *avctx,
     if (s->last_frame.data[0])
         avctx->release_buffer(avctx, &s->last_frame);
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = s->current_frame;
 
     /* shuffle frames */

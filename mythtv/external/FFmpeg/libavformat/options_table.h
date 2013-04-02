@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVFORMAT_OPTIONS_TABLE
-#define AVFORMAT_OPTIONS_TABLE
+#ifndef AVFORMAT_OPTIONS_TABLE_H
+#define AVFORMAT_OPTIONS_TABLE_H
 
 #include <limits.h>
 
@@ -71,7 +71,9 @@ static const AVOption options[]={
 {"compliant",  "consider all spec non compliancies as errors", 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_COMPLIANT }, INT_MIN, INT_MAX, D, "err_detect"},
 {"aggressive", "consider things that a sane encoder shouldnt do as an error", 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_AGGRESSIVE }, INT_MIN, INT_MAX, D, "err_detect"},
 {"use_wallclock_as_timestamps", "use wallclock as timestamps", OFFSET(use_wallclock_as_timestamps), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX-1, D},
-{"avoid_negative_ts", "avoid negative timestamps", OFFSET(avoid_negative_ts), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 1, E},
+{"avoid_negative_ts", "shift timestamps to make them positive. 1 enables, 0 disables, default of -1 enables when required by target format.", OFFSET(avoid_negative_ts), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 1, E},
+{"skip_initial_bytes", "skip initial bytes", OFFSET(skip_initial_bytes), AV_OPT_TYPE_INT, {.i64 = 0}, 0, INT_MAX-1, D},
+{"correct_ts_overflow", "correct single timestamp overflows", OFFSET(correct_ts_overflow), AV_OPT_TYPE_INT, {.i64 = 1}, 0, 1, D},
 {NULL},
 };
 
@@ -80,4 +82,4 @@ static const AVOption options[]={
 #undef DEFAULT
 #undef OFFSET
 
-#endif // AVFORMAT_OPTIONS_TABLE
+#endif /* AVFORMAT_OPTIONS_TABLE_H */

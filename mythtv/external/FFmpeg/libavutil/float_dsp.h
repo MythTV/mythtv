@@ -51,6 +51,36 @@ typedef struct AVFloatDSPContext {
      */
     void (*vector_fmac_scalar)(float *dst, const float *src, float mul,
                                int len);
+
+    /**
+     * Multiply a vector of floats by a scalar float.  Source and
+     * destination vectors must overlap exactly or not at all.
+     *
+     * @param dst result vector
+     *            constraints: 16-byte aligned
+     * @param src input vector
+     *            constraints: 16-byte aligned
+     * @param mul scalar value
+     * @param len length of vector
+     *            constraints: multiple of 4
+     */
+    void (*vector_fmul_scalar)(float *dst, const float *src, float mul,
+                               int len);
+
+    /**
+     * Multiply a vector of double by a scalar double.  Source and
+     * destination vectors must overlap exactly or not at all.
+     *
+     * @param dst result vector
+     *            constraints: 32-byte aligned
+     * @param src input vector
+     *            constraints: 32-byte aligned
+     * @param mul scalar value
+     * @param len length of vector
+     *            constraints: multiple of 8
+     */
+    void (*vector_dmul_scalar)(double *dst, const double *src, double mul,
+                               int len);
 } AVFloatDSPContext;
 
 /**
@@ -65,5 +95,6 @@ void avpriv_float_dsp_init(AVFloatDSPContext *fdsp, int strict);
 void ff_float_dsp_init_arm(AVFloatDSPContext *fdsp);
 void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int strict);
 void ff_float_dsp_init_x86(AVFloatDSPContext *fdsp);
+void ff_float_dsp_init_mips(AVFloatDSPContext *fdsp);
 
 #endif /* AVUTIL_FLOAT_DSP_H */

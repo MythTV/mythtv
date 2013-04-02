@@ -49,32 +49,9 @@ static int webvtt_probe(AVProbeData *p)
 static int64_t read_ts(const char *s)
 {
     int hh, mm, ss, ms;
-    if (sscanf(s, "%u:%u:%u.%u", &hh, &mm, &ss, &ms) == 4) return (hh*3600 + mm*60 + ss) * 1000 + ms;
-    if (sscanf(s,    "%u:%u.%u",      &mm, &ss, &ms) == 3) return (          mm*60 + ss) * 1000 + ms;
+    if (sscanf(s, "%u:%u:%u.%u", &hh, &mm, &ss, &ms) == 4) return (hh*3600LL + mm*60LL + ss) * 1000LL + ms;
+    if (sscanf(s,    "%u:%u.%u",      &mm, &ss, &ms) == 3) return (            mm*60LL + ss) * 1000LL + ms;
     return AV_NOPTS_VALUE;
-}
-
-static int64_t extract_cue(AVBPrint *buf, AVIOContext *pb)
-{
-    int prev_chr_is_eol = 0;
-    int64_t pos = avio_tell(pb);
-
-    av_bprint_clear(buf);
-    for (;;) {
-        char c = avio_r8(pb);
-        if (!c)
-            break;
-        if (c == '\r' || c == '\n') {
-            if (prev_chr_is_eol)
-                break;
-            prev_chr_is_eol = (c == '\n');
-        } else
-            prev_chr_is_eol = 0;
-        if (c != '\r')
-            av_bprint_chars(buf, c, 1);
-    }
-    av_bprint_chars(buf, '\0', 1);
-    return pos;
 }
 
 static int webvtt_read_header(AVFormatContext *s)
@@ -94,16 +71,20 @@ static int webvtt_read_header(AVFormatContext *s)
     av_bprint_init(&cue,    0, AV_BPRINT_SIZE_UNLIMITED);
 
     for (;;) {
-        int i, len;
-        int64_t pos = extract_cue(&cue, s->pb);
+        int i;
+        int64_t pos;
         AVPacket *sub;
-        const char *p = cue.str;
-        const char *identifier = p;
+        const char *p, *identifier;
         //const char *settings = NULL;
         int64_t ts_start, ts_end;
 
-        if (!*p) // EOF
+        ff_subtitles_read_chunk(s->pb, &cue);
+
+        if (!cue.len)
             break;
+
+        p = identifier = cue.str;
+        pos = avio_tell(s->pb);
 
         /* ignore header chunk */
         if (!strncmp(p, "\xEF\xBB\xBFWEBVTT", 9) ||
@@ -143,8 +124,7 @@ static int webvtt_read_header(AVFormatContext *s)
             p++;
 
         /* create packet */
-        len = cue.str + cue.len - p - 1;
-        sub = ff_subtitles_queue_insert(&webvtt->q, p, len, 0);
+        sub = ff_subtitles_queue_insert(&webvtt->q, p, strlen(p), 0);
         if (!sub) {
             res = AVERROR(ENOMEM);
             goto end;
@@ -168,6 +148,14 @@ static int webvtt_read_packet(AVFormatContext *s, AVPacket *pkt)
     return ff_subtitles_queue_read_packet(&webvtt->q, pkt);
 }
 
+static int webvtt_read_seek(AVFormatContext *s, int stream_index,
+                            int64_t min_ts, int64_t ts, int64_t max_ts, int flags)
+{
+    WebVTTContext *webvtt = s->priv_data;
+    return ff_subtitles_queue_seek(&webvtt->q, s, stream_index,
+                                   min_ts, ts, max_ts, flags);
+}
+
 static int webvtt_read_close(AVFormatContext *s)
 {
     WebVTTContext *webvtt = s->priv_data;
@@ -182,7 +170,7 @@ AVInputFormat ff_webvtt_demuxer = {
     .read_probe     = webvtt_probe,
     .read_header    = webvtt_read_header,
     .read_packet    = webvtt_read_packet,
+    .read_seek2     = webvtt_read_seek,
     .read_close     = webvtt_read_close,
-    .flags          = AVFMT_GENERIC_INDEX,
     .extensions     = "vtt",
 };

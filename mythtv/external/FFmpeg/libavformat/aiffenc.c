@@ -25,12 +25,29 @@
 #include "aiff.h"
 #include "avio_internal.h"
 #include "isom.h"
+#include "rawenc.h"
 
 typedef struct {
     int64_t form;
     int64_t frames;
     int64_t ssnd;
 } AIFFOutputContext;
+
+static void put_meta(AVFormatContext *s, const char *key, uint32_t id)
+{
+    AVDictionaryEntry *tag;
+    AVIOContext *pb = s->pb;
+
+    if (tag = av_dict_get(s->metadata, key, NULL, 0)) {
+        int size = strlen(tag->value);
+
+        avio_wl32(pb, id);
+        avio_wb32(pb, FFALIGN(size, 2));
+        avio_write(pb, tag->value, size);
+        if (size & 1)
+            avio_w8(pb, 0);
+    }
+}
 
 static int aiff_write_header(AVFormatContext *s)
 {
@@ -53,7 +70,6 @@ static int aiff_write_header(AVFormatContext *s)
     ffio_wfourcc(pb, aifc ? "AIFC" : "AIFF");
 
     if (aifc) { // compressed audio
-        enc->bits_per_coded_sample = 16;
         if (!enc->block_align) {
             av_log(s, AV_LOG_ERROR, "block align not set\n");
             return -1;
@@ -69,6 +85,11 @@ static int aiff_write_header(AVFormatContext *s)
         avio_wb32(pb, 12);
         ff_mov_write_chan(pb, enc->channel_layout);
     }
+
+    put_meta(s, "title",     MKTAG('N', 'A', 'M', 'E'));
+    put_meta(s, "author",    MKTAG('A', 'U', 'T', 'H'));
+    put_meta(s, "copyright", MKTAG('(', 'c', ')', ' '));
+    put_meta(s, "comment",   MKTAG('A', 'N', 'N', 'O'));
 
     /* Common chunk */
     ffio_wfourcc(pb, "COMM");
@@ -119,13 +140,6 @@ static int aiff_write_header(AVFormatContext *s)
     return 0;
 }
 
-static int aiff_write_packet(AVFormatContext *s, AVPacket *pkt)
-{
-    AVIOContext *pb = s->pb;
-    avio_write(pb, pkt->data, pkt->size);
-    return 0;
-}
-
 static int aiff_write_trailer(AVFormatContext *s)
 {
     AVIOContext *pb = s->pb;
@@ -171,7 +185,7 @@ AVOutputFormat ff_aiff_muxer = {
     .audio_codec       = AV_CODEC_ID_PCM_S16BE,
     .video_codec       = AV_CODEC_ID_NONE,
     .write_header      = aiff_write_header,
-    .write_packet      = aiff_write_packet,
+    .write_packet      = ff_raw_write_packet,
     .write_trailer     = aiff_write_trailer,
     .codec_tag         = (const AVCodecTag* const []){ ff_codec_aiff_tags, 0 },
 };
