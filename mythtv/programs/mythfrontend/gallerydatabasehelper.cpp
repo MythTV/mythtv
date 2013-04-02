@@ -91,7 +91,7 @@ void GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* dbList, 
 
 
 
-/** \fn     GalleryDatabaseHelper::LoadParentDirectory(QMap<QString, ImageMetadata *>*)
+/** \fn     GalleryDatabaseHelper::LoadDirectories(QMap<QString, ImageMetadata *>*)
  *  \brief  Loads all directory information from the database
  *  \param  dbList The list where the results are stored
  *  \return void
@@ -124,7 +124,7 @@ void GalleryDatabaseHelper::LoadDirectories(QMap<QString, ImageMetadata *>* dbLi
 
 
 
-/** \fn     GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* , int)
+/** \fn     GalleryDatabaseHelper::LoadDirectories(QList<ImageMetadata *>* , int)
  *  \brief  Loads all subdirectory information from the database for a given directory
  *  \param  dbList The list where the results are stored
  *  \param  parentId The id of the given directory
@@ -467,7 +467,7 @@ void GalleryDatabaseHelper::UpdateData(ImageMetadata *im)
 
 
 
-/** \fn     GalleryDatabaseHelper::InsertData(ImageMetadata *)
+/** \fn     GalleryDatabaseHelper::RemoveData(ImageMetadata *)
  *  \brief  Deletes either a directory or file from the database
  *  \param  im Information of the given item
  *  \return void

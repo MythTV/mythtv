@@ -39,7 +39,7 @@ ImageMetadata::ImageMetadata()
 
 
 
-/** \fn     DataMap::~DataMap()
+/** \fn     ImageMetadata::~ImageMetadata()
  *  \brief  Destructor
  *  \return void
  */
