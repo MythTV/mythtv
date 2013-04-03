@@ -116,44 +116,12 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
     return chaninfo;
 }
 
-static int TimezoneToInt (QString timezone)
+static void fromXMLTVDate(QString &timestr, QDateTime &dt)
 {
-    // we signal an error by setting it invalid (> 840min = 14hr)
-    int result = 841;
+    // The XMLTV spec requires dates to either be in UTC/GMT or to specify a
+    // valid timezone. We are sticking to the spec and require all grabbers
+    // to comply.
 
-    if (timezone.toUpper() == "UTC" || timezone.toUpper() == "GMT")
-        return 0;
-
-    if (timezone.length() == 5)
-    {
-        bool ok;
-
-        result = timezone.mid(1,2).toInt(&ok, 10);
-
-        if (!ok)
-            result = 841;
-        else
-        {
-            result *= 60;
-
-            int min = timezone.right(2).toInt(&ok, 10);
-
-            if (!ok)
-                result = 841;
-            else
-            {
-                result += min;
-                if (timezone.left(1) == "-")
-                    result *= -1;
-            }
-        }
-    }
-    return result;
-}
-
-// localTimezoneOffset: 841 == "None", -841 == "Auto", other == fixed offset
-static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 841)
-{
     if (timestr.isEmpty())
     {
         LOG(VB_XMLTV, LOG_ERR, "Found empty Date/Time in XMLTV data, ignoring");
@@ -162,62 +130,76 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 
     QStringList split = timestr.split(" ");
     QString ts = split[0];
-    bool ok;
-    int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+    QDateTime tmpDT;
+    tmpDT.setTimeSpec(Qt::LocalTime);
 
+    // UTC/GMT, just strip
+    if (ts.endsWith('Z'))
+        ts.truncate(ts.length()-1);
+    
     if (ts.length() == 14)
     {
-        year  = ts.left(4).toInt(&ok, 10);
-        month = ts.mid(4,2).toInt(&ok, 10);
-        day   = ts.mid(6,2).toInt(&ok, 10);
-        hour  = ts.mid(8,2).toInt(&ok, 10);
-        min   = ts.mid(10,2).toInt(&ok, 10);
-        sec   = ts.mid(12,2).toInt(&ok, 10);
+        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmmss");
     }
     else if (ts.length() == 12)
     {
-        year  = ts.left(4).toInt(&ok, 10);
-        month = ts.mid(4,2).toInt(&ok, 10);
-        day   = ts.mid(6,2).toInt(&ok, 10);
-        hour  = ts.mid(8,2).toInt(&ok, 10);
-        min   = ts.mid(10,2).toInt(&ok, 10);
-        sec   = 0;
+        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmm");
     }
-    else
+    else if (ts.length() == 8)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyyMMdd");
+    }
+    else if (ts.length() == 6)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyyMM");
+    }
+    else if (ts.length() == 4)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyy");
+    }
+
+    if (!tmpDT.isValid())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Ignoring unknown timestamp format: %1")
                 .arg(ts));
         return;
     }
-
-    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec),
-                   Qt::LocalTime);
-
-    if ((split.size() > 1) && (localTimezoneOffset <= 840))
+    
+    if (split.size() > 1)
     {
         QString tmp = split[1].trimmed();
-
-        int ts_offset = TimezoneToInt(tmp);
-        if (abs(ts_offset) > 840)
+        
+        // These shouldn't be required and they aren't ISO 8601 but the
+        // xmltv spec mentions these and just these so handle them just in
+        // case
+        if (tmp == "GMT" || tmp == "UTC")
+            tmp = "+0000";
+        else if (tmp == "BST")
+            tmp = "+0100";
+        
+        // While this seems like a hack, it's better than what was done before
+        QString isoDateString = QString("%1 %2").arg(tmpDT.toString(Qt::ISODate))
+                                                .arg(tmp);
+        dt = QDateTime::fromString(isoDateString, Qt::ISODate).toUTC();
+    }
+    
+    if (!dt.isValid())
+    {
+        static bool warned_once_on_implicit_utc = false;
+        if (!warned_once_on_implicit_utc)
         {
-            ts_offset = 0;
-            localTimezoneOffset = 841;
+            LOG(VB_XMLTV, LOG_ERR, "No explicit time zone found, "
+                "guessing implicit UTC! Please consider enhancing "
+                "the guide source to provice explicit UTC or local "
+                "time instead.");
+            warned_once_on_implicit_utc = true;
         }
-        dt = dt.addSecs(-ts_offset * 60);
+        dt = tmpDT;
     }
 
-    if (localTimezoneOffset < -840)
-    {
-        dt.setTimeSpec(Qt::UTC);
-    }
-    else if (abs(localTimezoneOffset) <= 840)
-    {
-        dt = dt.addSecs(localTimezoneOffset * 60 );
-    }
-
-    dt = dt.toUTC();
-
+    dt.setTimeSpec(Qt::UTC);
+    
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
@@ -286,19 +268,18 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
-ProgInfo *XMLTVParser::parseProgram(
-    QDomElement &element, int localTimezoneOffset)
+ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
     QString uniqueid, season, episode;
     int dd_progid_done = 0;
     ProgInfo *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");
-    fromXMLTVDate(text, pginfo->starttime, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->starttime);
     pginfo->startts = text;
 
     text = element.attribute("stop", "");
-    fromXMLTVDate(text, pginfo->endtime, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->endtime);
     pginfo->endts = text;
 
     text = element.attribute("channel", "");
@@ -422,8 +403,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 if (!prevdate.isEmpty())
                 {
                     QDateTime date;
-                    fromXMLTVDate(prevdate, date,
-                                localTimezoneOffset);
+                    fromXMLTVDate(prevdate, date);
                     pginfo->originalairdate = date.date();
                 }
             }
@@ -610,28 +590,6 @@ bool XMLTVParser::parseFile(
 
     f.close();
 
-    // now we calculate the localTimezoneOffset, so that we can fix
-    // the programdata if needed
-    QString config_offset = gCoreContext->GetSetting("TimeOffset", "None");
-    // we disable this feature by setting it invalid (> 840min = 14hr)
-    int localTimezoneOffset = 841;
-
-    if (config_offset == "Auto")
-    {
-        // we mark auto with the -ve of the disable magic number
-        localTimezoneOffset = -841;
-    }
-    else if (config_offset != "None")
-    {
-        localTimezoneOffset = TimezoneToInt(config_offset);
-        if (abs(localTimezoneOffset) > 840)
-        {
-            LOG(VB_XMLTV, LOG_ERR, QString("Ignoring invalid TimeOffset %1")
-                .arg(config_offset));
-            localTimezoneOffset = 841;
-        }
-    }
-
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
@@ -664,7 +622,7 @@ bool XMLTVParser::parseFile(
             }
             else if (e.tagName() == "programme")
             {
-                ProgInfo *pginfo = parseProgram(e, localTimezoneOffset);
+                ProgInfo *pginfo = parseProgram(e);
 
                 if (pginfo->startts == pginfo->endts)
                 {

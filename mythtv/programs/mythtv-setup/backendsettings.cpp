@@ -273,90 +273,6 @@ static HostLineEdit *MiscStatusScript()
     return he;
 }
 
-static void init_time_offsets(GlobalComboBox *gc)
-{
-    gc->addSelection("None");
-    gc->addSelection("Auto");
-    gc->addSelection("+0030");
-    gc->addSelection("+0100");
-    gc->addSelection("+0130");
-    gc->addSelection("+0200");
-    gc->addSelection("+0230");
-    gc->addSelection("+0300");
-    gc->addSelection("+0330");
-    gc->addSelection("+0400");
-    gc->addSelection("+0430");
-    gc->addSelection("+0500");
-    gc->addSelection("+0530");
-    gc->addSelection("+0600");
-    gc->addSelection("+0630");
-    gc->addSelection("+0700");
-    gc->addSelection("+0730");
-    gc->addSelection("+0800");
-    gc->addSelection("+0830");
-    gc->addSelection("+0900");
-    gc->addSelection("+0930");
-    gc->addSelection("+1000");
-    gc->addSelection("+1030");
-    gc->addSelection("+1100");
-    gc->addSelection("+1130");
-    gc->addSelection("+1200");
-    gc->addSelection("-1100");
-    gc->addSelection("-1030");
-    gc->addSelection("-1000");
-    gc->addSelection("-0930");
-    gc->addSelection("-0900");
-    gc->addSelection("-0830");
-    gc->addSelection("-0800");
-    gc->addSelection("-0730");
-    gc->addSelection("-0700");
-    gc->addSelection("-0630");
-    gc->addSelection("-0600");
-    gc->addSelection("-0530");
-    gc->addSelection("-0500");
-    gc->addSelection("-0430");
-    gc->addSelection("-0400");
-    gc->addSelection("-0330");
-    gc->addSelection("-0300");
-    gc->addSelection("-0230");
-    gc->addSelection("-0200");
-    gc->addSelection("-0130");
-    gc->addSelection("-0100");
-    gc->addSelection("-0030");
-}
-
-static GlobalComboBox *TimeOffset()
-{
-    GlobalComboBox *gc = new GlobalComboBox("TimeOffset");
-    gc->setLabel(QObject::tr("Your local time zone (for XMLTV)"));
-    init_time_offsets(gc);
-    QString helptext = QObject::tr(
-        "Used if the XMLTV data comes from a different time zone than your "
-        "own and modifies the date and time before insertion into the "
-        "database. 'Auto' converts the XMLTV time to local time using your "
-        "computer's time zone. "
-        "'None' ignores the XMLTV time zone, interpreting times as local.");
-    gc->setHelpText(helptext);
-    return gc;
-};
-
-#if 0
-static GlobalComboBox *EITTimeOffset()
-{
-    GlobalComboBox *gc = new GlobalComboBox("EITTimeOffset");
-    gc->setLabel(QObject::tr("Time offset for EIT listings"));
-    init_time_offsets(gc);
-    gc->setValue(1);
-    QString helptext = QObject::tr(
-        "Adjust the relative time zone of the EIT EPG data. "
-        "'Auto' converts the EIT time to local time using your "
-        "computer's time zone. "
-        "'None' ignores the EIT time zone, interpreting times as local.");
-    gc->setHelpText(helptext);
-    return gc;
-};
-#endif
-
 static GlobalSpinBox *EITTransportTimeout()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("EITTransportTimeout", 1, 15, 1);
@@ -918,7 +834,6 @@ BackendSettings::BackendSettings() {
     locale->addChild(TVFormat());
     locale->addChild(VbiFormat());
     locale->addChild(FreqTable());
-    locale->addChild(TimeOffset());
     addChild(locale);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
@@ -947,7 +862,6 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);
     group2a1->setLabel(QObject::tr("EIT Scanner Options"));
-    //group2a1->addChild(EITTimeOffset());
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITCrawIdleStart());
     addChild(group2a1);

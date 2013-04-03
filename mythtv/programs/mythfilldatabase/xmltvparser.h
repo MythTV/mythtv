@@ -19,7 +19,7 @@ class XMLTVParser
     XMLTVParser();
 
     ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
-    ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset);
+    ProgInfo *parseProgram(QDomElement &element);
     bool parseFile(QString filename, ChannelInfoList *chanlist,
                    QMap<QString, QList<ProgInfo> > *proglist);
 
