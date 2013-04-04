@@ -261,7 +261,8 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    switch (m_audioDec->sample_fmt)
+    AVSampleFormat format_pack = av_get_packed_sample_fmt(m_audioDec->sample_fmt);
+    switch (format_pack)
     {
         case AV_SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
         case AV_SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
