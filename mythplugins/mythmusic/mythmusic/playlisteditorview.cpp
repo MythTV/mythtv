@@ -31,6 +31,8 @@ MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
     m_action = action;
     m_showArrow = showArrow;
 
+    SetSortText(name.toLower());
+
     if (!action.isEmpty() && !action.isNull())
         setSelectable(true);
 

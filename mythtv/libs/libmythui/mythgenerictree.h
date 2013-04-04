@@ -22,11 +22,13 @@ class MUI_PUBLIC MythGenericTree
 
   public:
     MythGenericTree(const QString &a_string = "", int an_int = 0,
-                bool selectable_flag = false);
+                    bool selectable_flag = false);
     virtual ~MythGenericTree();
 
     MythGenericTree *addNode(const QString &a_string, int an_int = 0,
-                         bool selectable_flag = false, bool visible = true);
+                             bool selectable_flag = false, bool visible = true);
+    MythGenericTree *addNode(const QString &a_string, const QString &sortText = "",
+                             int an_int = 0, bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(MythGenericTree *child);
 
     /// Detach this node/branch from it's parent without deleting it, it can
@@ -67,6 +69,9 @@ class MUI_PUBLIC MythGenericTree
                  const QString &state="");
     void SetTextFromMap(InfoMap &infoMap, const QString &state="");
     QString GetText(const QString &name="") const;
+
+    QString GetSortText() const { return m_sortText; }
+    void SetSortText(const QString &text) { m_sortText = text; }
 
     void SetImage(const QString &filename, const QString &name="");
     void SetImageFromMap(InfoMap &infoMap);
@@ -110,6 +115,7 @@ class MUI_PUBLIC MythGenericTree
     void reorderSubnodes(void);
 
     QString m_text;
+    QString m_sortText;
     QMap<QString, TextProperties> m_strings;
     InfoMap m_imageFilenames;
     InfoMap m_states;

@@ -19,7 +19,7 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
 
     static bool sortByString(MythGenericTree *one, MythGenericTree *two)
     {
-        return one->GetText().toLower() < two->GetText().toLower();
+        return one->GetSortText() < two->GetSortText();
     }
 
     static int sortBySelectable(MythGenericTree *one, MythGenericTree *two)
@@ -67,6 +67,8 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
     m_selectedSubnode = NULL;
 
     m_text = a_string;
+    m_sortText = a_string;
+
     m_int = an_int;
     m_data = 0;
 
@@ -85,8 +87,19 @@ MythGenericTree* MythGenericTree::addNode(const QString &a_string, int an_int,
                                   bool selectable_flag, bool visible)
 {
     MythGenericTree *new_node = new MythGenericTree(a_string.simplified(),
-                                            an_int, selectable_flag);
+                                                    an_int, selectable_flag);
     new_node->SetVisible(visible);
+    return addNode(new_node);
+}
+
+MythGenericTree* MythGenericTree::addNode(const QString &a_string,
+                                  const QString &sortText, int an_int, bool
+                                  selectable_flag, bool visible)
+{
+    MythGenericTree *new_node = new MythGenericTree(a_string.simplified(),
+                                                    an_int, selectable_flag);
+    new_node->SetVisible(visible);
+    new_node->SetSortText(sortText);
 
     return addNode(new_node);
 }
@@ -514,7 +527,10 @@ void MythGenericTree::SetText(const QString &text, const QString &name,
         m_strings.insert(name, textprop);
     }
     else
+    {
         m_text = text;
+        m_sortText = text;
+    }
 }
 
 void MythGenericTree::SetTextFromMap(InfoMap &infoMap,
