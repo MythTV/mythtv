@@ -1,0 +1,39 @@
+<tv generator-info-name="MythTV XMLTV Parser Test">
+
+  <!-- BST isn't valid ISO 8601 but is explicitly included in the XMLTV DTD so we handle it anyway -->
+  <programme start="201304051900 BST" stop="201304052000Z" channel="test1.com">
+    <title lang="en">First</title>
+    <desc lang="en">
+       This is the first programme. It should be two hours long (1800-2000 UTC/GMT). It should belong to 'test1.com'.
+    </desc>
+  </programme>
+
+  <programme start="201304052200 +02:00" stop="201304052200 +01:00" channel="test1.com">
+    <title lang="en">Second</title>
+    <desc lang="en">
+       This is the second programme. It should be one hour long (2000-2100 UTC/GMT). It should belong to 'test1.com'. 
+    </desc>
+  </programme>
+
+  <programme start="201304051800 -0300" stop="201304060930 +1200" channel="test1.com">
+    <title lang="en">Third</title>
+    <desc lang="en">
+       This is the third programme. It should be a half hour long (2100-2130 UTC/GMT). It should belong to 'test1.com'. 
+    </desc>
+  </programme>
+  
+  <programme start="201304052130" stop="20130405220000" channel="test1.com"> <!-- Dates without an offset are treated as UTC/GMT -->
+    <title lang="en">Fourth</title>
+    <desc lang="en">
+       This is the fourth programme. It should be a half hour long (2130-2200 UTC/GMT). It should belong to 'test1.com'. 
+    </desc>
+  </programme>
+  
+  <programme start="201304051700 -05" stop="201304060345 +05" channel="test1.com">
+    <title lang="en">Fifth</title>
+    <desc lang="en">
+       This is the fifth programme. It should be forty five minutes long (2200-2245 UTC/GMT). It should belong to 'test1.com'. 
+    </desc>
+  </programme>
+
+</tv>
