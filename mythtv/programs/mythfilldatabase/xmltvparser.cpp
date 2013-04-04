@@ -604,8 +604,6 @@ bool XMLTVParser::parseFile(
 
     QString aggregatedTitle;
     QString aggregatedDesc;
-    QString groupingTitle;
-    QString groupingDesc;
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -626,31 +624,15 @@ bool XMLTVParser::parseFile(
 
                 if (pginfo->startts == pginfo->endts)
                 {
-                    /* Not a real program : just a grouping marker */
-                    if (!pginfo->title.isEmpty())
-                        groupingTitle = pginfo->title + " : ";
-
-                    if (!pginfo->description.isEmpty())
-                        groupingDesc = pginfo->description + " : ";
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
+                                                        "identical start and end "
+                                                        "times, skipping")
+                                                        .arg(pginfo->title));
                 }
                 else
                 {
                     if (pginfo->clumpidx.isEmpty())
-                    {
-                        if (!groupingTitle.isEmpty())
-                        {
-                            pginfo->title.prepend(groupingTitle);
-                            groupingTitle.clear();
-                        }
-
-                        if (!groupingDesc.isEmpty())
-                        {
-                            pginfo->description.prepend(groupingDesc);
-                            groupingDesc.clear();
-                        }
-
                         (*proglist)[pginfo->channel].push_back(*pginfo);
-                    }
                     else
                     {
                         /* append all titles/descriptions from one clump */
