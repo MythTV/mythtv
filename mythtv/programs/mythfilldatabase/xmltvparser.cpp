@@ -593,14 +593,7 @@ bool XMLTVParser::parseFile(
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
-
-    QUrl sourceUrl(docElem.attribute("source-info-url", ""));
-    if (sourceUrl.toString() == "http://labs.zap2it.com/")
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Don't use tv_grab_na_dd, use the"
-                                 "internal datadirect grabber.");
-        exit(GENERIC_EXIT_SETUP_ERROR);
-    }
+    //QUrl sourceUrl(docElem.attribute("source-info-url", ""));
 
     QString aggregatedTitle;
     QString aggregatedDesc;
