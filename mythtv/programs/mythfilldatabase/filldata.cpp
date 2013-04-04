@@ -394,14 +394,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber).arg(configfile).arg(filename);
 
-    // The one concession to grabber specific behaviour.
-    // Will be removed when the grabber allows.
-    if (xmltv_grabber == "tv_grab_jp")
-    {
-        command += QString(" --enable-readstr");
-        xmltv_parser.isJapan = true;
-    }
-    else if (source.xmltvgrabber_prefmethod != "allatonce")
+
+    if (source.xmltvgrabber_prefmethod != "allatonce")
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared

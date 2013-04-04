@@ -26,7 +26,7 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
-XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
+XMLTVParser::XMLTVParser() : current_year(0)
 {
     current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
@@ -100,7 +100,7 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 {
                     chaninfo->name = info.text();
                 }
-                else if (isJapan && chaninfo->callsign.isEmpty())
+                else if (chaninfo->callsign.isEmpty())
                 {
                     chaninfo->callsign = info.text();
                 }
@@ -303,16 +303,13 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         {
             if (info.tagName() == "title")
             {
-                if (isJapan)
+                if (info.attribute("lang") == "ja_JP")
                 {
-                    if (info.attribute("lang") == "ja_JP")
-                    {
-                        pginfo->title = getFirstText(info);
-                    }
-                    else if (info.attribute("lang") == "ja_JP@kana")
-                    {
-                        pginfo->title_pronounce = getFirstText(info);
-                    }
+                    pginfo->title = getFirstText(info);
+                }
+                else if (info.attribute("lang") == "ja_JP@kana")
+                {
+                    pginfo->title_pronounce = getFirstText(info);
                 }
                 else if (pginfo->title.isEmpty())
                 {

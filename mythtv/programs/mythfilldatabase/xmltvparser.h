@@ -23,9 +23,6 @@ class XMLTVParser
     bool parseFile(QString filename, ChannelInfoList *chanlist,
                    QMap<QString, QList<ProgInfo> > *proglist);
 
-  public:
-    bool isJapan;
-
   private:
     unsigned int current_year;
 };
