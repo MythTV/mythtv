@@ -140,45 +140,57 @@ static const struct hdhomerun_channelmap_range_t hdhomerun_channelmap_range_us_i
 static const struct hdhomerun_channelmap_record_t hdhomerun_channelmap_table[] = {
 	{"au-bcast", hdhomerun_channelmap_range_au_bcast, "au-bcast",               "AU"},
 	{"au-cable", hdhomerun_channelmap_range_eu_cable, "au-cable",               "AU"},
-	{"eu-bcast", hdhomerun_channelmap_range_eu_bcast, "eu-bcast",               "EU PA"},
-	{"eu-cable", hdhomerun_channelmap_range_eu_cable, "eu-cable",               "EU"},
+	{"eu-bcast", hdhomerun_channelmap_range_eu_bcast, "eu-bcast",               NULL},
+	{"eu-cable", hdhomerun_channelmap_range_eu_cable, "eu-cable",               NULL},
 	{"tw-bcast", hdhomerun_channelmap_range_us_bcast, "tw-bcast",               "TW"},
 	{"tw-cable", hdhomerun_channelmap_range_us_cable, "tw-cable",               "TW"},
 
 	{"kr-bcast", hdhomerun_channelmap_range_us_bcast, "kr-bcast",               "KR"},
 	{"kr-cable", hdhomerun_channelmap_range_kr_cable, "kr-cable",               "KR"},
-	{"us-bcast", hdhomerun_channelmap_range_us_bcast, "us-bcast",               "CA US"},
-	{"us-cable", hdhomerun_channelmap_range_us_cable, "us-cable us-hrc us-irc", "CA PA US"},
-	{"us-hrc",   hdhomerun_channelmap_range_us_hrc  , "us-cable us-hrc us-irc", "CA PA US"},
-	{"us-irc",   hdhomerun_channelmap_range_us_irc,   "us-cable us-hrc us-irc", "CA PA US"},
+	{"us-bcast", hdhomerun_channelmap_range_us_bcast, "us-bcast",               NULL},
+	{"us-cable", hdhomerun_channelmap_range_us_cable, "us-cable us-hrc us-irc", NULL},
+	{"us-hrc",   hdhomerun_channelmap_range_us_hrc  , "us-cable us-hrc us-irc", NULL},
+	{"us-irc",   hdhomerun_channelmap_range_us_irc,   "us-cable us-hrc us-irc", NULL},
 
 	{NULL,       NULL,                                NULL,                     NULL}
 };
 
-const char *hdhomerun_channelmap_get_channelmap_from_country_source(const char *countrycode, const char *source)
+const char *hdhomerun_channelmap_get_channelmap_from_country_source(const char *countrycode, const char *source, const char *supported)
 {
-	bool_t country_found = FALSE;
+	const char *default_result = NULL;
 
 	const struct hdhomerun_channelmap_record_t *record = hdhomerun_channelmap_table;
 	while (record->channelmap) {
+		/* Ignore records that do not match the requested source. */
+		if (!strstr(record->channelmap, source)) {
+			record++;
+			continue;
+		}
+
+		/* Ignore records that are not supported by the hardware. */
+		if (!strstr(supported, record->channelmap)) {
+			record++;
+			continue;
+		}
+
+		/* If this record is the default result then remember it and keep searching. */
+		if (!record->countrycodes) {
+			default_result = record->channelmap;
+			record++;
+			continue;
+		}
+
+		/* Ignore records that have a countrycode filter and do not match. */
 		if (!strstr(record->countrycodes, countrycode)) {
 			record++;
 			continue;
 		}
 
-		if (strstr(record->channelmap, source)) {
-			return record->channelmap;
-		}
-
-		country_found = TRUE;
-		record++;
+		/* Record found with exact match for source and countrycode. */
+		return record->channelmap;
 	}
 
-	if (!country_found) {
-		return hdhomerun_channelmap_get_channelmap_from_country_source("EU", source);
-	}
-
-	return NULL;
+	return default_result;
 }
 
 const char *hdhomerun_channelmap_get_channelmap_scan_group(const char *channelmap)

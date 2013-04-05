@@ -60,6 +60,7 @@ struct hdhomerun_channelscan_t *channelscan_create(struct hdhomerun_device_t *hd
 
 void channelscan_destroy(struct hdhomerun_channelscan_t *scan)
 {
+	hdhomerun_channel_list_destroy(scan->channel_list);
 	free(scan);
 }
 
