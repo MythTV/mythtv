@@ -90,6 +90,7 @@ void msleep_minimum(uint64_t ms)
 	}
 }
 
+#if !defined(PTHREAD_H)
 int pthread_create(pthread_t *tid, void *attr, LPTHREAD_START_ROUTINE start, void *arg)
 {
 	*tid = CreateThread(NULL, 0, start, arg, 0, NULL);
@@ -126,6 +127,7 @@ void pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
 	ReleaseMutex(*mutex);
 }
+#endif
 
 bool_t hdhomerun_vsprintf(char *buffer, char *end, const char *fmt, va_list ap)
 {
