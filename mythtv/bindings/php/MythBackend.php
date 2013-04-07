@@ -42,13 +42,13 @@ class MythBackend {
                             FATAL);
         }
 		
-		if (!isset($Backend[$host]))
-			$Backend[$host] = array();
+		if (!isset($Backends[$host]))
+			$Backends[$host] = array();
 
-        if (!isset($Backend[$host][$port]))
-            $Backend[$host][$port] = new MythBackend($host, $port);
+        if (!isset($Backends[$host][$port]))
+            $Backends[$host][$port] = new MythBackend($host, $port);
 			
-        return $Backend[$host][$port];
+        return $Backends[$host][$port];
     }
 
     function __construct($host, $port = null) {
