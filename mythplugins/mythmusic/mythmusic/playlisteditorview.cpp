@@ -282,13 +282,15 @@ void PlaylistEditorView::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Replace Tracks"))
             {
+                m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                doUpdatePlaylist();
+                doUpdatePlaylist(false);
             }
             else if (resulttext == tr("Add Tracks"))
             {
+                m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist();
+                doUpdatePlaylist(false);
             }
         }
         else if (resultid == "playlistmenu")
@@ -316,12 +318,12 @@ void PlaylistEditorView::customEvent(QEvent *event)
             {
                 m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                doUpdatePlaylist();
+                doUpdatePlaylist(false);
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist();
+                doUpdatePlaylist(false);
             }
         }
     }
@@ -450,6 +452,89 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
             MythUIButtonListItem *item = m_playlistTree->GetItemCurrent();
             if (item)
                 treeItemClicked(item);
+        }
+        else if ((action == "PLAY") && (GetFocusWidget() == m_playlistTree))
+        {
+            MythUIButtonListItem *item = m_playlistTree->GetItemCurrent();
+            if (item)
+            {
+                 MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
+                 MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
+
+                 if (mnode)
+                 {
+                     if (mnode->getAction() == "trackid")
+                     {
+                         handled = false;
+                     }
+                     else if ((mnode->getAction() == "playlists") || (mnode->getAction() == "smartplaylists") || (mnode->getAction() == "smartplaylistcategory"))
+                     {
+                         handled = false;
+                     }
+                     else if (mnode->getAction() == "playlist")
+                     {
+                         // get list of tracks to add
+                         int playlistID = mnode->getInt();
+                         Playlist *playlist = gMusicData->all_playlists->getPlaylist(playlistID);
+
+                         if (playlist)
+                         {
+                             SongList songlist = playlist->getSongs();
+                             if (songlist.count() > 0)
+                             {
+                                 m_songList.clear();
+                                 for (int x = 0; x < songlist.count(); x++)
+                                 {
+                                     m_songList.append(songlist.at(x)->ID());
+                                 }
+                             }
+                             else
+                             {
+                                 handled = false;
+                             }
+                         }
+                     }
+                     else if (mnode->getAction() == "smartplaylist")
+                     {
+                         // add the selected smart playlist's tracks to the song list
+                         QList<MythGenericTree*> *children = mnode->getAllChildren();
+                         if (children->count() > 0)
+                         {
+                             m_songList.clear();
+                             for (int x = 0; x < children->count(); x++)
+                             {
+                                 MythGenericTree *childnode = children->at(x);
+                                 m_songList.append(childnode->getInt());
+                             }
+                         }
+                         else
+                         {
+                             handled = false;
+                         }
+                     }
+                     else
+                     {
+                         m_songList.clear();
+                         MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (mnode->GetData());
+                         for (int x = 0; x < tracks->count(); x++)
+                         {
+                             Metadata *mdata = tracks->at(x);
+                             if (mdata)
+                                 m_songList.append((int)mdata->ID());
+                         }
+                     }
+                     if (handled)
+                     {
+                         m_playlistOptions.playPLOption = PL_FIRST;
+                         m_playlistOptions.insertPLOption = PL_REPLACE;
+                         doUpdatePlaylist(true);
+                     }
+                     else
+                     {
+                         handled = false;
+                     }
+                 }
+             }
         }
         else
             handled = false;
@@ -865,6 +950,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
     if (node->getAction() == "all tracks")
     {
         QMap<QString, int> map;
+        QStringList list;
 
         for (int x = 0; x < tracks->count(); x++)
         {

@@ -96,7 +96,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void byGenre(void);
     void byYear(void);
     void byTitle(void);
-    void doUpdatePlaylist(void);
+    void doUpdatePlaylist(bool startPlayback);
 
   protected:
     void showExitMenu(void);

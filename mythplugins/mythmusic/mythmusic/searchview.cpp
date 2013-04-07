@@ -238,7 +238,7 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
             else
                 handled = false;
         }
-        else if (action == "PLAY" || action == "PAUSE")
+        else if (action == "PLAY")
         {
             if (GetFocusWidget() == m_tracksList)
             {

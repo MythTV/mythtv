@@ -572,8 +572,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
             m_name = query.value(1).toString();
             rawSonglist = query.value(2).toString();
         }
-        if (m_name == "default_playlist_storage")
-            m_name = QObject::tr("Default Playlist");
     }
     else
     {
