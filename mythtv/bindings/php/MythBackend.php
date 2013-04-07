@@ -41,9 +41,13 @@ class MythBackend {
                             ."need to check your mythweb.conf file or re-run mythtv-setup",
                             FATAL);
         }
+		
+		if (!isset($Backend[$host]))
+			$Backend[$host] = array();
 
         if (!isset($Backend[$host][$port]))
             $Backend[$host][$port] = new MythBackend($host, $port);
+			
         return $Backend[$host][$port];
     }
 
