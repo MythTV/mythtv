@@ -31,6 +31,9 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     int64_t  GetEndPTS()           const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
     int64_t  GetSeqEndPTS()        const { return (int64_t)m_pci.pci_gi.vobu_se_e_ptm; }
     uint32_t GetLBA()              const { return m_pci.pci_gi.nv_pck_lbn;             }
+    int      GetNumFrames()        const;
+    int      GetNumFramesPresent() const;
+    int      GetFPS()              const { return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25; }
 
   protected:
     MythDVDContext();
@@ -93,8 +96,6 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool PGCLengthChanged(void);
     bool CellChanged(void);
     virtual bool IsInStillFrame(void)   const { return m_still > 0;             }
-    bool NeedsStillFrame(void) { return IsInStillFrame() || NewSequence(); }
-    bool NewSequence(bool new_sequence = false);
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
@@ -198,7 +199,6 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int64_t        m_endPts;
     int64_t        m_timeDiff;
 
-    bool           m_newSequence;
     int            m_still;
     int            m_lastStill;
     bool           m_audioStreamsChanged;

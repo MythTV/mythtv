@@ -3016,11 +3016,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         float aspect_override = -1.0f;
         if (ringBuffer->IsDVD())
-        {
-            if (start_code_state == SEQ_END_CODE)
-                ringBuffer->DVD()->NewSequence(true);
             aspect_override = ringBuffer->DVD()->GetAspectOverride();
-        }
 
         if (start_code_state >= SLICE_MIN && start_code_state <= SLICE_MAX)
             continue;
@@ -3315,9 +3311,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     {
         context->reordered_opaque = pkt->pts;
         ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
-        // Reparse it to not drop the DVD still frame
-        if (ringBuffer->IsDVD() && ringBuffer->DVD()->NeedsStillFrame())
-            ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
     }
     avcodeclock->unlock();
 

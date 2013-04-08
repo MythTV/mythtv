@@ -87,6 +87,31 @@ MythDVDContext::~MythDVDContext()
 {
 }
 
+int MythDVDContext::GetNumFrames() const
+{
+    return ((GetEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
+}
+
+int MythDVDContext::GetNumFramesPresent() const
+{
+    int frames = 0;
+
+    if (GetSeqEndPTS())
+    {
+        // Sequence end PTS is set.  This means that video frames
+        // are not present all the way to 'End PTS'
+        frames = ((GetSeqEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
+    }
+    else
+    if (m_dsi.dsi_gi.vobu_1stref_ea != 0)
+    {
+        // At least one video frame is present
+        frames = GetNumFrames();
+    }
+
+    return frames;
+}
+
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     RingBuffer(kRingBuffer_DVD),
     m_dvdnav(NULL),     m_dvdBlockReadBuf(NULL),
@@ -100,7 +125,6 @@ DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
     m_titleParts(0),    m_gotStop(false), m_currentAngle(0),
     m_currentTitleAngleCount(0),
     m_endPts(0),        m_timeDiff(0),
-    m_newSequence(false),
     m_still(0), m_lastStill(0),
     m_audioStreamsChanged(false),
     m_dvdWaiting(false),
@@ -2096,21 +2120,4 @@ bool DVDRingBuffer::SwitchAngle(uint angle)
         return true;
     }
     return false;
-}
-
-bool DVDRingBuffer::NewSequence(bool new_sequence)
-{
-    bool result = false;
-    if (new_sequence)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "New sequence");
-        m_newSequence = true;
-        return result;
-    }
-
-    result = m_newSequence && m_inMenu;
-    m_newSequence = false;
-    if (result)
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Asking for still frame");
-    return result;
 }

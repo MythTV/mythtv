@@ -36,6 +36,8 @@ class AvFormatDecoderDVD : public AvFormatDecoder
 
     MythDVDContext*        m_curContext;
     QList<MythDVDContext*> m_contextList;
+    AVPacket*              m_lastVideoPkt;
+    int                    m_framesReq;
 };
 
 #endif // AVFORMATDECODERDVD_H

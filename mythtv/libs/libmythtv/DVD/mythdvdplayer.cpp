@@ -177,19 +177,6 @@ bool MythDVDPlayer::VideoLoop(void)
             return !IsErrored();
         }
 
-        // we need a custom presentation method for still frame menus with audio
-        if (player_ctx->buffer->DVD()->IsInMenu() &&
-            !player_ctx->buffer->DVD()->IsInStillFrame())
-        {
-            // ensure we refresh the pause frame
-            if (!dvd_stillframe_showing)
-                needNewPauseFrame = true;
-            RefreshPauseFrame();
-            dvd_stillframe_showing = true;
-            DisplayLastFrame();
-            return !IsErrored();
-        }
-
         // the still frame is treated as a pause frame
         if (player_ctx->buffer->DVD()->IsInStillFrame())
         {
