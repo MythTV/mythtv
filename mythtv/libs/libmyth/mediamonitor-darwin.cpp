@@ -521,10 +521,6 @@ void MediaMonitorDarwin::StartMonitoring(void)
     if (m_Active)
         return;
 
-    if (!m_StartThread)
-        return;
-
-
     // If something (like the MythMusic plugin) stops and starts monitoring,
     // DiskArbitration would re-add the same drives several times over.
     // So, we make sure the device list is deleted.

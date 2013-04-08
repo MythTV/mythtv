@@ -171,11 +171,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
 
     if (drives.count() == 0)
     {
-        QString msg = "MediaMonitor::selectDrivePopup() ";
-        if (m_StartThread)
-            msg += "- no removable devices";
-        else
-            msg += "MonitorDrives is disabled - no device list";
+        QString msg = "MediaMonitor::selectDrivePopup() - no removable devices";
 
         LOG(VB_MEDIA, LOG_INFO, msg);
         return NULL;
@@ -304,10 +300,6 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     : QObject(par), m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
-    // MediaMonitor object is always created,
-    // but the user can elect not to actually do monitoring:
-    m_StartThread = gCoreContext->GetNumSetting("MonitorDrives");
-
     // User can specify that some devices are not monitored
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
 
@@ -316,16 +308,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     else
         m_IgnoreList = QStringList();  // Force empty list
 
-    if (m_StartThread)
-        LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
-    else
-#ifdef USING_DARWIN_DA
-        LOG(VB_MEDIA, LOG_INFO,
-                 "MediaMonitor is disabled. Eject will not work");
-#else
-        LOG(VB_MEDIA, LOG_INFO,
-                 "Creating inactive MediaMonitor and static device list");
-#endif
+    LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
     LOG(VB_MEDIA, LOG_INFO, "IgnoreDevices=" + ignore);
 
     // If any of IgnoreDevices are symlinks, also add the real device
@@ -425,9 +408,6 @@ void MediaMonitor::StartMonitoring(void)
 {
     // Sanity check
     if (m_Active)
-        return;
-
-    if (!m_StartThread)
         return;
 
     if (!m_Thread)

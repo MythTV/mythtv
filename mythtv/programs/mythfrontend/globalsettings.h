@@ -54,12 +54,6 @@ class GeneralRecPrioritiesSettings : public ConfigurationWizard
     GeneralRecPrioritiesSettings();
 };
 
-class XboxSettings : public ConfigurationWizard
-{
-  public:
-    XboxSettings();
-};
-
 class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
 {
     Q_OBJECT

@@ -2558,18 +2558,6 @@ static HostCheckBox *RealtimePriority()
     return gc;
 }
 
-static HostCheckBox *EnableMediaMon()
-{
-    HostCheckBox *gc = new HostCheckBox("MonitorDrives");
-    gc->setLabel(QObject::tr("Monitor CD/DVD") +
-                 QObject::tr(" (and other removable devices)"));
-    gc->setHelpText(QObject::tr("This enables support for monitoring your "
-                    "CD/DVD drives for new disks and launching the proper "
-                    "plugin to handle them. Requires restart."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostLineEdit *IgnoreMedia()
 {
     HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
@@ -2581,29 +2569,6 @@ static HostLineEdit *IgnoreMedia()
                                 "Requires restart."));
     return ge;
 }
-
-class MythMediaSettings : public TriggeredConfigurationGroup
-{
-  public:
-     MythMediaSettings() :
-         TriggeredConfigurationGroup(false, false, true, true)
-     {
-         setLabel(QObject::tr("MythMediaMonitor"));
-         setUseLabel(false);
-
-         Setting* enabled = EnableMediaMon();
-         addChild(enabled);
-         setTrigger(enabled);
-
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(IgnoreMedia());
-         addTarget("1", settings);
-
-         // show nothing if fillEnabled is off
-         addTarget("0", new VerticalConfigurationGroup(true));
-     };
-};
-
 
 static HostComboBox *DisplayGroupTitleSort()
 {
@@ -3142,8 +3107,7 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *media =
         new VerticalConfigurationGroup(false, true, false, false);
     media->setLabel(QObject::tr("Media Monitor"));
-    MythMediaSettings *mediaMon = new MythMediaSettings();
-    media->addChild(mediaMon);
+    media->addChild(IgnoreMedia());
     addChild(media);
 
     VerticalConfigurationGroup *remotecontrol =
