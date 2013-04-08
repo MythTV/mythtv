@@ -465,7 +465,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                  {
                      if (mnode->getAction() == "trackid")
                      {
-                         handled = false;
+                         m_songList.clear();
+                         m_songList.append(node->getInt());
                      }
                      else if ((mnode->getAction() == "playlists") || (mnode->getAction() == "smartplaylists") || (mnode->getAction() == "smartplaylistcategory"))
                      {
@@ -523,6 +524,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                                  m_songList.append((int)mdata->ID());
                          }
                      }
+
                      if (handled)
                      {
                          m_playlistOptions.playPLOption = PL_FIRST;
