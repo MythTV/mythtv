@@ -12,12 +12,33 @@
 
 #include "ringbuffer.h"
 #include "mythdate.h"
+#include "referencecounter.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
 #include "dvdnav/dvdnav.h"
+
+class MTV_PUBLIC MythDVDContext : public ReferenceCounter
+{
+    friend class DVDRingBuffer;
+
+  public:
+    virtual ~MythDVDContext();
+
+    int64_t  GetStartPTS()         const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
+    int64_t  GetEndPTS()           const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
+    int64_t  GetSeqEndPTS()        const { return (int64_t)m_pci.pci_gi.vobu_se_e_ptm; }
+    uint32_t GetLBA()              const { return m_pci.pci_gi.nv_pck_lbn;             }
+
+  protected:
+    MythDVDContext();
+
+  protected:
+    dsi_t          m_dsi;
+    pci_t          m_pci;
+};
 
 /** \class DVDRingBufferPriv
  *  \brief RingBuffer class for DVD's
@@ -78,7 +99,10 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
     void GetMenuSPUPkt(uint8_t *buf, int len, int stream_id, uint32_t startTime);
-    int64_t GetTimeDiff(void)      const { return m_timeDiff; }
+
+    uint32_t AdjustTimestamp(uint32_t timestamp);
+    int64_t AdjustTimestamp(int64_t timestamp);
+    MythDVDContext* GetDVDContext(void);
 
     // Public menu/button stuff
     AVSubtitle *GetMenuSubtitle(uint &version);
@@ -206,6 +230,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     MythDVDPlayer *m_parent;
     float          m_forcedAspect;
 
+    QMutex          m_contextLock;
+    MythDVDContext *m_context;
     processState_t  m_processState;
     dvdnav_status_t m_dvdStat;
     int32_t        m_dvdEvent;

@@ -2,12 +2,26 @@
 #include "mythdvdplayer.h"
 #include "avformatdecoderdvd.h"
 
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
+
 #define LOC QString("AFD_DVD: ")
 
 AvFormatDecoderDVD::AvFormatDecoderDVD(
     MythPlayer *parent, const ProgramInfo &pginfo, PlayerFlags flags)
   : AvFormatDecoder(parent, pginfo, flags)
+  , m_curContext(NULL)
 {
+}
+
+AvFormatDecoderDVD::~AvFormatDecoderDVD()
+{
+    if (m_curContext)
+        m_curContext->DecrRef();
+
+    while (m_contextList.size() > 0)
+        m_contextList.takeFirst()->DecrRef();
 }
 
 void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
@@ -32,22 +46,6 @@ bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
     return AvFormatDecoder::GetFrame( kDecodeAV );
 }
 
-int64_t AvFormatDecoderDVD::AdjustTimestamp(int64_t timestamp)
-{
-    int64_t newTimestamp = timestamp;
-
-    if (newTimestamp != AV_NOPTS_VALUE)
-    {
-        int64_t timediff = ringBuffer->DVD()->GetTimeDiff();
-        if (newTimestamp >= timediff)
-        {
-            newTimestamp -= timediff;
-        }
-    }
-
-    return newTimestamp;
-}
-
 int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
 {
     int result = av_read_frame(ctx, pkt);
@@ -67,11 +65,74 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
 
     if (result >= 0)
     {
-        pkt->dts = AdjustTimestamp(pkt->dts);
-        pkt->pts = AdjustTimestamp(pkt->pts);
+        pkt->dts = ringBuffer->DVD()->AdjustTimestamp(pkt->dts);
+        pkt->pts = ringBuffer->DVD()->AdjustTimestamp(pkt->pts);
     }
 
     return result;
+}
+
+void AvFormatDecoderDVD::CheckContext(int64_t pts)
+{
+    if (pts != AV_NOPTS_VALUE)
+    {
+        while (m_contextList.size() > 0 &&
+               pts >= m_contextList.first()->GetEndPTS())
+        {
+            if (m_curContext)
+                m_curContext->DecrRef();
+
+            m_curContext = m_contextList.takeFirst();
+
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("DVD context missed! lba: %1, curpts: %2, nav end pts: %3")
+                .arg(m_curContext->GetLBA())
+                .arg(pts)
+                .arg(m_curContext->GetEndPTS()));
+        }
+
+        if (m_contextList.size() > 0 &&
+            pts >= m_contextList.first()->GetStartPTS())
+        {
+            if (m_curContext)
+                m_curContext->DecrRef();
+
+            m_curContext = m_contextList.takeFirst();
+        }
+    }
+}
+
+
+bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
+{
+    int64_t pts = pkt->pts;
+
+    if (pts == AV_NOPTS_VALUE)
+        pts = pkt->dts;
+
+    CheckContext(pts);
+
+    return AvFormatDecoder::ProcessVideoPacket(stream, pkt);
+}
+
+bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
+                                           DecodeType decodetype)
+{
+    bool ret = true;
+
+    if (curstream->codec->codec_id == AV_CODEC_ID_DVD_NAV)
+    {
+        MythDVDContext* context = ringBuffer->DVD()->GetDVDContext();
+
+        if (context)
+            m_contextList.append(context);
+    }
+    else
+    {
+        ret = AvFormatDecoder::ProcessDataPacket(curstream, pkt, decodetype);
+    }
+
+    return ret;
 }
 
 void AvFormatDecoderDVD::PostProcessTracks(void)
@@ -255,7 +316,15 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
 
     // Always use the first video stream
     // (must come after ScanStreams above)
-    selectedTrack[kTrackTypeVideo].av_stream_index = 0;
+    for (uint i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream *st = ic->streams[i];
+        if (st && st->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+        {
+            selectedTrack[kTrackTypeVideo].av_stream_index = i;
+            break;
+        }
+    }
 }
 
 int AvFormatDecoderDVD::GetAudioLanguage(uint audio_index, uint stream_index)

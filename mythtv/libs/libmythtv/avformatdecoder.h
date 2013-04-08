@@ -96,7 +96,7 @@ class AvFormatDecoder : public DecoderBase
     static void GetDecoders(render_opts &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
-   ~AvFormatDecoder();
+    virtual ~AvFormatDecoder();
 
     virtual void SetEof(bool eof);
 
@@ -222,14 +222,14 @@ class AvFormatDecoder : public DecoderBase
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
     int  H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
-    bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
+    virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
     bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic);
     bool ProcessAudioPacket(AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
     bool ProcessSubtitlePacket(AVStream *stream, AVPacket *pkt);
     bool ProcessRawTextPacket(AVPacket *pkt);
-    bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
-                           DecodeType decodetype);
+    virtual bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
+                                   DecodeType decodetype);
 
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
