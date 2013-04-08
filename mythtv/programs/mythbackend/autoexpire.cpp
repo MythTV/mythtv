@@ -688,7 +688,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); ++maxIter)
     {
         query.prepare("SELECT chanid, starttime, title, progstart, progend, "
-                          "filesize, duplicate "
+                          "duplicate "
                       "FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
                       "AND recgroup NOT IN ('LiveTV', 'Deleted') "
@@ -714,7 +714,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                 QString title = query.value(2).toString();
                 QDateTime progstart = MythDate::as_utc(query.value(3).toDateTime());
                 QDateTime progend = MythDate::as_utc(query.value(4).toDateTime());
-                int duplicate = query.value(6).toInt();
+                int duplicate = query.value(5).toInt();
 
                 episodeKey = QString("%1_%2_%3")
                              .arg(chanid)
@@ -725,19 +725,24 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (!episodeParts.contains(episodeKey)) &&
                     (found > *maxIter))
                 {
-                    uint64_t spaceFreed = query.value(5).toLongLong() >> 20;
                     QString msg =
-                        QString("%1Expiring %2 MBytes for %3 at %4 => %5.  "
-                                "Too many episodes, we only want to keep %6.")
+                        QString("%1Deleting %2 at %3 => %4.  "
+                                "Too many episodes, we only want to keep %5.")
                         .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ?
                              "    " : "")
-                        .arg(spaceFreed)
                         .arg(chanid).arg(startts.toString(Qt::ISODate))
                         .arg(title).arg(*maxIter);
 
                     LOG(VB_GENERAL, LOG_NOTICE, msg);
 
-                    msg = QString("AUTO_EXPIRE %1 %2")
+                    // allow re-record if auto expired
+                    RecordingInfo recInfo(chanid, startts);
+                    if (gCoreContext->GetNumSetting("RerecordWatched", 0) ||
+                        !recInfo.IsWatched())
+                    {
+                        recInfo.ForgetHistory();
+                    }
+                    msg = QString("DELETE_RECORDING %1 %2")
                                   .arg(chanid)
                                   .arg(startts.toString(Qt::ISODate));
 
