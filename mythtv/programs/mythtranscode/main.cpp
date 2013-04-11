@@ -633,8 +633,11 @@ int main(int argc, char *argv[])
     {
         void (*update_func)(float) = NULL;
         int (*check_func)() = NULL;
-        if (useCutlist && !found_infile)
+        if (useCutlist)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Honoring the cutlist while transcoding");
             pginfo->QueryCutList(deleteMap);
+        }
         if (jobID >= 0)
         {
            glbl_jobID = jobID;
