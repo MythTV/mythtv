@@ -51,7 +51,7 @@ void FillProgramInfo( DTC::Program *pProgram,
     pProgram->setTitle     (  pInfo->GetTitle()             );
     pProgram->setSubTitle  (  pInfo->GetSubtitle()          );
     pProgram->setCategory  (  pInfo->GetCategory()          );
-    pProgram->setCatType   (  pInfo->GetCategoryType()      );
+    pProgram->setCatType   (  pInfo->GetCategoryTypeString());
     pProgram->setRepeat    (  pInfo->IsRepeat()             );
     pProgram->setVideoProps(  pInfo->GetVideoProperties()   );
     pProgram->setAudioProps(  pInfo->GetAudioProperties()   );

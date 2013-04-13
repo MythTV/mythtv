@@ -7,11 +7,10 @@
 using namespace std;
 
 // MythTV headers
+#include "programdata.h"
 #include "channelutil.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "programinfo.h"
-#include "programdata.h"
 #include "dvbdescriptors.h"
 
 #define LOC      QString("ProgramData: ")
@@ -274,7 +273,7 @@ uint DBEvent::GetOverlappingPrograms(
 
     while (query.next())
     {
-        MythCategoryType category_type =
+        ProgramInfo::CategoryType category_type =
             string_to_myth_category_type(query.value(4).toString());
 
         DBEvent prog(
@@ -502,7 +501,7 @@ uint DBEvent::UpdateDB(
     if (lseriesId.isEmpty() && !match.seriesId.isEmpty())
         lseriesId = match.seriesId;
 
-    uint tmp = categoryType;
+    ProgramInfo::CategoryType tmp = categoryType;
     if (!categoryType && match.categoryType)
         tmp = match.categoryType;
 

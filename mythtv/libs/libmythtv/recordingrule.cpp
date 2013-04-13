@@ -208,7 +208,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
     if (m_recordID)
         Load();
     else
-        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryType());
+        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryTypeString());
 
     if (m_type != kTemplateRecord &&
         (m_searchType == kNoSearch || m_searchType == kManualSearch))

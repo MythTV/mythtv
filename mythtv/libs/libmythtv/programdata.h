@@ -17,6 +17,7 @@ using namespace std;
 // MythTV headers
 #include "mythtvexp.h"
 #include "listingsources.h"
+#include "programinfo.h"
 
 class MSqlQuery;
 
@@ -85,7 +86,7 @@ class MTV_PUBLIC DBEvent
         audioProps(0),
         videoProps(0),
         stars(0.0),
-        categoryType(0/*kCategoryNone*/),
+        categoryType(ProgramInfo::kCategoryNone),
         seriesId(),
         programId(),
         previouslyshown(false),
@@ -93,7 +94,7 @@ class MTV_PUBLIC DBEvent
 
     DBEvent(const QString   &_title,     const QString   &_subtitle,
             const QString   &_desc,
-            const QString   &_category,  uint             _category_type,
+            const QString   &_category,  ProgramInfo::CategoryType _category_type,
             const QDateTime &_start,     const QDateTime &_end,
             unsigned char    _subtitleType,
             unsigned char    _audioProps,
@@ -163,7 +164,7 @@ class MTV_PUBLIC DBEvent
     unsigned char audioProps;
     unsigned char videoProps;
     float         stars;
-    unsigned char categoryType;
+    ProgramInfo::CategoryType categoryType;
     QString       seriesId;
     QString       programId;
     bool          previouslyshown;
@@ -177,7 +178,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
     DBEventEIT(uint             _chanid,
                const QString   &_title,     const QString   &_subtitle,
                const QString   &_desc,
-               const QString   &_category,  uint             _category_type,
+               const QString   &_category,  ProgramInfo::CategoryType _category_type,
                const QDateTime &_start,     const QDateTime &_end,
                uint             _fixup,
                unsigned char    _subtitleType,
@@ -199,7 +200,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _subtitleType,
                unsigned char    _audioProps,
                unsigned char    _videoProps) :
-        DBEvent(_title, QString(), _desc, QString(), 0/*kCategoryNone*/,
+        DBEvent(_title, QString(), _desc, QString(), ProgramInfo::kCategoryNone,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
                 0.0, QString(), QString(), kListingSourceEIT),
         chanid(_chanid), fixup(_fixup)

@@ -352,7 +352,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString subtitle      = QString("");
         QString description   = QString("");
         QString category      = QString("");
-        uint category_type = kCategoryNone;
+        ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
         // Parse descriptors
@@ -467,7 +467,20 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
             {
                 DishContentDescriptor content(content_data);
-                category_type = content.GetTheme();
+                switch (content.GetTheme())
+                {
+                    case kThemeMovie :
+                        category_type = ProgramInfo::kCategoryMovie;
+                        break;
+                    case kThemeSeries :
+                        category_type = ProgramInfo::kCategorySeries;
+                        break;
+                    case kThemeSports :
+                        category_type = ProgramInfo::kCategorySports;
+                        break;
+                    default :
+                        category_type = ProgramInfo::kCategoryNone;
+                }
                 if (EITFixUp::kFixDish & fix)
                     category  = content.GetCategory();
             }
@@ -547,7 +560,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
                 {
                     seriesId = desc.ContentId();
-                    category_type = kCategorySeries;
+                    category_type = ProgramInfo::kCategorySeries;
                 }
             }
         }
@@ -584,7 +597,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     QString subtitle      = QString("");
     QString description   = QString("");
     QString category      = QString("");
-    MythCategoryType category_type = kCategoryNone;
+    ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
     unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
     // Parse descriptors
@@ -607,11 +620,11 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
         {
             if(content.UserNibble(0)==0x1)
             {
-                category_type = kCategoryMovie;
+                category_type = ProgramInfo::kCategoryMovie;
             }
             else if(content.UserNibble(0)==0x0)
             {
-                category_type = kCategorySports;
+                category_type = ProgramInfo::kCategorySports;
                 category = QObject::tr("Sports");
             }
         }

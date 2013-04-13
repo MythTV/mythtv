@@ -329,8 +329,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             {
                 const QString cat = getFirstText(info).toLower();
 
-                if (kCategoryNone == pginfo->categoryType &&
-                    string_to_myth_category_type(cat) != kCategoryNone)
+                if (ProgramInfo::kCategoryNone == pginfo->categoryType &&
+                    string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
                 {
                     pginfo->categoryType = string_to_myth_category_type(cat);
                 }
@@ -339,10 +339,10 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     pginfo->category = cat;
                 }
 
-                if (cat == "film")
+                if (cat == QObject::tr("movie") || cat == QObject::tr("film"))
                 {
                     // Hack for tv_grab_uk_rt
-                    pginfo->categoryType = kCategoryMovie;
+                    pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
             }
             else if (info.tagName() == "date" && !pginfo->airdate)
@@ -448,7 +448,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     QString partnumber(part.section('/',0,0).trimmed());
                     QString parttotal(part.section('/',1,1).trimmed());
 
-                    pginfo->categoryType = kCategorySeries;
+                    pginfo->categoryType = ProgramInfo::kCategorySeries;
 
                     if (!episode.isEmpty())
                     {
@@ -486,14 +486,15 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 else if (info.attribute("system") == "onscreen" &&
                         pginfo->subtitle.isEmpty())
                 {
-                    pginfo->categoryType = kCategorySeries;
+                    pginfo->categoryType = ProgramInfo::kCategorySeries;
                     pginfo->subtitle = getFirstText(info);
                 }
             }
         }
     }
 
-    if (pginfo->category.isEmpty() && pginfo->categoryType != kCategoryNone)
+    if (pginfo->category.isEmpty() &&
+        pginfo->categoryType != ProgramInfo::kCategoryNone)
         pginfo->category = myth_category_type_to_string(pginfo->categoryType);
 
     if (!pginfo->airdate)
@@ -502,11 +503,11 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
     /* Let's build ourself a programid */
     QString programid;
 
-    if (kCategoryMovie == pginfo->categoryType)
+    if (ProgramInfo::kCategoryMovie == pginfo->categoryType)
         programid = "MV";
-    else if (kCategorySeries == pginfo->categoryType)
+    else if (ProgramInfo::kCategorySeries == pginfo->categoryType)
         programid = "EP";
-    else if (kCategorySports == pginfo->categoryType)
+    else if (ProgramInfo::kCategorySports == pginfo->categoryType)
         programid = "SP";
     else
         programid = "SH";
@@ -530,7 +531,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
             {
                 // Cannot represent season as a single base-36 character, so
                 // remove the programid and fall back to normal dup matching.
-                if (kCategoryMovie != pginfo->categoryType)
+                if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
                     programid.clear();
             }
             else
@@ -548,7 +549,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         {
             /* No ep/season info? Well then remove the programid and rely on
                normal dupchecking methods instead. */
-            if (kCategoryMovie != pginfo->categoryType)
+            if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
                 programid.clear();
         }
     }

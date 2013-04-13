@@ -70,7 +70,7 @@ RecordingInfo::RecordingInfo(
     const QString &_seriesid,
     const QString &_programid,
     const QString &_inetref,
-    const QString &_catType,
+    const CategoryType _catType,
 
     int _recpriority,
 

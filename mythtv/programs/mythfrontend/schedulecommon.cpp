@@ -261,7 +261,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
                              qVariantFromValue(recinfo));
         if (!recinfo.IsGeneric())
         {
-            if (recinfo.GetCategoryType() == "movie")
+            if (recinfo.GetCategoryType() == ProgramInfo::kCategoryMovie)
                 menuPopup->AddButton(tr("Record one showing"),
                                      qVariantFromValue(recinfo));
             else
@@ -340,7 +340,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
             if (recinfo.GetRecordingRuleType() != kOverrideRecord &&
                 !((recinfo.GetFindID() == 0 ||
                    !IsFindApplicable(recinfo)) &&
-                  recinfo.GetCategoryType() == "series" &&
+                  recinfo.GetCategoryType() == ProgramInfo::kCategorySeries &&
                   recinfo.GetProgramID().contains(QRegExp("0000$"))) &&
                 ((!(dupmethod & kDupCheckNone) &&
                   !recinfo.GetProgramID().isEmpty() &&

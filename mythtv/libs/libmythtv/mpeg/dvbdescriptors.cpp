@@ -10,6 +10,7 @@
 #include "iso6937tables.h"
 #include "freesat_huffman.h"
 #include "mythlogging.h"
+#include "programinfo.h"
 
 
 static QString decode_iso6937(const unsigned char *buf, uint length)
@@ -205,35 +206,13 @@ QMutex             ContentDescriptor::categoryLock;
 QMap<uint,QString> ContentDescriptor::categoryDesc;
 volatile bool      ContentDescriptor::categoryDescExists = false;
 
-QString myth_category_type_to_string(uint category_type)
-{
-    static const char *cattype[] =
-        { "", "movie", "series", "sports", "tvshow", };
-
-    if ((category_type > kCategoryNone) && (category_type < kCategoryLast))
-        return QString(cattype[category_type]);
-
-    return "";
-}
-
-MythCategoryType string_to_myth_category_type(const QString &category_type)
-{
-    static const char *cattype[] =
-        { "", "movie", "series", "sports", "tvshow", };
-
-    for (uint i = 1; i < 5; i++)
-        if (category_type == cattype[i])
-            return (MythCategoryType) i;
-    return kCategoryNone;
-}
-
-MythCategoryType ContentDescriptor::GetMythCategory(uint i) const
+ProgramInfo::CategoryType ContentDescriptor::GetMythCategory(uint i) const
 {
     if (0x1 == Nibble1(i))
-        return kCategoryMovie;
+        return ProgramInfo::kCategoryMovie;
     if (0x4 == Nibble1(i))
-        return kCategorySports;
-    return kCategoryTVShow;
+        return ProgramInfo::kCategorySports;
+    return ProgramInfo::kCategoryTVShow;
 }
 
 const char *linkage_types[] =

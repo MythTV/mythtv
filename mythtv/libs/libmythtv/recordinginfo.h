@@ -100,13 +100,13 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &storagegroup,
 
         uint year,
-	uint partnumber,
-	uint parttotal,
+        uint partnumber,
+        uint parttotal,
 
         const QString &seriesid,
         const QString &programid,
         const QString &inetref,
-        const QString &catType,
+        const CategoryType catType,
 
         int recpriority,
 

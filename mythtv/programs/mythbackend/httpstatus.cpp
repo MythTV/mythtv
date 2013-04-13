@@ -1515,7 +1515,7 @@ void HttpStatus::FillProgramInfo(QDomDocument *pDoc,
     program.setAttribute( "title"       , pInfo->GetTitle()   );
     program.setAttribute( "subTitle"    , pInfo->GetSubtitle());
     program.setAttribute( "category"    , pInfo->GetCategory());
-    program.setAttribute( "catType"     , pInfo->GetCategoryType());
+    program.setAttribute( "catType"     , pInfo->GetCategoryTypeString());
     program.setAttribute( "repeat"      , pInfo->IsRepeat()   );
 
     if (bDetails)

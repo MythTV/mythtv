@@ -558,19 +558,6 @@ class ComponentDescriptor : public MPEGDescriptor
     }
 };
 
-typedef enum
-{
-    kCategoryNone = 0,
-    kCategoryMovie,
-    kCategorySeries,
-    kCategorySports,
-    kCategoryTVShow,
-    kCategoryLast,
-} MythCategoryType;
-
-MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
-MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
-
 // DVB Bluebook A038 (Sept 2011) p 46
 class ContentDescriptor : public MPEGDescriptor
 {
@@ -598,7 +585,7 @@ class ContentDescriptor : public MPEGDescriptor
     uint UserNibble(uint i)  const { return _data[3 + (i<<1)]; }
     // }                            2.0
 
-    MythCategoryType GetMythCategory(uint i) const;
+    ProgramInfo::CategoryType GetMythCategory(uint i) const;
     QString GetDescription(uint i) const;
     QString toString(void) const;
 

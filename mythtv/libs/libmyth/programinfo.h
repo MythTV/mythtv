@@ -73,6 +73,9 @@ class MPUBLIC ProgramInfo
 {
     friend int pginfo_init_statics(void);
   public:
+    enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
+                        kCategorySports, kCategoryTVShow };
+                        
     /// Null constructor
     ProgramInfo(void);
     /// Copy constructor
@@ -190,7 +193,7 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
-                const QString &catType,
+                const CategoryType catType,
 
                 float stars,
                 uint year,
@@ -401,7 +404,8 @@ class MPUBLIC ProgramInfo
     QString GetSeriesID(void)             const { return seriesid;     }
     QString GetProgramID(void)            const { return programid;    }
     QString GetInetRef(void)              const { return inetref;      }
-    QString GetCategoryType(void)         const { return catType;      }
+    CategoryType GetCategoryType(void)    const { return catType;      }
+    QString GetCategoryTypeString(void)   const;
     int     GetRecordingPriority(void)    const { return recpriority;  }
     int     GetRecordingPriority2(void)   const { return recpriority2; }
     float   GetStars(void)                const { return stars;        }
@@ -486,7 +490,7 @@ class MPUBLIC ProgramInfo
     void SetSeriesID(      const QString &id)       { seriesid     = id;    }
     void SetProgramID(     const QString &id)       { programid    = id;    }
     void SetCategory(      const QString &cat)      { category     = cat;   }
-    void SetCategoryType(  const QString &type)     { catType      = type;  }
+    void SetCategoryType(  const CategoryType type) { catType      = type;  }
     void SetRecordingPriority(int priority)       { recpriority = priority; }
     void SetRecordingPriority2(int priority)     { recpriority2 = priority; }
     void SetRecordingRuleID(uint id)                { recordid     = id;    }
@@ -526,7 +530,7 @@ class MPUBLIC ProgramInfo
     uint        QueryMplexID(void) const;
     QDateTime   QueryBookmarkTimeStamp(void) const;
     uint64_t    QueryBookmark(void) const;
-    QString     QueryCategoryType(void) const;
+    CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     bool        QueryIsEditing(void) const;
     bool        QueryIsInUse(QStringList &byWho) const;
@@ -673,7 +677,7 @@ class MPUBLIC ProgramInfo
     QString seriesid;
     QString programid;
     QString inetref;
-    QString catType;
+    CategoryType catType;
 
     uint64_t filesize;
 
@@ -812,6 +816,9 @@ class MPUBLIC PMapDBReplacement
 };
 
 MPUBLIC QString format_season_and_episode(int seasEp, int digits = -1);
+
+MPUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_type);
+MPUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 
 Q_DECLARE_METATYPE(ProgramInfo*)
 

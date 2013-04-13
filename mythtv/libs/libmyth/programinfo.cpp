@@ -81,6 +81,29 @@ static void set_flag(uint32_t &flags, int flag_to_set, bool is_set)
         flags |= flag_to_set;
 }
 
+QString myth_category_type_to_string(ProgramInfo::CategoryType category_type)
+{
+    static const char *cattype[] =
+        { "", "movie", "series", "sports", "tvshow", };
+
+    if ((category_type > ProgramInfo::kCategoryNone) &&
+        (category_type < sizeof(cattype)))
+        return QString(cattype[category_type]);
+
+    return "";
+}
+
+ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_type)
+{
+    static const char *cattype[] =
+        { "", "movie", "series", "sports", "tvshow", };
+
+    for (uint i = 1; i < 5; i++)
+        if (category_type == cattype[i])
+            return (ProgramInfo::CategoryType) i;
+    return ProgramInfo::kCategoryNone;
+}
+
 /** \fn ProgramInfo::ProgramInfo(void)
  *  \brief Null constructor.
  */
@@ -112,7 +135,7 @@ ProgramInfo::ProgramInfo(void) :
     seriesid(),
     programid(),
     inetref(),
-    catType(),
+    catType(kCategoryNone),
 
 
     filesize(0ULL),
@@ -340,7 +363,7 @@ ProgramInfo::ProgramInfo(
     seriesid(_seriesid),
     programid(_programid),
     inetref(_inetref),
-    catType(),
+    catType(kCategoryNone),
 
     filesize(_filesize),
 
@@ -456,7 +479,7 @@ ProgramInfo::ProgramInfo(
     seriesid(_seriesid),
     programid(_programid),
     inetref(_inetref),
-    catType(),
+    catType(kCategoryNone),
 
     filesize(0ULL),
 
@@ -529,7 +552,7 @@ ProgramInfo::ProgramInfo(
 
     const QString &_seriesid,
     const QString &_programid,
-    const QString &_catType,
+    const CategoryType _catType,
 
     float _stars,
     uint _year,
@@ -729,7 +752,7 @@ ProgramInfo::ProgramInfo(
     seriesid(_seriesid),
     programid(_programid),
     inetref(_inetref),
-    catType(),
+    catType(kCategoryNone),
 
     filesize(0ULL),
 
@@ -1049,7 +1072,6 @@ void ProgramInfo::clone(const ProgramInfo &other,
     seriesid.detach();
     programid.detach();
     inetref.detach();
-    catType.detach();
 
     sortTitle.detach();
     inUseForWhat.detach();
@@ -1086,7 +1108,7 @@ void ProgramInfo::clear(void)
     seriesid.clear();
     programid.clear();
     inetref.clear();
-    catType.clear();
+    catType = kCategoryNone;
 
     sortTitle.clear();
 
@@ -1630,7 +1652,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
     progMap["inetref"] = inetref;
-    progMap["catType"] = catType;
+    progMap["catType"] = myth_category_type_to_string(catType);
 
     progMap["year"] = year ? QString::number(year) : "";
 
@@ -1710,6 +1732,12 @@ uint ProgramInfo::GetSecondsInRecording(void) const
     return (uint) ((recsecs>0) ? recsecs : max(duration,int64_t(0)));
 }
 
+/// \brief Returns catType as a string
+QString ProgramInfo::GetCategoryTypeString(void) const
+{
+    return myth_category_type_to_string(catType); 
+}
+
 /// \brief Returns last frame in position map or 0
 uint64_t ProgramInfo::QueryLastFrameInPosMap(void) const
 {
@@ -1737,7 +1765,7 @@ bool ProgramInfo::IsGeneric(void) const
         (programid.isEmpty() && subtitle.isEmpty() &&
          description.isEmpty()) ||
         (!programid.isEmpty() && programid.endsWith("0000")
-         && catType == "series");
+         && catType == kCategorySeries);
 }
 
 QString ProgramInfo::toString(const Verbosity v, QString sep, QString grp)
@@ -1826,7 +1854,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     {
         // These items are not initialized below so they need to be cleared
         // if we're loading in a different program into this ProgramInfo
-        catType.clear();
+        catType = kCategoryNone;
         lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
         rectype = kNotRecording;
         oldrecstatus = rsUnknown;
@@ -1999,7 +2027,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
 
-    if (catType == "series")
+    if (catType == kCategorySeries)
     {
         if (programid.endsWith("0000"))
             return false;
@@ -2606,9 +2634,9 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
  *
  *  \return string category_type
  */
-QString ProgramInfo::QueryCategoryType(void) const
+ProgramInfo::CategoryType ProgramInfo::QueryCategoryType(void) const
 {
-    QString ret;
+    CategoryType ret;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2622,7 +2650,7 @@ QString ProgramInfo::QueryCategoryType(void) const
 
     if (query.exec() && query.next())
     {
-        ret = query.value(0).toString();
+        ret = string_to_myth_category_type(query.value(0).toString());
     }
 
     return ret;
@@ -4678,7 +4706,7 @@ bool LoadFromProgram(
 
                 query.value(13).toString(), // seriesid
                 query.value(14).toString(), // programid
-                query.value(18).toString(), // catType
+                string_to_myth_category_type(query.value(18).toString()), // catType
 
                 query.value(16).toDouble(), // stars
                 query.value(15).toUInt(), // year

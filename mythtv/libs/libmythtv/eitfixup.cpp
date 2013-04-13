@@ -3,7 +3,7 @@
 
 // MythTV headers
 #include "eitfixup.h"
-#include "dvbdescriptors.h" // for MythCategoryType
+#include "programinfo.h" // for CategoryType
 #include "channelutil.h" // for GetDefaultAuthority()
 
 #include "programinfo.h" // for subtitle types and audio and video properties
@@ -781,7 +781,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         }
     }
     if (series)
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
 
     QRegExp tmpStarring = m_ukStarring;
     if (tmpStarring.indexIn(event.description) != -1)
@@ -1069,7 +1069,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
     }
 
     if (isSeries)
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
 
     // Look for additional persons in the description
     QRegExp tmpPersons = m_comHemPersons;
@@ -1245,7 +1245,7 @@ void EITFixUp::FixAUNine(DBEventEIT &event) const
     if (event.subtitle == "Movie")
     {
         event.subtitle = QString::null;
-        event.categoryType = kCategoryMovie;
+        event.categoryType = ProgramInfo::kCategoryMovie;
     }
     if (event.description.startsWith(event.title))
       event.description.remove(0,event.title.length()+1);
@@ -1385,7 +1385,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
                 QString("E%1S%2").arg(episode).arg(season);
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
 
     // Close captioned?
@@ -1450,7 +1450,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
                 event.AddPerson(DBPerson::kActor, (*it).trimmed());
             event.description = tmpExp1.cap(1).trimmed();
         }
-        event.categoryType = kCategoryMovie;
+        event.categoryType = ProgramInfo::kCategoryMovie;
     }
 
 }
@@ -1544,7 +1544,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     /* got an episode title now? (we did not have one at the start of this function) */
     if (!event.subtitle.isEmpty())
     {
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
 
     /* if we do not have an episode title by now try some guessing as last resort */
@@ -1648,88 +1648,88 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     if (event.category == "Documentary")
     {
         event.category = "Documentaire";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "News")
     {
         event.category = "Nieuws/actualiteiten";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Kids")
     {
         event.category = "Jeugd";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Show/game Show")
     {
         event.category = "Amusement";
-        event.categoryType = kCategoryTVShow;
+        event.categoryType = ProgramInfo::kCategoryTVShow;
     }
     if (event.category == "Music/Ballet/Dance")
     {
         event.category = "Muziek";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "News magazine")
     {
         event.category = "Informatief";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie")
     {
         event.category = "Film";
-        event.categoryType = kCategoryMovie;
+        event.categoryType = ProgramInfo::kCategoryMovie;
     }
     if (event.category == "Nature/animals/Environment")
     {
         event.category = "Natuur";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Adult")
     {
         event.category = "Erotiek";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Soap/melodrama/folkloric")
     {
         event.category = "Serie/soap";
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
     if (event.category == "Arts/Culture")
     {
         event.category = "Kunst/Cultuur";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Sports")
     {
         event.category = "Sport";
-        event.categoryType = kCategorySports;
+        event.categoryType = ProgramInfo::kCategorySports;
     }
     if (event.category == "Cartoons/Puppets")
     {
         event.category = "Animatie";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Comedy")
     {
         event.category = "Comedy";
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
     if (event.category == "Movie - Detective/Thriller")
     {
         event.category = "Misdaad";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Social/Spiritual Sciences")
     {
         event.category = "Religieus";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
 
     // Film - categories are usually not Films
     if (event.category.startsWith("Film -"))
     {
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::                                                                      kCategorySeries;
     }
 
     // Get stereo info
@@ -1888,11 +1888,11 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 void EITFixUp::FixCategory(DBEventEIT &event) const
 {
     // remove category movie from short events
-    if (event.categoryType == kCategoryMovie &&
+    if (event.categoryType == ProgramInfo::kCategoryMovie &&
         event.starttime.secsTo(event.endtime) < kMinMovieDuration)
     {
         /* default taken from ContentDescriptor::GetMythCategory */
-        event.categoryType = kCategoryTVShow;
+        event.categoryType = ProgramInfo::kCategoryTVShow;
     }
 }
 

@@ -4086,7 +4086,7 @@ void Scheduler::AddNewRecords(void)
             result.value(26).toString(),//seriesid
             result.value(27).toString(),//programid
             result.value(28).toString(),//inetref
-            result.value(29).toString(),//catType
+            string_to_myth_category_type(result.value(29).toString()),//catType
 
             result.value(12).toInt(),//recpriority
 
