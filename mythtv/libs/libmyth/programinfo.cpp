@@ -83,11 +83,12 @@ static void set_flag(uint32_t &flags, int flag_to_set, bool is_set)
 
 QString myth_category_type_to_string(ProgramInfo::CategoryType category_type)
 {
+    static int NUM_CAT_TYPES = 5;
     static const char *cattype[] =
         { "", "movie", "series", "sports", "tvshow", };
 
     if ((category_type > ProgramInfo::kCategoryNone) &&
-        (category_type < sizeof(cattype)))
+        ((int)category_type < NUM_CAT_TYPES))
         return QString(cattype[category_type]);
 
     return "";
@@ -95,10 +96,11 @@ QString myth_category_type_to_string(ProgramInfo::CategoryType category_type)
 
 ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_type)
 {
+    static int NUM_CAT_TYPES = 5;
     static const char *cattype[] =
         { "", "movie", "series", "sports", "tvshow", };
 
-    for (uint i = 1; i < 5; i++)
+    for (uint i = 1; i < NUM_CAT_TYPES; i++)
         if (category_type == cattype[i])
             return (ProgramInfo::CategoryType) i;
     return ProgramInfo::kCategoryNone;
