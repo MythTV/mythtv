@@ -260,8 +260,15 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
         menuPopup->AddButton(tr("Record all showings"),
                              qVariantFromValue(recinfo));
         if (!recinfo.IsGeneric())
-            menuPopup->AddButton(tr("Record one showing (this episode)"),
-                                 qVariantFromValue(recinfo));
+        {
+            if (recinfo.GetCategoryType() == "movie")
+                menuPopup->AddButton(tr("Record one showing"),
+                                     qVariantFromValue(recinfo));
+            else
+                menuPopup->AddButton(tr("Record one showing (this episode)"),
+                                     qVariantFromValue(recinfo));
+            
+        }
         menuPopup->AddButton(tr("Record all showings (this channel)"),
                              qVariantFromValue(recinfo));
         menuPopup->AddButton(tr("Edit recording rule"),
@@ -406,7 +413,8 @@ void ScheduleCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Record all showings"))
                 recInfo.ApplyRecordStateChange(kAllRecord);
-            else if (resulttext == tr("Record one showing (this episode)"))
+            else if (resulttext == tr("Record one showing (this episode)") ||
+                     resulttext == tr("Record one showing"))
             {
                 recInfo.ApplyRecordStateChange(kOneRecord, false);
                 recInfo.GetRecordingRule()->m_filter |= 64; // This episode
