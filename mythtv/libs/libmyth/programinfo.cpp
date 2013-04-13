@@ -3043,14 +3043,12 @@ AutoExpireType ProgramInfo::QueryAutoExpire(void) const
 
 bool ProgramInfo::QueryCutList(frm_dir_map_t &delMap, bool loadAutoSave) const
 {
-    frm_dir_map_t autosaveMap;
-    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_START);
-    QueryMarkupMap(autosaveMap, MARK_TMP_CUT_END, true);
-    QueryMarkupMap(autosaveMap, MARK_PLACEHOLDER, true);
-    bool result = !autosaveMap.isEmpty();
-
     if (loadAutoSave)
     {
+        frm_dir_map_t autosaveMap;
+        QueryMarkupMap(autosaveMap, MARK_TMP_CUT_START);
+        QueryMarkupMap(autosaveMap, MARK_TMP_CUT_END, true);
+        QueryMarkupMap(autosaveMap, MARK_PLACEHOLDER, true);
         // Convert the temporary marks into regular marks.
         delMap.clear();
         frm_dir_map_t::const_iterator i = autosaveMap.constBegin();
@@ -3072,7 +3070,7 @@ bool ProgramInfo::QueryCutList(frm_dir_map_t &delMap, bool loadAutoSave) const
         QueryMarkupMap(delMap, MARK_PLACEHOLDER, true);
     }
 
-    return result;
+    return !delMap.isEmpty();
 }
 
 void ProgramInfo::SaveCutList(frm_dir_map_t &delMap, bool isAutoSave) const
