@@ -8746,6 +8746,10 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
 
 void TV::DoEditSchedule(int editType)
 {
+    // Prevent nesting of the pop-up UI
+    if (ignoreKeyPresses)
+        return;
+
     if ((editType == kScheduleProgramGuide  && !RunProgramGuidePtr) ||
         (editType == kScheduleProgramFinder && !RunProgramFinderPtr) ||
         (editType == kScheduledRecording    && !RunScheduleEditorPtr) ||
