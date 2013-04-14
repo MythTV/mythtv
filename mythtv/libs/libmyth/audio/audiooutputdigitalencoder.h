@@ -34,7 +34,7 @@ class AudioOutputDigitalEncoder
     AVCodecContext *av_context;
     outbuf_t       *out;
     size_t          out_size;
-    inbuf_t        *in;
+    inbuf_t        *in, *inp;
     size_t          in_size;
     int             outlen;
     int             inlen;

@@ -19,6 +19,9 @@ class MPUBLIC AudioOutputUtil
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
                            AVPacket *pkt);
+    static void DeinterleaveSamples(AudioFormat format, int channels,
+                                    uint8_t *output, uint8_t *input,
+                                    int data_size);
 };
 
 #endif

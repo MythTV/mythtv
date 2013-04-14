@@ -23,7 +23,7 @@ extern "C" {
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     av_context(NULL),
     out(NULL), out_size(0),
-    in(NULL), in_size(0),
+    in(NULL), inp(NULL), in_size(0),
     outlen(0), inlen(0),
     samples_per_frame(0),
     m_spdifenc(NULL)
@@ -38,6 +38,7 @@ AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     {
         in_size = INBUFSIZE;
     }
+    inp = (inbuf_t *)av_malloc(INBUFSIZE);
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
@@ -61,6 +62,10 @@ void AudioOutputDigitalEncoder::Dispose()
     {
         av_freep(&in);
         in_size = 0;
+    }
+    if (inp)
+    {
+        av_freep(&inp);
     }
     if (m_spdifenc)
     {
@@ -136,7 +141,7 @@ bool AudioOutputDigitalEncoder::Init(
             av_context->channel_layout = AV_CH_LAYOUT_5POINT1;
             break;
     }
-    av_context->sample_fmt     = AV_SAMPLE_FMT_S16;
+    av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
 
 // open it
     ret = avcodec_open2(av_context, codec, NULL);
@@ -205,9 +210,20 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         inlen += len;
     }
 
-    int frames = inlen / sizeof(inbuf_t) / samples_per_frame;
-    int i = 0;
-    AVFrame *frame = avcodec_alloc_frame();
+    int frames           = inlen / sizeof(inbuf_t) / samples_per_frame;
+    int i                = 0;
+    int channels         = av_context->channels;
+    AVFrame *frame       = avcodec_alloc_frame();
+    int size_channel     = av_context->frame_size *
+        AudioOutputSettings::SampleSize(FORMAT_S16);
+    frame->extended_data = frame->data;
+    frame->nb_samples    = av_context->frame_size;
+    frame->pts           = AV_NOPTS_VALUE;
+        // init AVFrame for planar data (input is interleaved)
+    for (int j = 0, jj = 0; j < channels; j++, jj += samples_per_frame)
+    {
+        frame->data[j] = (uint8_t*)(inp + jj);
+    }
 
     while (i < frames)
     {
@@ -215,10 +231,14 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         av_init_packet(&pkt);
         pkt.data          = (uint8_t *)m_encodebuffer;
         pkt.size          = sizeof(m_encodebuffer);
-        frame->nb_samples = av_context->frame_size;
-        frame->data[0]    = (uint8_t *)(in + i * samples_per_frame);
-        frame->pts        = AV_NOPTS_VALUE;
         int got_packet    = 0;
+
+        AudioOutputUtil::DeinterleaveSamples(
+            FORMAT_S16, channels,
+            (uint8_t*)inp,
+            (uint8_t*)(in + i * samples_per_frame),
+            size_channel * channels);
+
         int ret           = avcodec_encode_audio2(av_context, &pkt, frame,
                                                   &got_packet);
         int outsize       = pkt.size;

@@ -767,3 +767,45 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 
     return ret;
 }
+
+template <class AudioDataType>
+void _DeinterleaveSample(AudioDataType *out, AudioDataType *in, int channels, int frames)
+{
+    AudioDataType *outp[8];
+
+    for (int i = 0; i < channels; i++)
+    {
+        outp[i] = out + (i * channels * frames);
+    }
+
+    for (int i = 0; i < frames; i++)
+    {
+        for (int j = 0; j < channels; j++)
+        {
+            *(outp[j]++) = *(in++);
+        }
+    }
+}
+
+/**
+ * Deinterleave input samples
+ * Deinterleave audio samples and compact them
+ */
+void AudioOutputUtil::DeinterleaveSamples(AudioFormat format, int channels,
+                                          uint8_t *output, uint8_t *input,
+                                          int data_size)
+{
+    int bits = AudioOutputSettings::FormatToBits(format);
+    if (bits == 8)
+    {
+        _DeinterleaveSample((char *)output, (char *)input, channels, data_size/sizeof(char)/channels);
+    }
+    else if (bits == 16)
+    {
+        _DeinterleaveSample((short *)output, (short *)input, channels, data_size/sizeof(short)/channels);
+    }
+    else
+    {
+        _DeinterleaveSample((int *)output, (int *)input, channels, data_size/sizeof(int)/channels);
+    }
+}
