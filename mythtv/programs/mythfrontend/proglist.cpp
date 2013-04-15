@@ -62,8 +62,25 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_curviewText(NULL),
     m_positionText(NULL),
     m_progList(NULL),
-    m_messageText(NULL)
+    m_messageText(NULL),
+
+    m_allowViewDialog(true)
 {
+    if (pltype == plMovies)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT COUNT(*) FROM program WHERE stars > 0");
+
+        if (query.exec() && query.next())
+        {
+            if (query.value(0).toInt() == 0) // No ratings in database
+            {
+                m_curView = 0; // Show All
+                m_allowViewDialog = false;
+            }
+        }
+    }
+
     switch (pltype)
     {
         case plTitleSearch:   m_searchType = kTitleSearch;   break;
@@ -112,7 +129,9 @@ ProgLister::ProgLister(
     m_curviewText(NULL),
     m_positionText(NULL),
     m_progList(NULL),
-    m_messageText(NULL)
+    m_messageText(NULL),
+
+    m_allowViewDialog(true)
 {
 }
 
@@ -190,7 +209,7 @@ bool ProgLister::Create()
 
 void ProgLister::Load(void)
 {
-    if (m_curView < 0)
+    if (m_viewList.isEmpty() || m_curView < 0)
         FillViewList(m_view);
 
     FillItemList(false, false);
@@ -299,7 +318,7 @@ void ProgLister::ShowMenu(void)
 
     MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
 
-    if (m_type != plPreviouslyRecorded)
+    if (m_allowViewDialog && m_type != plPreviouslyRecorded)
     {
         menu->AddItem(tr("Choose Search Phrase..."), SLOT(ShowChooseViewMenu()));
     }
@@ -1712,7 +1731,7 @@ void ProgLister::customEvent(QEvent *event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
-        if (message == "CHOOSE_VIEW")
+        if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();
         else if (message == "SCHEDULE_CHANGE")
             needUpdate = true;

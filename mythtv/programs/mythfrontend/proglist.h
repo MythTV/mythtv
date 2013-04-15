@@ -134,6 +134,8 @@ class ProgLister : public ScheduleCommon
     MythUIText       *m_positionText;
     MythUIButtonList *m_progList;
     MythUIText       *m_messageText;
+
+    bool              m_allowViewDialog;
 };
 
 #endif
