@@ -1122,7 +1122,7 @@ void AudioOutputBase::SetAudiotime(int frames, int64_t timecode)
     }
 
     audbuf_timecode =
-        timecode + (effdsp ? ((frames + processframes_unstretched * 100000) +
+        timecode + (effdsp ? ((frames + processframes_unstretched) * 100000 +
                     (processframes_stretched * eff_stretchfactor)
                    ) / effdsp : 0);
 
