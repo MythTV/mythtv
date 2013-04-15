@@ -613,6 +613,18 @@ bool XMLTVParser::parseFile(
     // now we calculate the localTimezoneOffset, so that we can fix
     // the programdata if needed
     QString config_offset = gCoreContext->GetSetting("TimeOffset", "None");
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Using 'TimeOffset' value of: %1").arg(config_offset));
+
+    if (config_offset != "Auto")
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            "TimeOffset values other than 'Auto' are DEPRECATED and will be "
+            "removed in 0.27 which will BREAK your guide data. Please ensure "
+            "your xmltv data complies with the XMLTV spec and "
+            "either uses GMT or specifies a valid offset to GMT per ISO8601");
+    }
+
     // we disable this feature by setting it invalid (> 840min = 14hr)
     int localTimezoneOffset = 841;
 

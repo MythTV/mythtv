@@ -312,14 +312,16 @@ static void init_time_offsets(GlobalComboBox *gc)
 static GlobalComboBox *TimeOffset()
 {
     GlobalComboBox *gc = new GlobalComboBox("TimeOffset");
-    gc->setLabel(QObject::tr("Your local time zone (for XMLTV)"));
+    gc->setLabel(QObject::tr("DEPRECATED. Local time zone (for XMLTV)"));
     init_time_offsets(gc);
     QString helptext = QObject::tr(
-        "Used if the XMLTV data comes from a different time zone than your "
-        "own and modifies the date and time before insertion into the "
-        "database. 'Auto' converts the XMLTV time to local time using your "
-        "computer's time zone. "
-        "'None' ignores the XMLTV time zone, interpreting times as local.");
+        "Provided as a TEMPORARY workaround for data which is not XMLTV "
+        "compliant. 'Auto' should be used.\n"
+        "'None' ignores the XMLTV time zone, interpreting times as local.\n"
+        "This setting will be removed in 0.27, at which point all times and "
+        "dates will be expected to be in UTC/GMT or to specify an offset to "
+        "UTC/GMT per ISO8601");
+    gc->setValue("Auto");
     gc->setHelpText(helptext);
     return gc;
 };
