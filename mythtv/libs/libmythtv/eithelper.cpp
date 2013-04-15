@@ -430,7 +430,20 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
             {
                 DishContentDescriptor content(content_data);
-                category_type = content.GetTheme();
+                switch (content.GetTheme())
+                {
+                    case kThemeMovie :
+                        category_type = kCategoryMovie;
+                        break;
+                    case kThemeSeries :
+                        category_type = kCategorySeries;
+                        break;
+                    case kThemeSports :
+                        category_type = kCategorySports;
+                        break;
+                    default :
+                        category_type = kCategoryNone;
+                }
                 if (EITFixUp::kFixDish & fix)
                     category  = content.GetCategory();
             }
