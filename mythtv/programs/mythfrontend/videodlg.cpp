@@ -2248,7 +2248,7 @@ void VideoDialog::UpdatePosition()
         return;
 
     CheckedSet(m_positionText, tr("%1 of %2")
-                                    .arg(currentList->GetCurrentPos() + 1)
+                                    .arg(currentList->IsEmpty() ? 0 : currentList->GetCurrentPos() + 1)
                                     .arg(currentList->GetCount()));
 }
 

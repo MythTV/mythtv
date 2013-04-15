@@ -1773,7 +1773,7 @@ void SmartPLResultViewer::trackSelected(MythUIButtonListItem *item)
     if (!item || !m_positionText)
         return;
 
-    m_positionText->SetText(tr("%1 of %2").arg(m_trackList->GetCurrentPos() + 1)
+    m_positionText->SetText(tr("%1 of %2").arg(m_trackList->IsEmpty() ? 0 : m_trackList->GetCurrentPos() + 1)
                                           .arg(m_trackList->GetCount()));
 }
 void SmartPLResultViewer::showTrackInfo(void)
