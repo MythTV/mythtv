@@ -78,6 +78,17 @@ QString NetworkInformationTable::NetworkName() const
     return _cached_network_name;
 }
 
+bool NetworkInformationTable::Mutate(void)
+{
+    if (VerifyCRC())
+    {
+        SetTableID((TableID() == TableID::NITo) ? TableID::NIT : TableID::NITo);
+        SetCRC(CalcCRC());
+        return true;
+    }
+    else
+        return false;
+}
 
 void ServiceDescriptionTable::Parse(void) const
 {

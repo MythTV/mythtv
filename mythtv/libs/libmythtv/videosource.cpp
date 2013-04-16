@@ -201,6 +201,20 @@ class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
     };
 };
 
+class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
+{
+  public:
+    DVBNetID(const VideoSource &parent, uint value, signed int min_val) :
+        SpinBoxSetting(this, min_val, 100000, 1),
+        VideoSourceDBStorage(this, parent, "dvb_nit_id")
+    {
+	setLabel(QObject::tr("Network ID"));
+        setHelpText(QObject::tr("Set this to the actual network ID at your "
+	         "location, if you have a provider that broadcasts a broken "
+		 "NIT. Leave at -1 if everything works out of the box."));
+    };
+};
+
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "freqtable")
 {
@@ -661,6 +675,7 @@ VideoSource::VideoSource()
     group->addChild(name = new Name(*this));
     group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
+    group->addChild(new DVBNetID(*this, -1, -1));
     addChild(group);
 }
 
