@@ -729,75 +729,50 @@
         </textarea>
 
         <textarea name="ruleslabel" from="basetextarea">
-            <area>280,102,250,30</area>
+            <area>30,102,450,30</area>
             <font>basemedium</font>
             <align>right</align>
             <value>Existing Rules:</value>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>540,100</position>
+            <position>490,100</position>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
-            <position>280,162</position>
+            <position>30,162</position>
             <value>Rule Name:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>540,156</position>
+            <position>490,156</position>
         </textedit>
 
         <textarea name="prioritylabel" from="ruleslabel">
-            <position>280,222</position>
+            <position>30,222</position>
             <value>Priority Change:</value>
         </textarea>
 
         <spinbox name="priority" from="basespinbox">
-            <position>540,220</position>
+            <position>490,220</position>
         </spinbox>
 
         <textarea name="clauseslabel" from="ruleslabel">
-            <area>340,300,600,40</area>
-            <value>Select a clause from the list.</value>
-            <align>allcenter</align>
+            <position>30,280</position>
+            <value>Select a clause from the list:</value>
         </textarea>
 
         <buttonlist name="clauses" from="basewideselector">
-            <position>360,350</position>
+            <position>490,275</position>
         </buttonlist>
 
         <button name="add" from="basebutton">
-            <position>770,350</position>
+            <position>490,340</position>
             <value>Add Clause</value>
         </button>
 
-        <textedit name="description">
-            <area>340,400,600,100</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>12,12,576,76</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
+        <textedit name="description" from="basemultilinetextedit">
+            <area>490,400,600,140</area>
         </textedit>
 
         <button name="cancel" from="basebutton">
