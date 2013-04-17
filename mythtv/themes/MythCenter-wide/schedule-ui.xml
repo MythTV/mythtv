@@ -612,12 +612,12 @@
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
-            <area>30,52,1200,380</area>
+            <area>30,52,1220,380</area>
             <buttonarea>0,0,1200,380</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>4,0,26,26</area>
+                        <area>4,0,30,30</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
@@ -662,7 +662,7 @@
         </imagetype>
 
         <textarea name="channelname" from="basetextarea">
-            <area>540,472,740,40</area>
+            <area>540,472,700,40</area>
             <font>baselarge</font>
         </textarea>
 
@@ -694,7 +694,7 @@
         </textarea>
 
         <textarea name="channelnumberlabel" from="basetextarea">
-            <area>540,618,400,30</area>
+            <area>540,618,140,30</area>
             <value>Channel:</value>
         </textarea>
 
