@@ -623,16 +623,16 @@
                     <statetype name="status">
                         <position>30,0</position>
                     </statetype>
-                    <textarea name="chanstr" from="buttontext">
+                    <textarea name="channelnumber" from="buttontext">
                         <area>60,2,150,24</area>
                     </textarea>
-                    <textarea name="callsign" from="chanstr">
+                    <textarea name="callsign" from="channelnumber">
                         <area>220,2,250,24</area>
                     </textarea>
-                    <textarea name="channelname" from="chanstr">
+                    <textarea name="channelname" from="channelnumber">
                         <area>570,2,550,24</area>
                     </textarea>
-                    <textarea name="priority" from="chanstr">
+                    <textarea name="priority" from="channelnumber">
                         <area>1130,2,40,24</area>
                         <align>right</align>
                     </textarea>
@@ -691,6 +691,15 @@
 
         <textarea name="channelrecpriority" from="basetextarea">
             <area>700,584,400,30</area>
+        </textarea>
+
+        <textarea name="channelnumberlabel" from="basetextarea">
+            <area>540,618,400,30</area>
+            <value>Channel:</value>
+        </textarea>
+
+        <textarea name="channelnumber" from="basetextarea">
+            <area>700,618,400,30</area>
         </textarea>
 
         <textarea name="norecordings_info">
