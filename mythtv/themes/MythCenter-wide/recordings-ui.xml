@@ -122,7 +122,7 @@
         </buttonlist>
 
         <buttonlist name="groups" from="basebuttonlist2">
-            <area>25,54,305,350</area>
+            <area>25,54,315,350</area>
             <buttonarea>0,36,255,270</buttonarea>
             <spacing>0</spacing>
             <wrapstyle>captive</wrapstyle>
@@ -130,7 +130,7 @@
             <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active" >
-                    <area>5,0,305,30</area>
+                    <area>5,0,310,30</area>
                     <textarea name="buttontext">
                         <area>3,0,100%-6,30</area>
                         <font>basesmall_normal</font>
@@ -171,7 +171,7 @@
         </buttonlist>
 
         <buttonlist name="recordings" from="basebuttonlist2">
-            <area>370,54,870,350</area>
+            <area>370,54,880,350</area>
             <buttonarea>0,36,880,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
             <spacing>0</spacing>
@@ -181,7 +181,7 @@
                 <state name="active">
                 <area>0,0,880,30</area>
                 <statetype name="status">
-                    <position>0,2</position>
+                    <position>3,2</position>
                     <state name="disabled">
                         <imagetype name="statusimage">
                             <filename>schedule_disabled.png</filename>
@@ -222,18 +222,18 @@
                         <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
+                        <position>8,7</position>
                         <state name="yes">
                             <imagetype name="yes">
-                                <position>4,2</position>
                                 <filename>small_watched.png</filename>
                             </imagetype>
                         </state>
                         <state name="no" />
                     </statetype>
                     <statetype name="playlist">
+                        <position>6,2</position>
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>6,0</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
