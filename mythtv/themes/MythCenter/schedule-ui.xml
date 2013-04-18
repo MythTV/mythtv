@@ -1220,7 +1220,7 @@
             <fill color="#131564"/>
         </shape>
 
-        <webbrowser name="browser">
+        <webbrowser name="browser" from="basewebbrowser">
             <area>50,70,700,480</area>
             <zoom>1.0</zoom>
             <background color="#131564"/>
