@@ -114,7 +114,7 @@
                     <imagetype name="channelicon">
                         <area>10,14,40,40</area>
                     </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
+                    <textarea name="channelname" from="basetextarea">
                         <area>54,0,138,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
@@ -122,6 +122,8 @@
                         <font state="favunavailable">basesmall_favourite_unavailable</font>
                         <cutdown>no</cutdown>
                         <align>allcenter</align>
+                        <multiline>yes</multiline>
+                        <template>%CHANNELNUMBER%\n%CALLSIGN%</template>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active"/>
@@ -315,7 +317,7 @@
                     <imagetype name="channelicon">
                         <area>10,14,40,40</area>
                     </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
+                    <textarea name="channelname" from="basetextarea">
                         <area>54,0,130,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
@@ -323,6 +325,8 @@
                         <font state="favunavailable">basesmall_favourite_unavailable</font>
                         <cutdown>no</cutdown>
                         <align>allcenter</align>
+                        <multiline>yes</multiline>
+                        <template>%CHANNELNUMBER%\n%CALLSIGN%</template>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active"/>
