@@ -26,6 +26,7 @@
             <statetype name="buttonitem">
                 <area>0,0,150,125</area>
                 <state name="active">
+                    <area>0,0,150,125</area>
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_reg.png</filename>
                     </imagetype>
