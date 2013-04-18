@@ -4,17 +4,17 @@
 <mythuitheme>
     <window name="mainmenu">
 
-        <fontdef name="menufont" face="Trebuchet MS">
+        <fontdef name="menufont" face="Liberation Sans">
             <color>#FFFFFF</color>
-            <size>16</size>
+            <pixelsize>26</pixelsize>
             <weight>bold</weight>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>
         </fontdef>
 
-        <fontdef name="clock" from="menufont">
-            <size>20</size>
+        <fontdef name="clock" from="small">
+            <pixelsize>28</pixelsize>
         </fontdef>
 
         <clock name="clock">
@@ -22,7 +22,6 @@
             <font>clock</font>
             <template>%DATE%, %TIME%</template>
             <align>center</align>
-            <alpha>85</alpha>
         </clock>
 
         <statetype name="titles">
@@ -130,17 +129,19 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>160,70,300,415</area>
+            <area>120,70,340,415</area>
             <layout>vertical</layout>
             <wrapstyle>selection</wrapstyle>
             <spacing>0</spacing>
-            <buttonarea>0,57,300,300</buttonarea>
+            <buttonarea>0,57,340,300</buttonarea>
+            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,300,50</area>
+                    <area>0,0,340,50</area>
                     <imagetype name="background" />
                     <textarea name="buttontext">
-                        <area>14,0,300,50</area>
+                        <area>14,0,326,50</area>
                         <font>menufont</font>
                         <align>left,vcenter</align>
                         <cutdown>yes</cutdown>
@@ -148,6 +149,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <imagetype name="background">
+                        <area>0,0,340,50</area>
                         <filename>ui/button_on.png</filename>
                     </imagetype>
                 </state>
