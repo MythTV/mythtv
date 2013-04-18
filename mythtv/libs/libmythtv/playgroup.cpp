@@ -137,7 +137,7 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
         PlayGroupDBStorage::Save();
     }
 
-    virtual void Save(QString /*destination*/) { Save(); }
+    virtual void Save(QString destination) { PlayGroupDBStorage::Save(destination); }
 };
 
 PlayGroupConfig::PlayGroupConfig(QString _name) : name(_name)
