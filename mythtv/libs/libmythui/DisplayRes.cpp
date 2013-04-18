@@ -191,17 +191,16 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     double target_rate;
 
     // need to change video mode?
+    // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
     if (next.RefreshRate() == 0)
     {
         next.SetRefreshRate(m_last.RefreshRate());
     }
 
     DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
-    // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
-    bool chg = (!(next == m_last) ||
-                (((int) next.RefreshRate()) != 0
-                 && !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
-                                                      target_rate))));
+    bool chg = !(next == m_last) ||
+               !(DisplayResScreen::compare_rates(m_last.RefreshRate(),
+                                                 target_rate));
 
     LOG(VB_GENERAL, LOG_INFO, QString("%1 %2x%3 %4 Hz")
         .arg(chg ? "Changing to" : "Using")
