@@ -61,6 +61,12 @@ class MUI_PUBLIC DisplayResScreen
         std::sort(refreshRates.begin(), refreshRates.end());
     }
     void ClearRefreshRates(void) { refreshRates.clear(); }
+    void SetRefreshRate(double rr) 
+    {
+        ClearRefreshRates();
+        AddRefreshRate(rr);
+    }
+
     void SetCustom(bool b) { custom = b; }
 
     // Map for matching real rates and xrandr rate;
