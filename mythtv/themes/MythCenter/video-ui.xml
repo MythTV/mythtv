@@ -4,7 +4,7 @@
 
     <!-- Popups -->
     <window name="castpopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
@@ -22,19 +22,19 @@
     </window>
 
     <window name="descriptionpopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,746,566</area>
 
         <imagetype name="box">
-            <filename>mv_results_popup.png</filename>
+            <filename>mv_itemdetail_popup.png</filename>
         </imagetype>
 
         <textarea name="description" from="basetextarea">
-            <area>18,18,360,325</area>
+            <area>24,24,-24,454</area>
             <multiline>yes</multiline>
         </textarea>
 
         <button name="ok" from="basebutton">
-            <position>119,350</position>
+            <position>296,480</position>
             <value>OK</value>
         </button>
     </window>
@@ -62,8 +62,8 @@
 
         <imagetype name="coverart">
             <area>25,100,227,350</area>
-            <filename>mv_browse_nocover_large.png</filename>
             <preserveaspect>true</preserveaspect>
+            <filename>shared/grid_noimage.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
@@ -141,7 +141,7 @@
     <window name="manager">
 
         <statetype name="parentallevel">
-            <position>740,10</position>
+            <area>740,10,40,40</area>
             <state name="None">
                 <imagetype name="icon">
                     <filename>mv_level_none.png</filename>
@@ -182,7 +182,7 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>20,65,130,35</area>
+            <area>10,65,140,35</area>
             <font>basesmall</font>
             <align>right,top</align>
             <value>Director:</value>
@@ -194,16 +194,16 @@
         </textarea>
 
         <textarea name="yrlbl" from="dirlbl">
-            <position>500,65</position>
+            <area>420,65,210,35</area>
             <value>Year:</value>
         </textarea>
 
         <textarea name="year" from="director">
-            <area>650,65,100,35</area>
+            <area>640,65,130,35</area>
         </textarea>
 
         <textarea name="ratlbl" from="dirlbl">
-            <position>20,95</position>
+            <position>10,95</position>
             <value>Rated:</value>
         </textarea>
 
@@ -211,20 +211,20 @@
             <area>160,95,350,35</area>
         </textarea>
 
-        <textarea name="lvllbl" from="dirlbl">
-            <position>500,95</position>
+        <textarea name="lvllbl" from="yrlbl">
+            <position>420,95</position>
             <value>Parental Level:</value>
         </textarea>
 
         <statetype name="videolevel">
-            <position>645,90</position>
+            <area>636,95,164,35</area>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <area>0,2,30,30</area>
+                    <area>0,0,30,30</area>
                     <filename>mv_level_lowest.png</filename>
                 </imagetype>
                 <textarea name="label">
-                    <area>35,6,100,35</area>
+                    <area>34,0,130,35</area>
                     <value>Lowest</value>
                     <font>basesmallyellow</font>
                 </textarea>
@@ -255,18 +255,18 @@
             </state>
         </statetype>
 
-        <textarea name="browselbl" from="dirlbl">
-            <position>500,125</position>
+        <textarea name="browselbl" from="yrlbl">
+            <position>420,125</position>
             <value>Browsable:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="browseable" from="director">
-            <area>650,125,100,35</area>
+            <area>640,125,130,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="dirlbl">
-            <position>20,125</position>
+            <position>10,125</position>
             <value>Runtime:</value>
         </textarea>
 
@@ -275,7 +275,7 @@
         </textarea>
 
         <textarea name="desclbl" from="dirlbl">
-            <position>20,155</position>
+            <position>10,155</position>
             <value>Plot:</value>
         </textarea>
 
@@ -284,16 +284,17 @@
         </textarea>
 
         <textarea name="fillbl" from="dirlbl">
-            <position>20,185</position>
+            <position>10,185</position>
             <value>Filename:</value>
         </textarea>
 
         <textarea name="filename" from="director">
             <area>160,185,600,35</area>
+            <cutdown>left</cutdown>
         </textarea>
 
         <textarea name="cvflbl" from="dirlbl">
-            <position>20,215</position>
+            <position>10,215</position>
             <value>Cover File:</value>
         </textarea>
 
@@ -302,7 +303,7 @@
         </textarea>
 
         <textarea name="imdblbl" from="dirlbl">
-            <position>20,245</position>
+            <position>10,245</position>
             <value>Video Num.:</value>
         </textarea>
 
@@ -311,54 +312,49 @@
         </textarea>
 
         <imagetype name="menu_background">
-            <position>0,270</position>
+            <position>0,276</position>
             <filename>cr-background.png</filename>
         </imagetype>
 
-        <imagetype name="menu_outline">
-            <position>0,270</position>
-            <filename>cr-lines.png</filename>
-        </imagetype>
-
         <buttonlist name="videos">
-            <area>20,282,760,242</area>
+            <area>20,290,760,310</area>
             <layout>vertical</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,0,760,250</buttonarea>
+            <spacing>0</spacing>
+            <buttonarea>0,0,760,256</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,760,25</area>
+                <area>0,0,760,32</area>
                 <state name="active">
                     <imagetype name="buttonimage">
-                        <area>0,2,25,25</area>
+                        <area>0,0,30,30</area>
                         <preserveaspect>yes</preserveaspect>
                         <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
-                        <position>0,9</position>
+                        <position>0,0</position>
                         <state name="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,25,25</area>
+                                <area>0,0,30,30</area>
                                 <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder">
                             <imagetype name="icon">
-                                <area>0,0,25,25</area>
+                                <area>0,0,30,30</area>
                                 <filename>shared/updirectory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                     </statetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>30,4,250,30</area>
+                        <area>30,0,520,32</area>
                         <font>basesmallgrey</font>
                     </textarea>
                     <textarea name="director" from="buttontext">
-                        <area>380,4,150,25</area>
+                        <area>550,0,150,32</area>
                     </textarea>
                     <textarea name="year" from="buttontext">
-                        <area>670,4,50,25</area>
+                        <area>700,0,72,32</area>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -374,7 +370,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>240,270</position>
+                <position>240,266</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -383,7 +379,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,270</position>
+                <position>456,266</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">
@@ -396,11 +392,6 @@
     </window>
 
     <window name="browser">
-
-        <imagetype name="filler">
-            <filename>mythtv-logo.png</filename>
-            <area>0,0,800,600</area>
-        </imagetype>
 
         <imagetype name="fanart">
             <!-- <filename>mv_browse_background.png</filename> -->
@@ -474,6 +465,7 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>730,140</position>
+                <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
@@ -483,19 +475,19 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,20,750,100</area>
+            <area>30,20,750,40</area>
             <multiline>no</multiline>
             <font>baseextralarge</font>
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>30,53,500,100</area>
+            <area>30,54,700,30</area>
             <multiline>yes</multiline>
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="##x##" from="basetextarea">
-            <area>560,45,100,100</area>
+        <textarea name="s##e##" from="basetextarea">
+            <area>680,44,100,30</area>
             <multiline>yes</multiline>
             <font>basemedium</font>
         </textarea>
@@ -510,53 +502,45 @@
             <align>top,vcenter</align>
         </textarea>
 
-        <textarea name="dirlbl" from="basetextarea">
-            <area>30,80,140,35</area>
-            <value>Directed by</value>
-            <align>left</align>
-        </textarea>
-
         <textarea name="director" from="basetextarea">
-            <area>160,80,350,35</area>
+            <area>30,84,400,30</area>
+            <template>Directed by %1</template>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>35,113,733,145</area>
+            <area>30,114,750,162</area>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="rating" from="basetextarea">
-            <area>30,245,533,35</area>
-            <multiline>yes</multiline>
+            <area>250,296,533,30</area>
         </textarea>
 
         <textarea name="lenlbl" from="basetextarea">
-            <area>30,272,150,35</area>
+            <area>30,268,150,30</area>
             <value>Runtime</value>
         </textarea>
 
         <textarea name="length" from="basetextarea">
-            <area>30,297,350,35</area>
+            <area>30,296,350,30</area>
         </textarea>
 
         <textarea name="yrlbl" from="basetextarea">
-            <area>470,272,90,35</area>
+            <area>470,268,100,30</area>
             <value>Year</value>
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>470,297,100,35</area>
+            <area>470,296,100,30</area>
         </textarea>
 
         <textarea name="userratinglbl" from="basetextarea">
-            <area>620,272,150,35</area>
-            <align>right,top</align>
+            <area>620,268,150,30</area>
             <value>User Rating</value>
         </textarea>
 
         <textarea name="userrating" from="basetextarea">
-            <area>670,297,100,35</area>
-            <align>hcenter,top</align>
+            <area>620,296,150,30</area>
         </textarea>
 
         <textarea name="position" from="basetextarea">
@@ -573,7 +557,7 @@
         </textarea>
 
         <statetype name="parentallevel">
-            <position>740,555</position>
+            <position>740,556</position>
             <state name="None">
                 <imagetype name="icon">
                     <filename>mv_level_none.png</filename>
@@ -604,19 +588,13 @@
 
     <window name="gallery">
         <textarea name="title" from="basetextarea">
-            <area>70,15,460,50</area>
+            <area>70,15,580,50</area>
             <cutdown>yes</cutdown>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>70,40,360,50</area>
-            <cutdown>yes</cutdown>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="##x##" from="basetextarea">
-            <area>440,40,70,50</area>
+            <area>70,40,580,50</area>
             <cutdown>yes</cutdown>
             <font>basemedium</font>
         </textarea>
@@ -655,12 +633,12 @@
                         </state>
                     </statetype>
                     <textarea name="buttontext">
-                        <area>5,98,140,25</area>
+                        <area>5,95,140,30</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>65,72,55,20</area>
+                        <area>65,72,55,30</area>
                         <font>basesmallblack</font>
                         <align>right</align>
                     </textarea>
@@ -692,9 +670,15 @@
         </buttonlist>
 
         <textarea name="position" from="basetextarea">
-            <area>530,15,110,40</area>
-            <align>hcenter,vcenter</align>
+            <area>650,15,110,40</area>
             <font>basemedium</font>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="s##e##" from="basetextarea">
+            <area>650,40,110,50</area>
+            <font>basemedium</font>
+            <align>right</align>
         </textarea>
 
         <textarea name="novideos" from="basetextarea">
@@ -748,53 +732,53 @@
         </textarea>
 
         <buttontree name="videos">
-            <area>40,50,720,260</area>
+            <area>40,50,720,258</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
             <buttonlist name="listtemplate" from="basebuttonlist" />
         </buttontree>
 
         <textarea name="title" from="basetextarea">
-            <area>40,330,530,40</area>
+            <area>40,310,580,40</area>
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="subtitle" from="basetextarea">
-            <area>50,360,425,30</area>
-        </textarea>
-
-        <textarea name="##x##" from="basetextarea">
-            <area>500,360,80,30</area>
+        <textarea name="s##e##" from="basetextarea">
+            <area>540,340,80,30</area>
             <align>right</align>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>50,390,450,30</area>
-        </textarea>
-
-        <textarea name="year" from="basetextarea">
-            <area>500,390,80,30</area>
-            <align>right</align>
+            <area>40,340,450,30</area>
+            <template>Directed by %1</template>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>40,418,530,80</area>
+            <area>40,370,580,108</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
+            <cutdown>yes</cutdown>
+            <template>%"|SUBTITLE|" %%(|YEAR|) %%DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="cast" from="basetextarea">
+            <area>40,482,580,54</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
 
-        <textarea name="cast" from="basetextarea">
-            <area>60,503,505,50</area>
-            <align>left,top</align>
-            <multiline>yes</multiline>
-            <cutdown>no</cutdown>
+        <textarea name="filename" from="basetextarea">
+            <area>40,536,580,24</area>
+            <cutdown>left</cutdown>
+            <font>basesmaller</font>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="position" from="basetextarea">
-            <area>266,555,266,40</area>
+            <area>266,560,266,40</area>
             <font>basemedium</font>
-            <align>hcenter,vcenter</align>
+            <align>hcenter,top</align>
         </textarea>
 
         <imagetype name="coverart">
@@ -803,9 +787,9 @@
         </imagetype>
 
         <textarea name="level_label" from="basetextarea">
-            <area>600,560,130,30</area>
+            <area>500,560,230,30</area>
             <value>Parental Level</value>
-            <align>right,vcenter</align>
+            <align>right,top</align>
         </textarea>
 
         <statetype name="parentallevel">
@@ -847,23 +831,23 @@
         </textarea>
 
         <textarea name="extension_text" from="basetextarea">
-            <area>90,200,200,40</area>
+            <area>20,200,270,40</area>
             <value>Extension:</value>
             <align>right,vcenter</align>
         </textarea>
 
         <textarea name="command_text" from="extension_text">
-            <position>90,260</position>
+            <position>20,260</position>
             <value>Command:</value>
         </textarea>
 
         <textarea name="default_text" from="extension_text">
-            <position>90,320</position>
+            <position>20,320</position>
             <value>Use default player:</value>
         </textarea>
 
         <textarea name="ignore_text" from="extension_text">
-            <position>90,380</position>
+            <position>20,380</position>
             <value>Ignore:</value>
         </textarea>
 
@@ -902,7 +886,7 @@
     <window name="edit_metadata">
 
         <textarea name="title" from="basetextarea">
-            <area>10,20,760,50</area>
+            <area>10,20,760,32</area>
             <value>Edit Video Information</value>
             <align>hcenter,vcenter</align>
             <font>baselarge</font>
@@ -911,175 +895,174 @@
         <!-- Labels  -->
 
         <textarea name="title_text" from="basetextarea">
-            <area>50,70,250,40</area>
+            <area>10,70,120,40</area>
             <value>Title:</value>
             <align>right,top</align>
         </textarea>
 
-        <textarea name="subtitle_text" from="basetextarea">
-            <area>50,128,250,40</area>
+        <textarea name="subtitle_text" from="title_text">
+            <position>10,128</position>
             <value>Subtitle:</value>
-            <align>right,top</align>
         </textarea>
 
         <textarea name="season_text" from="basetextarea">
-            <area>50,175,250,40</area>
+            <area>520,70,150,40</area>
             <value>Season:</value>
             <align>right,top</align>
         </textarea>
 
-        <textarea name="episode_text" from="basetextarea">
-            <area>370,175,150,40</area>
+        <textarea name="episode_text" from="season_text">
+            <position>520,128</position>
             <value>Episode:</value>
-            <align>right,top</align>
         </textarea>
 
-        <textarea name="category_text" from="title_text">
-            <area>370,222,150,40</area>
+        <textarea name="category_text" from="basetextarea">
+            <area>10,177,200,40</area>
             <align>right</align>
             <value>Category:</value>
         </textarea>
 
-        <textarea name="level_text" from="title_text">
-            <area>20,222,200,40</area>
+        <textarea name="level_text" from="category_text">
+            <position>10,222</position>
             <align>right</align>
             <value>Parental Control:</value>
         </textarea>
 
-        <textarea name="child_text" from="title_text">
-            <area>20,267,200,40</area>
+        <textarea name="child_text" from="category_text">
+            <position>10,267</position>
             <align>right</align>
-            <value>File to Always Play Next:</value>
+            <value>File to Play Next:</value>
         </textarea>
 
-        <textarea name="browse_text" from="title_text">
-            <area>500,265,200,40</area>
-            <align>left</align>
+        <textarea name="browse_text" from="basetextarea">
+            <area>440,177,290,40</area>
+            <align>right</align>
             <value>Include while Browsing:</value>
         </textarea>
 
-        <textarea name="watched_text" from="title_text">
-            <area>498,304,200,40</area>
-            <align>left</align>
+        <textarea name="watched_text" from="browse_text">
+            <position>440,222</position>
+            <align>right</align>
             <value>Item has been watched:</value>
         </textarea>
 
-        <textarea name="coverart_text_label" from="title_text">
-            <position>50,328</position>
+        <textarea name="coverart_text_label" from="basetextarea">
+            <area>10,310,290,30</area>
             <value>Cover Art:</value>
+            <align>right</align>
         </textarea>
 
-        <textarea name="screenshot_text_label" from="title_text">
-            <position>50,357</position>
+        <textarea name="screenshot_text_label" from="coverart_text_label">
+            <position>10,340</position>
             <value>Screenshot:</value>
         </textarea>
 
-        <textarea name="banner_text_label" from="title_text">
-            <position>50,386</position>
+        <textarea name="banner_text_label" from="coverart_text_label">
+            <position>10,370</position>
             <value>Banner:</value>
         </textarea>
 
-        <textarea name="fanart_text_label" from="title_text">
-            <position>50,415</position>
+        <textarea name="fanart_text_label" from="coverart_text_label">
+            <position>10,400</position>
             <value>Fanart:</value>
         </textarea>
 
-        <textarea name="trailer_text_label" from="title_text">
-            <position>50,447</position>
+        <textarea name="trailer_text_label" from="coverart_text_label">
+            <position>10,430</position>
             <value>Trailer:</value>
         </textarea>
 
-        <textarea name="player_text" from="title_text">
-            <position>50,487</position>
+        <textarea name="player_text" from="coverart_text_label">
+            <position>10,480</position>
             <value>Unique Player Command:</value>
         </textarea>
 
         <!-- Widgets -->
 
         <textedit name="title_edit" from="basetextedit">
-            <position>310,60</position>
+            <position>140,60</position>
         </textedit>
 
         <textedit name="subtitle_edit" from="basetextedit">
-            <position>310,116</position>
+            <position>140,116</position>
         </textedit>
 
         <spinbox name="season" from="basespinbox">
-            <position>310,171</position>
+            <position>680,60</position>
         </spinbox>
 
         <spinbox name="episode" from="basespinbox">
-            <position>530,171</position>
+            <position>680,116</position>
         </spinbox>
 
-        <buttonlist name="level_select" from="baseselector">
-            <position>230,215</position>
+        <buttonlist name="category_select" from="baseselector">
+            <position>220,170</position>
         </buttonlist>
 
-        <buttonlist name="category_select" from="baseselector">
-            <position>530,215</position>
+        <buttonlist name="level_select" from="baseselector">
+            <position>220,215</position>
         </buttonlist>
 
         <buttonlist name="child_select" from="baseselector">
-            <position>230,260</position>
+            <position>220,260</position>
         </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">
-            <position>680,263</position>
+            <position>740,172</position>
         </checkbox>
 
         <checkbox name="watched_check" from="basecheckbox">
-            <position>680,302</position>
+            <position>740,217</position>
         </checkbox>
 
         <button name="coverart_button" from="basesearchbutton">
-            <position>310,323</position>
+            <position>310,305</position>
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,328,250,40</area>
+            <area>350,310,430,30</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="screenshot_button" from="basesearchbutton">
-            <position>310,352</position>
+            <position>310,335</position>
         </button>
 
-        <textarea name="screenshot_text" from="basetextarea">
-            <area>350,357,250,40</area>
+        <textarea name="screenshot_text" from="coverart_text">
+            <position>350,340</position>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="banner_button" from="basesearchbutton">
-            <position>310,381</position>
+            <position>310,365</position>
         </button>
 
-        <textarea name="banner_text" from="basetextarea">
-            <area>350,386,250,40</area>
+        <textarea name="banner_text" from="coverart_text">
+            <position>350,370</position>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="fanart_button" from="basesearchbutton">
-            <position>310,412</position>
+            <position>310,395</position>
         </button>
 
-        <textarea name="fanart_text" from="basetextarea">
-            <area>350,415,250,40</area>
+        <textarea name="fanart_text" from="coverart_text">
+            <position>350,400</position>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button" from="basesearchbutton">
-            <position>310,442</position>
+            <position>310,425</position>
         </button>
 
-        <textarea name="trailer_text" from="basetextarea">
-            <area>350,447,250,40</area>
+        <textarea name="trailer_text" from="coverart_text">
+            <position>350,430</position>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
 
         <textedit name="player_edit" from="basetextedit">
-            <position>310,477</position>
+            <position>310,470</position>
         </textedit>
 
         <button name="done_button" from="basebutton">
@@ -1227,15 +1210,107 @@
         </textarea>
 
         <button name="done_button" from="basebutton">
-            <position>400,545</position>
+            <position>500,545</position>
             <value>Done</value>
         </button>
 
         <button name="save_button" from="basebutton">
-            <position>200,545</position>
+            <area>160,545,240,44</area>
             <value>Save as default</value>
         </button>
 
     </window>
+
+    <window name="playersettings">
+
+        <textarea name="title" from="basetextarea">
+            <area>20,20,760,32</area>
+            <value>Player Settings</value>
+            <align>hcenter,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="default_text" from="basetextarea">
+            <area>20,70,210,30</area>
+            <align>right</align>
+            <value>Default Player:</value>
+        </textarea>
+
+        <textedit name="defaultplayer" from="basetextedit">
+            <position>250,60</position>
+        </textedit>
+
+        <textarea name="dvd_text" from="default_text">
+            <position>20,120</position>
+            <value>DVD Player:</value>
+        </textarea>
+
+        <textedit name="dvdplayer" from="basetextedit">
+            <position>250,110</position>
+        </textedit>
+
+        <textarea name="dvddrive_text" from="default_text">
+            <position>20,170</position>
+            <value>DVD Drive:</value>
+        </textarea>
+
+        <textedit name="dvddrive" from="basetextedit">
+            <position>250,160</position>
+        </textedit>
+
+        <textarea name="blu_text" from="default_text">
+            <position>20,220</position>
+            <value>Blu-ray Mount:</value>
+        </textarea>
+
+        <textedit name="bluraymount" from="basetextedit">
+            <position>250,210</position>
+        </textedit>
+
+        <textarea name="blureg_text" from="default_text">
+            <position>20,270</position>
+            <value>Blu-ray Region:</value>
+        </textarea>
+
+        <buttonlist name="blurayregionlist" from="basewideselector">
+            <position>250,260</position>
+        </buttonlist>
+
+        <textarea name="altcheck_text" from="basetextarea">
+            <area>100,320,380,30</area>
+            <align>right</align>
+            <value>Enable Alternate Player:</value>
+        </textarea>
+
+        <checkbox name="altcheck" from="basecheckbox">
+            <position>500,320</position>
+        </checkbox>
+
+        <textarea name="alt_text" from="default_text">
+            <position>20,370</position>
+            <value>Alternate Player:</value>
+        </textarea>
+
+        <textedit name="altplayer" from="basetextedit">
+            <position>250,360</position>
+        </textedit>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>20,424,760,81</area>
+            <multiline>true</multiline>
+        </textarea>
+
+        <button name="ok" from="basebutton">
+            <position>200,520</position>
+            <value>OK</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>500,520</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
 <!-- vim: set expandtab ts=4 sw=4 : -->
