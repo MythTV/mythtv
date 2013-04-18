@@ -669,7 +669,7 @@
         </textarea>
 
         <buttonlist name="list" from="basebuttonlist">
-            <area>12,224,470,250</area>
+            <area>12,224,470,260</area>
             <drawfrombottom>yes</drawfrombottom>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
