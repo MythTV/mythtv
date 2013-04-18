@@ -161,8 +161,8 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
                     newrates.push_back(screenmap[key]);
                     realRates[screenmap[key]] = (int) round(*it);
                     found = true;
-#if 0
-                    LOG(VB_PLAYBACK, LOG_INFO,
+#if 1
+                    LOG(VB_PLAYBACK, LOG_DEBUG,
                         QString("CustomRate Found, set %1x%2@%3 as %4Hz")
                         .arg(w) .arg(h) .arg(*it) .arg(screenmap[key]));
 #endif
