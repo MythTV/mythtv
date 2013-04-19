@@ -3864,6 +3864,42 @@ uint ProgramInfo::QueryAverageFrameRate(void) const
     return load_markup_datum(MARK_VIDEO_RATE, chanid, recstartts);
 }
 
+MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recordedmarkup.type "
+                "FROM recordedmarkup "
+                "WHERE recordedmarkup.chanid    = :CHANID    AND "
+                "      recordedmarkup.starttime = :STARTTIME AND "
+                "      recordedmarkup.type      >= :ASPECTSTART AND "
+                "      recordedmarkup.type      <= :ASPECTEND "
+                "GROUP BY recordedmarkup.type "
+                "ORDER BY SUM( ( SELECT IFNULL(rm.mark, recordedmarkup.mark)"
+                "                FROM recordedmarkup AS rm "
+                "                WHERE rm.chanid    = recordedmarkup.chanid    AND "
+                "                      rm.starttime = recordedmarkup.starttime AND "
+                "                      rm.type      = recordedmarkup.type      AND "
+                "                      rm.mark      > recordedmarkup.mark "
+                "                ORDER BY rm.mark ASC LIMIT 1 "
+                "              ) - recordedmarkup.mark "
+                "            ) DESC "
+                "LIMIT 1");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
+    query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
+
+    if (!query.exec())
+    {
+        MythDB::DBError("QueryAverageAspectRatio", query);
+        return MARK_UNSET;
+    }
+
+    query.next();
+
+    return static_cast<MarkTypes>(query.value(0).toInt());
+}
+
 /** \brief If present in recording this loads total duration of the
  *         main video stream from database's stream markup table.
  */

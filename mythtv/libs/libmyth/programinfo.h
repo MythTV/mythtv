@@ -543,6 +543,7 @@ class MPUBLIC ProgramInfo
     uint        QueryAverageWidth(void) const;
     uint        QueryAverageHeight(void) const;
     uint        QueryAverageFrameRate(void) const;
+    MarkTypes   QueryAverageAspectRatio(void) const;
     int64_t     QueryTotalDuration(void) const;
     int64_t     QueryTotalFrames(void) const;
     QString     QueryRecordingGroup(void) const;

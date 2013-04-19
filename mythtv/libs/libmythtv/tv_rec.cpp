@@ -22,15 +22,17 @@
 #include "dtvrecorder.h"
 #include "livetvchain.h"
 #include "programinfo.h"
+#include "mythlogging.h"
+#include "channelbase.h"
 #include "atsctables.h"
 #include "dtvchannel.h"
 #include "eitscanner.h"
 #include "mythconfig.h"
 #include "remoteutil.h"
 #include "ringbuffer.h"
-#include "mythlogging.h"
 #include "v4lchannel.h"
 #include "dialogbox.h"
+#include "cardutil.h"
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "tv_rec.h"
@@ -896,11 +898,14 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
 
     // Get the width and set the videoprops
+    MarkTypes aspectRatio = curRec->QueryAverageAspectRatio();
     uint avg_height = curRec->QueryAverageHeight();
     curRec->SaveVideoProperties(
-        VID_1080 | VID_720 | VID_DAMAGED,
+        VID_1080 | VID_720 | VID_DAMAGED | VID_WIDESCREEN,
         ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
-        ((is_good) ? 0 : VID_DAMAGED));
+        ((is_good) ? 0 : VID_DAMAGED) |
+            ((aspectRatio == MARK_ASPECT_16_9) ||
+             (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0);
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())
