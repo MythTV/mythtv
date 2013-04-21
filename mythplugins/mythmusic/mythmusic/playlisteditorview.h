@@ -96,6 +96,7 @@ class PlaylistEditorView : public MusicCommon
 
     void updateSelectedTracks(void);
     void updateSelectedTracks(MusicGenericTree *node);
+    void updateSonglist(MusicGenericTree *node);
 
     void createRootNode(void);
     void reloadTree(void);
