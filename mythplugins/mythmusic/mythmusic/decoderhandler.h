@@ -99,6 +99,8 @@ class DecoderHandler : public QObject, public MythObservable
     virtual ~DecoderHandler(void);
 
     Decoder *getDecoder(void) { return m_decoder; }
+    DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
+
     void start(Metadata *mdata);
 
     void stop(void);
@@ -121,7 +123,6 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
     bool haveIOFactory(void) { return m_io_factory != NULL; }
-    DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
     void createIOFactory(const QUrl &url);
     void deleteIOFactory(void);
 
@@ -150,7 +151,7 @@ class DecoderIOFactory : public QObject, public MythObservable
 
     virtual void start(void) = 0;
     virtual void stop(void) = 0;
-    virtual QIODevice *takeInput(void) = 0;
+    virtual QIODevice *getInput(void) = 0;
 
     void setUrl (const QUrl &url) { m_url = url; }
     void setMeta (Metadata *meta) { m_meta = *meta; }
@@ -183,7 +184,7 @@ class DecoderIOFactoryFile : public DecoderIOFactory
     ~DecoderIOFactoryFile(void);
     void start(void);
     void stop() {}
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   private:
     QIODevice *m_input;
@@ -198,7 +199,7 @@ class DecoderIOFactorySG : public DecoderIOFactory
     ~DecoderIOFactorySG(void);
     void start(void);
     void stop() {}
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   private:
     QIODevice *m_input;
@@ -214,7 +215,7 @@ class DecoderIOFactoryUrl : public DecoderIOFactory
 
     void start(void);
     void stop(void);
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   protected slots:
     void replyFinished(QNetworkReply *reply);
@@ -291,7 +292,7 @@ class MusicSGIODevice : public QIODevice
 
   public:
     MusicSGIODevice(const QString &url);
-    ~MusicSGIODevice(void);
+    virtual ~MusicSGIODevice(void);
 
     virtual bool open(OpenMode mode);
     virtual void close(void) { };
@@ -300,7 +301,7 @@ class MusicSGIODevice : public QIODevice
     qint64 size(void) const;
     qint64 pos(void) const { return 0; }
     qint64 bytesAvailable(void) const;
-    bool   isSequential(void) const { return true; }
+    bool   isSequential(void) const { return false; }
     bool   seek(qint64 pos);
 
     qint64 readData(char *data, qint64 sz);

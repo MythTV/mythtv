@@ -17,7 +17,7 @@ class Metadata;
 class avfDecoder : public Decoder
 {
   public:
-    avfDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
+    avfDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~avfDecoder(void);
 
     bool initialize();

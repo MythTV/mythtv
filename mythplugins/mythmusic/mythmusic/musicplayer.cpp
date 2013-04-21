@@ -1450,7 +1450,7 @@ void CDWatcherThread::run()
 
         m_cdStatusChanged = false;
 
-        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
         decoder->setDevice(m_cdDevice);
         int numTracks = decoder->getNumCDAudioTracks();
         bool redo = false;

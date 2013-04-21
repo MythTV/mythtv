@@ -29,6 +29,7 @@
 #include <audiooutput.h>
 #include <audiooutpututil.h>
 #include <mythlogging.h>
+#include <decoderhandler.h>
 
 using namespace std;
 
@@ -171,9 +172,8 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     string_lock.unlock();
 }
 
-avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
-                       AudioOutput *o) :
-    Decoder(d, i, o),
+avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
+    Decoder(d, o),
     inited(false),              user_stop(false),
     stat(0),                    output_buf(NULL),
     output_at(0),               bks(0),
@@ -183,8 +183,8 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_sampleFmt(FORMAT_NONE),   m_channels(0),
     seekTime(-1.0),             devicename(""),
     m_inputFormat(NULL),        m_inputContext(NULL),
-    m_codec(NULL),
-    m_audioDec(NULL),           m_inputIsFile(false),
+    m_codec(NULL),              m_audioDec(NULL),
+    m_inputIsFile(false),
     m_buffer(NULL),             m_byteIOContext(NULL),
     errcode(0)
 {
@@ -430,7 +430,6 @@ void avfDecoder::deinit()
     freq = bitrate = 0;
     stat = m_channels = 0;
     m_sampleFmt = FORMAT_NONE;
-    setInput(0);
     setOutput(0);
 
     // Cleanup here
@@ -612,20 +611,18 @@ const QString &avfDecoderFactory::description() const
     return desc;
 }
 
-Decoder *avfDecoderFactory::create(const QString &file, QIODevice *input,
-                                  AudioOutput *output, bool deletable)
+Decoder *avfDecoderFactory::create(const QString &file, AudioOutput *output, bool deletable)
 {
     if (deletable)
-        return new avfDecoder(file, this, input, output);
+        return new avfDecoder(file, this, output);
 
     static avfDecoder *decoder = 0;
     if (!decoder)
     {
-        decoder = new avfDecoder(file, this, input, output);
+        decoder = new avfDecoder(file, this, output);
     }
     else
     {
-        decoder->setInput(input);
         decoder->setOutput(output);
     }
 

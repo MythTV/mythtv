@@ -20,7 +20,7 @@ class Metadata;
 class CdDecoder : public Decoder
 {
   public:
-    CdDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
+    CdDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~CdDecoder();
 
     // Decoder implementation

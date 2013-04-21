@@ -91,9 +91,8 @@ public:
 };
 
 
-CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
-                     AudioOutput *o) :
-    Decoder(d, i, o),
+CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
+    Decoder(d, o),
     m_inited(false),   m_user_stop(false),
     m_devicename(""),
     m_stat(DecoderEvent::Error),
@@ -308,7 +307,6 @@ void CdDecoder::deinit()
     m_freq = m_bitrate = 0L;
     m_stat = DecoderEvent::Finished;
     m_chan = 0;
-    setInput(0);
     setOutput(0);
 }
 
@@ -844,17 +842,18 @@ const QString &CdDecoderFactory::description() const
 }
 
 // pure virtual
-Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input,
-                                  AudioOutput *output, bool deletable)
+Decoder *CdDecoderFactory::create(const QString &file, AudioOutput *output, bool deletable)
 {
    if (deletable)
-        return new CdDecoder(file, this, input, output);
+        return new CdDecoder(file, this, output);
 
     static CdDecoder *decoder;
-    if (! decoder) {
-        decoder = new CdDecoder(file, this, input, output);
-    } else {
-        decoder->setInput(input);
+    if (! decoder)
+    {
+        decoder = new CdDecoder(file, this, output);
+    }
+    else
+    {
         decoder->setFilename(file);
         decoder->setOutput(output);
     }

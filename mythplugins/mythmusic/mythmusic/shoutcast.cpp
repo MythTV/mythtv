@@ -767,11 +767,9 @@ DecoderIOFactoryShoutCast::~DecoderIOFactoryShoutCast(void)
     closeIODevice();
 }
 
-QIODevice* DecoderIOFactoryShoutCast::takeInput(void)
+QIODevice* DecoderIOFactoryShoutCast::getInput(void)
 {
-    QIODevice *result = m_input;
-    //m_input = 0;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryShoutCast::makeIODevice(void)

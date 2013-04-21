@@ -119,11 +119,9 @@ DecoderIOFactoryFile::~DecoderIOFactoryFile(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactoryFile::takeInput(void)
+QIODevice* DecoderIOFactoryFile::getInput(void)
 {
-    QIODevice *result = m_input;
-    m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryFile::start(void)
@@ -150,11 +148,9 @@ DecoderIOFactorySG::~DecoderIOFactorySG(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactorySG::takeInput(void)
+QIODevice* DecoderIOFactorySG::getInput(void)
 {
-    QIODevice *result = m_input;
-    m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactorySG::start(void)
@@ -190,11 +186,9 @@ DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactoryUrl::takeInput(void) 
+QIODevice* DecoderIOFactoryUrl::getInput(void)
 {
-    QIODevice *result = m_input;
-    //m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryUrl::start(void)
@@ -426,7 +420,6 @@ void DecoderHandler::stop(void)
     if (m_decoder)
     {
         m_decoder->wait();
-        //delete m_decoder->input(); // TODO: need to sort out who is responsible for the input
         delete m_decoder;
         m_decoder = NULL;
     }
@@ -568,14 +561,13 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
     if (!m_decoder)
     {
-        if ((m_decoder = Decoder::create(format, NULL, NULL, true)) == NULL)
+        if ((m_decoder = Decoder::create(format, NULL, true)) == NULL)
         {
             doFailed(url, QString("No decoder for this format '%1'").arg(format));
             return;
         }
     }
 
-    m_decoder->setInput(getIOFactory()->takeInput());
     m_decoder->setFilename(url.toString());
 
     DecoderHandlerEvent ev(DecoderHandlerEvent::Ready);
@@ -758,8 +750,6 @@ int MusicIODevice::ungetch(int)
 MusicSGIODevice::MusicSGIODevice(const QString &url)
 {
     m_remotefile = new RemoteFile(url);
-    m_remotefile->Open();
-
     setOpenMode(ReadWrite);
 }
 

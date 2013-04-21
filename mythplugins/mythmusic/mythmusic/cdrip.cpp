@@ -752,7 +752,7 @@ void Ripper::scanCD(void)
     if (m_decoder)
         delete m_decoder;
 
-    m_decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    m_decoder = new CdDecoder("cda", NULL, NULL);
     if (m_decoder)
         m_decoder->setDevice(m_CDdevice);
 }
