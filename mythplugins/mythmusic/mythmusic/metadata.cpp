@@ -14,6 +14,7 @@
 #include <mythdownloadmanager.h>
 #include <mythlogging.h>
 #include <mythdate.h>
+#include <remotefile.h>
 
 // mythmusic
 #include "metadata.h"
@@ -686,7 +687,12 @@ QString Metadata::Filename(bool find) const
         return gMusicData->musicDir + m_filename;
 
     // maybe it's in our 'Music' storage group
-    //TODO add storage group lookup here
+    //FIXME: this is just looking on the master BE
+    QString filename = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                                gCoreContext->GetNumSetting("MasterServerPort"),
+                                                m_filename, "Music");
+    if (RemoteFile::Exists(filename))
+        return filename;
 
     // not found
     LOG(VB_GENERAL, LOG_ERR, QString("Metadata: Asked to get the filename for a track but no file found: %1")
