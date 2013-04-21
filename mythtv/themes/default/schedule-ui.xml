@@ -634,12 +634,10 @@
             <area>360,515,400,30</area>
         </textarea>
 
-        <textarea name="norecordings_info">
+        <textarea name="nochannels_warning">
             <area>0,110,800,70</area>
             <font>basemedium</font>
-            <value>You Haven't Scheduled Any Programs To Be Recorded\n
-                To schedule a recording, exit this screen and
-                select 'Program Guide' or 'Program Finder'</value>
+            <value>You haven't defined any channels</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>

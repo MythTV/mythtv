@@ -333,11 +333,14 @@ void ChannelRecPriority::updateList()
             m_channelList->SetItemCurrent(item);
     }
 
-    MythUIText *norecordingText = dynamic_cast<MythUIText*>
-                                                (GetChild("norecordings_info"));
+    // this textarea name is depreciated use 'nochannels_warning' instead
+    MythUIText *noChannelsText = dynamic_cast<MythUIText*>(GetChild("norecordings_info"));
 
-    if (norecordingText)
-        norecordingText->SetVisible(m_channelData.isEmpty());
+    if (!noChannelsText)
+        noChannelsText = dynamic_cast<MythUIText*>(GetChild("nochannels_warning"));
+
+    if (noChannelsText)
+        noChannelsText->SetVisible(m_channelData.isEmpty());
 }
 
 
