@@ -218,6 +218,10 @@ class MPEG2fixup
     {
         return inputFC->streams[id]->codec;
     }
+    AVCodecParserContext *getCodecParserContext(int id)
+    {
+        return inputFC->streams[id]->parser;
+    }
 
     void dumpList(FrameList *list);
 
