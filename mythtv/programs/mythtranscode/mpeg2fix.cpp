@@ -2642,7 +2642,8 @@ int main(int argc, char **argv)
 #endif
 
 int MPEG2fixup::BuildKeyframeIndex(QString &file,
-                                   frm_pos_map_t &posMap)
+                                   frm_pos_map_t &posMap,
+                                   frm_pos_map_t &durMap)
 {
     LOG(VB_GENERAL, LOG_INFO, "Generating Keyframe Index");
 
@@ -2667,7 +2668,10 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
         if (pkt.stream_index == vid_id)
         {
             if (pkt.flags & AV_PKT_FLAG_KEY)
+            {
                 posMap[count] = pkt.pos;
+                durMap[count] = totalDuration;
+            }
 
             // XXX totalDuration untested.  Results should be the same
             // as from mythcommflag --rebuild.
@@ -2676,8 +2680,7 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
             // AvFormatDecoder::PreProcessVideoPacket()
             totalDuration +=
                 av_q2d(inputFC->streams[pkt.stream_index]->time_base) *
-                pkt.duration * 1000000; // usec
-            posMap.insertMulti(count, totalDuration);
+                pkt.duration * 1000; // msec
             count++;
         }
         av_free_packet(&pkt);

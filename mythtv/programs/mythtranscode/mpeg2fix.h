@@ -147,7 +147,7 @@ class MPEG2fixup
     int Start();
     void AddRangeList(QStringList cutlist, int type);
     void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
-    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap);
+    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
 
     static void dec2x33(int64_t *pts1, int64_t pts2);
