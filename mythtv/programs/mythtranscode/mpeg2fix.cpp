@@ -2359,13 +2359,14 @@ int MPEG2fixup::Start()
         {
             FrameList *af = (*it);
             AVCodecContext *CC = getCodecContext(it.key());
+            AVCodecParserContext *CPC = getCodecParserContext(it.key());
             bool backwardsPTS = false;
 
             while (af->count())
             {
                 // What to do if the CC is corrupt?
                 // Just wait and hope it repairs itself
-                if (CC->sample_rate == 0 || CC->frame_size == 0)
+                if (CC->sample_rate == 0 || CPC->duration == 0)
                     break;
 
                 // The order of processing frames is critical to making
@@ -2381,7 +2382,7 @@ int MPEG2fixup::Start()
                 //     the audio frame
                 int64_t nextPTS, tmpPTS;
                 int64_t incPTS =
-                         90000LL * (int64_t)CC->frame_size / CC->sample_rate;
+                         90000LL * (int64_t)CPC->duration / CC->sample_rate;
 
                 if (poq.UpdateOrigPTS(it.key(), origaPTS[it.key()],
                                                   af->first()->pkt) < 0)
@@ -2450,7 +2451,7 @@ int MPEG2fixup::Start()
                 }
 
                 nextPTS = add2x33(af->first()->pkt.pts,
-                           90000LL * (int64_t)CC->frame_size / CC->sample_rate);
+                           90000LL * (int64_t)CPC->duration / CC->sample_rate);
 
                 if ((cutState[it.key()] == 1 &&
                      cmp2x33(nextPTS, cutStartPTS) > 0) ||
