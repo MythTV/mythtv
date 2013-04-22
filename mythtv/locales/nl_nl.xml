@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- EIT, Subtitle, Audio Stream Language Preferences -->
+    <setting name="ISO639Language0" global="true">dut</setting>
+    <setting name="ISO639Language1" global="true">dut</setting>
+
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">PAL</setting>
+    <setting name="VbiFormat" global="true">PAL Teletext</setting>
+    <setting name="FreqTable" global="true">europe-west</setting>
+
+    <!-- Scheduling -->
+    <setting name="prefDupMethod" global="true">8</setting> <!-- Subtitle then description works best -->
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language">nl</setting>
+
+    <!-- Country -->
+    <setting name="Country">NL</setting>
+
+    <!-- Date/Time format -->
+    <setting name="DateFormat">ddd d MMM</setting>
+    <setting name="TimeFormat">h:mm</setting>
+    <setting name="ShortDateFormat">d/M</setting>
+
+    <!-- Playback -->
+    <setting name="EnableMHEG">1</setting> <!-- Red button, interactive services -->
+
+  <!-- Plugins -->
+    <!-- MythArchive -->
+    <setting name="MythArchiveVideoFormat">PAL</setting>
+</mythlocale>
