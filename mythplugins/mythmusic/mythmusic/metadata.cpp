@@ -938,31 +938,53 @@ QString Metadata::getAlbumArtFile(void)
         }
         else
         {
-            if (!QFile::exists(res))
+            if (res.startsWith("myth://"))
             {
-                if (albumart_image->embedded)
+                // check for the image in the storage group
+                if (!RemoteFile::Exists(res))
                 {
-                    // image is embedded try to extract it from the tag and cache it for latter
-                    MetaIO *tagger = getTagger();
-                    if (tagger && tagger->supportsEmbeddedImages())
+                    if (albumart_image->embedded)
                     {
-                        QImage *image = tagger->getAlbumArt(Filename(), albumart_image->imageType);
-                        if (image)
-                        {
-                            image->save(res);
-                            delete image;
-                            delete tagger;
-                            return res;
-                        }
+                        // image is embedded try to extract it from the tag and cache it for latter
+                        //TODO need to update this to work with storage groups
+
+                        return QString("");
                     }
 
-                    if (tagger)
-                        delete tagger;
+                    // image couldn't be found!
+                    m_albumArt->getImageList()->removeAll(albumart_image);
+                    return QString("");
                 }
+            }
+            else
+            {
+                // check for the image in the local filesystem
+                if (!QFile::exists(res))
+                {
+                    if (albumart_image->embedded)
+                    {
+                        // image is embedded try to extract it from the tag and cache it for latter
+                        MetaIO *tagger = getTagger();
+                        if (tagger && tagger->supportsEmbeddedImages())
+                        {
+                            QImage *image = tagger->getAlbumArt(Filename(), albumart_image->imageType);
+                            if (image)
+                            {
+                                image->save(res);
+                                delete image;
+                                delete tagger;
+                                return res;
+                            }
+                        }
 
-                // image couldn't be found!
-                m_albumArt->getImageList()->removeAll(albumart_image);
-                return QString("");
+                        if (tagger)
+                            delete tagger;
+                    }
+
+                    // image couldn't be found!
+                    m_albumArt->getImageList()->removeAll(albumart_image);
+                    return QString("");
+                }
             }
         }
 
@@ -1530,10 +1552,26 @@ void AlbumArtImages::findImages(void)
                 bool embedded = (query.value(4).toInt() == 1);
                 image->id = query.value(0).toInt();
 
+                QUrl url(m_parent->Filename(true));
+
                 if (embedded)
-                    image->filename = GetConfDir() + "/MythMusic/AlbumArt/" + query.value(1).toString();
+                {
+                    if (url.scheme() == "myth")
+                        image->filename = gCoreContext->GenMythURL(url.host(), url.port(),
+                                                                   QString("AlbumArt/") + query.value(1).toString(),
+                                                                   "MusicArt");
+                    else
+                        image->filename = GetConfDir() + "/MythMusic/AlbumArt/" + query.value(1).toString();
+                }
                 else
-                    image->filename = gMusicData->musicDir + query.value(1).toString();
+                {
+                    if (url.scheme() == "myth")
+                        image->filename =  gCoreContext->GenMythURL(url.host(), url.port(),
+                                                                    query.value(1).toString(),
+                                                                    "Music");
+                    else
+                        image->filename = gMusicData->musicDir + query.value(1).toString();
+                }
 
                 image->imageType = (ImageType) query.value(3).toInt();
                 image->embedded = embedded;
