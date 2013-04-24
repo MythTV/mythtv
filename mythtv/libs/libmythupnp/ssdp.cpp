@@ -323,7 +323,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         long nRead = 0;
         do
         {
-            long ret = pSocket->readBlock( buffer.data() + nRead, nBytes );
+            long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
             if (ret < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")
