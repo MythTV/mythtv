@@ -488,7 +488,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
 
 int AvFormatDecoder::GetNumChapters()
 {
-    if (ic->nb_chapters > 1)
+    if (ic && ic->nb_chapters > 1)
         return ic->nb_chapters;
     return 0;
 }
@@ -3798,7 +3798,7 @@ int AvFormatDecoder::SetTrack(uint type, int trackNo)
 
 QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
 {
-    if (trackNo >= tracks[type].size())
+    if (!ic || trackNo >= tracks[type].size())
         return "";
 
     bool forced = tracks[type][trackNo].forced;
