@@ -1944,7 +1944,8 @@ void Scheduler::run(void)
         {
             MythEvent me("SCHEDULE_CHANGE");
             gCoreContext->dispatch(me);
-            idleSince = QDateTime();
+// a scheduler run has nothing to do with the idle shutdown
+//            idleSince = QDateTime();
         }
 
         // if idletimeout is 0, the user disabled the auto-shutdown feature
