@@ -111,6 +111,9 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
 
     //Authentication
     QString          m_nonce;
+
+    //Incoming data
+    QHash<QTcpSocket*, APHTTPRequest*> m_incoming;
 };
 
 #endif // MYTHAIRPLAYSERVER_H
