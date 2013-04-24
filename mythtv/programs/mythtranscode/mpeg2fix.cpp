@@ -2366,7 +2366,7 @@ int MPEG2fixup::Start()
             {
                 // What to do if the CC is corrupt?
                 // Just wait and hope it repairs itself
-                if (CC->sample_rate == 0 || CPC->duration == 0)
+                if (CC->sample_rate == 0 || !CPC || CPC->duration == 0)
                     break;
 
                 // The order of processing frames is critical to making
