@@ -1375,10 +1375,10 @@ bool MPEG2fixup::FindStart()
                     if (pkt.pos != vFrame.first()->pkt.pos)
                         break;
 
-                    if ((uint64_t)pkt.pts != AV_NOPTS_VALUE ||
-                        (uint64_t)pkt.dts != AV_NOPTS_VALUE)
+                    if (pkt.pts != AV_NOPTS_VALUE ||
+                        pkt.dts != AV_NOPTS_VALUE)
                     {
-                        if ((uint64_t)pkt.pts == AV_NOPTS_VALUE)
+                        if (pkt.pts == AV_NOPTS_VALUE)
                             vFrame.first()->pkt.pts = pkt.dts;
 
                         LOG(VB_PROCESS, LOG_INFO,
@@ -1859,7 +1859,7 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
     int64_t tmpPTS = diff2x33(curFrame->pkt.pts,
                               origvPTS / 300);
 
-    if ((uint64_t)curFrame->pkt.pts == AV_NOPTS_VALUE)
+    if (curFrame->pkt.pts == AV_NOPTS_VALUE)
     {
         LOG(VB_PROCESS, LOG_INFO,
             QString("Found frame %1 with missing PTS at %2")
@@ -2097,7 +2097,7 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep != (int64_t)AV_NOPTS_VALUE &&
+                                if (tmpPTSdiscrep != AV_NOPTS_VALUE &&
                                     tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }
