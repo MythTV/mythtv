@@ -4885,9 +4885,11 @@ if enabled taglib; then
             echo "Can't find taglib-config. Assuming 1.6 or later."
             taglib_minor="6"
         fi
+        tagprefix=`taglib-config --prefix`
+        tagincludes="-I${tagprefix}/include"
     fi
 
-    if test $taglib_minor -lt 6 || ! check_lib_cpp taglib/fileref.h TagLib::FileRef -ltag -lz ; then
+    if test $taglib_minor -lt 6 || ! check_lib_cpp taglib/fileref.h TagLib::FileRef -ltag -lz $tagincludes ; then
         die "ERROR: cannot find taglib 1.6 or later."
     fi
 fi
