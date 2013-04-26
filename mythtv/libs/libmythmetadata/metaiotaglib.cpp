@@ -10,9 +10,9 @@
 #include <tstring.h>
 #include <fileref.h>
 
-// Mythmusic
+// libmythmetadata
 #include "metaiotaglib.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 #include "musicutils.h"
 
 MetaIOTagLib::MetaIOTagLib()
@@ -28,28 +28,28 @@ MetaIOTagLib::~MetaIOTagLib(void)
 * \brief Writes metadata common to all tag formats to the tag
 *
 * \param tag A pointer to the tag
-* \param metadata Pointer to the metadata
+* \param metadata Pointer to the MusicMetadata
 */
-void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const Metadata *metadata)
+void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const MusicMetadata *metadata)
 {
     if (!tag || !metadata)
         return;
 
     if (!metadata->Artist().isEmpty())
         tag->setArtist(QStringToTString(metadata->Artist()));
-    
+
     if (!metadata->Title().isEmpty())
         tag->setTitle(QStringToTString(metadata->Title()));
-    
+
     if (!metadata->Album().isEmpty())
         tag->setAlbum(QStringToTString(metadata->Album()));
-    
+
     if (metadata->Year() > 999 && metadata->Year() < 10000) // 4 digit year.
         tag->setYear(metadata->Year());
-    
+
     if (!metadata->Genre().isEmpty())
         tag->setGenre(QStringToTString(metadata->Genre()));
-    
+
     if (0 != metadata->Track())
         tag->setTrack(metadata->Track());
 }
@@ -58,9 +58,9 @@ void MetaIOTagLib::WriteGenericMetadata(Tag *tag,  const Metadata *metadata)
 * \brief Writes metadata common to all tag formats to the tag
 *
 * \param tag A pointer to the tag
-* \param metadata Pointer to the metadata
+* \param metadata Pointer to the MusicMetadata
 */
-void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
+void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
 {
     if (!tag || ! metadata)
         return;
@@ -101,7 +101,7 @@ int MetaIOTagLib::getTrackLength(TagLib::File *file)
 
     if (file && file->audioProperties())
         milliseconds = file->audioProperties()->length() * 1000;
-    
+
     return milliseconds;
 }
 
@@ -127,6 +127,6 @@ int MetaIOTagLib::getTrackLength(const QString &filename)
                     "from '%1'. It may be corrupt.").arg(filename));
 
     delete file;
-    
+
     return milliseconds;
 }

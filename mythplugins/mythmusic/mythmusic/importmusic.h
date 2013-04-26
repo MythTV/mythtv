@@ -10,7 +10,7 @@ using namespace std;
 #include <mythscreentype.h>
 #include <mthread.h>
 
-class Metadata;
+class MusicMetadata;
 class ImportMusicDialog;
 
 class MythUIText;
@@ -23,9 +23,9 @@ class MythDialogBox;
 
 typedef struct
 {
-    Metadata *metadata;
-    bool      isNewTune;
-    bool      metadataHasChanged;
+    MusicMetadata *metadata;
+    bool           isNewTune;
+    bool           metadataHasChanged;
 } TrackInfo;
 
 class FileScannerThread: public MThread
@@ -95,7 +95,7 @@ class ImportMusicDialog : public MythScreenType
     vector<TrackInfo*>  *m_tracks;
     QStringList          m_sourceFiles;
     int                  m_currentTrack;
-    Metadata            *m_playingMetaData;
+    MusicMetadata       *m_playingMetaData;
 
     //  GUI stuff
     MythUITextEdit  *m_locationEdit;
@@ -123,19 +123,19 @@ class ImportMusicDialog : public MythScreenType
     MythUIButton    *m_addallnewButton;
     MythUIButton    *m_nextnewButton;
 
-    MythUICheckBox      *m_compilationCheck;
+    MythUICheckBox  *m_compilationCheck;
 
-    MythDialogBox       *m_popupMenu;
+    MythDialogBox   *m_popupMenu;
 
     // default metadata values
-    bool                 m_defaultCompilation;
-    QString              m_defaultCompArtist;
-    QString              m_defaultArtist;
-    QString              m_defaultAlbum;
-    QString              m_defaultGenre;
-    int                  m_defaultYear;
-    int                  m_defaultRating;
-    bool                 m_haveDefaults;
+    bool             m_defaultCompilation;
+    QString          m_defaultCompArtist;
+    QString          m_defaultArtist;
+    QString          m_defaultAlbum;
+    QString          m_defaultGenre;
+    int              m_defaultYear;
+    int              m_defaultRating;
+    bool             m_haveDefaults;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ class ImportCoverArtDialog : public MythScreenType
   public:
 
     ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
-                         Metadata *metadata);
+                         MusicMetadata *metadata);
     ~ImportCoverArtDialog();
 
     bool Create(void);
@@ -165,11 +165,11 @@ class ImportCoverArtDialog : public MythScreenType
     void updateStatus(void);
     void updateTypeSelector(void);
 
-    QStringList         m_filelist;
-    QString             m_sourceDir;
-    Metadata           *m_metadata;
-    int                 m_currentFile;
-    QString             m_saveFilename;
+    QStringList    m_filelist;
+    QString        m_sourceDir;
+    MusicMetadata *m_metadata;
+    int            m_currentFile;
+    QString        m_saveFilename;
 
     //
     //  GUI stuff

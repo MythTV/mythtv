@@ -1,5 +1,5 @@
-#ifndef METADATA_H_
-#define METADATA_H_
+#ifndef MUSICMETADATA_H_
+#define MUSICMETADATA_H_
 
 // C/C++
 #include <iostream>
@@ -15,17 +15,12 @@ using namespace std;
 #include <QMetaType>
 
 // mythtv
-#include "mythexp.h"
+#include "mythmetaexp.h"
 #include <mthread.h>
-
-
-
-// mythmusic
-
 
 class AllMusic;
 class AlbumArtImages;
-class PlaylistContainer;
+//class PlaylistContainer;
 class MetaIO;
 
 enum ImageType
@@ -39,7 +34,7 @@ enum ImageType
     IT_LAST
 };
 
-class AlbumArtImage
+class META_PUBLIC AlbumArtImage
 {
   public:
     AlbumArtImage(void) :
@@ -74,13 +69,13 @@ enum RepoType
 #define ID_TO_ID(x) x & METADATA_ID_MASK;
 #define ID_TO_REPO(x)  x >> METADATA_REPO_SHIFT
 
-class Metadata
+class META_PUBLIC MusicMetadata
 {
   public:
 
     typedef uint32_t IdType;
 
-    Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
+    MusicMetadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
@@ -123,18 +118,18 @@ class Metadata
         checkEmptyFields();
     }
 
-    Metadata(int lid, QString lstation, QString lchannel, QString lurl, QString llogourl,
+    MusicMetadata(int lid, QString lstation, QString lchannel, QString lurl, QString llogourl,
              QString lgenre, QString lmetaformat, QString lformat);
 
-    ~Metadata();
+    ~MusicMetadata();
 
-    Metadata(const Metadata &other)
+    MusicMetadata(const MusicMetadata &other)
     {
         *this = other;
          m_changed = false;
     }
 
-    Metadata& operator=(const Metadata &other);
+    MusicMetadata& operator=(const MusicMetadata &other);
 
     QString Artist() const { return m_artist; }
     void setArtist(const QString &lartist)
@@ -253,7 +248,7 @@ class Metadata
     void persist(void);
     void UpdateModTime(void) const;
     bool hasChanged() const { return m_changed; }
-    int  compare(const Metadata *other) const;
+    int  compare(const MusicMetadata *other) const;
 
     // static functions
     static void setArtistAndTrackFormats();
@@ -303,7 +298,7 @@ class Metadata
 
     IdType   m_id;
     QString  m_filename;
-    uint64_t  m_fileSize;
+    uint64_t m_fileSize;
     bool     m_changed;
 
     // radio stream stuff
@@ -324,17 +319,17 @@ class Metadata
     static QString m_formatcompilationcdtrack;
 };
 
-bool operator==(const Metadata& a, const Metadata& b);
-bool operator!=(const Metadata& a, const Metadata& b);
+bool operator==(const MusicMetadata& a, const MusicMetadata& b);
+bool operator!=(const MusicMetadata& a, const MusicMetadata& b);
 
-Q_DECLARE_METATYPE(Metadata *)
+Q_DECLARE_METATYPE(MusicMetadata *)
 
-typedef QList<Metadata*> MetadataPtrList;
+typedef QList<MusicMetadata*> MetadataPtrList;
 Q_DECLARE_METATYPE(MetadataPtrList *)
 
 //---------------------------------------------------------------------------
 
-class MetadataLoadingThread : public MThread
+class META_PUBLIC MetadataLoadingThread : public MThread
 {
 
   public:
@@ -349,15 +344,15 @@ class MetadataLoadingThread : public MThread
 
 //---------------------------------------------------------------------------
 
-class AllMusic
+class META_PUBLIC AllMusic
 {
   public:
 
     AllMusic(void);
     ~AllMusic();
 
-    Metadata*   getMetadata(int an_id);
-    bool        updateMetadata(int an_id, Metadata *the_track);
+    MusicMetadata*   getMetadata(int an_id);
+    bool        updateMetadata(int an_id, MusicMetadata *the_track);
     int         count() const { return m_numPcs; }
     int         countLoaded() const { return m_numLoaded; }
     void        save();
@@ -366,9 +361,9 @@ class AllMusic
 
     // cd stuff
     void        clearCDData(void);
-    void        addCDTrack(const Metadata &the_track);
-    bool        checkCDTrack(Metadata *the_track);
-    Metadata*   getCDMetadata(int m_the_track);
+    void        addCDTrack(const MusicMetadata &the_track);
+    bool        checkCDTrack(MusicMetadata *the_track);
+    MusicMetadata*   getCDMetadata(int m_the_track);
     QString     getCDTitle(void) const { return m_cdTitle; }
     void        setCDTitle(const QString &a_title) { m_cdTitle = a_title; }
     int         getCDTrackCount(void) const { return m_cdData.count(); }
@@ -386,7 +381,7 @@ class AllMusic
     int m_numPcs;
     int m_numLoaded;
 
-    typedef QMap<int, Metadata*> MusicMap;
+    typedef QMap<int, MusicMetadata*> MusicMap;
     MusicMap music_map;
 
     // cd stuff
@@ -403,9 +398,9 @@ class AllMusic
     double                   m_lastplayMax;
 };
 
-typedef QList<Metadata*> StreamList;
+typedef QList<MusicMetadata*> StreamList;
 
-class AllStream
+class META_PUBLIC AllStream
 {
   public:
 
@@ -414,17 +409,15 @@ class AllStream
 
     void loadStreams(void);
 
-    bool isValidID(Metadata::IdType an_id);
+    bool isValidID(MusicMetadata::IdType an_id);
 
-    Metadata*   getMetadata(Metadata::IdType an_id);
+    MusicMetadata*   getMetadata(MusicMetadata::IdType an_id);
 
     StreamList *getStreams(void) { return &m_streamList; }
 
-    void addStream(Metadata *mdata);
-    void removeStream(Metadata *mdata);
-    void updateStream(Metadata *mdata);
-
-    void createPlaylist(void);
+    void addStream(MusicMetadata *mdata);
+    void removeStream(MusicMetadata *mdata);
+    void updateStream(MusicMetadata *mdata);
 
   private:
     StreamList m_streamList;
@@ -432,36 +425,11 @@ class AllStream
 
 //----------------------------------------------------------------------------
 
-class MusicData : public QObject
-{
-  Q_OBJECT
 
-  public:
-
-    MusicData();
-    ~MusicData();
-
-  public slots:
-    void reloadMusic(void);
-
-  public:
-    QString             musicDir;
-    PlaylistContainer  *all_playlists;
-    AllMusic           *all_music;
-    AllStream          *all_streams;
-    bool                initialized;
-};
-
-// This global variable contains the MusicData instance for the application
-extern MPUBLIC MusicData *gMusicData;
-
-//----------------------------------------------------------------------------
-
-
-class AlbumArtImages
+class META_PUBLIC AlbumArtImages
 {
   public:
-    AlbumArtImages(Metadata *metadata);
+    AlbumArtImages(MusicMetadata *metadata);
     ~AlbumArtImages();
 
     void           addImage(const AlbumArtImage &newImage);
@@ -480,8 +448,8 @@ class AlbumArtImages
   private:
     void findImages(void);
 
-    Metadata     *m_parent;
-    AlbumArtList  m_imageList;
+    MusicMetadata *m_parent;
+    AlbumArtList   m_imageList;
 };
 
 Q_DECLARE_METATYPE(AlbumArtImage*);

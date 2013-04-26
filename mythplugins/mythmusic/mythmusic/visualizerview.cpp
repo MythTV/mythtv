@@ -135,7 +135,7 @@ void VisualizerView::showTrackInfoPopup(void)
 //---------------------------------------------------------
 #define MUSICINFOPOPUPTIME 8 * 1000
 
-TrackInfoPopup::TrackInfoPopup(MythScreenStack *parent, Metadata *metadata)
+TrackInfoPopup::TrackInfoPopup(MythScreenStack *parent, MusicMetadata *metadata)
          : MythScreenType(parent, "trackinfopopup", false)
 {
     m_metadata = metadata;
@@ -166,7 +166,7 @@ bool TrackInfoPopup::Create(void)
     m_metadata->toMap(metadataMap); 
 
     // add the map from the next track
-    Metadata *nextMetadata = gPlayer->getNextMetadata();
+    MusicMetadata *nextMetadata = gPlayer->getNextMetadata();
     if (nextMetadata)
         nextMetadata->toMap(metadataMap, "next");
 

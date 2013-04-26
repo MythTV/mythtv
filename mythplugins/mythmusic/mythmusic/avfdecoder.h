@@ -12,8 +12,6 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-class Metadata;
-
 class avfDecoder : public Decoder
 {
   public:

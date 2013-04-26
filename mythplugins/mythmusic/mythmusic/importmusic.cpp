@@ -7,12 +7,12 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <audiooutput.h>
+#include <musicmetadata.h>
 
 // mythmusic
 #include "importmusic.h"
 #include "decoder.h"
 #include "genres.h"
-#include "metadata.h"
 #include "cdrip.h"
 #include "editmetadata.h"
 #include "musicplayer.h"
@@ -141,7 +141,7 @@ void ImportMusicDialog::fillWidgets()
         m_currentText->SetText(QString("%1 of %2")
                 .arg(m_currentTrack + 1).arg(m_tracks->size()));
 
-        Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
+        MusicMetadata *meta = m_tracks->at(m_currentTrack)->metadata;
         m_filenameText->SetText(meta->Filename());
         m_compilationCheck->SetCheckState(meta->Compilation());
         m_compartistText->SetText(meta->CompilationArtist());
@@ -397,7 +397,7 @@ void ImportMusicDialog::addPressed()
     if (m_tracks->empty())
         return;
 
-    Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *meta = m_tracks->at(m_currentTrack)->metadata;
 
     // is the current track a new file?
     if (m_tracks->at(m_currentTrack)->isNewTune)
@@ -410,10 +410,10 @@ void ImportMusicDialog::addPressed()
         saveFilename += "." + fi.suffix();
 
         // copy the file to the new location
-        if (!copyFile(meta->Filename(), gMusicData->musicDir + saveFilename))
+        if (!copyFile(meta->Filename(), getMusicDirectory() + saveFilename))
         {
             ShowOkPopup(tr("Copy Failed\nCould not copy file to: %1")
-                                                        .arg(gMusicData->musicDir + saveFilename));
+                                                        .arg(getMusicDirectory() + saveFilename));
             return;
         }
 
@@ -422,7 +422,7 @@ void ImportMusicDialog::addPressed()
         // do we need to update the tags?
         if (m_tracks->at(m_currentTrack)->metadataHasChanged)
         {
-            MetaIO *tagger = MetaIO::createTagger(gMusicData->musicDir + saveFilename);
+            MetaIO *tagger = MetaIO::createTagger(getMusicDirectory() + saveFilename);
             if (tagger)
             {
                 tagger->write(meta);
@@ -574,7 +574,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
             MetaIO *tagger = MetaIO::createTagger(filename);
             if (tagger)
             {
-                Metadata *metadata = tagger->read(filename);
+                MusicMetadata *metadata = tagger->read(filename);
                 if (metadata)
                 {
                     TrackInfo * track = new TrackInfo;
@@ -597,7 +597,7 @@ void ImportMusicDialog::showEditMetadataDialog()
     if (m_tracks->empty())
         return;
 
-    Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -617,7 +617,7 @@ void ImportMusicDialog::showEditMetadataDialog()
 
 void ImportMusicDialog::metadataChanged(void)
 {
-    Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
     m_tracks->at(m_currentTrack)->metadataHasChanged = true;
     m_tracks->at(m_currentTrack)->isNewTune =
             isNewTune(editMeta->Artist(), editMeta->Album(), editMeta->Title());
@@ -662,7 +662,7 @@ void ImportMusicDialog::showMenu()
 
 void ImportMusicDialog::saveDefaults(void)
 {
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     m_defaultCompilation = data->Compilation();
     m_defaultCompArtist = data->CompilationArtist();
     m_defaultArtist = data->Artist();
@@ -679,7 +679,7 @@ void ImportMusicDialog::setCompilation(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
 
     if (m_defaultCompilation)
     {
@@ -700,7 +700,7 @@ void ImportMusicDialog::setCompilationArtist(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setCompilationArtist(m_defaultCompArtist);
 
     fillWidgets();
@@ -711,7 +711,7 @@ void ImportMusicDialog::setArtist(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setArtist(m_defaultArtist);
 
     m_tracks->at(m_currentTrack)->isNewTune =
@@ -725,7 +725,7 @@ void ImportMusicDialog::setAlbum(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setAlbum(m_defaultAlbum);
 
     m_tracks->at(m_currentTrack)->isNewTune = 
@@ -739,7 +739,7 @@ void ImportMusicDialog::setYear(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setYear(m_defaultYear);
 
     fillWidgets();
@@ -747,7 +747,7 @@ void ImportMusicDialog::setYear(void)
 
 void ImportMusicDialog::setTrack(void)
 {
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setTrack(data->Track() + 100);
 
     fillWidgets();
@@ -758,7 +758,7 @@ void ImportMusicDialog::setGenre(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setGenre(m_defaultGenre);
 
     fillWidgets();
@@ -769,13 +769,13 @@ void ImportMusicDialog::setRating(void)
     if (!m_haveDefaults)
         return;
 
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     data->setRating(m_defaultRating);
 }
 
 void ImportMusicDialog::setTitleInitialCap(void)
 {
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     QString title = data->Title();
     bool bFoundCap = false;
 
@@ -799,7 +799,7 @@ void ImportMusicDialog::setTitleInitialCap(void)
 
 void ImportMusicDialog::setTitleWordCaps(void)
 {
-    Metadata *data = m_tracks->at(m_currentTrack)->metadata;
+    MusicMetadata *data = m_tracks->at(m_currentTrack)->metadata;
     QString title = data->Title();
     bool bInWord = false;
 
@@ -862,7 +862,7 @@ void ImportMusicDialog::customEvent(QEvent *event)
 
 ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
                                            const QString &sourceDir,
-                                           Metadata *metadata) :
+                                           MusicMetadata *metadata) :
     MythScreenType(parent, "import_coverart"),
     m_sourceDir(sourceDir),
     m_metadata(metadata),
@@ -1063,7 +1063,7 @@ void ImportCoverArtDialog::updateStatus()
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();
 
-        QString saveFilename = gMusicData->musicDir + filenameFromMetadata(m_metadata, false);
+        QString saveFilename = getMusicDirectory() + filenameFromMetadata(m_metadata, false);
         QFileInfo fi(saveFilename);
         QString saveDir = fi.absolutePath();
 

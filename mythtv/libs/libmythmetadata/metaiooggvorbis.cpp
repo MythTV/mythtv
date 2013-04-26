@@ -1,21 +1,18 @@
 
+// libmythmetadata
+#include "metaiooggvorbis.h"
+#include "musicmetadata.h"
+#include "musicutils.h"
+
 // Libmyth
 #include <mythcontext.h>
 
-// Taglib
-#include <xiphcomment.h>
-
-// Mythmusic
-#include "metaioflacvorbis.h"
-#include "metadata.h"
-#include "musicutils.h"
-
-MetaIOFLACVorbis::MetaIOFLACVorbis(void)
+MetaIOOggVorbis::MetaIOOggVorbis(void)
     : MetaIOTagLib()
 {
 }
 
-MetaIOFLACVorbis::~MetaIOFLACVorbis(void)
+MetaIOOggVorbis::~MetaIOOggVorbis(void)
 {
 }
 
@@ -25,40 +22,40 @@ MetaIOFLACVorbis::~MetaIOFLACVorbis(void)
 * \param filename The filename
 * \returns A taglib file object for this format
 */
-TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
+TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::FLAC::File *flacfile =
-                            new TagLib::FLAC::File(fname.constData());
+    TagLib::Ogg::Vorbis::File *oggfile =
+                            new TagLib::Ogg::Vorbis::File(fname.constData());
 
-    if (!flacfile->isOpen())
+    if (!oggfile->isOpen())
     {
-        delete flacfile;
-        flacfile = NULL;
+        delete oggfile;
+        oggfile = NULL;
     }
 
-    return flacfile;
+    return oggfile;
 }
 
 
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOFLACVorbis::write(const Metadata* mdata)
+bool MetaIOOggVorbis::write(const MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
 
-    TagLib::FLAC::File *flacfile = OpenFile(mdata->Filename());
+    TagLib::Ogg::Vorbis::File *oggfile = OpenFile(mdata->Filename());
 
-    if (!flacfile)
+    if (!oggfile)
         return false;
 
-    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment(true);
+    TagLib::Ogg::XiphComment *tag = oggfile->tag();
 
     if (!tag)
     {
-        delete flacfile;
+        delete oggfile;
         return false;
     }
 
@@ -84,33 +81,33 @@ bool MetaIOFLACVorbis::write(const Metadata* mdata)
         tag->removeField("COMPILATION_ARTIST");
     }
 
-    bool result = flacfile->save();
+    bool result = oggfile->save();
 
-    if (flacfile)
-        delete flacfile;
+    if (oggfile)
+        delete oggfile;
 
     return (result);
 }
 
 /*!
- * \copydoc MetaIO::read()
- */
-Metadata* MetaIOFLACVorbis::read(const QString &filename)
+* \copydoc MetaIO::read()
+*/
+MusicMetadata* MetaIOOggVorbis::read(const QString &filename)
 {
-    TagLib::FLAC::File *flacfile = OpenFile(filename);
+    TagLib::Ogg::Vorbis::File *oggfile = OpenFile(filename);
 
-    if (!flacfile)
+    if (!oggfile)
         return NULL;
 
-    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment();
+    TagLib::Ogg::XiphComment *tag = oggfile->tag();
 
     if (!tag)
     {
-        delete flacfile;
+        delete oggfile;
         return NULL;
     }
 
-    Metadata *metadata = new Metadata(filename);
+    MusicMetadata *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 
@@ -138,27 +135,9 @@ Metadata* MetaIOFLACVorbis::read(const QString &filename)
     metadata->setCompilation(compilation);
 
     if (metadata->Length() <= 0)
-        metadata->setLength(getTrackLength(flacfile));
+        metadata->setLength(getTrackLength(oggfile));
 
-    delete flacfile;
+    delete oggfile;
 
     return metadata;
-}
-
-bool MetaIOFLACVorbis::TagExists(const QString &filename)
-{
-    TagLib::FLAC::File *flacfile = OpenFile(filename);
-
-    if (!flacfile)
-        return false;
-
-    TagLib::Ogg::XiphComment *tag = flacfile->xiphComment(false);
-
-    bool retval = false;
-    if (tag && !tag->isEmpty())
-        retval = true;
-
-    delete flacfile;
-
-    return retval;
 }

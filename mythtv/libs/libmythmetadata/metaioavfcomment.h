@@ -1,7 +1,7 @@
 #ifndef METAIOAVFCOMMENT_H_
 #define METAIOAVFCOMMENT_H_
 
-// Mythmusic
+// libmythmetadata
 #include "metaio.h"
 
 struct AVFormatContext;
@@ -16,14 +16,14 @@ struct AVFormatContext;
 *
 * \copydetails MetaIO
 */
-class MetaIOAVFComment : public MetaIO
+class META_PUBLIC MetaIOAVFComment : public MetaIO
 {
 public:
     MetaIOAVFComment(void);
     virtual ~MetaIOAVFComment(void);
 
-    bool write(const Metadata* mdata);
-    Metadata* read(const QString &filename);
+    bool write(const MusicMetadata* mdata);
+    MusicMetadata* read(const QString &filename);
 
 private:
     int getTrackLength(const QString &filename);

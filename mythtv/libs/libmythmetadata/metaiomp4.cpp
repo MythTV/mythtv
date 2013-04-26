@@ -1,7 +1,7 @@
 
-// MythMusic
+// libmythmetadata
 #include "metaiomp4.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Libmyth
 #include <mythlogging.h>
@@ -27,7 +27,7 @@ MetaIOMP4::~MetaIOMP4(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOMP4::write(const Metadata* mdata)
+bool MetaIOMP4::write(const MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
@@ -77,7 +77,7 @@ bool MetaIOMP4::write(const Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata* MetaIOMP4::read(const QString &filename)
+MusicMetadata* MetaIOMP4::read(const QString &filename)
 {
     QString title, artist, album, genre;
     int year = 0, tracknum = 0, length = 0;
@@ -134,7 +134,7 @@ Metadata* MetaIOMP4::read(const QString &filename)
 
     metadataSanityCheck(&artist, &album, &title, &genre);
 
-    Metadata *retdata = new Metadata(filename,
+    MusicMetadata *retdata = new MusicMetadata(filename,
                                      artist,
                                      compilation ? artist : "",
                                      album,

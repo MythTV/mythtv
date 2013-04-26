@@ -13,7 +13,7 @@
 #include <mythobservable.h>
 #include <mthread.h>
 
-class Metadata;
+class MusicMetadata;
 class MetaIO;
 class Decoder;
 class DecoderFactory;

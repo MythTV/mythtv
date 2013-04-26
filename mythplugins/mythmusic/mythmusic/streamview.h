@@ -10,7 +10,6 @@
 
 // mythmusic
 #include <musiccommon.h>
-//#include "metadata.h"
 
 class MythUIWebBrowser;
 class MythUIText;
@@ -27,9 +26,9 @@ class StreamView : public MusicCommon
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void addStream(Metadata *mdata);
-    void deleteStream(Metadata *mdata);
-    void updateStream(Metadata *mdata);
+    void addStream(MusicMetadata *mdata);
+    void deleteStream(MusicMetadata *mdata);
+    void updateStream(MusicMetadata *mdata);
 
     virtual void ShowMenu(void);
 
@@ -57,10 +56,10 @@ class EditStreamMetadata : public MythScreenType
 
   public:
     EditStreamMetadata(MythScreenStack *parentStack, StreamView *parent,
-                       Metadata *mdata = NULL);
+                       MusicMetadata *mdata = NULL);
 
     bool Create();
-    void changeStreamMetadata(Metadata *mdata);
+    void changeStreamMetadata(MusicMetadata *mdata);
 
   private slots:
     void searchClicked(void);
@@ -69,7 +68,7 @@ class EditStreamMetadata : public MythScreenType
   private:
     StreamView     *m_parent;
 
-    Metadata       *m_streamMeta;
+    MusicMetadata  *m_streamMeta;
 
     MythUITextEdit *m_stationEdit;
     MythUITextEdit *m_channelEdit;
@@ -103,7 +102,7 @@ class SearchStream : public MythScreenType
     void updateGenres(void);
 
     EditStreamMetadata      *m_parent;
-    QMap<QString, Metadata>  m_streams;
+    QMap<QString, MusicMetadata>  m_streams;
     QStringList  m_stations;
     QStringList  m_genres;
 

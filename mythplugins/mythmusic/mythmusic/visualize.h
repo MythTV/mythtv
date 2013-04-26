@@ -18,9 +18,9 @@
 
 // MythTV headers
 #include <visual.h>
+#include <musicmetadata.h>
 
 // MythMusic headers
-#include "metadata.h"
 #include "constants.h"
 #include "config.h"
 
@@ -290,7 +290,7 @@ class AlbumArt : public VisualBase
     ImageType m_currImageType;
     QImage m_image;
 
-    Metadata *m_currentMetadata;
+    MusicMetadata *m_currentMetadata;
     QDateTime m_lastCycle;
 };
 

@@ -18,9 +18,9 @@
 #include <mythcorecontext.h>
 #include <mcodecs.h>
 #include <mythversion.h>
+#include <musicmetadata.h>
 
 // mythmusic
-#include "metadata.h"
 #include "shoutcast.h"
 
 
@@ -889,7 +889,7 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 
-    Metadata mdata = getMetadata();
+    MusicMetadata mdata = getMetadata();
     mdata.setTitle(meta_map["title"]);
     mdata.setArtist(meta_map["artist"]);
     mdata.setAlbum(meta_map["album"]);

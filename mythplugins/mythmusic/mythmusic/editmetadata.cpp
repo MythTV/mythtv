@@ -17,28 +17,30 @@
 #include <mythuiimage.h>
 #include <mythuiwebbrowser.h>
 #include <mythuifilebrowser.h>
+#include <musicutils.h>
 
 // mythmusic
+#include "musicdata.h"
 #include "decoder.h"
 #include "genres.h"
 #include "metaio.h"
 #include "musicplayer.h"
-#include "musicutils.h"
+
 
 #include "editmetadata.h"
 
 // these need to be static so both screens can pick them up
 bool EditMetadataCommon::metadataOnly = false;
-Metadata *EditMetadataCommon::m_metadata = NULL;
-Metadata *EditMetadataCommon::m_sourceMetadata = NULL;
+MusicMetadata *EditMetadataCommon::m_metadata = NULL;
+MusicMetadata *EditMetadataCommon::m_sourceMetadata = NULL;
 
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
-                                       Metadata *source_metadata,
+                                       MusicMetadata *source_metadata,
                                        const QString &name) :
     MythScreenType(parent, name), m_doneButton(NULL)
 {
     // make a copy so we can abandon changes
-    m_metadata = new Metadata(*source_metadata);
+    m_metadata = new MusicMetadata(*source_metadata);
     m_sourceMetadata = source_metadata;
 
     metadataOnly = false;
@@ -301,7 +303,7 @@ void EditMetadataCommon::scanForImages(void)
 ///////////////////////////////////////////////////////////////////////////////
 // EditMatadataDialog
 
-EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, Metadata *source_metadata)
+EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata)
                   : EditMetadataCommon(parent, source_metadata, "EditMetadataDialog")
 {
     gCoreContext->addListener(this);
@@ -540,7 +542,7 @@ void EditMetadataDialog::checkClicked(bool state)
 void EditMetadataDialog::searchArtist()
 {
     QString msg = tr("Select an Artist");
-    QStringList searchList = Metadata::fillFieldList("artist");
+    QStringList searchList = MusicMetadata::fillFieldList("artist");
     QString s = m_metadata->Artist();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -585,7 +587,7 @@ void EditMetadataDialog::updateArtistImage(void)
 void EditMetadataDialog::searchCompilationArtist()
 {
     QString msg = tr("Select a Compilation Artist");
-    QStringList searchList = Metadata::fillFieldList("compilation_artist");
+    QStringList searchList = MusicMetadata::fillFieldList("compilation_artist");
     QString s = m_metadata->CompilationArtist();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -610,7 +612,7 @@ void EditMetadataDialog::setCompArtist(QString compArtist)
 void EditMetadataDialog::searchAlbum()
 {
     QString msg = tr("Select an Album");
-    QStringList searchList = Metadata::fillFieldList("album");
+    QStringList searchList = MusicMetadata::fillFieldList("album");
     QString s = m_metadata->Album();
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -653,7 +655,7 @@ void EditMetadataDialog::updateAlbumImage(void)
 void EditMetadataDialog::searchGenre()
 {
     QString msg = tr("Select a Genre");
-    QStringList searchList = Metadata::fillFieldList("genre");
+    QStringList searchList = MusicMetadata::fillFieldList("genre");
     // load genre list
     /*
     searchList.clear();

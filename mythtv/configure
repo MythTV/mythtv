@@ -1767,6 +1767,7 @@ MYTHTV_CONFIG_LIST='
     qtdbus
     quartz_video
     sdl
+    taglib
     v4l2
     v4l1
     valgrind
@@ -2563,6 +2564,7 @@ enable xv
 disable indevs
 disable sdl
 enable libfftw3
+enable taglib
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -4874,6 +4876,22 @@ if enabled libuuid ; then
   fi
 fi
 
+# Check for taglib for libmythmetadata
+if enabled taglib; then
+    taglib_minor="0"
+    if test x`which taglib-config` != x"" ; then
+        taglib_minor=`taglib-config --version | cut -d. -f2`
+        if test x"$taglib_minor" = x"" ; then
+            echo "Can't find taglib-config. Assuming 1.6 or later."
+            taglib_minor="6"
+        fi
+    fi
+
+    if test $taglib_minor -lt 6 || ! check_lib_cpp taglib/fileref.h TagLib::FileRef -ltag -lz ; then
+        die "ERROR: cannot find taglib 1.6 or later."
+    fi
+fi
+
 # Attempt to use libudev for mediamonitor
 enabled libudev && check_lib2 libudev.h udev_new -ludev || disable libudev
 
@@ -5398,6 +5416,11 @@ int main(void) {
     return 0;
 }
 EOF
+
+if enabled taglib; then
+    taglib_include=`taglib-config --prefix`/include/taglib
+    taglib_libs=`taglib-config --libs`
+fi
 
 enabled libudf && check_cc <<EOF || disable libudf
 #include <cdio/udf.h>
@@ -6266,6 +6289,11 @@ if enabled libxml2; then
     append CONFIG_INCLUDEPATH "$libxml2_path"
     append CCONFIG "using_libxml2"
   fi
+fi
+
+if enabled taglib; then
+    echo "CONFIG_TAGLIB_INCLUDES=$taglib_include" >> $TMPMAK
+    echo "CONFIG_TAGLIB_LIBS=$taglib_libs" >> $TMPMAK
 fi
 
 if enabled libudf; then

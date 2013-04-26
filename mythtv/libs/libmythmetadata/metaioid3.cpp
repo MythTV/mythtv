@@ -10,9 +10,9 @@
 #include <flacfile.h>
 #include <mpegfile.h>
 
-// MythMusic
+// libmythmetadata
 #include "metaioid3.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 #include "musicutils.h"
 
 const String email = "music@mythtv.org";  // TODO username/ip/hostname?
@@ -154,7 +154,7 @@ TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOID3::write(const Metadata* mdata)
+bool MetaIOID3::write(const MusicMetadata* mdata)
 {
     if (!OpenFile(mdata->Filename(), true))
         return false;
@@ -229,7 +229,7 @@ bool MetaIOID3::write(const Metadata* mdata)
 /*!
  * \copydoc MetaIO::read()
  */
-Metadata *MetaIOID3::read(const QString &filename)
+MusicMetadata *MetaIOID3::read(const QString &filename)
 {
     if (!OpenFile(filename))
         return NULL;
@@ -256,7 +256,7 @@ Metadata *MetaIOID3::read(const QString &filename)
         }
     }
 
-    Metadata *metadata = new Metadata(filename);
+    MusicMetadata *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 
@@ -828,7 +828,7 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
     return true;
 }
 
-bool MetaIOID3::writeVolatileMetadata(const Metadata* mdata)
+bool MetaIOID3::writeVolatileMetadata(const MusicMetadata* mdata)
 {
     QString filename = mdata->Filename();
     int rating = mdata->Rating();

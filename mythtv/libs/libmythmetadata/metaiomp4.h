@@ -1,7 +1,7 @@
 #ifndef metaioMP4_H_
 #define metaioMP4_H_
 
-// Mythmusic
+// libmythmetadata
 #include "metaio.h"
 
 struct AVFormatContext;
@@ -13,14 +13,14 @@ struct AVFormatContext;
 *
 * \copydetails MetaIO
 */
-class MetaIOMP4 : public MetaIO
+class META_PUBLIC MetaIOMP4 : public MetaIO
 {
   public:
     MetaIOMP4(void);
     virtual ~MetaIOMP4(void);
 
-    bool write(const Metadata* mdata);
-    Metadata* read(const QString &filename);
+    bool write(const MusicMetadata* mdata);
+    MusicMetadata* read(const QString &filename);
 
   private:
     int getTrackLength(const QString &filename);

@@ -8,9 +8,9 @@
 // mythtv
 #include <audiooutput.h>
 #include <mythscreentype.h>
+#include <musicmetadata.h>
 
 // mythmusic
-#include "metadata.h"
 #include "playlist.h"
 #include "musicplayer.h"
 
@@ -105,10 +105,10 @@ class MPUBLIC MusicCommon : public MythScreenType
   protected:
     QString getTimeString(int exTime, int maxTime);
     void updateProgressBar(void);
-    void setTrackOnLCD(Metadata *mdata);
-    void editTrackInfo(Metadata *mdata);
-    void updateTrackInfo(Metadata *mdata);
-    void showTrackInfo(Metadata *mdata);
+    void setTrackOnLCD(MusicMetadata *mdata);
+    void editTrackInfo(MusicMetadata *mdata);
+    void updateTrackInfo(MusicMetadata *mdata);
+    void showTrackInfo(MusicMetadata *mdata);
     void updateUIPlaylist(void);
     void updatePlaylistStats(void);
     void updateUIPlayedList(void);    // for streaming
@@ -230,14 +230,14 @@ class MPUBLIC TrackInfoDialog : public MythScreenType
 {
   Q_OBJECT
   public:
-    TrackInfoDialog(MythScreenStack *parent, Metadata *mdata, const char *name);
+    TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name);
     ~TrackInfoDialog(void);
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
 
   protected:
-    Metadata *m_metadata;
+    MusicMetadata *m_metadata;
 };
 
 #endif

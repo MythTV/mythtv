@@ -7,9 +7,11 @@ using namespace std;
 
 #include <QString>
 
-#include "metadata.h"
+// libmythmetadata
+#include <musicmetadata.h>
+#include <metaioflacvorbis.h>
+
 #include "flacencoder.h"
-#include "metaioflacvorbis.h"
 
 #include <FLAC/export.h>
 #if !defined(NEWFLAC)
@@ -24,7 +26,7 @@ using namespace std;
 #include <mythcontext.h>
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
-                         Metadata *metadata)
+                         MusicMetadata *metadata)
            : Encoder(outfile, qualitylevel, metadata)
 {
     sampleindex = 0;

@@ -1,9 +1,9 @@
 #ifndef METAIOFLACVORBIS_H_
 #define METAIOFLACVORBIS_H_
 
-// Mythmusic
+// libmythmetadata
 #include "metaiotaglib.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Taglib
 #include <flacfile.h>
@@ -18,17 +18,17 @@ using TagLib::String;
 *
 * \copydetails MetaIO
 */
-class MetaIOFLACVorbis : public MetaIOTagLib
+class META_PUBLIC MetaIOFLACVorbis : public MetaIOTagLib
 {
 public:
     MetaIOFLACVorbis(void);
     virtual ~MetaIOFLACVorbis(void);
 
-    bool write(const Metadata* mdata);
-    Metadata* read(const QString &filename);
+    bool write(const MusicMetadata* mdata);
+    MusicMetadata* read(const QString &filename);
 
     virtual bool TagExists(const QString &filename);
-    
+
 private:
     TagLib::FLAC::File *OpenFile(const QString &filename);
 };

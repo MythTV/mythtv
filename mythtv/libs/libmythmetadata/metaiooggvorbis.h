@@ -1,9 +1,9 @@
 #ifndef METAIOOGGVORBIS_H_
 #define METAIOOGGVORBIS_H_
 
-// Mythmusic
+// libmythmetadata
 #include "metaiotaglib.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Taglib
 #include <vorbisfile.h>
@@ -18,14 +18,14 @@ using TagLib::String;
 *
 * \copydetails MetaIO
 */
-class MetaIOOggVorbis : public MetaIOTagLib
+class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
 {
   public:
     MetaIOOggVorbis(void);
     ~MetaIOOggVorbis(void);
 
-    bool write(const Metadata* mdata);
-    Metadata* read(const QString &filename);
+    bool write(const MusicMetadata* mdata);
+    MusicMetadata* read(const QString &filename);
 
   private:
     TagLib::Ogg::Vorbis::File *OpenFile(const QString &filename);

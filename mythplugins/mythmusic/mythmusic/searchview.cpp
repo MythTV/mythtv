@@ -11,6 +11,7 @@
 #include <mythdb.h>
 
 // mythmusic
+#include "musicdata.h"
 #include "musiccommon.h"
 #include "searchview.h"
 
@@ -101,8 +102,8 @@ void SearchView::customEvent(QEvent *event)
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_tracksList->GetItemAt(x);
-            Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
-            if (mdata && (mdata->ID() == (Metadata::IdType) trackID || trackID == -1))
+            MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+            if (mdata && (mdata->ID() == (MusicMetadata::IdType) trackID || trackID == -1))
             {
                 if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
                     item->DisplayState("on", "selectedstate");
@@ -148,7 +149,7 @@ void SearchView::customEvent(QEvent *event)
         for (int x = 0; x < m_tracksList->GetCount(); x++)
         {
             MythUIButtonListItem *item = m_tracksList->GetItemAt(x);
-            Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+            MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
             if (mdata && mdata->ID() == trackID)
             {
                 MetadataMap metadataMap;
@@ -225,7 +226,7 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
             {
                 if (m_tracksList->GetItemCurrent())
                 {
-                    Metadata *mdata = qVariantValue<Metadata*> (m_tracksList->GetItemCurrent()->GetData());
+                    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (m_tracksList->GetItemCurrent()->GetData());
                     if (mdata)
                     {
                         if (action == "INFO")
@@ -276,7 +277,7 @@ void SearchView::ShowMenu(void)
         MythUIButtonListItem *item = m_tracksList->GetItemCurrent();
         if (item)
         {
-            Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+            MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
             if (mdata)
             {
                 if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
@@ -415,7 +416,7 @@ void SearchView::updateTracksList(void)
     {
         int trackid = query.value(0).toInt();
 
-        Metadata *mdata = gMusicData->all_music->getMetadata(trackid);
+        MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackid);
         if (mdata)
         {
             MythUIButtonListItem *newitem = new MythUIButtonListItem(m_tracksList, "");
@@ -441,7 +442,7 @@ void SearchView::updateTracksList(void)
 
 void SearchView::trackClicked(MythUIButtonListItem *item)
 {
-    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
     if (mdata)
     {
         if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
@@ -459,7 +460,7 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
 
     if (item->GetImageFilename().isEmpty())
     {
-        Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
         if (mdata)
         {
             QString artFile = mdata->getAlbumArtFile();

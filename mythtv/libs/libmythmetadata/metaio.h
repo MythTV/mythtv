@@ -4,12 +4,12 @@
 // QT
 #include <QString>
 
-// MythMusic
-#include "metadata.h"
+// libmythmetadata
+#include "musicmetadata.h"
 
 #define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
 
-class MetaIO
+class META_PUBLIC MetaIO
 {
   public:
     MetaIO(void);
@@ -18,30 +18,30 @@ class MetaIO
     /*!
     * \brief Writes all metadata back to a file
     *
-    * \param mdata A pointer to a Metadata object
+    * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool write(const Metadata* mdata) = 0;
+    virtual bool write(const MusicMetadata* mdata) = 0;
 
     /*!
     * \brief Writes rating and playcount back to a file
     *
-    * \param mdata A pointer to a Metadata object
+    * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool writeVolatileMetadata(const Metadata* mdata)
+    virtual bool writeVolatileMetadata(const MusicMetadata* mdata)
     {
         (void)mdata;
         return false;
     }
 
     /*!
-    * \brief Reads Metadata from a file.
+    * \brief Reads MusicMetadata from a file.
     *
     * \param filename The filename to read metadata from.
-    * \returns Metadata pointer or NULL on error
+    * \returns MusicMetadata pointer or NULL on error
     */
-    virtual Metadata* read(const QString &filename) = 0;
+    virtual MusicMetadata* read(const QString &filename) = 0;
 
     /*!
     * \brief Does the tag support embedded cover art.
@@ -99,7 +99,7 @@ class MetaIO
     }
 
     /*!
-    * \brief Reads Metadata based on the folder/filename.
+    * \brief Reads MusicMetadata based on the folder/filename.
     *
     * \param filename The filename to try and determine metadata for.
     * \returns artist, album, title, genre & tracknum in parameters.
@@ -109,14 +109,14 @@ class MetaIO
                           int &tracknum);
 
     /*!
-    * \brief Reads Metadata based on the folder/filename.
+    * \brief Reads MusicMetadata based on the folder/filename.
     *
     * \param filename The filename to try and determine metadata for.
-    * \returns Metadata Pointer, or NULL on error.
+    * \returns MusicMetadata Pointer, or NULL on error.
     */
-    Metadata* readFromFilename(const QString &filename, bool blnLength = false);
+    MusicMetadata* readFromFilename(const QString &filename, bool blnLength = false);
 
-    void readFromFilename(Metadata *metadata);
+    void readFromFilename(MusicMetadata *metadata);
 
     virtual bool TagExists(const QString &filename)
     { 
@@ -141,9 +141,9 @@ class MetaIO
     * Creates a \p MetaIO object using \p MetaIO::createTagger and uses
     * the MetaIO object to read the metadata.
     * \param filename The filename to read metadata from.
-    * \returns an instance of \p Metadata owned by the caller
+    * \returns an instance of \p MusicMetadata owned by the caller
     */
-    static Metadata *readMetadata(const QString &filename);
+    static MusicMetadata *readMetadata(const QString &filename);
 
     /*!
     * \brief Get the metadata for \p filename
@@ -152,9 +152,9 @@ class MetaIO
     * is no database entry, it'll call \p MetaIO::readMetadata.
     *
     * \param filename The filename to get metadata for.
-    * \returns an instance of \p Metadata owned by the caller
+    * \returns an instance of \p MusicMetadata owned by the caller
     */
-    static Metadata *getMetadata(const QString &filename);
+    static MusicMetadata *getMetadata(const QString &filename);
 
   protected:
 

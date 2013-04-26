@@ -1,12 +1,13 @@
 #include <math.h>
 
-#include "metaiowavpack.h"
-#include "metadata.h"
-
 #include <apetag.h>
 #include <apeitem.h>
 
 #include <mythcontext.h>
+
+// libmythmetadata
+#include "metaiowavpack.h"
+#include "musicmetadata.h"
 #include "musicutils.h"
 
 MetaIOWavPack::MetaIOWavPack(void)
@@ -42,7 +43,7 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 /*!
 * \copydoc MetaIO::write()
 */
-bool MetaIOWavPack::write(const Metadata* mdata)
+bool MetaIOWavPack::write(const MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
@@ -84,7 +85,7 @@ bool MetaIOWavPack::write(const Metadata* mdata)
 /*!
 * \copydoc MetaIO::read()
 */
-Metadata* MetaIOWavPack::read(const QString &filename)
+MusicMetadata* MetaIOWavPack::read(const QString &filename)
 {
     TagLib::WavPack::File *wpfile = OpenFile(filename);
 
@@ -99,7 +100,7 @@ Metadata* MetaIOWavPack::read(const QString &filename)
         return NULL;
     }
 
-    Metadata *metadata = new Metadata(filename);
+    MusicMetadata *metadata = new MusicMetadata(filename);
 
     ReadGenericMetadata(tag, metadata);
 

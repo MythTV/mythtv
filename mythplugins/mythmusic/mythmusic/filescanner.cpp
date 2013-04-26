@@ -12,14 +12,13 @@
 #include <mythdialogs.h>
 #include <mythscreenstack.h>
 #include <mythprogressdialog.h>
+#include <musicmetadata.h>
+#include <metaio.h>
 
 // MythMusic headers
-#include "decoder.h"
 #include "filescanner.h"
-#include "metadata.h"
-#include "metaio.h"
 
-FileScanner::FileScanner() : m_decoder(NULL)
+FileScanner::FileScanner()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -260,7 +259,7 @@ void FileScanner::AddFileToDB(const QString &filename)
 
     LOG(VB_FILE, LOG_INFO,
         QString("Reading metadata from %1").arg(filename));
-    Metadata *data = MetaIO::readMetadata(filename);
+    MusicMetadata *data = MetaIO::readMetadata(filename);
     data->setFileSize((quint64)QFileInfo(filename).size());
     if (data)
     {
@@ -480,8 +479,8 @@ void FileScanner::UpdateFileInDB(const QString &filename)
     directory.remove(0, m_startdir.length());
     directory = directory.section( '/', 0, -2);
 
-    Metadata *db_meta   = MetaIO::getMetadata(filename);
-    Metadata *disk_meta = MetaIO::readMetadata(filename);
+    MusicMetadata *db_meta   = MetaIO::getMetadata(filename);
+    MusicMetadata *disk_meta = MetaIO::readMetadata(filename);
 
     if (db_meta && disk_meta)
     {

@@ -23,9 +23,10 @@ using namespace std;
 #include <audiooutput.h>
 #include <compat.h>
 #include <lcddevice.h>
+#include <musicmetadata.h>
 
 // MythMusic includes
-#include "metadata.h"
+#include "musicdata.h"
 #include "constants.h"
 #include "decoder.h"
 #include "mainvisual.h"
@@ -192,7 +193,7 @@ bool MusicCommon::CreateCommon(void)
 
     m_currentTrack = gPlayer->getCurrentTrackPos();
 
-    Metadata *curMeta = gPlayer->getCurrentMetadata();
+    MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
     if (curMeta)
         updateTrackInfo(curMeta);
 
@@ -305,7 +306,7 @@ void MusicCommon::updateRepeatMode(void)
     }
 
     // need this to update the next track info
-    Metadata *curMeta = gPlayer->getCurrentMetadata();
+    MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
     if (curMeta)
         updateTrackInfo(curMeta);
 }
@@ -362,7 +363,7 @@ void MusicCommon::updateShuffleMode(bool updateUIList)
             playFirstTrack();
 
         // need this to update the next track info
-        Metadata *curMeta = gPlayer->getCurrentMetadata();
+        MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
         if (curMeta)
             updateTrackInfo(curMeta);
     }
@@ -666,7 +667,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             {
                 if (m_currentPlaylist->GetItemCurrent())
                 {
-                    Metadata *mdata = qVariantValue<Metadata*> (m_currentPlaylist->GetItemCurrent()->GetData());
+                    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (m_currentPlaylist->GetItemCurrent()->GetData());
                     if (mdata)
                     {
                         if (action == "INFO")
@@ -689,7 +690,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             MythUIButtonListItem *item = m_currentPlaylist->GetItemCurrent();
             if (item)
             {
-                Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
                 if (mdata)
                     gPlayer->removeTrack(mdata->ID());
             }
@@ -917,7 +918,7 @@ void MusicCommon::stopVisualizer(void )
     gPlayer->removeVisual(m_mainvisual);
 }
 
-void MusicCommon::setTrackOnLCD(Metadata *mdata)
+void MusicCommon::setTrackOnLCD(MusicMetadata *mdata)
 {
     LCD *lcd = LCD::Get();
     if (!lcd || !mdata)
@@ -1053,7 +1054,7 @@ void MusicCommon::changeRating(bool increase)
     //if (!m_ratingState)
     //    return;
 
-    Metadata *curMeta = gPlayer->getCurrentMetadata();
+    MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
     if (!curMeta)
         return;
 
@@ -1072,7 +1073,7 @@ void MusicCommon::customEvent(QEvent *event)
 
     if (event->type() == OutputEvent::Playing)
     {
-        Metadata *curMeta = gPlayer->getCurrentMetadata();
+        MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
         if (curMeta)
             updateTrackInfo(curMeta);
 
@@ -1139,7 +1140,7 @@ void MusicCommon::customEvent(QEvent *event)
             return;
 
         int rs = 0;
-        Metadata *curMeta = gPlayer->getCurrentMetadata();
+        MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
 
         if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
         {
@@ -1307,7 +1308,7 @@ void MusicCommon::customEvent(QEvent *event)
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemCurrent();
                 if (item)
                 {
-                    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+                    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
                     if (mdata)
                         gPlayer->removeTrack(mdata->ID());
                 }
@@ -1542,8 +1543,8 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
-                if (mdata && mdata->ID() == (Metadata::IdType) trackID)
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
                 {
                     // work around a bug in MythUIButtonlist not updating properly after removing the last item
                     if (m_currentPlaylist->GetCount() == 1)
@@ -1561,7 +1562,7 @@ void MusicCommon::customEvent(QEvent *event)
         // move to the next track
         if (gPlayer->getCurrentMetadata())
         {
-            if (gPlayer->getCurrentMetadata()->ID() == (Metadata::IdType) trackID)
+            if (gPlayer->getCurrentMetadata()->ID() == (MusicMetadata::IdType) trackID)
                 gPlayer->next();
         }
 
@@ -1592,7 +1593,7 @@ void MusicCommon::customEvent(QEvent *event)
             else
             {
                 // just one track was added so just add that track to the end of the list
-                Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+                MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
 
                 if (mdata)
                 {
@@ -1652,7 +1653,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
 
                 if (mdata && mdata->ID() == trackID)
                 {
@@ -1670,7 +1671,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_playedTracksList->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_playedTracksList->GetItemAt(x);
-                Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
 
                 if (mdata && mdata->ID() == trackID)
                 {
@@ -1702,7 +1703,7 @@ void MusicCommon::customEvent(QEvent *event)
             for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
-                Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
                 if (mdata && mdata->ID() == trackID)
                 {
                     // reload the albumart image if one has already been loaded for this track
@@ -1756,7 +1757,7 @@ void MusicCommon::updateVolume(void)
     }
 }
 
-void MusicCommon::editTrackInfo(Metadata *mdata)
+void MusicCommon::editTrackInfo(MusicMetadata *mdata)
 {
     if (!mdata)
         return;
@@ -1774,12 +1775,12 @@ void MusicCommon::editTrackInfo(Metadata *mdata)
     mainStack->AddScreen(editDialog);
 }
 
-void MusicCommon::updateTrackInfo(Metadata *mdata)
+void MusicCommon::updateTrackInfo(MusicMetadata *mdata)
 {
     if (!mdata)
     {
         MetadataMap metadataMap;
-        Metadata metadata;
+        MusicMetadata metadata;
         metadata.toMap(metadataMap);
         metadata.toMap(metadataMap, "next");
         ResetMap(metadataMap);
@@ -1811,7 +1812,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     mdata->toMap(metadataMap);
 
     // add the map from the next track
-    Metadata *nextMetadata = gPlayer->getNextMetadata();
+    MusicMetadata *nextMetadata = gPlayer->getNextMetadata();
     if (nextMetadata)
         nextMetadata->toMap(metadataMap, "next");
 
@@ -1836,7 +1837,7 @@ void MusicCommon::updateTrackInfo(Metadata *mdata)
     setTrackOnLCD(mdata);
 }
 
-void MusicCommon::showTrackInfo(Metadata *mdata)
+void MusicCommon::showTrackInfo(MusicMetadata *mdata)
 {
     if (!mdata)
         return;
@@ -1880,7 +1881,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
     if (mdata)
     {
         if (item->GetImageFilename().isEmpty())
@@ -1921,11 +1922,11 @@ void MusicCommon::updateUIPlaylist(void)
 
     Playlist *playlist = gPlayer->getPlaylist();
 
-    QList<Metadata*> songlist = playlist->getSongs();
-    QList<Metadata*>::iterator it = songlist.begin();
+    QList<MusicMetadata*> songlist = playlist->getSongs();
+    QList<MusicMetadata*>::iterator it = songlist.begin();
     for (; it != songlist.end(); ++it)
     {
-        Metadata *mdata = (*it);
+        MusicMetadata *mdata = (*it);
         if (mdata)
         {
             MythUIButtonListItem *item =
@@ -1967,11 +1968,11 @@ void MusicCommon::updateUIPlayedList(void)
 
     m_playedTracksList->Reset();
 
-    QList<Metadata*> playedList = gPlayer->getPlayedTracksList();
+    QList<MusicMetadata*> playedList = gPlayer->getPlayedTracksList();
 
     for (int x = playedList.count(); x > 0; x--)
     {
-        Metadata *mdata = playedList[x-1];
+        MusicMetadata *mdata = playedList[x-1];
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_playedTracksList, "", qVariantFromValue(mdata));
 
@@ -2298,7 +2299,7 @@ void MusicCommon::fromCD(void)
     // get the list of cd tracks
     for (int x = 1; x <= gMusicData->all_music->getCDTrackCount(); x++)
     {
-        Metadata *mdata = gMusicData->all_music->getCDMetadata(x);
+        MusicMetadata *mdata = gMusicData->all_music->getCDMetadata(x);
         if (mdata)
         {
             m_songList.append((mdata)->ID());
@@ -2310,7 +2311,7 @@ void MusicCommon::fromCD(void)
 
 void MusicCommon::byArtist(void)
 {
-    Metadata* mdata = gPlayer->getCurrentMetadata();
+    MusicMetadata* mdata = gPlayer->getCurrentMetadata();
     if (!mdata)
         return;
 
@@ -2323,7 +2324,7 @@ void MusicCommon::byArtist(void)
 
 void MusicCommon::byAlbum(void)
 {
-    Metadata* mdata = gPlayer->getCurrentMetadata();
+    MusicMetadata* mdata = gPlayer->getCurrentMetadata();
     if (!mdata)
         return;
 
@@ -2336,7 +2337,7 @@ void MusicCommon::byAlbum(void)
 
 void MusicCommon::byGenre(void)
 {
-    Metadata* mdata = gPlayer->getCurrentMetadata();
+    MusicMetadata* mdata = gPlayer->getCurrentMetadata();
     if (!mdata)
         return;
 
@@ -2349,7 +2350,7 @@ void MusicCommon::byGenre(void)
 
 void MusicCommon::byYear(void)
 {
-    Metadata* mdata = gPlayer->getCurrentMetadata();
+    MusicMetadata* mdata = gPlayer->getCurrentMetadata();
     if (!mdata)
         return;
 
@@ -2362,7 +2363,7 @@ void MusicCommon::byYear(void)
 
 void MusicCommon::byTitle(void)
 {
-    Metadata* mdata = gPlayer->getCurrentMetadata();
+    MusicMetadata* mdata = gPlayer->getCurrentMetadata();
     if (!mdata)
         return;
 
@@ -2533,8 +2534,8 @@ bool MusicCommon::restorePosition(int trackID)
     {
         for (int x = 0; x < gPlayer->getPlaylist()->getSongs().size(); x++)
         {
-            Metadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
-            if (mdata && mdata->ID() == (Metadata::IdType) trackID)
+            MusicMetadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
+            if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
             {
                 m_currentTrack = x;
                 if (m_currentPlaylist)
@@ -2674,7 +2675,7 @@ void MythMusicVolumeDialog::updateDisplay()
 //---------------------------------------------------------
 // TrackInfoDialog
 //---------------------------------------------------------
-TrackInfoDialog::TrackInfoDialog(MythScreenStack *parent, Metadata *metadata, const char *name)
+TrackInfoDialog::TrackInfoDialog(MythScreenStack *parent, MusicMetadata *metadata, const char *name)
          : MythScreenType(parent, name, false)
 {
     m_metadata = metadata;

@@ -26,13 +26,13 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythuihelper.h>
 #include <remotefile.h>
+#include <musicmetadata.h>
 
 // mythmusic
 #include "mainvisual.h"
 #include "visualize.h"
 #include "inlines.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "musicplayer.h"
 
 #define FFTW_N 512

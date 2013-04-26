@@ -295,7 +295,6 @@ DEPEND_LIST="
 vorbis
 flac
 mp3lame
-taglib
 "
 
 enable $PLUGIN_LIST $CONFIG_LIST $DEPEND_LIST
@@ -663,24 +662,7 @@ if enabled music ; then
         echo "MythMusic requires the LAME mp3 encoder."
     fi
 
-    taglib_minor="0"
-    if test x`which taglib-config` != x"" ; then
-        taglib_minor=`taglib-config --version | cut -d. -f2`
-        if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.6 or later."
-            taglib_minor="6"
-        fi
-        tagprefix=`taglib-config --prefix`
-        add_cxxflags "-I${tagprefix}/include"
-        add_ldflags "-L${tagprefix}/lib"
-    fi
-
-    if test $taglib_minor -lt 6 || ! check_lib_cxx taglib/fileref.h TagLib::FileRef -ltag -lz ; then
-        disable taglib
-        echo "MythMusic requires taglib 1.6 or later."
-    fi
-
-    if disabled vorbis || disabled flac || disabled mp3lame || disabled taglib ; then
+    if disabled vorbis || disabled flac || disabled mp3lame ;  then
         echo "Disabling MythMusic due to missing dependencies."
         disable music
     fi
@@ -905,10 +887,6 @@ if enabled music ; then
              ./mythmusic/mythmusic/config.pro
     else
         echo "        FFTW           support will not be included in MythMusic"
-    fi
-
-    if enabled taglib ; then
-        echo "INCLUDEPATH += `taglib-config --prefix`/include/taglib" >> ./mythmusic/mythmusic/config.pro
     fi
 fi
 

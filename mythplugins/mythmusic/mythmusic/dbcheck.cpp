@@ -5,11 +5,12 @@
 #include <iostream>
 using namespace std;
 
+#include <musicmetadata.h>
+#include <mythcontext.h>
+#include <mythtv/mythdb.h>
+#include <mythtv/schemawizard.h>
+
 #include "dbcheck.h"
-#include "metadata.h"
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdb.h"
-#include "mythtv/schemawizard.h"
 
 const QString currentDatabaseVersion = "1020";
 

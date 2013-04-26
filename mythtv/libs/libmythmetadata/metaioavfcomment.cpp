@@ -1,7 +1,7 @@
 
-// Mythmusic
+// libmythmetadata
 #include "metaioavfcomment.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // libmyth
 #include <mythconfig.h>
@@ -26,7 +26,7 @@ MetaIOAVFComment::~MetaIOAVFComment(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOAVFComment::write(const Metadata* mdata)
+bool MetaIOAVFComment::write(const MusicMetadata* mdata)
 {
     // Wont implement....
     (void)mdata; // -Wall annoyance
@@ -36,7 +36,7 @@ bool MetaIOAVFComment::write(const Metadata* mdata)
 /*!
 * \copydoc MetaIO::read()
 */
-Metadata* MetaIOAVFComment::read(const QString &filename)
+MusicMetadata* MetaIOAVFComment::read(const QString &filename)
 {
     QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
@@ -87,7 +87,7 @@ Metadata* MetaIOAVFComment::read(const QString &filename)
 
     length = getTrackLength(p_context);
 
-    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album, 
+    MusicMetadata *retdata = new MusicMetadata(filename, artist, compilation_artist, album, 
                                      title, genre, year, tracknum, length);
 
     retdata->determineIfCompilation();

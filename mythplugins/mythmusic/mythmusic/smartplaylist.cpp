@@ -22,10 +22,11 @@ using namespace std;
 #include <mythuicheckbox.h>
 #include <mythdialogbox.h>
 #include <mythdate.h>
+#include <musicmetadata.h>
 
 // mythmusic
+#include "musicdata.h"
 #include "smartplaylist.h"
-#include "metadata.h"
 #include "musiccommon.h"
 
 struct SmartPLField
@@ -1584,27 +1585,27 @@ void CriteriaRowEditor::valueButtonClicked(void)
     if (m_fieldSelector->GetValue() == "Artist")
     {
         msg = tr("Select an Artist");
-        searchList = Metadata::fillFieldList("artist");
+        searchList = MusicMetadata::fillFieldList("artist");
     }
     else if (m_fieldSelector->GetValue() == "Comp. Artist")
     {
         msg = tr("Select a Compilation Artist");
-        searchList = Metadata::fillFieldList("compilation_artist");
+        searchList = MusicMetadata::fillFieldList("compilation_artist");
     }
     else if (m_fieldSelector->GetValue() == "Album")
     {
         msg = tr("Select an Album");
-        searchList = Metadata::fillFieldList("album");
+        searchList = MusicMetadata::fillFieldList("album");
     }
     else if (m_fieldSelector->GetValue() == "Genre")
     {
         msg = tr("Select a Genre");
-        searchList = Metadata::fillFieldList("genre");
+        searchList = MusicMetadata::fillFieldList("genre");
     }
     else if (m_fieldSelector->GetValue() == "Title")
     {
         msg = tr("Select a Title");
-        searchList = Metadata::fillFieldList("title");
+        searchList = MusicMetadata::fillFieldList("title");
     }
     else if (m_fieldSelector->GetValue() == "Last Play")
     {
@@ -1754,7 +1755,7 @@ void SmartPLResultViewer::trackVisible(MythUIButtonListItem *item)
 
     if (item->GetImageFilename().isEmpty())
     {
-        Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+        MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
         if (mdata)
         {
             QString artFile = mdata->getAlbumArtFile();
@@ -1782,7 +1783,7 @@ void SmartPLResultViewer::showTrackInfo(void)
     if (!item)
         return;
 
-    Metadata *mdata = qVariantValue<Metadata*> (item->GetData());
+    MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
     if (!mdata)
         return;
 
@@ -1809,7 +1810,7 @@ void SmartPLResultViewer::setSQL(QString sql)
     {
         while (query.next())
         {
-            Metadata *mdata = gMusicData->all_music->getMetadata(query.value(0).toInt());
+            MusicMetadata *mdata = gMusicData->all_music->getMetadata(query.value(0).toInt());
             if (mdata)
             {
                 MetadataMap metadataMap;

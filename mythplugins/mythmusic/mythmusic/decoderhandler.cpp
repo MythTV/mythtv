@@ -15,11 +15,12 @@
 #include <compat.h> // For random() on MINGW32
 #include <remotefile.h>
 #include <mythcorecontext.h>
+#include <musicmetadata.h>
+
 
 // mythmusic
 #include "decoderhandler.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "shoutcast.h"
 
 /**********************************************************************/
@@ -31,10 +32,10 @@ QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::regist
 QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
-DecoderHandlerEvent::DecoderHandlerEvent(Type t, const Metadata &meta)
+DecoderHandlerEvent::DecoderHandlerEvent(Type t, const MusicMetadata &meta)
     : MythEvent(t), m_msg(NULL), m_meta(NULL), m_available(0), m_maxSize(0)
 { 
-    m_meta = new Metadata(meta);
+    m_meta = new MusicMetadata(meta);
 }
 
 DecoderHandlerEvent::~DecoderHandlerEvent(void)
@@ -54,7 +55,7 @@ MythEvent* DecoderHandlerEvent::clone(void) const
         result->m_msg = new QString(*m_msg);
 
     if (m_meta)
-        result->m_meta = new Metadata(*m_meta);
+        result->m_meta = new MusicMetadata(*m_meta);
 
     result->m_available = m_available;
     result->m_maxSize = m_maxSize;
@@ -295,7 +296,7 @@ DecoderHandler::~DecoderHandler(void)
     stop();
 }
 
-void DecoderHandler::start(Metadata *mdata)
+void DecoderHandler::start(MusicMetadata *mdata)
 {
     m_state = LOADING;
 

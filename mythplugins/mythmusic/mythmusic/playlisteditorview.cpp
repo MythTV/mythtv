@@ -13,13 +13,14 @@
 #include <mythuiutils.h>
 #include <mythdialogbox.h>
 #include <mythdirs.h>
+#include <musicutils.h>
 
 // mythmusic
+#include "musicdata.h"
 #include "playlistcontainer.h"
 #include "musiccommon.h"
 #include "playlisteditorview.h"
 #include "smartplaylist.h"
-#include "musicutils.h"
 
 MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
                                    const QString &name, const QString &action,
@@ -401,7 +402,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                     }
                     else if (mnode->getAction() == "trackid")
                     {
-                        Metadata *mdata = gMusicData->all_music->getMetadata(mnode->getInt());
+                        MusicMetadata *mdata = gMusicData->all_music->getMetadata(mnode->getInt());
                         if (mdata)
                         {
                             if (action == "INFO")
@@ -578,7 +579,7 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
         MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
                 m_songList.append((int)mdata->ID());
         }
@@ -742,7 +743,7 @@ void PlaylistEditorView::createRootNode(void )
 
     for (int x = 0; x < alltracks->count(); x++)
     {
-        Metadata *mdata = alltracks->at(x);
+        MusicMetadata *mdata = alltracks->at(x);
         if (mdata)
         {
             if (mdata->Compilation())
@@ -804,7 +805,7 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
 
         if (mnode->getAction() == "trackid")
         {
-            Metadata *mdata = gMusicData->all_music->getMetadata(mnode->getInt());
+            MusicMetadata *mdata = gMusicData->all_music->getMetadata(mnode->getInt());
             if (mdata)
                 artFile = mdata->getAlbumArtFile();
         }
@@ -814,7 +815,7 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
             MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
             for (int x = 0; x < tracks->count(); x++)
             {
-                Metadata *mdata = tracks->at(x);
+                MusicMetadata *mdata = tracks->at(x);
                 if (mdata)
                 {
                     artFile = mdata->getAlbumArtFile();
@@ -964,7 +965,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 QString key = mdata->Title();
@@ -1000,7 +1001,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 if (map.contains(mdata->Artist()))
@@ -1034,7 +1035,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 if (mdata->CompilationArtist() != mdata->Artist())
@@ -1071,7 +1072,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 if (map.contains(mdata->Album()))
@@ -1105,7 +1106,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 if (map.contains(mdata->Genre()))
@@ -1139,7 +1140,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 QString ratingStr = tr("%n Star(s)", "", mdata->Rating());
@@ -1172,7 +1173,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 QString yearStr = QString("%1").arg(mdata->Year());
@@ -1219,7 +1220,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
         for (int x = 0; x < tracks->count(); x++)
         {
-            Metadata *mdata = tracks->at(x);
+            MusicMetadata *mdata = tracks->at(x);
             if (mdata)
             {
                 QString filename = mdata->Filename(false);
@@ -1326,7 +1327,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             MetadataPtrList *tracks = qVariantValue<MetadataPtrList*> (node->GetData());
             for (int x = 0; x < tracks->count(); x++)
             {
-                Metadata *mdata = tracks->at(x);
+                MusicMetadata *mdata = tracks->at(x);
                 if (mdata)
                 {
                     if (mdata->Artist() != mdata->CompilationArtist())
@@ -1551,11 +1552,11 @@ void PlaylistEditorView::getPlaylists(MusicGenericTree *node)
 void PlaylistEditorView::getPlaylistTracks(MusicGenericTree *node, int playlistID)
 {
     Playlist *playlist = gMusicData->all_playlists->getPlaylist(playlistID);
-    QList<Metadata*> songs = playlist->getSongs();
+    QList<MusicMetadata*> songs = playlist->getSongs();
 
     for (int x = 0; x < songs.count(); x++)
     {
-        Metadata *mdata = songs.at(x);
+        MusicMetadata *mdata = songs.at(x);
         if (mdata)
         {
             MusicGenericTree *newnode = new MusicGenericTree(node, mdata->Title(), "trackid");

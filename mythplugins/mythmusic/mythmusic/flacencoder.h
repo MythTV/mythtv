@@ -76,13 +76,13 @@
 #define MAX_SAMPLES 588 * 4
 #define NUM_CHANNELS 2
 
-class Metadata;
+class MusicMetadata;
 class QString;
 
 class FlacEncoder : public Encoder
 {
   public:
-    FlacEncoder(const QString &outfile, int qualitylevel, Metadata *metadata);
+    FlacEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
    ~FlacEncoder();
     int addSamples(int16_t *bytes, unsigned int len);
 

@@ -1,9 +1,9 @@
 #ifndef METAIOTAGLIB_H_
 #define METAIOTAGLIB_H_
 
-// MythMusic
+// libmythmetadata
 #include "metaio.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Taglib
 #include <tfile.h>
@@ -17,20 +17,20 @@ using TagLib::String;
  *
  * \brief Base for Taglib metadata classes
  */
-class MetaIOTagLib : public MetaIO
+class META_PUBLIC MetaIOTagLib : public MetaIO
 {
   public:
     MetaIOTagLib(void);
     virtual ~MetaIOTagLib(void);
 
-    virtual bool write(const Metadata* mdata) = 0;
-    virtual Metadata* read(const QString &filename) = 0;
-    
+    virtual bool write(const MusicMetadata* mdata) = 0;
+    virtual MusicMetadata* read(const QString &filename) = 0;
+
   protected:
     int getTrackLength(TagLib::File *file);
     int getTrackLength(const QString &filename);
-    void ReadGenericMetadata(TagLib::Tag *tag, Metadata *metadata);
-    void WriteGenericMetadata(TagLib::Tag *tag, const Metadata *metadata);
+    void ReadGenericMetadata(TagLib::Tag *tag, MusicMetadata *metadata);
+    void WriteGenericMetadata(TagLib::Tag *tag, const MusicMetadata *metadata);
 };
 
 #endif

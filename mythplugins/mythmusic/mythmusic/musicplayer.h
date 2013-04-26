@@ -6,8 +6,10 @@
 #include <audiooutput.h>
 #include <mythobservable.h>
 
+// libmythmetadata
+#include <musicmetadata.h>
+
 // mythmusic
-#include "metadata.h"
 #include "decoderhandler.h"
 
 class AudioOutput;
@@ -63,7 +65,7 @@ class MusicPlayer : public QObject, public MythObservable
     void setPlayMode(PlayMode mode);
     PlayMode getPlayMode(void) { return m_playMode; }
 
-    void playFile(const Metadata &meta);
+    void playFile(const MusicMetadata &meta);
 
     void addListener(QObject *listener);
     void removeListener(QObject *listener);
@@ -113,8 +115,9 @@ class MusicPlayer : public QObject, public MythObservable
     AudioOutput    *getOutput(void) { return m_output; }
 
     void         loadPlaylist(void);
+    void         loadStreamPlaylist(void);
     Playlist    *getPlaylist(void) { return m_currentPlaylist; }
-    StreamList  *getStreamList(void) { return gMusicData->all_streams->getStreams(); }
+    StreamList  *getStreamList(void);
 
     // these add and remove tracks from the active playlist
     void         removeTrack(int trackID);
@@ -122,7 +125,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     void         moveTrackUpDown(bool moveUp, int whichTrack);
 
-    QList<Metadata*> &getPlayedTracksList(void) { return m_playedList; }
+    QList<MusicMetadata*> &getPlayedTracksList(void) { return m_playedList; }
 
     int          getCurrentTrackPos(void) { return m_currentTrack; }
     bool         setCurrentTrackPos(int pos);
@@ -136,8 +139,8 @@ class MusicPlayer : public QObject, public MythObservable
     void         setAllowRestorePos(bool allow) { m_allowRestorePos = allow; }
     void         seek(int pos);
 
-    Metadata    *getCurrentMetadata(void);
-    Metadata    *getNextMetadata(void);
+    MusicMetadata *getCurrentMetadata(void);
+    MusicMetadata *getNextMetadata(void);
     void         sendMetadataChangedEvent(int trackID);
     void         sendTrackStatsChangedEvent(int trackID);
     void         sendAlbumArtChangedEvent(int trackID);
@@ -198,8 +201,8 @@ class MusicPlayer : public QObject, public MythObservable
     int          m_currentTrack;
     int          m_currentTime;
 
-    Metadata    *m_currentMetadata;
-    Metadata    *m_oneshotMetadata;
+    MusicMetadata  *m_currentMetadata;
+    MusicMetadata  *m_oneshotMetadata;
 
     AudioOutput    *m_output;
     DecoderHandler *m_decoderHandler;
@@ -229,7 +232,7 @@ class MusicPlayer : public QObject, public MythObservable
     CDWatcherThread *m_cdWatcher;
 
     // radio stuff
-    QList<Metadata*>  m_playedList;
+    QList<MusicMetadata*>  m_playedList;
     int               m_lastTrackStart;
     int               m_bufferAvailable;
     int               m_bufferSize;

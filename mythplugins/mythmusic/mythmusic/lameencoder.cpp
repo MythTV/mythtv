@@ -23,18 +23,21 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+// qt
 #include <QApplication>
 #include <QString>
 
-#include "metadata.h"
-#include "lameencoder.h"
-#include "metaioid3.h"
-
-#include <iostream>
-
+// myth
 #include <mythcontext.h>
 #include <mythlogging.h>
+#include "musicmetadata.h"
+#include "metaioid3.h"
 
+// mythmusic
+#include "lameencoder.h"
+
+// c++
+#include <iostream>
 using namespace std;
 
 static int write_buffer(char *buf, int bufsize, FILE *fp)
@@ -96,7 +99,7 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
 }
 
 LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
-                         Metadata *metadata, bool vbr) :
+                         MusicMetadata *metadata, bool vbr) :
     Encoder(outfile, qualitylevel, metadata),
     bits(16),
     channels(2),

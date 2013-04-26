@@ -1,10 +1,14 @@
 #ifndef PLAYLIST_H_
 #define PLAYLIST_H_
 
+// qt
 #include <QList>
 #include <QMap>
 
-#include "metadata.h"
+// libmythmetadata
+#include <musicmetadata.h>
+
+// mythmusic
 #include "musicplayer.h"
 
 class PlaylistContainer;
@@ -32,7 +36,7 @@ struct PlaylistOptions
     PlayPLOption playPLOption;
 };
 
-typedef QList<Metadata*> SongList;
+typedef QList<MusicMetadata*> SongList;
 
 class Playlist : public QObject
 {
@@ -69,17 +73,17 @@ class Playlist : public QObject
     QString toRawSonglist(bool shuffled = false);
 
     const SongList &getSongs(void) { return m_shuffledSongs; }
-    Metadata* getSongAt(int pos);
+    MusicMetadata* getSongAt(int pos);
 
     int getCount(void) { return m_songs.count(); }
 
     void moveTrackUpDown(bool flag, int where_its_at);
-    void moveTrackUpDown(bool flag, Metadata *the_track);
+    void moveTrackUpDown(bool flag, MusicMetadata *the_track);
 
     bool checkTrack(int a_track_id) const;
 
     void addTrack(int trackID, bool update_display);
-    void addTrack(Metadata *mdata, bool update_display);
+    void addTrack(MusicMetadata *mdata, bool update_display);
 
     void removeTrack(int the_track_id);
     void removeAllTracks(void);
@@ -119,7 +123,7 @@ class Playlist : public QObject
     QString               m_name;
     SongList              m_songs;
     SongList              m_shuffledSongs;
-    QMap<int, Metadata*>  m_songMap;
+    QMap<int, MusicMetadata*>  m_songMap;
     PlaylistContainer    *m_parent;
     bool                  m_changed;
     bool                  m_doSave;

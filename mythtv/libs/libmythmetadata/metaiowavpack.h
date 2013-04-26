@@ -1,9 +1,9 @@
 #ifndef METAIOWAVPACK_H_
 #define METAIOWAVPACK_H_
 
-// Mythmusic
+// libmythmetadata
 #include "metaiotaglib.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Taglib
 #include <wavpackfile.h>
@@ -20,14 +20,14 @@ using TagLib::String;
 *
 * \copydetails MetaIO
 */
-class MetaIOWavPack : public MetaIOTagLib
+class META_PUBLIC MetaIOWavPack : public MetaIOTagLib
 {
 public:
     MetaIOWavPack(void);
     virtual ~MetaIOWavPack(void);
 
-    bool write(const Metadata* mdata);
-    Metadata* read(const QString &filename);
+    bool write(const MusicMetadata* mdata);
+    MusicMetadata* read(const QString &filename);
 
 private:
     TagLib::WavPack::File *OpenFile(const QString &filename);

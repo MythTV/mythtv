@@ -4,17 +4,22 @@
 // warranty, or liability of any kind.
 //
 
+// mythmusic
 #include "decoder.h"
 #include "constants.h"
-#include "metadata.h"
-#include "metaio.h"
 #include "musicplayer.h"
 
+// qt
 #include <QDir>
 
+// libmyth
 #include <mythcontext.h>
 #include <output.h>
 #include <visual.h>
+
+// libmythmetadata
+#include "musicmetadata.h"
+#include "metaio.h"
 
 QEvent::Type DecoderEvent::Decoding =
     (QEvent::Type) QEvent::registerEventType();

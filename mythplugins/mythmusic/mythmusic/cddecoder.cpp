@@ -20,6 +20,7 @@
 // MythTV
 #include <audiooutput.h>
 #include <mythcontext.h>
+#include <musicmetadata.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -27,7 +28,6 @@ extern "C" {
 
 // MythMusic
 #include "constants.h"
-#include "metadata.h"
 #include "cddb.h"
 
 #define CDEXT ".cda"
@@ -507,18 +507,18 @@ int CdDecoder::getNumCDAudioTracks()
 }
 
 //public
-Metadata* CdDecoder::getMetadata(int track)
+MusicMetadata* CdDecoder::getMetadata(int track)
 {
     m_settracknum = track;
     return getMetadata();
 }
 
 //public
-Metadata *CdDecoder::getLastMetadata()
+MusicMetadata *CdDecoder::getLastMetadata()
 {
     for(int i = getNumTracks(); i > 0; --i)
     {
-        Metadata *m = getMetadata(i);
+        MusicMetadata *m = getMetadata(i);
         if(m)
             return m;
     }
@@ -565,7 +565,7 @@ static Cddb::Toc& GetToc(CdIo_t *cdio, Cddb::Toc& toc)
 }
 
 //virtual
-Metadata *CdDecoder::getMetadata()
+MusicMetadata *CdDecoder::getMetadata()
 {
     QString artist, album, compilation_artist, title, genre;
     int year = 0;
@@ -774,7 +774,7 @@ Metadata *CdDecoder::getMetadata()
     if (title.isEmpty())
         title = QObject::tr("Track %1").arg(tracknum);
 
-    Metadata *m = new Metadata(getFilename(), artist, compilation_artist,
+    MusicMetadata *m = new MusicMetadata(getFilename(), artist, compilation_artist,
         album, title, genre, year, tracknum, length);
     if (m)
         m->setCompilation(isCompilation);
@@ -783,7 +783,7 @@ Metadata *CdDecoder::getMetadata()
 }
 
 // virtual
-void CdDecoder::commitMetadata(Metadata *mdata)
+void CdDecoder::commitMetadata(MusicMetadata *mdata)
 {
     QMutexLocker lock(&getCdioMutex());
 

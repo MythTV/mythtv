@@ -1,9 +1,9 @@
 // Qt
 #include <QFileInfo>
 
-// Mythmusic
+// libmythmetadata
 #include "metaio.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 #include "metaioid3.h"
 #include "metaiooggvorbis.h"
 #include "metaioflacvorbis.h"
@@ -59,9 +59,9 @@ MetaIO* MetaIO::createTagger(const QString& filename)
 }
 
 // static
-Metadata* MetaIO::readMetadata(const QString &filename)
+MusicMetadata* MetaIO::readMetadata(const QString &filename)
 {
-    Metadata *mdata = NULL;
+    MusicMetadata *mdata = NULL;
     MetaIO *tagger = MetaIO::createTagger(filename);
     bool ignoreID3 = (gCoreContext->GetNumSetting("Ignore_ID3", 0) == 1);
 
@@ -87,10 +87,10 @@ Metadata* MetaIO::readMetadata(const QString &filename)
 }
 
 // static
-Metadata* MetaIO::getMetadata(const QString &filename)
+MusicMetadata* MetaIO::getMetadata(const QString &filename)
 {
 
-    Metadata *mdata = new Metadata(filename);
+    MusicMetadata *mdata = new MusicMetadata(filename);
     if (mdata->isInDatabase())
         return mdata;
 
@@ -165,7 +165,7 @@ void MetaIO::readFromFilename(const QString &filename,
     }
 }
 
-Metadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
+MusicMetadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
 {
     QString artist, album, title, genre;
     int tracknum = 0, length = 0;
@@ -175,18 +175,18 @@ Metadata* MetaIO::readFromFilename(const QString &filename, bool blnLength)
     if (blnLength)
         length = getTrackLength(filename);
 
-    Metadata *retdata = new Metadata(filename, artist, "", album, 
-                                     title, genre, 0, tracknum, length);
+    MusicMetadata *retdata = new MusicMetadata(filename, artist, "", album,
+                                               title, genre, 0, tracknum, length);
 
     return retdata;
 }
 
 /*!
-* \brief Reads Metadata based on the folder/filename.
+* \brief Reads MusicMetadata based on the folder/filename.
 *
-* \param metadata Metadata Pointer
+* \param metadata MusicMetadata Pointer
 */
-void MetaIO::readFromFilename(Metadata* metadata)
+void MetaIO::readFromFilename(MusicMetadata* metadata)
 {
     QString artist, album, title, genre;
     int tracknum = 0;

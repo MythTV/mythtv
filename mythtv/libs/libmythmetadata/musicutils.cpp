@@ -17,9 +17,29 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-// mythmusic
-#include "metadata.h"
+// libmythmetadata
+#include "musicmetadata.h"
 #include "musicutils.h"
+
+static QString musicDirectory;
+
+QString getMusicDirectory(void)
+{
+    if (musicDirectory.isEmpty())
+    {
+        musicDirectory = gCoreContext->GetSetting("MusicLocation");
+        musicDirectory = QDir::cleanPath(musicDirectory);
+        if (!musicDirectory.isEmpty() && !musicDirectory.endsWith("/"))
+            musicDirectory += "/";
+    }
+
+    return musicDirectory;
+}
+
+void setMusicDirectory(const QString &musicDir)
+{
+    musicDirectory = musicDir;
+}
 
 static QRegExp badChars = QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)");
 
@@ -162,9 +182,9 @@ inline QString fixFileToken_sl(QString token)
     return token;
 }
 
-QString filenameFromMetadata(Metadata *track, bool createDir)
+QString filenameFromMetadata(MusicMetadata *track, bool createDir)
 {
-    QDir directoryQD(gMusicData->musicDir);
+    QDir directoryQD(getMusicDirectory());
     QString filename;
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
@@ -225,9 +245,9 @@ QString filenameFromMetadata(Metadata *track, bool createDir)
     if (createDir)
     {
         QFileInfo fi(filename);
-        if (!directoryQD.mkpath(gMusicData->musicDir + fi.path()))
+        if (!directoryQD.mkpath(getMusicDirectory() + fi.path()))
             LOG(VB_GENERAL, LOG_ERR,
-                QString("Ripper: Failed to create directory path: '%1'").arg(gMusicData->musicDir + filename));
+                QString("filenameFromMetadata: Failed to create directory path: '%1'").arg(getMusicDirectory() + filename));
     }
 
     return filename;

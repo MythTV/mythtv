@@ -22,10 +22,12 @@
 #include <mythuihelper.h>
 #include <mythprogressdialog.h>
 #include <lcddevice.h>
+#include <musicmetadata.h>
+#include <musicutils.h>
 
 // MythMusic headers
+#include "musicdata.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "playlisteditorview.h"
 #include "playlistview.h"
 #include "streamview.h"
@@ -83,20 +85,15 @@ static void loadMusic()
         }
     }
 
-    QString startdir = gCoreContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanPath(startdir);
-    if (!startdir.isEmpty() && !startdir.endsWith("/"))
-        startdir += "/";
-
-    gMusicData->musicDir = startdir;
+    QString musicDir = getMusicDirectory();
 
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
-    if (!gMusicData->musicDir.isEmpty() && !musicdata_exists)
+    if (!musicDir.isEmpty() && !musicdata_exists)
     {
         FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(startdir);
+        fscan->SearchDir(musicDir);
         delete fscan;
     }
 
@@ -111,7 +108,7 @@ static void loadMusic()
         busy = NULL;
 
     // Set the various track formatting modes
-    Metadata::setArtistAndTrackFormats();
+    MusicMetadata::setArtistAndTrackFormats();
 
     AllMusic *all_music = new AllMusic();
 
@@ -130,8 +127,7 @@ static void loadMusic()
         usleep(50000);
     }
 
-    gMusicData->all_streams->createPlaylist();
-
+    gPlayer->loadStreamPlaylist();
     gPlayer->loadPlaylist();
 
     if (busy)
@@ -205,36 +201,26 @@ static void startRipper(void)
 
 static void runScan(void)
 {
-    // maybe we haven't loaded the music yet in which case we wont have a valid music dir set
-    if (gMusicData->musicDir.isEmpty())
-    {
-        QString startdir = gCoreContext->GetSetting("MusicLocation");
-        startdir = QDir::cleanPath(startdir);
-        if (!startdir.isEmpty() && !startdir.endsWith("/"))
-            startdir += "/";
-
-        gMusicData->musicDir = startdir;
-    }
-
-    // if we still don't have a valid start dir warn the user and give up
-    if (gMusicData->musicDir.isEmpty())
+    // if we don't have a valid start dir warn the user and give up
+    if (getMusicDirectory().isEmpty())
     {
         ShowOkPopup(QObject::tr("You need to tell me where to find your music on the "
                                 "'General Settings' page of MythMusic's settings pages."));
        return;
     }
 
-    if (!QFile::exists(gMusicData->musicDir))
+    if (!QFile::exists(getMusicDirectory()))
     {
         ShowOkPopup(QObject::tr("Can't find your music directory. Have you set it correctly on the "
                                 "'General Settings' page of MythMusic's settings pages?"));
        return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(gMusicData->musicDir));
+    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(getMusicDirectory()));
 
     FileScanner *fscan = new FileScanner();
-    fscan->SearchDir(gMusicData->musicDir);
+    QString musicDir = getMusicDirectory();
+    fscan->SearchDir(musicDir);
 
     // save anything that may have changed
     if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())

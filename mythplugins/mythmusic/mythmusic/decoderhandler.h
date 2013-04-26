@@ -13,9 +13,10 @@
 
 // mythtv
 #include <mythobservable.h>
+#include <musicmetadata.h>
 
 // mythmusic
-#include "metadata.h"
+
 #include "pls.h"
 
 class MusicBuffer;
@@ -26,7 +27,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 
 class Decoder;
-class Metadata;
+class MusicMetadata;
 class DecoderIOFactory;
 class DecoderHandler;
 class MusicBuffer;
@@ -47,11 +48,11 @@ class DecoderHandlerEvent : public MythEvent
         : MythEvent(t), m_msg(0), m_meta(0), 
           m_available(available), m_maxSize(maxSize) {}
 
-    DecoderHandlerEvent(Type t, const Metadata &m);
+    DecoderHandlerEvent(Type t, const MusicMetadata &m);
     ~DecoderHandlerEvent();
 
     QString *getMessage(void) const { return m_msg; }
-    Metadata *getMetadata(void) const { return m_meta; }
+    MusicMetadata *getMetadata(void) const { return m_meta; }
     void getBufferStatus(int *available, int *maxSize) const;
 
     virtual MythEvent *clone(void) const;
@@ -65,7 +66,7 @@ class DecoderHandlerEvent : public MythEvent
 
   private:
     QString  *m_msg;
-    Metadata *m_meta;
+    MusicMetadata *m_meta;
     int       m_available;
     int       m_maxSize;
 };
@@ -101,7 +102,7 @@ class DecoderHandler : public QObject, public MythObservable
     Decoder *getDecoder(void) { return m_decoder; }
     DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
 
-    void start(Metadata *mdata);
+    void start(MusicMetadata *mdata);
 
     void stop(void);
     void customEvent(QEvent *e);
@@ -131,7 +132,7 @@ class DecoderHandler : public QObject, public MythObservable
     PlayListFile      m_playlist;
     DecoderIOFactory *m_io_factory;
     Decoder          *m_decoder;
-    Metadata         *m_meta;
+    MusicMetadata    *m_meta;
     bool              m_op;
     uint              m_redirects;
 
@@ -154,7 +155,7 @@ class DecoderIOFactory : public QObject, public MythObservable
     virtual QIODevice *getInput(void) = 0;
 
     void setUrl (const QUrl &url) { m_url = url; }
-    void setMeta (Metadata *meta) { m_meta = *meta; }
+    void setMeta (MusicMetadata *meta) { m_meta = *meta; }
 
     static const uint DefaultPrebufferSize = 128 * 1024;
     static const uint DefaultBufferSize = 256 * 1024;
@@ -166,12 +167,12 @@ class DecoderIOFactory : public QObject, public MythObservable
     void doFailed(const QString &message);
     void doOperationStart(const QString &name);
     void doOperationStop(void);
-    Metadata& getMetadata() { return m_meta; }
+    MusicMetadata& getMetadata() { return m_meta; }
     QUrl& getUrl() { return m_url; }
 
   private:
     DecoderHandler *m_handler;
-    Metadata        m_meta;
+    MusicMetadata   m_meta;
     QUrl            m_url;
 };
 

@@ -1,9 +1,9 @@
 #ifndef METAIOID3_H_
 #define METAIOID3_H_
 
-// MythMusic
+// libmythmetadata
 #include "metaiotaglib.h"
-#include "metadata.h"
+#include "musicmetadata.h"
 
 // Taglib
 #include <id3v1tag.h>
@@ -30,19 +30,19 @@ using TagLib::ID3v2::AttachedPictureFrame;
 *
 * \copydetails MetaIO
 */
-class MetaIOID3 : public MetaIOTagLib
+class META_PUBLIC MetaIOID3 : public MetaIOTagLib
 {
   public:
     MetaIOID3(void);
     virtual ~MetaIOID3(void);
 
-    virtual bool write(const Metadata* mdata);
-    bool writeVolatileMetadata(const Metadata* mdata);
+    virtual bool write(const MusicMetadata* mdata);
+    bool writeVolatileMetadata(const MusicMetadata* mdata);
 
     bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
     bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
 
-    Metadata* read(const QString &filename);
+    MusicMetadata* read(const QString &filename);
     AlbumArtList getAlbumArtList(const QString &filename);
     QImage *getAlbumArt(const QString &filename, ImageType type);
 
@@ -57,7 +57,7 @@ class MetaIOID3 : public MetaIOTagLib
     bool OpenFile(const QString &filename, bool forWriting = false);
     bool SaveFile();
     void CloseFile();
-    
+
     TagLib::ID3v2::Tag* GetID3v2Tag(bool create = false);
     TagLib::ID3v1::Tag* GetID3v1Tag(bool create = false);
 
@@ -72,10 +72,10 @@ class MetaIOID3 : public MetaIOTagLib
                                    const AttachedPictureFrame::Type &type,
                                    const String &description = String::null);
     QString getExtFromMimeType(const QString &mimeType);
-    
+
     TagLib::File *m_file;
     QString m_filename;
-    
+
     typedef enum { kMPEG, kFLAC } TagType;
     TagType m_fileType;
 };
