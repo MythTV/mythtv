@@ -4890,7 +4890,7 @@ if enabled taglib; then
         taglibs=`taglib-config --libs`
     fi
 
-    if test $taglib_minor -lt 6 || ! check_lib_cpp taglib/fileref.h TagLib::FileRef $tagincludes $taglibs; then
+    if test $taglib_minor -lt 6 || ! check_lib_cpp taglib/fileref.h TagLib::FileRef $tagincludes $taglibs -lstdc++; then
         die "ERROR: cannot find taglib 1.6 or later."
     fi
 fi
