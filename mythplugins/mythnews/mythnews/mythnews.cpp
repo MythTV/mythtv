@@ -56,7 +56,7 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    m_zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    m_zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
     m_browser = gCoreContext->GetSetting("WebBrowserCommand", "");
 
     // Initialize variables

@@ -65,7 +65,7 @@ bool BrowserConfig::Create()
     m_commandEdit->SetText(gCoreContext->GetSetting("WebBrowserCommand",
                            "Internal"));
 
-    m_zoomEdit->SetText(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+    m_zoomEdit->SetText(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0"));
 
     int setting = gCoreContext->GetNumSetting("WebBrowserEnablePlugins", 1);
     if (setting == 1)
@@ -372,7 +372,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     m_savedBookmark = *site;
 
     QString cmd = gCoreContext->GetSetting("WebBrowserCommand", "Internal");
-    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
     QStringList urls;
 
     urls.append(site->url);
@@ -591,7 +591,7 @@ void BookmarkManager::slotShowMarked(void)
     }
 
     QString cmd = gCoreContext->GetSetting("WebBrowserCommand", "Internal");
-    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
     QStringList urls;
 
     for (int x = 0; x < m_siteList.size(); x++)
