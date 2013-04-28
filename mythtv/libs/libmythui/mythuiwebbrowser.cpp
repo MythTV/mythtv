@@ -1151,7 +1151,7 @@ void MythUIWebBrowser::ZoomOut(void)
 
 /** \fn MythUIWebBrowser::SetZoom(float)
  *  \brief Set the text size to specific size
- *  \param zoom The size to use. Useful values are between 0.2 and 5.0
+ *  \param zoom The size to use. Useful values are between 0.3 and 5.0
  */
 void MythUIWebBrowser::SetZoom(float zoom)
 {
