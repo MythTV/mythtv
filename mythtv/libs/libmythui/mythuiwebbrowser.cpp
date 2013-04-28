@@ -1158,6 +1158,12 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
+    if (zoom < 0.3)
+        zoom = 0.3;
+
+    if (zoom > 5.0)
+        zoom = 5.0;
+
     m_zoom = zoom;
     m_browser->setZoomFactor(m_zoom);
     ResetScrollBars();
