@@ -1162,6 +1162,8 @@ void MythUIWebBrowser::SetZoom(float zoom)
     m_browser->setZoomFactor(m_zoom);
     ResetScrollBars();
     UpdateBuffer();
+
+    slotStatusBarMessage(tr("Zoom: %1%").arg(m_zoom * 100));
 }
 
 void MythUIWebBrowser::SetDefaultSaveDirectory(const QString &saveDir)
