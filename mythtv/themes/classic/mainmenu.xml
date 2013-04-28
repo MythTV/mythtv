@@ -87,13 +87,6 @@
     </button>
 
     <button>
-        <type>WEBPAGE</type>
-        <text>Email</text>
-        <description>View email</description>
-        <action>MEDIA WebBrowser https://skyid.sky.com/signin/email/</action>
-    </button>
-
-    <button>
         <type>RECIPE</type>
         <text>Recipes</text>
         <action>PLUGIN mythRecipe</action>
