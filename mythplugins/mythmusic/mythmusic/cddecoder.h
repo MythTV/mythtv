@@ -67,7 +67,6 @@ class CdDecoder : public Decoder
                        m_leadout;       ///< End of last track
     double             m_lengthInSecs;
     vector<int>        m_tracks;        ///< Start block offset of each track
-    vector<Metadata*>  m_mData;         ///< After lookup, details of each trk
 #endif
     static QMutex& getCdioMutex();
 
