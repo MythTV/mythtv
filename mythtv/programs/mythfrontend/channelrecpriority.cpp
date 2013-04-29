@@ -247,7 +247,6 @@ void ChannelRecPriority::FillList(void)
 
     m_channelData.clear();
     m_sortedChannel.clear();
-    m_visMap.clear();
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT sourceid, name FROM videosource;");
@@ -260,7 +259,7 @@ void ChannelRecPriority::FillList(void)
         }
     }
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                   "icon, recpriority, name, visible FROM channel;");
+                   "icon, recpriority, name FROM channel WHERE visible=1;");
 
     if (result.exec())
     {
@@ -275,8 +274,7 @@ void ChannelRecPriority::FillList(void)
             chaninfo->icon = result.value(4).toString();
             chaninfo->recpriority = result.value(5).toInt();
             chaninfo->name = result.value(6).toString();
-            if (result.value(7).toInt() > 0)
-                m_visMap[chaninfo->chanid] = true;
+
             chaninfo->SetSourceName(srcMap[chaninfo->sourceid]);
 
             m_channelData[QString::number(cnt)] = *chaninfo;
@@ -309,8 +307,6 @@ void ChannelRecPriority::updateList()
                                                    qVariantFromValue(chanInfo));
 
         QString fontState = "default";
-        if (!m_visMap[chanInfo->chanid])
-            fontState = "disabled";
 
         item->SetText(chanInfo->GetFormatted(ChannelInfo::kChannelLong),
                                              fontState);
@@ -319,10 +315,7 @@ void ChannelRecPriority::updateList()
         chanInfo->ToMap(infomap);
         item->SetTextFromMap(infomap, fontState);
 
-        if (m_visMap[chanInfo->chanid])
-            item->DisplayState("normal", "status");
-        else
-            item->DisplayState("disabled", "status");
+        item->DisplayState("normal", "status");
 
         item->SetImage(chanInfo->icon, "icon");
         item->SetImage(chanInfo->icon);
