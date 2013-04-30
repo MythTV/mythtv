@@ -704,12 +704,19 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     data_size = 0;
     avcodec_get_frame_defaults(&frame);
     ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
-    if (ret < 0 || !got_frame)
+    if (ret < 0)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("audio decode error: %1 (%2)")
             .arg(av_make_error_string(error, sizeof(error), ret))
             .arg(got_frame));
+        return ret;
+    }
+
+    if (!got_frame)
+    {
+        LOG(VB_AUDIO, LOG_DEBUG, LOC +
+            QString("audio decode, no frame decoded (%1)").arg(ret));
         return ret;
     }
 
