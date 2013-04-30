@@ -5,19 +5,21 @@
 #include "mythcorecontext.h"
 #include "settings.h"
 #include "channelsettings.h" // for ChannelTVFormat::GetFormats()
-#include "serverpool.h"
 #include <unistd.h>
+
+#include <QNetworkInterface>
 
 
 static HostComboBox *LocalServerIP()
 {
     HostComboBox *gc = new HostComboBox("BackendServerIP");
     gc->setLabel(QObject::tr("IPv4 address"));
-    QList<QHostAddress> list = ServerPool::DefaultListenIPv4();
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
     QList<QHostAddress>::iterator it;
     for (it = list.begin(); it != list.end(); ++it)
     {
-        gc->addSelection((*it).toString(), (*it).toString());
+        if ((*it).protocol() == QAbstractSocket::IPv4Protocol)
+            gc->addSelection((*it).toString(), (*it).toString());
     }
 
     gc->setValue("127.0.0.1");
@@ -34,11 +36,12 @@ static HostComboBox *LocalServerIP6()
 {
     HostComboBox *gc = new HostComboBox("BackendServerIP6");
     gc->setLabel(QObject::tr("IPv6 address"));
-    QList<QHostAddress> list = ServerPool::DefaultListenIPv6();
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
     QList<QHostAddress>::iterator it;
     for (it = list.begin(); it != list.end(); ++it)
     {
-        gc->addSelection((*it).toString(), (*it).toString());
+        if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
+            gc->addSelection((*it).toString(), (*it).toString());
     }
 
 #if defined(QT_NO_IPV6)
