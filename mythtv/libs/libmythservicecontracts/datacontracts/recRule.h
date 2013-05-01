@@ -15,7 +15,7 @@ namespace DTC
 class SERVICE_PUBLIC RecRule : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.10" );
+    Q_CLASSINFO( "version"    , "1.11" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( int             ParentId        READ ParentId         WRITE setParentId       )
@@ -36,10 +36,8 @@ class SERVICE_PUBLIC RecRule : public QObject
 
     Q_PROPERTY( int             ChanId          READ ChanId           WRITE setChanId         )
     Q_PROPERTY( QString         CallSign        READ CallSign         WRITE setCallSign       )
-    Q_PROPERTY( int             Day             READ Day              WRITE setDay            )
-    Q_PROPERTY( QTime           Time            READ Time             WRITE setTime           )
-    Q_PROPERTY( int             FindId          READ FindId           WRITE setFindId         )
-
+    Q_PROPERTY( int             FindDay         READ FindDay          WRITE setFindDay        )
+    Q_PROPERTY( QTime           FindTime        READ FindTime         WRITE setFindTime       )
     Q_PROPERTY( QString         Type            READ Type             WRITE setType           )
     Q_PROPERTY( QString         SearchType      READ SearchType       WRITE setSearchType     )
     Q_PROPERTY( int             RecPriority     READ RecPriority      WRITE setRecPriority    )
@@ -89,9 +87,8 @@ class SERVICE_PUBLIC RecRule : public QObject
     PROPERTYIMP    ( QString    , Inetref        )
     PROPERTYIMP    ( int        , ChanId         )
     PROPERTYIMP    ( QString    , CallSign       )
-    PROPERTYIMP    ( int        , Day            )
-    PROPERTYIMP    ( QTime      , Time           )
-    PROPERTYIMP    ( int        , FindId         )
+    PROPERTYIMP    ( int        , FindDay        )
+    PROPERTYIMP    ( QTime      , FindTime       )
     PROPERTYIMP    ( QString    , Type           )
     PROPERTYIMP    ( QString    , SearchType     )
     PROPERTYIMP    ( int        , RecPriority    )
@@ -135,8 +132,7 @@ class SERVICE_PUBLIC RecRule : public QObject
               m_Season        ( 0      ),
               m_Episode       ( 0      ),
               m_ChanId        ( 0      ),
-              m_Day           ( 0      ),
-              m_FindId        ( 0      ),
+              m_FindDay       ( 0      ),
               m_RecPriority   ( 0      ),
               m_PreferredInput( 0      ),
               m_StartOffset   ( 0      ),
@@ -180,9 +176,8 @@ class SERVICE_PUBLIC RecRule : public QObject
             m_Inetref       = src.m_Inetref       ;
             m_ChanId        = src.m_ChanId        ;
             m_CallSign      = src.m_CallSign      ;
-            m_Day           = src.m_Day           ;
-            m_Time          = src.m_Time          ;
-            m_FindId        = src.m_FindId        ;
+            m_FindDay       = src.m_FindDay       ;
+            m_FindTime      = src.m_FindTime      ;
             m_Type          = src.m_Type          ;
             m_SearchType    = src.m_SearchType    ;
             m_RecPriority   = src.m_RecPriority   ;

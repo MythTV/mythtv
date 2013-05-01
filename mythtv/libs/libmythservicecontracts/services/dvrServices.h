@@ -38,12 +38,13 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.6" );
+    Q_CLASSINFO( "version"    , "1.7" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
+    Q_CLASSINFO( "UpdateRecordSchedule_Method",                 "POST" )
 
     public:
 
@@ -94,14 +95,65 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         // Recording Rules
 
-        virtual int                AddRecordSchedule     ( int       ChanId,
+        virtual int                AddRecordSchedule     ( QString   Title,
+                                                           QString   Subtitle,
+                                                           QString   Description,
+                                                           QString   Category,
                                                            QDateTime StartTime,
+                                                           QDateTime EndTime,
+                                                           QString   SeriesId,
+                                                           QString   ProgramId,
+                                                           int       ChanId,
+                                                           QString   Station,
+                                                           int       FindDay,
+                                                           QTime     FindTime,
                                                            int       ParentId,
                                                            bool      Inactive,
                                                            uint      Season,
                                                            uint      Episode,
                                                            QString   Inetref,
-                                                           int       FindId,
+                                                           QString   Type,
+                                                           QString   SearchType,
+                                                           int       RecPriority,
+                                                           uint      PreferredInput,
+                                                           int       StartOffset,
+                                                           int       EndOffset,
+                                                           QString   DupMethod,
+                                                           QString   DupIn,
+                                                           uint      Filter,
+                                                           QString   RecProfile,
+                                                           QString   RecGroup,
+                                                           QString   StorageGroup,
+                                                           QString   PlayGroup,
+                                                           bool      AutoExpire,
+                                                           int       MaxEpisodes,
+                                                           bool      MaxNewest,
+                                                           bool      AutoCommflag,
+                                                           bool      AutoTranscode,
+                                                           bool      AutoMetaLookup,
+                                                           bool      AutoUserJob1,
+                                                           bool      AutoUserJob2,
+                                                           bool      AutoUserJob3,
+                                                           bool      AutoUserJob4,
+                                                           int       Transcoder        ) = 0;
+
+        virtual bool               UpdateRecordSchedule  ( int       RecordId,
+                                                           QString   Title,
+                                                           QString   Subtitle,
+                                                           QString   Description,
+                                                           QString   Category,
+                                                           QDateTime StartTime,
+                                                           QDateTime EndTime,
+                                                           QString   SeriesId,
+                                                           QString   ProgramId,
+                                                           int       ChanId,
+                                                           QString   Station,
+                                                           int       FindDay,
+                                                           QTime     FindTime,
+                                                           bool      Inactive,
+                                                           uint      Season,
+                                                           uint      Episode,
+                                                           QString   Inetref,
                                                            QString   Type,
                                                            QString   SearchType,
                                                            int       RecPriority,
@@ -132,7 +184,11 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::RecRuleList*  GetRecordScheduleList ( int              StartIndex,
                                                            int              Count      ) = 0;
 
-        virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId   ) = 0;
+        virtual DTC::RecRule*      GetRecordSchedule     ( uint             RecordId,
+                                                           QString          Template,
+                                                           int              ChanId,
+                                                           QDateTime        StartTime,
+                                                           bool             MakeOverride ) = 0;
 
         virtual bool               EnableRecordSchedule  ( uint             RecordId   ) = 0;
 

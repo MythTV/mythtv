@@ -492,14 +492,24 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     return pPrograms;
 }
 
-int Dvr::AddRecordSchedule   ( int       chanid,
+int Dvr::AddRecordSchedule   (
+                               QString   sTitle,
+                               QString   sSubtitle,
+                               QString   sDescription,
+                               QString   sCategory,
                                QDateTime recstarttsRaw,
+                               QDateTime recendtsRaw,
+                               QString   sSeriesId,
+                               QString   sProgramId,
+                               int       nChanId,
+                               QString   sStation,
+                               int       nFindDay,
+                               QTime     tFindTime,
                                int       nParentId,
                                bool      bInactive,
                                uint      nSeason,
                                uint      nEpisode,
                                QString   sInetref,
-                               int       nFindId,
                                QString   sType,
                                QString   sSearchType,
                                int       nRecPriority,
@@ -526,9 +536,9 @@ int Dvr::AddRecordSchedule   ( int       chanid,
                                int       nTranscoder)
 {
     QDateTime recstartts = recstarttsRaw.toUTC();
-    RecordingInfo info(chanid, recstartts, false);
-    RecordingRule *rule = info.GetRecordingRule();
-    // ^ rule is owned by info and deleted when it leaves scope
+    QDateTime recendts = recendtsRaw.toUTC();
+    RecordingRule rule;
+    rule.LoadTemplate("Default");
 
     if (sType.isEmpty())
         sType = "single";
@@ -542,11 +552,14 @@ int Dvr::AddRecordSchedule   ( int       chanid,
     if (sDupIn.isEmpty())
         sDupIn = "all";
 
-    rule->m_title = info.GetTitle();
-    rule->m_type = recTypeFromString(sType);
-    rule->m_searchType = searchTypeFromString(sSearchType);
-    rule->m_dupMethod = dupMethodFromString(sDupMethod);
-    rule->m_dupIn = dupInFromString(sDupIn);
+    rule.m_title = sTitle;
+    rule.m_subtitle = sSubtitle;
+    rule.m_description = sDescription;
+
+    rule.m_type = recTypeFromString(sType);
+    rule.m_searchType = searchTypeFromString(sSearchType);
+    rule.m_dupMethod = dupMethodFromString(sDupMethod);
+    rule.m_dupIn = dupInFromString(sDupIn);
 
     if (sRecProfile.isEmpty())
         sRecProfile = "Default";
@@ -560,45 +573,213 @@ int Dvr::AddRecordSchedule   ( int       chanid,
     if (sPlayGroup.isEmpty())
         sPlayGroup = "Default";
 
-    rule->m_recProfile = sRecProfile;
-    rule->m_recGroup = sRecGroup;
-    rule->m_storageGroup = sStorageGroup;
-    rule->m_playGroup = sPlayGroup;
+    rule.m_category = sCategory;
+    rule.m_seriesid = sSeriesId;
+    rule.m_programid = sProgramId;
 
-    rule->m_parentRecID = nParentId;
-    rule->m_isInactive = bInactive;
+    rule.m_station = sStation;
 
-    rule->m_season = nSeason;
-    rule->m_episode = nEpisode;
-    rule->m_inetref = sInetref;
-    rule->m_findid = nFindId;
+    rule.m_findday = nFindDay;
+    rule.m_findtime = tFindTime;
 
-    rule->m_recPriority = nRecPriority;
-    rule->m_prefInput = nPreferredInput;
-    rule->m_startOffset = nStartOffset;
-    rule->m_endOffset = nEndOffset;
-    rule->m_filter = nFilter;
+    rule.m_recProfile = sRecProfile;
+    rule.m_recGroup = sRecGroup;
+    rule.m_storageGroup = sStorageGroup;
+    rule.m_playGroup = sPlayGroup;
 
-    rule->m_autoExpire = bAutoExpire;
-    rule->m_maxEpisodes = nMaxEpisodes;
-    rule->m_maxNewest = bMaxNewest;
+    rule.m_parentRecID = nParentId;
+    rule.m_isInactive = bInactive;
 
-    rule->m_autoCommFlag = bAutoCommflag;
-    rule->m_autoTranscode = bAutoTranscode;
-    rule->m_autoMetadataLookup = bAutoMetaLookup;
+    rule.m_season = nSeason;
+    rule.m_episode = nEpisode;
+    rule.m_inetref = sInetref;
 
-    rule->m_autoUserJob1 = bAutoUserJob1;
-    rule->m_autoUserJob2 = bAutoUserJob2;
-    rule->m_autoUserJob3 = bAutoUserJob3;
-    rule->m_autoUserJob4 = bAutoUserJob4;
+    rule.m_recPriority = nRecPriority;
+    rule.m_prefInput = nPreferredInput;
+    rule.m_startOffset = nStartOffset;
+    rule.m_endOffset = nEndOffset;
+    rule.m_filter = nFilter;
 
-    rule->m_transcoder = nTranscoder;
+    rule.m_autoExpire = bAutoExpire;
+    rule.m_maxEpisodes = nMaxEpisodes;
+    rule.m_maxNewest = bMaxNewest;
 
-    rule->Save();
+    rule.m_autoCommFlag = bAutoCommflag;
+    rule.m_autoTranscode = bAutoTranscode;
+    rule.m_autoMetadataLookup = bAutoMetaLookup;
 
-    int recid = rule->m_recordID;
+    rule.m_autoUserJob1 = bAutoUserJob1;
+    rule.m_autoUserJob2 = bAutoUserJob2;
+    rule.m_autoUserJob3 = bAutoUserJob3;
+    rule.m_autoUserJob4 = bAutoUserJob4;
+
+    rule.m_transcoder = nTranscoder;
+
+    QString msg;
+    if (!rule.IsValid(msg))
+        throw msg;
+
+    rule.Save();
+
+    int recid = rule.m_recordID;
 
     return recid;
+}
+
+bool Dvr::UpdateRecordSchedule ( int       nRecordId,
+                                 QString   sTitle,
+                                 QString   sSubtitle,
+                                 QString   sDescription,
+                                 QString   sCategory,
+                                 QDateTime dStartTimeRaw,
+                                 QDateTime dEndTimeRaw,
+                                 QString   sSeriesId,
+                                 QString   sProgramId,
+                                 int       nChanId,
+                                 QString   sStation,
+                                 int       nFindDay,
+                                 QTime     tFindTime,
+                                 bool      bInactive,
+                                 uint      nSeason,
+                                 uint      nEpisode,
+                                 QString   sInetref,
+                                 QString   sType,
+                                 QString   sSearchType,
+                                 int       nRecPriority,
+                                 uint      nPreferredInput,
+                                 int       nStartOffset,
+                                 int       nEndOffset,
+                                 QString   sDupMethod,
+                                 QString   sDupIn,
+                                 uint      nFilter,
+                                 QString   sRecProfile,
+                                 QString   sRecGroup,
+                                 QString   sStorageGroup,
+                                 QString   sPlayGroup,
+                                 bool      bAutoExpire,
+                                 int       nMaxEpisodes,
+                                 bool      bMaxNewest,
+                                 bool      bAutoCommflag,
+                                 bool      bAutoTranscode,
+                                 bool      bAutoMetaLookup,
+                                 bool      bAutoUserJob1,
+                                 bool      bAutoUserJob2,
+                                 bool      bAutoUserJob3,
+                                 bool      bAutoUserJob4,
+                                 int       nTranscoder)
+{
+    if (nRecordId <= 0 )
+        throw QString("Record ID is invalid.");
+
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
+
+    if (!pRule.IsLoaded())
+        throw QString("Record ID does not exist.");
+
+    QDateTime recstartts = dStartTimeRaw.toUTC();
+    QDateTime recendts = dEndTimeRaw.toUTC();
+
+    pRule.m_isInactive = bInactive;
+    if (sType.isEmpty())
+        sType = "single";
+
+    if (sSearchType.isEmpty())
+        sSearchType = "none";
+
+    if (sDupMethod.isEmpty())
+        sDupMethod = "subtitleanddescription";
+
+    if (sDupIn.isEmpty())
+        sDupIn = "all";
+
+    pRule.m_type = recTypeFromString(sType);
+    pRule.m_searchType = searchTypeFromString(sSearchType);
+    pRule.m_dupMethod = dupMethodFromString(sDupMethod);
+    pRule.m_dupIn = dupInFromString(sDupIn);
+
+    if (sRecProfile.isEmpty())
+        sRecProfile = "Default";
+
+    if (sRecGroup.isEmpty())
+        sRecGroup = "Default";
+
+    if (sStorageGroup.isEmpty())
+        sStorageGroup = "Default";
+
+    if (sPlayGroup.isEmpty())
+        sPlayGroup = "Default";
+
+    if (!sTitle.isEmpty())
+        pRule.m_title = sTitle;
+
+    if (!sSubtitle.isEmpty())
+        pRule.m_subtitle = sSubtitle;
+
+    if(!sDescription.isEmpty())
+        pRule.m_description = sDescription;
+
+    if (!sCategory.isEmpty())
+            pRule.m_category = sCategory;
+
+    if (!sSeriesId.isEmpty())
+        pRule.m_seriesid = sSeriesId;
+
+    if (!sProgramId.isEmpty())
+        pRule.m_programid = sProgramId;
+
+    if (!sStation.isEmpty())
+        pRule.m_station = sStation;
+
+    pRule.m_startdate = recstartts.date();
+    pRule.m_starttime = recstartts.time();
+
+    pRule.m_enddate = recendts.date();
+    pRule.m_endtime = recendts.time();
+
+    pRule.m_findday = nFindDay;
+    pRule.m_findtime = tFindTime;
+
+    pRule.m_recProfile = sRecProfile;
+    pRule.m_recGroup = sRecGroup;
+    pRule.m_storageGroup = sStorageGroup;
+    pRule.m_playGroup = sPlayGroup;
+
+    pRule.m_isInactive = bInactive;
+
+    pRule.m_season = nSeason;
+    pRule.m_episode = nEpisode;
+    pRule.m_inetref = sInetref;
+
+    pRule.m_recPriority = nRecPriority;
+    pRule.m_prefInput = nPreferredInput;
+    pRule.m_startOffset = nStartOffset;
+    pRule.m_endOffset = nEndOffset;
+    pRule.m_filter = nFilter;
+
+    pRule.m_autoExpire = bAutoExpire;
+    pRule.m_maxEpisodes = nMaxEpisodes;
+    pRule.m_maxNewest = bMaxNewest;
+
+    pRule.m_autoCommFlag = bAutoCommflag;
+    pRule.m_autoTranscode = bAutoTranscode;
+    pRule.m_autoMetadataLookup = bAutoMetaLookup;
+
+    pRule.m_autoUserJob1 = bAutoUserJob1;
+    pRule.m_autoUserJob2 = bAutoUserJob2;
+    pRule.m_autoUserJob3 = bAutoUserJob3;
+    pRule.m_autoUserJob4 = bAutoUserJob4;
+
+    pRule.m_transcoder = nTranscoder;
+
+    QString msg;
+    if (!pRule.IsValid(msg))
+        throw msg;
+
+    pRule.Save();
+
+    return true;
 }
 
 bool Dvr::RemoveRecordSchedule ( uint nRecordId )
@@ -606,7 +787,7 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
     bool bResult = false;
 
     if (nRecordId <= 0 )
-        throw( QString("Record ID appears invalid."));
+        throw QString("Record ID does not exist.");
 
     RecordingRule pRule;
     pRule.m_recordID = nRecordId;
@@ -662,14 +843,44 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
     return pRecRules;
 }
 
-DTC::RecRule* Dvr::GetRecordSchedule( uint nRecordId )
+DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
+                                      QString   sTemplate,
+                                      int       nChanId,
+                                      QDateTime dStartTimeRaw,
+                                      bool      bMakeOverride )
 {
-    if (nRecordId <= 0 )
-        throw( QString("Record ID appears invalid."));
+    if (nRecordId < 0 )
+        throw QString("Record ID is invalid.");
 
     RecordingRule rule;
-    rule.m_recordID = nRecordId;
-    rule.Load();
+
+    if (nRecordId > 0)
+    {
+        rule.m_recordID = nRecordId;
+        if (!rule.Load())
+            throw QString("Record ID does not exist.");
+    }
+    else if (!sTemplate.isEmpty())
+    {
+        if (!rule.LoadTemplate(sTemplate))
+            throw QString("Template does not exist.");
+    }
+    else if (nChanId > 0 && dStartTimeRaw.isValid())
+    {
+        RecordingInfo::LoadStatus status;
+        RecordingInfo info(nChanId, dStartTimeRaw, false, 0, &status);
+        if (status != RecordingInfo::kFoundProgram)
+            throw QString("Program does not exist.");
+        RecordingRule *pRule = info.GetRecordingRule();
+        if (bMakeOverride && rule.m_type != kSingleRecord &&
+            rule.m_type != kOverrideRecord && rule.m_type != kDontRecord)
+            pRule->MakeOverride();
+        rule = *pRule;
+    }
+    else
+    {
+        throw QString("Invalid request.");
+    }
 
     DTC::RecRule *pRecRule = new DTC::RecRule();
     FillRecRuleInfo( pRecRule, &rule );
@@ -682,7 +893,7 @@ bool Dvr::EnableRecordSchedule ( uint nRecordId )
     bool bResult = false;
 
     if (nRecordId <= 0 )
-        throw( QString("Record ID appears invalid."));
+        throw QString("Record ID appears invalid.");
 
     RecordingRule pRule;
     pRule.m_recordID = nRecordId;
@@ -703,7 +914,7 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     bool bResult = false;
 
     if (nRecordId <= 0 )
-        throw( QString("Record ID appears invalid."));
+        throw QString("Record ID appears invalid.");
 
     RecordingRule pRule;
     pRule.m_recordID = nRecordId;

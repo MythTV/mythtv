@@ -191,9 +191,8 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setInetref        (  pRule->m_inetref                );
     pRecRule->setChanId         (  pRule->m_channelid              );
     pRecRule->setCallSign       (  pRule->m_station                );
-    pRecRule->setDay            (  pRule->m_findday                );
-    pRecRule->setTime           (  pRule->m_findtime               );
-    pRecRule->setFindId         (  pRule->m_findid                 );
+    pRecRule->setFindDay        (  pRule->m_findday                );
+    pRecRule->setFindTime       (  pRule->m_findtime               );
     pRecRule->setType           (  toRawString(pRule->m_type)      );
     pRecRule->setSearchType     (  toRawString(pRule->m_searchType));
     pRecRule->setRecPriority    (  pRule->m_recPriority            );
