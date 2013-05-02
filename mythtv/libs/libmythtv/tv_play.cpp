@@ -4105,6 +4105,8 @@ bool TV::TimeStretchHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_UP, actions))
         ChangeTimeStretch(ctx, 5);
     else if (has_action("ADJUSTSTRETCH", actions))
+        ToggleTimeStretch(ctx);
+    else if (has_action(ACTION_SELECT, actions))
         ClearOSD(ctx);
     else
         handled = false;
