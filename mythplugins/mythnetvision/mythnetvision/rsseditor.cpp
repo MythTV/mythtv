@@ -195,8 +195,9 @@ void RSSEditPopup::slotCheckRedirect(QNetworkReply* reply)
     QVariant possibleRedirectUrl =
          reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
-    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
-                                       urlRedirectedTo);
+    QUrl urlRedirectedTo;
+    urlRedirectedTo = redirectUrl(
+        possibleRedirectUrl.toUrl(), urlRedirectedTo);
 
     if(!urlRedirectedTo.isEmpty())
     {

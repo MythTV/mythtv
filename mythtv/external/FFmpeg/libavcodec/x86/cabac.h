@@ -23,9 +23,11 @@
 
 #include "libavcodec/cabac.h"
 #include "libavutil/attributes.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/x86/asm.h"
 #include "libavutil/internal.h"
 #include "config.h"
+
+#if HAVE_INLINE_ASM
 
 #ifdef BROKEN_RELOCATIONS
 #define TABLES_ARG , "r"(tables)
@@ -167,14 +169,17 @@ static av_always_inline int get_cabac_inline_x86(CABACContext *c,
     __asm__ volatile(
         BRANCHLESS_GET_CABAC("%0", "%q0", "(%4)", "%1", "%w1",
                              "%2", "%q2", "%3", "%b3",
-                             "%a6(%5)", "%a7(%5)", "%a8", "%a9", "%a10", "%11")
-        : "=&r"(bit), "+&r"(c->low), "+&r"(c->range), "=&q"(tmp)
+                             "%c6(%5)", "%c7(%5)",
+                             AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
+                             AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
+                             AV_STRINGIFY(H264_MLPS_STATE_OFFSET),
+                             "%8")
+        : "=&r"(bit), "=&r"(c->low), "=&r"(c->range), "=&q"(tmp)
         : "r"(state), "r"(c),
           "i"(offsetof(CABACContext, bytestream)),
-          "i"(offsetof(CABACContext, bytestream_end)),
-          "i"(H264_NORM_SHIFT_OFFSET),
-          "i"(H264_LPS_RANGE_OFFSET),
-          "i"(H264_MLPS_STATE_OFFSET) TABLES_ARG
+          "i"(offsetof(CABACContext, bytestream_end))
+          TABLES_ARG
+          ,"1"(c->low), "2"(c->range)
         : "%"REG_c, "memory"
     );
     return bit & 1;
@@ -186,8 +191,8 @@ static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
 {
     x86_reg tmp;
     __asm__ volatile(
-        "movl        %a6(%2), %k1       \n\t"
-        "movl        %a3(%2), %%eax     \n\t"
+        "movl        %c6(%2), %k1       \n\t"
+        "movl        %c3(%2), %%eax     \n\t"
         "shl             $17, %k1       \n\t"
         "add           %%eax, %%eax     \n\t"
         "sub             %k1, %%eax     \n\t"
@@ -198,16 +203,16 @@ static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
         "sub           %%edx, %%ecx     \n\t"
         "test           %%ax, %%ax      \n\t"
         "jnz              1f            \n\t"
-        "mov         %a4(%2), %1        \n\t"
+        "mov         %c4(%2), %1        \n\t"
         "subl        $0xFFFF, %%eax     \n\t"
         "movzwl         (%1), %%edx     \n\t"
         "bswap         %%edx            \n\t"
         "shrl            $15, %%edx     \n\t"
         "add              $2, %1        \n\t"
         "addl          %%edx, %%eax     \n\t"
-        "mov              %1, %a4(%2)   \n\t"
+        "mov              %1, %c4(%2)   \n\t"
         "1:                             \n\t"
-        "movl          %%eax, %a3(%2)   \n\t"
+        "movl          %%eax, %c3(%2)   \n\t"
 
         : "+c"(val), "=&r"(tmp)
         : "r"(c),
@@ -220,4 +225,5 @@ static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
     return val;
 }
 
+#endif /* HAVE_INLINE_ASM */
 #endif /* AVCODEC_X86_CABAC_H */

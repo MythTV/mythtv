@@ -19,8 +19,7 @@
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86util.asm"
 
 SECTION_RODATA
 
@@ -408,12 +407,14 @@ SCALE_FUNC %1, %2, X, X8, 7, %3
 SCALE_FUNCS  8, 15, %1
 SCALE_FUNCS  9, 15, %2
 SCALE_FUNCS 10, 15, %2
+SCALE_FUNCS 12, 15, %2
 SCALE_FUNCS 14, 15, %2
 SCALE_FUNCS 16, 15, %3
 %endif ; !sse4
 SCALE_FUNCS  8, 19, %1
 SCALE_FUNCS  9, 19, %2
 SCALE_FUNCS 10, 19, %2
+SCALE_FUNCS 12, 19, %2
 SCALE_FUNCS 14, 19, %2
 SCALE_FUNCS 16, 19, %3
 %endmacro

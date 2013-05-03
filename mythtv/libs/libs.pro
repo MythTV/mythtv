@@ -5,12 +5,10 @@ TEMPLATE = subdirs
 # Libraries without dependencies
 SUBDIRS += libmythsamplerate
 SUBDIRS += libmythsoundtouch libmythdvdnav
-SUBDIRS += libmythbluray libmythfreesurround libmythbase
+SUBDIRS += libmythfreesurround libmythbase
 SUBDIRS += libmythservicecontracts
 
 using_mheg:SUBDIRS += libmythfreemheg
-using_live:SUBDIRS += libmythlivemedia
-using_hdhomerun:SUBDIRS += libmythhdhomerun
 using_x11:SUBDIRS += libmythnvctrl
 !contains( CONFIG_LIBMPEG2EXTERNAL, yes):SUBDIRS += libmythmpeg2
 
@@ -36,3 +34,10 @@ libmythmetadata.depends = $$LIBMYTHTVDEPS libmythtv
 #libmythmediaserver
 SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
+
+# unit tests
+SUBDIRS += lib*/test
+
+unittest.target = test
+unittest.commands = ../programs/scripts/unittests.sh
+unix:QMAKE_EXTRA_TARGETS += unittest

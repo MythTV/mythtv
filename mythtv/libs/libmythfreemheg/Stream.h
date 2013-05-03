@@ -44,6 +44,16 @@ class MHStream : public MHPresentable
     virtual void ContentPreparation(MHEngine *engine);
 
     virtual MHRoot *FindByObjectNo(int n);
+
+    virtual void BeginPlaying(MHEngine *engine);
+    virtual void StopPlaying(MHEngine *engine);
+
+    // Actions
+    virtual void GetCounterPosition(MHRoot *, MHEngine *);
+    virtual void GetCounterMaxPosition(MHRoot *, MHEngine *);
+    virtual void SetCounterPosition(int /*pos*/, MHEngine *);
+    virtual void SetSpeed(int, MHEngine *engine);
+
   protected:
     MHOwnPtrSequence <MHPresentable> m_Multiplex;
     enum Storage { ST_Mem = 1, ST_Stream = 2 } m_nStorage;
@@ -62,7 +72,6 @@ class MHAudio : public MHPresentable
     virtual void Activation(MHEngine *engine);
     virtual void Deactivation(MHEngine *engine);
 
-    virtual void SetStreamRef(MHEngine *, const MHContentRef &);
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 
@@ -71,7 +80,6 @@ class MHAudio : public MHPresentable
     int m_nOriginalVol;
 
     bool m_fStreamPlaying;
-    MHContentRef m_streamContentRef;
 };
 
 class MHVideo : public MHVisible  
@@ -97,7 +105,6 @@ class MHVideo : public MHVisible
     virtual void SetVideoDecodeOffset(int newXOffset, int newYOffset, MHEngine *);
     virtual void GetVideoDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset, MHEngine *);
 
-    virtual void SetStreamRef(MHEngine *, const MHContentRef &);
     virtual void BeginPlaying(MHEngine *engine);
     virtual void StopPlaying(MHEngine *engine);
 
@@ -109,7 +116,6 @@ class MHVideo : public MHVisible
     int     m_nDecodeWidth, m_nDecodeHeight;
 
     bool m_fStreamPlaying;
-    MHContentRef m_streamContentRef;
 };
 
 // Real-time graphics - not needed for UK MHEG.
@@ -144,6 +150,58 @@ class MHGetVideoDecodeOffset: public MHActionObjectRef2
   public:
     MHGetVideoDecodeOffset(): MHActionObjectRef2(":GetVideoDecodeOffset")  {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetVideoDecodeOffset(pArg1, pArg2, engine); }
+};
+
+class MHActionGenericObjectRefFix: public MHActionGenericObjectRef
+{
+public:
+    MHActionGenericObjectRefFix(const char *name) : MHActionGenericObjectRef(name) {}
+    virtual void Perform(MHEngine *engine);
+};
+
+class MHGetCounterPosition: public MHActionGenericObjectRefFix
+{
+public:
+    MHGetCounterPosition(): MHActionGenericObjectRefFix(":GetCounterPosition")  {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg)
+        { pTarget->GetCounterPosition(pArg, engine); }
+};
+
+class MHGetCounterMaxPosition: public MHActionGenericObjectRefFix
+{
+public:
+    MHGetCounterMaxPosition(): MHActionGenericObjectRefFix(":GetCounterMaxPosition")  {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg)
+        { pTarget->GetCounterMaxPosition(pArg, engine); }
+};
+
+class MHSetCounterPosition: public MHActionInt
+{
+public:
+    MHSetCounterPosition(): MHActionInt(":SetCounterPosition")  {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg)
+        { pTarget->SetCounterPosition(nArg, engine); }
+};
+
+
+class MHSetSpeed: public MHElemAction
+{
+    typedef MHElemAction base;
+public:
+    MHSetSpeed(): base(":SetSpeed") {}
+    virtual void Initialise(MHParseNode *p, MHEngine *engine) {
+        //printf("SetSpeed Initialise args: "); p->PrintMe(stdout);
+        base::Initialise(p, engine);
+        MHParseNode *pn = p->GetArgN(1);
+        if (pn->m_nNodeType == MHParseNode::PNSeq) pn = pn->GetArgN(0);
+        m_Argument.Initialise(pn, engine);
+    }
+    virtual void Perform(MHEngine *engine) {
+        Target(engine)->SetSpeed(m_Argument.GetValue(engine), engine);
+    }
+protected:
+    virtual void PrintArgs(FILE *fd, int) const { m_Argument.PrintMe(fd, 0); }
+    MHGenericInteger m_Argument;
 };
 
 

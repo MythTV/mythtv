@@ -1,6 +1,7 @@
 #ifndef AVFORMATWRITER_H_
 #define AVFORMATWRITER_H_
 
+#include "mythconfig.h"
 #include "filewriterbase.h"
 #include "avfringbuffer.h"
 

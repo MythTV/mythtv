@@ -26,25 +26,30 @@ class ProgramRecPriorityInfo : public RecordingInfo
   public:
     ProgramRecPriorityInfo();
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);
-    ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo&);
-    ProgramRecPriorityInfo &operator=(const RecordingInfo&);
-    ProgramRecPriorityInfo &operator=(const ProgramInfo&);
+    ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
+        { clone(other); return *this; }
+    ProgramRecPriorityInfo &operator=(const RecordingInfo &other)
+        { clone(other); return *this; }
+    ProgramRecPriorityInfo &operator=(const ProgramInfo &other)
+        { clone(other); return *this; }
+    virtual void clone(const ProgramRecPriorityInfo &other,
+                       bool ignore_non_serialized_data = false);
+    virtual void clone(const RecordingInfo &other,
+                       bool ignore_non_serialized_data = false);
+    virtual void clone(const ProgramInfo &other,
+                       bool ignore_non_serialized_data = false);
 
-    virtual ProgramRecPriorityInfo &clone(const ProgramRecPriorityInfo &other);
-    virtual ProgramRecPriorityInfo &clone(const ProgramInfo &other);
     virtual void clear(void);
 
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false,
                        uint star_range = 10) const;
 
-    int recTypeRecPriority;
     RecordingType recType;
     int matchCount;
     int recCount;
     QDateTime last_record;
     int avg_delay;
-    int autoRecPriority;
     QString profile;
 };
 
@@ -109,7 +114,6 @@ class ProgramRecPriority : public ScheduleCommon
     MythUIButtonList *m_programList;
 
     MythUIText *m_schedInfoText;
-    MythUIText *m_rectypePriorityText;
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
     MythUIText *m_finalPriorityText;

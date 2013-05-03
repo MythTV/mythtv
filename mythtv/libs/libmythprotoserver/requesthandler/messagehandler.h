@@ -1,8 +1,6 @@
 #ifndef _MESSAGEHANDLER_H_
 #define _MESSAGEHANDLER_H_
 
-using namespace std;
-
 #include <QEvent>
 #include <QStringList>
 

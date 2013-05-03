@@ -25,6 +25,7 @@
  * H.261 decoder.
  */
 
+#include "libavutil/avassert.h"
 #include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
@@ -85,7 +86,7 @@ static av_cold int h261_decode_init(AVCodecContext *avctx){
 
     s->out_format = FMT_H261;
     s->low_delay= 1;
-    avctx->pix_fmt= PIX_FMT_YUV420P;
+    avctx->pix_fmt= AV_PIX_FMT_YUV420P;
 
     s->codec_id= avctx->codec->id;
 
@@ -550,7 +551,7 @@ static int get_consumed_bytes(MpegEncContext *s, int buf_size){
 }
 
 static int h261_decode_frame(AVCodecContext *avctx,
-                             void *data, int *data_size,
+                             void *data, int *got_frame,
                              AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -629,13 +630,13 @@ retry:
     }
     ff_MPV_frame_end(s);
 
-assert(s->current_picture.f.pict_type == s->current_picture_ptr->f.pict_type);
-assert(s->current_picture.f.pict_type == s->pict_type);
+    av_assert0(s->current_picture.f.pict_type == s->current_picture_ptr->f.pict_type);
+    av_assert0(s->current_picture.f.pict_type == s->pict_type);
 
     *pict = s->current_picture_ptr->f;
     ff_print_debug_info(s, pict);
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
 
     return get_consumed_bytes(s, buf_size);
 }
@@ -652,7 +653,7 @@ static av_cold int h261_decode_end(AVCodecContext *avctx)
 AVCodec ff_h261_decoder = {
     .name           = "h261",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_H261,
+    .id             = AV_CODEC_ID_H261,
     .priv_data_size = sizeof(H261Context),
     .init           = h261_decode_init,
     .close          = h261_decode_end,

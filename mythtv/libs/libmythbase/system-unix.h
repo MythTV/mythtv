@@ -91,7 +91,7 @@ class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
         virtual void Signal(int sig);
         virtual void JumpAbort(void);
 
-        virtual bool ParseShell(const QString cmd, QString &abscmd,
+        virtual bool ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args);
 
         friend class MythSystemManager;

@@ -8,6 +8,7 @@ using_frontend {
     SUBDIRS += mythjobqueue mythlcdserver mythlogserver
     SUBDIRS += mythwelcome mythshutdown mythutil
     SUBDIRS += mythpreviewgen mythmediaserver mythccextractor
+    SUBDIRS += mythscreenwizard
     !mingw: SUBDIRS += mythtranscode/replex
 }
 

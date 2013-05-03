@@ -17,7 +17,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
-#include "dbchannelinfo.h"
+#include "channelinfo.h"
 #include "programinfo.h"
 #include "recordingrule.h"
 #include "tv_play.h"
@@ -165,16 +165,18 @@ bool JumpToChannel::Update(void)
 }
 
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
-                    TV *player, bool embedVideo, bool allowFinder, int changrpid)
+                                const QDateTime startTime,
+                                TV *player, bool embedVideo,
+                                bool allowFinder, int changrpid)
 {
     // which channel group should we default to
     if (changrpid == -2)
         changrpid = gCoreContext->GetNumSetting("ChannelGroupDefault", -1);
 
     // check there are some channels setup
-    DBChanList channels = ChannelUtil::GetChannels(
+    ChannelInfoList channels = ChannelUtil::GetChannels(
         0, true, "", (changrpid<0) ? 0 : changrpid);
-    if (!channels.size())
+    if (channels.empty())
     {
         QString message;
         if (changrpid == -1)
@@ -207,7 +209,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GuideGrid *gg = new GuideGrid(mainStack,
-                                  chanid, channum,
+                                  chanid, channum, startTime,
                                   player, embedVideo, allowFinder,
                                   changrpid);
 
@@ -218,7 +220,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 }
 
 GuideGrid::GuideGrid(MythScreenStack *parent,
-                     uint chanid, QString channum,
+                     uint chanid, QString channum, const QDateTime startTime,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
          : ScheduleCommon(parent, "guidegrid"),
@@ -254,6 +256,9 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     }
 
     m_originalStartTime = MythDate::current();
+    if (startTime.isValid() &&
+        startTime > m_originalStartTime.addSecs(-8 * 3600))
+        m_originalStartTime = startTime;
 
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
@@ -657,7 +662,7 @@ void GuideGrid::ShowRecordingMenu(void)
     }
 }
 
-DBChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
+ChannelInfo *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 {
     sel = (sel >= 0) ? sel : m_channelInfoIdx[chan_idx];
 
@@ -670,7 +675,7 @@ DBChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
     return &(m_channelInfos[chan_idx][sel]);
 }
 
-const DBChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
+const ChannelInfo *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
 {
     return ((GuideGrid*)this)->GetChannelInfo(chan_idx, sel);
 }
@@ -715,7 +720,7 @@ uint GuideGrid::GetAlternateChannelIndex(
     uint chan_idx, bool with_same_channum) const
 {
     uint si = m_channelInfoIdx[chan_idx];
-    const DBChannel *chinfo = GetChannelInfo(chan_idx, si);
+    const ChannelInfo *chinfo = GetChannelInfo(chan_idx, si);
 
     PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
 
@@ -725,7 +730,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (i == si)
             continue;
 
-        const DBChannel *ciinfo = GetChannelInfo(chan_idx, i);
+        const ChannelInfo *ciinfo = GetChannelInfo(chan_idx, i);
         if (!ciinfo)
             continue;
 
@@ -770,9 +775,9 @@ uint GuideGrid::GetAlternateChannelIndex(
 
 
 #define MKKEY(IDX,SEL) ((((uint64_t)IDX) << 32) | SEL)
-DBChanList GuideGrid::GetSelection(void) const
+ChannelInfoList GuideGrid::GetSelection(void) const
 {
-    DBChanList selected;
+    ChannelInfoList selected;
 
     int idx = GetStartChannelOffset();
     if (idx < 0)
@@ -783,7 +788,7 @@ DBChanList GuideGrid::GetSelection(void) const
     vector<uint64_t> sel;
     sel.push_back( MKKEY(idx, si) );
 
-    const DBChannel *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
+    const ChannelInfo *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
     if (!ch)
         return selected;
 
@@ -798,7 +803,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const DBChannel *ci = GetChannelInfo(idx, i);
+        const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
             (ci->callsign == ch->callsign) && (ci->channum  == ch->channum))
         {
@@ -808,7 +813,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const DBChannel *ci = GetChannelInfo(idx, i);
+        const ChannelInfo *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
             (ci->callsign == ch->callsign) && (ci->channum  != ch->channum))
         {
@@ -818,7 +823,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
-        const DBChannel *ci = GetChannelInfo(idx, i);
+        const ChannelInfo *ci = GetChannelInfo(idx, i);
         if ((i != si) && (ci->callsign != ch->callsign))
         {
             sel.push_back( MKKEY(idx, i) );
@@ -827,7 +832,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     for (uint i = 1; i < sel.size(); ++i)
     {
-        const DBChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
+        const ChannelInfo *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
         const ProgramList ch_proglist = GetProgramList(ch->chanid);
 
         if (!ci || proglist.size() != ch_proglist.size())
@@ -860,7 +865,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_channelInfoIdx.clear();
     m_currentStartChannel = 0;
 
-    DBChanList channels = ChannelUtil::GetChannels(
+    ChannelInfoList channels = ChannelUtil::GetChannels(
         0, true, "", (m_changrpid < 0) ? 0 : m_changrpid);
     ChannelUtil::SortChannels(channels, m_channelOrdering, false);
 
@@ -882,7 +887,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         if (ndup && cdup)
             continue;
 
-        DBChannel val(channels[chan]);
+        ChannelInfo val(channels[chan]);
 
         channum_to_index_map[val.channum].push_back(GetChannelCount());
         callsign_to_index_map[val.callsign].push_back(GetChannelCount());
@@ -1300,21 +1305,16 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             case kSingleRecord:
                 recFlag = 1;
                 break;
-            case kTimeslotRecord:
+            case kDailyRecord:
                 recFlag = 2;
-                break;
-            case kChannelRecord:
-                recFlag = 3;
                 break;
             case kAllRecord:
                 recFlag = 4;
                 break;
-            case kWeekslotRecord:
+            case kWeeklyRecord:
                 recFlag = 5;
                 break;
-            case kFindOneRecord:
-            case kFindDailyRecord:
-            case kFindWeeklyRecord:
+            case kOneRecord:
                 recFlag = 6;
                 break;
             case kOverrideRecord:
@@ -1509,7 +1509,7 @@ void GuideGrid::updateChannels(void)
 {
     m_channelList->Reset();
 
-    DBChannel *chinfo = GetChannelInfo(m_currentStartChannel);
+    ChannelInfo *chinfo = GetChannelInfo(m_currentStartChannel);
 
     if (m_player)
         m_player->ClearTunableCache();
@@ -1559,7 +1559,7 @@ void GuideGrid::updateChannels(void)
 
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_channelList,
-                                     chinfo ? chinfo->GetFormatted(DBChannel::kChannelShort) : QString());
+                                     chinfo ? chinfo->GetFormatted(ChannelInfo::kChannelShort) : QString());
 
         QString state = "available";
         if (unavailable)
@@ -1606,7 +1606,7 @@ void GuideGrid::updateInfo(void)
     if (chanNum < 0)
         chanNum = 0;
 
-    DBChannel *chinfo = GetChannelInfo(chanNum);
+    ChannelInfo *chinfo = GetChannelInfo(chanNum);
 
     if (m_channelImage)
     {
@@ -1668,7 +1668,9 @@ void GuideGrid::generateListings()
 
 void GuideGrid::ChannelGroupMenu(int mode)
 {
-    if (m_changrplist.empty())
+    ChannelGroupList channels = ChannelGroup::GetChannelGroups(mode == 0);
+    
+    if (channels.empty())
     {
       QString message = tr("You don't have any channel groups defined");
 
@@ -1695,19 +1697,19 @@ void GuideGrid::ChannelGroupMenu(int mode)
         {
             // add channel to group menu
             menuPopup->SetReturnEvent(this, "channelgrouptogglemenu");
-            ChannelGroupList channels = ChannelGroup::GetChannelGroups(true);
-            for (uint i = 0; i < channels.size(); ++i)
-                menuPopup->AddButton(channels[i].name);
         }
         else
         {
             // switch to channel group menu
             menuPopup->SetReturnEvent(this, "channelgroupmenu");
             menuPopup->AddButton(QObject::tr("All Channels"));
-            for (uint i = 0; i < m_changrplist.size(); ++i)
-                menuPopup->AddButton(m_changrplist[i].name);
         }
 
+        for (uint i = 0; i < channels.size(); ++i)
+        {
+            menuPopup->AddButton(channels[i].name);
+        }
+        
         popupStack->AddScreen(menuPopup);
     }
     else
@@ -1737,7 +1739,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     if (chanNum < 0)
         chanNum = 0;
 
-    DBChannel *ch = GetChannelInfo(chanNum);
+    ChannelInfo *ch = GetChannelInfo(chanNum);
     uint chanid = ch->chanid;
 
     if (m_changrpid == -1)
@@ -1746,6 +1748,9 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     else
         // Only allow delete if viewing the favorite group in question
         ChannelGroup::ToggleChannel(chanid, grpid, true);
+
+    //regenerate the list of non empty group in case it did change
+    m_changrplist = ChannelGroup::GetChannelGroups(false);
 
     // If viewing favorites, refresh because a channel was removed
     if (m_changrpid != -1)
@@ -1980,10 +1985,7 @@ void GuideGrid::quickRecord()
     if (pginfo->GetTitle() == kUnknownTitle)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.ToggleRecord();
-    *pginfo = ri;
-
+    QuickRecord(pginfo);
     LoadFromScheduler(m_recList);
     fillProgramInfos();
     updateInfo();
@@ -2084,7 +2086,7 @@ void GuideGrid::channelUpdate(void)
     if (!m_player)
         return;
 
-    DBChanList sel = GetSelection();
+    ChannelInfoList sel = GetSelection();
 
     if (sel.size())
     {

@@ -1,6 +1,7 @@
 #ifndef MYTHEXP_H_
 #define MYTHEXP_H_
 
+#ifdef __cplusplus
 #include <QtCore/qglobal.h>
 
 #if defined(MYTH_API) || defined(MPLUGIN_API)
@@ -8,6 +9,7 @@
 #else
 # define MPUBLIC Q_DECL_IMPORT
 #endif
+#endif /* __cplusplus */
 
 #if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
 # define MHIDDEN     __attribute__((visibility("hidden")))
@@ -19,4 +21,4 @@
 # define MDEPRECATED
 #endif
 
-#endif // MYTHEXP_H_
+#endif /* MYTHEXP_H_ */

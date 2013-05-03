@@ -151,7 +151,7 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
 {
     m_retObject = NULL;
 
-    Init(startPath);
+    SetPath(startPath);
 
     m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
                     QDir::Readable | QDir::Writable | QDir::Executable);
@@ -167,7 +167,7 @@ MythUIFileBrowser::~MythUIFileBrowser()
 {
 }
 
-void MythUIFileBrowser::Init(const QString &startPath)
+void MythUIFileBrowser::SetPath(const QString &startPath)
 {
     if (startPath.startsWith("myth://"))
     {
@@ -353,7 +353,7 @@ bool MythUIFileBrowser::IsImage(QString extension)
 
     QList<QByteArray> formats = QImageReader::supportedImageFormats();
 
-    if (formats.contains(extension.toAscii()))
+    if (formats.contains(extension.toLatin1()))
         return true;
 
     return false;
@@ -363,7 +363,7 @@ void MythUIFileBrowser::editLostFocus()
 {
     QString newPath = m_locationEdit->GetText();
 
-    Init(newPath);
+    SetPath(newPath);
 
     updateFileList();
 }

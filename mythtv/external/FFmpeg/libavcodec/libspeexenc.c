@@ -62,16 +62,37 @@
  *     sometimes desirable to use multiple frames-per-packet to reduce the
  *     amount of container overhead.  This can be done by setting the
  *     'frames_per_packet' option to a value 1 to 8.
+ *
+ *
+ * Optional features
+ * Speex encoder supports several optional features, which can be useful
+ * for some conditions.
+ *
+ * Voice Activity Detection
+ *     When enabled, voice activity detection detects whether the audio
+ *     being encoded is speech or silence/background noise. VAD is always
+ *     implicitly activated when encoding in VBR, so the option is only useful
+ *     in non-VBR operation. In this case, Speex detects non-speech periods and
+ *     encodes them with just enough bits to reproduce the background noise.
+ *
+ * Discontinuous Transmission (DTX)
+ *     DTX is an addition to VAD/VBR operation, that allows to stop transmitting
+ *     completely when the background noise is stationary.
+ *     In file-based operation only 5 bits are used for such frames.
  */
 
 #include <speex/speex.h>
 #include <speex/speex_header.h>
 #include <speex/speex_stereo.h>
+
+#include "libavutil/channel_layout.h"
+#include "libavutil/common.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
 #include "internal.h"
 #include "audio_frame_queue.h"
 
+/* TODO: Think about converting abr, vad, dtx and such flags to a bit field */
 typedef struct {
     AVClass *class;             ///< AVClass for private options
     SpeexBits bits;             ///< libspeex bitwriter context
@@ -81,6 +102,8 @@ typedef struct {
     float vbr_quality;          ///< VBR quality 0.0 to 10.0
     int cbr_quality;            ///< CBR quality 0 to 10
     int abr;                    ///< flag to enable ABR
+    int vad;                    ///< flag to enable VAD
+    int dtx;                    ///< flag to enable DTX
     int pkt_frame_count;        ///< frame count for the current packet
     AudioFrameQueue afq;        ///< frame queue
 } LibSpeexEncContext;
@@ -115,6 +138,8 @@ static av_cold void print_enc_params(AVCodecContext *avctx,
            s->frames_per_packet);
     av_log(avctx, AV_LOG_DEBUG, "packet size: %d\n",
            avctx->frame_size * s->frames_per_packet);
+    av_log(avctx, AV_LOG_DEBUG, "voice activity detection: %d\n", s->vad);
+    av_log(avctx, AV_LOG_DEBUG, "discontinuous transmission: %d\n", s->dtx);
 }
 
 static av_cold int encode_init(AVCodecContext *avctx)
@@ -155,6 +180,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
     if (avctx->flags & CODEC_FLAG_QSCALE) {
         /* VBR */
         s->header.vbr = 1;
+        s->vad = 1; /* VAD is always implicitly activated for VBR */
         speex_encoder_ctl(s->enc_state, SPEEX_SET_VBR, &s->header.vbr);
         s->vbr_quality = av_clipf(avctx->global_quality / (float)FF_QP2LAMBDA,
                                   0.0f, 10.0f);
@@ -184,6 +210,17 @@ static av_cold int encode_init(AVCodecContext *avctx)
         /* stereo side information adds about 800 bps to the base bitrate */
         /* TODO: this should be calculated exactly */
         avctx->bit_rate = s->header.bitrate + (avctx->channels == 2 ? 800 : 0);
+    }
+
+    /* VAD is activated with VBR or can be turned on by itself */
+    if (s->vad)
+        speex_encoder_ctl(s->enc_state, SPEEX_SET_VAD, &s->vad);
+
+    /* Activiting Discontinuous Transmission */
+    if (s->dtx) {
+        speex_encoder_ctl(s->enc_state, SPEEX_SET_DTX, &s->dtx);
+        if (!(s->abr || s->vad || s->header.vbr))
+            av_log(avctx, AV_LOG_WARNING, "DTX is not much of use without ABR, VAD or VBR\n");
     }
 
     /* set encoding complexity */
@@ -251,7 +288,7 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
             speex_encode_stereo_int(samples, s->header.frame_size, &s->bits);
         speex_encode_int(s->enc_state, samples, &s->bits);
         s->pkt_frame_count++;
-        if ((ret = ff_af_queue_add(&s->afq, frame) < 0))
+        if ((ret = ff_af_queue_add(&s->afq, frame)) < 0)
             return ret;
     } else {
         /* handle end-of-stream */
@@ -302,9 +339,11 @@ static av_cold int encode_close(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(LibSpeexEncContext, x)
 #define AE AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
-    { "abr",               "Use average bit rate",                      OFFSET(abr),               AV_OPT_TYPE_INT, { 0 }, 0,   1, AE },
-    { "cbr_quality",       "Set quality value (0 to 10) for CBR",       OFFSET(cbr_quality),       AV_OPT_TYPE_INT, { 8 }, 0,  10, AE },
-    { "frames_per_packet", "Number of frames to encode in each packet", OFFSET(frames_per_packet), AV_OPT_TYPE_INT, { 1 }, 1,   8, AE },
+    { "abr",               "Use average bit rate",                      OFFSET(abr),               AV_OPT_TYPE_INT, { .i64 = 0 }, 0,   1, AE },
+    { "cbr_quality",       "Set quality value (0 to 10) for CBR",       OFFSET(cbr_quality),       AV_OPT_TYPE_INT, { .i64 = 8 }, 0,  10, AE },
+    { "frames_per_packet", "Number of frames to encode in each packet", OFFSET(frames_per_packet), AV_OPT_TYPE_INT, { .i64 = 1 }, 1,   8, AE },
+    { "vad",               "Voice Activity Detection",                  OFFSET(vad),               AV_OPT_TYPE_INT, { .i64 = 0 }, 0,   1, AE },
+    { "dtx",               "Discontinuous Transmission",                OFFSET(dtx),               AV_OPT_TYPE_INT, { .i64 = 0 }, 0,   1, AE },
     { NULL },
 };
 
@@ -324,7 +363,7 @@ static const AVCodecDefault defaults[] = {
 AVCodec ff_libspeex_encoder = {
     .name           = "libspeex",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_SPEEX,
+    .id             = AV_CODEC_ID_SPEEX,
     .priv_data_size = sizeof(LibSpeexEncContext),
     .init           = encode_init,
     .encode2        = encode_frame,
@@ -332,6 +371,10 @@ AVCodec ff_libspeex_encoder = {
     .capabilities   = CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
+    .channel_layouts = (const uint64_t[]){ AV_CH_LAYOUT_MONO,
+                                           AV_CH_LAYOUT_STEREO,
+                                           0 },
+    .supported_samplerates = (const int[]){ 8000, 16000, 32000, 0 },
     .long_name      = NULL_IF_CONFIG_SMALL("libspeex Speex"),
     .priv_class     = &class,
     .defaults       = defaults,

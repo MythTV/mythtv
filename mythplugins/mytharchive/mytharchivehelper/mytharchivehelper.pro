@@ -3,10 +3,6 @@ include ( ../../settings.pro )
 include ( ../../../mythtv/version.pro )
 include ( ../../programs-libs.pro )
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavutil
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavcodec
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavformat
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libswscale
 DEPENDPATH *= $${INCLUDEPATH}
 
 TEMPLATE = app

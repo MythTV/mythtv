@@ -43,13 +43,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< RecRuleList   >();
-            qRegisterMetaType< RecRuleList*  >();
-
-            RecRule::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -89,5 +83,16 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
 Q_DECLARE_METATYPE( DTC::RecRuleList  )
 Q_DECLARE_METATYPE( DTC::RecRuleList* )
+
+namespace DTC
+{
+inline void RecRuleList::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecRuleList   >();
+    qRegisterMetaType< RecRuleList*  >();
+
+    RecRule::InitializeCustomTypes();
+}
+}
 
 #endif

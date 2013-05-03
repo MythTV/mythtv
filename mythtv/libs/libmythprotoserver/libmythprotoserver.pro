@@ -1,6 +1,9 @@
 include ( ../../settings.pro )
 
 QT += network sql
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 TEMPLATE = lib
 TARGET = mythprotoserver-$$LIBVERSION
@@ -44,7 +47,6 @@ LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 using_mheg:LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live:LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
-using_hdhomerun:LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 inc.path = $${PREFIX}/include/mythtv/protoserver
 

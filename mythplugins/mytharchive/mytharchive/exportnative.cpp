@@ -476,21 +476,16 @@ void ExportNative::runScript()
     QString configDir = tempDir + "config";
     QString commandline;
 
-    // remove existing progress.log if present
-    if (QFile::exists(logDir + "/progress.log"))
-        QFile::remove(logDir + "/progress.log");
+    // remove any existing logs
+    myth_system("rm -f " + logDir + "/*.log");
 
     // remove cancel flag file if present
     if (QFile::exists(logDir + "/mythburncancel.lck"))
         QFile::remove(logDir + "/mythburncancel.lck");
 
     createConfigFile(configDir + "/mydata.xml");
-    commandline = "mytharchivehelper --nativearchive --outfile " + configDir +
-                  "/mydata.xml";  // job file
-    commandline += logPropagateArgs;
-    if (!logPropagateQuiet())
-        commandline += " --quiet";
-    commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
+    commandline = "mytharchivehelper --logpath " + logDir + " --nativearchive "
+                  "--outfile " + configDir + "/mydata.xml";  // job file
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs |
                  kMSDontDisableDrawing;

@@ -40,11 +40,7 @@ class SERVICE_PUBLIC LabelValue : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< LabelValue  >();
-            qRegisterMetaType< LabelValue* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -77,5 +73,14 @@ class SERVICE_PUBLIC LabelValue : public QObject
 
 Q_DECLARE_METATYPE( DTC::LabelValue )
 Q_DECLARE_METATYPE( DTC::LabelValue* )
+
+namespace DTC
+{
+inline void LabelValue::InitializeCustomTypes()
+{
+    qRegisterMetaType< LabelValue  >();
+    qRegisterMetaType< LabelValue* >();
+}
+}
 
 #endif

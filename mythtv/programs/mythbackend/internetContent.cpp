@@ -23,8 +23,11 @@
 #include "mythdirs.h"
 
 #include "rssparse.h"
-#include "netutils.h"
 #include "netgrabbermanager.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include "netutils.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -139,6 +142,7 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
                 "Command: %1 -p %2 -S '%3'")
             .arg(command).arg(pagenum).arg(query));
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     Search *search = new Search();
     QEventLoop loop;
 
@@ -161,6 +165,9 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
         return;
 
     pRequest->FormatRawResponse( ret.toString() );
+#else
+#warning InternetContent::GetInternetSearch() not yet ported to Qt5
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////

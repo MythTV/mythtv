@@ -8,7 +8,6 @@ MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
 
 MythUIEditBar::~MythUIEditBar(void)
 {
-    ReleaseImages();
 }
 
 void MythUIEditBar::ReleaseImages(void)
@@ -119,7 +118,7 @@ void MythUIEditBar::Display(void)
 
     ClearImages();
 
-    if (!m_regions.size())
+    if (m_regions.isEmpty())
     {
         if (keep)
             keep->SetVisible(true);
@@ -296,6 +295,7 @@ void MythUIEditBar::ClearImages(void)
 {
     while (m_images.size())
         DeleteChild(m_images.takeFirst());
+    SetRedraw();
 }
 
 /**

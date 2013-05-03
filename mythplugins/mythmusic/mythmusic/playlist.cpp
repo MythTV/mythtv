@@ -12,6 +12,7 @@ using namespace std;
 #include <QObject>
 
 // mythmusic
+#include "musicdata.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
 #include "smartplaylist.h"
@@ -43,20 +44,26 @@ bool Playlist::checkTrack(int a_track_id) const
     return false;
 }
 
-void Playlist::copyTracks(Playlist *to_ptr, bool update_display) const
+void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
 {
+    disableSaves();
+
     SongList::const_iterator it = m_songs.begin();
     for (; it != m_songs.end(); ++it)
     {
         to_ptr->addTrack(*it, update_display);
     }
+
+    enableSaves();
+
+    changed();
 }
 
 /// Given a tracks ID, add that track to this playlist
 void Playlist::addTrack(int trackID, bool update_display)
 {
     int repo = ID_TO_REPO(trackID);
-    Metadata *mdata = NULL;
+    MusicMetadata *mdata = NULL;
 
     if (repo == RT_Radio)
         mdata = gMusicData->all_streams->getMetadata(trackID);
@@ -70,13 +77,13 @@ void Playlist::addTrack(int trackID, bool update_display)
 }
 
 /// Given a tracks metadata, add that track to this playlist
-void Playlist::addTrack(Metadata *mdata, bool update_display)
+void Playlist::addTrack(MusicMetadata *mdata, bool update_display)
 {
     m_songs.push_back(mdata);
     m_shuffledSongs.push_back(mdata);
     m_songMap.insert(mdata->ID(), mdata);
 
-    m_changed = true;
+    changed();
 
     if (update_display)
         gPlayer->activePlaylistChanged(mdata->ID(), false);
@@ -88,12 +95,12 @@ void Playlist::removeAllTracks(void)
     m_songMap.clear();
     m_shuffledSongs.clear();
 
-    m_changed = true;
+    changed();
 }
 
 void Playlist::removeTrack(int the_track)
 {
-    QMap<int, Metadata*>::iterator it = m_songMap.find(the_track);
+    QMap<int, MusicMetadata*>::iterator it = m_songMap.find(the_track);
     if (it != m_songMap.end())
     {
         m_songMap.remove(the_track);
@@ -101,12 +108,14 @@ void Playlist::removeTrack(int the_track)
         m_shuffledSongs.removeAll(*it);
     }
 
+    changed();
+
     gPlayer->activePlaylistChanged(the_track, true);
 }
 
 void Playlist::moveTrackUpDown(bool flag, int where_its_at)
 {
-    Metadata *the_track = m_shuffledSongs.at(where_its_at);
+    MusicMetadata *the_track = m_shuffledSongs.at(where_its_at);
 
     if (!the_track)
     {
@@ -118,7 +127,7 @@ void Playlist::moveTrackUpDown(bool flag, int where_its_at)
     moveTrackUpDown(flag, the_track);
 }
 
-void Playlist::moveTrackUpDown(bool flag, Metadata* mdata)
+void Playlist::moveTrackUpDown(bool flag, MusicMetadata* mdata)
 {
     uint insertion_point = 0;
     int where_its_at = m_shuffledSongs.indexOf(mdata);
@@ -137,7 +146,7 @@ void Playlist::moveTrackUpDown(bool flag, Metadata* mdata)
     m_shuffledSongs.removeAt(where_its_at);
     m_shuffledSongs.insert(insertion_point, mdata);
 
-    m_changed = true;
+    changed();
 }
 
 Playlist::Playlist(void) :
@@ -145,6 +154,7 @@ Playlist::Playlist(void) :
     m_name(QObject::tr("oops")),
     m_parent(NULL),
     m_changed(false),
+    m_doSave(true),
     m_progress(NULL),
     m_proc(NULL),
     m_procExitVal(0)
@@ -166,7 +176,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
     {
         case MusicPlayer::SHUFFLE_RANDOM:
         {
-            QMultiMap<int, Metadata*> songMap;
+            QMultiMap<int, MusicMetadata*> songMap;
 
             SongList::const_iterator it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
@@ -174,7 +184,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                 songMap.insert(rand(), *it);
             }
 
-            QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
+            QMultiMap<int, MusicMetadata*>::const_iterator i = songMap.constBegin();
             while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
@@ -205,7 +215,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             {
                 if (!(*it)->isCDTrack())
                 {
-                    Metadata *mdata = (*it);
+                    MusicMetadata *mdata = (*it);
 
                     if (0 == idx)
                     {
@@ -235,7 +245,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             int TotalWeight = RatingWeight + PlayCountWeight + LastPlayWeight;
             for (int trackItI = 0; trackItI < m_songs.size(); ++trackItI)
             {
-                Metadata *mdata = m_songs[trackItI];
+                MusicMetadata *mdata = m_songs[trackItI];
                 if (!mdata->isCDTrack())
                 {
                     int rating = mdata->Rating();
@@ -308,13 +318,13 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             // create a map of tracks sorted by the computed order
-            QMultiMap<int, Metadata*> songMap;
+            QMultiMap<int, MusicMetadata*> songMap;
             it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
                 songMap.insert(order[(*it)->ID()], *it);
 
             // copy the shuffled tracks to the shuffled song list
-            QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
+            QMultiMap<int, MusicMetadata*>::const_iterator i = songMap.constBegin();
             while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
@@ -338,7 +348,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             SongList::const_iterator it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
             {
-                Metadata *mdata = (*it);
+                MusicMetadata *mdata = (*it);
                 album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());
                 if ((Ialbum = album_map.find(album)) == album_map.end())
                     album_map.insert(AlbumMap::value_type(album, 0));
@@ -353,12 +363,12 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             // create a map of tracks sorted by the computed order
-            QMultiMap<int, Metadata*> songMap;
+            QMultiMap<int, MusicMetadata*> songMap;
             it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
             {
                 uint32_t album_order;
-                Metadata *mdata = (*it);
+                MusicMetadata *mdata = (*it);
                 if (mdata)
                 {
                     album = album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());;
@@ -381,7 +391,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             // copy the shuffled tracks to the shuffled song list
-            QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
+            QMultiMap<int, MusicMetadata*>::const_iterator i = songMap.constBegin();
             while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
@@ -405,7 +415,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             SongList::const_iterator it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
             {
-                Metadata *mdata = (*it);
+                MusicMetadata *mdata = (*it);
                 artist = mdata->Artist() + " ~ " + mdata->Title();
                 if ((Iartist = artist_map.find(artist)) == artist_map.end())
                     artist_map.insert(ArtistMap::value_type(artist,0));
@@ -420,12 +430,12 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             // create a map of tracks sorted by the computed order
-            QMultiMap<int, Metadata*> songMap;
+            QMultiMap<int, MusicMetadata*> songMap;
             it = m_songs.begin();
             for (; it != m_songs.end(); ++it)
             {
                 uint32_t artist_order;
-                Metadata *mdata = (*it);
+                MusicMetadata *mdata = (*it);
                 if (mdata)
                 {
                     artist = mdata->Artist() + " ~ " + mdata->Title();
@@ -448,7 +458,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             }
 
             // copy the shuffled tracks to the shuffled song list
-            QMultiMap<int, Metadata*>::const_iterator i = songMap.constBegin();
+            QMultiMap<int, MusicMetadata*>::const_iterator i = songMap.constBegin();
             while (i != songMap.constEnd())
             {
                 m_shuffledSongs.append(i.value());
@@ -506,7 +516,7 @@ void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, 
     SongList::const_iterator it = m_shuffledSongs.begin();
     for (; it != m_shuffledSongs.end(); ++it, ++track)
     {
-        Metadata *mdata = (*it);
+        MusicMetadata *mdata = (*it);
         if (mdata)
         {
             total += mdata->Length();
@@ -536,7 +546,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (m_name == "default_playlist_storage" ||
-        m_name == "backup_playlist_storage"  || 
         m_name == "stream_playlist")
     {
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
@@ -547,7 +556,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
     else
     {
         // Technically this is never called as this function
-        // is only used to load the default/backup playlists.
+        // is only used to load the default playlist.
         query.prepare("SELECT playlist_id, playlist_name, playlist_songs "
                       "FROM music_playlists "
                       "WHERE playlist_name = :NAME"
@@ -564,10 +573,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
             m_name = query.value(1).toString();
             rawSonglist = query.value(2).toString();
         }
-        if (m_name == "default_playlist_storage")
-            m_name = QObject::tr("Default Playlist");
-        if (m_name == "backup_playlist_storage")
-            m_name = "and they should **REALLY** never see this";
     }
     else
     {
@@ -576,7 +581,6 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
                           // of an existing playlist
         rawSonglist.clear();
         savePlaylist(a_name, a_host);
-        m_changed = true;
     }
 
     fillSongsFromSonglist(rawSonglist);
@@ -607,15 +611,14 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
 
     if (m_name == "default_playlist_storage")
         m_name = QObject::tr("Default Playlist");
-    if (m_name == "backup_playlist_storage")
-        m_name = "and they should **REALLY** never see this";
 
     fillSongsFromSonglist(rawSonglist);
 }
 
 void Playlist::fillSongsFromSonglist(QString songList)
 {
-    Metadata::IdType id;
+    MusicMetadata::IdType id;
+    bool badTrack = false;
 
     QStringList list = songList.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = list.begin();
@@ -628,14 +631,13 @@ void Playlist::fillSongsFromSonglist(QString songList)
             // check this is a valid stream ID
             if (gMusicData->all_streams->isValidID(id))
             {
-                Metadata *mdata = gMusicData->all_streams->getMetadata(id);
+                MusicMetadata *mdata = gMusicData->all_streams->getMetadata(id);
                 m_songs.push_back(mdata);
                 m_songMap.insert(id, mdata);
             }
             else
             {
-                m_changed = true;
-
+                badTrack = true;
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
             }
         }
@@ -644,14 +646,13 @@ void Playlist::fillSongsFromSonglist(QString songList)
             // check this is a valid track ID
             if (gMusicData->all_music->isValidID(id))
             {
-                Metadata *mdata = gMusicData->all_music->getMetadata(id);
+                MusicMetadata *mdata = gMusicData->all_music->getMetadata(id);
                 m_songs.push_back(mdata);
                 m_songMap.insert(id, mdata);
             }
             else
             {
-                m_changed = true;
-
+                badTrack = true;
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Got a bad track %1").arg(id));
             }
         }
@@ -662,10 +663,12 @@ void Playlist::fillSongsFromSonglist(QString songList)
     else
         shuffleTracks(MusicPlayer::SHUFFLE_OFF);
 
+    if (badTrack)
+        changed();
+
     gPlayer->activePlaylistChanged(-1, false);
 }
 
-//FIXME:: this needs checking
 void Playlist::fillSonglistFromQuery(QString whereClause,
                                      bool removeDuplicates,
                                      InsertPLOption insertOption,
@@ -674,6 +677,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
 
+    disableSaves();
     removeAllTracks();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -699,6 +703,8 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
         MythDB::DBError("Load songlist from query", query);
         new_songlist.clear();
         fillSongsFromSonglist(new_songlist);
+        enableSaves();
+        changed();
         return;
     }
 
@@ -754,6 +760,9 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     }
 
     fillSongsFromSonglist(new_songlist);
+
+    enableSaves();
+    changed();
 }
 
 // songList is a list of trackIDs to add
@@ -764,6 +773,8 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
 {
     QString orig_songlist = toRawSonglist();
     QString new_songlist;
+
+    disableSaves();
 
     removeAllTracks();
 
@@ -819,11 +830,10 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     }
 
     fillSongsFromSonglist(new_songlist);
-}
 
-void Playlist::fillSongsFromCD()
-{
-    //FIXME: is this still needed?
+    enableSaves();
+
+    changed();
 }
 
 QString Playlist::toRawSonglist(bool shuffled)
@@ -939,29 +949,35 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
     if (limitTo > 0)
         whereClause +=  " LIMIT " + QString::number(limitTo);
 
-    //m_name = name; // Set Playlist name to match smart playlist name
-
     fillSonglistFromQuery(whereClause, removeDuplicates,
                           insertOption, currentTrackID);
 }
 
+void Playlist::changed(void)
+{
+    m_changed = true;
+
+    if (m_doSave)
+        savePlaylist(m_name, gCoreContext->GetHostName());
+}
+
 void Playlist::savePlaylist(QString a_name, QString a_host)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "Saving playlist: " + a_name);
+
     m_name = a_name.simplified();
-    if (m_name.length() < 1)
+    if (m_name.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not saving unnamed playlist");
         return;
     }
 
-    if (a_host.length() < 1)
+    if (a_host.isEmpty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Not saving playlist without a host name");
         return;
     }
-    if (m_name.length() < 1)
-        return;
 
     QString rawSonglist = toRawSonglist(true);
 
@@ -970,8 +986,7 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
 
     getStats(&songcount, &playtime);
 
-    bool save_host = ("default_playlist_storage" == a_name
-        || "backup_playlist_storage" == a_name);
+    bool save_host = ("default_playlist_storage" == a_name);
     if (m_playlistid > 0)
     {
         QString str_query = "UPDATE music_playlists SET "
@@ -1014,6 +1029,8 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
 
     if (m_playlistid < 1)
         m_playlistid = query.lastInsertId().toInt();
+
+    m_changed = false;
 }
 
 QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist)
@@ -1032,7 +1049,7 @@ QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QStr
     return songlist;
 }
 
-Metadata* Playlist::getSongAt(int pos)
+MusicMetadata* Playlist::getSongAt(int pos)
 {
     if (pos >= 0 && pos < m_shuffledSongs.size())
         return m_shuffledSongs.at(pos);
@@ -1060,7 +1077,7 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
             continue;
 
         // Normal track
-        Metadata *tmpdata = (*it);
+        MusicMetadata *tmpdata = (*it);
         if (tmpdata)
         {
             if (tmpdata->Length() > 0)
@@ -1192,7 +1209,7 @@ int Playlist::CreateCDMP3(void)
             continue;
 
         // Normal track
-        Metadata *tmpdata = (*it);
+        MusicMetadata *tmpdata = (*it);
         if (tmpdata)
         {
             // check filename..

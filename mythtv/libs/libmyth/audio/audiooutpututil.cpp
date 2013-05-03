@@ -1,10 +1,17 @@
 #include <math.h>
-
-#include "mythconfig.h"
-#include "audiooutpututil.h"
 #include <sys/types.h>
 #include <inttypes.h>
 #include "bswap.h"
+
+#include "mythconfig.h"
+#include "mythlogging.h"
+#include "audiooutpututil.h"
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libswresample/swresample.h"
+#include "pink.h"
+}
 
 #define LOC QString("AOUtil: ")
 
@@ -488,9 +495,10 @@ int AudioOutputUtil::toFloat(AudioFormat format, void *out, void *in,
         case FORMAT_FLT:
             memcpy(out, in, bytes);
             return bytes;
+        case FORMAT_NONE:
+        default:
+            return 0;
     }
-
-    return 0;
 }
 
 /**
@@ -516,9 +524,10 @@ int AudioOutputUtil::fromFloat(AudioFormat format, void *out, void *in,
             return fromFloat32(format, (int *)out, (float *)in, bytes >> 2);
         case FORMAT_FLT:
             return fromFloatFLT((float *)out, (float *)in, bytes >> 2);
+        case FORMAT_NONE:
+        default:
+            return 0;
     }
-
-    return 0;
 }
 
 /**
@@ -675,4 +684,135 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
     }    
     return frames;
 }
-  
+
+/**
+ * DecodeAudio
+ * Decode an audio packet, and compact it if data is planar
+ * Return negative error code if an error occurred during decoding
+ * or the number of bytes consumed from the input AVPacket
+ * data_size contains the size of decoded data copied into buffer
+ */
+int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
+                                 uint8_t *buffer, int &data_size,
+                                 AVPacket *pkt)
+{
+    AVFrame frame;
+    int got_frame = 0;
+    int ret, ret2;
+    char error[AV_ERROR_MAX_STRING_SIZE];
+
+    data_size = 0;
+    avcodec_get_frame_defaults(&frame);
+    ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
+    if (ret < 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC +
+            QString("audio decode error: %1 (%2)")
+            .arg(av_make_error_string(error, sizeof(error), ret))
+            .arg(got_frame));
+        return ret;
+    }
+
+    if (!got_frame)
+    {
+        LOG(VB_AUDIO, LOG_DEBUG, LOC +
+            QString("audio decode, no frame decoded (%1)").arg(ret));
+        return ret;
+    }
+
+    AVSampleFormat format = (AVSampleFormat)frame.format;
+    if (!av_sample_fmt_is_planar(format))
+    {
+            // data is already compacted... simply copy it
+        data_size = av_samples_get_buffer_size(NULL, ctx->channels,
+                                               frame.nb_samples,
+                                               format, 1);
+        memcpy(buffer, frame.extended_data[0], data_size);
+        return ret;
+    }
+
+        // Need to find a valid channels layout, as not all codecs provide one
+    int64_t channel_layout =
+        frame.channel_layout && frame.channels == av_get_channel_layout_nb_channels(frame.channel_layout) ?
+        frame.channel_layout : av_get_default_channel_layout(frame.channels);
+    SwrContext *swr = swr_alloc_set_opts(NULL,
+                                         channel_layout,
+                                         av_get_packed_sample_fmt(format),
+                                         frame.sample_rate,
+                                         channel_layout,
+                                         format,
+                                         frame.sample_rate,
+                                         0, NULL);
+    if (!swr)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "error allocating resampler context");
+        return AVERROR(ENOMEM);
+    }
+        /* initialize the resampling context */
+    ret2 = swr_init(swr);
+    if (ret2 < 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC +
+            QString("error initializing resampler context (%1)")
+            .arg(av_make_error_string(error, sizeof(error), ret2)));
+        swr_free(&swr);
+        return ret2;
+    }
+
+    uint8_t *out[] = {buffer};
+    ret2 = swr_convert(swr, out, frame.nb_samples,
+                       (const uint8_t **)frame.extended_data, frame.nb_samples);
+    swr_free(&swr);
+    if (ret2 < 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC +
+            QString("error converting audio from planar format (%1)")
+            .arg(av_make_error_string(error, sizeof(error), ret2)));
+        return ret2;
+    }
+    data_size = ret2 * frame.channels * av_get_bytes_per_sample(format);
+
+    return ret;
+}
+
+template <class AudioDataType>
+void _DeinterleaveSample(AudioDataType *out, AudioDataType *in, int channels, int frames)
+{
+    AudioDataType *outp[8];
+
+    for (int i = 0; i < channels; i++)
+    {
+        outp[i] = out + (i * channels * frames);
+    }
+
+    for (int i = 0; i < frames; i++)
+    {
+        for (int j = 0; j < channels; j++)
+        {
+            *(outp[j]++) = *(in++);
+        }
+    }
+}
+
+/**
+ * Deinterleave input samples
+ * Deinterleave audio samples and compact them
+ */
+void AudioOutputUtil::DeinterleaveSamples(AudioFormat format, int channels,
+                                          uint8_t *output, uint8_t *input,
+                                          int data_size)
+{
+    int bits = AudioOutputSettings::FormatToBits(format);
+    if (bits == 8)
+    {
+        _DeinterleaveSample((char *)output, (char *)input, channels, data_size/sizeof(char)/channels);
+    }
+    else if (bits == 16)
+    {
+        _DeinterleaveSample((short *)output, (short *)input, channels, data_size/sizeof(short)/channels);
+    }
+    else
+    {
+        _DeinterleaveSample((int *)output, (int *)input, channels, data_size/sizeof(int)/channels);
+    }
+}

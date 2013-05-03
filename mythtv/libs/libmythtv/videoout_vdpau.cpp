@@ -85,7 +85,9 @@ void VideoOutputVDPAU::TearDown(void)
     DeleteRender();
 }
 
-bool VideoOutputVDPAU::Init(int width, int height, float aspect,
+bool VideoOutputVDPAU::Init(const QSize &video_dim_buf,
+                            const QSize &video_dim_disp,
+                            float aspect,
                             WId winid, const QRect &win_rect,
                             MythCodecID codec_id)
 {
@@ -98,11 +100,13 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect,
     m_win = winid;
     QMutexLocker locker(&m_lock);
     window.SetNeedRepaint(true);
-    bool ok = VideoOutput::Init(width, height, aspect, winid, win_rect,codec_id);
+    bool ok = VideoOutput::Init(video_dim_buf, video_dim_disp,
+                                aspect, winid, win_rect,codec_id);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
 
-    InitDisplayMeasurements(width, height, true);
+    InitDisplayMeasurements(video_dim_disp.width(), video_dim_disp.height(),
+                            true);
     ParseOptions();
     if (ok) ok = InitRender();
     if (ok) ok = InitBuffers();
@@ -126,7 +130,6 @@ bool VideoOutputVDPAU::InitRender(void)
     QMutexLocker locker(&m_lock);
 
     const QSize size = window.GetDisplayVisibleRect().size();
-    const QRect rect = QRect(QPoint(0,0), size);
     m_render = new MythRenderVDPAU();
 
     if (m_render && m_render->Create(size, m_win))
@@ -269,7 +272,7 @@ bool VideoOutputVDPAU::CreateVideoSurfaces(uint num)
 
 void VideoOutputVDPAU::DeleteVideoSurfaces(void)
 {
-    if (!m_render || !m_video_surfaces.size())
+    if (!m_render || m_video_surfaces.isEmpty())
         return;
 
     for (int i = 0; i < m_video_surfaces.size(); i++)
@@ -705,7 +708,8 @@ void VideoOutputVDPAU::ClearAfterSeek(void)
     m_lock.unlock();
 }
 
-bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
+bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
+                                    const QSize &video_dim_disp,
                                     float        aspect,
                                     MythCodecID  av_codec_id,
                                     void        *codec_private,
@@ -713,7 +717,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged(%1,%2,%3) '%4'->'%5'")
-            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(video_dim_disp.width()).arg(video_dim_disp.height())
+            .arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
@@ -730,7 +735,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     }
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetActualVideoDim();
     bool asp_changed = aspect      != window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
@@ -748,7 +753,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
 
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
-    if (Init(input_size.width(), input_size.height(),
+    if (Init(video_dim_buf, video_dim_disp,
              aspect, m_win, disp, av_codec_id))
     {
         if (wasembedding)
@@ -827,9 +832,9 @@ void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
 
     vbuffers.begin_lock(kVideoBuffer_used);
 
-    if (vbuffers.size(kVideoBuffer_used) && m_render)
+    if (vbuffers.Size(kVideoBuffer_used) && m_render)
     {
-        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        VideoFrame *frame = vbuffers.Head(kVideoBuffer_used);
         disp_timecode = frame->disp_timecode;
         if (codec_is_std(video_codec_id))
         {
@@ -979,7 +984,7 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 
     m_lock.lock();
     if (FrameIsInUse(frame))
-        vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
+        vbuffers.SafeEnqueue(kVideoBuffer_displayed, frame);
     else
     {
         vbuffers.DoneDisplayingFrame(frame);
@@ -1003,7 +1008,7 @@ void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 void VideoOutputVDPAU::DoneDisplayingFrame(VideoFrame *frame)
 {
     m_lock.lock();
-    if (vbuffers.contains(kVideoBuffer_used, frame))
+    if (vbuffers.Contains(kVideoBuffer_used, frame))
         DiscardFrame(frame);
     CheckFrameStates();
     m_lock.unlock();
@@ -1019,7 +1024,7 @@ void VideoOutputVDPAU::CheckFrameStates(void)
         VideoFrame* frame = *it;
         if (!FrameIsInUse(frame))
         {
-            if (vbuffers.contains(kVideoBuffer_decode, frame))
+            if (vbuffers.Contains(kVideoBuffer_decode, frame))
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Frame %1 is in use by avlib and so is "
@@ -1028,7 +1033,7 @@ void VideoOutputVDPAU::CheckFrameStates(void)
             }
             else
             {
-                vbuffers.safeEnqueue(kVideoBuffer_avail, frame);
+                vbuffers.SafeEnqueue(kVideoBuffer_avail, frame);
                 vbuffers.end_lock();
                 it = vbuffers.begin_lock(kVideoBuffer_displayed);
                 continue;

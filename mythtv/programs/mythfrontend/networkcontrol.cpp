@@ -74,10 +74,8 @@ NetworkControl::NetworkControl() :
     jumpMap["playmusic"]             = "Play music";
     jumpMap["programfinder"]         = "Program Finder";
     jumpMap["programguide"]          = "Program Guide";
-    jumpMap["recordingpriorities"]   = "Program Recording Priorities";
     jumpMap["ripcd"]                 = "Rip CD";
     jumpMap["musicplaylists"]        = "Select music playlists";
-    jumpMap["deleterecordings"]      = "TV Recording Deletion";
     jumpMap["playbackrecordings"]    = "TV Recording Playback";
     jumpMap["videobrowser"]          = "Video Browser";
     jumpMap["videogallery"]          = "Video Gallery";
@@ -92,9 +90,8 @@ NetworkControl::NetworkControl() :
     jumpMap["previousbox"]           = "Previously Recorded";
     jumpMap["progfinder"]            = "Program Finder";
     jumpMap["guidegrid"]             = "Program Guide";
-    jumpMap["programrecpriority"]    = "Program Recording Priorities";
+    jumpMap["managerecrules"]        = "Manage Recording Rules";
     jumpMap["statusbox"]             = "Status Screen";
-    jumpMap["deletebox"]             = "TV Recording Deletion";
     jumpMap["playbackbox"]           = "TV Recording Playback";
     jumpMap["pbb"]                   = "TV Recording Playback";
 
@@ -829,6 +826,17 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         message = QString("NETWORK_CONTROL VOLUME %1")
                           .arg(nc->getArg(2).toLower());
     }
+    else if (is_abbrev("subtitles", nc->getArg(1), 2))
+    {
+	if (nc->getArgCount() < 3)
+	    message = QString("NETWORK_CONTROL SUBTITLES 0");
+	else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
+	    return QString("ERROR: See 'help %1' for usage information")
+		.arg(nc->getArg(0));
+	else
+	    message = QString("NETWORK_CONTROL SUBTITLES %1")
+		.arg(nc->getArg(2));
+    }
     else
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(nc->getArg(0));
@@ -1117,6 +1125,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "play speed 1/3x        - Playback at 1/3x speed\r\n"
             "play speed 1/2x        - Playback at 1/2x speed\r\n"
             "play stop              - Stop playback\r\n"
+            "play subtitles [#]     - Switch on indicated subtitle tracks\r\n"
             "play music play        - Resume playback (MythMusic)\r\n"
             "play music pause       - Pause playback (MythMusic)\r\n"
             "play music stop        - Stop Playback (MythMusic)\r\n"

@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QFileInfo>
 #include <QMutexLocker>
 
@@ -34,7 +31,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)
-        remote->useReadyReadCallback(false);
+        remote->SetReadyReadCallbackEnabled(false);
 }
 
 FileTransfer::~FileTransfer()
@@ -120,11 +117,11 @@ int FileTransfer::RequestBlock(int size)
         int request = size - tot;
 
         ret = rbuffer->Read(buf, request);
-        
+
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
 
-        if (!GetSocket()->writeData(buf, (uint)ret))
+        if (GetSocket()->Write(buf, (uint)ret) != ret)
         {
             tot = -1;
             break;
@@ -157,7 +154,7 @@ int FileTransfer::WriteBlock(int size)
     {
         int request = size - tot;
 
-        if (!GetSocket()->readData(buf, (uint)request))
+        if (GetSocket()->Read(buf, (uint)request, 25 /*ms*/) != request)
             break;
 
         ret = rbuffer->Write(buf, request);

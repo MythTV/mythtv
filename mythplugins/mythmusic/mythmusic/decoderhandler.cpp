@@ -15,11 +15,12 @@
 #include <compat.h> // For random() on MINGW32
 #include <remotefile.h>
 #include <mythcorecontext.h>
+#include <musicmetadata.h>
+
 
 // mythmusic
 #include "decoderhandler.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "shoutcast.h"
 
 /**********************************************************************/
@@ -31,10 +32,10 @@ QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::regist
 QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
-DecoderHandlerEvent::DecoderHandlerEvent(Type t, const Metadata &meta)
+DecoderHandlerEvent::DecoderHandlerEvent(Type t, const MusicMetadata &meta)
     : MythEvent(t), m_msg(NULL), m_meta(NULL), m_available(0), m_maxSize(0)
 { 
-    m_meta = new Metadata(meta);
+    m_meta = new MusicMetadata(meta);
 }
 
 DecoderHandlerEvent::~DecoderHandlerEvent(void)
@@ -54,7 +55,7 @@ MythEvent* DecoderHandlerEvent::clone(void) const
         result->m_msg = new QString(*m_msg);
 
     if (m_meta)
-        result->m_meta = new Metadata(*m_meta);
+        result->m_meta = new MusicMetadata(*m_meta);
 
     result->m_available = m_available;
     result->m_maxSize = m_maxSize;
@@ -119,11 +120,9 @@ DecoderIOFactoryFile::~DecoderIOFactoryFile(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactoryFile::takeInput(void)
+QIODevice* DecoderIOFactoryFile::getInput(void)
 {
-    QIODevice *result = m_input;
-    m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryFile::start(void)
@@ -150,11 +149,9 @@ DecoderIOFactorySG::~DecoderIOFactorySG(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactorySG::takeInput(void)
+QIODevice* DecoderIOFactorySG::getInput(void)
 {
-    QIODevice *result = m_input;
-    m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactorySG::start(void)
@@ -190,11 +187,9 @@ DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)
         delete m_input;
 }
 
-QIODevice* DecoderIOFactoryUrl::takeInput(void) 
+QIODevice* DecoderIOFactoryUrl::getInput(void)
 {
-    QIODevice *result = m_input;
-    //m_input = NULL;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryUrl::start(void)
@@ -301,7 +296,7 @@ DecoderHandler::~DecoderHandler(void)
     stop();
 }
 
-void DecoderHandler::start(Metadata *mdata)
+void DecoderHandler::start(MusicMetadata *mdata)
 {
     m_state = LOADING;
 
@@ -426,7 +421,6 @@ void DecoderHandler::stop(void)
     if (m_decoder)
     {
         m_decoder->wait();
-        //delete m_decoder->input(); // TODO: need to sort out who is responsible for the input
         delete m_decoder;
         m_decoder = NULL;
     }
@@ -521,14 +515,9 @@ void DecoderHandler::createPlaylistForSingleFile(const QUrl &url)
 
 void DecoderHandler::createPlaylistFromFile(const QUrl &url)
 {
-    QFile f(QFileInfo(url.path()).absolutePath() + "/" + QFileInfo(url.path()).fileName());
-    if (!f.open(QIODevice::ReadOnly))
-        return;
-    QTextStream stream(&f);
+    QString file = url.toLocalFile();
 
-    QString extension = QFileInfo(url.path()).suffix().toLower();
-
-    PlayListFile::parse(&m_playlist, &stream, extension);
+    PlayListFile::parse(&m_playlist, file);
 
     doStart((m_playlist.size() > 0));
 }
@@ -573,14 +562,13 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 
     if (!m_decoder)
     {
-        if ((m_decoder = Decoder::create(format, NULL, NULL, true)) == NULL)
+        if ((m_decoder = Decoder::create(format, NULL, true)) == NULL)
         {
             doFailed(url, QString("No decoder for this format '%1'").arg(format));
             return;
         }
     }
 
-    m_decoder->setInput(getIOFactory()->takeInput());
     m_decoder->setFilename(url.toString());
 
     DecoderHandlerEvent ev(DecoderHandlerEvent::Ready);
@@ -712,7 +700,7 @@ MusicIODevice::~MusicIODevice(void)
     delete m_buffer;
 }
 
-bool MusicIODevice::open(int)
+bool MusicIODevice::open(OpenMode)
 {
     return true;
 }
@@ -763,8 +751,6 @@ int MusicIODevice::ungetch(int)
 MusicSGIODevice::MusicSGIODevice(const QString &url)
 {
     m_remotefile = new RemoteFile(url);
-    m_remotefile->Open();
-
     setOpenMode(ReadWrite);
 }
 
@@ -774,7 +760,7 @@ MusicSGIODevice::~MusicSGIODevice(void)
     delete m_remotefile;
 }
 
-bool MusicSGIODevice::open(int)
+bool MusicSGIODevice::open(OpenMode)
 {
     return m_remotefile->isOpen();
 }

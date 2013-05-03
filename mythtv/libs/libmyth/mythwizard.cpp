@@ -59,8 +59,8 @@ public:
     struct Page {
         Page( QWidget * widget, const QString & title ):
             w( widget ), t( title ),
-            backEnabled( TRUE ), nextEnabled( TRUE ), finishEnabled( FALSE ),
-            appropriate( TRUE )
+            backEnabled( true ), nextEnabled( true ), finishEnabled( false ),
+            appropriate( true )
         {}
         QWidget * w;
         QString t;
@@ -125,7 +125,7 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
     d->nextButton->setText( tr( "&Next >" ) );
     d->finishButton->setText( tr( "&Finish" ) );
 
-    d->nextButton->setDefault( TRUE );
+    d->nextButton->setDefault( true );
 
     connect( d->backButton, SIGNAL(clicked()),
              this, SLOT(back()) );
@@ -217,7 +217,7 @@ void MythWizard::showPage( QWidget * page )
     if ( p ) {
         int i;
         for( i = 0; i < (int)d->pages.size() && d->pages[i] != p; i++ );
-        bool notFirst( FALSE );
+        bool notFirst( false );
 
         if (i)
         {
@@ -229,7 +229,7 @@ void MythWizard::showPage( QWidget * page )
             }
         }
         setBackEnabled( notFirst );
-        setNextEnabled( TRUE );
+        setNextEnabled( true );
         d->ws->setCurrentWidget(page);
         d->current = p;
     }
@@ -240,7 +240,7 @@ void MythWizard::showPage( QWidget * page )
 
     if (indexOf(page) == pageCount()-1) {
         // last page
-        finishButton()->setEnabled(TRUE);
+        finishButton()->setEnabled(true);
         finishButton()->setFocus();
     } else {
         nextButton()->setFocus();
@@ -337,7 +337,7 @@ void MythWizard::setFinishEnabled( QWidget * page, bool enable )
 bool MythWizard::appropriate( QWidget * page ) const
 {
     MythWizardPrivate::Page * p = d->page( page );
-    return p ? p->appropriate : TRUE;
+    return p ? p->appropriate : true;
 }
 
 void MythWizard::setAppropriate( QWidget * page, bool appropriate )
@@ -354,7 +354,7 @@ void MythWizard::updateButtons()
 
     int i;
     for( i = 0; i < (int)d->pages.size() && d->pages[i] != d->current; i++ );
-    bool notFirst( FALSE );
+    bool notFirst( false );
     if ( i ) {
         i--;
         while( ( i >= 0 ) && !notFirst ) {

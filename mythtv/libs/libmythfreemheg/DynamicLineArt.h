@@ -52,8 +52,8 @@ class MHDynamicLineArt : public MHLineArt
     // These actions set the properties for subsequent drawing but don't affect anything drawn so far.
     virtual void SetFillColour(const MHColour &colour, MHEngine *);
     virtual void SetLineColour(const MHColour &colour, MHEngine *);
-    virtual void SetLineWidth(int nWidth);
-    virtual void SetLineStyle(int nStyle);
+    virtual void SetLineWidth(int nWidth, MHEngine *);
+    virtual void SetLineStyle(int nStyle, MHEngine *);
 
     virtual void GetLineWidth(MHRoot *pResult) { pResult->SetVariableValue(m_nLineWidth); }
     virtual void GetLineStyle(MHRoot *pResult) { pResult->SetVariableValue(m_LineStyle); }

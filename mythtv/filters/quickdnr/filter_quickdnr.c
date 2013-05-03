@@ -590,11 +590,12 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       "quickdnr",
-        descript:   "removes noise with a fast single/double thresholded average filter",
-        formats:    FmtList,
-        libname:    NULL
+        .filter_init= &new_filter,
+        .name=       (char*)"quickdnr",
+        .descript=   (char*)
+        "removes noise with a fast single/double thresholded average filter",
+        .formats=    FmtList,
+        .libname=    NULL
     },
     FILT_NULL
 };

@@ -170,19 +170,20 @@ void ZMPlayer::getEventInfo()
     m_curFrame = 0;
     m_lastFrame = 0;
 
-    m_eventText->SetText(QString(event->eventName + " (%1/%2)")
+    m_eventText->SetText(QString(event->eventName() + " (%1/%2)")
             .arg((*m_currentEvent) + 1)
             .arg(m_eventList->size()));
-    m_cameraText->SetText(event->monitorName);
+    m_cameraText->SetText(event->monitorName());
     m_dateText->SetText(
         MythDate::toString(
-            event->startTime, MythDate::kDateTimeFull | MythDate::kSimplify));
+            event->startTime(),
+            MythDate::kDateTimeFull | MythDate::kSimplify));
 
     // get frames data
     m_frameList->clear();
     if (class ZMClient *zm = ZMClient::get())
     {
-        zm->getFrameList(event->eventID, m_frameList);
+        zm->getFrameList(event->eventID(), m_frameList);
         m_curFrame = 1;
         m_lastFrame = m_frameList->size();
         m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
@@ -310,7 +311,7 @@ void ZMPlayer::deletePressed()
         m_frameTimer->stop();
 
         if (class ZMClient *zm = ZMClient::get())
-            zm->deleteEvent(event->eventID);
+            zm->deleteEvent(event->eventID());
 
         m_eventList->erase(m_eventList->begin() + *m_currentEvent);
         if (*m_currentEvent > (int)m_eventList->size() - 1)

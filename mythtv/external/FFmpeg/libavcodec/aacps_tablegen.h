@@ -23,6 +23,7 @@
 #ifndef AACPS_TABLEGEN_H
 #define AACPS_TABLEGEN_H
 
+#include <math.h>
 #include <stdint.h>
 
 #if CONFIG_HARDCODED_TABLES
@@ -30,6 +31,7 @@
 #include "libavcodec/aacps_tables.h"
 #else
 #include "libavutil/common.h"
+#include "libavutil/libm.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
 #define NR_ALLPASS_BANDS20 30

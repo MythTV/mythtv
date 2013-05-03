@@ -303,11 +303,11 @@ static void handle_transport_desc(vector<uint> &muxes,
             freq,                  QString(),
             // DVB specific
             (int)tsid,            (int)netid,
-            -1,                   cd.BandwidthString()[0].toAscii(),
+            -1,                   cd.BandwidthString()[0].toLatin1(),
             -1,                   'a',
-            cd.TransmissionModeString()[0].toAscii(),
+            cd.TransmissionModeString()[0].toLatin1(),
             QString(),                         cd.ConstellationString(),
-            cd.HierarchyString()[0].toAscii(), cd.CodeRateHPString(),
+            cd.HierarchyString()[0].toLatin1(), cd.CodeRateHPString(),
             cd.CodeRateLPString(),             cd.GuardIntervalString(),
             QString(),                         QString());
 
@@ -332,7 +332,7 @@ static void handle_transport_desc(vector<uint> &muxes,
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,
-            cd.PolarizationString()[0].toAscii(), 'a',
+            cd.PolarizationString()[0].toLatin1(), 'a',
             -1,
             cd.FECInnerString(),  QString(),
             -1,                   QString(),
@@ -420,11 +420,11 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
         mux.frequency,                    mux.modulation.toString(),
         // DVB specific
         transport_id,                     network_id,
-        mux.symbolrate,                   mux.bandwidth.toChar().toAscii(),
-        mux.polarity.toChar().toAscii(),  mux.inversion.toChar().toAscii(),
-        mux.trans_mode.toChar().toAscii(),
+        mux.symbolrate,                   mux.bandwidth.toChar().toLatin1(),
+        mux.polarity.toChar().toLatin1(),  mux.inversion.toChar().toLatin1(),
+        mux.trans_mode.toChar().toLatin1(),
         mux.fec.toString(),               mux.modulation.toString(),
-        mux.hierarchy.toChar().toAscii(), mux.hp_code_rate.toString(),
+        mux.hierarchy.toChar().toLatin1(), mux.hp_code_rate.toString(),
         mux.lp_code_rate.toString(),      mux.guard_interval.toString(),
         mux.mod_sys.toString(),           mux.rolloff.toString());
 }
@@ -1726,6 +1726,64 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
     }
 }
 
+bool ChannelUtil::UpdateIPTVTuningData(
+    uint channel_id, const IPTVTuningData &tuning)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "DELETE FROM iptv_channel "
+        "WHERE chanid=:CHANID");
+    query.bindValue(":CHANID", channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateIPTVTuningData -- delete", query);
+        return false;
+    }
+
+    query.prepare(
+        "INSERT INTO iptv_channel (chanid, url, type, bitrate) "
+        "VALUES (:CHANID, :URL, :TYPE, :BITRATE)");
+    query.bindValue(":CHANID", channel_id);
+
+    query.bindValue(":URL", tuning.GetDataURL().toString());
+    query.bindValue(":TYPE", tuning.GetFECTypeString(0));
+    query.bindValue(":BITRATE", tuning.GetBitrate(0));
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateIPTVTuningData -- data", query);
+        return false;
+    }
+
+    if (tuning.GetFECURL0().port() >= 0)
+    {
+        query.bindValue(":URL", tuning.GetFECURL0().toString());
+        query.bindValue(":TYPE", tuning.GetFECTypeString(1));
+        query.bindValue(":BITRATE", tuning.GetBitrate(1));
+        if (!query.exec())
+        {
+            MythDB::DBError("UpdateIPTVTuningData -- fec 0", query);
+            return false;
+        }
+    }
+
+    if (tuning.GetFECURL1().port() >= 0)
+    {
+        query.bindValue(":URL", tuning.GetFECURL1().toString());
+        query.bindValue(":TYPE", tuning.GetFECTypeString(2));
+        query.bindValue(":BITRATE", tuning.GetBitrate(2));
+        if (!query.exec())
+        {
+            MythDB::DBError("UpdateIPTVTuningData -- fec 1", query);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool ChannelUtil::DeleteChannel(uint channel_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1737,6 +1795,17 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
     if (!query.exec())
     {
         MythDB::DBError("Delete Channel", query);
+        return false;
+    }
+
+    query.prepare(
+        "DELETE FROM iptv_channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Delete Channel 2", query);
         return false;
     }
 
@@ -1963,11 +2032,82 @@ bool ChannelUtil::GetExtendedChannelData(
                            dvb_transportid, dvb_networkid, dtv_si_std);
 }
 
-DBChanList ChannelUtil::GetChannelsInternal(
+IPTVTuningData ChannelUtil::GetIPTVTuningData(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT type+0, url, bitrate "
+        "FROM iptv_channel "
+        "WHERE chanid = :CHANID "
+        "ORDER BY type+0");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetChannelData -- iptv", query);
+        return IPTVTuningData();
+    }
+
+    QString data_url, fec_url0, fec_url1;
+    IPTVTuningData::FECType fec_type = IPTVTuningData::kNone;
+    uint bitrate[3] = { 0, 0, 0, };
+    while (query.next())
+    {
+        IPTVTuningData::IPTVType type = (IPTVTuningData::IPTVType)
+            query.value(0).toUInt();
+        switch (type)
+        {
+            case IPTVTuningData::kData:
+                data_url = query.value(1).toString();
+                bitrate[0] = query.value(2).toUInt();
+                break;
+            case IPTVTuningData::kRFC2733_1:
+            case IPTVTuningData::kRFC5109_1:
+            case IPTVTuningData::kSMPTE2022_1:
+                fec_url0 = query.value(1).toString();
+                bitrate[1] = query.value(2).toUInt();
+                break;
+            case IPTVTuningData::kRFC2733_2:
+            case IPTVTuningData::kRFC5109_2:
+            case IPTVTuningData::kSMPTE2022_2:
+                fec_url1 = query.value(1).toString();
+                bitrate[2] = query.value(2).toUInt();
+                break;
+        }
+        switch (type)
+        {
+            case IPTVTuningData::kData:
+                break;
+            case IPTVTuningData::kRFC2733_1:
+                fec_type = IPTVTuningData::kRFC2733;
+                break;
+            case IPTVTuningData::kRFC5109_1:
+                fec_type = IPTVTuningData::kRFC5109;
+                break;
+            case IPTVTuningData::kSMPTE2022_1:
+                fec_type = IPTVTuningData::kSMPTE2022;
+                break;
+            case IPTVTuningData::kRFC2733_2:
+            case IPTVTuningData::kRFC5109_2:
+            case IPTVTuningData::kSMPTE2022_2:
+                break; // will be handled by type of first FEC stream
+        }
+    }
+
+    IPTVTuningData tuning(data_url, bitrate[0], fec_type,
+                          fec_url0, bitrate[1], fec_url1, bitrate[2]);
+    LOG(VB_GENERAL, LOG_INFO, QString("Loaded %1 for %2")
+        .arg(tuning.GetDeviceName()).arg(chanid));
+    return tuning;
+}
+
+// TODO This should be modified to load a complete channelinfo object including
+//      all fields from the database
+ChannelInfoList ChannelUtil::GetChannelsInternal(
     uint sourceid, bool vis_only, bool include_disconnected,
     const QString &grp, uint changrpid)
 {
-    DBChanList list;
+    ChannelInfoList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1975,7 +2115,9 @@ DBChanList ChannelUtil::GetChannelsInternal(
         "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible, "
-        "       channel.sourceid, cardinput.cardid, channelgroup.grpid "
+        "       channel.sourceid, GROUP_CONCAT(DISTINCT cardinput.cardid),"
+        "       GROUP_CONCAT(DISTINCT channelgroup.grpid), "
+        "       xmltvid "
         "FROM channel "
         "LEFT JOIN channelgroup ON channel.chanid     = channelgroup.chanid "
         " %1  JOIN cardinput    ON cardinput.sourceid = channel.sourceid "
@@ -2005,8 +2147,10 @@ DBChanList ChannelUtil::GetChannelsInternal(
         cond = " AND ";
     }
 
+    qstr += " GROUP BY chanid";
+
     if (!grp.isEmpty())
-        qstr += QString(" GROUP BY %1 ").arg(grp);
+        qstr += QString(", %1").arg(grp);
 
     query.prepare(qstr);
     if (!query.exec())
@@ -2020,7 +2164,7 @@ DBChanList ChannelUtil::GetChannelsInternal(
         if (query.value(0).toString().isEmpty() || !query.value(2).toUInt())
             continue; // skip if channum blank, or chanid empty
 
-        DBChannel chan(
+        ChannelInfo chan(
             query.value(0).toString(),                    /* channum    */
             query.value(1).toString(),                    /* callsign   */
             query.value(2).toUInt(),                      /* chanid     */
@@ -2030,11 +2174,22 @@ DBChanList ChannelUtil::GetChannelsInternal(
             query.value(8).toBool(),                      /* visible    */
             query.value(5).toString(),                    /* name       */
             query.value(6).toString(),                    /* icon       */
-            query.value(9).toUInt(),                      /* sourceid   */
-            query.value(11).toUInt(),                     /* cardid     */
-            query.value(10).toUInt());                    /* grpid      */
+            query.value(9).toUInt());                     /* sourceid   */
 
+        chan.xmltvid = query.value(12).toString();        /* xmltvid    */
+
+        QStringList cardIDs = query.value(11).toString().split(",");
+        QString cardid;
+        while (!cardIDs.isEmpty())
+                chan.AddCardId(cardIDs.takeFirst().toUInt());
+
+        QStringList groupIDs = query.value(10).toString().split(",");
+        QString groupid;
+        while (!groupIDs.isEmpty())
+                chan.AddCardId(groupIDs.takeFirst().toUInt());
+        
         list.push_back(chan);
+
     }
 
     return list;
@@ -2061,12 +2216,12 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid)
     return list;
 }
 
-inline bool lt_callsign(const DBChannel &a, const DBChannel &b)
+inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
     return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
 }
 
-inline bool lt_smart(const DBChannel &a, const DBChannel &b)
+inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
 {
     static QMutex sepExprLock;
     static const QRegExp sepExpr(ChannelUtil::kATSCSeparators);
@@ -2076,10 +2231,10 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     bool isIntA, isIntB;
     int a_int = a.channum.toUInt(&isIntA);
     int b_int = b.channum.toUInt(&isIntB);
-    int a_major = a.major_chan;
-    int b_major = b.major_chan;
-    int a_minor = a.minor_chan;
-    int b_minor = b.minor_chan;
+    int a_major = a.atsc_major_chan;
+    int b_major = b.atsc_major_chan;
+    int a_minor = a.atsc_minor_chan;
+    int b_minor = b.atsc_minor_chan;
 
     // Extract minor and major numbers from channum..
     bool tmp1, tmp2;
@@ -2174,7 +2329,7 @@ uint ChannelUtil::GetChannelCount(int sourceid)
     return query.size();
 }
 
-void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
+void ChannelUtil::SortChannels(ChannelInfoList &list, const QString &order,
                                bool eliminate_duplicates)
 {
     bool cs = order.toLower() == "callsign";
@@ -2185,7 +2340,7 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 
     if (eliminate_duplicates && !list.empty())
     {
-        DBChanList tmp;
+        ChannelInfoList tmp;
         tmp.push_back(list[0]);
         for (uint i = 1; i < list.size(); i++)
         {
@@ -2201,14 +2356,14 @@ void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
 }
 
 uint ChannelUtil::GetNextChannel(
-    const DBChanList &sorted,
+    const ChannelInfoList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
     int               direction,
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
-    DBChanList::const_iterator it =
+    ChannelInfoList::const_iterator it =
         find(sorted.begin(), sorted.end(), old_chanid);
 
     if (it == sorted.end())
@@ -2217,7 +2372,7 @@ uint ChannelUtil::GetNextChannel(
     if (it == sorted.end())
         return 0; // no channels..
 
-    DBChanList::const_iterator start = it;
+    ChannelInfoList::const_iterator start = it;
 
     if (CHANNEL_DIRECTION_DOWN == direction)
     {

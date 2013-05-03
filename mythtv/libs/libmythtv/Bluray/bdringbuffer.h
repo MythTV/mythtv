@@ -7,8 +7,9 @@
 #include <QRect>
 #include <QHash>
 
-#include "libmythbluray/bluray.h"
-#include "libmythbluray/keys.h"
+// external/libmythbluray
+#include "bluray.h"
+#include "keys.h" // Likely to cause collisions?
 
 #include "ringbuffer.h"
 #include "mythdate.h"
@@ -85,10 +86,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t GetChapterStartFrame(uint32_t chapter);
     bool IsOpen(void)        const { return bdnav; }
     bool IsHDMVNavigation(void) const { return m_isHDMVNavigation; }
-    bool IsInMenu(void) const { return m_inMenu; }
-    bool IsInStillFrame(void) const;
-    virtual bool IsInDiscMenuOrStillFrame(void) const
-        { return IsInMenu() || IsInStillFrame(); } // RingBuffer
+    virtual bool IsInMenu(void) const { return m_inMenu; }
+    virtual bool IsInStillFrame(void) const;
     bool TitleChanged(void);
 
     void GetDescForPos(QString &desc);
@@ -131,7 +130,6 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     void HandleBDEvent(BD_EVENT &event);
 
     BLURAY            *bdnav;
-    meta_dl           *m_metaDiscLibrary;
     bool               m_isHDMVNavigation;
     bool               m_tryHDMVNavigation;
     bool               m_topMenuSupported;

@@ -16,7 +16,6 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythdate.h"
 #include "remotefile.h"
-#include "mythplugin.h"
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
@@ -26,7 +25,6 @@ using namespace std;
 #include "dbutil.h"
 #include "DisplayRes.h"
 #include "mythmediamonitor.h"
-#include "mythsocketthread.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -40,6 +38,8 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsystem.h"
 #include "mythmiscutil.h"
+
+#include "mythplugin.h"
 
 #ifdef USING_MINGW
 #include <unistd.h>
@@ -85,10 +85,8 @@ class MythContextPrivate : public QObject
 
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup(void);
-    void ConnectFailurePopupClosed(void);
 
     void ShowVersionMismatchPopup(uint remoteVersion);
-    void VersionMismatchPopupClosed(void);
 
   public:
     MythContext *parent;
@@ -103,9 +101,6 @@ class MythContextPrivate : public QObject
     Configuration    *m_pConfig;
 
     bool disableeventpopup;
-    bool disablelibrarypopup;
-
-    MythPluginManager *pluginmanager;
 
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
@@ -181,7 +176,7 @@ static void exec_program_tv_cb(const QString &cmd)
 
 static void configplugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gCoreContext->GetPluginManager();
     if (pmanager)
         if (pmanager->config_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("Failed to configure plugin %1").arg(cmd));
@@ -189,7 +184,7 @@ static void configplugin_cb(const QString &cmd)
 
 static void plugin_cb(const QString &cmd)
 {
-    MythPluginManager *pmanager = gContext->getPluginManager();
+    MythPluginManager *pmanager = gCoreContext->GetPluginManager();
     if (pmanager)
         if (pmanager->run_plugin(cmd.trimmed()))
             ShowOkPopup(QObject::tr("The plugin %1 has failed "
@@ -206,8 +201,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_gui(false),
       m_pConfig(NULL), 
       disableeventpopup(false),
-      disablelibrarypopup(false),
-      pluginmanager(NULL),
       m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
       MBEconnectPopup(NULL),
@@ -244,7 +237,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     SilenceDBerrors();
 
     gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     // Qt 4.4 has window-focus problems
     gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 #endif
@@ -440,7 +433,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_DBparams.LoadDefaults();
 
     m_DBparams.localHostName = m_pConfig->GetValue("LocalHostName", "");
-
+    m_DBparams.dbHostPing = m_pConfig->GetValue(kDefaultDB + "PingHost", true);
     m_DBparams.dbHostName = m_pConfig->GetValue(kDefaultDB + "Host", "");
     m_DBparams.dbUserName = m_pConfig->GetValue(kDefaultDB + "UserName", "");
     m_DBparams.dbPassword = m_pConfig->GetValue(kDefaultDB + "Password", "");
@@ -1020,11 +1013,10 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 
 void MythContextPrivate::HideConnectionFailurePopup(void)
 {
-    if (MBEconnectPopup)
-    {
-        MBEconnectPopup->Close();
-        MBEconnectPopup = NULL;
-    }
+    MythConfirmationDialog *dlg = this->MBEconnectPopup;
+    this->MBEconnectPopup = NULL;
+    if (dlg)
+        dlg->Close();
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
@@ -1168,7 +1160,6 @@ MythContext::~MythContext()
     if (MThreadPool::globalInstance()->activeThreadCount())
         LOG(VB_GENERAL, LOG_INFO, "Waiting for threads to exit.");
 
-    ShutdownRRT();
     MThreadPool::globalInstance()->waitForDone();
     logStop();
 
@@ -1181,46 +1172,9 @@ MythContext::~MythContext()
     delete d;
 }
 
-bool MythContext::TestPopupVersion(const QString &name,
-                                   const QString &libversion,
-                                   const QString &pluginversion)
-{
-    if (libversion == pluginversion)
-        return true;
-
-    QString err = QObject::tr(
-        "Plugin %1 is not compatible with the installed MythTV "
-        "libraries.");
-
-    LOG(VB_GENERAL, LOG_EMERG, 
-             QString("Plugin %1 (%2) binary version does not "
-                     "match libraries (%3)")
-                 .arg(name).arg(pluginversion).arg(libversion));
-
-    if (GetMythMainWindow() && !d->disablelibrarypopup)
-        ShowOkPopup(err.arg(name));
-
-    return false;
-}
-
 void MythContext::SetDisableEventPopup(bool check)
 {
     d->disableeventpopup = check;
-}
-
-void MythContext::SetDisableLibraryPopup(bool check)
-{
-    d->disablelibrarypopup = check;
-}
-
-void MythContext::SetPluginManager(MythPluginManager *pmanager)
-{
-    d->pluginmanager = pmanager;
-}
-
-MythPluginManager *MythContext::getPluginManager(void)
-{
-    return d->pluginmanager;
 }
 
 DatabaseParams MythContext::GetDatabaseParams(void)

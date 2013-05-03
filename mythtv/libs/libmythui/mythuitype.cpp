@@ -24,7 +24,6 @@
 #include "mythuitextedit.h"
 #include "mythuiprogressbar.h"
 #include "mythuispinbox.h"
-#include "mythuiwebbrowser.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent)
@@ -144,7 +143,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
  */
 MythUIType *MythUIType::GetChild(const QString &name) const
 {
-    QObject *ret = qChildHelper(name.toAscii().constData(), NULL, true, children());
+    QObject *ret = qChildHelper(name.toLatin1().constData(), NULL, true, children());
 
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
@@ -436,6 +435,7 @@ void MythUIType::HandleAlphaPulse(void)
         {
             m_AlphaChangeMode = 0;
             m_AlphaChange = 0;
+            emit FinishedFading();
         }
     }
 
@@ -478,7 +478,10 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
-    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
+    // NB m_DirtyRegion may be extended by HandleMovementPulse, SetRedraw
+    // or SetChildNeedsRedraw etc _AFTER_ GetDirtyArea is called.
+    // So clipRect may not include the whole of m_DirtyRegion
+    m_DirtyRegion -= QRegion(clipRect); // NB Qt >= 4.2
 
     if (!m_Visible || m_Vanished)
         return;
@@ -639,7 +642,7 @@ void MythUIType::AdjustMinArea(int delta_x, int delta_y,
     if (bounded.x() + bounded.width() > m_Area.x() + m_Area.width())
         bounded.moveRight(m_Area.x() + m_Area.width());
     if (bounded.y() + bounded.height() > m_Area.y() + m_Area.height())
-        bounded.moveBottom(m_Area.x() + m_Area.height());
+        bounded.moveBottom(m_Area.y() + m_Area.height());
     if (bounded.x() < m_Area.x())
     {
         bounded.moveLeft(m_Area.x());
@@ -825,7 +828,7 @@ void MythUIType::SetMinArea(const MythRect &rect)
         if (bounded.x() + bounded.width() > m_Area.x() + m_Area.width())
             bounded.moveRight(m_Area.x() + m_Area.width());
         if (bounded.y() + bounded.height() > m_Area.y() + m_Area.height())
-            bounded.moveBottom(m_Area.x() + m_Area.height());
+            bounded.moveBottom(m_Area.y() + m_Area.height());
         if (bounded.x() < m_Area.x())
         {
             bounded.moveLeft(m_Area.x());

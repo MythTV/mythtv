@@ -200,6 +200,10 @@ QString ChannelGroup::GetChannelGroupName(int grpid)
     if (grpid == -1)
         return QObject::tr("All Channels");
 
+    // No group
+    if (grpid == 0)
+        return "";
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name FROM channelgroupnames WHERE grpid = :GROUPID");
     query.bindValue(":GROUPID", grpid);

@@ -352,7 +352,7 @@ void LIRC::Process(const QByteArray &data)
         // Send a dummy keycode if we couldn't convert the key sequence.
         // This is done so the main code can output a warning for bad
         // mappings.
-        if (!a.count())
+        if (a.isEmpty())
         {
             QCoreApplication::postEvent(
                 m_mainWindow, new LircKeycodeEvent(

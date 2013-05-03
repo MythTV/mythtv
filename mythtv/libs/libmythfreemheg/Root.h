@@ -175,6 +175,10 @@ class MHRoot
     virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleVideo"); }
     virtual void SetVideoDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetVideoDecodeOffset"); }
     virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot * /*pYOffset*/, MHEngine *) { InvalidAction("GetVideoDecodeOffset"); }
+    virtual void GetCounterPosition(MHRoot * /*pPos*/, MHEngine *) { InvalidAction("GetCounterPosition"); }
+    virtual void GetCounterMaxPosition(MHRoot * /*pPos*/, MHEngine *) { InvalidAction("GetCounterMaxPosition"); }
+    virtual void SetCounterPosition(int /*pos*/, MHEngine *) { InvalidAction("SetCounterPosition"); }
+    virtual void SetSpeed(int /*speed 0=stop*/, MHEngine *) { InvalidAction("SetSpeed"); }
 
     // Actions on Interactibles.
     virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine *) { InvalidAction("SetInteractionStatus"); }

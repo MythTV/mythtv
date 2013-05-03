@@ -118,7 +118,7 @@ class DecoderIOFactoryShoutCast : public DecoderIOFactory
 
     void start(void);
     void stop(void);
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   protected slots:
     void periodicallyCheckResponse(void);

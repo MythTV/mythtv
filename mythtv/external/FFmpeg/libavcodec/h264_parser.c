@@ -31,8 +31,6 @@
 #include "h264data.h"
 #include "golomb.h"
 
-#include <assert.h>
-
 
 static int ff_h264_find_frame_end(H264Context *h, const uint8_t *buf, int buf_size)
 {
@@ -41,7 +39,6 @@ static int ff_h264_find_frame_end(H264Context *h, const uint8_t *buf, int buf_si
     ParseContext *pc = &(h->s.parse_context);
     int next_avc= h->is_avc ? 0 : buf_size;
 
-//printf("first %02X%02X%02X%02X\n", buf[0], buf[1],buf[2],buf[3]);
 //    mb_addr= pc->mb_addr - 1;
     state= pc->state;
     if(state>13)
@@ -324,7 +321,7 @@ static int h264_parse(AVCodecParserContext *s,
         }
 
         if(next<0 && next != END_NOT_FOUND){
-            assert(pc->last_index + next >= 0 );
+            av_assert1(pc->last_index + next >= 0 );
             ff_h264_find_frame_end(h, &pc->buffer[pc->last_index + next], -next); //update state
         }
     }
@@ -392,7 +389,7 @@ static int init(AVCodecParserContext *s)
 }
 
 AVCodecParser ff_h264_parser = {
-    .codec_ids      = { CODEC_ID_H264 },
+    .codec_ids      = { AV_CODEC_ID_H264 },
     .priv_data_size = sizeof(H264Context),
     .parser_init    = init,
     .parser_parse   = h264_parse,

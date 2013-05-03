@@ -562,6 +562,7 @@
                         <xs:restriction base="xs:string">
                             <xs:enumeration value="box" />
                             <xs:enumeration value="roundbox" />
+                            <xs:enumeration value="ellipse" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>

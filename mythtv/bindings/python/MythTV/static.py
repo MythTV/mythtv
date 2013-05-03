@@ -4,12 +4,12 @@
 Contains any static and global variables for MythTV Python Bindings
 """
 
-OWN_VERSION = (0,26,-1,1)
-SCHEMA_VERSION = 1307
+OWN_VERSION = (0,27,-1,0)
+SCHEMA_VERSION = 1310
 NVSCHEMA_VERSION = 1007
 MUSICSCHEMA_VERSION = 1018
-PROTO_VERSION = '75'
-PROTO_TOKEN = 'SweetRock'
+PROTO_VERSION = '77'
+PROTO_TOKEN = 'WindMark'
 BACKEND_SEP = '[]:[]'
 INSTALL_PREFIX = '/usr/local'
 
@@ -34,19 +34,22 @@ class MARKUP( object ):
     MARK_ASPECT_CUSTOM  = 14
     MARK_VIDEO_WIDTH    = 30
     MARK_VIDEO_HEIGHT   = 31
+    MARK_VIDEO_RATE     = 32
+    MARK_DURATION_MS    = 33
 
 class RECTYPE( object ):
     kNotRecording       = 0
     kSingleRecord       = 1
-    kTimeslotRecord     = 2
-    kChannelRecord      = 3
+    kDailyRecord        = 2
+    #kChannelRecord      = 3 (Obsolete)
     kAllRecord          = 4
-    kWeekslotRecord     = 5
-    kFindOneRecord      = 6
+    kWeeklyRecord       = 5
+    kOneRecord          = 6
     kOverrideRecord     = 7
     kDontRecord         = 8
-    kFindDailyRecord    = 9
-    kFindWeeklyRecord   = 10
+    #kFindDailyRecord    = 9 (Obsolete)
+    #kFindWeeklyRecord   = 10 (Obsolete)
+    kTemplateRecord     = 11
 
 class RECSEARCHTYPE( object ):
     kNoSearch           = 0
@@ -213,26 +216,30 @@ class LOGFACILITY( object ):
     LOCAL7      = 17
 
 class ERRCODES( object ):
-    GENERIC             = 0
-    SYSTEM              = 1
-    SOCKET              = 2
-    DB_RAW              = 50
-    DB_CONNECTION       = 51
-    DB_CREDENTIALS      = 52
-    DB_SETTING          = 53
-    DB_SCHEMAMISMATCH   = 54
-    DB_SCHEMAUPDATE     = 55
-    DB_RESTRICT         = 56
-    PROTO_CONNECTION    = 100
-    PROTO_ANNOUNCE      = 101
-    PROTO_MISMATCH      = 102
-    PROTO_PROGRAMINFO   = 103
-    FE_CONNECTION       = 150
-    FE_ANNOUNCE         = 151
-    FILE_ERROR          = 200
-    FILE_FAILED_READ    = 201
-    FILE_FAILED_WRITE   = 202
-    FILE_FAILED_SEEK    = 203
+    GENERIC                 = 0
+    SYSTEM                  = 1
+    SOCKET                  = 2
+    DB_RAW                  = 50
+    DB_CONNECTION           = 51
+    DB_CREDENTIALS          = 52
+    DB_SETTING              = 53
+    DB_SCHEMAMISMATCH       = 54
+    DB_SCHEMAUPDATE         = 55
+    DB_RESTRICT             = 56
+    PROTO_CONNECTION        = 100
+    PROTO_ANNOUNCE          = 101
+    PROTO_MISMATCH          = 102
+    PROTO_PROGRAMINFO       = 103
+    FE_CONNECTION           = 150
+    FE_ANNOUNCE             = 151
+    FILE_ERROR              = 200
+    FILE_FAILED_READ        = 201
+    FILE_FAILED_WRITE       = 202
+    FILE_FAILED_SEEK        = 203
+    TZ_ERROR                = 250
+    TZ_INVALID_FILE         = 251
+    TZ_INVALID_TRANSITION   = 252
+    TZ_CONVERSION_ERROR     = 253
 
 class MythSchema( object ):
     _schema_value = 'DBSchemaVer'

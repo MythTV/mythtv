@@ -31,7 +31,7 @@ class MythUIGuideGrid;
 
 #define MAX_DISPLAY_TIMES 36
 
-typedef vector<DBChannel>   db_chan_list_t;
+typedef vector<ChannelInfo>   db_chan_list_t;
 typedef vector<db_chan_list_t> db_chan_list_list_t;
 
 class JumpToChannel;
@@ -84,12 +84,13 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     // Use this function to instantiate a guidegrid instance.
     static void RunProgramGuide(uint           startChanId,
                                 const QString &startChanNum,
+                                const QDateTime startTime,
                                 TV            *player = NULL,
                                 bool           embedVideo = false,
                                 bool           allowFinder = true,
                                 int            changrpid = -1);
 
-    DBChanList GetSelection(void) const;
+    ChannelInfoList GetSelection(void) const;
 
     virtual void GoTo(int start, int cur_row);
     virtual void SetJumpToChannel(JumpToChannel *ptr);
@@ -133,8 +134,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
   protected:
     GuideGrid(MythScreenStack *parentStack,
-              uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool embedVideo = false,
+              uint chanid, QString channum,
+              const QDateTime startTime,
+              TV *player = NULL,
+              bool embedVideo = false,
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
@@ -180,8 +183,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void setStartChannel(int newStartChannel);
 
-    DBChannel       *GetChannelInfo(uint chan_idx, int sel = -1);
-    const DBChannel *GetChannelInfo(uint chan_idx, int sel = -1) const;
+    ChannelInfo       *GetChannelInfo(uint chan_idx, int sel = -1);
+    const ChannelInfo *GetChannelInfo(uint chan_idx, int sel = -1) const;
     uint                 GetChannelCount(void) const;
     int                  GetStartChannelOffset(int row = -1) const;
 

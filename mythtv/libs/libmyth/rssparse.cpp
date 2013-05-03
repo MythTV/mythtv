@@ -9,10 +9,10 @@
 #include <QRegExp>
 
 #include "rssparse.h"
-#include "netutils.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
 #include "mythdate.h"
+#include "programinfo.h" // for format_season_and_episode()
 
 using namespace std;
 
@@ -148,14 +148,14 @@ void ResultItem::toMap(MetadataMap &metadataMap)
 
     if (m_season > 0 || m_episode > 0)
     {
-        metadataMap["season"] = GetDisplaySeasonEpisode(m_season, 1);
-        metadataMap["episode"] = GetDisplaySeasonEpisode(m_episode, 1);
-        metadataMap["s##e##"] = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                 (m_season, 2)).arg(
-                                 GetDisplaySeasonEpisode(m_episode, 2));
-        metadataMap["##x##"] = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                 (m_season, 1)).arg(
-                                 GetDisplaySeasonEpisode(m_episode, 2));
+        metadataMap["season"] = format_season_and_episode(m_season, 1);
+        metadataMap["episode"] = format_season_and_episode(m_episode, 1);
+        metadataMap["s##e##"] = QString("s%1e%2")
+            .arg(format_season_and_episode(m_season, 2))
+            .arg(format_season_and_episode(m_episode, 2));
+        metadataMap["##x##"] = QString("%1x%2")
+            .arg(format_season_and_episode(m_season, 1))
+            .arg(format_season_and_episode(m_episode, 2));
     }
     else
     {

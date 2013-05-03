@@ -585,12 +585,12 @@ void MPEG2fixup::InitReplex()
         strncpy(rx.extframe[i].language, lang, 4);
         switch(GetStreamType(it.key()))
         {
-            case CODEC_ID_MP2:
-            case CODEC_ID_MP3:
+            case AV_CODEC_ID_MP2:
+            case AV_CODEC_ID_MP3:
                 rx.exttype[i] = 2;
                 rx.exttypcnt[i] = mp2_count++;
                 break;
-            case CODEC_ID_AC3:
+            case AV_CODEC_ID_AC3:
                 rx.exttype[i] = 1;
                 rx.exttypcnt[i] = ac3_count++;
                 break;
@@ -642,9 +642,9 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         iu.frame_off = f->framePos - f->pkt.data;
         iu.dts = f->pkt.dts * 300;
     }
-    else if (GetStreamType(id) == CODEC_ID_MP2 ||
-             GetStreamType(id) == CODEC_ID_MP3 ||
-             GetStreamType(id) == CODEC_ID_AC3)
+    else if (GetStreamType(id) == AV_CODEC_ID_MP2 ||
+             GetStreamType(id) == AV_CODEC_ID_MP3 ||
+             GetStreamType(id) == AV_CODEC_ID_AC3)
     {
         rb = &rx.extrbuf[aud_map[id]];
         rbi = &rx.index_extrbuf[aud_map[id]];
@@ -783,9 +783,9 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
                         QString("Skipping invalid audio stream: %1").arg(i));
                     break;
                 }
-                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 ||
-                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
-                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
+                if (inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_AC3 ||
+                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP3 ||
+                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP2)
                 {
                     aud_map[i] = ext_count++;
                     aFrame[i] = new FrameList();
@@ -1063,7 +1063,7 @@ extern "C" {
 #include "helper.h"
 }
 
-int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
+bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 {
     const mpeg2_info_t *info;
     int outbuf_size;
@@ -1074,7 +1074,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     info = mpeg2_info(img_decoder);
     if (!info->display_fbuf)
-        return 1;
+        return true;
 
     outbuf_size = info->sequence->width * info->sequence->height * 2;
 
@@ -1110,21 +1110,16 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     picture->interlaced_frame = !(info->display_picture->flags &
                                   PIC_FLAG_PROGRESSIVE_FRAME);
 
-    out_codec = avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);
+    out_codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
 
     if (!out_codec)
     {
         free(picture);
         LOG(VB_GENERAL, LOG_ERR, "Couldn't find MPEG2 encoder");
-        return 1;
+        return true;
     }
 
     c = avcodec_alloc_context3(NULL);
-
-    //We disable all optimizations for the time being.  There shouldn't be too
-    //much encoding going on, and the optimizations have been shown to cause
-    //corruption in some cases
-    c->dsp_mask = 0xffff;
 
     //NOTE: The following may seem wrong, but avcodec requires
     //sequence->progressive == frame->progressive
@@ -1164,19 +1159,29 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     {
         free(picture);
         LOG(VB_GENERAL, LOG_ERR, "could not open codec");
-        return 1;
+        return true;
     }
 
     int got_packet = 0;
+    int ret;
+    bool initial = true;
 
-    int ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
-
-    if (ret < 0 || !got_packet)
+    // Need to call this repeatedly as it seems to be pipelined.  The first
+    // call will return no packet, then the second one will flush it.  In case
+    // it becomes more pipelined, just loop until it creates a packet or errors
+    // out.
+    while (!got_packet)
     {
-        free(picture);
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("avcodec_encode_video failed (%1)").arg(pkt->size));
-        return 1;
+        ret = avcodec_encode_video2(c, pkt, (initial ? picture : NULL),
+                                             &got_packet);
+
+        if (ret < 0)
+        {
+            free(picture);
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("avcodec_encode_video2 failed (%1)").arg(ret));
+            return true;
+        }
     }
 
     if (!fname.isEmpty())
@@ -1198,7 +1203,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     av_freep(&c);
     av_freep(&picture);
 
-    return 0;
+    return false;
 }
 
 #define MAX_FRAMES 20000
@@ -1370,10 +1375,10 @@ bool MPEG2fixup::FindStart()
                     if (pkt.pos != vFrame.first()->pkt.pos)
                         break;
 
-                    if ((uint64_t)pkt.pts != AV_NOPTS_VALUE ||
-                        (uint64_t)pkt.dts != AV_NOPTS_VALUE)
+                    if (pkt.pts != AV_NOPTS_VALUE ||
+                        pkt.dts != AV_NOPTS_VALUE)
                     {
-                        if ((uint64_t)pkt.pts == AV_NOPTS_VALUE)
+                        if (pkt.pts == AV_NOPTS_VALUE)
                             vFrame.first()->pkt.pts = pkt.dts;
 
                         LOG(VB_PROCESS, LOG_INFO,
@@ -1623,7 +1628,10 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
         {
             SetFrameNum(tmpFrame->framePos, ++tmpFrameNum);
             if (ProcessVideo(tmpFrame, img_decoder) < 0)
+            {
+                delete tmpFrame;
                 return NULL;
+            }
         }
 
         framePool.enqueue(tmpFrame);
@@ -1851,7 +1859,7 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
     int64_t tmpPTS = diff2x33(curFrame->pkt.pts,
                               origvPTS / 300);
 
-    if ((uint64_t)curFrame->pkt.pts == AV_NOPTS_VALUE)
+    if (curFrame->pkt.pts == AV_NOPTS_VALUE)
     {
         LOG(VB_PROCESS, LOG_INFO,
             QString("Found frame %1 with missing PTS at %2")
@@ -1910,7 +1918,7 @@ int MPEG2fixup::Start()
 {
     // NOTE: expectedvPTS/DTS are in units of SCR (300*PTS) to allow for better
     // accounting of rounding errors (still won't be right, but better)
-    int64_t expectedvPTS, expectedPTS[N_AUDIO];
+    int64_t expectedvPTS; // , expectedPTS[N_AUDIO];
     int64_t expectedDTS = 0, lastPTS = 0, initPTS = 0, deltaPTS = 0;
     int64_t origvPTS = 0, origaPTS[N_AUDIO];
     int64_t cutStartPTS = 0, cutEndPTS = 0;
@@ -1975,7 +1983,7 @@ int MPEG2fixup::Start()
     {
         FrameList *af = (*it);
         origaPTS[it.key()] = af->first()->pkt.pts * 300;
-        expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
+        //expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
         af_dlta_cnt[it.key()] = 0;
         cutState[it.key()] = !!(discard);
     }
@@ -2089,7 +2097,7 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep != (int64_t)AV_NOPTS_VALUE &&
+                                if (tmpPTSdiscrep != AV_NOPTS_VALUE &&
                                     tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }
@@ -2351,13 +2359,14 @@ int MPEG2fixup::Start()
         {
             FrameList *af = (*it);
             AVCodecContext *CC = getCodecContext(it.key());
+            AVCodecParserContext *CPC = getCodecParserContext(it.key());
             bool backwardsPTS = false;
 
             while (af->count())
             {
                 // What to do if the CC is corrupt?
                 // Just wait and hope it repairs itself
-                if (CC->sample_rate == 0 || CC->frame_size == 0)
+                if (CC->sample_rate == 0 || !CPC || CPC->duration == 0)
                     break;
 
                 // The order of processing frames is critical to making
@@ -2373,7 +2382,7 @@ int MPEG2fixup::Start()
                 //     the audio frame
                 int64_t nextPTS, tmpPTS;
                 int64_t incPTS =
-                         90000LL * (int64_t)CC->frame_size / CC->sample_rate;
+                         90000LL * (int64_t)CPC->duration / CC->sample_rate;
 
                 if (poq.UpdateOrigPTS(it.key(), origaPTS[it.key()],
                                                   af->first()->pkt) < 0)
@@ -2442,7 +2451,7 @@ int MPEG2fixup::Start()
                 }
 
                 nextPTS = add2x33(af->first()->pkt.pts,
-                           90000LL * (int64_t)CC->frame_size / CC->sample_rate);
+                           90000LL * (int64_t)CPC->duration / CC->sample_rate);
 
                 if ((cutState[it.key()] == 1 &&
                      cmp2x33(nextPTS, cutStartPTS) > 0) ||
@@ -2633,7 +2642,8 @@ int main(int argc, char **argv)
 #endif
 
 int MPEG2fixup::BuildKeyframeIndex(QString &file,
-                                   frm_pos_map_t &posMap)
+                                   frm_pos_map_t &posMap,
+                                   frm_pos_map_t &durMap)
 {
     LOG(VB_GENERAL, LOG_INFO, "Generating Keyframe Index");
 
@@ -2652,12 +2662,25 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
 
     av_init_packet(&pkt);
 
+    uint64_t totalDuration = 0;
     while (av_read_frame(inputFC, &pkt) >= 0)
     {
         if (pkt.stream_index == vid_id)
         {
             if (pkt.flags & AV_PKT_FLAG_KEY)
+            {
                 posMap[count] = pkt.pos;
+                durMap[count] = totalDuration;
+            }
+
+            // XXX totalDuration untested.  Results should be the same
+            // as from mythcommflag --rebuild.
+
+            // totalDuration calculation based on
+            // AvFormatDecoder::PreProcessVideoPacket()
+            totalDuration +=
+                av_q2d(inputFC->streams[pkt.stream_index]->time_base) *
+                pkt.duration * 1000; // msec
             count++;
         }
         av_free_packet(&pkt);

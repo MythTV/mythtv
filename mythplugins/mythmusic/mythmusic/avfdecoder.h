@@ -12,20 +12,16 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-class Metadata;
-
 class avfDecoder : public Decoder
 {
   public:
-    avfDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
+    avfDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~avfDecoder(void);
 
     bool initialize();
     double lengthInSeconds();
     void seek(double);
     void stop();
-
-    MetaIO *doCreateTagger(void);
 
   private:
     void run();
@@ -35,7 +31,7 @@ class avfDecoder : public Decoder
 
     bool inited, user_stop;
     int stat;
-    char *output_buf;
+    uint8_t *output_buf;
     ulong output_at;
 
     unsigned int bks, bksFrames, decodeBytes;

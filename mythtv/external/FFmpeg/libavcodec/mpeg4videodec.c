@@ -850,7 +850,7 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                               int n, int coded, int intra, int rvlc)
 {
     int level, i, last, run;
-    int dc_pred_dir;
+    int av_uninit(dc_pred_dir);
     RLTable * rl;
     RL_VLC_ELEM * rl_vlc;
     const uint8_t * scan_table;
@@ -1182,7 +1182,7 @@ static int mpeg4_decode_mb(MpegEncContext *s,
     static int8_t quant_tab[4] = { -1, -2, 1, 2 };
     const int xy= s->mb_x + s->mb_y * s->mb_stride;
 
-    assert(s->h263_pred);
+    av_assert2(s->h263_pred);
 
     if (s->pict_type == AV_PICTURE_TYPE_P || s->pict_type==AV_PICTURE_TYPE_S) {
         do{
@@ -1493,7 +1493,7 @@ intra:
 end:
 
         /* per-MB end of slice check */
-    if(s->codec_id==CODEC_ID_MPEG4){
+    if(s->codec_id==AV_CODEC_ID_MPEG4){
         int next= mpeg4_is_resync(s);
         if(next) {
             if        (s->mb_x + s->mb_y*s->mb_width + 1 >  next && (s->avctx->err_recognition & AV_EF_AGGRESSIVE)) {
@@ -1591,7 +1591,7 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
             skip_bits1(gb);     /* marker */
         }
     }else{
-        // set low delay flag only once the smartest? low delay detection won't be overriden
+        // set low delay flag only once the smartest? low delay detection won't be overridden
         if(s->picture_number==0)
             s->low_delay=0;
     }
@@ -1635,6 +1635,9 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
             height = get_bits(gb, 13);
             skip_bits1(gb);   /* marker */
             if(width && height && !(s->width && s->codec_tag == AV_RL32("MP4S"))){ /* they should be non zero but who knows ... */
+                if (s->width && s->height &&
+                    (s->width != width || s->height != height))
+                    s->context_reinit = 1;
                 s->width = width;
                 s->height = height;
             }
@@ -1861,7 +1864,7 @@ no_cplx_est:
     }
 
     if(s->avctx->debug&FF_DEBUG_PICT_INFO) {
-        av_log(s->avctx, AV_LOG_DEBUG, "tb %d/%d, tincrbits:%d, qp_prec:%d, ps:%d,  %s%s\n",
+        av_log(s->avctx, AV_LOG_DEBUG, "tb %d/%d, tincrbits:%d, qp_prec:%d, ps:%d,  %s%s%s%s\n",
                s->avctx->time_base.num, s->avctx->time_base.den,
                s->time_increment_bits,
                s->quant_precision,
@@ -1965,6 +1968,9 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
         }
 
         av_log(s->avctx, AV_LOG_ERROR, "my guess is %d bits ;)\n",s->time_increment_bits);
+        if (s->avctx->time_base.den && 4*s->avctx->time_base.den < 1<<s->time_increment_bits) {
+            s->avctx->time_base.den = 1<<s->time_increment_bits;
+        }
     }
 
     if(IS_3IV1) time_increment= get_bits1(gb); //FIXME investigate further
@@ -2006,7 +2012,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     }
 
     if(s->avctx->time_base.num)
-        s->current_picture_ptr->f.pts = (s->time + s->avctx->time_base.num / 2) / s->avctx->time_base.num;
+        s->current_picture_ptr->f.pts = ROUNDED_DIV(s->time, s->avctx->time_base.num);
     else
         s->current_picture_ptr->f.pts = AV_NOPTS_VALUE;
     if(s->avctx->debug&FF_DEBUG_PTS)
@@ -2114,7 +2120,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
              s->b_code=1;
 
          if(s->avctx->debug&FF_DEBUG_PICT_INFO){
-             av_log(s->avctx, AV_LOG_DEBUG, "qp:%d fc:%d,%d %s size:%d pro:%d alt:%d top:%d %spel part:%d resync:%d w:%d a:%d rnd:%d vot:%d%s dc:%d ce:%d/%d/%d time:%d tincr:%d\n",
+             av_log(s->avctx, AV_LOG_DEBUG, "qp:%d fc:%d,%d %s size:%d pro:%d alt:%d top:%d %spel part:%d resync:%d w:%d a:%d rnd:%d vot:%d%s dc:%d ce:%d/%d/%d time:%"PRId64" tincr:%d\n",
                  s->qscale, s->f_code, s->b_code,
                  s->pict_type == AV_PICTURE_TYPE_I ? "I" : (s->pict_type == AV_PICTURE_TYPE_P ? "P" : (s->pict_type == AV_PICTURE_TYPE_B ? "B" : "S")),
                  gb->size_in_bits,s->progressive_sequence, s->alternate_scan, s->top_field_first,
@@ -2254,23 +2260,10 @@ end:
     return decode_vop_header(s, gb);
 }
 
-static av_cold int decode_init(AVCodecContext *avctx)
-{
-    MpegEncContext *s = avctx->priv_data;
-    int ret;
+av_cold void ff_mpeg4videodec_static_init(void) {
     static int done = 0;
 
-    s->divx_version=
-    s->divx_build=
-    s->xvid_build=
-    s->lavc_build= -1;
-
-    if((ret=ff_h263_decode_init(avctx)) < 0)
-        return ret;
-
     if (!done) {
-        done = 1;
-
         ff_init_rl(&ff_mpeg4_rl_intra, ff_mpeg4_static_rl_table_store[0]);
         ff_init_rl(&ff_rvlc_rl_inter, ff_mpeg4_static_rl_table_store[1]);
         ff_init_rl(&ff_rvlc_rl_intra, ff_mpeg4_static_rl_table_store[2]);
@@ -2289,10 +2282,27 @@ static av_cold int decode_init(AVCodecContext *avctx)
         INIT_VLC_STATIC(&mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
                  &ff_mb_type_b_tab[0][1], 2, 1,
                  &ff_mb_type_b_tab[0][0], 2, 1, 16);
+        done = 1;
     }
+}
+
+static av_cold int decode_init(AVCodecContext *avctx)
+{
+    MpegEncContext *s = avctx->priv_data;
+    int ret;
+
+    s->divx_version=
+    s->divx_build=
+    s->xvid_build=
+    s->lavc_build= -1;
+
+    if((ret=ff_h263_decode_init(avctx)) < 0)
+        return ret;
+
+    ff_mpeg4videodec_static_init();
 
     s->h263_pred = 1;
-    s->low_delay = 0; //default, might be overriden in the vol header during header parsing
+    s->low_delay = 0; //default, might be overridden in the vol header during header parsing
     s->decode_mb= mpeg4_decode_mb;
     s->time_increment_bits = 4; /* default value for broken headers */
     avctx->chroma_sample_location = AVCHROMA_LOC_LEFT;
@@ -2321,8 +2331,8 @@ static const AVProfile mpeg4_video_profiles[] = {
 };
 
 static const AVOption mpeg4_options[] = {
-    {"quarter_sample", "1/4 subpel MC", offsetof(MpegEncContext, quarter_sample), FF_OPT_TYPE_INT, {.dbl = 0}, 0, 1, 0},
-    {"divx_packed", "divx style packed b frames", offsetof(MpegEncContext, divx_packed), FF_OPT_TYPE_INT, {.dbl = 0}, 0, 1, 0},
+    {"quarter_sample", "1/4 subpel MC", offsetof(MpegEncContext, quarter_sample), FF_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
+    {"divx_packed", "divx style packed b frames", offsetof(MpegEncContext, divx_packed), FF_OPT_TYPE_INT, {.i64 = 0}, 0, 1, 0},
     {NULL}
 };
 
@@ -2343,7 +2353,7 @@ static const AVClass mpeg4_vdpau_class = {
 AVCodec ff_mpeg4_decoder = {
     .name                  = "mpeg4",
     .type                  = AVMEDIA_TYPE_VIDEO,
-    .id                    = CODEC_ID_MPEG4,
+    .id                    = AV_CODEC_ID_MPEG4,
     .priv_data_size        = sizeof(MpegEncContext),
     .init                  = decode_init,
     .close                 = ff_h263_decode_end,
@@ -2365,7 +2375,7 @@ AVCodec ff_mpeg4_decoder = {
 AVCodec ff_mpeg4_vdpau_decoder = {
     .name           = "mpeg4_vdpau",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_MPEG4,
+    .id             = AV_CODEC_ID_MPEG4,
     .priv_data_size = sizeof(MpegEncContext),
     .init           = decode_init,
     .close          = ff_h263_decode_end,
@@ -2373,8 +2383,8 @@ AVCodec ff_mpeg4_vdpau_decoder = {
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY |
                       CODEC_CAP_HWACCEL_VDPAU,
     .long_name      = NULL_IF_CONFIG_SMALL("MPEG-4 part 2 (VDPAU)"),
-    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_VDPAU_MPEG4,
-                                                  PIX_FMT_NONE },
+    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_VDPAU_MPEG4,
+                                                  AV_PIX_FMT_NONE },
     .priv_class     = &mpeg4_vdpau_class,
 };
 #endif

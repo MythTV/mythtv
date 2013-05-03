@@ -18,9 +18,9 @@ using namespace std;
 // MythTV
 #include <mythcontext.h>
 #include <compat.h> // For random() on MINGW32
+#include <musicmetadata.h>
 
 // MythMusic
-#include "metadata.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "metaiooggvorbis.h"
@@ -35,7 +35,7 @@ static int write_page(ogg_page *page, FILE *fp)
 }
 
 VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
-                             Metadata *metadata) :
+                             MusicMetadata *metadata) :
     Encoder(outfile, qualitylevel, metadata),
     packetsdone(0),
     eos(0),

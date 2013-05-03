@@ -16,10 +16,12 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 #include "proglist.h"
 #include "mythdb.h"
 #include "mythdate.h"
+#include "guidegrid.h"
 
 #define LOC      QString("ProgLister: ")
 #define LOC_WARN QString("ProgLister, Warning: ")
@@ -60,8 +62,25 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_curviewText(NULL),
     m_positionText(NULL),
     m_progList(NULL),
-    m_messageText(NULL)
+    m_messageText(NULL),
+
+    m_allowViewDialog(true)
 {
+    if (pltype == plMovies)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT COUNT(*) FROM program WHERE stars > 0");
+
+        if (query.exec() && query.next())
+        {
+            if (query.value(0).toInt() == 0) // No ratings in database
+            {
+                m_curView = 0; // Show All
+                m_allowViewDialog = false;
+            }
+        }
+    }
+
     switch (pltype)
     {
         case plTitleSearch:   m_searchType = kTitleSearch;   break;
@@ -110,7 +129,9 @@ ProgLister::ProgLister(
     m_curviewText(NULL),
     m_positionText(NULL),
     m_progList(NULL),
-    m_messageText(NULL)
+    m_messageText(NULL),
+
+    m_allowViewDialog(true)
 {
 }
 
@@ -188,7 +209,7 @@ bool ProgLister::Create()
 
 void ProgLister::Load(void)
 {
-    if (m_curView < 0)
+    if (m_viewList.isEmpty() || m_curView < 0)
         FillViewList(m_view);
 
     FillItemList(false, false);
@@ -241,6 +262,8 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             ShowUpcoming();
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
+        else if (action == "GUIDE")
+            ShowGuide();
         else if (action == "TOGGLERECORD")
             RecordSelected();
         else if (action == "1")
@@ -295,7 +318,7 @@ void ProgLister::ShowMenu(void)
 
     MythMenu *menu = new MythMenu(tr("Options"), this, "menu");
 
-    if (m_type != plPreviouslyRecorded)
+    if (m_allowViewDialog && m_type != plPreviouslyRecorded)
     {
         menu->AddItem(tr("Choose Search Phrase..."), SLOT(ShowChooseViewMenu()));
     }
@@ -307,6 +330,7 @@ void ProgLister::ShowMenu(void)
 
     menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
     menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
+    menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
     menu->AddItem(tr("Upcoming"),        SLOT(ShowUpcoming()));
     menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
 
@@ -454,6 +478,8 @@ void ProgLister::ShowChooseViewMenu(void)
                 case plStoredSearch: msg = QString("%1\n%2")
                     .arg(tr("Select a search stored from"))
                     .arg(tr("Custom Record")); break;
+                default: // silence warning
+                    break;
             }
 
             screen = new MythUISearchDialog(
@@ -474,12 +500,20 @@ void ProgLister::ShowChooseViewMenu(void)
                 (m_curView >= 0) ? m_viewList[m_curView] : QString());
             break;
         case plTime:
+        {
             QString message =  tr("Start search from date and time");
             int flags = (MythTimeInputDialog::kDay |
                          MythTimeInputDialog::kHours |
                          MythTimeInputDialog::kFutureDates);
             screen = new MythTimeInputDialog(popupStack, message, flags);
             connect_string = false;
+            break;
+        }
+        case plRecordid:
+        case plPreviouslyRecorded:
+        case plUnknown:
+        case plTitle:
+        case plSQLSearch:
             break;
     }
 
@@ -597,11 +631,7 @@ void ProgLister::RecordSelected(void)
 {
     ProgramInfo *pi = GetCurrent();
     if (pi)
-    {
-        RecordingInfo ri(*pi);
-        ri.ToggleRecord();
-        *pi = ri;
-    }
+        QuickRecord(pi);
 }
 
 void ProgLister::HandleClicked(void)
@@ -756,6 +786,17 @@ void ProgLister::ShowOldRecordedMenu(void)
         delete menuPopup;
 }
 
+void ProgLister::ShowGuide(void)
+{
+    ProgramInfo *pi = GetCurrent();
+    if (pi)
+    {
+        GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
+                                   pi->GetScheduledStartTime(),
+                                   NULL, this, -2);
+    }
+}
+
 void ProgLister::ShowUpcoming(void)
 {
     ProgramInfo *pi = GetCurrent();
@@ -770,13 +811,13 @@ void ProgLister::FillViewList(const QString &view)
 
     if (m_type == plChannel) // list by channel
     {
-        DBChanList channels = ChannelUtil::GetChannels(
+        ChannelInfoList channels = ChannelUtil::GetChannels(
             0, true, "channum, chanid");
         ChannelUtil::SortChannels(channels, m_channelOrdering, true);
 
         for (uint i = 0; i < channels.size(); ++i)
         {
-            QString chantext = channels[i].GetFormatted(DBChannel::kChannelShort);
+            QString chantext = channels[i].GetFormatted(ChannelInfo::kChannelShort);
 
             m_viewList.push_back(QString::number(channels[i].chanid));
             m_viewTextList.push_back(chantext);
@@ -1036,9 +1077,9 @@ void ProgLister::FillViewList(const QString &view)
 
 class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
 {
-    public:
-        virtual bool operator()(const ProgramInfo *a, const ProgramInfo *b)
-            = 0;
+  public:
+    virtual bool operator()(const ProgramInfo*, const ProgramInfo*) = 0;
+    virtual ~plCompare() {}
 };
 
 class plTitleSort : public plCompare
@@ -1553,7 +1594,7 @@ void ProgLister::UpdateButtonList(void)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(QLocale::system().toString(m_progList->GetCurrentPos() + 1))
+            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1))
             .arg(QLocale::system().toString(m_progList->GetCount())));
     }
 }
@@ -1582,7 +1623,7 @@ void ProgLister::HandleSelected(MythUIButtonListItem *item)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(QLocale::system().toString(m_progList->GetCurrentPos() + 1))
+            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1))
             .arg(QLocale::system().toString(m_progList->GetCount())));
     }
 
@@ -1690,7 +1731,7 @@ void ProgLister::customEvent(QEvent *event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
-        if (message == "CHOOSE_VIEW")
+        if (m_allowViewDialog && message == "CHOOSE_VIEW")
             ShowChooseViewMenu();
         else if (message == "SCHEDULE_CHANGE")
             needUpdate = true;

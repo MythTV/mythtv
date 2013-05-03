@@ -7,15 +7,14 @@ QEvent::Type ProgressUpdateEvent::kEventType =
 
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
-         : MythScreenType(parent, name, false)
+         : MythScreenType(parent, name, false),
+            m_haveNewMessage(false), m_messageText(NULL)
 {
     if (!message.isEmpty())
         m_message = message;
     else
         m_message = tr("Please Wait...");
     m_origMessage = m_message;
-    m_messageText = NULL;
-    m_haveNewMessage = false;
 }
 
 bool MythUIBusyDialog::Create(void)
@@ -118,11 +117,11 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
 
 MythUIProgressDialog::MythUIProgressDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
-         : MythScreenType(parent, name, false)
+         : MythScreenType(parent, name, false),
+            m_total(0), m_count(0),
+            m_messageText(NULL), m_progressText(NULL), m_progressBar(NULL)
 {
-    m_count = m_total = 0;
     m_message = message;
-    m_messageText = NULL;
 }
 
 bool MythUIProgressDialog::Create(void)

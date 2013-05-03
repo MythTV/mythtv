@@ -4,9 +4,7 @@
 #define VIDEOOUTBASE_H_
 
 #include "frame.h"
-extern "C" {
 #include "filter.h"
-}
 
 #include <QSize>
 #include <QRect>
@@ -50,14 +48,17 @@ class VideoOutput
     static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
         const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
-        PIPState pipState,      const QSize &video_dim,    float video_aspect,
+        PIPState pipState,      const QSize &video_dim_buf,
+        const QSize &video_dim_disp, float video_aspect,
         QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
         uint playerFlags);
 
     VideoOutput();
     virtual ~VideoOutput();
 
-    virtual bool Init(int width, int height, float aspect,
+    virtual bool Init(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
+                      float aspect,
                       WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
@@ -78,7 +79,8 @@ class VideoOutput
 
     virtual void WindowResized(const QSize &new_size) {}
 
-    virtual bool InputChanged(const QSize &input_size,
+    virtual bool InputChanged(const QSize &video_dim_buf,
+                              const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
                               void        *codec_private,
@@ -121,11 +123,14 @@ class VideoOutput
     virtual void ToggleAdjustFill(
         AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
+    QString GetZoomString(void) const { return window.GetZoomString(); }
+
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
                               FilterChain *filterList,
                               const PIPMap &pipPlayers,
                               FrameScanType scan = kScan_Ignore) = 0;
+    void CropToDisplay(VideoFrame *frame);
 
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void);

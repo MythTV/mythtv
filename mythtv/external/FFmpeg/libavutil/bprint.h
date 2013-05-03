@@ -82,25 +82,41 @@ typedef struct AVBPrint {
 } AVBPrint;
 
 /**
- * Init a print buffer.
- *
- * @param buf        buffer to init
- * @param size_init  initial size (including the final 0)
- * @param size_max   maximum size;
- *                   0 means do not write anything, just count the length;
- *                   1 is replaced by the maximum value for automatic storage
- */
-void av_bprint_init(AVBPrint *buf, unsigned size_init, unsigned size_max);
-
-/**
- * Convenience macros for special values for size_max.
+ * Convenience macros for special values for av_bprint_init() size_max
+ * parameter.
  */
 #define AV_BPRINT_SIZE_UNLIMITED  ((unsigned)-1)
 #define AV_BPRINT_SIZE_AUTOMATIC  1
 #define AV_BPRINT_SIZE_COUNT_ONLY 0
 
 /**
- * Append a formated string to a print buffer.
+ * Init a print buffer.
+ *
+ * @param buf        buffer to init
+ * @param size_init  initial size (including the final 0)
+ * @param size_max   maximum size;
+ *                   0 means do not write anything, just count the length;
+ *                   1 is replaced by the maximum value for automatic storage;
+ *                   any large value means that the internal buffer will be
+ *                   reallocated as needed up to that limit; -1 is converted to
+ *                   UINT_MAX, the largest limit possible.
+ *                   Check also AV_BPRINT_SIZE_* macros.
+ */
+void av_bprint_init(AVBPrint *buf, unsigned size_init, unsigned size_max);
+
+/**
+ * Init a print buffer using a pre-existing buffer.
+ *
+ * The buffer will not be reallocated.
+ *
+ * @param buf     buffer structure to init
+ * @param buffer  byte buffer to use for the string data
+ * @param size    size of buffer
+ */
+void av_bprint_init_for_buffer(AVBPrint *buf, char *buffer, unsigned size);
+
+/**
+ * Append a formatted string to a print buffer.
  */
 void av_bprintf(AVBPrint *buf, const char *fmt, ...) av_printf_format(2, 3);
 
@@ -108,6 +124,32 @@ void av_bprintf(AVBPrint *buf, const char *fmt, ...) av_printf_format(2, 3);
  * Append char c n times to a print buffer.
  */
 void av_bprint_chars(AVBPrint *buf, char c, unsigned n);
+
+struct tm;
+/**
+ * Append a formatted date and time to a print buffer.
+ *
+ * param buf  bprint buffer to use
+ * param fmt  date and time format string, see strftime()
+ * param tm   broken-down time structure to translate
+ *
+ * @note due to poor design of the standard strftime function, it may
+ * produce poor results if the format string expands to a very long text and
+ * the bprint buffer is near the limit stated by the size_max option.
+ */
+void av_bprint_strftime(AVBPrint *buf, const char *fmt, const struct tm *tm);
+
+/**
+ * Allocate bytes in the buffer for external use.
+ *
+ * @param[in]  buf          buffer structure
+ * @param[in]  size         required size
+ * @param[out] mem          pointer to the memory area
+ * @param[out] actual_size  size of the memory area after allocation;
+ *                          can be larger or smaller than size
+ */
+void av_bprint_get_buffer(AVBPrint *buf, unsigned size,
+                          unsigned char **mem, unsigned *actual_size);
 
 /**
  * Reset the string to "" but keep internal allocated data.

@@ -16,7 +16,8 @@ using namespace std;
 // MythTV headers
 #include "mythtvexp.h"
 #include "dtvmultiplex.h"
-#include "dbchannelinfo.h"
+#include "channelinfo.h"
+#include "iptvtuningdata.h"
 
 class NetworkInformationTable;
 
@@ -134,6 +135,15 @@ class MTV_PUBLIC ChannelUtil
                                  QString xmltvid = QString::null,
                                  QString default_authority = QString::null);
 
+    static bool    CreateIPTVTuningData(
+        uint channel_id, const IPTVTuningData &tuning)
+    {
+        return UpdateIPTVTuningData(channel_id, tuning);
+    }
+
+    static bool    UpdateIPTVTuningData(
+        uint channel_id, const IPTVTuningData &tuning);
+
     static void    UpdateInsertInfoFromDB(ChannelInsertInfo &chan);
 
     static bool    DeleteChannel(uint channel_id);
@@ -181,8 +191,9 @@ class MTV_PUBLIC ChannelUtil
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
+    static IPTVTuningData GetIPTVTuningData(uint chanid);
 
-    static DBChanList GetChannels(
+    static ChannelInfoList GetChannels(
         uint sourceid, bool visible_only, 
         const QString &group_by = QString(), uint channel_groupid = 0)
     {
@@ -191,16 +202,16 @@ class MTV_PUBLIC ChannelUtil
     }
     /// Returns channels that are not connected to a capture card
     /// and channels that are not marked as visible.
-    static DBChanList GetAllChannels(uint sourceid)
+    static ChannelInfoList GetAllChannels(uint sourceid)
     {
         return GetChannelsInternal(sourceid, false, true, QString(), 0);
     }
     static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
-    static void    SortChannels(DBChanList &list, const QString &order,
+    static void    SortChannels(ChannelInfoList &list, const QString &order,
                                 bool eliminate_duplicates = false);
 
-    static uint    GetNextChannel(const DBChanList &sorted,
+    static uint    GetNextChannel(const ChannelInfoList &sorted,
                                   uint old_chanid,
                                   uint mplexid_restriction,
                                   int  direction,
@@ -278,7 +289,7 @@ class MTV_PUBLIC ChannelUtil
     static const QString kATSCSeparators;
 
   private:
-    static DBChanList GetChannelsInternal(
+    static ChannelInfoList GetChannelsInternal(
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chanid, const QString &field);

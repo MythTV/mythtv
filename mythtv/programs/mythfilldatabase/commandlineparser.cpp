@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include <QString>
 
 #include "mythcorecontext.h"
@@ -39,17 +36,11 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "Directly define the sourceid and XMLTV file to "
             "import.")
         ->SetBlocks("ddfile")
-        ->SetBlocks("xawchannels")
         ->SetRequires("sourceid");
     add("--dd-file", "ddfile", false,
             "Bypass grabber, and read SD data from file",
             "Directly define the data needed to import a local "
             "DataDirect download.")
-        ->SetBlocks("xawchannels")
-        ->SetRequires("sourceid");
-    add("--xawchannels", "xawchannels", false,
-            "Read channels from xawtvrc file",
-            "Import channels from an xawtvrc file.")
         ->SetRequires("sourceid");
 
     add("--sourceid", "sourceid", 0, "Operate on single source",
@@ -71,11 +62,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "rather than pull data through the specified grabber.")
         ->SetRequiredChildOf("ddfile")
         ->SetRequiredChildOf("file");
-
-    add("--xawtvrcfile", "xawtvrcfile", "",
-            "xawtvrc file to import channels from",
-            "Xawtvrc file containing channels to be imported.")
-        ->SetRequiredChildOf("xawchannels");
 
     add("--do-channel-updates", "dochannelupdates", false,
             "update channels using datadirect",
@@ -201,19 +187,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "channel lineup.")
         ->SetGroup("Channel List Handling");
     add("--no-mark-repeats", "markrepeats", true, "do not mark repeats", "");
-    add("--export-icon-map", "exporticonmap", "iconmap.xml",
-            "export icon map to file", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--import-icon-map", "importiconmap", "iconmap.xml",
-            "import icon map to file", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--update-icon-map", "updateiconmap", false,
-            "updates icon map icons", "")
-        ->SetGroup("Channel Icon Handling");
-    add("--reset-icon-map", "reseticonmap", "", "resets icon maps",
-            "Reset all icon maps. If given 'all' as an optional value, reset "
-            "channel icons as well.")
-        ->SetGroup("Channel Icon Handling");
 
     add("--graboptions", "graboptions", "", "", "")
         ->SetRemoved("mythfilldatabase now passes any text after an\n"

@@ -18,9 +18,9 @@
 #include <mythcorecontext.h>
 #include <mcodecs.h>
 #include <mythversion.h>
+#include <musicmetadata.h>
 
 // mythmusic
-#include "metadata.h"
 #include "shoutcast.h"
 
 
@@ -77,11 +77,19 @@ class ShoutCastRequest
                       "Accept: */*\r\n");
 
         QString path = url.path();
+        QString host = url.host();
+
+        if (path.isEmpty())
+            path = "/";
+
         if (url.hasQuery())
             path += '?' + url.encodedQuery();
 
+        if (url.port() != -1)
+            host += QString(":%1").arg(url.port());
+
         hdr.replace("%PATH%", path);
-        hdr.replace("%HOST%", url.host());
+        hdr.replace("%HOST%", host);
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
@@ -123,11 +131,19 @@ class IceCastRequest
                       "Accept: */*\r\n");
 
         QString path = url.path();
+        QString host = url.host();
+
+        if (path.isEmpty())
+            path = "/";
+
         if (url.hasQuery())
             path += '?' + url.encodedQuery();
 
+        if (url.port() != -1)
+            host += QString(":%1").arg(url.port());
+
         hdr.replace("%PATH%", path);
-        hdr.replace("%HOST%", url.host());
+        hdr.replace("%HOST%", host);
         hdr.replace("%VERSION%", MYTH_BINARY_VERSION);
 
         if (!url.userName().isEmpty() && !url.password().isEmpty()) 
@@ -751,11 +767,9 @@ DecoderIOFactoryShoutCast::~DecoderIOFactoryShoutCast(void)
     closeIODevice();
 }
 
-QIODevice* DecoderIOFactoryShoutCast::takeInput(void)
+QIODevice* DecoderIOFactoryShoutCast::getInput(void)
 {
-    QIODevice *result = m_input;
-    //m_input = 0;
-    return result;
+    return m_input;
 }
 
 void DecoderIOFactoryShoutCast::makeIODevice(void)
@@ -875,7 +889,7 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 
-    Metadata mdata = getMetadata();
+    MusicMetadata mdata = getMetadata();
     mdata.setTitle(meta_map["title"]);
     mdata.setArtist(meta_map["artist"]);
     mdata.setAlbum(meta_map["album"]);

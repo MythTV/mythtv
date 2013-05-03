@@ -73,7 +73,8 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
     QDir d(dir);
     QString currDir = d.absolutePath();
     QFileInfoList list = d.entryInfoList(GalleryUtil::GetMediaFilter(),
-                                         QDir::Files | QDir::AllDirs,
+                                         QDir::Files | QDir::AllDirs |
+                                         QDir::NoDotAndDotDot,
                                          (QDir::SortFlag)flt.getSort());
 
     if (list.isEmpty())
@@ -86,8 +87,6 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
          it != list.end(); ++it)
     {
         fi = &(*it);
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         // remove these already-resized pictures.
         if ((fi->fileName().indexOf(".thumb.") > 0) ||

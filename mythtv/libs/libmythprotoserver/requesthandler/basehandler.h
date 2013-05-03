@@ -1,8 +1,6 @@
 #ifndef _BASESOCKETREQUESTHANDLER_H_
 #define _BASESOCKETREQUESTHANDLER_H_
 
-using namespace std;
-
 #include <QString>
 #include <QStringList>
 

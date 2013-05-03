@@ -23,9 +23,9 @@
  * eval audio source
  */
 
-#include "libavutil/audioconvert.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/eval.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
@@ -65,39 +65,37 @@ typedef struct {
 } EvalContext;
 
 #define OFFSET(x) offsetof(EvalContext, x)
+#define FLAGS AV_OPT_FLAG_AUDIO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
 
-static const AVOption eval_options[]= {
-    { "nb_samples",  "set the number of samples per requested frame", OFFSET(nb_samples),      AV_OPT_TYPE_INT,    {.dbl = 1024},    0,        INT_MAX },
-    { "n",           "set the number of samples per requested frame", OFFSET(nb_samples),      AV_OPT_TYPE_INT,    {.dbl = 1024},    0,        INT_MAX },
-    { "sample_rate", "set the sample rate",                           OFFSET(sample_rate_str), AV_OPT_TYPE_STRING, {.str = "44100"}, CHAR_MIN, CHAR_MAX },
-    { "s",           "set the sample rate",                           OFFSET(sample_rate_str), AV_OPT_TYPE_STRING, {.str = "44100"}, CHAR_MIN, CHAR_MAX },
-    { "duration",    "set audio duration", OFFSET(duration_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "d",           "set audio duration", OFFSET(duration_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "channel_layout", "set channel layout", OFFSET(chlayout_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
-    { "c",              "set channel layout", OFFSET(chlayout_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0 },
+static const AVOption aevalsrc_options[]= {
+    { "nb_samples",  "set the number of samples per requested frame", OFFSET(nb_samples),      AV_OPT_TYPE_INT,    {.i64 = 1024},    0,        INT_MAX, FLAGS },
+    { "n",           "set the number of samples per requested frame", OFFSET(nb_samples),      AV_OPT_TYPE_INT,    {.i64 = 1024},    0,        INT_MAX, FLAGS },
+    { "sample_rate", "set the sample rate",                           OFFSET(sample_rate_str), AV_OPT_TYPE_STRING, {.str = "44100"}, CHAR_MIN, CHAR_MAX, FLAGS },
+    { "s",           "set the sample rate",                           OFFSET(sample_rate_str), AV_OPT_TYPE_STRING, {.str = "44100"}, CHAR_MIN, CHAR_MAX, FLAGS },
+    { "duration",    "set audio duration", OFFSET(duration_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "d",           "set audio duration", OFFSET(duration_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "channel_layout", "set channel layout", OFFSET(chlayout_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
+    { "c",              "set channel layout", OFFSET(chlayout_str), AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, FLAGS },
 {NULL},
 };
 
-static const char *eval_get_name(void *ctx)
-{
-    return "aevalsrc";
-}
+AVFILTER_DEFINE_CLASS(aevalsrc);
 
-static const AVClass eval_class = {
-    "AEvalSrcContext",
-    eval_get_name,
-    eval_options
-};
-
-static int init(AVFilterContext *ctx, const char *args, void *opaque)
+static int init(AVFilterContext *ctx, const char *args)
 {
     EvalContext *eval = ctx->priv;
     char *args1 = av_strdup(args);
     char *expr, *buf, *bufptr;
     int ret, i;
 
-    eval->class = &eval_class;
+    eval->class = &aevalsrc_class;
     av_opt_set_defaults(eval);
+
+    if (!args1) {
+        av_log(ctx, AV_LOG_ERROR, "Argument is empty\n");
+        ret = args ? AVERROR(ENOMEM) : AVERROR(EINVAL);
+        goto end;
+    }
 
     /* parse expressions */
     buf = args1;
@@ -190,7 +188,7 @@ static int config_props(AVFilterLink *outlink)
 
     av_get_channel_layout_string(buf, sizeof(buf), 0, eval->chlayout);
 
-    av_log(outlink->src, AV_LOG_INFO,
+    av_log(outlink->src, AV_LOG_VERBOSE,
            "sample_rate:%d chlayout:%s duration:%f\n",
            eval->sample_rate, buf, eval->duration);
 
@@ -200,13 +198,13 @@ static int config_props(AVFilterLink *outlink)
 static int query_formats(AVFilterContext *ctx)
 {
     EvalContext *eval = ctx->priv;
-    enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_DBLP, AV_SAMPLE_FMT_NONE };
+    static const enum AVSampleFormat sample_fmts[] = { AV_SAMPLE_FMT_DBLP, AV_SAMPLE_FMT_NONE };
     int64_t chlayouts[] = { eval->chlayout, -1 };
     int sample_rates[] = { eval->sample_rate, -1 };
 
-    avfilter_set_common_sample_formats (ctx, avfilter_make_format_list(sample_fmts));
+    ff_set_common_formats (ctx, ff_make_format_list(sample_fmts));
     ff_set_common_channel_layouts(ctx, avfilter_make_format64_list(chlayouts));
-    ff_set_common_samplerates(ctx, avfilter_make_format_list(sample_rates));
+    ff_set_common_samplerates(ctx, ff_make_format_list(sample_rates));
 
     return 0;
 }
@@ -239,10 +237,20 @@ static int request_frame(AVFilterLink *outlink)
     samplesref->audio->sample_rate = eval->sample_rate;
     eval->pts += eval->nb_samples;
 
-    ff_filter_samples(outlink, samplesref);
+    ff_filter_frame(outlink, samplesref);
 
     return 0;
 }
+
+static const AVFilterPad aevalsrc_outputs[] = {
+    {
+        .name          = "default",
+        .type          = AVMEDIA_TYPE_AUDIO,
+        .config_props  = config_props,
+        .request_frame = request_frame,
+    },
+    { NULL }
+};
 
 AVFilter avfilter_asrc_aevalsrc = {
     .name        = "aevalsrc",
@@ -252,12 +260,7 @@ AVFilter avfilter_asrc_aevalsrc = {
     .init        = init,
     .uninit      = uninit,
     .priv_size   = sizeof(EvalContext),
-
-    .inputs      = (const AVFilterPad[]) {{ .name = NULL}},
-
-    .outputs     = (const AVFilterPad[]) {{ .name = "default",
-                                      .type = AVMEDIA_TYPE_AUDIO,
-                                      .config_props = config_props,
-                                      .request_frame = request_frame, },
-                                    { .name = NULL}},
+    .inputs      = NULL,
+    .outputs     = aevalsrc_outputs,
+    .priv_class  = &aevalsrc_class,
 };

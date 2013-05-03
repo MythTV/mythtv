@@ -22,7 +22,12 @@
 #if !defined(FREEMHEG_H)
 #define FREEMHEG_H
 
+#include <QtGlobal>
+#include <QString>
+#include <QByteArray>
 #include <QRegion>
+#include <QRect>
+#include <QSize>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +37,7 @@ class MHTextDisplay;
 class MHBitmapDisplay;
 class MHContext;
 class MHEG;
+class MHStream;
 
 // Called to create a new instance of the module.
 extern MHEG *MHCreateEngine(MHContext *context);
@@ -51,6 +57,7 @@ class MHEG
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode) = 0;
     virtual void EngineEvent(int) = 0;
+    virtual void StreamStarted(MHStream*, bool bStarted = true) = 0;
 };
 
 // Logging control
@@ -128,18 +135,33 @@ class MHContext
     // the m_stopped condition if we have.
     virtual bool CheckStop(void) = 0;
 
-    // Begin playing audio from the specified stream
-    virtual bool BeginAudio(const QString &stream, int tag) = 0;
+    // Begin playing the specified stream
+    virtual bool BeginStream(const QString &str, MHStream* notify = 0) = 0;
+    // Stop playing stream
+    virtual void EndStream() = 0;
+    // Begin playing audio component
+    virtual bool BeginAudio(int tag) = 0;
     // Stop playing audio
-    virtual void StopAudio(void) = 0;
-    // Begin displaying video from the specified stream
-    virtual bool BeginVideo(const QString &stream, int tag) = 0;
+    virtual void StopAudio() = 0;
+    // Begin displaying video component
+    virtual bool BeginVideo(int tag) = 0;
     // Stop displaying video
-    virtual void StopVideo(void) = 0;
+    virtual void StopVideo() = 0;
+    // Get current stream position in mS, -1 if unknown
+    virtual long GetStreamPos() = 0;
+    // Get current stream size in mS, -1 if unknown
+    virtual long GetStreamMaxPos() = 0;
+    // Set current stream position in mS
+    virtual long SetStreamPos(long) = 0;
+    // Play or pause a stream
+    virtual void StreamPlay(bool play = true) = 0;
 
     // Get the context id strings.
     virtual const char *GetReceiverId(void) = 0;
     virtual const char *GetDSMCCId(void) = 0;
+
+    // InteractionChannel
+    virtual int GetICStatus() = 0; // 0= Active, 1= Inactive, 2= Disabled
 };
 
 // Dynamic Line Art objects record a sequence of drawing actions.
@@ -187,7 +209,7 @@ class MHBitmapDisplay
     // Draw the completed drawing onto the display.  x and y give the position of the image
     // relative to the screen.  rect gives the bounding box for the image, again relative to
     // the screen.
-    virtual void Draw(int x, int y, QRect rect, bool tiled) = 0;
+    virtual void Draw(int x, int y, QRect rect, bool tiled, bool bUnder) = 0;
     // Creation functions
     virtual void CreateFromPNG(const unsigned char *data, int length) = 0;
     virtual void CreateFromMPEG(const unsigned char *data, int length) = 0;

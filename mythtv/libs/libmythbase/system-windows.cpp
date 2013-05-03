@@ -545,8 +545,7 @@ MythSystemWindows::~MythSystemWindows(void)
 {
 }
 
-bool MythSystemWindows::ParseShell(const QString cmd, QString &abscmd,
-                                   QStringList &args)
+bool MythSystemWindows::ParseShell(const QString&, QString &, QStringList&)
 {
     return false;
 }

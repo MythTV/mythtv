@@ -18,7 +18,6 @@ WriteMakefile(
                             'Config'           => 0,
                             'DBI'              => 0,
                             'DBD::mysql'       => 0,
-                            'Date::Manip'      => 0,
                             'Fcntl'            => 0,
                             'File::Copy'       => 0,
                             'HTTP::Request'    => 0,

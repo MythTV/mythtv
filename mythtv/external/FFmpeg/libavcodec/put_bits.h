@@ -99,7 +99,7 @@ static inline void flush_put_bits(PutBitContext *s)
 
 #ifdef BITSTREAM_WRITER_LE
 #define avpriv_align_put_bits align_put_bits_unsupported_here
-#define ff_put_string ff_put_string_unsupported_here
+#define avpriv_put_string ff_put_string_unsupported_here
 #define avpriv_copy_bits avpriv_copy_bits_unsupported_here
 #else
 /**
@@ -112,7 +112,7 @@ void avpriv_align_put_bits(PutBitContext *s);
  *
  * @param terminate_string 0-terminates the written string if value is 1
  */
-void ff_put_string(PutBitContext *pb, const char *string, int terminate_string);
+void avpriv_put_string(PutBitContext *pb, const char *string, int terminate_string);
 
 /**
  * Copy the content of src to the bitstream.
@@ -131,13 +131,11 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
     unsigned int bit_buf;
     int bit_left;
 
-    //    printf("put_bits=%d %x\n", n, value);
     av_assert2(n <= 31 && value < (1U << n));
 
     bit_buf = s->bit_buf;
     bit_left = s->bit_left;
 
-    //    printf("n=%d value=%x cnt=%d buf=%x\n", n, value, bit_cnt, bit_buf);
     /* XXX: optimize */
 #ifdef BITSTREAM_WRITER_LE
     bit_buf |= value << (32 - bit_left);
@@ -158,7 +156,6 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
         bit_buf |= value >> (n - bit_left);
         av_assert2(s->buf_ptr+3<s->buf_end);
         AV_WB32(s->buf_ptr, bit_buf);
-        //printf("bitbuf = %08x\n", bit_buf);
         s->buf_ptr+=4;
         bit_left+=32 - n;
         bit_buf = value;
@@ -171,7 +168,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 
 static inline void put_sbits(PutBitContext *pb, int n, int32_t value)
 {
-    assert(n >= 0 && n <= 31);
+    av_assert2(n >= 0 && n <= 31);
 
     put_bits(pb, n, value & ((1<<n)-1));
 }
@@ -207,8 +204,8 @@ static inline uint8_t* put_bits_ptr(PutBitContext *s)
  */
 static inline void skip_put_bytes(PutBitContext *s, int n)
 {
-        assert((put_bits_count(s)&7)==0);
-        assert(s->bit_left==32);
+        av_assert2((put_bits_count(s)&7)==0);
+        av_assert2(s->bit_left==32);
         s->buf_ptr += n;
 }
 

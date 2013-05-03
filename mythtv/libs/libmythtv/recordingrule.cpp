@@ -34,7 +34,7 @@ RecordingRule::RecordingRule()
     m_enddate(),
     m_inetref(), // String could be null when we trying to insert into DB
     m_channelid(0),
-    m_findday(-1),
+    m_findday(0),
     m_findtime(QTime::fromString("00:00:00", Qt::ISODate)),
     m_findid(QDate(1970, 1, 1).daysTo(MythDate::current().toLocalTime().date())
              + 719528),
@@ -208,7 +208,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
     if (m_recordID)
         Load();
     else
-        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryType());
+        LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryTypeString());
 
     if (m_type != kTemplateRecord &&
         (m_searchType == kNoSearch || m_searchType == kManualSearch))
@@ -223,7 +223,8 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 }
 
 bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
-                                 QString forwhat, QString from)
+                                 QString forwhat, QString from,
+                                 ProgramInfo *pginfo)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -263,10 +264,16 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         m_title = ltitle;
         m_subtitle = from;
         m_description = forwhat;
-        QDate ldate = MythDate::current().toLocalTime().date();
-        m_findday = (ldate.dayOfWeek() + 1) % 7;
-        QDate epoch(1970, 1, 1);
-        m_findid = epoch.daysTo(ldate) + 719528;
+
+        if (pginfo)
+        {
+            m_findday =
+                (pginfo->GetScheduledStartTime().toLocalTime().date()
+                 .dayOfWeek() + 1) % 7;
+            m_findtime = pginfo->GetScheduledStartTime().toLocalTime().time();
+            m_findid = QDate(1970, 1, 1).daysTo(
+                pginfo->GetScheduledStartTime().toLocalTime().date()) + 719528;
+        }
     }
 
     m_loaded = true;
@@ -579,13 +586,13 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
             startts, MythDate::kDateTimeShort | MythDate::kSimplify) + " - " +
         MythDate::toString(endts, MythDate::kTime);
 
-    if (m_type == kFindDailyRecord || m_type == kFindWeeklyRecord)
+    if (m_type == kDailyRecord || m_type == kWeeklyRecord)
     {
         QDateTime ldt =
             QDateTime(MythDate::current().toLocalTime().date(), m_findtime,
                       Qt::LocalTime);
         QString findfrom = MythDate::toString(ldt, MythDate::kTime);
-        if (m_type == kFindWeeklyRecord)
+        if (m_type == kWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;
             findfrom = QString("%1, %2").arg(QDate::shortDayName(daynum))
@@ -703,15 +710,13 @@ void RecordingRule::AssignProgramInfo()
     m_endtime     = m_progInfo->GetScheduledEndTime().time();
     m_seriesid    = m_progInfo->GetSeriesID();
     m_programid   = m_progInfo->GetProgramID();
-    if (m_findday < 0)
+    if (m_recordID <= 0)
     {
         m_findday =
             (m_progInfo->GetScheduledStartTime().toLocalTime().date()
              .dayOfWeek() + 1) % 7;
         m_findtime = m_progInfo->GetScheduledStartTime().toLocalTime().time();
-
-        QDate epoch(1970, 1, 1);
-        m_findid = epoch.daysTo(
+        m_findid = QDate(1970, 1, 1).daysTo(
             m_progInfo->GetScheduledStartTime().toLocalTime().date()) + 719528;
     }
     else
@@ -806,4 +811,180 @@ QStringList RecordingRule::GetTemplateNames(void)
         result << query.value(0).toString();
 
     return result;
+}
+
+bool RecordingRule::IsValid(QString &msg)
+{
+    bool isOverride = false;
+    switch (m_type)
+    {
+    case kSingleRecord:
+    case kDailyRecord:
+    case kAllRecord:
+    case kWeeklyRecord:
+    case kOneRecord:
+    case kTemplateRecord:
+        break;
+    case kOverrideRecord:
+    case kDontRecord:
+        isOverride = true;
+    case kNotRecording:
+    default:
+        msg = QString("Invalid recording type.");
+        return false;
+    }
+
+    bool isNormal = false;
+    bool isSearch = false;
+    bool isManual = false;
+    switch (m_searchType)
+    {
+    case kNoSearch:
+        isNormal = true;
+        break;
+    case kPowerSearch:
+    case kTitleSearch:
+    case kKeywordSearch:
+    case kPeopleSearch:
+        isSearch = true;
+        break;
+    case kManualSearch:
+        isManual = true;
+        break;
+    default:
+        msg = QString("Invalid search type.");
+        return false;
+    }
+
+    if ((isNormal && (m_type == kDailyRecord || m_type == kWeeklyRecord)) ||
+        (isSearch && (m_type != kDailyRecord && m_type != kWeeklyRecord &&
+                      m_type != kOneRecord && m_type != kAllRecord)) ||
+        (isManual && (m_type != kDailyRecord && m_type != kWeeklyRecord &&
+                      m_type != kSingleRecord && m_type != kAllRecord)))
+    {
+        msg = QString("Invalid recording type/search type.");
+        return false;
+    }
+
+    if ((m_parentRecID && !isOverride) ||
+        (!m_parentRecID && isOverride))
+    {
+        msg = QString("Invalid parentID/override.");
+        return false;
+    }
+
+    if (m_title.isEmpty())
+    {
+        msg = QString("Invalid title.");
+        return false;
+    }
+
+    if (m_searchType == kPowerSearch)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(QString("SELECT NULL FROM (program, channel) "
+                              "%1 WHERE %2")
+                      .arg(m_subtitle).arg(m_description));
+        if (m_description.contains(';') || !query.exec())
+        {
+            msg = QString("Invalid custom search values.");
+            return false;
+        }
+    }
+    else if (isSearch)
+    {
+        if (m_description.isEmpty())
+        {
+            msg = QString("Invalid search value.");
+            return false;
+        }
+    }
+
+    if (!isSearch)
+    {
+        if (!m_startdate.isValid() || !m_starttime.isValid() ||
+            !m_enddate.isValid() || !m_endtime.isValid())
+        {
+            msg = QString("Invalid start/end date/time.");
+            return false;
+        }
+        int secsto = QDateTime(m_startdate, m_starttime)
+            .secsTo(QDateTime(m_enddate, m_endtime));
+        if (secsto <= 0 || secsto > (8 * 3600))
+        {
+            msg = QString("Invalid duration.");
+            return false;
+        }
+
+        if (!m_channelid || m_station.isEmpty())
+        {
+            msg = QString("Invalid channel.");
+            return false;
+        }
+    }
+
+    if (m_findday < 0 || m_findday > 6 || !m_findtime.isValid())
+    {
+        msg = QString("Invalid find values.");
+        return false;
+    }
+
+    if (m_recPriority < -99 || m_recPriority > 99)
+    {
+        msg = QString("Invalid priority.");
+        return false;
+    }
+
+    if (m_startOffset < -480 || m_startOffset > 480 ||
+        m_endOffset < -480 || m_endOffset > 480)
+    {
+        msg = QString("Invalid start/end offset.");
+        return false;
+    }
+
+    if (m_prefInput < 0)
+    {
+        msg = QString("Invalid preferred input.");
+        return false;
+    }
+
+    if (m_filter & (~0 << kNumFilters))
+    {
+        msg = QString("Invalid filter value.");
+        return false;
+    }
+
+    if (m_recProfile.isEmpty() || m_recGroup.isEmpty() ||
+        m_storageGroup.isEmpty() || m_playGroup.isEmpty())
+    {
+        msg = QString("Invalid group value.");
+        return false;
+    }
+
+    if (m_maxEpisodes < 0)
+    {
+        msg = QString("Invalid max episodes value.");
+        return false;
+    }
+
+    if (m_dupIn & ~(kDupsInAll | kDupsNewEpi))
+    {
+        msg = QString("Invalid duplicate scope.");
+        return false;
+    }
+
+    if (m_dupMethod & ~(kDupCheckNone | kDupCheckSub |
+                        kDupCheckDesc | kDupCheckSubThenDesc))
+    {
+        msg = QString("Invalid duplicate method.");
+        return false;
+    }
+
+    if (m_transcoder < 0)
+    {
+        msg = QString("Invalid transcoder value.");
+        return false;
+    }
+
+    return true;
 }

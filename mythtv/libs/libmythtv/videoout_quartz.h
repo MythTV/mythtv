@@ -12,7 +12,9 @@ class VideoOutputQuartz : public VideoOutput
     VideoOutputQuartz();
    ~VideoOutputQuartz();
 
-    bool Init(int width, int height, float aspect, WId winid,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect, WId winid,
               const QRect &win_rect, MythCodecID codec_id);
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -24,7 +26,8 @@ class VideoOutputQuartz : public VideoOutput
 
     void SetVideoFrameRate(float playback_fps);
     void ToggleAspectOverride(AspectOverrideMode aspectMode);
-    bool InputChanged(const QSize &input_size,
+    bool InputChanged(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,

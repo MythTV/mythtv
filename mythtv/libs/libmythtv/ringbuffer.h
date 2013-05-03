@@ -39,16 +39,19 @@ enum RingBufferType
     kRingBuffer_BD,
     kRingBuffer_HTTP,
     kRingBuffer_HLS,
+    kRingBuffer_MHEG
 };
 
 class MTV_PUBLIC RingBuffer : protected MThread
 {
+    friend class ICRingBuffer;
+
   public:
     static RingBuffer *Create(const QString &lfilename, bool write,
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
-    virtual ~RingBuffer();
+    virtual ~RingBuffer() = 0;
 
     // Sets
     void SetWriteBufferSize(int newSize);
@@ -85,6 +88,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool IsBookmarkAllowed(void) { return true; }
     virtual int  BestBufferSize(void)   { return 32768; }
     static QString BitrateToString(uint64_t rate, bool hz = false);
+    RingBufferType GetType() const { return type; }
 
     // DVD and bluray methods
     bool IsDisc(void) const { return IsDVD() || IsBD(); }
@@ -96,7 +100,9 @@ class MTV_PUBLIC RingBuffer : protected MThread
     BDRingBuffer  *BD(void);
     virtual bool StartFromBeginning(void)                   { return true;  }
     virtual void IgnoreWaitStates(bool ignore)              { }
-    virtual bool IsInDiscMenuOrStillFrame(void) const       { return false; }
+    virtual bool IsInMenu(void) const                       { return false; }
+    virtual bool IsInStillFrame(void) const                 { return false; }
+    virtual bool IsInDiscMenuOrStillFrame(void) const       { return IsInMenu() || IsInStillFrame(); }
     virtual bool HandleAction(const QStringList &, int64_t) { return false; }
 
     // General Commands

@@ -20,12 +20,13 @@
 #include "programinfo.h"
 #include "programdata.h"
 #include "dvbdescriptors.h"
+#include "channelinfo.h"
 
 // filldata headers
 #include "channeldata.h"
 #include "fillutil.h"
 
-XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
+XMLTVParser::XMLTVParser() : current_year(0)
 {
     current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
@@ -62,12 +63,11 @@ static QString getFirstText(QDomElement element)
     return QString();
 }
 
-ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
+ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 {
-    ChanInfo *chaninfo = new ChanInfo;
+    ChannelInfo *chaninfo = new ChannelInfo;
 
     QString xmltvid = element.attribute("id", "");
-    QStringList split = xmltvid.simplified().split(" ");
 
     chaninfo->xmltvid = xmltvid;
     chaninfo->tvformat = "Default";
@@ -84,14 +84,14 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 if (!path.isEmpty() && !path.contains("://"))
                 {
                     QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                    chaninfo->iconpath = base +
+                    chaninfo->icon = base +
                         ((path.left(1) == "/") ? path : QString("/") + path);
                 }
                 else if (!path.isEmpty())
                 {
                     QUrl url(path);
                     if (url.isValid())
-                        chaninfo->iconpath = url.toString();
+                        chaninfo->icon = url.toString();
                 }
             }
             else if (info.tagName() == "display-name")
@@ -100,60 +100,28 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 {
                     chaninfo->name = info.text();
                 }
-                else if (isJapan && chaninfo->callsign.isEmpty())
+                else if (chaninfo->callsign.isEmpty())
                 {
                     chaninfo->callsign = info.text();
                 }
-                else if (chaninfo->chanstr.isEmpty())
+                else if (chaninfo->channum.isEmpty())
                 {
-                    chaninfo->chanstr = info.text();
+                    chaninfo->channum = info.text();
                 }
             }
         }
     }
 
-    chaninfo->freqid = chaninfo->chanstr;
+    chaninfo->freqid = chaninfo->channum;
     return chaninfo;
 }
 
-static int TimezoneToInt (QString timezone)
+static void fromXMLTVDate(QString &timestr, QDateTime &dt)
 {
-    // we signal an error by setting it invalid (> 840min = 14hr)
-    int result = 841;
+    // The XMLTV spec requires dates to either be in UTC/GMT or to specify a
+    // valid timezone. We are sticking to the spec and require all grabbers
+    // to comply.
 
-    if (timezone.toUpper() == "UTC" || timezone.toUpper() == "GMT")
-        return 0;
-
-    if (timezone.length() == 5)
-    {
-        bool ok;
-
-        result = timezone.mid(1,2).toInt(&ok, 10);
-
-        if (!ok)
-            result = 841;
-        else
-        {
-            result *= 60;
-
-            int min = timezone.right(2).toInt(&ok, 10);
-
-            if (!ok)
-                result = 841;
-            else
-            {
-                result += min;
-                if (timezone.left(1) == "-")
-                    result *= -1;
-            }
-        }
-    }
-    return result;
-}
-
-// localTimezoneOffset: 841 == "None", -841 == "Auto", other == fixed offset
-static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 841)
-{
     if (timestr.isEmpty())
     {
         LOG(VB_XMLTV, LOG_ERR, "Found empty Date/Time in XMLTV data, ignoring");
@@ -162,62 +130,76 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffs
 
     QStringList split = timestr.split(" ");
     QString ts = split[0];
-    bool ok;
-    int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+    QDateTime tmpDT;
+    tmpDT.setTimeSpec(Qt::LocalTime);
 
+    // UTC/GMT, just strip
+    if (ts.endsWith('Z'))
+        ts.truncate(ts.length()-1);
+    
     if (ts.length() == 14)
     {
-        year  = ts.left(4).toInt(&ok, 10);
-        month = ts.mid(4,2).toInt(&ok, 10);
-        day   = ts.mid(6,2).toInt(&ok, 10);
-        hour  = ts.mid(8,2).toInt(&ok, 10);
-        min   = ts.mid(10,2).toInt(&ok, 10);
-        sec   = ts.mid(12,2).toInt(&ok, 10);
+        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmmss");
     }
     else if (ts.length() == 12)
     {
-        year  = ts.left(4).toInt(&ok, 10);
-        month = ts.mid(4,2).toInt(&ok, 10);
-        day   = ts.mid(6,2).toInt(&ok, 10);
-        hour  = ts.mid(8,2).toInt(&ok, 10);
-        min   = ts.mid(10,2).toInt(&ok, 10);
-        sec   = 0;
+        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmm");
     }
-    else
+    else if (ts.length() == 8)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyyMMdd");
+    }
+    else if (ts.length() == 6)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyyMM");
+    }
+    else if (ts.length() == 4)
+    {
+        tmpDT = QDateTime::fromString(ts, "yyyy");
+    }
+
+    if (!tmpDT.isValid())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Ignoring unknown timestamp format: %1")
                 .arg(ts));
         return;
     }
-
-    dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec),
-                   Qt::LocalTime);
-
-    if ((split.size() > 1) && (localTimezoneOffset <= 840))
+    
+    if (split.size() > 1)
     {
         QString tmp = split[1].trimmed();
-
-        int ts_offset = TimezoneToInt(tmp);
-        if (abs(ts_offset) > 840)
+        
+        // These shouldn't be required and they aren't ISO 8601 but the
+        // xmltv spec mentions these and just these so handle them just in
+        // case
+        if (tmp == "GMT" || tmp == "UTC")
+            tmp = "+0000";
+        else if (tmp == "BST")
+            tmp = "+0100";
+        
+        // While this seems like a hack, it's better than what was done before
+        QString isoDateString = QString("%1 %2").arg(tmpDT.toString(Qt::ISODate))
+                                                .arg(tmp);
+        dt = QDateTime::fromString(isoDateString, Qt::ISODate).toUTC();
+    }
+    
+    if (!dt.isValid())
+    {
+        static bool warned_once_on_implicit_utc = false;
+        if (!warned_once_on_implicit_utc)
         {
-            ts_offset = 0;
-            localTimezoneOffset = 841;
+            LOG(VB_XMLTV, LOG_ERR, "No explicit time zone found, "
+                "guessing implicit UTC! Please consider enhancing "
+                "the guide source to provice explicit UTC or local "
+                "time instead.");
+            warned_once_on_implicit_utc = true;
         }
-        dt = dt.addSecs(-ts_offset * 60);
+        dt = tmpDT;
     }
 
-    if (localTimezoneOffset < -840)
-    {
-        dt.setTimeSpec(Qt::UTC);
-    }
-    else if (abs(localTimezoneOffset) <= 840)
-    {
-        dt = dt.addSecs(localTimezoneOffset * 60 );
-    }
-
-    dt = dt.toUTC();
-
+    dt.setTimeSpec(Qt::UTC);
+    
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
 
@@ -286,19 +268,18 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
-ProgInfo *XMLTVParser::parseProgram(
-    QDomElement &element, int localTimezoneOffset)
+ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
     QString uniqueid, season, episode;
     int dd_progid_done = 0;
     ProgInfo *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");
-    fromXMLTVDate(text, pginfo->starttime, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->starttime);
     pginfo->startts = text;
 
     text = element.attribute("stop", "");
-    fromXMLTVDate(text, pginfo->endtime, localTimezoneOffset);
+    fromXMLTVDate(text, pginfo->endtime);
     pginfo->endts = text;
 
     text = element.attribute("channel", "");
@@ -322,16 +303,13 @@ ProgInfo *XMLTVParser::parseProgram(
         {
             if (info.tagName() == "title")
             {
-                if (isJapan)
+                if (info.attribute("lang") == "ja_JP")
                 {
-                    if (info.attribute("lang") == "ja_JP")
-                    {
-                        pginfo->title = getFirstText(info);
-                    }
-                    else if (info.attribute("lang") == "ja_JP@kana")
-                    {
-                        pginfo->title_pronounce = getFirstText(info);
-                    }
+                    pginfo->title = getFirstText(info);
+                }
+                else if (info.attribute("lang") == "ja_JP@kana")
+                {
+                    pginfo->title_pronounce = getFirstText(info);
                 }
                 else if (pginfo->title.isEmpty())
                 {
@@ -351,8 +329,8 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 const QString cat = getFirstText(info).toLower();
 
-                if (kCategoryNone == pginfo->categoryType &&
-                    string_to_myth_category_type(cat) != kCategoryNone)
+                if (ProgramInfo::kCategoryNone == pginfo->categoryType &&
+                    string_to_myth_category_type(cat) != ProgramInfo::kCategoryNone)
                 {
                     pginfo->categoryType = string_to_myth_category_type(cat);
                 }
@@ -361,10 +339,10 @@ ProgInfo *XMLTVParser::parseProgram(
                     pginfo->category = cat;
                 }
 
-                if (cat == "film")
+                if (cat == QObject::tr("movie") || cat == QObject::tr("film"))
                 {
                     // Hack for tv_grab_uk_rt
-                    pginfo->categoryType = kCategoryMovie;
+                    pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
             }
             else if (info.tagName() == "date" && !pginfo->airdate)
@@ -422,8 +400,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 if (!prevdate.isEmpty())
                 {
                     QDateTime date;
-                    fromXMLTVDate(prevdate, date,
-                                localTimezoneOffset);
+                    fromXMLTVDate(prevdate, date);
                     pginfo->originalairdate = date.date();
                 }
             }
@@ -471,7 +448,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     QString partnumber(part.section('/',0,0).trimmed());
                     QString parttotal(part.section('/',1,1).trimmed());
 
-                    pginfo->categoryType = kCategorySeries;
+                    pginfo->categoryType = ProgramInfo::kCategorySeries;
 
                     if (!episode.isEmpty())
                     {
@@ -498,7 +475,7 @@ ProgInfo *XMLTVParser::parseProgram(
                     if (!parttotal.isEmpty() && partno > 0)
                     {
                         bool ok;
-                        uint partto = parttotal.toUInt(&ok) + 1;
+                        uint partto = parttotal.toUInt(&ok);
                         if (ok && partnumber <= parttotal)
                         {
                             pginfo->parttotal  = partto;
@@ -509,14 +486,15 @@ ProgInfo *XMLTVParser::parseProgram(
                 else if (info.attribute("system") == "onscreen" &&
                         pginfo->subtitle.isEmpty())
                 {
-                    pginfo->categoryType = kCategorySeries;
+                    pginfo->categoryType = ProgramInfo::kCategorySeries;
                     pginfo->subtitle = getFirstText(info);
                 }
             }
         }
     }
 
-    if (pginfo->category.isEmpty() && pginfo->categoryType != kCategoryNone)
+    if (pginfo->category.isEmpty() &&
+        pginfo->categoryType != ProgramInfo::kCategoryNone)
         pginfo->category = myth_category_type_to_string(pginfo->categoryType);
 
     if (!pginfo->airdate)
@@ -525,11 +503,11 @@ ProgInfo *XMLTVParser::parseProgram(
     /* Let's build ourself a programid */
     QString programid;
 
-    if (kCategoryMovie == pginfo->categoryType)
+    if (ProgramInfo::kCategoryMovie == pginfo->categoryType)
         programid = "MV";
-    else if (kCategorySeries == pginfo->categoryType)
+    else if (ProgramInfo::kCategorySeries == pginfo->categoryType)
         programid = "EP";
-    else if (kCategorySports == pginfo->categoryType)
+    else if (ProgramInfo::kCategorySports == pginfo->categoryType)
         programid = "SP";
     else
         programid = "SH";
@@ -553,7 +531,7 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 // Cannot represent season as a single base-36 character, so
                 // remove the programid and fall back to normal dup matching.
-                if (kCategoryMovie != pginfo->categoryType)
+                if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
                     programid.clear();
             }
             else
@@ -571,7 +549,7 @@ ProgInfo *XMLTVParser::parseProgram(
         {
             /* No ep/season info? Well then remove the programid and rely on
                normal dupchecking methods instead. */
-            if (kCategoryMovie != pginfo->categoryType)
+            if (ProgramInfo::kCategoryMovie != pginfo->categoryType)
                 programid.clear();
         }
     }
@@ -582,7 +560,7 @@ ProgInfo *XMLTVParser::parseProgram(
 }
 
 bool XMLTVParser::parseFile(
-    QString filename, QList<ChanInfo> *chanlist,
+    QString filename, ChannelInfoList *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
@@ -610,44 +588,13 @@ bool XMLTVParser::parseFile(
 
     f.close();
 
-    // now we calculate the localTimezoneOffset, so that we can fix
-    // the programdata if needed
-    QString config_offset = gCoreContext->GetSetting("TimeOffset", "None");
-    // we disable this feature by setting it invalid (> 840min = 14hr)
-    int localTimezoneOffset = 841;
-
-    if (config_offset == "Auto")
-    {
-        // we mark auto with the -ve of the disable magic number
-        localTimezoneOffset = -841;
-    }
-    else if (config_offset != "None")
-    {
-        localTimezoneOffset = TimezoneToInt(config_offset);
-        if (abs(localTimezoneOffset) > 840)
-        {
-            LOG(VB_XMLTV, LOG_ERR, QString("Ignoring invalid TimeOffset %1")
-                .arg(config_offset));
-            localTimezoneOffset = 841;
-        }
-    }
-
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
-
-    QUrl sourceUrl(docElem.attribute("source-info-url", ""));
-    if (sourceUrl.toString() == "http://labs.zap2it.com/")
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Don't use tv_grab_na_dd, use the"
-                                 "internal datadirect grabber.");
-        exit(GENERIC_EXIT_SETUP_ERROR);
-    }
+    //QUrl sourceUrl(docElem.attribute("source-info-url", ""));
 
     QString aggregatedTitle;
     QString aggregatedDesc;
-    QString groupingTitle;
-    QString groupingDesc;
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -657,41 +604,26 @@ bool XMLTVParser::parseFile(
         {
             if (e.tagName() == "channel")
             {
-                ChanInfo *chinfo = parseChannel(e, baseUrl);
-                chanlist->push_back(*chinfo);
+                ChannelInfo *chinfo = parseChannel(e, baseUrl);
+                if (!chinfo->xmltvid.isEmpty())
+                    chanlist->push_back(*chinfo);
                 delete chinfo;
             }
             else if (e.tagName() == "programme")
             {
-                ProgInfo *pginfo = parseProgram(e, localTimezoneOffset);
+                ProgInfo *pginfo = parseProgram(e);
 
                 if (pginfo->startts == pginfo->endts)
                 {
-                    /* Not a real program : just a grouping marker */
-                    if (!pginfo->title.isEmpty())
-                        groupingTitle = pginfo->title + " : ";
-
-                    if (!pginfo->description.isEmpty())
-                        groupingDesc = pginfo->description + " : ";
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
+                                                        "identical start and end "
+                                                        "times, skipping")
+                                                        .arg(pginfo->title));
                 }
                 else
                 {
                     if (pginfo->clumpidx.isEmpty())
-                    {
-                        if (!groupingTitle.isEmpty())
-                        {
-                            pginfo->title.prepend(groupingTitle);
-                            groupingTitle.clear();
-                        }
-
-                        if (!groupingDesc.isEmpty())
-                        {
-                            pginfo->description.prepend(groupingDesc);
-                            groupingDesc.clear();
-                        }
-
                         (*proglist)[pginfo->channel].push_back(*pginfo);
-                    }
                     else
                     {
                         /* append all titles/descriptions from one clump */

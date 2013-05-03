@@ -19,7 +19,9 @@ class VideoOutputD3D : public VideoOutput
     VideoOutputD3D();
    ~VideoOutputD3D();
 
-    bool Init(int width, int height, float aspect,
+    bool Init(const QSize &video_dim_buf,
+              const QSize &video_dim_disp,
+              float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -28,7 +30,8 @@ class VideoOutputD3D : public VideoOutput
                       FrameScanType scan);
     void Show(FrameScanType );
     void WindowResized(const QSize &new_size);
-    bool InputChanged(const QSize &input_size,
+    bool InputChanged(const QSize &video_dim_buf,
+                      const QSize &video_dim_disp,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private,

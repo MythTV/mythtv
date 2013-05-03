@@ -42,11 +42,7 @@ class SERVICE_PUBLIC Lineup : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< Lineup  >();
-            qRegisterMetaType< Lineup* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -87,13 +83,7 @@ class SERVICE_PUBLIC LineupList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< LineupList  >();
-            qRegisterMetaType< LineupList* >();
-
-            Lineup::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -132,5 +122,22 @@ Q_DECLARE_METATYPE( DTC::LineupList* )
 
 Q_DECLARE_METATYPE( DTC::Lineup  )
 Q_DECLARE_METATYPE( DTC::Lineup* )
+
+namespace DTC
+{
+inline void Lineup::InitializeCustomTypes()
+{
+    qRegisterMetaType< Lineup  >();
+    qRegisterMetaType< Lineup* >();
+}
+
+inline void LineupList::InitializeCustomTypes()
+{
+    qRegisterMetaType< LineupList  >();
+    qRegisterMetaType< LineupList* >();
+
+    Lineup::InitializeCustomTypes();
+}
+}
 
 #endif

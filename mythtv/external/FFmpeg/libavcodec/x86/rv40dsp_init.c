@@ -2,20 +2,20 @@
  * RV40 decoder motion compensation functions x86-optimised
  * Copyright (c) 2008 Konstantin Shishkov
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -26,20 +26,23 @@
  * 3,3 is bugged in the rv40 format and maps to _xy2 version
  */
 
-#include "libavcodec/x86/dsputil_mmx.h"
 #include "libavcodec/rv34dsp.h"
+#include "libavutil/mem.h"
+#include "libavutil/x86/cpu.h"
+#include "dsputil_mmx.h"
 
+#if HAVE_YASM
 void ff_put_rv40_chroma_mc8_mmx  (uint8_t *dst, uint8_t *src,
                                   int stride, int h, int x, int y);
-void ff_avg_rv40_chroma_mc8_mmx2 (uint8_t *dst, uint8_t *src,
-                                  int stride, int h, int x, int y);
+void ff_avg_rv40_chroma_mc8_mmxext(uint8_t *dst, uint8_t *src,
+                                   int stride, int h, int x, int y);
 void ff_avg_rv40_chroma_mc8_3dnow(uint8_t *dst, uint8_t *src,
                                   int stride, int h, int x, int y);
 
 void ff_put_rv40_chroma_mc4_mmx  (uint8_t *dst, uint8_t *src,
                                   int stride, int h, int x, int y);
-void ff_avg_rv40_chroma_mc4_mmx2 (uint8_t *dst, uint8_t *src,
-                                  int stride, int h, int x, int y);
+void ff_avg_rv40_chroma_mc4_mmxext(uint8_t *dst, uint8_t *src,
+                                   int stride, int h, int x, int y);
 void ff_avg_rv40_chroma_mc4_3dnow(uint8_t *dst, uint8_t *src,
                                   int stride, int h, int x, int y);
 
@@ -52,7 +55,7 @@ void ff_rv40_weight_func_nornd_16_##opt(uint8_t *dst, uint8_t *src1, uint8_t *sr
                                         int w1, int w2, ptrdiff_t stride); \
 void ff_rv40_weight_func_nornd_8_##opt (uint8_t *dst, uint8_t *src1, uint8_t *src2, \
                                         int w1, int w2, ptrdiff_t stride);
-DECLARE_WEIGHT(mmx2)
+DECLARE_WEIGHT(mmxext)
 DECLARE_WEIGHT(sse2)
 DECLARE_WEIGHT(ssse3)
 
@@ -147,9 +150,9 @@ QPEL_MC_DECL(avg_, _sse2)
 
 QPEL_MC_DECL(put_, _mmx)
 
-#define ff_put_rv40_qpel_h_mmx2  ff_put_rv40_qpel_h_mmx
-#define ff_put_rv40_qpel_v_mmx2  ff_put_rv40_qpel_v_mmx
-QPEL_MC_DECL(avg_, _mmx2)
+#define ff_put_rv40_qpel_h_mmxext  ff_put_rv40_qpel_h_mmx
+#define ff_put_rv40_qpel_v_mmxext  ff_put_rv40_qpel_v_mmx
+QPEL_MC_DECL(avg_, _mmxext)
 
 #define ff_put_rv40_qpel_h_3dnow  ff_put_rv40_qpel_h_mmx
 #define ff_put_rv40_qpel_v_3dnow  ff_put_rv40_qpel_v_mmx
@@ -182,40 +185,44 @@ QPEL_FUNCS_SET (OP, 3, 1, OPT) \
 QPEL_FUNCS_SET (OP, 3, 2, OPT)
 /** @} */
 
+#endif /* HAVE_YASM */
+
 void ff_rv40dsp_init_x86(RV34DSPContext *c, DSPContext *dsp)
 {
 #if HAVE_YASM
     int mm_flags = av_get_cpu_flags();
 
-    if (mm_flags & AV_CPU_FLAG_MMX) {
+    if (EXTERNAL_MMX(mm_flags)) {
         c->put_chroma_pixels_tab[0] = ff_put_rv40_chroma_mc8_mmx;
         c->put_chroma_pixels_tab[1] = ff_put_rv40_chroma_mc4_mmx;
+#if HAVE_MMX_INLINE
         c->put_pixels_tab[0][15] = ff_put_rv40_qpel16_mc33_mmx;
         c->put_pixels_tab[1][15] = ff_put_rv40_qpel8_mc33_mmx;
         c->avg_pixels_tab[0][15] = ff_avg_rv40_qpel16_mc33_mmx;
         c->avg_pixels_tab[1][15] = ff_avg_rv40_qpel8_mc33_mmx;
+#endif /* HAVE_MMX_INLINE */
 #if ARCH_X86_32
         QPEL_MC_SET(put_, _mmx)
 #endif
     }
-    if (mm_flags & AV_CPU_FLAG_MMX2) {
-        c->avg_chroma_pixels_tab[0] = ff_avg_rv40_chroma_mc8_mmx2;
-        c->avg_chroma_pixels_tab[1] = ff_avg_rv40_chroma_mc4_mmx2;
-        c->rv40_weight_pixels_tab[0][0] = ff_rv40_weight_func_rnd_16_mmx2;
-        c->rv40_weight_pixels_tab[0][1] = ff_rv40_weight_func_rnd_8_mmx2;
-        c->rv40_weight_pixels_tab[1][0] = ff_rv40_weight_func_nornd_16_mmx2;
-        c->rv40_weight_pixels_tab[1][1] = ff_rv40_weight_func_nornd_8_mmx2;
+    if (EXTERNAL_MMXEXT(mm_flags)) {
+        c->avg_chroma_pixels_tab[0]     = ff_avg_rv40_chroma_mc8_mmxext;
+        c->avg_chroma_pixels_tab[1]     = ff_avg_rv40_chroma_mc4_mmxext;
+        c->rv40_weight_pixels_tab[0][0] = ff_rv40_weight_func_rnd_16_mmxext;
+        c->rv40_weight_pixels_tab[0][1] = ff_rv40_weight_func_rnd_8_mmxext;
+        c->rv40_weight_pixels_tab[1][0] = ff_rv40_weight_func_nornd_16_mmxext;
+        c->rv40_weight_pixels_tab[1][1] = ff_rv40_weight_func_nornd_8_mmxext;
 #if ARCH_X86_32
-        QPEL_MC_SET(avg_, _mmx2)
+        QPEL_MC_SET(avg_, _mmxext)
 #endif
-    } else if (mm_flags & AV_CPU_FLAG_3DNOW) {
+    } else if (EXTERNAL_AMD3DNOW(mm_flags)) {
         c->avg_chroma_pixels_tab[0] = ff_avg_rv40_chroma_mc8_3dnow;
         c->avg_chroma_pixels_tab[1] = ff_avg_rv40_chroma_mc4_3dnow;
 #if ARCH_X86_32
         QPEL_MC_SET(avg_, _3dnow)
 #endif
     }
-    if (mm_flags & AV_CPU_FLAG_SSE2) {
+    if (EXTERNAL_SSE2(mm_flags)) {
         c->rv40_weight_pixels_tab[0][0] = ff_rv40_weight_func_rnd_16_sse2;
         c->rv40_weight_pixels_tab[0][1] = ff_rv40_weight_func_rnd_8_sse2;
         c->rv40_weight_pixels_tab[1][0] = ff_rv40_weight_func_nornd_16_sse2;
@@ -223,7 +230,7 @@ void ff_rv40dsp_init_x86(RV34DSPContext *c, DSPContext *dsp)
         QPEL_MC_SET(put_, _sse2)
         QPEL_MC_SET(avg_, _sse2)
     }
-    if (mm_flags & AV_CPU_FLAG_SSSE3) {
+    if (EXTERNAL_SSSE3(mm_flags)) {
         c->rv40_weight_pixels_tab[0][0] = ff_rv40_weight_func_rnd_16_ssse3;
         c->rv40_weight_pixels_tab[0][1] = ff_rv40_weight_func_rnd_8_ssse3;
         c->rv40_weight_pixels_tab[1][0] = ff_rv40_weight_func_nornd_16_ssse3;
@@ -231,5 +238,5 @@ void ff_rv40dsp_init_x86(RV34DSPContext *c, DSPContext *dsp)
         QPEL_MC_SET(put_, _ssse3)
         QPEL_MC_SET(avg_, _ssse3)
     }
-#endif
+#endif /* HAVE_YASM */
 }

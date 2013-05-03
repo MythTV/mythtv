@@ -3,7 +3,7 @@
 
 // MythTV headers
 #include "eitfixup.h"
-#include "dvbdescriptors.h" // for MythCategoryType
+#include "programinfo.h" // for CategoryType
 #include "channelutil.h" // for GetDefaultAuthority()
 
 #include "programinfo.h" // for subtitle types and audio and video properties
@@ -88,7 +88,8 @@ EITFixUp::EITFixUp()
       m_mcaDD(",?\\sDD\\.?"),
       m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
       m_RTLSubtitle("^([^\\.]{3,})\\.\\s+(.+)"),
-      m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
+      /* should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20 */
+      m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\s|\\.\\s*|$)"),
       m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle4("^Thema.{0,5}:\\s([^\\.]+)\\.\\s*"),
@@ -105,6 +106,7 @@ EITFixUp::EITFixUp()
       m_nlRepeat("herh."),
       m_nlHD("\\sHD$"),
       m_nlSub("\\sAfl\\.:\\s([^\\.]+)\\."),
+      m_nlSub2("\\s\"([^\"]+)\""),
       m_nlActors("\\sMet:\\s.+e\\.a\\."),
       m_nlPres("\\sPresentatie:\\s([^\\.]+)\\."),
       m_nlPersSeparator("(, |\\sen\\s)"),
@@ -115,14 +117,36 @@ EITFixUp::EITFixUp()
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
       m_noRerun("\\(R\\)"),
+      m_noHD("[\\(\\[]HD[\\)\\]]"),
       m_noColonSubtitle("^([^:]+): (.+)"),
       m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
                         "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
                         "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
                         "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
       m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
-      m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
-
+      m_Stereo("\\b\\(?[sS]tereo\\)?\\b"),
+      m_dkEpisode("\\(([0-9]+)\\)"),
+      m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
+      m_dkSubtitle1("^([^:]+): (.+)"),
+      m_dkSubtitle2("^([^:]+) - (.+)"),
+      m_dkSeason1("Sæson ([0-9]+)\\."),
+      m_dkSeason2("- år ([0-9]+)(?: :)"),
+      m_dkFeatures("Features:(.+)"),
+      m_dkWidescreen(" 16:9"),
+      m_dkDolby(" 5:1"),
+      m_dkSurround(" \\(\\(S\\)\\)"),
+      m_dkStereo(" S"),
+      m_dkReplay(" \\(G\\)"),
+      m_dkTxt(" TTV"),
+      m_dkHD(" HD"),
+      m_dkActors("(?:Medvirkende: |Medv\\.: )(.+)"),
+      m_dkPersonsSeparator("(, )|(og )"),
+      m_dkDirector("(?:Instr.: |Instrukt.r: )(.+)$"),
+      m_dkYear(" fra ([0-9]{4})[ \\.]"),
+      m_AUFreeviewSY("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\)$"),
+      m_AUFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
+      m_AUFreeviewYC("(.*) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$"),
+      m_AUFreeviewSYC("(.*) \\((.+)\\) \\(([12][0-9][0-9][0-9])\\) \\((.+)\\)$")
 {
 }
 
@@ -161,6 +185,18 @@ void EITFixUp::Fix(DBEventEIT &event) const
     if (kFixAUStar & event.fixup)
         FixAUStar(event);
 
+    if (kFixAUDescription & event.fixup)
+        FixAUDescription(event);
+        
+    if (kFixAUFreeview & event.fixup)
+        FixAUFreeview(event);
+        
+    if (kFixAUNine & event.fixup)
+        FixAUNine(event);
+        
+    if (kFixAUSeven & event.fixup)
+        FixAUSeven(event);
+    
     if (kFixMCA & event.fixup)
         FixMCA(event);
 
@@ -181,6 +217,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixNRK_DVBT & event.fixup)
         FixNRK_DVBT(event);
+
+    if (kFixDK & event.fixup)
+        FixDK(event);
 
     if (kFixCategory & event.fixup)
         FixCategory(event);
@@ -734,14 +773,15 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
             event.parttotal  = tmpExp1.cap(2).toUInt();
-            // Remove from the description
+#if 0       // Remove from the description
             event.description = event.description.left(position1) +
                 event.description.mid(position1+tmpExp1.cap(0).length());
+#endif
             series = true;
         }
     }
     if (series)
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
 
     QRegExp tmpStarring = m_ukStarring;
     if (tmpStarring.indexIn(event.description) != -1)
@@ -1029,7 +1069,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
     }
 
     if (isSeries)
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
 
     // Look for additional persons in the description
     QRegExp tmpPersons = m_comHemPersons;
@@ -1154,6 +1194,141 @@ void EITFixUp::FixAUStar(DBEventEIT &event) const
     }
 }
 
+/** \fn EITFixUp::FixAUDescription(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (fix common annoyances common to most networks)
+ */
+void EITFixUp::FixAUDescription(DBEventEIT &event) const
+{
+    if (event.description.startsWith("[Program data ") || event.description.startsWith("[Program info "))//TEN
+    {
+        event.description = "";//event.subtitle;
+    }
+    if (event.description.endsWith("Copyright West TV Ltd. 2011)"))
+        event.description.resize(event.description.length()-40);
+    
+    if (event.description.isEmpty() && !event.subtitle.isEmpty())//due to ten's copyright info, this won't be caught before
+    {
+        event.description = event.subtitle;
+        event.subtitle = QString::null;
+    }
+    if (event.description.startsWith(event.title+" - "))
+        event.description.remove(0,event.title.length()+3);
+    if (event.title.startsWith("LIVE: ", Qt::CaseInsensitive))
+    {
+        event.title.remove(0, 6);
+        event.description.prepend("(Live) ");
+    }
+}
+/** \fn EITFixUp::FixAUNine(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (Nine network)
+ */
+void EITFixUp::FixAUNine(DBEventEIT &event) const
+{
+    QRegExp rating("\\((G|PG|M|MA)\\)");
+    if (rating.indexIn(event.description) == 0)
+    {
+      EventRating prograting;
+      prograting.system="AU"; prograting.rating = rating.cap(1);
+      event.ratings.push_back(prograting);
+      event.description.remove(0,rating.matchedLength()+1);
+    }
+    if (event.description.startsWith("[HD]"))
+    {
+      event.videoProps |= VID_HDTV;
+      event.description.remove(0,5);
+    }
+    if (event.description.startsWith("[CC]"))
+    {
+      event.subtitleType |= SUB_NORMAL;
+      event.description.remove(0,5);
+    }
+    if (event.subtitle == "Movie")
+    {
+        event.subtitle = QString::null;
+        event.categoryType = ProgramInfo::kCategoryMovie;
+    }
+    if (event.description.startsWith(event.title))
+      event.description.remove(0,event.title.length()+1);
+}
+/** \fn EITFixUp::FixAUSeven(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (Seven network)
+ */
+void EITFixUp::FixAUSeven(DBEventEIT &event) const
+{
+    if (event.description.endsWith(" Rpt"))
+    {
+        event.previouslyshown = true;
+        event.description.resize(event.description.size()-4);
+    }
+    QRegExp year("(\\d{4})$");
+    if (year.indexIn(event.description) != -1)
+    {
+        event.airdate = year.cap(3).toUInt();
+        event.description.resize(event.description.size()-5);
+    }
+    if (event.description.endsWith(" CC"))
+    {
+      event.subtitleType |= SUB_NORMAL;
+      event.description.resize(event.description.size()-3);
+    }
+    QString advisories;//store the advisories to append later
+    QRegExp adv("(\\([A-Z,]+\\))$");
+    if (adv.indexIn(event.description) != -1)
+    {
+        advisories = adv.cap(1);
+        event.description.resize(event.description.size()-(adv.matchedLength()+1));
+    }
+    QRegExp rating("(C|G|PG|M|MA)$");
+    if (rating.indexIn(event.description) != -1)
+    {
+        EventRating prograting;
+        prograting.system=""; prograting.rating = rating.cap(1);
+        if (!advisories.isEmpty())
+            prograting.rating.append(" ").append(advisories);
+        event.ratings.push_back(prograting);
+        event.description.resize(event.description.size()-(rating.matchedLength()+1));
+    }
+}
+/** \fn EITFixUp::FixAUFreeview(DBEventEIT&) const
+ *  \brief Use this to standardize DVB-T guide in Australia. (generic freeview - extra info in brackets at end of desc)
+ */
+void EITFixUp::FixAUFreeview(DBEventEIT &event) const
+{
+    if (event.description.endsWith(".."))//has been truncated to fit within the 'subtitle' eit field, so none of the following will work (ABC)
+        return;
+
+    if (m_AUFreeviewSY.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        if (event.subtitle.isEmpty())//nine sometimes has an actual subtitle field and the brackets thingo)
+            event.subtitle = m_AUFreeviewSY.cap(2);
+        event.airdate = m_AUFreeviewSY.cap(3).toUInt();
+        event.description = m_AUFreeviewSY.cap(1);
+    }
+    else if (m_AUFreeviewY.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        event.airdate = m_AUFreeviewY.cap(2).toUInt();
+        event.description = m_AUFreeviewY.cap(1);
+    }
+    else if (m_AUFreeviewSYC.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        if (event.subtitle.isEmpty())
+            event.subtitle = m_AUFreeviewSYC.cap(2);
+        event.airdate = m_AUFreeviewSYC.cap(3).toUInt();
+        QStringList actors = m_AUFreeviewSYC.cap(4).split("/");
+        for (int i = 0; i < actors.size(); ++i)
+            event.AddPerson(DBPerson::kActor, actors.at(i));
+        event.description = m_AUFreeviewSYC.cap(1);
+    }
+    else if (m_AUFreeviewYC.indexIn(event.description.trimmed(), 0) != -1) 
+    {
+        event.airdate = m_AUFreeviewYC.cap(2).toUInt();
+        QStringList actors = m_AUFreeviewYC.cap(3).split("/");
+        for (int i = 0; i < actors.size(); ++i)
+            event.AddPerson(DBPerson::kActor, actors.at(i));
+        event.description = m_AUFreeviewYC.cap(1);
+    }
+}
+
 /** \fn EITFixUp::FixMCA(DBEventEIT&) const
  *  \brief Use this to standardise the MultiChoice Africa DVB-S guide.
  */
@@ -1210,7 +1385,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
                 QString("E%1S%2").arg(episode).arg(season);
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
 
     // Close captioned?
@@ -1275,7 +1450,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
                 event.AddPerson(DBPerson::kActor, (*it).trimmed());
             event.description = tmpExp1.cap(1).trimmed();
         }
-        event.categoryType = kCategoryMovie;
+        event.categoryType = ProgramInfo::kCategoryMovie;
     }
 
 }
@@ -1287,7 +1462,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
 {
     int        pos;
 
-    // No need to continue without a description and with an subtitle.
+    // No need to continue without a description or with an subtitle.
     if (event.description.length() <= 0 || event.subtitle.length() > 0)
         return;
 
@@ -1298,7 +1473,6 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         // remove '.' if it matches at the beginning of the description
         int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
         event.description = event.description.remove(pos, length).trimmed();
-        event.originalairdate = event.starttime.addDays(-1).date();
     }
 
     QRegExp tmpExp1 = m_RTLSubtitle;
@@ -1367,20 +1541,30 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
             event.description.remove(0, tmpExpEpisodeNo2.matchedLength());
     }
 
-    int position;
-    const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
-    const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
-
-    if ((position = tmpExp1.indexIn(event.description)) != -1)
+    /* got an episode title now? (we did not have one at the start of this function) */
+    if (!event.subtitle.isEmpty())
     {
-        uint tmpExp1Len = tmpExp1.cap(1).length();
-        uint evDescLen = max(event.description.length(), 1);
+        event.categoryType = ProgramInfo::kCategorySeries;
+    }
 
-        if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
-            (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
+    /* if we do not have an episode title by now try some guessing as last resort */
+    if (event.subtitle.length() == 0)
+    {
+        int position;
+        const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
+        const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
+
+        if ((position = tmpExp1.indexIn(event.description)) != -1)
         {
-            event.subtitle    = tmpExp1.cap(1);
-            event.description = tmpExp1.cap(2);
+            uint tmpExp1Len = tmpExp1.cap(1).length();
+            uint evDescLen = max(event.description.length(), 1);
+
+            if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+                (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
+            {
+                event.subtitle    = tmpExp1.cap(1);
+                event.description = tmpExp1.cap(2);
+            }
         }
     }
 }
@@ -1464,82 +1648,88 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     if (event.category == "Documentary")
     {
         event.category = "Documentaire";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "News")
     {
         event.category = "Nieuws/actualiteiten";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Kids")
     {
         event.category = "Jeugd";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Show/game Show")
     {
         event.category = "Amusement";
-        event.categoryType = kCategoryTVShow;
+        event.categoryType = ProgramInfo::kCategoryTVShow;
     }
     if (event.category == "Music/Ballet/Dance")
     {
         event.category = "Muziek";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "News magazine")
     {
         event.category = "Informatief";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie")
     {
         event.category = "Film";
-        event.categoryType = kCategoryMovie;
+        event.categoryType = ProgramInfo::kCategoryMovie;
     }
     if (event.category == "Nature/animals/Environment")
     {
         event.category = "Natuur";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Adult")
     {
         event.category = "Erotiek";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Soap/melodrama/folkloric")
     {
         event.category = "Serie/soap";
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
     if (event.category == "Arts/Culture")
     {
         event.category = "Kunst/Cultuur";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Sports")
     {
         event.category = "Sport";
-        event.categoryType = kCategorySports;
+        event.categoryType = ProgramInfo::kCategorySports;
     }
     if (event.category == "Cartoons/Puppets")
     {
         event.category = "Animatie";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Movie - Comedy")
     {
         event.category = "Comedy";
-        event.categoryType = kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
     if (event.category == "Movie - Detective/Thriller")
     {
         event.category = "Misdaad";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
     }
     if (event.category == "Social/Spiritual Sciences")
     {
         event.category = "Religieus";
-        event.categoryType = kCategoryNone;
+        event.categoryType = ProgramInfo::kCategoryNone;
+    }
+
+    // Film - categories are usually not Films
+    if (event.category.startsWith("Film -"))
+    {
+        event.categoryType = ProgramInfo::                                                                      kCategorySeries;
     }
 
     // Get stereo info
@@ -1576,7 +1766,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.title = event.title.replace(m_nlHD, "");
     }
 
-    // Try to make subtitle
+    // Try to make subtitle from Afl.:
     QRegExp tmpSub = m_nlSub;
     QString tmpSubString;
     if (tmpSub.indexIn(fullinfo) != -1)
@@ -1586,6 +1776,18 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.subtitle = tmpSubString.left(tmpSubString.length() -1);
         fullinfo = fullinfo.replace(tmpSub.cap(0), "");
     }
+
+    // Try to make subtitle from " "
+    QRegExp tmpSub2 = m_nlSub2;
+    //QString tmpSubString2;
+    if (tmpSub2.indexIn(fullinfo) != -1)
+    {
+        tmpSubString = tmpSub2.cap(0);
+        tmpSubString = tmpSubString.right(tmpSubString.length() - 2);
+        event.subtitle = tmpSubString.left(tmpSubString.length() -1);
+        fullinfo = fullinfo.replace(tmpSub2.cap(0), "");
+    }
+
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
@@ -1686,11 +1888,11 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 void EITFixUp::FixCategory(DBEventEIT &event) const
 {
     // remove category movie from short events
-    if (event.categoryType == kCategoryMovie &&
+    if (event.categoryType == ProgramInfo::kCategoryMovie &&
         event.starttime.secsTo(event.endtime) < kMinMovieDuration)
     {
         /* default taken from ContentDescriptor::GetMythCategory */
-        event.categoryType = kCategoryTVShow;
+        event.categoryType = ProgramInfo::kCategoryTVShow;
     }
 }
 
@@ -1705,6 +1907,20 @@ void EITFixUp::FixNO(DBEventEIT &event) const
     {
       event.previouslyshown = true;
       event.title = event.title.replace(m_noRerun, "");
+    }
+    // Check for "subtitle (HD)" in the subtitle
+    position = event.subtitle.indexOf(m_noHD);
+    if (position != -1)
+    {
+      event.videoProps |= VID_HDTV;
+      event.subtitle = event.subtitle.replace(m_noHD, "");
+    }
+   // Check for "description (HD)" in the description
+    position = event.description.indexOf(m_noHD);
+    if (position != -1)
+    {
+      event.videoProps |= VID_HDTV;
+      event.description = event.description.replace(m_noHD, "");
     }
 }
 
@@ -1765,3 +1981,188 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
     }
 }
 
+/** \fn EITFixUp::FixDK(DBEventEIT&) const
+ *  \brief Use this to clean YouSee's DVB-C guide in Denmark.
+ */
+void EITFixUp::FixDK(DBEventEIT &event) const
+{
+    // Source: YouSee Rules of Operation v1.16
+    // url: http://yousee.dk/~/media/pdf/CPE/Rules_Operation.ashx
+    int        position = -1;
+    int        episode = -1;
+    int        season = -1;
+    QRegExp    tmpRegEx;
+    // Title search
+    // episode and part/part total
+    tmpRegEx = m_dkEpisode;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      episode = tmpRegEx.cap(1).toInt();
+      event.partnumber = tmpRegEx.cap(1).toInt();
+      event.title = event.title.replace(tmpRegEx, "");
+    }
+
+    tmpRegEx = m_dkPart;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      episode = tmpRegEx.cap(1).toInt();
+      event.partnumber = tmpRegEx.cap(1).toInt();
+      event.parttotal = tmpRegEx.cap(2).toInt();
+      event.title = event.title.replace(tmpRegEx, "");
+    }
+
+    // subtitle delimiters
+    tmpRegEx = m_dkSubtitle1;
+    position = event.title.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      event.title = tmpRegEx.cap(1);
+      event.subtitle = tmpRegEx.cap(2);
+    }
+    else
+    {
+        tmpRegEx = m_dkSubtitle2;
+        if(event.title.indexOf(tmpRegEx) != -1)
+        {
+            event.title = tmpRegEx.cap(1);
+            event.subtitle = tmpRegEx.cap(2);
+        }
+    }
+    // Description search
+    // Season (Sæson [:digit:]+.) => episode = season episode number
+    // or year (- år [:digit:]+(\\)|:) ) => episode = total episode number
+    tmpRegEx = m_dkSeason1;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+      season = tmpRegEx.cap(1).toInt();
+    }
+    else
+    {
+        tmpRegEx = m_dkSeason2;
+        if(event.description.indexOf(tmpRegEx) !=  -1)
+        {
+            season = tmpRegEx.cap(1).toInt();
+        }
+    }
+
+    //Feature:
+    tmpRegEx = m_dkFeatures;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString features = tmpRegEx.cap(1);
+        event.description = event.description.replace(tmpRegEx, "");
+        // 16:9
+        if (features.indexOf(m_dkWidescreen) !=  -1)
+            event.videoProps |= VID_WIDESCREEN;
+        // HDTV
+        if (features.indexOf(m_dkHD) !=  -1)
+            event.videoProps |= VID_HDTV;
+        // Dolby Digital surround
+        if (features.indexOf(m_dkDolby) !=  -1)
+            event.audioProps |= AUD_DOLBY;
+        // surround
+        if (features.indexOf(m_dkSurround) !=  -1)
+            event.audioProps |= AUD_SURROUND;
+        // stereo
+        if (features.indexOf(m_dkStereo) !=  -1)
+            event.audioProps |= AUD_STEREO;
+        // (G)
+        if (features.indexOf(m_dkReplay) !=  -1)
+            event.previouslyshown = true;
+        // TTV
+        if (features.indexOf(m_dkTxt) !=  -1)
+            event.subtitleType |= SUB_NORMAL;
+    }
+
+    // Series and program id
+    // programid is currently not transmitted
+    // YouSee doesn't use a default authority but uses the first byte after
+    // the / to indicate if the seriesid is global unique or unique on the
+    // service id
+    if (event.seriesId.length() >= 1 && event.seriesId[0] == '/')
+    {
+        QString newid;
+        if (event.seriesId[1] == '1')
+            newid = QString("%1%2").arg(event.chanid).
+                    arg(event.seriesId.mid(2,8));
+        else
+            newid = event.seriesId.mid(2,8);
+        event.seriesId = newid;
+    }
+
+    if (event.programId.length() >= 1 && event.programId[0] == '/')
+        event.programId[0]='_';
+
+    // Add season and episode number to subtitle
+    if(episode>0)
+    {
+        event.subtitle = QString("%1 (%2").arg(event.subtitle).arg(episode);
+        if (event.parttotal >0)
+            event.subtitle = QString("%1:%2").arg(event.subtitle).
+                    arg(event.parttotal);
+        if (season>0)
+        {
+            event.syndicatedepisodenumber =
+                    QString("E%1S%2").arg(episode).arg(season);
+            event.subtitle = QString("%1 Sæson %2").arg(event.subtitle).
+                    arg(season);
+        }
+        event.subtitle = QString("%1)").arg(event.subtitle);
+    }
+    // Find actors and director in description
+    tmpRegEx = m_dkDirector;
+    bool directorPresent = false;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpDirectorsString = tmpRegEx.cap(1);
+        const QStringList directors =
+            tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = directors.begin();
+        for (; it != directors.end(); ++it)
+        {
+            tmpDirectorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpDirectorsString != "")
+                event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
+        }
+        directorPresent = true;
+    }
+
+    tmpRegEx = m_dkActors;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        QString tmpActorsString = tmpRegEx.cap(1);
+        if (directorPresent)
+            tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
+        const QStringList actors =
+            tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); ++it)
+        {
+            tmpActorsString = it->split(":").last().trimmed().
+                    remove(QRegExp("\\.$"));
+            if (tmpActorsString != "")
+                event.AddPerson(DBPerson::kActor, tmpActorsString);
+        }
+    }
+    //find year
+    tmpRegEx = m_dkYear;
+    position = event.description.indexOf(tmpRegEx);
+    if (position != -1)
+    {
+        bool ok;
+        uint y = tmpRegEx.cap(1).toUInt(&ok);
+        if (ok)
+            event.originalairdate = QDate(y, 1, 1);
+    }
+    // Remove white spaces
+    event.description = event.description.trimmed();
+    event.title       = event.title.trimmed();
+    event.subtitle    = event.subtitle.trimmed();
+}

@@ -95,6 +95,7 @@
 #include "libswscale/rgb2rgb.h"
 #include "libswscale/swscale.h"
 #include "libswscale/swscale_internal.h"
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/pixdesc.h"
 #include "yuv2rgb_altivec.h"
@@ -317,12 +318,7 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
     const ubyte *ui  = in[1];                                                 \
     const ubyte *vi  = in[2];                                                 \
                                                                               \
-    vector unsigned char *oute =                                              \
-        (vector unsigned char *)                                              \
-            (oplanes[0] + srcSliceY * outstrides[0]);                         \
-    vector unsigned char *outo =                                              \
-        (vector unsigned char *)                                              \
-            (oplanes[0] + srcSliceY * outstrides[0] + outstrides[0]);         \
+    vector unsigned char *oute, *outo;                                        \
                                                                               \
     /* loop moves y{1, 2}i by w */                                            \
     instrides_scl[0] = instrides[0] * 2 - w;                                  \
@@ -332,6 +328,9 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
     instrides_scl[2] = instrides[2] - w / 2;                                  \
                                                                               \
     for (i = 0; i < h / 2; i++) {                                             \
+        oute = (vector unsigned char *)(oplanes[0] + outstrides[0] *          \
+                                        (srcSliceY + i * 2));                 \
+        outo = oute + (outstrides[0] >> 4);                                   \
         vec_dstst(outo, (0x02000002 | (((w * 3 + 32) / 32) << 16)), 0);       \
         vec_dstst(oute, (0x02000002 | (((w * 3 + 32) / 32) << 16)), 1);       \
                                                                               \
@@ -428,9 +427,6 @@ static int altivec_ ## name(SwsContext *c, const unsigned char **in,          \
             ui  += 8;                                                         \
             vi  += 8;                                                         \
         }                                                                     \
-                                                                              \
-        outo += (outstrides[0]) >> 4;                                         \
-        oute += (outstrides[0]) >> 4;                                         \
                                                                               \
         ui  += instrides_scl[1];                                              \
         vi  += instrides_scl[2];                                              \
@@ -536,7 +532,7 @@ static int altivec_uyvy_rgb32(SwsContext *c, const unsigned char **in,
  *
  * So we just fall back to the C codes for this.
  */
-SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
+av_cold SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
 {
     if (!(av_get_cpu_flags() & AV_CPU_FLAG_ALTIVEC))
         return NULL;
@@ -552,41 +548,41 @@ SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
         return NULL;
 
     switch (c->srcFormat) {
-    case PIX_FMT_YUV410P:
-    case PIX_FMT_YUV420P:
+    case AV_PIX_FMT_YUV410P:
+    case AV_PIX_FMT_YUV420P:
     /*case IMGFMT_CLPL:        ??? */
-    case PIX_FMT_GRAY8:
-    case PIX_FMT_NV12:
-    case PIX_FMT_NV21:
+    case AV_PIX_FMT_GRAY8:
+    case AV_PIX_FMT_NV12:
+    case AV_PIX_FMT_NV21:
         if ((c->srcH & 0x1) != 0)
             return NULL;
 
         switch (c->dstFormat) {
-        case PIX_FMT_RGB24:
+        case AV_PIX_FMT_RGB24:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space RGB24\n");
             return altivec_yuv2_rgb24;
-        case PIX_FMT_BGR24:
+        case AV_PIX_FMT_BGR24:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space BGR24\n");
             return altivec_yuv2_bgr24;
-        case PIX_FMT_ARGB:
+        case AV_PIX_FMT_ARGB:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space ARGB\n");
             return altivec_yuv2_argb;
-        case PIX_FMT_ABGR:
+        case AV_PIX_FMT_ABGR:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space ABGR\n");
             return altivec_yuv2_abgr;
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space RGBA\n");
             return altivec_yuv2_rgba;
-        case PIX_FMT_BGRA:
+        case AV_PIX_FMT_BGRA:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space BGRA\n");
             return altivec_yuv2_bgra;
         default: return NULL;
         }
         break;
 
-    case PIX_FMT_UYVY422:
+    case AV_PIX_FMT_UYVY422:
         switch (c->dstFormat) {
-        case PIX_FMT_BGR32:
+        case AV_PIX_FMT_BGR32:
             av_log(c, AV_LOG_WARNING, "ALTIVEC: Color Space UYVY -> RGB32\n");
             return altivec_uyvy_rgb32;
         default: return NULL;
@@ -596,9 +592,11 @@ SwsFunc ff_yuv2rgb_init_altivec(SwsContext *c)
     return NULL;
 }
 
-void ff_yuv2rgb_init_tables_altivec(SwsContext *c, const int inv_table[4],
-                                    int brightness, int contrast,
-                                    int saturation)
+av_cold void ff_yuv2rgb_init_tables_altivec(SwsContext *c,
+                                            const int inv_table[4],
+                                            int brightness,
+                                            int contrast,
+                                            int saturation)
 {
     union {
         DECLARE_ALIGNED(16, signed short, tmp)[8];
@@ -633,7 +631,7 @@ static av_always_inline void ff_yuv2packedX_altivec(SwsContext *c,
                                                     const int16_t **alpSrc,
                                                     uint8_t *dest,
                                                     int dstW, int dstY,
-                                                    enum PixelFormat target)
+                                                    enum AVPixelFormat target)
 {
     int i, j;
     vector signed short X, X0, X1, Y0, U0, V0, Y1, U1, V1, U, V;
@@ -708,22 +706,22 @@ static av_always_inline void ff_yuv2packedX_altivec(SwsContext *c,
         B = vec_packclp(B0, B1);
 
         switch (target) {
-        case PIX_FMT_ABGR:
+        case AV_PIX_FMT_ABGR:
             out_abgr(R, G, B, out);
             break;
-        case PIX_FMT_BGRA:
+        case AV_PIX_FMT_BGRA:
             out_bgra(R, G, B, out);
             break;
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             out_rgba(R, G, B, out);
             break;
-        case PIX_FMT_ARGB:
+        case AV_PIX_FMT_ARGB:
             out_argb(R, G, B, out);
             break;
-        case PIX_FMT_RGB24:
+        case AV_PIX_FMT_RGB24:
             out_rgb24(R, G, B, out);
             break;
-        case PIX_FMT_BGR24:
+        case AV_PIX_FMT_BGR24:
             out_bgr24(R, G, B, out);
             break;
         default:
@@ -800,22 +798,22 @@ static av_always_inline void ff_yuv2packedX_altivec(SwsContext *c,
 
         nout = (vector unsigned char *) scratch;
         switch (target) {
-        case PIX_FMT_ABGR:
+        case AV_PIX_FMT_ABGR:
             out_abgr(R, G, B, nout);
             break;
-        case PIX_FMT_BGRA:
+        case AV_PIX_FMT_BGRA:
             out_bgra(R, G, B, nout);
             break;
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             out_rgba(R, G, B, nout);
             break;
-        case PIX_FMT_ARGB:
+        case AV_PIX_FMT_ARGB:
             out_argb(R, G, B, nout);
             break;
-        case PIX_FMT_RGB24:
+        case AV_PIX_FMT_RGB24:
             out_rgb24(R, G, B, nout);
             break;
-        case PIX_FMT_BGR24:
+        case AV_PIX_FMT_BGR24:
             out_bgr24(R, G, B, nout);
             break;
         default:
@@ -848,9 +846,9 @@ void ff_yuv2 ## suffix ## _X_altivec(SwsContext *c,                     \
                            dest, dstW, dstY, pixfmt);                   \
 }
 
-YUV2PACKEDX_WRAPPER(abgr,  PIX_FMT_ABGR);
-YUV2PACKEDX_WRAPPER(bgra,  PIX_FMT_BGRA);
-YUV2PACKEDX_WRAPPER(argb,  PIX_FMT_ARGB);
-YUV2PACKEDX_WRAPPER(rgba,  PIX_FMT_RGBA);
-YUV2PACKEDX_WRAPPER(rgb24, PIX_FMT_RGB24);
-YUV2PACKEDX_WRAPPER(bgr24, PIX_FMT_BGR24);
+YUV2PACKEDX_WRAPPER(abgr,  AV_PIX_FMT_ABGR);
+YUV2PACKEDX_WRAPPER(bgra,  AV_PIX_FMT_BGRA);
+YUV2PACKEDX_WRAPPER(argb,  AV_PIX_FMT_ARGB);
+YUV2PACKEDX_WRAPPER(rgba,  AV_PIX_FMT_RGBA);
+YUV2PACKEDX_WRAPPER(rgb24, AV_PIX_FMT_RGB24);
+YUV2PACKEDX_WRAPPER(bgr24, AV_PIX_FMT_BGR24);

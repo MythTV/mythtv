@@ -212,16 +212,11 @@ class Videos(object):
         self.tree_order = ['standard_feeds', 'location_feeds', 'local_feeds', 'category']
         self.tree_org = {
             'category': [
-                ['Movies', u''],
-                ['Trailers and Movies', ['Trailers', 'Movies']],
-                ['Movies by Genre', ['Movies_Action_adventure', 'Movies_Drama', 'Movies_Sci_fi_fantasy', 'Movies_Thriller', 'Movies_Comedy', 'Movies_Classics', 'Movies_Horror', 'Movies_Family', 'Movies_Anime_animation', 'Movies_Foreign', 'Movies_Documentary', 'Movies_Shorts',]],
-                ['Amateur', ['Shortmov', 'Film']],
-                ['',u''],
-                ['TV', ['Shows', 'Comedy',]],
+                ['', ['Film']],
                 ['', ['Sports']],
                 ['Information', ['News', 'Tech', 'Education', 'Howto', ]],
-                ['Entertainment', ['Music', 'Games', 'Entertainment', ]],
-                ['Other', ['Autos', 'Animals', 'Travel', 'Videoblog', 'People', 'Nonprofit']] ],
+                ['Entertainment', ['Comedy', 'Music', 'Games', 'Entertainment', ]],
+                ['Other', ['Autos', 'Animals', 'Travel', 'People', 'Nonprofit']] ],
             'standard_feeds':
                 [['Feeds', ['top_rated', 'top_favourites', 'most_viewed', 'most_popular', 'most_recent', 'most_discussed', 'most_responded', 'recently_featured', '']], ],
             'local_feeds':
@@ -234,8 +229,7 @@ class Videos(object):
             'category': {
                 '__default__': {'order': 'rating', 'max-results': '20', 'start-index': '1', 'Ir': self.config['language']},
                 #'cat name': {'order: '', 'max-results': , 'start-index': , 'restriction: '', 'time': '', 'Ir': ''},
-                'Trailers': {'max-results': '40', 'time': 'this_month',},
-                'Movies': {'max-results': '40', 'time': 'this_month',},
+                'Film': {'max-results': '40', 'time': 'this_month',},
                 'Music': {'max-results': '40', 'time': 'this_month',},
                 'Sports': {'max-results': '40', 'time': 'this_month',},
             },
@@ -263,19 +257,12 @@ class Videos(object):
             'local_feeds': {'top_rated': 'directories/topics/rated', 'top_favourites': 'directories/topics/most_subscribed', 'most_viewed': 'directories/topics/most_viewed', 'most_popular': None, 'most_recent': 'directories/topics/most_recent', 'most_discussed': 'directories/topics/most_comments', 'most_responded': None, 'recently_featured': 'directories/topics/featured'
                 },
             'category': {
-                'Trailers and Movies': 'directories/topics/movies',
-                'Movies by Genre': 'directories/topics/movies',
-                'Amateur': 'directories/topics/movies',
-                'TV': 'directories/topics/tv',
-                'Movies': 'directories/topics/movies',
-                'Trailers': 'directories/film_genres/trailers',
-                'Movies_Action_adventure': 'directories/film_genres/action_adventure', 'Movies_Drama': 'directories/film_genres/drama', 'Movies_Sci_fi_fantasy': 'directories/film_genres/scifi', 'Movies_Thriller': 'directories/film_genres/thriller', 'Movies_Comedy': 'directories/film_genres/comedy', 'Movies_Classics': 'directories/film_genres/classics', 'Movies_Horror': 'directories/film_genres/horror', 'Movies_Family': 'directories/film_genres/family_films', 'Movies_Anime_animation': 'directories/film_genres/animation', 'Movies_Foreign': 'directories/film_genres/foreign_films', 'Movies_Documentary': 'directories/film_genres/documentaries', 'Movies_Shorts': 'directories/film_genres/short_film',
-                'Shortmov': 'directories/film_genres/short_film', 'Film': 'directories/film_genres/animation',
-                'Shows': 'directories/topics/tv', 'Comedy': 'directories/film_genres/comedy',
+                'Film': 'directories/topics/movies',
+                'Comedy': 'directories/film_genres/comedy',
                 'Sports': 'directories/topics/sports',
                 'News': 'directories/topics/news', 'Tech': 'directories/topics/technology', 'Education': 'directories/topics/education', 'Howto': 'directories/topics/howto',
                 'Music': 'directories/topics/music', 'Games': 'directories/topics/games', 'Entertainment': 'directories/topics/entertainment',
-                'Autos': 'directories/topics/automotive', 'Animals': 'directories/topics/animals', 'Travel': 'directories/topics/travel', 'Videoblog': 'directories/topics/videoblog', 'People': 'directories/topics/people', 'Nonprofit': 'directories/topics/nonprofit',
+                'Autos': 'directories/topics/automotive', 'Animals': 'directories/topics/animals', 'Travel': 'directories/topics/travel', 'People': 'directories/topics/people', 'Nonprofit': 'directories/topics/nonprofit',
                 },
             }
 

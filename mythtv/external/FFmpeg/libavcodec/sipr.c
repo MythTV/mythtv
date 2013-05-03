@@ -25,14 +25,15 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/mathematics.h"
 #include "avcodec.h"
 #define BITSTREAM_READER_LE
 #include "get_bits.h"
 #include "dsputil.h"
+#include "internal.h"
 
 #include "lsp.h"
-#include "celp_math.h"
 #include "acelp_vectors.h"
 #include "acelp_pitch_delay.h"
 #include "acelp_filters.h"
@@ -411,7 +412,7 @@ static void decode_frame(SiprContext *ctx, SiprParameters *params,
                               SUBFR_SIZE);
 
         avg_energy =
-            (0.01 + ff_dot_productf(fixed_vector, fixed_vector, SUBFR_SIZE))/
+            (0.01 + ff_scalarproduct_float_c(fixed_vector, fixed_vector, SUBFR_SIZE)) /
                 SUBFR_SIZE;
 
         ctx->past_pitch_gain = pitch_gain = gain_cb[params->gc_index[i]][0];
@@ -453,9 +454,9 @@ static void decode_frame(SiprContext *ctx, SiprParameters *params,
 
     if (ctx->mode == MODE_5k0) {
         for (i = 0; i < subframe_count; i++) {
-            float energy = ff_dot_productf(ctx->postfilter_syn5k0 + LP_FILTER_ORDER + i*SUBFR_SIZE,
-                                           ctx->postfilter_syn5k0 + LP_FILTER_ORDER + i*SUBFR_SIZE,
-                                           SUBFR_SIZE);
+            float energy = ff_scalarproduct_float_c(ctx->postfilter_syn5k0 + LP_FILTER_ORDER + i * SUBFR_SIZE,
+                                                    ctx->postfilter_syn5k0 + LP_FILTER_ORDER + i * SUBFR_SIZE,
+                                                    SUBFR_SIZE);
             ff_adaptive_gain_control(&synth[i * SUBFR_SIZE],
                                      &synth[i * SUBFR_SIZE], energy,
                                      SUBFR_SIZE, 0.9, &ctx->postfilter_agc);
@@ -486,11 +487,13 @@ static av_cold int sipr_decoder_init(AVCodecContext * avctx)
     case 29: ctx->mode = MODE_6k5; break;
     case 37: ctx->mode = MODE_5k0; break;
     default:
-        av_log(avctx, AV_LOG_ERROR, "Invalid block_align: %d\n", avctx->block_align);
         if      (avctx->bit_rate > 12200) ctx->mode = MODE_16k;
         else if (avctx->bit_rate > 7500 ) ctx->mode = MODE_8k5;
         else if (avctx->bit_rate > 5750 ) ctx->mode = MODE_6k5;
         else                              ctx->mode = MODE_5k0;
+        av_log(avctx, AV_LOG_WARNING,
+               "Invalid block_align: %d. Mode %s guessed based on bitrate: %d\n",
+               avctx->block_align, modes[ctx->mode].mode_name, avctx->bit_rate);
     }
 
     av_log(avctx, AV_LOG_DEBUG, "Mode: %s\n", modes[ctx->mode].mode_name);
@@ -508,7 +511,9 @@ static av_cold int sipr_decoder_init(AVCodecContext * avctx)
     for (i = 0; i < 4; i++)
         ctx->energy_history[i] = -14;
 
-    avctx->sample_fmt = AV_SAMPLE_FMT_FLT;
+    avctx->channels       = 1;
+    avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    avctx->sample_fmt     = AV_SAMPLE_FMT_FLT;
 
     avcodec_get_frame_defaults(&ctx->frame);
     avctx->coded_frame = &ctx->frame;
@@ -539,7 +544,7 @@ static int sipr_decode_frame(AVCodecContext *avctx, void *data,
     /* get output buffer */
     ctx->frame.nb_samples = mode_par->frames_per_packet * subframe_size *
                             mode_par->subframe_count;
-    if ((ret = avctx->get_buffer(avctx, &ctx->frame)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &ctx->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -564,7 +569,7 @@ static int sipr_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_sipr_decoder = {
     .name           = "sipr",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_SIPR,
+    .id             = AV_CODEC_ID_SIPR,
     .priv_data_size = sizeof(SiprContext),
     .init           = sipr_decoder_init,
     .decode         = sipr_decode_frame,

@@ -451,8 +451,8 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = QString(tr("Category type") +
-                   " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')");
+    rule.title = tr("Category type (%1)", "List of hardcoded category types")
+                    .arg("'movie', 'series', 'sports', 'tvshow'");
     rule.subtitle.clear();
     rule.description = "program.category_type = 'sports' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
@@ -678,7 +678,8 @@ void CustomEdit::recordClicked(void)
     {
         record->LoadBySearch(kPowerSearch, m_titleEdit->GetText(),
                              evaluate(m_descriptionEdit->GetText()),
-                             m_subtitleEdit->GetText());
+                             m_subtitleEdit->GetText(),
+                             m_pginfo->GetTitle().isEmpty() ? NULL : m_pginfo);
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

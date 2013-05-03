@@ -147,7 +147,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythgallery", libversion,
+    if (!gCoreContext->TestPluginVersion("mythgallery", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 

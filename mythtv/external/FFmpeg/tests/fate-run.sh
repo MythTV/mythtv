@@ -71,11 +71,17 @@ run(){
 }
 
 probefmt(){
-    run ffprobe -show_format_entry format_name -print_format default=nw=1:nk=1 -v 0 "$@"
+    run ffprobe -show_entries format=format_name -print_format default=nw=1:nk=1 -v 0 "$@"
 }
 
 ffmpeg(){
-    run ffmpeg -nostats -threads $threads -thread_type $thread_type -cpuflags $cpuflags "$@"
+    dec_opts="-threads $threads -thread_type $thread_type"
+    ffmpeg_args="-nostats -cpuflags $cpuflags"
+    for arg in $@; do
+        [ x${arg} = x-i ] && ffmpeg_args="${ffmpeg_args} ${dec_opts}"
+        ffmpeg_args="${ffmpeg_args} ${arg}"
+    done
+    run ffmpeg ${ffmpeg_args}
 }
 
 framecrc(){
@@ -108,7 +114,7 @@ enc_dec_pcm(){
     cleanfiles=$encfile
     encfile=$(target_path ${encfile})
     ffmpeg -i $src_file "$@" -f $out_fmt -y ${encfile} || return
-    ffmpeg -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
+    ffmpeg -flags +bitexact -i ${encfile} -c:a pcm_${pcm_fmt} -f ${dec_fmt} -
 }
 
 FLAGS="-flags +bitexact -sws_flags +accurate_rnd+bitexact"
@@ -158,22 +164,11 @@ lavfitest(){
     regtest lavfi lavfi tests/vsynth1
 }
 
-seektest(){
-    t="${test#seek-}"
-    ref=${base}/ref/seek/$t
-    case $t in
-        image_*) file="tests/data/images/${t#image_}/%02d.${t#image_}" ;;
-        *)       file=$(echo $t | tr _ '?')
-                 for d in fate/acodec- fate/vsynth2- lavf/; do
-                     test -f tests/data/$d$file && break
-                 done
-                 file=$(echo tests/data/$d$file)
-                 ;;
-    esac
-    run libavformat/seek-test $target_path/$file
-}
-
 mkdir -p "$outdir"
+
+# Disable globbing: command arguments may contain globbing characters and
+# must be kept verbatim
+set -f
 
 exec 3>&2
 eval $command >"$outfile" 2>$errfile

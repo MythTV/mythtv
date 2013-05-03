@@ -242,7 +242,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="527"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="528"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>¿Seguro que desea cancelar la suscripción a este canal?</translation>
     </message>

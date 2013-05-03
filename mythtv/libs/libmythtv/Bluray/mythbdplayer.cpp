@@ -9,6 +9,16 @@ MythBDPlayer::MythBDPlayer(PlayerFlags flags)
 {
 }
 
+bool MythBDPlayer::HasReachedEof(void) const
+{
+    EofState eof = GetEof();
+    if (eof != kEofStateNone && !allpaused)
+        return true;
+    // DeleteMap and EditMode from the parent MythPlayer should not be
+    // relevant here.
+    return false;
+}
+
 void MythBDPlayer::PreProcessNormalFrame(void)
 {
     DisplayMenu();
@@ -239,9 +249,9 @@ QString MythBDPlayer::GetTitleName(int title) const
 
 QString MythBDPlayer::GetAngleName(int angle) const
 {
-    if (angle >= 0 && angle < GetNumAngles())
+    if (angle >= 1 && angle <= GetNumAngles())
     {
-        QString name = QObject::tr("Angle %1").arg(angle+1);
+        QString name = QObject::tr("Angle %1").arg(angle);
         return name;
     }
     return QString();

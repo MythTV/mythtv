@@ -17,6 +17,8 @@
 #define DEFAULT_UPDATE_TIMEOUT (5*60*1000)
 #define DEFAULT_SCRIPT_TIMEOUT (60)
 
+class ScriptInfo;
+
 typedef unsigned char units_t;
 typedef QMap<QString, QString> DataMap;
 
@@ -43,7 +45,7 @@ class TypeListInfo
         location.detach();
     }
     TypeListInfo(const QString &_name, const QString &_location,
-                 struct ScriptInfo *_src)
+                 ScriptInfo *_src)
         : name(_name), location(_location), src(_src)
     {
         name.detach();
@@ -53,7 +55,7 @@ class TypeListInfo
   public:
     QString name;
     QString location;
-    struct ScriptInfo *src;
+    ScriptInfo *src;
 };
 typedef QMultiHash<QString, TypeListInfo> TypeListMap;
 

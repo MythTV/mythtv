@@ -3,6 +3,9 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 TEMPLATE = app
 CONFIG += thread
@@ -18,9 +21,8 @@ DEPENDPATH  += ../../libs/libmythtv/mpeg
 
 # Input
 HEADERS += filldata.h   channeldata.h
-HEADERS += icondata.h   xmltvparser.h
+HEADERS += xmltvparser.h
 HEADERS += fillutil.h   commandlineparser.h
 SOURCES += filldata.cpp channeldata.cpp
-SOURCES += icondata.cpp xmltvparser.cpp
-SOURCES += fillutil.cpp
+SOURCES += xmltvparser.cpp fillutil.cpp
 SOURCES += main.cpp     commandlineparser.cpp

@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "asm.S"
+#include "libavutil/arm/asm.S"
 
 .macro  bflies          d0,  d1,  r0,  r1
         vrev64.32       \r0, \d1                @ t5, t6, t1, t2
@@ -214,7 +214,7 @@ function fft\n\()_neon
         bl              fft\n4\()_neon
         mov             r0,  r4
         pop             {r4, lr}
-        movrel          r1,  X(ff_cos_\n\()_fixed)
+        movrelx         r1,  X(ff_cos_\n\()_fixed)
         mov             r2,  #\n4/2
         b               fft_pass_neon
 endfunc

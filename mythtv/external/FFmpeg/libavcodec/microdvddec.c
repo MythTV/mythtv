@@ -101,6 +101,8 @@ static char *microdvd_load_tags(struct microdvd_tag *tags, char *s)
         case 'C':
             tag.persistent = MICRODVD_PERSISTENT_ON;
         case 'c':
+            if (*s == '$')
+                s++;
             tag.data1 = strtol(s, &s, 16) & 0x00ffffff;
             if (*s != '}')
                 break;
@@ -226,7 +228,7 @@ static void microdvd_close_no_persistent_tags(AVBPrint *new_line,
 {
     int i, sidx;
 
-    for (i = sizeof(MICRODVD_TAGS) - 2; i; i--) {
+    for (i = sizeof(MICRODVD_TAGS) - 2; i >= 0; i--) {
         if (tags[i].persistent != MICRODVD_PERSISTENT_OFF)
             continue;
         switch (tags[i].key) {
@@ -258,6 +260,7 @@ static int microdvd_decode_frame(AVCodecContext *avctx,
 {
     AVSubtitle *sub = data;
     AVBPrint new_line;
+    char c;
     char *decoded_sub;
     char *line = avpkt->data;
     char *end = avpkt->data + avpkt->size;
@@ -266,11 +269,16 @@ static int microdvd_decode_frame(AVCodecContext *avctx,
     if (avpkt->size <= 0)
         return avpkt->size;
 
-    av_bprint_init(&new_line, 0, 2048);
+    /* To be removed later */
+    if (sscanf(line, "{%*d}{%*[0123456789]}%c", &c) == 1 &&
+        line[avpkt->size - 1] == '\n') {
+        av_log(avctx, AV_LOG_ERROR, "AVPacket is not clean (contains timing "
+               "information and a trailing line break). You need to upgrade "
+               "your libavformat or sanitize your packet.\n");
+        return AVERROR_INVALIDDATA;
+    }
 
-    // skip {frame_start}{frame_end}
-    line = strchr(line, '}'); if (!line) goto end; line++;
-    line = strchr(line, '}'); if (!line) goto end; line++;
+    av_bprint_init(&new_line, 0, 2048);
 
     // subtitle content
     while (line < end && *line) {
@@ -292,8 +300,9 @@ static int microdvd_decode_frame(AVCodecContext *avctx,
             line++;
         }
     }
+    if (new_line.len) {
+        av_bprintf(&new_line, "\r\n");
 
-end:
     av_bprint_finalize(&new_line, &decoded_sub);
     if (*decoded_sub) {
         int64_t start    = avpkt->pts;
@@ -304,16 +313,65 @@ end:
         ff_ass_add_rect(sub, decoded_sub, ts_start, ts_duration, 0);
     }
     av_free(decoded_sub);
+    }
 
     *got_sub_ptr = sub->num_rects > 0;
     return avpkt->size;
+}
+
+static int microdvd_init(AVCodecContext *avctx)
+{
+    int i, sidx;
+    AVBPrint font_buf;
+    int font_size    = ASS_DEFAULT_FONT_SIZE;
+    int color        = ASS_DEFAULT_COLOR;
+    int bold         = ASS_DEFAULT_BOLD;
+    int italic       = ASS_DEFAULT_ITALIC;
+    int underline    = ASS_DEFAULT_UNDERLINE;
+    int alignment    = ASS_DEFAULT_ALIGNMENT;
+    struct microdvd_tag tags[sizeof(MICRODVD_TAGS) - 1] = {{0}};
+
+    av_bprint_init(&font_buf, 0, AV_BPRINT_SIZE_AUTOMATIC);
+    av_bprintf(&font_buf, "%s", ASS_DEFAULT_FONT);
+
+    if (avctx->extradata) {
+        microdvd_load_tags(tags, avctx->extradata);
+        for (i = 0; i < sizeof(MICRODVD_TAGS) - 1; i++) {
+            switch (av_tolower(tags[i].key)) {
+            case 'y':
+                for (sidx = 0; sidx < sizeof(MICRODVD_STYLES) - 1; sidx++) {
+                    if (tags[i].data1 & (1 << sidx)) {
+                        switch (MICRODVD_STYLES[sidx]) {
+                        case 'i': italic    = 1; break;
+                        case 'b': bold      = 1; break;
+                        case 'u': underline = 1; break;
+                        }
+                    }
+                }
+                break;
+
+            case 'c': color     = tags[i].data1; break;
+            case 's': font_size = tags[i].data1; break;
+            case 'p': alignment =             8; break;
+
+            case 'f':
+                av_bprint_clear(&font_buf);
+                av_bprintf(&font_buf, "%.*s",
+                           tags[i].data_string_len, tags[i].data_string);
+                break;
+            }
+        }
+    }
+    return ff_ass_subtitle_header(avctx, font_buf.str, font_size, color,
+                                  ASS_DEFAULT_BACK_COLOR, bold, italic,
+                                  underline, alignment);
 }
 
 AVCodec ff_microdvd_decoder = {
     .name         = "microdvd",
     .long_name    = NULL_IF_CONFIG_SMALL("MicroDVD subtitle"),
     .type         = AVMEDIA_TYPE_SUBTITLE,
-    .id           = CODEC_ID_MICRODVD,
-    .init         = ff_ass_subtitle_header_default,
+    .id           = AV_CODEC_ID_MICRODVD,
+    .init         = microdvd_init,
     .decode       = microdvd_decode_frame,
 };

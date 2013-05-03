@@ -116,7 +116,9 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 
         int ret = scanEvent->intValue();
         if (!transports.empty() || (MythDialog::Rejected != ret))
+        {
             Process(transports);
+        }
     }
     else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
     {

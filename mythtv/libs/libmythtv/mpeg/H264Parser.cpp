@@ -2,6 +2,7 @@
 #include "H264Parser.h"
 #include <iostream>
 #include "mythlogging.h"
+#include "recorders/dtvrecorder.h" // for FrameRate
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -129,6 +130,7 @@ void H264Parser::Reset(void)
 
     delta_pic_order_always_zero_flag = 0;
     separate_colour_plane_flag = 0;
+    chroma_format_idc = 1;
     frame_mbs_only_flag = -1;
     pic_order_present_flag = -1;
     redundant_pic_cnt_present_flag = 0;
@@ -574,8 +576,6 @@ void H264Parser::processRBSP(bool rbsp_complete)
 */
 bool H264Parser::decode_Header(GetBitContext *gb)
 {
-    uint first_mb_in_slice;
-
     is_keyframe = false;
 
     if (log2_max_frame_num == 0 || pic_order_present_flag == -1)
@@ -601,7 +601,8 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       that precedes the current slice in decoding order and has the
       same value of colour_plane_id.
      */
-    first_mb_in_slice = get_ue_golomb(gb);
+    //uint first_mb_in_slice = get_ue_golomb(gb);
+    get_ue_golomb(gb); // Replaced above line
 
     /*
       slice_type specifies the coding type of the slice according to
@@ -758,7 +759,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
  */
 void H264Parser::decode_SPS(GetBitContext * gb)
 {
-    int profile_idc, chroma_format_idc;
+    int profile_idc;
 
     seen_sps = true;
 
@@ -808,7 +809,6 @@ void H264Parser::decode_SPS(GetBitContext * gb)
     int  offset_for_non_ref_pic;
     int  offset_for_top_to_bottom_field;
     uint tmp;
-    bool gaps_in_frame_num_allowed_flag;
 
     /*
       pic_order_cnt_type specifies the method to decode picture order
@@ -866,6 +866,8 @@ void H264Parser::decode_SPS(GetBitContext * gb)
         for (uint idx = 0; idx < tmp; ++idx)
             get_se_golomb(gb);  // offset_for_ref_frame[i]
     }
+    (void) offset_for_non_ref_pic; // suppress unused var warning
+    (void) offset_for_top_to_bottom_field; // suppress unused var warning
 
     /*
       num_ref_frames specifies the maximum number of short-term and
@@ -884,7 +886,8 @@ void H264Parser::decode_SPS(GetBitContext * gb)
       decoding process in case of an inferred gap between values of
       frame_num as specified in subclause 8.2.5.2.
      */
-    gaps_in_frame_num_allowed_flag = get_bits1(gb);
+    //bool gaps_in_frame_num_allowed_flag = get_bits1(gb);
+    get_bits1(gb); // Replaced above line
 
     /*
       pic_width_in_mbs_minus1 plus 1 specifies the width of each
@@ -1067,6 +1070,10 @@ void H264Parser::decode_SEI(GetBitContext *gb)
                 break;
         }
     }
+
+    (void) exact_match_flag; // suppress unused var warning
+    (void) broken_link_flag; // suppress unused var warning
+    (void) changing_group_slice_idc; // suppress unused var warning
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
@@ -1218,15 +1225,25 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     }
 }
 
-uint H264Parser::frameRate(void) const
+double H264Parser::frameRate(void) const
 {
     uint64_t    num;
-    uint64_t    fps;
+    double      fps;
 
     num   = 500 * (uint64_t)timeScale; /* 1000 * 0.5 */
-    fps   = ( unitsInTick != 0 ? num / unitsInTick : 0 );
+    fps   = ( unitsInTick != 0 ? num / (double)unitsInTick : 0 ) / 1000;
 
-    return (uint)fps;
+    return fps;
+}
+
+void H264Parser::getFrameRate(FrameRate &result) const
+{
+    if (unitsInTick == 0)
+        result = FrameRate(0);
+    else if (timeScale & 0x1)
+        result = FrameRate(timeScale, unitsInTick * 2);
+    else
+        result = FrameRate(timeScale / 2, unitsInTick);
 }
 
 uint H264Parser::aspectRatio(void) const
@@ -1235,7 +1252,7 @@ uint H264Parser::aspectRatio(void) const
     double aspect = 0.0;
 
     if (pic_height)
-        aspect = pic_width / (double)pic_height;
+        aspect = pictureWidthCropped() / (double)pictureHeightCropped();
 
     switch (aspect_ratio_idc)
     {
@@ -1323,4 +1340,28 @@ uint H264Parser::aspectRatio(void) const
         return 4;
 
     return aspect * 1000000;
+}
+
+// Following the lead of libavcodec, ignore the left cropping.
+uint H264Parser::pictureWidthCropped(void) const
+{
+    uint ChromaArrayType = separate_colour_plane_flag ? 0 : chroma_format_idc;
+    uint CropUnitX = 1;
+    uint SubWidthC = chroma_format_idc == 3 ? 1 : 2;
+    if (ChromaArrayType != 0)
+        CropUnitX = SubWidthC;
+    uint crop = CropUnitX * frame_crop_right_offset;
+    return pic_width - crop;
+}
+
+// Following the lead of libavcodec, ignore the top cropping.
+uint H264Parser::pictureHeightCropped(void) const
+{
+    uint ChromaArrayType = separate_colour_plane_flag ? 0 : chroma_format_idc;
+    uint CropUnitY = 2 - frame_mbs_only_flag;
+    uint SubHeightC = chroma_format_idc <= 1 ? 2 : 1;
+    if (ChromaArrayType != 0)
+        CropUnitY *= SubHeightC;
+    uint crop = CropUnitY * frame_crop_bottom_offset;
+    return pic_height - crop;
 }

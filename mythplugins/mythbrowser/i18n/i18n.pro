@@ -14,6 +14,7 @@ trans.files += mythbrowser_hu.qm mythbrowser_en_us.qm mythbrowser_el.qm
 trans.files += mythbrowser_pt.qm mythbrowser_ja.qm mythbrowser_pl.qm
 trans.files += mythbrowser_en_ca.qm mythbrowser_es_es.qm
 trans.files += mythbrowser_it.qm
+trans.files += mythbrowser_zh_hk.qm
 
 INSTALLS += trans
 

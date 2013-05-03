@@ -39,8 +39,6 @@
 
 #include <netinet/in.h>
 #include <netinet/sctp.h>
-#include <sys/time.h>
-#include <unistd.h>
 
 #include "config.h"
 
@@ -123,7 +121,7 @@ static int ff_sctp_send(int s, const void *msg, size_t len,
     outmsg.msg_name       = NULL;
     outmsg.msg_namelen    = 0;
     outmsg.msg_iov        = &iov;
-    iov.iov_base          = msg;
+    iov.iov_base          = (void*)msg;
     iov.iov_len           = len;
     outmsg.msg_iovlen     = 1;
     outmsg.msg_controllen = 0;
@@ -172,8 +170,12 @@ static int sctp_open(URLContext *h, const char *uri, int flags)
 
     av_url_split(proto, sizeof(proto), NULL, 0, hostname, sizeof(hostname),
                  &port, path, sizeof(path), uri);
-    if (strcmp(proto,"sctp") || port <= 0 || port >= 65536)
+    if (strcmp(proto, "sctp"))
         return AVERROR(EINVAL);
+    if (port <= 0 || port >= 65536) {
+        av_log(s, AV_LOG_ERROR, "Port missing in uri\n");
+        return AVERROR(EINVAL);
+    }
 
     s->max_streams = 0;
     p = strchr(uri, '?');
@@ -294,8 +296,10 @@ static int sctp_write(URLContext *h, const uint8_t *buf, int size)
         /*StreamId is introduced as a 2byte code into the stream*/
         struct sctp_sndrcvinfo info = { 0 };
         info.sinfo_stream           = AV_RB16(buf);
-        if (info.sinfo_stream > s->max_streams)
-            abort();
+        if (info.sinfo_stream > s->max_streams) {
+            av_log(h, AV_LOG_ERROR, "bad input data\n");
+            return AVERROR(EINVAL);
+        }
         ret = ff_sctp_send(s->fd, buf + 2, size - 2, &info, MSG_EOR);
     } else
         ret = send(s->fd, buf, size, 0);

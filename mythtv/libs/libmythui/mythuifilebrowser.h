@@ -80,7 +80,6 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
    ~MythUIFileBrowser();
 
-    void Init(const QString &startPath);
     bool Create(void);
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
@@ -99,6 +98,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     void LoadPreview(void);
 
   private:
+    void SetPath(const QString &startPath);
     bool GetRemoteFileList(const QString &url, const QString &sgDir,
                            QStringList &list);
     void updateFileList(void);

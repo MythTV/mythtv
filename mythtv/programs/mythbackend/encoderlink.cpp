@@ -81,6 +81,7 @@ EncoderLink::~EncoderLink(void)
         delete tv;
         tv = NULL;
     }
+    SetSocket(NULL);
 }
 
 /** \fn EncoderLink::SetSocket(PlaybackSock *lsock)
@@ -569,6 +570,19 @@ bool EncoderLink::GetKeyframePositions(
     }
 
     return tv->GetKeyframePositions(start, end, map);
+}
+
+bool EncoderLink::GetKeyframeDurations(
+    int64_t start, int64_t end, frm_pos_map_t &map)
+{
+    if (!local)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Should be local only query: GetKeyframeDurations");
+        return false;
+    }
+
+    return tv->GetKeyframeDurations(start, end, map);
 }
 
 /** \fn EncoderLink::FrontendReady()

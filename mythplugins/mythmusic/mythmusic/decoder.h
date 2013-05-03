@@ -13,7 +13,7 @@
 #include <mythobservable.h>
 #include <mthread.h>
 
-class Metadata;
+class MusicMetadata;
 class MetaIO;
 class Decoder;
 class DecoderFactory;
@@ -74,9 +74,8 @@ class Decoder : public MThread, public MythObservable
 
     DecoderFactory *factory() const { return fctry; }
 
-    QIODevice *input() { return in; }
+    QIODevice *input(void);
     AudioOutput *output() { return out; }
-    void setInput(QIODevice *);
     void setOutput(AudioOutput *);
     void setFilename(const QString &newName) { filename = newName; }
 
@@ -89,35 +88,22 @@ class Decoder : public MThread, public MythObservable
 
     QString getFilename(void) const { return filename; }
 
-    virtual Metadata *readMetadata(void);
-    virtual Metadata *getMetadata(void);
-    virtual MetaIO *doCreateTagger (void);
-    virtual void commitMetadata(Metadata *mdata);
-    virtual void commitVolatileMetadata(const Metadata *mdata);
-
     // static methods
     static QStringList all();
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
-    static Decoder *create(const QString &, QIODevice *, AudioOutput *,
-                           bool = false);
-    static void SetLocationFormatUseTags(void);
+    static Decoder *create(const QString &, AudioOutput *, bool = false);
 
   protected:
-    Decoder(DecoderFactory *, QIODevice *, AudioOutput *);
+    Decoder(DecoderFactory *, AudioOutput *);
     QMutex* getMutex(void) { return &mtx; }
     void error(const QString &);
 
     QString filename;
 
-    static QString filename_format;
-    static int ignore_id3;
-    static QString musiclocation;
-
   private:
     DecoderFactory *fctry;
 
-    QIODevice *in;
     AudioOutput *out;
 
     QMutex mtx;
@@ -131,7 +117,7 @@ public:
     virtual bool supports(const QString &source) const = 0;
     virtual const QString &extension() const = 0; // file extension, ie. ".mp3" or ".ogg"
     virtual const QString &description() const = 0; // file type, ie. "MPEG Audio Files"
-    virtual Decoder *create(const QString &, QIODevice *, AudioOutput *, bool) = 0;
+    virtual Decoder *create(const QString &, AudioOutput *, bool) = 0;
     virtual ~DecoderFactory() {}
 };
 
@@ -141,7 +127,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
+    Decoder *create(const QString &, AudioOutput *, bool);
 };
 
 class avfDecoderFactory : public DecoderFactory
@@ -150,7 +136,7 @@ public:
     bool supports(const QString &) const;
     const QString &extension() const;
     const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
+    Decoder *create(const QString &, AudioOutput *, bool);
 };
 
 #endif

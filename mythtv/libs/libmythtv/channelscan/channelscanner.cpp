@@ -46,7 +46,7 @@ using namespace std;
 #define LOC QString("ChScan: ")
 
 ChannelScanner::ChannelScanner() :
-    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL),
+    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), iptvScanner(NULL),
     freeToAirOnly(false), serviceRequirements(kRequireAV)
 {
 }
@@ -76,14 +76,12 @@ void ChannelScanner::Teardown(void)
         channel = NULL;
     }
 
-#ifdef USING_IPTV
-    if (freeboxScanner)
+    if (iptvScanner)
     {
-        freeboxScanner->Stop();
-        delete freeboxScanner;
-        freeboxScanner = NULL;
+        iptvScanner->Stop();
+        delete iptvScanner;
+        iptvScanner = NULL;
     }
-#endif // USING_IPTV
 
     if (scanMonitor)
     {
@@ -280,22 +278,19 @@ bool ChannelScanner::ImportM3U(
     (void) cardid;
     (void) inputname;
     (void) sourceid;
-    bool ok = false;
 
-#ifdef USING_IPTV
+    if (!scanMonitor)
+        scanMonitor = new ScanMonitor(this);
+
     // Create an IPTV scan object
-    freeboxScanner = new IPTVChannelFetcher(
+    iptvScanner = new IPTVChannelFetcher(
         cardid, inputname, sourceid, scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
-    ok = freeboxScanner->Scan();
-#endif // USING_IPTV
+    iptvScanner->Scan();
 
-    if (!ok)
-        InformUser(tr("Error starting scan"));
-
-    return ok;
+    return true;
 }
 
 void ChannelScanner::PreScanCommon(

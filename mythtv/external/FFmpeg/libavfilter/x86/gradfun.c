@@ -18,16 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
-#include "libavutil/x86_cpu.h"
+#include "libavutil/mem.h"
+#include "libavutil/x86/asm.h"
 #include "libavfilter/gradfun.h"
+
+#if HAVE_INLINE_ASM
 
 DECLARE_ALIGNED(16, static const uint16_t, pw_7f)[8] = {0x7F,0x7F,0x7F,0x7F,0x7F,0x7F,0x7F,0x7F};
 DECLARE_ALIGNED(16, static const uint16_t, pw_ff)[8] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
-void ff_gradfun_filter_line_mmx2(uint8_t *dst, const uint8_t *src, const uint16_t *dc, int width, int thresh, const uint16_t *dithers)
+#if HAVE_MMXEXT_INLINE
+static void gradfun_filter_line_mmxext(uint8_t *dst, const uint8_t *src, const uint16_t *dc,
+                                       int width, int thresh,
+                                       const uint16_t *dithers)
 {
-#if HAVE_MMX
     intptr_t x;
     if (width & 3) {
         x = width & ~3;
@@ -40,7 +46,9 @@ void ff_gradfun_filter_line_mmx2(uint8_t *dst, const uint8_t *src, const uint16_
         "pxor       %%mm7, %%mm7 \n"
         "pshufw $0, %%mm5, %%mm5 \n"
         "movq          %6, %%mm6 \n"
-        "movq          %5, %%mm4 \n"
+        "movq          (%5), %%mm3 \n"
+        "movq         8(%5), %%mm4 \n"
+
         "1: \n"
         "movd     (%2,%0), %%mm0 \n"
         "movd     (%3,%0), %%mm1 \n"
@@ -55,27 +63,52 @@ void ff_gradfun_filter_line_mmx2(uint8_t *dst, const uint8_t *src, const uint16_
         "psubw      %%mm6, %%mm2 \n"
         "pminsw     %%mm7, %%mm2 \n" // m = -max(0, 127-m)
         "pmullw     %%mm2, %%mm2 \n"
-        "paddw      %%mm4, %%mm0 \n" // pix += dither
-        "pmulhw     %%mm2, %%mm1 \n"
+        "paddw      %%mm3, %%mm0 \n" // pix += dither
         "psllw         $2, %%mm1 \n" // m = m*m*delta >> 14
+        "pmulhw     %%mm2, %%mm1 \n"
+        "paddw      %%mm1, %%mm0 \n" // pix += m
+        "psraw         $7, %%mm0 \n"
+        "packuswb   %%mm0, %%mm0 \n"
+        "movd       %%mm0, (%1,%0) \n" // dst = clip(pix>>7)
+        "add           $4, %0 \n"
+        "jnl 2f \n"
+
+        "movd     (%2,%0), %%mm0 \n"
+        "movd     (%3,%0), %%mm1 \n"
+        "punpcklbw  %%mm7, %%mm0 \n"
+        "punpcklwd  %%mm1, %%mm1 \n"
+        "psllw         $7, %%mm0 \n"
+        "pxor       %%mm2, %%mm2 \n"
+        "psubw      %%mm0, %%mm1 \n" // delta = dc - pix
+        "psubw      %%mm1, %%mm2 \n"
+        "pmaxsw     %%mm1, %%mm2 \n"
+        "pmulhuw    %%mm5, %%mm2 \n" // m = abs(delta) * thresh >> 16
+        "psubw      %%mm6, %%mm2 \n"
+        "pminsw     %%mm7, %%mm2 \n" // m = -max(0, 127-m)
+        "pmullw     %%mm2, %%mm2 \n"
+        "paddw      %%mm4, %%mm0 \n" // pix += dither
+        "psllw         $2, %%mm1 \n" // m = m*m*delta >> 14
+        "pmulhw     %%mm2, %%mm1 \n"
         "paddw      %%mm1, %%mm0 \n" // pix += m
         "psraw         $7, %%mm0 \n"
         "packuswb   %%mm0, %%mm0 \n"
         "movd       %%mm0, (%1,%0) \n" // dst = clip(pix>>7)
         "add           $4, %0 \n"
         "jl 1b \n"
+
+        "2: \n"
         "emms \n"
         :"+r"(x)
         :"r"(dst+width), "r"(src+width), "r"(dc+width/2),
-         "rm"(thresh), "m"(*dithers), "m"(*pw_7f)
+         "rm"(thresh), "r"(dithers), "m"(*pw_7f)
         :"memory"
     );
-#endif
 }
+#endif
 
-void ff_gradfun_filter_line_ssse3(uint8_t *dst, const uint8_t *src, const uint16_t *dc, int width, int thresh, const uint16_t *dithers)
+#if HAVE_SSSE3_INLINE
+static void gradfun_filter_line_ssse3(uint8_t *dst, const uint8_t *src, const uint16_t *dc, int width, int thresh, const uint16_t *dithers)
 {
-#if HAVE_SSSE3
     intptr_t x;
     if (width & 7) {
         // could be 10% faster if I somehow eliminated this
@@ -103,9 +136,9 @@ void ff_gradfun_filter_line_ssse3(uint8_t *dst, const uint8_t *src, const uint16
         "psubw      %%xmm6, %%xmm2 \n"
         "pminsw     %%xmm7, %%xmm2 \n" // m = -max(0, 127-m)
         "pmullw     %%xmm2, %%xmm2 \n"
-        "psllw          $1, %%xmm2 \n"
+        "psllw          $2, %%xmm1 \n"
         "paddw      %%xmm4, %%xmm0 \n" // pix += dither
-        "pmulhrsw   %%xmm2, %%xmm1 \n" // m = m*m*delta >> 14
+        "pmulhw     %%xmm2, %%xmm1 \n" // m = m*m*delta >> 14
         "paddw      %%xmm1, %%xmm0 \n" // pix += m
         "psraw          $7, %%xmm0 \n"
         "packuswb   %%xmm0, %%xmm0 \n"
@@ -117,12 +150,12 @@ void ff_gradfun_filter_line_ssse3(uint8_t *dst, const uint8_t *src, const uint16
          "rm"(thresh), "m"(*dithers), "m"(*pw_7f)
         :"memory"
     );
-#endif // HAVE_SSSE3
 }
+#endif /* HAVE_SSSE3_INLINE */
 
-void ff_gradfun_blur_line_sse2(uint16_t *dc, uint16_t *buf, const uint16_t *buf1, const uint8_t *src, int src_linesize, int width)
+#if HAVE_SSE2_INLINE
+static void gradfun_blur_line_sse2(uint16_t *dc, uint16_t *buf, const uint16_t *buf1, const uint8_t *src, int src_linesize, int width)
 {
-#if HAVE_SSE
 #define BLURV(load)\
     intptr_t x = -2*width;\
     __asm__ volatile(\
@@ -160,5 +193,25 @@ void ff_gradfun_blur_line_sse2(uint16_t *dc, uint16_t *buf, const uint16_t *buf1
     } else {
         BLURV("movdqa");
     }
-#endif // HAVE_SSE
+}
+#endif /* HAVE_SSE2_INLINE */
+
+#endif /* HAVE_INLINE_ASM */
+
+av_cold void ff_gradfun_init_x86(GradFunContext *gf)
+{
+    int cpu_flags = av_get_cpu_flags();
+
+#if HAVE_MMXEXT_INLINE
+    if (cpu_flags & AV_CPU_FLAG_MMXEXT)
+        gf->filter_line = gradfun_filter_line_mmxext;
+#endif
+#if HAVE_SSSE3_INLINE
+    if (cpu_flags & AV_CPU_FLAG_SSSE3)
+        gf->filter_line = gradfun_filter_line_ssse3;
+#endif
+#if HAVE_SSE2_INLINE
+    if (cpu_flags & AV_CPU_FLAG_SSE2)
+        gf->blur_line = gradfun_blur_line_sse2;
+#endif
 }

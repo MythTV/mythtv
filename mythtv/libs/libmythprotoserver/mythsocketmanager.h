@@ -1,18 +1,19 @@
 #ifndef _MYTHSOCKETMANAGER_H_
 #define _MYTHSOCKETMANAGER_H_
 
-using namespace std;
-
 // Qt
-#include <QReadWriteLock>
 #include <QMap>
+#include <QSet>
 #include <QList>
+#include <QMutex>
 #include <QTimer>
+#include <QReadWriteLock>
 #include <QWaitCondition>
 
 // MythTV
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
+#include "mythqtcompat.h"
 #include "mthreadpool.h"
 #include "mythsocket.h"
 #include "serverpool.h"
@@ -24,10 +25,10 @@ class MythServer : public ServerPool
     MythServer(QObject *parent=0);
 
   signals:
-    void newConnection(MythSocket *);
+    void newConnection(qt_socket_fd_t socket);
 
   protected slots:
-    virtual void newTcpConnection(int socket);
+    virtual void newTcpConnection(qt_socket_fd_t socket);
 };
 
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs
@@ -53,7 +54,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     bool Listen(int port);
 
   public slots:
-    void newConnection(MythSocket *socket) { socket->setCallbacks(this); }
+    void newConnection(qt_socket_fd_t sd);
 
   private:
     void ProcessRequestWork(MythSocket *socket);
@@ -69,5 +70,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     MythServer     *m_server;
     MThreadPool     m_threadPool;
 
+    QMutex m_socketListLock;
+    QSet<MythSocket*> m_socketList;
 };
 #endif

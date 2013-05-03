@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkCookieJar>
+#include <QNetworkCookie>
 #include <QAuthenticator>
 #include <QTextStream>
 #include <QNetworkProxy>
@@ -813,7 +814,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     while ((!dlInfo->IsDone()) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
-             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 10)) ||
+             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 60)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
              (startedAt.secsTo(MythDate::current()) < 20))))
     {
@@ -1088,7 +1089,7 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
             QNetworkCacheMetaData::RawHeader newheader;
             QDateTime now = MythDate::current();
             newheader = QNetworkCacheMetaData::RawHeader("Date",
-                                        now.toString(dateFormat).toAscii());
+                                        now.toString(dateFormat).toLatin1());
             headers.append(newheader);
             urlData.setRawHeaders(headers);
             m_infoLock->lock();

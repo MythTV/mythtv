@@ -23,7 +23,7 @@
 #include <GL/glext.h>
 #endif
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
 #include "util-osx.h"
 #import <agl.h>
 #endif

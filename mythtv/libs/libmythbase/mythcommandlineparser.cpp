@@ -133,7 +133,25 @@ const char* NamedOptType(int type)
     }
 }
 
+/** \defgroup commandlineparser Command Line Processing
+ *  \ingroup libmythbase
+ *  \brief Utility responsible for processing arguments from the command line
+ *
+ *  This fundamental design for this utility is a class that can be modularly
+ *  configured with different optional arguments and behaviors, let process
+ *  the received input arguments, and then persist for the results to be read
+ *  out as needed.
+ *
+ *  In typical use, one will subclass MythCommandLineParser() and overwrite
+ *  the LoadArguments() and GetHelpHeader() virtual functions. LoadArguments()
+ *  is a convenient place to define default behaviors and accepted arguments.
+ *  GetHelpHeader() is called for text describing the application, used when
+ *  calling the '--help' argument. This utility will automatically handle help
+ *  output, as well as check relationships between arguments.
+ */
+
 /** \class CommandLineArg
+ *  \ingroup commandlineparser
  *  \brief Definition for a single command line option
  *
  *  This class contains instructions for the command line parser about what
@@ -1118,6 +1136,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
 }
 
 /** \class MythCommandLineParser
+ *  \ingroup commandlineparser
  *  \brief Parent class for defining application command line parsers
  *
  *  This class provides a generic interface for defining and parsing available
@@ -1485,7 +1504,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             return false;
         }
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
         if (opt.startsWith("-psn_"))
         {
             cerr << "Ignoring Process Serial Number from command line"
@@ -1624,28 +1643,27 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
  */
 bool MythCommandLineParser::ReconcileLinks(void)
 {
-    QList<CommandLineArg*> links;
-    QMap<QString,CommandLineArg*>::iterator i1;
-    QList<CommandLineArg*>::iterator i2;
-
     if (m_verbose)
         cerr << "Reconciling links for option interdependencies." << endl;
-
-    for (i1 = m_namedArgs.begin(); i1 != m_namedArgs.end(); ++i1)
+ 
+    QMap<QString,CommandLineArg*>::iterator args_it;
+    for (args_it = m_namedArgs.begin(); args_it != m_namedArgs.end(); ++args_it)
     {
-        links = (*i1)->m_parents;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        QList<CommandLineArg*> links = (*args_it)->m_parents;
+        QList<CommandLineArg*>::iterator links_it;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1653,25 +1671,26 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as child of %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetChildOf(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetChildOf(m_namedArgs[(*links_it)->m_name]);
         }
 
-        links = (*i1)->m_children;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        links = (*args_it)->m_children;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1679,25 +1698,26 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as parent of %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetParentOf(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetParentOf(m_namedArgs[(*links_it)->m_name]);
         }
 
-        links = (*i1)->m_requires;
-        for (i2 = links.begin(); i2 != links.end(); ++i2)
+        links = (*args_it)->m_requires;
+        for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QVariant::Invalid)
                 continue; // already handled
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*links_it)->m_name))
             {
                 // not found
                 cerr << "ERROR: could not reconcile linked argument." << endl
-                     << "  '" << (*i1)->m_name.toLocal8Bit().constData()
+                     << "  '" << (*args_it)->m_name.toLocal8Bit().constData()
                      << "' could not find '"
-                     << (*i2)->m_name.toLocal8Bit().constData() << "'." << endl
+                     << (*links_it)->m_name.toLocal8Bit().constData()
+                     << "'." << endl
                      << "  Please resolve dependency and recompile." << endl;
                 return false;
             }
@@ -1705,57 +1725,64 @@ bool MythCommandLineParser::ReconcileLinks(void)
             // replace linked argument
             if (m_verbose)
                 cerr << QString("  Setting %1 as requiring %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*links_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetRequires(m_namedArgs[(*i2)->m_name]);
+            (*args_it)->SetRequires(m_namedArgs[(*links_it)->m_name]);
         }
 
-        i2 = (*i1)->m_requiredby.begin();
-        while (i2 != (*i1)->m_requiredby.end())
+        QList<CommandLineArg*>::iterator req_it =
+            (*args_it)->m_requiredby.begin();
+        while (req_it != (*args_it)->m_requiredby.end())
         {
-            if ((*i2)->m_type == QVariant::Invalid)
+            if ((*req_it)->m_type == QVariant::Invalid)
             {
                 // if its not an invalid, it shouldnt be here anyway
-                if (m_namedArgs.contains((*i2)->m_name))
+                if (m_namedArgs.contains((*req_it)->m_name))
                 {
-                    m_namedArgs[(*i2)->m_name]->SetRequires(*i1);
+                    m_namedArgs[(*req_it)->m_name]->SetRequires(*args_it);
                     if (m_verbose)
+                    {
                         cerr << QString("  Setting %1 as blocking %2")
-                                    .arg((*i1)->m_name).arg((*i2)->m_name)
+                                    .arg((*args_it)->m_name)
+                                    .arg((*req_it)->m_name)
                                     .toLocal8Bit().constData()
                              << endl;
+                    }
                 }
             }
 
-            (*i2)->DecrRef();
-            i2 = (*i1)->m_requiredby.erase(i2);
+            (*req_it)->DecrRef();
+            req_it = (*args_it)->m_requiredby.erase(req_it);
         }
 
-        i2 = (*i1)->m_blocks.begin();
-        while (i2 != (*i1)->m_blocks.end())
+        QList<CommandLineArg*>::iterator block_it =
+            (*args_it)->m_blocks.begin();
+        while (block_it != (*args_it)->m_blocks.end())
         {
-            if ((*i2)->m_type != QVariant::Invalid)
+            if ((*block_it)->m_type != QVariant::Invalid)
             {
-                ++i2;
+                ++block_it;
                 continue; // already handled
             }
 
-            if (!m_namedArgs.contains((*i2)->m_name))
+            if (!m_namedArgs.contains((*block_it)->m_name))
             {
-                (*i2)->DecrRef();
-                i2 = (*i1)->m_blocks.erase(i2);
+                (*block_it)->DecrRef();
+                block_it = (*args_it)->m_blocks.erase(block_it);
                 continue; // if it doesnt exist, it cant block this command
             }
 
             // replace linked argument
             if (m_verbose)
+            {
                 cerr << QString("  Setting %1 as blocking %2")
-                            .arg((*i1)->m_name).arg((*i2)->m_name)
+                            .arg((*args_it)->m_name).arg((*block_it)->m_name)
                             .toLocal8Bit().constData()
                      << endl;
-            (*i1)->SetBlocks(m_namedArgs[(*i2)->m_name]);
-            ++i2;
+            }
+            (*args_it)->SetBlocks(m_namedArgs[(*block_it)->m_name]);
+            ++block_it;
         }
     }
 
@@ -1848,7 +1875,7 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
                 }
                 else
                 {
-                    QByteArray tmp = filename.toAscii();
+                    QByteArray tmp = filename.toLatin1();
                     cerr << "Failed to open the override settings file: '"
                          << tmp.constData() << "'" << endl;
                 }
@@ -2586,7 +2613,7 @@ bool openPidfile(ofstream &pidfs, const QString &pidfile)
 {
     if (!pidfile.isEmpty())
     {
-        pidfs.open(pidfile.toAscii().constData());
+        pidfs.open(pidfile.toLatin1().constData());
         if (!pidfs)
         {
             cerr << "Could not open pid file: " << ENO_STR << endl;
@@ -2676,11 +2703,19 @@ int MythCommandLineParser::Daemonize(void)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
 
+#if CONFIG_DARWIN
+    if (toBool("daemon"))
+    {
+        cerr << "Daemonizing is unavaible in OSX" << ENO_STR << endl;
+        LOG(VB_GENERAL, LOG_WARNING, "Unable to daemonize");
+    }
+#else
     if (toBool("daemon") && (daemon(0, 1) < 0))
     {
         cerr << "Failed to daemonize: " << ENO_STR << endl;
         return GENERIC_EXIT_DAEMONIZING_ERROR;
     }
+#endif
 
     QString username = toString("username");
     if (!username.isEmpty() && !setUser(username))

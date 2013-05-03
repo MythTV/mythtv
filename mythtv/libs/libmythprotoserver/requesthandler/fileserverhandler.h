@@ -1,8 +1,6 @@
 #ifndef FILESERVER_H_
 #define FILESERVER_H_
 
-using namespace std;
-
 #include <QMutex>
 
 #include "mythsocketmanager.h"

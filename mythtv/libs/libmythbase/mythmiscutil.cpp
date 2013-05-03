@@ -37,6 +37,7 @@ using namespace std;
 #include <QReadWriteLock>
 #include <QNetworkProxy>
 #include <QStringList>
+#include <QUdpSocket>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -46,7 +47,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
-#include "msocketdevice.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
 #include "mythsystem.h"
@@ -265,7 +265,7 @@ bool telnet(const QString &host, int port)
 {
     MythSocket *s = new MythSocket();
 
-    bool connected = s->connect(host, port);
+    bool connected = s->ConnectToHost(host, port);
     s->DecrRef();
 
     return connected;
@@ -371,7 +371,7 @@ QString createTempFile(QString name_template, bool dir)
     }
     QString tmpFileName(tempfilename);
 #else
-    QByteArray safe_name_template = name_template.toAscii();
+    QByteArray safe_name_template = name_template.toLatin1();
     const char *tmp = safe_name_template.constData();
     char *ctemplate = strdup(tmp);
 
@@ -423,7 +423,7 @@ QString createTempFile(QString name_template, bool dir)
  */
 void makeFileAccessible(QString filename)
 {
-    QByteArray fname = filename.toAscii();
+    QByteArray fname = filename.toLatin1();
     chmod(fname.constData(), 0666);
 }
 
@@ -670,11 +670,9 @@ bool WakeOnLAN(QString MAC)
     LOG(VB_NETWORK, LOG_INFO,
             QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));
 
-    MSocketDevice socket(MSocketDevice::Datagram);
-    socket.setBroadcast(true);
-    socket.writeBlock(msg, msglen, QHostAddress("255.255.255.255"), 32767);
-
-    return true;
+    QUdpSocket udp_socket;
+    return udp_socket.writeDatagram(
+        msg, msglen, QHostAddress::Broadcast, 32767) == msglen;
 }
 
 bool IsPulseAudioRunning(void)
@@ -938,8 +936,8 @@ void setHttpProxy(void)
             url = "http://%1:%2";
 
         url = url.arg(p.hostName()).arg(p.port());
-        setenv("HTTP_PROXY", url.toAscii(), 1);
-        setenv("http_proxy", url.toAscii(), 0);
+        setenv("HTTP_PROXY", url.toLatin1(), 1);
+        setenv("http_proxy", url.toLatin1(), 0);
 
         return;
     }

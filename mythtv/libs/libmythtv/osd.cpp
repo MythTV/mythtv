@@ -182,7 +182,7 @@ bool OSD::Init(const QRect &rect, float font_aspect)
     LoadWindows();
     RevertUIScale();
 
-    if (!m_Children.size())
+    if (m_Children.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to load any windows.");
         return false;

@@ -22,10 +22,12 @@
 #include <mythuihelper.h>
 #include <mythprogressdialog.h>
 #include <lcddevice.h>
+#include <musicmetadata.h>
+#include <musicutils.h>
 
 // MythMusic headers
+#include "musicdata.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "playlisteditorview.h"
 #include "playlistview.h"
 #include "streamview.h"
@@ -65,71 +67,6 @@ static QString chooseCD(void)
     return MediaMonitor::defaultCDdevice();
 }
 
-static void SavePending(int pending)
-{
-    //  Temporary Hack until mythmusic
-    //  has a proper settings/setup
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT * FROM settings "
-                  "WHERE value = :LASTPUSH "
-                  "AND hostname = :HOST ;");
-    query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-    query.bindValue(":HOST", gCoreContext->GetHostName());
-
-    if (query.exec() && query.size() == 0)
-    {
-        //  first run from this host / recent version
-        query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
-                         "(:LASTPUSH, :DATA, :HOST );");
-        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":DATA", pending);
-        query.bindValue(":HOST", gCoreContext->GetHostName());
-
-        if (!query.exec())
-            MythDB::DBError("SavePending - inserting LastMusicPlaylistPush",
-                            query);
-    }
-    else if (query.size() == 1)
-    {
-        //  ah, just right
-        query.prepare("UPDATE settings SET data = :DATA "
-                         "WHERE value = :LASTPUSH "
-                         "AND hostname = :HOST ;");
-        query.bindValue(":DATA", pending);
-        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":HOST", gCoreContext->GetHostName());
-
-        if (!query.exec())
-            MythDB::DBError("SavePending - updating LastMusicPlaylistPush",
-                            query);
-    }
-    else
-    {
-        //  correct thor's diabolical plot to
-        //  consume all table space
-
-        query.prepare("DELETE FROM settings WHERE "
-                         "WHERE value = :LASTPUSH "
-                         "AND hostname = :HOST ;");
-        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":HOST", gCoreContext->GetHostName());
-        if (!query.exec())
-            MythDB::DBError("SavePending - deleting LastMusicPlaylistPush",
-                            query);
-
-        query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
-                         "(:LASTPUSH, :DATA, :HOST );");
-        query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":DATA", pending);
-        query.bindValue(":HOST", gCoreContext->GetHostName());
-
-        if (!query.exec())
-            MythDB::DBError("SavePending - inserting LastMusicPlaylistPush (2)",
-                            query);
-    }
-}
-
 static void loadMusic()
 {
     // only do this once
@@ -148,22 +85,15 @@ static void loadMusic()
         }
     }
 
-    QString startdir = gCoreContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanPath(startdir);
-    if (!startdir.isEmpty() && !startdir.endsWith("/"))
-        startdir += "/";
-
-    gMusicData->musicDir = startdir;
-
-    Decoder::SetLocationFormatUseTags();
+    QString musicDir = getMusicDirectory();
 
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
-    if (!gMusicData->musicDir.isEmpty() && !musicdata_exists)
+    if (!musicDir.isEmpty() && !musicdata_exists)
     {
         FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(startdir);
+        fscan->SearchDir(musicDir);
         delete fscan;
     }
 
@@ -178,13 +108,12 @@ static void loadMusic()
         busy = NULL;
 
     // Set the various track formatting modes
-    Metadata::setArtistAndTrackFormats();
+    MusicMetadata::setArtistAndTrackFormats();
 
     AllMusic *all_music = new AllMusic();
 
     //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(
-            all_music, gCoreContext->GetHostName());
+    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
 
     gMusicData->all_music = all_music;
     gMusicData->all_streams = new AllStream();
@@ -197,10 +126,8 @@ static void loadMusic()
         qApp->processEvents();
         usleep(50000);
     }
-    gMusicData->all_playlists->postLoad();
 
-    gMusicData->all_streams->createPlaylist();
-
+    gPlayer->loadStreamPlaylist();
     gPlayer->loadPlaylist();
 
     if (busy)
@@ -274,36 +201,26 @@ static void startRipper(void)
 
 static void runScan(void)
 {
-    // maybe we haven't loaded the music yet in which case we wont have a valid music dir set
-    if (gMusicData->musicDir.isEmpty())
-    {
-        QString startdir = gCoreContext->GetSetting("MusicLocation");
-        startdir = QDir::cleanPath(startdir);
-        if (!startdir.isEmpty() && !startdir.endsWith("/"))
-            startdir += "/";
-
-        gMusicData->musicDir = startdir;
-    }
-
-    // if we still don't have a valid start dir warn the user and give up
-    if (gMusicData->musicDir.isEmpty())
+    // if we don't have a valid start dir warn the user and give up
+    if (getMusicDirectory().isEmpty())
     {
         ShowOkPopup(QObject::tr("You need to tell me where to find your music on the "
                                 "'General Settings' page of MythMusic's settings pages."));
        return;
     }
 
-    if (!QFile::exists(gMusicData->musicDir))
+    if (!QFile::exists(getMusicDirectory()))
     {
         ShowOkPopup(QObject::tr("Can't find your music directory. Have you set it correctly on the "
                                 "'General Settings' page of MythMusic's settings pages?"));
        return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(gMusicData->musicDir));
+    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(getMusicDirectory()));
 
     FileScanner *fscan = new FileScanner();
-    fscan->SearchDir(gMusicData->musicDir);
+    QString musicDir = getMusicDirectory();
+    fscan->SearchDir(musicDir);
 
     // save anything that may have changed
     if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
@@ -312,8 +229,6 @@ static void runScan(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     // force a complete reload of the tracks and playlists
@@ -656,7 +571,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythmusic", libversion,
+    if (!gCoreContext->TestPluginVersion("mythmusic", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 
@@ -673,8 +588,6 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    Decoder::SetLocationFormatUseTags();
-
     gPlayer = new MusicPlayer(NULL, chooseCD());
     gMusicData = new MusicData();
 
@@ -689,8 +602,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    Decoder::SetLocationFormatUseTags();
-
     return runMenu("music_settings.xml");
 }
 
@@ -708,8 +619,6 @@ void mythplugin_destroy(void)
     if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
     {
         gMusicData->all_playlists->save();
-        int x = gMusicData->all_playlists->getPending();
-        SavePending(x);
     }
 
     delete gPlayer;

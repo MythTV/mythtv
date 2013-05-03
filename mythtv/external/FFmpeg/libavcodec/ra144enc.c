@@ -347,7 +347,8 @@ static void ra144_encode_subblock(RA144Context *ractx,
     float zero[BLOCKSIZE], cba[BLOCKSIZE], cb1[BLOCKSIZE], cb2[BLOCKSIZE];
     int16_t cba_vect[BLOCKSIZE];
     int cba_idx, cb1_idx, cb2_idx, gain;
-    int i, n, m[3];
+    int i, n;
+    unsigned m[3];
     float g[3];
     float error, best_error;
 
@@ -535,7 +536,7 @@ static int ra144_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         for (; i < frame->nb_samples; i++)
             ractx->curr_block[i] = samples[i] >> 2;
 
-        if ((ret = ff_af_queue_add(&ractx->afq, frame) < 0))
+        if ((ret = ff_af_queue_add(&ractx->afq, frame)) < 0)
             return ret;
     } else
         ractx->last_frame = 1;
@@ -555,7 +556,7 @@ static int ra144_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
 AVCodec ff_ra_144_encoder = {
     .name           = "real_144",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_RA_144,
+    .id             = AV_CODEC_ID_RA_144,
     .priv_data_size = sizeof(RA144Context),
     .init           = ra144_encode_init,
     .encode2        = ra144_encode_frame,
@@ -563,5 +564,6 @@ AVCodec ff_ra_144_encoder = {
     .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_SMALL_LAST_FRAME,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
+    .supported_samplerates = (const int[]){ 8000, 0 },
     .long_name      = NULL_IF_CONFIG_SMALL("RealAudio 1.0 (14.4K)"),
 };

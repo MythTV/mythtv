@@ -362,7 +362,7 @@ void VAAPIContext::InitPictureAttributes(VideoColourSpace &colourspace)
     colourspace.SetSupportedAttributes((PictureAttributeSupported)supported_controls);
     delete [] attribs;
 
-    if (!supported.size())
+    if (supported.isEmpty())
         return;
 
     m_pictureAttributeCount = supported.size();

@@ -8,21 +8,6 @@
 
 #include "netutils.h"
 
-QString GetDisplaySeasonEpisode(int seasEp, int digits)
-{
-    QString seasEpNum;
-
-    if (seasEp > -1)
-    {
-        seasEpNum = QString::number(seasEp);
-
-        if (digits == 2 && seasEpNum.size() < 2)
-            seasEpNum.prepend("0");
-    }
-
-    return seasEpNum;
-}
-
 bool findTreeGrabberInDB(const QString& commandline,
                          ArticleType type)
 {

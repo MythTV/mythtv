@@ -1,0 +1,18 @@
+17/12/2012:
+
+Modifications to utils/ to support streaming from storage groups
+
+8/23/2010:
+
+No current significant differences with upstream.  Header files need:
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+and
+
+#ifdef __cplusplus
+};
+#endif
+

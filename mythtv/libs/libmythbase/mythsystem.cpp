@@ -48,12 +48,14 @@ void MythSystem::initializePrivate(void)
 
 MythSystem::MythSystem()
 {
+    setObjectName("MythSystem()");
     m_semReady.release(1);  // initialize
     initializePrivate();
 }
 
 MythSystem::MythSystem(const QString &command, uint flags)
 {
+    setObjectName(QString("MythSystem(%1)").arg(command));
     m_semReady.release(1);  // initialize
     initializePrivate();
     SetCommand(command, flags);
@@ -105,6 +107,23 @@ void MythSystem::SetCommand(const QString &command,
 
     ProcessFlags(flags);
 
+    // add logging arguments
+    if (GetSetting("PropagateLogs"))
+    {
+        if (GetSetting("UseShell") && m_args.isEmpty())
+        {
+            m_command += logPropagateArgs;
+            if (!logPropagateQuiet())
+                m_command += " --quiet";
+        }
+        else
+        {
+            m_args << logPropagateArgList;
+            if (!logPropagateQuiet())
+                m_args << "--quiet";
+        }
+    }
+
     // check for execute rights
     if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK))
     {
@@ -140,6 +159,11 @@ MythSystem::MythSystem(const MythSystem &other) :
 // QBuffers may also need freeing
 MythSystem::~MythSystem(void)
 {
+    if (GetStatus() == GENERIC_EXIT_RUNNING)
+    {
+        Term(true);
+        Wait();
+    }
     d->DecrRef();
 }
 
@@ -320,6 +344,8 @@ void MythSystem::ProcessFlags(uint flags)
         m_settings["AnonLog"] = true;
     if( flags & kMSLowExitVal )
         m_settings["OnlyLowExitVal"] = true;
+    if( flags & kMSPropagateLogs )
+        m_settings["PropagateLogs"] = true;
 }
 
 QByteArray  MythSystem::Read(int size)

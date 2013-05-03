@@ -6,12 +6,12 @@
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
         <source>Edit Bookmark Details</source>
-        <translation>Editar Detalles del Marcador</translation>
+        <translation>Editar detalles del marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
         <source>Enter Bookmark Details</source>
-        <translation>Introducir Detalles del Marcador</translation>
+        <translation>Introducir detalles del marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
@@ -28,7 +28,7 @@
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>No hay marcadores definidos
 
-Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcadores</translation>
+Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcadores</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
@@ -38,37 +38,37 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
         <source>Add Bookmark</source>
-        <translation>Añadir Marcador</translation>
+        <translation>Añadir marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
         <source>Edit Bookmark</source>
-        <translation>Editar Marcador</translation>
+        <translation>Editar marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="306"/>
         <source>Delete Bookmark</source>
-        <translation>Eliminar Marcador</translation>
+        <translation>Eliminar marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="307"/>
         <source>Show Bookmark</source>
-        <translation>Mostrar Marcador</translation>
+        <translation>Mostrar marcador</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
         <source>Delete Marked</source>
-        <translation>Eliminar Marcados</translation>
+        <translation>Eliminar marcados</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="313"/>
         <source>Show Marked</source>
-        <translation>Mostrar Marcados</translation>
+        <translation>Mostrar marcados</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="314"/>
         <source>Clear Marked</source>
-        <translation>Quitar Marcados</translation>
+        <translation>Quitar marcados</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
@@ -91,17 +91,17 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="131"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
-        <translation>Ésta es la orden que se usará para mostrar el navegador web. Use &apos;internal&apos; para utilizar el navegador web nativo. %ZOOM% y %URL% se reemplazarán con el número de aumentos y la lista de URL.</translation>
+        <translation>Ésta es la orden que se usará para mostrar el navegador web. Use &apos;internal&apos; para utilizar el navegador web nativo. %ZOOM% y %URL% se sustituirán por el número de aumentos y la lista de URL.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="135"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation>Éste es el tamaño del texto que se usará por defecto. Los valores válidos para el navegador interno van desde 0.3 a 5.0 siendo 1.0 el tamaño normal, menos de 1 es más pequeño y mayor que 1 es más grande que el tamaño normal.</translation>
+        <translation>Éste es el tamaño del texto que se usará de forma predeterminada. Los valores válidos para el navegador interno van desde 0.3 a 5.0 siendo 1.0 el tamaño normal, menor que 1 es más pequeño y mayor que 1 es más grande que el tamaño normal.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="140"/>
         <source>If checked this will enable browser plugins if the &apos;Internal&apos; browser is being used.</source>
-        <translation>Al marcar se activarán los complementos del navegador si se usa el interno.</translation>
+        <translation>Al marcarlo se activarán los complementos del navegador si se usa el interno.</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="143"/>
@@ -111,7 +111,7 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="145"/>
         <source>Save settings and Exit</source>
-        <translation>Guardar la configuración y Salir</translation>
+        <translation>Guardar la configuración y salir</translation>
     </message>
 </context>
 <context>
@@ -155,17 +155,17 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
         <source>New Tab</source>
-        <translation>Nueva Pestaña</translation>
+        <translation>Nueva pestaña</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
         <source>Delete Tab</source>
-        <translation>Eliminar Pestaña</translation>
+        <translation>Eliminar pestaña</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
         <source>Add Bookmark</source>
-        <translation>Añadir Marcador</translation>
+        <translation>Añadir marcador</translation>
     </message>
 </context>
 <context>
@@ -178,12 +178,12 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="../mythbrowser/main.cpp" line="68"/>
         <source>Move to previous browser tab</source>
-        <translation>Ir a la pestaña previa</translation>
+        <translation>Ir a la pestaña anterior</translation>
     </message>
     <message>
         <location filename="../mythbrowser/main.cpp" line="71"/>
         <source>Internal Web Browser</source>
-        <translation>Navegador Web Interno</translation>
+        <translation>Navegador web interno</translation>
     </message>
 </context>
 <context>
@@ -191,7 +191,7 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Bookmark Manager</source>
-        <translation>Administrador de Marcadores</translation>
+        <translation>Administrador de marcadores</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
@@ -221,7 +221,7 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>Web Page</source>
-        <translation>Página Web</translation>
+        <translation>Página web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -231,7 +231,7 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Web Bookmarks</source>
-        <translation>Marcadores Web</translation>
+        <translation>Marcadores web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
@@ -256,19 +256,19 @@ Use la opción &quot;Añadir Marcador&quot; del menú para añadir nuevos marcad
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>Rating Settings</source>
-        <translation>Configuración de la Puntuación</translation>
+        <translation>Configuración de la puntuación</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Configure Web Browser</source>
-        <translation>Configurar Navegador Web</translation>
+        <translation>Configurar navegador web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>Puede editar el nombre, URL, y la categoría para el sitio Web seleccionado en esta pantalla.
+        <translation>Puede editar el nombre, URL, y la categoría para el sitio web seleccionado en esta pantalla.
 
 Cuando haya terminado de editar, seleccione &quot;Aceptar&quot; o &quot;Cancelar&quot; para continuar.</translation>
     </message>
@@ -330,12 +330,12 @@ Cuando haya terminado de editar, seleccione &quot;Aceptar&quot; o &quot;Cancelar
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Browser Command:</source>
-        <translation>Orden del Navegador:</translation>
+        <translation>Orden del navegador:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Text Size:</source>
-        <translation>Tamaño del Texto:</translation>
+        <translation>Tamaño del texto:</translation>
     </message>
 </context>
 <context>

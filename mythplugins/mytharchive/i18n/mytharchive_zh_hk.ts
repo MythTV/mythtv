@@ -743,7 +743,7 @@ Please Wait...</source>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="42"/>
         <source>DVD +/- RW</source>
-        <translation></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="43"/>
@@ -827,12 +827,12 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Prev</source>
-        <translation>上一個</translation>
+        <translation>上一步</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Next</source>
-        <translation>下一個</translation>
+        <translation>下一步</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
@@ -1137,7 +1137,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>12.34 GB</source>
-        <translation></translation>
+        <translation>12.34 GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
@@ -1157,7 +1157,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>0:00:00.00</source>
-        <translation></translation>
+        <translation>0:00:00.00</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
@@ -1172,7 +1172,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>0.00 GB</source>
-        <translation></translation>
+        <translation>0.00 GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
@@ -1187,27 +1187,27 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>1</source>
-        <translation></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>xxxxx MB</source>
-        <translation></translation>
+        <translation>xxxxx MB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>0 MB</source>
-        <translation></translation>
+        <translation>0 MB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation>2004年09月13日  下午 11:00  (1小時15分)</translation>
+        <translation>2004年9月13日  下午 11:00  (1小時15分)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>x.xx GB</source>
-        <translation></translation>
+        <translation>x.xx GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
@@ -1217,7 +1217,7 @@ Please Wait...</source>
     <message>
         <location filename="themestrings.h" line="94"/>
         <source>x.xx Gb</source>
-        <translation></translation>
+        <translation>x.xx Gb</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>

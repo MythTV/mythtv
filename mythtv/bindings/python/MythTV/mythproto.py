@@ -228,14 +228,22 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                       FileTransfer(host, file, storagegroup, mode, db)
 
     # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
-    match = reuri.match(file)
-    if match is None:
+    match = None
+    try:
+        match = reuri.match(file)
+    except:
+        pass
+
+    if match:
+        host = match.group('host')
+        filename = match.group('file')
+        sgroup = match.group('group')
+        if sgroup is None:
+            sgroup = 'Default'
+    elif len(file) == 3:
+        host, sgroup, filename = file
+    else:
         raise MythError('Invalid FileTransfer input string: '+file)
-    host = match.group('host')
-    filename = match.group('file')
-    sgroup = match.group('group')
-    if sgroup is None:
-        sgroup = 'Default'
 
     # get full system name
     host = host.strip('[]')
@@ -608,6 +616,8 @@ class FileOps( BECache ):
         getRecording()      - return a Program object for a recording
         deleteRecording()   - notify the backend to delete a recording
         forgetRecording()   - allow a recording to re-record
+        stopRecording()     - stop an in-progress recording without deleting
+                              the file
         deleteFile()        - notify the backend to delete a file
                               in a storage group
         getHash()           - return the hash of a file in a storage group
@@ -648,6 +658,11 @@ class FileOps( BECache ):
     def forgetRecording(self, program):
         """FileOps.forgetRecording(program) -> None"""
         self.backendCommand(BACKEND_SEP.join(['FORGET_RECORDING',
+                    program.toString()]))
+
+    def stopRecording(self, program):
+        """FileOps.stopRecording(program) -> None"""
+        self.backendCommand(BACKEND_SEP.join(['STOP_RECORDING',
                     program.toString()]))
 
     def deleteFile(self, file, sgroup):
@@ -811,34 +826,36 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
     """Represents a program with all detail returned by the backend."""
 
     _field_order = [ 'title',        'subtitle',     'description',
-                     'season',       'episode',      'category',
-                     'chanid',       'channum',      'callsign',
-                     'channame',     'filename',     'filesize',
-                     'starttime',    'endtime',      'findid',
-                     'hostname',     'sourceid',     'cardid',
-                     'inputid',      'recpriority',  'recstatus',
-                     'recordid',     'rectype',      'dupin',
-                     'dupmethod',    'recstartts',   'recendts',
-                     'programflags', 'recgroup',     'outputfilters',
-                     'seriesid',     'programid',    'inetref',
-                     'lastmodified', 'stars',        'airdate',
-                     'playgroup',    'recpriority2', 'parentid',
-                     'storagegroup', 'audio_props',  'video_props',
-                     'subtitle_type','year']
+                     'season',       'episode',      'syndicatedepisode',
+                     'category',     'chanid',       'channum',
+                     'callsign',     'channame',     'filename',
+                     'filesize',     'starttime',    'endtime',
+                     'findid',       'hostname',     'sourceid',
+                     'cardid',       'inputid',      'recpriority',
+                     'recstatus',    'recordid',     'rectype',
+                     'dupin',        'dupmethod',    'recstartts',
+                     'recendts',     'programflags', 'recgroup',
+                     'outputfilters','seriesid',     'programid',
+                     'inetref',      'lastmodified', 'stars',
+                     'airdate',      'playgroup',    'recpriority2',
+                     'parentid',     'storagegroup', 'audio_props',
+                     'video_props',  'subtitle_type','year',
+                     'part_number',  'part_total']
     _field_type = [  3,      3,      3,
                      0,      0,      3,
-                     0,      3,      3,
-                     3,      3,      0,
-                     4,      4,      0,
-                     3,      0,      0,
-                     0,      0,      0,
-                     0,      3,      0,
-                     0,      4,      4,
-                     3,      3,      3,
-                     3,      3,      3,
-                     4,      1,      5,
                      3,      0,      3,
-                     3,      0,      0,
+                     3,      3,      3,
+                     0,      4,      4,
+                     0,      3,      0,
+                     0,      0,      0,
+                     0,      0,      3,
+                     0,      0,      4,
+                     4,      3,      3,
+                     3,      3,      3,
+                     3,      4,      1,
+                     5,      3,      0,
+                     3,      3,      0,
+                     0,      0,      0,
                      0,      0]
     def __str__(self):
         return u"<Program '%s','%s' at %s>" % (self.title,
@@ -944,11 +961,9 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
         return res
 
     def _openProto(self):
-        if not self.filename.startswith('myth://'):
-            self.filename = 'myth://%s@%s/%s' % (self.storagegroup, \
-                                                 self.hostname, \
-                                                 self.filename)
-        return ftopen(self.filename, 'r', db=self._db, chanid=self.chanid, \
+        filename = self.filename if self.filename.startswith('myth://') else \
+                    (self.hostname, self.storagegroup, self.filename)
+        return ftopen(filename, 'r', db=self._db, chanid=self.chanid, \
                       starttime=self.recstartts)
 
     def _openXML(self):

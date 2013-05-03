@@ -2,8 +2,29 @@
 #define MYTHUI_WEBBROWSER_H_
 
 #include <QtGlobal>
-#include <QString>
 #include <QUrl>
+#include "mythuitype.h"
+#include "mythuiexp.h"
+
+#if QT_VERSION >= 0x050000
+class MUI_PUBLIC MythUIWebBrowser : public MythUIType
+{
+  Q_OBJECT
+
+  public:
+    MythUIWebBrowser(MythUIType *parent, const QString &name) :
+    MythUIType(parent, name) {}
+    ~MythUIWebBrowser() {}
+    void SetHtml(const QString &, const QUrl &baseUrl = QUrl()) {}
+    void SetZoom(float) {}
+    float GetZoom(void) { return 1.0; }
+    void ZoomIn(void) {}
+    void ZoomOut(void) {}
+};
+#warning MythUIWebBrowser has not yet been ported to Qt5
+#else
+
+#include <QString>
 #include <QTime>
 #include <QColor>
 #include <QIcon>
@@ -11,8 +32,6 @@
 #include <QWebView>
 #include <QWebPage>
 #include <QNetworkReply>
-
-#include "mythuitype.h"
 
 class MythUIScrollBar;
 class MythUIWebBrowser;
@@ -52,6 +71,16 @@ class BrowserApi : public QObject
 
     bool       m_gotAnswer;
     QString    m_answer;
+};
+
+class MythNetworkAccessManager : public QNetworkAccessManager
+{
+  Q_OBJECT
+  public:
+    MythNetworkAccessManager();
+
+  protected:
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = 0);
 };
 
 class MythWebPage : public QWebPage
@@ -185,6 +214,8 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void slotIconChanged(void);
     void slotLinkClicked(const QUrl &url);
     void slotTopScreenChanged(MythScreenType *screen);
+    void slotScrollBarShowing(void);
+    void slotScrollBarHiding(void);
 
   protected:
     void Finalize(void);
@@ -193,6 +224,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     void SetBackgroundColor(QColor color);
     void ResetScrollBars(void);
     void UpdateScrollBars(void);
+    bool IsOnTopScreen(void);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
@@ -206,6 +238,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 
     MythWebView *m_browser;
     MythRect     m_browserArea;
+    MythRect     m_actualBrowserArea;
 
     MythImage   *m_image;
 
@@ -232,5 +265,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     MythUIAnimation  m_scrollAnimation;
     QPoint           m_destinationScrollPos;
 };
+
+#endif // version check
 
 #endif

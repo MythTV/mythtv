@@ -96,6 +96,12 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
      else
         m_preferredPos = VK_POSBELOWEDIT;
+
+     loadEventKeyDefinitions(&m_upKey, "UP");
+     loadEventKeyDefinitions(&m_downKey, "DOWN");
+     loadEventKeyDefinitions(&m_leftKey, "LEFT");
+     loadEventKeyDefinitions(&m_rightKey, "RIGHT");
+     loadEventKeyDefinitions(&m_newlineKey, "NEWLINE");
 }
 
 MythUIVirtualKeyboard::~MythUIVirtualKeyboard(void)
@@ -537,28 +543,51 @@ void MythUIVirtualKeyboard::compClicked(void)
 
 void MythUIVirtualKeyboard::returnClicked(void)
 {
-    Close();
+    if (m_shift)
+    {
+        emit keyPressed("{NEWLINE}");
+        QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, m_newlineKey.keyCode, m_newlineKey.modifiers, "");
+        m_parentEdit->keyPressEvent(event);
+    }
+    else
+        Close();
 }
 
 void MythUIVirtualKeyboard::moveleftClicked(void)
 {
-    emit keyPressed("{MOVELEFT}");
-
     if (m_parentEdit)
     {
-        QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier, "");
-        m_parentEdit->keyPressEvent(event);
+        if (m_shift)
+        {
+            emit keyPressed("{MOVEUP}");
+            QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, m_upKey.keyCode, m_upKey.modifiers, "");
+            m_parentEdit->keyPressEvent(event);
+        }
+        else
+        {
+            emit keyPressed("{MOVELEFT}");
+            QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, m_leftKey.keyCode, m_leftKey.modifiers,"");
+            m_parentEdit->keyPressEvent(event);
+        }
     }
 }
 
 void MythUIVirtualKeyboard::moverightClicked(void)
 {
-    emit keyPressed("{MOVERIGHT}");
-
     if (m_parentEdit)
     {
-        QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier, "");
-        m_parentEdit->keyPressEvent(event);
+        if (m_shift)
+        {
+            emit keyPressed("{MOVEDOWN}");
+            QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, m_downKey.keyCode, m_downKey.modifiers, "");
+            m_parentEdit->keyPressEvent(event);
+        }
+        else
+        {
+            emit keyPressed("{MOVERIGHT}");
+            QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, m_rightKey.keyCode, m_rightKey.modifiers,"");
+            m_parentEdit->keyPressEvent(event);
+        }
     }
 }
 
@@ -610,4 +639,38 @@ QString MythUIVirtualKeyboard::getKeyText(KeyDefinition key)
         return key.alt;
 
     return key.normal;
+}
+
+void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action)
+{
+    QString keylist = GetMythMainWindow()->GetKey("Global", action);
+    QStringList keys = keylist.split(',', QString::SkipEmptyParts);
+    if (keys.empty())
+        return;
+
+    QKeySequence a(keys[0]);
+    if (a.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("loadEventKeyDefinitions bad key (%1)").arg(keys[0]));
+        return;
+    }
+
+    keyDef->keyCode = a[0];
+
+    Qt::KeyboardModifiers modifiers = Qt::NoModifier;
+    QStringList parts = keys[0].split('+');
+    for (int j = 0; j < parts.count(); j++)
+    {
+        if (parts[j].toUpper() == "CTRL")
+            modifiers |= Qt::ControlModifier;
+        if (parts[j].toUpper() == "SHIFT")
+            modifiers |= Qt::ShiftModifier;
+        if (parts[j].toUpper() == "ALT")
+            modifiers |= Qt::AltModifier;
+        if (parts[j].toUpper() == "META")
+            modifiers |= Qt::MetaModifier;
+    }
+
+    keyDef->modifiers = modifiers;
 }

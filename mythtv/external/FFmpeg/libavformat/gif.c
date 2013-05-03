@@ -223,7 +223,7 @@ static int gif_image_write_image(AVIOContext *pb,
         put_bits(&p, 9, 0x0100); /* clear code */
 
         for (i = (left < GIF_CHUNKS) ? left : GIF_CHUNKS; i; i--) {
-            if (pix_fmt == PIX_FMT_RGB24) {
+            if (pix_fmt == AV_PIX_FMT_RGB24) {
                 v    = gif_clut_index(ptr[0], ptr[1], ptr[2]);
                 ptr += 3;
             } else {
@@ -290,7 +290,7 @@ static int gif_write_header(AVFormatContext *s)
 //        rate = video_enc->time_base.den;
     }
 
-    if (video_enc->pix_fmt != PIX_FMT_RGB24) {
+    if (video_enc->pix_fmt != AV_PIX_FMT_RGB24) {
         av_log(s, AV_LOG_ERROR,
                "ERROR: gif only handles the rgb24 pixel format. Use -pix_fmt rgb24.\n");
         return AVERROR(EIO);
@@ -327,7 +327,7 @@ static int gif_write_video(AVFormatContext *s, AVCodecContext *enc,
     avio_w8(pb, 0x00);
 
     gif_image_write_image(pb, 0, 0, enc->width, enc->height,
-                          buf, enc->width * 3, PIX_FMT_RGB24);
+                          buf, enc->width * 3, AV_PIX_FMT_RGB24);
 
     avio_flush(s->pb);
     return 0;
@@ -347,7 +347,7 @@ static int gif_write_trailer(AVFormatContext *s)
     AVIOContext *pb = s->pb;
 
     avio_w8(pb, 0x3b);
-    avio_flush(s->pb);
+
     return 0;
 }
 
@@ -355,7 +355,7 @@ static int gif_write_trailer(AVFormatContext *s)
 #define ENC AV_OPT_FLAG_ENCODING_PARAM
 static const AVOption options[] = {
     { "loop", "Number of times to loop the output.", OFFSET(loop),
-      AV_OPT_TYPE_INT, { 0 }, 0, 65535, ENC },
+      AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 65535, ENC },
     { NULL },
 };
 
@@ -372,8 +372,8 @@ AVOutputFormat ff_gif_muxer = {
     .mime_type      = "image/gif",
     .extensions     = "gif",
     .priv_data_size = sizeof(GIFContext),
-    .audio_codec    = CODEC_ID_NONE,
-    .video_codec    = CODEC_ID_RAWVIDEO,
+    .audio_codec    = AV_CODEC_ID_NONE,
+    .video_codec    = AV_CODEC_ID_RAWVIDEO,
     .write_header   = gif_write_header,
     .write_packet   = gif_write_packet,
     .write_trailer  = gif_write_trailer,

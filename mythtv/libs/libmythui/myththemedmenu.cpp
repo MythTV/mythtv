@@ -29,6 +29,9 @@
 #include "mythversion.h"
 #include "mythdate.h"
 
+// libmythbase headers
+#include "mythplugin.h"
+
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
     : MythScreenType(parent, name),
@@ -104,7 +107,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
         m_allocedstate = true;
     }
 
-    Init(menufile);
+    SetMenuTheme(menufile);
 }
 
 /** \brief Loads the main UI theme, and a menu theme.
@@ -114,7 +117,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
  *
  *  \param menufile name of menu item xml file
  */
-void MythThemedMenu::Init(const QString &menufile)
+void MythThemedMenu::SetMenuTheme(const QString &menufile)
 {
     if (!m_state->m_loaded)
     {
@@ -144,7 +147,8 @@ MythThemedMenu::~MythThemedMenu(void)
         delete m_state;
 }
 
-/// \brief Returns true iff a theme has been found by a previous call to Init()
+/// \brief Returns true iff a theme has been
+///        found by a previous call to SetMenuTheme().
 bool MythThemedMenu::foundTheme(void)
 {
     return m_foundtheme;
@@ -842,6 +846,7 @@ bool MythThemedMenu::findDepends(const QString &fileList)
 {
     QStringList files = fileList.split(" ");
     QString filename;
+    MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
     {
@@ -849,10 +854,9 @@ bool MythThemedMenu::findDepends(const QString &fileList)
         if (!filename.isEmpty() && filename.endsWith(".xml"))
             return true;
 
-        QString newname = FindPluginName(*it);
-
-        QFile checkFile(newname);
-        if (checkFile.exists())
+        // Has plugin by this name been successfully loaded
+        MythPlugin *plugin = pluginManager->GetPlugin(*it);
+        if (plugin)
             return true;
     }
 

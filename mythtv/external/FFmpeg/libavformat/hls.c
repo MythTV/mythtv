@@ -30,9 +30,9 @@
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/dict.h"
+#include "libavutil/time.h"
 #include "avformat.h"
 #include "internal.h"
-#include <unistd.h>
 #include "avio_internal.h"
 #include "url.h"
 
@@ -42,7 +42,7 @@
  * An apple http stream consists of a playlist with media segment files,
  * played sequentially. There may be several playlists with the same
  * video content, in different bandwidth variants, that are played in
- * parallel (preferrably only one bandwidth variant at a time). In this case,
+ * parallel (preferably only one bandwidth variant at a time). In this case,
  * the user supplied the url to a main playlist that only lists the variant
  * playlists.
  *
@@ -212,9 +212,14 @@ static int parse_playlist(HLSContext *c, const char *url,
     int close_in = 0;
 
     if (!in) {
+        AVDictionary *opts = NULL;
         close_in = 1;
-        if ((ret = avio_open2(&in, url, AVIO_FLAG_READ,
-                              c->interrupt_callback, NULL)) < 0)
+        /* Some HLS servers dont like being sent the range header */
+        av_dict_set(&opts, "seekable", "0", 0);
+        ret = avio_open2(&in, url, AVIO_FLAG_READ,
+                         c->interrupt_callback, &opts);
+        av_dict_free(&opts);
+        if (ret < 0)
             return ret;
     }
 
@@ -325,17 +330,20 @@ fail:
 
 static int open_input(struct variant *var)
 {
+    AVDictionary *opts = NULL;
+    int ret;
     struct segment *seg = var->segments[var->cur_seq_no - var->start_seq_no];
+    av_dict_set(&opts, "seekable", "0", 0);
     if (seg->key_type == KEY_NONE) {
-        return ffurl_open(&var->input, seg->url, AVIO_FLAG_READ,
-                          &var->parent->interrupt_callback, NULL);
+        ret = ffurl_open(&var->input, seg->url, AVIO_FLAG_READ,
+                          &var->parent->interrupt_callback, &opts);
+        goto cleanup;
     } else if (seg->key_type == KEY_AES_128) {
         char iv[33], key[33], url[MAX_URL_SIZE];
-        int ret;
         if (strcmp(seg->key, var->key_url)) {
             URLContext *uc;
             if (ffurl_open(&uc, seg->key, AVIO_FLAG_READ,
-                           &var->parent->interrupt_callback, NULL) == 0) {
+                           &var->parent->interrupt_callback, &opts) == 0) {
                 if (ffurl_read_complete(uc, var->key, sizeof(var->key))
                     != sizeof(var->key)) {
                     av_log(NULL, AV_LOG_ERROR, "Unable to read key file %s\n",
@@ -357,17 +365,25 @@ static int open_input(struct variant *var)
             snprintf(url, sizeof(url), "crypto:%s", seg->url);
         if ((ret = ffurl_alloc(&var->input, url, AVIO_FLAG_READ,
                                &var->parent->interrupt_callback)) < 0)
-            return ret;
+            goto cleanup;
         av_opt_set(var->input->priv_data, "key", key, 0);
         av_opt_set(var->input->priv_data, "iv", iv, 0);
-        if ((ret = ffurl_connect(var->input, NULL)) < 0) {
+        /* Need to repopulate options */
+        av_dict_free(&opts);
+        av_dict_set(&opts, "seekable", "0", 0);
+        if ((ret = ffurl_connect(var->input, &opts)) < 0) {
             ffurl_close(var->input);
             var->input = NULL;
-            return ret;
+            goto cleanup;
         }
-        return 0;
+        ret = 0;
     }
-    return AVERROR(ENOSYS);
+    else
+      ret = AVERROR(ENOSYS);
+
+cleanup:
+    av_dict_free(&opts);
+    return ret;
 }
 
 static int read_data(void *opaque, uint8_t *buf, int buf_size)
@@ -393,7 +409,7 @@ reload:
             /* If we need to reload the playlist again below (if
              * there's still no more segments), switch to a reload
              * interval of half the target duration. */
-            reload_interval = v->target_duration * 500000;
+            reload_interval = v->target_duration * 500000LL;
         }
         if (v->cur_seq_no < v->start_seq_no) {
             av_log(NULL, AV_LOG_WARNING,
@@ -407,7 +423,7 @@ reload:
             while (av_gettime() - v->last_load_time < reload_interval) {
                 if (ff_check_interrupt(c->interrupt_callback))
                     return AVERROR_EXIT;
-                usleep(100*1000);
+                av_usleep(100*1000);
             }
             /* Enough time has elapsed since the last reload */
             goto reload;
@@ -420,8 +436,6 @@ reload:
     ret = ffurl_read(v->input, buf, buf_size);
     if (ret > 0)
         return ret;
-    if (ret < 0 && ret != AVERROR_EOF)
-        return ret;
     ffurl_close(v->input);
     v->input = NULL;
     v->cur_seq_no++;
@@ -429,7 +443,7 @@ reload:
     c->end_of_segment = 1;
     c->cur_seq_no = v->cur_seq_no;
 
-    if (v->ctx && v->ctx->nb_streams) {
+    if (v->ctx && v->ctx->nb_streams && v->parent->nb_streams >= v->stream_offset + v->ctx->nb_streams) {
         v->needed = 0;
         for (i = v->stream_offset; i < v->stream_offset + v->ctx->nb_streams;
              i++) {
@@ -490,6 +504,7 @@ static int hls_read_header(AVFormatContext *s)
         struct variant *v = c->variants[i];
         AVInputFormat *in_fmt = NULL;
         char bitrate_str[20];
+        AVProgram *program = NULL;
         if (v->n_segments == 0)
             continue;
 
@@ -519,6 +534,7 @@ static int hls_read_header(AVFormatContext *s)
              * so avformat_close_input shouldn't be called. If
              * avformat_open_input fails below, it frees and zeros the
              * context, so it doesn't need any special treatment like this. */
+            av_log(s, AV_LOG_ERROR, "Error when loading first segment '%s'\n", v->segments[0]->url);
             avformat_free_context(v->ctx);
             v->ctx = NULL;
             goto fail;
@@ -527,16 +543,31 @@ static int hls_read_header(AVFormatContext *s)
         ret = avformat_open_input(&v->ctx, v->segments[0]->url, in_fmt, NULL);
         if (ret < 0)
             goto fail;
+
         v->stream_offset = stream_offset;
+        v->ctx->ctx_flags &= ~AVFMTCTX_NOHEADER;
+        ret = avformat_find_stream_info(v->ctx, NULL);
+        if (ret < 0)
+            goto fail;
         snprintf(bitrate_str, sizeof(bitrate_str), "%d", v->bandwidth);
+
+        /* Create new AVprogram for variant i */
+        program = av_new_program(s, i);
+        if (!program)
+            goto fail;
+        av_dict_set(&program->metadata, "variant_bitrate", bitrate_str, 0);
+
         /* Create new AVStreams for each stream in this variant */
         for (j = 0; j < v->ctx->nb_streams; j++) {
             AVStream *st = avformat_new_stream(s, NULL);
+            AVStream *ist = v->ctx->streams[j];
             if (!st) {
                 ret = AVERROR(ENOMEM);
                 goto fail;
             }
+            ff_program_add_stream_index(s, i, stream_offset + j);
             st->id = i;
+            avpriv_set_pts_info(st, ist->pts_wrap_bits, ist->time_base.num, ist->time_base.den);
             avcodec_copy_context(st->codec, v->ctx->streams[j]->codec);
             if (v->bandwidth)
                 av_dict_set(&st->metadata, "variant_bitrate", bitrate_str,
@@ -612,7 +643,7 @@ start:
                 AVStream *st;
                 ret = av_read_frame(var->ctx, &var->pkt);
                 if (ret < 0) {
-                    if (!url_feof(&var->pb))
+                    if (!url_feof(&var->pb) && ret != AVERROR_EOF)
                         return ret;
                     reset_packet(&var->pkt);
                     break;
@@ -642,9 +673,21 @@ start:
         }
         /* Check if this stream has the packet with the lowest dts */
         if (var->pkt.data) {
-            if (minvariant < 0 ||
-                var->pkt.dts < c->variants[minvariant]->pkt.dts)
+            if(minvariant < 0) {
                 minvariant = i;
+            } else {
+                struct variant *minvar = c->variants[minvariant];
+                int64_t dts    =    var->pkt.dts;
+                int64_t mindts = minvar->pkt.dts;
+                AVStream *st   =    var->ctx->streams[   var->pkt.stream_index];
+                AVStream *minst= minvar->ctx->streams[minvar->pkt.stream_index];
+
+                if(   st->start_time != AV_NOPTS_VALUE)    dts -=    st->start_time;
+                if(minst->start_time != AV_NOPTS_VALUE) mindts -= minst->start_time;
+
+                if (av_compare_ts(dts, st->time_base, mindts, minst->time_base) < 0)
+                    minvariant = i;
+            }
         }
     }
     if (c->end_of_segment) {
@@ -745,7 +788,7 @@ static int hls_probe(AVProbeData *p)
 
 AVInputFormat ff_hls_demuxer = {
     .name           = "hls,applehttp",
-    .long_name      = NULL_IF_CONFIG_SMALL("Apple HTTP Live Streaming format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Apple HTTP Live Streaming"),
     .priv_data_size = sizeof(HLSContext),
     .read_probe     = hls_probe,
     .read_header    = hls_read_header,

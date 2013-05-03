@@ -30,6 +30,16 @@ void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                         !player_ctx->buffer->IsInDiscMenuOrStillFrame());
 }
 
+bool MythDVDPlayer::HasReachedEof(void) const
+{
+    EofState eof = GetEof();
+    if (eof != kEofStateNone && !allpaused)
+        return true;
+    // DeleteMap and EditMode from the parent MythPlayer should not be
+    // relevant here.
+    return false;
+}
+
 void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
 {
     if ((kDisplayAVSubtitle & mode) && player_ctx->buffer->IsDVD())
@@ -124,7 +134,12 @@ bool MythDVDPlayer::VideoLoop(void)
         // if we go below the pre-buffering limit, the player will pause
         // so do this 'manually'
         DisplayNormalFrame(false);
-        dvd_stillframe_showing = false;
+        // unpause the still frame if more frames become available
+        if (dvd_stillframe_showing && nbframes > 1)
+        {
+            dvd_stillframe_showing = false;
+            UnpauseVideo();
+        }
         return !IsErrored();
     }
 
@@ -390,7 +405,7 @@ long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     return MythPlayer::CalcMaxFFTime(ff, setjump);
 }
 
-int64_t MythDVDPlayer::GetSecondsPlayed(void)
+int64_t MythDVDPlayer::GetSecondsPlayed(bool)
 {
     if (!player_ctx->buffer->IsDVD())
         return 0;
@@ -628,9 +643,9 @@ int MythDVDPlayer::GetCurrentAngle(void) const
 
 QString MythDVDPlayer::GetAngleName(int angle) const
 {
-    if (angle >= 0 && angle < GetNumAngles())
+    if (angle >= 1 && angle <= GetNumAngles())
     {
-        QString name = QObject::tr("Angle %1").arg(angle+1);
+        QString name = QObject::tr("Angle %1").arg(angle);
         return name;
     }
     return QString();
@@ -642,8 +657,8 @@ bool MythDVDPlayer::SwitchAngle(int angle)
     if (!total || angle == GetCurrentAngle())
         return false;
 
-    if (angle >= (int)total)
-        angle = 0;
+    if (angle < 1 || angle > (int)total)
+        angle = 1;
 
     return player_ctx->buffer->DVD()->SwitchAngle(angle);
 }
@@ -657,7 +672,13 @@ void MythDVDPlayer::ResetStillFrameTimer(void)
 
 void MythDVDPlayer::SetStillFrameTimeout(int length)
 {
-    m_stillFrameLength = length;
+    if (length != m_stillFrameLength)
+    {
+        m_stillFrameTimerLock.lock();
+        m_stillFrameLength = length;
+        m_stillFrameTimer.restart();
+        m_stillFrameTimerLock.unlock();
+    }
 }
 
 void MythDVDPlayer::StillFrameCheck(void)

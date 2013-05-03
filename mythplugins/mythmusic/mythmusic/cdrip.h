@@ -1,13 +1,15 @@
 #ifndef CDRIP_H_
 #define CDRIP_H_
 
-#include "metadata.h"
-
+// qt
 #include <QEvent>
 #include <QVector>
 
+// mythtv
+#include <musicmetadata.h>
 #include <mythscreentype.h>
 #include <mthread.h>
+
 
 class MythUIText;
 class MythUITextEdit;
@@ -42,10 +44,10 @@ class CDEjectorThread: public MThread
 
 typedef struct
 {
-    Metadata *metadata;
-    bool      active;
-    int       length;
-    bool      isNew;
+    MusicMetadata *metadata;
+    bool           active;
+    int            length;
+    bool           isNew;
 } RipTrack;
 
 Q_DECLARE_METATYPE(RipTrack *)

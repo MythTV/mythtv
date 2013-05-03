@@ -78,7 +78,7 @@ class build(pybuild):
 
 setup(
         name='MythTV',
-        version='0.25.0',
+        version='0.27.-1',
         description='MythTV Python bindings.',
         long_description='Provides canned database and protocol access to the MythTV database, mythproto, mythxml, and frontend remote control.',
         packages=['MythTV', 'MythTV/tmdb', 'MythTV/tmdb3', 'MythTV/ttvdb',

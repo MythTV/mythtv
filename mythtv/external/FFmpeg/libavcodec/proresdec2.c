@@ -30,6 +30,7 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
+#include "internal.h"
 #include "simple_idct.h"
 #include "proresdec.h"
 
@@ -126,13 +127,17 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
         ctx->frame.top_field_first = ctx->frame_type == 1;
     }
 
-    avctx->pix_fmt = (buf[12] & 0xC0) == 0xC0 ? PIX_FMT_YUV444P10 : PIX_FMT_YUV422P10;
+    avctx->pix_fmt = (buf[12] & 0xC0) == 0xC0 ? AV_PIX_FMT_YUV444P10 : AV_PIX_FMT_YUV422P10;
 
     ptr   = buf + 20;
     flags = buf[19];
     av_dlog(avctx, "flags %x\n", flags);
 
     if (flags & 2) {
+        if(buf + data_size - ptr < 64) {
+            av_log(avctx, AV_LOG_ERROR, "Header truncated\n");
+            return -1;
+        }
         permute(ctx->qmat_luma, ctx->prodsp.idct_permutation, ptr);
         ptr += 64;
     } else {
@@ -140,6 +145,10 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
     }
 
     if (flags & 1) {
+        if(buf + data_size - ptr < 64) {
+            av_log(avctx, AV_LOG_ERROR, "Header truncated\n");
+            return -1;
+        }
         permute(ctx->qmat_chroma, ctx->prodsp.idct_permutation, ptr);
     } else {
         memset(ctx->qmat_chroma, 4, 64);
@@ -431,6 +440,7 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
     int16_t qmat_chroma_scaled[64];
     int mb_x_shift;
 
+    slice->ret = -1;
     //av_log(avctx, AV_LOG_INFO, "slice %d mb width %d mb x %d y %d\n",
     //       jobnr, slice->mb_count, slice->mb_x, slice->mb_y);
 
@@ -464,7 +474,7 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
         chroma_stride = pic->linesize[1] << 1;
     }
 
-    if (avctx->pix_fmt == PIX_FMT_YUV444P10) {
+    if (avctx->pix_fmt == AV_PIX_FMT_YUV444P10) {
         mb_x_shift = 5;
         log2_chroma_blocks_per_mb = 2;
     } else {
@@ -494,24 +504,25 @@ static int decode_slice_thread(AVCodecContext *avctx, void *arg, int jobnr, int 
                             qmat_chroma_scaled, log2_chroma_blocks_per_mb);
     }
 
+    slice->ret = 0;
     return 0;
 }
 
 static int decode_picture(AVCodecContext *avctx)
 {
     ProresContext *ctx = avctx->priv_data;
-    int i, threads_ret[ctx->slice_count];
+    int i;
 
-    avctx->execute2(avctx, decode_slice_thread, NULL, threads_ret, ctx->slice_count);
+    avctx->execute2(avctx, decode_slice_thread, NULL, NULL, ctx->slice_count);
 
     for (i = 0; i < ctx->slice_count; i++)
-        if (threads_ret[i] < 0)
-            return threads_ret[i];
+        if (ctx->slices[i].ret < 0)
+            return ctx->slices[i].ret;
 
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     ProresContext *ctx = avctx->priv_data;
@@ -540,7 +551,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     if (frame->data[0])
         avctx->release_buffer(avctx, frame);
 
-    if (avctx->get_buffer(avctx, frame) < 0)
+    if (ff_get_buffer(avctx, frame) < 0)
         return -1;
 
  decode_picture:
@@ -563,7 +574,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         goto decode_picture;
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = *frame;
 
     return avpkt->size;
@@ -584,7 +595,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
 AVCodec ff_prores_decoder = {
     .name           = "prores",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_PRORES,
+    .id             = AV_CODEC_ID_PRORES,
     .priv_data_size = sizeof(ProresContext),
     .init           = decode_init,
     .close          = decode_close,

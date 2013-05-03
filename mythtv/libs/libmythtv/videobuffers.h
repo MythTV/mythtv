@@ -87,37 +87,37 @@ class VideoBuffers
     void DoneDisplayingFrame(VideoFrame *frame);
     void DiscardFrame(VideoFrame *frame);
 
-    VideoFrame *at(uint i) { return &buffers[i]; }
-    VideoFrame *dequeue(BufferType);
-    VideoFrame *head(BufferType); // peek at next dequeue
-    VideoFrame *tail(BufferType); // peek at last enqueue
-    void requeue(BufferType dst, BufferType src, int num = 1);
-    void enqueue(BufferType, VideoFrame*);
-    void safeEnqueue(BufferType, VideoFrame* frame);
-    void remove(BufferType, VideoFrame *); // multiple buffer types ok
+    VideoFrame *At(uint i) { return &buffers[i]; }
+    VideoFrame *Dequeue(BufferType);
+    VideoFrame *Head(BufferType); // peek at next dequeue
+    VideoFrame *Tail(BufferType); // peek at last enqueue
+    void Requeue(BufferType dst, BufferType src, int num = 1);
+    void Enqueue(BufferType, VideoFrame*);
+    void SafeEnqueue(BufferType, VideoFrame* frame);
+    void Remove(BufferType, VideoFrame *); // multiple buffer types ok
     frame_queue_t::iterator begin_lock(BufferType); // this locks VideoBuffer
     frame_queue_t::iterator end(BufferType);
     void end_lock() { global_lock.unlock(); } // this unlocks VideoBuffer
-    uint size(BufferType type) const;
-    bool contains(BufferType type, VideoFrame*) const;
+    uint Size(BufferType type) const;
+    bool Contains(BufferType type, VideoFrame*) const;
 
     VideoFrame *GetScratchFrame(void);
-    VideoFrame *GetLastDecodedFrame(void) { return at(vpos); }
-    VideoFrame *GetLastShownFrame(void) { return at(rpos); }
+    VideoFrame *GetLastDecodedFrame(void) { return At(vpos); }
+    VideoFrame *GetLastShownFrame(void) { return At(rpos); }
     void SetLastShownFrameToScratch(void);
 
-    uint ValidVideoFrames(void) const { return size(kVideoBuffer_used); }
-    uint FreeVideoFrames(void) const { return size(kVideoBuffer_avail); }
+    uint ValidVideoFrames(void) const { return Size(kVideoBuffer_used); }
+    uint FreeVideoFrames(void) const { return Size(kVideoBuffer_avail); }
     bool EnoughFreeFrames(void) const
-        { return size(kVideoBuffer_avail) >= needfreeframes; }
+        { return Size(kVideoBuffer_avail) >= needfreeframes; }
     bool EnoughDecodedFrames(void) const
-        { return size(kVideoBuffer_used) >= needprebufferframes; }
+        { return Size(kVideoBuffer_used) >= needprebufferframes; }
     bool EnoughPrebufferedFrames(void) const
-        { return size(kVideoBuffer_used) >= keepprebufferframes; }
+        { return Size(kVideoBuffer_used) >= keepprebufferframes; }
 
-    const VideoFrame *at(uint i) const { return &buffers[i]; }
-    const VideoFrame *GetLastDecodedFrame(void) const { return at(vpos); }
-    const VideoFrame *GetLastShownFrame(void) const { return at(rpos); }
+    const VideoFrame *At(uint i) const { return &buffers[i]; }
+    const VideoFrame *GetLastDecodedFrame(void) const { return At(vpos); }
+    const VideoFrame *GetLastShownFrame(void) const { return At(rpos); }
     uint  Size() const { return buffers.size(); }
 
     void Clear(uint i);
@@ -130,8 +130,8 @@ class VideoBuffers
 
     QString GetStatus(int n=-1) const; // debugging method
   private:
-    frame_queue_t         *queue(BufferType type);
-    const frame_queue_t   *queue(BufferType type) const;
+    frame_queue_t         *Queue(BufferType type);
+    const frame_queue_t   *Queue(BufferType type) const;
     VideoFrame            *GetNextFreeFrameInternal(BufferType enqueue_to);
 
     frame_queue_t          available, used, limbo, pause, displayed, decode, finished;

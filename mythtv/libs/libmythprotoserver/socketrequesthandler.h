@@ -1,8 +1,6 @@
 #ifndef _SOCKETREQUESTHANDLER_H_
 #define _SOCKETREQUESTHANDLER_H_
 
-using namespace std;
-
 #include <QString>
 
 #include "mythsocket.h"

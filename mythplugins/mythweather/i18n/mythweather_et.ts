@@ -1011,8 +1011,9 @@
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
-        <translation>Tuul(tuulehoog):</translation>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
+        <translation>Tuul (tuulehoog):</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>

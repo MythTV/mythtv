@@ -23,6 +23,7 @@ QString toString(MarkTypes type)
 {
     switch (type)
     {
+        case MARK_ALL:          return "ALL";
         case MARK_UNSET:        return "UNSET";
         case MARK_TMP_CUT_END:  return "TMP_CUT_END";
         case MARK_TMP_CUT_START:return "TMP_CUT_START";
@@ -38,6 +39,16 @@ QString toString(MarkTypes type)
         case MARK_KEYFRAME:     return "KEYFRAME";
         case MARK_SCENE_CHANGE: return "SCENE_CHANGE";
         case MARK_GOP_BYFRAME:  return "GOP_BYFRAME";
+        case MARK_ASPECT_1_1:   return "ASPECT_1_1 (depreciated)";
+        case MARK_ASPECT_4_3:   return "ASPECT_4_3";
+        case MARK_ASPECT_16_9:  return "ASPECT_16_9";
+        case MARK_ASPECT_2_21_1:return "ASPECT_2_21_1";
+        case MARK_ASPECT_CUSTOM:return "ASPECT_CUSTOM";
+        case MARK_VIDEO_WIDTH:  return "VIDEO_WIDTH";
+        case MARK_VIDEO_HEIGHT: return "VIDEO_HEIGHT";
+        case MARK_VIDEO_RATE:   return "VIDEO_RATE";
+        case MARK_DURATION_MS:  return "DURATION_MS";
+        case MARK_TOTAL_FRAMES: return "TOTAL_FRAMES";
     }
 
     return "unknown";
@@ -154,6 +165,8 @@ QString toString(RecStatusType recstatus, uint id)
         case rsOtherTuning:
             ret = QString::number(id);
             break;
+        case rsUnknown:
+            break;
     }
 
     return (ret.isEmpty()) ? QString("-") : ret;
@@ -219,6 +232,8 @@ QString toString(RecStatusType recstatus, RecordingType rectype)
             return QObject::tr("Other Recording");
         case rsOtherTuning:
             return QObject::tr("Other Tuning");
+        case rsUnknown:
+            return QObject::tr("Unknown");
     }
 
     return QObject::tr("Unknown");
@@ -234,7 +249,8 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
     QString message;
     QDateTime now = MythDate::current();
 
-    if (recstatus <= rsWillRecord)
+    if (recstatus <= rsWillRecord ||
+        recstatus == rsOtherShowing)
     {
         switch (recstatus)
         {
@@ -259,38 +275,36 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
                 message = QObject::tr("This showing was recorded.");
                 break;
             case rsAborted:
-                message = QObject::tr(
-                    "This showing was recorded but was aborted "
-                    "before recording was completed.");
+                message = QObject::tr("This showing was recorded but was "
+                                      "aborted before completion.");
                 break;
             case rsMissed:
-                message = QObject::tr(
-                    "This showing was not recorded because the "
-                    "master backend was hung or not running.");
-                break;
             case rsMissedFuture:
-                message = 
-                    "This showing was not recorded because the "
-                    "master backend was hung or not running.";
+                message = QObject::tr("This showing was not recorded because "
+                                      "the master backend was not running.");
                 break;
             case rsCancelled:
-                message = QObject::tr(
-                    "This showing was not recorded because it "
-                    "was manually cancelled.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "it was manually cancelled.");
                 break;
             case rsLowDiskSpace:
-                message = QObject::tr(
-                    "There wasn't enough disk space available.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "there wasn't enough disk space.");
                 break;
             case rsTunerBusy:
-                message = QObject::tr("The tuner card was already being used.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "the recorder was already in use.");
                 break;
             case rsFailed:
-                message = QObject::tr("The recorder failed to record.");
+                message = QObject::tr("This showing was not recorded because "
+                                      "the recorder failed.");
+                break;
+            case rsOtherShowing:
+                message += QObject::tr("This showing will be recorded on a "
+                                       "different channel.");
                 break;
             default:
-                message = QObject::tr(
-                    "The status of this showing is unknown.");
+                message = QObject::tr("The status of this showing is unknown.");
                 break;
         }
 
@@ -331,7 +345,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
             break;
         case rsLaterShowing:
             message += QObject::tr("this episode will be recorded at a "
-                                   "later time.");
+                                   "later time instead.");
             break;
         case rsRepeat:
             message += QObject::tr("this episode is a repeat.");
@@ -347,11 +361,7 @@ QString toDescription(RecStatusType recstatus, RecordingType rectype,
             message += QObject::tr("it was marked to never be recorded.");
             break;
         case rsOffLine:
-            message += QObject::tr("the backend recorder is off-line.");
-            break;
-        case rsOtherShowing:
-            message += QObject::tr("this episode will be recorded on a "
-                                   "different channel in this time slot.");
+            message += QObject::tr("the required recorder is off-line.");
             break;
         default:
             if (recstartts > now)

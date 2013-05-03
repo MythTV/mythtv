@@ -116,7 +116,7 @@ class SequenceRandomBase : public SequenceBase
     { 
         if(seq)
         { 
-            delete seq; 
+            delete[] seq; 
         }
     };
 
@@ -125,9 +125,11 @@ class SequenceRandomBase : public SequenceBase
         SequenceBase::reset(_len); 
         if(seq)
         { 
-            delete seq; 
+            delete[] seq; 
         } 
-        seq = new(int[len]); 
+
+        seq = new int[len];
+
         for( int i = 0 ; i < len ; i++ )
         { 
             seq[i] = -1; 
@@ -181,7 +183,7 @@ public:
     { 
         if (map)
         { 
-            delete map; 
+            delete[] map; 
         } 
     };
 
@@ -191,10 +193,10 @@ public:
 
         if(map)
         { 
-           delete map; 
+           delete[] map;
         } 
 
-        map = new(int[(len / sizeof(int)) + 1]); 
+        map = new int[(len / sizeof(int)) + 1];
 
         for( int i = 0 ; i < len ; i++ )
         { 

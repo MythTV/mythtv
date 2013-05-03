@@ -60,12 +60,6 @@ class PlaybackBox : public ScheduleCommon
     friend class PlaybackBoxListItem;
 
   public:
-    typedef enum
-    {
-        kPlayBox,
-        kDeleteBox,
-    } BoxType;
-
     // ViewType values cannot change; they are stored in the database.
     typedef enum {
         TitlesOnly = 0,
@@ -120,7 +114,7 @@ class PlaybackBox : public ScheduleCommon
         kDone
     } killStateType;
 
-    PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
+    PlaybackBox(MythScreenStack *parent, QString name,
                 TV *player = NULL, bool showTV = false);
    ~PlaybackBox(void);
 
@@ -261,6 +255,7 @@ class PlaybackBox : public ScheduleCommon
     void saveViewChanges(void);
 
     void checkPassword(const QString &password);
+    void passwordClosed(void);
 
     void fanartLoad(void);
     void bannerLoad(void);
@@ -354,9 +349,6 @@ class PlaybackBox : public ScheduleCommon
     InfoMap m_currentMap;
 
     // Settings ///////////////////////////////////////////////////////////////
-    /// If "Play"  this is a recording playback selection UI,
-    /// if "Delete this is a recording deletion selection UI.
-    BoxType             m_type;
     /// titleView controls showing titles in group list
     bool                m_titleView;
     /// useCategories controls showing categories in group list
@@ -371,8 +363,6 @@ class PlaybackBox : public ScheduleCommon
     int                 m_watchListMaxAge;
     /// adjust exclusion of a title from the Watch List after a delete
     int                 m_watchListBlackOut;
-    /// contains "DispRecGroupAsAllProg" setting
-    bool                m_groupnameAsAllProg;
     /// allOrder controls the ordering of the "All Programs" list
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list
@@ -443,6 +433,11 @@ class PlaybackBox : public ScheduleCommon
     PlaybackBoxHelper   m_helper;
     /// Outstanding preview image requests
     QSet<QString>       m_preview_tokens;
+
+    bool                m_firstGroup;
+    bool                m_usingGroupSelector;
+    bool                m_groupSelected;
+    bool                m_passwordEntered;
 };
 
 class GroupSelector : public MythScreenType

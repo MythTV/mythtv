@@ -64,7 +64,7 @@ vector<int> iso639_get_language_key_list(void)
 
 QString iso639_str2_to_str3(const QString &str2)
 {
-    int key2 = iso639_str2_to_key2(str2.toAscii().constData());
+    int key2 = iso639_str2_to_key2(str2.toLatin1().constData());
     int key3 = 0;
     if (_iso639_key2_to_key3.contains(key2))
         key3 = _iso639_key2_to_key3[key2];
@@ -463,6 +463,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
   names[iso639_str3_to_key("mwr")] = QString("Marwari");
   names[iso639_str3_to_key("myn")] = QString("Mayan languages");
   names[iso639_str3_to_key("myv")] = QString("Erzya");
+  names[iso639_str3_to_key("nar")] = QString("Narrative"); // UK & Irish DTV Spec
   names[iso639_str3_to_key("nah")] = QString("Nahuatl");
   names[iso639_str3_to_key("nai")] = QString("North American Indian");
   names[iso639_str3_to_key("nap")] = QString("Neapolitan");

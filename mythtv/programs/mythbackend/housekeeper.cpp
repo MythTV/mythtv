@@ -673,6 +673,11 @@ void HouseKeeper::CleanupProgramListings(void)
     // Keep as many days of listings data as we keep matching, non-recorded
     // oldrecorded entries to allow for easier post-mortem analysis
     int offset = gCoreContext->GetNumSetting( "CleanOldRecorded", 10);
+    // Also make sure to keep enough data so that we can flag the original
+    // airdate, for when that isn't included in guide data
+    int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
+    if (newEpiWindow > offset)
+        offset = newEpiWindow;
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
                   "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
@@ -723,7 +728,7 @@ void HouseKeeper::CleanupProgramListings(void)
     findq.prepare("SELECT record.recordid FROM record "
                   "LEFT JOIN oldfind ON oldfind.recordid = record.recordid "
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
-    findq.bindValue(":FINDONE", kFindOneRecord);
+    findq.bindValue(":FINDONE", kOneRecord);
 
     if (findq.exec())
     {

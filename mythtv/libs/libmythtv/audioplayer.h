@@ -2,6 +2,7 @@
 #define AUDIOPLAYER_H
 
 #include <stdint.h>
+#include "audiooutputsettings.h"
 
 class MythPlayer;
 class AudioOutput;

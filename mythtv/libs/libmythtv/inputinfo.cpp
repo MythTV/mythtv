@@ -130,7 +130,6 @@ ChannelInputInfo::ChannelInputInfo(const ChannelInputInfo &other) :
     channels(other.channels),
     groups(other.groups),
     inputNumV4L(other.inputNumV4L),
-    videoModeV4L1(other.videoModeV4L1),
     videoModeV4L2(other.videoModeV4L2)
 {
     startChanNum.detach();
@@ -148,7 +147,6 @@ ChannelInputInfo &ChannelInputInfo::operator=(const ChannelInputInfo &other)
     channels        = other.channels;
     groups          = other.groups;
     inputNumV4L     = other.inputNumV4L;
-    videoModeV4L1   = other.videoModeV4L1;
     videoModeV4L2   = other.videoModeV4L2;
 
     startChanNum.detach();

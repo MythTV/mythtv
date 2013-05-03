@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '75';
-    static $protocol_token          = 'SweetRock';
+    static $protocol_version        = '77';
+    static $protocol_token          = 'WindMark';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';
@@ -20,7 +20,7 @@ class MythBackend {
 // NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 // the number of items in a ProgramInfo QStringList group used by
 // ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    static $program_line_number     = 44;
+    static $program_line_number     = 47;
 
     private $fp                     = null;
     private $connected              = false;
@@ -41,10 +41,14 @@ class MythBackend {
                             ."need to check your mythweb.conf file or re-run mythtv-setup",
                             FATAL);
         }
+		
+		if (!isset($Backends[$host]))
+			$Backends[$host] = array();
 
-        if (!isset($Backend[$host][$port]))
-            $Backend[$host][$port] = new MythBackend($host, $port);
-        return $Backend[$host][$port];
+        if (!isset($Backends[$host][$port]))
+            $Backends[$host][$port] = new MythBackend($host, $port);
+			
+        return $Backends[$host][$port];
     }
 
     function __construct($host, $port = null) {

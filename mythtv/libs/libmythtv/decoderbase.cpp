@@ -27,10 +27,12 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
       current_aspect(1.33333), fps(29.97),
       bitrate(4000),
 
-      framesPlayed(0), framesRead(0), totalDuration(0),
+      framesPlayed(0), framesRead(0),
+      totalDuration(AVRationalInit(0)),
       lastKey(0), keyframedist(-1), indexOffset(0),
+      trackTotalDuration(false),
 
-      ateof(false), exitafterdecoded(false), transcoding(false),
+      ateof(kEofStateNone), exitafterdecoded(false), transcoding(false),
 
       hasFullPositionMap(false), recordingHasPositionMap(false),
       posmapStarted(false), positionMapType(MARK_UNSET),
@@ -84,14 +86,14 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
         ResetPosMap();
         framesPlayed = 0;
         framesRead = 0;
-        totalDuration = 0;
+        totalDuration = AVRationalInit(0);
         dontSyncPositionMap = false;
     }
 
     if (reset_file)
     {
         waitingForChange = false;
-        SetEof(false);
+        SetEofState(kEofStateNone);
     }
 }
 
@@ -119,9 +121,9 @@ bool DecoderBase::PosMapFromDb(void)
         return false;
 
     // Overwrites current positionmap with entire contents of database
-    frm_pos_map_t posMap;
+    frm_pos_map_t posMap, durMap;
 
-    if (ringBuffer->IsDVD())
+    if (ringBuffer && ringBuffer->IsDVD())
     {
         long long totframes;
         keyframedist = 15;
@@ -131,7 +133,7 @@ bool DecoderBase::PosMapFromDb(void)
         totframes = (long long)(ringBuffer->DVD()->GetTotalTimeOfTitle() * fps);
         posMap[totframes] = ringBuffer->DVD()->GetTotalReadPosition();
     }
-    else if (ringBuffer->IsBD())
+    else if (ringBuffer && ringBuffer->IsBD())
     {
         long long totframes;
         keyframedist = 15;
@@ -191,6 +193,8 @@ bool DecoderBase::PosMapFromDb(void)
     if (posMap.empty())
         return false; // no position map in recording
 
+    m_playbackinfo->QueryPositionMap(durMap, MARK_DURATION_MS);
+
     QMutexLocker locker(&m_positionMapLock);
     m_positionMap.clear();
     m_positionMap.reserve(posMap.size());
@@ -202,7 +206,7 @@ bool DecoderBase::PosMapFromDb(void)
         m_positionMap.push_back(e);
     }
 
-    if (!m_positionMap.empty() && !ringBuffer->IsDisc())
+    if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
         indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
@@ -210,6 +214,21 @@ bool DecoderBase::PosMapFromDb(void)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Position map filled from DB to: %1")
                 .arg(m_positionMap.back().index));
+    }
+
+    uint64_t last = 0;
+    for (frm_pos_map_t::const_iterator it = durMap.begin();
+         it != durMap.end(); ++it)
+    {
+        m_frameToDurMap[it.key()] = it.value();
+        m_durToFrameMap[it.value()] = it.key();
+        last = it.key();
+    }
+
+    if (!m_durToFrameMap.empty())
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Duration map filled from DB to: %1").arg(last));
     }
 
     return true;
@@ -235,26 +254,26 @@ bool DecoderBase::PosMapFromEnc(void)
             start = m_positionMap.back().index + 1;
     }
 
-    QMap<long long, long long> posMap;
-    if (!m_parent->PosMapFromEnc(start, posMap))
+    frm_pos_map_t posMap, durMap;
+    if (!m_parent->PosMapFromEnc(start, posMap, durMap))
         return false;
 
     QMutexLocker locker(&m_positionMapLock);
 
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
-    long long last_index = m_positionMap.back().index;
-    for (QMap<long long,long long>::const_iterator it = posMap.begin();
+    uint64_t last_index = m_positionMap.back().index;
+    for (frm_pos_map_t::const_iterator it = posMap.begin();
          it != posMap.end(); ++it)
     {
         if (it.key() <= last_index)
-            continue; // we released the m_positionMapLock for a few ms...
+            continue;
 
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
 
-    if (!m_positionMap.empty() && !ringBuffer->IsDisc())
+    if (!m_positionMap.empty() && !(ringBuffer && ringBuffer->IsDisc()))
         indexOffset = m_positionMap[0].index;
 
     if (!m_positionMap.empty())
@@ -262,6 +281,30 @@ bool DecoderBase::PosMapFromEnc(void)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Position map filled from Encoder to: %1")
                 .arg(m_positionMap.back().index));
+    }
+
+    bool isEmpty = m_frameToDurMap.empty();
+    if (!isEmpty)
+    {
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        --it;
+        last_index = it.key();
+    }
+    for (frm_pos_map_t::const_iterator it = durMap.begin();
+         it != durMap.end(); ++it)
+    {
+        if (!isEmpty && it.key() <= last_index)
+            continue; // we released the m_positionMapLock for a few ms...
+        m_frameToDurMap[it.key()] = it.value();
+        m_durToFrameMap[it.value()] = it.key();
+    }
+
+    if (!m_frameToDurMap.empty())
+    {
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        --it;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Duration map filled from Encoder to: %1").arg(it.key()));
     }
 
     return true;
@@ -354,13 +397,13 @@ bool DecoderBase::SyncPositionMap(void)
         long long totframes = 0;
         int length = 0;
 
-        if (ringBuffer->IsDVD())
+        if (ringBuffer && ringBuffer->IsDVD())
         {
             length = ringBuffer->DVD()->GetTotalTimeOfTitle();
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index;
         }
-        else if (ringBuffer->IsBD())
+        else if (ringBuffer && ringBuffer->IsBD())
         {
             length = ringBuffer->BD()->GetTotalTimeOfTitle();
             QMutexLocker locker(&m_positionMapLock);
@@ -384,6 +427,10 @@ bool DecoderBase::SyncPositionMap(void)
                 .arg(totframes).arg(length).arg(new_posmap_size));
     }
     recordingHasPositionMap |= (0 != new_posmap_size);
+    {
+        QMutexLocker locker(&m_positionMapLock);
+        m_lastPositionMapUpdate = QDateTime::currentDateTime();
+    }
     return ret_val;
 }
 
@@ -453,15 +500,18 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
     upper_bound = upper;
     lower_bound = lower;
+    bool empty = m_positionMap.empty();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("FindPosition(%1, search%3 adjusted)")
             .arg(desired_value).arg((search_adjusted) ? "" : " not") +
         QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
-            .arg(lower_bound).arg(GetKey(m_positionMap[lower_bound]))
+            .arg(lower_bound)
+            .arg(empty ? -1 : GetKey(m_positionMap[lower_bound]))
             .arg(m_positionMap[lower_bound].pos)
-            .arg(upper_bound).arg(GetKey(m_positionMap[upper_bound]))
-            .arg(m_positionMap[upper_bound].pos));
+            .arg(upper_bound)
+            .arg(empty ? -1 : GetKey(m_positionMap[upper_bound]))
+            .arg(empty ? -1 : m_positionMap[upper_bound].pos));
 
     return false;
 }
@@ -491,10 +541,22 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
         saved++;
     }
 
+    frm_pos_map_t durMap;
+    for (frm_pos_map_t::const_iterator it = m_frameToDurMap.begin();
+         it != m_frameToDurMap.end(); ++it)
+    {
+        if (it.key() < first)
+            continue;
+        if (it.key() > last)
+            break;
+        durMap[it.key()] = it.value();
+    }
+
     locker.unlock();
 
     stm.start();
     m_playbackinfo->SavePositionMapDelta(posMap, type);
+    m_playbackinfo->SavePositionMapDelta(durMap, MARK_DURATION_MS);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
@@ -528,7 +590,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, true, discardFrames);
 
-    if (ringBuffer->IsDisc() || discardFrames)
+    if (discardFrames || (ringBuffer && ringBuffer->IsDisc()))
         m_parent->SetFramesPlayed(framesPlayed+1);
 
     return true;
@@ -536,7 +598,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 
 long long DecoderBase::GetKey(const PosMapEntry &e) const
 {
-    long long kf = (ringBuffer->IsDisc()) ? 1LL : keyframedist;
+    long long kf = (ringBuffer && ringBuffer->IsDisc()) ?
+        1LL : keyframedist;
     return (hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - indexOffset) * kf;
 }
 
@@ -547,6 +610,12 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     if (!GetPositionMapSize())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "PosMap is empty, can't seek");
+        return false;
+    }
+
+    if (!ringBuffer)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No ringBuffer yet, can't seek");
         return false;
     }
 
@@ -659,6 +728,12 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
+    if (!ringBuffer)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No ringBuffer yet, can't fast forward");
+        return false;
+    }
+
     if (ringBuffer->IsDVD() &&
         !ringBuffer->IsInDiscMenuOrStillFrame() &&
         ringBuffer->DVD()->TitleTimeLeft() < 5)
@@ -767,6 +842,13 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
  */
 void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 {
+    if (!ringBuffer)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "No ringBuffer yet, can't fast forward seek");
+        return;
+    }
+
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
@@ -810,7 +892,7 @@ void DecoderBase::FileChanged(void)
     ResetPosMap();
     framesPlayed = 0;
     framesRead = 0;
-    totalDuration = 0;
+    totalDuration = AVRationalInit(0);
 
     waitingForChange = false;
     justAfterChange = true;
@@ -997,7 +1079,8 @@ int DecoderBase::AutoSelectTrack(uint type)
                           m_parent->ForcedSubtitlesFavored());
             int position = numStreams - i;
             int language = 0;
-            for (int j = 0; language == 0 && j < languagePreference.size(); ++j)
+            for (uint j = 0;
+                 (language == 0) && (j < languagePreference.size()); ++j)
             {
                 if (tracks[type][i].language == languagePreference[j])
                     language = languagePreference.size() - j;
@@ -1083,12 +1166,46 @@ int to_track_type(const QString &str)
     return ret;
 }
 
+QString toString(AudioTrackType type)
+{
+    QString str;
+
+    switch (type)
+    {
+        case kAudioTypeAudioDescription :
+            str = QObject::tr("Audio Description",
+                              "On-screen events described for the visually impaired");
+            break;
+        case kAudioTypeCleanEffects :
+            str = QObject::tr("Clean Effects",
+                              "No dialog, background audio only");
+            break;
+        case kAudioTypeHearingImpaired :
+            str = QObject::tr("Hearing Impaired",
+                              "Clear dialog for the hearing impaired");
+            break;
+        case kAudioTypeSpokenSubs :
+            str = QObject::tr("Spoken Subtitles",
+                              "Subtitles are read out for the visually impaired");
+            break;
+        case kAudioTypeCommentary :
+            str = QObject::tr("Commentary", "Director/Cast commentary track");
+            break;
+        case kAudioTypeNormal :
+        default:
+            str = QObject::tr("Normal", "Ordinary audio track");
+            break;
+    }
+    
+    return str;
+}
+
 void DecoderBase::SaveTotalDuration(void)
 {
-    if (!m_playbackinfo || !totalDuration)
+    if (!m_playbackinfo || av_q2d(totalDuration) == 0)
         return;
 
-    m_playbackinfo->SaveTotalDuration(totalDuration);
+    m_playbackinfo->SaveTotalDuration(1000000 * av_q2d(totalDuration));
 }
 
 void DecoderBase::SaveTotalFrames(void)
@@ -1097,6 +1214,194 @@ void DecoderBase::SaveTotalFrames(void)
         return;
 
     m_playbackinfo->SaveTotalFrames(framesRead);
+}
+
+// Linearly interpolate the value for a given key in the map.  If the
+// key is outside the range of keys in the map, linearly extrapolate
+// using the fallback ratio.
+uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
+                                        uint64_t key,
+                                        float fallback_ratio)
+{
+    uint64_t key1, key2;
+    uint64_t val1, val2;
+
+    frm_pos_map_t::const_iterator lower = map.lowerBound(key);
+    // QMap::lowerBound() finds a key >= the given key.  We want one
+    // <= the given key, so back up one element upon > condition.
+    if (lower != map.begin() && (lower == map.end() || lower.key() > key))
+        --lower;
+    if (lower == map.end() || lower.key() > key)
+    {
+        key1 = 0;
+        val1 = 0;
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("TranslatePosition(key=%1): extrapolating to (0,0)")
+            .arg(key));
+    }
+    else
+    {
+        key1 = lower.key();
+        val1 = lower.value();
+    }
+    // Find the next key >= the given key.  QMap::lowerBound() is
+    // precisely correct in this case.
+    frm_pos_map_t::const_iterator upper = map.lowerBound(key);
+    if (upper == map.end())
+    {
+        // Extrapolate from (key1,val1) based on fallback_ratio
+        key2 = key;
+        val2 = val1 + fallback_ratio * (key2 - key1) + 0.5;
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("TranslatePosition(key=%1, ratio=%2): "
+                    "extrapolating to (%3,%4)")
+            .arg(key).arg(fallback_ratio).arg(key2).arg(val2));
+        return val2;
+    }
+    else
+    {
+        key2 = upper.key();
+        val2 = upper.value();
+    }
+    if (key1 == key2) // this happens for an exact keyframe match
+        return val2; // can also set key2 = key1 + 1 avoid dividing by zero
+
+    return val1 + (double) (key - key1) * (val2 - val1) / (key2 - key1) + 0.5;
+}
+
+// Convert from an absolute frame number (not cutlist adjusted) to its
+// cutlist-adjusted position in milliseconds.
+uint64_t DecoderBase::TranslatePositionFrameToMs(uint64_t position,
+                                                 float fallback_framerate,
+                                                 const frm_dir_map_t &cutlist)
+{
+    QMutexLocker locker(&m_positionMapLock);
+    // Accurate calculation of duration requires an up-to-date
+    // duration map.  However, the last frame (total duration) will
+    // almost always appear to be past the end of the duration map, so
+    // we limit duration map syncing to once every 3 seconds (a
+    // somewhat arbitrary value).
+    if (!m_frameToDurMap.empty())
+    {
+        frm_pos_map_t::const_iterator it = m_frameToDurMap.end();
+        --it;
+        if (position > it.key())
+        {
+            if (!m_lastPositionMapUpdate.isValid() ||
+                (QDateTime::currentDateTime() >
+                 m_lastPositionMapUpdate.addSecs(3)))
+                SyncPositionMap();
+        }
+    }
+    return TranslatePositionAbsToRel(cutlist, position, m_frameToDurMap,
+                                     1000 / fallback_framerate);
+}
+
+// Convert from a cutlist-adjusted position in milliseconds to its
+// absolute frame number (not cutlist-adjusted).
+uint64_t DecoderBase::TranslatePositionMsToFrame(uint64_t dur_ms,
+                                                 float fallback_framerate,
+                                                 const frm_dir_map_t &cutlist)
+{
+    QMutexLocker locker(&m_positionMapLock);
+    // Convert relative position in milliseconds (cutlist-adjusted) to
+    // its absolute position in milliseconds (not cutlist-adjusted).
+    uint64_t ms = TranslatePositionRelToAbs(cutlist, dur_ms, m_frameToDurMap,
+                                            1000 / fallback_framerate);
+    // Convert absolute position in milliseconds to its absolute frame
+    // number.
+    return TranslatePosition(m_durToFrameMap, ms, fallback_framerate / 1000);
+}
+
+// Convert from an "absolute" (not cutlist-adjusted) value to its
+// "relative" (cutlist-adjusted) mapped value.  Usually the position
+// argument is a frame number, the map argument maps frames to
+// milliseconds, the fallback_ratio is 1000/framerate_fps, and the
+// return value is in milliseconds.
+//
+// If the map and fallback_ratio arguments are omitted, it simply
+// converts from an absolute frame number to a relative
+// (cutlist-adjusted) frame number.
+uint64_t
+DecoderBase::TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
+                                       uint64_t absPosition, // frames
+                                       const frm_pos_map_t &map, // frame->ms
+                                       float fallback_ratio)
+{
+    uint64_t subtraction = 0;
+    uint64_t startOfCutRegion = 0;
+    bool withinCut = false;
+    bool first = true;
+    for (frm_dir_map_t::const_iterator i = deleteMap.begin();
+         i != deleteMap.end(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        if (i.key() > absPosition)
+            break;
+        uint64_t mappedKey = TranslatePosition(map, i.key(), fallback_ratio);
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = mappedKey;
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            subtraction += (mappedKey - startOfCutRegion);
+        }
+    }
+    uint64_t mappedPos = TranslatePosition(map, absPosition, fallback_ratio);
+    if (withinCut)
+        subtraction += (mappedPos - startOfCutRegion);
+    return mappedPos - subtraction;
+}
+
+// Convert from a "relative" (cutlist-adjusted) value to its
+// "absolute" (not cutlist-adjusted) mapped value.  Usually the
+// position argument is in milliseconds, the map argument maps frames
+// to milliseconds, the fallback_ratio is 1000/framerate_fps, and the
+// return value is also in milliseconds.  Upon return, if necessary,
+// the result may need a separate, non-cutlist adjusted conversion
+// from milliseconds to frame number, using the inverse
+// millisecond-to-frame map and the inverse fallback_ratio; see for
+// example TranslatePositionMsToFrame().
+//
+// If the map and fallback_ratio arguments are omitted, it simply
+// converts from a relatve (cutlist-adjusted) frame number to an
+// absolute frame number.
+uint64_t
+DecoderBase::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
+                                       uint64_t relPosition, // ms
+                                       const frm_pos_map_t &map, // frame->ms
+                                       float fallback_ratio)
+{
+    uint64_t addition = 0;
+    uint64_t startOfCutRegion = 0;
+    bool withinCut = false;
+    bool first = true;
+    for (frm_dir_map_t::const_iterator i = deleteMap.begin();
+         i != deleteMap.end(); ++i)
+    {
+        if (first)
+            withinCut = (i.value() == MARK_CUT_END);
+        first = false;
+        uint64_t mappedKey = TranslatePosition(map, i.key(), fallback_ratio);
+        if (i.value() == MARK_CUT_START && !withinCut)
+        {
+            withinCut = true;
+            startOfCutRegion = mappedKey;
+            if (relPosition + addition <= startOfCutRegion)
+                break;
+        }
+        else if (i.value() == MARK_CUT_END && withinCut)
+        {
+            withinCut = false;
+            addition += (mappedKey - startOfCutRegion);
+        }
+    }
+    return relPosition + addition;
 }
 
 

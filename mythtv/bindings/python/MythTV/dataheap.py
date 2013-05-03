@@ -17,20 +17,57 @@ import locale
 import xml.etree.cElementTree as etree
 from datetime import date, time
 
-class Artwork( unicode ):
+_default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
+
+from UserString import MutableString
+class Artwork( MutableString ):
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
               'fanart':     'Fanart',
               'banner':     'Banners',
               'screenshot': 'ScreenShots',
               'trailer':    'Trailers'}
-    def __new__(self, attr, parent=None, imagetype=None):
-        s = u''
-        if parent and (parent[attr] is not None):
-            s = parent[attr]
-        return super(Artwork, self).__new__(self, s)
+
+    @property
+    def data(self):
+        try:
+            val = self.parent[self.attr]
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
+        else:
+            if val is None:
+                return ''
+            return val
+    @data.setter
+    def data(self, value):
+        try:
+            self.parent[self.attr] = value
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
+    @data.deleter
+    def data(self):
+        try:
+            self.parent[self.attr] = self.parent._defaults.get(self.attr, "")
+        except:
+            raise RuntimeError("Artwork property must be used through an " +\
+                               "object, not independently.")
+
+    def __new__(cls, attr, parent=None, imagetype=None):
+        if (imagetype is None) and (attr not in cls._types):
+            # usage appears to be export from immutable UserString methods
+            # return a dumb string
+            return unicode.__new__(unicode, attr)
+        else:
+            return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
 
     def __init__(self, attr, parent=None, imagetype=None):
+        # replace standard MutableString init to not overwrite self.data
+        from warnings import warnpy3k
+        warnpy3k('the class UserString.MutableString has been removed in '
+                    'Python 3.0', stacklevel=2)
+
         self.attr = attr
         if imagetype is None:
             imagetype = self._types[attr]
@@ -39,10 +76,9 @@ class Artwork( unicode ):
 
         if parent:
             self.hostname = parent.get('hostname', parent.get('host', None))
-        super(Artwork, self).__init__()
 
     def __repr__(self):
-        return u"<{0.imagetype} '{0}'>".format(self)
+        return u"<{0.imagetype} '{0.data}'>".format(self)
 
     def __get__(self, inst, owner):
         if inst is None:
@@ -50,13 +86,15 @@ class Artwork( unicode ):
         return Artwork(self.attr, inst, self.imagetype)
 
     def __set__(self, inst, value):
-        super(Artwork, self).__set__(inst, value)
-        self.parent[self.attr] = value
+        inst[self.attr] = value
+
+    def __delete__(self, inst):
+        inst[self.attr] = inst._defaults.get(self.attr, "")
 
     @property
     def exists(self):
         be = FileOps(self.hostname, db = self.parent._db)
-        return be.fileExists(self, self.imagetype)
+        return be.fileExists(unicode(self), self.imagetype)
 
     def downloadFrom(self, url):
         if self.parent is None:
@@ -66,19 +104,48 @@ class Artwork( unicode ):
         be.downloadTo(url, self.imagetype, self)
 
     def open(self, mode='r'):
-        return ftopen('myth://{0.imagetype}@{0.hostname}/{0}'.format(self), mode)
+        return ftopen((self.hostname, self.imagetype, str(self)), mode)
 
 class Record( CMPRecord, DBDataWrite, RECTYPE ):
     """
     Record(id=None, db=None) -> Record object
     """
-    _defaults = {'type':RECTYPE.kAllRecord,
-                 'title':u'Unknown', 'subtitle':'',      'description':'',
-                 'category':'',      'station':'',       'seriesid':'',
-                 'search':0,         'last_record':datetime(1900,1,1),
-                 'inetref':'',       'next_record':datetime(1900,1,1),
-                 'season':0,         'last_delete':datetime(1900,1,1),
-                 'episode':0}
+
+    @classmethod
+    def _setClassDefs(cls, db=None):
+        db = DBCache(db)
+        super(Record, cls)._setClassDefs(db)
+        defaults = cls._template('Default', db=db)
+        for k,v in defaults.iteritems():
+            cls._defaults[k] = v
+
+    _stored_templates = {}
+    @classmethod
+    def _template(cls, name, db=None):
+        if name not in cls._stored_templates:
+            db = DBCache(db)
+            cls._setClassDefs(db)
+            tmp = cls._fromQuery("WHERE title=?", (name + " (Template)",))\
+                                    .next().iteritems()
+            data = {}
+            for k,v in tmp:
+                if k in ['type', 'category', 'profile', 'recpriority',
+                         'autoexpire', 'maxepisodes', 'startoffset',
+                         'endoffset', 'recgroup', 'dupmethod', 'dupin',
+                         'search', 'autotranscode', 'autocommflag',
+                         'autouserjob1', 'autouserjob2', 'autouserjob3',
+                         'autouserjob4', 'autometadata', 'findday',
+                         'findtime', 'inactive', 'transcoder', 'playgroup',
+                         'prefinput', 'storagegroup', 'avg_delay', 'filter']:
+                    data[k] = v
+            cls._stored_templates[name] = data
+        return cls._stored_templates[name]
+
+    _defaults = {'title':u'Unknown', 'subtitle':u'', 'description':u'',
+                 'category':u'', 'station':u'', 'seriesid':u'', 'inetref':u'',
+                 'season':0, 'episode':0, 'last_record':_default_datetime,
+                 'next_record':_default_datetime,
+                 'last_delete':_default_datetime}
     _artwork = None
 
     def __str__(self):
@@ -89,6 +156,11 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    def __init__(self, data=None, db=None, template=None):
+        DBDataWrite.__init__(self, data, db)
+        if (data is None) and template:
+            dict.update(self, self._template(template, db=self._db))
 
     def create(self, data=None, wait=False):
         """Record.create(data=None) -> Record object"""
@@ -178,8 +250,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
                            join='', db=None, type=RECTYPE.kAllRecord, 
                            searchtype=RECSEARCHTYPE.kPowerSearch, wait=False):
 
-        if type not in (RECTYPE.kAllRecord,           RECTYPE.kFindDailyRecord,
-                        RECTYPE.kFindWeeklyRecord,    RECTYPE.kFindOneRecord):
+        if type not in (RECTYPE.kAllRecord,           RECTYPE.kDailyRecord,
+                        RECTYPE.kWeeklyRecord,        RECTYPE.kOneRecord):
             raise MythDBError("Invalid 'type' set for power recording rule.")
 
         rec = cls(None, db=db)
@@ -294,11 +366,9 @@ class Recorded( CMPRecord, DBDataWrite ):
 
     def open(self, type='r'):
         """Recorded.open(type='r') -> file or FileTransfer object"""
-        return ftopen("myth://%s@%s/%s" % ( self.storagegroup,
-                                            self.hostname,
-                                            self.basename),
-                      type, db=self._db,
-                      chanid=self.chanid, starttime=self.starttime)
+        return ftopen((self.hostname, self.storagegroup, self.basename),
+                      type, db=self._db, chanid=self.chanid,
+                      starttime=self.starttime)
 
     def getProgram(self):
         """Recorded.getProgram() -> Program object"""
@@ -657,7 +727,7 @@ class Channel( DBDataWrite ):
                  'useonairguide':0,      'atsc_major_chan':0,
                  'tmoffset':0,           'default_authority':'',
                  'commmethod':-1,        'atsc_minor_chan':0,
-                 'last_record':datetime(1900,1,1)}
+                 'last_record':_default_datetime}
 
     def __str__(self):
         if self._wheredat is None:
@@ -892,7 +962,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
     trailer              = Artwork('trailer')
 
     def open(self, mode='r', nooverwrite=False):
-        return ftopen('myth://Videos@{0.host}/{0.filename}'.format(self),
+        return ftopen((self.host, 'Videos', self.filename),
                     mode, False, nooverwrite, self._db)
 
     def getHash(self):

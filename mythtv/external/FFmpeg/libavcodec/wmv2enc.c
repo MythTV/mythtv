@@ -85,10 +85,10 @@ int ff_wmv2_encode_picture_header(MpegEncContext * s, int picture_number)
     w->abt_type=0;
     w->j_type=0;
 
-    assert(s->flipflop_rounding);
+    av_assert0(s->flipflop_rounding);
 
     if (s->pict_type == AV_PICTURE_TYPE_I) {
-        assert(s->no_rounding==1);
+        av_assert0(s->no_rounding==1);
         if(w->j_type_bit) put_bits(&s->pb, 1, w->j_type);
 
         if(w->per_mb_rl_bit) put_bits(&s->pb, 1, s->per_mb_rl_table);
@@ -214,11 +214,11 @@ void ff_wmv2_encode_mb(MpegEncContext * s,
 AVCodec ff_wmv2_encoder = {
     .name           = "wmv2",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_WMV2,
+    .id             = AV_CODEC_ID_WMV2,
     .priv_data_size = sizeof(Wmv2Context),
     .init           = wmv2_encode_init,
     .encode2        = ff_MPV_encode_picture,
     .close          = ff_MPV_encode_end,
-    .pix_fmts       = (const enum PixelFormat[]){ PIX_FMT_YUV420P, PIX_FMT_NONE },
+    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 8"),
 };

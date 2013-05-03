@@ -40,14 +40,14 @@ class SubtitleScreen : public MythScreenType
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
     void SetZoom(int percent);
-    int GetZoom(void);
+    int GetZoom(void) const;
+    void SetDelay(int ms);
+    int GetDelay(void) const;
 
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
-                       bool teletext,
                        float layoutSpacing) const;
-    int CalcPadding(const CC708CharacterAttribute &format,
-                    bool teletext, bool isLeft) const;
+    int CalcPadding(const CC708CharacterAttribute &format, bool isLeft) const;
 
     void RegisterExpiration(MythUIType *shape, long long endTime)
     {
@@ -63,6 +63,10 @@ class SubtitleScreen : public MythScreenType
     virtual void Pulse(void);
 
   private:
+    void SetElementAdded(void);
+    void SetElementResized(void);
+    void SetElementDeleted(void);
+    void ResetElementState(void);
     void OptimiseDisplayedArea(void);
     void DisplayAVSubtitles(void);
     int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
@@ -78,8 +82,7 @@ class SubtitleScreen : public MythScreenType
     void AddScaledImage(QImage &img, QRect &pos);
     void Clear708Cache(int num);
     void InitializeFonts(bool wasResized);
-    MythFontProperties* GetFont(CC708CharacterAttribute attr,
-                                bool teletext) const;
+    MythFontProperties* GetFont(CC708CharacterAttribute attr) const;
     void SetFontSize(int pixelSize) { m_fontSize = pixelSize; }
 
     MythPlayer        *m_player;
@@ -94,7 +97,10 @@ class SubtitleScreen : public MythScreenType
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;
-    bool               m_refreshArea;
+    int                m_textFontDelayMs; // valid for text subs
+    int                m_textFontDelayMsPrev;
+    bool               m_refreshModified;
+    bool               m_refreshDeleted;
     QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
     QString            m_family; // 608, 708, text, teletext
@@ -122,19 +128,19 @@ class FormattedTextChunk
 {
   public:
     FormattedTextChunk(const QString &t, CC708CharacterAttribute formatting,
-                       SubtitleScreen *p, bool teletext = false)
-        : text(t), format(formatting), parent(p), isTeletext(teletext)
+                       SubtitleScreen *p)
+        : text(t), format(formatting), parent(p)
     {
     }
-    FormattedTextChunk(void) : parent(NULL), isTeletext(false) {}
+    FormattedTextChunk(void) : parent(NULL) {}
 
     QSize CalcSize(float layoutSpacing = 0.0f) const
     {
-        return parent->CalcTextSize(text, format, isTeletext, layoutSpacing);
+        return parent->CalcTextSize(text, format, layoutSpacing);
     }
     int CalcPadding(bool isLeft) const
     {
-        return parent->CalcPadding(format, isTeletext, isLeft);
+        return parent->CalcPadding(format, isLeft);
     }
     bool Split(FormattedTextChunk &newChunk);
     QString ToLogString(void) const;
@@ -142,7 +148,6 @@ class FormattedTextChunk
     QString text;
     CC708CharacterAttribute format;
     SubtitleScreen *parent; // where fonts and sizes are kept
-    bool isTeletext;
 };
 
 class FormattedTextLine

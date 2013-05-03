@@ -51,10 +51,17 @@ class EITFixUp
         kFixNO         = 0x10000,
         kFixNRK_DVBT   = 0x20000,
         kFixDish       = 0x40000,
+        kFixDK         = 0x80000,
+        kFixAUFreeview    = 0x100000,
+        kFixAUDescription = 0x200000,
+        kFixAUNine        = 0x400000,
+        kFixAUSeven       = 0x800000,
+
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
         kEFixForceISO8859_15 = 0x4000,
+        kEFixForceISO8859_9  = 0x80000,
     };
 
     EITFixUp();
@@ -82,6 +89,10 @@ class EITFixUp
     void FixComHem(DBEventEIT &event,
                    bool parse_subtitle) const;      // Sweden DVB-C
     void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
+    void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
+    void FixAUNine(DBEventEIT &event) const;    
+    void FixAUSeven(DBEventEIT &event) const;    
+    void FixAUDescription(DBEventEIT &event) const;
     void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
@@ -90,6 +101,7 @@ class EITFixUp
     void FixCategory(DBEventEIT &event) const;      // Generic Category fixes
     void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
     void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
+    void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -180,6 +192,7 @@ class EITFixUp
     const QRegExp m_nlRepeat;
     const QRegExp m_nlHD;
     const QRegExp m_nlSub;
+    const QRegExp m_nlSub2;
     const QRegExp m_nlActors;
     const QRegExp m_nlPres;
     const QRegExp m_nlPersSeparator;
@@ -190,10 +203,33 @@ class EITFixUp
     const QRegExp m_nlCat;
     const QRegExp m_nlOmroep;
     const QRegExp m_noRerun;
+    const QRegExp m_noHD;
     const QRegExp m_noColonSubtitle;
     const QRegExp m_noNRKCategories;
     const QRegExp m_noPremiere;
     const QRegExp m_Stereo;
+    const QRegExp m_dkEpisode;
+    const QRegExp m_dkPart;
+    const QRegExp m_dkSubtitle1;
+    const QRegExp m_dkSubtitle2;
+    const QRegExp m_dkSeason1;
+    const QRegExp m_dkSeason2;
+    const QRegExp m_dkFeatures;
+    const QRegExp m_dkWidescreen;
+    const QRegExp m_dkDolby;
+    const QRegExp m_dkSurround;
+    const QRegExp m_dkStereo;
+    const QRegExp m_dkReplay;
+    const QRegExp m_dkTxt;
+    const QRegExp m_dkHD;
+    const QRegExp m_dkActors;
+    const QRegExp m_dkPersonsSeparator;
+    const QRegExp m_dkDirector;
+    const QRegExp m_dkYear;
+    const QRegExp m_AUFreeviewSY;//subtitle, year
+    const QRegExp m_AUFreeviewY;//year
+    const QRegExp m_AUFreeviewYC;//year, cast
+    const QRegExp m_AUFreeviewSYC;//subtitle, year, cast
 };
 
 #endif // EITFIXUP_H

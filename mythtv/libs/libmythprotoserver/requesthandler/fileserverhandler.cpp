@@ -184,13 +184,14 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
             handler->AllowStandardEvents(true);
             handler->AllowSystemEvents(true);
 
+            handler->WriteStringList(QStringList("OK"));
+
             QWriteLocker wlock(&m_fsLock);
             m_fsMap.insert(commands[2], handler);
             m_parent->AddSocketHandler(handler);
 
-            slist.clear();
-            slist << "OK";
-            handler->SendStringList(slist);
+            handler->DecrRef();
+            
             return true;
         }
         return false;
@@ -250,7 +251,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
                     "to write to in FileTransfer write command");
 
             slist << "ERROR" << "filetransfer_directory_not_found";
-            socket->writeStringList(slist);
+            socket->WriteStringList(slist);
             return true;
         }
 
@@ -262,7 +263,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
                     .arg(qurl.toString()));
 
             slist << "ERROR" << "filetransfer_filename_empty";
-            socket->writeStringList(slist);
+            socket->WriteStringList(slist);
             return true;
         }
 
@@ -274,7 +275,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
                     .arg(basename));
 
             slist << "ERROR" << "filetransfer_filename_dangerous";
-            socket->writeStringList(slist);
+            socket->WriteStringList(slist);
             return true;
         }
 
@@ -291,7 +292,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
                 .arg(filename));
 
         slist << "ERROR" << "filetransfer_filename_is_a_directory";
-        socket->writeStringList(slist);
+        socket->WriteStringList(slist);
         return true;
     }
 
@@ -309,7 +310,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
                         .arg(filename));
 
                 slist << "ERROR" << "filetransfer_unable_to_create_subdirectory";
-                socket->writeStringList(slist);
+                socket->WriteStringList(slist);
                 return true;
             }
         }
@@ -323,11 +324,11 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
 
     {
         QWriteLocker wlock(&m_ftLock);
-        m_ftMap.insert(socket->socket(), ft);
+        m_ftMap.insert(socket->GetSocketDescriptor(), ft);
     }
 
     slist << "OK"
-          << QString::number(socket->socket())
+          << QString::number(socket->GetSocketDescriptor())
           << QString::number(ft->GetFileSize());
 
     if (checkfiles.size())
@@ -342,8 +343,10 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         }
     }
 
-    socket->writeStringList(slist);
+    socket->WriteStringList(slist);
     m_parent->AddSocketHandler(ft);
+    ft->DecrRef(); ft = NULL;
+
     return true;
 }
 
@@ -405,7 +408,7 @@ bool FileServerHandler::HandleQueryFreeSpace(SocketHandler *socket)
     for (i = disks.begin(); i != disks.end(); ++i)
         i->ToStringList(res);
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -441,7 +444,7 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
         << QString::number(total)
         << QString::number(used);
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -462,7 +465,7 @@ bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
     }
 
     res << QString::number(total) << QString::number(used);
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -580,7 +583,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
             QString("ERROR checking for file, filename '%1' "
                     "fails sanity checks").arg(filename));
         res << "";
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -619,7 +622,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
     else
         res << "0";
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -652,7 +655,7 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
                 QString("ERROR checking for file, filename '%1' "
                         "fails sanity checks").arg(filename));
             res << "";
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
             return true;
         }
         break;
@@ -711,7 +714,7 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
 
 
     res << hash;
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
 
     return true;
 }
@@ -746,7 +749,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
         if (socket)
         {
             res << "0";
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
             return true;
         }
         return false;
@@ -761,7 +764,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
         if (socket)
         {
             res << "0";
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
             return true;
         }
         return false;
@@ -773,7 +776,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
         if (socket)
         {
             res << "1";
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
         }
         RunDeleteThread();
         deletethread->AddFile(fullfile);
@@ -785,7 +788,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
         if (socket)
         {
             res << "0";
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
         }
     }
 
@@ -811,7 +814,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
                                      .arg(slist.join("[]:[]")));
         res << "EMPTY LIST";
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -867,7 +870,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
         }
     }
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -881,7 +884,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
                 .arg(slist.join("[]:[]")));
         res << "EMPTY LIST";
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -928,7 +931,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
         }
     }
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -959,7 +962,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
                     << "unknown_file_transfer_socket";
             }
 
-            socket->SendStringList(res);
+            socket->WriteStringList(res);
             return true;
         }
 
@@ -1042,7 +1045,7 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
     }
 
     ft->DecrRef();
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 
@@ -1054,7 +1057,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
     if (slist.size() != 4)
     {
         res << "ERROR" << QString("Bad %1 command").arg(slist[0]);
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -1078,7 +1081,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
         LOG(VB_GENERAL, LOG_ERR, QString("Unable to determine directory "
                 "to write to in %1 write command").arg(slist[0]));
         res << "ERROR" << "downloadfile_directory_not_found";
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -1089,7 +1092,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
                 "filename '%2' does not pass sanity checks.")
                 .arg(slist[0]).arg(filename));
         res << "ERROR" << "downloadfile_filename_dangerous";
-        socket->SendStringList(res);
+        socket->WriteStringList(res);
         return true;
     }
 
@@ -1118,7 +1121,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
             << gCoreContext->GetMasterHostPrefix(storageGroup) + filename;
     }
 
-    socket->SendStringList(res);
+    socket->WriteStringList(res);
     return true;
 }
 

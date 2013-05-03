@@ -29,11 +29,13 @@
 #define MYTH_APPNAME_MYTHMETADATALOOKUP "mythmetadatalookup"
 #define MYTH_APPNAME_MYTHUTIL "mythutil"
 #define MYTH_APPNAME_MYTHLOGSERVER "mythlogserver"
+#define MYTH_APPNAME_MYTHSCREENWIZARD "mythscreenwizard"
 
 class MDBManager;
 class MythCoreContextPrivate;
 class MythSocket;
 class MythScheduler;
+class MythPluginManager;
 
 /** \class MythCoreContext
  *  \brief This class contains the runtime context for MythTV.
@@ -59,6 +61,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SetEventSocket(MythSocket *eventSock);
     void SetScheduler(MythScheduler *sched);
 
+    bool SafeConnectToMasterServer(bool blockingClient = true,
+                                   bool openEventSocket = true);
     bool ConnectToMasterServer(bool blockingClient = true,
                                bool openEventSocket = true);
 
@@ -173,6 +177,13 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void UnregisterForPlayback(QObject *sender);
     void WantingPlayback(QObject *sender);
 
+    // Plugin related methods
+    bool TestPluginVersion(const QString &name, const QString &libversion,
+                          const QString &pluginversion);
+
+    void SetPluginManager(MythPluginManager *pmanager);
+    MythPluginManager *GetPluginManager(void);
+    
     // signal related methods
     void WaitUntilSignals(const char *signal1, ...);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }

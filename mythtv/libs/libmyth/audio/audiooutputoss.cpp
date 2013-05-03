@@ -47,7 +47,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
 {
     AudioOutputSettings *settings = new AudioOutputSettings();
 
-    QByteArray device = main_device.toAscii();
+    QByteArray device = main_device.toLatin1();
     audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
 
     AudioFormat fmt;
@@ -121,7 +121,7 @@ bool AudioOutputOSS::OpenDevice()
 
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
-        QByteArray device = main_device.toAscii();
+        QByteArray device = main_device.toLatin1();
         audiofd = open(device.constData(), O_WRONLY);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
@@ -282,7 +282,7 @@ void AudioOutputOSS::VolumeInit()
     if (device.toLower() == "software")
         return;
 
-    QByteArray dev = device.toAscii();
+    QByteArray dev = device.toLatin1();
     mixerfd = open(dev.constData(), O_RDONLY);
 
     QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");

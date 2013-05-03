@@ -7,6 +7,7 @@ class MythBDPlayer : public MythPlayer
 {
   public:
     MythBDPlayer(PlayerFlags flags = kNoFlags);
+    virtual bool    HasReachedEof(void) const;
     virtual bool    GoToMenu(QString str);
     virtual int     GetNumChapters(void);
     virtual int     GetCurrentChapter(void);

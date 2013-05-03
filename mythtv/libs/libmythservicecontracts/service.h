@@ -45,10 +45,7 @@ class SERVICE_PUBLIC Service : public QObject
 
     public:
 
-        Service( QObject *parent = 0 ) : QObject( parent ) 
-        {
-            qRegisterMetaType< QFileInfo   >();
-        }
+        inline Service( QObject *parent = NULL );
 
     public:
 
@@ -71,6 +68,14 @@ class SERVICE_PUBLIC Service : public QObject
 //
 //////////////////////////////////////////////////////////////////////////////
 
-Q_DECLARE_METATYPE( QFileInfo  )
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+Q_DECLARE_METATYPE( QFileInfo )
+inline Service::Service(QObject *parent) : QObject(parent)
+{
+    qRegisterMetaType< QFileInfo >();
+}
+#else
+inline Service::Service(QObject *parent) : QObject(parent) {}
+#endif
 
 #endif

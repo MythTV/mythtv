@@ -1,5 +1,7 @@
 #include <climits>
 
+#include "mythconfig.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 }

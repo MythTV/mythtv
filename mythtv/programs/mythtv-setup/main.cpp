@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
 
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
@@ -288,6 +288,9 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
@@ -406,9 +409,9 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "%5i: %s %s\n",
                         cardids[i],
                         CardUtil::GetRawCardType(cardids[i])
-                        .toAscii().constData(),
+                        .toLatin1().constData(),
                         CardUtil::GetVideoDevice(cardids[i])
-                        .toAscii().constData());
+                        .toLatin1().constData());
             }
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
@@ -420,7 +423,7 @@ int main(int argc, char *argv[])
             cerr << "Valid inputs: " << endl;
             for (int i = 0; i < inputnames.size(); i++)
             {
-                cerr << inputnames[i].toAscii().constData() << endl;
+                cerr << inputnames[i].toLatin1().constData() << endl;
             }
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
@@ -481,7 +484,7 @@ int main(int argc, char *argv[])
                    scans[i].scanid,   scans[i].cardid,
                    scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
                    scans[i].scandate.toString(Qt::ISODate)
-                   .toAscii().constData());
+                   .toLatin1().constData());
         }
         cout<<endl;
 

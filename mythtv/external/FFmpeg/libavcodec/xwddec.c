@@ -3,26 +3,27 @@
  *
  * Copyright (c) 2012 Paul B Mahol
  *
- * This file is part of Libav.
+ * This file is part of FFmpeg.
  *
- * Libav is free software; you can redistribute it and/or
+ * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * Libav is distributed in the hope that it will be useful,
+ * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Libav; if not, write to the Free Software
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 #include "xwd.h"
 
 static av_cold int xwd_decode_init(AVCodecContext *avctx)
@@ -35,7 +36,7 @@ static av_cold int xwd_decode_init(AVCodecContext *avctx)
 }
 
 static int xwd_decode_frame(AVCodecContext *avctx, void *data,
-                            int *data_size, AVPacket *avpkt)
+                            int *got_frame, AVPacket *avpkt)
 {
     AVFrame *p = avctx->coded_frame;
     const uint8_t *buf = avpkt->data;
@@ -153,19 +154,22 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_PATCHWELCOME;
     }
 
-    avctx->pix_fmt = PIX_FMT_NONE;
+    avctx->pix_fmt = AV_PIX_FMT_NONE;
     switch (vclass) {
     case XWD_STATIC_GRAY:
     case XWD_GRAY_SCALE:
-        if (bpp != 1)
+        if (bpp != 1 && bpp != 8)
             return AVERROR_INVALIDDATA;
-        if (pixdepth == 1)
-            avctx->pix_fmt = PIX_FMT_MONOWHITE;
+        if (pixdepth == 1) {
+            avctx->pix_fmt = AV_PIX_FMT_MONOWHITE;
+        } else if (pixdepth == 8) {
+            avctx->pix_fmt = AV_PIX_FMT_GRAY8;
+        }
         break;
     case XWD_STATIC_COLOR:
     case XWD_PSEUDO_COLOR:
         if (bpp == 8)
-            avctx->pix_fmt = PIX_FMT_PAL8;
+            avctx->pix_fmt = AV_PIX_FMT_PAL8;
         break;
     case XWD_TRUE_COLOR:
     case XWD_DIRECT_COLOR:
@@ -173,24 +177,24 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
             return AVERROR_INVALIDDATA;
         if (bpp == 16 && pixdepth == 15) {
             if (rgb[0] == 0x7C00 && rgb[1] == 0x3E0 && rgb[2] == 0x1F)
-                avctx->pix_fmt = be ? PIX_FMT_RGB555BE : PIX_FMT_RGB555LE;
+                avctx->pix_fmt = be ? AV_PIX_FMT_RGB555BE : AV_PIX_FMT_RGB555LE;
             else if (rgb[0] == 0x1F && rgb[1] == 0x3E0 && rgb[2] == 0x7C00)
-                avctx->pix_fmt = be ? PIX_FMT_BGR555BE : PIX_FMT_BGR555LE;
+                avctx->pix_fmt = be ? AV_PIX_FMT_BGR555BE : AV_PIX_FMT_BGR555LE;
         } else if (bpp == 16 && pixdepth == 16) {
             if (rgb[0] == 0xF800 && rgb[1] == 0x7E0 && rgb[2] == 0x1F)
-                avctx->pix_fmt = be ? PIX_FMT_RGB565BE : PIX_FMT_RGB565LE;
+                avctx->pix_fmt = be ? AV_PIX_FMT_RGB565BE : AV_PIX_FMT_RGB565LE;
             else if (rgb[0] == 0x1F && rgb[1] == 0x7E0 && rgb[2] == 0xF800)
-                avctx->pix_fmt = be ? PIX_FMT_BGR565BE : PIX_FMT_BGR565LE;
+                avctx->pix_fmt = be ? AV_PIX_FMT_BGR565BE : AV_PIX_FMT_BGR565LE;
         } else if (bpp == 24) {
             if (rgb[0] == 0xFF0000 && rgb[1] == 0xFF00 && rgb[2] == 0xFF)
-                avctx->pix_fmt = be ? PIX_FMT_RGB24 : PIX_FMT_BGR24;
+                avctx->pix_fmt = be ? AV_PIX_FMT_RGB24 : AV_PIX_FMT_BGR24;
             else if (rgb[0] == 0xFF && rgb[1] == 0xFF00 && rgb[2] == 0xFF0000)
-                avctx->pix_fmt = be ? PIX_FMT_BGR24 : PIX_FMT_RGB24;
+                avctx->pix_fmt = be ? AV_PIX_FMT_BGR24 : AV_PIX_FMT_RGB24;
         } else if (bpp == 32) {
             if (rgb[0] == 0xFF0000 && rgb[1] == 0xFF00 && rgb[2] == 0xFF)
-                avctx->pix_fmt = be ? PIX_FMT_ARGB : PIX_FMT_BGRA;
+                avctx->pix_fmt = be ? AV_PIX_FMT_ARGB : AV_PIX_FMT_BGRA;
             else if (rgb[0] == 0xFF && rgb[1] == 0xFF00 && rgb[2] == 0xFF0000)
-                avctx->pix_fmt = be ? PIX_FMT_ABGR : PIX_FMT_RGBA;
+                avctx->pix_fmt = be ? AV_PIX_FMT_ABGR : AV_PIX_FMT_RGBA;
         }
         bytestream2_skipu(&gb, ncolors * XWD_CMAP_SIZE);
         break;
@@ -199,7 +203,7 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
         return AVERROR_INVALIDDATA;
     }
 
-    if (avctx->pix_fmt == PIX_FMT_NONE) {
+    if (avctx->pix_fmt == AV_PIX_FMT_NONE) {
         av_log_ask_for_sample(avctx, "unknown file: bpp %d, pixdepth %d, vclass %d\n", bpp, pixdepth, vclass);
         return AVERROR_PATCHWELCOME;
     }
@@ -208,7 +212,7 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
         avctx->release_buffer(avctx, p);
 
     p->reference = 0;
-    if ((ret = avctx->get_buffer(avctx, p)) < 0) {
+    if ((ret = ff_get_buffer(avctx, p)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -216,7 +220,7 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
     p->key_frame = 1;
     p->pict_type = AV_PICTURE_TYPE_I;
 
-    if (avctx->pix_fmt == PIX_FMT_PAL8) {
+    if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         uint32_t *dst = (uint32_t *)p->data[1];
         uint8_t red, green, blue;
 
@@ -241,7 +245,7 @@ static int xwd_decode_frame(AVCodecContext *avctx, void *data,
         ptr += p->linesize[0];
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame       = 1;
     *(AVFrame *)data = *p;
 
     return buf_size;
@@ -260,7 +264,7 @@ static av_cold int xwd_decode_close(AVCodecContext *avctx)
 AVCodec ff_xwd_decoder = {
     .name           = "xwd",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_XWD,
+    .id             = AV_CODEC_ID_XWD,
     .init           = xwd_decode_init,
     .close          = xwd_decode_close,
     .decode         = xwd_decode_frame,

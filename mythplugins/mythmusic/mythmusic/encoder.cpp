@@ -1,13 +1,14 @@
 #include <iostream>
 
-#include "metadata.h"
+#include <musicmetadata.h>
+#include <mythcontext.h>
+
 #include "encoder.h"
 
-#include <mythcontext.h>
 
 using namespace std;
 
-Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
+Encoder::Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata)
     : m_outfile(outfile), m_out(NULL), m_quality(qualitylevel),
       m_metadata(metadata)
 {

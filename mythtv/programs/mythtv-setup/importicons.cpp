@@ -7,9 +7,12 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "httpcomms.h"
 #include "importicons.h"
 #include "mythdate.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include "httpcomms.h"
+#endif
 
 // MythUI
 #include "mythuitext.h"
@@ -519,7 +522,8 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
 
 QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
 {
-    QByteArray raw(strParam.toAscii());
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QByteArray raw(strParam.toLatin1());
     QBuffer data(&raw);
     QHttpRequestHeader header;
 
@@ -531,10 +535,15 @@ QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
     QString str = HttpComms::postHttp(url,&header,&data);
 
     return str;
+#else
+#warning ImportIconsWizard::wget() not ported to Qt5
+    return QString();
+#endif
 }
 
 bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& localChanId)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QString iconUrl = url;
     QString filename = url.section('/', -1);
     QFileInfo file(m_strChannelDir+filename);
@@ -565,6 +574,10 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     }
 
     return fRet;
+#else
+#warning ImportIconsWizard::checkAndDownload() not ported to Qt5
+    return false;
+#endif
 }
 
 bool ImportIconsWizard::lookup(const QString& strParam)

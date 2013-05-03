@@ -12,14 +12,13 @@
 #include <mythdialogs.h>
 #include <mythscreenstack.h>
 #include <mythprogressdialog.h>
+#include <musicmetadata.h>
+#include <metaio.h>
 
 // MythMusic headers
-#include "decoder.h"
 #include "filescanner.h"
-#include "metadata.h"
-#include "metaio.h"
 
-FileScanner::FileScanner() : m_decoder(NULL)
+FileScanner::FileScanner()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -87,6 +86,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     if (!d.exists())
         return;
 
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
     if (list.isEmpty())
         return;
@@ -102,8 +102,6 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
         QString filename = fi->absoluteFilePath();
         if (fi->isDir())
         {
@@ -259,67 +257,65 @@ void FileScanner::AddFileToDB(const QString &filename)
         return;
     }
 
-    Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
-
-    if (decoder)
+    LOG(VB_FILE, LOG_INFO,
+        QString("Reading metadata from %1").arg(filename));
+    MusicMetadata *data = MetaIO::readMetadata(filename);
+    data->setFileSize((quint64)QFileInfo(filename).size());
+    if (data)
     {
-        LOG(VB_FILE, LOG_INFO,
-            QString("Reading metadata from %1").arg(filename));
-        Metadata *data = decoder->readMetadata();
-        data->setFileSize((quint64)QFileInfo(filename).size());
-        if (data)
+        QString album_cache_string;
+
+        // Set values from cache
+        int did = m_directoryid[directory];
+        if (did > 0)
+            data->setDirectoryId(did);
+
+        int aid = m_artistid[data->Artist().toLower()];
+        if (aid > 0)
         {
-            QString album_cache_string;
+            data->setArtistId(aid);
 
-            // Set values from cache
-            int did = m_directoryid[directory];
-            if (did > 0)
-                data->setDirectoryId(did);
-
-            int aid = m_artistid[data->Artist().toLower()];
-            if (aid > 0)
-            {
-                data->setArtistId(aid);
-
-                // The album cache depends on the artist id
-                album_cache_string = data->getArtistId() + "#"
-                    + data->Album().toLower();
-
-                if (m_albumid[album_cache_string] > 0)
-                    data->setAlbumId(m_albumid[album_cache_string]);
-            }
-
-            int gid = m_genreid[data->Genre().toLower()];
-            if (gid > 0)
-                data->setGenreId(gid);
-
-            // Commit track info to database
-            data->dumpToDatabase();
-
-            // Update the cache
-            m_artistid[data->Artist().toLower()] =
-                data->getArtistId();
-
-            m_genreid[data->Genre().toLower()] =
-                data->getGenreId();
-
+            // The album cache depends on the artist id
             album_cache_string = data->getArtistId() + "#"
                 + data->Album().toLower();
-            m_albumid[album_cache_string] = data->getAlbumId();
 
-            // read any embedded images from the tag
-            MetaIO *tagger = data->getTagger();
-            if (tagger && tagger->supportsEmbeddedImages())
+            if (m_albumid[album_cache_string] > 0)
+                data->setAlbumId(m_albumid[album_cache_string]);
+        }
+
+        int gid = m_genreid[data->Genre().toLower()];
+        if (gid > 0)
+            data->setGenreId(gid);
+
+        // Commit track info to database
+        data->dumpToDatabase();
+
+        // Update the cache
+        m_artistid[data->Artist().toLower()] =
+            data->getArtistId();
+
+        m_genreid[data->Genre().toLower()] =
+            data->getGenreId();
+
+        album_cache_string = data->getArtistId() + "#"
+            + data->Album().toLower();
+        m_albumid[album_cache_string] = data->getAlbumId();
+
+        // read any embedded images from the tag
+        MetaIO *tagger = MetaIO::createTagger(filename);
+
+        if (tagger)
+        {
+            if (tagger->supportsEmbeddedImages())
             {
                 AlbumArtList artList = tagger->getAlbumArtList(data->Filename());
                 data->setEmbeddedAlbumArt(artList);
                 data->getAlbumArtImages()->dumpToDatabase();
             }
-
-            delete data;
+            delete tagger;
         }
 
-        delete decoder;
+        delete data;
     }
 }
 
@@ -483,77 +479,70 @@ void FileScanner::UpdateFileInDB(const QString &filename)
     directory.remove(0, m_startdir.length());
     directory = directory.section( '/', 0, -2);
 
-    Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
+    MusicMetadata *db_meta   = MetaIO::getMetadata(filename);
+    MusicMetadata *disk_meta = MetaIO::readMetadata(filename);
 
-    if (decoder)
+    if (db_meta && disk_meta)
     {
-        Metadata *db_meta   = decoder->getMetadata();
-        Metadata *disk_meta = decoder->readMetadata();
-
-        if (db_meta && disk_meta)
+        if (db_meta->ID() <= 0)
         {
-            if (db_meta->ID() <= 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, QString("Asked to update track with "
-                                                 "invalid ID - %1")
-                                                .arg(db_meta->ID()));
-                delete disk_meta;
-                delete db_meta;
-                return;
-            }
-            
-            disk_meta->setID(db_meta->ID());
-            disk_meta->setRating(db_meta->Rating());
-            if (db_meta->PlayCount() > disk_meta->PlayCount())
-                disk_meta->setPlaycount(db_meta->Playcount());
-
-            QString album_cache_string;
-
-            // Set values from cache
-            int did = m_directoryid[directory];
-            if (did > 0)
-                disk_meta->setDirectoryId(did);
-
-            int aid = m_artistid[disk_meta->Artist().toLower()];
-            if (aid > 0)
-            {
-                disk_meta->setArtistId(aid);
-
-                // The album cache depends on the artist id
-                album_cache_string = disk_meta->getArtistId() + "#" +
-                    disk_meta->Album().toLower();
-
-                if (m_albumid[album_cache_string] > 0)
-                    disk_meta->setAlbumId(m_albumid[album_cache_string]);
-            }
-
-            int gid = m_genreid[disk_meta->Genre().toLower()];
-            if (gid > 0)
-                disk_meta->setGenreId(gid);
-
-            disk_meta->setFileSize((quint64)QFileInfo(filename).size());
-            
-            // Commit track info to database
-            disk_meta->dumpToDatabase();
-
-            // Update the cache
-            m_artistid[disk_meta->Artist().toLower()]
-                = disk_meta->getArtistId();
-            m_genreid[disk_meta->Genre().toLower()]
-                = disk_meta->getGenreId();
-            album_cache_string = disk_meta->getArtistId() + "#" +
-                disk_meta->Album().toLower();
-            m_albumid[album_cache_string] = disk_meta->getAlbumId();
+            LOG(VB_GENERAL, LOG_ERR, QString("Asked to update track with "
+                                                "invalid ID - %1")
+                                            .arg(db_meta->ID()));
+            delete disk_meta;
+            delete db_meta;
+            return;
         }
 
-        if (disk_meta)
-            delete disk_meta;
+        disk_meta->setID(db_meta->ID());
+        disk_meta->setRating(db_meta->Rating());
+        if (db_meta->PlayCount() > disk_meta->PlayCount())
+            disk_meta->setPlaycount(db_meta->Playcount());
 
-        if (db_meta)
-            delete db_meta;
+        QString album_cache_string;
 
-        delete decoder;
+        // Set values from cache
+        int did = m_directoryid[directory];
+        if (did > 0)
+            disk_meta->setDirectoryId(did);
+
+        int aid = m_artistid[disk_meta->Artist().toLower()];
+        if (aid > 0)
+        {
+            disk_meta->setArtistId(aid);
+
+            // The album cache depends on the artist id
+            album_cache_string = disk_meta->getArtistId() + "#" +
+                disk_meta->Album().toLower();
+
+            if (m_albumid[album_cache_string] > 0)
+                disk_meta->setAlbumId(m_albumid[album_cache_string]);
+        }
+
+        int gid = m_genreid[disk_meta->Genre().toLower()];
+        if (gid > 0)
+            disk_meta->setGenreId(gid);
+
+        disk_meta->setFileSize((quint64)QFileInfo(filename).size());
+
+        // Commit track info to database
+        disk_meta->dumpToDatabase();
+
+        // Update the cache
+        m_artistid[disk_meta->Artist().toLower()]
+            = disk_meta->getArtistId();
+        m_genreid[disk_meta->Genre().toLower()]
+            = disk_meta->getGenreId();
+        album_cache_string = disk_meta->getArtistId() + "#" +
+            disk_meta->Album().toLower();
+        m_albumid[album_cache_string] = disk_meta->getAlbumId();
     }
+
+    if (disk_meta)
+        delete disk_meta;
+
+    if (db_meta)
+        delete db_meta;
 }
 
 /*!

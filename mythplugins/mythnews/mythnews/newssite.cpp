@@ -286,6 +286,26 @@ void NewsSite::process(void)
 
 }
 
+static bool isImage(const QString &mimeType)
+{
+    if (mimeType == "image/png" || mimeType == "image/jpeg" ||
+        mimeType == "image/jpg" || mimeType == "image/gif" ||
+        mimeType == "image/bmp")
+        return true;
+
+    return false;
+}
+
+static bool isVideo(const QString &mimeType)
+{
+    if (mimeType == "video/mpeg" || mimeType == "video/x-ms-wmv" ||
+        mimeType == "application/x-troff-msvideo" || mimeType == "video/avi" ||
+        mimeType == "video/msvideo" || mimeType == "video/x-msvideo")
+        return true;
+
+    return false;
+}
+
 void NewsSite::parseRSS(QDomDocument domDoc)
 {
     QMutexLocker locker(&m_lock);
@@ -349,6 +369,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         //////////////////////////////////////////////////////////////
         // From this point forward, we process RSS 2.0 media tags.
         // Please put all other tag processing before this comment.
+        // See http://www.rssboard.org/media-rss for details
         //////////////////////////////////////////////////////////////
 
         // Some media: tags can be enclosed in a media:group item.
@@ -380,26 +401,41 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         if (!descNode.isNull())
             description = descNode.toElement().text().simplified();
 
-        if (enclosure.isEmpty())
+        // parse any media:content items looking for any images or videos
+        QDomElement e = itemNode.toElement();
+        QDomNodeList mediaNodes = e.elementsByTagName("media:content");
+        for (int x = 0; x < mediaNodes.count(); x++)
         {
-            QDomNode contentNode = itemNode.namedItem("media:content");
-            if (!contentNode.isNull())
-            {
-                QDomAttr enclosureURL = contentNode.toElement()
-                    .attributeNode("url");
+            QString medium;
+            QString type;
+            QString url;
 
-                if (!enclosureURL.isNull())
-                   enclosure  = enclosureURL.value();
+            QDomElement mediaElement = mediaNodes.at(x).toElement();
 
-                QDomAttr enclosureType = contentNode.toElement()
-                    .attributeNode("type");
+            if (mediaElement.isNull())
+                continue;
 
-                if (!enclosureType.isNull())
-                   enclosure_type  = enclosureType.value();
-            }
+            if (mediaElement.hasAttribute("medium"))
+                medium = mediaElement.attributeNode("medium").value();
+
+            if (mediaElement.hasAttribute("type"))
+                type = mediaElement.attributeNode("type").value();
+
+            if (mediaElement.hasAttribute("url"))
+                url = mediaElement.attributeNode("url").value();
+
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("parseRSS found media:content: medium: %1, type: %2, url: 3")
+                        .arg(medium).arg(type).arg(url));
+
+            // if this is an image use it as the thumbnail if we haven't found one yet
+            if (thumbnail.isEmpty() && (medium == "image" || isImage(type)))
+                thumbnail = url;
+
+            // if this is a video use it as the enclosure if we haven't found one yet
+            if (enclosure.isEmpty() && (medium == "video" || isVideo(type)))
+                enclosure = url;
         }
-
-        (void) enclosure_type; // not currently used...
 
         insertNewsArticle(NewsArticle(title, description, url,
                                       thumbnail, mediaurl, enclosure));

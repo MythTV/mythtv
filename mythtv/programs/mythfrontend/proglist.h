@@ -64,6 +64,7 @@ class ProgLister : public ScheduleCommon
     void EditCustom(void)    { ScheduleCommon::EditCustom(GetCurrent());    }
 
     void ShowDetails(void)   { ScheduleCommon::ShowDetails(GetCurrent());   }
+    void ShowGuide(void);
     void ShowUpcoming(void);
     void ShowDeleteRuleMenu(void);
     void ShowDeleteOldEpisodeMenu(void);
@@ -133,6 +134,8 @@ class ProgLister : public ScheduleCommon
     MythUIText       *m_positionText;
     MythUIButtonList *m_progList;
     MythUIText       *m_messageText;
+
+    bool              m_allowViewDialog;
 };
 
 #endif

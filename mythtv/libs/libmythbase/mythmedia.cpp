@@ -249,7 +249,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
     if (!d.exists())
         return false;
 
-
+    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
 
     for( QFileInfoList::iterator it = list.begin();
@@ -257,9 +257,6 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
                                ++it )
     {
         QFileInfo &fi = *it;
-
-        if (("." == fi.fileName()) || (".." == fi.fileName()))
-            continue;
 
         if (fi.isSymLink())
             continue;
@@ -324,9 +321,7 @@ bool MythMediaDevice::isSameDevice(const QString &path)
 
 void MythMediaDevice::setSpeed(int speed)
 {
-    LOG(VB_MEDIA, LOG_ERR,
-            QString("Cannot setSpeed(%1) for device %2 - not implemented.")
-            .arg(speed).arg(m_DevicePath));
+    setDeviceSpeed(m_DevicePath.toLocal8Bit().constData(), speed);
 }
 
 MythMediaError MythMediaDevice::lock()
@@ -481,6 +476,7 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
             case MEDIASTAT_USEABLE:
             case MEDIASTAT_MOUNTED:
             case MEDIASTAT_UNPLUGGED:
+            case MEDIASTAT_UNFORMATTED:
                 // get rid of the compiler warning...
                 break;
         }

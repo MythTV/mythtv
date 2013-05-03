@@ -22,15 +22,17 @@
 #include "dtvrecorder.h"
 #include "livetvchain.h"
 #include "programinfo.h"
+#include "mythlogging.h"
+#include "channelbase.h"
 #include "atsctables.h"
 #include "dtvchannel.h"
 #include "eitscanner.h"
 #include "mythconfig.h"
 #include "remoteutil.h"
 #include "ringbuffer.h"
-#include "mythlogging.h"
 #include "v4lchannel.h"
 #include "dialogbox.h"
+#include "cardutil.h"
 #include "jobqueue.h"
 #include "mythdb.h"
 #include "tv_rec.h"
@@ -39,7 +41,7 @@
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
-#define LOC QString("TVRec(%1): ").arg(cardid)
+#define LOC QString("TVRec[%1]: ").arg(cardid)
 
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
@@ -806,7 +808,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 }
 
 /** \brief If not a premature stop, adds program to history of recorded
- *         programs. If the recording type is kFindOneRecord this find
+ *         programs. If the recording type is kOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
  *  \param curRec RecordingInfo or recording to mark as done
@@ -896,11 +898,14 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
 
     // Get the width and set the videoprops
+    MarkTypes aspectRatio = curRec->QueryAverageAspectRatio();
     uint avg_height = curRec->QueryAverageHeight();
     curRec->SaveVideoProperties(
-        VID_1080 | VID_720 | VID_DAMAGED,
+        VID_1080 | VID_720 | VID_DAMAGED | VID_WIDESCREEN,
         ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
-        ((is_good) ? 0 : VID_DAMAGED));
+        ((is_good) ? 0 : VID_DAMAGED) |
+            ((aspectRatio == MARK_ASPECT_16_9) ||
+             (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0);
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())
@@ -918,6 +923,9 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         PreviewGeneratorQueue::GetPreviewImage(*curRec, "");
     }
 
+    // store recording in recorded table
+    curRec->FinishedRecording(!is_good || (recgrp == "LiveTV"));
+
     // send out UPDATE_RECORDING_STATUS message
     if (recgrp != "LiveTV")
     {
@@ -929,9 +937,6 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
                      .arg(curRec->GetRecordingEndTime(MythDate::ISODate)));
         gCoreContext->dispatch(me);
     }
-
-    // store recording in recorded table
-    curRec->FinishedRecording(!is_good || (recgrp == "LiveTV"));
 
     // send out REC_FINISHED message
     SendMythSystemRecEvent("REC_FINISHED", curRec);
@@ -1827,7 +1832,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         ATSCStreamData *asd = dynamic_cast<ATSCStreamData*>(sd);
         if (!asd)
         {
-            sd = asd = new ATSCStreamData(major, minor);
+            sd = asd = new ATSCStreamData(major, minor, cardid);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(asd);
@@ -1858,7 +1863,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
         DVBStreamData *dsd = dynamic_cast<DVBStreamData*>(sd);
         if (!dsd)
         {
-            sd = dsd = new DVBStreamData(netid, tsid, progNum);
+            sd = dsd = new DVBStreamData(netid, tsid, progNum, cardid);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(dsd);
@@ -1896,7 +1901,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     {
         if (!sd)
         {
-            sd = new MPEGStreamData(progNum, true);
+            sd = new MPEGStreamData(progNum, cardid, true);
             sd->SetCaching(true);
             if (GetDTVRecorder())
                 GetDTVRecorder()->SetStreamData(sd);
@@ -2557,6 +2562,17 @@ bool TVRec::GetKeyframePositions(
     return false;
 }
 
+bool TVRec::GetKeyframeDurations(
+    int64_t start, int64_t end, frm_pos_map_t &map) const
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (recorder)
+        return recorder->GetKeyframeDurations(start, end, map);
+
+    return false;
+}
+
 /** \fn TVRec::GetMaxBitrate(void) const
  *  \brief Returns the maximum bits per second this recorder can produce.
  *
@@ -2989,6 +3005,16 @@ QString TVRec::GetInput(void) const
     if (channel)
         return channel->GetCurrentInput();
     return QString::null;
+}
+
+/** \fn TVRec::GetSourceID(void) const
+ *  \brief Returns current source id.
+ */
+uint TVRec::GetSourceID(void) const
+{
+    if (channel)
+        return channel->GetCurrentSourceID();
+    return 0;
 }
 
 /** \fn TVRec::SetInput(QString, uint)
@@ -4209,7 +4235,7 @@ void TVRec::TuningRestartRecorder(void)
     // Some recorders unpause on Reset, others do not...
     recorder->Unpause();
 
-    if (pseudoLiveTVRecording)
+    if (pseudoLiveTVRecording && curRecording)
     {
         ProgramInfo *rcinfo1 = pseudoLiveTVRecording;
         QString msg1 = QString("Recording: %1 %2 %3 %4")
@@ -4466,7 +4492,8 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     QString        inputName;
     int            inputID = -1;
 
-    if (!channel->CheckChannel(channum, inputName))
+    if (!channel ||
+        !channel->CheckChannel(channum, inputName))
     {
         ChangeState(kState_None);
         return false;
@@ -4525,7 +4552,8 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     QString        inputName;
     int            inputID = -1;
 
-    if (!channel->CheckChannel(channum, inputName))
+    if (!channel ||
+        !channel->CheckChannel(channum, inputName))
     {
         ChangeState(kState_None);
         return false;

@@ -7,10 +7,6 @@ First, --skipdb tells mythcommflag to try to avoid touching the
 database; obviously you want to use this if you aren't running
 a mysql instance with a mythconverg database.
 
---hogcpu will make mythcommflag use 1 CPU to it's maximum potential,
-normally mythcommflag will sleep for much of the time to avoid causing
-problems for a running mythbackend.
-
 --file specifies the input file
 
 --outputfile specifies the output file. Notably if you use "-" as
@@ -43,7 +39,7 @@ The basic outputmethod is "essentials" and this will be used if you don't
 specify an output format.
 
 Here is an example input:
-  mythcommflag --hogcpu --skipdb --file /path/my.avi --outputfile output.txt
+  mythcommflag --skipdb --file /path/my.avi --outputfile output.txt
 
 This will put something like this in the output file:
 commercialBreakListFor: /path/my.avi
@@ -75,10 +71,10 @@ values. The verbose format is easier for humans to read.
 
 Here are some examples commands:
 
-mythcommflag --hogcpu --skipdb --file /path/my.avi \
+mythcommflag --skipdb --file /path/my.avi \
              --outputmethod full --outputfile output.txt
 
-mythcommflag --very-quiet --hogcpu --skipdb --file /path/my.avi \
+mythcommflag --very-quiet --skipdb --file /path/my.avi \
              --outputmethod full --outputfile output.txt
 
 The first will have a header like this:

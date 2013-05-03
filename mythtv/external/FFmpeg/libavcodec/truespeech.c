@@ -19,10 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "dsputil.h"
 #include "get_bits.h"
+#include "internal.h"
 
 #include "truespeech_data.h"
 /**
@@ -63,10 +65,11 @@ static av_cold int truespeech_decode_init(AVCodecContext * avctx)
 
     if (avctx->channels != 1) {
         av_log_ask_for_sample(avctx, "Unsupported channel count: %d\n", avctx->channels);
-        return AVERROR(EINVAL);
+        return AVERROR_PATCHWELCOME;
     }
 
-    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
+    avctx->channel_layout = AV_CH_LAYOUT_MONO;
+    avctx->sample_fmt     = AV_SAMPLE_FMT_S16;
 
     ff_dsputil_init(&c->dsp, avctx);
 
@@ -182,7 +185,7 @@ static void truespeech_apply_twopoint_filter(TSContext *dec, int quart)
     off = av_clip(off, 0, 145);
     ptr0 = tmp + 145 - off;
     ptr1 = tmp + 146;
-    filter = (const int16_t*)ts_order2_coeffs + (t % 25) * 2;
+    filter = ts_order2_coeffs + (t % 25) * 2;
     for(i = 0; i < 60; i++){
         t = (ptr0[0] * filter[0] + ptr0[1] * filter[1] + 0x2000) >> 14;
         ptr0++;
@@ -207,7 +210,7 @@ static void truespeech_place_pulses(TSContext *dec, int16_t *out, int quart)
     }
 
     coef = dec->pulsepos[quart] >> 15;
-    ptr1 = (const int16_t*)ts_pulse_values + 30;
+    ptr1 = ts_pulse_values + 30;
     ptr2 = tmp;
     for(i = 0, j = 3; (i < 30) && (j > 0); i++){
         t = *ptr1++;
@@ -220,7 +223,7 @@ static void truespeech_place_pulses(TSContext *dec, int16_t *out, int quart)
         }
     }
     coef = dec->pulsepos[quart] & 0x7FFF;
-    ptr1 = (const int16_t*)ts_pulse_values;
+    ptr1 = ts_pulse_values;
     for(i = 30, j = 4; (i < 60) && (j > 0); i++){
         t = *ptr1++;
         if(coef >= t)
@@ -325,7 +328,7 @@ static int truespeech_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     c->frame.nb_samples = iterations * 240;
-    if ((ret = avctx->get_buffer(avctx, &c->frame)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &c->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -360,7 +363,7 @@ static int truespeech_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_truespeech_decoder = {
     .name           = "truespeech",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_TRUESPEECH,
+    .id             = AV_CODEC_ID_TRUESPEECH,
     .priv_data_size = sizeof(TSContext),
     .init           = truespeech_decode_init,
     .decode         = truespeech_decode_frame,

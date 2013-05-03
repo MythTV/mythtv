@@ -29,6 +29,9 @@
 #include "libavutil/pixdesc.h"
 #include "libavutil/intreadwrite.h"
 #include "avfilter.h"
+#include "formats.h"
+#include "internal.h"
+#include "video.h"
 
 typedef struct {
     /* masks used for two pixels interpolation */
@@ -40,6 +43,7 @@ typedef struct {
     uint32_t q_lo_pixel_mask;
 
     int bpp; ///< bytes per pixel, pixel stride for each (packed) pixel
+    int is_be;
 } Super2xSaIContext;
 
 #define GET_RESULT(A, B, C, D) ((A != C || A != D) - (B != C || B != D))
@@ -72,34 +76,33 @@ static void super2xsai(AVFilterContext *ctx,
 
 #define READ_COLOR4(dst, src_line, off) dst = *((const uint32_t *)src_line + off)
 #define READ_COLOR3(dst, src_line, off) dst = AV_RL24 (src_line + 3*off)
-#define READ_COLOR2(dst, src_line, off) dst = *((const uint16_t *)src_line + off)
-
-    /* Initialise the color matrix for this row. */
-    switch (bpp) {
-    case 4:
-        READ_COLOR4(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR4(color[0][2], src_line[0], 1); READ_COLOR4(color[0][3], src_line[0], 2);
-        READ_COLOR4(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR4(color[1][2], src_line[1], 1); READ_COLOR4(color[1][3], src_line[1], 2);
-        READ_COLOR4(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR4(color[2][2], src_line[2], 1); READ_COLOR4(color[2][3], src_line[2], 2);
-        READ_COLOR4(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR4(color[3][2], src_line[3], 1); READ_COLOR4(color[3][3], src_line[3], 2);
-        break;
-    case 3:
-        READ_COLOR3(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR3(color[0][2], src_line[0], 1); READ_COLOR3(color[0][3], src_line[0], 2);
-        READ_COLOR3(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR3(color[1][2], src_line[1], 1); READ_COLOR3(color[1][3], src_line[1], 2);
-        READ_COLOR3(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR3(color[2][2], src_line[2], 1); READ_COLOR3(color[2][3], src_line[2], 2);
-        READ_COLOR3(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR3(color[3][2], src_line[3], 1); READ_COLOR3(color[3][3], src_line[3], 2);
-        break;
-    default:
-        READ_COLOR2(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR2(color[0][2], src_line[0], 1); READ_COLOR2(color[0][3], src_line[0], 2);
-        READ_COLOR2(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR2(color[1][2], src_line[1], 1); READ_COLOR2(color[1][3], src_line[1], 2);
-        READ_COLOR2(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR2(color[2][2], src_line[2], 1); READ_COLOR2(color[2][3], src_line[2], 2);
-        READ_COLOR2(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR2(color[3][2], src_line[3], 1); READ_COLOR2(color[3][3], src_line[3], 2);
-    }
+#define READ_COLOR2(dst, src_line, off) dst = sai->is_be ? AV_RB16(src_line + 2 * off) : AV_RL16(src_line + 2 * off)
 
     for (y = 0; y < height; y++) {
         uint8_t *dst_line[2];
 
         dst_line[0] = dst + dst_linesize*2*y;
         dst_line[1] = dst + dst_linesize*(2*y+1);
+
+        switch (bpp) {
+        case 4:
+            READ_COLOR4(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR4(color[0][2], src_line[0], 1); READ_COLOR4(color[0][3], src_line[0], 2);
+            READ_COLOR4(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR4(color[1][2], src_line[1], 1); READ_COLOR4(color[1][3], src_line[1], 2);
+            READ_COLOR4(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR4(color[2][2], src_line[2], 1); READ_COLOR4(color[2][3], src_line[2], 2);
+            READ_COLOR4(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR4(color[3][2], src_line[3], 1); READ_COLOR4(color[3][3], src_line[3], 2);
+            break;
+        case 3:
+            READ_COLOR3(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR3(color[0][2], src_line[0], 1); READ_COLOR3(color[0][3], src_line[0], 2);
+            READ_COLOR3(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR3(color[1][2], src_line[1], 1); READ_COLOR3(color[1][3], src_line[1], 2);
+            READ_COLOR3(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR3(color[2][2], src_line[2], 1); READ_COLOR3(color[2][3], src_line[2], 2);
+            READ_COLOR3(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR3(color[3][2], src_line[3], 1); READ_COLOR3(color[3][3], src_line[3], 2);
+            break;
+        default:
+            READ_COLOR2(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR2(color[0][2], src_line[0], 1); READ_COLOR2(color[0][3], src_line[0], 2);
+            READ_COLOR2(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR2(color[1][2], src_line[1], 1); READ_COLOR2(color[1][3], src_line[1], 2);
+            READ_COLOR2(color[2][0], src_line[2], 0); color[2][1] = color[2][0]; READ_COLOR2(color[2][2], src_line[2], 1); READ_COLOR2(color[2][3], src_line[2], 2);
+            READ_COLOR2(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR2(color[3][2], src_line[3], 1); READ_COLOR2(color[3][3], src_line[3], 2);
+        }
 
         for (x = 0; x < width; x++) {
             uint32_t product1a, product1b, product2a, product2b;
@@ -176,8 +179,13 @@ static void super2xsai(AVFilterContext *ctx,
                 AV_WL24(dst_line[1] + x * 6 + 3, product2b);
                 break;
             default: // bpp = 2
-                AV_WN32A(dst_line[0] + x * 4, product1a | (product1b << 16));
-                AV_WN32A(dst_line[1] + x * 4, product2a | (product2b << 16));
+                if (sai->is_be) {
+                    AV_WB32(dst_line[0] + x * 4, product1a | (product1b << 16));
+                    AV_WB32(dst_line[1] + x * 4, product2a | (product2b << 16));
+                } else {
+                    AV_WL32(dst_line[0] + x * 4, product1a | (product1b << 16));
+                    AV_WL32(dst_line[1] + x * 4, product2a | (product2b << 16));
+                }
             }
 
             /* Move color matrix forward */
@@ -220,39 +228,20 @@ static void super2xsai(AVFilterContext *ctx,
         src_line[3] = src_line[2];
         if (y < height - 3)
             src_line[3] += src_linesize;
-
-        switch (bpp) {
-        case 4:
-            READ_COLOR4(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR4(color[0][2], src_line[0], 1); READ_COLOR4(color[0][3], src_line[0], 2);
-            READ_COLOR4(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR4(color[1][2], src_line[1], 1); READ_COLOR4(color[1][3], src_line[1], 2);
-            READ_COLOR4(color[2][0], src_line[2], 0); color[2][1] = color[2][1]; READ_COLOR4(color[2][2], src_line[2], 1); READ_COLOR4(color[2][3], src_line[2], 2);
-            READ_COLOR4(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR4(color[3][2], src_line[3], 1); READ_COLOR4(color[3][3], src_line[3], 2);
-            break;
-        case 3:
-            READ_COLOR3(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR3(color[0][2], src_line[0], 1); READ_COLOR3(color[0][3], src_line[0], 2);
-            READ_COLOR3(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR3(color[1][2], src_line[1], 1); READ_COLOR3(color[1][3], src_line[1], 2);
-            READ_COLOR3(color[2][0], src_line[2], 0); color[2][1] = color[2][1]; READ_COLOR3(color[2][2], src_line[2], 1); READ_COLOR3(color[2][3], src_line[2], 2);
-            READ_COLOR3(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR3(color[3][2], src_line[3], 1); READ_COLOR3(color[3][3], src_line[3], 2);
-            break;
-        default:
-            READ_COLOR2(color[0][0], src_line[0], 0); color[0][1] = color[0][0]; READ_COLOR2(color[0][2], src_line[0], 1); READ_COLOR2(color[0][3], src_line[0], 2);
-            READ_COLOR2(color[1][0], src_line[1], 0); color[1][1] = color[1][0]; READ_COLOR2(color[1][2], src_line[1], 1); READ_COLOR2(color[1][3], src_line[1], 2);
-            READ_COLOR2(color[2][0], src_line[2], 0); color[2][1] = color[2][1]; READ_COLOR2(color[2][2], src_line[2], 1); READ_COLOR2(color[2][3], src_line[2], 2);
-            READ_COLOR2(color[3][0], src_line[3], 0); color[3][1] = color[3][0]; READ_COLOR2(color[3][2], src_line[3], 1); READ_COLOR2(color[3][3], src_line[3], 2);
-        }
     } // y loop
 }
 
 static int query_formats(AVFilterContext *ctx)
 {
-    static const enum PixelFormat pix_fmts[] = {
-        PIX_FMT_RGBA, PIX_FMT_BGRA, PIX_FMT_ARGB, PIX_FMT_ABGR,
-        PIX_FMT_RGB24, PIX_FMT_BGR24,
-        PIX_FMT_RGB565, PIX_FMT_BGR565, PIX_FMT_RGB555, PIX_FMT_BGR555,
-        PIX_FMT_NONE
+    static const enum AVPixelFormat pix_fmts[] = {
+        AV_PIX_FMT_RGBA, AV_PIX_FMT_BGRA, AV_PIX_FMT_ARGB, AV_PIX_FMT_ABGR,
+        AV_PIX_FMT_RGB24, AV_PIX_FMT_BGR24,
+        AV_PIX_FMT_RGB565BE, AV_PIX_FMT_BGR565BE, AV_PIX_FMT_RGB555BE, AV_PIX_FMT_BGR555BE,
+        AV_PIX_FMT_RGB565LE, AV_PIX_FMT_BGR565LE, AV_PIX_FMT_RGB555LE, AV_PIX_FMT_BGR555LE,
+        AV_PIX_FMT_NONE
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
     return 0;
 }
 
@@ -267,13 +256,16 @@ static int config_input(AVFilterLink *inlink)
     sai->bpp  = 4;
 
     switch (inlink->format) {
-    case PIX_FMT_RGB24:
-    case PIX_FMT_BGR24:
+    case AV_PIX_FMT_RGB24:
+    case AV_PIX_FMT_BGR24:
         sai->bpp = 3;
         break;
 
-    case PIX_FMT_RGB565:
-    case PIX_FMT_BGR565:
+    case AV_PIX_FMT_RGB565BE:
+    case AV_PIX_FMT_BGR565BE:
+        sai->is_be = 1;
+    case AV_PIX_FMT_RGB565LE:
+    case AV_PIX_FMT_BGR565LE:
         sai->hi_pixel_mask   = 0xF7DEF7DE;
         sai->lo_pixel_mask   = 0x08210821;
         sai->q_hi_pixel_mask = 0xE79CE79C;
@@ -281,8 +273,11 @@ static int config_input(AVFilterLink *inlink)
         sai->bpp = 2;
         break;
 
-    case PIX_FMT_BGR555:
-    case PIX_FMT_RGB555:
+    case AV_PIX_FMT_BGR555BE:
+    case AV_PIX_FMT_RGB555BE:
+        sai->is_be = 1;
+    case AV_PIX_FMT_BGR555LE:
+    case AV_PIX_FMT_RGB555LE:
         sai->hi_pixel_mask   = 0x7BDE7BDE;
         sai->lo_pixel_mask   = 0x04210421;
         sai->q_hi_pixel_mask = 0x739C739C;
@@ -301,50 +296,58 @@ static int config_output(AVFilterLink *outlink)
     outlink->w = inlink->w*2;
     outlink->h = inlink->h*2;
 
-    av_log(inlink->dst, AV_LOG_INFO, "fmt:%s size:%dx%d -> size:%dx%d\n",
+    av_log(inlink->dst, AV_LOG_VERBOSE, "fmt:%s size:%dx%d -> size:%dx%d\n",
            av_get_pix_fmt_name(inlink->format),
            inlink->w, inlink->h, outlink->w, outlink->h);
 
     return 0;
 }
 
-static void null_draw_slice(AVFilterLink *inlink, int y, int h, int slice_dir) { }
-
-static void end_frame(AVFilterLink *inlink)
+static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *inpicref)
 {
     AVFilterLink *outlink = inlink->dst->outputs[0];
-    AVFilterBufferRef  *inpicref =  inlink->cur_buf;
-    AVFilterBufferRef *outpicref = outlink->out_buf;
+    AVFilterBufferRef *outpicref = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    if (!outpicref) {
+        avfilter_unref_bufferp(&inpicref);
+        return AVERROR(ENOMEM);
+    }
+    avfilter_copy_buffer_ref_props(outpicref, inpicref);
+    outpicref->video->w = outlink->w;
+    outpicref->video->h = outlink->h;
 
     super2xsai(inlink->dst, inpicref->data[0], inpicref->linesize[0],
                outpicref->data[0], outpicref->linesize[0],
                inlink->w, inlink->h);
 
-    avfilter_unref_buffer(inpicref);
-    avfilter_draw_slice(outlink, 0, outlink->h, 1);
-    avfilter_end_frame(outlink);
-    avfilter_unref_buffer(outpicref);
+    avfilter_unref_bufferp(&inpicref);
+    return ff_filter_frame(outlink, outpicref);
 }
+
+static const AVFilterPad super2xsai_inputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_input,
+        .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ,
+    },
+    { NULL }
+};
+
+static const AVFilterPad super2xsai_outputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = config_output,
+    },
+    { NULL }
+};
 
 AVFilter avfilter_vf_super2xsai = {
     .name        = "super2xsai",
     .description = NULL_IF_CONFIG_SMALL("Scale the input by 2x using the Super2xSaI pixel art algorithm."),
     .priv_size   = sizeof(Super2xSaIContext),
     .query_formats = query_formats,
-
-    .inputs = (const AVFilterPad[]) {
-        { .name             = "default",
-          .type             = AVMEDIA_TYPE_VIDEO,
-          .config_props     = config_input,
-          .draw_slice       = null_draw_slice,
-          .end_frame        = end_frame,
-          .min_perms        = AV_PERM_READ },
-        { .name = NULL }
-    },
-    .outputs = (const AVFilterPad[]) {
-        { .name             = "default",
-          .type             = AVMEDIA_TYPE_VIDEO,
-          .config_props     = config_output },
-        { .name = NULL }
-    },
+    .inputs        = super2xsai_inputs,
+    .outputs       = super2xsai_outputs,
 };

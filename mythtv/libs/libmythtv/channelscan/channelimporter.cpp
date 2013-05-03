@@ -61,7 +61,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     {
         cout << "Before processing: " << endl;
         ChannelImporterBasicStats infoA = CollectStats(transports);
-        cout << FormatChannels(transports, infoA).toAscii().constData() << endl;
+        cout << FormatChannels(transports, infoA).toLatin1().constData() << endl;
         cout << endl << endl;
     }
 
@@ -100,11 +100,11 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
         CollectUniquenessStats(transports, info);
 
     // Print out each channel
-    cout << FormatChannels(transports, info).toAscii().constData() << endl;
+    cout << FormatChannels(transports, info).toLatin1().constData() << endl;
 
     // Create summary
     QString msg = GetSummary(transports.size(), info, stats);
-    cout << msg.toAscii().constData() << endl << endl;
+    cout << msg.toLatin1().constData() << endl << endl;
 
     if (do_insert)
         InsertChannels(transports, info);
@@ -322,8 +322,8 @@ void ChannelImporter::InsertChannels(
     ChannelImporterBasicStats      ninfo  = CollectStats(list);
     ChannelImporterUniquenessStats nstats = CollectUniquenessStats(list, ninfo);
     cout << endl << endl << "Printing remaining channels" << endl;
-    cout << FormatChannels(list, ninfo).toAscii().constData() << endl;
-    cout << GetSummary(list.size(), ninfo, nstats).toAscii().constData()
+    cout << FormatChannels(list, ninfo).toLatin1().constData() << endl;
+    cout << GetSummary(list.size(), ninfo, nstats).toLatin1().constData()
          << endl << endl;
 
     // if any of the potential uniques is high and inserting
@@ -403,7 +403,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             {
                 cout<<QString("Skipping Insert: %1")
                     .arg(FormatChannel(transports[i], chan))
-                    .toAscii().constData()<<endl;
+                    .toLatin1().constData()<<endl;
                 handle = false;
             }
 
@@ -468,7 +468,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 {
                     cout<<QString("Skipping Insert: %1")
                         .arg(FormatChannel(transports[i], chan))
-                        .toAscii().constData()<<endl;
+                        .toLatin1().constData()<<endl;
                     handle = false;
                 }
             }
@@ -509,8 +509,8 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 {
                     chan.channel_id = chanid;
 
-                    cout<<"Insert("<<chan.si_standard.toAscii().constData()
-                        <<"): "<<chan.chan_num.toAscii().constData()<<endl;
+                    cout<<"Insert("<<chan.si_standard.toLatin1().constData()
+                        <<"): "<<chan.chan_num.toLatin1().constData()<<endl;
 
                     inserted = ChannelUtil::CreateChannel(
                         chan.db_mplexid,
@@ -632,8 +632,8 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 if (conflicting)
                 {
                     cout<<"Skipping Update("
-                        <<chan.si_standard.toAscii().constData()<<"): "
-                        <<chan.chan_num.toAscii().constData()<<endl;
+                        <<chan.si_standard.toLatin1().constData()<<"): "
+                        <<chan.chan_num.toLatin1().constData()<<endl;
                     handle = false;
                 }
             }
@@ -646,8 +646,8 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
             bool updated = false;
             if (handle)
             {
-                cout<<"Update("<<chan.si_standard.toAscii().constData()<<"): "
-                    <<chan.chan_num.toAscii().constData()<<endl;
+                cout<<"Update("<<chan.si_standard.toLatin1().constData()<<"): "
+                    <<chan.chan_num.toLatin1().constData()<<endl;
 
                 ChannelUtil::UpdateInsertInfoFromDB(chan);
 
@@ -998,7 +998,7 @@ QString ChannelImporter::FormatChannel(
     QString msg;
     QTextStream ssMsg(&msg);
 
-    ssMsg << transport.modulation.toString().toAscii().constData()
+    ssMsg << transport.modulation.toString().toLatin1().constData()
           << ":";
     ssMsg << transport.frequency << ":";
 
@@ -1014,7 +1014,7 @@ QString ChannelImporter::FormatChannel(
                   .arg(chan.vct_tsid)
                   .arg(chan.vct_chan_tsid)
                   .arg(chan.pat_tsid)
-                  .arg(si_standard)).toAscii().constData();
+                  .arg(si_standard)).toLatin1().constData();
     else if (si_standard == "dvb")
         ssMsg << (QString("%1:%2:%3:%4:%5:%6=%7:%8")
                   .arg(chan.service_name).arg(chan.chan_num)
@@ -1022,13 +1022,13 @@ QString ChannelImporter::FormatChannel(
                   .arg(chan.service_id)
                   .arg(chan.sdt_tsid)
                   .arg(chan.pat_tsid)
-                  .arg(si_standard)).toAscii().constData();
+                  .arg(si_standard)).toLatin1().constData();
     else
         ssMsg << (QString("%1:%2:%3:%4:%5")
                   .arg(chan.callsign).arg(chan.chan_num)
                   .arg(chan.service_id)
                   .arg(chan.pat_tsid)
-                  .arg(si_standard)).toAscii().constData();
+                  .arg(si_standard)).toLatin1().constData();
 
     if (info)
     {
@@ -1042,7 +1042,7 @@ QString ChannelImporter::FormatChannel(
               << (QString("cnt(pnum:%1,channum:%2)")
                   .arg(info->prognum_cnt[chan.service_id])
                   .arg(info->channum_cnt[map_str(chan.chan_num)])
-                  ).toAscii().constData();
+                  ).toLatin1().constData();
         if (chan.si_standard == "atsc")
         {
             ssMsg <<
@@ -1052,7 +1052,7 @@ QString ChannelImporter::FormatChannel(
                           (chan.atsc_minor_channel)])
                  .arg(info->atscmin_cnt[
                           chan.atsc_minor_channel])
-                    ).toAscii().constData();
+                    ).toLatin1().constData();
         }
     }
 
@@ -1075,24 +1075,24 @@ QString ChannelImporter::SimpleFormatChannel(
         if (si_standard == "atsc")
             ssMsg << (QString("%1-%2")
                   .arg(chan.atsc_major_channel)
-                  .arg(chan.atsc_minor_channel)).toAscii().constData();
+                  .arg(chan.atsc_minor_channel)).toLatin1().constData();
         else
             ssMsg << (QString("%1-%2")
                   .arg(chan.freqid)
-                  .arg(chan.service_id)).toAscii().constData();
+                  .arg(chan.service_id)).toLatin1().constData();
 
         if (!chan.callsign.isEmpty())
             ssMsg << (QString(" (%1)")
-                  .arg(chan.callsign)).toAscii().constData();
+                  .arg(chan.callsign)).toLatin1().constData();
     }
     else if (si_standard == "dvb")
         ssMsg << (QString("%1 (%2 %3)")
                   .arg(chan.service_name).arg(chan.service_id)
-                  .arg(chan.netid)).toAscii().constData();
+                  .arg(chan.netid)).toLatin1().constData();
     else
         ssMsg << (QString("%1-%2")
                   .arg(chan.freqid).arg(chan.service_id))
-                  .toAscii().constData();
+                  .toLatin1().constData();
 
     return msg;
 }
@@ -1291,7 +1291,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toAscii().constData()          << endl;
+        cout << msg.toLatin1().constData()          << endl;
         cout << "Do you want to:"    << endl;
         cout << "1. Delete all"      << endl;
         cout << "2. Set all invisible" << endl;
@@ -1351,7 +1351,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toAscii().constData()          << endl;
+        cout << msg.toLatin1().constData()          << endl;
         cout << "Do you want to:"    << endl;
         cout << "1. Insert all"      << endl;
         cout << "2. Insert manually" << endl;
@@ -1408,15 +1408,15 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toAscii().constData()
+        cout << msg.toLatin1().constData()
              << endl
-             << QObject::tr("Do you want to:").toAscii().constData()
+             << QObject::tr("Do you want to:").toLatin1().constData()
              << endl
-             << "1. " << QObject::tr("Update all").toAscii().constData()
+             << "1. " << QObject::tr("Update all").toLatin1().constData()
              << endl
-             << "2. " << QObject::tr("Update manually").toAscii().constData()
+             << "2. " << QObject::tr("Update manually").toLatin1().constData()
              << endl
-             << "3. " << QObject::tr("Ignore all").toAscii().constData()
+             << "3. " << QObject::tr("Ignore all").toLatin1().constData()
              << endl;
         while (true)
         {
@@ -1435,7 +1435,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
             {
                 cout << QObject::tr(
                     "Please enter either 1, 2, or 3:")
-                    .toAscii().constData() << endl;
+                    .toLatin1().constData() << endl;
             }
         }
     }
@@ -1447,7 +1447,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     MythMainWindow *parent, QString title,
     QString message, QString &text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
 
     popup->addLabel(message, MythPopupBox::Medium, true);
 
@@ -1471,7 +1471,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->hide();
         popup->deleteLater();
 
-        popup = new MythPopupBox(parent, title.toAscii().constData());
+        popup = new MythPopupBox(parent, title.toLatin1().constData());
         popup->addLabel(message, MythPopupBox::Medium, true);
 
         textEdit = new MythLineEdit(popup);
@@ -1536,7 +1536,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
     }
     else if (is_interactive)
     {
-        cout << msg.toAscii().constData() << endl;
+        cout << msg.toLatin1().constData() << endl;
 
         QString cancelStr = QObject::tr("Cancel").toLower();
         QString cancelAllStr = QObject::tr("Cancel All").toLower();
@@ -1547,7 +1547,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
 
         while (true)
         {
-            cout << msg2.toAscii().constData() << endl;
+            cout << msg2.toLatin1().constData() << endl;
             string sret;
             cin >> sret;
             QString val = QString(sret.c_str());
@@ -1620,7 +1620,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
     }
     else if (is_interactive)
     {
-        cout << msg.toAscii().constData() << endl;
+        cout << msg.toLatin1().constData() << endl;
 
         QString cancelStr    = QObject::tr("Cancel").toLower();
         QString cancelAllStr = QObject::tr("Cancel All").toLower();
@@ -1631,7 +1631,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
 
         while (true)
         {
-            cout << msg2.toAscii().constData() << endl;
+            cout << msg2.toLatin1().constData() << endl;
             string sret;
             cin >> sret;
             QString val = QString(sret.c_str());

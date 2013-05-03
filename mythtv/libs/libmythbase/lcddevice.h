@@ -11,9 +11,10 @@
 #include <QList>
 
 #include "mythbaseexp.h"
-#include "mythsocket_cb.h"
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
+
+class QTcpSocket;
 
 class MBASE_PUBLIC LCDMenuItem
 {
@@ -169,7 +170,7 @@ enum LCDFunctionSet {
     FUNC_NEWS = 7 << 1,
 };
 
-class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
+class MBASE_PUBLIC LCD : public QObject
 {
     Q_OBJECT
 
@@ -308,13 +309,12 @@ class MBASE_PUBLIC LCD : public QObject, public MythSocketCBs
     QString quotedString(const QString &s);
     void describeServer();
 
-    // mythsocket CB's
-    void connected(MythSocket *sock) { (void)sock; }
-    void connectionClosed(MythSocket *sock);
-    void readyRead(MythSocket *sock);
-    void connectionFailed(MythSocket *sock);
+  private slots:
+    void ReadyRead(void);
+    void Disconnected(void);
 
-    MythSocket *socket;
+  private:
+    QTcpSocket *socket;
     QMutex   socketLock;
     QString  hostname;
     uint     port;

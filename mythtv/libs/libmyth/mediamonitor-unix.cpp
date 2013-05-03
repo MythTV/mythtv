@@ -234,9 +234,9 @@ bool MediaMonitorUnix::CheckMountable(void)
 
                 MythMediaDevice* pDevice;
                 if (DeviceProperty(*it, "DeviceIsRemovable").toBool())
-                    pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
+                    pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
                 else
-                    pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
+                    pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
                 if (pDevice && !AddDevice(pDevice))
                     pDevice->deleteLater();
@@ -256,15 +256,12 @@ bool MediaMonitorUnix::CheckMountable(void)
     m_fifo = open(kUDEV_FIFO, O_RDONLY | O_NONBLOCK);
 
     QDir sysfs("/sys/block");
-    sysfs.setFilter(QDir::Dirs);
+    sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
     QStringList devices = sysfs.entryList();
 
     for (QStringList::iterator it = devices.begin(); it != devices.end(); ++it)
     {
-        if (*it == "." || *it == "..")
-            continue;
-
         // ignore floppies, too slow
         if ((*it).startsWith("fd"))
             continue;
@@ -335,7 +332,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     if (udev != NULL)
     {
         struct udev_device *device =
-            udev_device_new_from_syspath(udev, sysfs.toAscii().constData());
+            udev_device_new_from_syspath(udev, sysfs.toLatin1().constData());
         if (device != NULL)
         {
             const char *name = udev_device_get_devnode(device);
@@ -536,7 +533,7 @@ static void LookupModel(MythMediaDevice* device)
 
     LOG(VB_MEDIA, LOG_DEBUG, QString("LookupModel '%1' -> '%2'")
              .arg(device->getRealDevice()).arg(desc) );
-    device->setDeviceModel(desc.toAscii().constData());
+    device->setDeviceModel(desc.toLatin1().constData());
 }
 
 /**
@@ -717,9 +714,9 @@ void MediaMonitorUnix::deviceAdded( QDBusObjectPath o)
 
         MythMediaDevice* pDevice;
         if (DeviceProperty(o, "DeviceIsRemovable").toBool())
-            pDevice = MythCDROM::get(this, dev.toAscii(), false, m_AllowEject);
+            pDevice = MythCDROM::get(this, dev.toLatin1(), false, m_AllowEject);
         else
-            pDevice = MythHDD::Get(this, dev.toAscii(), false, false);
+            pDevice = MythHDD::Get(this, dev.toLatin1(), false, false);
 
         if (pDevice && !AddDevice(pDevice))
             pDevice->deleteLater();
@@ -772,16 +769,13 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     {
         // check for partitions
         QDir sysfs(dev);
-        sysfs.setFilter(QDir::Dirs);
+        sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
         bool found_partitions = false;
         QStringList parts = sysfs.entryList();
         for (QStringList::iterator pit = parts.begin();
              pit != parts.end(); ++pit)
         {
-            if (*pit == "." || *pit == "..")
-                continue;
-
             // skip some sysfs dirs that are _not_ sub-partitions
             if (*pit == "device" || *pit == "holders" || *pit == "queue"
                                  || *pit == "slaves"  || *pit == "subsystem"
@@ -810,13 +804,13 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     {
         // found cdrom device
             pDevice = MythCDROM::get(
-                this, device_file.toAscii().constData(), false, m_AllowEject);
+                this, device_file.toLatin1().constData(), false, m_AllowEject);
     }
     else
     {
         // found block or partition device
             pDevice = MythHDD::Get(
-                this, device_file.toAscii().constData(), false, false);
+                this, device_file.toLatin1().constData(), false, false);
     }
 
     if (AddDevice(pDevice))

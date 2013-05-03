@@ -203,6 +203,7 @@ class SwitchAddressSetting : public LineEditSetting, public Storage
     {
         m_switch.SetAddress(getValue().toUInt(0, 16));
     }
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -506,6 +507,8 @@ class RotorPosConfig : public ConfigurationDialog
         while (ConfigurationDialog::exec() == kDialogCodeAccepted);
         return kDialogCodeRejected;
     }
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
 };
 
 //////////////////////////////////////// RotorConfig
@@ -582,11 +585,11 @@ class lnb_preset
 static lnb_preset lnb_presets[] =
 {
     /* description, type, LOF switch, LOF low, LOF high, inverted polarity */
-    lnb_preset(DeviceTree::tr("Single (Europe)"),
-               DiSEqCDevLNB::kTypeVoltageControl,       0,  9750000),
     lnb_preset(DeviceTree::tr("Universal (Europe)"),
                DiSEqCDevLNB::kTypeVoltageAndToneControl,
                11700000,  9750000, 10600000),
+    lnb_preset(DeviceTree::tr("Single (Europe)"),
+               DiSEqCDevLNB::kTypeVoltageControl,       0,  9750000),
     lnb_preset(DeviceTree::tr("Circular (N. America)"),
                DiSEqCDevLNB::kTypeVoltageControl,       0, 11250000),
     lnb_preset(DeviceTree::tr("Linear (N. America)"),

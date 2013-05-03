@@ -8,7 +8,7 @@
 #include <QString>
 #include <QHash>
 
-#include "dbchannelinfo.h" // for DBChanList
+#include "channelinfo.h"   // for ChannelInfoList
 #include "programtypes.h"  // for InfoMap
 #include "mthread.h"
 #include "tv.h"            // for BrowseDirection
@@ -111,8 +111,8 @@ class TVBrowseHelper : public MThread
     virtual void run();
 
     TV               *m_tv;
-    DBChanList        db_all_channels;
-    DBChanList        db_all_visible_channels;
+    ChannelInfoList   db_all_channels;
+    ChannelInfoList   db_all_visible_channels;
     uint              db_browse_max_forward;
     bool              db_browse_all_tuners;
     bool              db_use_channel_groups;

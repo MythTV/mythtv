@@ -167,9 +167,9 @@ int AudioOutputSettings::FormatToBits(AudioFormat format)
         case FORMAT_S24:    return 24;
         case FORMAT_S32:
         case FORMAT_FLT:    return 32;
+        case FORMAT_NONE:
+        default:            return -1;
     }
-
-    return -1;
 }
 
 const char* AudioOutputSettings::FormatToString(AudioFormat format)
@@ -182,6 +182,7 @@ const char* AudioOutputSettings::FormatToString(AudioFormat format)
         case FORMAT_S24LSB: return "signed 24 bit LSB";
         case FORMAT_S32:    return "signed 32 bit";
         case FORMAT_FLT:    return "32 bit floating point";
+        case FORMAT_NONE:   return "none";
         default:            return "unknown";
     }
 }
@@ -196,9 +197,9 @@ int AudioOutputSettings::SampleSize(AudioFormat format)
         case FORMAT_S24LSB:
         case FORMAT_S32:
         case FORMAT_FLT:    return 4;
+        case FORMAT_NONE:
+        default:            return 0;
     }
-
-    return 0;
 }
 
 void AudioOutputSettings::AddSupportedChannels(int channels)
@@ -449,14 +450,14 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
 
     switch (codec)
     {
-        case CODEC_ID_AC3:
+        case AV_CODEC_ID_AC3:
             log = "AC3";
             break;
-        case CODEC_ID_EAC3:
+        case AV_CODEC_ID_EAC3:
             samplerate = samplerate * 4;
             log = "Dolby Digital Plus (E-AC3)";
             break;
-        case CODEC_ID_DTS:
+        case AV_CODEC_ID_DTS:
             switch(codec_profile)
             {
                 case FF_PROFILE_DTS_ES:
@@ -487,7 +488,7 @@ QString AudioOutputSettings::GetPassthroughParams(int codec, int codec_profile,
                     break;
             }
             break;
-        case CODEC_ID_TRUEHD:
+        case AV_CODEC_ID_TRUEHD:
             channels = 8;
             log = "TrueHD";
             switch(samplerate)

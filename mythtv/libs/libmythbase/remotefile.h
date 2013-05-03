@@ -47,11 +47,6 @@ class MBASE_PUBLIC RemoteFile
     long long GetFileSize(void) const
         { return filesize; }
 
-    const MythSocket *getSocket(void) const
-        { return sock; }
-    MythSocket *getSocket(void)
-        { return sock; }
-
     QStringList GetAuxiliaryFiles(void) const
         { return auxfiles; }
 

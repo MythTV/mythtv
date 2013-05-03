@@ -36,6 +36,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        schedorder(0),
         desiredrecstartts(),
         desiredrecendts(),
         record(NULL) {}
@@ -44,6 +45,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(other.oldrecstatus),
         savedrecstatus(other.savedrecstatus),
         future(other.future),
+        schedorder(other.schedorder),
         desiredrecstartts(other.desiredrecstartts),
         desiredrecendts(other.desiredrecendts),
         record(NULL) {}
@@ -52,6 +54,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        schedorder(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL) {}
@@ -60,6 +63,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        schedorder(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL) {}
@@ -69,6 +73,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         oldrecstatus(rsUnknown),
         savedrecstatus(rsUnknown),
         future(false),
+        schedorder(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
         record(NULL) {}
@@ -80,6 +85,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &description,
         uint season,
         uint episode,
+        const QString &syndicatedepisode,
         const QString &category,
 
         uint chanid,
@@ -94,11 +100,13 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QString &storagegroup,
 
         uint year,
+        uint partnumber,
+        uint parttotal,
 
         const QString &seriesid,
         const QString &programid,
         const QString &inetref,
-        const QString &catType,
+        const CategoryType catType,
 
         int recpriority,
 
@@ -131,7 +139,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         uint subtitleType,
         uint videoproperties,
         uint audioproperties,
-        bool future);
+        bool future,
+        int schedorder);
 
     /// Create RecordingInfo from 'record'+'channel' tables,
     /// user in scheduler.cpp  @ ~ 3566 & ~ 3643
@@ -217,7 +226,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     QString GetProgramRecordingProfile(void) const;
     void ApplyRecordStateChange(RecordingType newstate, bool save = true);
     void ApplyRecordRecPriorityChange(int);
-    void ToggleRecord(void);
+    void QuickRecord(void);
 
     // Used in determining start and end for RecordingQuality determination
     void SetDesiredStartTime(const QDateTime &dt) { desiredrecstartts = dt; }
@@ -250,6 +259,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
     bool future;
+    int schedorder;
     QDateTime desiredrecstartts;
     QDateTime desiredrecendts;
 

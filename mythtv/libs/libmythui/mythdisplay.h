@@ -1,8 +1,7 @@
 #ifndef MYTHDISPLAY_H
 #define MYTHDISPLAY_H
 
-#include <QWindowsStyle>
-#include <QWidget>
+#include <QWidget> // for WId
 #include <QSize>
 
 #include "mythuiexp.h"

@@ -212,7 +212,12 @@ ZMServer::ZMServer(int sock, bool debug)
     string setting = getZMSetting("ZM_SHM_KEY");
 
     if (setting != "")
-        sscanf(setting.c_str(), "%20x", (unsigned int *)&m_shmKey);
+    {
+        unsigned long long tmp = m_shmKey;
+        sscanf(setting.c_str(), "%20llx", &tmp);
+        m_shmKey = tmp;
+    }
+
     if (m_debug)
     {
         snprintf(buf, sizeof(buf), "0x%x", (unsigned int)m_shmKey);
@@ -1380,7 +1385,7 @@ void ZMServer::initMonitor(MONITOR *monitor)
 
         shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
                                             MAP_SHARED, mapFile, 0x0);
-        if (shm_ptr == NULL)
+        if (shm_ptr == MAP_FAILED)
         {
             cout << "Failed to map shared memory from file [" << 
                 mmap_filename << "] " <<
@@ -1389,6 +1394,21 @@ void ZMServer::initMonitor(MONITOR *monitor)
                 endl;
             monitor->status = "Error";
             return;
+        }
+    }
+    else
+    {
+        // this is not necessarily a problem, maybe the user is still
+        // using the legacy shared memory support
+        if (m_debug)
+        {
+            cout << "Failed to open mmap file [" <<
+                mmap_filename << "] " <<
+                "for monitor: " <<
+                monitor->mon_id <<
+                " : " << strerror(errno) <<
+                endl;
+            cout << "Falling back to the legacy shared memory method" << endl;
         }
     }
 #endif

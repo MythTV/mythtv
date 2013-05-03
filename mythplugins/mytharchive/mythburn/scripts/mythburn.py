@@ -1707,7 +1707,6 @@ def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
         write("Using cutlist: %s" % cutlist_s)
 
     if (localfile != ""):
-        localfile = quoteFilename(localfile)
         if usecutlist == True:
             command = "mythtranscode --mpeg2 --honorcutlist %s --infile %s --outfile %s" % (cutlist_s, quoteCmdArg(localfile), quoteCmdArg(destination))
         else:
@@ -2003,7 +2002,7 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
         if audio1[AUDIO_CODEC] == "AC3":
             if name == "-acodec":
                 value = "copy"
-            if name == "-ar" or name == "-ab" or name == "-ac":
+            if name == "-ar" or name == "-b:a" or name == "-ac":
                 name = ""
                 value = ""
 
@@ -2024,14 +2023,12 @@ def encodeVideoToMPEG2(source, destvideofile, video, audio1, audio2, aspectratio
             if audio1[AUDIO_CODEC] == "AC3":
                 if name == "-acodec":
                     value = "copy"
-                if name == "-ar" or name == "-ab" or name == "-ac":
+                if name == "-ar" or name == "-b:a" or name == "-ac":
                     name = ""
                     value = ""
 
-            if name == "-acodec" or name == "-ar" or name == "-ab" or name == "-ac":
+            if name == "-acodec" or name == "-ar" or name == "-b:a" or name == "-ac":
                     command += " " + name + " " + value
-
-        command += " -newaudio" 
 
     #make sure we get the correct stream(s) that we want
     command += " -map 0:%d -map 0:%d " % (video[VIDEO_INDEX], audio1[AUDIO_INDEX])
@@ -4347,7 +4344,7 @@ def getStreamList(folder):
 def isFileOkayForDVD(file, folder):
     """return true if the file is dvd compliant"""
 
-    if string.lower(getVideoCodec(folder)) != "mpeg2video":
+    if not string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
         return False
 
 #    if string.lower(getAudioCodec(folder)) != "ac3" and encodeToAC3:
@@ -4427,7 +4424,7 @@ def doProcessFile(file, folder, count):
         #can only use mythtranscode to cut commercials on mpeg2 files
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
-        if string.lower(getVideoCodec(folder)) == "mpeg2video": 
+        if string.lower(getVideoCodec(folder)).startswith("mpeg2video"):
             if file.attributes["usecutlist"].value == "1" and getText(infoDOM.getElementsByTagName("hascutlist")[0]) == "yes":
                 # Run from local file?
                 if file.hasAttribute("localfilename"):
@@ -4464,8 +4461,8 @@ def doProcessFile(file, folder, count):
         write("File type is '%s'" % getFileType(folder))
         write("Video codec is '%s'" % getVideoCodec(folder))
 
-        if (alwaysRunMythtranscode == True and 
-                string.lower(getVideoCodec(folder)) == "mpeg2video" and
+        if (alwaysRunMythtranscode == True and
+                string.lower(getVideoCodec(folder)).startswith("mpeg2video") and
                 isFileOkayForDVD(file, folder)):
             if file.hasAttribute("localfilename"):
                 localfile = file.attributes["localfilename"].value

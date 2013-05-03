@@ -117,7 +117,6 @@ class MPUBLIC MediaMonitor : public QObject
 
     bool                         m_Active;      ///< Was MonitorThread started?
     bool                         m_SendEvent;   ///< Send MediaEvent to plugins?
-    bool                         m_StartThread; ///< Should we actually monitor?
 
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;

@@ -91,7 +91,7 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
     void buttonAction(MythUIButtonListItem* item, bool skipPass = false);
 
   private:
-    void Init(const QString &menufile);
+    void SetMenuTheme(const QString &menufile);
 
     bool parseMenu(const QString &menuname);
     void parseThemeButton(QDomElement &element);

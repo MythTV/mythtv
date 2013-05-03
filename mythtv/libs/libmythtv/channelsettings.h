@@ -151,6 +151,7 @@ class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
 
     virtual void Load(void);
     virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     const ChannelID &cid;

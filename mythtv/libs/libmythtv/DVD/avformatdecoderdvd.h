@@ -10,6 +10,11 @@ class AvFormatDecoderDVD : public AvFormatDecoder
                        PlayerFlags flags);
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
     virtual void UpdateFramesPlayed(void);
+    virtual bool GetFrame(DecodeType decodetype); // DecoderBase
+
+  protected:
+    int64_t AdjustTimestamp(int64_t timestamp);
+    virtual int  ReadPacket(AVFormatContext *ctx, AVPacket *pkt);
 
   private:
     virtual bool DoRewindSeek(long long desiredFrame);
@@ -17,6 +22,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void);
     virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+    virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
     long long DVDFindPosition(long long desiredFrame);
 };

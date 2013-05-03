@@ -26,6 +26,7 @@
  */
 
 #include "libavutil/avstring.h"
+#include "libavutil/channel_layout.h"
 #include "libswresample/swresample.h"
 #include "avfilter.h"
 #include "audio.h"
@@ -37,7 +38,7 @@ typedef struct {
     struct SwrContext *swr;
 } AConvertContext;
 
-static av_cold int init(AVFilterContext *ctx, const char *args0, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args0)
 {
     AConvertContext *aconvert = ctx->priv;
     char *arg, *ptr = NULL;
@@ -75,14 +76,14 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterLink *outlink = ctx->outputs[0];
     AVFilterChannelLayouts *layouts;
 
-    avfilter_formats_ref(avfilter_make_all_formats(AVMEDIA_TYPE_AUDIO),
+    ff_formats_ref(ff_all_formats(AVMEDIA_TYPE_AUDIO),
                          &inlink->out_formats);
     if (aconvert->out_sample_fmt != AV_SAMPLE_FMT_NONE) {
         formats = NULL;
-        avfilter_add_format(&formats, aconvert->out_sample_fmt);
-        avfilter_formats_ref(formats, &outlink->in_formats);
+        ff_add_format(&formats, aconvert->out_sample_fmt);
+        ff_formats_ref(formats, &outlink->in_formats);
     } else
-        avfilter_formats_ref(avfilter_make_all_formats(AVMEDIA_TYPE_AUDIO),
+        ff_formats_ref(ff_all_formats(AVMEDIA_TYPE_AUDIO),
                              &outlink->in_formats);
 
     ff_channel_layouts_ref(ff_all_channel_layouts(),
@@ -126,7 +127,7 @@ static int config_output(AVFilterLink *outlink)
                                  -1, inlink ->channel_layout);
     av_get_channel_layout_string(buf2, sizeof(buf2),
                                  -1, outlink->channel_layout);
-    av_log(ctx, AV_LOG_INFO,
+    av_log(ctx, AV_LOG_VERBOSE,
            "fmt:%s cl:%s -> fmt:%s cl:%s\n",
            av_get_sample_fmt_name(inlink ->format), buf1,
            av_get_sample_fmt_name(outlink->format), buf2);
@@ -134,22 +135,44 @@ static int config_output(AVFilterLink *outlink)
     return 0;
 }
 
-static void filter_samples(AVFilterLink *inlink, AVFilterBufferRef *insamplesref)
+static int  filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamplesref)
 {
     AConvertContext *aconvert = inlink->dst->priv;
     const int n = insamplesref->audio->nb_samples;
     AVFilterLink *const outlink = inlink->dst->outputs[0];
     AVFilterBufferRef *outsamplesref = ff_get_audio_buffer(outlink, AV_PERM_WRITE, n);
+    int ret;
 
     swr_convert(aconvert->swr, outsamplesref->data, n,
                         (void *)insamplesref->data, n);
 
     avfilter_copy_buffer_ref_props(outsamplesref, insamplesref);
+    outsamplesref->audio->channels       = outlink->channels;
     outsamplesref->audio->channel_layout = outlink->channel_layout;
 
-    ff_filter_samples(outlink, outsamplesref);
+    ret = ff_filter_frame(outlink, outsamplesref);
     avfilter_unref_buffer(insamplesref);
+    return ret;
 }
+
+static const AVFilterPad aconvert_inputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_AUDIO,
+        .filter_frame = filter_frame,
+        .min_perms    = AV_PERM_READ,
+    },
+    { NULL }
+};
+
+static const AVFilterPad aconvert_outputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_AUDIO,
+        .config_props = config_output,
+    },
+    { NULL }
+};
 
 AVFilter avfilter_af_aconvert = {
     .name          = "aconvert",
@@ -158,14 +181,6 @@ AVFilter avfilter_af_aconvert = {
     .init          = init,
     .uninit        = uninit,
     .query_formats = query_formats,
-
-    .inputs    = (const AVFilterPad[]) {{ .name      = "default",
-                                    .type            = AVMEDIA_TYPE_AUDIO,
-                                    .filter_samples  = filter_samples,
-                                    .min_perms       = AV_PERM_READ, },
-                                  { .name = NULL}},
-    .outputs   = (const AVFilterPad[]) {{ .name      = "default",
-                                    .type            = AVMEDIA_TYPE_AUDIO,
-                                    .config_props    = config_output, },
-                                  { .name = NULL}},
+    .inputs        = aconvert_inputs,
+    .outputs       = aconvert_outputs,
 };

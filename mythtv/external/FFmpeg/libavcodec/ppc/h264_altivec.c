@@ -19,13 +19,14 @@
  */
 
 #include "libavutil/cpu.h"
+#include "libavutil/intreadwrite.h"
+#include "libavutil/ppc/types_altivec.h"
+#include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/dsputil.h"
 #include "libavcodec/h264data.h"
 #include "libavcodec/h264dsp.h"
 
 #include "dsputil_altivec.h"
-#include "util_altivec.h"
-#include "types_altivec.h"
 
 #define PUT_OP_U8_ALTIVEC(d, s, dst) d = s
 #define AVG_OP_U8_ALTIVEC(d, s, dst) d = vec_avg(dst, s)
@@ -39,7 +40,7 @@
 #define PREFIX_h264_qpel16_v_lowpass_num       altivec_put_h264_qpel16_v_lowpass_num
 #define PREFIX_h264_qpel16_hv_lowpass_altivec  put_h264_qpel16_hv_lowpass_altivec
 #define PREFIX_h264_qpel16_hv_lowpass_num      altivec_put_h264_qpel16_hv_lowpass_num
-#include "h264_template_altivec.c"
+#include "h264_altivec_template.c"
 #undef OP_U8_ALTIVEC
 #undef PREFIX_h264_chroma_mc8_altivec
 #undef PREFIX_h264_chroma_mc8_num
@@ -59,7 +60,7 @@
 #define PREFIX_h264_qpel16_v_lowpass_num       altivec_avg_h264_qpel16_v_lowpass_num
 #define PREFIX_h264_qpel16_hv_lowpass_altivec  avg_h264_qpel16_hv_lowpass_altivec
 #define PREFIX_h264_qpel16_hv_lowpass_num      altivec_avg_h264_qpel16_hv_lowpass_num
-#include "h264_template_altivec.c"
+#include "h264_altivec_template.c"
 #undef OP_U8_ALTIVEC
 #undef PREFIX_h264_chroma_mc8_altivec
 #undef PREFIX_h264_chroma_mc8_num
@@ -788,7 +789,7 @@ static inline vec_u8 h264_deblock_q1(register vec_u8 p0,
     alphavec = vec_splat(alphavec, 0x0);                                                     \
     mask = h264_deblock_mask(p0, p1, q0, q1, alphavec, betavec); /*if in block */            \
                                                                                              \
-    *((int *)temp) = *((int *)tc0);                                                          \
+    AV_COPY32(temp, tc0);                                                                    \
     tc0vec = vec_ld(0, (signed char*)temp);                                                  \
     tc0vec = vec_mergeh(tc0vec, tc0vec);                                                     \
     tc0vec = vec_mergeh(tc0vec, tc0vec);                                                     \

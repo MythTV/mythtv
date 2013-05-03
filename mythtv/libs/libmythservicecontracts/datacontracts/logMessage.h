@@ -59,11 +59,7 @@ class SERVICE_PUBLIC LogMessage : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< LogMessage  >();
-            qRegisterMetaType< LogMessage* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -108,5 +104,14 @@ class SERVICE_PUBLIC LogMessage : public QObject
 
 Q_DECLARE_METATYPE( DTC::LogMessage )
 Q_DECLARE_METATYPE( DTC::LogMessage* )
+
+namespace DTC
+{
+inline void LogMessage::InitializeCustomTypes()
+{
+    qRegisterMetaType< LogMessage  >();
+    qRegisterMetaType< LogMessage* >();
+}
+}
 
 #endif

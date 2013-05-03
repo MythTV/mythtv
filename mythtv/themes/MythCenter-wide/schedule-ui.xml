@@ -114,7 +114,7 @@
                     <imagetype name="channelicon">
                         <area>10,14,40,40</area>
                     </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
+                    <textarea name="channelname" from="basetextarea">
                         <area>54,0,138,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
@@ -122,6 +122,8 @@
                         <font state="favunavailable">basesmall_favourite_unavailable</font>
                         <cutdown>no</cutdown>
                         <align>allcenter</align>
+                        <multiline>yes</multiline>
+                        <template>%CHANNELNUMBER%\n%CALLSIGN%</template>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active"/>
@@ -315,7 +317,7 @@
                     <imagetype name="channelicon">
                         <area>10,14,40,40</area>
                     </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
+                    <textarea name="channelname" from="basetextarea">
                         <area>54,0,130,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
@@ -323,6 +325,8 @@
                         <font state="favunavailable">basesmall_favourite_unavailable</font>
                         <cutdown>no</cutdown>
                         <align>allcenter</align>
+                        <multiline>yes</multiline>
+                        <template>%CHANNELNUMBER%\n%CALLSIGN%</template>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active"/>
@@ -612,28 +616,28 @@
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
-            <area>30,52,1200,380</area>
+            <area>30,52,1220,380</area>
             <buttonarea>0,0,1200,380</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>4,0,26,26</area>
+                        <area>4,0,30,30</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
                         <position>30,0</position>
                     </statetype>
-                    <textarea name="chanstr" from="buttontext">
+                    <textarea name="channelnumber" from="buttontext">
                         <area>60,2,150,24</area>
                     </textarea>
-                    <textarea name="callsign" from="chanstr">
+                    <textarea name="callsign" from="channelnumber">
                         <area>220,2,250,24</area>
                     </textarea>
-                    <textarea name="channelname" from="chanstr">
-                        <area>570,2,500,24</area>
+                    <textarea name="channelname" from="channelnumber">
+                        <area>570,2,550,24</area>
                     </textarea>
-                    <textarea name="priority" from="chanstr">
-                        <area>1140,2,30,24</area>
+                    <textarea name="priority" from="channelnumber">
+                        <area>1130,2,40,24</area>
                         <align>right</align>
                     </textarea>
                 </state>
@@ -662,7 +666,7 @@
         </imagetype>
 
         <textarea name="channelname" from="basetextarea">
-            <area>540,472,740,40</area>
+            <area>540,472,700,40</area>
             <font>baselarge</font>
         </textarea>
 
@@ -693,12 +697,19 @@
             <area>700,584,400,30</area>
         </textarea>
 
-        <textarea name="norecordings_info">
+        <textarea name="channelnumberlabel" from="basetextarea">
+            <area>540,618,140,30</area>
+            <value>Channel:</value>
+        </textarea>
+
+        <textarea name="channelnumber" from="basetextarea">
+            <area>700,618,400,30</area>
+        </textarea>
+
+        <textarea name="nochannels_warning">
             <area>0,210,1280,70</area>
             <font>basemedium</font>
-            <value>You Haven't Scheduled Any Programs To Be Recorded\n
-                To schedule a recording, exit this screen and
-                select 'Program Guide' or 'Program Finder'</value>
+            <value>You haven't defined any channels</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -707,143 +718,6 @@
             <area>0,670,1280,30</area>
             <value>(1) Channel (2) Priority</value>
             <align>center</align>
-        </textarea>
-
-    </window>
-
-    <window name="programrecpriority">
-
-        <textarea name="pagetitle" from="basetextarea">
-            <area>15,5,570,40</area>
-            <font>baselarge</font>
-            <value>Schedule Priorities</value>
-        </textarea>
-
-        <shape name="list_background" from="basebackground">
-            <area>20,48,1240,390</area>
-        </shape>
-
-        <textarea name="prioritylabel" from="basetextarea">
-            <area>900,14,200,40</area>
-            <value>Priority</value>
-            <align>allcenter</align>
-        </textarea>
-
-        <textarea name="finalrecprioritylabel" from="basetextarea">
-            <area>1140,14,94,40</area>
-            <value>Final</value>
-            <align>allcenter</align>
-        </textarea>
-
-        <buttonlist name="programs" from="basebuttonlist2">
-            <position>24,60</position>
-            <searchposition>-1,450</searchposition>
-            <statetype name="buttonitem">
-                <state name="active">
-                    <textarea name="rectypechar" from="buttontext">
-                        <area>24,2,20,24</area>
-                        <align>allcenter</align>
-                    </textarea>
-                    <textarea name="titlesubtitle" from="rectypechar">
-                        <area>60,2,850,24</area>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="progpriority" from="rectypechar">
-                        <area>934,2,40,24</area>
-                        <align>right,vcenter</align>
-                    </textarea>
-                    <textarea name="finalpriority" from="progpriority">
-                        <position>1130,2</position>
-                    </textarea>
-                </state>
-                <state name="selectedactive" from="active">
-                    <textarea name="rectypechar" from="buttontext">
-                        <area>24,2,20,24</area>
-                        <align>allcenter</align>
-                        <font>base_normal_selected</font>
-                        <font state="disabled">basesmall_normal_selected</font>
-                        <font state="error">basesmall_normal_selected</font>
-                        <font state="warning">basesmall_normal_selected</font>
-                        <font state="normal">basesmall_normal_selected</font>
-                        <font state="running">basesmall_normal_selected</font>
-                    </textarea>
-                    <textarea name="titlesubtitle" from="rectypechar">
-                        <area>60,2,850,24</area>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="progpriority" from="rectypechar">
-                        <area>934,2,40,24</area>
-                        <align>right,vcenter</align>
-                    </textarea>
-                    <textarea name="finalpriority" from="progpriority">
-                        <position>1130,2</position>
-                    </textarea>
-                    <shape name="selectbar">
-                        <area>6,0,1220,28</area>
-                    </shape>
-                </state>
-                <state name="selectedinactive" from="active" />
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>1214,-36</position>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>1210,386</position>
-            </statetype>
-        </buttonlist>
-
-        <textarea name="title" from="basetextarea">
-            <area>24,450,740,40</area>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="scheduleinfo" from="basetextarea">
-            <area>24,490,740,30</area>
-        </textarea>
-
-        <textarea name="rec_str" from="basetextarea">
-            <area>24,530,430,30</area>
-        </textarea>
-
-        <textarea name="recprioritylabel" from="basetextarea">
-            <area>700,490,200,30</area>
-            <value>Priority:</value>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="recpriority" from="basetextarea">
-            <area>920,490,40,30</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="recpriorityB" from="recpriority">
-            <position>970,490</position>
-        </textarea>
-
-        <textarea name="rectypeprioritylabel" from="recprioritylabel">
-            <position>700,520</position>
-            <value>Type Priority:</value>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="rectypepriority" from="recpriority">
-            <position>920,520</position>
-        </textarea>
-
-        <textarea name="finalprioritylabel" from="recprioritylabel">
-            <position>700,550</position>
-            <value>Final Priority:</value>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="finalpriority" from="recpriority">
-            <position>920,550</position>
-        </textarea>
-
-        <textarea name="keyinstr" from="basetextarea">
-            <area>0,590,1280,30</area>
-            <value>(1) Title (2) Priority (4) Type</value>
-            <align>allcenter</align>
         </textarea>
 
     </window>
@@ -857,75 +731,50 @@
         </textarea>
 
         <textarea name="ruleslabel" from="basetextarea">
-            <area>280,102,250,30</area>
+            <area>30,102,450,30</area>
             <font>basemedium</font>
             <align>right</align>
             <value>Existing Rules:</value>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>540,100</position>
+            <position>490,100</position>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
-            <position>280,162</position>
+            <position>30,162</position>
             <value>Rule Name:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>540,156</position>
+            <position>490,156</position>
         </textedit>
 
         <textarea name="prioritylabel" from="ruleslabel">
-            <position>280,222</position>
+            <position>30,222</position>
             <value>Priority Change:</value>
         </textarea>
 
         <spinbox name="priority" from="basespinbox">
-            <position>540,220</position>
+            <position>490,220</position>
         </spinbox>
 
         <textarea name="clauseslabel" from="ruleslabel">
-            <area>340,300,600,40</area>
-            <value>Select a clause from the list.</value>
-            <align>allcenter</align>
+            <position>30,280</position>
+            <value>Select a clause from the list:</value>
         </textarea>
 
         <buttonlist name="clauses" from="basewideselector">
-            <position>360,350</position>
+            <position>490,275</position>
         </buttonlist>
 
         <button name="add" from="basebutton">
-            <position>770,350</position>
+            <position>490,340</position>
             <value>Add Clause</value>
         </button>
 
-        <textedit name="description">
-            <area>340,400,600,100</area>
-            <statetype name="background">
-                <area>0,0,100%,100%</area>
-                <state name="active">
-                    <area>0,0,100%,100%</area>
-                    <shape name="background">
-                        <area>0,0,100%,100%</area>
-                        <fill color="#FFFFFF" alpha="180" />
-                    </shape>
-                </state>
-                <state name="selected" from="active">
-                    <shape name="background">
-                        <fill alpha="255" />
-                    </shape>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <imagetype name="cursor">
-                <filename>cursor.png</filename>
-            </imagetype>
-            <textarea name="text">
-                <area>12,12,576,76</area>
-                <font>basesmall_textedit</font>
-                <multiline>yes</multiline>
-            </textarea>
+        <textedit name="description" from="basemultilinetextedit">
+            <area>490,400,600,140</area>
         </textedit>
 
         <button name="cancel" from="basebutton">
@@ -1271,7 +1120,7 @@
             <fill color="#131564"/>
         </shape>
 
-        <webbrowser name="browser">
+        <webbrowser name="browser" from="basewebbrowser">
             <area>80,70,1120,580</area>
             <zoom>1.0</zoom>
             <background color="#131564"/>

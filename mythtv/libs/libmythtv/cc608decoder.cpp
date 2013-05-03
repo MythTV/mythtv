@@ -669,6 +669,8 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
     {
         QChar cp = cc608str[i];
         int cpu = cp.unicode();
+        if (cpu == 0)
+            break;
         switch (cpu)
         {
             case 0x2120 :  ret += "(SM)"; break;
@@ -689,10 +691,10 @@ QString CC608Decoder::ToASCII(const QString &cc608str, bool suppress_unknown)
                     if (!suppress_unknown)
                         ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
                 }
-                else if (cpu >= 0x20 && cpu <= 0x80)
+                else if (cpu <= 0x80)
                     ret += QString(cp.toLatin1());
-                if (!suppress_unknown)
-                    ret += QString("[%1]").arg(cpu - 0x7000, 2, 16);
+                else if (!suppress_unknown)
+                    ret += QString("{%1}").arg(cpu, 2, 16);
         }
     }
 
@@ -1029,7 +1031,7 @@ static bool is_better(const QString &newStr, const QString &oldStr)
 
         // check if the string contains any bogus characters
         for (int i = 0; i < newStr.length(); i++)
-            if (newStr[i].toAscii() < 0x20)
+            if (newStr[i].toLatin1() < 0x20)
                 return false;
 
         return true;
@@ -1265,16 +1267,15 @@ void CC608Decoder::XDSPacketParse(const vector<unsigned char> &xds_buf)
         ; // reserved
     else if (xds_class == 0x0d) // cont code: 0x0e
         handled = true; // undefined
-#if DEBUG_XDS
-    if (!handled)
+
+    if (DEBUG_XDS && !handled)
     {
         LOG(VB_VBI, LOG_INFO, QString("XDS: ") +
-                QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
-                .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
-                .arg(xds_buf.size())
-                .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
+            QString("Unhandled packet (0x%1 0x%2) sz(%3) '%4'")
+            .arg(xds_buf[0],0,16).arg(xds_buf[1],0,16)
+            .arg(xds_buf.size())
+            .arg(XDSDecodeString(xds_buf, 2, xds_buf.size() - 2)));
     }
-#endif // DEBUG_XDS
 }
 
 bool CC608Decoder::XDSPacketCRC(const vector<unsigned char> &xds_buf)

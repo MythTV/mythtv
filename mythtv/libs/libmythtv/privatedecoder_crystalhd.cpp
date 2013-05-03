@@ -196,19 +196,19 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
 
     switch (avctx->codec_id)
     {
-        case CODEC_ID_MPEG4:
+        case AV_CODEC_ID_MPEG4:
             if (codecs & BC_DEC_FLAGS_M4P2)
                 sub_type = BC_MSUBTYPE_DIVX;
             break;
-        case CODEC_ID_MPEG1VIDEO:
+        case AV_CODEC_ID_MPEG1VIDEO:
             if (codecs & BC_DEC_FLAGS_MPEG2)
                 sub_type = BC_MSUBTYPE_MPEG1VIDEO;
             break;
-        case CODEC_ID_MPEG2VIDEO:
+        case AV_CODEC_ID_MPEG2VIDEO:
             if (codecs & BC_DEC_FLAGS_MPEG2)
                 sub_type = BC_MSUBTYPE_MPEG2VIDEO;
             break;
-        case CODEC_ID_VC1:
+        case AV_CODEC_ID_VC1:
             if (codecs & BC_DEC_FLAGS_VC1)
             {
                 if (avctx->codec_tag == MKTAG('W','V','C','1'))
@@ -217,11 +217,11 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
                     sub_type = BC_MSUBTYPE_VC1;
             }
             break;
-        case CODEC_ID_WMV3:
+        case AV_CODEC_ID_WMV3:
             if (codecs & BC_DEC_FLAGS_VC1)
                 sub_type = BC_MSUBTYPE_WMV3;
             break;
-        case CODEC_ID_H264:
+        case AV_CODEC_ID_H264:
             if (codecs & BC_DEC_FLAGS_H264)
             {
                 if (avctx->extradata[0] == 0x01)
@@ -248,7 +248,7 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
     }
 
     int nalsize = 4;
-    if (avctx->codec_id == CODEC_ID_H264)
+    if (avctx->codec_id == AV_CODEC_ID_H264)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("H.264 Profile: %1 RefFrames: %2 Codec tag: %3")

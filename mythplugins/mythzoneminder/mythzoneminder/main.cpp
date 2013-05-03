@@ -137,7 +137,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythzoneminder",
+    if (!gCoreContext->TestPluginVersion("mythzoneminder",
                                     libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
@@ -166,5 +166,8 @@ int mythplugin_config(void)
     return 0;
 }
 
-
+void mythplugin_destroy(void)
+{
+    delete ZMClient::get();
+}
 

@@ -13,7 +13,7 @@
 class MythUIButtonList;
 class MythUIButton;
 
-struct DatabaseParams;
+class DatabaseParams;
 
 // TODO: The following do not belong here, but I cannot think of a better
 //       location at this moment in time
@@ -53,6 +53,7 @@ class BackendSelection : public MythScreenType
     virtual ~BackendSelection();
 
     bool Create(void);
+    virtual void Close(void);
     void customEvent(QEvent *event);
 
   protected slots:
@@ -69,7 +70,7 @@ class BackendSelection : public MythScreenType
     void RemoveItem(QString URN);
     bool TryDBfromURL(const QString &error, QString URL);
     void PromptForPassword(void);
-    void Close(Decision);
+    void CloseWithDecision(Decision);
 
     DatabaseParams *m_DBparams;
     Configuration  *m_pConfig;

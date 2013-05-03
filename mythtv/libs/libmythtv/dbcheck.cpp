@@ -38,7 +38,6 @@ The schema contains the following tables:
 
 \htmlonly
 <table>
-<tr><td>callsignnetworkmap         <td>pk(id)
 <tr><td>capturecard                <td>pk(cardid)
 <tr><td>cardinput                  <td>pk(cardinputid)
 <tr><td>channel                    <td>pk(chanid) k(channum,sourceid)
@@ -58,7 +57,6 @@ The schema contains the following tables:
 <tr><td>keybindings                <td>pk(context,action,hostname)
 <tr><td>keyword                    <td>uk(phrase,searchtype)
 <tr><td>mythlog                    <td>pk(logid)
-<tr><td>networkiconmap             <td>pk(id) uk(network)
 <tr><td>oldprogram                 <td>pk(oldtitle)
 <tr><td>oldrecorded                <td>k(endtime) k(title) k(seriesid) k(programid)
                                        pk(station,starttime,title)
@@ -2277,6 +2275,70 @@ NULL
             return false;
     }
 
+    if (dbver == "1307")
+    {
+        const char *updates[] = {
+"ALTER TABLE channel MODIFY COLUMN icon varchar(255) NOT NULL DEFAULT '';",
+"UPDATE channel SET icon='' WHERE icon='none';",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1308", dbver))
+            return false;
+    }
+    
+    if (dbver == "1308")
+    {
+        const char *updates[] = {
+// Add this time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 1440 <= 10', 0)",
+// Add this day and time filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (9, 'This day and time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 10080 <= 10', 0)",
+// Convert old, normal Timeslot rules to Channel with time filter
+"UPDATE record SET type = 3, filter = filter|256 "
+"  WHERE type = 2 AND search = 0",
+// Convert old, normal Weekslot rules to Channel with day and time filter
+"UPDATE record SET type = 3, filter = filter|512 "
+"  WHERE type = 5 AND search = 0",
+// Convert old, normal find daily to new, power search, find daily
+"UPDATE record SET type = 2, search = 1, chanid = 0, station = '', "
+"  subtitle = '', description = CONCAT('program.title = ''', "
+"  REPLACE(title, '''', ''''''), ''''), "
+"  title = CONCAT(title, ' (Power Search)') WHERE type = 9 AND search = 0",
+// Convert old, normal find weekly to new, power search, find weekly
+"UPDATE record SET type = 5, search = 1, chanid = 0, station = '', "
+"  subtitle = '', description = CONCAT('program.title = ''', "
+"  REPLACE(title, '''', ''''''), ''''), "
+"  title = CONCAT(title, ' (Power Search)') WHERE type = 10 AND search = 0",
+// Convert old, find daily to new, find daily
+"UPDATE record SET type = 2 WHERE type = 9",
+// Convert old, find weekly to new, find weekly
+"UPDATE record SET type = 5 WHERE type = 10",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1309", dbver))
+            return false;
+    }
+
+    if (dbver == "1309")
+    {
+        const char *updates[] = {
+// Add this channel filter
+"REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
+"  VALUES (10, 'This channel', 'channel.callsign = RECTABLE.station', 0)",
+// Convert old, Channel rules to All with channel filter
+"UPDATE record SET type = 4, filter = filter|1024 WHERE type = 3",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1310", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -2320,13 +2382,6 @@ bool InitializeMythSchema(void)
         "Inserting MythTV initial database information.");
 
     const char *updates[] = {
-"CREATE TABLE callsignnetworkmap ("
-"  id int(11) NOT NULL AUTO_INCREMENT,"
-"  callsign varchar(20) NOT NULL DEFAULT '',"
-"  network varchar(20) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (id),"
-"  UNIQUE KEY callsign (callsign)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE capturecard ("
 "  cardid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  videodevice varchar(128) DEFAULT NULL,"
@@ -2381,7 +2436,7 @@ bool InitializeMythSchema(void)
 "  sourceid int(10) unsigned DEFAULT NULL,"
 "  callsign varchar(20) NOT NULL DEFAULT '',"
 "  `name` varchar(64) NOT NULL DEFAULT '',"
-"  icon varchar(255) NOT NULL DEFAULT 'none',"
+"  icon varchar(255) NOT NULL DEFAULT '',"
 "  finetune int(11) DEFAULT NULL,"
 "  videofilters varchar(255) NOT NULL DEFAULT '',"
 "  xmltvid varchar(255) NOT NULL DEFAULT '',"
@@ -2820,13 +2875,6 @@ bool InitializeMythSchema(void)
 "  details varchar(16000) NOT NULL DEFAULT '',"
 "  PRIMARY KEY (logid),"
 "  KEY module (module)"
-") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
-"CREATE TABLE networkiconmap ("
-"  id int(11) NOT NULL AUTO_INCREMENT,"
-"  network varchar(20) NOT NULL DEFAULT '',"
-"  url varchar(255) NOT NULL DEFAULT '',"
-"  PRIMARY KEY (id),"
-"  UNIQUE KEY network (network)"
 ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
 "CREATE TABLE oldfind ("
 "  recordid int(11) NOT NULL DEFAULT '0',"

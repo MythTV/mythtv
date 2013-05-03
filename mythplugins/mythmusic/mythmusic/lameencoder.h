@@ -27,7 +27,7 @@
 #define LAMEENCODER_H_
 
 class QString;
-class Metadata;
+class MusicMetadata;
 class Encoder;
 
 #ifdef MMX
@@ -46,7 +46,7 @@ class Encoder;
 class LameEncoder : public Encoder
 {
   public:
-    LameEncoder(const QString &outfile, int qualitylevel, Metadata *metadata,
+    LameEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata,
                 bool vbr = false);
    ~LameEncoder();
     int addSamples(int16_t *bytes, unsigned int len);

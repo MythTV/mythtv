@@ -433,14 +433,16 @@ static void commDetectorBreathe()
                 case JOB_PAUSE:
                 {
                     JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
-                                              QObject::tr("Paused"));
+                        QCoreApplication::translate("(mythcommflag)",
+                                                    "Paused", "Job status"));
                     commDetector->pause();
                     break;
                 }
                 case JOB_RESUME:
                 {
                     JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
-                                              QObject::tr("Running"));
+                        QCoreApplication::translate("(mythcommflag)",
+                                                    "Running", "Job status"));
                     commDetector->resume();
                     break;
                 }
@@ -767,7 +769,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 if (!skipTypes->contains(val))
                 {
                     cerr << "Failed to decode --method option '"
-                         << val.toAscii().constData()
+                         << val.toLatin1().constData()
                          << "'" << endl;
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
@@ -995,7 +997,7 @@ static int FlagCommercials(QString filename, int jobid,
     if (progress)
     {
         cerr << "MythTV Commercial Flagger, flagging commercials for:" << endl
-             << "    " << filename.toAscii().constData() << endl;
+             << "    " << filename.toLatin1().constData() << endl;
     }
 
     ProgramInfo pginfo(filename);
@@ -1067,7 +1069,7 @@ static int RebuildSeekTable(QString filename, int jobid)
     if (progress)
     {
         cerr << "MythTV Commercial Flagger, building seek table for:" << endl
-             << "    " << filename.toAscii().constData() << endl;
+             << "    " << filename.toLatin1().constData() << endl;
     }
     ProgramInfo pginfo(filename);
     return RebuildSeekTable(&pginfo, jobid);
@@ -1127,6 +1129,9 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
@@ -1205,11 +1210,15 @@ int main(int argc, char *argv[])
             ret = FlagCommercials(chanid, starttime, jobID, "", jobQueueCPU != 0);
 
         if (ret > GENERIC_EXIT_NOT_OK)
-            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED,
-                        QString("Failed with exit status %1").arg(ret));
+            JobQueue::ChangeJobStatus(jobID, JOB_ERRORED, 
+                QCoreApplication::translate("(mythcommflag)",
+                                            "Failed with exit status %1",
+                                            "Job status").arg(ret));
         else
             JobQueue::ChangeJobStatus(jobID, JOB_FINISHED,
-                        QString("%1 commercial breaks").arg(ret));
+                QCoreApplication::translate("(mythcommflag)",
+                                            "%1 commercial break(s)",
+                                            "Job status").arg(ret));
     }
     else if (cmdline.toBool("video"))
     {

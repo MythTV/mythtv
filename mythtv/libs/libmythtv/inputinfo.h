@@ -7,7 +7,7 @@
 #include <QMap>
 
 // MythTV headers
-#include "channelutil.h" // for DBChanList
+#include "channelinfo.h" // for ChannelInfoList
 
 class MTV_PUBLIC InputInfo
 {
@@ -72,20 +72,19 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     ChannelInputInfo() :
         startChanNum(QString::null),    tuneToChannel(QString::null),
         externalChanger(QString::null),
-        inputNumV4L(-1),
-        videoModeV4L1(0),               videoModeV4L2(0) {}
+        inputNumV4L(-1), videoModeV4L2(0) {}
     ChannelInputInfo(QString _name,            QString _startChanNum,
                      QString _tuneToChannel,   QString _externalChanger,
                      uint    _sourceid,        uint    _cardid,
                      uint    _inputid,         uint    _mplexid,
                      uint    _livetvorder,
-                     const DBChanList &_channels) :
+                     const ChannelInfoList &_channels) :
         InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _livetvorder),
         startChanNum(_startChanNum),
         tuneToChannel(_tuneToChannel),  externalChanger(_externalChanger),
         channels(_channels),
         inputNumV4L(-1),
-        videoModeV4L1(0),               videoModeV4L2(0) {}
+        videoModeV4L2(0) {}
     ChannelInputInfo(const ChannelInputInfo &other);
     ChannelInputInfo &operator=(const ChannelInputInfo &other);
     virtual ~ChannelInputInfo() {}
@@ -96,10 +95,9 @@ class MTV_PUBLIC ChannelInputInfo : public InputInfo
     QString      startChanNum;    ///< channel to start on
     QString      tuneToChannel;   ///< for using a cable box & S-Video
     QString      externalChanger; ///< for using a cable box...
-    DBChanList   channels;
+    ChannelInfoList   channels;
     vector<uint> groups;
     int          inputNumV4L;
-    int          videoModeV4L1;
     int          videoModeV4L2;
 };
 typedef QMap<uint, ChannelInputInfo*> InputMap;

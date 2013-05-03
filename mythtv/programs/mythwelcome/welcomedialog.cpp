@@ -573,7 +573,7 @@ bool WelcomeDialog::checkConnectionToServer(void)
         bRes = true;
     else
     {
-        if (gCoreContext->ConnectToMasterServer(false))
+        if (gCoreContext->SafeConnectToMasterServer(false))
         {
             bRes = true;
             updateAll();

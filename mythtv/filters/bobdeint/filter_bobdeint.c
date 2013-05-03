@@ -143,11 +143,13 @@ static FmtConv FmtList[] =
 const FilterInfo filter_table[] =
 {
     {
-        filter_init: &new_filter,
-        name:       "bobdeint",
-        descript:   "bob deinterlace filter; splits fields to top and bottom of buffer",
-        formats:    FmtList,
-        libname:    NULL,
+        .filter_init= &new_filter,
+        .name=       (char*)"bobdeint",
+        .descript=   (char*)
+        "bob deinterlace filter; "
+        "splits fields to top and bottom of buffer",
+        .formats=    FmtList,
+        .libname=    NULL,
     },
     FILT_NULL
 };

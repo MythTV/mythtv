@@ -113,7 +113,6 @@ class AutoExpire : public QObject
 
     // main expire info
     QSet<QString> dont_expire_set;
-    QSet<QString> deleted_set;
     ExpireThread *expire_thread;     // protected by instance_lock
     uint          desired_freq;      // protected by instance_lock
     bool          expire_thread_run; // protected by instance_lock

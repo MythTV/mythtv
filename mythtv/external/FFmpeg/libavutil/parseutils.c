@@ -21,17 +21,15 @@
  * misc parsing utilities
  */
 
-#include <sys/time.h>
 #include <time.h>
 
 #include "avstring.h"
 #include "avutil.h"
+#include "common.h"
 #include "eval.h"
 #include "log.h"
 #include "random_seed.h"
 #include "parseutils.h"
-
-#undef time
 
 #ifdef TEST
 
@@ -47,7 +45,6 @@ int av_parse_ratio(AVRational *q, const char *str, int max,
 {
     char c;
     int ret;
-    int64_t gcd;
 
     if (sscanf(str, "%d:%d%c", &q->num, &q->den, &c) != 2) {
         double d;
@@ -57,12 +54,8 @@ int av_parse_ratio(AVRational *q, const char *str, int max,
         if (ret < 0)
             return ret;
         *q = av_d2q(d, max);
-    }
-
-    gcd = av_gcd(FFABS(q->num), FFABS(q->den));
-    if (gcd) {
-        q->num /= gcd;
-        q->den /= gcd;
+    } else {
+        av_reduce(&q->num, &q->den, q->num, q->den, max);
     }
 
     return 0;
@@ -144,11 +137,14 @@ int av_parse_video_size(int *width_ptr, int *height_ptr, const char *str)
         }
     }
     if (i == n) {
-        p = str;
-        width = strtol(p, (void*)&p, 10);
+        width = strtol(str, (void*)&p, 10);
         if (*p)
             p++;
         height = strtol(p, (void*)&p, 10);
+
+        /* trailing extraneous data detected, like in 123x345foobar */
+        if (*p)
+            return AVERROR(EINVAL);
     }
     if (width <= 0 || height <= 0)
         return AVERROR(EINVAL);
@@ -250,8 +246,8 @@ static const ColorEntry color_table[] = {
     { "LightCoral",           { 0xF0, 0x80, 0x80 } },
     { "LightCyan",            { 0xE0, 0xFF, 0xFF } },
     { "LightGoldenRodYellow", { 0xFA, 0xFA, 0xD2 } },
-    { "LightGrey",            { 0xD3, 0xD3, 0xD3 } },
     { "LightGreen",           { 0x90, 0xEE, 0x90 } },
+    { "LightGrey",            { 0xD3, 0xD3, 0xD3 } },
     { "LightPink",            { 0xFF, 0xB6, 0xC1 } },
     { "LightSalmon",          { 0xFF, 0xA0, 0x7A } },
     { "LightSeaGreen",        { 0x20, 0xB2, 0xAA } },
@@ -389,7 +385,7 @@ int av_parse_color(uint8_t *rgba_color, const char *color_string, int slen,
     }
 
     if (tail) {
-        unsigned long int alpha;
+        double alpha;
         const char *alpha_string = tail;
         if (!strncmp(alpha_string, "0x", 2)) {
             alpha = strtoul(alpha_string, &tail, 16);
@@ -401,7 +397,7 @@ int av_parse_color(uint8_t *rgba_color, const char *color_string, int slen,
                 alpha = 255 * norm_alpha;
         }
 
-        if (tail == alpha_string || *tail || alpha > 255) {
+        if (tail == alpha_string || *tail || alpha > 255 || alpha < 0) {
             av_log(log_ctx, AV_LOG_ERROR, "Invalid alpha value specifier '%s' in '%s'\n",
                    alpha_string, color_string);
             return AVERROR(EINVAL);
@@ -438,29 +434,26 @@ static int date_get_num(const char **pp,
     return val;
 }
 
-/**
- * Parse the input string p according to the format string fmt and
- * store its results in the structure dt.
- * This implementation supports only a subset of the formats supported
- * by the standard strptime().
- *
- * @return a pointer to the first character not processed in this
- * function call, or NULL in case the function fails to match all of
- * the fmt string and therefore an error occurred
- */
-static const char *small_strptime(const char *p, const char *fmt, struct tm *dt)
+char *av_small_strptime(const char *p, const char *fmt, struct tm *dt)
 {
     int c, val;
 
     for(;;) {
+        /* consume time string until a non whitespace char is found */
+        while (isspace(*fmt)) {
+            while (isspace(*p))
+                p++;
+            fmt++;
+        }
         c = *fmt++;
         if (c == '\0') {
-            return p;
+            return (char *)p;
         } else if (c == '%') {
             c = *fmt++;
             switch(c) {
             case 'H':
-                val = date_get_num(&p, 0, 23, 2);
+            case 'J':
+                val = date_get_num(&p, 0, c == 'H' ? 23 : INT_MAX, 2);
                 if (val == -1)
                     return NULL;
                 dt->tm_hour = val;
@@ -558,7 +551,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
 
         /* parse the year-month-day part */
         for (i = 0; i < FF_ARRAY_ELEMS(date_fmt); i++) {
-            q = small_strptime(p, date_fmt[i], &dt);
+            q = av_small_strptime(p, date_fmt[i], &dt);
             if (q)
                 break;
         }
@@ -576,7 +569,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
 
         /* parse the hour-minute-second part */
         for (i = 0; i < FF_ARRAY_ELEMS(time_fmt); i++) {
-            q = small_strptime(p, time_fmt[i], &dt);
+            q = av_small_strptime(p, time_fmt[i], &dt);
             if (q)
                 break;
         }
@@ -587,7 +580,7 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
             ++p;
         }
         /* parse timestr as HH:MM:SS */
-        q = small_strptime(p, time_fmt[0], &dt);
+        q = av_small_strptime(p, "%J:%M:%S", &dt);
         if (!q) {
             /* parse timestr as S+ */
             dt.tm_sec = strtol(p, (void *)&q, 10);
@@ -611,6 +604,8 @@ int av_parse_time(int64_t *timeval, const char *timestr, int duration)
                 break;
             microseconds += n * (*q - '0');
         }
+        while (isdigit(*q))
+            q++;
     }
 
     if (duration) {
@@ -679,21 +674,19 @@ int av_find_info_tag(char *arg, int arg_size, const char *tag1, const char *info
 
 #ifdef TEST
 
-static uint32_t random = MKTAG('L','A','V','U');
+static uint32_t randomv = MKTAG('L','A','V','U');
 
 static uint32_t av_get_random_seed_deterministic(void)
 {
-    return random = random * 1664525 + 1013904223;
+    return randomv = randomv * 1664525 + 1013904223;
 }
-
-#undef printf
 
 int main(void)
 {
     printf("Testing av_parse_video_rate()\n");
     {
         int i;
-        const char *rates[] = {
+        static const char *const rates[] = {
             "-inf",
             "inf",
             "nan",
@@ -723,12 +716,10 @@ int main(void)
 
         for (i = 0; i < FF_ARRAY_ELEMS(rates); i++) {
             int ret;
-            char err[1024];
-            AVRational q = (AVRational){0, 0};
+            AVRational q = { 0, 0 };
             ret = av_parse_video_rate(&q, rates[i]);
-            av_strerror(ret, err, sizeof(err));
-            printf("'%s' -> %d/%d ret:%s\n",
-                   rates[i], q.num, q.den, err);
+            printf("'%s' -> %d/%d %s\n",
+                   rates[i], q.num, q.den, ret ? "ERROR" : "OK");
         }
     }
 
@@ -736,7 +727,7 @@ int main(void)
     {
         int i;
         uint8_t rgba[4];
-        const char *color_names[] = {
+        static const char *const color_names[] = {
             "bikeshed",
             "RaNdOm",
             "foo",
@@ -779,9 +770,39 @@ int main(void)
 
         for (i = 0;  i < FF_ARRAY_ELEMS(color_names); i++) {
             if (av_parse_color(rgba, color_names[i], -1, NULL) >= 0)
-                printf("%s -> R(%d) G(%d) B(%d) A(%d)\n", color_names[i], rgba[0], rgba[1], rgba[2], rgba[3]);
+                printf("%s -> R(%d) G(%d) B(%d) A(%d)\n",
+                       color_names[i], rgba[0], rgba[1], rgba[2], rgba[3]);
             else
                 printf("%s -> error\n", color_names[i]);
+        }
+    }
+
+    printf("\nTesting av_small_strptime()\n");
+    {
+        int i;
+        struct tm tm = { 0 };
+        struct fmt_timespec_entry {
+            const char *fmt, *timespec;
+        } fmt_timespec_entries[] = {
+            { "%Y-%m-%d",                    "2012-12-21" },
+            { "%Y - %m - %d",                "2012-12-21" },
+            { "%Y-%m-%d %H:%M:%S",           "2012-12-21 20:12:21" },
+            { "  %Y - %m - %d %H : %M : %S", "   2012 - 12 -  21   20 : 12 : 21" },
+        };
+
+        av_log_set_level(AV_LOG_DEBUG);
+        for (i = 0;  i < FF_ARRAY_ELEMS(fmt_timespec_entries); i++) {
+            char *p;
+            struct fmt_timespec_entry *e = &fmt_timespec_entries[i];
+            printf("fmt:'%s' spec:'%s' -> ", e->fmt, e->timespec);
+            p = av_small_strptime(e->timespec, e->fmt, &tm);
+            if (p) {
+                printf("%04d-%02d-%2d %02d:%02d:%02d\n",
+                       1900+tm.tm_year, tm.tm_mon+1, tm.tm_mday,
+                       tm.tm_hour, tm.tm_min, tm.tm_sec);
+            } else {
+                printf("error\n");
+            }
         }
     }
 

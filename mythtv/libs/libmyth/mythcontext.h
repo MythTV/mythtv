@@ -9,7 +9,6 @@
 #include "mythexp.h"
 #include "mythlogging.h"
 
-class MythPluginManager;
 class MythContextPrivate;
 
 class MythContextSlotHandler : public QObject
@@ -53,14 +52,7 @@ class MPUBLIC MythContext
     DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);
 
-    bool TestPopupVersion(const QString &name, const QString &libversion,
-                          const QString &pluginversion);
-
     void SetDisableEventPopup(bool check);
-    void SetDisableLibraryPopup(bool check);
-
-    void SetPluginManager(MythPluginManager *pmanager);
-    MythPluginManager *getPluginManager(void);
 
   private:
     MythContextPrivate *d;

@@ -295,7 +295,6 @@ DEPEND_LIST="
 vorbis
 flac
 mp3lame
-taglib
 "
 
 enable $PLUGIN_LIST $CONFIG_LIST $DEPEND_LIST
@@ -520,8 +519,12 @@ EOF
     die "Sanity test failed."
 fi
 
+is_qmake5(){
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
+}
+
 is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[5-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
 }
 
 # bring in mythtv config
@@ -558,12 +561,13 @@ OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
-if ! is_qmake4 $qmake; then
-    is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.6 or newer not found.\nPlease specify the correct qmake with --qmake="
-fi
-
-if ! expr $($qmake -query QT_VERSION) : "4\.[6-9]\.[0-9]" >/dev/null; then
-    die "Qt4.6 or newer is required to build MythTV."
+if ! is_qmake5 $qmake ; then
+  if ! is_qmake4 $qmake; then
+      is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+  fi
+  if ! expr $($qmake -query QT_VERSION) : "4\.[8-9]\.[0-9]" >/dev/null; then
+      die "Qt4.8 or newer is required to build MythTV."
+  fi
 fi
 
 # rely on what was discover during MythTV configure
@@ -658,24 +662,7 @@ if enabled music ; then
         echo "MythMusic requires the LAME mp3 encoder."
     fi
 
-    taglib_minor="0"
-    if test x`which taglib-config` != x"" ; then
-        taglib_minor=`taglib-config --version | cut -d. -f2`
-        if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.6 or later."
-            taglib_minor="6"
-        fi
-        tagprefix=`taglib-config --prefix`
-        add_cxxflags "-I${tagprefix}/include"
-        add_ldflags "-L${tagprefix}/lib"
-    fi
-
-    if test $taglib_minor -lt 6 || ! check_lib_cxx taglib/fileref.h TagLib::FileRef -ltag -lz ; then
-        disable taglib
-        echo "MythMusic requires taglib 1.6 or later."
-    fi
-
-    if disabled vorbis || disabled flac || disabled mp3lame || disabled taglib ; then
+    if disabled vorbis || disabled flac || disabled mp3lame ;  then
         echo "Disabling MythMusic due to missing dependencies."
         disable music
     fi
@@ -900,10 +887,6 @@ if enabled music ; then
              ./mythmusic/mythmusic/config.pro
     else
         echo "        FFTW           support will not be included in MythMusic"
-    fi
-
-    if enabled taglib ; then
-        echo "INCLUDEPATH += `taglib-config --prefix`/include/taglib" >> ./mythmusic/mythmusic/config.pro
     fi
 fi
 

@@ -4,17 +4,17 @@
 <mythuitheme>
     <window name="mainmenu">
 
-        <fontdef name="menufont" face="Trebuchet MS">
+        <fontdef name="menufont" face="Liberation Sans">
             <color>#FFFFFF</color>
-            <size>16</size>
+            <pixelsize>26</pixelsize>
             <weight>bold</weight>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>
         </fontdef>
 
-        <fontdef name="clock" from="menufont">
-            <size>20</size>
+        <fontdef name="clock" from="small">
+            <pixelsize>28</pixelsize>
         </fontdef>
 
         <clock name="clock">
@@ -22,7 +22,6 @@
             <font>clock</font>
             <template>%DATE%, %TIME%</template>
             <align>center</align>
-            <alpha>85</alpha>
         </clock>
 
         <statetype name="titles">
@@ -130,17 +129,19 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>160,70,300,415</area>
+            <area>120,70,340,415</area>
             <layout>vertical</layout>
             <wrapstyle>selection</wrapstyle>
             <spacing>0</spacing>
-            <buttonarea>0,57,300,300</buttonarea>
+            <buttonarea>0,57,340,300</buttonarea>
+            <triggerevent context="Global" action="SELECT">RIGHT</triggerevent>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,300,50</area>
+                    <area>0,0,340,50</area>
                     <imagetype name="background" />
                     <textarea name="buttontext">
-                        <area>14,0,300,50</area>
+                        <area>14,0,326,50</area>
                         <font>menufont</font>
                         <align>left,vcenter</align>
                         <cutdown>yes</cutdown>
@@ -148,6 +149,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <imagetype name="background">
+                        <area>0,0,340,50</area>
                         <filename>ui/button_on.png</filename>
                     </imagetype>
                 </state>
@@ -354,7 +356,7 @@
                 </imagetype>
             </state>
             <state name="TV_MANUAL_SCHEDULE" from="TV_PROGRAM_GUIDE" />
-            <state name="TV_RECPRIORITIES" from="DEFAULT">
+            <state name="TV_RECORDING_RULES" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/priority.png</filename>
                 </imagetype>
@@ -362,9 +364,9 @@
             <state name="TV_CONFLICTS" from="TV_CUSTOM_RECORD" />
 
             <!--   recpriorities_settings.xml  -->
-            <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECPRIORITIES" />
-            <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECPRIORITIES" />
-            <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
+            <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECORDING_RULES" />
+            <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECORDING_RULES" />
+            <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECORDING_RULES" />
 
             <!--   setup.xml  -->
             <state name="SETUP_GENERAL" from="SETUP" />
@@ -406,7 +408,7 @@
             <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
             <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
             <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
-            <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
+            <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECORDING_RULES" />
 
             <!--   tvmenu.xml  -->
             <state name="TV_WATCH_TV" from="TV" />
@@ -414,11 +416,6 @@
             <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/play.png</filename>
-                </imagetype>
-            </state>
-            <state name="TV_DELETE" from="DEFAULT">
-                <imagetype name="watermark">
-                    <filename>watermark/error.png</filename>
                 </imagetype>
             </state>
             <state name="TV_PREVIOUS" from="DEFAULT">

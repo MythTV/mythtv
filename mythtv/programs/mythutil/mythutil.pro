@@ -3,6 +3,9 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network sql xml
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 TEMPLATE = app
 CONFIG += thread

@@ -1034,6 +1034,8 @@ UPnpCDSExtensionResults *
             // Items don't have any children.
             break;
         }
+        case CDS_BrowseUnknown:
+            break;
     }
 
     return pResults;

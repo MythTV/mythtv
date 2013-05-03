@@ -50,6 +50,9 @@
  */
 
 #include "avfilter.h"
+#include "formats.h"
+#include "internal.h"
+#include "video.h"
 #include "libavutil/common.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
@@ -57,8 +60,8 @@
 
 #include "transform.h"
 
-#define CHROMA_WIDTH(link)  -((-link->w) >> av_pix_fmt_descriptors[link->format].log2_chroma_w)
-#define CHROMA_HEIGHT(link) -((-link->h) >> av_pix_fmt_descriptors[link->format].log2_chroma_h)
+#define CHROMA_WIDTH(link)  -((-link->w) >> av_pix_fmt_desc_get(link->format)->log2_chroma_w)
+#define CHROMA_HEIGHT(link) -((-link->h) >> av_pix_fmt_desc_get(link->format)->log2_chroma_h)
 
 enum SearchMethod {
     EXHAUSTIVE,        ///< Search all possible positions
@@ -87,10 +90,10 @@ typedef struct {
     AVFilterBufferRef *ref;    ///< Previous frame
     int rx;                    ///< Maximum horizontal shift
     int ry;                    ///< Maximum vertical shift
-    enum FillMethod edge;      ///< Edge fill method
+    int edge;                  ///< Edge fill method
     int blocksize;             ///< Size of blocks to compare
     int contrast;              ///< Contrast threshold
-    enum SearchMethod search;  ///< Motion search method
+    int search;                ///< Motion search method
     AVCodecContext *avctx;
     DSPContext c;              ///< Context providing optimized SAD methods
     Transform last;            ///< Transform from last frame
@@ -329,7 +332,7 @@ static void find_motion(DeshakeContext *deshake, uint8_t *src1, uint8_t *src2,
     av_free(angles);
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     DeshakeContext *deshake = ctx->priv;
     char filename[256] = {0};
@@ -350,8 +353,8 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
     if (args) {
         sscanf(args, "%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%255s",
                &deshake->cx, &deshake->cy, &deshake->cw, &deshake->ch,
-               &deshake->rx, &deshake->ry, (int *)&deshake->edge,
-               &deshake->blocksize, &deshake->contrast, (int *)&deshake->search, filename);
+               &deshake->rx, &deshake->ry, &deshake->edge,
+               &deshake->blocksize, &deshake->contrast, &deshake->search, filename);
 
         deshake->blocksize /= 2;
 
@@ -375,7 +378,7 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
         deshake->cx &= ~15;
     }
 
-    av_log(ctx, AV_LOG_INFO, "cx: %d, cy: %d, cw: %d, ch: %d, rx: %d, ry: %d, edge: %d blocksize: %d contrast: %d search: %d\n",
+    av_log(ctx, AV_LOG_VERBOSE, "cx: %d, cy: %d, cw: %d, ch: %d, rx: %d, ry: %d, edge: %d blocksize: %d contrast: %d search: %d\n",
            deshake->cx, deshake->cy, deshake->cw, deshake->ch,
            deshake->rx, deshake->ry, deshake->edge, deshake->blocksize * 2, deshake->contrast, deshake->search);
 
@@ -384,13 +387,13 @@ static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
 
 static int query_formats(AVFilterContext *ctx)
 {
-    enum PixelFormat pix_fmts[] = {
-        PIX_FMT_YUV420P,  PIX_FMT_YUV422P,  PIX_FMT_YUV444P,  PIX_FMT_YUV410P,
-        PIX_FMT_YUV411P,  PIX_FMT_YUV440P,  PIX_FMT_YUVJ420P, PIX_FMT_YUVJ422P,
-        PIX_FMT_YUVJ444P, PIX_FMT_YUVJ440P, PIX_FMT_NONE
+    static const enum AVPixelFormat pix_fmts[] = {
+        AV_PIX_FMT_YUV420P,  AV_PIX_FMT_YUV422P,  AV_PIX_FMT_YUV444P,  AV_PIX_FMT_YUV410P,
+        AV_PIX_FMT_YUV411P,  AV_PIX_FMT_YUV440P,  AV_PIX_FMT_YUVJ420P, AV_PIX_FMT_YUVJ422P,
+        AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ440P, AV_PIX_FMT_NONE
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
 
     return 0;
 }
@@ -418,19 +421,27 @@ static av_cold void uninit(AVFilterContext *ctx)
     avfilter_unref_buffer(deshake->ref);
     if (deshake->fp)
         fclose(deshake->fp);
-    avcodec_close(deshake->avctx);
+    if (deshake->avctx)
+        avcodec_close(deshake->avctx);
     av_freep(&deshake->avctx);
 }
 
-static void end_frame(AVFilterLink *link)
+static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
 {
     DeshakeContext *deshake = link->dst->priv;
-    AVFilterBufferRef *in  = link->cur_buf;
-    AVFilterBufferRef *out = link->dst->outputs[0]->out_buf;
+    AVFilterLink *outlink = link->dst->outputs[0];
+    AVFilterBufferRef *out;
     Transform t = {{0},0}, orig = {{0},0};
     float matrix[9];
     float alpha = 2.0 / deshake->refcount;
     char tmp[256];
+
+    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    if (!out) {
+        avfilter_unref_bufferp(&in);
+        return AVERROR(ENOMEM);
+    }
+    avfilter_copy_buffer_ref_props(out, in);
 
     if (deshake->cx < 0 || deshake->cy < 0 || deshake->cw < 0 || deshake->ch < 0) {
         // Find the most likely global motion for the current frame
@@ -516,43 +527,42 @@ static void end_frame(AVFilterLink *link)
     avfilter_transform(in->data[1], out->data[1], in->linesize[1], out->linesize[1], CHROMA_WIDTH(link), CHROMA_HEIGHT(link), matrix, INTERPOLATE_BILINEAR, deshake->edge);
     avfilter_transform(in->data[2], out->data[2], in->linesize[2], out->linesize[2], CHROMA_WIDTH(link), CHROMA_HEIGHT(link), matrix, INTERPOLATE_BILINEAR, deshake->edge);
 
+    // Cleanup the old reference frame
+    avfilter_unref_buffer(deshake->ref);
+
     // Store the current frame as the reference frame for calculating the
     // motion of the next frame
-    if (deshake->ref != NULL)
-        avfilter_unref_buffer(deshake->ref);
-
-    // Cleanup the old reference frame
     deshake->ref = in;
 
-    // Draw the transformed frame information
-    avfilter_draw_slice(link->dst->outputs[0], 0, link->h, 1);
-    avfilter_end_frame(link->dst->outputs[0]);
-    avfilter_unref_buffer(out);
+    return ff_filter_frame(outlink, out);
 }
 
-static void draw_slice(AVFilterLink *link, int y, int h, int slice_dir)
-{
-}
+static const AVFilterPad deshake_inputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = filter_frame,
+        .config_props = config_props,
+        .min_perms    = AV_PERM_READ | AV_PERM_PRESERVE,
+    },
+    { NULL }
+};
+
+static const AVFilterPad deshake_outputs[] = {
+    {
+        .name = "default",
+        .type = AVMEDIA_TYPE_VIDEO,
+    },
+    { NULL }
+};
 
 AVFilter avfilter_vf_deshake = {
-    .name      = "deshake",
-    .description = NULL_IF_CONFIG_SMALL("Stabilize shaky video."),
-
-    .priv_size = sizeof(DeshakeContext),
-
-    .init = init,
-    .uninit = uninit,
+    .name          = "deshake",
+    .description   = NULL_IF_CONFIG_SMALL("Stabilize shaky video."),
+    .priv_size     = sizeof(DeshakeContext),
+    .init          = init,
+    .uninit        = uninit,
     .query_formats = query_formats,
-
-    .inputs    = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO,
-                                    .draw_slice       = draw_slice,
-                                    .end_frame        = end_frame,
-                                    .config_props     = config_props,
-                                    .min_perms        = AV_PERM_READ, },
-                                  { .name = NULL}},
-
-    .outputs   = (const AVFilterPad[]) {{ .name       = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO, },
-                                  { .name = NULL}},
+    .inputs        = deshake_inputs,
+    .outputs       = deshake_outputs,
 };

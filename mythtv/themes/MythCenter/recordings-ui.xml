@@ -2,150 +2,238 @@
 <!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
 
-    <window name="watchrecordings">
+    <window name ="watchrecordings">
 
-        <fontdef name="menufont" face="Trebuchet MS">
-            <color>#FFFFFF</color>
-            <size>16</size>
-            <weight>bold</weight>
-            <shadowcolor>#000000</shadowcolor>
-            <shadowoffset>2,2</shadowoffset>
-            <shadowalpha>50</shadowalpha>
-        </fontdef>
-
-        <fontdef name="clock" from="menufont">
-            <size>20</size>
-        </fontdef>
-
-        <clock name="clock">
-            <area>40,538,150,40</area>
-            <font>clock</font>
-            <template>%TIME%</template>
-            <align>center</align>
-            <alpha>85</alpha>
-        </clock>
-
-        <shape name="iconbackground">
-            <area>235,532,326,54</area>
-            <type>roundbox</type>
-            <fill color="#000000" alpha="55" />
-            <line color="#000000" alpha="100" width="2" />
-        </shape>
-
-        <shape name="previewbackground">
-            <area>634,520,136,78</area>
-            <type>box</type>
-            <fill color="#000000" alpha="115" />
-            <line color="#EEEEEE" alpha="200" width="3" />
-        </shape>
+        <imagetype name="fanart">
+            <area>0,0,100%,100%</area>
+            <filename />
+        </imagetype>
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,570,40</area>
+            <area>10,4,570,40</area>
             <font>baselarge</font>
             <value>Watch Recordings</value>
         </textarea>
 
-        <imagetype name="coverart">
-            <area>633,337,113,167</area>
-            <preserveaspect>true</preserveaspect>
-        </imagetype>
+        <clock name="clock">
+            <area>400,5,390,30</area>
+            <font>basesmall_normal</font>
+            <align>vcenter,right</align>
+            <template>%DATE% %TIME%</template>
+        </clock>
 
-        <imagetype name="listbackground">
-            <filename>reclist_background.png</filename>
-            <position>0,40</position>
-        </imagetype>
+        <shape name="groupbackground" from="basebackground">
+            <area>10,80,230,255</area>
+        </shape>
+
+        <shape name="progbackground" from="basebackground">
+            <area>245,80,545,255</area>
+        </shape>
+
+        <shape name="detailsbackground" from="basebackground">
+            <area>10,340,780,250</area>
+        </shape>
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>225,15,340,35</area>
-            <align>hcenter</align>
-            <scrollstyle>center</scrollstyle>
+            <align>top,hcenter</align>
+            <spacing>0</spacing>
+            <scrollstyle>free</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
-            <buttonarea>0,0,100%,100%</buttonarea>
+
+            <area>240,35,550,46</area>
+            <buttonarea>25,0,-25,100%</buttonarea>
+
             <statetype name="buttonitem">
+                <area>0,0,400,100%</area>
+                <minsize>50,100%</minsize>
+
                 <state name="selectedinactive">
-                    <area>0,0,300,100%</area>
-                    <textarea name="buttontext">
-                        <area>10,2,-10,-5</area>
-                        <align>center</align>
-                        <font>basemedium</font>
-                        <alpha>230</alpha>
-                    </textarea>
+                    <area>0,5,100%,-5</area>
+                    <minsize>50,100%</minsize>
+                    <group name="areagroup">
+                        <area>0,0,100%,100%</area>
+                        <minsize>50,100%</minsize>
+
+                        <shape name="recGroupShape">
+                            <area>0,0,100%,100%</area>
+                            <minsize>50,100%</minsize>
+                            <type>roundbox</type>
+                            <cornerradius>15</cornerradius>
+                            <line color="#ffffff" alpha="255" width="3" />
+                            <fill style="gradient">
+                                <gradient start="#00aa00" end="#00ff00" alpha="200" direction="vertical" />
+                            </fill>
+                        </shape>
+                        <textarea name="buttontext">
+                            <area>15,5,-15,-5</area>
+                            <minsize>50,100%</minsize>
+                            <extraleading>4</extraleading>
+                            <align>center</align>
+                            <cutdown>yes</cutdown>
+                            <font>basesmall</font>
+                            <alpha>255</alpha>
+                        </textarea>
+                    </group>
                 </state>
+
+                <state name="selectedactive" from="selectedinactive" />
+
                 <state name="inactive" from="selectedinactive">
-                    <textarea name="buttontext">
-                        <area>0,0,0,0</area>
-                    </textarea>
+                    <area>0,0,100%,100%</area>
+                    <group name="areagroup">
+                        <area>0,5,100%,-5</area>
+                        <minsize>50,100%</minsize>
+                        <shape name="recGroupShape">
+                            <area>0,0,100%,100%</area>
+                            <minsize>50,100%</minsize>
+                            <type>roundbox</type>
+                            <fill color="#00aa00" alpha="120" />
+                            <line color="#cccccc" width="3" alpha="100" />
+                            <cornerradius>15</cornerradius>
+                        </shape>
+                    </group>
                 </state>
+
+                <state name="active" from="inactive" />
+
             </statetype>
+
             <statetype name="upscrollarrow">
-                <area>0,0,0,0</area>
+                <position>0,50%-16</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="lefton">
+                        <filename>ui/left_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <area>0,0,0,0</area>
+                <position>100%-32,50%-16</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="righton">
+                        <filename>ui/right_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
+
         </buttonlist>
 
-        <buttonlist name="groups">
-            <area>30,70,188,300</area>
-            <buttonarea>0,0,188,250</buttonarea>
-            <spacing>5</spacing>
-            <scrollstyle>center</scrollstyle>
-            <wrapstyle>items</wrapstyle>
+        <buttonlist name="groups" from="basebuttonlist2">
+            <area>15,85,220,240</area>
+            <buttonarea>0,0,220,210</buttonarea>
+            <spacing>0</spacing>
+            <wrapstyle>captive</wrapstyle>
+            <searchposition>-1,390</searchposition>
+            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
-                <state name="active">
-                    <textarea name="name">
-                        <area>5,-4,180,30</area>
-                        <font>basesmallboldblue</font>
+                <state name="active" >
+                    <area>0,0,220,30</area>
+                    <textarea name="buttontext">
+                        <area>3,0,100%-6,30</area>
+                        <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedinactive" from="active">
-                    <textarea name="name">
-                        <area>5,-4,180,30</area>
-                        <font>basesmallboldblue</font>
+                    <shape name="selectbar">
+                        <area>0,0,100%,30</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>3,0,100%-6,30</area>
+                        <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <textarea name="name">
-                        <area>5,-4,180,30</area>
-                        <font>basesmallbold</font>
+                    <shape name="selectbar">
+                        <area>0,0,100%,30</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>3,0,100%-6,30</area>
+                        <font>basesmall_normal_selected</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
             </statetype>
+            <statetype name="upscrollarrow">
+                <position>155,220</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>185,220</position>
+            </statetype>
+
         </buttonlist>
 
         <buttonlist name="recordings" from="basebuttonlist2">
-            <area>225,31,550,330</area>
-            <buttonarea>0,27,550,270</buttonarea>
-            <spacing>5</spacing>
+            <area>250,85,535,240</area>
+            <buttonarea>0,0,535,210</buttonarea>
             <wrapstyle>captive</wrapstyle>
+            <spacing>0</spacing>
+            <searchposition>-1,390</searchposition>
+            <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
+                <area>0,0,535,30</area>
+                <statetype name="status">
+                    <position>3,2</position>
+                    <state name="disabled">
+                        <imagetype name="statusimage">
+                            <filename>schedule_disabled.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="error">
+                        <imagetype name="statusimage">
+                            <filename>schedule_conflict.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="warning">
+                        <imagetype name="statusimage">
+                            <filename>schedule_other.png</filename>
+                        </imagetype>
+                    </state>
+<!--                <state name="normal">
+                        <imagetype name="statusimage">
+                            <filename>schedule_record.png</filename>
+                        </imagetype>
+                    </state> -->
+                    <state name="running">
+                        <imagetype name="statusimage">
+                            <filename>schedule_recording.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="marked"></state>
+                </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>15,1,370,24</area>
-                        <font>basesmallboldblue</font>
+                        <area>32,2,266,28</area>
+                        <align>vcenter</align>
                     </textarea>
                     <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>340,1,100,24</area>
-                        <align>right</align>
-                        <font>basesmallboldblue</font>
+                        <area>280,2,130,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>440,1,105,24</area>
-                        <align>right</align>
-                        <font>basesmallboldblue</font>
+                        <area>415,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
+                    <statetype name="watched">
+                        <position>8,7</position>
+                        <state name="yes">
+                            <imagetype name="yes">
+                                <filename>small_watched.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="no" />
+                    </statetype>
                     <statetype name="playlist">
+                        <position>6,2</position>
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>-1,-5</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
@@ -154,60 +242,63 @@
                 </state>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
-                        <area>1,-3,552,30</area>
+                        <area>0,0,100%,30</area>
                     </shape>
                 </state>
                 <state name="selectedactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,100%,30</area>
+                    </shape>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>15,1,370,24</area>
-                        <font>basesmallbold</font>
-                        <font state="normal">basesmalllightgrey</font>
+                        <area>32,2,266,28</area>
+                        <font>basesmall_normal_selected</font>
+                        <font state="disabled">basesmall_disabled_selected</font>
+                        <font state="error">basesmall_error_selected</font>
+                        <font state="warning">basesmall_warning_selected</font>
+                        <font state="normal">basesmall_normal_selected</font>
+                        <font state="running">basesmall_running_selected</font>
+                        <align>vcenter</align>
                     </textarea>
                     <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>340,1,100,24</area>
-                        <align>right</align>
-                        <font>basesmallbold</font>
+                        <area>280,2,130,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortstartdate">
-                        <area>440,1,105,24</area>
-                        <align>right</align>
-                        <font>basesmallbold</font>
+                        <area>415,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
-                    <shape name="selectbar">
-                        <area>1,-3,552,30</area>
-                    </shape>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>530,-10</position>
+                <position>450,220</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>530,304</position>
+                <position>480,220</position>
             </statetype>
         </buttonlist>
 
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
-            <position>245,544</position>
+            <position>622,506</position>
         </imagetype>
 
         <imagetype name="commflagged">
             <filename>commflagged.png</filename>
-            <position>279,544</position>
+            <position>666,506</position>
         </imagetype>
 
         <imagetype name="bookmark">
             <filename>bookmark.png</filename>
-            <position>313,544</position>
+            <position>708,506</position>
         </imagetype>
 
         <imagetype name="cutlist">
             <filename>cutlist.png</filename>
-            <position>347,544</position>
+            <position>752,506</position>
         </imagetype>
 
         <statetype name="audioprops">
-            <position>381,544</position>
+            <position>622,540</position>
             <showempty>yes</showempty>
             <state name="stereo">
                 <imagetype name="stereo">
@@ -232,7 +323,7 @@
         </statetype>
 
         <statetype name="subtitletypes">
-            <position>415,544</position>
+            <position>663,542</position>
             <showempty>yes</showempty>
             <state name="cc">
                 <imagetype name="cc">
@@ -252,7 +343,7 @@
         </statetype>
 
         <statetype name="videoprops">
-            <position>449,544</position>
+            <position>701,543</position>
             <showempty>yes</showempty>
             <state name="hd1080">
                 <imagetype name="hd1080">
@@ -276,50 +367,83 @@
             </state>
         </statetype>
 
-        <imagetype name="watched">
+<!--        <imagetype name="watched">
             <filename>watched.png</filename>
-            <position>493,544</position>
-        </imagetype>
+            <position>716,500</position>
+        </imagetype>-->
 
         <imagetype name="processing">
             <filename>processing.png</filename>
-            <position>527,544</position>
+            <position>752,543</position>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>25,335,700,40</area>
+            <area>20,340,560,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>25,380,160,30</area>
+            <area>20,385,160,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>195,380,480,30</area>
+            <area>185,385,305,30</area>
+            <align>hcenter</align>
+            <template>%startdate%%| startyear%, %starttime% </template>
+        </textarea>
+
+        <textarea name="filesize_str" from="basetextarea">
+            <area>495,385,85,30</area>
+            <align>right</align>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>25,410,590,110</area>
+            <area>20,425,560,160</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</value>
+            <template>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
-        <imagetype name="preview">
-            <area>635,522,133,74</area>
+        <imagetype name="preview" depends="!coverart">
+            <area>590,345,190,140</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <imagetype name="coverart" >
+            <area>590,345,190,140</area>
+            <filename />
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <textarea name="norecordings">
-            <area>20,75,760,300</area>
+            <area>20,74,760,300</area>
             <font>basemedium</font>
             <value>
             </value>
             <multiline>yes</multiline>
             <align>allcenter</align>
+        </textarea>
+
+        <progressbar name="usedbar">
+            <area>10,45,230,28</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_fill2.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="freereport">
+            <area>10,45,230,28</area>
+            <align>center</align>
+            <font>basesmaller</font>
         </textarea>
     </window>
 
@@ -330,7 +454,7 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,5,470,90</area>
+            <area>12,4,470,104</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <font>basesmall</font>
@@ -463,81 +587,80 @@
     </window>
 
     <window name="editmetadata">
-        <area>-1,-1,500,500</area>
+        <area>-1,-1,780,580</area>
 
         <imagetype name="backimg">
+            <area>0,0,100%,100%</area>
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,60</area>
+            <area>20,0,100%-20,60</area>
+            <font>baselarge</font>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>8,120,90,30</area>
+            <area>8,80,150,30</area>
             <align>right,vcenter</align>
             <value>Title:</value>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>105,110</position>
+            <area>165,70,570,50</area>
         </textedit>
 
-        <textarea name="subtitlelabel" from="basetextarea">
-            <area>8,180,90,30</area>
-            <align>right,vcenter</align>
+        <textarea name="subtitlelabel" from="titlelabel">
+            <position>8,140</position>
             <value>Subtitle:</value>
         </textarea>
 
-        <textedit name="subtitle" from="basetextedit">
-            <position>105,170</position>
+        <textedit name="subtitle" from="title">
+            <position>165,130</position>
         </textedit>
 
-        <textarea name="inetreflabel" from="basetextarea">
-            <area>8,240,90,30</area>
-            <align>right,vcenter</align>
+        <textarea name="inetreflabel" from="titlelabel">
+            <position>8,200</position>
             <value>Inetref:</value>
         </textarea>
 
         <textedit name="inetref" from="basetextedit">
-            <position>105,230</position>
+            <position>165,190</position>
         </textedit>
 
-        <textarea name="seaslabel" from="basetextarea">
-            <area>8,300,90,30</area>
-            <align>right,vcenter</align>
+        <textarea name="seaslabel" from="titlelabel">
+            <position>8,255</position>
             <value>Season:</value>
         </textarea>
 
         <spinbox name="season" from="basespinbox">
-            <position>105,290</position>
+            <position>165,250</position>
         </spinbox>
 
         <textarea name="eplabel" from="basetextarea">
-            <area>208,300,90,30</area>
+            <area>258,255,90,30</area>
             <align>right,vcenter</align>
             <value>Episode:</value>
         </textarea>
 
         <spinbox name="episode" from="basespinbox">
-            <position>305,290</position>
+            <position>355,250</position>
         </spinbox>
 
-        <textarea name="descriptionlabel" from="basetextarea">
-            <area>8,360,90,30</area>
+        <textarea name="descriptionlabel" from="titlelabel">
+            <position>8,320</position>
             <align>right,vcenter</align>
             <value>Plot:</value>
         </textarea>
 
-        <textedit name="description" from="basetextedit">
-            <position>105,350</position>
+        <textedit name="description" from="basemultilinetextedit">
+            <area>165,310,570,190</area>
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>175,434</position>
+            <position>50%-77,514</position>
             <value>OK</value>
         </button>
     </window>

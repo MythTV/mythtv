@@ -23,6 +23,11 @@
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
+%define program_name ff
+%define cpuflags_mmxext cpuflags_mmx2
+
+%include "libavutil/x86/x86inc.asm"
+
 %macro SBUTTERFLY 4
 %if avx_enabled == 0
     mova      m%4, m%2
@@ -141,28 +146,26 @@
 %endif
 %endmacro
 
-; PABSW macros assume %1 != %2, while ABS1/2 macros work in-place
-%macro PABSW_MMX 2
+; PABSW macro assumes %1 != %2, while ABS1/2 macros work in-place
+%macro PABSW 2
+%if cpuflag(ssse3)
+    pabsw      %1, %2
+%elif cpuflag(mmxext)
+    pxor    %1, %1
+    psubw   %1, %2
+    pmaxsw  %1, %2
+%else
     pxor       %1, %1
     pcmpgtw    %1, %2
     pxor       %2, %1
     psubw      %2, %1
     SWAP       %1, %2
+%endif
 %endmacro
 
 %macro PSIGNW_MMX 2
     pxor       %1, %2
     psubw      %1, %2
-%endmacro
-
-%macro PABSW_MMX2 2
-    pxor    %1, %1
-    psubw   %1, %2
-    pmaxsw  %1, %2
-%endmacro
-
-%macro PABSW_SSSE3 2
-    pabsw      %1, %2
 %endmacro
 
 %macro PSIGNW_SSSE3 2
@@ -187,13 +190,13 @@
     psubw      %2, %4
 %endmacro
 
-%macro ABS1_MMX2 2   ; a, tmp
+%macro ABS1_MMXEXT 2 ; a, tmp
     pxor    %2, %2
     psubw   %2, %1
     pmaxsw  %1, %2
 %endmacro
 
-%macro ABS2_MMX2 4   ; a, b, tmp0, tmp1
+%macro ABS2_MMXEXT 4 ; a, b, tmp0, tmp1
     pxor    %3, %3
     pxor    %4, %4
     psubw   %3, %1
@@ -256,18 +259,36 @@
 %define ABSB ABSB_MMX
 %define ABSB2 ABSB2_MMX
 
-%macro SPLATB_MMX 3
+%macro SPLATB_LOAD 3
+%if cpuflag(ssse3)
+    movd      %1, [%2-3]
+    pshufb    %1, %3
+%else
     movd      %1, [%2-3] ;to avoid crossing a cacheline
     punpcklbw %1, %1
     SPLATW    %1, %1, 3
+%endif
 %endmacro
 
-%macro SPLATB_SSSE3 3
-    movd      %1, [%2-3]
+%macro SPLATB_REG 3
+%if cpuflag(ssse3)
+    movd      %1, %2d
     pshufb    %1, %3
+%else
+    movd      %1, %2d
+    punpcklbw %1, %1
+    SPLATW    %1, %1, 0
+%endif
 %endmacro
 
-%macro PALIGNR_MMX 4-5 ; [dst,] src1, src2, imm, tmp
+%macro PALIGNR 4-5
+%if cpuflag(ssse3)
+%if %0==5
+    palignr %1, %2, %3, %4
+%else
+    palignr %1, %2, %3
+%endif
+%elif cpuflag(mmx) ; [dst,] src1, src2, imm, tmp
     %define %%dst %1
 %if %0==5
 %ifnidn %1, %2
@@ -286,13 +307,26 @@
     psrldq  %4, %3
 %endif
     por     %%dst, %4
+%endif
 %endmacro
 
-%macro PALIGNR_SSSE3 4-5
-%if %0==5
-    palignr %1, %2, %3, %4
-%else
-    palignr %1, %2, %3
+%macro PSHUFLW 1+
+    %if mmsize == 8
+        pshufw %1
+    %else
+        pshuflw %1
+    %endif
+%endmacro
+
+%macro PSWAPD 2
+%if cpuflag(mmxext)
+    pshufw    %1, %2, q1032
+%elif cpuflag(3dnowext)
+    pswapd    %1, %2
+%elif cpuflag(3dnow)
+    movq      %1, %2
+    psrlq     %1, 32
+    punpckldq %1, %2
 %endif
 %endmacro
 
@@ -507,43 +541,47 @@
     movh  [%7+%8], %4
 %endmacro
 
-%macro PMINUB_MMX 3 ; dst, src, tmp
+%macro PMINUB 3 ; dst, src, ignored
+%if cpuflag(mmxext)
+    pminub   %1, %2
+%else ; dst, src, tmp
     mova     %3, %1
     psubusb  %3, %2
     psubb    %1, %3
-%endmacro
-
-%macro PMINUB_MMXEXT 3 ; dst, src, ignored
-    pminub   %1, %2
+%endif
 %endmacro
 
 %macro SPLATW 2-3 0
 %if mmsize == 16
     pshuflw    %1, %2, (%3)*0x55
     punpcklqdq %1, %1
-%else
+%elif cpuflag(mmxext)
     pshufw     %1, %2, (%3)*0x55
-%endif
-%endmacro
-
-%macro SPLATD 2-3 0
-%if mmsize == 16
-    pshufd %1, %2, (%3)*0x55
 %else
-    pshufw %1, %2, (%3)*0x11 + ((%3)+1)*0x44
+    %ifnidn %1, %2
+        mova       %1, %2
+    %endif
+    %if %3 & 2
+        punpckhwd  %1, %1
+    %else
+        punpcklwd  %1, %1
+    %endif
+    %if %3 & 1
+        punpckhwd  %1, %1
+    %else
+        punpcklwd  %1, %1
+    %endif
 %endif
 %endmacro
 
-%macro SPLATD_MMX 1
+%macro SPLATD 1
+%if mmsize == 8
     punpckldq  %1, %1
-%endmacro
-
-%macro SPLATD_SSE 1
-    shufps  %1, %1, 0
-%endmacro
-
-%macro SPLATD_SSE2 1
+%elif cpuflag(sse2)
     pshufd  %1, %1, 0
+%elif cpuflag(sse)
+    shufps  %1, %1, 0
+%endif
 %endmacro
 
 %macro CLIPW 3 ;(dst, min, max)
@@ -590,5 +628,40 @@
 %else ; sse
     movss        %1, %2
     shufps       %1, %1, 0
+%endif
+%endmacro
+
+%macro VBROADCASTSD 2 ; dst xmm/ymm, src m64
+%if cpuflag(avx) && mmsize == 32
+    vbroadcastsd %1, %2
+%elif cpuflag(sse3)
+    movddup      %1, %2
+%else ; sse2
+    movsd        %1, %2
+    movlhps      %1, %1
+%endif
+%endmacro
+
+%macro SHUFFLE_MASK_W 8
+    %rep 8
+        %if %1>=0x80
+            db %1, %1
+        %else
+            db %1*2
+            db %1*2+1
+        %endif
+        %rotate 1
+    %endrep
+%endmacro
+
+%macro PMOVSXWD 2; dst, src
+%if cpuflag(sse4)
+    pmovsxwd     %1, %2
+%else
+    %ifnidn %1, %2
+    mova         %1, %2
+    %endif
+    punpcklwd    %1, %1
+    psrad        %1, 16
 %endif
 %endmacro

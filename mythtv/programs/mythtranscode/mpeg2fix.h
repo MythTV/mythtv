@@ -4,6 +4,8 @@
 // C
 #include <cstdlib>
 
+#include "mythconfig.h"
+
 extern "C"
 {
 //AVFormat/AVCodec
@@ -145,7 +147,7 @@ class MPEG2fixup
     int Start();
     void AddRangeList(QStringList cutlist, int type);
     void ShowRangeMap(frm_dir_map_t *mapPtr, QString msg);
-    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap);
+    int BuildKeyframeIndex(QString &file, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
 
     static void dec2x33(int64_t *pts1, int64_t pts2);
@@ -171,7 +173,7 @@ class MPEG2fixup
     void WriteFrame(QString filename, AVPacket *pkt);
     void WriteYUV(QString filename, const mpeg2_info_t *info);
     void WriteData(QString filename, uint8_t *data, int size);
-    int BuildFrame(AVPacket *pkt, QString fname);
+    bool BuildFrame(AVPacket *pkt, QString fname);
     MPEG2frame *GetPoolFrame(AVPacket *pkt);
     MPEG2frame *GetPoolFrame(MPEG2frame *f);
     int GetFrame(AVPacket *pkt);
@@ -211,12 +213,16 @@ class MPEG2fixup
     }
     int GetStreamType(int id) const
     {
-        return (inputFC->streams[id]->codec->codec_id == CODEC_ID_AC3) ?
-               CODEC_ID_AC3 : CODEC_ID_MP2;
+        return (inputFC->streams[id]->codec->codec_id == AV_CODEC_ID_AC3) ?
+               AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
     }
     AVCodecContext *getCodecContext(int id)
     {
         return inputFC->streams[id]->codec;
+    }
+    AVCodecParserContext *getCodecParserContext(int id)
+    {
+        return inputFC->streams[id]->parser;
     }
 
     void dumpList(FrameList *list);

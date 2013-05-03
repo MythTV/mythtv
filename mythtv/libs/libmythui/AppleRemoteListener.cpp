@@ -56,6 +56,8 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
             break;
         case AppleRemote::ControlSwitched:
             return;
+        case AppleRemote::Undefined:
+            break;
     }
     QKeySequence a(code);
     int keycode = 0;

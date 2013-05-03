@@ -82,7 +82,7 @@ static void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythnetvision",
+    if (!gCoreContext->TestPluginVersion("mythnetvision",
                                     libversion,
                                     MYTH_BINARY_VERSION))
         return -1;

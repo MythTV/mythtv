@@ -43,13 +43,13 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void SetText(const QString &text, bool moveCursor = true);
     void InsertText(const QString &text);
-    QString GetText(void) const { return m_Message; }
+    QString GetText(void) const;
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
     void SetMaxLength(const int length);
 
-    enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
+    enum MoveDirection { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
     bool MoveCursor(MoveDirection);
 
     void SetKeyboardPosition(PopupPosition pos) { m_keyboardPosition = pos; }

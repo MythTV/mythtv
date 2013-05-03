@@ -15,8 +15,6 @@
  *
  * ============================================================ */
 
-using namespace std;
-
 // Qt headers
 #include <QApplication>
 #include <QEvent>

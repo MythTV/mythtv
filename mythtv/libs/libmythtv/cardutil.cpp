@@ -101,7 +101,7 @@ bool CardUtil::IsCableCardPresent(uint cardid,
         hdhomerun_device_t *hdhr;
         hdhomerun_tuner_status_t status;
         QString device = GetVideoDevice(cardid);
-        hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
+        hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
         if (!hdhr)
             return false;
 
@@ -396,7 +396,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    QByteArray dev = dvbdev.toAscii();
+    QByteArray dev = dvbdev.toLatin1();
     int fd_frontend = open(dev.constData(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
     {
@@ -438,7 +438,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    QByteArray dev = dvbdev.toAscii();
+    QByteArray dev = dvbdev.toLatin1();
     int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
         return "ERROR_OPEN";
@@ -1621,7 +1621,7 @@ vector<uint> CardUtil::GetSharedInputGroups(uint cardid)
         return list;
 
     list = GetInputGroups(inputs[0]);
-    for (uint i = 1; (i < inputs.size()) && list.size(); i++)
+    for (uint i = 1; (i < inputs.size()) && !list.empty(); i++)
     {
         vector<uint> curlist = GetInputGroups(inputs[i]);
         vector<uint> newlist;
@@ -1859,7 +1859,7 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 #endif // USING_V4L1
 
     // Create an input on single input cards that don't advertise input
-    if (!list.size())
+    if (list.isEmpty())
         list[0] = "Television";
 
     ok = true;
@@ -1952,7 +1952,7 @@ QStringList CardUtil::ProbeV4LVideoInputs(QString device)
 {
     bool ok;
     QStringList ret;
-    QByteArray dev = device.toAscii();
+    QByteArray dev = device.toLatin1();
     int videofd = open(dev.constData(), O_RDWR);
     if (videofd < 0)
     {
@@ -1985,7 +1985,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(QString device)
 
     bool ok;
     QStringList ret;
-    int videofd = open(device.toAscii().constData(), O_RDWR);
+    int videofd = open(device.toLatin1().constData(), O_RDWR);
     if (videofd < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "ProbeAudioInputs() -> couldn't open device");
@@ -2346,7 +2346,7 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
+    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
     if (!hdhr)
         return false;
 
@@ -2380,13 +2380,13 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
             return QObject::tr("Invalid Device ID");
     }
-
+    (void) deviceIsIP;
 
     LOG(VB_GENERAL, LOG_INFO, "CardUtil::GetHDHRdescription(" + device +
                               ") - trying to locate device");
 
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
+    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
     if (!hdhr)
         return QObject::tr("Invalid Device ID or address.");
 
@@ -2516,6 +2516,31 @@ uint CardUtil::GetASIBufferSize(uint device_num, QString *error)
         return 0;
     }
     return buf_size;
+#else
+    (void) device_num;
+    if (error)
+        *error = "Not compiled with ASI support.";
+    return 0;
+#endif
+}
+
+uint CardUtil::GetASINumBuffers(uint device_num, QString *error)
+{
+#ifdef USING_ASI
+    // get the buffer size
+    QString sys_numbuffers_contents = read_sys(sys_dev(device_num, "buffers"));
+    bool ok;
+    uint num_buffers = sys_numbuffers_contents.toUInt(&ok);
+    if (!ok)
+    {
+        if (error)
+        {
+            *error = QString("Failed to read num buffers from '%1'")
+                .arg(sys_dev(device_num, "buffers"));
+        }
+        return 0;
+    }
+    return num_buffers;
 #else
     (void) device_num;
     if (error)

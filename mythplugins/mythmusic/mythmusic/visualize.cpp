@@ -25,13 +25,14 @@ using namespace std;
 #include <mythdbcon.h>
 #include <mythcontext.h>
 #include <mythuihelper.h>
+#include <remotefile.h>
+#include <musicmetadata.h>
 
 // mythmusic
 #include "mainvisual.h"
 #include "visualize.h"
 #include "inlines.h"
 #include "decoder.h"
-#include "metadata.h"
 #include "musicplayer.h"
 
 #define FFTW_N 512
@@ -1522,8 +1523,22 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
     {
         QImage art;
         QString imageFilename = gPlayer->getCurrentMetadata()->getAlbumArtFile(m_currImageType);
-        if (!imageFilename.isEmpty())
-            art.load(imageFilename);
+
+        if (imageFilename.startsWith("myth://"))
+        {
+            RemoteFile *rf = new RemoteFile(imageFilename, false, false, 0);
+
+            QByteArray data;
+            bool ret = rf->SaveAs(data);
+
+            delete rf;
+
+            if (ret)
+                art.loadFromData(data);
+        }
+        else
+            if (!imageFilename.isEmpty())
+                art.load(imageFilename);
 
         if (art.isNull())
         {

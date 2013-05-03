@@ -382,6 +382,8 @@ class MTV_PUBLIC CardUtil
 
     static uint         GetASIBufferSize(uint device_num,
                                          QString *error = NULL);
+    static uint         GetASINumBuffers(uint device_num,
+                                         QString *error = NULL);
     static int          GetASIMode(uint device_num,
                                    QString *error = NULL);
     static bool         SetASIMode(uint device_num, uint mode,

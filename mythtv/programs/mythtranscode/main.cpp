@@ -28,6 +28,7 @@ using namespace std;
 #include "commandlineparser.h"
 #include "recordinginfo.h"
 #include "signalhandling.h"
+#include "HLS/httplivestream.h"
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &resultCode);
@@ -35,7 +36,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
 
-static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
+static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, QString mapfile,
                        ProgramInfo *pginfo)
 {
     if (pginfo && mapfile.isEmpty())
@@ -43,9 +44,11 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
         pginfo->ClearPositionMap(MARK_KEYFRAME);
         pginfo->ClearPositionMap(MARK_GOP_START);
         pginfo->SavePositionMap(posMap, MARK_GOP_BYFRAME);
+        pginfo->SavePositionMap(durMap, MARK_DURATION_MS);
     }
     else if (!mapfile.isEmpty())
     {
+        MarkTypes keyType = MARK_GOP_BYFRAME;
         FILE *mapfh = fopen(mapfile.toLocal8Bit().constData(), "w");
         if (!mapfh)
         {
@@ -54,23 +57,28 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, QString mapfile,
             return;
         }
         frm_pos_map_t::const_iterator it;
-        fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
+        fprintf (mapfh, "Type: %d\n", keyType);
         for (it = posMap.begin(); it != posMap.end(); ++it)
-            fprintf(mapfh, "%lld %lld\n",
-                    (unsigned long long)it.key(), (unsigned long long)*it);
+        {
+            if (it.key() == keyType)
+            {
+                QString str = QString("%1 %2\n").arg(it.key()).arg(*it);
+                fprintf(mapfh, "%s", qPrintable(str));
+            }
+        }
         fclose(mapfh);
     }
 }
 
 static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                       frm_pos_map_t &posMap, int jobID)
+                       frm_pos_map_t &posMap, frm_pos_map_t &durMap, int jobID)
 {
     if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
     {
         if (jobID >= 0)
             JobQueue::ChangeJobComment(jobID,
                                        QObject::tr("Generating Keyframe Index"));
-        int err = m2f->BuildKeyframeIndex(infile, posMap);
+        int err = m2f->BuildKeyframeIndex(infile, posMap, durMap);
         if (err)
             return err;
         if (jobID >= 0)
@@ -167,7 +175,8 @@ int main(int argc, char *argv[])
     bool cleanCut = false;
     QMap<QString, QString> settingsOverride;
     frm_dir_map_t deleteMap;
-    frm_pos_map_t posMap;
+    frm_pos_map_t posMap; ///< position of keyframes
+    frm_pos_map_t durMap; ///< duration from beginning of keyframes
     int AudioTrackNo = -1;
 
     int found_starttime = 0;
@@ -378,6 +387,9 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif
@@ -474,7 +486,13 @@ int main(int argc, char *argv[])
     ProgramInfo *pginfo = NULL;
     if (cmdline.toBool("hls"))
     {
-        pginfo = new ProgramInfo();
+        if (cmdline.toBool("hlsstreamid"))
+        {
+            HTTPLiveStream hls(cmdline.toInt("hlsstreamid"));
+            pginfo = new ProgramInfo(hls.GetSourceFile());
+        }
+        if (pginfo == NULL)
+            pginfo = new ProgramInfo();
     }
     else if (isVideo)
     {
@@ -616,8 +634,11 @@ int main(int argc, char *argv[])
     {
         void (*update_func)(float) = NULL;
         int (*check_func)() = NULL;
-        if (useCutlist && !found_infile)
+        if (useCutlist)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Honoring the cutlist while transcoding");
             pginfo->QueryCutList(deleteMap);
+        }
         if (jobID >= 0)
         {
            glbl_jobID = jobID;
@@ -632,26 +653,26 @@ int main(int argc, char *argv[])
 
         if (build_index)
         {
-            int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
+            int err = BuildKeyframeIndex(m2f, infile, posMap, durMap, jobID);
             if (err)
                 return err;
             if (update_index)
-                UpdatePositionMap(posMap, NULL, pginfo);
+                UpdatePositionMap(posMap, durMap, NULL, pginfo);
             else
-                UpdatePositionMap(posMap, outfile + QString(".map"), pginfo);
+                UpdatePositionMap(posMap, durMap, outfile + QString(".map"), pginfo);
         }
         else
         {
             result = m2f->Start();
             if (result == REENCODE_OK)
             {
-                result = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
+                result = BuildKeyframeIndex(m2f, outfile, posMap, durMap, jobID);
                 if (result == REENCODE_OK)
                 {
                     if (update_index)
-                        UpdatePositionMap(posMap, NULL, pginfo);
+                        UpdatePositionMap(posMap, durMap, NULL, pginfo);
                     else
-                        UpdatePositionMap(posMap, outfile + QString(".map"),
+                        UpdatePositionMap(posMap, durMap, outfile + QString(".map"),
                                           pginfo);
                 }
             }
@@ -830,13 +851,13 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         return;
     }
 
-    WaitToDelete(pginfo);
-
     const QString filename = pginfo->GetPlaybackURL(false, true);
     const QByteArray fname = filename.toLocal8Bit();
 
     if (status == JOB_STOPPING)
     {
+        WaitToDelete(pginfo);
+
         // Transcoding may take several minutes.  Reload the bookmark
         // in case it changed, then save its translated value back.
         uint64_t previousBookmark =

@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "mythexp.h"
+#include "mythconfig.h"
+
 #include <QString>
 
 extern "C" {

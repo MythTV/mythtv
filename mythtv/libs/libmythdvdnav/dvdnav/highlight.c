@@ -325,6 +325,66 @@ dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32
   return DVDNAV_STATUS_OK;
 }
 
+dvdnav_status_t dvdnav_get_highlight_area_from_group(pci_t *nav_pci, DVDBtnGrp_t group,
+                      int32_t button, int32_t mode, dvdnav_highlight_area_t *highlight) {
+  btni_t *button_ptr;
+  unsigned int mask = (unsigned int)group;
+  int grpstart;
+  int maxbtns;
+
+#ifdef BUTTON_TESTING
+  fprintf(MSG_OUT, "libdvdnav: Button dvdnav_get_highlight_area_from_group %i,%i\n", button, group);
+#endif
+
+  if(!nav_pci->hli.hl_gi.hli_ss)
+    return DVDNAV_STATUS_ERR;
+  if((button <= 0) || (button > nav_pci->hli.hl_gi.btn_ns) || (nav_pci->hli.hl_gi.btngr_ns <= 0))
+    return DVDNAV_STATUS_ERR;
+
+  if(group == DVD_BTN_GRP_Normal) {
+    mask = 0xFFFFFFFF;
+  }
+
+  /* 36 buttons in total are spread over the number
+   * of button groups.  Find out how many buttons we
+   * have in each group
+   */
+  maxbtns = (36 / nav_pci->hli.hl_gi.btngr_ns);
+
+  if((nav_pci->hli.hl_gi.btngr1_dsp_ty & mask) == group) {
+    grpstart = 0;
+  } else if((nav_pci->hli.hl_gi.btngr_ns > 1) && ((nav_pci->hli.hl_gi.btngr2_dsp_ty & mask) == group)) {
+    grpstart = maxbtns;
+  } else if((nav_pci->hli.hl_gi.btngr_ns > 2) && ((nav_pci->hli.hl_gi.btngr3_dsp_ty & mask) == group)) {
+    grpstart = maxbtns * 2;
+  } else {
+    grpstart = 0;
+  }
+
+  button_ptr = &nav_pci->hli.btnit[grpstart+button-1];
+
+  highlight->sx = button_ptr->x_start;
+  highlight->sy = button_ptr->y_start;
+  highlight->ex = button_ptr->x_end;
+  highlight->ey = button_ptr->y_end;
+  if(button_ptr->btn_coln != 0) {
+    highlight->palette = nav_pci->hli.btn_colit.btn_coli[button_ptr->btn_coln-1][mode];
+  } else {
+    highlight->palette = 0;
+  }
+  highlight->pts = nav_pci->hli.hl_gi.hli_s_ptm;
+  highlight->buttonN = button;
+#ifdef BUTTON_TESTING
+  fprintf(MSG_OUT, "libdvdnav: highlight: Highlight area is (%u,%u)-(%u,%u), display = %i, button = %u, groupmask = %i\n",
+               button_ptr->x_start, button_ptr->y_start,
+               button_ptr->x_end, button_ptr->y_end,
+               1, group,
+               button);
+#endif
+
+  return DVDNAV_STATUS_OK;
+}
+
 dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
   int32_t button;
   btni_t *button_ptr = NULL;

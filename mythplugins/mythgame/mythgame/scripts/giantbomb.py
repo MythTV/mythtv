@@ -212,6 +212,8 @@ def main():
                         help=u"Display version and author")
     parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'en', dest="language",
                         help=u"Select data that matches the specified language. At this time giantbomb.com only supports 'en' English.")
+    parser.add_option(  "-a", "--area", metavar="AREA", default=u"gb", dest="area",
+			help=u"Select data that matches the specified country. This option is currently not used.")
     parser.add_option(  "-M", "--gamelist", action="store_true", default=False, dest="gamelist",
                         help=u"Get matching Movie list")
     parser.add_option(  "-D", "--gamedata", action="store_true", default=False, dest="gamedata",

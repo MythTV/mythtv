@@ -308,7 +308,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     edit = new MythLineEdit(
         settingValue, NULL,
-        QString(QString(widgetName) + "-edit").toAscii().constData());
+        QString(QString(widgetName) + "-edit").toLatin1().constData());
     edit->setHelpText(getHelpText());
     edit->setText( getValue() );
     edit->setMinimumHeight(25);
@@ -408,7 +408,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     }
 
     MythSlider *slider = new MythSlider(
-        NULL, QString(QString(widgetName) + "-slider").toAscii().constData());
+        NULL, QString(QString(widgetName) + "-slider").toLatin1().constData());
     slider->setHelpText(getHelpText());
     slider->setMinimum(min);
     slider->setMaximum(max);
@@ -419,7 +419,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     QLCDNumber *lcd = new QLCDNumber();
     lcd->setObjectName(QString(QString(widgetName) + "-lcd")
-                       .toAscii().constData());
+                       .toLatin1().constData());
     lcd->setMode(QLCDNumber::Dec);
     lcd->setSegmentStyle(QLCDNumber::Flat);
     lcd->display(intValue());
@@ -484,7 +484,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this,     SLOT(widgetDeleted(QObject*)));
 
     QString sbname = QString(widgetName) + "MythSpinBox";
-    spinbox = new MythSpinBox(NULL, sbname.toAscii().constData(), sstep);
+    spinbox = new MythSpinBox(NULL, sbname.toLatin1().constData(), sstep);
     spinbox->setHelpText(getHelpText());
     spinbox->setMinimum(min);
     spinbox->setMaximum(max);

@@ -45,11 +45,15 @@ struct AVAudioResampleContext {
     double center_mix_level;                    /**< center mix level       */
     double surround_mix_level;                  /**< surround mix level     */
     double lfe_mix_level;                       /**< lfe mix level          */
+    int normalize_mix_level;                    /**< enable mix level normalization */
     int force_resampling;                       /**< force resampling       */
     int filter_size;                            /**< length of each FIR filter in the resampling filterbank relative to the cutoff frequency */
     int phase_shift;                            /**< log2 of the number of entries in the resampling polyphase filterbank */
     int linear_interp;                          /**< if 1 then the resampling FIR filter will be linearly interpolated */
     double cutoff;                              /**< resampling cutoff frequency. 1.0 corresponds to half the output sample rate */
+    enum AVResampleFilterType filter_type;      /**< resampling filter type */
+    int kaiser_beta;                            /**< beta value for Kaiser window (only applicable if filter_type == AV_FILTER_TYPE_KAISER) */
+    enum AVResampleDitherMethod dither_method;  /**< dither method          */
 
     int in_channels;        /**< number of input channels                   */
     int out_channels;       /**< number of output channels                  */
@@ -70,6 +74,13 @@ struct AVAudioResampleContext {
     AudioConvert *ac_out;       /**< output sample format conversion context */
     ResampleContext *resample;  /**< resampling context                      */
     AudioMix *am;               /**< channel mixing context                  */
+    enum AVMatrixEncoding matrix_encoding;      /**< matrixed stereo encoding */
+
+    /**
+     * mix matrix
+     * only used if avresample_set_matrix() is called before avresample_open()
+     */
+    double *mix_matrix;
 };
 
 #endif /* AVRESAMPLE_INTERNAL_H */

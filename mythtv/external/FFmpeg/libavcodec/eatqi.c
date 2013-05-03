@@ -30,6 +30,8 @@
 #include "get_bits.h"
 #include "dsputil.h"
 #include "aandcttab.h"
+#include "eaidct.h"
+#include "internal.h"
 #include "mpeg12.h"
 #include "mpegvideo.h"
 
@@ -46,13 +48,12 @@ static av_cold int tqi_decode_init(AVCodecContext *avctx)
     TqiContext *t = avctx->priv_data;
     MpegEncContext *s = &t->s;
     s->avctx = avctx;
-    if(avctx->idct_algo==FF_IDCT_AUTO)
-        avctx->idct_algo=FF_IDCT_EA;
     ff_dsputil_init(&s->dsp, avctx);
+    ff_init_scantable_permutation(s->dsp.idct_permutation, FF_NO_IDCT_PERM);
     ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable, ff_zigzag_direct);
     s->qscale = 1;
     avctx->time_base = (AVRational){1, 15};
-    avctx->pix_fmt = PIX_FMT_YUV420P;
+    avctx->pix_fmt = AV_PIX_FMT_YUV420P;
     ff_mpeg12_init_vlcs();
     return 0;
 }
@@ -76,13 +77,13 @@ static inline void tqi_idct_put(TqiContext *t, DCTELEM (*block)[64])
     uint8_t *dest_cb = t->frame.data[1] + (s->mb_y * 8 * t->frame.linesize[1]) + s->mb_x * 8;
     uint8_t *dest_cr = t->frame.data[2] + (s->mb_y * 8 * t->frame.linesize[2]) + s->mb_x * 8;
 
-    s->dsp.idct_put(dest_y                 , linesize, block[0]);
-    s->dsp.idct_put(dest_y              + 8, linesize, block[1]);
-    s->dsp.idct_put(dest_y + 8*linesize    , linesize, block[2]);
-    s->dsp.idct_put(dest_y + 8*linesize + 8, linesize, block[3]);
+    ff_ea_idct_put_c(dest_y                 , linesize, block[0]);
+    ff_ea_idct_put_c(dest_y              + 8, linesize, block[1]);
+    ff_ea_idct_put_c(dest_y + 8*linesize    , linesize, block[2]);
+    ff_ea_idct_put_c(dest_y + 8*linesize + 8, linesize, block[3]);
     if(!(s->avctx->flags&CODEC_FLAG_GRAY)) {
-        s->dsp.idct_put(dest_cb, t->frame.linesize[1], block[4]);
-        s->dsp.idct_put(dest_cr, t->frame.linesize[2], block[5]);
+        ff_ea_idct_put_c(dest_cb, t->frame.linesize[1], block[4]);
+        ff_ea_idct_put_c(dest_cr, t->frame.linesize[2], block[5]);
     }
 }
 
@@ -90,19 +91,13 @@ static void tqi_calculate_qtable(MpegEncContext *s, int quant)
 {
     const int qscale = (215 - 2*quant)*5;
     int i;
-    if (s->avctx->idct_algo==FF_IDCT_EA) {
-        s->intra_matrix[0] = (ff_inv_aanscales[0]*ff_mpeg1_default_intra_matrix[0])>>11;
-        for(i=1; i<64; i++)
-            s->intra_matrix[i] = (ff_inv_aanscales[i]*ff_mpeg1_default_intra_matrix[i]*qscale + 32)>>14;
-    }else{
-        s->intra_matrix[0] = ff_mpeg1_default_intra_matrix[0];
-        for(i=1; i<64; i++)
-            s->intra_matrix[i] = (ff_mpeg1_default_intra_matrix[i]*qscale + 32)>>3;
-    }
+    s->intra_matrix[0] = (ff_inv_aanscales[0]*ff_mpeg1_default_intra_matrix[0])>>11;
+    for(i=1; i<64; i++)
+        s->intra_matrix[i] = (ff_inv_aanscales[i]*ff_mpeg1_default_intra_matrix[i]*qscale + 32)>>14;
 }
 
 static int tqi_decode_frame(AVCodecContext *avctx,
-                            void *data, int *data_size,
+                            void *data, int *got_frame,
                             AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
@@ -122,7 +117,7 @@ static int tqi_decode_frame(AVCodecContext *avctx,
     if (s->avctx->width!=s->width || s->avctx->height!=s->height)
         avcodec_set_dimensions(s->avctx, s->width, s->height);
 
-    if(avctx->get_buffer(avctx, &t->frame) < 0) {
+    if(ff_get_buffer(avctx, &t->frame) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
@@ -144,7 +139,7 @@ static int tqi_decode_frame(AVCodecContext *avctx,
     }
     end:
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = t->frame;
     return buf_size;
 }
@@ -161,7 +156,7 @@ static av_cold int tqi_decode_end(AVCodecContext *avctx)
 AVCodec ff_eatqi_decoder = {
     .name           = "eatqi",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_TQI,
+    .id             = AV_CODEC_ID_TQI,
     .priv_data_size = sizeof(TqiContext),
     .init           = tqi_decode_init,
     .close          = tqi_decode_end,

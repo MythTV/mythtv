@@ -10,7 +10,7 @@ extern "C" {
 #include "ffmpeg-mmx.h"
 }
 
-static mmx_t mmx_1s = {0xffffffffffffffffLL};
+static mmx_t mmx_1s = {0xffffffffffffffffULL};
 
 static inline void mmx_pack_alpha1s_high(uint8_t *y1, uint8_t *y2)
 {
@@ -100,7 +100,7 @@ static inline void mmx_pack_easy(uint8_t *dest, uint8_t *y)
 }
 
 static mmx_t mmx_0s = {0x0000000000000000LL};
-static mmx_t round  = {0x0002000200020002LL};
+static mmx_t mmx_round  = {0x0002000200020002LL};
 
 static inline void mmx_interp_start(uint8_t *left, uint8_t *right)
 {
@@ -110,7 +110,7 @@ static inline void mmx_interp_start(uint8_t *left, uint8_t *right)
     movq_r2r  (mm5, mm4);
     paddw_r2r (mm4, mm4);
     paddw_r2r (mm5, mm4);
-    paddw_m2r (round, mm4);
+    paddw_m2r (mmx_round, mm4);
 
     movd_m2r  (*right, mm5);
     punpcklbw_m2r (mmx_0s, mm5);

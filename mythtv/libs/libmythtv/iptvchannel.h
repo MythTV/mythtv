@@ -33,6 +33,7 @@ class IPTVChannel : public DTVChannel
     bool IsOpen(void) const;
 
     // Channel scanning stuff
+    using DTVChannel::Tune;
     bool Tune(const DTVMultiplex&, QString) { return true; }
 
   private:

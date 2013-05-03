@@ -24,9 +24,11 @@
  * Kega Game Video decoder
  */
 
+#include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
+#include "internal.h"
 
 typedef struct {
     AVCodecContext *avctx;
@@ -41,7 +43,8 @@ static void decode_flush(AVCodecContext *avctx)
         avctx->release_buffer(avctx, &c->prev);
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
+                        AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     const uint8_t *buf_end = buf + avpkt->size;
@@ -70,7 +73,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     maxcnt = w * h;
 
     c->cur.reference = 3;
-    if ((res = avctx->get_buffer(avctx, &c->cur)) < 0)
+    if ((res = ff_get_buffer(avctx, &c->cur)) < 0)
         return res;
     out  = (uint16_t *) c->cur.data[0];
     if (c->prev.data[0]) {
@@ -82,7 +85,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     for (i = 0; i < 8; i++)
         offsets[i] = -1;
 
-    while (outcnt < maxcnt && buf_end - 2 > buf) {
+    while (outcnt < maxcnt && buf_end - 2 >= buf) {
         int code = AV_RL16(buf);
         buf += 2;
 
@@ -153,7 +156,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     if (outcnt - maxcnt)
         av_log(avctx, AV_LOG_DEBUG, "frame finished with %d diff\n", outcnt - maxcnt);
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = c->cur;
 
     if (c->prev.data[0])
@@ -168,7 +171,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     KgvContext * const c = avctx->priv_data;
 
     c->avctx = avctx;
-    avctx->pix_fmt = PIX_FMT_RGB555;
+    avctx->pix_fmt = AV_PIX_FMT_RGB555;
     avctx->flags  |= CODEC_FLAG_EMU_EDGE;
 
     return 0;
@@ -183,11 +186,12 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_kgv1_decoder = {
     .name           = "kgv1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_KGV1,
+    .id             = AV_CODEC_ID_KGV1,
     .priv_data_size = sizeof(KgvContext),
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_frame,
     .flush          = decode_flush,
     .long_name      = NULL_IF_CONFIG_SMALL("Kega Game Video"),
+    .capabilities   = CODEC_CAP_DR1,
 };

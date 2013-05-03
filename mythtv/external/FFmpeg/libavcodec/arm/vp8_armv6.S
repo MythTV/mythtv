@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "asm.S"
+#include "libavutil/arm/asm.S"
 
 .macro rac_get_prob     h, bs, buf, cw, pr, t0, t1
         adds            \bs, \bs, \t0
@@ -65,7 +65,7 @@ T       orrcs           \cw, \cw, \t1
 
 function ff_decode_block_coeffs_armv6, export=1
         push            {r0,r1,r4-r11,lr}
-        movrel          lr,  X(ff_vp56_norm_shift)
+        movrelx         lr,  X(ff_vp56_norm_shift)
         ldrd            r4,  r5,  [sp, #44]             @ token_prob, qmul
         cmp             r3,  #0
         ldr             r11, [r5]
@@ -88,7 +88,7 @@ function ff_decode_block_coeffs_armv6, export=1
 
         add             r4,  r3,  r3,  lsl #5
         sxth            r12, r11
-        add             r4,  r2,  r4
+        add             r4,  r4,  r2
         adds            r6,  r6,  r9
         add             r4,  r4,  #11
         lsl             r8,  r8,  r9
@@ -138,7 +138,7 @@ A       orrcs           r8,  r8,  r10, lsl r6
 2:
         add             r4,  r3,  r3,  lsl #5
         cmp             r3,  #16
-        add             r4,  r2,  r4
+        add             r4,  r4,  r2
         pkhtb           r11, r11, r11, asr #16
         bne             0b
         b               6b
@@ -206,7 +206,7 @@ A       orrcs           r8,  r8,  r10, lsl r6
         mov             r9,  #8
         it              ge
         addge           r12, r12, #1
-        movrel          r4,  X(ff_vp8_dct_cat_prob)
+        movrelx         r4,  X(ff_vp8_dct_cat_prob), r1
         lsl             r9,  r9,  r12
         ldr             r4,  [r4, r12, lsl #2]
         add             r12, r9,  #3
@@ -226,7 +226,7 @@ A       orrcs           r8,  r8,  r10, lsl r6
         ldr             r1,  [sp, #4]
 4:
         add             r4,  r3,  r3,  lsl #5
-        add             r4,  r2,  r4
+        add             r4,  r4,  r2
         add             r4,  r4,  #22
         rac_get_128     r5,  r6,  r7,  r8,  r9,  r10
         it              ge

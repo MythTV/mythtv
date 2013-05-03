@@ -29,7 +29,7 @@ const QString JUMP_VIDEO_TREE = "Video Listings";
 const QString JUMP_VIDEO_GALLERY = "Video Gallery";
 const QString JUMP_VIDEO_DEFAULT = "Video Default";
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
 const QString DEFAULT_VIDEOSTARTUP_DIR = QDir::homePath() + "/Movies";
 #else
 const QString DEFAULT_VIDEOSTARTUP_DIR = "/share/Movies/dvd";

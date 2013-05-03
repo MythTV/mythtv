@@ -17,18 +17,22 @@ using namespace std;
 #include "premieretables.h"
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
+#include "channelutil.h"        // for ChannelUtil
 #include "mythdate.h"
 #include "programdata.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
+#include "scheduledrecording.h" // for ScheduledRecording
 #include "compat.h" // for gmtime_r on windows.
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
 
-static uint get_chan_id_from_db(uint sourceid,
-                                uint atscmajor, uint atscminor);
-static uint get_chan_id_from_db(uint sourceid,  uint serviceid,
-                                uint networkid, uint transportid);
+static uint get_chan_id_from_db_atsc(uint sourceid,
+                                     uint atscmajor, uint atscminor);
+static uint get_chan_id_from_db_dvb(uint sourceid,  uint serviceid,
+                                    uint networkid, uint transportid);
+static uint get_chan_id_from_db_dtv(uint sourceid,
+                                    uint programnumber, uint tunedchanid);
 static void init_fixup(QMap<uint64_t,uint> &fix);
 
 #define LOC QString("EITHelper: ")
@@ -36,7 +40,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix);
 EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
     gps_offset(-1 * GPS_LEAP_SECONDS),
-    sourceid(0)
+    sourceid(0), channelid(0),
+    maxStarttime(QDateTime()), seenEITother(false)
 {
     init_fixup(fixup);
 }
@@ -66,7 +71,7 @@ uint EITHelper::ProcessEvents(void)
     QMutexLocker locker(&eitList_lock);
     uint insertCount = 0;
 
-    if (!db_events.size())
+    if (db_events.empty())
         return 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -78,6 +83,7 @@ uint EITHelper::ProcessEvents(void)
         eitfixup->Fix(*event);
 
         insertCount += event->UpdateDB(query, 1000);
+        maxStarttime = max (maxStarttime, event->starttime);
 
         delete event;
         eitList_lock.lock();
@@ -131,6 +137,12 @@ void EITHelper::SetSourceID(uint _sourceid)
 {
     QMutexLocker locker(&eitList_lock);
     sourceid = _sourceid;
+}
+
+void EITHelper::SetChannelID(uint _channelid)
+{
+    QMutexLocker locker(&eitList_lock);
+    channelid = _channelid;
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
@@ -210,8 +222,10 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
         MPEGDescriptor::FindBestMatch(
             list, DescriptorID::short_event, languagePreferences);
 
+    // from EN 300 468, Appendix A.2 - Selection of character table
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
-    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f };
+    unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
+    unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
     const unsigned char *enc = NULL;
 
@@ -221,6 +235,14 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     {
         enc = enc_1;
         enc_len = sizeof(enc_1);
+    }
+
+    // Is this broken DVB provider in Western Europe?
+    // Use an encoding override of ISO 8859-9 (Latin5)
+    if (fix & EITFixUp::kEFixForceISO8859_9)
+    {
+        enc = enc_9;
+        enc_len = sizeof(enc_9);
     }
 
     // Is this broken DVB provider in Western Europe?
@@ -285,6 +307,26 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
+    uint chanid = 0;
+    if ((eit->TableID() == TableID::PF_EIT) ||
+        ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))
+    {
+        // EITa(ctive)
+        chanid = GetChanID(eit->ServiceID());
+    }
+    else
+    {
+        // EITo(ther)
+        chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
+        // do not reschedule if its only present+following
+        if (eit->TableID() != TableID::PF_EITo)
+        {
+            seenEITother = true;
+        }
+    }
+    if (!chanid)
+        return;
+
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
     uint fix = fixup.value(eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((uint64_t)eit->TSID()) << 32) |
@@ -294,11 +336,6 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                  (uint64_t)(eit->OriginalNetworkID() << 16) |
                   (uint64_t)eit->ServiceID());
     fix |= EITFixUp::kFixGenericDVB;
-
-    uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
-                            eit->TSID());
-    if (!chanid)
-        return;
 
     uint tableid   = eit->TableID();
     uint version   = eit->Version();
@@ -315,7 +352,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString subtitle      = QString("");
         QString description   = QString("");
         QString category      = QString("");
-        uint category_type = kCategoryNone;
+        ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
         // Parse descriptors
@@ -430,9 +467,75 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
             {
                 DishContentDescriptor content(content_data);
-                category_type = content.GetTheme();
+                switch (content.GetTheme())
+                {
+                    case kThemeMovie :
+                        category_type = ProgramInfo::kCategoryMovie;
+                        break;
+                    case kThemeSeries :
+                        category_type = ProgramInfo::kCategorySeries;
+                        break;
+                    case kThemeSports :
+                        category_type = ProgramInfo::kCategorySports;
+                        break;
+                    default :
+                        category_type = ProgramInfo::kCategoryNone;
+                }
                 if (EITFixUp::kFixDish & fix)
                     category  = content.GetCategory();
+            }
+            else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble1(0))
+                {
+                    case 0x01: 
+                        category = "Movie"; 
+                        break;
+                    case 0x02: 
+                        category = "News"; 
+                        break;
+                    case 0x03: 
+                        category = "Entertainment"; 
+                        break;
+                    case 0x04: 
+                        category = "Sport"; 
+                        break;
+                    case 0x05: 
+                        category = "Children"; 
+                        break;
+                    case 0x06: 
+                        category = "Music"; 
+                        break;
+                    case 0x07: 
+                        category = "Arts/Culture"; 
+                        break;
+                    case 0x08: 
+                        category = "Current Affairs"; 
+                        break;
+                    case 0x09: 
+                        category = "Education"; 
+                        break;
+                    case 0x0A: 
+                        category = "Infotainment"; 
+                        break;
+                    case 0x0B: 
+                        category = "Special"; 
+                        break;
+                    case 0x0C: 
+                        category = "Comedy"; 
+                        break;
+                    case 0x0D: 
+                        category = "Drama"; 
+                        break;
+                    case 0x0E: 
+                        category = "Documentary"; 
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(0);
             }
             else
             {
@@ -455,7 +558,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                 if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
                     programId = desc.ContentId();
                 else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
+                {
                     seriesId = desc.ContentId();
+                    category_type = ProgramInfo::kCategorySeries;
+                }
             }
         }
 
@@ -491,7 +597,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     QString subtitle      = QString("");
     QString description   = QString("");
     QString category      = QString("");
-    MythCategoryType category_type = kCategoryNone;
+    ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
     unsigned char subtitle_type=0, audio_props=0, video_props=0;
 
     // Parse descriptors
@@ -514,11 +620,11 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
         {
             if(content.UserNibble(0)==0x1)
             {
-                category_type = kCategoryMovie;
+                category_type = ProgramInfo::kCategoryMovie;
             }
             else if(content.UserNibble(0)==0x0)
             {
-                category_type = kCategorySports;
+                category_type = ProgramInfo::kCategorySports;
                 category = QObject::tr("Sports");
             }
         }
@@ -645,11 +751,10 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
-        return max(*it, 0);
+        return max(*it, 0u);
 
-    uint chanid = get_chan_id_from_db(sourceid, atsc_major, atsc_minor);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
+    uint chanid = get_chan_id_from_db_atsc(sourceid, atsc_major, atsc_minor);
+    srv_to_chanid[key] = chanid;
 
     return chanid;
 }
@@ -664,16 +769,32 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
-        return max(*it, 0);
+        return max(*it, 0u);
 
-    uint chanid = get_chan_id_from_db(sourceid, serviceid, networkid, tsid);
-    if (chanid)
-        srv_to_chanid[key] = chanid;
+    uint chanid = get_chan_id_from_db_dvb(sourceid, serviceid, networkid, tsid);
+    srv_to_chanid[key] = chanid;
 
     return chanid;
 }
 
-static uint get_chan_id_from_db(uint sourceid,
+uint EITHelper::GetChanID(uint program_number)
+{
+    uint64_t key;
+    key  = ((uint64_t) sourceid);
+    key |= ((uint64_t) program_number) << 16;
+    key |= ((uint64_t) channelid)      << 32;
+
+    ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
+    if (it != srv_to_chanid.end())
+        return max(*it, 0u);
+
+    uint chanid = get_chan_id_from_db_dtv(sourceid, program_number, channelid);
+    srv_to_chanid[key] = chanid;
+
+    return chanid;
+}
+
+static uint get_chan_id_from_db_atsc(uint sourceid,
                                 uint atsc_major, uint atsc_minor)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -699,7 +820,7 @@ static uint get_chan_id_from_db(uint sourceid,
 }
 
 // Figure out the chanid for this channel
-static uint get_chan_id_from_db(uint sourceid, uint serviceid,
+static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
                                 uint networkid, uint transportid)
 {
     uint chanid = 0;
@@ -723,6 +844,23 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Looking up chanID", query);
 
+    if (query.size() == 0) {
+        // Attempt fuzzy matching, by skipping the tsid
+        // DVB Link to chanid
+        QString qstr =
+            "SELECT chanid, useonairguide, channel.sourceid "
+            "FROM channel, dtv_multiplex "
+            "WHERE serviceid        = :SERVICEID   AND "
+            "      networkid        = :NETWORKID   AND "
+            "      channel.mplexid  = dtv_multiplex.mplexid";
+
+        query.prepare(qstr);
+        query.bindValue(":SERVICEID",   serviceid);
+        query.bindValue(":NETWORKID",   networkid);
+        if (!query.exec() || !query.isActive())
+            MythDB::DBError("Looking up chanID in fuzzy mode", query);
+    }
+
     while (query.next())
     {
         // Check to see if we are interested in this channel
@@ -732,12 +870,64 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
             return useOnAirGuide ? chanid : 0;
     }
 
-    if (query.size() > 1) {
+    if (query.size() > 1)
+    {
         LOG(VB_EIT, LOG_INFO,
             LOC + QString("found %1 channels for networdid %2, "
                           "transportid %3, serviceid %4 but none "
                           "for current sourceid %5.")
                 .arg(query.size()).arg(networkid).arg(transportid)
+                .arg(serviceid).arg(sourceid));
+    }
+
+    return useOnAirGuide ? chanid : 0;
+}
+
+/* Figure out the chanid for this channel from the sourceid,
+ * program_number/service_id and the chanid of the channel we are tuned to
+ *
+ * TODO for SPTS (e.g. HLS / IPTV) it would be useful to match without an entry
+ * in dtv_multiplex
+ */
+static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
+                                uint tunedchanid)
+{
+    uint chanid = 0;
+    bool useOnAirGuide = false;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // DVB Link to chanid
+    QString qstr =
+        "SELECT c1.chanid, c1.useonairguide, c1.sourceid "
+        "FROM channel c1, dtv_multiplex m, channel c2 "
+        "WHERE c1.serviceid        = :SERVICEID   AND "
+        "      c1.mplexid  = m.mplexid AND "
+        "      m.mplexid = c2.mplexid AND "
+        "      c2.chanid = :CHANID";
+
+    query.prepare(qstr);
+    query.bindValue(":SERVICEID",   serviceid);
+    query.bindValue(":CHANID", tunedchanid);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Looking up chanID", query);
+
+    while (query.next())
+    {
+        // Check to see if we are interested in this channel
+        chanid        = query.value(0).toUInt();
+        useOnAirGuide = query.value(1).toBool();
+        if (sourceid == query.value(2).toUInt())
+            return useOnAirGuide ? chanid : 0;
+    }
+
+    if (query.size() > 1)
+    {
+        LOG(VB_EIT, LOG_INFO,
+            LOC + QString("found %1 channels for multiplex of chanid %2, "
+                          "serviceid %3 but none "
+                          "for current sourceid %4.")
+                .arg(query.size()).arg(tunedchanid)
                 .arg(serviceid).arg(sourceid));
     }
 
@@ -818,8 +1008,17 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[40999U << 16 | 1069] = EITFixUp::kFixSubtitle;
 
     // Australia
-    fix[ 4096U << 16] = EITFixUp::kFixAUStar;
-    fix[ 4096U << 16] = EITFixUp::kFixAUStar;
+    fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
+    fix[ 4096U  << 16] = EITFixUp::kFixAUStar;
+    fix[ 4112U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview; // ABC Brisbane
+    fix[ 4114U << 16]  = EITFixUp::kFixAUDescription | EITFixUp::kFixAUFreeview | EITFixUp::kFixAUNine;; // Nine Brisbane
+    fix[ 4115U  << 16] = EITFixUp::kFixAUDescription | EITFixUp::kFixAUSeven; //Seven
+    fix[ 4116U  << 16] = EITFixUp::kFixAUDescription; //Ten
+    fix[ 12801U << 16] = EITFixUp::kFixAUFreeview | EITFixUp::kFixAUDescription; //ABC
+    fix[ 12802U << 16] = EITFixUp::kFixAUDescription; //SBS
+    fix[ 12803U << 16] = EITFixUp::kFixAUFreeview | EITFixUp::kFixAUDescription | EITFixUp::kFixAUNine; //Nine
+    fix[ 12842U << 16] = EITFixUp::kFixAUDescription; // 31 Brisbane
+    fix[ 12862U  << 16] = EITFixUp::kFixAUDescription; //WestTV
 
     // MultiChoice Africa
     fix[ 6144U << 16] = EITFixUp::kFixMCA;
@@ -844,14 +1043,25 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
     fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
 
-    // Netherlands
+    // Netherlands DVB-C
     fix[ 1000U << 16] = EITFixUp::kFixNL;
+    // Canal Digitaal DVB-S 19.2 Dutch/Belgian ONID 53 covers all CanalDigitaal TiD
+    fix[   53U << 16] = EITFixUp::kFixNL;
+    // Canal Digitaal DVB-S 23.5 Dutch/Belgian
+    fix[  3202LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3208LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3211LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3222LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
+    fix[  3225LL << 32 | 3U << 16] = EITFixUp::kFixNL; 
 
     // Finland
     fix[      8438U << 16] = // DVB-T Espoo
         fix[ 42249U << 16] = // DVB-C Welho
         fix[    15U << 16] = // DVB-C Welho
         EITFixUp::kFixFI | EITFixUp::kFixCategory;
+
+    // DVB-C YouSee (Denmark)
+    fix[65024U << 16] = EITFixUp::kFixDK;
 
     // DVB-S(2) Thor 0.8W Norwegian
     fix[70U << 16] = EITFixUp::kFixNO;
@@ -897,7 +1107,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     //DVB-T Germany Berlin HSE/MonA TV
     fix[  772LL << 32 | 8468 << 16 | 16387] = EITFixUp::kEFixForceISO8859_15;
     //DVB-T Germany Ruhrgebiet Tele 5
-    fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15;
+    //fix[ 8707LL << 32 | 8468 << 16 | 16413] = EITFixUp::kEFixForceISO8859_15; // they are sending the ISO 8859-9 signalling now
+    // ANIXE
+    fix[ 8707LL << 32 | 8468U << 16 | 16426 ] = // DVB-T Rhein-Main
+        EITFixUp::kEFixForceISO8859_9;
 
     // DVB-C Kabel Deutschland encoding fixes Germany
     fix[   112LL << 32 | 61441U << 16] = EITFixUp::kEFixForceISO8859_15;
@@ -982,4 +1195,17 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
+}
+
+/** \fn EITHelper::RescheduleRecordings(void)
+ *  \brief Tells scheduler about programming changes.
+ *
+ */
+void EITHelper::RescheduleRecordings(void)
+{
+    ScheduledRecording::RescheduleMatch(
+        0, sourceid, seenEITother ? 0 : ChannelUtil::GetMplexID(channelid),
+        maxStarttime, "EITScanner");
+    seenEITother = false;
+    maxStarttime = QDateTime();
 }

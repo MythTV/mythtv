@@ -35,9 +35,8 @@
 #include "h264data.h" // FIXME FIXME FIXME
 #include "h264_mvpred.h"
 #include "golomb.h"
+#include "libavutil/avassert.h"
 
-//#undef NDEBUG
-#include <assert.h>
 
 static const uint8_t golomb_to_inter_cbp_gray[16]={
  0, 1, 2, 4, 8, 3, 5,10,12,15, 7,11,13,14, 6, 9,
@@ -361,7 +360,7 @@ av_cold void ff_h264_decode_init_vlc(void){
          * the packed static coeff_token_vlc table sizes
          * were initialized correctly.
          */
-        assert(offset == FF_ARRAY_ELEMS(coeff_token_vlc_tables));
+        av_assert0(offset == FF_ARRAY_ELEMS(coeff_token_vlc_tables));
 
         for(i=0; i<3; i++){
             chroma_dc_total_zeros_vlc[i].table = chroma_dc_total_zeros_vlc_tables[i];
@@ -481,7 +480,7 @@ static int decode_residual(H264Context *h, GetBitContext *gb, DCTELEM *block, in
 
     trailing_ones= coeff_token&3;
     tprintf(h->s.avctx, "trailing:%d, total:%d\n", trailing_ones, total_coeff);
-    assert(total_coeff<=16);
+    av_assert2(total_coeff<=16);
 
     i = show_bits(gb, 3);
     skip_bits(gb, trailing_ones);
@@ -639,7 +638,7 @@ static av_always_inline int decode_luma_residual(H264Context *h, GetBitContext *
             return -1; //FIXME continue if partitioned and other return -1 too
         }
 
-        assert((cbp&15) == 0 || (cbp&15) == 15);
+        av_assert2((cbp&15) == 0 || (cbp&15) == 15);
 
         if(cbp&15){
             for(i8x8=0; i8x8<4; i8x8++){
@@ -701,6 +700,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
     int dct8x8_allowed= h->pps.transform_8x8_mode;
     int decode_chroma = h->sps.chroma_format_idc == 1 || h->sps.chroma_format_idc == 2;
     const int pixel_shift = h->pixel_shift;
+    unsigned local_ref_count[2];
 
     mb_xy = h->mb_xy = s->mb_x + s->mb_y*s->mb_stride;
 
@@ -745,7 +745,7 @@ int ff_h264_decode_mb_cavlc(H264Context *h){
             goto decode_intra_mb;
         }
     }else{
-       assert(h->slice_type_nos == AV_PICTURE_TYPE_I);
+       av_assert2(h->slice_type_nos == AV_PICTURE_TYPE_I);
         if(h->slice_type == AV_PICTURE_TYPE_SI && mb_type)
             mb_type--;
 decode_intra_mb:
@@ -786,10 +786,8 @@ decode_intra_mb:
         return 0;
     }
 
-    if(MB_MBAFF){
-        h->ref_count[0] <<= 1;
-        h->ref_count[1] <<= 1;
-    }
+    local_ref_count[0] = h->ref_count[0] << MB_MBAFF;
+    local_ref_count[1] = h->ref_count[1] << MB_MBAFF;
 
     fill_decode_neighbors(h, mb_type);
     fill_decode_caches(h, mb_type);
@@ -857,7 +855,7 @@ decode_intra_mb:
                 h->ref_cache[1][scan8[12]] = PART_NOT_AVAILABLE;
             }
         }else{
-            assert(h->slice_type_nos == AV_PICTURE_TYPE_P); //FIXME SP correct ?
+            av_assert2(h->slice_type_nos == AV_PICTURE_TYPE_P); //FIXME SP correct ?
             for(i=0; i<4; i++){
                 h->sub_mb_type[i]= get_ue_golomb_31(&s->gb);
                 if(h->sub_mb_type[i] >=4){
@@ -870,7 +868,7 @@ decode_intra_mb:
         }
 
         for(list=0; list<h->list_count; list++){
-            int ref_count= IS_REF0(mb_type) ? 1 : h->ref_count[list];
+            int ref_count= IS_REF0(mb_type) ? 1 : local_ref_count[list];
             for(i=0; i<4; i++){
                 if(IS_DIRECT(h->sub_mb_type[i])) continue;
                 if(IS_DIR(h->sub_mb_type[i], 0, list)){
@@ -950,13 +948,13 @@ decode_intra_mb:
             for(list=0; list<h->list_count; list++){
                     unsigned int val;
                     if(IS_DIR(mb_type, 0, list)){
-                        if(h->ref_count[list]==1){
+                        if(local_ref_count[list]==1){
                             val= 0;
-                        }else if(h->ref_count[list]==2){
+                        }else if(local_ref_count[list]==2){
                             val= get_bits1(&s->gb)^1;
                         }else{
                             val= get_ue_golomb_31(&s->gb);
-                            if(val >= h->ref_count[list]){
+                            if(val >= local_ref_count[list]){
                                 av_log(h->s.avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                 return -1;
                             }
@@ -980,13 +978,13 @@ decode_intra_mb:
                     for(i=0; i<2; i++){
                         unsigned int val;
                         if(IS_DIR(mb_type, i, list)){
-                            if(h->ref_count[list] == 1){
+                            if(local_ref_count[list] == 1){
                                 val= 0;
-                            }else if(h->ref_count[list] == 2){
+                            }else if(local_ref_count[list] == 2){
                                 val= get_bits1(&s->gb)^1;
                             }else{
                                 val= get_ue_golomb_31(&s->gb);
-                                if(val >= h->ref_count[list]){
+                                if(val >= local_ref_count[list]){
                                     av_log(h->s.avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                     return -1;
                                 }
@@ -1012,18 +1010,18 @@ decode_intra_mb:
                 }
             }
         }else{
-            assert(IS_8X16(mb_type));
+            av_assert2(IS_8X16(mb_type));
             for(list=0; list<h->list_count; list++){
                     for(i=0; i<2; i++){
                         unsigned int val;
                         if(IS_DIR(mb_type, i, list)){ //FIXME optimize
-                            if(h->ref_count[list]==1){
+                            if(local_ref_count[list]==1){
                                 val= 0;
-                            }else if(h->ref_count[list]==2){
+                            }else if(local_ref_count[list]==2){
                                 val= get_bits1(&s->gb)^1;
                             }else{
                                 val= get_ue_golomb_31(&s->gb);
-                                if(val >= h->ref_count[list]){
+                                if(val >= local_ref_count[list]){
                                     av_log(h->s.avctx, AV_LOG_ERROR, "ref %u overflow\n", val);
                                     return -1;
                                 }
@@ -1071,6 +1069,11 @@ decode_intra_mb:
             }
             if(IS_INTRA4x4(mb_type)) cbp= golomb_to_intra4x4_cbp_gray[cbp];
             else                     cbp= golomb_to_inter_cbp_gray[cbp];
+        }
+    } else {
+        if (!decode_chroma && cbp>15) {
+            av_log(s->avctx, AV_LOG_ERROR, "gray chroma\n");
+            return AVERROR_INVALIDDATA;
         }
     }
 
@@ -1162,11 +1165,6 @@ decode_intra_mb:
     }
     s->current_picture.f.qscale_table[mb_xy] = s->qscale;
     write_back_non_zero_count(h);
-
-    if(MB_MBAFF){
-        h->ref_count[0] >>= 1;
-        h->ref_count[1] >>= 1;
-    }
 
     return 0;
 }

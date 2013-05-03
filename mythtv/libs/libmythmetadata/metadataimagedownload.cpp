@@ -9,7 +9,6 @@
 #include "mythcorecontext.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
-#include "httpcomms.h"
 #include "storagegroup.h"
 #include "metadataimagedownload.h"
 #include "remotefile.h"

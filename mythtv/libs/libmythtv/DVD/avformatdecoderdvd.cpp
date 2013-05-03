@@ -26,6 +26,54 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
+bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
+{
+    // Always try to decode audio and video for DVDs
+    return AvFormatDecoder::GetFrame( kDecodeAV );
+}
+
+int64_t AvFormatDecoderDVD::AdjustTimestamp(int64_t timestamp)
+{
+    int64_t newTimestamp = timestamp;
+
+    if (newTimestamp != AV_NOPTS_VALUE)
+    {
+        int64_t timediff = ringBuffer->DVD()->GetTimeDiff();
+        if (newTimestamp >= timediff)
+        {
+            newTimestamp -= timediff;
+        }
+    }
+
+    return newTimestamp;
+}
+
+int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
+{
+    int result = av_read_frame(ctx, pkt);
+
+    while (result == AVERROR_EOF && errno == EAGAIN)
+    {
+        if (ringBuffer->DVD()->IsReadingBlocked())
+        {
+            ringBuffer->DVD()->UnblockReading();
+            result = av_read_frame(ctx, pkt);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (result >= 0)
+    {
+        pkt->dts = AdjustTimestamp(pkt->dts);
+        pkt->pts = AdjustTimestamp(pkt->pts);
+    }
+
+    return result;
+}
+
 void AvFormatDecoderDVD::PostProcessTracks(void)
 {
     if (!ringBuffer)
@@ -165,4 +213,32 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
         return (desiredTimePos * 90000LL);
     }
     return current_speed;
+}
+
+AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
+{
+    int type = 0;
+    
+    if (ringBuffer && ringBuffer->DVD())
+        type = ringBuffer->DVD()->GetAudioTrackType(stream_index);
+    
+    if (type > 0 && type < 5) // These are the only types defined in unofficial documentation
+    {
+        AudioTrackType ret = kAudioTypeNormal;
+        switch (type)
+        {
+            case 1:
+                ret = kAudioTypeNormal;
+                break;
+            case 2:
+                ret = kAudioTypeAudioDescription;
+                break;
+            case 3: case 4:
+                ret = kAudioTypeCommentary;
+                break;
+        }
+        return ret;
+    }
+    else // If the DVD metadata doesn't include the info then we might as well fall through, maybe we'll get lucky
+        return AvFormatDecoder::GetAudioTrackType(stream_index);
 }

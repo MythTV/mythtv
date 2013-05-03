@@ -3,6 +3,9 @@ include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
 QT += network xml sql
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
 
 INCLUDEPATH += ../../libs/libmythtv/channelscan
 DEPENDPATH += ../../libs/libmythtv/channelscan

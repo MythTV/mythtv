@@ -71,6 +71,7 @@
 #include "libavutil/imgutils.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 
 #define PALETTE_COUNT 256
 #define VQA_HEADER_SIZE 0x2A
@@ -124,25 +125,25 @@ static av_cold int vqa_decode_init(AVCodecContext *avctx)
     int i, j, codebook_index;
 
     s->avctx = avctx;
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
     /* make sure the extradata made it */
     if (s->avctx->extradata_size != VQA_HEADER_SIZE) {
         av_log(s->avctx, AV_LOG_ERROR, "expected extradata size of %d\n", VQA_HEADER_SIZE);
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     /* load up the VQA parameters from the header */
     s->vqa_version = s->avctx->extradata[0];
     if (s->vqa_version < 1 || s->vqa_version > 3) {
         av_log(s->avctx, AV_LOG_ERROR, "unsupported version %d\n", s->vqa_version);
-        return -1;
+        return AVERROR_PATCHWELCOME;
     }
     s->width = AV_RL16(&s->avctx->extradata[6]);
     s->height = AV_RL16(&s->avctx->extradata[8]);
     if(av_image_check_size(s->width, s->height, 0, avctx)){
         s->width= s->height= 0;
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
     s->vector_width = s->avctx->extradata[10];
     s->vector_height = s->avctx->extradata[11];
@@ -152,7 +153,7 @@ static av_cold int vqa_decode_init(AVCodecContext *avctx)
     if ((s->vector_width != 4) ||
         ((s->vector_height != 2) && (s->vector_height != 4))) {
         /* return without further initialization */
-        return -1;
+        return AVERROR_INVALIDDATA;
     }
 
     if (s->width % s->vector_width || s->height % s->vector_height) {
@@ -203,22 +204,22 @@ fail:
 
 #define CHECK_COUNT() \
     if (dest_index + count > dest_size) { \
-        av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: next op would overflow dest_index\n"); \
-        av_log(NULL, AV_LOG_ERROR, "  VQA video: current dest_index = %d, count = %d, dest_size = %d\n", \
+        av_log(s->avctx, AV_LOG_ERROR, "decode_format80 problem: next op would overflow dest_index\n"); \
+        av_log(s->avctx, AV_LOG_ERROR, "current dest_index = %d, count = %d, dest_size = %d\n", \
             dest_index, count, dest_size); \
         return AVERROR_INVALIDDATA; \
     }
 
 #define CHECK_COPY(idx) \
     if (idx < 0 || idx + count > dest_size) { \
-        av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: next op would overflow dest_index\n"); \
-        av_log(NULL, AV_LOG_ERROR, "  VQA video: current src_pos = %d, count = %d, dest_size = %d\n", \
+        av_log(s->avctx, AV_LOG_ERROR, "decode_format80 problem: next op would overflow dest_index\n"); \
+        av_log(s->avctx, AV_LOG_ERROR, "current src_pos = %d, count = %d, dest_size = %d\n", \
             src_pos, count, dest_size); \
         return AVERROR_INVALIDDATA; \
     }
 
 
-static int decode_format80(GetByteContext *gb, int src_size,
+static int decode_format80(VqaContext *s, int src_size,
     unsigned char *dest, int dest_size, int check_size) {
 
     int dest_index = 0;
@@ -227,26 +228,26 @@ static int decode_format80(GetByteContext *gb, int src_size,
     unsigned char color;
     int i;
 
-    start = bytestream2_tell(gb);
-    while (bytestream2_tell(gb) - start < src_size) {
-        opcode = bytestream2_get_byte(gb);
-        av_dlog(NULL, "      opcode %02X: ", opcode);
+    start = bytestream2_tell(&s->gb);
+    while (bytestream2_tell(&s->gb) - start < src_size) {
+        opcode = bytestream2_get_byte(&s->gb);
+        av_dlog(s->avctx, "opcode %02X: ", opcode);
 
         /* 0x80 means that frame is finished */
         if (opcode == 0x80)
             return 0;
 
         if (dest_index >= dest_size) {
-            av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: dest_index (%d) exceeded dest_size (%d)\n",
+            av_log(s->avctx, AV_LOG_ERROR, "decode_format80 problem: dest_index (%d) exceeded dest_size (%d)\n",
                 dest_index, dest_size);
             return AVERROR_INVALIDDATA;
         }
 
         if (opcode == 0xFF) {
 
-            count   = bytestream2_get_le16(gb);
-            src_pos = bytestream2_get_le16(gb);
-            av_dlog(NULL, "(1) copy %X bytes from absolute pos %X\n", count, src_pos);
+            count   = bytestream2_get_le16(&s->gb);
+            src_pos = bytestream2_get_le16(&s->gb);
+            av_dlog(s->avctx, "(1) copy %X bytes from absolute pos %X\n", count, src_pos);
             CHECK_COUNT();
             CHECK_COPY(src_pos);
             for (i = 0; i < count; i++)
@@ -255,9 +256,9 @@ static int decode_format80(GetByteContext *gb, int src_size,
 
         } else if (opcode == 0xFE) {
 
-            count = bytestream2_get_le16(gb);
-            color = bytestream2_get_byte(gb);
-            av_dlog(NULL, "(2) set %X bytes to %02X\n", count, color);
+            count = bytestream2_get_le16(&s->gb);
+            color = bytestream2_get_byte(&s->gb);
+            av_dlog(s->avctx, "(2) set %X bytes to %02X\n", count, color);
             CHECK_COUNT();
             memset(&dest[dest_index], color, count);
             dest_index += count;
@@ -265,8 +266,8 @@ static int decode_format80(GetByteContext *gb, int src_size,
         } else if ((opcode & 0xC0) == 0xC0) {
 
             count = (opcode & 0x3F) + 3;
-            src_pos = bytestream2_get_le16(gb);
-            av_dlog(NULL, "(3) copy %X bytes from absolute pos %X\n", count, src_pos);
+            src_pos = bytestream2_get_le16(&s->gb);
+            av_dlog(s->avctx, "(3) copy %X bytes from absolute pos %X\n", count, src_pos);
             CHECK_COUNT();
             CHECK_COPY(src_pos);
             for (i = 0; i < count; i++)
@@ -276,16 +277,16 @@ static int decode_format80(GetByteContext *gb, int src_size,
         } else if (opcode > 0x80) {
 
             count = opcode & 0x3F;
-            av_dlog(NULL, "(4) copy %X bytes from source to dest\n", count);
+            av_dlog(s->avctx, "(4) copy %X bytes from source to dest\n", count);
             CHECK_COUNT();
-            bytestream2_get_buffer(gb, &dest[dest_index], count);
+            bytestream2_get_buffer(&s->gb, &dest[dest_index], count);
             dest_index += count;
 
         } else {
 
             count = ((opcode & 0x70) >> 4) + 3;
-            src_pos = bytestream2_get_byte(gb) | ((opcode & 0x0F) << 8);
-            av_dlog(NULL, "(5) copy %X bytes from relpos %X\n", count, src_pos);
+            src_pos = bytestream2_get_byte(&s->gb) | ((opcode & 0x0F) << 8);
+            av_dlog(s->avctx, "(5) copy %X bytes from relpos %X\n", count, src_pos);
             CHECK_COUNT();
             CHECK_COPY(dest_index - src_pos);
             for (i = 0; i < count; i++)
@@ -300,7 +301,7 @@ static int decode_format80(GetByteContext *gb, int src_size,
      * not every entry needs to be filled */
     if (check_size)
         if (dest_index < dest_size)
-            av_log(NULL, AV_LOG_ERROR, "  VQA video: decode_format80 problem: decode finished with dest_index (%d) < dest_size (%d)\n",
+            av_log(s->avctx, AV_LOG_ERROR, "decode_format80 problem: decode finished with dest_index (%d) < dest_size (%d)\n",
                 dest_index, dest_size);
 
     return 0; // let's display what we decoded anyway
@@ -416,7 +417,7 @@ static int vqa_decode_chunk(VqaContext *s)
             r = bytestream2_get_byteu(&s->gb) * 4;
             g = bytestream2_get_byteu(&s->gb) * 4;
             b = bytestream2_get_byteu(&s->gb) * 4;
-            s->palette[i] = 0xFF << 24 | r << 16 | g << 8 | b;
+            s->palette[i] = 0xFFU << 24 | r << 16 | g << 8 | b;
             s->palette[i] |= s->palette[i] >> 6 & 0x30303;
         }
     }
@@ -434,7 +435,7 @@ static int vqa_decode_chunk(VqaContext *s)
 
         bytestream2_seek(&s->gb, cbfz_chunk, SEEK_SET);
         chunk_size = bytestream2_get_be32(&s->gb);
-        if ((res = decode_format80(&s->gb, chunk_size, s->codebook,
+        if ((res = decode_format80(s, chunk_size, s->codebook,
                                    s->codebook_size, 0)) < 0)
             return res;
     }
@@ -464,7 +465,7 @@ static int vqa_decode_chunk(VqaContext *s)
 
     bytestream2_seek(&s->gb, vptz_chunk, SEEK_SET);
     chunk_size = bytestream2_get_be32(&s->gb);
-    if ((res = decode_format80(&s->gb, chunk_size,
+    if ((res = decode_format80(s, chunk_size,
                                s->decode_buffer, s->decode_buffer_size, 1)) < 0)
         return res;
 
@@ -536,6 +537,12 @@ static int vqa_decode_chunk(VqaContext *s)
         bytestream2_seek(&s->gb, cbp0_chunk, SEEK_SET);
         chunk_size = bytestream2_get_be32(&s->gb);
 
+        if (chunk_size > MAX_CODEBOOK_SIZE - s->next_codebook_buffer_index) {
+            av_log(s->avctx, AV_LOG_ERROR, "cbp0 chunk too large (%u bytes)\n",
+                   chunk_size);
+            return AVERROR_INVALIDDATA;
+        }
+
         /* accumulate partial codebook */
         bytestream2_get_buffer(&s->gb, &s->next_codebook_buffer[s->next_codebook_buffer_index],
                                chunk_size);
@@ -559,6 +566,12 @@ static int vqa_decode_chunk(VqaContext *s)
         bytestream2_seek(&s->gb, cbpz_chunk, SEEK_SET);
         chunk_size = bytestream2_get_be32(&s->gb);
 
+        if (chunk_size > MAX_CODEBOOK_SIZE - s->next_codebook_buffer_index) {
+            av_log(s->avctx, AV_LOG_ERROR, "cbpz chunk too large (%u bytes)\n",
+                   chunk_size);
+            return AVERROR_INVALIDDATA;
+        }
+
         /* accumulate partial codebook */
         bytestream2_get_buffer(&s->gb, &s->next_codebook_buffer[s->next_codebook_buffer_index],
                                chunk_size);
@@ -566,11 +579,9 @@ static int vqa_decode_chunk(VqaContext *s)
 
         s->partial_countdown--;
         if (s->partial_countdown <= 0) {
-            GetByteContext gb;
-
-            bytestream2_init(&gb, s->next_codebook_buffer, s->next_codebook_buffer_index);
+            bytestream2_init(&s->gb, s->next_codebook_buffer, s->next_codebook_buffer_index);
             /* decompress codebook */
-            if ((res = decode_format80(&gb, s->next_codebook_buffer_index,
+            if ((res = decode_format80(s, s->next_codebook_buffer_index,
                                        s->codebook, s->codebook_size, 0)) < 0)
                 return res;
 
@@ -584,7 +595,7 @@ static int vqa_decode_chunk(VqaContext *s)
 }
 
 static int vqa_decode_frame(AVCodecContext *avctx,
-                            void *data, int *data_size,
+                            void *data, int *got_frame,
                             AVPacket *avpkt)
 {
     VqaContext *s = avctx->priv_data;
@@ -593,9 +604,9 @@ static int vqa_decode_frame(AVCodecContext *avctx,
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);
 
-    if (avctx->get_buffer(avctx, &s->frame)) {
-        av_log(s->avctx, AV_LOG_ERROR, "  VQA Video: get_buffer() failed\n");
-        return -1;
+    if ((res = ff_get_buffer(avctx, &s->frame))) {
+        av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        return res;
     }
 
     bytestream2_init(&s->gb, avpkt->data, avpkt->size);
@@ -606,7 +617,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
     memcpy(s->frame.data[1], s->palette, PALETTE_COUNT * 4);
     s->frame.palette_has_changed = 1;
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = s->frame;
 
     /* report that the buffer was completely consumed */
@@ -630,7 +641,7 @@ static av_cold int vqa_decode_end(AVCodecContext *avctx)
 AVCodec ff_vqa_decoder = {
     .name           = "vqavideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_WS_VQA,
+    .id             = AV_CODEC_ID_WS_VQA,
     .priv_data_size = sizeof(VqaContext),
     .init           = vqa_decode_init,
     .close          = vqa_decode_end,

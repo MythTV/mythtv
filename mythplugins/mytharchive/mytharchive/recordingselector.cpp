@@ -26,7 +26,6 @@
 #include <mythdialogbox.h>
 #include <mythlogging.h>
 #include <mythdate.h>
-#include <netutils.h>
 
 // mytharchive
 #include "recordingselector.h"
@@ -452,11 +451,11 @@ void RecordingSelector::updateRecordingList(void)
                 if (season && episode)
                 {
                     seasone = QString("s%1e%2")
-                                .arg(GetDisplaySeasonEpisode(season, 2))
-                                .arg(GetDisplaySeasonEpisode(episode, 2));
+                        .arg(format_season_and_episode(season, 2))
+                        .arg(format_season_and_episode(episode, 2));
                     seasonx = QString("%1x%2")
-                              .arg(GetDisplaySeasonEpisode(season, 1))
-                              .arg(GetDisplaySeasonEpisode(episode, 2));
+                        .arg(format_season_and_episode(season, 1))
+                        .arg(format_season_and_episode(episode, 2));
                 }
 
                 item->SetText(title, "title");

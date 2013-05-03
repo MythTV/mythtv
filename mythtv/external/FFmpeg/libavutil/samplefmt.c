@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "common.h"
 #include "samplefmt.h"
 
 #include <stdio.h>
@@ -163,14 +164,18 @@ int av_samples_fill_arrays(uint8_t **audio_data, int *linesize,
     if (buf_size < 0)
         return buf_size;
 
-    audio_data[0] = buf;
+    audio_data[0] = (uint8_t *)buf;
     for (ch = 1; planar && ch < nb_channels; ch++)
         audio_data[ch] = audio_data[ch-1] + line_size;
 
     if (linesize)
         *linesize = line_size;
 
+#if FF_API_SAMPLES_UTILS_RETURN_ZERO
     return 0;
+#else
+    return buf_size;
+#endif
 }
 
 int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
@@ -182,7 +187,7 @@ int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
     if (size < 0)
         return size;
 
-    buf = av_mallocz(size);
+    buf = av_malloc(size);
     if (!buf)
         return AVERROR(ENOMEM);
 
@@ -192,7 +197,14 @@ int av_samples_alloc(uint8_t **audio_data, int *linesize, int nb_channels,
         av_free(buf);
         return size;
     }
+
+    av_samples_set_silence(audio_data, 0, nb_samples, nb_channels, sample_fmt);
+
+#if FF_API_SAMPLES_UTILS_RETURN_ZERO
     return 0;
+#else
+    return size;
+#endif
 }
 
 int av_samples_copy(uint8_t **dst, uint8_t * const *src, int dst_offset,
@@ -208,8 +220,13 @@ int av_samples_copy(uint8_t **dst, uint8_t * const *src, int dst_offset,
     dst_offset *= block_align;
     src_offset *= block_align;
 
-    for (i = 0; i < planes; i++)
-        memcpy(dst[i] + dst_offset, src[i] + src_offset, data_size);
+    if((dst[0] < src[0] ? src[0] - dst[0] : dst[0] - src[0]) >= data_size) {
+        for (i = 0; i < planes; i++)
+            memcpy(dst[i] + dst_offset, src[i] + src_offset, data_size);
+    } else {
+        for (i = 0; i < planes; i++)
+            memmove(dst[i] + dst_offset, src[i] + src_offset, data_size);
+    }
 
     return 0;
 }

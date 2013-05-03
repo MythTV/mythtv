@@ -2,11 +2,18 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql webkit script
+QT += network xml sql script
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+QT += webkit
+using_qtdbus: CONFIG += qdbus
+}
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+using_qtdbus: QT += dbus
+}
 
 TEMPLATE = app
 CONFIG += thread
-using_qtdbus: CONFIG += qdbus
 TARGET = mythfrontend
 target.path = $${PREFIX}/bin
 INSTALLS = target
@@ -24,7 +31,7 @@ HEADERS += playbackbox.h viewscheduled.h globalsettings.h audiogeneralsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
-HEADERS += screenwizard.h exitprompt.h
+HEADERS += exitprompt.h
 HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
 HEADERS += progfind.h guidegrid.h customedit.h
 HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
@@ -45,7 +52,7 @@ SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp
-SOURCES += custompriority.cpp screenwizard.cpp exitprompt.cpp
+SOURCES += custompriority.cpp exitprompt.cpp
 SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
 SOURCES += keygrabber.cpp progfind.cpp guidegrid.cpp
 SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp

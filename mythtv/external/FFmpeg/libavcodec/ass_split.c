@@ -267,7 +267,8 @@ static const char *ass_split_section(ASSSplitContext *ctx, const char *buf)
                     }
             }
         }
-        buf += strcspn(buf, "\n") + 1;
+        buf += strcspn(buf, "\n");
+        buf += !!*buf;
     }
     return buf;
 }
@@ -352,8 +353,10 @@ void ff_ass_split_free(ASSSplitContext *ctx)
 {
     if (ctx) {
         int i;
-        for (i=0; i<FF_ARRAY_ELEMS(ass_sections); i++)
+        for (i=0; i<FF_ARRAY_ELEMS(ass_sections); i++) {
             free_section(ctx, &ass_sections[i]);
+            av_freep(&(ctx->field_order[i]));
+        }
         av_free(ctx);
     }
 }
@@ -366,7 +369,7 @@ int ff_ass_split_override_codes(const ASSCodesCallbacks *callbacks, void *priv,
     char new_line[2];
     int text_len = 0;
 
-    while (*buf) {
+    while (buf && *buf) {
         if (text && callbacks->text &&
             (sscanf(buf, "\\%1[nN]", new_line) == 1 ||
              !strncmp(buf, "{\\", 2))) {
@@ -454,7 +457,7 @@ int ff_ass_split_override_codes(const ASSCodesCallbacks *callbacks, void *priv,
     return 0;
 }
 
-ASSStyle *ass_style_get(ASSSplitContext *ctx, const char *style)
+ASSStyle *ff_ass_style_get(ASSSplitContext *ctx, const char *style)
 {
     ASS *ass = &ctx->ass;
     int i;

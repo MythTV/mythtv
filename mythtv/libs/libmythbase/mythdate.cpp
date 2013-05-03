@@ -72,6 +72,9 @@ QString toString(const QDateTime &raw_dt, uint format)
 {
     QString result;
 
+    if (!raw_dt.isValid())
+        return result;
+
     // if no format is set default to UTC for ISO/file/DB dates.
     if (!((format & kOverrideUTC) || (format & kOverrideLocal)))
     {
@@ -117,6 +120,9 @@ QString toString(const QDateTime &raw_dt, uint format)
 QString toString(const QDate &date, uint format)
 {
     QString result;
+
+    if (!date.isValid())
+        return result;
 
     if (format & (kDateFull | kDateShort))
     {

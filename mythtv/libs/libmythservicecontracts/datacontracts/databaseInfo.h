@@ -46,11 +46,7 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< DatabaseInfo   >();
-            qRegisterMetaType< DatabaseInfo*  >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -87,5 +83,14 @@ typedef DatabaseInfo * DatabaseInfoPtr;
 
 Q_DECLARE_METATYPE( DTC::DatabaseInfo  )
 Q_DECLARE_METATYPE( DTC::DatabaseInfo* )
+
+namespace DTC
+{
+inline void DatabaseInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< DatabaseInfo   >();
+    qRegisterMetaType< DatabaseInfo*  >();
+}
+}
 
 #endif

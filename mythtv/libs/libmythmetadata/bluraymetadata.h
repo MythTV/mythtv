@@ -56,7 +56,6 @@ class META_PUBLIC BlurayMetadata : public QObject
 
   private:
     BLURAY              *m_bdnav;
-    meta_dl             *m_metadata;
 
     QString              m_title;
     QString              m_alttitle;

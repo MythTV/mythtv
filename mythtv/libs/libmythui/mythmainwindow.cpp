@@ -161,7 +161,7 @@ class MythMainWindowPrivate
 
         sysEventHandler(NULL),
 
-        drawInterval(1000 / 70),
+        drawInterval(1000 / MythMainWindow::drawRefresh),
         drawTimer(NULL),
         mainStack(NULL),
 
@@ -878,7 +878,7 @@ bool MythMainWindow::SaveScreenShot(const QImage &image, QString filename)
     LOG(VB_GENERAL, LOG_INFO, QString("Saving screenshot to %1 (%2x%3)")
                        .arg(filename).arg(image.width()).arg(image.height()));
 
-    if (image.save(filename, extension.toAscii(), 100))
+    if (image.save(filename, extension.toLatin1(), 100))
     {
         LOG(VB_GENERAL, LOG_INFO, "MythMainWindow::screenShot succeeded");
         return true;
@@ -1147,6 +1147,8 @@ void MythMainWindow::InitKeys()
         ,"Copy text from textedit"), "Ctrl+C");
     RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
         "Paste text into textedit"), "Ctrl+V");
+    RegisterKey("Global", "NEWLINE", QT_TRANSLATE_NOOP("MythControls",
+        "Insert newline into textedit"), "Ctrl+Return");
     RegisterKey("Global", "UNDO", QT_TRANSLATE_NOOP("MythControls",
         "Undo"), "Ctrl+Z");
     RegisterKey("Global", "REDO", QT_TRANSLATE_NOOP("MythControls",
@@ -1261,7 +1263,7 @@ void MythMainWindow::ReinitDone(void)
     d->paintwin->raise();
     ShowPainterWindow();
 
-    d->drawTimer->start(1000 / 70);
+    d->drawTimer->start(1000 / drawRefresh);
 }
 
 void MythMainWindow::Show(void)
@@ -1298,7 +1300,7 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
-#ifndef Q_WS_MACX
+#ifndef Q_OS_MAC
     child->winId();
 #endif
     child->raise();
@@ -1391,7 +1393,7 @@ void MythMainWindow::SetDrawEnabled(bool enable)
             QApplication::postEvent(this, new QEvent(QEvent::UpdateRequest), Qt::LowEventPriority);
             d->m_pendingUpdate = false;
         }
-        d->drawTimer->start(1000 / 70);
+        d->drawTimer->start(1000 / drawRefresh);
         ShowPainterWindow();
     }
     else
@@ -2210,12 +2212,6 @@ void MythMainWindow::customEvent(QEvent *ce)
             int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
             QString text;
 
-            if (k & Qt::UNICODE_ACCEL)
-            {
-                QChar c(k & ~Qt::UNICODE_ACCEL);
-                text = QString(c);
-            }
-
             QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
                           QEvent::KeyRelease, k, mod, text);
 
@@ -2320,10 +2316,12 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::kLockInputDevicesEventType)
     {
         LockInputDevices(true);
+        PauseIdleTimer(true);
     }
     else if (ce->type() == MythEvent::kUnlockInputDevicesEventType)
     {
         LockInputDevices(false);
+        PauseIdleTimer(false);
     }
     else if (ce->type() == MythEvent::kDisableUDPListenerEventType)
     {
@@ -2649,6 +2647,13 @@ void MythMainWindow::EnterStandby(bool manual)
 
     d->standby = true;
     gCoreContext->AllowShutdown();
+
+    QVariantMap state;
+    state.insert("state", "standby");
+    state.insert("menutheme",
+        GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+    state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
+    MythUIStateTracker::SetState(state);
 }
 
 void MythMainWindow::ExitStandby(bool manual)
@@ -2668,6 +2673,13 @@ void MythMainWindow::ExitStandby(bool manual)
 
     d->standby = false;
     gCoreContext->BlockShutdown();
+
+    QVariantMap state;
+    state.insert("state", "idle");
+    state.insert("menutheme",
+         GetMythDB()->GetSetting("menutheme", "defaultmenu"));
+    state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
+    MythUIStateTracker::SetState(state);
 }
 
 

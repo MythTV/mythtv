@@ -4,62 +4,62 @@
 <context>
     <name>AlbumArtImages</name>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1606"/>
+        <location filename="../mythmusic/metadata.cpp" line="1590"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1607"/>
+        <location filename="../mythmusic/metadata.cpp" line="1591"/>
         <source>Front Cover</source>
         <translation>Portada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1608"/>
+        <location filename="../mythmusic/metadata.cpp" line="1592"/>
         <source>Back Cover</source>
         <translation>Contraportada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1609"/>
+        <location filename="../mythmusic/metadata.cpp" line="1593"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1610"/>
+        <location filename="../mythmusic/metadata.cpp" line="1594"/>
         <source>Inlay</source>
         <translation>Interior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1611"/>
+        <location filename="../mythmusic/metadata.cpp" line="1595"/>
         <source>Artist</source>
         <translation>Intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1623"/>
+        <location filename="../mythmusic/metadata.cpp" line="1607"/>
         <source>unknown</source>
         <translation>desconocido</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1624"/>
+        <location filename="../mythmusic/metadata.cpp" line="1608"/>
         <source>front</source>
         <translation>portada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1625"/>
+        <location filename="../mythmusic/metadata.cpp" line="1609"/>
         <source>back</source>
         <translation>contraportada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1626"/>
+        <location filename="../mythmusic/metadata.cpp" line="1610"/>
         <source>cd</source>
         <translation>cd</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1627"/>
+        <location filename="../mythmusic/metadata.cpp" line="1611"/>
         <source>inlay</source>
         <translation>interior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1628"/>
+        <location filename="../mythmusic/metadata.cpp" line="1612"/>
         <source>artist</source>
         <translation>intérprete</translation>
     </message>
@@ -95,7 +95,7 @@
 <context>
     <name>DecoderHandler</name>
     <message>
-        <location filename="../mythmusic/decoderhandler.cpp" line="541"/>
+        <location filename="../mythmusic/decoderhandler.cpp" line="536"/>
         <source>Retrieving playlist</source>
         <translation>Recuperando la lista de reproducción</translation>
     </message>
@@ -103,41 +103,41 @@
 <context>
     <name>DecoderIOFactoryShoutCast</name>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="794"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="810"/>
         <source>Connecting</source>
         <translation>Conectando</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="910"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="926"/>
         <source>Finding radio stream</source>
         <translation>Buscando emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="913"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="929"/>
         <source>Cannot find radio.
 Check the URL is correct.</source>
         <translation>No fue posible encontrar la radio.
 Compruebe que el URL sea correcto.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="916"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="932"/>
         <source>Connecting to radio stream</source>
         <translation>Conectando con la emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="919"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="935"/>
         <source>Cannot connect to radio.
 Check the URL is correct.</source>
         <translation>No fue posible conectar con la radio.
 Compruebe que el URL sea correcto.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="923"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="939"/>
         <source>Connected to radio stream</source>
         <translation>Conectado a la emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="933"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="949"/>
         <source>Buffering</source>
         <translation>Almacenando</translation>
     </message>
@@ -153,60 +153,60 @@ Compruebe que el URL sea correcto.</translation>
 <context>
     <name>EditAlbumartDialog</name>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1005"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1060"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1198"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1006"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1061"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1199"/>
         <source>Change Image Type</source>
         <translation>Cambiar Tipo de Imagen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1007"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1008"/>
         <source>What image type do you want to use for this image?</source>
         <translation>¿Qué tipo desea usar para esta imagen?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1040"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1041"/>
         <source>Options</source>
         <translation>Opciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1054"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1192"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1055"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1193"/>
         <source>Edit Metadata</source>
         <translation>Editar Metadatos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1055"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1194"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1056"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1195"/>
         <source>Rescan For Images</source>
         <translation>Buscar Imágenes de Nuevo</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1056"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1196"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1057"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1197"/>
         <source>Search Internet For Images</source>
         <translation>Buscar Imágenes en Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1073"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1200"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1074"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1201"/>
         <source>Copy Selected Image To Tag</source>
         <translation>Copiar la Imagen Seleccionada a la Etiqueta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1078"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1202"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1079"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1203"/>
         <source>Remove Selected Image From Tag</source>
         <translation>Eliminar la Imagen Seleccionada de la Etiqueta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1088"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="1204"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1089"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1205"/>
         <source>Copy Image To Tag</source>
         <translation>Copiar Imagen a la Etiqueta</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="1293"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="1294"/>
         <source>Are you sure you want to permanently remove this image from the tag?</source>
         <translation>¿Seguro que desea eliminar permanentemente esta imagen de la etiqueta?</translation>
     </message>
@@ -233,62 +233,62 @@ Compruebe que el URL sea correcto.</translation>
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="481"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="482"/>
         <source>Options</source>
         <translation>Opciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="495"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="765"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="496"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="766"/>
         <source>Edit Albumart Images</source>
         <translation>Editar Imágenes del Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="496"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="772"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="497"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="773"/>
         <source>Search Internet For Artist Image</source>
         <translation>Buscar Imágenes del Intérprete en Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="497"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="777"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="498"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="778"/>
         <source>Search Internet For Album Image</source>
         <translation>Buscar Imágenes del Álbum en Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="498"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="767"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="499"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="768"/>
         <source>Search Internet For Genre Image</source>
         <translation>Buscar Imágenes del Género en Internet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="499"/>
-        <location filename="../mythmusic/editmetadata.cpp" line="782"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="500"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="783"/>
         <source>Check Track Length</source>
         <translation>Comprobar Duración de la Pista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="534"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="535"/>
         <source>Various Artists</source>
         <translation>Varios Intérpretes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="541"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="542"/>
         <source>Select an Artist</source>
         <translation>Seleccionar un Intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="586"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="587"/>
         <source>Select a Compilation Artist</source>
         <translation>Selecciona un Intérprete de Compilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="611"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="612"/>
         <source>Select an Album</source>
         <translation>Selecciona un Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="654"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="655"/>
         <source>Select a Genre</source>
         <translation>Selecciona un Género</translation>
     </message>
@@ -412,7 +412,7 @@ Compruebe que el URL sea correcto.</translation>
         <translation>Nuevo Archivo</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="456"/>
+        <location filename="../mythmusic/importmusic.cpp" line="457"/>
         <source>This track is already in the database</source>
         <translation>Esta pista ya existe en la base de datos</translation>
     </message>
@@ -441,7 +441,7 @@ Could not copy file to: %1</source>
 No fue posible copiar el archivo a: %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="485"/>
+        <location filename="../mythmusic/importmusic.cpp" line="486"/>
         <source>%1 new tracks were added to the database</source>
         <translation>Se añadieron %1 pistas nuevas a la base de datos</translation>
     </message>
@@ -641,7 +641,7 @@ GENRE (género), ARTIST (intérprete), ALBUM (álbum), TRACK (pista), TITLE (tí
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1320"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2136"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2147"/>
         <source>Save To New Playlist</source>
         <translation>Guardar en una Nueva Lista de Reproducción</translation>
     </message>
@@ -652,7 +652,7 @@ GENRE (género), ARTIST (intérprete), ALBUM (álbum), TRACK (pista), TITLE (tí
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1336"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2137"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2148"/>
         <source>Save To Existing Playlist</source>
         <translation>Guardar en una Lista de Reproducción Existente</translation>
     </message>
@@ -663,152 +663,152 @@ GENRE (género), ARTIST (intérprete), ALBUM (álbum), TRACK (pista), TITLE (tí
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1403"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2178"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2189"/>
         <source>Change Volume</source>
         <translation>Cambiar Volumen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1405"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2179"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2190"/>
         <source>Mute</source>
         <translation>Silenciar</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1407"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2180"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2191"/>
         <source>Previous Track</source>
         <translation>Pista Anterior</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1409"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2181"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2192"/>
         <source>Next Track</source>
         <translation>Pista Siguiente</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1411"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2185"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2196"/>
         <source>Jump Back</source>
         <translation>Saltar Atrás</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1413"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2186"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2197"/>
         <source>Jump Forward</source>
         <translation>Saltar Adelante</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1415"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2189"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2200"/>
         <source>Play</source>
         <translation>Reproducir</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1417"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2190"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2201"/>
         <source>Stop</source>
         <translation>Detener</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1419"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2193"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2204"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1424"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2232"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2243"/>
         <source>All Tracks</source>
         <translation>Todas las Pistas</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1426"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2235"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2246"/>
         <source>From CD</source>
         <translation>Desde CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2113"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2124"/>
         <source>Play Radio Stream</source>
         <translation>Reproducir Emisión de Radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2377"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2388"/>
         <source>More Options</source>
         <translation>Más Opciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2070"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2081"/>
         <source>Actions</source>
         <translation>Acciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2078"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2100"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2089"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2111"/>
         <source>Switch View</source>
         <translation>Conmutar Vista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2082"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2122"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2093"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2133"/>
         <source>Playlist Options</source>
         <translation>Opciones de la Lista de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2083"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2213"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2094"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2224"/>
         <source>Set Shuffle Mode</source>
         <translation>Establecer Modo de Mezcla</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2084"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2200"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2095"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2211"/>
         <source>Set Repeat Mode</source>
         <translation>Establecer Modo de Repetición</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2087"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2098"/>
         <source>Player Options</source>
         <translation>Opciones del Reproductor</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2090"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2228"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2101"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2239"/>
         <source>Quick Playlists</source>
         <translation>Listas Rápidas de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2093"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2104"/>
         <source>Change Visualizer</source>
         <translation>Cambiar Visualizador</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2105"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2116"/>
         <source>Current Playlist</source>
         <translation>Lista de Reproducción Actual</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2107"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2118"/>
         <source>Playlist Editor - Tree</source>
         <translation>Editor de la Lista de Reproducción - Árbol</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2109"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2120"/>
         <source>Playlist Editor - Gallery</source>
         <translation>Editor de la Lista de Reproducción - Galería</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2111"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2122"/>
         <source>Search for Music</source>
         <translation>Buscar Música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2115"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2126"/>
         <source>Fullscreen Visualizer</source>
         <translation>Visualizador a Pantalla Completa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2150"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2161"/>
         <source>Exiting Music Player.
 
 Do you want to continue playing in the background?</source>
@@ -817,53 +817,53 @@ Do you want to continue playing in the background?</source>
 ¿Desea continuar la reproducción en segundo plano?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2174"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2185"/>
         <source>Player Actions</source>
         <translation>Acciones del Reproductor</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2204"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2217"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2215"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2228"/>
         <source>None</source>
         <translation>Ninguno</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2205"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2216"/>
         <source>Track</source>
         <translation>Pista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2206"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2217"/>
         <source>All</source>
         <translation>Todas</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2218"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2229"/>
         <source>Random</source>
         <translation>Aleatorio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2219"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2230"/>
         <source>Smart</source>
         <translation>Inteligente</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2220"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2231"/>
         <source>Album</source>
         <translation>Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2221"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2232"/>
         <source>Artist</source>
         <translation>Intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2251"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2262"/>
         <source>Choose Visualizer</source>
         <translation>Elija Visualizador</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2263"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2274"/>
         <source>Add to Playlist Options</source>
         <translation>Añadir a las Opciones de la Lista de Reproducción</translation>
     </message>
@@ -874,101 +874,101 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1294"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2076"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2087"/>
         <source>Search List...</source>
         <translation>Buscar en la Lista...</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1301"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2128"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2139"/>
         <source>Sync List With Current Track</source>
         <translation>Sincronizar la Lista Con la Pista Actual</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1305"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2129"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2140"/>
         <source>Remove Selected Track</source>
         <translation>Eliminar la Pista Seleccionada</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1315"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2132"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2143"/>
         <source>Remove All Tracks</source>
         <translation>Eliminar Todas las Pistas</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1351"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2142"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2153"/>
         <source>Switch To Move Mode</source>
         <translation>Conmutar al Modo de Movimiento</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1359"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2140"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2151"/>
         <source>Switch To Select Mode</source>
         <translation>Conmutar al Modo de Selección</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1428"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2239"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2250"/>
         <source>Tracks By Current Artist</source>
         <translation>Pistas del Intérprete Actual</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1430"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2241"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2252"/>
         <source>Tracks From Current Genre</source>
         <translation>Pistas del Género Actual</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1432"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2240"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2251"/>
         <source>Tracks From Current Album</source>
         <translation>Pistas del Álbum Actual</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1434"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2242"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2253"/>
         <source>Tracks From Current Year</source>
         <translation>Pistas del Año Actual</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1436"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2243"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2254"/>
         <source>Tracks With Same Title</source>
         <translation>Pistas Con El Mismo Título</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1441"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2267"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2278"/>
         <source>Replace Tracks</source>
         <translation>Reemplazar Pistas</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1446"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2268"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2279"/>
         <source>Add Tracks</source>
         <translation>Añadir Pistas</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="1985"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="1996"/>
         <source>%1 of %2</source>
         <translation>%1 de %2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2167"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2178"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1390"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2165"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2176"/>
         <source>No - Exit, Stop Playing</source>
         <translation>No - Salir y Detener la Reproducción</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1396"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2166"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2177"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Sí, Salir y Continuar la Reproducción</translation>
     </message>
@@ -976,13 +976,13 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>MusicPlayer</name>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1275"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1288"/>
         <source>%1% (Muted)</source>
         <comment>Zero Audio Volume</comment>
         <translation>%1% (Sin sonido)</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1279"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1292"/>
         <source>Muted</source>
         <translation>Sin Sonido</translation>
     </message>
@@ -990,177 +990,177 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythmusic/main.cpp" line="573"/>
+        <location filename="../mythmusic/main.cpp" line="502"/>
         <source>Play music</source>
         <translation>Reproducir</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="575"/>
+        <location filename="../mythmusic/main.cpp" line="504"/>
         <source>Select music playlists</source>
         <translation>Seleccionar listas de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="577"/>
+        <location filename="../mythmusic/main.cpp" line="506"/>
         <source>Play radio stream</source>
         <translation>Reproducir emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="579"/>
+        <location filename="../mythmusic/main.cpp" line="508"/>
         <source>Rip CD</source>
         <translation>Importar CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="581"/>
+        <location filename="../mythmusic/main.cpp" line="510"/>
         <source>Scan music</source>
         <translation>Explorar música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="583"/>
+        <location filename="../mythmusic/main.cpp" line="512"/>
         <source>Show Music Miniplayer</source>
         <translation>Mostrar Minirreproductor</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="586"/>
+        <location filename="../mythmusic/main.cpp" line="515"/>
         <source>Move to the next track</source>
         <translation>Pista siguiente</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="588"/>
+        <location filename="../mythmusic/main.cpp" line="517"/>
         <source>Move to the previous track</source>
         <translation>Pista anterior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="590"/>
+        <location filename="../mythmusic/main.cpp" line="519"/>
         <source>Fast forward</source>
         <translation>Avance rápido</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="592"/>
+        <location filename="../mythmusic/main.cpp" line="521"/>
         <source>Rewind</source>
         <translation>Rebobinar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="594"/>
+        <location filename="../mythmusic/main.cpp" line="523"/>
         <source>Pause/Start playback</source>
         <translation>Pausa/Iniciar reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="596"/>
+        <location filename="../mythmusic/main.cpp" line="525"/>
         <source>Start playback</source>
         <translation>Iniciar reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="598"/>
+        <location filename="../mythmusic/main.cpp" line="527"/>
         <source>Stop playback</source>
         <translation>Detener reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="600"/>
+        <location filename="../mythmusic/main.cpp" line="529"/>
         <source>Volume down</source>
         <translation>Bajar volumen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="602"/>
+        <location filename="../mythmusic/main.cpp" line="531"/>
         <source>Volume up</source>
         <translation>Subir volumen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="604"/>
+        <location filename="../mythmusic/main.cpp" line="533"/>
         <source>Mute</source>
         <translation>Silenciar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="606"/>
+        <location filename="../mythmusic/main.cpp" line="535"/>
         <source>Toggle audio upmixer</source>
         <translation>Conmutar mezclador de sonido</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="608"/>
+        <location filename="../mythmusic/main.cpp" line="537"/>
         <source>Cycle visualizer mode</source>
         <translation>Rotar modo de visualización</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="610"/>
+        <location filename="../mythmusic/main.cpp" line="539"/>
         <source>Blank screen</source>
         <translation>Pantalla en blanco</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="612"/>
+        <location filename="../mythmusic/main.cpp" line="541"/>
         <source>Increase rating</source>
         <translation>Aumentar puntuación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="614"/>
+        <location filename="../mythmusic/main.cpp" line="543"/>
         <source>Decrease rating</source>
         <translation>Disminuir puntuación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="616"/>
+        <location filename="../mythmusic/main.cpp" line="545"/>
         <source>Refresh music tree</source>
         <translation>Refrescar árbol de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="618"/>
+        <location filename="../mythmusic/main.cpp" line="547"/>
         <source>Increase Play Speed</source>
         <translation>Aumentar Velocidad de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="620"/>
+        <location filename="../mythmusic/main.cpp" line="549"/>
         <source>Decrease Play Speed</source>
         <translation>Disminuir Velocidad de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="622"/>
+        <location filename="../mythmusic/main.cpp" line="551"/>
         <source>Toggle track selection</source>
         <translation>Conmutar selección de pista</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="624"/>
+        <location filename="../mythmusic/main.cpp" line="553"/>
         <source>Toggle shuffle mode</source>
         <translation>Conmutar modo de mezcla</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="626"/>
+        <location filename="../mythmusic/main.cpp" line="555"/>
         <source>Toggle repeat mode</source>
         <translation>Conmutar modo de repetición</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="630"/>
+        <location filename="../mythmusic/main.cpp" line="559"/>
         <source>Switch to the current playlist view</source>
         <translation>Cambiar a vista de la lista de reproducción actual</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="632"/>
+        <location filename="../mythmusic/main.cpp" line="561"/>
         <source>Switch to the playlist editor tree view</source>
         <translation>Cambiar a vista de árbol del editor de lista de reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="634"/>
+        <location filename="../mythmusic/main.cpp" line="563"/>
         <source>Switch to the playlist editor gallery view</source>
         <translation>Cambiar a vista de galería del editor de lista de reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="636"/>
+        <location filename="../mythmusic/main.cpp" line="565"/>
         <source>Switch to the search view</source>
         <translation>Cambiar a vista de búsqueda</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="638"/>
+        <location filename="../mythmusic/main.cpp" line="567"/>
         <source>Switch to the fullscreen visualiser view</source>
         <translation>Cambiar a vista del visualizador a pantalla completa</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="640"/>
+        <location filename="../mythmusic/main.cpp" line="569"/>
         <source>Switch to the radio stream view</source>
         <translation>Cambiar a vista de emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="646"/>
+        <location filename="../mythmusic/main.cpp" line="575"/>
         <source>MythMusic Media Handler 1/2</source>
         <translation>Gestor de Medios de MythMusic 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="649"/>
+        <location filename="../mythmusic/main.cpp" line="578"/>
         <source>MythMusic Media Handler 2/2</source>
         <translation>Gestor de Medios de MythMusic 2/2</translation>
     </message>
@@ -1305,43 +1305,43 @@ Nombre: %1</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="616"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1174"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1183"/>
         <source>All Tracks</source>
         <translation>Todas las Pistas</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="620"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1180"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1189"/>
         <source>Albums</source>
         <translation>Álbumes</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="624"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1187"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1196"/>
         <source>Artists</source>
         <translation>Intérpretes</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="628"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1235"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1244"/>
         <source>Genres</source>
         <translation>Géneros</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="632"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1242"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1251"/>
         <source>Tags</source>
         <translation>Etiquetas</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="636"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1249"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1258"/>
         <source>Ratings</source>
         <translation>Puntuaciones</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="640"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1256"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1265"/>
         <source>Years</source>
         <translation>Años</translation>
     </message>
@@ -1352,7 +1352,7 @@ Nombre: %1</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="662"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1101"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1110"/>
         <source>Directory</source>
         <translation>Directorio</translation>
     </message>
@@ -1363,7 +1363,7 @@ Nombre: %1</translation>
     </message>
     <message>
         <location filename="../mythmusic/playlisteditorview.cpp" line="669"/>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1541"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1550"/>
         <source>Smart Playlists</source>
         <translation>Listas Inteligentes</translation>
     </message>
@@ -1373,7 +1373,7 @@ Nombre: %1</translation>
         <translation>%1 de %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1028"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1037"/>
         <source>%n Star(s)</source>
         <translation>
             <numerusform>%n Estrella</numerusform>
@@ -1381,17 +1381,17 @@ Nombre: %1</translation>
         </translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1227"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1236"/>
         <source>Compilation Artists</source>
         <translation>Intérpretes de Recopilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1418"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1427"/>
         <source>** No matching tracks **</source>
         <translation>** No hay pistas coincidentes **</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlisteditorview.cpp" line="1458"/>
+        <location filename="../mythmusic/playlisteditorview.cpp" line="1467"/>
         <source>** Empty Playlist!! **</source>
         <translation>** ¡¡Lista de Reproducción Vacía!! **</translation>
     </message>
@@ -1399,13 +1399,13 @@ Nombre: %1</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="578"/>
-        <location filename="../mythmusic/importmusic.cpp" line="510"/>
+        <location filename="../mythmusic/filescanner.cpp" line="568"/>
+        <location filename="../mythmusic/importmusic.cpp" line="511"/>
         <source>Searching for music files</source>
         <translation>Buscando archivos de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="596"/>
+        <location filename="../mythmusic/filescanner.cpp" line="586"/>
         <source>Updating music database</source>
         <translation>Actualizando la base de datos de música</translation>
     </message>
@@ -1420,7 +1420,7 @@ Nombre: %1</translation>
         <translation>Analizador de CD de audio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1506"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1519"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
@@ -1445,58 +1445,58 @@ Nombre: %1</translation>
         <translation>Nunca Reproducida</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1264"/>
+        <location filename="../mythmusic/metadata.cpp" line="1244"/>
         <source>CD -- none</source>
         <translation>CD -- ninguno</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1641"/>
+        <location filename="../mythmusic/metadata.cpp" line="1625"/>
         <source>front</source>
         <translation>portada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1644"/>
+        <location filename="../mythmusic/metadata.cpp" line="1628"/>
         <source>back</source>
         <translation>contraportada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1647"/>
+        <location filename="../mythmusic/metadata.cpp" line="1631"/>
         <source>inlay</source>
         <translation>interior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1650"/>
+        <location filename="../mythmusic/metadata.cpp" line="1634"/>
         <source>cd</source>
         <translation>cd</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1653"/>
+        <location filename="../mythmusic/metadata.cpp" line="1637"/>
         <source>cover</source>
         <translation>versión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="145"/>
+        <location filename="../mythmusic/playlist.cpp" line="153"/>
         <source>oops</source>
         <translation>uups</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlistcontainer.cpp" line="354"/>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="294"/>
         <source>Something is Wrong</source>
         <translation>Algo va Mal</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="568"/>
-        <location filename="../mythmusic/playlist.cpp" line="609"/>
+        <location filename="../mythmusic/playlist.cpp" line="576"/>
+        <location filename="../mythmusic/playlist.cpp" line="614"/>
         <source>Default Playlist</source>
         <translation>Lista de Reproducción Predeterminada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1267"/>
+        <location filename="../mythmusic/playlist.cpp" line="1285"/>
         <source>Creating CD File System</source>
         <translation>Creando Sistema de Archivos en el CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1316"/>
+        <location filename="../mythmusic/playlist.cpp" line="1334"/>
         <source>Burning CD</source>
         <translation>Grabando CD</translation>
     </message>
@@ -1511,12 +1511,12 @@ Nombre: %1</translation>
         <translation>Pista %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="670"/>
+        <location filename="../mythmusic/filescanner.cpp" line="660"/>
         <source>Scanning music files</source>
         <translation>Explorando archivos de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1821"/>
+        <location filename="../mythmusic/metadata.cpp" line="1812"/>
         <source>Rebuilding music tree</source>
         <translation>Reconstruyendo árbol música</translation>
     </message>
@@ -1531,37 +1531,37 @@ Nombre: %1</translation>
         <translation>Explorando CD. Por favor, espere...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="336"/>
+        <location filename="../mythmusic/filescanner.cpp" line="333"/>
         <source>Cleaning music database</source>
         <translation>Vaciando base de datos de música</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="752"/>
+        <location filename="../mythmusic/filescanner.cpp" line="742"/>
         <source>Scanning Album Artwork</source>
         <translation>Explorando Arte del Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="548"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="509"/>
         <source>Internal Decoder</source>
         <translation>Descodificador Interno</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="171"/>
+        <location filename="../mythmusic/main.cpp" line="104"/>
         <source>Loading Music. Please wait ...</source>
         <translation>Cargando Música. Por favor, espera ...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="291"/>
+        <location filename="../mythmusic/main.cpp" line="222"/>
         <source>You need to tell me where to find your music on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages.</source>
         <translation>Necesita decirme dónde encontrar su música en la página &apos;Configuración General&apos; de MythMusic.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/main.cpp" line="298"/>
+        <location filename="../mythmusic/main.cpp" line="229"/>
         <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
         <translation>No encuentro su directorio de música. ¿Lo ha configurado correctamente en la página &apos;Configuración General&apos; de MythMusic?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="856"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="872"/>
         <source>Unsupported content type for ShoutCast stream: %1</source>
         <translation>Tipo de contenido no admitido para la emisión ShoutCast: %1</translation>
     </message>
@@ -1697,16 +1697,16 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SearchStream</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="779"/>
-        <location filename="../mythmusic/streamview.cpp" line="851"/>
-        <location filename="../mythmusic/streamview.cpp" line="872"/>
+        <location filename="../mythmusic/streamview.cpp" line="803"/>
+        <location filename="../mythmusic/streamview.cpp" line="875"/>
+        <location filename="../mythmusic/streamview.cpp" line="896"/>
         <source>&lt;All Stations&gt;</source>
         <translation>&lt;Todas las Estaciones&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="780"/>
-        <location filename="../mythmusic/streamview.cpp" line="861"/>
-        <location filename="../mythmusic/streamview.cpp" line="873"/>
+        <location filename="../mythmusic/streamview.cpp" line="804"/>
+        <location filename="../mythmusic/streamview.cpp" line="885"/>
+        <location filename="../mythmusic/streamview.cpp" line="897"/>
         <source>&lt;All Genres&gt;</source>
         <translation>&lt;Todos los Géneros&gt;</translation>
     </message>
@@ -1714,61 +1714,61 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SearchView</name>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="56"/>
+        <location filename="../mythmusic/searchview.cpp" line="58"/>
         <source>All Fields</source>
         <translation>Todos los Campos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="58"/>
+        <location filename="../mythmusic/searchview.cpp" line="60"/>
         <source>Artist</source>
         <translation>Intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="60"/>
+        <location filename="../mythmusic/searchview.cpp" line="62"/>
         <source>Album</source>
         <translation>Álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="62"/>
+        <location filename="../mythmusic/searchview.cpp" line="64"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="64"/>
+        <location filename="../mythmusic/searchview.cpp" line="66"/>
         <source>Genre</source>
         <translation>Género</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="173"/>
-        <location filename="../mythmusic/searchview.cpp" line="284"/>
+        <location filename="../mythmusic/searchview.cpp" line="175"/>
+        <location filename="../mythmusic/searchview.cpp" line="286"/>
         <source>Add To Playlist</source>
         <translation>Añadir a la Lista de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="173"/>
-        <location filename="../mythmusic/searchview.cpp" line="281"/>
+        <location filename="../mythmusic/searchview.cpp" line="175"/>
+        <location filename="../mythmusic/searchview.cpp" line="283"/>
         <source>Remove From Playlist</source>
         <translation>Eliminar de la Lista de Reproducción</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="185"/>
-        <location filename="../mythmusic/searchview.cpp" line="285"/>
+        <location filename="../mythmusic/searchview.cpp" line="187"/>
+        <location filename="../mythmusic/searchview.cpp" line="287"/>
         <source>Add To Playlist And Play</source>
         <translation>Añadir a la Lista de Reproducción y Reproducir</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="197"/>
-        <location filename="../mythmusic/searchview.cpp" line="291"/>
+        <location filename="../mythmusic/searchview.cpp" line="199"/>
+        <location filename="../mythmusic/searchview.cpp" line="293"/>
         <source>Search List...</source>
         <translation>Buscar en la Lista...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="270"/>
+        <location filename="../mythmusic/searchview.cpp" line="272"/>
         <source>Search Actions</source>
         <translation>Acciones de Búsqueda</translation>
     </message>
     <message>
-        <location filename="../mythmusic/searchview.cpp" line="293"/>
+        <location filename="../mythmusic/searchview.cpp" line="295"/>
         <source>More Options</source>
         <translation>Más Opciones</translation>
     </message>
@@ -1776,7 +1776,7 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2578"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="2252"/>
         <source>Invalid Date</source>
         <translation>Fecha Inválida</translation>
     </message>
@@ -1792,54 +1792,44 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2071"/>
         <source>Smart Playlists</source>
-        <translation>Listas Inteligentes</translation>
+        <translation type="obsolete">Listas Inteligentes</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2103"/>
         <source>1 Select</source>
-        <translation>1 Seleccionar</translation>
+        <translation type="obsolete">1 Seleccionar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2105"/>
         <source>Select</source>
-        <translation>Seleccionar</translation>
+        <translation type="obsolete">Seleccionar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2110"/>
         <source>2 New</source>
-        <translation>2 Nueva</translation>
+        <translation type="obsolete">2 Nueva</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2112"/>
         <source>New</source>
-        <translation>Nueva</translation>
+        <translation type="obsolete">Nueva</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2118"/>
         <source>3 Edit</source>
-        <translation>3 Editar</translation>
+        <translation type="obsolete">3 Editar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2120"/>
         <source>Edit</source>
-        <translation>Editar</translation>
+        <translation type="obsolete">Editar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2125"/>
         <source>4 Delete</source>
-        <translation>4 Borrar</translation>
+        <translation type="obsolete">4 Borrar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2127"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation type="obsolete">Borrar</translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="2273"/>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation>¿Seguro que deseas borrar esta Lista Inteligente?</translation>
+        <translation type="obsolete">¿Seguro que deseas borrar esta Lista Inteligente?</translation>
     </message>
 </context>
 <context>
@@ -1930,35 +1920,35 @@ Do you want to permanently delete the existing file(s)?</source>
 <context>
     <name>StreamView</name>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="88"/>
+        <location filename="../mythmusic/streamview.cpp" line="87"/>
         <source>Stream Actions</source>
         <translation>Acciones sobre la Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="89"/>
-        <location filename="../mythmusic/streamview.cpp" line="297"/>
+        <location filename="../mythmusic/streamview.cpp" line="88"/>
+        <location filename="../mythmusic/streamview.cpp" line="296"/>
         <source>Add Stream</source>
         <translation>Añadir Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="93"/>
-        <location filename="../mythmusic/streamview.cpp" line="311"/>
+        <location filename="../mythmusic/streamview.cpp" line="92"/>
+        <location filename="../mythmusic/streamview.cpp" line="310"/>
         <source>Edit Stream</source>
         <translation>Editar Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="94"/>
-        <location filename="../mythmusic/streamview.cpp" line="307"/>
+        <location filename="../mythmusic/streamview.cpp" line="93"/>
+        <location filename="../mythmusic/streamview.cpp" line="306"/>
         <source>Remove Stream</source>
         <translation>Eliminar Emisión</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="97"/>
+        <location filename="../mythmusic/streamview.cpp" line="96"/>
         <source>More Options</source>
         <translation>Más Opciones</translation>
     </message>
     <message>
-        <location filename="../mythmusic/streamview.cpp" line="389"/>
+        <location filename="../mythmusic/streamview.cpp" line="388"/>
         <source>Are you sure you want to delete this Stream?
 Station: %1 - Channel: %2</source>
         <translation>¿Seguro que desea eliminar esta Emisión?
@@ -3126,28 +3116,28 @@ Emisora: %1 - Canal: %2</translation>
 <context>
     <name>VisualizationSettings</name>
     <message>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="52"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="58"/>
         <source>Change the visualizer when the song changes.</source>
         <translation>Cambiar el visualizador al cambiar de canción.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="53"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="59"/>
         <source>On changing the visualizer pick a new one at random.</source>
         <translation>Al cambiar de visualizador, elegir uno aleatoriamente.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="54"/>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="58"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="60"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="64"/>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half. Currently only used by the goom visualization. Reduces CPU load on slower machines.</source>
         <translation>Si se elige &quot;2&quot;, las visualizaciones serán reducidas a la mitad de tamaño. Actualmente lo usa sólo la visualización &quot;goom&quot;. Reduce la carga de CPU en máquinas lentas.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="62"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="68"/>
         <source>Exit without saving settings</source>
         <translation>Salir sin guardar la configuración</translation>
     </message>
     <message>
-        <location filename="../mythmusic/visualizationsettings.cpp" line="63"/>
+        <location filename="../mythmusic/visualizationsettings.cpp" line="69"/>
         <source>Save settings and Exit</source>
         <translation>Guardar la configuración y salir</translation>
     </message>

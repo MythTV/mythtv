@@ -157,7 +157,7 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
             samples = (VO_PBYTE)frame->data[0];
         }
         /* add current frame to the queue */
-        if ((ret = ff_af_queue_add(&s->afq, frame) < 0))
+        if ((ret = ff_af_queue_add(&s->afq, frame)) < 0)
             return ret;
     }
 
@@ -185,17 +185,24 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     return 0;
 }
 
+/* duplicated from avpriv_mpeg4audio_sample_rates to avoid shared build
+ * failures */
+static const int mpeg4audio_sample_rates[16] = {
+    96000, 88200, 64000, 48000, 44100, 32000,
+    24000, 22050, 16000, 12000, 11025, 8000, 7350
+};
+
 AVCodec ff_libvo_aacenc_encoder = {
     .name           = "libvo_aacenc",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_AAC,
+    .id             = AV_CODEC_ID_AAC,
     .priv_data_size = sizeof(AACContext),
     .init           = aac_encode_init,
     .encode2        = aac_encode_frame,
     .close          = aac_encode_close,
-    .supported_samplerates = avpriv_mpeg4audio_sample_rates,
+    .supported_samplerates = mpeg4audio_sample_rates,
     .capabilities   = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                      AV_SAMPLE_FMT_NONE },
-    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC"),
+    .long_name      = NULL_IF_CONFIG_SMALL("Android VisualOn AAC (Advanced Audio Coding)"),
 };

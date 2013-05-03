@@ -101,24 +101,21 @@ void FillData::SetRefresh(int day, bool set)
 }
 
 // DataDirect stuff
-void FillData::DataDirectStationUpdate(Source source, bool update_icons)
+void FillData::DataDirectStationUpdate(Source source)
 {
     DataDirectProcessor::UpdateStationViewTable(source.lineupid);
 
     bool insert_channels = chan_data.insert_chan(source.id);
     int new_channels = DataDirectProcessor::UpdateChannelsSafe(
-        source.id, insert_channels, chan_data.filter_new_channels);
+        source.id, insert_channels, chan_data.m_filterNewChannels);
 
     //  User must pass "--do-channel-updates" for these updates
-    if (chan_data.channel_updates)
+    if (chan_data.m_channelUpdates)
     {
         DataDirectProcessor::UpdateChannelsUnsafe(
-            source.id, chan_data.filter_new_channels);
+            source.id, chan_data.m_filterNewChannels);
     }
     // TODO delete any channels which no longer exist in listings source
-
-    if (update_icons)
-        icon_data.UpdateSourceIcons(source.id);
 
     // Unselect channels not in users lineup for DVB, HDTV
     if (!insert_channels && (new_channels > 0) &&
@@ -179,7 +176,7 @@ bool FillData::DataDirectUpdateChannels(Source source)
     }
 
     if (ok)
-        DataDirectStationUpdate(source, false);
+        DataDirectStationUpdate(source);
 
     return ok;
 }
@@ -325,14 +322,13 @@ bool FillData::GrabDDData(Source source, int poffset,
 // XMLTV stuff
 bool FillData::GrabDataFromFile(int id, QString &filename)
 {
-    QList<ChanInfo> chanlist;
+    ChannelInfoList chanlist;
     QMap<QString, QList<ProgInfo> > proglist;
 
     if (!xmltv_parser.parseFile(filename, &chanlist, &proglist))
         return false;
 
     chan_data.handleChannels(id, &chanlist);
-    icon_data.UpdateSourceIcons(id);
     if (proglist.count() == 0)
     {
         LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
@@ -398,14 +394,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber).arg(configfile).arg(filename);
 
-    // The one concession to grabber specific behaviour.
-    // Will be removed when the grabber allows.
-    if (xmltv_grabber == "tv_grab_jp")
-    {
-        command += QString(" --enable-readstr");
-        xmltv_parser.isJapan = true;
-    }
-    else if (source.xmltvgrabber_prefmethod != "allatonce")
+
+    if (source.xmltvgrabber_prefmethod != "allatonce")
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -1001,90 +991,6 @@ bool FillData::Run(SourceList &sourcelist)
     }
 
     return (failures == 0);
-}
-
-ChanInfo *FillData::xawtvChannel(QString &id, QString &channel, QString &fine)
-{
-    ChanInfo *chaninfo = new ChanInfo;
-    chaninfo->xmltvid = id;
-    chaninfo->name = id;
-    chaninfo->callsign = id;
-    if (chan_data.channel_preset)
-        chaninfo->chanstr = id;
-    else
-        chaninfo->chanstr = channel;
-    chaninfo->finetune = fine;
-    chaninfo->freqid = channel;
-    chaninfo->tvformat = "Default";
-
-    return chaninfo;
-}
-
-void FillData::readXawtvChannels(int id, QString xawrcfile)
-{
-    QByteArray tmp = xawrcfile.toAscii();
-    fstream fin(tmp.constData(), ios::in);
-
-    if (!fin.is_open())
-        return;
-
-    QList<ChanInfo> chanlist;
-
-    QString xawid;
-    QString channel;
-    QString fine;
-
-    string strLine;
-    int nSplitPoint = 0;
-
-    while(!fin.eof())
-    {
-        getline(fin,strLine);
-
-        if ((strLine[0] != '#') && (!strLine.empty()))
-        {
-            if (strLine[0] == '[')
-            {
-                if ((nSplitPoint = strLine.find(']')) > 1)
-                {
-                    if (!xawid.isEmpty() && !channel.isEmpty())
-                    {
-                        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
-                        chanlist.push_back(*chinfo);
-                        delete chinfo;
-                    }
-                    xawid = strLine.substr(1, nSplitPoint - 1).c_str();
-                    channel.clear();
-                    fine.clear();
-                }
-            }
-            else if ((nSplitPoint = strLine.find('=') + 1) > 0)
-            {
-                while (strLine.substr(nSplitPoint,1) == " ")
-                { ++nSplitPoint; }
-
-                if (!strncmp(strLine.c_str(), "channel", 7))
-                {
-                    channel = strLine.substr(nSplitPoint,
-                                             strLine.size()).c_str();
-                }
-                else if (!strncmp(strLine.c_str(), "fine", 4))
-                {
-                    fine = strLine.substr(nSplitPoint, strLine.size()).c_str();
-                }
-            }
-        }
-    }
-
-    if (!xawid.isEmpty() && !channel.isEmpty())
-    {
-        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
-        chanlist.push_back(*chinfo);
-        delete chinfo;
-    }
-
-    chan_data.handleChannels(id, &chanlist);
-    icon_data.UpdateSourceIcons(id);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -6,11 +6,11 @@
 
 static const mmx_t mm_cpool[] =
 {
-    { uw: {128, 128, 128, 128} },
-    { uw: {255, 255, 255, 255} },
-    { uw: {514, 514, 514, 514} },
-    { uw: {1, 1, 1, 1} },
-    { uw: {257, 257, 257, 257} }
+    { .uw = {128, 128, 128, 128} },
+    { .uw = {255, 255, 255, 255} },
+    { .uw = {514, 514, 514, 514} },
+    { .uw = {1, 1, 1, 1} },
+    { .uw = {257, 257, 257, 257} }
 };
 
 void blendregion_mmx (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
@@ -21,7 +21,7 @@ void blendregion_mmx (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
                       int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t amod = { uw: {alphamod, alphamod, alphamod, alphamod} };
+    mmx_t amod = { .uw = {alphamod, alphamod, alphamod, alphamod} };
     int16_t wbuf[8];
 
     (void) pow_lut;
@@ -245,7 +245,7 @@ void blendcolumn2_mmx (uint8_t * ysrc1, uint8_t * usrc1, uint8_t * vsrc1,
                        int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t amod = { uw: {alphamod, alphamod, alphamod, alphamod} };
+    mmx_t amod = { .uw = {alphamod, alphamod, alphamod, alphamod} };
     mmx_t maskm;
     mmx_t ysrc1m;
     mmx_t uvsrc1m;
@@ -564,10 +564,10 @@ void blendcolor_mmx (uint8_t ysrc, uint8_t usrc, uint8_t vsrc,
                       int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t amod = { uw: {alphamod, alphamod, alphamod, alphamod} };
-    mmx_t ysrcm = { uw: {ysrc, ysrc, ysrc, ysrc} };
-    mmx_t usrcm = { uw: {usrc, usrc, usrc, usrc} };
-    mmx_t vsrcm = { uw: {vsrc, vsrc, vsrc, vsrc} };
+    mmx_t amod = { .uw = {alphamod, alphamod, alphamod, alphamod} };
+    mmx_t ysrcm = { .uw = {ysrc, ysrc, ysrc, ysrc} };
+    mmx_t usrcm = { .uw = {usrc, usrc, usrc, usrc} };
+    mmx_t vsrcm = { .uw = {vsrc, vsrc, vsrc, vsrc} };
     int16_t wbuf[8];
 
     (void) pow_lut;
@@ -780,10 +780,10 @@ void blendconst_mmx (uint8_t ysrc, uint8_t usrc, uint8_t vsrc,
                       int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t ysrcm = { uw: {ysrc, ysrc, ysrc, ysrc} };
-    mmx_t usrcm = { uw: {usrc, usrc, usrc, usrc} };
-    mmx_t vsrcm = { uw: {vsrc, vsrc, vsrc, vsrc} };
-    mmx_t asrcm = { uw: {asrc, asrc, asrc, asrc} };
+    mmx_t ysrcm = { .uw = {ysrc, ysrc, ysrc, ysrc} };
+    mmx_t usrcm = { .uw = {usrc, usrc, usrc, usrc} };
+    mmx_t vsrcm = { .uw = {vsrc, vsrc, vsrc, vsrc} };
+    mmx_t asrcm = { .uw = {asrc, asrc, asrc, asrc} };
     int16_t wbuf[8];
 
     (void) pow_lut;
@@ -983,7 +983,7 @@ void blendcolumn_mmx (uint8_t * ysrc, uint8_t * usrc, uint8_t * vsrc,
                       int16_t rec_lut[256], uint8_t pow_lut[256][256])
 {
     int x, y, i, alpha, newalpha;
-    mmx_t amod = { uw: {alphamod, alphamod, alphamod, alphamod} };
+    mmx_t amod = { .uw = {alphamod, alphamod, alphamod, alphamod} };
     mmx_t ysrcm;
     mmx_t usrcm;
     mmx_t vsrcm;

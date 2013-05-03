@@ -18,6 +18,10 @@
 #include "httprequest.h"
 #include "upnp.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include "httpcomms.h"
+#endif
+
 #define LOC      QString("SOAPClient: ")
 
 /** \brief Full SOAPClient constructor. After constructing the client
@@ -120,7 +124,7 @@ bool SOAPClient::GetNodeValue(
     if (sValue.isEmpty())
         return bDefault;
 
-    char ret = sValue[0].toAscii();
+    char ret = sValue[0].toLatin1();
     switch (ret)
     {
         case 't': case 'T': case 'y': case 'Y': case '1':
@@ -201,11 +205,13 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     // Add appropriate headers
     // --------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QHttpRequestHeader header("POST", sMethod, 1, 0);
 
     header.setValue("CONTENT-TYPE", "text/xml; charset=\"utf-8\"" );
     header.setValue("SOAPACTION",
                     QString("\"%1#%2\"").arg(m_sNamespace).arg(sMethod));
+#endif
 
     // --------------------------------------------------------------
     // Build request payload
@@ -246,6 +252,7 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
 
     QBuffer buff(&aBuffer);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     LOG(VB_UPNP, LOG_DEBUG,
         QString("SOAPClient(%1) sending:\n").arg(url.toString()) +
         header.toString() + QString("\n%1\n").arg(aBuffer.constData()));
@@ -263,6 +270,10 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
                             QString() // userAgent, UPnP/1.0 very strict on
                                       // format if set
         );
+#else
+    #warning This needs to be ported to Qt5
+    QString sXml("This needs to be ported to Qt5");
+#endif
 
     // --------------------------------------------------------------
     // Parse response

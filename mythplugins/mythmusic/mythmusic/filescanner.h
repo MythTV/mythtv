@@ -1,9 +1,6 @@
 #ifndef _FILESCANNER_H_
 #define _FILESCANNER_H_
 
-class Metadata;
-class Decoder;
-
 typedef QMap<QString, int> IdCache;
 
 class FileScanner
@@ -39,8 +36,6 @@ class FileScanner
         IdCache  m_artistid;
         IdCache  m_genreid;
         IdCache  m_albumid;
-
-        Decoder *m_decoder;
 };
 
 #endif // _FILESCANNER_H_

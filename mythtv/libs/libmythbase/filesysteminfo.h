@@ -2,8 +2,6 @@
 #define DISKINFO_H_
 #define NUMDISKINFOLINES 8
 
-using namespace std;
-
 #include <stdint.h>
 
 #include <QList>

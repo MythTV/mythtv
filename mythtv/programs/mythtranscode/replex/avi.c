@@ -348,7 +348,7 @@ int read_avi_header( avi_context *ac, int fd)
 			case TAG_IT('a','u','d','s'):
 				ac->ahandler = getle32(buf+4);
 #ifdef DEBUG
-				if (ac->vhandler){
+				if (ac->ahandler){
 					cc = (char *) &ac->ahandler;
 					LOG(VB_GENERAL, LOG_DEBUG,
 					    "     audio handler: %c%c%c%c",

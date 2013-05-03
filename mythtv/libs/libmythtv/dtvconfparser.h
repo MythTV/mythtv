@@ -44,7 +44,7 @@ using namespace std;
 #include <QString>
 
 // MythTV headers
-#include "dtvchannel.h"
+#include "dtvmultiplex.h"
 
 class QStringList;
 

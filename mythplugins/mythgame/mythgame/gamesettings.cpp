@@ -333,9 +333,9 @@ MythGamePlayerEditor::MythGamePlayerEditor() : listbox(new ListBoxSetting(this))
     addChild(listbox);
 }
 
-DialogCode MythGamePlayerEditor::exec(void)
+DialogCode MythGamePlayerEditor::exec(bool saveOnExec, bool doLoad)
 {
-    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
+    while (ConfigurationDialog::exec(saveOnExec, doLoad) == kDialogCodeAccepted)
         edit();
 
     return kDialogCodeRejected;

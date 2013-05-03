@@ -12,6 +12,7 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "mythmiscutil.h"
@@ -183,8 +184,10 @@ void ClassicCommDetector::Init()
     height = video_disp_dim.height();
     fps = player->GetFrameRate();
 
-    preRoll  = (long long)(max(0,recordingStartedAt.secsTo(startedAt)) * fps);
-    postRoll = (long long)(max(0,stopsAt.secsTo(recordingStopsAt)) * fps);
+    preRoll  = (long long)(
+        max(int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt))) * fps);
+    postRoll = (long long)(
+        max(int64_t(0), int64_t(stopsAt.secsTo(recordingStopsAt))) * fps);
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(width, height);
@@ -295,7 +298,8 @@ bool ClassicCommDetector::go()
     int requiredHeadStart = requiredBuffer;
     bool wereRecording = stillRecording;
 
-    emit statusUpdate(QObject::tr("Building Head Start Buffer"));
+    emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+        "Building Head Start Buffer"));
     secsSince = recordingStartedAt.secsTo(MythDate::current());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
@@ -317,10 +321,12 @@ bool ClassicCommDetector::go()
         logoDetector = new ClassicLogoDetector(this, width, height,
             commDetectBorder, horizSpacing, vertSpacing);
 
-        requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
+        requiredHeadStart += max(
+            int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt)));
         requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
 
-        emit statusUpdate(QObject::tr("Building Logo Detection Buffer"));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "Building Logo Detection Buffer"));
         secsSince = recordingStartedAt.secsTo(MythDate::current());
         while (stillRecording && (secsSince < requiredHeadStart))
         {
@@ -350,7 +356,8 @@ bool ClassicCommDetector::go()
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
-        emit statusUpdate(QObject::tr("Searching for Logo"));
+        emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+            "Searching for Logo"));
 
         if (showProgress)
         {
@@ -404,7 +411,7 @@ bool ClassicCommDetector::go()
 
     player->ResetTotalDuration();
 
-    while (!player->GetEof())
+    while (player->GetEof() == kEofStateNone)
     {
         struct timeval startTime;
         if (stillRecording)
@@ -523,11 +530,13 @@ bool ClassicCommDetector::go()
             }
 
             if (myTotalFrames)
-                emit statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
-                                  .arg(percentage).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1% Completed @ %2 fps.")
+                        .arg(percentage).arg(flagFPS));
             else
-                emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
-                                  .arg(currentFrameNumber).arg(flagFPS));
+                emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
+                    "%1 Frames Completed @ %2 fps.")
+                        .arg(currentFrameNumber).arg(flagFPS));
 
             if (percentage % 10 == 0 && prevpercent != percentage)
             {
@@ -2502,7 +2511,7 @@ void ClassicCommDetector::PrintFullMap(
 {
     if (verbose)
     {
-        QByteArray tmp = FrameInfoEntry::GetHeader().toAscii();
+        QByteArray tmp = FrameInfoEntry::GetHeader().toLatin1();
         out << tmp.constData() << " mark" << endl;
     }
 
@@ -2512,7 +2521,7 @@ void ClassicCommDetector::PrintFullMap(
         if (it == frameInfo.end())
             continue;
 
-        QByteArray atmp = (*it).toString(i, verbose).toAscii();
+        QByteArray atmp = (*it).toString(i, verbose).toLatin1();
         out << atmp.constData() << " ";
         if (comm_breaks)
         {
@@ -2521,7 +2530,7 @@ void ClassicCommDetector::PrintFullMap(
             {
                 QString tmp = (verbose) ?
                     toString((MarkTypes)*mit) : QString::number(*mit);
-                atmp = tmp.toAscii();
+                atmp = tmp.toLatin1();
 
                 out << atmp.constData();
             }

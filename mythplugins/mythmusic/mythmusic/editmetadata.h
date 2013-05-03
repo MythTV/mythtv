@@ -5,7 +5,7 @@
 using namespace std;
 
 #include <mythscreentype.h>
-#include "metadata.h"
+#include <musicmetadata.h>
 
 class MythUIStateType;
 class MythUIImage;
@@ -20,7 +20,7 @@ class EditMetadataCommon : public MythScreenType
     Q_OBJECT
 
   public:
-    EditMetadataCommon(MythScreenStack *parent, Metadata *source_metadata, const QString &name);
+    EditMetadataCommon(MythScreenStack *parent, MusicMetadata *source_metadata, const QString &name);
     EditMetadataCommon(MythScreenStack *parent, const QString &name);
 
     ~EditMetadataCommon(void);
@@ -48,7 +48,7 @@ class EditMetadataCommon : public MythScreenType
     void scanForImages(void);
 
     static bool            metadataOnly;
-    static Metadata       *m_metadata, *m_sourceMetadata;
+    static MusicMetadata  *m_metadata, *m_sourceMetadata;
 
     MythUIButton   *m_doneButton;
 };
@@ -58,7 +58,7 @@ class EditMetadataDialog : public EditMetadataCommon
     Q_OBJECT
 
   public:
-    EditMetadataDialog(MythScreenStack *parent, Metadata *source_metadata);
+    EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata);
     EditMetadataDialog(MythScreenStack *parent);
     ~EditMetadataDialog(void);
 

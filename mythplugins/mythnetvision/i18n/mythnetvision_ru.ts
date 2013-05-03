@@ -165,7 +165,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="529"/>
         <source>Update Site Maps</source>
-        <translation type="unfinished">Обновить карты сайтов
+        <translation>Обновить карты сайтов
 </translation>
     </message>
     <message>
@@ -499,17 +499,17 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Select to change image</source>
-        <translation type="unfinished">Выберите чтобы изменить изображение</translation>
+        <translation>Выберите чтобы изменить изображение</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Internet Video List</source>
-        <translation type="unfinished">Список видео в интернет</translation>
+        <translation>Список видео в интернет</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>User Rating: %1</source>
-        <translation type="unfinished">Пользовательский рейтинг: %1</translation>
+        <translation>Пользовательский рейтинг: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
@@ -519,7 +519,7 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Internet Video Gallery</source>
-        <translation type="unfinished">Галерея видео</translation>
+        <translation>Галерея видео</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>

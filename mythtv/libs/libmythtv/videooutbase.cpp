@@ -111,7 +111,8 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
  */
 VideoOutput *VideoOutput::Create(
     const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
-    PIPState pipState,      const QSize &video_dim,    float video_aspect,
+    PIPState pipState,      const QSize &video_dim_buf,
+    const QSize &video_dim_disp, float video_aspect,
     QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
     uint playerFlags)
 {
@@ -143,29 +144,35 @@ VideoOutput *VideoOutput::Create(
     else
     {
 #ifdef USING_MINGW
-        renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
+        renderers += VideoOutputD3D::
+            GetAllowedRenderers(codec_id, video_dim_disp);
 #endif
 
 #ifdef USING_XV
-        xvlist = VideoOutputXv::GetAllowedRenderers(codec_id, video_dim);
+        xvlist = VideoOutputXv::
+            GetAllowedRenderers(codec_id, video_dim_disp);
         renderers += xvlist;
 #endif // USING_XV
 
 #ifdef USING_QUARTZ_VIDEO
-        osxlist = VideoOutputQuartz::GetAllowedRenderers(codec_id, video_dim);
+        osxlist = VideoOutputQuartz::
+            GetAllowedRenderers(codec_id, video_dim_disp);
         renderers += osxlist;
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
-        renderers += VideoOutputOpenGL::GetAllowedRenderers(codec_id, video_dim);
+        renderers += VideoOutputOpenGL::
+            GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_OPENGL_VIDEO
 
 #ifdef USING_VDPAU
-        renderers += VideoOutputVDPAU::GetAllowedRenderers(codec_id, video_dim);
+        renderers += VideoOutputVDPAU::
+            GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_VDPAU
 
 #ifdef USING_GLVAAPI
-        renderers += VideoOutputOpenGLVAAPI::GetAllowedRenderers(codec_id, video_dim);
+        renderers += VideoOutputOpenGLVAAPI::
+            GetAllowedRenderers(codec_id, video_dim_disp);
 #endif // USING_GLVAAPI
     }
 
@@ -181,7 +188,7 @@ VideoOutput *VideoOutput::Create(
     if (renderers.size() > 0)
     {
         VideoDisplayProfile vprof;
-        vprof.SetInput(video_dim);
+        vprof.SetInput(video_dim_disp);
 
         QString tmp = vprof.GetVideoRenderer();
         if (vprof.IsDecoderCompatible(decoder) && renderers.contains(tmp))
@@ -276,7 +283,7 @@ VideoOutput *VideoOutput::Create(
             vo->SetPIPState(pipState);
             vo->SetVideoFrameRate(video_prate);
             if (vo->Init(
-                    video_dim.width(), video_dim.height(), video_aspect,
+                    video_dim_buf, video_dim_disp, video_aspect,
                     widget->winId(), display_rect, codec_id))
             {
                 vo->SetVideoScalingAllowed(true);
@@ -288,7 +295,7 @@ VideoOutput *VideoOutput::Create(
         }
         else if (vo && (playerFlags & kVideoIsNull))
         {
-            if (vo->Init(video_dim.width(), video_dim.height(),
+            if (vo->Init(video_dim_buf, video_dim_disp,
                          video_aspect, 0, QRect(), codec_id))
             {
                 return vo;
@@ -468,7 +475,9 @@ VideoOutput::~VideoOutput()
  * \brief Performs most of the initialization for VideoOutput.
  * \return true if successful, false otherwise.
  */
-bool VideoOutput::Init(int width, int height, float aspect, WId winid,
+bool VideoOutput::Init(const QSize &video_dim_buf,
+                       const QSize &video_dim_disp,
+                       float aspect, WId winid,
                        const QRect &win_rect, MythCodecID codec_id)
 {
     (void)winid;
@@ -482,7 +491,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
         StopEmbedding();
     }
 
-    bool mainSuccess = window.Init(QSize(width, height), aspect, win_rect,
+    bool mainSuccess = window.Init(video_dim_buf, video_dim_disp,
+                                   aspect, win_rect,
                                    db_aspectoverride, db_adjustfill);
 
     if (db_vdisp_profile)
@@ -734,13 +744,15 @@ void VideoOutput::VideoAspectRatioChanged(float aspect)
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-bool VideoOutput::InputChanged(const QSize &input_size,
+bool VideoOutput::InputChanged(const QSize &video_dim_buf,
+                               const QSize &video_dim_disp,
                                float        aspect,
                                MythCodecID  myth_codec_id,
                                void        *codec_private,
                                bool        &aspect_only)
 {
-    window.InputChanged(input_size, aspect, myth_codec_id, codec_private);
+    window.InputChanged(video_dim_buf, video_dim_disp,
+                        aspect, myth_codec_id, codec_private);
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetInput(window.GetVideoDim());
@@ -1131,22 +1143,25 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
         }
     }
 
-    int xoff = position.left();
-    int yoff = position.top();
-    uint xoff2[3]  = { xoff, xoff>>1, xoff>>1 };
-    uint yoff2[3]  = { yoff, yoff>>1, yoff>>1 };
-
-    uint pip_height = pip_tmp_image.height;
-    uint height[3] = { pip_height, pip_height>>1, pip_height>>1 };
-
-    for (int p = 0; p < 3; p++)
+    if ((position.left() >= 0) && (position.top() >= 0))
     {
-        for (uint h = 2; h < height[p]; h++)
+        int xoff = position.left();
+        int yoff = position.top();
+        int xoff2[3] = { xoff, xoff>>1, xoff>>1 };
+        int yoff2[3] = { yoff, yoff>>1, yoff>>1 };
+
+        int pip_height = pip_tmp_image.height;
+        int height[3] = { pip_height, pip_height>>1, pip_height>>1 };
+
+        for (int p = 0; p < 3; p++)
         {
-            memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
-                   frame->pitches[p] + xoff2[p],
-                   (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
-                   pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+            for (int h = 2; h < height[p]; h++)
+            {
+                memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
+                       frame->pitches[p] + xoff2[p],
+                       (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
+                       pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
+            }
         }
     }
 
@@ -1503,14 +1518,14 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         memcpy(to->buf + to->offsets[2], from->buf + from->offsets[2],
                from->pitches[2] * (from->height>>1));
     }
-    else
+    else if ((from->height >= 0) && (to->height >= 0))
     {
-        uint f[3] = { from->height,   from->height>>1, from->height>>1, };
-        uint t[3] = { to->height,     to->height>>1,   to->height>>1,   };
-        uint h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
+        int f[3] = { from->height,   from->height>>1, from->height>>1, };
+        int t[3] = { to->height,     to->height>>1,   to->height>>1,   };
+        int h[3] = { min(f[0],t[0]), min(f[1],t[1]),  min(f[2],t[2]),  };
         for (uint i = 0; i < 3; i++)
         {
-            for (uint j = 0; j < h[i]; j++)
+            for (int j = 0; j < h[i]; j++)
             {
                 memcpy(to->buf   + to->offsets[i]   + (j * to->pitches[i]),
                        from->buf + from->offsets[i] + (j * from->pitches[i]),
@@ -1682,8 +1697,13 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
             return;
     }
 
+#if 0
+    // width and height should already be the properly cropped
+    // versions, and therefore height should not need this manual
+    // truncation.  Delete this code if no problems crop up.
     if ((width == 1920 || width == 1440) && height == 1088)
         height = 1080; // ATSC 1920x1080
+#endif
 
     float rate = db_vdisp_profile ? db_vdisp_profile->GetOutput() : 0.0f;
     if (display_res && display_res->SwitchToVideo(width, height, rate))
@@ -1865,4 +1885,42 @@ int VideoOutput::CalcHueBase(const QString &adaptor_name)
     }
 
     return hue_adj;
+}
+
+void VideoOutput::CropToDisplay(VideoFrame *frame)
+{
+    // TODO: support cropping in the horizontal dimension
+    if (!frame)
+        return;
+    if (frame->pitches[1] != frame->pitches[2])
+        return;
+    int crop = window.GetVideoDim().height() -
+        window.GetVideoDispDim().height();
+    if (crop <= 0 || crop >= 16)
+        return; // something may be amiss, so don't crop
+
+    // assume input and output formats are FMT_YV12
+    uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
+    uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);
+    uint64_t *vbuf = (uint64_t*) (frame->buf + frame->offsets[2]);
+    const uint64_t Y_black  = 0x0000000000000000LL; // 8 bytes
+    const uint64_t UV_black = 0x8080808080808080LL; // 8 bytes
+    int y;
+    int sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
+    // Luma bottom
+    y = ((frame->height - crop) >> 4) * frame->pitches[0] << 1;
+    y = y + (sz - y) * (16 - crop) / 16;
+    for (; y < sz; y++)
+    {
+        ybuf[y] = Y_black;
+    }
+    // Chroma bottom
+    sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
+    y = ((frame->height - crop) >> 4) * frame->pitches[1];
+    y = y + (sz - y) * (16 - crop) / 16;
+    for (; y < sz; y++)
+    {
+        ubuf[y] = UV_black;
+        vbuf[y] = UV_black;
+    }
 }

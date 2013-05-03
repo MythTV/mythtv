@@ -21,20 +21,23 @@
 
 #include "config.h"
 #include "libavutil/cpu.h"
+#include "libavutil/x86/cpu.h"
 #include "libavcodec/sbrdsp.h"
 
 float ff_sbr_sum_square_sse(float (*x)[2], int n);
 void ff_sbr_hf_g_filt_sse(float (*Y)[2], const float (*X_high)[40][2],
                           const float *g_filt, int m_max, intptr_t ixh);
+void ff_sbr_hf_gen_sse(float (*X_high)[2], const float (*X_low)[2],
+                       const float alpha0[2], const float alpha1[2],
+                       float bw, int start, int end);
 
 void ff_sbrdsp_init_x86(SBRDSPContext *s)
 {
-    if (HAVE_YASM) {
-        int mm_flags = av_get_cpu_flags();
+    int mm_flags = av_get_cpu_flags();
 
-        if (mm_flags & AV_CPU_FLAG_SSE) {
-            s->sum_square = ff_sbr_sum_square_sse;
-            s->hf_g_filt = ff_sbr_hf_g_filt_sse;
-        }
+    if (EXTERNAL_SSE(mm_flags)) {
+        s->sum_square = ff_sbr_sum_square_sse;
+        s->hf_g_filt  = ff_sbr_hf_g_filt_sse;
+        s->hf_gen     = ff_sbr_hf_gen_sse;
     }
 }

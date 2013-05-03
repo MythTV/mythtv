@@ -13,9 +13,10 @@
 
 // mythtv
 #include <mythobservable.h>
+#include <musicmetadata.h>
 
 // mythmusic
-#include "metadata.h"
+
 #include "pls.h"
 
 class MusicBuffer;
@@ -26,7 +27,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 
 class Decoder;
-class Metadata;
+class MusicMetadata;
 class DecoderIOFactory;
 class DecoderHandler;
 class MusicBuffer;
@@ -47,11 +48,11 @@ class DecoderHandlerEvent : public MythEvent
         : MythEvent(t), m_msg(0), m_meta(0), 
           m_available(available), m_maxSize(maxSize) {}
 
-    DecoderHandlerEvent(Type t, const Metadata &m);
+    DecoderHandlerEvent(Type t, const MusicMetadata &m);
     ~DecoderHandlerEvent();
 
     QString *getMessage(void) const { return m_msg; }
-    Metadata *getMetadata(void) const { return m_meta; }
+    MusicMetadata *getMetadata(void) const { return m_meta; }
     void getBufferStatus(int *available, int *maxSize) const;
 
     virtual MythEvent *clone(void) const;
@@ -65,7 +66,7 @@ class DecoderHandlerEvent : public MythEvent
 
   private:
     QString  *m_msg;
-    Metadata *m_meta;
+    MusicMetadata *m_meta;
     int       m_available;
     int       m_maxSize;
 };
@@ -99,7 +100,9 @@ class DecoderHandler : public QObject, public MythObservable
     virtual ~DecoderHandler(void);
 
     Decoder *getDecoder(void) { return m_decoder; }
-    void start(Metadata *mdata);
+    DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
+
+    void start(MusicMetadata *mdata);
 
     void stop(void);
     void customEvent(QEvent *e);
@@ -121,7 +124,6 @@ class DecoderHandler : public QObject, public MythObservable
     void createPlaylistFromRemoteUrl(const QUrl &url);
 
     bool haveIOFactory(void) { return m_io_factory != NULL; }
-    DecoderIOFactory *getIOFactory(void) { return m_io_factory; }
     void createIOFactory(const QUrl &url);
     void deleteIOFactory(void);
 
@@ -130,7 +132,7 @@ class DecoderHandler : public QObject, public MythObservable
     PlayListFile      m_playlist;
     DecoderIOFactory *m_io_factory;
     Decoder          *m_decoder;
-    Metadata         *m_meta;
+    MusicMetadata    *m_meta;
     bool              m_op;
     uint              m_redirects;
 
@@ -150,10 +152,10 @@ class DecoderIOFactory : public QObject, public MythObservable
 
     virtual void start(void) = 0;
     virtual void stop(void) = 0;
-    virtual QIODevice *takeInput(void) = 0;
+    virtual QIODevice *getInput(void) = 0;
 
     void setUrl (const QUrl &url) { m_url = url; }
-    void setMeta (Metadata *meta) { m_meta = *meta; }
+    void setMeta (MusicMetadata *meta) { m_meta = *meta; }
 
     static const uint DefaultPrebufferSize = 128 * 1024;
     static const uint DefaultBufferSize = 256 * 1024;
@@ -165,12 +167,12 @@ class DecoderIOFactory : public QObject, public MythObservable
     void doFailed(const QString &message);
     void doOperationStart(const QString &name);
     void doOperationStop(void);
-    Metadata& getMetadata() { return m_meta; }
+    MusicMetadata& getMetadata() { return m_meta; }
     QUrl& getUrl() { return m_url; }
 
   private:
     DecoderHandler *m_handler;
-    Metadata        m_meta;
+    MusicMetadata   m_meta;
     QUrl            m_url;
 };
 
@@ -183,7 +185,7 @@ class DecoderIOFactoryFile : public DecoderIOFactory
     ~DecoderIOFactoryFile(void);
     void start(void);
     void stop() {}
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   private:
     QIODevice *m_input;
@@ -198,7 +200,7 @@ class DecoderIOFactorySG : public DecoderIOFactory
     ~DecoderIOFactorySG(void);
     void start(void);
     void stop() {}
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   private:
     QIODevice *m_input;
@@ -214,7 +216,7 @@ class DecoderIOFactoryUrl : public DecoderIOFactory
 
     void start(void);
     void stop(void);
-    QIODevice *takeInput(void);
+    QIODevice *getInput(void);
 
   protected slots:
     void replyFinished(QNetworkReply *reply);
@@ -262,8 +264,8 @@ class MusicIODevice : public QIODevice
     MusicIODevice(void);
     ~MusicIODevice(void);
 
-    bool open(int);
-    void close(void) { };
+    virtual bool open(OpenMode mode);
+    virtual void close(void) { };
     bool flush(void);
 
     qint64 size(void) const;
@@ -291,16 +293,16 @@ class MusicSGIODevice : public QIODevice
 
   public:
     MusicSGIODevice(const QString &url);
-    ~MusicSGIODevice(void);
+    virtual ~MusicSGIODevice(void);
 
-    bool open(int);
-    void close(void) { };
+    virtual bool open(OpenMode mode);
+    virtual void close(void) { };
     bool flush(void);
 
     qint64 size(void) const;
     qint64 pos(void) const { return 0; }
     qint64 bytesAvailable(void) const;
-    bool   isSequential(void) const { return true; }
+    bool   isSequential(void) const { return false; }
     bool   seek(qint64 pos);
 
     qint64 readData(char *data, qint64 sz);

@@ -147,7 +147,7 @@ class VDPAULayer
 class VDPAUResource
 {
   public:
-    VDPAUResource() {}
+    VDPAUResource() : m_id(0) {} 
     VDPAUResource(uint id, QSize size) : m_id(id), m_size(size) { }
     virtual ~VDPAUResource() {}
 
@@ -158,7 +158,7 @@ class VDPAUResource
 class VDPAUOutputSurface : public VDPAUResource
 {
   public:
-    VDPAUOutputSurface() {}
+    VDPAUOutputSurface() : m_fmt(0) {}
     VDPAUOutputSurface(uint id, QSize size, VdpRGBAFormat fmt)
       : VDPAUResource(id, size), m_fmt(fmt) { }
 
@@ -168,7 +168,7 @@ class VDPAUOutputSurface : public VDPAUResource
 class VDPAUVideoSurface : public VDPAUResource
 {
   public:
-    VDPAUVideoSurface() : m_needs_reset(false), m_owner(NULL)
+    VDPAUVideoSurface() : m_type(0), m_needs_reset(false), m_owner(NULL)
     {
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
     }
@@ -196,7 +196,7 @@ class VDPAUVideoSurface : public VDPAUResource
 class VDPAUBitmapSurface : public VDPAUResource
 {
   public:
-    VDPAUBitmapSurface() {}
+    VDPAUBitmapSurface() : m_fmt(0) {}
     VDPAUBitmapSurface(uint id, QSize size, VdpRGBAFormat fmt)
       : VDPAUResource(id, size), m_fmt(fmt) { }
 
@@ -206,7 +206,7 @@ class VDPAUBitmapSurface : public VDPAUResource
 class VDPAUDecoder : public VDPAUResource
 {
   public:
-    VDPAUDecoder() {}
+    VDPAUDecoder() : m_profile(0), m_max_refs(0) {}
     VDPAUDecoder(uint id, QSize size, VdpDecoderProfile profile, uint refs)
       : VDPAUResource(id, size), m_profile(profile), m_max_refs(refs) { }
 
@@ -218,7 +218,7 @@ class VDPAUVideoMixer : public VDPAUResource
 {
   public:
     VDPAUVideoMixer() :
-        m_layers(0), m_features(0),
+        m_layers(0), m_features(0), m_type(0),
         m_noise_reduction(NULL), m_sharpness(NULL),
         m_skip_chroma(NULL), m_background(NULL)
     {
@@ -1509,14 +1509,12 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
 {
     CHECK_VIDEO_SURFACES()
-    VdpDecoder decoder = 0;
 
     {
         CHECK_STATUS()
         LOCK_DECODE
         if (!m_decoders.contains(id))
             return;
-        decoder = m_decoders[id].m_id;
     }
 
     INIT_ST

@@ -84,7 +84,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
 
     Ingest608Captions();  Process608Captions(kProcessNormal);
     Ingest708Captions();  Process708Captions(kProcessNormal);
-    IngestTeletext();     ProcessTeletext();
+    IngestTeletext();     ProcessTeletext(kProcessNormal);
     IngestDVBSubtitles(); ProcessDVBSubtitles(kProcessNormal);
 }
 
@@ -190,6 +190,7 @@ bool MythCCExtractorPlayer::run(void)
 
     Process608Captions(kProcessFinalize);
     Process708Captions(kProcessFinalize);
+    ProcessTeletext(kProcessFinalize);
     ProcessDVBSubtitles(kProcessFinalize);
 
     SetPlaying(false);
@@ -528,7 +529,8 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 static QStringList to_string_list(const TeletextSubPage &subPage)
 {
     QStringList content;
-    for (int i = 0; i < 25; ++i)
+    // Skip the page header (line 0)
+    for (int i = 1; i < 25; ++i)
     {
         QString str = decode_teletext(subPage.lang, subPage.data[i]).trimmed();
         if (!str.isEmpty())
@@ -563,7 +565,7 @@ void MythCCExtractorPlayer::IngestTeletext(void)
     }
 }
 
-void MythCCExtractorPlayer::ProcessTeletext(void)
+void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 {
     int i = 0;
     TeletextInfo::iterator ttxit = m_ttx_info.begin();
@@ -578,6 +580,8 @@ void MythCCExtractorPlayer::ProcessTeletext(void)
         {
             if ((*it).empty())
                 continue; // Skip empty subtitle streams.
+            if (((kProcessFinalize & flags) == 0) && ((*it).size() <= 1))
+                continue; // Leave one caption behind so it can be amended
 
             uint page = it.key();
 
@@ -607,7 +611,7 @@ void MythCCExtractorPlayer::ProcessTeletext(void)
                 continue;
             }
 
-            while (!(*it).empty())
+            while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
                 if ((*it).front().length <= 0)
                     (*it).front().length = OneSubtitle::kDefaultLength;

@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/mjpeg.h"
 #include "avformat.h"
@@ -47,15 +48,16 @@ static int mxg_read_header(AVFormatContext *s)
     if (!video_st)
         return AVERROR(ENOMEM);
     video_st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    video_st->codec->codec_id = CODEC_ID_MXPEG;
+    video_st->codec->codec_id = AV_CODEC_ID_MXPEG;
     avpriv_set_pts_info(video_st, 64, 1, 1000000);
 
     audio_st = avformat_new_stream(s, NULL);
     if (!audio_st)
         return AVERROR(ENOMEM);
     audio_st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-    audio_st->codec->codec_id = CODEC_ID_PCM_ALAW;
+    audio_st->codec->codec_id = AV_CODEC_ID_PCM_ALAW;
     audio_st->codec->channels = 1;
+    audio_st->codec->channel_layout = AV_CH_LAYOUT_MONO;
     audio_st->codec->sample_rate = 8000;
     audio_st->codec->bits_per_coded_sample = 8;
     audio_st->codec->block_align = 1;
@@ -241,7 +243,7 @@ static int mxg_close(struct AVFormatContext *s)
 
 AVInputFormat ff_mxg_demuxer = {
     .name           = "mxg",
-    .long_name      = NULL_IF_CONFIG_SMALL("MxPEG clip file format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("MxPEG clip"),
     .priv_data_size = sizeof(MXGContext),
     .read_header    = mxg_read_header,
     .read_packet    = mxg_read_packet,

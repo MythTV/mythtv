@@ -39,6 +39,7 @@
 #include <stdlib.h>
 
 #include "avcodec.h"
+#include "internal.h"
 #include "msrledec.h"
 
 #include <zlib.h>
@@ -70,31 +71,29 @@ typedef struct TsccContext {
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
+                        AVPacket *avpkt)
 {
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     CamtasiaContext * const c = avctx->priv_data;
     const unsigned char *encoded = buf;
     int zret; // Zlib return code
-    int len = buf_size;
-
-    if(c->pic.data[0])
-            avctx->release_buffer(avctx, &c->pic);
+    int ret, len = buf_size;
 
     c->pic.reference = 3;
     c->pic.buffer_hints = FF_BUFFER_HINTS_VALID;
-    if(avctx->get_buffer(avctx, &c->pic) < 0){
+    if((ret = avctx->reget_buffer(avctx, &c->pic)) < 0){
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
+        return ret;
     }
 
     zret = inflateReset(&c->zstream);
     if (zret != Z_OK) {
         av_log(avctx, AV_LOG_ERROR, "Inflate reset error: %d\n", zret);
-        return -1;
+        return AVERROR(EINVAL);
     }
-    c->zstream.next_in = encoded;
+    c->zstream.next_in = (uint8_t*)encoded;
     c->zstream.avail_in = len;
     c->zstream.next_out = c->decomp_buf;
     c->zstream.avail_out = c->decomp_size;
@@ -102,7 +101,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     // Z_DATA_ERROR means empty picture
     if ((zret != Z_OK) && (zret != Z_STREAM_END) && (zret != Z_DATA_ERROR)) {
         av_log(avctx, AV_LOG_ERROR, "Inflate error: %d\n", zret);
-        return -1;
+        return AVERROR(EINVAL);
     }
 
 
@@ -113,7 +112,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     }
 
     /* make the palette available on the way out */
-    if (c->avctx->pix_fmt == PIX_FMT_PAL8) {
+    if (c->avctx->pix_fmt == AV_PIX_FMT_PAL8) {
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE, NULL);
 
         if (pal) {
@@ -123,7 +122,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         memcpy(c->pic.data[1], c->pal, AVPALETTE_SIZE);
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame      = 1;
     *(AVFrame*)data = c->pic;
 
     /* always report that the buffer was completely consumed */
@@ -150,14 +149,14 @@ static av_cold int decode_init(AVCodecContext *avctx)
     // Needed if zlib unused or init aborted before inflateInit
     memset(&c->zstream, 0, sizeof(z_stream));
     switch(avctx->bits_per_coded_sample){
-    case  8: avctx->pix_fmt = PIX_FMT_PAL8; break;
-    case 16: avctx->pix_fmt = PIX_FMT_RGB555; break;
+    case  8: avctx->pix_fmt = AV_PIX_FMT_PAL8; break;
+    case 16: avctx->pix_fmt = AV_PIX_FMT_RGB555; break;
     case 24:
-             avctx->pix_fmt = PIX_FMT_BGR24;
+             avctx->pix_fmt = AV_PIX_FMT_BGR24;
              break;
-    case 32: avctx->pix_fmt = PIX_FMT_RGB32; break;
+    case 32: avctx->pix_fmt = AV_PIX_FMT_RGB32; break;
     default: av_log(avctx, AV_LOG_ERROR, "Camtasia error: unknown depth %i bpp\n", avctx->bits_per_coded_sample);
-             return -1;
+             return AVERROR_PATCHWELCOME;
     }
     c->bpp = avctx->bits_per_coded_sample;
     // buffer size for RLE 'best' case when 2-byte code precedes each pixel and there may be padding after it too
@@ -167,7 +166,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     if (c->decomp_size) {
         if ((c->decomp_buf = av_malloc(c->decomp_size)) == NULL) {
             av_log(avctx, AV_LOG_ERROR, "Can't allocate decompression buffer.\n");
-            return 1;
+            return AVERROR(ENOMEM);
         }
     }
 
@@ -177,7 +176,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     zret = inflateInit(&c->zstream);
     if (zret != Z_OK) {
         av_log(avctx, AV_LOG_ERROR, "Inflate init error: %d\n", zret);
-        return 1;
+        return AVERROR(ENOMEM);
     }
 
     return 0;
@@ -206,7 +205,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_tscc_decoder = {
     .name           = "camtasia",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_TSCC,
+    .id             = AV_CODEC_ID_TSCC,
     .priv_data_size = sizeof(CamtasiaContext),
     .init           = decode_init,
     .close          = decode_end,

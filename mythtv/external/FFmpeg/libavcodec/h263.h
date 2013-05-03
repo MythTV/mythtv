@@ -69,7 +69,7 @@ int ff_h263_decode_motion(MpegEncContext * s, int pred, int f_code);
 av_const int ff_h263_aspect_to_info(AVRational aspect);
 int ff_h263_decode_init(AVCodecContext *avctx);
 int ff_h263_decode_frame(AVCodecContext *avctx,
-                             void *data, int *data_size,
+                             void *data, int *got_frame,
                              AVPacket *avpkt);
 int ff_h263_decode_end(AVCodecContext *avctx);
 void ff_h263_encode_mb(MpegEncContext *s,
@@ -110,7 +110,7 @@ int av_const h263_get_picture_format(int width, int height);
 
 void ff_clean_h263_qscales(MpegEncContext *s);
 int ff_h263_resync(MpegEncContext *s);
-const uint8_t *ff_h263_find_resync_marker(const uint8_t *p, const uint8_t *end);
+const uint8_t *ff_h263_find_resync_marker(MpegEncContext *s, const uint8_t *p, const uint8_t *end);
 int ff_h263_get_gob_height(MpegEncContext *s);
 void ff_h263_encode_motion(MpegEncContext * s, int val, int f_code);
 

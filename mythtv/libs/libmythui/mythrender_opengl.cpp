@@ -76,7 +76,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         LOG(VB_GENERAL, LOG_INFO, LOC + "Sync to VBlank is enabled (good!)");
     }
 
-#if defined(Q_WS_MAC)
+#if defined(Q_OS_MAC)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing swap interval for OS X.");
     setswapinterval = true;
 #endif
@@ -175,7 +175,7 @@ void MythRenderOpenGL::doneCurrent()
 
 void MythRenderOpenGL::Release(void)
 {
-#if !defined(Q_WS_WIN)
+#if !defined(Q_OS_WIN)
     while (m_lock_level > 0)
         doneCurrent();
 #endif

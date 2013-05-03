@@ -137,7 +137,7 @@ void ff_init_cabac_decoder(CABACContext *c, const uint8_t *buf, int buf_size){
     c->range= 0x1FE;
 }
 
-void ff_init_cabac_states(CABACContext *c){
+void ff_init_cabac_states(){
     int i, j;
 
     for(i=0; i<64; i++){
@@ -251,7 +251,7 @@ static int put_cabac_terminate(CABACContext *c, int bit){
 
         renorm_cabac_encoder(c);
 
-        assert(c->low <= 0x1FF);
+        av_assert0(c->low <= 0x1FF);
         put_cabac_bit(c, c->low>>9);
         put_bits(&c->pb, 2, ((c->low>>7)&3)|1);
 
@@ -271,7 +271,7 @@ int main(void){
 
     av_lfg_init(&prng, 1);
     ff_init_cabac_encoder(&c, b, SIZE);
-    ff_init_cabac_states(&c);
+    ff_init_cabac_states();
 
     for(i=0; i<SIZE; i++){
         if(2*i<SIZE) r[i] = av_lfg_get(&prng) % 7;

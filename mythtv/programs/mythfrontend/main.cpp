@@ -68,7 +68,6 @@ using namespace std;
 #include "myththemedmenu.h"
 #include "mediarenderer.h"
 #include "mythmainwindow.h"
-#include "screenwizard.h"
 #include "mythcontrols.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
@@ -292,17 +291,40 @@ namespace
 
 static void startAppearWiz(void)
 {
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    int curX = gCoreContext->GetNumSetting("GuiOffsetX", 0);
+    int curY = gCoreContext->GetNumSetting("GuiOffsetY", 0);
+    int curW = gCoreContext->GetNumSetting("GuiWidth", 0);
+    int curH = gCoreContext->GetNumSetting("GuiHeight", 0);
 
-    ScreenWizard *screenwizard = new ScreenWizard(mainStack,
-                                                        "screenwizard");
+    MythSystem *wizard = new MythSystem(
+                    GetInstallPrefix() + "/bin/mythscreenwizard",
+                    QStringList(),
+                    kMSNoRunShell | kMSDisableUDPListener | kMSPropagateLogs);
+    wizard->Run();
 
-    if (screenwizard->Create())
-        mainStack->AddScreen(screenwizard);
-    else
-        delete screenwizard;
+    bool reload = false;
+
+    if (!wizard->Wait())
+    {
+        // no reported errors, check for changed geometry parameters
+        gCoreContext->ClearSettingsCache("GuiOffsetX");
+        gCoreContext->ClearSettingsCache("GuiOffsetY");
+        gCoreContext->ClearSettingsCache("GuiWidth");
+        gCoreContext->ClearSettingsCache("GuiHeight");
+
+        if ((curX != gCoreContext->GetNumSetting("GuiOffsetX", 0)) ||
+            (curY != gCoreContext->GetNumSetting("GuiOffsetY", 0)) ||
+            (curW != gCoreContext->GetNumSetting("GuiWidth", 0)) ||
+            (curH != gCoreContext->GetNumSetting("GuiHeight", 0)))
+                reload = true;
+    }
+
+    delete wizard;
+    wizard = NULL;
+
+    if (reload)
+        GetMythMainWindow()->JumpTo("Reload Theme");
 }
-
 
 static void startKeysSetup()
 {
@@ -321,7 +343,8 @@ static void startGuide(void)
     uint chanid = 0;
     QString channum = gCoreContext->GetSetting("DefaultTVChannel");
     channum = (channum.isEmpty()) ? "3" : channum;
-    GuideGrid::RunProgramGuide(chanid, channum, NULL, false, true, -2);
+    QDateTime startTime;
+    GuideGrid::RunProgramGuide(chanid, channum, startTime, NULL, false, true, -2);
 }
 
 static void startFinder(void)
@@ -441,19 +464,6 @@ static void startManaged(void)
         delete viewsched;
 }
 
-static void startProgramRecPriorities(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack,
-                                                        "ProgramRecPriority");
-
-    if (progRecPrior->Create())
-        mainStack->AddScreen(progRecPrior);
-    else
-        delete progRecPrior;
-}
-
 static void startManageRecordingRules(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -496,7 +506,7 @@ static void startPlaybackWithGroup(QString recGroup = "")
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     PlaybackBox *pbb = new PlaybackBox(
-        mainStack, "playbackbox", PlaybackBox::kPlayBox);
+        mainStack, "playbackbox");
 
     if (pbb->Create())
     {
@@ -512,19 +522,6 @@ static void startPlaybackWithGroup(QString recGroup = "")
 static void startPlayback(void)
 {
     startPlaybackWithGroup();
-}
-
-static void startDelete(void)
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    PlaybackBox *pbb = new PlaybackBox(
-        mainStack, "deletebox", PlaybackBox::kDeleteBox);
-
-    if (pbb->Create())
-        mainStack->AddScreen(pbb);
-    else
-        delete pbb;
 }
 
 static void startPrevious(void)
@@ -799,16 +796,12 @@ static void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "tv_schedule")
         startGuide();
-    else if (sel == "tv_delete")
-        startDelete();
     else if (sel == "tv_manualschedule")
         startManualSchedule();
     else if (sel == "tv_custom_record")
         startCustomEdit();
     else if (sel == "tv_fix_conflicts")
         startManaged();
-    else if (sel == "tv_set_recpriorities")
-        startProgramRecPriorities();
     else if (sel == "tv_manage_recording_rules")
         startManageRecordingRules();
     else if (sel == "tv_progfind")
@@ -879,7 +872,7 @@ static void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "screensetupwizard")
     {
-       startAppearWiz();
+        startAppearWiz();
     }
     else if (sel == "setup_keys")
     {
@@ -1293,16 +1286,12 @@ static void InitJumpPoints(void)
      //    "", "", startSearch);
      REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Manage Recordings / "
          "Fix Conflicts"), "", "", startManaged, "VIEWSCHEDULED");
-     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Program Recording "
-         "Priorities"), "", "", startProgramRecPriorities);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Manage Recording Rules"),
          "", "", startManageRecordingRules);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Channel Recording "
          "Priorities"), "", "", startChannelRecPriorities);
      REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "TV Recording Playback"),
          "", "", startPlayback, "JUMPREC");
-     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Deletion"),
-         "", "", startDelete);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV"),
          "", "", startTVNormal);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV In Guide"),
@@ -1467,7 +1456,7 @@ int main(int argc, char **argv)
 
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_WS_MACX
+#ifdef Q_OS_MAC
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
@@ -1479,6 +1468,9 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     SignalHandler::SetHandler(SIGUSR1, handleSIGUSR1);
     SignalHandler::SetHandler(SIGUSR2, handleSIGUSR2);
@@ -1653,7 +1645,7 @@ int main(int argc, char **argv)
     setHttpProxy();
 
     pmanager = new MythPluginManager();
-    gContext->SetPluginManager(pmanager);
+    gCoreContext->SetPluginManager(pmanager);
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)

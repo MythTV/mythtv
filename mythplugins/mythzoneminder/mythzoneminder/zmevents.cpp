@@ -202,13 +202,13 @@ void ZMEvents::updateUIList()
         MythUIButtonListItem *item = new MythUIButtonListItem(m_eventGrid,
                 "", NULL, true, MythUIButtonListItem::NotChecked);
 
-        item->SetText(event->eventName);
-        item->SetText(event->monitorName, "camera" );
+        item->SetText(event->eventName());
+        item->SetText(event->monitorName(), "camera" );
         item->SetText(
             MythDate::toString(
-                event->startTime,
+                event->startTime(),
                 MythDate::kDateTimeFull | MythDate::kSimplify), "time");
-        item->SetText(event->length, "length");
+        item->SetText(event->length(), "length");
     }
 
     m_eventGrid->SetItemCurrent(m_eventGrid->GetItemFirst());
@@ -324,7 +324,7 @@ void ZMEvents::deletePressed(void)
     if (event)
     {
         if (class ZMClient *zm = ZMClient::get())
-            zm->deleteEvent(event->eventID);
+            zm->deleteEvent(event->eventID());
 
         MythUIButtonListItem *item = m_eventGrid->GetItemCurrent();
         if (item)

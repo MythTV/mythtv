@@ -439,6 +439,9 @@ class ComponentDescriptor : public MPEGDescriptor
             case 0x0B: case 0x0C:
             case 0x0F: case 0x10:
                 return VID_WIDESCREEN | VID_HDTV;
+            case 0x80: case 0x81:
+            case 0x82: case 0x83:
+                return VID_WIDESCREEN | VID_HDTV | VID_3DTV;
             default:
                 return VID_UNKNOWN;
         }
@@ -555,19 +558,6 @@ class ComponentDescriptor : public MPEGDescriptor
     }
 };
 
-typedef enum
-{
-    kCategoryNone = 0,
-    kCategoryMovie,
-    kCategorySeries,
-    kCategorySports,
-    kCategoryTVShow,
-    kCategoryLast,
-} MythCategoryType;
-
-MTV_PUBLIC QString myth_category_type_to_string(uint category_type);
-MTV_PUBLIC MythCategoryType string_to_myth_category_type(const QString &type);
-
 // DVB Bluebook A038 (Sept 2011) p 46
 class ContentDescriptor : public MPEGDescriptor
 {
@@ -595,7 +585,7 @@ class ContentDescriptor : public MPEGDescriptor
     uint UserNibble(uint i)  const { return _data[3 + (i<<1)]; }
     // }                            2.0
 
-    MythCategoryType GetMythCategory(uint i) const;
+    ProgramInfo::CategoryType GetMythCategory(uint i) const;
     QString GetDescription(uint i) const;
     QString toString(void) const;
 
@@ -632,7 +622,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
         for (uint i=0; i<CountryCount(); i++)
         {
             if (i!=0) countries.append(" ");
-            countries.append(QString::fromAscii(
+            countries.append(QString::fromLatin1(
                                  (const char *)_data+(3*(i+1)), 3));
         };
         return countries;
@@ -2022,7 +2012,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
     QString ContentId(void) const
     {
-        return QString::fromAscii((const char *)_data+4, _data[3]);
+        return QString::fromLatin1((const char *)_data+4, _data[3]);
     }
 };
 
@@ -2038,7 +2028,7 @@ class DefaultAuthorityDescriptor : public MPEGDescriptor
 
     QString DefaultAuthority(void) const
     {
-        return QString::fromAscii((const char *)_data+2, _data[1]);
+        return QString::fromLatin1((const char *)_data+2, _data[1]);
     }
 
     QString toString(void) const

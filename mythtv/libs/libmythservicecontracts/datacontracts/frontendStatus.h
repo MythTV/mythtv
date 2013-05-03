@@ -27,11 +27,7 @@ namespace DTC
         PROPERTYIMP_RO_REF(QVariantMap, AudioTracks)
 
       public:
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType<FrontendStatus>();
-            qRegisterMetaType<FrontendStatus*>();
-        }
+        static inline void InitializeCustomTypes();
 
       public:
         FrontendStatus(QObject *parent = 0) : QObject(parent)
@@ -79,5 +75,14 @@ namespace DTC
 
 Q_DECLARE_METATYPE(DTC::FrontendStatus)
 Q_DECLARE_METATYPE(DTC::FrontendStatus*)
+
+namespace DTC
+{
+inline void FrontendStatus::InitializeCustomTypes()
+{
+    qRegisterMetaType<FrontendStatus>();
+    qRegisterMetaType<FrontendStatus*>();
+}
+}
 
 #endif // FRONTENDSTATUS_H

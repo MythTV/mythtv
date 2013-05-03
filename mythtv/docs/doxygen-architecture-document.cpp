@@ -11,30 +11,46 @@ with it to get familiar with different aspects of the code base.
 
 If you are just looking for the code formatting standards,
 see the official %MythTV wiki article
-<a href="http://www.mythtv.org/wiki/index.php/Coding_Standards">
+<a href="http://www.mythtv.org/wiki/Coding_Standards">
 coding standards</a>. If you are looking for the
-<a href="http://svn.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
+<a href="http://code.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
 it can be found on the official pages.
 If you haven't already, you should subscribe to
 the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">
-developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">SVN commits mailing list</a>
+developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">Commits mailing list</a>
 
 If you just stumbled onto the developer pages
 by accident, maybe you want to go to the official
-<a href="http://www.mythtv.org/modules.php?name=MythInstall">%MythTV
-Installation page</a>. There is also a good unofficial
-<a href="http://wilsonet.com/mythtv/fcmyth.php">Fedora %MythTV installation</a> page,
-and a
-<a href="http://dev.gentoo.org/~cardoe/mythtv/">Gentoo %MythTV installation</a> page.
+<a href="http://www.mythtv.org/docs/">%MythTV
+ User Documentation</a> or <a href="http://wiki.mythtv.org/">%MythTV
+ Wiki</a>.
 
 If you are new to Qt programming it is essential that you keep in mind
 that almost all Qt objects are not thread-safe, including QString.
-Almost all Qt container objects, including QString, make shallow copies
-on assignment, the two copies of the object must only be used in one
-thread unless you use a lock on the object. You can use the
-<a href="http://doc.trolltech.com/3.1/qdeepcopy.html">QDeepCopy</a>
-template on most Qt containers to make a copy you can use in another
-thread.
+The Qt containers QMap, QSet, QHash, QString, QList, etc are
+copy-on-write containers. This means that when you assign one
+container from another the data isn't actually copied. Instead
+a copy of a pointer to the data is made and the reference count
+is increased. Then when you actually modify the date or get 
+a modifiable reference into the container an actual copy is
+made. This means you can return one of these containers efficiently
+from a function without needing C++11 support. This also means
+these containers are a bit less efficient than their STL equivalents
+most of the time. We still prefer them in MythTV code, especially
+QString due to the extensive i18n support in Qt. QList is actually
+equivalent to an STL deque. We also use the STL style iterators. This
+is both because it makes it easier to switch to an STL container in
+the rare case when it is necessary, such as when we need a reverse
+iterator iterator, and because they are more efficient than the
+Java style iterators that Qt also supports.
+
+In Qt 3.x and Qt 4.0 assignment of one Qt copy-on-write was
+not yet thread-safe. Because of this you will see a number of
+::detach() calls in MythTV code. These calls force a deep copy
+to be made immediately and should either be removed or a comment
+should be added in the rare case where this is done as an
+optimization and not just a hold-over from when copy-on-write 
+wasn't yet thread-safe in Qt 4.0 and earlier.
 
 There are some special dangers when
 \ref qobject_dangers "using QObject" outside the Qt event thread.
@@ -46,9 +62,9 @@ There are also a few simple \ref testing "testing shortcuts".
 
 \section libs Libraries
 
-%MythTV is divided up into 20 libraries:
+%MythTV is divided up into over 20 libraries:
 <dl>
-  <dt>libmythbase
+  <dt>\ref libmythbase "libmythbase"
   <dd>Lowest-level %MythTV library. Used by the Plugins.
 
       Contains the \ref database_subsystem "database",
@@ -164,7 +180,12 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythhdhomerun       <dd>Support for the HDHomeRun recorder device.
+  <dt>libmythhdhomerun
+      <dd>Interface to the SiliconDust HDHomeRun EtherNet connected TV tuner
+      products.
+
+      <a href="http://www.silicondust.com/hdhomerun/hdhomerun_development.pdf">
+      Documented externally</a>.
 
       This library does not depend on any of our libraries.
 
@@ -178,7 +199,7 @@ to match the hardware sample rate to the A/V streams audio sample rate.
 The database schema is documented \ref db_schema "here".
 
 \section apps Applications
-%MythTV contains 12 applications which are installed by make install
+%MythTV contains 13 applications which are installed by make install
 
 <dl>
   <dt>mythbackend      <dd>This is the backend server which runs the recorders.
@@ -226,6 +247,10 @@ The database schema is documented \ref db_schema "here".
   <dt>mythwelcome/mythshutdown
       <dd>These programs manage Power Saving (shutdown/wakeup) on your MythTV
           PCs.
+  <dt>mythlogserver
+      <dd>A tool that records log messages from a number of other myth
+          applications in one stream, storing them in any or all of;
+          a logfile, the Unix system log (if availale), and the MySQL database.
 </dl>
 
 \section fe_plugins Frontend Plugins
@@ -237,8 +262,6 @@ The database schema is documented \ref db_schema "here".
   <dt>mythgame    <dd>Launches PC games and game system emulators.
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
-  <dt>mythvideo   <dd>Launch DVD players, and a browser for other video files
-                      (non-%MythTV recordings).
   <dt>mythweather <dd>Presents your local weather report.
   <dt>mythzoneminder<dd>Video surveilance system interface.
 </dl>
@@ -251,6 +274,9 @@ The database schema is documented \ref db_schema "here".
 \section spt_scripts Support Scripts
 These tools are in the packaging repository:
 <dl>
+  <dt>osx-packager-qtsdk.pl
+      <dd>Downloads and builds all dependencies, then the source, of %MythTV
+          and all the official plugins, on Mac OS 10.7 and 10.8
   <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
                             source, of %MythTV and all the official plugins,
                             on Mac OS (10.3?, 10.4?,) 10.5 and 10.6
@@ -560,7 +586,7 @@ any of the query or file streaming commands will silently fail.
 The following summarises some of these commands.
 For a full understanding of all the commands, either read the source code
 (programs/mythbackend/mainserver.cpp), or look on the Wiki
-(http://www.mythtv.org/wiki/index.php/Myth_Protocol_Command_List).
+(http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands).
 
  */
 
@@ -621,9 +647,12 @@ to access these assets:
   <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,
       or $HOME/.mythtv</li>
 
-  <li>mysql.txt is loaded from GetShareDir(), GetInstallPrefix() + /etc/mythtv,
-      GetConfDir(), and the current directory. Later files override the values
-      from earlier ones.</li>
+  <li>The new config.xml has replaced the old mysql.txt, and is loaded from
+      GetConfDir() only. If not found, MythTV will attempt to discover the
+      database credentials over UPnP from the master backend, falling back to
+      the compiled-in defaults of mythtv:mythtv@localhost/mythconverg. If no
+      connection can be established, the necessary information is queried from
+      the user.</li>
 </ol>
 
  */
@@ -654,7 +683,7 @@ so that the languages which contain accents and multi-byte strings
 are not corrupted.
 
 This page:
-http://www.mythtv.org/wiki/index.php/Translation
+http://www.mythtv.org/wiki/Translation
 on the Wiki explains how to update an existing translation.
 
 To add a new language, look up the ISO 639-1 language code,
@@ -984,4 +1013,12 @@ currently supported, so the ImportRecorder is substituted for DEMO cards.
 
 /** \defgroup db_schema    MythTV Database Schema
 This line is filler that is ignored by Doxygen.
+*/
+
+/** \defgroup libraries    MythTV Libraries
+This line is filler that is ignored by Doxygen.
+*/
+
+/** \defgroup libmythbase    libmythbase - Core MythTV library
+    \ingroup libraries
 */

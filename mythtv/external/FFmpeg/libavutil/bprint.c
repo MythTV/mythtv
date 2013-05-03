@@ -21,6 +21,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include "avassert.h"
 #include "bprint.h"
 #include "common.h"
 #include "error.h"
@@ -78,6 +80,15 @@ void av_bprint_init(AVBPrint *buf, unsigned size_init, unsigned size_max)
         av_bprint_alloc(buf, size_init - 1);
 }
 
+void av_bprint_init_for_buffer(AVBPrint *buf, char *buffer, unsigned size)
+{
+    buf->str      = buffer;
+    buf->len      = 0;
+    buf->size     = size;
+    buf->size_max = size;
+    *buf->str = 0;
+}
+
 void av_bprintf(AVBPrint *buf, const char *fmt, ...)
 {
     unsigned room;
@@ -117,6 +128,57 @@ void av_bprint_chars(AVBPrint *buf, char c, unsigned n)
         memset(buf->str + buf->len, c, real_n);
     }
     av_bprint_grow(buf, n);
+}
+
+void av_bprint_strftime(AVBPrint *buf, const char *fmt, const struct tm *tm)
+{
+    unsigned room;
+    size_t l;
+
+    if (!*fmt)
+        return;
+    while (1) {
+        room = av_bprint_room(buf);
+        if (room && (l = strftime(buf->str + buf->len, room, fmt, tm)))
+            break;
+        /* strftime does not tell us how much room it would need: let us
+           retry with twice as much until the buffer is large enough */
+        room = !room ? strlen(fmt) + 1 :
+               room <= INT_MAX / 2 ? room * 2 : INT_MAX;
+        if (av_bprint_alloc(buf, room)) {
+            /* impossible to grow, try to manage something useful anyway */
+            room = av_bprint_room(buf);
+            if (room < 1024) {
+                /* if strftime fails because the buffer has (almost) reached
+                   its maximum size, let us try in a local buffer; 1k should
+                   be enough to format any real date+time string */
+                char buf2[1024];
+                if ((l = strftime(buf2, sizeof(buf2), fmt, tm))) {
+                    av_bprintf(buf, "%s", buf2);
+                    return;
+                }
+            }
+            if (room) {
+                /* if anything else failed and the buffer is not already
+                   truncated, let us add a stock string and force truncation */
+                static const char txt[] = "[truncated strftime output]";
+                memset(buf->str + buf->len, '!', room);
+                memcpy(buf->str + buf->len, txt, FFMIN(sizeof(txt) - 1, room));
+                av_bprint_grow(buf, room); /* force truncation */
+            }
+            return;
+        }
+    }
+    av_bprint_grow(buf, l);
+}
+
+void av_bprint_get_buffer(AVBPrint *buf, unsigned size,
+                          unsigned char **mem, unsigned *actual_size)
+{
+    if (size > av_bprint_room(buf))
+        av_bprint_alloc(buf, size);
+    *actual_size = av_bprint_room(buf);
+    *mem = *actual_size ? buf->str + buf->len : NULL;
 }
 
 void av_bprint_clear(AVBPrint *buf)
@@ -161,7 +223,10 @@ int av_bprint_finalize(AVBPrint *buf, char **ret_str)
 
 static void bprint_pascal(AVBPrint *b, unsigned size)
 {
-    unsigned p[size + 1], i, j;
+    unsigned i, j;
+    unsigned p[42];
+
+    av_assert0(size < FF_ARRAY_ELEMS(p));
 
     p[0] = 1;
     av_bprintf(b, "%8d\n", 1);
@@ -178,35 +243,50 @@ static void bprint_pascal(AVBPrint *b, unsigned size)
 int main(void)
 {
     AVBPrint b;
+    char buf[256];
+    struct tm testtime = { .tm_year = 100, .tm_mon = 11, .tm_mday = 20 };
 
     av_bprint_init(&b, 0, -1);
     bprint_pascal(&b, 5);
-    printf("Short text in unlimited buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Short text in unlimited buffer: %u/%u\n", (unsigned)strlen(b.str), b.len);
     printf("%s\n", b.str);
     av_bprint_finalize(&b, NULL);
 
     av_bprint_init(&b, 0, -1);
     bprint_pascal(&b, 25);
-    printf("Long text in unlimited buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Long text in unlimited buffer: %u/%u\n", (unsigned)strlen(b.str), b.len);
     av_bprint_finalize(&b, NULL);
 
     av_bprint_init(&b, 0, 2048);
     bprint_pascal(&b, 25);
-    printf("Long text in limited buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Long text in limited buffer: %u/%u\n", (unsigned)strlen(b.str), b.len);
     av_bprint_finalize(&b, NULL);
 
     av_bprint_init(&b, 0, 1);
     bprint_pascal(&b, 5);
-    printf("Short text in automatic buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Short text in automatic buffer: %u/%u\n", (unsigned)strlen(b.str), b.len);
 
     av_bprint_init(&b, 0, 1);
     bprint_pascal(&b, 25);
-    printf("Long text in automatic buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Long text in automatic buffer: %u/%u\n", (unsigned)strlen(b.str)/8*8, b.len);
     /* Note that the size of the automatic buffer is arch-dependant. */
 
     av_bprint_init(&b, 0, 0);
     bprint_pascal(&b, 25);
-    printf("Long text count only buffer: %zu/%u\n", strlen(b.str), b.len);
+    printf("Long text count only buffer: %u/%u\n", (unsigned)strlen(b.str), b.len);
+
+    av_bprint_init_for_buffer(&b, buf, sizeof(buf));
+    bprint_pascal(&b, 25);
+    printf("Long text count only buffer: %u/%u\n", (unsigned)strlen(buf), b.len);
+
+    av_bprint_init(&b, 0, -1);
+    av_bprint_strftime(&b, "%Y-%m-%d", &testtime);
+    printf("strftime full: %u/%u \"%s\"\n", (unsigned)strlen(buf), b.len, b.str);
+    av_bprint_finalize(&b, NULL);
+
+    av_bprint_init(&b, 0, 8);
+    av_bprint_strftime(&b, "%Y-%m-%d", &testtime);
+    printf("strftime truncated: %u/%u \"%s\"\n", (unsigned)strlen(buf), b.len, b.str);
 
     return 0;
 }

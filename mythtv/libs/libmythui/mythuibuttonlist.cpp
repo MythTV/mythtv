@@ -1742,7 +1742,8 @@ int MythUIButtonList::PageUp(void)
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
-            total += m_itemHorizSpacing + buttonstate->GetArea().width();
+            if (buttonstate)
+                total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
 
         return 0;
@@ -1792,7 +1793,8 @@ int MythUIButtonList::PageUp(void)
         buttonItem->SetToRealButton(realButton, false);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
-        total += m_itemHorizSpacing + buttonstate->GetArea().height();
+        if (buttonstate)
+            total += m_itemHorizSpacing + buttonstate->GetArea().height();
     }
 
     return 0;
@@ -1845,7 +1847,8 @@ int MythUIButtonList::PageDown(void)
             buttonItem->SetToRealButton(realButton, false);
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
-            total += m_itemHorizSpacing + buttonstate->GetArea().width();
+            if (buttonstate)
+                total += m_itemHorizSpacing + buttonstate->GetArea().width();
         }
 
         return num_items - 1;
@@ -2082,7 +2085,9 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = 0;
             }
+            break;
 
+        case MoveMid:
             break;
     }
 
@@ -2516,7 +2521,7 @@ void MythUIButtonList::customEvent(QEvent *event)
         for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
         {
             const int loginterval = (cur < 1000 ? 100 : 500);
-            if (cur % loginterval == 0)
+            if (cur > 200 && cur % loginterval == 0)
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Build background buttonlist item %1").arg(cur));
             emit itemLoaded(GetItemAt(cur));

@@ -194,7 +194,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    QByteArray fname = sNewFileName.toAscii();
+    QByteArray fname = sNewFileName.toLatin1();
     img.save( fname.constData(), "JPG", 60 );
 
     delete pImage;
@@ -414,7 +414,7 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    QByteArray fname = sNewFileName.toAscii();
+    QByteArray fname = sNewFileName.toLatin1();
     img.save( fname.constData(), "PNG" );
 
     delete pImage;

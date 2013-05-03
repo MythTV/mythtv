@@ -33,10 +33,12 @@
 #include "libavutil/file.h"
 #include "avformat.h"
 #include <fcntl.h>
-#if HAVE_SETMODE
+#if HAVE_IO_H
 #include <io.h>
 #endif
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include <stdlib.h>
 #include "os_support.h"
@@ -112,7 +114,9 @@ static int64_t cache_seek(URLContext *h, int64_t pos, int whence)
         c->pos= pos;
         return pos;
     }else{
-        lseek(c->fd, c->pos, SEEK_SET);
+        if(lseek(c->fd, c->pos, SEEK_SET) < 0) {
+            av_log(h, AV_LOG_ERROR, "Failure to seek in cache\n");
+        }
         return AVERROR(EPIPE);
     }
 }

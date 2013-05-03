@@ -28,9 +28,11 @@
  * adds an option to use scaled or non-scaled coefficients, and more...
  */
 
-#include <strings.h>
 #include <float.h>
 #include "avfilter.h"
+#include "formats.h"
+#include "internal.h"
+#include "video.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/avstring.h"
 
@@ -143,7 +145,7 @@ static int get_color_mode_index(const char *name)
     return -1;
 }
 
-static av_cold int init(AVFilterContext *ctx, const char *args, void *opaque)
+static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     ColorMatrixContext *color = ctx->priv;
 
@@ -306,65 +308,73 @@ static int config_input(AVFilterLink *inlink)
 {
     AVFilterContext *ctx = inlink->dst;
     ColorMatrixContext *color = ctx->priv;
-    const AVPixFmtDescriptor *pix_desc = &av_pix_fmt_descriptors[inlink->format];
+    const AVPixFmtDescriptor *pix_desc = av_pix_fmt_desc_get(inlink->format);
 
     color->hsub = pix_desc->log2_chroma_w;
     color->vsub = pix_desc->log2_chroma_h;
 
-    av_log(ctx, AV_LOG_INFO, "%s -> %s\n", color->src, color->dst);
+    av_log(ctx, AV_LOG_VERBOSE, "%s -> %s\n", color->src, color->dst);
 
     return 0;
 }
 
 static int query_formats(AVFilterContext *ctx)
 {
-    static const enum PixelFormat pix_fmts[] = {
-        PIX_FMT_YUV422P,
-        PIX_FMT_YUV420P,
-        PIX_FMT_UYVY422,
-        PIX_FMT_NONE
+    static const enum AVPixelFormat pix_fmts[] = {
+        AV_PIX_FMT_YUV422P,
+        AV_PIX_FMT_YUV420P,
+        AV_PIX_FMT_UYVY422,
+        AV_PIX_FMT_NONE
     };
 
-    avfilter_set_common_pixel_formats(ctx, avfilter_make_format_list(pix_fmts));
+    ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
 
     return 0;
 }
 
-static AVFilterBufferRef *get_video_buffer(AVFilterLink *inlink, int perms, int w, int h)
-{
-    AVFilterBufferRef *picref =
-        avfilter_get_video_buffer(inlink->dst->outputs[0], perms, w, h);
-    return picref;
-}
-
-static void start_frame(AVFilterLink *link, AVFilterBufferRef *picref)
-{
-    AVFilterBufferRef *outpicref = avfilter_ref_buffer(picref, ~0);
-
-    link->dst->outputs[0]->out_buf = outpicref;
-
-    avfilter_start_frame(link->dst->outputs[0], outpicref);
-}
-
-static void end_frame(AVFilterLink *link)
+static int filter_frame(AVFilterLink *link, AVFilterBufferRef *in)
 {
     AVFilterContext *ctx = link->dst;
     ColorMatrixContext *color = ctx->priv;
-    AVFilterBufferRef *out = link->dst->outputs[0]->out_buf;
+    AVFilterLink *outlink = ctx->outputs[0];
+    AVFilterBufferRef *out;
 
-    if (link->cur_buf->format == PIX_FMT_YUV422P)
-        process_frame_yuv422p(color, out, link->cur_buf);
-    else if (link->cur_buf->format == PIX_FMT_YUV420P)
-        process_frame_yuv420p(color, out, link->cur_buf);
+    out = ff_get_video_buffer(outlink, AV_PERM_WRITE, outlink->w, outlink->h);
+    if (!out) {
+        avfilter_unref_bufferp(&in);
+        return AVERROR(ENOMEM);
+    }
+    avfilter_copy_buffer_ref_props(out, in);
+
+    if (in->format == AV_PIX_FMT_YUV422P)
+        process_frame_yuv422p(color, out, in);
+    else if (in->format == AV_PIX_FMT_YUV420P)
+        process_frame_yuv420p(color, out, in);
     else
-        process_frame_uyvy422(color, out, link->cur_buf);
+        process_frame_uyvy422(color, out, in);
 
-    avfilter_draw_slice(ctx->outputs[0], 0, link->dst->outputs[0]->h, 1);
-    avfilter_end_frame(ctx->outputs[0]);
-    avfilter_unref_buffer(link->cur_buf);
+    avfilter_unref_bufferp(&in);
+    return ff_filter_frame(outlink, out);
 }
 
-static void null_draw_slice(AVFilterLink *link, int y, int h, int slice_dir) { }
+static const AVFilterPad colormatrix_inputs[] = {
+    {
+        .name             = "default",
+        .type             = AVMEDIA_TYPE_VIDEO,
+        .config_props     = config_input,
+        .min_perms        = AV_PERM_READ,
+        .filter_frame     = filter_frame,
+    },
+    { NULL }
+};
+
+static const AVFilterPad colormatrix_outputs[] = {
+    {
+        .name = "default",
+        .type = AVMEDIA_TYPE_VIDEO,
+    },
+    { NULL }
+};
 
 AVFilter avfilter_vf_colormatrix = {
     .name          = "colormatrix",
@@ -373,17 +383,6 @@ AVFilter avfilter_vf_colormatrix = {
     .priv_size     = sizeof(ColorMatrixContext),
     .init          = init,
     .query_formats = query_formats,
-
-    .inputs    = (AVFilterPad[]) {{ .name             = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO,
-                                    .config_props     = config_input,
-                                    .start_frame      = start_frame,
-                                    .get_video_buffer = get_video_buffer,
-                                    .draw_slice       = null_draw_slice,
-                                    .end_frame        = end_frame, },
-                                  { .name = NULL }},
-
-    .outputs   = (AVFilterPad[]) {{ .name             = "default",
-                                    .type             = AVMEDIA_TYPE_VIDEO, },
-                                  { .name = NULL }},
+    .inputs        = colormatrix_inputs,
+    .outputs       = colormatrix_outputs,
 };

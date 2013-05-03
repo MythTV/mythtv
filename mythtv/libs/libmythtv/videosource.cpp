@@ -31,6 +31,7 @@ using namespace std;
 #include "scanwizard.h"
 #include "cardutil.h"
 #include "sourceutil.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 #include "frequencies.h"
 #include "diseqcsettings.h"
@@ -741,6 +742,11 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
                               card, driver, false);
     };
 
+    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    {
+        fillSelectionsFromDir(dir, 0, 255, QString::null, QString::null, false);
+    }
+
     uint fillSelectionsFromDir(const QDir& dir,
                                uint minor_min, uint minor_max,
                                QString card, QString driver,
@@ -784,7 +790,7 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
                 continue;
 
             // if the driver returns any info add this device to our list
-            QByteArray tmp = filepath.toAscii();
+            QByteArray tmp = filepath.toLatin1();
             int videofd = open(tmp.constData(), O_RDWR);
             if (videofd >= 0)
             {
@@ -837,6 +843,11 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
         }
     }
 
+    void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
+    {
+        fillSelectionsFromDir(dir, QString::null, QString::null);
+    }
+
     uint fillSelectionsFromDir(const QDir &dir, const QString &card,
                                const QString &driver)
     {
@@ -849,7 +860,7 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
             QFileInfo &fi = *it;
 
             QString    device = fi.absoluteFilePath();
-            QByteArray adevice = device.toAscii();
+            QByteArray adevice = device.toLatin1();
             int vbifd = open(adevice.constData(), O_RDWR);
             if (vbifd < 0)
                 continue;
@@ -1539,7 +1550,8 @@ class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
     {
         setValue("http://mafreebox.freebox.fr/freeboxtv/playlist.m3u");
         setLabel(QObject::tr("M3U URL"));
-        setHelpText(QObject::tr("URL of M3U containing IPTV channel URLs."));
+        setHelpText(
+            QObject::tr("URL of M3U containing RTSP/RTP/UDP channel URLs."));
     }
 };
 
@@ -1980,16 +1992,7 @@ void CetonDeviceID::SetIP(const QString &ip)
     if (QRegExp(regexp).exactMatch(ip + "."))
     {
         _ip = ip;
-        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
-    }
-}
-
-void CetonDeviceID::SetCard(const QString &card)
-{
-    if (QRegExp("^(\\d|RTP)$").exactMatch(card))
-    {
-        _card = card;
-        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+        setValue(QString("%1-RTP.%3").arg(_ip).arg(_tuner));
     }
 }
 
@@ -1998,7 +2001,7 @@ void CetonDeviceID::SetTuner(const QString &tuner)
     if (QRegExp("^\\d$").exactMatch(tuner))
     {
         _tuner = tuner;
-        setValue(QString("%1-%2.%3").arg(_ip).arg(_card).arg(_tuner));
+        setValue(QString("%1-RTP.%2").arg(_ip).arg(_tuner));
     }
 }
 
@@ -2014,13 +2017,11 @@ void CetonDeviceID::UpdateValues(void)
     if (newstyle.exactMatch(getValue()))
     {
         emit LoadedIP(newstyle.cap(1));
-        emit LoadedCard(newstyle.cap(2));
         emit LoadedTuner(newstyle.cap(3));
     }
 }
 
-CetonConfigurationGroup::CetonConfigurationGroup
-        (CaptureCard& a_parent) :
+CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent)
 {
@@ -2032,32 +2033,22 @@ CetonConfigurationGroup::CetonConfigurationGroup
     ip    = new CetonSetting(
         "IP Address",
         "IP Address of the Ceton device (192.168.200.1 by default)");
-    card  = new CetonSetting(
-        "Card Number",
-        "Number of the installed Ceton card. Use 0 if only 1 Ceton card is "
-        "installed in your system. Use the value RTP if this is a Ceton "
-        "card installed in a remote system");
     tuner = new CetonSetting(
         "Tuner",
         "Number of the tuner on the Ceton device (first tuner is number 0)");
 
     addChild(ip);
-    addChild(card);
     addChild(tuner);
     addChild(deviceid);
     addChild(desc);
 
     connect(ip,       SIGNAL(NewValue(const QString&)),
             deviceid, SLOT(  SetIP(const QString&)));
-    connect(card,     SIGNAL(NewValue(const QString&)),
-            deviceid, SLOT(  SetCard(const QString&)));
     connect(tuner,    SIGNAL(NewValue(const QString&)),
             deviceid, SLOT(  SetTuner(const QString&)));
 
     connect(deviceid, SIGNAL(LoadedIP(const QString&)),
             ip,       SLOT(  LoadValue(const QString&)));
-    connect(deviceid, SIGNAL(LoadedCard(const QString&)),
-            card,     SLOT(  LoadValue(const QString&)));
     connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
             tuner,    SLOT(  LoadValue(const QString&)));
 
@@ -2093,7 +2084,7 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 {
     QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
 
-    QByteArray adevice = device.toAscii();
+    QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
     if (videofd >= 0)
     {
@@ -2137,7 +2128,7 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
 {
     QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
 
-    QByteArray adevice = device.toAscii();
+    QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
     if (videofd >= 0)
     {
@@ -2261,40 +2252,43 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
+    
+#ifdef USING_DVB
+    addTarget("DVB",       new DVBConfigurationGroup(parent));
+#endif // USING_DVB
 
 #ifdef USING_V4L2
-    addTarget("V4L",       new V4LConfigurationGroup(parent));
-# ifdef USING_IVTV
-    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
-# endif // USING_IVTV
 # ifdef USING_HDPVR
     addTarget("HDPVR",     new HDPVRConfigurationGroup(parent));
 # endif // USING_HDPVR
 #endif // USING_V4L2
 
-#ifdef USING_DVB
-    addTarget("DVB",       new DVBConfigurationGroup(parent));
-#endif // USING_DVB
+#ifdef USING_HDHOMERUN
+    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
+#endif // USING_HDHOMERUN
 
 #ifdef USING_FIREWIRE
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
 
-#ifdef USING_HDHOMERUN
-    addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
-#endif // USING_HDHOMERUN
+#ifdef USING_CETON
+    addTarget("CETON",     new CetonConfigurationGroup(parent));
+#endif // USING_CETON
 
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
-
+    
+#ifdef USING_V4L2
+    addTarget("V4L",       new V4LConfigurationGroup(parent));
+# ifdef USING_IVTV
+    addTarget("MPEG",      new MPEGConfigurationGroup(parent));
+# endif // USING_IVTV
+#endif // USING_V4L2
+    
 #ifdef USING_ASI
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
-
-#ifdef USING_CETON
-    addTarget("CETON",     new CetonConfigurationGroup(parent));
-#endif // USING_CETON
 
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
@@ -2415,7 +2409,7 @@ void CaptureCard::Save(void)
         init_cardid = cardid;
 
     // Delete old clone cards as required.
-    for (uint i = cardids.size() - 1; (i > cloneCount) && cardids.size(); i--)
+    for (uint i = cardids.size() - 1; (i > cloneCount) && !cardids.empty(); i--)
     {
         CardUtil::DeleteCard(cardids.back());
         cardids.pop_back();
@@ -2460,54 +2454,54 @@ CardType::CardType(const CaptureCard &parent) :
 
 void CardType::fillSelections(SelectSetting* setting)
 {
+#ifdef USING_DVB
+    setting->addSelection(
+        QObject::tr("DVB-T/S/C, ATSC or ISDB-T tuner card"), "DVB");
+#endif // USING_DVB
+
 #ifdef USING_V4L2
-    setting->addSelection(
-        QObject::tr("Analog V4L capture card"), "V4L");
-    setting->addSelection(
-        QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
-# ifdef USING_IVTV
-    setting->addSelection(
-        QObject::tr("MPEG-2 encoder card"), "MPEG");
-# endif // USING_IVTV
 # ifdef USING_HDPVR
     setting->addSelection(
-        QObject::tr("H.264 encoder card (HD-PVR)"), "HDPVR");
+        QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
 # endif // USING_HDPVR
 #endif // USING_V4L2
 
-#ifdef USING_DVB
+#ifdef USING_HDHOMERUN
     setting->addSelection(
-        QObject::tr("DVB DTV capture card (v3.x)"), "DVB");
-#endif // USING_DVB
-
+        QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
+#endif // USING_HDHOMERUN
+    
 #ifdef USING_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
 #endif // USING_FIREWIRE
 
-#ifdef USING_V4L2
+#ifdef USING_CETON
     setting->addSelection(
-        QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
-        "GO7007");
-#endif // USING_V4L2
-
-#ifdef USING_HDHOMERUN
-    setting->addSelection(
-        QObject::tr("HDHomeRun DTV tuner box"), "HDHOMERUN");
-#endif // USING_HDHOMERUN
+        QObject::tr("Ceton Cablecard tuner"), "CETON");
+#endif // USING_CETON
 
 #ifdef USING_IPTV
-    setting->addSelection(QObject::tr("Network recorder"), "FREEBOX");
+    setting->addSelection(QObject::tr("IPTV recorder"), "FREEBOX");
 #endif // USING_IPTV
+
+#ifdef USING_V4L2
+# ifdef USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
+# endif // USING_IVTV
+    setting->addSelection(
+        QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
+    setting->addSelection(
+        QObject::tr("Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)"),
+        "GO7007");
+    setting->addSelection(
+        QObject::tr("Analog capture card"), "V4L");
+#endif // USING_V4L2
 
 #ifdef USING_ASI
     setting->addSelection(QObject::tr("DVEO ASI recorder"), "ASI");
 #endif
-
-#ifdef USING_CETON
-    setting->addSelection(
-        QObject::tr("Ceton Cablecard tuner "), "CETON");
-#endif // USING_CETON
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
@@ -2613,6 +2607,8 @@ class InputGroup : public TransComboBoxSetting
                 CardUtil::LinkInputGroup(inputid, new_groupid);
         }
     }
+
+    virtual void Save(QString /*destination*/) { Save(); }
 
   private:
     const CardInput &cardinput;
@@ -2767,7 +2763,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // Get the existing starting channel
     QString startChan = CardUtil::GetStartingChannel(getInputID());
 
-    DBChanList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
+    ChannelInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 
     if (channels.empty())
     {
@@ -2780,7 +2776,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     // (selecting the old start channel if it is there).
     QString order = gCoreContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
-    bool has_visible = false, found_existing = false;
+    bool has_visible = false;
     for (uint i = 0; i < channels.size() && !has_visible; i++)
         has_visible |= channels[i].visible;
 
@@ -2791,7 +2787,6 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         if (!has_visible || channels[i].visible || sel)
         {
             addSelection(channum, channum, sel);
-            found_existing |= sel;
         }
     }
 }

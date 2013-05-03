@@ -23,25 +23,10 @@
     </button>
 
     <button>
-        <type>TV_DELETE</type>
-        <text>Delete Recordings</text>
-        <description>Remove television recordings</description>
-        <action>TV_DELETE</action>
-        <dependswindow xmlfile="recordings-ui.xml">deleterecordings</dependswindow>
-    </button>
-
-    <button>
         <type>TV_PREVIOUS</type>
         <text>Previously Recorded</text>
         <description>See what you have recorded</description>
         <action>TV_PREVIOUS</action>
-    </button>
-
-    <button>
-        <type>TV_RECPRIORITIES</type>
-        <text>Set Priorities</text>
-        <description>Prioritize some shows over others</description>
-        <action>TV_SET_RECPRIORITIES</action>
     </button>
 
 </mythmenu>

@@ -117,12 +117,15 @@ QStringList VideoOutputNullVAAPI::GetAllowedRenderers(MythCodecID myth_codec_id)
     return list;
 }
 
-bool VideoOutputNullVAAPI::Init(int width, int height, float aspect,
+bool VideoOutputNullVAAPI::Init(const QSize &video_dim_buf,
+                                const QSize &video_dim_disp,
+                                float aspect,
                                 WId winid, const QRect &win_rect,
                                 MythCodecID codec_id)
 {
     QMutexLocker locker(&m_lock);
-    bool ok = VideoOutput::Init(width, height, aspect, winid, win_rect, codec_id);
+    bool ok = VideoOutput::Init(video_dim_buf, video_dim_disp,
+                                aspect, winid, win_rect, codec_id);
     if (!codec_is_vaapi_hw(video_codec_id))
         return false;
 
@@ -138,7 +141,8 @@ bool VideoOutputNullVAAPI::Init(int width, int height, float aspect,
     return ok;
 }
 
-bool VideoOutputNullVAAPI::InputChanged(const QSize &input_size,
+bool VideoOutputNullVAAPI::InputChanged(const QSize &video_dim_buf,
+                                        const QSize &video_dim_disp,
                                         float aspect,
                                         MythCodecID av_codec_id,
                                         void *codec_private,
@@ -146,13 +150,14 @@ bool VideoOutputNullVAAPI::InputChanged(const QSize &input_size,
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InputChanged(%1,%2,%3) '%4'->'%5'")
-            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(video_dim_disp.width()).arg(video_dim_disp.height())
+            .arg(aspect)
             .arg(toString(video_codec_id)).arg(toString(av_codec_id)));
 
     QMutexLocker locker(&m_lock);
 
     bool cid_changed = (video_codec_id != av_codec_id);
-    bool res_changed = input_size  != window.GetActualVideoDim();
+    bool res_changed = video_dim_disp != window.GetActualVideoDim();
     if (!res_changed && !cid_changed)
     {
         aspect_only = true;
@@ -161,7 +166,7 @@ bool VideoOutputNullVAAPI::InputChanged(const QSize &input_size,
 
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
-    if (Init(input_size.width(), input_size.height(),
+    if (Init(video_dim_buf, video_dim_disp,
              aspect, 0, disp, av_codec_id))
     {
         return true;
@@ -187,8 +192,8 @@ VideoFrame* VideoOutputNullVAAPI::GetLastDecodedFrame(void)
 {
     VideoFrame* gpu = vbuffers.GetLastDecodedFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -198,8 +203,8 @@ VideoFrame* VideoOutputNullVAAPI::GetLastShownFrame(void)
 {
     VideoFrame* gpu = vbuffers.GetLastShownFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
-        if (vbuffers.at(i) == gpu)
-            return m_shadowBuffers->at(i);
+        if (vbuffers.At(i) == gpu)
+            return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
     return NULL;
 }
@@ -210,9 +215,9 @@ void VideoOutputNullVAAPI::DiscardFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -220,7 +225,7 @@ void VideoOutputNullVAAPI::DiscardFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
             vbuffers.DiscardFrame(frame);
@@ -236,9 +241,9 @@ void VideoOutputNullVAAPI::DoneDisplayingFrame(VideoFrame *frame)
     // is this a CPU frame
     for (uint i = 0; i < m_shadowBuffers->Size(); i++)
     {
-        if (m_shadowBuffers->at(i) == frame)
+        if (m_shadowBuffers->At(i) == frame)
         {
-            frame = vbuffers.at(i);
+            frame = vbuffers.At(i);
             break;
         }
     }
@@ -246,7 +251,7 @@ void VideoOutputNullVAAPI::DoneDisplayingFrame(VideoFrame *frame)
     // is this a GPU frame
     for (uint i = 0; i < vbuffers.Size(); i++)
     {
-        if (vbuffers.at(i) == frame)
+        if (vbuffers.At(i) == frame)
         {
             m_lock.lock();
             VideoOutput::DiscardFrame(frame);
@@ -270,9 +275,9 @@ void VideoOutputNullVAAPI::ReleaseFrame(VideoFrame *frame)
     QMutexLocker lock(&m_lock);
     for (uint i = 0; i < vbuffers.Size() && m_ctx; i++)
     {
-        if (vbuffers.at(i)->buf == frame->buf)
+        if (vbuffers.At(i)->buf == frame->buf)
         {
-            VideoFrame *vf = m_shadowBuffers->at(i);
+            VideoFrame *vf = m_shadowBuffers->At(i);
             vf->aspect = frame->aspect;
             vf->disp_timecode = frame->disp_timecode;
             vf->dummy = frame->dummy;
@@ -281,7 +286,7 @@ void VideoOutputNullVAAPI::ReleaseFrame(VideoFrame *frame)
             vf->timecode = frame->timecode;
             vf->repeat_pict = frame->repeat_pict;
             vf->top_field_first = frame->top_field_first;
-            m_ctx->CopySurfaceToFrame(vf, vbuffers.at(i)->buf);
+            m_ctx->CopySurfaceToFrame(vf, vbuffers.At(i)->buf);
         }
     }
     VideoOutput::ReleaseFrame(frame);

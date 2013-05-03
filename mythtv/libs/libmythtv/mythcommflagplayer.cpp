@@ -74,6 +74,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
         player_ctx->playingInfo->ClearPositionMap(MARK_KEYFRAME);
         player_ctx->playingInfo->ClearPositionMap(MARK_GOP_START);
         player_ctx->playingInfo->ClearPositionMap(MARK_GOP_BYFRAME);
+        player_ctx->playingInfo->ClearPositionMap(MARK_DURATION_MS);
     }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -99,13 +100,14 @@ bool MythCommFlagPlayer::RebuildSeekTable(
     inuse_timer.start();
     save_timer.start();
 
-    DecoderGetFrame(kDecodeNothing,true);
+    decoder->TrackTotalDuration(true);
 
     if (showPercentage)
         cout << "\r                         \r" << flush;
 
     int prevperc = -1;
-    while (!GetEof())
+    bool usingIframes = false;
+    while (GetEof() == kEofStateNone)
     {
         if (inuse_timer.elapsed() > 2534)
         {
@@ -179,6 +181,27 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
         if (DecoderGetFrame(kDecodeNothing,true))
             myFramesPlayed = decoder->GetFramesRead();
+
+        // H.264 recordings from an HD-PVR contain IDR keyframes,
+        // which are the only valid cut points for lossless cuts.
+        // However, DVB-S h.264 recordings may lack IDR keyframes, in
+        // which case we need to allow non-IDR I-frames.  If we get
+        // far enough into the rebuild without having created any
+        // seektable entries, we can assume it is because of the IDR
+        // keyframe setting, and so we rewind and allow h.264 non-IDR
+        // I-frames to be treated as keyframes.
+        uint64_t frames = decoder->GetFramesRead();
+        if (!usingIframes &&
+            (GetEof() != kEofStateNone || (frames > 1000 && frames < 1100)) &&
+            !decoder->HasPositionMap())
+        {
+            cout << "No I-frames found, rewinding..." << endl;
+            decoder->DoRewind(0);
+            decoder->Reset(true, true, true);
+            pmap_first = pmap_last = myFramesPlayed = 0;
+            decoder->SetIdrOnlyKeyframes(false);
+            usingIframes = true;
+        }
     }
 
     if (showPercentage)

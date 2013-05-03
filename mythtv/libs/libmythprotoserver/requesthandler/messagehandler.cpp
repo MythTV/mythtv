@@ -1,6 +1,3 @@
-
-using namespace std;
-
 #include "mythcorecontext.h"
 #include "mythevent.h"
 
@@ -53,7 +50,7 @@ bool MessageHandler::HandleInbound(SocketHandler *sock, QStringList &slist)
     if (slist.size() < 2)
     {
         res << "ERROR" << "Insufficient Length";
-        sock->SendStringList(res);
+        sock->WriteStringList(res);
         return true;
     }
 
@@ -74,7 +71,7 @@ bool MessageHandler::HandleInbound(SocketHandler *sock, QStringList &slist)
     }
 
     res << "OK";
-    sock->SendStringList(res);
+    sock->WriteStringList(res);
     return true;
 }
 

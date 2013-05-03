@@ -1,5 +1,5 @@
                                    MythTV
-                                Release 0.26
+                                Release 0.27
 
 NOTE
 ----
@@ -17,7 +17,7 @@ The following is a list of some of the prerequisites you will need installed:
                 optional in the future, or we may switch to vorbis if they speed
                 optimize things a little more.
 
-   QT - Version 4.6 or greater is required.  You will need the MySQL bindings.
+   QT - Version 4.8 or greater is required.  You will need the MySQL bindings.
         http://www.trolltech.com
 
    MySQL - You need this setup and working.  Version 5.0.15 or higher is

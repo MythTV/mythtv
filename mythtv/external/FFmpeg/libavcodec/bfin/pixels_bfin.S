@@ -84,7 +84,7 @@ apc$3: R6 = BYTEOP3P(R1:0, R3:2) (LO)    || [I2++M0] = R6   || R2 = [I1];
 DEFUN_END(add_pixels_clamped)
 
 
-/*
+/**
   motion compensation
   primitives
 
@@ -518,7 +518,7 @@ DEFUN_END(pix_sum)
 
 
 DEFUN(get_pixels,mL1,
-        (DCTELEM *restrict block, const uint8_t *pixels, int line_size)):
+        (DCTELEM *av_restrict block, const uint8_t *pixels, int line_size)):
         [--sp] = (r7:4);
         i3=r0;        // dest
         i0=r1;        // src0

@@ -90,6 +90,8 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     virtual void CompleteLoad(int profileId, const QString &type,
                               const QString &name);
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
 
     // sets
     void setCodecTypes();
@@ -139,6 +141,8 @@ class RecordingProfileEditor :
     RecordingProfileEditor(int id, QString profName);
 
     virtual DialogCode exec(void);
+    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
+        { return exec(); }
     virtual void Load(void);
     virtual void Save(void) { }
     virtual void Save(QString /*destination*/) { }

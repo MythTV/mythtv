@@ -45,7 +45,7 @@ static void cleanup(void)
 
     if (pidfile.size())
     {
-        unlink(pidfile.toAscii().constData());
+        unlink(pidfile.toLatin1().constData());
         pidfile.clear();
     }
 
@@ -112,6 +112,9 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif

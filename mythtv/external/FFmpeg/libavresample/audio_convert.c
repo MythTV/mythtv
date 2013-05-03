@@ -22,12 +22,15 @@
 #include <stdint.h>
 
 #include "config.h"
+#include "libavutil/common.h"
 #include "libavutil/libm.h"
 #include "libavutil/log.h"
 #include "libavutil/mem.h"
 #include "libavutil/samplefmt.h"
 #include "audio_convert.h"
 #include "audio_data.h"
+#include "dither.h"
+#include "internal.h"
 
 enum ConvFuncType {
     CONV_FUNC_TYPE_FLAT,
@@ -45,6 +48,7 @@ typedef void (conv_func_deinterleave)(uint8_t **out, const uint8_t *in, int len,
 
 struct AudioConvert {
     AVAudioResampleContext *avr;
+    DitherContext *dc;
     enum AVSampleFormat in_fmt;
     enum AVSampleFormat out_fmt;
     int channels;
@@ -245,10 +249,18 @@ static void set_generic_function(AudioConvert *ac)
     SET_CONV_FUNC_GROUP(AV_SAMPLE_FMT_DBL, AV_SAMPLE_FMT_DBL)
 }
 
+void ff_audio_convert_free(AudioConvert **ac)
+{
+    if (!*ac)
+        return;
+    ff_dither_free(&(*ac)->dc);
+    av_freep(ac);
+}
+
 AudioConvert *ff_audio_convert_alloc(AVAudioResampleContext *avr,
                                      enum AVSampleFormat out_fmt,
                                      enum AVSampleFormat in_fmt,
-                                     int channels)
+                                     int channels, int sample_rate)
 {
     AudioConvert *ac;
     int in_planar, out_planar;
@@ -261,6 +273,17 @@ AudioConvert *ff_audio_convert_alloc(AVAudioResampleContext *avr,
     ac->out_fmt  = out_fmt;
     ac->in_fmt   = in_fmt;
     ac->channels = channels;
+
+    if (avr->dither_method != AV_RESAMPLE_DITHER_NONE          &&
+        av_get_packed_sample_fmt(out_fmt) == AV_SAMPLE_FMT_S16 &&
+        av_get_bytes_per_sample(in_fmt) > 2) {
+        ac->dc = ff_dither_alloc(avr, out_fmt, in_fmt, channels, sample_rate);
+        if (!ac->dc) {
+            av_free(ac);
+            return NULL;
+        }
+        return ac;
+    }
 
     in_planar  = av_sample_fmt_is_planar(in_fmt);
     out_planar = av_sample_fmt_is_planar(out_fmt);
@@ -275,15 +298,27 @@ AudioConvert *ff_audio_convert_alloc(AVAudioResampleContext *avr,
 
     set_generic_function(ac);
 
+    if (ARCH_ARM)
+        ff_audio_convert_init_arm(ac);
     if (ARCH_X86)
         ff_audio_convert_init_x86(ac);
 
     return ac;
 }
 
-int ff_audio_convert(AudioConvert *ac, AudioData *out, AudioData *in, int len)
+int ff_audio_convert(AudioConvert *ac, AudioData *out, AudioData *in)
 {
     int use_generic = 1;
+    int len         = in->nb_samples;
+
+    if (ac->dc) {
+        /* dithered conversion */
+        av_dlog(ac->avr, "%d samples - audio_convert: %s to %s (dithered)\n",
+                len, av_get_sample_fmt_name(ac->in_fmt),
+                av_get_sample_fmt_name(ac->out_fmt));
+
+        return ff_convert_dither(ac->dc, out, in);
+    }
 
     /* determine whether to use the optimized function based on pointer and
        samples alignment in both the input and output */

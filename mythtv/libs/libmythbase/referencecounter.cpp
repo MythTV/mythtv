@@ -88,7 +88,7 @@ ReferenceCounter::ReferenceCounter(const QString &debugName, bool logDebug) :
 
 ReferenceCounter::~ReferenceCounter(void)
 {
-    if (0 != m_referenceCount)
+    if (0 != m_referenceCount.fetchAndAddRelaxed(0))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Object deleted with non-zero reference count!");

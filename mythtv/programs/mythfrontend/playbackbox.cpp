@@ -33,7 +33,6 @@
 #include "remoteutil.h"
 #include "mythdbcon.h"
 #include "playgroup.h"
-#include "netutils.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "mythdate.h"
@@ -364,7 +363,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     PlaybackBox *pbb = new PlaybackBox(
-        mainStack,"playbackbox", PlaybackBox::kPlayBox, (TV *)player, showTV);
+        mainStack,"playbackbox", (TV *)player, showTV);
 
     if (pbb->Create())
         mainStack->AddScreen(pbb);
@@ -374,7 +373,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     return NULL;
 }
 
-PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
+PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
                             TV *player, bool showTV)
     : ScheduleCommon(parent, name),
       m_prefixes(QObject::tr("^(The |A |An )")),
@@ -382,10 +381,8 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       // Artwork Variables
       m_artHostOverride(),
       // Settings
-      m_type(ltype),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
-      m_groupnameAsAllProg(false),
       m_listOrder(1),
       // Recording Group settings
       m_groupDisplayName(ProgramInfo::i18n("All Programs")),
@@ -407,7 +404,12 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_needUpdate(false),
       // Other
       m_player(NULL),
-      m_helper(this)
+      m_helper(this),
+
+      m_firstGroup(true),
+      m_usingGroupSelector(false),
+      m_groupSelected(false),
+      m_passwordEntered(false)
 {
     for (uint i = 0; i < sizeof(m_artImage) / sizeof(MythUIImage*); i++)
     {
@@ -426,7 +428,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_watchListAutoExpire= gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
-    m_groupnameAsAllProg = gCoreContext->GetNumSetting("DispRecGroupAsAllProg", 0);
 
     bool displayCat  = gCoreContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -472,8 +473,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_recGroupIdx = -1;
     m_recGroupType.clear();
     m_recGroupType[m_recGroup] = (displayCat) ? "category" : "recgroup";
-    if (m_groupnameAsAllProg)
-        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
+    m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
     fillRecGroupPasswordCache();
 
@@ -505,13 +505,8 @@ PlaybackBox::~PlaybackBox(void)
 
 bool PlaybackBox::Create()
 {
-    if (m_type == kDeleteBox &&
-            LoadWindowFromXML("recordings-ui.xml", "deleterecordings", this))
-        LOG(VB_GENERAL, LOG_DEBUG,
-            "Found a customized delete recording screen");
-    else
-        if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
-            return false;
+    if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
+        return false;
 
     m_recgroupList  = dynamic_cast<MythUIButtonList *> (GetChild("recgroups"));
     m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
@@ -602,6 +597,8 @@ void PlaybackBox::SwitchList()
 
 void PlaybackBox::displayRecGroup(const QString &newRecGroup)
 {
+    m_groupSelected = true;
+
     QString password = m_recGroupPwCache[newRecGroup];
 
     m_newRecGroup = newRecGroup;
@@ -617,9 +614,14 @@ void PlaybackBox::displayRecGroup(const QString &newRecGroup)
 
         connect(pwd, SIGNAL(haveResult(QString)),
                 SLOT(checkPassword(QString)));
+        connect(pwd, SIGNAL(Exiting(void)),
+                SLOT(passwordClosed(void)));
+
+        m_passwordEntered = false;
 
         if (pwd->Create())
             popupStack->AddScreen(pwd, false);
+
         return;
     }
 
@@ -628,9 +630,23 @@ void PlaybackBox::displayRecGroup(const QString &newRecGroup)
 
 void PlaybackBox::checkPassword(const QString &password)
 {
+    m_passwordEntered = true;
+
     QString grouppass = m_recGroupPwCache[m_newRecGroup];
     if (password == grouppass)
         setGroupFilter(m_newRecGroup);
+    else
+        qApp->postEvent(this, new MythEvent("DISPLAY_RECGROUP",
+                                            m_newRecGroup));
+}
+
+void PlaybackBox::passwordClosed(void)
+{
+    if (m_passwordEntered)
+        return;
+
+    if (m_usingGroupSelector || m_firstGroup)
+        showGroupFilter();
 }
 
 void PlaybackBox::updateGroupInfo(const QString &groupname,
@@ -639,21 +655,11 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     InfoMap infoMap;
     int countInGroup;
 
-    if (groupname.isEmpty())
-    {
-        countInGroup = m_progLists[""].size();
-        infoMap["title"] = m_groupDisplayName;
-        infoMap["group"] = m_groupDisplayName;
-        infoMap["show"]  = ProgramInfo::i18n("All Programs");
-    }
-    else
-    {
-        countInGroup = m_progLists[groupname].size();
-        infoMap["title"] = QString("%1 - %2").arg(m_groupDisplayName)
-                                             .arg(grouplabel);
-        infoMap["group"] = m_groupDisplayName;
-        infoMap["show"]  = grouplabel;
-    }
+    infoMap["group"] = m_groupDisplayName;
+    infoMap["title"] = grouplabel;
+    infoMap["show"] =
+        groupname.isEmpty() ? ProgramInfo::i18n("All Programs") : grouplabel;
+    countInGroup = m_progLists[groupname].size();
 
     if (m_artImage[kArtworkFanart])
     {
@@ -684,7 +690,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     QString desc = tr("There is/are %n recording(s) in this display group",
                       "", countInGroup);
 
-    if (m_type == kDeleteBox && countInGroup > 1)
+    if (countInGroup > 1)
     {
         ProgramList  group     = m_progLists[groupname];
         float        groupSize = 0.0;
@@ -841,6 +847,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
         InfoMap infoMap;
 
         pginfo->ToMap(infoMap);
+        infoMap["group"] = m_groupDisplayName;
         ResetMap(m_currentMap);
         SetTextFromMap(infoMap);
         m_currentMap = infoMap;
@@ -961,7 +968,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
                 item->DisplayState(sit.value(), "subtitletypes");
         }
 
-        item->DisplayState(pginfo->GetCategoryType(), "categorytype");
+        item->DisplayState(pginfo->GetCategoryTypeString(), "categorytype");
 
         // Mark this button list item as initialized.
         item->SetText("yes", "is_item_initialized");
@@ -1229,7 +1236,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconState = dynamic_cast<MythUIStateType *>(GetChild("categorytype"));
     if (iconState)
     {
-        if (!(pginfo && iconState->DisplayState(pginfo->GetCategoryType())))
+        if (!(pginfo && iconState->DisplayState(pginfo->GetCategoryTypeString())))
             iconState->Reset();
     }
 }
@@ -1333,7 +1340,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
-            QString groupname = (*it).simplified();
+            QString groupname = (*it);
 
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(
@@ -1349,8 +1356,15 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
             QString displayName = groupname;
             if (displayName.isEmpty())
-                displayName = m_groupDisplayName;
+            {
+                if (m_recGroup == "All Programs")
+                    displayName = ProgramInfo::i18n("All Programs");
+                else
+                    displayName = ProgramInfo::i18n("All Programs - %1")
+                        .arg(m_groupDisplayName);
+            }
 
+            item->SetText(groupname, "groupname");
             item->SetText(displayName, "name");
             item->SetText(displayName);
 
@@ -1629,7 +1643,7 @@ bool PlaybackBox::UpdateUILists(void)
         }
 
         vector<ProgramInfo*> list;
-        bool newest_first = (0==m_allOrder) || (kDeleteBox==m_type);
+        bool newest_first = (0==m_allOrder);
         m_programInfoCache.GetOrdered(list, newest_first);
         vector<ProgramInfo*>::const_iterator it = list.begin();
         for ( ; it != list.end(); ++it)
@@ -1690,7 +1704,7 @@ bool PlaybackBox::UpdateUILists(void)
                     sTitle = construct_sort_title(
                         p->GetTitle(), m_viewMask, titleSort,
                         p->GetRecordingPriority(), m_prefixes);
-                    sTitle = sTitle.toLower().simplified();
+                    sTitle = sTitle.toLower();
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->GetTitle();
@@ -1791,7 +1805,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!Iprog.key().isEmpty())
             {
                 std::stable_sort((*Iprog).begin(), (*Iprog).end(),
-                                 (m_listOrder == 0 || m_type == kDeleteBox) ?
+                                 (m_listOrder == 0) ?
                                  comp_originalAirDate_rev_less_than :
                                  comp_originalAirDate_less_than);
             }
@@ -1805,7 +1819,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!Iprog.key().isEmpty())
             {
                 std::stable_sort((*Iprog).begin(), (*Iprog).end(),
-                                 (m_listOrder == 0 || m_type == kDeleteBox) ?
+                                 (m_listOrder == 0) ?
                                  comp_programid_rev_less_than :
                                  comp_programid_less_than);
             }
@@ -1819,7 +1833,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!it.key().isEmpty())
             {
                 std::stable_sort((*it).begin(), (*it).end(),
-                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 (!m_listOrder) ?
                                  comp_recordDate_rev_less_than :
                                  comp_recordDate_less_than);
             }
@@ -1833,7 +1847,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (!it.key().isEmpty())
             {
                 std::stable_sort((*it).begin(), (*it).end(),
-                                 (!m_listOrder || m_type == kDeleteBox) ?
+                                 (!m_listOrder) ?
                                  comp_season_rev_less_than :
                                  comp_season_less_than);
             }
@@ -1940,8 +1954,7 @@ bool PlaybackBox::UpdateUILists(void)
 
             // Daily
             if (spanHours[recid] < 50 ||
-                recType[recid] == kTimeslotRecord ||
-                recType[recid] == kFindDailyRecord)
+                recType[recid] == kDailyRecord)
             {
                 if (delHours[recid] < m_watchListBlackOut * 4)
                 {
@@ -1973,8 +1986,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
             // Weekly
             else if (nextHours[recid] ||
-                     recType[recid] == kWeekslotRecord ||
-                     recType[recid] == kFindWeeklyRecord)
+                     recType[recid] == kWeeklyRecord)
 
             {
                 if (delHours[recid] < (m_watchListBlackOut * 24) - 4)
@@ -2324,11 +2336,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    switch (m_type)
-    {
-        case kPlayBox:   PlayFromBookmark(item);   break;
-        case kDeleteBox: deleteSelected(item); break;
-    }
+    PlayFromBookmark(item);
 }
 
 void PlaybackBox::popupClosed(QString which, int result)
@@ -4185,6 +4193,12 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             m_playListPlay.clear();
         }
+        else if ((message == "DISPLAY_RECGROUP") &&
+                 (me->ExtraDataCount() >= 1))
+        {
+            QString recGroup = me->ExtraData(0);
+            displayRecGroup(recGroup);
+        }
     }
     else
         ScheduleCommon::customEvent(event);
@@ -4458,6 +4472,8 @@ void PlaybackBox::showGroupFilter(void)
 
     if (recGroupPopup->Create())
     {
+        m_usingGroupSelector = true;
+        m_groupSelected = false;
         connect(recGroupPopup, SIGNAL(result(QString)),
                 SLOT(displayRecGroup(QString)));
         connect(recGroupPopup, SIGNAL(Exiting()),
@@ -4470,9 +4486,13 @@ void PlaybackBox::showGroupFilter(void)
 
 void PlaybackBox::groupSelectorClosed(void)
 {
-    if ((gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1) &&
-        ((m_titleList.size() <= 1)))
+    if (m_groupSelected)
+        return;
+
+    if (m_firstGroup)
         Close();
+
+    m_usingGroupSelector = false;
 }
 
 void PlaybackBox::setGroupFilter(const QString &recGroup)
@@ -4481,6 +4501,9 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     if (newRecGroup.isEmpty())
         return;
+
+    m_firstGroup = false;
+    m_usingGroupSelector = false;
 
     if (newRecGroup == ProgramInfo::i18n("Default"))
         newRecGroup = "Default";
@@ -4495,8 +4518,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     m_recGroup = newRecGroup;
 
-    if (m_groupnameAsAllProg)
-        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
+    m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
     // Since the group filter is changing, the current position in the lists
     // is meaningless -- so reset the lists so the position won't be saved.
@@ -4743,14 +4765,14 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         QString episode;
         if (newSeason > 0 || newEpisode > 0)
         {
-            season = GetDisplaySeasonEpisode(newSeason, 1);
-            episode = GetDisplaySeasonEpisode(newEpisode, 1);
-            seasone = QString("s%1e%2").arg(GetDisplaySeasonEpisode
-                                                (newSeason, 2))
-                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
-            seasonx = QString("%1x%2").arg(GetDisplaySeasonEpisode
-                                                (newSeason, 1))
-                            .arg(GetDisplaySeasonEpisode(newEpisode, 2));
+            season = format_season_and_episode(newSeason, 1);
+            episode = format_season_and_episode(newEpisode, 1);
+            seasone = QString("s%1e%2")
+                .arg(format_season_and_episode(newSeason, 2))
+                .arg(format_season_and_episode(newEpisode, 2));
+            seasonx = QString("%1x%2")
+                .arg(format_season_and_episode(newSeason, 1))
+                .arg(format_season_and_episode(newEpisode, 2));
         }
 
         item->SetText(tempSubTitle, "titlesubtitle");

@@ -29,7 +29,10 @@
 #include "Logging.h"
 #include "freemheg.h"
 
+#include <QStringList>
+#if HAVE_GETTIMEOFDAY == 0
 #include <sys/timeb.h>
+#endif
 #ifdef __FreeBSD__
 #include <sys/time.h>
 #else
@@ -138,6 +141,15 @@ static int GetInt(MHParameter *parm, MHEngine *engine)
     return un.m_nIntVal;
 }
 
+// Return a bool value.  May throw an exception if it isn't the correct type.
+static bool GetBool(MHParameter *parm, MHEngine *engine)
+{
+    MHUnion un;
+    un.GetValueFrom(*parm, engine);
+    un.CheckType(MHUnion::U_Bool);
+    return un.m_fBoolVal;
+}
+
 // Extract a string value.
 static void GetString(MHParameter *parm, MHOctetString &str, MHEngine *engine)
 {
@@ -165,10 +177,9 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         {
             if (args.Size() == 2)
             {
-                struct timeb timebuffer;
-#if HAVE_FTIME
-                ftime(&timebuffer);
-#elif HAVE_GETTIMEOFDAY
+                time_t epochSeconds = 0;
+                short int timeZone = 0;
+#if HAVE_GETTIMEOFDAY
                 struct timeval   time;
                 struct timezone  zone;
 
@@ -177,19 +188,26 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     MHLOG(MHLogDetail, QString("gettimeofday() failed"));
                 }
 
-                timebuffer.time     = time.tv_sec;
-                timebuffer.timezone = zone.tz_minuteswest;
-                timebuffer.dstflag  = zone.tz_dsttime;
+                epochSeconds     = time.tv_sec;
+                timeZone = zone.tz_minuteswest;
+#elif HAVE_FTIME
+                struct timeb timebuffer;
+                if (ftime(&timebuffer) == -1)
+                {
+                    MHLOG(MHLogDetail, QString("ftime() failed"));
+                }
+                epochSeconds = timebuffer.time;
+                timeZone = timebuffer.timezone;
 #else
 #error Configuration error? No ftime() or gettimeofday()?
 #endif
                 // Adjust the time to local.  TODO: Check this.
-                timebuffer.time -= timebuffer.timezone * 60;
+                epochSeconds -= timeZone * 60;
                 // Time as seconds since midnight.
-                int nTimeAsSecs = timebuffer.time % (24 * 60 * 60);
+                int nTimeAsSecs = epochSeconds % (24 * 60 * 60);
                 // Modified Julian date as number of days since 17th November 1858.
                 // 1st Jan 1970 was date 40587.
-                int nModJulianDate = 40587 + timebuffer.time / (24 * 60 * 60);
+                int nModJulianDate = 40587 + epochSeconds / (24 * 60 * 60);
 
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(nModJulianDate);
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(nTimeAsSecs);
@@ -738,7 +756,14 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         else if (m_Name.Equal("SSM"))   // SetSubtitleMode
         {
             // Enable or disable subtitles in addition to MHEG.
-            MHERROR("SetSubtitleMode ResidentProgram is not implemented");
+            if (args.Size() == 1) {
+                bool status = GetBool(args.GetAt(0), engine);
+                MHLOG(MHLogNotifications, QString("NOTE SetSubtitleMode %1")
+                    .arg(status ? "enabled" : "disabled"));
+                // TODO Notify player
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
         else if (m_Name.Equal("WAI"))   // WhoAmI
@@ -798,15 +823,98 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
         else if (m_Name.Equal("SBI"))   // SetBroadcastInterrupt
         {
-            // Required for InteractionChannelExtension
+            // Required for NativeApplicationExtension
             // En/dis/able program interruptions e.g. green button
-            MHERROR("SetBroadcastInterrupt ResidentProgram is not implemented");
+            if (args.Size() == 1) {
+                bool status = GetBool(args.GetAt(0), engine);
+                MHLOG(MHLogNotifications, QString("NOTE SetBroadcastInterrupt %1")
+                    .arg(status ? "enabled" : "disabled"));
+                // Nothing todo at present
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
-        else if (m_Name.Equal("GIS"))   // GetICStatus
-        {
-            // Required for NativeApplicationExtension
-            MHERROR("GetICStatus ResidentProgram is not implemented");
+        // InteractionChannelExtension
+        else if (m_Name.Equal("GIS")) { // GetICStatus
+            if (args.Size() == 1)
+            {
+                int ICstatus = engine->GetContext()->GetICStatus();
+                MHLOG(MHLogNotifications, "NOTE InteractionChannel " + QString(
+                    ICstatus == 0 ? "active" : ICstatus == 1 ? "inactive" :
+                    ICstatus == 2 ? "disabled" : "undefined"));
+                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(ICstatus);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("RDa")) { // ReturnData
+            if (args.Size() >= 3)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+
+                // Variable name/value pairs
+                QStringList params;
+                int i = 1;
+                for (; i + 2 < args.Size(); i += 2)
+                {
+                    GetString(args.GetAt(i), string, engine);
+                    QString name = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                    QString val;
+                    MHUnion un;
+                    un.GetValueFrom(*(args.GetAt(i+1)), engine);
+                    switch (un.m_Type) {
+                    case MHUnion::U_Int:
+                        val = QString::number(un.m_nIntVal);
+                        break;
+                    case MHParameter::P_Bool:
+                        val = un.m_fBoolVal ? "true" : "false";
+                        break;
+                    case MHParameter::P_String:
+                        val = QString::fromUtf8((const char*)un.m_StrVal.Bytes(), un.m_StrVal.Size());
+                        break;
+                    case MHParameter::P_ObjRef:
+                        val = un.m_ObjRefVal.Printable();
+                        break;
+                    case MHParameter::P_ContentRef:
+                        val = un.m_ContentRefVal.Printable();
+                        break;
+                    case MHParameter::P_Null:
+                        val = "<NULL>";
+                        break;
+                    default:
+                        val = QString("<type %1>").arg(un.m_Type);
+                        break;
+                    }
+                    params += name + "=" + val;
+                }
+                // TODO
+                MHLOG(MHLogNotifications, "NOTE ReturnData '" + url + "' { " + params.join(" ") + " }");
+                // HTTP response code, 0= none
+                engine->FindObject(*(args.GetAt(i)->GetReference()))->SetVariableValue(0);
+                // HTTP response data
+                string = "";
+                engine->FindObject(*(args.GetAt(i+1)->GetReference()))->SetVariableValue(string);
+                SetSuccessFlag(success, false, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("SHF")) { // SetHybridFileSystem
+            if (args.Size() == 2)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString str = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                GetString(args.GetAt(1), string, engine);
+                QString str2 = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                // TODO
+                MHLOG(MHLogNotifications, QString("NOTE SetHybridFileSystem %1=%2")
+                    .arg(str).arg(str2));
+                SetSuccessFlag(success, false, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
         }
 
         else
@@ -908,7 +1016,7 @@ void MHCall::PrintArgs(FILE *fd, int nTabs) const
         m_Parameters.GetAt(i)->PrintMe(fd, 0);
     }
 
-    fprintf(fd, " )\n");
+    fprintf(fd, " )");
 }
 
 void MHCall::Perform(MHEngine *engine)

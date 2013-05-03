@@ -92,9 +92,7 @@ static av_cold int aacPlus_encode_init(AVCodecContext *avctx)
             avctx->extradata_size = decoder_specific_info_size;
             memcpy(avctx->extradata, buffer, avctx->extradata_size);
         }
-#undef free
         free(buffer);
-#define free please_use_av_free
     }
     return 0;
 }
@@ -132,11 +130,12 @@ static av_cold int aacPlus_encode_close(AVCodecContext *avctx)
 AVCodec ff_libaacplus_encoder = {
     .name           = "libaacplus",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_AAC,
+    .id             = AV_CODEC_ID_AAC,
     .priv_data_size = sizeof(aacPlusAudioContext),
     .init           = aacPlus_encode_init,
     .encode2        = aacPlus_encode_frame,
     .close          = aacPlus_encode_close,
-    .sample_fmts = (const enum AVSampleFormat[]){AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE},
-    .long_name = NULL_IF_CONFIG_SMALL("libaacplus AAC+ (Advanced Audio Codec with SBR+PS)"),
+    .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
+                                                     AV_SAMPLE_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("libaacplus AAC+ (Advanced Audio Codec with SBR+PS)"),
 };

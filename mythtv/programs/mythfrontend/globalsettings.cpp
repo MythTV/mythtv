@@ -130,17 +130,6 @@ static HostCheckBox *RememberRecGroup()
     return gc;
 }
 
-static HostCheckBox *UseGroupNameAsAllPrograms()
-{
-    HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
-    gc->setLabel(QObject::tr("Show filter name instead of \"All Programs\""));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, use the name of the display "
-                    "filter currently applied in place of the term \"All "
-                    "Programs\" in the playback screen."));
-    return gc;
-}
-
 static HostCheckBox *PBBStartInTitle()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
@@ -1238,7 +1227,7 @@ static HostComboBox *PlayBoxEpisodeSort()
     gc->addSelection(QObject::tr("Season/Episode"), "Season");
     gc->addSelection(QObject::tr("Original air date"), "OrigAirDate");
     gc->addSelection(QObject::tr("Program ID"), "Id");
-    gc->setHelpText(QObject::tr("Selects how to sort a shows episodes"));
+    gc->setHelpText(QObject::tr("Selects how to sort a show's episodes"));
     return gc;
 }
 
@@ -1411,7 +1400,7 @@ static HostCheckBox *BrowseAllTuners()
     gc->setValue(false);
     gc->setHelpText(
         QObject::tr(
-            "If enabled, browse mode will shows channels on all "
+            "If enabled, browse mode will show channels on all "
             "available recording devices, instead of showing "
             "channels on just the current recorder."));
     return gc;
@@ -2068,12 +2057,12 @@ static HostComboBox *MythDateFormatCB()
     gc->addSelection(locale.toString(sampdate, "ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(locale.toString(sampdate, "ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(locale.toString(sampdate, "ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5")),
-        QString::fromUtf8("dddd yyyy\u5E74M\u6708d\u65E5"));
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("ddd M\u6708d\u65E5")),
-        QString::fromUtf8("ddd M\u6708d\u65E5"));
+    QString jp_long = QString("dddd yyyy") + QChar(0x5E74) +
+        "M" + QChar(0x6708) + "d"+ QChar(0x65E5); // dddd yyyy年M月d日
+    gc->addSelection(locale.toString(sampdate, jp_long), jp_long);
+    QString jp_med = QString("dddd ") +
+        "M" + QChar(0x6708) + "d"+ QChar(0x65E5); // dddd M月d日
+    gc->addSelection(locale.toString(sampdate, jp_med), jp_med);
     gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2114,9 +2103,8 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(locale.toString(sampdate, "ddd d/M"), "ddd d/M");
     gc->addSelection(locale.toString(sampdate, "M/d ddd"), "M/d ddd");
     gc->addSelection(locale.toString(sampdate, "d/M ddd"), "d/M ddd");
-    gc->addSelection(locale.toString(sampdate,
-        QString::fromUtf8("M\u6708d\u65E5")),
-        QString::fromUtf8("M\u6708d\u65E5"));
+    QString jp = QString("M") + QChar(0x6708) + "d" + QChar(0x65E5); // M月d日
+    gc->addSelection(locale.toString(sampdate, jp), jp);
     gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
@@ -2192,17 +2180,6 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static GlobalCheckBox *LiveTVPriority()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("LiveTVPriority");
-    bc->setLabel(QObject::tr("Allow Live TV to move scheduled shows"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If enabled, scheduled recordings will "
-                    "be moved to other cards (where possible), so that "
-                    "Live TV will not be interrupted."));
-    return bc;
-}
-
 static HostCheckBox *ChannelGroupRememberLast()
 {
     HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
@@ -2272,19 +2249,6 @@ class ChannelGroupSettings : public TriggeredConfigurationGroup
 
 // General RecPriorities settings
 
-static GlobalCheckBox *GRSchedMoveHigher()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("SchedMoveHigher");
-    bc->setLabel(QObject::tr("Reschedule higher priorities"));
-    bc->setHelpText(QObject::tr("Move higher priority programs to other "
-                    "cards and showings when resolving conflicts. This "
-                    "can be used to record lower priority programs that "
-                    "would otherwise not be recorded, but risks missing "
-                    "a higher priority program if the schedule changes."));
-    bc->setValue(true);
-    return bc;
-}
-
 static GlobalComboBox *GRSchedOpenEnd()
 {
     GlobalComboBox *bc = new GlobalComboBox("SchedOpenEnd");
@@ -2327,18 +2291,6 @@ static GlobalSpinBox *GRWSRecPriority()
     bs->setLabel(QObject::tr("Widescreen recording priority"));
     bs->setHelpText(QObject::tr("Additional priority when a showing "
                     "is marked as widescreen in the TV listings."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRAutoRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoRecPriority", -99, 99, 1);
-    bs->setLabel(QObject::tr("Automatic priority range (+/-)"));
-    bs->setHelpText(QObject::tr("Up to this number of priority points may "
-                    "be added for titles that are usually watched soon after "
-                    "recording or subtracted for titles that are often "
-                    "watched several days or weeks later."));
     bs->setValue(0);
     return bs;
 }
@@ -2396,84 +2348,6 @@ static GlobalSpinBox *GRAudioDescRecPriority()
     bs->setLabel(QObject::tr("Audio described priority"));
     bs->setHelpText(QObject::tr("Additional priority when a showing "
                     "is marked as being Audio Described."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRSingleRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("SingleRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Single recordings priority"));
-    bs->setHelpText(QObject::tr("Single recordings will receive this "
-                    "additional recording priority value."));
-    bs->setValue(1);
-    return bs;
-}
-
-static GlobalSpinBox *GRWeekslotRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("WeekslotRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Weekslot recordings priority"));
-    bs->setHelpText(QObject::tr("Weekslot recordings will receive this "
-                    "additional recording priority value."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRTimeslotRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("TimeslotRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Timeslot recordings priority"));
-    bs->setHelpText(QObject::tr("Timeslot recordings will receive this "
-                    "additional recording priority value."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRChannelRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("ChannelRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Channel recordings priority"));
-    bs->setHelpText(QObject::tr("Channel recordings will receive this "
-                    "additional recording priority value."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRAllRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("AllRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("All recordings priority"));
-    bs->setHelpText(QObject::tr("The 'All' recording type will receive this "
-                    "additional recording priority value."));
-    bs->setValue(0);
-    return bs;
-}
-
-static GlobalSpinBox *GRFindOneRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("FindOneRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Find one recordings priority"));
-    bs->setHelpText(QObject::tr("Find One, Find Weekly and Find Daily "
-                    "recording types will receive this "
-                    "additional recording priority value."));
-    bs->setValue(-1);
-    return bs;
-}
-
-static GlobalSpinBox *GROverrideRecordRecPriority()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("OverrideRecordRecPriority",
-                                            -99, 99, 1);
-    bs->setLabel(QObject::tr("Override recordings priority"));
-    bs->setHelpText(QObject::tr("Override recordings will receive this "
-                    "additional recording priority value."));
     bs->setValue(0);
     return bs;
 }
@@ -2684,18 +2558,6 @@ static HostCheckBox *RealtimePriority()
     return gc;
 }
 
-static HostCheckBox *EnableMediaMon()
-{
-    HostCheckBox *gc = new HostCheckBox("MonitorDrives");
-    gc->setLabel(QObject::tr("Monitor CD/DVD") +
-                 QObject::tr(" (and other removable devices)"));
-    gc->setHelpText(QObject::tr("This enables support for monitoring your "
-                    "CD/DVD drives for new disks and launching the proper "
-                    "plugin to handle them. Requires restart."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostLineEdit *IgnoreMedia()
 {
     HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
@@ -2707,29 +2569,6 @@ static HostLineEdit *IgnoreMedia()
                                 "Requires restart."));
     return ge;
 }
-
-class MythMediaSettings : public TriggeredConfigurationGroup
-{
-  public:
-     MythMediaSettings() :
-         TriggeredConfigurationGroup(false, false, true, true)
-     {
-         setLabel(QObject::tr("MythMediaMonitor"));
-         setUseLabel(false);
-
-         Setting* enabled = EnableMediaMon();
-         addChild(enabled);
-         setTrigger(enabled);
-
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(IgnoreMedia());
-         addTarget("1", settings);
-
-         // show nothing if fillEnabled is off
-         addTarget("0", new VerticalConfigurationGroup(true));
-     };
-};
-
 
 static HostComboBox *DisplayGroupTitleSort()
 {
@@ -3268,8 +3107,7 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *media =
         new VerticalConfigurationGroup(false, true, false, false);
     media->setLabel(QObject::tr("Media Monitor"));
-    MythMediaSettings *mediaMon = new MythMediaSettings();
-    media->addChild(mediaMon);
+    media->addChild(IgnoreMedia());
     addChild(media);
 
     VerticalConfigurationGroup *remotecontrol =
@@ -3389,7 +3227,6 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
-    pbox2->addChild(UseGroupNameAsAllPrograms());
     addChild(pbox2);
 
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
@@ -3459,9 +3296,8 @@ OSDSettings::OSDSettings()
     //cc->addChild(DecodeVBIFormat());
     //addChild(cc);
 
-#if CONFIG_DARWIN
+#if defined(Q_OS_MACX)
     // Any Mac OS-specific OSD stuff would go here.
-    // Note that this define should be Q_WS_MACX
 #endif
 }
 
@@ -3472,7 +3308,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
     general->addChild(LongChannelFormat());
-    general->addChild(LiveTVPriority());
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
@@ -3540,12 +3375,10 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     VerticalConfigurationGroup* sched = new VerticalConfigurationGroup(false);
     sched->setLabel(QObject::tr("Scheduler Options"));
 
-    sched->addChild(GRSchedMoveHigher());
     sched->addChild(GRSchedOpenEnd());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());
     sched->addChild(GRWSRecPriority());
-    sched->addChild(GRAutoRecPriority());
     addChild(sched);
 
     VerticalConfigurationGroup* access = new VerticalConfigurationGroup(false);
@@ -3557,18 +3390,6 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     access->addChild(GRHardHearRecPriority());
     access->addChild(GRAudioDescRecPriority());
     addChild(access);
-
-    VerticalConfigurationGroup* rtype = new VerticalConfigurationGroup(false);
-    rtype->setLabel(QObject::tr("Recording Type Priority Settings"));
-
-    rtype->addChild(GRSingleRecordRecPriority());
-    rtype->addChild(GROverrideRecordRecPriority());
-    rtype->addChild(GRFindOneRecordRecPriority());
-    rtype->addChild(GRWeekslotRecordRecPriority());
-    rtype->addChild(GRTimeslotRecordRecPriority());
-    rtype->addChild(GRChannelRecordRecPriority());
-    rtype->addChild(GRAllRecordRecPriority());
-    addChild(rtype);
 }
 
 AppearanceSettings::AppearanceSettings()

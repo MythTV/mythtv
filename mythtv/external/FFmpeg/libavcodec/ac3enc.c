@@ -30,9 +30,9 @@
 
 #include <stdint.h>
 
-#include "libavutil/audioconvert.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/crc.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
@@ -40,7 +40,6 @@
 #include "dsputil.h"
 #include "ac3dsp.h"
 #include "ac3.h"
-#include "audioconvert.h"
 #include "fft.h"
 #include "ac3enc.h"
 #include "eac3enc.h"
@@ -273,7 +272,7 @@ void ff_ac3_apply_rematrixing(AC3EncodeContext *s)
     int nb_coefs;
     int blk, bnd, i;
     int start, end;
-    uint8_t *flags;
+    uint8_t *flags = NULL;
 
     if (!s->rematrixing_enabled)
         return;
@@ -660,7 +659,7 @@ static void count_frame_bits_fixed(AC3EncodeContext *s)
      *   bit allocation parameters do not change between blocks
      *   no delta bit allocation
      *   no skipped data
-     *   no auxilliary data
+     *   no auxiliary data
      *   no E-AC-3 metadata
      */
 
@@ -2427,7 +2426,7 @@ av_cold int ff_ac3_encode_init(AVCodecContext *avctx)
 
     s->avctx = avctx;
 
-    s->eac3 = avctx->codec_id == CODEC_ID_EAC3;
+    s->eac3 = avctx->codec_id == AV_CODEC_ID_EAC3;
 
     ff_ac3_common_init();
 
@@ -2491,6 +2490,7 @@ av_cold int ff_ac3_encode_init(AVCodecContext *avctx)
 #endif
 
     ff_dsputil_init(&s->dsp, avctx);
+    avpriv_float_dsp_init(&s->fdsp, avctx->flags & CODEC_FLAG_BITEXACT);
     ff_ac3dsp_init(&s->ac3dsp, avctx->flags & CODEC_FLAG_BITEXACT);
 
     dprint_options(s);

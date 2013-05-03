@@ -29,12 +29,12 @@
 #include "mpegvideo.h"
 #include "dnxhddata.h"
 
-typedef struct {
+typedef struct RCCMPEntry {
     uint16_t mb;
     int value;
 } RCCMPEntry;
 
-typedef struct {
+typedef struct RCEntry {
     int ssd;
     int bits;
 } RCEntry;
@@ -90,9 +90,9 @@ typedef struct DNXHDEncContext {
     RCCMPEntry *mb_cmp;
     RCEntry   (*mb_rc)[8160];
 
-    void (*get_pixels_8x4_sym)(DCTELEM */*align 16*/, const uint8_t *, int);
+    void (*get_pixels_8x4_sym)(DCTELEM * /*align 16*/, const uint8_t *, int);
 } DNXHDEncContext;
 
-void ff_dnxhd_init_mmx(DNXHDEncContext *ctx);
+void ff_dnxhdenc_init_x86(DNXHDEncContext *ctx);
 
 #endif /* AVCODEC_DNXHDENC_H */

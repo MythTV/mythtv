@@ -29,7 +29,7 @@
 #define MP_DVDNAV 1
 
 // Change this only when syncing to mplayer dvdnav trunk
-#define DVDNAV_SVN_REV "svnR1215"
+#define DVDNAV_SVN_REV "svnR1251"
 
 #ifdef __cplusplus
 extern "C" {
@@ -479,6 +479,13 @@ dsi_t* dvdnav_get_current_nav_dsi(dvdnav_t *self);
  */
 dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32_t mode,
 					  dvdnav_highlight_area_t *highlight);
+
+/*
+ * Get the area associated with a certain button in the given
+ * button group.
+ */
+dvdnav_status_t dvdnav_get_highlight_area_from_group(pci_t *nav_pci, DVDBtnGrp_t group,
+                      int32_t button, int32_t mode, dvdnav_highlight_area_t *highlight);
 
 /*
  * Move button highlight around as suggested by function name (e.g. with arrow keys).

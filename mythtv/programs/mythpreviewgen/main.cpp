@@ -96,7 +96,7 @@ int preview_helper(uint chanid, QDateTime starttime,
     if (setpriority(PRIO_PROCESS, 0, 9))
         LOG(VB_GENERAL, LOG_ERR, "Setting priority failed." + ENO);
 
-    if (!chanid || !starttime.isValid())
+    if (!QFileInfo(infile).isReadable() && (!chanid || !starttime.isValid()))
         ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
     ProgramInfo *pginfo = NULL;
@@ -207,6 +207,9 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif

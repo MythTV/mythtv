@@ -42,15 +42,14 @@ extern "C" {
 
 #include "filtermanager.h"
 
-static QSize fix_1080i(QSize raw);
 static QSize fix_alignment(QSize raw);
 static float fix_aspect(float raw);
 static float snap(float value, float snapto, float diff);
 
-const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 2.0f;
-const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 2.0f;
-const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.5f;
-const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.5f;
+const float VideoOutWindow::kManualZoomMaxHorizontalZoom = 4.0f;
+const float VideoOutWindow::kManualZoomMaxVerticalZoom   = 4.0f;
+const float VideoOutWindow::kManualZoomMinHorizontalZoom = 0.25f;
+const float VideoOutWindow::kManualZoomMinVerticalZoom   = 0.25f;
 const int   VideoOutWindow::kManualZoomMaxMove           = 50;
 
 VideoOutWindow::VideoOutWindow() :
@@ -95,7 +94,7 @@ VideoOutWindow::VideoOutWindow() :
     db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
 
     QDesktopWidget *desktop = NULL;
-    if (QApplication::type() == QApplication::GuiClient)
+    if (qobject_cast<QApplication*>(qApp))
         desktop = QApplication::desktop();
 
     if (desktop)
@@ -105,8 +104,13 @@ VideoOutWindow::VideoOutWindow() :
         if (using_xinerama)
         {
             screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
             if (screen_num >= desktop->numScreens())
                 screen_num = 0;
+#else
+            if (screen_num >= desktop->screenCount())
+                screen_num = 0;
+#endif
         }
 
         screen_geom = desktop->geometry();
@@ -479,7 +483,8 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
     }
 }
 
-bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
+bool VideoOutWindow::Init(const QSize &new_video_dim_buf,
+                          const QSize &new_video_dim_disp, float new_video_aspect,
                           const QRect &new_display_visible_rect,
                           AspectOverrideMode new_aspectoverride,
                           AdjustFillMode new_adjustfill)
@@ -494,9 +499,9 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
     if (pip_state == kPBPRight)
             display_visible_rect.moveLeft(pbp_width);
 
-    video_dim_act  = new_video_dim;
-    video_disp_dim = fix_1080i(new_video_dim);
-    video_dim = fix_alignment(new_video_dim);
+    video_dim_act  = new_video_dim_disp;
+    video_disp_dim = new_video_dim_disp;
+    video_dim = new_video_dim_buf;
     video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
 
     if (pip_state > kPIPOff)
@@ -596,15 +601,16 @@ void VideoOutWindow::VideoAspectRatioChanged(float aspect)
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-bool VideoOutWindow::InputChanged(const QSize &input_size, float aspect,
+bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
+                                  const QSize &input_size_disp, float aspect,
                                   MythCodecID myth_codec_id, void *codec_private)
 {
     (void) myth_codec_id;
     (void) codec_private;
 
-    video_dim_act  = input_size;
-    video_disp_dim = fix_1080i(input_size);
-    video_dim = fix_alignment(input_size);
+    video_dim_act  = input_size_disp;
+    video_disp_dim = input_size_disp;
+    video_dim = input_size_buf;
 
     /*    if (db_vdisp_profile)
           db_vdisp_profile->SetInput(video_dim);*///done in videooutput
@@ -876,6 +882,7 @@ QRect VideoOutWindow::GetPIPRect(
  */
 void VideoOutWindow::Zoom(ZoomDirection direction)
 {
+    const float zf = 0.02;
     if (kZoomHome == direction)
     {
         mz_scale_v = 1.0f;
@@ -887,14 +894,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
             (mz_scale_v < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h *= 1.05f;
-            mz_scale_v *= 1.05f;
-        }
-        else
-        {
-            float ratio = mz_scale_v / mz_scale_h;
-            mz_scale_h = 1.0f;
-            mz_scale_v = ratio * mz_scale_h;
+            mz_scale_h += zf;
+            mz_scale_v += zf;
         }
     }
     else if (kZoomOut == direction)
@@ -902,14 +903,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
             (mz_scale_v > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h *= 1.0f / 1.05f;
-            mz_scale_v *= 1.0f / 1.05f;
-        }
-        else
-        {
-            float ratio = mz_scale_v / mz_scale_h;
-            mz_scale_h = 1.0f;
-            mz_scale_v = ratio * mz_scale_h;
+            mz_scale_h -= zf;
+            mz_scale_v -= zf;
         }
     }
     else if (kZoomAspectUp == direction)
@@ -917,8 +912,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
             (mz_scale_v > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h *= 1.05f;
-            mz_scale_v *= 1.0 / 1.05f;
+            mz_scale_h += zf;
+            mz_scale_v -= zf;
         }
     }
     else if (kZoomAspectDown == direction)
@@ -926,21 +921,30 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
             (mz_scale_v < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h *= 1.0 / 1.05f;
-            mz_scale_v *= 1.05f;
+            mz_scale_h -= zf;
+            mz_scale_v += zf;
         }
     }
-    else if (kZoomUp    == direction && (mz_move.y() <= +kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() + 2);
-    else if (kZoomDown  == direction && (mz_move.y() >= -kManualZoomMaxMove))
-        mz_move.setY(mz_move.y() - 2);
-    else if (kZoomLeft  == direction && (mz_move.x() <= +kManualZoomMaxMove))
+    else if (kZoomUp    == direction && (mz_move.y() < +kManualZoomMaxMove))
+        mz_move.setY(mz_move.y() + 1);
+    else if (kZoomDown  == direction && (mz_move.y() > -kManualZoomMaxMove))
+        mz_move.setY(mz_move.y() - 1);
+    else if (kZoomLeft  == direction && (mz_move.x() < +kManualZoomMaxMove))
         mz_move.setX(mz_move.x() + 2);
-    else if (kZoomRight == direction && (mz_move.x() >= -kManualZoomMaxMove))
+    else if (kZoomRight == direction && (mz_move.x() > -kManualZoomMaxMove))
         mz_move.setX(mz_move.x() - 2);
 
-    mz_scale_v = snap(mz_scale_v, 1.0f, 0.03f);
-    mz_scale_h = snap(mz_scale_h, 1.0f, 0.03f);
+    mz_scale_v = snap(mz_scale_v, 1.0f, zf / 2);
+    mz_scale_h = snap(mz_scale_h, 1.0f, zf / 2);
+}
+
+QString VideoOutWindow::GetZoomString(void) const
+{
+    float zh = GetMzScaleH();
+    float zv = GetMzScaleV();
+    QPoint zo = GetMzMove();
+    return QObject::tr("Zoom %1x%2 @ (%3,%4)")
+        .arg(zh, 0, 'f', 2).arg(zv, 0, 'f', 2).arg(zo.x()).arg(zo.y());
 }
 
 /// Correct for rounding errors
@@ -963,16 +967,6 @@ void VideoOutWindow::SetPIPState(PIPState setting)
         QString("VideoOutWindow::SetPIPState. pip_state: %1]") .arg(setting));
 
     pip_state = setting;
-}
-
-/// Correct for a 1920x1080 frames reported as 1920x1088
-static QSize fix_1080i(QSize raw)
-{
-    if (QSize(1920, 1088) == raw)
-        return QSize(1920, 1080);
-    if (QSize(1440, 1088) == raw)
-        return QSize(1440, 1080);
-    return raw;
 }
 
 /// Correct for underalignment

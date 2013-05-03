@@ -40,11 +40,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< VideoSource   >();
-            qRegisterMetaType< VideoSource*  >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -78,5 +74,14 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
 Q_DECLARE_METATYPE( DTC::VideoSource  )
 Q_DECLARE_METATYPE( DTC::VideoSource* )
+
+namespace DTC
+{
+inline void VideoSource::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoSource   >();
+    qRegisterMetaType< VideoSource*  >();
+}
+}
 
 #endif

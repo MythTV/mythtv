@@ -170,7 +170,7 @@ void JobQueue::ProcessQueue(void)
     QString logInfo;
     int jobID;
     int cmds;
-    int flags;
+    //int flags;
     int status;
     QString hostname;
     int sleepTime;
@@ -256,7 +256,7 @@ void JobQueue::ProcessQueue(void)
             {
                 jobID = jobs[x].id;
                 cmds = jobs[x].cmds;
-                flags = jobs[x].flags;
+                //flags = jobs[x].flags;
                 status = jobs[x].status;
                 hostname = jobs[x].hostname;
 

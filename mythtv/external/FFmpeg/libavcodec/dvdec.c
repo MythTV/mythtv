@@ -35,9 +35,11 @@
  * DV decoder
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "dsputil.h"
+#include "internal.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "simple_idct.h"
@@ -147,8 +149,8 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
     const int log2_blocksize = 3-s->avctx->lowres;
     int is_field_mode[5];
 
-    assert((((int)mb_bit_buffer) & 7) == 0);
-    assert((((int)vs_bit_buffer) & 7) == 0);
+    av_assert1((((int)mb_bit_buffer) & 7) == 0);
+    av_assert1((((int)vs_bit_buffer) & 7) == 0);
 
     memset(sblock, 0, 5*DV_MAX_BPM*sizeof(*sblock));
 
@@ -253,8 +255,8 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
         dv_calculate_mb_xy(s, work_chunk, mb_index, &mb_x, &mb_y);
 
         /* idct_put'ting luminance */
-        if ((s->sys->pix_fmt == PIX_FMT_YUV420P) ||
-            (s->sys->pix_fmt == PIX_FMT_YUV411P && mb_x >= (704 / 8)) ||
+        if ((s->sys->pix_fmt == AV_PIX_FMT_YUV420P) ||
+            (s->sys->pix_fmt == AV_PIX_FMT_YUV411P && mb_x >= (704 / 8)) ||
             (s->sys->height >= 720 && mb_y != 134)) {
             y_stride = (s->picture.linesize[0] << ((!is_field_mode[mb_index]) * log2_blocksize));
         } else {
@@ -274,11 +276,11 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
         block += 4*64;
 
         /* idct_put'ting chrominance */
-        c_offset = (((mb_y >>  (s->sys->pix_fmt == PIX_FMT_YUV420P)) * s->picture.linesize[1] +
-                     (mb_x >> ((s->sys->pix_fmt == PIX_FMT_YUV411P) ? 2 : 1))) << log2_blocksize);
+        c_offset = (((mb_y >>  (s->sys->pix_fmt == AV_PIX_FMT_YUV420P)) * s->picture.linesize[1] +
+                     (mb_x >> ((s->sys->pix_fmt == AV_PIX_FMT_YUV411P) ? 2 : 1))) << log2_blocksize);
         for (j = 2; j; j--) {
             uint8_t *c_ptr = s->picture.data[j] + c_offset;
-            if (s->sys->pix_fmt == PIX_FMT_YUV411P && mb_x >= (704 / 8)) {
+            if (s->sys->pix_fmt == AV_PIX_FMT_YUV411P && mb_x >= (704 / 8)) {
                   uint64_t aligned_pixels[64/8];
                   uint8_t *pixels = (uint8_t*)aligned_pixels;
                   uint8_t *c_ptr1, *ptr1;
@@ -310,7 +312,7 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
 /* NOTE: exactly one frame must be given (120000 bytes for NTSC,
    144000 bytes for PAL - or twice those for 50Mbps) */
 static int dvvideo_decode_frame(AVCodecContext *avctx,
-                                 void *data, int *data_size,
+                                 void *data, int *got_frame,
                                  AVPacket *avpkt)
 {
     uint8_t *buf = avpkt->data;
@@ -335,12 +337,21 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     avctx->pix_fmt   = s->sys->pix_fmt;
     avctx->time_base = s->sys->time_base;
     avcodec_set_dimensions(avctx, s->sys->width, s->sys->height);
-    if (avctx->get_buffer(avctx, &s->picture) < 0) {
+    if (ff_get_buffer(avctx, &s->picture) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
     s->picture.interlaced_frame = 1;
     s->picture.top_field_first  = 0;
+
+    /* Determine the codec's sample_aspect ratio and field order from the packet */
+    vsc_pack = buf + 80*5 + 48 + 5;
+    if ( *vsc_pack == dv_video_control ) {
+        apt = buf[4] & 0x07;
+        is16_9 = (vsc_pack[2] & 0x07) == 0x02 || (!apt && (vsc_pack[2] & 0x07) == 0x07);
+        avctx->sample_aspect_ratio = s->sys->sar[is16_9];
+        s->picture.top_field_first = !(vsc_pack[3] & 0x40);
+    }
 
     s->buf = buf;
     avctx->execute(avctx, dv_decode_video_segment, s->sys->work_chunks, NULL,
@@ -349,16 +360,8 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     emms_c();
 
     /* return image */
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = s->picture;
-
-    /* Determine the codec's sample_aspect ratio from the packet */
-    vsc_pack = buf + 80*5 + 48 + 5;
-    if ( *vsc_pack == dv_video_control ) {
-        apt = buf[4] & 0x07;
-        is16_9 = (vsc_pack[2] & 0x07) == 0x02 || (!apt && (vsc_pack[2] & 0x07) == 0x07);
-        avctx->sample_aspect_ratio = s->sys->sar[is16_9];
-    }
 
     return s->sys->frame_size;
 }
@@ -376,7 +379,7 @@ static int dvvideo_close(AVCodecContext *c)
 AVCodec ff_dvvideo_decoder = {
     .name           = "dvvideo",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_DVVIDEO,
+    .id             = AV_CODEC_ID_DVVIDEO,
     .priv_data_size = sizeof(DVVideoContext),
     .init           = ff_dvvideo_init,
     .close          = dvvideo_close,

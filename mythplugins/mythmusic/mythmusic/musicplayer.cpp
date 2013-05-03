@@ -14,11 +14,14 @@
 #include <mythdb.h>
 #include <mythdialogbox.h>
 #include <mythmainwindow.h>
+#include <musicutils.h>
 
 // mythmusic
+#include "musicdata.h"
 #include "musicplayer.h"
 #include "decoder.h"
 #include "decoderhandler.h"
+#include "metaio.h"
 #ifdef HAVE_CDIO
 #include "cddecoder.h"
 #endif
@@ -245,7 +248,7 @@ void MusicPlayer::loadSettings(void )
 }
 
 // this stops playing the playlist and plays the file pointed to by mdata
-void MusicPlayer::playFile(const Metadata &mdata)
+void MusicPlayer::playFile(const MusicMetadata &mdata)
 {
     if (m_oneshotMetadata)
     {
@@ -253,7 +256,7 @@ void MusicPlayer::playFile(const Metadata &mdata)
         m_oneshotMetadata = NULL;
     }
 
-    m_oneshotMetadata = new Metadata();
+    m_oneshotMetadata = new MusicMetadata();
     *m_oneshotMetadata = mdata;
 
     play();
@@ -328,7 +331,7 @@ void MusicPlayer::pause(void)
 
 void MusicPlayer::play(void)
 {
-    Metadata *meta = getCurrentMetadata();
+    MusicMetadata *meta = getCurrentMetadata();
     if (!meta)
         return;
 
@@ -536,12 +539,14 @@ void MusicPlayer::customEvent(QEvent *event)
         if (!dhe)
             return;
 
-        Metadata *mdata = new Metadata(*dhe->getMetadata());
+        MusicMetadata *mdata = new MusicMetadata(*dhe->getMetadata());
 
         m_lastTrackStart += m_currentTime;
 
         mdata->setID(m_currentMetadata->ID());
         mdata->setTrack(m_playedList.count() + 1);
+        mdata->setStation(m_currentMetadata->Station());
+        mdata->setChannel(m_currentMetadata->Channel());
 
         m_playedList.append(mdata);
 
@@ -636,7 +641,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (start != -1 && end != -1 && start != end)
                     {
                         QString filename = me->Message().mid(start + 1, end - start - 1);
-                        Metadata mdata;
+                        MusicMetadata mdata;
                         mdata.setFilename(filename);
                         playFile(mdata);
                     }
@@ -650,7 +655,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (list.size() == 4)
                     {
                         QString filename = list[3];
-                        Metadata mdata;
+                        MusicMetadata mdata;
                         mdata.setFilename(filename);
                         playFile(mdata);
                     }
@@ -664,7 +669,7 @@ void MusicPlayer::customEvent(QEvent *event)
                     if (list.size() == 4)
                     {
                         int trackID = list[3].toInt();
-                        Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+                        MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
                         if (mdata)
                             playFile(*mdata);
                     }
@@ -676,7 +681,7 @@ void MusicPlayer::customEvent(QEvent *event)
                 else if (list[2] == "GET_METADATA")
                 {
                     QString mdataStr;
-                    Metadata *mdata = getCurrentMetadata();
+                    MusicMetadata *mdata = getCurrentMetadata();
                     if (mdata)
                         mdataStr = QString("%1 by %2 from %3").arg(mdata->Title()).arg(mdata->Artist()).arg(mdata->Album());
                     else
@@ -700,7 +705,7 @@ void MusicPlayer::customEvent(QEvent *event)
             if (!startdir.isEmpty() && !startdir.endsWith("/"))
                 startdir += "/";
 
-            gMusicData->musicDir = startdir;
+            setMusicDirectory(startdir);
 
             loadSettings();
         }
@@ -884,6 +889,22 @@ void MusicPlayer::loadPlaylist(void)
         m_cdWatcher->start();
 }
 
+void MusicPlayer::loadStreamPlaylist(void)
+{
+    // create the radio playlist
+    gMusicData->all_playlists->getStreamPlaylist()->disableSaves();
+    gMusicData->all_playlists->getStreamPlaylist()->removeAllTracks();
+    StreamList *list = gMusicData->all_streams->getStreams();
+
+    for (int x = 0; x < list->count(); x++)
+    {
+        MusicMetadata *mdata = list->at(x);
+        gMusicData->all_playlists->getStreamPlaylist()->addTrack(mdata->ID(), false);
+    }
+
+    gMusicData->all_playlists->getStreamPlaylist()->enableSaves();
+}
+
 void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
 {
     if (moveUp && whichTrack <= 0)
@@ -892,7 +913,7 @@ void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
     if (!moveUp && whichTrack >=  m_currentPlaylist->getSongs().size() - 1)
         return;
 
-    Metadata *currTrack = m_currentPlaylist->getSongs().at(m_currentTrack);
+    MusicMetadata *currTrack = m_currentPlaylist->getSongs().at(m_currentTrack);
 
     m_currentPlaylist->moveTrackUpDown(moveUp, whichTrack);
 
@@ -1021,7 +1042,7 @@ void MusicPlayer::changeCurrentTrack(int trackNo)
 }
 
 /// get the metadata for the current track in the playlist
-Metadata *MusicPlayer::getCurrentMetadata(void)
+MusicMetadata *MusicPlayer::getCurrentMetadata(void)
 {
     if (m_oneshotMetadata)
         return m_oneshotMetadata;
@@ -1038,7 +1059,7 @@ Metadata *MusicPlayer::getCurrentMetadata(void)
 }
 
 /// get the metadata for the next track in the playlist
-Metadata *MusicPlayer::getNextMetadata(void)
+MusicMetadata *MusicPlayer::getNextMetadata(void)
 {
     if (m_playMode == PLAYMODE_RADIO)
         return NULL;
@@ -1133,8 +1154,8 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
     {
         for (int x = 0; x < getPlaylist()->getSongs().size(); x++)
         {
-            Metadata *mdata = getPlaylist()->getSongs().at(x);
-            if (mdata && mdata->ID() == (Metadata::IdType) curTrackID)
+            MusicMetadata *mdata = getPlaylist()->getSongs().at(x);
+            if (mdata && mdata->ID() == (MusicMetadata::IdType) curTrackID)
             {
                 m_currentTrack = x;
                 break;
@@ -1161,8 +1182,18 @@ void MusicPlayer::updateVolatileMetadata(void)
         if (m_currentMetadata->hasChanged())
         {
             m_currentMetadata->persist();
-            if (getDecoder())
-                getDecoder()->commitVolatileMetadata(m_currentMetadata);
+
+            // only write the playcount & rating to the tag if it's enabled by the user
+            if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
+            {
+                MetaIO *tagger = MetaIO::createTagger(m_currentMetadata->Filename(true));
+
+                if (tagger)
+                {
+                    tagger->writeVolatileMetadata(m_currentMetadata);
+                    delete tagger;
+                }
+            }
 
             sendTrackStatsChangedEvent(m_currentMetadata->ID());
         }
@@ -1402,7 +1433,7 @@ void MusicPlayer::decoderHandlerReady(void)
 
 void MusicPlayer::removeTrack(int trackID)
 {
-    Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+    MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
     if (mdata)
     {
         int trackPos = gPlayer->getPlaylist()->getSongs().indexOf(mdata);
@@ -1416,6 +1447,11 @@ void MusicPlayer::removeTrack(int trackID)
 void MusicPlayer::addTrack(int trackID, bool updateUI)
 {
     getPlaylist()->addTrack(trackID, updateUI);
+}
+
+StreamList  *MusicPlayer::getStreamList(void) 
+{
+    return gMusicData->all_streams->getStreams();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1437,7 +1473,7 @@ void CDWatcherThread::run()
 
         m_cdStatusChanged = false;
 
-        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
         decoder->setDevice(m_cdDevice);
         int numTracks = decoder->getNumCDAudioTracks();
         bool redo = false;
@@ -1457,7 +1493,7 @@ void CDWatcherThread::run()
         else if (numTracks > 0)
         {
             // Check the last track to see if it's changed
-            Metadata *checker = decoder->getLastMetadata();
+            MusicMetadata *checker = decoder->getLastMetadata();
             if (checker)
             {
                 if (!gMusicData->all_music->checkCDTrack(checker))
@@ -1484,7 +1520,7 @@ void CDWatcherThread::run()
         for (int actual_tracknum = 1;
             redo && actual_tracknum <= tracks; actual_tracknum++)
         {
-            Metadata *track = decoder->getMetadata(actual_tracknum);
+            MusicMetadata *track = decoder->getMetadata(actual_tracknum);
             if (track)
             {
                 gMusicData->all_music->addCDTrack(*track);

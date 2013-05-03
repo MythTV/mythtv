@@ -19,11 +19,13 @@
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%include "x86inc.asm"
-%include "x86util.asm"
+%include "libavutil/x86/x86util.asm"
 
-;SECTION_RODATA
-SECTION .text
+SECTION_RODATA
+; mask equivalent for multiply by -1.0 1.0
+ps_mask         times 2 dd 1<<31, 0
+
+SECTION_TEXT
 
 INIT_XMM sse
 cglobal sbr_sum_square, 2, 3, 6
@@ -112,4 +114,67 @@ cglobal sbr_hf_g_filt, 5, 6, 5
     dec         r5
     jnz         .loop1
 .end:
+    RET
+
+; static void sbr_hf_gen_c(float (*X_high)[2], const float (*X_low)[2],
+;                          const float alpha0[2], const float alpha1[2],
+;                          float bw, int start, int end)
+;
+cglobal sbr_hf_gen, 4,4,8, X_high, X_low, alpha0, alpha1, BW, S, E
+    ; load alpha factors
+%define bw m0
+%if ARCH_X86_64 == 0 || WIN64
+    movss      bw, BWm
+%endif
+    movlps     m2, [alpha1q]
+    movlps     m1, [alpha0q]
+    shufps     bw, bw, 0
+    mulps      m2, bw             ; (a1[0] a1[1])*bw
+    mulps      m1, bw             ; (a0[0] a0[1])*bw    = (a2 a3)
+    mulps      m2, bw             ; (a1[0] a1[1])*bw*bw = (a0 a1)
+    mova       m3, m1
+    mova       m4, m2
+
+    ; Set pointers
+%if ARCH_X86_64 == 0 || WIN64
+    ; start and end 6th and 7th args on stack
+    mov        r2d, Sm
+    mov        r3d, Em
+%define  start r2q
+%define  end   r3q
+%else
+; BW does not actually occupy a register, so shift by 1
+%define  start BWq
+%define  end   Sq
+%endif
+    sub      start, end          ; neg num of loops
+    lea    X_highq, [X_highq + end*2*4]
+    lea     X_lowq, [X_lowq  + end*2*4 - 2*2*4]
+    shl      start, 3            ; offset from num loops
+
+    mova        m0, [X_lowq + start]
+    shufps      m3, m3, q1111
+    shufps      m4, m4, q1111
+    xorps       m3, [ps_mask]
+    shufps      m1, m1, q0000
+    shufps      m2, m2, q0000
+    xorps       m4, [ps_mask]
+.loop2:
+    movu        m7, [X_lowq + start + 8]        ; BbCc
+    mova        m6, m0
+    mova        m5, m7
+    shufps      m0, m0, q2301                   ; aAbB
+    shufps      m7, m7, q2301                   ; bBcC
+    mulps       m0, m4
+    mulps       m7, m3
+    mulps       m6, m2
+    mulps       m5, m1
+    addps       m7, m0
+    mova        m0, [X_lowq + start +16]        ; CcDd
+    addps       m7, m0
+    addps       m6, m5
+    addps       m7, m6
+    mova  [X_highq + start], m7
+    add     start, 16
+    jnz         .loop2
     RET

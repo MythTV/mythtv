@@ -46,11 +46,11 @@ namespace
         FileAssociationWrap(const FileAssociations::file_association &fa) :
             m_fa(fa), m_state(efsNONE) {}
 
-        int GetID() const { return m_fa.id; }
-        QString GetExtension() const { return m_fa.extension; }
-        QString GetCommand() const { return m_fa.playcommand; }
-        bool GetDefault() const { return m_fa.use_default; }
-        bool GetIgnore() const { return m_fa.ignore; }
+        unsigned int GetIDx(void) const { return m_fa.id; }
+        QString GetExtension(void) const { return m_fa.extension; }
+        QString GetCommand(void) const { return m_fa.playcommand; }
+        bool GetDefault(void) const { return m_fa.use_default; }
+        bool GetIgnore(void) const { return m_fa.ignore; }
 
         FA_State GetState() const { return m_state; }
 
@@ -61,7 +61,7 @@ namespace
                 case efsDELETE:
                 {
                     FileAssociations::getFileAssociation().remove(m_fa.id);
-                    m_fa.id = -1;
+                    m_fa.id = 0;
                     m_state = efsNONE;
                     break;
                 }

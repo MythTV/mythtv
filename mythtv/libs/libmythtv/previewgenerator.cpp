@@ -129,7 +129,7 @@ bool PreviewGenerator::RunReal(void)
                     "because mode was invalid 0x%2")
             .arg(pathname).arg((int)mode,0,16));
     }
-    else if (is_local && !!(mode & kLocal) && LocalPreviewRun())
+    else if (!!(mode & kLocal) && LocalPreviewRun())
     {
         ok = true;
         msg = QString("Generated on %1 in %2 seconds, starting at %3")
@@ -224,30 +224,41 @@ bool PreviewGenerator::Run(void)
     else
     {
         // This is where we fork and run mythpreviewgen to actually make preview
-        command += QString(" --size %1x%2")
-            .arg(outSize.width()).arg(outSize.height());
+        QStringList cmdargs;
+
+        cmdargs << "--size"
+                << QString("%1x%2").arg(outSize.width()).arg(outSize.height());
         if (captureTime >= 0)
         {
             if (timeInSeconds)
-                command += QString(" --seconds %1").arg(captureTime);
+                cmdargs << "--seconds";
             else
-                command += QString(" --frame %1").arg(captureTime);
+                cmdargs << "--frame";
+            cmdargs << QString::number(captureTime);
         }
-        command += QString(" --chanid %1").arg(programInfo.GetChanID());
-        command += QString(" --starttime %1")
-            .arg(programInfo.GetRecordingStartTime(MythDate::kFilename));
+        cmdargs << "--chanid"
+                << QString::number(programInfo.GetChanID())
+                << "--starttime"
+                << programInfo.GetRecordingStartTime(MythDate::kFilename);
 
         if (!outFileName.isEmpty())
-            command += QString(" --outfile \"%1\"").arg(outFileName);
-
-        command += logPropagateArgs;
-        if (!logPropagateQuiet())
-            command += " --quiet";
+            cmdargs << "--outfile" << outFileName;
 
         // Timeout in 30s
-        uint ret = myth_system(command, kMSDontBlockInputDevs |
+        MythSystem *ms = new MythSystem(command, cmdargs,
+                                        kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
-                                        kMSProcessEvents, 30);
+                                        kMSProcessEvents      |
+                                        kMSNoRunShell         |
+                                        kMSAutoCleanup        |
+                                        kMSPropagateLogs);
+        ms->SetNice(10);
+        ms->SetIOPrio(7);
+
+        ms->Run(30);
+        uint ret = ms->Wait();
+        delete ms;
+
         if (ret != GENERIC_EXIT_OK)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + 
@@ -440,7 +451,7 @@ bool PreviewGenerator::event(QEvent *e)
 
     size_t     length     = me->ExtraData(4).toULongLong();
     quint16    checksum16 = me->ExtraData(5).toUInt();
-    QByteArray data       = QByteArray::fromBase64(me->ExtraData(6).toAscii());
+    QByteArray data       = QByteArray::fromBase64(me->ExtraData(6).toLatin1());
     if ((size_t) data.size() < length)
     {   // (note data.size() may be up to 3
         //  bytes longer after decoding
@@ -536,16 +547,6 @@ bool PreviewGenerator::SavePreview(QString filename,
 {
     if (!data || !width || !height)
         return false;
-
-    if( height == 1088 )
-    {
-        // Remove the extra 8 pixels at the bottom of 1080i recordings that
-        // decode to 1088 rows as these are bogus pixels and make the previews
-        // look a bit wrong.  The worst offender seems to be H.264 captures
-        // from HDPVR.  Apparently, BBC HD also may exhibit the same behavior
-        // in the UK, although with a different width.
-        height = 1080;
-    }
 
     const QImage img((unsigned char*) data,
                      width, height, QImage::Format_RGB32);

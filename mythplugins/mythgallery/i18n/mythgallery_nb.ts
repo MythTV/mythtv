@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="229"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="236"/>
         <source>Press SELECT to play again</source>
         <translation>Trykk VELG for å vise en gang til</translation>
     </message>
@@ -637,7 +637,7 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="204"/>
+        <location filename="../mythgallery/singleview.cpp" line="211"/>
         <source>Press SELECT to play again</source>
         <translation>Trykk VELG for å vise en gang til</translation>
     </message>
@@ -675,9 +675,24 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>MENY: Aktiver meny</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>PICTURE GALLERY</source>
+        <translation>BILLEDGALLERI</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="12"/>
         <source>Adjust view for your picture library</source>
         <translation>Juster visningen for ditt billedgalleri</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Filter and sort images</source>
+        <translation>Filtrer og sorter bilder</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Folder filter:</source>
+        <translation>Mappefilter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>

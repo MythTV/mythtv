@@ -375,7 +375,8 @@ void SourceManager::recurseDirs( QDir dir )
     if (!dir.exists())
         return;
 
-    dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
+    dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs |
+                  QDir::NoDotAndDotDot);
     QFileInfoList files = dir.entryInfoList();
     QFileInfo file;
 
@@ -385,8 +386,6 @@ void SourceManager::recurseDirs( QDir dir )
         file = files.at(x);
         if (file.isDir())
         {
-            if (file.fileName() == QString("..")) continue;
-            if (file.fileName() == QString("."))  continue;
             QDir recurseTo(file.filePath());
             recurseDirs(recurseTo);
         }

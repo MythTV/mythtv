@@ -235,6 +235,13 @@ class Metadata( DictData ):
         if xml is not None:
             self._process(xml)
 
+    def __setitem__(self, key, value):
+        if key not in self._field_order:
+                raise KeyError(str(key))
+        if self._global_type[key] in (4,6):
+            value = datetime.duck(value)
+        dict.__setitem__(self, key, value)
+
     def _fillNone(self):
         DictData._fillNone(self)
         for subgroup in self._groups:
@@ -385,12 +392,12 @@ class Grabber( System ):
                 this method will return a fully populated object.
         """
         try:
-            if inetref.season and inetref.episode:
+            if (inetref.season is not None) and (inetref.episode is not None):
                 args = (inetref.inetref, inetref.season, inetref.episode)
             else:
                 args = (inetref.inetref,)
         except:
-            if season and episode:
+            if (season is not None) and (episode is not None):
                 args = (inetref, season, episode)
             else:
                 args = (inetref,)

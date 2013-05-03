@@ -1580,7 +1580,7 @@ EOF
             # previous DB schema updates if the user is running a restore
             # script from an older version of MythTV, but the extra data will
             # only take a bit of hard drive space.
-                @partial_restore_tables = ('callsignnetworkmap',
+                @partial_restore_tables = ('callsignnetworkmap', # historic
                                            'capturecard',
                                            'cardinput',
                                            'channel',
@@ -1617,7 +1617,7 @@ EOF
                                            'keybindings',
                                            'keyword',
                                            'mythlog',
-                                           'networkiconmap',
+                                           'networkiconmap',        # historic
                                            'oldfind',
                                            'oldprogram',
                                            'people',

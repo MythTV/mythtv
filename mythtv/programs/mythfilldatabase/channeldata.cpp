@@ -58,23 +58,23 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
 
 bool ChannelData::insert_chan(uint sourceid)
 {
-    bool insert_channels = channel_updates;
+    bool insert_channels = m_channelUpdates;
     if (!insert_channels)
     {
         bool isEncoder, isUnscanable;
         bool isCableCard  = SourceUtil::IsCableCardPresent(sourceid);
-        if (cardtype.isEmpty())
+        if (m_cardType.isEmpty())
         {
             isEncoder    = SourceUtil::IsEncoder(sourceid);
             isUnscanable = SourceUtil::IsUnscanable(sourceid);
         }
         else
         {
-            isEncoder    = CardUtil::IsEncoder(cardtype);
-            isUnscanable = CardUtil::IsUnscanable(cardtype);
+            isEncoder    = CardUtil::IsEncoder(m_cardType);
+            isUnscanable = CardUtil::IsUnscanable(m_cardType);
         }
         insert_channels = (isCableCard || isEncoder || isUnscanable) &&
-                           !remove_new_channels;
+                           !m_removeNewChannels;
     }
 
     return insert_channels;
@@ -82,79 +82,116 @@ bool ChannelData::insert_chan(uint sourceid)
 
 
 unsigned int ChannelData::promptForChannelUpdates(
-    QList<ChanInfo>::iterator chaninfo, unsigned int chanid)
+    ChannelInfoList::iterator chaninfo, unsigned int chanid)
 {
-    if (chanid == 0)
+    (*chaninfo).name = getResponse(QObject::tr("Choose a channel name (any string, "
+                                   "long version) "),(*chaninfo).name);
+    (*chaninfo).callsign = getResponse(QObject::tr("Choose a channel callsign (any string, "
+                                       "short version) "),(*chaninfo).callsign);
+
+    if (m_channelPreset)
     {
-        // Default is 0 to allow rapid skipping of many channels,
-        // in some xmltv outputs there may be over 100 channel, but
-        // only 10 or so that are available in each area.
-        chanid = getResponse("Choose a channel ID (positive integer) ", "0")
-            .toUInt();
-
-        // If we wish to skip this channel, use the default 0 and return.
-        if (chanid == 0)
-            return(0);
-    }
-
-    (*chaninfo).name = getResponse("Choose a channel name (any string, "
-                                   "long version) ",(*chaninfo).name);
-    (*chaninfo).callsign = getResponse("Choose a channel callsign (any string, "
-                                       "short version) ",(*chaninfo).callsign);
-
-    if (channel_preset)
-    {
-        (*chaninfo).chanstr = getResponse("Choose a channel preset (0..999) ",
-                                         (*chaninfo).chanstr);
-        (*chaninfo).freqid  = getResponse("Choose a frequency id (just like "
-                                          "xawtv) ",(*chaninfo).freqid);
+        (*chaninfo).channum = getResponse(QObject::tr("Choose a channel preset (0..999) "),
+                                         (*chaninfo).channum);
+        (*chaninfo).freqid  = getResponse(QObject::tr("Choose a frequency id "),
+                                          (*chaninfo).freqid);
     }
     else
     {
-        (*chaninfo).chanstr  = getResponse("Choose a channel number (just like "
-                                           "xawtv) ",(*chaninfo).chanstr);
-        (*chaninfo).freqid = (*chaninfo).chanstr;
+        (*chaninfo).channum  = getResponse(QObject::tr("Choose a channel number "),
+                                           (*chaninfo).channum);
+        (*chaninfo).freqid = (*chaninfo).channum;
     }
 
-    (*chaninfo).finetune = getResponse("Choose a channel fine tune offset (just"
-                                       " like xawtv) ",(*chaninfo).finetune);
+    (*chaninfo).finetune = getResponse(QObject::tr("Choose a channel fine tune offset "),
+                                       QString::number((*chaninfo).finetune)).toInt();
 
-    (*chaninfo).tvformat = getResponse("Choose a TV format "
-                                       "(PAL/SECAM/NTSC/ATSC/Default) ",
+    (*chaninfo).tvformat = getResponse(QObject::tr("Choose a TV format "
+                                       "(PAL/SECAM/NTSC/ATSC/Default) "),
                                        (*chaninfo).tvformat);
 
-    (*chaninfo).iconpath = getResponse("Choose a channel icon image (any path "
-                                       "name) ",(*chaninfo).iconpath);
+    (*chaninfo).icon = getResponse(QObject::tr("Choose a channel icon image "
+                                   "(relative path to icon storage group) "),
+                                   (*chaninfo).icon);
 
     return(chanid);
 }
 
-void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
+QString ChannelData::normalizeChannelKey(const QString &chanName) const
 {
+    QString result = chanName;
+
+    // Lowercase
+    result = result.toLower();
+    // Strip all whitespace
+    result = result.replace(" ", "");
+    
+    return result;
+}
+
+QHash<QString, ChannelInfo> ChannelData::channelList(int sourceId)
+{
+    QHash<QString, ChannelInfo> retList;
+
+    ChannelInfoList channelList = ChannelUtil::GetChannels(sourceId, true);
+    
+    ChannelInfoList::iterator it = channelList.begin();
+    for ( ; it != channelList.end(); ++it)
+    {
+        QString chanName = (*it).name;
+        QString key  = normalizeChannelKey(chanName);
+        retList[key] = (*it);
+    }
+
+    return retList;
+}
+
+ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
+                            QHash<QString, ChannelInfo> existingChannels) const
+{
+    QHash<QString, ChannelInfo>::iterator it;
+    for (it = existingChannels.begin(); it != existingChannels.end(); ++it)
+    {
+        if ((*it).xmltvid == chanInfo.xmltvid)
+            return (*it);
+    }
+
+    QString searchKey = normalizeChannelKey(chanInfo.name);
+    ChannelInfo existChan = existingChannels.value(searchKey);
+
+    return existChan;
+}
+
+void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
+{
+    QHash<QString, ChannelInfo> existingChannels = channelList(id);
     QString fileprefix = SetupIconCacheDirectory();
 
     QDir::setCurrent(fileprefix);
 
     fileprefix += "/";
 
-    QList<ChanInfo>::iterator i = chanlist->begin();
+    ChannelInfoList::iterator i = chanlist->begin();
     for (; i != chanlist->end(); ++i)
     {
+        if ((*i).xmltvid.isEmpty())
+            continue;
+
         QString localfile;
 
-        if (!(*i).iconpath.isEmpty())
+        if (!(*i).icon.isEmpty())
         {
-            QDir remotefile = QDir((*i).iconpath);
+            QDir remotefile = QDir((*i).icon);
             QString filename = remotefile.dirName();
 
             localfile = fileprefix + filename;
             QFile actualfile(localfile);
             if (!actualfile.exists() &&
-                !GetMythDownloadManager()->download((*i).iconpath, localfile))
+                !GetMythDownloadManager()->download((*i).icon, localfile))
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to fetch icon from '%1'")
-                        .arg((*i).iconpath));
+                        .arg((*i).icon));
             }
         }
 
@@ -190,78 +227,62 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 }
             }
         }
-
-        query.prepare(
-            "SELECT chanid,   name, callsign, channum, "
-            "       finetune, icon, freqid,   tvformat "
-            "FROM channel "
-            "WHERE xmltvid  = :XMLTVID AND "
-            "      sourceid = :SOURCEID");
-        query.bindValue(":XMLTVID",  (*i).xmltvid);
-        query.bindValue(":SOURCEID", id);
-
-        if (!query.exec())
+        
+        ChannelInfo dbChan = FindMatchingChannel(*i, existingChannels);
+        if (dbChan.chanid > 0) // Channel exists, updating
         {
-            MythDB::DBError("handleChannels", query);
-        }
-        else if (query.next())
-        {
-            QString chanid = query.value(0).toString();
-            if (interactive)
+            LOG(VB_XMLTV, LOG_NOTICE,
+                    QString("Match found for xmltvid %1 to channel %2 (%3)")
+                        .arg((*i).xmltvid).arg(dbChan.name).arg(dbChan.chanid));
+            if (m_interactive)
             {
-                QString name     = query.value(1).toString();
-                QString callsign = query.value(2).toString();
-                QString chanstr  = query.value(3).toString();
-                QString finetune = query.value(4).toString();
-                QString icon     = query.value(5).toString();
-                QString freqid   = query.value(6).toString();
-                QString tvformat = query.value(7).toString();
 
                 cout << "### " << endl;
                 cout << "### Existing channel found" << endl;
                 cout << "### " << endl;
                 cout << "### xmltvid  = "
-                     << (*i).xmltvid.toLocal8Bit().constData() << endl;
+                     << (*i).xmltvid.toLocal8Bit().constData()        << endl;
                 cout << "### chanid   = "
-                     << chanid.toLocal8Bit().constData()       << endl;
+                     << dbChan.chanid                                 << endl;
                 cout << "### name     = "
-                     << name.toLocal8Bit().constData()         << endl;
+                     << dbChan.name.toLocal8Bit().constData()         << endl;
                 cout << "### callsign = "
-                     << callsign.toLocal8Bit().constData()     << endl;
+                     << dbChan.callsign.toLocal8Bit().constData()     << endl;
                 cout << "### channum  = "
-                     << chanstr.toLocal8Bit().constData()      << endl;
-                if (channel_preset)
+                     << dbChan.channum.toLocal8Bit().constData()      << endl;
+                if (m_channelPreset)
                 {
                     cout << "### freqid   = "
-                         << freqid.toLocal8Bit().constData()   << endl;
+                         << dbChan.freqid.toLocal8Bit().constData()   << endl;
                 }
                 cout << "### finetune = "
-                     << finetune.toLocal8Bit().constData()     << endl;
+                     << dbChan.finetune                               << endl;
                 cout << "### tvformat = "
-                     << tvformat.toLocal8Bit().constData()     << endl;
+                     << dbChan.tvformat.toLocal8Bit().constData()     << endl;
                 cout << "### icon     = "
-                     << icon.toLocal8Bit().constData()         << endl;
+                     << dbChan.icon.toLocal8Bit().constData()         << endl;
                 cout << "### " << endl;
 
-                (*i).name = name;
-                (*i).callsign = callsign;
-                (*i).chanstr  = chanstr;
-                (*i).finetune = finetune;
-                (*i).freqid = freqid;
-                (*i).tvformat = tvformat;
+                // The only thing the xmltv data supplies here is the icon
+                (*i).name = dbChan.name;
+                (*i).callsign = dbChan.callsign;
+                (*i).channum  = dbChan.channum;
+                (*i).finetune = dbChan.finetune;
+                (*i).freqid = dbChan.freqid;
+                (*i).tvformat = dbChan.tvformat;
 
-                promptForChannelUpdates(i, chanid.toUInt());
+                promptForChannelUpdates(i, dbChan.chanid);
 
                 if ((*i).callsign.isEmpty())
-                    (*i).callsign = chanid;
+                    (*i).callsign = dbChan.name;
 
-                if (name     != (*i).name ||
-                    callsign != (*i).callsign ||
-                    chanstr  != (*i).chanstr ||
-                    finetune != (*i).finetune ||
-                    freqid   != (*i).freqid ||
-                    icon     != localfile ||
-                    tvformat != (*i).tvformat)
+                if (dbChan.name     != (*i).name ||
+                    dbChan.callsign != (*i).callsign ||
+                    dbChan.channum  != (*i).channum ||
+                    dbChan.finetune != (*i).finetune ||
+                    dbChan.freqid   != (*i).freqid ||
+                    dbChan.icon     != localfile ||
+                    dbChan.tvformat != (*i).tvformat)
                 {
                     MSqlQuery subquery(MSqlQuery::InitCon());
                     subquery.prepare("UPDATE channel SET chanid = :CHANID, "
@@ -271,11 +292,11 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                                      "tvformat = :TVFORMAT "
                                      " WHERE xmltvid = :XMLTVID "
                                      "AND sourceid = :SOURCEID;");
-                    subquery.bindValue(":CHANID", chanid);
+                    subquery.bindValue(":CHANID", dbChan.chanid);
                     subquery.bindValue(":NAME", (*i).name);
                     subquery.bindValue(":CALLSIGN", (*i).callsign);
-                    subquery.bindValue(":CHANNUM", (*i).chanstr);
-                    subquery.bindValue(":FINE", (*i).finetune.toInt());
+                    subquery.bindValue(":CHANNUM", (*i).channum);
+                    subquery.bindValue(":FINE", (*i).finetune);
                     subquery.bindValue(":ICON", localfile);
                     subquery.bindValue(":FREQID", (*i).freqid);
                     subquery.bindValue(":TVFORMAT", (*i).tvformat);
@@ -300,15 +321,34 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else
+            else if ((dbChan.icon != localfile) ||
+                     (dbChan.xmltvid != (*i).xmltvid))
             {
-                if (!non_us_updating && !localfile.isEmpty())
+                LOG(VB_XMLTV, LOG_NOTICE, QString("Updating channel %1 (%2)")
+                                        .arg(dbChan.name).arg(dbChan.chanid));
+                if (!m_nonUSUpdating && !localfile.isEmpty())
                 {
                     MSqlQuery subquery(MSqlQuery::InitCon());
                     subquery.prepare("UPDATE channel SET icon = :ICON WHERE "
                                      "chanid = :CHANID;");
                     subquery.bindValue(":ICON", localfile);
-                    subquery.bindValue(":CHANID", chanid);
+                    subquery.bindValue(":CHANID", dbChan.chanid);
+
+                    if (!subquery.exec())
+                        MythDB::DBError("Channel icon change", subquery);
+                }
+                else
+                {
+                    if (localfile.isEmpty())
+                        localfile = dbChan.icon;
+                    MSqlQuery subquery(MSqlQuery::InitCon());
+
+                    subquery.prepare("UPDATE channel SET icon = :ICON "
+                            ", xmltvid:= :XMLTVID WHERE "
+                                     "chanid = :CHANID;");
+                    subquery.bindValue(":ICON", localfile);
+                    subquery.bindValue(":XMLTVID", (*i).xmltvid);
+                    subquery.bindValue(":CHANID", dbChan.chanid);
 
                     if (!subquery.exec())
                         MythDB::DBError("Channel icon change", subquery);
@@ -319,9 +359,9 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
         {
             int major, minor = 0;
             long long freq = 0;
-            get_atsc_stuff((*i).chanstr, id, (*i).freqid.toInt(), major, minor, freq);
+            get_atsc_stuff((*i).channum, id, (*i).freqid.toInt(), major, minor, freq);
 
-            if (interactive && ((minor == 0) || (freq > 0)))
+            if (m_interactive && ((minor == 0) || (freq > 0)))
             {
                 cout << "### " << endl;
                 cout << "### New channel found" << endl;
@@ -331,14 +371,14 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 cout << "### callsign = "
                      << (*i).callsign.toLocal8Bit().constData() << endl;
                 cout << "### channum  = "
-                     << (*i).chanstr.toLocal8Bit().constData()  << endl;
-                if (channel_preset)
+                     << (*i).channum.toLocal8Bit().constData()  << endl;
+                if (m_channelPreset)
                 {
                     cout << "### freqid   = "
                          << (*i).freqid.toLocal8Bit().constData() << endl;
                 }
                 cout << "### finetune = "
-                     << (*i).finetune.toLocal8Bit().constData() << endl;
+                     << (*i).finetune                           << endl;
                 cout << "### tvformat = "
                      << (*i).tvformat.toLocal8Bit().constData() << endl;
                 cout << "### icon     = "
@@ -358,7 +398,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 if (((mplexid > 0) || ((minor == 0) && (chanid > 0))) &&
                     ChannelUtil::CreateChannel(
                         mplexid,          id,               chanid,
-                        (*i).callsign,    (*i).name,        (*i).chanstr,
+                        (*i).callsign,    (*i).name,        (*i).channum,
                         0 /*service id*/, major,            minor,
                         false /*use on air guide*/, false /*hidden*/,
                         false /*hidden in guide*/,
@@ -376,7 +416,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if (!non_us_updating && ((minor == 0) || (freq > 0)))
+            else if (!m_nonUSUpdating && ((minor == 0) || (freq > 0)))
             {
                 // We only do this if we are not asked to skip it with the
                 // --updating flag.
@@ -388,7 +428,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 }
 
                 if ((mplexid > 0) || (minor == 0))
-                    chanid = ChannelUtil::CreateChanID(id, (*i).chanstr);
+                    chanid = ChannelUtil::CreateChanID(id, (*i).channum);
 
                 if ((*i).callsign.isEmpty())
                 {
@@ -411,8 +451,8 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                 if (chanid > 0)
                 {
-                    QString cstr = QString((*i).chanstr);
-                    if(channel_preset && cstr.isEmpty())
+                    QString cstr = QString((*i).channum);
+                    if(m_channelPreset && cstr.isEmpty())
                         cstr = QString::number(chanid % 1000);
 
                     bool retval = ChannelUtil::CreateChannel(

@@ -551,7 +551,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     EncoderProfile *profile = NULL;
 
     // is the file an mpeg2 file?
-    if (item->videoCodec.toLower() == "mpeg2video")
+    if (item->videoCodec.toLower() == "mpeg2video (main)")
     {
         // does the file already have a valid DVD resolution?
         if (gCoreContext->GetSetting("MythArchiveVideoFormat", "pal").toLower()
@@ -942,9 +942,8 @@ void MythBurn::runScript()
     QString configDir = tempDir + "config";
     QString commandline;
 
-    // remove existing progress.log if present
-    if (QFile::exists(logDir + "/progress.log"))
-        QFile::remove(logDir + "/progress.log");
+    // remove any existing logs
+    myth_system("rm -f " + logDir + "/*.log");
 
     // remove cancel flag file if present
     if (QFile::exists(logDir + "/mythburncancel.lck"))

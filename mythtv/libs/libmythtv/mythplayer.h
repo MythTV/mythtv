@@ -10,7 +10,6 @@
 
 #include "playercontext.h"
 #include "volumebase.h"
-#include "audiooutputsettings.h"
 #include "ringbuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
@@ -31,9 +30,8 @@
 
 #include "mythtvexp.h"
 
-extern "C" {
 #include "filter.h"
-}
+
 using namespace std;
 
 class VideoOutput;
@@ -144,7 +142,7 @@ class MTV_PUBLIC MythPlayer
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetVideoFilters(const QString &override);
-    void SetEof(bool eof);
+    void SetEof(EofState eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
 
@@ -182,8 +180,9 @@ class MTV_PUBLIC MythPlayer
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
     int     GetLength(void) const             { return totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
+    uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
-    virtual  int64_t GetSecondsPlayed(void);
+    virtual  int64_t GetSecondsPlayed(bool honorCutList);
     virtual  int64_t GetTotalSeconds(void) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
@@ -200,7 +199,7 @@ class MTV_PUBLIC MythPlayer
     bool    IsPaused(void) const              { return allpaused;      }
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
-    bool    GetEof(void);
+    EofState GetEof(void) const;
     bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
@@ -258,6 +257,7 @@ class MTV_PUBLIC MythPlayer
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return decoder; }
     void *GetDecoderContext(unsigned char* buf, uint8_t*& id);
+    virtual bool HasReachedEof(void) const;
 
     // Preview Image stuff
     void SaveScreenshot(void);
@@ -292,6 +292,11 @@ class MTV_PUBLIC MythPlayer
     // Public MHEG/MHI stream selection
     bool SetAudioByComponentTag(int tag);
     bool SetVideoByComponentTag(int tag);
+    bool SetStream(const QString &);
+    long GetStreamPos(); // mS
+    long GetStreamMaxPos(); // mS
+    long SetStreamPos(long); // mS
+    void StreamPlay(bool play = true);
 
     // LiveTV public stuff
     void CheckTVChain();
@@ -318,8 +323,9 @@ class MTV_PUBLIC MythPlayer
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
 
     // Position Map Stuff
-    bool PosMapFromEnc(unsigned long long          start,
-                       QMap<long long, long long> &posMap);
+    bool PosMapFromEnc(uint64_t start,
+                       frm_pos_map_t &posMap,
+                       frm_pos_map_t &durMap);
 
     // OSD locking for TV class
     bool TryLockOSD(void) { return osdLock.tryLock(50); }
@@ -388,12 +394,27 @@ class MTV_PUBLIC MythPlayer
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
-    uint64_t TranslatePositionAbsToRel(uint64_t absPosition) const {
-        return deleteMap.TranslatePositionAbsToRel(absPosition);
+    uint64_t TranslatePositionFrameToMs(uint64_t position,
+                                        bool use_cutlist) const;
+    uint64_t TranslatePositionMsToFrame(uint64_t position,
+                                        bool use_cutlist) const {
+        return deleteMap.TranslatePositionMsToFrame(position,
+                                                    GetFrameRate(),
+                                                    use_cutlist);
     }
-    uint64_t TranslatePositionRelToAbs(uint64_t relPosition) const {
-        return deleteMap.TranslatePositionRelToAbs(relPosition);
+    // TranslatePositionAbsToRel and TranslatePositionRelToAbs are
+    // used for frame calculations when seeking relative to a number
+    // of frames rather than by time.
+    uint64_t TranslatePositionAbsToRel(uint64_t position) const {
+        return deleteMap.TranslatePositionAbsToRel(position);
     }
+    uint64_t TranslatePositionRelToAbs(uint64_t position) const {
+        return deleteMap.TranslatePositionRelToAbs(position);
+    }
+    float ComputeSecs(uint64_t position, bool use_cutlist) const {
+        return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
+    }
+    uint64_t FindFrame(float offset, bool use_cutlist) const;
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)
@@ -455,7 +476,7 @@ class MTV_PUBLIC MythPlayer
     // Edit mode stuff
     bool EnableEdit(void);
     bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
-    bool GetEditMode(void) { return deleteMap.IsEditing(); }
+    bool GetEditMode(void) const { return deleteMap.IsEditing(); }
     void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
     uint64_t GetNearestMark(uint64_t frame, bool right);
@@ -552,6 +573,8 @@ class MTV_PUBLIC MythPlayer
     // The "inaccuracy" argument is generally one of the kInaccuracy* values.
     bool DoFastForward(uint64_t frames, double inaccuracy);
     bool DoRewind(uint64_t frames, double inaccuracy);
+    bool DoFastForwardSecs(float secs, double inaccuracy, bool use_cutlist);
+    bool DoRewindSecs(float secs, double inaccuracy, bool use_cutlist);
     void DoJumpToFrame(uint64_t frame, double inaccuracy);
 
     // Private seeking stuff
@@ -578,11 +601,12 @@ class MTV_PUBLIC MythPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
+    void  JumpToStream(const QString&);
 
   protected:
     PlayerFlags    playerFlags;
     DecoderBase   *decoder;
-    QMutex         decoder_change_lock;
+    mutable QMutex decoder_change_lock;
     VideoOutput   *videoOutput;
     PlayerContext *player_ctx;
     DecoderThread *decoderThread;
@@ -711,6 +735,7 @@ class MTV_PUBLIC MythPlayer
     InteractiveTV *interactiveTV;
     bool       itvEnabled;
     QMutex     itvLock;
+    QString    m_newStream; // Guarded by itvLock
 
     // OSD stuff
     OSD  *osd;

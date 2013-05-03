@@ -26,6 +26,8 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
+#include "internal.h"
+#include "libavutil/internal.h"
 
 typedef struct VCR1Context {
     AVFrame picture;
@@ -47,8 +49,12 @@ static av_cold int vcr1_decode_init(AVCodecContext *avctx)
 {
     vcr1_common_init(avctx);
 
-    avctx->pix_fmt = PIX_FMT_YUV410P;
+    avctx->pix_fmt = AV_PIX_FMT_YUV410P;
 
+    if (avctx->width % 8 || avctx->height%4) {
+        av_log_ask_for_sample(avctx, "odd dimensions are not supported\n");
+        return AVERROR_PATCHWELCOME;
+    }
     return 0;
 }
 
@@ -63,7 +69,7 @@ static av_cold int vcr1_decode_end(AVCodecContext *avctx)
 }
 
 static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
-                             int *data_size, AVPacket *avpkt)
+                             int *got_frame, AVPacket *avpkt)
 {
     const uint8_t *buf        = avpkt->data;
     int buf_size              = avpkt->size;
@@ -82,7 +88,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     p->reference = 0;
-    if (avctx->get_buffer(avctx, p) < 0) {
+    if (ff_get_buffer(avctx, p) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
@@ -137,7 +143,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     *picture   = a->picture;
-    *data_size = sizeof(AVPicture);
+    *got_frame = 1;
 
     return buf_size;
 }
@@ -145,7 +151,7 @@ static int vcr1_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_vcr1_decoder = {
     .name           = "vcr1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VCR1,
+    .id             = AV_CODEC_ID_VCR1,
     .priv_data_size = sizeof(VCR1Context),
     .init           = vcr1_decode_init,
     .close          = vcr1_decode_end,
@@ -185,7 +191,7 @@ static int vcr1_encode_frame(AVCodecContext *avctx, unsigned char *buf,
 AVCodec ff_vcr1_encoder = {
     .name           = "vcr1",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_VCR1,
+    .id             = AV_CODEC_ID_VCR1,
     .priv_data_size = sizeof(VCR1Context),
     .init           = vcr1_common_init,
     .encode         = vcr1_encode_frame,

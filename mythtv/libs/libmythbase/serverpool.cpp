@@ -61,7 +61,7 @@ PrivTcpServer::PrivTcpServer(QObject *parent) : QTcpServer(parent)
 {
 }
 
-void PrivTcpServer::incomingConnection(int socket)
+void PrivTcpServer::incomingConnection(qt_socket_fd_t socket)
 {
     emit newConnection(socket);
 }
@@ -386,9 +386,13 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         server->setProxy(m_proxy);
         server->setMaxPendingConnections(m_maxPendingConn);
 
-        connect(server, SIGNAL(newConnection(int)),
-                this,   SLOT(newTcpConnection(int)));
-
+#if (QT_VERSION >= 0x050000)
+        connect(server, &PrivTcpServer::newConnection,
+                this,   &ServerPool::newTcpConnection);
+#else
+        connect(server, SIGNAL(newConnection(qt_socket_fd_t)),
+                this,   SLOT(newTcpConnection(qt_socket_fd_t)));
+#endif
         if (server->listen(*it, m_port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Listening on TCP %1:%2")
@@ -567,7 +571,7 @@ qint64 ServerPool::writeDatagram(const QByteArray &datagram,
     return writeDatagram(datagram.data(), datagram.size(), addr, port);
 }
 
-void ServerPool::newTcpConnection(int socket)
+void ServerPool::newTcpConnection(qt_socket_fd_t socket)
 {
     QTcpSocket *qsock = new QTcpSocket(this);
     qsock->setSocketDescriptor(socket);

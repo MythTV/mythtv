@@ -334,16 +334,11 @@
                                 <filename>watermarks/stop_light.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECPRIORITIES" from="TV">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/priority.png</filename>
-                            </imagetype>-->
-                        </state>
                         <state name="TV_CONFLICTS" from="TV_CUSTOM_RECORD" />
 
-                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECPRIORITIES" />
-                        <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECPRIORITIES" />
-                        <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
+                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECORDING_RULES" />
+                        <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECORDING_RULES" />
+                        <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECORDING_RULES" />
 
                         <state name="SETUP_GENERAL" from="SETUP" />
                         <state name="SETUP_SYSTEM_EVENTS" from="SETUP" />
@@ -394,18 +389,13 @@
                         <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
                         <state name="TV_SETTINGS_CHANNEL_GROUP" from="TV" />
                         <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
-                        <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
+                        <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECORDING_RULES" />
 
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
                         <state name="TV_WATCH_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="TV_DELETE" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/delete.png</filename>
                             </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="default">
@@ -745,16 +735,11 @@
                                 <filename>watermarks/stop_light.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECPRIORITIES" from="TV">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/priority.png</filename>
-                            </imagetype>-->
-                        </state>
                         <state name="TV_CONFLICTS" from="TV_CUSTOM_RECORD" />
 
-                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECPRIORITIES" />
-                        <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECPRIORITIES" />
-                        <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
+                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECORDING_RULES" />
+                        <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECORDING_RULES" />
+                        <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECORDING_RULES" />
 
                         <state name="SETUP_GENERAL" from="SETUP" />
                         <state name="SETUP_SYSTEM_EVENTS" from="SETUP" />
@@ -798,18 +783,13 @@
                         <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
                         <state name="TV_SETTINGS_CHANNEL_GROUP" from="TV" />
                         <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
-                        <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
+                        <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECORDING_RULES" />
 
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
                         <state name="TV_WATCH_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="TV_DELETE" from="default">
-                            <imagetype name="icon">
-                                <filename>watermarks/delete.png</filename>
                             </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="default">

@@ -117,53 +117,53 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="120"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="327"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
         <source>Enter URL</source>
         <translation>Введите URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="252"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="316"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
         <source>Actions</source>
         <translation>Действия</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="330"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
         <source>Back</source>
         <translation>Назад</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="333"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
         <source>Forward</source>
         <translation>Вперед</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
         <source>Zoom In</source>
         <translation>Увеличить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
         <source>Zoom Out</source>
         <translation>Уменьшить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
         <source>New Tab</source>
         <translation>Новая вкладка</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
         <source>Delete Tab</source>
         <translation>Удалить вкладку</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
         <source>Add Bookmark</source>
         <translation>Добавить закладку</translation>
     </message>
@@ -341,7 +341,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="121"/>
+        <location filename="../mythbrowser/webpage.cpp" line="126"/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>

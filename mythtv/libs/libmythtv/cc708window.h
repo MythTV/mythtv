@@ -207,6 +207,7 @@ class MTV_PUBLIC CC708Window
                       int row_count,        int column_count,
                       int row_lock,         int column_lock,
                       int pen_style,        int window_style);
+    void Resize(uint new_rows, uint new_columns);
     void Clear(void);
     void SetWindowStyle(uint);
 
@@ -271,8 +272,11 @@ class MTV_PUBLIC CC708Window
     uint justify;
     uint word_wrap;
 
+    // These are akin to the capacity of a vector, which is always >=
+    // the current size.
     uint true_row_count;
     uint true_column_count;
+
     CC708Character *text;
     CC708Pen        pen;
 

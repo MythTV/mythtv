@@ -852,7 +852,8 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
 
     if (!dir.exists())
         return;
-
+    
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
@@ -860,8 +861,6 @@ void ThemeChooser::removeThemeDir(const QString &dirname)
     while (it != list.end())
     {
         fi = &(*it++);
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
         if (fi->isFile() && !fi->isSymLink())
         {
             QFile::remove(fi->absoluteFilePath());

@@ -74,7 +74,7 @@
 #define AV_DICT_APPEND         32   /**< If the entry already exists, append to it.  Note that no
                                       delimiter is added, the strings are simply concatenated. */
 
-typedef struct {
+typedef struct AVDictionaryEntry {
     char *key;
     char *value;
 } AVDictionaryEntry;
@@ -91,6 +91,14 @@ typedef struct AVDictionary AVDictionary;
  */
 AVDictionaryEntry *
 av_dict_get(AVDictionary *m, const char *key, const AVDictionaryEntry *prev, int flags);
+
+/**
+ * Get number of entries in dictionary.
+ *
+ * @param m dictionary
+ * @return  number of entries in dictionary
+ */
+int av_dict_count(const AVDictionary *m);
 
 /**
  * Set the given entry in *pm, overwriting an existing entry.
@@ -124,4 +132,4 @@ void av_dict_free(AVDictionary **m);
  * @}
  */
 
-#endif // AVUTIL_DICT_H
+#endif /* AVUTIL_DICT_H */

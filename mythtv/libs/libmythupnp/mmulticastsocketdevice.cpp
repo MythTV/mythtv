@@ -53,7 +53,7 @@ MMulticastSocketDevice::MMulticastSocketDevice(
     setProtocol(IPv4);
     setSocket(createNewSocket(), MSocketDevice::Datagram);
 
-    m_imr.imr_multiaddr.s_addr = inet_addr(sAddress.toAscii().constData());
+    m_imr.imr_multiaddr.s_addr = inet_addr(sAddress.toLatin1().constData());
     m_imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
     if (setsockopt(socket(), IPPROTO_IP, IP_ADD_MEMBERSHIP,

@@ -39,13 +39,13 @@ static av_cold int decode_init(AVCodecContext *avctx)
     AnmContext *s = avctx->priv_data;
     int i;
 
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
     avcodec_get_frame_defaults(&s->frame);
     s->frame.reference = 3;
     bytestream2_init(&s->gb, avctx->extradata, avctx->extradata_size);
     if (bytestream2_get_bytes_left(&s->gb) < 16 * 8 + 4 * 256)
-        return -1;
+        return AVERROR_INVALIDDATA;
 
     bytestream2_skipu(&s->gb, 16 * 8);
     for (i = 0; i < 256; i++)
@@ -56,8 +56,9 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
 /**
  * Perform decode operation
- * @param dst, dst_end Destination image buffer
- * @param gb, GetByteContext (optional, see below)
+ * @param dst     pointer to destination image buffer
+ * @param dst_end pointer to end of destination image buffer
+ * @param gb GetByteContext (optional, see below)
  * @param pixel Fill color (optional, see below)
  * @param count Pixel count
  * @param x Pointer to x-axis counter
@@ -66,8 +67,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
  * @return non-zero if destination buffer is exhausted
  *
  * a copy operation is achieved when 'gb' is set
- * a fill operation is acheived when 'gb' is null and pixel is >= 0
- * a skip operation is acheived when 'gb' is null and pixel is < 0
+ * a fill operation is achieved when 'gb' is null and pixel is >= 0
+ * a skip operation is achieved when 'gb' is null and pixel is < 0
  */
 static inline int op(uint8_t **dst, const uint8_t *dst_end,
                      GetByteContext *gb,
@@ -105,17 +106,17 @@ exhausted:
 }
 
 static int decode_frame(AVCodecContext *avctx,
-                        void *data, int *data_size,
+                        void *data, int *got_frame,
                         AVPacket *avpkt)
 {
     AnmContext *s = avctx->priv_data;
     const int buf_size = avpkt->size;
     uint8_t *dst, *dst_end;
-    int count;
+    int count, ret;
 
-    if(avctx->reget_buffer(avctx, &s->frame) < 0){
+    if ((ret = avctx->reget_buffer(avctx, &s->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
+        return ret;
     }
     dst     = s->frame.data[0];
     dst_end = s->frame.data[0] + s->frame.linesize[0]*avctx->height;
@@ -124,11 +125,11 @@ static int decode_frame(AVCodecContext *avctx,
 
     if (bytestream2_get_byte(&s->gb) != 0x42) {
         av_log_ask_for_sample(avctx, "unknown record type\n");
-        return buf_size;
+        return AVERROR_INVALIDDATA;
     }
     if (bytestream2_get_byte(&s->gb)) {
         av_log_ask_for_sample(avctx, "padding bytes not supported\n");
-        return buf_size;
+        return AVERROR_PATCHWELCOME;
     }
     bytestream2_skip(&s->gb, 2);
 
@@ -158,7 +159,7 @@ static int decode_frame(AVCodecContext *avctx,
                     break; // stop
                 if (type == 2) {
                     av_log_ask_for_sample(avctx, "unknown opcode");
-                    return AVERROR_INVALIDDATA;
+                    return AVERROR_PATCHWELCOME;
                 }
                 continue;
             }
@@ -170,7 +171,7 @@ static int decode_frame(AVCodecContext *avctx,
 
     memcpy(s->frame.data[1], s->palette, AVPALETTE_SIZE);
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = s->frame;
     return buf_size;
 }
@@ -186,7 +187,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 AVCodec ff_anm_decoder = {
     .name           = "anm",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_ANM,
+    .id             = AV_CODEC_ID_ANM,
     .priv_data_size = sizeof(AnmContext),
     .init           = decode_init,
     .close          = decode_end,

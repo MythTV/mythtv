@@ -776,7 +776,7 @@ LogServerThread::~LogServerThread()
 
 /// \brief Run the logging thread.  This thread reads from ZeroMQ (TCP:35327)
 ///        and handles distributing the LoggingItems to each logger instance
-///        vi ZeroMQ (inproc).
+///        via ZeroMQ (inproc).
 void LogServerThread::run(void)
 {
     RunProlog();
@@ -938,6 +938,9 @@ void LogServerThread::stop(void)
 
 /// \brief  Entry point to start logging for the application.  This will
 ///         start up all of the threads needed.
+/// \return TRUE on success, FALSE on failure
+///
+/// \todo   Implement the following parameters to customise behaviour?...
 /// \param  logfile Filename of the logfile to create.  Empty if no file.
 /// \param  progress    non-zero if progress output will be sent to the console.
 ///                     This squelches all messages less important than LOG_ERR
@@ -948,7 +951,6 @@ void LogServerThread::stop(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-/// \return TRUE on success, FALSE on failure
 bool logServerStart(void)
 {
     if (logServerThread && logServerThread->isRunning())
@@ -1201,7 +1203,7 @@ void LogForwardThread::expireClients(void)
         QString clientId = logClientToDel.takeFirst();
         logClientCount.deref();
         LOG(VB_GENERAL, LOG_INFO, QString("Expiring client %1 (#%2)")
-            .arg(clientId).arg(logClientCount));
+            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
         LoggerListItem *item = logClientMap.take(clientId);
         if (!item)
             continue;
@@ -1228,8 +1230,10 @@ void LogForwardThread::expireClients(void)
         delete list;
     }
 
+    // TODO FIXME: This is not thread-safe!
     // just this daemon left
-    if (logClientCount == 1 && m_shutdownTimer && !m_shutdownTimer->isActive())
+    if (logClientCount.fetchAndAddOrdered(0) == 1 &&
+        m_shutdownTimer && !m_shutdownTimer->isActive())
     {
         LOG(VB_GENERAL, LOG_INFO, "Starting 5min shutdown timer");
         m_shutdownTimer->start(5*60*1000);
@@ -1307,9 +1311,10 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
         logClientCount.ref();
         LOG(VB_GENERAL, LOG_INFO, QString("New Client: %1 (#%2)")
-            .arg(clientId).arg(logClientCount));
+            .arg(clientId).arg(logClientCount.fetchAndAddOrdered(0)));
 
-        if (logClientCount > 1 && m_shutdownTimer &&
+        // TODO FIXME This is not thread-safe!
+        if (logClientCount.fetchAndAddOrdered(0) > 1 && m_shutdownTimer &&
             m_shutdownTimer->isActive())
         {
             LOG(VB_GENERAL, LOG_INFO, "Aborting shutdown timer");

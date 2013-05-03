@@ -26,12 +26,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "dsputil.h"
+#include "libavutil/internal.h"
 #include "libavutil/lfg.h"
+#include "libavutil/mem.h"
+#include "libavutil/time.h"
 
 #undef printf
 
@@ -58,13 +59,6 @@ static void help(void)
            "test motion implementations\n");
 }
 
-static int64_t gettime(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    return (int64_t)tv.tv_sec * 1000000 + tv.tv_usec;
-}
-
 #define NB_ITS 500
 
 int dummy;
@@ -86,8 +80,8 @@ static void test_motion(const char *name,
         for(y=0;y<HEIGHT-17;y++) {
             for(x=0;x<WIDTH-17;x++) {
                 ptr = img2 + y * WIDTH + x;
-                d1 = test_func(NULL, img1, ptr, WIDTH, 1);
-                d2 = ref_func(NULL, img1, ptr, WIDTH, 1);
+                d1 = test_func(NULL, img1, ptr, WIDTH, 8);
+                d2 = ref_func(NULL, img1, ptr, WIDTH, 8);
                 if (d1 != d2) {
                     printf("error: mmx=%d c=%d\n", d1, d2);
                 }
@@ -97,19 +91,19 @@ static void test_motion(const char *name,
     emms_c();
 
     /* speed test */
-    ti = gettime();
+    ti = av_gettime();
     d1 = 0;
     for(it=0;it<NB_ITS;it++) {
         for(y=0;y<HEIGHT-17;y++) {
             for(x=0;x<WIDTH-17;x++) {
                 ptr = img2 + y * WIDTH + x;
-                d1 += test_func(NULL, img1, ptr, WIDTH, 1);
+                d1 += test_func(NULL, img1, ptr, WIDTH, 8);
             }
         }
     }
     emms_c();
     dummy = d1; /* avoid optimization */
-    ti = gettime() - ti;
+    ti = av_gettime() - ti;
 
     printf("  %0.0f kop/s\n",
            (double)NB_ITS * (WIDTH - 16) * (HEIGHT - 16) /
@@ -122,28 +116,24 @@ int main(int argc, char **argv)
     AVCodecContext *ctx;
     int c;
     DSPContext cctx, mmxctx;
-    int flags[2] = { AV_CPU_FLAG_MMX, AV_CPU_FLAG_MMX2 };
-    int flags_size = HAVE_MMX2 ? 2 : 1;
+    int flags[2] = { AV_CPU_FLAG_MMX, AV_CPU_FLAG_MMXEXT };
+    int flags_size = HAVE_MMXEXT ? 2 : 1;
 
-    for(;;) {
-        c = getopt(argc, argv, "h");
-        if (c == -1)
-            break;
-        switch(c) {
-        case 'h':
-            help();
-            return 1;
-        }
+    if (argc > 1) {
+        help();
+        return 1;
     }
 
     printf("ffmpeg motion test\n");
 
     ctx = avcodec_alloc_context3(NULL);
     ctx->dsp_mask = AV_CPU_FLAG_FORCE;
+    memset(&cctx, 0, sizeof(cctx));
     ff_dsputil_init(&cctx, ctx);
     for (c = 0; c < flags_size; c++) {
         int x;
         ctx->dsp_mask = AV_CPU_FLAG_FORCE | flags[c];
+        memset(&mmxctx, 0, sizeof(mmxctx));
         ff_dsputil_init(&mmxctx, ctx);
 
         for (x = 0; x < 2; x++) {

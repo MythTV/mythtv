@@ -17,8 +17,6 @@
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/AudioFormat.h>
 
-using namespace std;
-
 #include "mythcorecontext.h"
 #include "audiooutputca.h"
 #include "config.h"

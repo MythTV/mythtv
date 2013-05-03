@@ -6,8 +6,10 @@
 #include <QList>
 #include <QString>
 
+// libmythtv
+#include "channelinfo.h"
+
 class ProgInfo;
-class ChanInfo;
 class QUrl;
 class QDomElement;
 
@@ -16,15 +18,10 @@ class XMLTVParser
   public:
     XMLTVParser();
 
-    ChanInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
-    ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset);
-    bool parseFile(
-        QString filename, QList<ChanInfo> *chanlist,
-        QMap<QString, QList<ProgInfo> > *proglist);
-
-
-  public:
-    bool isJapan;
+    ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
+    ProgInfo *parseProgram(QDomElement &element);
+    bool parseFile(QString filename, ChannelInfoList *chanlist,
+                   QMap<QString, QList<ProgInfo> > *proglist);
 
   private:
     unsigned int current_year;

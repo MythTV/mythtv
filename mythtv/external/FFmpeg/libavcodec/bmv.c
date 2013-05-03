@@ -19,8 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/avassert.h"
+#include "libavutil/channel_layout.h"
 #include "avcodec.h"
 #include "bytestream.h"
+#include "internal.h"
 
 enum BMVFlags{
     BMV_NOP = 0,
@@ -52,7 +55,7 @@ typedef struct BMVDecContext {
 
 static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, int frame_off)
 {
-    int val, saved_val = 0;
+    unsigned val, saved_val = 0;
     int tmplen = src_len;
     const uint8_t *src, *source_end = source + src_len;
     uint8_t *frame_end = frame + SCREEN_WIDE * SCREEN_HIGH;
@@ -98,6 +101,8 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
         }
         if (!(val & 0xC)) {
             for (;;) {
+                if(shift>22)
+                    return -1;
                 if (!read_two_nibbles) {
                     if (src < source || src >= source_end)
                         return -1;
@@ -131,6 +136,7 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
         }
         advance_mode = val & 1;
         len = (val >> 1) - 1;
+        av_assert0(len>0);
         mode += 1 + advance_mode;
         if (mode >= 4)
             mode -= 3;
@@ -140,7 +146,9 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
         case 1:
             if (forward) {
                 if (dst - frame + SCREEN_WIDE < frame_off ||
-                        frame_end - dst < frame_off + len)
+                        dst - frame + SCREEN_WIDE + frame_off < 0 ||
+                        frame_end - dst < frame_off + len ||
+                        frame_end - dst < len)
                     return -1;
                 for (i = 0; i < len; i++)
                     dst[i] = dst[frame_off + i];
@@ -148,7 +156,9 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
             } else {
                 dst -= len;
                 if (dst - frame + SCREEN_WIDE < frame_off ||
-                        frame_end - dst < frame_off + len)
+                        dst - frame + SCREEN_WIDE + frame_off < 0 ||
+                        frame_end - dst < frame_off + len ||
+                        frame_end - dst < len)
                     return -1;
                 for (i = len - 1; i >= 0; i--)
                     dst[i] = dst[frame_off + i];
@@ -179,8 +189,6 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
                 memset(dst, val, len);
             }
             break;
-        default:
-            break;
         }
         if (dst == dst_end)
             return 0;
@@ -188,11 +196,12 @@ static int decode_bmv_frame(const uint8_t *source, int src_len, uint8_t *frame, 
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *pkt)
+static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
+                        AVPacket *pkt)
 {
     BMVDecContext * const c = avctx->priv_data;
     int type, scr_off;
-    int i;
+    int i, ret;
     uint8_t *srcptr, *outptr;
 
     c->stream = pkt->data;
@@ -219,7 +228,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
             return AVERROR_INVALIDDATA;
         }
         for (i = 0; i < 256; i++)
-            c->pal[i] = 0xFF << 24 | bytestream_get_be24(&c->stream);
+            c->pal[i] = 0xFFU << 24 | bytestream_get_be24(&c->stream);
     }
     if (type & BMV_SCROLL) {
         if (c->stream - pkt->data > pkt->size - 2) {
@@ -231,6 +240,15 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         scr_off = -640;
     } else {
         scr_off = 0;
+    }
+
+    if (c->pic.data[0])
+        avctx->release_buffer(avctx, &c->pic);
+
+    c->pic.reference = 3;
+    if ((ret = ff_get_buffer(avctx, &c->pic)) < 0) {
+        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
+        return ret;
     }
 
     if (decode_bmv_frame(c->stream, pkt->size - (c->stream - pkt->data), c->frame, scr_off)) {
@@ -250,7 +268,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         outptr += c->pic.linesize[0];
     }
 
-    *data_size = sizeof(AVFrame);
+    *got_frame = 1;
     *(AVFrame*)data = c->pic;
 
     /* always report that the buffer was completely consumed */
@@ -262,12 +280,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
     BMVDecContext * const c = avctx->priv_data;
 
     c->avctx = avctx;
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
-    c->pic.reference = 1;
-    if (avctx->get_buffer(avctx, &c->pic) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
+    if (avctx->width != SCREEN_WIDE || avctx->height != SCREEN_HIGH) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid dimension %dx%d\n", avctx->width, avctx->height);
+        return AVERROR_INVALIDDATA;
     }
 
     c->frame = c->frame_base + 640;
@@ -297,12 +314,9 @@ static av_cold int bmv_aud_decode_init(AVCodecContext *avctx)
 {
     BMVAudioDecContext *c = avctx->priv_data;
 
-    if (avctx->channels != 2) {
-        av_log(avctx, AV_LOG_INFO, "invalid number of channels\n");
-        return AVERROR(EINVAL);
-    }
-
-    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
+    avctx->channels       = 2;
+    avctx->channel_layout = AV_CH_LAYOUT_STEREO;
+    avctx->sample_fmt     = AV_SAMPLE_FMT_S16;
 
     avcodec_get_frame_defaults(&c->frame);
     avctx->coded_frame = &c->frame;
@@ -330,7 +344,7 @@ static int bmv_aud_decode_frame(AVCodecContext *avctx, void *data,
 
     /* get output buffer */
     c->frame.nb_samples = total_blocks * 32;
-    if ((ret = avctx->get_buffer(avctx, &c->frame)) < 0) {
+    if ((ret = ff_get_buffer(avctx, &c->frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -356,18 +370,19 @@ static int bmv_aud_decode_frame(AVCodecContext *avctx, void *data,
 AVCodec ff_bmv_video_decoder = {
     .name           = "bmv_video",
     .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = CODEC_ID_BMV_VIDEO,
+    .id             = AV_CODEC_ID_BMV_VIDEO,
     .priv_data_size = sizeof(BMVDecContext),
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
     .long_name      = NULL_IF_CONFIG_SMALL("Discworld II BMV video"),
 };
 
 AVCodec ff_bmv_audio_decoder = {
     .name           = "bmv_audio",
     .type           = AVMEDIA_TYPE_AUDIO,
-    .id             = CODEC_ID_BMV_AUDIO,
+    .id             = AV_CODEC_ID_BMV_AUDIO,
     .priv_data_size = sizeof(BMVAudioDecContext),
     .init           = bmv_aud_decode_init,
     .decode         = bmv_aud_decode_frame,

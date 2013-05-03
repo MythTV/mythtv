@@ -361,7 +361,7 @@
                 </imagetype>
             </state>
             <state name="TV_MANUAL_SCHEDULE" from="TV_PROGRAM_GUIDE" />
-            <state name="TV_RECPRIORITIES" from="DEFAULT">
+            <state name="TV_RECORDING_RULES" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/priority.png</filename>
                 </imagetype>
@@ -369,9 +369,9 @@
             <state name="TV_CONFLICTS" from="TV_CUSTOM_RECORD" />
 
             <!--   recpriorities_settings.xml  -->
-            <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECPRIORITIES" />
-            <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECPRIORITIES" />
-            <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
+            <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECORDING_RULES" />
+            <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECORDING_RULES" />
+            <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECORDING_RULES" />
 
             <!--   setup.xml  -->
             <state name="SETUP_GENERAL" from="SETUP" />
@@ -413,7 +413,7 @@
             <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
             <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
             <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
-            <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
+            <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECORDING_RULES" />
 
             <!--   tvmenu.xml  -->
             <state name="TV_WATCH_TV" from="TV" />
@@ -421,11 +421,6 @@
             <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/play.png</filename>
-                </imagetype>
-            </state>
-            <state name="TV_DELETE" from="DEFAULT">
-                <imagetype name="watermark">
-                    <filename>watermark/error.png</filename>
                 </imagetype>
             </state>
             <state name="TV_PREVIOUS" from="DEFAULT">

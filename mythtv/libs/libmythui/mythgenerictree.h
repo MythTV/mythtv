@@ -22,11 +22,13 @@ class MUI_PUBLIC MythGenericTree
 
   public:
     MythGenericTree(const QString &a_string = "", int an_int = 0,
-                bool selectable_flag = false);
+                    bool selectable_flag = false);
     virtual ~MythGenericTree();
 
     MythGenericTree *addNode(const QString &a_string, int an_int = 0,
-                         bool selectable_flag = false, bool visible = true);
+                             bool selectable_flag = false, bool visible = true);
+    MythGenericTree *addNode(const QString &a_string, const QString &sortText = "",
+                             int an_int = 0, bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(MythGenericTree *child);
 
     /// Detach this node/branch from it's parent without deleting it, it can
@@ -41,8 +43,6 @@ class MUI_PUBLIC MythGenericTree
 
     MythGenericTree *nextSibling(int number_down);
     MythGenericTree *prevSibling(int number_up);
-
-    QList<MythGenericTree*>::iterator getFirstChildIterator() const;
 
     MythGenericTree *getSelectedChild(bool onlyVisible = false) const;
     MythGenericTree *getVisibleChildAt(uint reference) const;
@@ -65,15 +65,13 @@ class MUI_PUBLIC MythGenericTree
     void setParent(MythGenericTree* a_parent) { m_parent = a_parent; }
     MythGenericTree *getParent(void) const;
 
-    // Deprecated
-    const QString getString(void) const { return m_text; }
-    void setString(const QString &str) { m_text = str; }
-    // End deprecated
-
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
     void SetTextFromMap(InfoMap &infoMap, const QString &state="");
     QString GetText(const QString &name="") const;
+
+    QString GetSortText() const { return m_sortText; }
+    void SetSortText(const QString &text) { m_sortText = text; }
 
     void SetImage(const QString &filename, const QString &name="");
     void SetImageFromMap(InfoMap &infoMap);
@@ -101,27 +99,12 @@ class MUI_PUBLIC MythGenericTree
     void IncVisibleCount() { m_visibleCount++; }
     void DecVisibleCount() { m_visibleCount--; }
 
-    void setAttribute(uint attribute_position, int value_of_attribute);
-    int getAttribute(uint which_one) const;
-    IntVector *getAttributes(void) const { return m_attributes; }
-
-    void setOrderingIndex(int ordering_index);
-    int getOrderingIndex(void) const { return m_currentOrderingIndex; }
-
     void becomeSelectedChild(void);
-    void setSelectedChild(MythGenericTree* a_node) { m_selected_subnode = a_node; }
-
-    void addYourselfIfSelectable(QList<MythGenericTree*> *flat_list);
-    void buildFlatListOfSubnodes(bool scrambled_parents);
-
-    MythGenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around,
-                                      MythGenericTree *active) const;
+    void setSelectedChild(MythGenericTree* a_node) { m_selectedSubnode = a_node; }
 
     void sortByString();
-    void sortByAttributeThenByString(int which_attribute);
     void sortBySelectable();
     void deleteAllChildren();
-    void reOrderAsSorted();
 
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(MythGenericTree *item, bool flag);
@@ -132,6 +115,7 @@ class MUI_PUBLIC MythGenericTree
     void reorderSubnodes(void);
 
     QString m_text;
+    QString m_sortText;
     QMap<QString, TextProperties> m_strings;
     InfoMap m_imageFilenames;
     InfoMap m_states;
@@ -140,16 +124,12 @@ class MUI_PUBLIC MythGenericTree
     uint m_visibleCount;
 
     SortableMythGenericTreeList *m_subnodes;
-    SortableMythGenericTreeList *m_ordered_subnodes;
-    SortableMythGenericTreeList *m_flatenedSubnodes;
 
-    MythGenericTree *m_selected_subnode;
-    IntVector *m_attributes;
+    MythGenericTree *m_selectedSubnode;
     MythGenericTree *m_parent;
 
     bool m_selectable;
     bool m_visible;
-    int m_currentOrderingIndex;
 };
 
 Q_DECLARE_METATYPE(MythGenericTree*)

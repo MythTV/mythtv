@@ -93,11 +93,11 @@ static av_cold int y41p_encode_close(AVCodecContext *avctx)
 AVCodec ff_y41p_encoder = {
     .name         = "y41p",
     .type         = AVMEDIA_TYPE_VIDEO,
-    .id           = CODEC_ID_Y41P,
+    .id           = AV_CODEC_ID_Y41P,
     .init         = y41p_encode_init,
     .encode2      = y41p_encode_frame,
     .close        = y41p_encode_close,
-    .pix_fmts     = (const enum PixelFormat[]) { PIX_FMT_YUV411P,
-                                                 PIX_FMT_NONE },
+    .pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV411P,
+                                                 AV_PIX_FMT_NONE },
     .long_name    = NULL_IF_CONFIG_SMALL("Uncompressed YUV 4:1:1 12-bit"),
 };

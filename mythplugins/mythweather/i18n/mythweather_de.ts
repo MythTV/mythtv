@@ -1189,7 +1189,8 @@ Wenn Sie fertig sind klicken Sie &quot;Beenden&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
-        <source>Wind(Gust):</source>
+        <source>Wind (Gust):</source>
+        <oldsource>Wind(Gust):</oldsource>
         <translation>Wind (Böen):</translation>
     </message>
     <message>

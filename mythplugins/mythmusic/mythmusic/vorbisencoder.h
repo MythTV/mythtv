@@ -1,7 +1,7 @@
 #ifndef VORBISENCODER_H_
 #define VORBISENCODER_H_
 
-class Metadata;
+class MusicMetadata;
 class Encoder;
 class QString;
 
@@ -10,7 +10,7 @@ class QString;
 class VorbisEncoder : public Encoder
 {
   public:
-    VorbisEncoder(const QString &outfile, int qualitylevel, Metadata *metadata);
+    VorbisEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
    ~VorbisEncoder();
     int addSamples(int16_t *bytes, unsigned int len);
 
@@ -27,7 +27,7 @@ class VorbisEncoder : public Encoder
     vorbis_block vb;
     vorbis_info vi;
 
-    Metadata *m_metadata;
+    MusicMetadata *m_metadata;
 };
 
 #endif

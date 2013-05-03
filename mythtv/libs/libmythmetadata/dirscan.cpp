@@ -54,22 +54,19 @@ namespace
         // Return a fail if directory doesn't exist.
         if (!d.exists())
             return false;
-
+        
+        d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
         QFileInfoList list = d.entryInfoList();
         // An empty directory is fine
-        if (!list.size())
+        if (list.isEmpty())
             return true;
 
         QDir dir_tester;
 
         for (QFileInfoList::iterator p = list.begin(); p != list.end(); ++p)
         {
-            if (p->fileName() == "." ||
-                p->fileName() == ".." ||
-                p->fileName() == "Thumbs.db")
-            {
+            if (p->fileName() == "Thumbs.db")
                 continue;
-            }
 
             if (!p->isDir() &&
                 ext_settings.extension_ignored(p->suffix())) continue;
@@ -152,7 +149,7 @@ namespace
             return false;
         }
 
-        if ((!list.size()) || (list.at(0) == "EMPTY LIST"))
+        if (list.isEmpty() || (list.at(0) == "EMPTY LIST"))
             return true;
 
         for (QStringList::iterator p = list.begin(); p != list.end(); ++p)

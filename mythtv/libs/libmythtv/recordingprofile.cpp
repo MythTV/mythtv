@@ -1055,7 +1055,7 @@ class ImageSize : public VerticalConfigurationGroup
               bool transcoding = false) :
             SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxwidth, 16, false,
-                           transcoding ? QObject::tr("Auto") : ""),
+                           transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "width")
         {
             setLabel(QObject::tr("Width"));

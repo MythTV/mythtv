@@ -68,7 +68,7 @@ typedef struct MJpegDecodeContext {
     int maxval;
     int near;         ///< near lossless bound (si 0 for lossless)
     int t1,t2,t3;
-    int reset;        ///< context halfing intervall ?rename
+    int reset;        ///< context halfing interval ?rename
 
     int width, height;
     int mb_width, mb_height;
@@ -119,7 +119,7 @@ typedef struct MJpegDecodeContext {
 int ff_mjpeg_decode_init(AVCodecContext *avctx);
 int ff_mjpeg_decode_end(AVCodecContext *avctx);
 int ff_mjpeg_decode_frame(AVCodecContext *avctx,
-                          void *data, int *data_size,
+                          void *data, int *got_frame,
                           AVPacket *avpkt);
 int ff_mjpeg_decode_dqt(MJpegDecodeContext *s);
 int ff_mjpeg_decode_dht(MJpegDecodeContext *s);

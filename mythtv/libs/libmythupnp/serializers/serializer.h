@@ -67,13 +67,16 @@ class UPNP_PUBLIC Serializer
         virtual void    AddHeaders     ( QStringMap &headers );
 
 
-        Serializer() : m_hash( QCryptographicHash::Sha1 )
-        {
-            qRegisterMetaType< QList<QObject*> >("QList<QObject*>");
-        }
+        inline Serializer();
 };
 
 Q_DECLARE_METATYPE( QList<QObject*> )
+
+inline Serializer::Serializer() :
+    m_hash(QCryptographicHash::Sha1)
+{
+    qRegisterMetaType< QList<QObject*> >("QList<QObject*>");
+}
 
 #endif
 

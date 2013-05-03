@@ -78,9 +78,9 @@ static inline int iso639_str3_to_key(const QString &iso639_2)
     }
     else
     {
-        return ((iso639_2.at(0).toAscii()<<16) |
-                (iso639_2.at(1).toAscii()<<8) |
-                (iso639_2.at(2).toAscii()));
+        return ((iso639_2.at(0).toLatin1()<<16) |
+                (iso639_2.at(1).toLatin1()<<8) |
+                (iso639_2.at(2).toLatin1()));
     }
 }
 
@@ -97,7 +97,7 @@ static inline int iso639_str2_to_key2(const char *iso639_1)
 
 static inline QString iso639_str_to_canonoical_str(const QString &str3)
 {
-    int key = iso639_str3_to_key(str3.toAscii().constData());
+    int key = iso639_str3_to_key(str3.toLatin1().constData());
     int can =  iso639_key_to_canonical_key(key);
     return iso639_key_to_str3(can);
 }

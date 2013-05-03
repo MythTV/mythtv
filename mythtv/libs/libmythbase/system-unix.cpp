@@ -590,7 +590,7 @@ MythSystemUnix::~MythSystemUnix(void)
 {
 }
 
-bool MythSystemUnix::ParseShell(const QString cmd, QString &abscmd,
+bool MythSystemUnix::ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args)
 {
     QList<QChar> whitespace; whitespace << ' ' << '\t' << '\n' << '\r';

@@ -61,10 +61,9 @@ main_settings.xml
 manage_recordings.xml
 
       1. TV_SCHEDULE_RECORDINGS
-      2. TV_RECPRIORITIES
+      2. TV_RECORDING_RULES
       3. TV_UPCOMING_RECORDINGS
-      4. TV_DELETE
-      5. TV_PREVIOUS
+      4. TV_PREVIOUS
 
 media_settings.xml
 

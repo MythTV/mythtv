@@ -1,8 +1,6 @@
 #ifndef _OUTBOUNDREQUESTHANDLER_H_
 #define _OUTBOUNDREQUESTHANDLER_H_
 
-using namespace std;
-
 #include <QTimer>
 #include <QString>
 #include <QStringList>

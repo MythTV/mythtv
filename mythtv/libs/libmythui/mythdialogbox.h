@@ -365,6 +365,9 @@ MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject 
 
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_DECLARE_METATYPE(QFileInfo)
+#endif
 
 #endif

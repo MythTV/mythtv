@@ -3,6 +3,7 @@
 
 #ifdef __cplusplus
 #include <QString>
+#include <QStringList>
 #endif
 #include <stdint.h>
 #include <errno.h>
@@ -60,8 +61,9 @@ extern MBASE_PUBLIC uint64_t   verboseMask;
 #ifdef __cplusplus
 }
 
-extern MBASE_PUBLIC QString    logPropagateArgs;
-extern MBASE_PUBLIC QString    verboseString;
+extern MBASE_PUBLIC QStringList logPropagateArgList;
+extern MBASE_PUBLIC QString     logPropagateArgs;
+extern MBASE_PUBLIC QString     verboseString;
 
 MBASE_PUBLIC void logStart(QString logfile, int progress = 0, int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,

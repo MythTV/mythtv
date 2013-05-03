@@ -53,7 +53,6 @@ class ChannelRecPriority : public MythScreenType
     QMap<QString, ChannelInfo> m_channelData;
     QMap<QString, ChannelInfo*> m_sortedChannel;
     QMap<QString, QString> m_origRecPriorityData;
-    QMap<int, bool> m_visMap;
 
     MythUIButtonList *m_channelList;
 

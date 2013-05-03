@@ -1,5 +1,14 @@
 include ( ../../settings.pro )
 
+QT += xml sql network
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+QT += webkit
+}
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+# QT += webkitwidgets # this does not seem to work.. 
+}
+
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
 CONFIG += thread dll
@@ -42,7 +51,7 @@ SOURCES += mythuistatetype.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
-SOURCES += mythuigroup.cpp mythuiprogressbar.cpp mythuiwebbrowser.cpp
+SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp x11colors.cpp
 SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
@@ -51,6 +60,10 @@ SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
 SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
+
+contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+SOURCES += mythuiwebbrowser.cpp
+}
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -97,6 +110,7 @@ using_x11 {
 macx {
     HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
+    QMAKE_OBJECTIVE_CFLAGS += $$QMAKE_CXXFLAGS
     QMAKE_OBJECTIVE_CXXFLAGS += $$QMAKE_CXXFLAGS
     OBJECTIVE_HEADERS += util-osx-cocoa.h
     OBJECTIVE_SOURCES += util-osx-cocoa.mm
@@ -163,7 +177,6 @@ using_opengl {
     mingw:LIBS += -lopengl32
 }
 
-QT += xml sql network webkit
 DEFINES += USING_QTWEBKIT
 DEFINES += MUI_API
 

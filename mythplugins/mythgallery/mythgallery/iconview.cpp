@@ -37,7 +37,6 @@ using namespace std;
 // MythTV headers
 #include <mythdate.h>
 #include <mythdbcon.h>
-#include <httpcomms.h>
 #include <mythsystem.h>
 #include <mythcontext.h>
 #include <mythlogging.h>
@@ -388,7 +387,7 @@ void IconView::UpdateText(MythUIButtonListItem *item)
 
     if (m_positionText)
         m_positionText->SetText(tr("%1 of %2")
-                                .arg(m_imageList->GetCurrentPos() + 1)
+                                .arg(m_imageList->IsEmpty() ? 0 : m_imageList->GetCurrentPos() + 1)
                                 .arg(m_imageList->GetCount()));
 
     ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
@@ -456,6 +455,8 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 HandleRotateCCW();
             else if (action == "DELETE")
                 HandleDelete();
+            else if (action == "EDIT")
+                HandleRename();
             else if (action == "MARK")
             {
                 ThumbItem *thumbitem = GetCurrentThumb();
@@ -1039,6 +1040,11 @@ void IconView::DoDeleteCurrent(bool doDelete)
     {
         ThumbItem *thumbitem = GetCurrentThumb();
 
+        int currPos = 0;
+        MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+        if (item)
+            currPos = m_imageList->GetCurrentPos();
+
         if (!thumbitem)
             return;
 
@@ -1047,6 +1053,8 @@ void IconView::DoDeleteCurrent(bool doDelete)
         GalleryUtil::Delete(fi);
 
         LoadDirectory(m_currDir);
+
+        m_imageList->SetItemCurrent(currPos);
     }
 }
 
@@ -1359,6 +1367,16 @@ void IconView::DoRename(QString folderName)
 
     ThumbItem *thumbitem = GetCurrentThumb();
 
+    int currPos = 0;
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    if (item)
+    {
+        currPos = m_imageList->GetCurrentPos() + 1;
+
+        if (currPos >= m_imageList->GetCount())
+            currPos = m_imageList->GetCount() - 1;
+    }
+
     if (!thumbitem)
         return;
 
@@ -1376,6 +1394,8 @@ void IconView::DoRename(QString folderName)
     }
 
     LoadDirectory(m_currDir);
+
+    m_imageList->SetItemCurrent(currPos);
 }
 
 void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
@@ -1388,7 +1408,8 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
     d.setNameFilters(GalleryUtil::GetMediaFilter());
     d.setSorting((QDir::SortFlag)m_sortorder);
     d.setFilter(QDir::Files       | QDir::AllDirs |
-                QDir::NoSymLinks  | QDir::Readable);
+                QDir::NoSymLinks  | QDir::Readable |
+                QDir::NoDotAndDotDot);
     QFileInfoList list = d.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
@@ -1397,8 +1418,6 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         if (fi->isDir())
         {
@@ -1566,7 +1585,8 @@ int ChildCountThread::getChildCount(const QString &filepath)
     isGallery = (gList.count() != 0);
 
     QFileInfoList list = d.entryInfoList(GalleryUtil::GetMediaFilter(),
-                                         QDir::Files | QDir::AllDirs);
+                                         QDir::Files | QDir::AllDirs |
+                                         QDir::NoDotAndDotDot);
 
     if (list.isEmpty())
         return 0;
@@ -1579,8 +1599,6 @@ int ChildCountThread::getChildCount(const QString &filepath)
     {
         fi = &(*it);
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
 
         // remove these already-resized pictures.
         if (isGallery && (

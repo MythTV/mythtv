@@ -52,7 +52,12 @@ void DeleteThread::run(void)
         // this will only happen if the program is closing, so fast
         // deletion is not a problem
         QList<DeleteHandler*>::iterator i;
-        (*i)->DecrRef();
+        for (i = m_files.begin(); i != m_files.end(); ++i)
+        {
+            (*i)->Close();
+            (*i)->DecrRef();
+        }
+        m_files.clear();
     }
     else
         LOG(VB_FILE, LOG_DEBUG, "Delete thread self-terminating due to idle.");

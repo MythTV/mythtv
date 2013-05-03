@@ -95,7 +95,7 @@ void MetadataDownload::run()
                 else if (!lookup->GetSubtitle().isEmpty())
                     list = handleVideoUndetermined(lookup);
 
-                if (!list.size())
+                if (list.isEmpty())
                     list = handleRecordingGeneric(lookup);
             }
             else if (lookup->GetSubtype() == kProbableMovie)
@@ -130,12 +130,20 @@ void MetadataDownload::run()
 
             // If we're in automatic mode, we need to make
             // these decisions on our own.  Pass to title match.
-            if (list.at(0)->GetAutomatic() && list.count() > 1)
+            if (list.at(0)->GetAutomatic() && list.count() > 1
+                && list.at(0)->GetStep() == kLookupSearch)
             {
-                if (!findBestMatch(list, lookup->GetTitle()))
-                    QCoreApplication::postEvent(m_parent,
-                        new MetadataLookupFailure(MetadataLookupList() << lookup));
-                continue;
+                MetadataLookup *bestLookup = findBestMatch(list, lookup->GetTitle());
+                if (bestLookup)
+                {
+                    MetadataLookup *newlookup = bestLookup;
+                    newlookup->SetStep(kLookupData);
+                    prependLookup(newlookup);
+                    continue;
+                }
+                
+                QCoreApplication::postEvent(m_parent,
+                    new MetadataLookupFailure(MetadataLookupList() << lookup));
             }
 
             LOG(VB_GENERAL, LOG_INFO,
@@ -166,16 +174,45 @@ MetadataLookup* MetadataDownload::moreWork()
     return result;
 }
 
-bool MetadataDownload::findBestMatch(MetadataLookupList list,
-                                           QString originaltitle)
+MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
+                                            const QString &originaltitle) const
 {
     QStringList titles;
+    MetadataLookup *ret = NULL;
 
     // Build a list of all the titles
+    int exactMatches = 0;
     for (MetadataLookupList::const_iterator i = list.begin();
             i != list.end(); ++i)
     {
-        titles.append((*i)->GetTitle());
+        QString title = (*i)->GetTitle();
+        if (title == originaltitle)
+        {
+            ret = (*i);
+            exactMatches++;
+        }
+        
+        titles.append(title);
+    }
+
+    // If there was one or more exact matches then we can skip a more intensive
+    // and time consuming search
+    if (exactMatches > 0)
+    {
+        if (exactMatches == 1)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Single Exact Title Match For %1")
+                    .arg(originaltitle));
+            return ret;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Multiple exact title matches found for %1. "
+                        "Need to match on other criteria.")
+                    .arg(originaltitle));
+            return NULL;
+        }
     }
 
     // Apply Levenshtein distance algorithm to determine closest match
@@ -188,7 +225,7 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
             QString("No adequate match or multiple "
                     "matches found for %1.  Update manually.")
                     .arg(originaltitle));
-        return false;
+        return NULL;
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Best Title Match For %1: %2")
@@ -200,15 +237,12 @@ bool MetadataDownload::findBestMatch(MetadataLookupList list,
     {
         if ((*i)->GetTitle() == bestTitle)
         {
-            MetadataLookup *newlookup = (*i);
-            newlookup->SetStep(kLookupData);
-
-            prependLookup(newlookup);
-            return true;
+            ret = (*i);
+            break;
         }
     }
 
-    return false;
+    return ret;
 }
 
 MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
@@ -450,6 +484,8 @@ MetadataLookupList MetadataDownload::handleGame(MetadataLookup* lookup)
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -495,6 +531,9 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup* lookup)
         args.append(QString("-l")); // Language Flag
         args.append(gCoreContext->GetLanguage()); // UI Language
 
+        args.append(QString("-a"));
+        args.append(gCoreContext->GetLocale()->GetCountryCode());
+
         // If the inetref is populated, even in kLookupSearch mode,
         // become a kLookupData grab and use that.
         if (lookup->GetStep() == kLookupSearch &&
@@ -532,6 +571,9 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup* lookup)
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+    
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
 
     // If the inetref is populated, even in kLookupSearch mode,
     // become a kLookupData grab and use that.
@@ -595,6 +637,10 @@ MetadataLookupList MetadataDownload::handleVideoUndetermined(
     QStringList args;
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
+
     args.append(QString("-N"));
     if (!lookup->GetInetref().isEmpty())
     {
@@ -634,6 +680,11 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(
 
     args.append(QString("-l")); // Language Flag
     args.append(gCoreContext->GetLanguage()); // UI Language
+
+    args.append(QString("-a"));
+    args.append(gCoreContext->GetLocale()->GetCountryCode());
+
+
     args.append("-M");
     QString title = lookup->GetTitle();
     args.append(title);

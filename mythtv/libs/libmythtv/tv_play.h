@@ -31,6 +31,7 @@ using namespace std;
 #include "tv.h"
 #include "mythdate.h"
 #include "programinfo.h"
+#include "channelinfo.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
 #include "volumebase.h"
@@ -57,7 +58,7 @@ struct osdInfo;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef void (*EMBEDRETURNVOID) (void *, bool);
-typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool, int);
+typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, const QDateTime, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
 typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *, void *);
 
@@ -287,7 +288,7 @@ class MTV_PUBLIC TV : public QObject
     QSet<uint> IsTunableOn(const PlayerContext*, uint chanid,
                            bool use_cache, bool early_exit);
     void ClearTunableCache(void);
-    void ChangeChannel(const PlayerContext*, const DBChanList &options);
+    void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
     QString GetRecordingGroup(int player_idx) const;
@@ -316,7 +317,7 @@ class MTV_PUBLIC TV : public QObject
 
     // Other toggles
     void ToggleAutoExpire(PlayerContext*);
-    void ToggleRecord(PlayerContext*);
+    void QuickRecord(PlayerContext*);
 
     // General TV state
     static bool StateIsRecording(TVState state);
@@ -425,6 +426,7 @@ class MTV_PUBLIC TV : public QObject
     void DoSeek(PlayerContext*, float time, const QString &mesg,
                 bool timeIsOffset, bool honorCutlist);
     bool DoPlayerSeek(PlayerContext*, float time);
+    bool DoPlayerSeekToFrame(PlayerContext *ctx, uint64_t target);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
         ARBSEEK_REWIND,
@@ -504,6 +506,9 @@ class MTV_PUBLIC TV : public QObject
     bool SubtitleZoomHandleAction(PlayerContext *ctx,
                                   const QStringList &actions);
     void ChangeSubtitleZoom(PlayerContext *ctx, int dir);
+    bool SubtitleDelayHandleAction(PlayerContext *ctx,
+                                   const QStringList &actions);
+    void ChangeSubtitleDelay(PlayerContext *ctx, int dir);
 
     // PxP handling
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
@@ -694,6 +699,7 @@ class MTV_PUBLIC TV : public QObject
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
     bool subtitleZoomAdjustment; ///< True if subtitle zoom is turned on
+    bool subtitleDelayAdjustment; ///< True if subtitle delay is turned on
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?
@@ -818,7 +824,7 @@ class MTV_PUBLIC TV : public QObject
     /// to read this value in the UI thread.
     mutable QMutex channelGroupLock;
     volatile int   channelGroupId;
-    DBChanList     channelGroupChannelList;
+    ChannelInfoList     channelGroupChannelList;
 
     // Network Control stuff
     MythDeque<QString> networkControlCommands;

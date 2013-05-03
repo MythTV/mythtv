@@ -46,7 +46,7 @@ class EITScanner : public QRunnable
   private:
     void TeardownAll(void);
     static void *SpawnEventLoop(void*);
-    static void RescheduleRecordings(void);
+           void  RescheduleRecordings(void);
 
     QMutex           lock;
     ChannelBase     *channel;

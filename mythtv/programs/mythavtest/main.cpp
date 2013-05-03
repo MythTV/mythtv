@@ -107,7 +107,7 @@ class VideoPerformanceTest
                 break;
             }
 
-            if (mp->GetEof())
+            if (mp->GetEof() != kEofStateNone)
             {
                 LOG(VB_GENERAL, LOG_INFO, "End of file.");
                 break;
@@ -233,6 +233,9 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
+#if ! CONFIG_DARWIN
+    signallist << SIGRTMIN;
+#endif
     SignalHandler::Init(signallist);
     signal(SIGHUP, SIG_IGN);
 #endif

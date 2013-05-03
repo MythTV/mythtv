@@ -22,6 +22,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "myth_imgconvert.h"
 #include "programinfo.h"
+#include "audiooutpututil.h"
 
 #include "minilzo.h"
 
@@ -56,7 +57,8 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     memset(&extradata, 0, sizeof(extendeddata));
     memset(&tmppicture, 0, sizeof(AVPicture));
     planes[0] = planes[1] = planes[2] = 0;
-    m_audioFrame = avcodec_alloc_frame();
+    m_audioSamples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                           sizeof(int32_t));
 
     // set parent class variables
     positionMapType = MARK_KEYFRAME;
@@ -95,7 +97,7 @@ NuppelDecoder::~NuppelDecoder()
     if (strm_buf)
         delete [] strm_buf;
 
-    av_free(m_audioFrame);
+    av_free(m_audioSamples);
 
     while (!StoredData.empty())
     {
@@ -378,6 +380,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                      ste.keyframe_number * keyframedist,
                                      ste.file_offset};
                     m_positionMap.push_back(e);
+                    uint64_t frame_num = ste.keyframe_number * keyframedist;
+                    m_frameToDurMap[frame_num] =
+                        frame_num * 1000 / video_frame_rate;
+                    m_durToFrameMap[m_frameToDurMap[frame_num]] = frame_num;
                 }
                 hasFullPositionMap = true;
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
@@ -526,7 +532,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         m_audio->SetAudioParams(format, extradata.audio_channels,
                                 extradata.audio_channels,
-                                CODEC_ID_NONE, extradata.audio_sample_rate,
+                                AV_CODEC_ID_NONE, extradata.audio_sample_rate,
                                 false /* AC3/DTS pass through */);
         m_audio->ReinitAudio();
         foundit = 1;
@@ -665,18 +671,18 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     {
         switch(extradata.video_fourcc)
         {
-            case FOURCC_DIVX: codec = CODEC_ID_MPEG4;      break;
-            case FOURCC_WMV1: codec = CODEC_ID_WMV1;       break;
-            case FOURCC_DIV3: codec = CODEC_ID_MSMPEG4V3;  break;
-            case FOURCC_MP42: codec = CODEC_ID_MSMPEG4V2;  break;
-            case FOURCC_MPG4: codec = CODEC_ID_MSMPEG4V1;  break;
-            case FOURCC_MJPG: codec = CODEC_ID_MJPEG;      break;
-            case FOURCC_H263: codec = CODEC_ID_H263;       break;
-            case FOURCC_H264: codec = CODEC_ID_H264;       break;
-            case FOURCC_I263: codec = CODEC_ID_H263I;      break;
-            case FOURCC_MPEG: codec = CODEC_ID_MPEG1VIDEO; break;
-            case FOURCC_MPG2: codec = CODEC_ID_MPEG2VIDEO; break;
-            case FOURCC_HFYU: codec = CODEC_ID_HUFFYUV;    break;
+            case FOURCC_DIVX: codec = AV_CODEC_ID_MPEG4;      break;
+            case FOURCC_WMV1: codec = AV_CODEC_ID_WMV1;       break;
+            case FOURCC_DIV3: codec = AV_CODEC_ID_MSMPEG4V3;  break;
+            case FOURCC_MP42: codec = AV_CODEC_ID_MSMPEG4V2;  break;
+            case FOURCC_MPG4: codec = AV_CODEC_ID_MSMPEG4V1;  break;
+            case FOURCC_MJPG: codec = AV_CODEC_ID_MJPEG;      break;
+            case FOURCC_H263: codec = AV_CODEC_ID_H263;       break;
+            case FOURCC_H264: codec = AV_CODEC_ID_H264;       break;
+            case FOURCC_I263: codec = AV_CODEC_ID_H263I;      break;
+            case FOURCC_MPEG: codec = AV_CODEC_ID_MPEG1VIDEO; break;
+            case FOURCC_MPG2: codec = AV_CODEC_ID_MPEG2VIDEO; break;
+            case FOURCC_HFYU: codec = AV_CODEC_ID_HUFFYUV;    break;
             default: codec = -1;
         }
     }
@@ -693,7 +699,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         return false;
     }
 
-    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != CODEC_ID_MJPEG)
+    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
         directrendering = true;
 
     if (mpa_vidctx)
@@ -759,8 +765,8 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     {
         switch(extradata.audio_fourcc)
         {
-            case FOURCC_LAME: codec = CODEC_ID_MP3;        break;
-            case FOURCC_AC3 : codec = CODEC_ID_AC3;        break;
+            case FOURCC_LAME: codec = AV_CODEC_ID_MP3;        break;
+            case FOURCC_AC3 : codec = AV_CODEC_ID_AC3;        break;
             default: codec = -1;
         }
     }
@@ -1152,6 +1158,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     {
                         PosMapEntry e = {this_index, lastKey, currentposition};
                         m_positionMap.push_back(e);
+                        m_frameToDurMap[lastKey] =
+                            lastKey * 1000 / video_frame_rate;
+                        m_durToFrameMap[m_frameToDurMap[lastKey]] = lastKey;
                     }
                 }
             }
@@ -1245,9 +1254,9 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 if (!mpa_audcodec)
                 {
                     if (frameheader.comptype == '3')
-                        InitAVCodecAudio(CODEC_ID_MP3);
+                        InitAVCodecAudio(AV_CODEC_ID_MP3);
                     else if (frameheader.comptype == 'A')
-                        InitAVCodecAudio(CODEC_ID_AC3);
+                        InitAVCodecAudio(AV_CODEC_ID_AC3);
                     else
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC + QString("GetFrame: "
@@ -1266,25 +1275,23 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                 while (pkt.size > 0)
                 {
-                    int got_frame = 0;
-                    ret = avcodec_decode_audio4(mpa_audctx, m_audioFrame,
-                                                &got_frame, &pkt);
+                    int data_size = 0;
 
-                    if (got_frame && ret > 0)
+                    ret = AudioOutputUtil::DecodeAudio(mpa_audctx, m_audioSamples,
+                                                       data_size, &pkt);
+                    if (ret < 0)
                     {
-                        int data_size =
-                            av_samples_get_buffer_size(NULL,
-                                                       mpa_audctx->channels,
-                                                       m_audioFrame->nb_samples,
-                                                       mpa_audctx->sample_fmt,
-                                                       1);
-                        m_audio->AddAudioData(
-                            (char *)m_audioFrame->extended_data[0],
-                            data_size, frameheader.timecode, 0);
+                        LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown audio decoding error");
+                        return false;
                     }
 
                     pkt.size -= ret;
                     pkt.data += ret;
+                    if (data_size <= 0)
+                        continue;
+
+                    m_audio->AddAudioData((char *)m_audioSamples, data_size,
+                                          frameheader.timecode, 0);
                 }
             }
             else

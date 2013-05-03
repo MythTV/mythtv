@@ -1,10 +1,6 @@
 
 #include <unistd.h>
 
-// QT headers
-#include <QApplication>
-#include <QDir>
-
 // MythTV headers
 #include <lcddevice.h>
 #include <mythcontext.h>
@@ -62,7 +58,7 @@ static void setupKeys()
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythweather", libversion,
+    if (!gCoreContext->TestPluginVersion("mythweather", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
 

@@ -50,13 +50,7 @@ class SERVICE_PUBLIC Encoder : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< Encoder  >();
-            qRegisterMetaType< Encoder* >();
-
-            Program::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -98,5 +92,16 @@ class SERVICE_PUBLIC Encoder : public QObject
 
 Q_DECLARE_METATYPE( DTC::Encoder  )
 Q_DECLARE_METATYPE( DTC::Encoder* )
+
+namespace DTC
+{
+inline void Encoder::InitializeCustomTypes()
+{
+    qRegisterMetaType< Encoder  >();
+    qRegisterMetaType< Encoder* >();
+
+    Program::InitializeCustomTypes();
+}
+}
 
 #endif

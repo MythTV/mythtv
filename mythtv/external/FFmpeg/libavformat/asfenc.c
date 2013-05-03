@@ -218,10 +218,10 @@ typedef struct {
 } ASFContext;
 
 static const AVCodecTag codec_asf_bmp_tags[] = {
-    { CODEC_ID_MPEG4, MKTAG('M', '4', 'S', '2') },
-    { CODEC_ID_MPEG4, MKTAG('M', 'P', '4', 'S') },
-    { CODEC_ID_MSMPEG4V3, MKTAG('M', 'P', '4', '3') },
-    { CODEC_ID_NONE, 0 },
+    { AV_CODEC_ID_MPEG4, MKTAG('M', '4', 'S', '2') },
+    { AV_CODEC_ID_MPEG4, MKTAG('M', 'P', '4', 'S') },
+    { AV_CODEC_ID_MSMPEG4V3, MKTAG('M', 'P', '4', '3') },
+    { AV_CODEC_ID_NONE, 0 },
 };
 
 #define PREROLL_TIME 3100
@@ -318,7 +318,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
 
     duration = asf->duration + PREROLL_TIME * 10000;
     has_title = tags[0] || tags[1] || tags[2] || tags[3] || tags[4];
-    metadata_count = s->metadata ? s->metadata->count : 0;
+    metadata_count = av_dict_count(s->metadata);
 
     bit_rate = 0;
     for(n=0;n<s->nb_streams;n++) {
@@ -448,7 +448,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
             }
             /* ERROR Correction */
             avio_w8(pb, 0x01);
-            if(enc->codec_id == CODEC_ID_ADPCM_G726 || !enc->block_align){
+            if(enc->codec_id == AV_CODEC_ID_ADPCM_G726 || !enc->block_align){
                 avio_wl16(pb, 0x0190);
                 avio_wl16(pb, 0x0190);
             }else{
@@ -491,7 +491,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         else
             avio_wl16(pb, -1);
 
-        if(enc->codec_id == CODEC_ID_WMAV2)
+        if(enc->codec_id == AV_CODEC_ID_WMAV2)
             desc = "Windows Media Audio V8";
         else
             desc = p ? p->name : enc->codec_name;
@@ -578,6 +578,9 @@ static int asf_write_header(AVFormatContext *s)
     asf->packet_timestamp_end = -1;
     ffio_init_context(&asf->pb, asf->packet_buf, s->packet_size, 1,
                   NULL, NULL, NULL, NULL);
+
+    if (s->avoid_negative_ts < 0)
+        s->avoid_negative_ts = 1;
 
     return 0;
 }
@@ -893,7 +896,6 @@ static int asf_write_trailer(AVFormatContext *s)
         asf_write_header1(s, file_size, data_size - asf->data_offset);
     }
 
-    avio_flush(s->pb);
     av_free(asf->index_ptr);
     return 0;
 }
@@ -901,12 +903,12 @@ static int asf_write_trailer(AVFormatContext *s)
 #if CONFIG_ASF_MUXER
 AVOutputFormat ff_asf_muxer = {
     .name           = "asf",
-    .long_name      = NULL_IF_CONFIG_SMALL("ASF format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
     .mime_type      = "video/x-ms-asf",
     .extensions     = "asf,wmv,wma",
     .priv_data_size = sizeof(ASFContext),
-    .audio_codec    = CODEC_ID_WMAV2,
-    .video_codec    = CODEC_ID_MSMPEG4V3,
+    .audio_codec    = AV_CODEC_ID_WMAV2,
+    .video_codec    = AV_CODEC_ID_MSMPEG4V3,
     .write_header   = asf_write_header,
     .write_packet   = asf_write_packet,
     .write_trailer  = asf_write_trailer,
@@ -920,12 +922,12 @@ AVOutputFormat ff_asf_muxer = {
 #if CONFIG_ASF_STREAM_MUXER
 AVOutputFormat ff_asf_stream_muxer = {
     .name           = "asf_stream",
-    .long_name      = NULL_IF_CONFIG_SMALL("ASF format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("ASF (Advanced / Active Streaming Format)"),
     .mime_type      = "video/x-ms-asf",
     .extensions     = "asf,wmv,wma",
     .priv_data_size = sizeof(ASFContext),
-    .audio_codec    = CODEC_ID_WMAV2,
-    .video_codec    = CODEC_ID_MSMPEG4V3,
+    .audio_codec    = AV_CODEC_ID_WMAV2,
+    .video_codec    = AV_CODEC_ID_MSMPEG4V3,
     .write_header   = asf_write_stream_header,
     .write_packet   = asf_write_packet,
     .write_trailer  = asf_write_trailer,

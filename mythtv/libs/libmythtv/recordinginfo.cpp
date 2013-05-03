@@ -49,6 +49,7 @@ RecordingInfo::RecordingInfo(
     const QString &_description,
     uint _season,
     uint _episode,
+    const QString &_syndicatedepisode,
     const QString &_category,
 
     uint _chanid,
@@ -63,11 +64,13 @@ RecordingInfo::RecordingInfo(
     const QString &_storagegroup,
 
     uint _year,
+    uint _partnumber,
+    uint _parttotal,
 
     const QString &_seriesid,
     const QString &_programid,
     const QString &_inetref,
-    const QString &_catType,
+    const CategoryType _catType,
 
     int _recpriority,
 
@@ -100,7 +103,8 @@ RecordingInfo::RecordingInfo(
     uint _subtitleType,
     uint _videoproperties,
     uint _audioproperties,
-    bool _future) :
+    bool _future,
+    int _schedorder) :
     ProgramInfo(
         _title, _subtitle, _description, _season, _episode,
         _category, _chanid, _chanstr, _chansign, _channame,
@@ -110,6 +114,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(_oldrecstatus),
     savedrecstatus(rsUnknown),
     future(_future),
+    schedorder(_schedorder),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL)
@@ -117,8 +122,11 @@ RecordingInfo::RecordingInfo(
     hostname = _hostname;
     storagegroup = _storagegroup;
 
-    year = _year;
+    syndicatedepisode = _syndicatedepisode;
 
+    year = _year;
+    partnumber = _partnumber;
+    parttotal = _parttotal;
     catType = _catType;
 
     recpriority = _recpriority;
@@ -205,6 +213,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    schedorder(0),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
     record(NULL)
@@ -238,6 +247,7 @@ RecordingInfo::RecordingInfo(
     oldrecstatus(rsUnknown),
     savedrecstatus(rsUnknown),
     future(false),
+    schedorder(0),
     desiredrecstartts(),
     desiredrecendts(),
     record(NULL)
@@ -388,6 +398,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
         oldrecstatus   = other.oldrecstatus;
         savedrecstatus = other.savedrecstatus;
         future         = other.future;
+        schedorder     = other.schedorder;
         desiredrecstartts = other.desiredrecstartts;
         desiredrecendts = other.desiredrecendts;
     }
@@ -414,6 +425,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
     oldrecstatus   = rsUnknown;
     savedrecstatus = rsUnknown;
     future         = false;
+    schedorder     = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 }
@@ -428,6 +440,7 @@ void RecordingInfo::clear(void)
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
     future = false;
+    schedorder = 0;
     desiredrecstartts = QDateTime();
     desiredrecendts = QDateTime();
 }
@@ -760,90 +773,14 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
     }
 }
 
-/** \fn RecordingInfo::ToggleRecord(void)
- *  \brief Cycles through recording types.
- *
- *   If the program recording status is kNotRecording,
- *   ApplyRecordStateChange(kSingleRecord) is called.
- *   If the program recording status is kSingleRecording,
- *   ApplyRecordStateChange(kFindOneRecord) is called.
- *   <br>etc...
- *
- *   The states in order are: kNotRecording, kSingleRecord, kFindOneRecord,
- *     kWeekslotRecord, kFindWeeklyRecord, kTimeslotRecord, kFindDailyRecord,
- *     kChannelRecord, kAllRecord.<br>
- *   And: kOverrideRecord, kDontRecord.
- *
- *   That is if you the recording is in any of the first set of states,
- *   we cycle through those, if not we toggle between kOverrideRecord and
- *   kDontRecord.
+/** \fn RecordingInfo::QuickRecord(void)
+ *  \brief Create a kSingleRecord if not already scheduled.
  */
-void RecordingInfo::ToggleRecord(void)
+void RecordingInfo::QuickRecord(void)
 {
     RecordingType curType = GetProgramRecordingStatus();
-
-    switch (curType)
-    {
-        case kNotRecording:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-        case kSingleRecord:
-            ApplyRecordStateChange(kFindOneRecord);
-            break;
-        case kFindOneRecord:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-        case kAllRecord:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-
-        case kOverrideRecord:
-            ApplyRecordStateChange(kDontRecord);
-            break;
-        case kDontRecord:
-            ApplyRecordStateChange(kOverrideRecord);
-            break;
-
-        default:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-/*
-        case kNotRecording:
-            ApplyRecordStateChange(kSingleRecord);
-            break;
-        case kSingleRecord:
-            ApplyRecordStateChange(kFindOneRecord);
-            break;
-        case kFindOneRecord:
-            ApplyRecordStateChange(kWeekslotRecord);
-            break;
-        case kWeekslotRecord:
-            ApplyRecordStateChange(kFindWeeklyRecord);
-            break;
-        case kFindWeeklyRecord:
-            ApplyRecordStateChange(kTimeslotRecord);
-            break;
-        case kTimeslotRecord:
-            ApplyRecordStateChange(kFindDailyRecord);
-            break;
-        case kFindDailyRecord:
-            ApplyRecordStateChange(kChannelRecord);
-            break;
-        case kChannelRecord:
-            ApplyRecordStateChange(kAllRecord);
-            break;
-        case kAllRecord:
-        default:
-            ApplyRecordStateChange(kNotRecording);
-            break;
-        case kOverrideRecord:
-            ApplyRecordStateChange(kDontRecord);
-            break;
-        case kDontRecord:
-            ApplyRecordStateChange(kOverrideRecord);
-            break;
-*/
-    }
+    if (curType == kNotRecording)
+        ApplyRecordStateChange(kSingleRecord);
 }
 
 /**

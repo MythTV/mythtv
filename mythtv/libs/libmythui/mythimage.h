@@ -84,7 +84,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 
     uint GetCacheSize(void) const
     {
-        return (m_cached) ? numBytes() : 0;
+        return (m_cached) ? byteCount() : 0;
     }
 
   protected:
