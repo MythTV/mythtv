@@ -41,6 +41,7 @@ libavformat/Makefile
 libavformat/allformats.c
 libavformat/avformat.h
 libavformat/avidec.c
+libavformat/mov.c
 libavformat/mpeg.c
 libavformat/mpeg.h
 libavformat/mpegts-mythtv.c  <- new file
