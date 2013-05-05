@@ -425,7 +425,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                 url = mediaElement.attributeNode("url").value();
 
             LOG(VB_GENERAL, LOG_DEBUG,
-                QString("parseRSS found media:content: medium: %1, type: %2, url: 3")
+                QString("parseRSS found media:content: medium: %1, type: %2, url: %3")
                         .arg(medium).arg(type).arg(url));
 
             // if this is an image use it as the thumbnail if we haven't found one yet
