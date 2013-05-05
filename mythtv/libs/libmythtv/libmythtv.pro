@@ -395,8 +395,8 @@ using_frontend {
         DEFINES += FFTW3_SUPPORT
         HEADERS += visualisations/videovisualspectrum.h
         SOURCES += visualisations/videovisualspectrum.cpp
-        using_opengl: HEADERS += videovisualcircles.h
-        using_opengl: SOURCES += videovisualcircles.cpp
+        using_opengl: HEADERS += visualisations/videovisualcircles.h
+        using_opengl: SOURCES += visualisations/videovisualcircles.cpp
     }
 
     using_quartz_video: DEFINES += USING_QUARTZ_VIDEO

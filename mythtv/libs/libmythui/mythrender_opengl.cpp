@@ -793,14 +793,16 @@ void MythRenderOpenGL::InitProcs(void)
 
 void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
 {
+    // TODO FIXME - this should really return a void(*) not void*
     static const QString exts[4] = { "", "ARB", "EXT", "OES" };
     void *result;
     for (int i = 0; i < 4; i++)
     {
-        result = QLibrary::resolve("libGLESv2", (proc + exts[i]).toLatin1().data());
+        result = reinterpret_cast<void*>(
+            QLibrary::resolve("libGLESv2", (proc + exts[i]).toLatin1().data()));
         if (result)
             break;
-        result = getProcAddress(proc + exts[i]);
+        result = reinterpret_cast<void*>(getProcAddress(proc + exts[i]));
         if (result)
             break;
     }
