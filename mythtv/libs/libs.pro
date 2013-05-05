@@ -36,7 +36,7 @@ SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
 
 # unit tests
-SUBDIRS += lib*/test
+SUBDIRS += $$files(lib*/test)
 
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh

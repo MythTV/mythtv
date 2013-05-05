@@ -2,7 +2,7 @@ include (../../../settings.pro)
 
 TEMPLATE = subdirs
 
-SUBDIRS += test_*
+SUBDIRS += $$files(test_*)
 
 unittest.target = test
 unittest.commands = ../../../programs/scripts/unittests.sh
