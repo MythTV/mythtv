@@ -1521,8 +1521,17 @@ MythCookieJar::MythCookieJar()
  */
 void MythCookieJar::load(const QString &filename)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("MythCookieJar: loading cookies from: %1").arg(filename));
+
+    QFile f(filename);
+    if (!f.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("MythCookieJar::load() failed to open file for reading: %1").arg(filename));
+        return;
+    }
+
     QList<QNetworkCookie> cookieList;
-    QTextStream stream((QString *)&filename, QIODevice::ReadOnly);
+    QTextStream stream(&f);
     while (!stream.atEnd())
     {
         QString cookie = stream.readLine();
@@ -1537,8 +1546,17 @@ void MythCookieJar::load(const QString &filename)
  */
 void MythCookieJar::save(const QString &filename)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("MythCookieJar: saving cookies to: %1").arg(filename));
+
+    QFile f(filename);
+    if (!f.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MythCookieJar::save() failed to open file for writing: %1").arg(filename));
+        return;
+    }
+
     QList<QNetworkCookie> cookieList = allCookies();
-    QTextStream stream((QString *)&filename, QIODevice::WriteOnly);
+    QTextStream stream(&f);
 
     for (QList<QNetworkCookie>::iterator it = cookieList.begin();
          it != cookieList.end(); ++it)
