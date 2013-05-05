@@ -107,6 +107,7 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
 
     networkManager = new MythNetworkAccessManager();
     LOG(VB_GENERAL, LOG_DEBUG, "Copying DLManager's Cookie Jar");
+    GetMythDownloadManager()->loadCookieJar(GetConfDir() + "/MythBrowser/cookiejar.txt");
     networkManager->setCookieJar(GetMythDownloadManager()->copyCookieJar());
 
     atexit(DestroyNetworkAccessManager);
@@ -271,6 +272,7 @@ MythWebPage::~MythWebPage()
 {
     LOG(VB_GENERAL, LOG_DEBUG, "Refreshing DLManager's Cookie Jar");
     GetMythDownloadManager()->refreshCookieJar(networkManager->cookieJar());
+    GetMythDownloadManager()->saveCookieJar(GetConfDir() + "/MythBrowser/cookiejar.txt");
 }
 
 bool MythWebPage::supportsExtension(Extension extension) const
