@@ -982,6 +982,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     InitByteContext();
 
+    ic->pb->buffer_size = ringBuffer->DiscoveryBufferSize();
     int err = avformat_open_input(&ic, filename, fmt, NULL);
     if (err < 0)
     {
@@ -990,6 +991,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
+    ic->pb->buffer_size = ringBuffer->BestBufferSize();
     int ret = FindStreamInfo();
     if (ret < 0)
     {

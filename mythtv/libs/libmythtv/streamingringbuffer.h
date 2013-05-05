@@ -23,6 +23,7 @@ class StreamingRingBuffer : public RingBuffer
     virtual bool IsStreamed(void)       { return m_streamed;   }
     virtual bool IsSeekingAllowed(void) { return m_allowSeeks; }
     virtual bool IsBookmarkAllowed(void) { return false; }
+    virtual int  DiscoveryBufferSize(void)   { return 2048; }
 
   protected:
     virtual int safe_read(void *data, uint sz);
