@@ -413,7 +413,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
                                     (host, application, pid, thread,
                                      msgtime, level, message)
                                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (self.db.gethostname(), argv[0].rsplit('/', 1)[1],
+                    (self.db.gethostname(), argv[0],
                      os.getpid(), self.module, self.time(), level,
                      message + (' -- {0}'.format(detail) if detail else '')))
 
