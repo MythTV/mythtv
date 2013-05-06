@@ -110,7 +110,6 @@ class MythWebView : public QWebView
     ~MythWebView(void);
 
     virtual void keyPressEvent(QKeyEvent *event);
-    virtual void wheelEvent(QWheelEvent *event);
     virtual void customEvent(QEvent *e);
 
   protected slots:

@@ -451,12 +451,6 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void MythWebView::wheelEvent(QWheelEvent *event)
-{
-    event->accept();
-    QCoreApplication::postEvent(GetMythMainWindow(), new QWheelEvent(*event));
-}
-
 void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
