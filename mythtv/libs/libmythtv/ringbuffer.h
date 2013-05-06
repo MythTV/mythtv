@@ -87,7 +87,6 @@ class MTV_PUBLIC RingBuffer : protected MThread
     virtual bool IsSeekingAllowed(void) { return true;  }
     virtual bool IsBookmarkAllowed(void) { return true; }
     virtual int  BestBufferSize(void)   { return 32768; }
-    virtual int  DiscoveryBufferSize(void)   { return BestBufferSize(); }
     static QString BitrateToString(uint64_t rate, bool hz = false);
     RingBufferType GetType() const { return type; }
 
