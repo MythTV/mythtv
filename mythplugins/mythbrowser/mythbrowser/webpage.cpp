@@ -133,15 +133,13 @@ void WebPage::slotLoadStarted(void)
 
 void WebPage::slotLoadFinished(bool OK)
 {
-    (void) OK;
-
     m_listItem->DisplayState("off", "loadingstate");
-
-    slotLoadProgress(0);
 
     slotIconChanged();
 
     m_listItem->SetText(m_browser->GetTitle());
+
+    emit loadFinished(OK);
 }
 
 void WebPage::slotLoadProgress(int progress)

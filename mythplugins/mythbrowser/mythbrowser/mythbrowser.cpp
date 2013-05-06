@@ -44,23 +44,25 @@ MythBrowser::~MythBrowser()
 
 bool MythBrowser::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("browser-ui.xml", "browser", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("browser-ui.xml", "browser", this))
         return false;
 
-    MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *> (GetChild("webbrowser"));
-    m_progressBar = dynamic_cast<MythUIProgressBar *>(GetChild("progressbar"));
-    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
-    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
-    m_pageList = dynamic_cast<MythUIButtonList *>(GetChild("pagelist"));
+    bool err = false;
+    MythUIWebBrowser *browser = NULL;
 
-    if (!browser || !m_pageList)
+    UIUtilE::Assign(this, browser,         "webbrowser", &err);
+    UIUtilE::Assign(this, m_pageList,      "pagelist", &err);
+    UIUtilW::Assign(this, m_progressBar,   "progressbar");
+    UIUtilW::Assign(this, m_statusText,    "status");
+    UIUtilW::Assign(this, m_titleText,     "title");
+    UIUtilW::Assign(this, m_backButton,    "back");
+    UIUtilW::Assign(this, m_forwardButton, "forward");
+    UIUtilW::Assign(this, m_exitButton,    "exit");
+
+    if (err)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'browser'");
         return false;
     }
 
@@ -91,9 +93,30 @@ bool MythBrowser::Create(void)
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(page, SIGNAL(loadFinished(bool)),
+            this, SLOT(slotLoadFinished(bool)));
 
     if (m_progressBar)
         m_progressBar->SetTotal(100);
+
+    if (m_exitButton)
+    {
+        m_exitButton->SetEnabled(false);
+        m_exitButton->SetEnabled(true);
+        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    }
+
+    if (m_backButton)
+    {
+        m_backButton->SetEnabled(false);
+        connect(m_backButton, SIGNAL(Clicked()), this, SLOT(slotBack()));
+    }
+
+    if (m_forwardButton)
+    {
+        m_forwardButton->SetEnabled(false);
+        connect(m_forwardButton, SIGNAL(Clicked()), this, SLOT(slotForward()));
+    }
 
     BuildFocusList();
 
@@ -158,6 +181,8 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(page, SIGNAL(loadFinished(bool)),
+            this, SLOT(slotLoadFinished(bool)));
 
     if (doSwitch)
         m_pageList->SetItemCurrent(m_browserList.size() -1);
@@ -262,6 +287,12 @@ void MythBrowser::slotLoadFinished(bool OK)
 
     if (m_progressBar)
         m_progressBar->SetUsed(0);
+
+    if (m_backButton)
+        m_backButton->SetEnabled(activeBrowser()->CanGoBack());
+
+    if (m_forwardButton)
+        m_forwardButton->SetEnabled(activeBrowser()->CanGoForward());
 }
 
 void MythBrowser::slotLoadProgress(int progress)

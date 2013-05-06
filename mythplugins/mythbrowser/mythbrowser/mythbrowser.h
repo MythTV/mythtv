@@ -5,6 +5,7 @@
 
 #include <mythuiwebbrowser.h>
 #include <mythuibuttonlist.h>
+#include <mythuibutton.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
 #include <mythuiprogressbar.h>
@@ -72,6 +73,9 @@ class MythBrowser : public MythScreenType
     MythUIProgressBar        *m_progressBar;
     MythUIText               *m_titleText;
     MythUIText               *m_statusText;
+    MythUIButton             *m_backButton;
+    MythUIButton             *m_forwardButton;
+    MythUIButton             *m_exitButton;
 
     int       m_currentBrowser;
     QUrl      m_url;
