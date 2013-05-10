@@ -408,6 +408,14 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             server->disconnect();
             server->deleteLater();
 
+            if (server->serverError() == QAbstractSocket::HostNotFoundError)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Address %1 no longer exists - ignoring")
+                    .arg(PRETTYIP(it)));
+                continue;
+            }
+
             if (requireall)
             {
                 close();
@@ -494,6 +502,14 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                         .arg(socket->errorString()));
             socket->disconnect();
             socket->deleteLater();
+            
+            if (socket->error() == QAbstractSocket::SocketAddressNotAvailableError)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Address %1 no longer exists - ignoring")
+                    .arg(PRETTYIP(it)));
+                continue;
+            }
 
             if (requireall)
             {
