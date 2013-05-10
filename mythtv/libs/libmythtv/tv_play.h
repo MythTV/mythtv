@@ -707,32 +707,6 @@ class MTV_PUBLIC TV : public QObject, public MenuBase
     // Menu dialog
     void ShowOSDMenu(const PlayerContext*, bool isCompact = false);
 
-#if 0
-    void FillOSDMenuAudio    (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuVideo    (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuSubtitles(const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuNavigate (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuJobs     (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuPlayback (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuSchedule (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-    void FillOSDMenuSource   (const PlayerContext *ctx, OSD *osd,
-                              QString category, const QString selected,
-                              QString &currenttext, QString &backaction);
-#endif
     void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString category = "",
                               int level = 0, const QString selected = "");
 
