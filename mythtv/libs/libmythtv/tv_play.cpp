@@ -16,6 +16,11 @@ using namespace std;
 #include <QEvent>
 #include <QFile>
 #include <QDir>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QDomNode>
+
+Q_DECLARE_METATYPE(QDomNode)
 
 #include "signalhandling.h"
 #include "mythdb.h"
@@ -569,6 +574,8 @@ void TV::InitKeys(void)
 
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
             "Exit or return to DVD menu"), "Esc");
+    REG_KEY("TV Playback", ACTION_MENUCOMPACT, QT_TRANSLATE_NOOP("MythControls",
+            "Playback Compact Menu"), "Alt+M");
     REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
     REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
@@ -4481,6 +4488,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         ChangeTimeStretch(ctx, -1);
     else if (has_action("MENU", actions))
         ShowOSDMenu(ctx);
+    else if (has_action(ACTION_MENUCOMPACT, actions))
+        ShowOSDMenu(ctx, true);
     else if (has_action("INFO", actions) ||
              has_action("INFOWITHCUTLIST", actions))
     {
@@ -9177,8 +9186,17 @@ void TV::customEvent(QEvent *e)
     {
         DialogCompletionEvent *dce =
             reinterpret_cast<DialogCompletionEvent*>(e);
-        OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
-                       dce->GetData().toString());
+        if (dce->GetData().userType() == qMetaTypeId<QDomNode>())
+        {
+            QDomNode data = qVariantValue<QDomNode>(dce->GetData());
+            if (dce->GetResult() == -1) // menu exit/back
+                MenuShow(data.parentNode(), data);
+            else
+                MenuShow(data, QDomNode());
+        }
+        else
+            OSDDialogEvent(dce->GetResult(), dce->GetResultText(),
+                           dce->GetData().toString());
         return;
     }
 
@@ -10593,12 +10611,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         action.remove("DIALOG_");
         QStringList desc = action.split("_");
         bool valid = desc.size() == 3;
-        if (valid && desc[0] == "MENU")
-        {
-            ShowOSDMenu(actx, desc[1], text);
-            hide = false;
-        }
-        else if (valid && desc[0] == ACTION_JUMPREC)
+        if (valid && desc[0] == ACTION_JUMPREC)
         {
             FillOSDMenuJumpRec(actx, desc[1], desc[2].toInt(), text);
             hide = false;
@@ -10959,9 +10972,1161 @@ void TV::HandleOSDInfo(PlayerContext *ctx, QString action)
     }
 }
 
-void TV::ShowOSDMenu(const PlayerContext *ctx, const QString category,
-                     const QString selected)
+bool MenuBase::MenuLoadFromFile(const QString &filename,
+                                const QString &menuname,
+                                const char *translationContext,
+                                const QString &keyBindingContext)
 {
+    bool result = false;
+
+    m_translationContext = translationContext;
+    m_keyBindingContext = keyBindingContext;
+    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+    QStringList::const_iterator it = searchpath.begin();
+    for (; !result && it != searchpath.end(); ++it)
+    {
+        QString themefile = *it + filename;
+        LOG(VB_PLAYBACK, LOG_INFO,
+            LOC + QString("Loading menu %1").arg(themefile));
+        QFile file(themefile);
+        if (file.open(QIODevice::ReadOnly))
+        {
+            m_menuDocument = new QDomDocument();
+            if (m_menuDocument->setContent(&file))
+            {
+                result = true;
+                m_menuName =
+                    MenuTranslate(MenuGetRoot().attribute("text", menuname));
+                QDomElement root = MenuGetRoot();
+                MenuProcessIncludes(root);
+            }
+            else
+            {
+                delete m_menuDocument;
+                m_menuDocument = NULL;
+            }
+            file.close();
+        }
+        if (!result)
+        {
+            LOG(VB_FILE, LOG_ERR, LOC + "No theme file " + themefile);
+        }
+    }
+
+    return result;
+}
+
+void MenuBase::MenuProcessIncludes(QDomElement &root)
+{
+    const int maxRecursion = 10;
+    for (QDomNode n = root.firstChild(); !n.isNull(); n = n.nextSibling())
+    {
+        if (n.isElement())
+        {
+            QDomElement e = n.toElement();
+            if (e.tagName() == "include")
+            {
+                QString include = e.attribute("file", "");
+                int level = m_recursionLevel + 1;
+                if (level > maxRecursion)
+                {
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Maximum include depth (%1) "
+                                "exceeded for %2")
+                        .arg(maxRecursion).arg(include));
+                    return;
+                }
+                MenuBase menu;
+                menu.m_recursionLevel = level;
+                if (menu.MenuLoadFromFile(include, include,
+                                          m_translationContext,
+                                          m_keyBindingContext))
+                {
+                    QDomNode newChild = menu.MenuGetRoot();
+                    newChild = m_menuDocument->importNode(newChild, true);
+                    root.replaceChild(newChild, n);
+                    n = newChild;
+                }
+            }
+            else if (e.tagName() == "menu")
+            {
+                MenuProcessIncludes(e);
+            }
+        }
+    }
+}
+
+MenuBase::~MenuBase()
+{
+    if (m_menuDocument)
+    {
+        delete m_menuDocument;
+        m_menuDocument = NULL;
+    }
+}
+
+QDomElement MenuBase::MenuGetRoot(void) const
+{
+    return m_menuDocument->documentElement();
+}
+
+QString MenuBase::MenuTranslate(const QString &text) const
+{
+    return qApp->translate(m_translationContext, text.toUtf8(), NULL,
+                           QCoreApplication::UnicodeUTF8);
+}
+
+bool MenuBase::MenuShowHelper(const QDomNode &node,
+                              const QDomNode &selected,
+                              bool doDisplay)
+{
+    bool hasSelected = false;
+    bool displayed = false;
+    for (QDomNode n = node.firstChild(); !n.isNull(); n = n.nextSibling())
+    {
+        if (n == selected)
+            hasSelected = true;
+    }
+    for (QDomNode n = node.firstChild(); !n.isNull(); n = n.nextSibling())
+    {
+        if (n.isElement())
+        {
+            QDomElement e = n.toElement();
+            QString text  = e.attribute("text", "");
+            text          = MenuTranslate(text);
+            QString show = e.attribute("show", "");
+            MenuShowContext showContext =
+                (show == "active" ? kMenuShowActive :
+                 show == "inactive" ? kMenuShowInactive : kMenuShowAlways);
+            QString current = e.attribute("current", "");
+            bool currentActive = (current == "active") && !hasSelected;
+            if (e.tagName() == "menu")
+            {
+                MenuItemContext c(n, text, (hasSelected && n == selected),
+                                  doDisplay);
+                displayed |= MenuDisplayItem(c);
+            }
+            else if (e.tagName() == "item")
+            {
+                QString action = e.attribute("action", "");
+                MenuItemContext c(n, showContext, currentActive, action,
+                                  text, doDisplay);
+                displayed |= MenuDisplayItem(c);
+            }
+            else if (e.tagName() == "itemlist")
+            {
+                QString actiongroup = e.attribute("actiongroup", "");
+                MenuItemContext c(n, showContext, currentActive,
+                                  actiongroup, doDisplay);
+                displayed |= MenuDisplayItem(c);
+            }
+        }
+        if (!doDisplay && displayed)
+            break; // early exit optimization
+    }
+    return displayed;
+}
+
+static bool matchesGroup(const QString &name, const QString &inPrefix,
+                         MenuCategory category, QString &outPrefix)
+{
+    outPrefix = name;
+    return ((category == kMenuCategoryItem && name.startsWith(inPrefix)) ||
+            (category == kMenuCategoryItemlist && name == inPrefix));
+}
+
+static void addButton(const MenuItemContext &c, OSD *osd, bool active,
+                      bool &result, const QString &action,
+                      const QString &defaultTextActive,
+                      const QString &defaultTextInactive = "",
+                      bool isMenu = false)
+{
+    if (c.m_category == kMenuCategoryItemlist || action == c.m_action)
+    {
+        if ((c.m_showContext != kMenuShowInactive && active) ||
+            (c.m_showContext != kMenuShowActive && !active))
+        {
+            result = true;
+            if (c.m_doDisplay)
+            {
+                QString text = c.m_actionText;
+                if (text.isEmpty())
+                    text = (active || defaultTextInactive.isEmpty()) ?
+                        defaultTextActive : defaultTextInactive;
+                osd->DialogAddButton(text, action, isMenu,
+                                     active && c.m_setCurrentActive);
+            }
+        }
+    }
+}
+
+#define BUTTON(action, text) \
+    addButton(c, osd, active, result, (action), (text))
+#define BUTTON2(action, textActive, textInactive) \
+    addButton(c, osd, active, result, (action), (textActive), (textInactive))
+#define BUTTON3(action, textActive, textInactive, isMenu)     \
+    addButton(c, osd, active, result, (action), (textActive), \
+              (textInactive), (isMenu))
+
+// Returns true if at least one item should be displayed.
+bool TV::MenuDisplayItem(const MenuItemContext &c)
+{
+    MenuCategory category = c.m_category;
+    const QString &actionName = c.m_action;
+
+    bool result = false;
+    bool active = true;
+    PlayerContext *ctx = m_tvmCtx;
+    OSD *osd = m_tvmOsd;
+    if (!osd)
+        return result;
+    if (category == kMenuCategoryMenu)
+    {
+        result = MenuShowHelper(c.m_node, QDomNode(), false);
+        if (result && c.m_doDisplay)
+        {
+            QVariant v;
+            v.setValue(c.m_node);
+            osd->DialogAddButton(c.m_menuName, v, true, c.m_setCurrentActive);
+        }
+        return result;
+    }
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    QString prefix;
+    if (matchesGroup(actionName, "VISUALISER_", category, prefix))
+    {
+        for (int i = 0; i < m_tvm_visualisers.size(); i++)
+        {
+            QString action = prefix + m_tvm_visualisers[i];
+            active = (m_tvm_active == m_tvm_visualisers[i]);
+            BUTTON(action, m_tvm_visualisers[i]);
+        }
+    }
+    else if (matchesGroup(actionName, "TOGGLEASPECT", category, prefix))
+    {
+        if (ctx == GetPlayer(ctx, 0))
+        {
+            for (int j = kAspect_Off; j < kAspect_END; j++)
+            {
+                // swap 14:9 and 16:9
+                int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
+                         ((kAspect_16_9 == j) ? kAspect_14_9 : j));
+                QString action = prefix + QString::number(i);
+                active = (m_tvm_aspectoverride == i);
+                BUTTON(action, toString((AspectOverrideMode) i));
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "TOGGLEFILL", category, prefix))
+    {
+        if (ctx == GetPlayer(ctx, 0))
+        {
+            for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
+            {
+                QString action = prefix + QString::number(i);
+                active = (m_tvm_adjustfill == i);
+                BUTTON(action, toString((AdjustFillMode) i));
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "TOGGLEPICCONTROLS", category, prefix))
+    {
+        if (ctx == GetPlayer(ctx, 0))
+        {
+            for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
+            {
+                if (toMask((PictureAttribute)i) & m_tvm_sup)
+                {
+                    QString action = prefix +
+                        QString::number(i - kPictureAttribute_MIN);
+                    active = m_tvm_studio_levels;
+                    if ((PictureAttribute)i == kPictureAttribute_StudioLevels)
+                        BUTTON(ACTION_TOGGLESTUDIOLEVELS,
+                               toString((AdjustFillMode) i));
+                    else
+                        BUTTON(action, toString((PictureAttribute) i));
+                }
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "3D", category, prefix))
+    {
+        if (m_tvm_stereoallowed)
+        {
+            active = (m_tvm_stereomode == kStereoscopicModeNone);
+            BUTTON(ACTION_3DNONE, tr("None"));
+            active = (m_tvm_stereomode == kStereoscopicModeSideBySide);
+            BUTTON(ACTION_3DSIDEBYSIDE, tr("Side by Side"));
+            active = (m_tvm_stereomode == kStereoscopicModeSideBySideDiscard);
+            BUTTON(ACTION_3DSIDEBYSIDEDISCARD, tr("Discard Side by Side"));
+            active = (m_tvm_stereomode == kStereoscopicModeTopAndBottom);
+            BUTTON(ACTION_3DTOPANDBOTTOM, tr("Top and Bottom"));
+            active = (m_tvm_stereomode == kStereoscopicModeTopAndBottomDiscard);
+            BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
+        }
+    }
+    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix))
+    {
+        active = (m_tvm_scan_type_unlocked == kScan_Detect);
+        BUTTON("SELECTSCAN_0", tr("Detect") + m_tvm_cur_mode);
+        active = (m_tvm_scan_type_unlocked == kScan_Progressive);
+        BUTTON("SELECTSCAN_3", tr("Progressive"));
+        active = (m_tvm_scan_type_unlocked == kScan_Interlaced);
+        BUTTON("SELECTSCAN_1", tr("Interlaced (Normal)"));
+        active = (m_tvm_scan_type_unlocked == kScan_Intr2ndField);
+        BUTTON("SELECTSCAN_2", tr("Interlaced (Reversed)"));
+    }
+    else if (matchesGroup(actionName, "DEINTERLACER_", category, prefix))
+    {
+        if (m_tvm_scan_type != kScan_Progressive)
+        {
+            foreach (QString deint, m_tvm_deinterlacers)
+            {
+                if ((deint.contains("doublerate") ||
+                     deint.contains("doubleprocess") ||
+                     deint.contains("bobdeint")) && !m_tvm_doublerate)
+                {
+                    continue;
+                }
+                QString action = prefix + deint;
+                active = (deint == m_tvm_currentdeinterlacer);
+                QString trans = VideoDisplayProfile::GetDeinterlacerName(deint);
+                BUTTON(action, trans);
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
+             matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
+             matchesGroup(actionName, "SELECTCC708_",    category, prefix) ||
+             matchesGroup(actionName, "SELECTCC608_",    category, prefix) ||
+             matchesGroup(actionName, "SELECTTTC_",      category, prefix) ||
+             matchesGroup(actionName, "SELECTAUDIO_",    category, prefix))
+    {
+        int i = 0;
+        TrackType type = kTrackTypeUnknown;
+        if (prefix == "SELECTSUBTITLE_")
+            type = kTrackTypeSubtitle;
+        else if (prefix == "SELECTRAWTEXT_")
+            type = kTrackTypeRawText;
+        else if (prefix == "SELECTCC708_")
+            type = kTrackTypeCC708;
+        else if (prefix == "SELECTCC608_")
+            type = kTrackTypeCC608;
+        else if (prefix == "SELECTTTC_")
+            type = kTrackTypeTeletextCaptions;
+        else if (prefix == "SELECTAUDIO_")
+        {
+            type = kTrackTypeAudio;
+            if (m_tvm_tracks[type].size() <= 1)
+                i = 1; // don't show choices if only 1 audio track
+        }
+
+        for (; i < m_tvm_tracks[type].size(); i++)
+        {
+            QString action = prefix + QString::number(i);
+            active = (i == m_tvm_curtrack[type]);
+            BUTTON(action, m_tvm_tracks[type][i]);
+        }
+    }
+    else if (matchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
+    {
+        static struct {
+            int speedX100;
+            QString suffix;
+            QString trans;
+        } speeds[] = {
+            {  0, "",    tr("Adjust")},
+            { 50, "0.5", tr("0.5x")},
+            { 90, "0.9", tr("0.9x")},
+            {100, "1.0", tr("1.0x")},
+            {110, "1.1", tr("1.1x")},
+            {120, "1.2", tr("1.2x")},
+            {130, "1.3", tr("1.3x")},
+            {140, "1.4", tr("1.4x")},
+            {150, "1.5", tr("1.5x")},
+        };
+        for (uint i = 0; i < sizeof(speeds) / sizeof(*speeds); ++i)
+        {
+            QString action = prefix + speeds[i].suffix;
+            active = (m_tvm_speedX100 == speeds[i].speedX100);
+            BUTTON(action, speeds[i].trans);
+        }
+    }
+    else if (matchesGroup(actionName, "TOGGLESLEEP", category, prefix))
+    {
+        active = false;
+        if (sleepTimerId)
+            BUTTON(ACTION_TOGGLESLEEP + "ON", tr("Sleep Off"));
+        BUTTON(ACTION_TOGGLESLEEP + "30", tr("%n minute(s)", "", 30));
+        BUTTON(ACTION_TOGGLESLEEP + "60", tr("%n minute(s)", "", 60));
+        BUTTON(ACTION_TOGGLESLEEP + "90", tr("%n minute(s)", "", 90));
+        BUTTON(ACTION_TOGGLESLEEP + "120", tr("%n minute(s)", "", 120));
+    }
+    else if (matchesGroup(actionName, "CHANGROUP_", category, prefix))
+    {
+        if (db_use_channel_groups)
+        {
+            active = false;
+            BUTTON("CHANGROUP_ALL_CHANNELS", tr("All Channels"));
+            ChannelGroupList::const_iterator it;
+            for (it = db_channel_groups.begin();
+                 it != db_channel_groups.end(); ++it)
+            {
+                QString action = prefix + QString::number(it->grpid);
+                active = ((int)(it->grpid) == channelGroupId);
+                BUTTON(action, it->name);
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "TOGGLECOMMSKIP", category, prefix))
+    {
+        static uint cas_ord[] = { 0, 2, 1 };
+        if (m_tvm_isrecording || m_tvm_isrecorded)
+        {
+            for (uint i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
+            {
+                const CommSkipMode mode = (CommSkipMode) cas_ord[i];
+                QString action = prefix + QString::number(cas_ord[i]);
+                active = (mode == m_tvm_curskip);
+                BUTTON(action, toString((CommSkipMode) cas_ord[i]));
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "JUMPTOCHAPTER", category, prefix))
+    {
+        if (m_tvm_num_chapters &&
+            m_tvm_num_chapters == m_tvm_chapter_times.size())
+        {
+            int size = QString::number(m_tvm_num_chapters).size();
+            for (int i = 0; i < m_tvm_num_chapters; i++)
+            {
+                int hours   = m_tvm_chapter_times[i] / 60 / 60;
+                int minutes = (m_tvm_chapter_times[i] / 60) - (hours * 60);
+                int secs    = m_tvm_chapter_times[i] % 60;
+                QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
+                QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
+                QString desc = chapter1 + QString(" (%1:%2:%3)")
+                    .arg(hours,   2, 10, QChar(48))
+                    .arg(minutes, 2, 10, QChar(48))
+                    .arg(secs,    2, 10, QChar(48));
+                QString action = prefix + chapter2;
+                active = (m_tvm_current_chapter == (i + 1));
+                BUTTON(action, desc);
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "SWITCHTOANGLE", category, prefix))
+    {
+        if (m_tvm_num_angles > 1)
+        {
+            for (int i = 1; i <= m_tvm_num_angles; i++)
+            {
+                QString angleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+                QString desc = GetAngleName(ctx, i);
+                QString action = prefix + angleIdx;
+                active = (m_tvm_current_angle == i);
+                BUTTON(action, desc);
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "JUMPTOTITLE", category, prefix))
+    {
+        for (int i = 0; i < m_tvm_num_titles; i++)
+        {
+            if (GetTitleDuration(ctx, i) < 120) // Ignore < 2 minutes long
+                continue;
+
+            QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));
+            QString desc = GetTitleName(ctx, i);
+            QString action = prefix + titleIdx;
+            active = (m_tvm_current_title == i);
+            BUTTON(action, desc);
+        }
+    }
+    else if (matchesGroup(actionName, "SWITCHTOINPUT_", category, prefix))
+    {
+        if (ctx->recorder)
+        {
+            vector<uint> cardids = CardUtil::GetCardList();
+            uint cardid  = ctx->GetCardID();
+            vector<uint> excluded_cardids;
+            stable_sort(cardids.begin(), cardids.end());
+            excluded_cardids.push_back(cardid);
+            vector<uint>::const_iterator it = cardids.begin();
+            InfoMap info;
+            ctx->recorder->GetChannelInfo(info);
+            uint sourceid = info["sourceid"].toUInt();
+            for (; it != cardids.end(); ++it)
+            {
+                vector<InputInfo> inputs =
+                    RemoteRequestFreeInputList(*it, excluded_cardids);
+
+                for (uint i = 0; i < inputs.size(); i++)
+                {
+                    // don't add current input to list
+                    if ((inputs[i].cardid   == cardid) &&
+                        (inputs[i].sourceid == sourceid))
+                    {
+                        continue;
+                    }
+
+                    QString name = CardUtil::GetDisplayName(inputs[i].inputid);
+                    if (name.isEmpty())
+                    {
+                        name = tr("C", "Card") + ":" +
+                            QString::number(*it) + " " +
+                            tr("I", "Input") + ":" + inputs[i].name;
+                    }
+
+                    QString action = prefix +
+                        QString::number(inputs[i].inputid);
+                    active = false;
+                    BUTTON(action, name);
+                }
+            }
+        }
+    }
+    else if (matchesGroup(actionName, "SWITCHTOSOURCE_", category, prefix))
+    {
+        if (ctx->recorder)
+        {
+            QMap<uint,InputInfo> sources;
+            vector<uint> cardids;
+            uint cardid = 0;
+            vector<uint> excluded_cardids;
+            uint sourceid = 0;
+            cardids = CardUtil::GetCardList();
+            cardid  = ctx->GetCardID();
+            excluded_cardids.push_back(cardid);
+            InfoMap info;
+            ctx->recorder->GetChannelInfo(info);
+            sourceid = info["sourceid"].toUInt();
+            // Get sources available on other cards
+            vector<uint>::const_iterator it = cardids.begin();
+            for (; it != cardids.end(); ++it)
+            {
+                vector<InputInfo> inputs =
+                    RemoteRequestFreeInputList(*it, excluded_cardids);
+                if (inputs.empty())
+                    continue;
+
+                for (uint i = 0; i < inputs.size(); i++)
+                    if (!sources.contains(inputs[i].sourceid))
+                        sources[inputs[i].sourceid] = inputs[i];
+            }
+            // Get other sources available on this card
+            vector<uint> currentinputs = CardUtil::GetInputIDs(cardid);
+            if (!currentinputs.empty())
+            {
+                for (uint i = 0; i < currentinputs.size(); i++)
+                {
+                    InputInfo info;
+                    info.inputid = currentinputs[i];
+                    if (CardUtil::GetInputInfo(info))
+                        if (!sources.contains(info.sourceid) &&
+                            info.livetvorder)
+                            sources[info.sourceid] = info;
+                }
+            }
+            // delete current source from list
+            sources.remove(sourceid);
+            QMap<uint,InputInfo>::const_iterator sit = sources.begin();
+            for (; sit != sources.end(); ++sit)
+            {
+                QString action = QString("SWITCHTOINPUT_%1").arg((*sit).inputid);
+                BUTTON(action, SourceUtil::GetSourceName((*sit).sourceid));
+            }
+        }
+    }
+    else if (category == kMenuCategoryItem)
+    {
+        if (actionName == "TOGGLEAUDIOSYNC")
+        {
+            BUTTON(actionName, tr("Adjust Audio Sync"));
+        }
+        else if (actionName == "DISABLEVISUALISATION")
+        {
+            if (m_tvm_visual)
+                BUTTON(actionName, tr("None"));
+        }
+        else if (actionName == "DISABLEUPMIX")
+        {
+            if (m_tvm_canupmix)
+            {
+                active = !m_tvm_upmixing;
+                BUTTON(actionName, tr("Disable Audio Upmixer"));
+            }
+        }
+        else if (actionName == "ENABLEUPMIX")
+        {
+            if (m_tvm_canupmix)
+            {
+                active = m_tvm_upmixing;
+                BUTTON(actionName, tr("Auto Detect"));
+            }
+        }
+        else if (actionName == "AUTODETECT_FILL")
+        {
+            if (m_tvm_fill_autodetect)
+            {
+                active =
+                    (m_tvm_adjustfill == kAdjustFill_AutoDetect_DefaultHalf) ||
+                    (m_tvm_adjustfill == kAdjustFill_AutoDetect_DefaultOff);
+                BUTTON(actionName, tr("Auto Detect"));
+            }
+        }
+        else if (actionName == "TOGGLEMANUALZOOM")
+        {
+            BUTTON(actionName, tr("Manual Zoom Mode"));
+        }
+        else if (actionName == "TOGGLENIGHTMODE")
+        {
+            if (m_tvm_sup != kPictureAttributeSupported_None)
+            {
+                active = gCoreContext->GetNumSetting("NightModeEnabled", 0);
+                BUTTON2(actionName,
+                        tr("Disable Night Mode"), tr("Enable Night Mode"));
+            }
+        }
+        else if (actionName == "DISABLESUBS")
+        {
+            active = !m_tvm_subs_enabled;
+            if (m_tvm_subs_have_subs)
+                BUTTON(actionName, tr("Disable Subtitles"));
+        }
+        else if (actionName == "ENABLESUBS")
+        {
+            active = m_tvm_subs_enabled;
+            if (m_tvm_subs_have_subs)
+                BUTTON(actionName, tr("Enable Subtitles"));
+        }
+        else if (actionName == "DISABLEFORCEDSUBS")
+        {
+            active = !m_tvm_subs_forcedon;
+            if (!m_tvm_tracks[kTrackTypeSubtitle].empty() ||
+                !m_tvm_tracks[kTrackTypeRawText].empty())
+            {
+                BUTTON(actionName, tr("Disable Forced Subtitles"));
+            }
+        }
+        else if (actionName == "ENABLEFORCEDSUBS")
+        {
+            active = m_tvm_subs_forcedon;
+            if (!m_tvm_tracks[kTrackTypeSubtitle].empty() ||
+                !m_tvm_tracks[kTrackTypeRawText].empty())
+            {
+                BUTTON(actionName, tr("Enable Forced Subtitles"));
+            }
+        }
+        else if (actionName == "DISABLEEXTTEXT")
+        {
+            active = m_tvm_subs_capmode != kDisplayTextSubtitle;
+            if (m_tvm_subs_havetext)
+                BUTTON(actionName, tr("Disable External Subtitles"));
+        }
+        else if (actionName == "ENABLEEXTTEXT")
+        {
+            active = m_tvm_subs_capmode == kDisplayTextSubtitle;
+            if (m_tvm_subs_havetext)
+                BUTTON(actionName, tr("Enable External Subtitles"));
+        }
+        else if (actionName == "TOGGLETTM")
+        {
+            if (!m_tvm_tracks[kTrackTypeTeletextMenu].empty())
+                BUTTON(actionName, tr("Toggle Teletext Menu"));
+        }
+        else if (actionName == "TOGGLESUBZOOM")
+        {
+            if (m_tvm_subs_enabled)
+                BUTTON(actionName, tr("Adjust Subtitle Zoom"));
+        }
+        else if (actionName == "TOGGLESUBDELAY")
+        {
+            if (m_tvm_subs_enabled &&
+                (m_tvm_subs_capmode == kDisplayRawTextSubtitle ||
+                 m_tvm_subs_capmode == kDisplayTextSubtitle))
+            {
+                BUTTON(actionName, tr("Adjust Subtitle Delay"));
+            }
+        }
+        else if (actionName == "PAUSE")
+        {
+            active = m_tvm_ispaused;
+            BUTTON2(actionName, tr("Play"), tr("Pause"));
+        }
+        else if (actionName == "TOGGLESTRETCH")
+        {
+            BUTTON(actionName, tr("Toggle"));
+        }
+        else if (actionName == "CREATEPIPVIEW")
+        {
+            MenuLazyInit(&m_tvm_freerecordercount);
+            if (m_tvm_freerecordercount &&
+                player.size() <= kMaxPIPCount && !m_tvm_hasPBP && m_tvm_allowPIP)
+            {
+                BUTTON(actionName, tr("Open Live TV PIP"));
+            }
+        }
+        else if (actionName == "CREATEPBPVIEW")
+        {
+            MenuLazyInit(&m_tvm_freerecordercount);
+            if (m_tvm_freerecordercount &&
+                player.size() < kMaxPBPCount && !m_tvm_hasPIP && m_tvm_allowPBP)
+            {
+                BUTTON(actionName, tr("Open Live TV PBP"));
+            }
+        }
+        else if (actionName == "JUMPRECPIP")
+        {
+            if (player.size() <= kMaxPIPCount &&
+                !m_tvm_hasPBP && m_tvm_allowPIP)
+            {
+                BUTTON(actionName, tr("Open Recording PIP"));
+            }
+        }
+        else if (actionName == "JUMPRECPBP")
+        {
+            if (player.size() < kMaxPBPCount &&
+                !m_tvm_hasPIP && m_tvm_allowPBP)
+            {
+                BUTTON(actionName, tr("Open Recording PBP"));
+            }
+        }
+        else if (actionName == "NEXTPIPWINDOW")
+        {
+            if (player.size() > 1)
+                BUTTON(actionName, tr("Change Active Window"));
+        }
+        else if (actionName == "TOGGLEPIPMODE")
+        {
+            if (player.size() > 1)
+            {
+                const PlayerContext *mctx = GetPlayer(ctx, 0);
+                const PlayerContext *octx = GetPlayer(ctx, 1);
+                if (mctx == ctx && octx->IsPIP())
+                    BUTTON(actionName, tr("Close PIP(s)", 0, player.size() - 1));
+            }
+        }
+        else if (actionName == "TOGGLEPBPMODE")
+        {
+            if (player.size() > 1)
+            {
+                const PlayerContext *mctx = GetPlayer(ctx, 0);
+                const PlayerContext *octx = GetPlayer(ctx, 1);
+                if (mctx == ctx && octx->IsPBP())
+                    BUTTON(actionName, tr("Close PBP(s)", 0, player.size() - 1));
+            }
+        }
+        else if (actionName == "SWAPPIP")
+        {
+            const PlayerContext *mctx = GetPlayer(ctx, 0);
+            if (mctx != ctx || player.size() == 2)
+                BUTTON(actionName, tr("Swap Windows"));
+        }
+        else if (actionName == "TOGGLEPIPSTATE")
+        {
+            uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
+            if (player.size() <= max_cnt &&
+                !(m_tvm_hasPIP && !m_tvm_allowPBP) &&
+                !(m_tvm_hasPBP && !m_tvm_allowPIP))
+            {
+                active = !m_tvm_hasPBP;
+                BUTTON2(actionName, tr("Switch to PBP"), tr("Switch to PIP"));
+            }
+        }
+        else if (actionName == "TOGGLEBROWSE")
+        {
+            if (db_use_channel_groups)
+                BUTTON(actionName, tr("Toggle Browse Mode"));
+        }
+        else if (actionName == "CANCELPLAYLIST")
+        {
+            if (inPlaylist)
+                BUTTON(actionName, tr("Cancel Playlist"));
+        }
+        else if (actionName == "DEBUGOSD")
+        {
+            BUTTON(actionName, tr("Playback Data"));
+        }
+        else if (actionName == "JUMPFFWD")
+        {
+            if (m_tvm_jump)
+                BUTTON(actionName, tr("Jump Ahead"));
+        }
+        else if (actionName == "JUMPRWND")
+        {
+            if (m_tvm_jump)
+                BUTTON(actionName, tr("Jump Back"));
+        }
+        else if (actionName == "JUMPTODVDROOTMENU")
+        {
+            if (m_tvm_isbd || m_tvm_isdvd)
+            {
+                active = m_tvm_isdvd;
+                BUTTON2(actionName, tr("DVD Root Menu"), tr("Top menu"));
+            }
+        }
+        else if (actionName == "JUMPTOPOPUPMENU")
+        {
+            if (m_tvm_isbd)
+                BUTTON(actionName, tr("Popup menu"));
+        }
+        else if (actionName == "JUMPTODVDTITLEMENU")
+        {
+            if (m_tvm_isdvd)
+                BUTTON(actionName, tr("DVD Title Menu"));
+        }
+        else if (actionName == "JUMPTODVDCHAPTERMENU")
+        {
+            if (m_tvm_isdvd)
+                BUTTON(actionName, tr("DVD Chapter Menu"));
+        }
+        else if (actionName == "PREVCHAN")
+        {
+            if (m_tvm_previouschan)
+                BUTTON(actionName, tr("Previous Channel"));
+        }
+        else if (actionName == "GUIDE")
+        {
+            BUTTON(actionName, tr("Program Guide"));
+        }
+        else if (actionName == "FINDER")
+        {
+            BUTTON(actionName, tr("Program Finder"));
+        }
+        else if (actionName == "VIEWSCHEDULED")
+        {
+            BUTTON(actionName, tr("Upcoming Recordings"));
+        }
+        else if (actionName == "SCHEDULE")
+        {
+            BUTTON(actionName, tr("Edit Recording Schedule"));
+        }
+        else if (actionName == "DIALOG_JUMPREC_X_0")
+        {
+            BUTTON3(actionName, tr("Recorded Program"), "", true);
+            QVariant v;
+            v.setValue(c.m_node);
+            m_tvm_jumprec_back_hack = v;
+        }
+        else if (actionName == "JUMPPREV")
+        {
+            if (lastProgram != NULL)
+            {
+                if (lastProgram->GetSubtitle().isEmpty())
+                    BUTTON(actionName, lastProgram->GetTitle());
+                else
+                    BUTTON(actionName,
+                           QString("%1: %2")
+                           .arg(lastProgram->GetTitle())
+                           .arg(lastProgram->GetSubtitle()));
+            }
+        }
+        else if (actionName == "EDIT")
+        {
+            if (m_tvm_islivetv || m_tvm_isrecorded ||
+                m_tvm_isrecording || m_tvm_isvideo)
+            {
+                active = m_tvm_islivetv;
+                BUTTON2(actionName, tr("Edit Channel"), tr("Edit Recording"));
+            }
+        }
+        else if (actionName == "TOGGLEAUTOEXPIRE")
+        {
+            if (m_tvm_isrecorded || m_tvm_isrecording)
+            {
+                active = m_tvm_is_on;
+                BUTTON2(actionName,
+                        tr("Turn Auto-Expire OFF"), tr("Turn Auto-Expire ON"));
+            }
+        }
+        else if (actionName == "QUEUETRANSCODE")
+        {
+            if (m_tvm_isrecorded)
+            {
+                active = m_tvm_transcoding;
+                BUTTON2(actionName, tr("Stop Transcoding"), tr("Default"));
+            }
+        }
+        else if (actionName == "QUEUETRANSCODE_AUTO")
+        {
+            if (m_tvm_isrecorded)
+            {
+                active = m_tvm_transcoding;
+                BUTTON(actionName, tr("Autodetect"));
+            }
+        }
+        else if (actionName == "QUEUETRANSCODE_HIGH")
+        {
+            if (m_tvm_isrecorded)
+            {
+                active = m_tvm_transcoding;
+                BUTTON(actionName, tr("High Quality"));
+            }
+        }
+        else if (actionName == "QUEUETRANSCODE_MEDIUM")
+        {
+            if (m_tvm_isrecorded)
+            {
+                active = m_tvm_transcoding;
+                BUTTON(actionName, tr("Medium Quality"));
+            }
+        }
+        else if (actionName == "QUEUETRANSCODE_LOW")
+        {
+            if (m_tvm_isrecorded)
+            {
+                active = m_tvm_transcoding;
+                BUTTON(actionName, tr("Low Quality"));
+            }
+        }
+        else
+        {
+            // Allow an arbitrary action if it has a translated
+            // description available to be used as the button text.
+            // Look in the specified keybinding context as well as the
+            // Global context.
+            QString text = GetMythMainWindow()->
+                GetActionText(m_keyBindingContext, actionName);
+            if (text.isEmpty())
+                text = GetMythMainWindow()
+                    ->GetActionText("Global", actionName);
+            if (!text.isEmpty())
+                BUTTON(actionName, text);
+        }
+    }
+
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    return result;
+}
+
+void TV::MenuLazyInit(void *field)
+{
+    if (field == &m_tvm_freerecordercount)
+    {
+        if (m_tvm_freerecordercount < 0)
+            m_tvm_freerecordercount = RemoteGetFreeRecorderCount();
+    }
+}
+
+void TV::MenuInit(void)
+{
+    m_tvmCtx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+    m_tvmOsd = GetOSDLock(m_tvmCtx);
+    PlayerContext *ctx = m_tvmCtx;
+
+    m_tvm_avsync   = true;
+    m_tvm_visual   = false;
+    m_tvm_active   = "";
+    m_tvm_upmixing = false;
+    m_tvm_canupmix = false;
+
+    m_tvm_aspectoverride     = kAspect_Off;
+    m_tvm_adjustfill         = kAdjustFill_Off;
+    m_tvm_fill_autodetect    = false;
+    m_tvm_sup                = kPictureAttributeSupported_None;
+    m_tvm_studio_levels      = false;
+    m_tvm_stereoallowed      = false;
+    m_tvm_stereomode         = kStereoscopicModeNone;
+    m_tvm_scan_type          = kScan_Ignore;
+    m_tvm_scan_type_unlocked = kScan_Ignore;
+    m_tvm_scan_type_locked   = false;
+    m_tvm_cur_mode           = "";
+    m_tvm_doublerate         = false;
+
+    m_tvm_speedX100         = (int)(round(ctx->ts_normal * 100));
+    m_tvm_state             = ctx->GetState();
+    m_tvm_isrecording       = (m_tvm_state == kState_WatchingRecording);
+    m_tvm_isrecorded        = (m_tvm_state == kState_WatchingPreRecorded);
+    m_tvm_isrecorded        = (m_tvm_state == kState_WatchingPreRecorded);
+    m_tvm_isvideo           = (m_tvm_state == kState_WatchingVideo);
+    m_tvm_curskip           = kCommSkipOff;
+    m_tvm_ispaused          = false;
+    m_tvm_allowPIP          = IsPIPSupported(ctx);
+    m_tvm_allowPBP          = IsPBPSupported(ctx);
+    m_tvm_hasPBP            = (player.size() > 1) && GetPlayer(ctx,1)->IsPBP();
+    m_tvm_hasPIP            = (player.size() > 1) && GetPlayer(ctx,1)->IsPIP();
+    m_tvm_freerecordercount = -1;
+    m_tvm_isdvd             = (m_tvm_state == kState_WatchingDVD);
+    m_tvm_isbd              = (ctx->buffer && ctx->buffer->IsBD() &&
+                               ctx->buffer->BD()->IsHDMVNavigation());
+    m_tvm_jump              = (!m_tvm_num_chapters && !m_tvm_isdvd &&
+                               !m_tvm_isbd && ctx->buffer->IsSeekingAllowed());
+    m_tvm_islivetv          = StateIsLiveTV(m_tvm_state);
+    m_tvm_previouschan      = false;
+
+    m_tvm_num_chapters    = GetNumChapters(ctx);
+    m_tvm_current_chapter = GetCurrentChapter(ctx);
+    m_tvm_num_angles      = GetNumAngles(ctx);
+    m_tvm_current_angle   = GetCurrentAngle(ctx);
+    m_tvm_num_titles      = GetNumTitles(ctx);
+    m_tvm_current_title   = GetCurrentTitle(ctx);
+    m_tvm_chapter_times.clear();
+    GetChapterTimes(ctx, m_tvm_chapter_times);
+
+    m_tvm_subs_capmode   = 0;
+    m_tvm_subs_havetext  = false;
+    m_tvm_subs_forcedon  = true;
+    m_tvm_subs_enabled   = false;
+    m_tvm_subs_have_subs = false;
+
+    for (int i = kTrackTypeUnknown ; i < kTrackTypeCount ; ++i)
+        m_tvm_curtrack[i] = -1;
+
+    if (m_tvm_islivetv)
+    {
+        QString prev_channum = ctx->GetPreviousChannel();
+        QString cur_channum  = QString();
+        if (ctx->tvchain)
+            cur_channum = ctx->tvchain->GetChannelName(-1);
+        if (!prev_channum.isEmpty() && prev_channum != cur_channum)
+            m_tvm_previouschan = true;
+    }
+
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+
+    if (ctx->player)
+    {
+        for (int i = kTrackTypeUnknown ; i < kTrackTypeCount ; ++i)
+        {
+            m_tvm_tracks[i] = ctx->player->GetTracks(i);
+            if (!m_tvm_tracks[i].empty())
+                m_tvm_curtrack[i] = ctx->player->GetTrack(i);
+        }
+        m_tvm_subs_have_subs =
+            !m_tvm_tracks[kTrackTypeSubtitle].empty() ||
+            m_tvm_subs_havetext ||
+            !m_tvm_tracks[kTrackTypeCC708].empty() ||
+            !m_tvm_tracks[kTrackTypeCC608].empty() ||
+            !m_tvm_tracks[kTrackTypeTeletextCaptions].empty() ||
+            !m_tvm_tracks[kTrackTypeRawText].empty();
+        m_tvm_avsync = (ctx->player->GetTrackCount(kTrackTypeVideo) > 0) &&
+            !m_tvm_tracks[kTrackTypeAudio].empty();
+        m_tvm_visual             = ctx->player->CanVisualise();
+        m_tvm_active             = ctx->player->GetVisualiserName();
+        m_tvm_upmixing           = ctx->player->GetAudio()->IsUpmixing();
+        m_tvm_canupmix           = ctx->player->GetAudio()->CanUpmix();
+        m_tvm_aspectoverride     = ctx->player->GetAspectOverride();
+        m_tvm_adjustfill         = ctx->player->GetAdjustFill();
+        m_tvm_scan_type          = ctx->player->GetScanType();
+        m_tvm_scan_type_unlocked = m_tvm_scan_type;
+        m_tvm_scan_type_locked   = ctx->player->IsScanTypeLocked();
+        m_tvm_doublerate         = ctx->player->CanSupportDoubleRate();
+        m_tvm_curskip            = ctx->player->GetAutoCommercialSkip();
+        m_tvm_ispaused           = ctx->player->IsPaused();
+        m_tvm_subs_capmode       = ctx->player->GetCaptionMode();
+        m_tvm_subs_enabled       = ctx->player->GetCaptionsEnabled();
+        m_tvm_subs_havetext      = ctx->player->HasTextSubtitles();
+        m_tvm_subs_forcedon      = ctx->player->GetAllowForcedSubtitles();
+        ctx->player->GetVideoOutput()->GetDeinterlacers(m_tvm_deinterlacers);
+        m_tvm_currentdeinterlacer =
+            ctx->player->GetVideoOutput()->GetDeinterlacer();
+        if (m_tvm_visual)
+            m_tvm_visualisers = ctx->player->GetVisualiserList();
+        VideoOutput *vo = ctx->player->GetVideoOutput();
+        if (vo)
+        {
+            m_tvm_sup             = vo->GetSupportedPictureAttributes();
+            m_tvm_stereoallowed   = vo->StereoscopicModesAllowed();
+            m_tvm_stereomode      = vo->GetStereoscopicMode();
+            m_tvm_fill_autodetect = !vo->hasHWAcceleration();
+            m_tvm_studio_levels   =
+                vo->GetPictureAttribute(kPictureAttribute_StudioLevels) > 0;
+        }
+        if (!m_tvm_scan_type_locked)
+        {
+            if (kScan_Interlaced == m_tvm_scan_type)
+                m_tvm_cur_mode = tr("(I)", "Interlaced (Normal)");
+            else if (kScan_Intr2ndField == m_tvm_scan_type)
+                m_tvm_cur_mode = tr("(i)", "Interlaced (Reversed)");
+            else if (kScan_Progressive == m_tvm_scan_type)
+                m_tvm_cur_mode = tr("(P)", "Progressive");
+            m_tvm_cur_mode = " " + m_tvm_cur_mode;
+            m_tvm_scan_type_unlocked = kScan_Detect;
+        }
+    }
+    ctx->LockPlayingInfo(__FILE__, __LINE__);
+    m_tvm_is_on = ctx->playingInfo->QueryAutoExpire() != kDisableAutoExpire;
+    m_tvm_transcoding = JobQueue::IsJobQueuedOrRunning
+        (JOB_TRANSCODE, ctx->playingInfo->GetChanID(),
+         ctx->playingInfo->GetScheduledStartTime());
+    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+}
+
+void TV::MenuDeinit(void)
+{
+    ReturnOSDLock(m_tvmCtx, m_tvmOsd);
+    ReturnPlayerLock(m_tvmCtx);
+    m_tvmOsd = NULL;
+    m_tvmOsd = NULL;
+}
+
+void TV::MenuShow(const QDomNode &node, const QDomNode &selected)
+{
+    MenuInit();
+    if (m_tvmOsd)
+    {
+        m_tvmOsd->DialogShow(OSD_DLG_MENU, m_menuName);
+        MenuBase::MenuShow(node, selected);
+        QString text =
+            MenuTranslate(node.toElement().attribute("text", m_menuName));
+        m_tvmOsd->DialogSetText(text);
+        QDomNode parent = node.parentNode();
+        if (!parent.parentNode().isNull())
+        {
+            QVariant v;
+            v.setValue(node);
+            m_tvmOsd->DialogBack("", v);
+        }
+    }
+    MenuDeinit();
+}
+
+void TV::MenuStrings(void) const
+{
+    tr("Playback Menu");
+    tr("Playback Compact Menu");
+    tr("Audio");
+    tr("Select Audio Track");
+    tr("Visualisation");
+    tr("Video");
+    tr("Change Aspect Ratio");
+    tr("Adjust Fill");
+    tr("Adjust Picture");
+    tr("3D");
+    tr("Advanced");
+    tr("Video Scan");
+    tr("Deinterlacer");
+    tr("Subtitles");
+    tr("Select Subtitle");
+    tr("Text Subtitles");
+    tr("Select ATSC CC");
+    tr("Select VBI CC");
+    tr("Select Teletext CC");
+    tr("Playback");
+    tr("Adjust Time Stretch");
+    tr("Picture-in-Picture");
+    tr("Sleep");
+    tr("Channel Groups");
+    tr("Navigate");
+    tr("Commercial Auto-Skip");
+    tr("Chapter");
+    tr("Angle");
+    tr("Title");
+    tr("Schedule");
+    tr("Source");
+    tr("Jump to Program");
+    tr("Switch Input");
+    tr("Switch Source");
+    tr("Jobs");
+    tr("Begin Transcoding");
+}
+
+void TV::ShowOSDMenu(const PlayerContext *ctx, bool isCompact)
+{
+#if 0
     QString cat = category.isEmpty() ? "MAIN" : category;
 
     OSD *osd = GetOSDLock(ctx);
@@ -10986,8 +12151,25 @@ void TV::ShowOSDMenu(const PlayerContext *ctx, const QString category,
             osd->DialogBack(cat, QString("DIALOG_MENU_%1_0").arg(back));
     }
     ReturnOSDLock(ctx, osd);
+#endif
+    if (!MenuIsLoaded())
+    {
+        MenuLoadFromFile("menu_playback.xml",
+                         tr("Playback Menu"),
+                         metaObject()->className(),
+                         "TV Playback");
+        m_compactMenu.MenuLoadFromFile("menu_playback_compact.xml",
+                                       tr("Playback Compact Menu"),
+                                       metaObject()->className(),
+                                       "TV Playback");
+    }
+    if (isCompact && m_compactMenu.MenuIsLoaded())
+        MenuShow(m_compactMenu.MenuGetRoot(), QDomNode());
+    else if (MenuIsLoaded())
+        MenuShow(MenuGetRoot(), QDomNode());
 }
 
+#if 0
 void TV::FillOSDMenuAudio(const PlayerContext *ctx, OSD *osd,
                           QString category, const QString selected,
                           QString &currenttext, QString &backaction)
@@ -12075,6 +13257,7 @@ void TV::FillOSDMenuSchedule(const PlayerContext *ctx, OSD *osd,
         osd->DialogAddButton(tr("Edit Recording Schedule"), "SCHEDULE");
     }
 }
+#endif
 
 void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
                             int level, const QString selected)
@@ -12185,8 +13368,13 @@ void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
             if (level == 1)
                 osd->DialogBack(category, "DIALOG_" + ACTION_JUMPREC + "_X_0");
             else if (level == 0)
-                osd->DialogBack(ACTION_JUMPREC,
-                                "DIALOG_MENU_" + ACTION_JUMPREC +"_0");
+            {
+                if (m_tvm_jumprec_back_hack.isValid())
+                    osd->DialogBack("", m_tvm_jumprec_back_hack);
+                else
+                    osd->DialogBack(ACTION_JUMPREC,
+                                    "DIALOG_MENU_" + ACTION_JUMPREC +"_0");
+            }
         }
     }
     ReturnOSDLock(ctx, osd);

@@ -39,8 +39,11 @@ using namespace std;
 #include "channelgroup.h"
 #include "mythtimer.h"
 #include "osd.h"
+#include "decoderbase.h"
 
 class QDateTime;
+class QDomDocument;
+class QDomNode;
 class OSD;
 class RemoteEncoder;
 class MythPlayer;
@@ -138,6 +141,102 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
+enum MenuCategory {
+    kMenuCategoryItem,
+    kMenuCategoryItemlist,
+    kMenuCategoryMenu
+};
+enum MenuShowContext {
+    kMenuShowActive,
+    kMenuShowInactive,
+    kMenuShowAlways
+};
+
+class MenuItemContext
+{
+public:
+    // Constructor for a menu element.
+    MenuItemContext(const QDomNode &node,
+                    const QString &menuName,
+                    bool setCurrentActive,
+                    bool doDisplay) :
+        m_node(node),
+        m_category(kMenuCategoryMenu),
+        m_menuName(menuName),
+        m_showContext(kMenuShowAlways),
+        m_setCurrentActive(setCurrentActive),
+        m_action(""),
+        m_actionText(""),
+        m_doDisplay(doDisplay) {}
+    // Constructor for an item element.
+    MenuItemContext(const QDomNode &node,
+                    MenuShowContext showContext,
+                    bool setCurrentActive,
+                    const QString &action,
+                    const QString &actionText,
+                    bool doDisplay) :
+        m_node(node),
+        m_category(kMenuCategoryItem),
+        m_menuName(""),
+        m_showContext(showContext),
+        m_setCurrentActive(setCurrentActive),
+        m_action(action),
+        m_actionText(actionText),
+        m_doDisplay(doDisplay) {}
+    // Constructor for an itemlist element.
+    MenuItemContext(const QDomNode &node,
+                    MenuShowContext showContext,
+                    bool setCurrentActive,
+                    const QString &action,
+                    bool doDisplay) :
+        m_node(node),
+        m_category(kMenuCategoryItemlist),
+        m_menuName(""),
+        m_showContext(showContext),
+        m_setCurrentActive(setCurrentActive),
+        m_action(action),
+        m_actionText(""),
+        m_doDisplay(doDisplay) {}
+    const QDomNode &m_node;
+    MenuCategory m_category;
+    const QString m_menuName;
+    MenuShowContext m_showContext;
+    bool m_setCurrentActive;
+    const QString m_action;
+    const QString m_actionText;
+    bool m_doDisplay;
+};
+
+class MenuBase
+{
+public:
+    MenuBase() : m_menuDocument(NULL), m_translationContext(""),
+                 m_recursionLevel(0) {}
+    ~MenuBase();
+    bool MenuLoadFromFile(const QString &filename, const QString &menuname,
+                          const char *translationContext,
+                          const QString &keyBindingContext);
+    bool MenuIsLoaded(void) const { return (m_menuDocument != NULL); }
+    QDomElement MenuGetRoot(void) const;
+    QString MenuTranslate(const QString &text) const;
+    virtual void MenuShow(const QDomNode &node, const QDomNode &selected) {
+        MenuShowHelper(node, selected, true);
+    }
+protected:
+    virtual bool MenuShowHelper(const QDomNode &node,
+                                const QDomNode &selected,
+                                bool doDisplay);
+    virtual bool MenuDisplayItem(const MenuItemContext &c) { return false; }
+    virtual void MenuStrings(void) const {}
+    QDomDocument *m_menuDocument;
+    QString m_menuName;
+    const char *m_translationContext;
+    QString m_keyBindingContext;
+private:
+    void MenuProcessIncludes(QDomElement &root);
+    int m_recursionLevel; // guard against infinite recursion
+};
+
 /**
  * \class TV
  *
@@ -156,7 +255,7 @@ class AskProgramInfo
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject
+class MTV_PUBLIC TV : public QObject, public MenuBase
 {
     friend class PlaybackBox;
     friend class GuideGrid;
@@ -606,9 +705,9 @@ class MTV_PUBLIC TV : public QObject
     bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
 
     // Menu dialog
-    void ShowOSDMenu(const PlayerContext*, const QString category = "",
-                     const QString selected = "");
+    void ShowOSDMenu(const PlayerContext*, bool isCompact = false);
 
+#if 0
     void FillOSDMenuAudio    (const PlayerContext *ctx, OSD *osd,
                               QString category, const QString selected,
                               QString &currenttext, QString &backaction);
@@ -633,8 +732,16 @@ class MTV_PUBLIC TV : public QObject
     void FillOSDMenuSource   (const PlayerContext *ctx, OSD *osd,
                               QString category, const QString selected,
                               QString &currenttext, QString &backaction);
+#endif
     void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString category = "",
                               int level = 0, const QString selected = "");
+
+    virtual void MenuShow(const QDomNode &node, const QDomNode &selected);
+    virtual bool MenuDisplayItem(const MenuItemContext &c);
+    virtual void MenuInit(void);
+    virtual void MenuDeinit(void);
+    virtual void MenuStrings(void) const;
+    void MenuLazyInit(void *field);
 
     // LCD
     void UpdateLCD(void);
@@ -856,6 +963,84 @@ class MTV_PUBLIC TV : public QObject
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
     TimerContextMap      tvchainUpdateTimerId;
+
+    // Playback menu state caching
+    PlayerContext *m_tvmCtx;
+    OSD *m_tvmOsd;
+
+    // Various tracks
+    // XXX This ignores kTrackTypeTextSubtitle which is greater than
+    // kTrackTypeCount, and it unnecessarily includes
+    // kTrackTypeUnknown.
+    QStringList m_tvm_tracks[kTrackTypeCount];
+    int m_tvm_curtrack[kTrackTypeCount];
+
+    // Audio
+    bool m_tvm_avsync;
+    bool m_tvm_visual;
+    QString m_tvm_active;
+    bool m_tvm_upmixing;
+    bool m_tvm_canupmix;
+    QStringList m_tvm_visualisers;
+
+    // Video
+    AspectOverrideMode m_tvm_aspectoverride;
+    AdjustFillMode m_tvm_adjustfill;
+    bool m_tvm_fill_autodetect;
+    uint m_tvm_sup;
+    bool m_tvm_studio_levels;
+    bool m_tvm_stereoallowed;
+    StereoscopicMode m_tvm_stereomode;
+    FrameScanType m_tvm_scan_type;
+    FrameScanType m_tvm_scan_type_unlocked;
+    bool m_tvm_scan_type_locked;
+    QString m_tvm_cur_mode;
+    QStringList m_tvm_deinterlacers;
+    QString     m_tvm_currentdeinterlacer;
+    bool        m_tvm_doublerate;
+
+    // Playback
+    int m_tvm_speedX100;
+    TVState m_tvm_state;
+    bool m_tvm_isrecording;
+    bool m_tvm_isrecorded;
+    bool m_tvm_isvideo;
+    CommSkipMode m_tvm_curskip;
+    bool m_tvm_ispaused;
+    bool m_tvm_allowPIP;
+    bool m_tvm_allowPBP;
+    bool m_tvm_hasPIP;
+    bool m_tvm_hasPBP;
+    int m_tvm_freerecordercount;
+    bool m_tvm_isdvd;
+    bool m_tvm_isbd;
+    bool m_tvm_jump;
+    bool m_tvm_islivetv;
+    bool m_tvm_previouschan;
+
+    // Navigate
+    int m_tvm_num_chapters;
+    int m_tvm_current_chapter;
+    QList<long long> m_tvm_chapter_times;
+    int m_tvm_num_angles;
+    int m_tvm_current_angle;
+    int m_tvm_num_titles;
+    int m_tvm_current_title;
+
+    // Subtitles
+    uint m_tvm_subs_capmode;
+    bool m_tvm_subs_havetext;
+    bool m_tvm_subs_forcedon;
+    bool m_tvm_subs_enabled;
+    bool m_tvm_subs_have_subs;
+
+    bool m_tvm_is_on;
+    bool m_tvm_transcoding;
+
+    QVariant m_tvm_jumprec_back_hack;
+    // End of playback menu state caching
+
+    MenuBase m_compactMenu;
 
   public:
     // Constants

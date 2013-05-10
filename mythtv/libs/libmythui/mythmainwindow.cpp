@@ -233,6 +233,7 @@ class MythMainWindowPrivate
     QMap<int, JumpData*> jumpMap;
     QMap<QString, JumpData> destinationMap;
     QMap<QString, MPData> mediaPluginMap;
+    QHash<QString, QHash<QString, QString> > actionText;
 
     void (*exitmenucallback)(void);
 
@@ -1701,6 +1702,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     }
 
     BindKey(context, action, keybind);
+    d->actionText[context][action] = description;
 }
 
 QString MythMainWindow::GetKey(const QString &context,
@@ -1723,6 +1725,18 @@ QString MythMainWindow::GetKey(const QString &context,
         return "?";
 
     return query.value(0).toString();
+}
+
+QString MythMainWindow::GetActionText(const QString &context,
+                                      const QString &action) const
+{
+    if (d->actionText.contains(context))
+    {
+        QHash<QString, QString> entry = d->actionText.value(context);
+        if (entry.contains(action))
+            return entry.value(action);
+    }
+    return "";
 }
 
 void MythMainWindow::ClearJump(const QString &destination)
