@@ -270,7 +270,7 @@ class ShoutCastMetaParser
     ~ShoutCastMetaParser(void) { }
 
     void setMetaFormat(const QString &metaformat);
-    ShoutCastMetaMap parseMeta(QString meta);
+    ShoutCastMetaMap parseMeta(const QString &meta);
 
   private:
     QString m_meta_format;
@@ -335,25 +335,23 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
     m_meta_format.replace("%%", "%");
 }
 
-ShoutCastMetaMap ShoutCastMetaParser::parseMeta(QString meta)
+ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
 {
-    QByteArray metastring(meta.toLocal8Bit());
     ShoutCastMetaMap result;
-    int title_begin_pos = metastring.indexOf("StreamTitle='");
+    int title_begin_pos = mdata.indexOf("StreamTitle='");
     int title_end_pos;
 
     if (title_begin_pos >= 0) 
     {
         title_begin_pos += 13;
-        title_end_pos = metastring.indexOf("';", title_begin_pos);
-        QByteArray title = metastring.mid(title_begin_pos, 
-                                          title_end_pos - title_begin_pos);
+        title_end_pos = mdata.indexOf("';", title_begin_pos);
+        QString title = mdata.mid(title_begin_pos, title_end_pos - title_begin_pos);
         QRegExp rx;
         rx.setPattern(m_meta_format);
         if (rx.indexIn(title) != -1)
         {
             LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
-                    .arg(meta));
+                    .arg(mdata));
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("ShoutCast: Parsed as: '%1' by '%2'")
                     .arg(rx.cap(m_meta_title_pos))
@@ -742,14 +740,14 @@ bool ShoutCastIODevice::parseMeta(void)
         return false;
     }
 
-    QString metadata_string = QString::fromUtf8(data.constData());
+    QString metadataString = QString::fromUtf8(data.constData());
 
     // avoid sending signals if the data hasn't changed
-    if (m_last_metadata == metadata_string)
+    if (m_last_metadata == metadataString)
         return true;
 
-    m_last_metadata = metadata_string;
-    emit meta(metadata_string);
+    m_last_metadata = metadataString;
+    emit meta(metadataString);
 
     return true;
 }
