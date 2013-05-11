@@ -16,19 +16,19 @@ struct Cddb
     // A CDDB query match
     struct Match
     {
-        QString genre;
+        QString discGenre;
         discid_t discID;
         QString artist;
         QString title;
 
         Match() : discID(0) {}
         Match(const char *g, discid_t d, const char *a, const char *t) :
-            genre(g), discID(d), artist(a), title(t)
+            discGenre(g), discID(d), artist(a), title(t)
         {}
         Match(const QString &g, discid_t d, const QString &a, const QString &t) :
-            genre(g), discID(d), artist(a), title(t)
+            discGenre(g), discID(d), artist(a), title(t)
         {}
-        Match(const Album& a) : genre(a.genre), discID(a.discID),
+        Match(const Album& a) : discGenre(a.discGenre), discID(a.discID),
             artist(a.artist), title(a.title)
         {}
     };
@@ -60,10 +60,11 @@ struct Cddb
     // CDDB detail result
     struct Album
     {
-        QString genre;
+        QString discGenre; // the genre used in the query to differentiate similar discID's
         discid_t discID;
         QString artist;
         QString title;
+        QString genre;     // the genre from the DGENRE= item
         int year;
         QString submitter;
         int rev;
@@ -76,7 +77,7 @@ struct Cddb
         Toc toc;
 
         Album(discid_t d = 0, const char* g = 0) :
-            genre(g), discID(d), year(0), rev(1), isCompilation(false) {}
+            discGenre(g), discID(d), year(0), rev(1), isCompilation(false) {}
 
         Album(const QString& s) { *this = s; }
 

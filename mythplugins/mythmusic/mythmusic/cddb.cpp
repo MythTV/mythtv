@@ -238,7 +238,7 @@ bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
     }
 
     album = cddb;
-    album.genre = cddb.section(' ', 0, 0);
+    album.discGenre = genre;
     album.discID = discID;
 
     // Success - add to cache
@@ -302,10 +302,11 @@ void Cddb::Alias(const Album& album, discid_t discID)
  */
 Cddb::Album& Cddb::Album::operator =(const QString& rhs)
 {
-    genre.clear();
+    discGenre.clear();
     discID = 0;
     artist.clear();
     title.clear();
+    genre.clear();
     year = 0;
     submitter = "MythTV " MYTH_BINARY_VERSION;
     rev = 1;
@@ -462,7 +463,7 @@ Cddb::Album::operator QString() const
     ret += "DISCID=" + QString::number(discID,16) + '\n';
     ret += "DTITLE=" + artist.toUtf8() + " / " + title + '\n';
     ret += "DYEAR=" + (year ? QString::number(year) : "")+ '\n';
-    ret += "DGENRE=" + genre.toLower().toUtf8() + '\n';
+    ret += "DGENRE=" + genre.toUtf8() + '\n';
     for (int t = 0; t < tracks.size(); ++t)
         ret += "TTITLE" + QString::number(t) + "=" +
             tracks[t].title.toUtf8() + '\n';
@@ -501,7 +502,7 @@ bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text))
                 {
                     Cddb::Album a = QTextStream(&file).readAll();
-                    a.genre = genre;
+                    a.discGenre = genre;
                     a.discID = discID;
                     LOG(VB_MEDIA, LOG_INFO, QString("LocalCDDB found %1 in ").
                         arg(discID,0,16) + genre + " : " +
@@ -522,12 +523,12 @@ bool Dbase::Search(Cddb::Album& a, const QString& genre, const Cddb::discid_t di
 {
     if (CacheGet(a, genre, discID))
         return true;
-    
+
     QFile file(GetDB() + '/' + genre.toLower() + '/' + QString::number(discID,16));
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         a = QTextStream(&file).readAll();
-        a.genre = genre.toLower();
+        a.discGenre = genre.toLower();
         a.discID = discID;
         LOG(VB_MEDIA, LOG_INFO, QString("LocalCDDB matched %1 ").arg(discID,0,16) +
             genre + " to " + a.artist + " / " + a.title);
@@ -544,8 +545,8 @@ bool Dbase::Write(const Cddb::Album& album)
 {
     CachePut(album);
 
-    const QString genre = !album.genre.isEmpty() ?
-        album.genre.toLower().toUtf8() : "misc";
+    const QString genre = !album.discGenre.isEmpty() ?
+        album.discGenre.toLower().toUtf8() : "misc";
 
     LOG(VB_MEDIA, LOG_INFO, "WriteDB " + genre +
         QString(" %1 ").arg(album.discID,0,16) +
@@ -600,10 +601,10 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
             ret = true;
             res.discID = discID;
             LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CacheGet found %1 ").
-                arg(discID,0,16) + it->genre + " " + it->artist + " / " + it->title);
+                arg(discID,0,16) + it->discGenre + " " + it->artist + " / " + it->title);
 
             // If it's marker for 'no match' then genre is empty
-            if (!it->genre.isEmpty())
+            if (!it->discGenre.isEmpty())
                 res.matches.push_back(Cddb::Match(*it));
         }
     }
@@ -614,7 +615,7 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
 bool Dbase::CacheGet(Cddb::Album& album, const QString& genre, const Cddb::discid_t discID)
 {
     const Cddb::Album& a = s_cache[ discID];
-    if (a.discID && a.genre == genre)
+    if (a.discID && a.discGenre == genre)
     {
         album = a;
         return true;

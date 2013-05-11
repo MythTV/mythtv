@@ -730,7 +730,7 @@ MusicMetadata *CdDecoder::getMetadata()
                 for (Cddb::Matches::match_t::const_iterator it = select;
                     it != r.matches.end(); ++it)
                 {
-                    QString g = it->genre.toLower();
+                    QString g = it->discGenre.toLower();
                     if (g != "misc" && g != "data")
                     {
                         select = it;
@@ -740,14 +740,19 @@ MusicMetadata *CdDecoder::getMetadata()
             }
 
             Cddb::Album info;
-            if (Cddb::Read(info, select->genre, select->discID))
+            if (Cddb::Read(info, select->discGenre, select->discID))
             {
                 isCompilation = info.isCompilation;
-                if (info.genre.toLower() != "misc")
-                    genre = info.genre;
+
+                if (info.genre.toLower() != "unknown")
+                    genre = info.genre[0].toTitleCase() + info.genre.mid(1);
+                else
+                    genre = info.discGenre[0].toTitleCase() + info.discGenre.mid(1);;
+
                 album = info.title;
                 compilation_artist = info.artist;
                 year = info.year;
+
                 if (info.tracks.size() >= tracknum)
                 {
                     const Cddb::Track& track = info.tracks[tracknum - 1];
@@ -798,7 +803,7 @@ void CdDecoder::commitMetadata(MusicMetadata *mdata)
     Cddb::discid_t discID = Cddb::Discid(secs, toc.data(), toc.size() - 1);
 
     Cddb::Album album(discID, mdata->Genre().toLower().toUtf8());
-    if (!Cddb::Read(album, album.genre, discID))
+    if (!Cddb::Read(album, album.discGenre, discID))
         album.toc = toc;
 
     album.isCompilation = mdata->Compilation();
