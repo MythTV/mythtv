@@ -26,7 +26,6 @@ class GeneralSettings : public MythScreenType
     MythUITextEdit     *m_musicCDDevice;
     MythUITextEdit     *m_nonID3FileNameFormat;
     MythUICheckBox     *m_ignoreID3Tags;
-    MythUIButtonList   *m_tagEncoding;
     MythUICheckBox     *m_allowTagWriting;
     MythUIButton       *m_saveButton;
     MythUIButton       *m_cancelButton;
