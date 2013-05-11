@@ -30,8 +30,8 @@ const int CDROM_LEADOUT_TRACK = 0xaa;
 const int CD_FRAMES_PER_SEC = 75;
 const int SECS_PER_MIN = 60;
 
-static const char URL[] = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
-//static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
+//static const char URL[] = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
+static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
 static const QString& helloID();
 
 namespace {
