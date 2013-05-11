@@ -10981,7 +10981,8 @@ bool MenuBase::MenuLoadFromFile(const QString &filename,
 
     m_translationContext = translationContext;
     m_keyBindingContext = keyBindingContext;
-    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+    QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+    searchpath.prepend(GetConfDir() + '/');
     QStringList::const_iterator it = searchpath.begin();
     for (; !result && it != searchpath.end(); ++it)
     {
