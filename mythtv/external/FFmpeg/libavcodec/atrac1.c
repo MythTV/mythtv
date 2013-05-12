@@ -32,9 +32,9 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#include "libavutil/float_dsp.h"
 #include "avcodec.h"
 #include "get_bits.h"
-#include "dsputil.h"
 #include "fft.h"
 #include "internal.h"
 #include "sinewin.h"
@@ -72,7 +72,6 @@ typedef struct {
  * The atrac1 context, holds all needed parameters for decoding
  */
 typedef struct {
-    AVFrame frame;
     AT1SUCtx            SUs[AT1_MAX_CHANNELS];              ///< channel sound unit
     DECLARE_ALIGNED(32, float, spec)[AT1_SU_SAMPLES];      ///< the mdct spectrum buffer
 
@@ -81,7 +80,7 @@ typedef struct {
     DECLARE_ALIGNED(32, float, high)[512];
     float*              bands[3];
     FFTContext          mdct_ctx[3];
-    DSPContext          dsp;
+    AVFloatDSPContext   fdsp;
 } AT1Ctx;
 
 /** size of the transform in samples in the long mode for each QMF band */
@@ -141,8 +140,8 @@ static int at1_imdct_block(AT1SUCtx* su, AT1Ctx *q)
             at1_imdct(q, &q->spec[pos], &su->spectrum[0][ref_pos + start_pos], nbits, band_num);
 
             /* overlap and window */
-            q->dsp.vector_fmul_window(&q->bands[band_num][start_pos], prev_buf,
-                                      &su->spectrum[0][ref_pos + start_pos], ff_sine_32, 16);
+            q->fdsp.vector_fmul_window(&q->bands[band_num][start_pos], prev_buf,
+                                       &su->spectrum[0][ref_pos + start_pos], ff_sine_32, 16);
 
             prev_buf = &su->spectrum[0][ref_pos+start_pos + 16];
             start_pos += block_size;
@@ -273,6 +272,7 @@ static void at1_subband_synthesis(AT1Ctx *q, AT1SUCtx* su, float *pOut)
 static int atrac1_decode_frame(AVCodecContext *avctx, void *data,
                                int *got_frame_ptr, AVPacket *avpkt)
 {
+    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     AT1Ctx *q          = avctx->priv_data;
@@ -286,8 +286,8 @@ static int atrac1_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     /* get output buffer */
-    q->frame.nb_samples = AT1_SU_SAMPLES;
-    if ((ret = ff_get_buffer(avctx, &q->frame)) < 0) {
+    frame->nb_samples = AT1_SU_SAMPLES;
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -309,11 +309,10 @@ static int atrac1_decode_frame(AVCodecContext *avctx, void *data,
         ret = at1_imdct_block(su, q);
         if (ret < 0)
             return ret;
-        at1_subband_synthesis(q, su, (float *)q->frame.extended_data[ch]);
+        at1_subband_synthesis(q, su, (float *)frame->extended_data[ch]);
     }
 
-    *got_frame_ptr   = 1;
-    *(AVFrame *)data = q->frame;
+    *got_frame_ptr = 1;
 
     return avctx->block_align;
 }
@@ -362,7 +361,7 @@ static av_cold int atrac1_decode_init(AVCodecContext *avctx)
 
     ff_atrac_generate_tables();
 
-    ff_dsputil_init(&q->dsp, avctx);
+    avpriv_float_dsp_init(&q->fdsp, avctx->flags & CODEC_FLAG_BITEXACT);
 
     q->bands[0] = q->low;
     q->bands[1] = q->mid;
@@ -373,9 +372,6 @@ static av_cold int atrac1_decode_init(AVCodecContext *avctx)
     q->SUs[0].spectrum[1] = q->SUs[0].spec2;
     q->SUs[1].spectrum[0] = q->SUs[1].spec1;
     q->SUs[1].spectrum[1] = q->SUs[1].spec2;
-
-    avcodec_get_frame_defaults(&q->frame);
-    avctx->coded_frame = &q->frame;
 
     return 0;
 }

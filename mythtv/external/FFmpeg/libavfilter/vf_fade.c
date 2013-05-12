@@ -78,41 +78,14 @@ AVFILTER_DEFINE_CLASS(fade);
 static av_cold int init(AVFilterContext *ctx, const char *args)
 {
     FadeContext *fade = ctx->priv;
-    int ret = 0;
-    char *args1, *expr, *bufptr = NULL;
+    static const char *shorthand[] = { "type", "start_frame", "nb_frames", NULL };
+    int ret;
 
     fade->class = &fade_class;
     av_opt_set_defaults(fade);
 
-    if (!(args1 = av_strdup(args))) {
-        ret = AVERROR(ENOMEM);
-        goto end;
-    }
-
-    if (expr = av_strtok(args1, ":", &bufptr)) {
-        av_free(fade->type);
-        if (!(fade->type = av_strdup(expr))) {
-            ret = AVERROR(ENOMEM);
-            goto end;
-        }
-    }
-    if (expr = av_strtok(NULL, ":", &bufptr)) {
-        if ((ret = av_opt_set(fade, "start_frame", expr, 0)) < 0) {
-            av_log(ctx, AV_LOG_ERROR,
-                   "Invalid value '%s' for start_frame option\n", expr);
-            goto end;
-        }
-    }
-    if (expr = av_strtok(NULL, ":", &bufptr)) {
-        if ((ret = av_opt_set(fade, "nb_frames", expr, 0)) < 0) {
-            av_log(ctx, AV_LOG_ERROR,
-                   "Invalid value '%s' for nb_frames option\n", expr);
-            goto end;
-        }
-    }
-
-    if (bufptr && (ret = av_set_options_string(fade, bufptr, "=", ":")) < 0)
-        goto end;
+    if ((ret = av_opt_set_from_string(fade, args, shorthand, "=", ":")) < 0)
+        return ret;
 
     fade->fade_per_frame = (1 << 16) / fade->nb_frames;
     if (!strcmp(fade->type, "in"))
@@ -123,25 +96,21 @@ static av_cold int init(AVFilterContext *ctx, const char *args)
     } else {
         av_log(ctx, AV_LOG_ERROR,
                "Type argument must be 'in' or 'out' but '%s' was specified\n", fade->type);
-        ret = AVERROR(EINVAL);
-        goto end;
+        return AVERROR(EINVAL);
     }
     fade->stop_frame = fade->start_frame + fade->nb_frames;
 
     av_log(ctx, AV_LOG_VERBOSE,
            "type:%s start_frame:%d nb_frames:%d alpha:%d\n",
            fade->type, fade->start_frame, fade->nb_frames, fade->alpha);
-
-end:
-    av_free(args1);
-    return ret;
+    return 0;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
 {
     FadeContext *fade = ctx->priv;
 
-    av_freep(&fade->type);
+    av_opt_free(fade);
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -151,7 +120,7 @@ static int query_formats(AVFilterContext *ctx)
         AV_PIX_FMT_YUV411P,  AV_PIX_FMT_YUV410P,
         AV_PIX_FMT_YUVJ444P, AV_PIX_FMT_YUVJ422P, AV_PIX_FMT_YUVJ420P,
         AV_PIX_FMT_YUV440P,  AV_PIX_FMT_YUVJ440P,
-        AV_PIX_FMT_YUVA420P,
+        AV_PIX_FMT_YUVA420P, AV_PIX_FMT_YUVA422P, AV_PIX_FMT_YUVA444P,
         AV_PIX_FMT_RGB24,    AV_PIX_FMT_BGR24,
         AV_PIX_FMT_ARGB,     AV_PIX_FMT_ABGR,
         AV_PIX_FMT_RGBA,     AV_PIX_FMT_BGRA,
@@ -169,13 +138,6 @@ const static enum AVPixelFormat studio_level_pix_fmts[] = {
     AV_PIX_FMT_NONE
 };
 
-static enum AVPixelFormat alpha_pix_fmts[] = {
-    AV_PIX_FMT_YUVA420P,
-    AV_PIX_FMT_ARGB, AV_PIX_FMT_ABGR,
-    AV_PIX_FMT_RGBA, AV_PIX_FMT_BGRA,
-    AV_PIX_FMT_NONE
-};
-
 static int config_props(AVFilterLink *inlink)
 {
     FadeContext *fade = inlink->dst->priv;
@@ -185,7 +147,7 @@ static int config_props(AVFilterLink *inlink)
     fade->vsub = pixdesc->log2_chroma_h;
 
     fade->bpp = av_get_bits_per_pixel(pixdesc) >> 3;
-    fade->alpha = fade->alpha ? ff_fmt_is_in(inlink->format, alpha_pix_fmts) : 0;
+    fade->alpha &= pixdesc->flags & PIX_FMT_ALPHA;
     fade->is_packed_rgb = ff_fill_rgba_map(fade->rgba_map, inlink->format) >= 0;
 
     /* use CCIR601/709 black level for studio-level pixel non-alpha components */

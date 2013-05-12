@@ -66,10 +66,14 @@ static inline int get_ue_golomb(GetBitContext *gb){
         return ff_ue_golomb_vlc_code[buf];
     }else{
         log= 2*av_log2(buf) - 31;
-        buf>>= log;
-        buf--;
         LAST_SKIP_BITS(re, gb, 32 - log);
         CLOSE_READER(re, gb);
+        if (CONFIG_FTRAPV && log < 0) {
+            av_log(0, AV_LOG_ERROR, "Invalid UE golomb code\n");
+            return AVERROR_INVALIDDATA;
+        }
+        buf>>= log;
+        buf--;
 
         return buf;
     }
@@ -183,7 +187,11 @@ static inline int get_se_golomb(GetBitContext *gb){
 
         return ff_se_golomb_vlc_code[buf];
     }else{
-        log= 2*av_log2(buf) - 31;
+        log = av_log2(buf);
+        LAST_SKIP_BITS(re, gb, 31 - log);
+        UPDATE_CACHE(re, gb);
+        buf = GET_CACHE(re, gb);
+
         buf>>= log;
 
         LAST_SKIP_BITS(re, gb, 32 - log);

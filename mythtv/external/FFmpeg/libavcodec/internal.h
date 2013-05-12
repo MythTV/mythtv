@@ -62,7 +62,7 @@ typedef struct AVCodecInternal {
      */
     int is_copy;
 
-#if FF_API_OLD_DECODE_AUDIO
+#if FF_API_OLD_ENCODE_AUDIO
     /**
      * Internal sample count used by avcodec_encode_audio() to fabricate pts.
      * Can be removed along with avcodec_encode_audio().
@@ -123,6 +123,9 @@ unsigned int avpriv_toupper4(unsigned int x);
  * does needed setup of pkt_pts/pos and such for (re)get_buffer();
  */
 void ff_init_buffer_info(AVCodecContext *s, AVFrame *frame);
+
+
+void avpriv_color_frame(AVFrame *frame, const int color[4]);
 
 /**
  * Remove and free all side data from packet.
@@ -189,6 +192,10 @@ int ff_get_logical_cpus(AVCodecContext *avctx);
 
 int avpriv_h264_has_num_reorder_frames(AVCodecContext *avctx);
 
+void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_table,
+                         uint8_t *visualization_buffer[3], int *low_delay,
+                         int mb_width, int mb_height, int mb_stride, int quarter_sample);
+
 /**
  * Call avcodec_open2 recursively by decrementing counter, unlocking mutex,
  * calling the function and then restoring again. Assumes the mutex is
@@ -205,5 +212,7 @@ int ff_codec_close_recursive(AVCodecContext *avctx);
  * Finalize buf into extradata and set its size appropriately.
  */
 int avpriv_bprint_to_extradata(AVCodecContext *avctx, struct AVBPrint *buf);
+
+AVDictionary **ff_frame_get_metadatap(AVFrame *frame);
 
 #endif /* AVCODEC_INTERNAL_H */

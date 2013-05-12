@@ -86,7 +86,8 @@ static av_cold int yop_decode_init(AVCodecContext *avctx)
 
     if (avctx->width & 1 || avctx->height & 1 ||
         av_image_check_size(avctx->width, avctx->height, 0, avctx) < 0) {
-        return -1;
+        av_log(avctx, AV_LOG_ERROR, "YOP has invalid dimensions\n");
+        return AVERROR_INVALIDDATA;
     }
 
     if (avctx->extradata_size < 3) {
@@ -199,16 +200,14 @@ static int yop_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     if (s->frame.data[0])
         avctx->release_buffer(avctx, &s->frame);
 
-    if (avpkt->size < 4 + 3*s->num_pal_colors) {
-        av_log(avctx, AV_LOG_ERROR, "packet of size %d too small\n", avpkt->size);
-        return AVERROR_INVALIDDATA;
-    }
-
     ret = ff_get_buffer(avctx, &s->frame);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
+
+    if (!avctx->frame_number)
+        memset(s->frame.data[1], 0, AVPALETTE_SIZE);
 
     s->dstbuf     = s->frame.data[0];
     s->dstptr     = s->frame.data[0];

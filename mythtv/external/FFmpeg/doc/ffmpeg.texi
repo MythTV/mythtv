@@ -256,6 +256,14 @@ libx264, and the 138th audio, which will be encoded with libvorbis.
 Stop writing the output after its duration reaches @var{duration}.
 @var{duration} may be a number in seconds, or in @code{hh:mm:ss[.xxx]} form.
 
+-to and -t are mutually exclusive and -t has priority.
+
+@item -to @var{position} (@emph{output})
+Stop writing the output at @var{position}.
+@var{position} may be a number in seconds, or in @code{hh:mm:ss[.xxx]} form.
+
+-to and -t are mutually exclusive and -t has priority.
+
 @item -fs @var{limit_size} (@emph{output})
 Set the file size limit, expressed in bytes.
 
@@ -334,13 +342,21 @@ Stop writing to the stream after @var{framecount} frames.
 Use fixed quality scale (VBR). The meaning of @var{q} is
 codec-dependent.
 
+@anchor{filter_option}
 @item -filter[:@var{stream_specifier}] @var{filter_graph} (@emph{output,per-stream})
-@var{filter_graph} is a description of the filter graph to apply to
-the stream. Use @code{-filters} to show all the available filters
-(including also sources and sinks).
+Create the filter graph specified by @var{filter_graph} and use it to
+filter the stream.
 
-See also the @option{-filter_complex} option if you want to create filter graphs
-with multiple inputs and/or outputs.
+@var{filter_graph} is a description of the filter graph to apply to
+the stream, and must have a single input and a single output of the
+same type of the stream. In the filter graph, the input is associated
+to the label @code{in}, and the output to the label @code{out}. See
+the ffmpeg-filters manual for more information about the filtergraph
+syntax.
+
+See the @ref{filter_complex_option,,-filter_complex option} if you
+want to create filter graphs with multiple inputs and/or outputs.
+
 @item -pre[:@var{stream_specifier}] @var{preset_name} (@emph{output,per-stream})
 Specify the preset for matching stream(s).
 
@@ -395,11 +411,11 @@ will be used.
 
 E.g. to extract the first attachment to a file named 'out.ttf':
 @example
-ffmpeg -dump_attachment:t:0 out.ttf INPUT
+ffmpeg -dump_attachment:t:0 out.ttf -i INPUT
 @end example
 To extract all attachments to files determined by the @code{filename} tag:
 @example
-ffmpeg -dump_attachment:t "" INPUT
+ffmpeg -dump_attachment:t "" -i INPUT
 @end example
 
 Technical note -- attachments are implemented as codec extradata, so this
@@ -443,21 +459,6 @@ form @var{num}:@var{den}, where @var{num} and @var{den} are the
 numerator and denominator of the aspect ratio. For example "4:3",
 "16:9", "1.3333", and "1.7777" are valid argument values.
 
-@item -croptop @var{size}
-@item -cropbottom @var{size}
-@item -cropleft @var{size}
-@item -cropright @var{size}
-All the crop options have been removed. Use -vf
-crop=width:height:x:y instead.
-
-@item -padtop @var{size}
-@item -padbottom @var{size}
-@item -padleft @var{size}
-@item -padright @var{size}
-@item -padcolor @var{hex_color}
-All the pad options have been removed. Use -vf
-pad=width:height:x:y:color instead.
-
 @item -vn (@emph{output})
 Disable video recording.
 
@@ -487,11 +488,10 @@ stream
 Set the ISO 639 language code (3 letters) of the current video stream.
 
 @item -vf @var{filter_graph} (@emph{output})
-@var{filter_graph} is a description of the filter graph to apply to
-the input video.
-Use the option "-filters" to show all the available filters (including
-also sources and sinks).  This is an alias for @code{-filter:v}.
+Create the filter graph specified by @var{filter_graph} and use it to
+filter the stream.
 
+This is an alias for @code{-filter:v}, see the @ref{filter_option,,-filter option}.
 @end table
 
 @section Advanced Video Options
@@ -545,12 +545,58 @@ Force video tag/fourcc. This is an alias for @code{-tag:v}.
 Show QP histogram
 @item -vbsf @var{bitstream_filter}
 Deprecated see -bsf
+
 @item -force_key_frames[:@var{stream_specifier}] @var{time}[,@var{time}...] (@emph{output,per-stream})
+@item -force_key_frames[:@var{stream_specifier}] expr:@var{expr} (@emph{output,per-stream})
 Force key frames at the specified timestamps, more precisely at the first
 frames after each specified time.
+
+If the argument is prefixed with @code{expr:}, the string @var{expr}
+is interpreted like an expression and is evaluated for each frame. A
+key frame is forced in case the evaluation is non-zero.
+
+If one of the times is "@code{chapters}[@var{delta}]", it is expanded into
+the time of the beginning of all chapters in the file, shifted by
+@var{delta}, expressed as a time in seconds.
 This option can be useful to ensure that a seek point is present at a
 chapter mark or any other designated place in the output file.
-The timestamps must be specified in ascending order.
+
+For example, to insert a key frame at 5 minutes, plus key frames 0.1 second
+before the beginning of every chapter:
+@example
+-force_key_frames 0:05:00,chapters-0.1
+@end example
+
+The expression in @var{expr} can contain the following constants:
+@table @option
+@item n
+the number of current processed frame, starting from 0
+@item n_forced
+the number of forced frames
+@item prev_forced_n
+the number of the previous forced frame, it is @code{NAN} when no
+keyframe was forced yet
+@item prev_forced_t
+the time of the previous forced frame, it is @code{NAN} when no
+keyframe was forced yet
+@item t
+the time of the current processed frame
+@end table
+
+For example to force a key frame every 5 seconds, you can specify:
+@example
+-force_key_frames expr:gte(t,n_forced*5)
+@end example
+
+To force a key frame 5 seconds after the time of the last forced one,
+starting from second 13:
+@example
+-force_key_frames expr:if(isnan(prev_forced_t),gte(t,13),gte(t,prev_forced_t+5))
+@end example
+
+Note that forcing too many keyframes is very harmful for the lookahead
+algorithms of certain encoders: using fixed-GOP options or similar
+would be more efficient.
 
 @item -copyinkf[:@var{stream_specifier}] (@emph{output,per-stream})
 When doing stream copy, copy also non-key frames found at the
@@ -581,11 +627,12 @@ Set the audio codec. This is an alias for @code{-codec:a}.
 @item -sample_fmt[:@var{stream_specifier}] @var{sample_fmt} (@emph{output,per-stream})
 Set the audio sample format. Use @code{-sample_fmts} to get a list
 of supported sample formats.
+
 @item -af @var{filter_graph} (@emph{output})
-@var{filter_graph} is a description of the filter graph to apply to
-the input audio.
-Use the option "-filters" to show all the available filters (including
-also sources and sinks).  This is an alias for @code{-filter:a}.
+Create the filter graph specified by @var{filter_graph} and use it to
+filter the stream.
+
+This is an alias for @code{-filter:a}, see the @ref{filter_option,,-filter option}.
 @end table
 
 @section Advanced Audio options:
@@ -595,6 +642,12 @@ also sources and sinks).  This is an alias for @code{-filter:a}.
 Force audio tag/fourcc. This is an alias for @code{-tag:a}.
 @item -absf @var{bitstream_filter}
 Deprecated, see -bsf
+@item -guess_layout_max @var{channels} (@emph{input,per-stream})
+If some input channel layout is not known, try to guess only if it
+corresponds to at most the specified number of channels. For example, 2
+tells to @command{ffmpeg} to recognize 1 channel as mono and 2 channels as
+stereo but not 6 channels as 5.1. The default is to always try to guess. Use
+0 to disable all guessing.
 @end table
 
 @section Subtitle options:
@@ -928,6 +981,7 @@ Specify Timecode for writing. @var{SEP} is ':' for non drop timecode and ';'
 ffmpeg -i input.mpg -timecode 01:02:03.04 -r 30000/1001 -s ntsc output.mpg
 @end example
 
+@anchor{filter_complex_option}
 @item -filter_complex @var{filtergraph} (@emph{global})
 Define a complex filter graph, i.e. one with arbitrary number of inputs and/or
 outputs. For simple graphs -- those with one input and one output of the same
@@ -972,7 +1026,7 @@ ffmpeg -i video.mkv -i image.png -filter_complex 'overlay' out.mkv
 
 To generate 5 seconds of pure red video using lavfi @code{color} source:
 @example
-ffmpeg -filter_complex 'color=red' -t 5 out.mkv
+ffmpeg -filter_complex 'color=c=red' -t 5 out.mkv
 @end example
 @end table
 
@@ -1284,7 +1338,7 @@ ffmpeg -i src.ext -lmax 21*QP2LAMBDA dst.ext
 @url{ffmpeg-scaler.html,ffmpeg-scaler},
 @url{ffmpeg-resampler.html,ffmpeg-resampler},
 @url{ffmpeg-codecs.html,ffmpeg-codecs},
-@url{ffmpeg-bitstream-filters,ffmpeg-bitstream-filters},
+@url{ffmpeg-bitstream-filters.html,ffmpeg-bitstream-filters},
 @url{ffmpeg-formats.html,ffmpeg-formats},
 @url{ffmpeg-devices.html,ffmpeg-devices},
 @url{ffmpeg-protocols.html,ffmpeg-protocols},

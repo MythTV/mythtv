@@ -74,18 +74,23 @@ void avcodec_register_all(void)
 
     /* hardware accelerators */
     REGISTER_HWACCEL(H263_VAAPI,        h263_vaapi);
+    REGISTER_HWACCEL(H263_VDPAU,        h263_vdpau);
     REGISTER_HWACCEL(H264_DXVA2,        h264_dxva2);
     REGISTER_HWACCEL(H264_VAAPI,        h264_vaapi);
     REGISTER_HWACCEL(H264_VDA,          h264_vda);
+    REGISTER_HWACCEL(H264_VDPAU,        h264_vdpau);
     REGISTER_HWACCEL(MPEG1_VDPAU,       mpeg1_vdpau);
     REGISTER_HWACCEL(MPEG2_DXVA2,       mpeg2_dxva2);
     REGISTER_HWACCEL(MPEG2_VAAPI,       mpeg2_vaapi);
     REGISTER_HWACCEL(MPEG2_VDPAU,       mpeg2_vdpau);
     REGISTER_HWACCEL(MPEG4_VAAPI,       mpeg4_vaapi);
+    REGISTER_HWACCEL(MPEG4_VDPAU,       mpeg4_vdpau);
     REGISTER_HWACCEL(VC1_DXVA2,         vc1_dxva2);
     REGISTER_HWACCEL(VC1_VAAPI,         vc1_vaapi);
+    REGISTER_HWACCEL(VC1_VDPAU,         vc1_vdpau);
     REGISTER_HWACCEL(WMV3_DXVA2,        wmv3_dxva2);
     REGISTER_HWACCEL(WMV3_VAAPI,        wmv3_vaapi);
+    REGISTER_HWACCEL(WMV3_VDPAU,        wmv3_vdpau);
 
     /* video codecs */
     REGISTER_ENCODER(A64MULTI,          a64multi);
@@ -318,6 +323,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC (DCA,               dca);
     REGISTER_DECODER(DSICINAUDIO,       dsicinaudio);
     REGISTER_ENCDEC (EAC3,              eac3);
+    REGISTER_DECODER(EVRC,              evrc);
     REGISTER_DECODER(FFWAVESYNTH,       ffwavesynth);
     REGISTER_ENCDEC (FLAC,              flac);
     REGISTER_ENCDEC (G723_1,            g723_1);
@@ -483,7 +489,8 @@ void avcodec_register_all(void)
     REGISTER_ENCODER(LIBVO_AACENC,      libvo_aacenc);
     REGISTER_ENCODER(LIBVO_AMRWBENC,    libvo_amrwbenc);
     REGISTER_ENCDEC (LIBVORBIS,         libvorbis);
-    REGISTER_ENCDEC (LIBVPX,            libvpx);
+    REGISTER_ENCDEC (LIBVPX_VP8,        libvpx_vp8);
+    REGISTER_ENCDEC (LIBVPX_VP9,        libvpx_vp9);
     REGISTER_ENCODER(LIBX264,           libx264);
     REGISTER_ENCODER(LIBX264RGB,        libx264rgb);
     REGISTER_ENCODER(LIBXAVS,           libxavs);

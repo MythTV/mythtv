@@ -19,17 +19,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/asm.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/dsputil.h"
 #include "libavcodec/mpegvideo.h"
 #include "dsputil_mmx.h"
 
 #if HAVE_INLINE_ASM
 
 static void dct_unquantize_h263_intra_mmx(MpegEncContext *s,
-                                  DCTELEM *block, int n, int qscale)
+                                  int16_t *block, int n, int qscale)
 {
     x86_reg level, qmul, qadd, nCoeffs;
 
@@ -104,7 +104,7 @@ __asm__ volatile(
 
 
 static void dct_unquantize_h263_inter_mmx(MpegEncContext *s,
-                                  DCTELEM *block, int n, int qscale)
+                                  int16_t *block, int n, int qscale)
 {
     x86_reg qmul, qadd, nCoeffs;
 
@@ -187,7 +187,7 @@ __asm__ volatile(
  high3 += tlow1
 */
 static void dct_unquantize_mpeg1_intra_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, int qscale)
+                                     int16_t *block, int n, int qscale)
 {
     x86_reg nCoeffs;
     const uint16_t *quant_matrix;
@@ -256,7 +256,7 @@ __asm__ volatile(
 }
 
 static void dct_unquantize_mpeg1_inter_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, int qscale)
+                                     int16_t *block, int n, int qscale)
 {
     x86_reg nCoeffs;
     const uint16_t *quant_matrix;
@@ -322,7 +322,7 @@ __asm__ volatile(
 }
 
 static void dct_unquantize_mpeg2_intra_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, int qscale)
+                                     int16_t *block, int n, int qscale)
 {
     x86_reg nCoeffs;
     const uint16_t *quant_matrix;
@@ -388,7 +388,7 @@ __asm__ volatile(
 }
 
 static void dct_unquantize_mpeg2_inter_mmx(MpegEncContext *s,
-                                     DCTELEM *block, int n, int qscale)
+                                     int16_t *block, int n, int qscale)
 {
     x86_reg nCoeffs;
     const uint16_t *quant_matrix;
@@ -464,7 +464,7 @@ __asm__ volatile(
         );
 }
 
-static void  denoise_dct_mmx(MpegEncContext *s, DCTELEM *block){
+static void  denoise_dct_mmx(MpegEncContext *s, int16_t *block){
     const int intra= s->mb_intra;
     int *sum= s->dct_error_sum[intra];
     uint16_t *offset= s->dct_offset[intra];
@@ -518,7 +518,7 @@ static void  denoise_dct_mmx(MpegEncContext *s, DCTELEM *block){
     );
 }
 
-static void  denoise_dct_sse2(MpegEncContext *s, DCTELEM *block){
+static void  denoise_dct_sse2(MpegEncContext *s, int16_t *block){
     const int intra= s->mb_intra;
     int *sum= s->dct_error_sum[intra];
     uint16_t *offset= s->dct_offset[intra];
@@ -576,7 +576,7 @@ static void  denoise_dct_sse2(MpegEncContext *s, DCTELEM *block){
 
 #endif /* HAVE_INLINE_ASM */
 
-void ff_MPV_common_init_x86(MpegEncContext *s)
+av_cold void ff_MPV_common_init_x86(MpegEncContext *s)
 {
 #if HAVE_INLINE_ASM
     int mm_flags = av_get_cpu_flags();

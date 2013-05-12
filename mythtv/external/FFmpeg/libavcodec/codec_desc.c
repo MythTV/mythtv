@@ -749,7 +749,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "sgi",
         .long_name = NULL_IF_CONFIG_SMALL("SGI image"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
     {
         .id        = AV_CODEC_ID_SGIRLE,
@@ -944,7 +944,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "dpx",
         .long_name = NULL_IF_CONFIG_SMALL("DPX image"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
     {
         .id        = AV_CODEC_ID_MAD,
@@ -1028,6 +1028,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "vp8",
         .long_name = NULL_IF_CONFIG_SMALL("On2 VP8"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_VP9,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "vp9",
+        .long_name = NULL_IF_CONFIG_SMALL("Google VP9"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
@@ -1348,12 +1355,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "xface",
         .long_name = NULL_IF_CONFIG_SMALL("X-face image"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_BRENDER_PIX,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "brender_pix",
         .long_name = NULL_IF_CONFIG_SMALL("BRender PIX image"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
 
     /* various PCM "codecs" */
@@ -2343,6 +2352,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("TAK (Tom's lossless Audio Kompressor)"),
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
+    {
+        .id        = AV_CODEC_ID_EVRC,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "evrc",
+        .long_name = NULL_IF_CONFIG_SMALL("EVRC (Enhanced Variable Rate Codec)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_SMV,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "smv",
+        .long_name = NULL_IF_CONFIG_SMALL("SMV (Selectable Mode Vocoder)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* subtitle codecs */
     {
@@ -2350,12 +2373,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "dvd_subtitle",
         .long_name = NULL_IF_CONFIG_SMALL("DVD subtitles"),
+        .props     = AV_CODEC_PROP_BITMAP_SUB,
     },
     {
         .id        = AV_CODEC_ID_DVB_SUBTITLE,
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "dvb_subtitle",
         .long_name = NULL_IF_CONFIG_SMALL("DVB subtitles"),
+        .props     = AV_CODEC_PROP_BITMAP_SUB,
     },
     {
         .id        = AV_CODEC_ID_TEXT,
@@ -2368,6 +2393,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "xsub",
         .long_name = NULL_IF_CONFIG_SMALL("XSUB"),
+        .props     = AV_CODEC_PROP_BITMAP_SUB,
     },
     {
         .id        = AV_CODEC_ID_SSA,
@@ -2386,6 +2412,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_SUBTITLE,
         .name      = "hdmv_pgs_subtitle",
         .long_name = NULL_IF_CONFIG_SMALL("HDMV Presentation Graphic Stream subtitles"),
+        .props     = AV_CODEC_PROP_BITMAP_SUB,
     },
     {
         .id        = AV_CODEC_ID_DVB_TELETEXT,

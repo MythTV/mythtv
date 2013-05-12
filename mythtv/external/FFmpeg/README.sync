@@ -9,6 +9,7 @@ git://source.ffmpeg.org/ffmpeg.git at SHA1 553c9c77 on December 16th, 2012 (jya)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 057051b8 on February 17th, 2013 (jya) (release/1.1 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 7c8beec4 on March 7th, 2013 (jya) (release/1.1 branch)
 git://source.ffmpeg.org/ffmpeg.git at SHA1 fc7071cb on March 30th, 2013 (jya) (release/1.1 branch)
+git://source.ffmpeg.org/ffmpeg.git at SHA1 33d699a4 on May 12th, 2013 (jya) (release/1.2 branch)
 
 List of files modified from original FFmpeg:
 Makefile
@@ -50,7 +51,7 @@ libavformat/mpegts.c
 libavformat/mpegts.h
 libavformat/utils-mythtv.c  <- new file
 libavformat/utils.c
-libavformat/rtpdec.c <- header change
+libavformat/rtpdec_mpegts.c <- header change
 libavformat/rtsp.c <- header change
 libavformat/wtvdec.c <- header change
 libavutil/bswap.h

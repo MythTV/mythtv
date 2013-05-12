@@ -191,7 +191,7 @@ static int xan_decode_chroma(AVCodecContext *avctx, unsigned chroma_off)
     dec_size = xan_unpack(s, s->scratch_buffer, s->buffer_size);
     if (dec_size < 0) {
         av_log(avctx, AV_LOG_ERROR, "Chroma unpacking failed\n");
-        return AVERROR_INVALIDDATA;
+        return dec_size;
     }
 
     U = s->pic.data[1];
@@ -315,7 +315,7 @@ static int xan_decode_frame_type0(AVCodecContext *avctx)
         int dec_size;
 
         bytestream2_seek(&s->gb, 8 + corr_off, SEEK_SET);
-        dec_size = xan_unpack(s, s->scratch_buffer, s->buffer_size / 2);
+        dec_size = xan_unpack(s, s->scratch_buffer, s->buffer_size);
         if (dec_size < 0)
             dec_size = 0;
         else

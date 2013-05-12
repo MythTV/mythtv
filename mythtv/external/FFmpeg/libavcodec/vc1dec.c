@@ -27,10 +27,10 @@
  */
 
 #include "internal.h"
-#include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
 #include "h263.h"
+#include "h264chroma.h"
 #include "vc1.h"
 #include "vc1data.h"
 #include "vc1acdata.h"
@@ -73,6 +73,17 @@ enum Imode {
 };
 /** @} */ //imode defines
 
+static void init_block_index(VC1Context *v)
+{
+    MpegEncContext *s = &v->s;
+    ff_init_block_index(s);
+    if (v->field_mode && v->second_field) {
+        s->dest[0] += s->current_picture_ptr->f.linesize[0];
+        s->dest[1] += s->current_picture_ptr->f.linesize[1];
+        s->dest[2] += s->current_picture_ptr->f.linesize[2];
+    }
+}
+
 
 /** @} */ //Bitplane group
 
@@ -80,7 +91,7 @@ static void vc1_put_signed_blocks_clamped(VC1Context *v)
 {
     MpegEncContext *s = &v->s;
     int topleft_mb_pos, top_mb_pos;
-    int stride_y, fieldtx;
+    int stride_y, fieldtx = 0;
     int v_dist;
 
     /* The put pixels loop is always one MB row behind the decoding loop,
@@ -93,7 +104,8 @@ static void vc1_put_signed_blocks_clamped(VC1Context *v)
     if (!s->first_slice_line) {
         if (s->mb_x) {
             topleft_mb_pos = (s->mb_y - 1) * s->mb_stride + s->mb_x - 1;
-            fieldtx        = v->fieldtx_plane[topleft_mb_pos];
+            if (v->fcm == ILACE_FRAME)
+                fieldtx = v->fieldtx_plane[topleft_mb_pos];
             stride_y       = s->linesize << fieldtx;
             v_dist         = (16 - fieldtx) >> (fieldtx == 0);
             s->dsp.put_signed_pixels_clamped(v->block[v->topleft_blk_idx][0],
@@ -117,7 +129,8 @@ static void vc1_put_signed_blocks_clamped(VC1Context *v)
         }
         if (s->mb_x == s->mb_width - 1) {
             top_mb_pos = (s->mb_y - 1) * s->mb_stride + s->mb_x;
-            fieldtx    = v->fieldtx_plane[top_mb_pos];
+            if (v->fcm == ILACE_FRAME)
+                fieldtx = v->fieldtx_plane[top_mb_pos];
             stride_y   = s->linesize << fieldtx;
             v_dist     = fieldtx ? 15 : 8;
             s->dsp.put_signed_pixels_clamped(v->block[v->top_blk_idx][0],
@@ -332,6 +345,7 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
 {
     MpegEncContext *s = &v->s;
     DSPContext *dsp   = &v->s.dsp;
+    H264ChromaContext *h264chroma = &v->h264chroma;
     uint8_t *srcY, *srcU, *srcV;
     int dxy, mx, my, uvmx, uvmy, src_x, src_y, uvsrc_x, uvsrc_y;
     int off, off_uv;
@@ -496,13 +510,8 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
         srcY += s->mspel * (1 + s->linesize);
     }
 
-    if (v->field_mode && v->second_field) {
-        off    = s->current_picture_ptr->f.linesize[0];
-        off_uv = s->current_picture_ptr->f.linesize[1];
-    } else {
         off    = 0;
         off_uv = 0;
-    }
     if (s->mspel) {
         dxy = ((my & 3) << 2) | (mx & 3);
         v->vc1dsp.put_vc1_mspel_pixels_tab[dxy](s->dest[0] + off    , srcY    , s->linesize, v->rnd);
@@ -523,8 +532,8 @@ static void vc1_mc_1mv(VC1Context *v, int dir)
     uvmx = (uvmx & 3) << 1;
     uvmy = (uvmy & 3) << 1;
     if (!v->rnd) {
-        dsp->put_h264_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
-        dsp->put_h264_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->put_h264_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->put_h264_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
     } else {
         v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
         v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
@@ -638,8 +647,6 @@ static void vc1_mc_4mv_luma(VC1Context *v, int n, int dir)
         off = ((n > 1) ? s->linesize : 0) + (n & 1) * 8;
     else
         off = s->linesize * 4 * (n & 2) + (n & 1) * 8;
-    if (v->field_mode && v->second_field)
-        off += s->current_picture_ptr->f.linesize[0];
 
     src_x = s->mb_x * 16 + (n & 1) * 8 + (mx >> 2);
     if (!fieldmv)
@@ -778,7 +785,7 @@ static av_always_inline int get_chroma_mv(int *mvx, int *mvy, int *a, int flag, 
 static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
 {
     MpegEncContext *s = &v->s;
-    DSPContext *dsp   = &v->s.dsp;
+    H264ChromaContext *h264chroma = &v->h264chroma;
     uint8_t *srcU, *srcV;
     int uvmx, uvmy, uvsrc_x, uvsrc_y;
     int k, tx = 0, ty = 0;
@@ -876,7 +883,7 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
             srcU += s->current_picture_ptr->f.linesize[1];
             srcV += s->current_picture_ptr->f.linesize[2];
         }
-        off = v->second_field ? s->current_picture_ptr->f.linesize[1] : 0;
+        off = 0;
     }
 
     if (v->rangeredfrm || (v->mv_mode == MV_PMODE_INTENSITY_COMP)
@@ -930,8 +937,8 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
     uvmx = (uvmx & 3) << 1;
     uvmy = (uvmy & 3) << 1;
     if (!v->rnd) {
-        dsp->put_h264_chroma_pixels_tab[0](s->dest[1] + off, srcU, s->uvlinesize, 8, uvmx, uvmy);
-        dsp->put_h264_chroma_pixels_tab[0](s->dest[2] + off, srcV, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->put_h264_chroma_pixels_tab[0](s->dest[1] + off, srcU, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->put_h264_chroma_pixels_tab[0](s->dest[2] + off, srcV, s->uvlinesize, 8, uvmx, uvmy);
     } else {
         v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[0](s->dest[1] + off, srcU, s->uvlinesize, 8, uvmx, uvmy);
         v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[0](s->dest[2] + off, srcV, s->uvlinesize, 8, uvmx, uvmy);
@@ -943,7 +950,7 @@ static void vc1_mc_4mv_chroma(VC1Context *v, int dir)
 static void vc1_mc_4mv_chroma4(VC1Context *v)
 {
     MpegEncContext *s = &v->s;
-    DSPContext *dsp = &v->s.dsp;
+    H264ChromaContext *h264chroma = &v->h264chroma;
     uint8_t *srcU, *srcV;
     int uvsrc_x, uvsrc_y;
     int uvmx_field[4], uvmy_field[4];
@@ -1016,8 +1023,8 @@ static void vc1_mc_4mv_chroma4(VC1Context *v)
             }
         }
         if (!v->rnd) {
-            dsp->put_h264_chroma_pixels_tab[1](s->dest[1] + off, srcU, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
-            dsp->put_h264_chroma_pixels_tab[1](s->dest[2] + off, srcV, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
+            h264chroma->put_h264_chroma_pixels_tab[1](s->dest[1] + off, srcU, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
+            h264chroma->put_h264_chroma_pixels_tab[1](s->dest[2] + off, srcV, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
         } else {
             v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[1](s->dest[1] + off, srcU, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
             v->vc1dsp.put_no_rnd_vc1_chroma_pixels_tab[1](s->dest[2] + off, srcV, s->uvlinesize << fieldmv, 4, uvmx_field[i], uvmy_field[i]);
@@ -1755,9 +1762,10 @@ static inline void vc1_pred_mv_intfr(VC1Context *v, int n, int dmv_x, int dmv_y,
                 px = mid_pred(A[0], B[0], C[0]);
                 py = mid_pred(A[1], B[1], C[1]);
             } else if (total_valid) {
-                if (a_valid) { px = A[0]; py = A[1]; }
-                if (b_valid) { px = B[0]; py = B[1]; }
-                if (c_valid) { px = C[0]; py = C[1]; }
+                if      (a_valid) { px = A[0]; py = A[1]; }
+                else if (b_valid) { px = B[0]; py = B[1]; }
+                else if (c_valid) { px = C[0]; py = C[1]; }
+                else av_assert2(0);
             } else
                 px = py = 0;
         }
@@ -1845,6 +1853,7 @@ static void vc1_interp_mc(VC1Context *v)
 {
     MpegEncContext *s = &v->s;
     DSPContext *dsp = &v->s.dsp;
+    H264ChromaContext *h264chroma = &v->h264chroma;
     uint8_t *srcY, *srcU, *srcV;
     int dxy, mx, my, uvmx, uvmy, src_x, src_y, uvsrc_x, uvsrc_y;
     int off, off_uv;
@@ -1945,13 +1954,8 @@ static void vc1_interp_mc(VC1Context *v)
         srcY += s->mspel * (1 + s->linesize);
     }
 
-    if (v->field_mode && v->second_field) {
-        off    = s->current_picture_ptr->f.linesize[0];
-        off_uv = s->current_picture_ptr->f.linesize[1];
-    } else {
         off    = 0;
         off_uv = 0;
-    }
 
     if (s->mspel) {
         dxy = ((my & 3) << 2) | (mx & 3);
@@ -1966,7 +1970,7 @@ static void vc1_interp_mc(VC1Context *v)
         if (!v->rnd)
             dsp->avg_pixels_tab[0][dxy](s->dest[0] + off, srcY, s->linesize, 16);
         else
-            dsp->avg_no_rnd_pixels_tab[0][dxy](s->dest[0] + off, srcY, s->linesize, 16);
+            dsp->avg_no_rnd_pixels_tab[dxy](s->dest[0] + off, srcY, s->linesize, 16);
     }
 
     if (s->flags & CODEC_FLAG_GRAY) return;
@@ -1974,8 +1978,8 @@ static void vc1_interp_mc(VC1Context *v)
     uvmx = (uvmx & 3) << 1;
     uvmy = (uvmy & 3) << 1;
     if (!v->rnd) {
-        dsp->avg_h264_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
-        dsp->avg_h264_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->avg_h264_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
+        h264chroma->avg_h264_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
     } else {
         v->vc1dsp.avg_no_rnd_vc1_chroma_pixels_tab[0](s->dest[1] + off_uv, srcU, s->uvlinesize, 8, uvmx, uvmy);
         v->vc1dsp.avg_no_rnd_vc1_chroma_pixels_tab[0](s->dest[2] + off_uv, srcV, s->uvlinesize, 8, uvmx, uvmy);
@@ -2555,7 +2559,7 @@ static void vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
  * @param coded are AC coeffs present or not
  * @param codingset set of VLC to decode data
  */
-static int vc1_decode_i_block(VC1Context *v, DCTELEM block[64], int n,
+static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
                               int coded, int codingset)
 {
     GetBitContext *gb = &v->s.gb;
@@ -2718,14 +2722,14 @@ not_coded:
  * @param codingset set of VLC to decode data
  * @param mquant quantizer value for this macroblock
  */
-static int vc1_decode_i_block_adv(VC1Context *v, DCTELEM block[64], int n,
+static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
                                   int coded, int codingset, int mquant)
 {
     GetBitContext *gb = &v->s.gb;
     MpegEncContext *s = &v->s;
     int dc_pred_dir = 0; /* Direction of the DC prediction used */
     int i;
-    int16_t *dc_val;
+    int16_t *dc_val = NULL;
     int16_t *ac_val, *ac_val2;
     int dcdiff;
     int a_avail = v->a_avail, c_avail = v->c_avail;
@@ -2930,14 +2934,14 @@ static int vc1_decode_i_block_adv(VC1Context *v, DCTELEM block[64], int n,
  * @param mquant block quantizer
  * @param codingset set of VLC to decode data
  */
-static int vc1_decode_intra_block(VC1Context *v, DCTELEM block[64], int n,
+static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
                                   int coded, int mquant, int codingset)
 {
     GetBitContext *gb = &v->s.gb;
     MpegEncContext *s = &v->s;
     int dc_pred_dir = 0; /* Direction of the DC prediction used */
     int i;
-    int16_t *dc_val;
+    int16_t *dc_val = NULL;
     int16_t *ac_val, *ac_val2;
     int dcdiff;
     int mb_pos = s->mb_x + s->mb_y * s->mb_stride;
@@ -3140,7 +3144,7 @@ static int vc1_decode_intra_block(VC1Context *v, DCTELEM block[64], int n,
 
 /** Decode P block
  */
-static int vc1_decode_p_block(VC1Context *v, DCTELEM block[64], int n,
+static int vc1_decode_p_block(VC1Context *v, int16_t block[64], int n,
                               int mquant, int ttmb, int first_block,
                               uint8_t *dst, int linesize, int skip_block,
                               int *ttmb_out)
@@ -3955,7 +3959,6 @@ static int vc1_decode_p_mb_intfi(VC1Context *v)
                 continue;
             v->vc1dsp.vc1_inv_trans_8x8(s->block[i]);
             off  = (i & 4) ? 0 : ((i & 1) * 8 + (i & 2) * 4 * s->linesize);
-            off += v->second_field ? ((i & 4) ? s->current_picture_ptr->f.linesize[1] : s->current_picture_ptr->f.linesize[0]) : 0;
             s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i & 4) ? s->uvlinesize : s->linesize);
             // TODO: loop filter
         }
@@ -4002,8 +4005,6 @@ static int vc1_decode_p_mb_intfi(VC1Context *v)
             dst_idx += i >> 2;
             val = ((cbp >> (5 - i)) & 1);
             off = (i & 4) ? 0 : (i & 1) * 8 + (i & 2) * 4 * s->linesize;
-            if (v->second_field)
-                off += (i & 4) ? s->current_picture_ptr->f.linesize[1] : s->current_picture_ptr->f.linesize[0];
             if (val) {
                 pat = vc1_decode_p_block(v, s->block[i], i, mquant, ttmb,
                                          first_block, s->dest[dst_idx] + off,
@@ -4232,7 +4233,6 @@ static void vc1_decode_b_mb_intfi(VC1Context *v)
                 for (j = 0; j < 64; j++)
                     s->block[i][j] <<= 1;
             off  = (i & 4) ? 0 : ((i & 1) * 8 + (i & 2) * 4 * s->linesize);
-            off += v->second_field ? ((i & 4) ? s->current_picture_ptr->f.linesize[1] : s->current_picture_ptr->f.linesize[0]) : 0;
             s->dsp.put_signed_pixels_clamped(s->block[i], s->dest[dst_idx] + off, (i & 4) ? s->uvlinesize : s->linesize);
             // TODO: yet to perform loop filter
         }
@@ -4314,8 +4314,6 @@ static void vc1_decode_b_mb_intfi(VC1Context *v)
             dst_idx += i >> 2;
             val = ((cbp >> (5 - i)) & 1);
             off = (i & 4) ? 0 : (i & 1) * 8 + (i & 2) * 4 * s->linesize;
-            if (v->second_field)
-                off += (i & 4) ? s->current_picture_ptr->f.linesize[1] : s->current_picture_ptr->f.linesize[0];
             if (val) {
                 vc1_decode_p_block(v, s->block[i], i, mquant, ttmb,
                                    first_block, s->dest[dst_idx] + off,
@@ -4374,7 +4372,7 @@ static void vc1_decode_i_blocks(VC1Context *v)
     s->first_slice_line = 1;
     for (s->mb_y = 0; s->mb_y < s->end_mb_y; s->mb_y++) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         for (; s->mb_x < v->end_mb_x; s->mb_x++) {
             uint8_t *dst[6];
             ff_update_block_index(s);
@@ -4448,25 +4446,25 @@ static void vc1_decode_i_blocks(VC1Context *v)
             if (v->s.loop_filter) vc1_loop_filter_iblk(v, v->pq);
 
             if (get_bits_count(&s->gb) > v->bits) {
-                ff_er_add_slice(s, 0, 0, s->mb_x, s->mb_y, ER_MB_ERROR);
+                ff_er_add_slice(&s->er, 0, 0, s->mb_x, s->mb_y, ER_MB_ERROR);
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i\n",
                        get_bits_count(&s->gb), v->bits);
                 return;
             }
         }
         if (!v->s.loop_filter)
-            ff_draw_horiz_band(s, s->mb_y * 16, 16);
+            ff_mpeg_draw_horiz_band(s, s->mb_y * 16, 16);
         else if (s->mb_y)
-            ff_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
+            ff_mpeg_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
 
         s->first_slice_line = 0;
     }
     if (v->s.loop_filter)
-        ff_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
+        ff_mpeg_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
 
     /* This is intentionally mb_height and not end_mb_y - unlike in advanced
      * profile, these only differ are when decoding MSS2 rectangles. */
-    ff_er_add_slice(s, 0, 0, s->mb_width - 1, s->mb_height - 1, ER_MB_END);
+    ff_er_add_slice(&s->er, 0, 0, s->mb_width - 1, s->mb_height - 1, ER_MB_END);
 }
 
 /** Decode blocks of I-frame for advanced profile
@@ -4514,15 +4512,15 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
     s->mb_y             = s->start_mb_y;
     if (s->start_mb_y) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         memset(&s->coded_block[s->block_index[0] - s->b8_stride], 0,
                (1 + s->b8_stride) * sizeof(*s->coded_block));
     }
     for (; s->mb_y < s->end_mb_y; s->mb_y++) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         for (;s->mb_x < s->mb_width; s->mb_x++) {
-            DCTELEM (*block)[64] = v->block[v->cur_blk_idx];
+            int16_t (*block)[64] = v->block[v->cur_blk_idx];
             ff_update_block_index(s);
             s->dsp.clear_blocks(block[0]);
             mb_pos = s->mb_x + s->mb_y * s->mb_stride;
@@ -4576,22 +4574,23 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
 
             if (get_bits_count(&s->gb) > v->bits) {
                 // TODO: may need modification to handle slice coding
-                ff_er_add_slice(s, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
+                ff_er_add_slice(&s->er, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i\n",
                        get_bits_count(&s->gb), v->bits);
                 return;
             }
         }
         if (!v->s.loop_filter)
-            ff_draw_horiz_band(s, s->mb_y * 16, 16);
+            ff_mpeg_draw_horiz_band(s, s->mb_y * 16, 16);
         else if (s->mb_y)
-            ff_draw_horiz_band(s, (s->mb_y-1) * 16, 16);
+            ff_mpeg_draw_horiz_band(s, (s->mb_y-1) * 16, 16);
         s->first_slice_line = 0;
     }
 
     /* raw bottom MB row */
     s->mb_x = 0;
-    ff_init_block_index(s);
+    init_block_index(v);
+
     for (;s->mb_x < s->mb_width; s->mb_x++) {
         ff_update_block_index(s);
         vc1_put_signed_blocks_clamped(v);
@@ -4599,8 +4598,8 @@ static void vc1_decode_i_blocks_adv(VC1Context *v)
             vc1_loop_filter_iblk_delayed(v, v->pq);
     }
     if (v->s.loop_filter)
-        ff_draw_horiz_band(s, (s->end_mb_y-1)*16, 16);
-    ff_er_add_slice(s, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
+        ff_mpeg_draw_horiz_band(s, (s->end_mb_y-1)*16, 16);
+    ff_er_add_slice(&s->er, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
                     (s->end_mb_y << v->field_mode) - 1, ER_MB_END);
 }
 
@@ -4639,7 +4638,7 @@ static void vc1_decode_p_blocks(VC1Context *v)
     memset(v->cbp_base, 0, sizeof(v->cbp_base[0])*2*s->mb_stride);
     for (s->mb_y = s->start_mb_y; s->mb_y < s->end_mb_y; s->mb_y++) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         for (; s->mb_x < s->mb_width; s->mb_x++) {
             ff_update_block_index(s);
 
@@ -4652,7 +4651,7 @@ static void vc1_decode_p_blocks(VC1Context *v)
                 vc1_apply_p_loop_filter(v);
             if (get_bits_count(&s->gb) > v->bits || get_bits_count(&s->gb) < 0) {
                 // TODO: may need modification to handle slice coding
-                ff_er_add_slice(s, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
+                ff_er_add_slice(&s->er, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i at %ix%i\n",
                        get_bits_count(&s->gb), v->bits, s->mb_x, s->mb_y);
                 return;
@@ -4662,20 +4661,20 @@ static void vc1_decode_p_blocks(VC1Context *v)
         memmove(v->ttblk_base,    v->ttblk,    sizeof(v->ttblk_base[0])    * s->mb_stride);
         memmove(v->is_intra_base, v->is_intra, sizeof(v->is_intra_base[0]) * s->mb_stride);
         memmove(v->luma_mv_base,  v->luma_mv,  sizeof(v->luma_mv_base[0])  * s->mb_stride);
-        if (s->mb_y != s->start_mb_y) ff_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
+        if (s->mb_y != s->start_mb_y) ff_mpeg_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
         s->first_slice_line = 0;
     }
     if (apply_loop_filter && v->fcm == PROGRESSIVE) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         for (; s->mb_x < s->mb_width; s->mb_x++) {
             ff_update_block_index(s);
             vc1_apply_p_loop_filter(v);
         }
     }
     if (s->end_mb_y >= s->start_mb_y)
-        ff_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
-    ff_er_add_slice(s, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
+        ff_mpeg_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
+    ff_er_add_slice(&s->er, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
                     (s->end_mb_y << v->field_mode) - 1, ER_MB_END);
 }
 
@@ -4711,7 +4710,7 @@ static void vc1_decode_b_blocks(VC1Context *v)
     s->first_slice_line = 1;
     for (s->mb_y = s->start_mb_y; s->mb_y < s->end_mb_y; s->mb_y++) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         for (; s->mb_x < s->mb_width; s->mb_x++) {
             ff_update_block_index(s);
 
@@ -4721,7 +4720,7 @@ static void vc1_decode_b_blocks(VC1Context *v)
                 vc1_decode_b_mb(v);
             if (get_bits_count(&s->gb) > v->bits || get_bits_count(&s->gb) < 0) {
                 // TODO: may need modification to handle slice coding
-                ff_er_add_slice(s, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
+                ff_er_add_slice(&s->er, 0, s->start_mb_y, s->mb_x, s->mb_y, ER_MB_ERROR);
                 av_log(s->avctx, AV_LOG_ERROR, "Bits overconsumption: %i > %i at %ix%i\n",
                        get_bits_count(&s->gb), v->bits, s->mb_x, s->mb_y);
                 return;
@@ -4729,14 +4728,14 @@ static void vc1_decode_b_blocks(VC1Context *v)
             if (v->s.loop_filter) vc1_loop_filter_iblk(v, v->pq);
         }
         if (!v->s.loop_filter)
-            ff_draw_horiz_band(s, s->mb_y * 16, 16);
+            ff_mpeg_draw_horiz_band(s, s->mb_y * 16, 16);
         else if (s->mb_y)
-            ff_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
+            ff_mpeg_draw_horiz_band(s, (s->mb_y - 1) * 16, 16);
         s->first_slice_line = 0;
     }
     if (v->s.loop_filter)
-        ff_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
-    ff_er_add_slice(s, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
+        ff_mpeg_draw_horiz_band(s, (s->end_mb_y - 1) * 16, 16);
+    ff_er_add_slice(&s->er, 0, s->start_mb_y << v->field_mode, s->mb_width - 1,
                     (s->end_mb_y << v->field_mode) - 1, ER_MB_END);
 }
 
@@ -4744,18 +4743,18 @@ static void vc1_decode_skip_blocks(VC1Context *v)
 {
     MpegEncContext *s = &v->s;
 
-    ff_er_add_slice(s, 0, s->start_mb_y, s->mb_width - 1, s->end_mb_y - 1, ER_MB_END);
+    ff_er_add_slice(&s->er, 0, s->start_mb_y, s->mb_width - 1, s->end_mb_y - 1, ER_MB_END);
     s->first_slice_line = 1;
     for (s->mb_y = s->start_mb_y; s->mb_y < s->end_mb_y; s->mb_y++) {
         s->mb_x = 0;
-        ff_init_block_index(s);
+        init_block_index(v);
         ff_update_block_index(s);
         if (s->last_picture.f.data[0]) {
             memcpy(s->dest[0], s->last_picture.f.data[0] + s->mb_y * 16 * s->linesize,   s->linesize   * 16);
             memcpy(s->dest[1], s->last_picture.f.data[1] + s->mb_y *  8 * s->uvlinesize, s->uvlinesize *  8);
             memcpy(s->dest[2], s->last_picture.f.data[2] + s->mb_y *  8 * s->uvlinesize, s->uvlinesize *  8);
         }
-        ff_draw_horiz_band(s, s->mb_y * 16, 16);
+        ff_mpeg_draw_horiz_band(s, s->mb_y * 16, 16);
         s->first_slice_line = 0;
     }
     s->pict_type = AV_PICTURE_TYPE_P;
@@ -5181,10 +5180,6 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
     avctx->flags |= CODEC_FLAG_EMU_EDGE;
     v->s.flags   |= CODEC_FLAG_EMU_EDGE;
 
-    if (avctx->idct_algo == FF_IDCT_AUTO) {
-        avctx->idct_algo = FF_IDCT_WMV2;
-    }
-
     if (ff_vc1_init_common(v) < 0)
         return -1;
     // ensure static VLC tables are initialized
@@ -5196,6 +5191,8 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
     // again once we know all necessary settings.
     // That this is necessary might indicate a bug.
     ff_vc1_decode_end(avctx);
+
+    ff_h264chroma_init(&v->h264chroma, 8);
     ff_vc1dsp_init(&v->vc1dsp);
 
     if (avctx->codec_id == AV_CODEC_ID_WMV3 || avctx->codec_id == AV_CODEC_ID_WMV3IMAGE) {
@@ -5263,7 +5260,7 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
             av_log(avctx, AV_LOG_ERROR, "Incomplete extradata\n");
             return -1;
         }
-        v->res_sprite = (avctx->codec_tag == MKTAG('W','V','P','2'));
+        v->res_sprite = (avctx->codec_id == AV_CODEC_ID_VC1IMAGE);
     }
 
     avctx->profile = v->profile;
@@ -5295,6 +5292,11 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
             v->sprite_height > 1 << 14 ||
             v->output_width  > 1 << 14 ||
             v->output_height > 1 << 14) return -1;
+
+        if ((v->sprite_width&1) || (v->sprite_height&1)) {
+            av_log_ask_for_sample(avctx, "odd sprites are not supported\n");
+            return AVERROR_PATCHWELCOME;
+        }
     }
     return 0;
 }
@@ -5642,10 +5644,12 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 goto err;
         }
     } else {
+        int header_ret = 0;
+
         if (v->fcm == ILACE_FRAME && s->pict_type == AV_PICTURE_TYPE_B)
             goto err; // This codepath is still incomplete thus it is disabled
 
-        ff_er_frame_start(s);
+        ff_mpeg_er_frame_start(s);
 
         v->bits = buf_size * 8;
         v->end_mb_x = s->mb_width;
@@ -5675,7 +5679,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                     continue;
                 }
                 v->second_field = 1;
-                v->blocks_off   = s->mb_width  * s->mb_height << 1;
+                v->blocks_off   = s->b8_stride * (s->mb_height&~1);
                 v->mb_off       = s->mb_stride * s->mb_height >> 1;
             } else {
                 v->second_field = 0;
@@ -5685,18 +5689,20 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             if (i) {
                 v->pic_header_flag = 0;
                 if (v->field_mode && i == n_slices1 + 2) {
-                    if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
+                    if ((header_ret = ff_vc1_parse_frame_header_adv(v, &s->gb)) < 0) {
                         av_log(v->s.avctx, AV_LOG_ERROR, "Field header damaged\n");
                         continue;
                     }
                 } else if (get_bits1(&s->gb)) {
                     v->pic_header_flag = 1;
-                    if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
+                    if ((header_ret = ff_vc1_parse_frame_header_adv(v, &s->gb)) < 0) {
                         av_log(v->s.avctx, AV_LOG_ERROR, "Slice header damaged\n");
                         continue;
                     }
                 }
             }
+            if (header_ret < 0)
+                continue;
             s->start_mb_y = (i == 0) ? 0 : FFMAX(0, slices[i-1].mby_start % mb_height);
             if (!v->field_mode || v->second_field)
                 s->end_mb_y = (i == n_slices     ) ? mb_height : FFMIN(mb_height, slices[i].mby_start % mb_height);
@@ -5709,6 +5715,10 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             }
             if (s->end_mb_y <= s->start_mb_y) {
                 av_log(v->s.avctx, AV_LOG_ERROR, "end mb y %d %d invalid\n", s->end_mb_y, s->start_mb_y);
+                continue;
+            }
+            if (!v->p_frame_skipped && s->pict_type != AV_PICTURE_TYPE_I && !v->cbpcy_vlc) {
+                av_log(v->s.avctx, AV_LOG_ERROR, "missing cbpcy_vlc\n");
                 continue;
             }
             ff_vc1_decode_blocks(v);
@@ -5731,10 +5741,10 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
                 get_bits_count(&s->gb), s->gb.size_in_bits);
 //  if (get_bits_count(&s->gb) > buf_size * 8)
 //      return -1;
-        if(s->error_occurred && s->pict_type == AV_PICTURE_TYPE_B)
+        if(s->er.error_occurred && s->pict_type == AV_PICTURE_TYPE_B)
             goto err;
         if(!v->field_mode)
-            ff_er_frame_end(s);
+            ff_er_frame_end(&s->er);
     }
 
     ff_MPV_frame_end(s);
@@ -5787,6 +5797,20 @@ static const AVProfile profiles[] = {
     { FF_PROFILE_UNKNOWN },
 };
 
+static const enum AVPixelFormat vc1_hwaccel_pixfmt_list_420[] = {
+#if CONFIG_DXVA2
+    AV_PIX_FMT_DXVA2_VLD,
+#endif
+#if CONFIG_VAAPI
+    AV_PIX_FMT_VAAPI_VLD,
+#endif
+#if CONFIG_VDPAU
+    AV_PIX_FMT_VDPAU,
+#endif
+    AV_PIX_FMT_YUV420P,
+    AV_PIX_FMT_NONE
+};
+
 AVCodec ff_vc1_decoder = {
     .name           = "vc1",
     .type           = AVMEDIA_TYPE_VIDEO,
@@ -5798,7 +5822,7 @@ AVCodec ff_vc1_decoder = {
     .flush          = ff_mpeg_flush,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .long_name      = NULL_IF_CONFIG_SMALL("SMPTE VC-1"),
-    .pix_fmts       = ff_hwaccel_pixfmt_list_420,
+    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
     .profiles       = NULL_IF_CONFIG_SMALL(profiles)
 };
 
@@ -5814,7 +5838,7 @@ AVCodec ff_wmv3_decoder = {
     .flush          = ff_mpeg_flush,
     .capabilities   = CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .long_name      = NULL_IF_CONFIG_SMALL("Windows Media Video 9"),
-    .pix_fmts       = ff_hwaccel_pixfmt_list_420,
+    .pix_fmts       = vc1_hwaccel_pixfmt_list_420,
     .profiles       = NULL_IF_CONFIG_SMALL(profiles)
 };
 #endif

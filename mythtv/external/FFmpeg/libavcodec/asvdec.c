@@ -29,7 +29,6 @@
 #include "asv.h"
 #include "avcodec.h"
 #include "put_bits.h"
-#include "dsputil.h"
 #include "internal.h"
 #include "mathops.h"
 #include "mpeg12data.h"
@@ -94,7 +93,7 @@ static inline int asv2_get_level(GetBitContext *gb)
         return code - 31;
 }
 
-static inline int asv1_decode_block(ASV1Context *a, DCTELEM block[64])
+static inline int asv1_decode_block(ASV1Context *a, int16_t block[64])
 {
     int i;
 
@@ -108,7 +107,7 @@ static inline int asv1_decode_block(ASV1Context *a, DCTELEM block[64])
                 break;
             if (ccp < 0 || i >= 10) {
                 av_log(a->avctx, AV_LOG_ERROR, "coded coeff pattern damaged\n");
-                return -1;
+                return AVERROR_INVALIDDATA;
             }
 
             if (ccp & 8)
@@ -125,7 +124,7 @@ static inline int asv1_decode_block(ASV1Context *a, DCTELEM block[64])
     return 0;
 }
 
-static inline int asv2_decode_block(ASV1Context *a, DCTELEM block[64])
+static inline int asv2_decode_block(ASV1Context *a, int16_t block[64])
 {
     int i, count, ccp;
 
@@ -161,7 +160,7 @@ static inline int asv2_decode_block(ASV1Context *a, DCTELEM block[64])
     return 0;
 }
 
-static inline int decode_mb(ASV1Context *a, DCTELEM block[6][64])
+static inline int decode_mb(ASV1Context *a, int16_t block[6][64])
 {
     int i;
 
@@ -183,7 +182,7 @@ static inline int decode_mb(ASV1Context *a, DCTELEM block[6][64])
 
 static inline void idct_put(ASV1Context *a, int mb_x, int mb_y)
 {
-    DCTELEM (*block)[64] = a->block;
+    int16_t (*block)[64] = a->block;
     int linesize         = a->picture.linesize[0];
 
     uint8_t *dest_y  = a->picture.data[0] + (mb_y * 16* linesize              ) + mb_x * 16;
@@ -210,15 +209,15 @@ static int decode_frame(AVCodecContext *avctx,
     int buf_size          = avpkt->size;
     AVFrame *picture      = data;
     AVFrame * const p     = &a->picture;
-    int mb_x, mb_y;
+    int mb_x, mb_y, ret;
 
     if (p->data[0])
         avctx->release_buffer(avctx, p);
 
     p->reference = 0;
-    if (ff_get_buffer(avctx, p) < 0) {
+    if ((ret = ff_get_buffer(avctx, p)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
-        return -1;
+        return ret;
     }
     p->pict_type = AV_PICTURE_TYPE_I;
     p->key_frame = 1;
@@ -240,8 +239,8 @@ static int decode_frame(AVCodecContext *avctx,
 
     for (mb_y = 0; mb_y < a->mb_height2; mb_y++) {
         for (mb_x = 0; mb_x < a->mb_width2; mb_x++) {
-            if (decode_mb(a, a->block) < 0)
-                return -1;
+            if ((ret = decode_mb(a, a->block)) < 0)
+                return ret;
 
             idct_put(a, mb_x, mb_y);
         }
@@ -250,8 +249,8 @@ static int decode_frame(AVCodecContext *avctx,
     if (a->mb_width2 != a->mb_width) {
         mb_x = a->mb_width2;
         for (mb_y = 0; mb_y < a->mb_height2; mb_y++) {
-            if (decode_mb(a, a->block) < 0)
-                return -1;
+            if ((ret = decode_mb(a, a->block)) < 0)
+                return ret;
 
             idct_put(a, mb_x, mb_y);
         }
@@ -260,8 +259,8 @@ static int decode_frame(AVCodecContext *avctx,
     if (a->mb_height2 != a->mb_height) {
         mb_y = a->mb_height2;
         for (mb_x = 0; mb_x < a->mb_width; mb_x++) {
-            if (decode_mb(a, a->block) < 0)
-                return -1;
+            if ((ret = decode_mb(a, a->block)) < 0)
+                return ret;
 
             idct_put(a, mb_x, mb_y);
         }

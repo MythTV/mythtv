@@ -1506,6 +1506,15 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
         /* TODO: drop PictureEssenceCoding and SoundEssenceCompression, only check EssenceContainer */
         codec_ul = mxf_get_codec_ul(ff_mxf_codec_uls, &descriptor->essence_codec_ul);
         st->codec->codec_id = (enum AVCodecID)codec_ul->id;
+        av_log(mxf->fc, AV_LOG_VERBOSE, "%s: Universal Label: ",
+               avcodec_get_name(st->codec->codec_id));
+        for (k = 0; k < 16; k++) {
+            av_log(mxf->fc, AV_LOG_VERBOSE, "%.2x",
+                   descriptor->essence_codec_ul[k]);
+            if (!(k+1 & 19) || k == 5)
+                av_log(mxf->fc, AV_LOG_VERBOSE, ".");
+        }
+        av_log(mxf->fc, AV_LOG_VERBOSE, "\n");
         if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             source_track->intra_only = mxf_is_intra_only(descriptor);
             container_ul = mxf_get_codec_ul(mxf_picture_essence_container_uls, essence_container_ul);
@@ -2070,7 +2079,7 @@ static int mxf_set_audio_pts(MXFContext *mxf, AVCodecContext *codec, AVPacket *p
     pkt->pts = track->sample_count;
     if (codec->channels <= 0 || av_get_bits_per_sample(codec->codec_id) <= 0)
         return AVERROR(EINVAL);
-    track->sample_count += pkt->size / (codec->channels * av_get_bits_per_sample(codec->codec_id) / 8);
+    track->sample_count += pkt->size / (codec->channels * (int64_t)av_get_bits_per_sample(codec->codec_id) / 8);
     return 0;
 }
 

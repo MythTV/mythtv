@@ -128,6 +128,63 @@ m3u8 files.
 
 HTTP (Hyper Text Transfer Protocol).
 
+This protocol accepts the following options.
+
+@table @option
+@item seekable
+Control seekability of connection. If set to 1 the resource is
+supposed to be seekable, if set to 0 it is assumed not to be seekable,
+if set to -1 it will try to autodetect if it is seekable. Default
+value is -1.
+
+@item chunked_post
+If set to 1 use chunked transfer-encoding for posts, default is 1.
+
+@item headers
+Set custom HTTP headers, can override built in default headers. The
+value must be a string encoding the headers.
+
+@item content_type
+Force a content type.
+
+@item user-agent
+Override User-Agent header. If not specified the protocol will use a
+string describing the libavformat build.
+
+@item multiple_requests
+Use persistent connections if set to 1. By default it is 0.
+
+@item post_data
+Set custom HTTP post data.
+
+@item timeout
+Set timeout of socket I/O operations used by the underlying low level
+operation. By default it is set to -1, which means that the timeout is
+not specified.
+
+@item mime_type
+Set MIME type.
+
+@item cookies
+Set the cookies to be sent in future requests. The format of each cookie is the
+same as the value of a Set-Cookie HTTP response field. Multiple cookies can be
+delimited by a newline character.
+@end table
+
+@subsection HTTP Cookies
+
+Some HTTP requests will be denied unless cookie values are passed in with the
+request. The @option{cookies} option allows these cookies to be specified. At
+the very least, each cookie must specify a value along with a path and domain.
+HTTP requests that match both the domain and path will automatically include the
+cookie value in the HTTP Cookie header field. Multiple cookies can be delimited
+by a newline.
+
+The required syntax to play a stream specifying a cookie is:
+@example
+ffplay -cookies "nlqptid=nltid=tsn; path=/; domain=somedomain.com;" http://somedomain.com/somestream.m3u8
+@end example
+
 @section mmst
 
 MMS (Microsoft Media Server) protocol over TCP.

@@ -267,6 +267,7 @@ enum AVCodecID {
     AV_CODEC_ID_MTS2,
     AV_CODEC_ID_CLLC,
     AV_CODEC_ID_MSS2,
+    AV_CODEC_ID_VP9,
     AV_CODEC_ID_BRENDER_PIX= MKBETAG('B','P','I','X'),
     AV_CODEC_ID_Y41P       = MKBETAG('Y','4','1','P'),
     AV_CODEC_ID_ESCAPE130  = MKBETAG('E','1','3','0'),
@@ -447,6 +448,8 @@ enum AVCodecID {
     AV_CODEC_ID_PAF_AUDIO   = MKBETAG('P','A','F','A'),
     AV_CODEC_ID_OPUS        = MKBETAG('O','P','U','S'),
     AV_CODEC_ID_TAK         = MKBETAG('t','B','a','K'),
+    AV_CODEC_ID_EVRC        = MKBETAG('s','e','v','c'),
+    AV_CODEC_ID_SMV         = MKBETAG('s','s','m','v'),
 
     /* subtitle codecs */
     AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
@@ -544,6 +547,10 @@ typedef struct AVCodecDescriptor {
  * Codec supports lossless compression. Audio and video codecs only.
  */
 #define AV_CODEC_PROP_LOSSLESS      (1 << 2)
+/**
+ * Subtitle codec is bitmap based
+ */
+#define AV_CODEC_PROP_BITMAP_SUB    (1 << 16)
 
 #if FF_API_OLD_DECODE_AUDIO
 /* in bytes */
@@ -717,6 +724,8 @@ typedef struct RcOverride{
 #define CODEC_FLAG2_NO_OUTPUT     0x00000004 ///< Skip bitstream encoding.
 #define CODEC_FLAG2_LOCAL_HEADER  0x00000008 ///< Place global headers at every keyframe instead of in extradata.
 #define CODEC_FLAG2_DROP_FRAME_TIMECODE 0x00002000 ///< timecode is in drop frame format. DEPRECATED!!!!
+#define CODEC_FLAG2_IGNORE_CROP   0x00010000 ///< Discard cropping information from SPS.
+
 #if FF_API_MPV_GLOBAL_OPTS
 #define CODEC_FLAG_CBP_RD         0x04000000 ///< Use rate distortion optimization for cbp.
 #define CODEC_FLAG_QP_RD          0x08000000 ///< Use rate distortion optimization for qp selectioon.
@@ -985,6 +994,14 @@ enum AVPacketSideDataType {
      * @endcode
      */
     AV_PKT_DATA_SUBTITLE_POSITION,
+
+    /**
+     * Data found in BlockAdditional element of matroska container. There is
+     * no end marker for the data, so it is required to rely on the side data
+     * size to recognize the end. 8 byte id (as found in BlockAddId) followed
+     * by data.
+     */
+    AV_PKT_DATA_MATROSKA_BLOCKADDITIONAL,
 };
 
 /**
@@ -1491,7 +1508,7 @@ typedef struct AVFrame {
      * - encoding: unused
      * - decoding: Read by user.
      */
-    int64_t channels;
+    int channels;
 
     /** ATSC CC data CEA-608/708 
      * - encoding: unused
@@ -2919,20 +2936,22 @@ typedef struct AVCodecContext {
 #define FF_IDCT_ALTIVEC       8
 #define FF_IDCT_SH4           9
 #define FF_IDCT_SIMPLEARM     10
-#define FF_IDCT_H264          11
-#define FF_IDCT_VP3           12
 #define FF_IDCT_IPP           13
 #define FF_IDCT_XVIDMMX       14
-#define FF_IDCT_CAVS          15
 #define FF_IDCT_SIMPLEARMV5TE 16
 #define FF_IDCT_SIMPLEARMV6   17
 #define FF_IDCT_SIMPLEVIS     18
-#define FF_IDCT_WMV2          19
 #define FF_IDCT_FAAN          20
-#define FF_IDCT_EA            21
 #define FF_IDCT_SIMPLENEON    22
 #define FF_IDCT_SIMPLEALPHA   23
+#if FF_API_IDCT
+#define FF_IDCT_H264          11
+#define FF_IDCT_VP3           12
+#define FF_IDCT_CAVS          15
+#define FF_IDCT_WMV2          19
+#define FF_IDCT_EA            21
 #define FF_IDCT_BINK          24
+#endif
 
 #if FF_API_DSP_MASK
     /**
@@ -3190,7 +3209,7 @@ typedef struct AVCodecContext {
     /**
      * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
      * Code outside libavcodec should access this field using:
-     * avcodec_set_pkt_timebase(avctx)
+     * av_codec_{get,set}_pkt_timebase(avctx)
      * - encoding unused.
      * - decodimg set by user
      */
@@ -3199,7 +3218,7 @@ typedef struct AVCodecContext {
     /**
      * AVCodecDescriptor
      * Code outside libavcodec should access this field using:
-     * avcodec_get_codec_descriptior(avctx)
+     * av_codec_{get,set}_codec_descriptor(avctx)
      * - encoding: unused.
      * - decoding: set by libavcodec.
      */
@@ -3221,6 +3240,24 @@ typedef struct AVCodecContext {
      * - encoding: unused
      */
     AVDictionary *metadata;
+
+    /**
+     * Character encoding of the input subtitles file.
+     * - decoding: set by user
+     * - encoding: unused
+     */
+    char *sub_charenc;
+
+    /**
+     * Subtitles character encoding mode. Formats or codecs might be adjusting
+     * this setting (if they are doing the conversion themselves for instance).
+     * - decoding: set by libavcodec
+     * - encoding: unused
+     */
+    int sub_charenc_mode;
+#define FF_SUB_CHARENC_MODE_DO_NOTHING  -1  ///< do nothing (demuxer outputs a stream supposed to be already in UTF-8, or the codec is bitmap for instance)
+#define FF_SUB_CHARENC_MODE_AUTOMATIC    0  ///< libavcodec will select the mode itself
+#define FF_SUB_CHARENC_MODE_PRE_DECODER  1  ///< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
@@ -4616,11 +4653,16 @@ int avpicture_layout(const AVPicture* src, enum AVPixelFormat pix_fmt,
  */
 int avpicture_get_size(enum AVPixelFormat pix_fmt, int width, int height);
 
+#if FF_API_DEINTERLACE
 /**
  *  deinterlace - if not supported return -1
+ *
+ * @deprecated - use yadif (in libavfilter) instead
  */
+attribute_deprecated
 int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                           enum AVPixelFormat pix_fmt, int width, int height);
+#endif
 /**
  * Copy image src to dst. Wraps av_image_copy().
  */

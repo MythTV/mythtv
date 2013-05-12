@@ -33,6 +33,7 @@
 #include "fft.h"
 #include "aacps.h"
 #include "sbrdsp.h"
+#include "libavutil/internal.h"
 #include "libavutil/libm.h"
 #include "libavutil/avassert.h"
 
@@ -42,6 +43,10 @@
 
 #define ENVELOPE_ADJUSTMENT_OFFSET 2
 #define NOISE_FLOOR_OFFSET 6.0f
+
+#if ARCH_MIPS
+#include "mips/aacsbr_mips.h"
+#endif /* ARCH_MIPS */
 
 /**
  * SBR VLC tables
@@ -85,6 +90,8 @@ static const int8_t vlc_sbr_lav[10] =
 
 #define SBR_VLC_ROW(name) \
     { name ## _codes, name ## _bits, sizeof(name ## _codes), sizeof(name ## _codes[0]) }
+
+static void aacsbr_func_ptr_init(AACSBRContext *c);
 
 av_cold void ff_aac_sbr_init(void)
 {
@@ -154,6 +161,7 @@ av_cold void ff_aac_sbr_ctx_init(AACContext *ac, SpectralBandReplication *sbr)
     ff_mdct_init(&sbr->mdct_ana, 7, 1, -2.0 * 32768.0);
     ff_ps_ctx_init(&sbr->ps);
     ff_sbrdsp_init(&sbr->dsp);
+    aacsbr_func_ptr_init(&sbr->c);
 }
 
 av_cold void ff_aac_sbr_ctx_close(SpectralBandReplication *sbr)
@@ -391,6 +399,8 @@ static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
         max_qmf_subbands = 35;
     } else if (sbr->sample_rate >= 48000)
         max_qmf_subbands = 32;
+    else
+        av_assert0(0);
 
     if (sbr->k[2] - sbr->k[0] > max_qmf_subbands) {
         av_log(ac->avctx, AV_LOG_ERROR,
@@ -1172,7 +1182,8 @@ static void sbr_dequant(SpectralBandReplication *sbr, int id_aac)
  * @param   x       pointer to the beginning of the first sample window
  * @param   W       array of complex-valued samples split into subbands
  */
-static void sbr_qmf_analysis(DSPContext *dsp, FFTContext *mdct,
+#ifndef sbr_qmf_analysis
+static void sbr_qmf_analysis(AVFloatDSPContext *dsp, FFTContext *mdct,
                              SBRDSPContext *sbrdsp, const float *in, float *x,
                              float z[320], float W[2][32][32][2], int buf_idx)
 {
@@ -1189,13 +1200,15 @@ static void sbr_qmf_analysis(DSPContext *dsp, FFTContext *mdct,
         x += 32;
     }
 }
+#endif
 
 /**
  * Synthesis QMF Bank (14496-3 sp04 p206) and Downsampled Synthesis QMF Bank
  * (14496-3 sp04 p206)
  */
-static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
-                              SBRDSPContext *sbrdsp, AVFloatDSPContext *fdsp,
+#ifndef sbr_qmf_synthesis
+static void sbr_qmf_synthesis(FFTContext *mdct,
+                              SBRDSPContext *sbrdsp, AVFloatDSPContext *dsp,
                               float *out, float X[2][38][64],
                               float mdct_buf[2][64],
                               float *v0, int *v_off, const unsigned int div)
@@ -1226,7 +1239,7 @@ static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
             mdct->imdct_half(mdct, mdct_buf[1], X[1][i]);
             sbrdsp->qmf_deint_bfly(v, mdct_buf[1], mdct_buf[0]);
         }
-        fdsp->vector_fmul   (out, v                , sbr_qmf_window                       , 64 >> div);
+        dsp->vector_fmul    (out, v                , sbr_qmf_window                       , 64 >> div);
         dsp->vector_fmul_add(out, v + ( 192 >> div), sbr_qmf_window + ( 64 >> div), out   , 64 >> div);
         dsp->vector_fmul_add(out, v + ( 256 >> div), sbr_qmf_window + (128 >> div), out   , 64 >> div);
         dsp->vector_fmul_add(out, v + ( 448 >> div), sbr_qmf_window + (192 >> div), out   , 64 >> div);
@@ -1239,6 +1252,7 @@ static void sbr_qmf_synthesis(DSPContext *dsp, FFTContext *mdct,
         out += 64 >> div;
     }
 }
+#endif
 
 /** High Frequency Generation (14496-3 sp04 p214+) and Inverse Filtering
  * (14496-3 sp04 p214)
@@ -1684,13 +1698,13 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
     }
     for (ch = 0; ch < nch; ch++) {
         /* decode channel */
-        sbr_qmf_analysis(&ac->dsp, &sbr->mdct_ana, &sbr->dsp, ch ? R : L, sbr->data[ch].analysis_filterbank_samples,
+        sbr_qmf_analysis(&ac->fdsp, &sbr->mdct_ana, &sbr->dsp, ch ? R : L, sbr->data[ch].analysis_filterbank_samples,
                          (float*)sbr->qmf_filter_scratch,
                          sbr->data[ch].W, sbr->data[ch].Ypos);
-        sbr_lf_gen(ac, sbr, sbr->X_low, sbr->data[ch].W, sbr->data[ch].Ypos);
+        sbr->c.sbr_lf_gen(ac, sbr, sbr->X_low, sbr->data[ch].W, sbr->data[ch].Ypos);
         sbr->data[ch].Ypos ^= 1;
         if (sbr->start) {
-            sbr_hf_inverse_filter(&sbr->dsp, sbr->alpha0, sbr->alpha1, sbr->X_low, sbr->k[0]);
+            sbr->c.sbr_hf_inverse_filter(&sbr->dsp, sbr->alpha0, sbr->alpha1, sbr->X_low, sbr->k[0]);
             sbr_chirp(sbr, &sbr->data[ch]);
             sbr_hf_gen(ac, sbr, sbr->X_high, sbr->X_low, sbr->alpha0, sbr->alpha1,
                        sbr->data[ch].bw_array, sbr->data[ch].t_env,
@@ -1701,14 +1715,14 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
             if (!err) {
                 sbr_env_estimate(sbr->e_curr, sbr->X_high, sbr, &sbr->data[ch]);
                 sbr_gain_calc(ac, sbr, &sbr->data[ch], sbr->data[ch].e_a);
-                sbr_hf_assemble(sbr->data[ch].Y[sbr->data[ch].Ypos],
+                sbr->c.sbr_hf_assemble(sbr->data[ch].Y[sbr->data[ch].Ypos],
                                 sbr->X_high, sbr, &sbr->data[ch],
                                 sbr->data[ch].e_a);
             }
         }
 
         /* synthesis */
-        sbr_x_gen(sbr, sbr->X[ch],
+        sbr->c.sbr_x_gen(sbr, sbr->X[ch],
                   sbr->data[ch].Y[1-sbr->data[ch].Ypos],
                   sbr->data[ch].Y[  sbr->data[ch].Ypos],
                   sbr->X_low, ch);
@@ -1723,15 +1737,26 @@ void ff_sbr_apply(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
         nch = 2;
     }
 
-    sbr_qmf_synthesis(&ac->dsp, &sbr->mdct, &sbr->dsp, &ac->fdsp,
+    sbr_qmf_synthesis(&sbr->mdct, &sbr->dsp, &ac->fdsp,
                       L, sbr->X[0], sbr->qmf_filter_scratch,
                       sbr->data[0].synthesis_filterbank_samples,
                       &sbr->data[0].synthesis_filterbank_samples_offset,
                       downsampled);
     if (nch == 2)
-        sbr_qmf_synthesis(&ac->dsp, &sbr->mdct, &sbr->dsp, &ac->fdsp,
+        sbr_qmf_synthesis(&sbr->mdct, &sbr->dsp, &ac->fdsp,
                           R, sbr->X[1], sbr->qmf_filter_scratch,
                           sbr->data[1].synthesis_filterbank_samples,
                           &sbr->data[1].synthesis_filterbank_samples_offset,
                           downsampled);
+}
+
+static void aacsbr_func_ptr_init(AACSBRContext *c)
+{
+    c->sbr_lf_gen            = sbr_lf_gen;
+    c->sbr_hf_assemble       = sbr_hf_assemble;
+    c->sbr_x_gen             = sbr_x_gen;
+    c->sbr_hf_inverse_filter = sbr_hf_inverse_filter;
+
+    if(ARCH_MIPS)
+        ff_aacsbr_func_ptr_init_mips(c);
 }

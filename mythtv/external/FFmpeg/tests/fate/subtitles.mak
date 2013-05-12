@@ -7,6 +7,9 @@ fate-sub-jacosub: CMD = md5 -i $(SAMPLES)/sub/JACOsub_capability_tester.jss -f a
 FATE_SUBTITLES_ASS-$(call DEMDEC, MICRODVD, MICRODVD) += fate-sub-microdvd
 fate-sub-microdvd: CMD = md5 -i $(SAMPLES)/sub/MicroDVD_capability_tester.sub -f ass
 
+FATE_SUBTITLES-$(call ALLYES, MICRODVD_DEMUXER MICRODVD_MUXER) += fate-sub-microdvd-remux
+fate-sub-microdvd-remux: CMD = md5 -i $(SAMPLES)/sub/MicroDVD_capability_tester.sub -c:s copy -f microdvd
+
 FATE_SUBTITLES_ASS-$(call DEMDEC, MOV, MOVTEXT) += fate-sub-movtext
 fate-sub-movtext: CMD = md5 -i $(SAMPLES)/sub/MovText_capability_tester.mp4 -f ass
 
@@ -48,6 +51,9 @@ fate-sub-vplayer: CMD = md5 -i $(SAMPLES)/sub/VPlayer_capability_tester.txt -f a
 
 FATE_SUBTITLES_ASS-$(call DEMDEC, WEBVTT, WEBVTT) += fate-sub-webvtt
 fate-sub-webvtt: CMD = md5 -i $(SAMPLES)/sub/WebVTT_capability_tester.vtt -f ass
+
+FATE_SUBTITLES_ASS-$(call ALLYES, MICRODVD_DEMUXER MICRODVD_DECODER ICONV) += fate-sub-charenc
+fate-sub-charenc: CMD = md5 -sub_charenc cp1251 -i $(SAMPLES)/sub/cp1251-subtitles.sub -f ass
 
 FATE_SUBTITLES-$(call ENCMUX, ASS, ASS) += $(FATE_SUBTITLES_ASS-yes)
 FATE_SUBTITLES += $(FATE_SUBTITLES-yes)

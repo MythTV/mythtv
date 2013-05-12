@@ -74,10 +74,15 @@ You can interactively cycle through the available show modes by
 pressing the key @key{w}.
 
 @item -vf @var{filter_graph}
+Create the filter graph specified by @var{filter_graph} and use it to
+filter the video stream.
+
 @var{filter_graph} is a description of the filter graph to apply to
-the input video.
-Use the option "-filters" to show all the available filters (including
-also sources and sinks).
+the stream, and must have a single video input and a single video
+output. In the filter graph, the input is associated to the label
+@code{in}, and the output to the label @code{out}. See the
+ffmpeg-filters manual for more information about the filtergraph
+syntax.
 
 @item -i @var{input_file}
 Read @var{input_file}.
@@ -194,7 +199,7 @@ Seek to percentage in file corresponding to fraction of width.
 @url{ffmpeg-scaler.html,ffmpeg-scaler},
 @url{ffmpeg-resampler.html,ffmpeg-resampler},
 @url{ffmpeg-codecs.html,ffmpeg-codecs},
-@url{ffmpeg-bitstream-filters,ffmpeg-bitstream-filters},
+@url{ffmpeg-bitstream-filters.html,ffmpeg-bitstream-filters},
 @url{ffmpeg-formats.html,ffmpeg-formats},
 @url{ffmpeg-devices.html,ffmpeg-devices},
 @url{ffmpeg-protocols.html,ffmpeg-protocols},

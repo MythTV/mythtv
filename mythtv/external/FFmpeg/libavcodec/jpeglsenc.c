@@ -27,10 +27,10 @@
 
 #include "avcodec.h"
 #include "get_bits.h"
+#include "put_bits.h"
 #include "golomb.h"
 #include "internal.h"
 #include "mathops.h"
-#include "dsputil.h"
 #include "mjpeg.h"
 #include "jpegls.h"
 

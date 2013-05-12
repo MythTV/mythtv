@@ -36,7 +36,7 @@
 #include "libmpcodecs/vf.h"
 #include "libmpcodecs/img_format.h"
 #include "libmpcodecs/cpudetect.h"
-#include "libmpcodecs/vd_ffmpeg.h"
+#include "libmpcodecs/av_helpers.h"
 #include "libmpcodecs/vf_scale.h"
 #include "libmpcodecs/libvo/fastmemcpy.h"
 
@@ -126,17 +126,14 @@ extern const vf_info_t ff_vf_info_detc;
 extern const vf_info_t ff_vf_info_dint;
 extern const vf_info_t ff_vf_info_divtc;
 extern const vf_info_t ff_vf_info_down3dright;
-extern const vf_info_t ff_vf_info_dsize;
 extern const vf_info_t ff_vf_info_eq2;
 extern const vf_info_t ff_vf_info_eq;
 extern const vf_info_t ff_vf_info_fil;
 //extern const vf_info_t ff_vf_info_filmdint;
 extern const vf_info_t ff_vf_info_fspp;
 extern const vf_info_t ff_vf_info_harddup;
-extern const vf_info_t ff_vf_info_il;
 extern const vf_info_t ff_vf_info_ilpack;
 extern const vf_info_t ff_vf_info_ivtc;
-extern const vf_info_t ff_vf_info_kerndeint;
 extern const vf_info_t ff_vf_info_mcdeint;
 extern const vf_info_t ff_vf_info_noise;
 extern const vf_info_t ff_vf_info_ow;
@@ -147,12 +144,9 @@ extern const vf_info_t ff_vf_info_pullup;
 extern const vf_info_t ff_vf_info_qp;
 extern const vf_info_t ff_vf_info_sab;
 extern const vf_info_t ff_vf_info_softpulldown;
-extern const vf_info_t ff_vf_info_softskip;
 extern const vf_info_t ff_vf_info_spp;
-extern const vf_info_t ff_vf_info_stereo3d;
 extern const vf_info_t ff_vf_info_telecine;
 extern const vf_info_t ff_vf_info_tinterlace;
-extern const vf_info_t ff_vf_info_unsharp;
 extern const vf_info_t ff_vf_info_uspp;
 
 
@@ -161,17 +155,14 @@ static const vf_info_t* const filters[]={
     &ff_vf_info_dint,
     &ff_vf_info_divtc,
     &ff_vf_info_down3dright,
-    &ff_vf_info_dsize,
     &ff_vf_info_eq2,
     &ff_vf_info_eq,
     &ff_vf_info_fil,
 //    &ff_vf_info_filmdint, cmmx.h vd.h ‘opt_screen_size_x’
     &ff_vf_info_fspp,
     &ff_vf_info_harddup,
-    &ff_vf_info_il,
     &ff_vf_info_ilpack,
     &ff_vf_info_ivtc,
-    &ff_vf_info_kerndeint,
     &ff_vf_info_mcdeint,
     &ff_vf_info_noise,
     &ff_vf_info_ow,
@@ -182,12 +173,9 @@ static const vf_info_t* const filters[]={
     &ff_vf_info_qp,
     &ff_vf_info_sab,
     &ff_vf_info_softpulldown,
-    &ff_vf_info_softskip,
     &ff_vf_info_spp,
-    &ff_vf_info_stereo3d,
     &ff_vf_info_telecine,
     &ff_vf_info_tinterlace,
-    &ff_vf_info_unsharp,
     &ff_vf_info_uspp,
 
     NULL

@@ -81,7 +81,7 @@ int copy_ts           = 0;
 int copy_tb           = -1;
 int debug_ts          = 0;
 int exit_on_error     = 0;
-int print_stats       = 1;
+int print_stats       = -1;
 int qp_hist           = 0;
 int stdin_interaction = 1;
 int frame_bits_per_raw_sample = 0;
@@ -126,6 +126,7 @@ static void uninit_options(OptionsContext *o, int is_input)
     av_freep(&o->stream_maps);
     av_freep(&o->audio_channel_maps);
     av_freep(&o->streamid_map);
+    av_freep(&o->attachments);
 
     if (is_input)
         recording_time = o->recording_time;
@@ -143,22 +144,11 @@ static void init_options(OptionsContext *o, int is_input)
                 "-t is not an input option, keeping it for the next output;"
                 " consider fixing your command line.\n");
     } else
-    o->recording_time = INT64_MAX;
+        o->recording_time = INT64_MAX;
+    o->stop_time = INT64_MAX;
     o->mux_max_delay  = 0.7;
     o->limit_filesize = UINT64_MAX;
     o->chapters_input_file = INT_MAX;
-}
-
-static int opt_frame_crop(void *optctx, const char *opt, const char *arg)
-{
-    av_log(NULL, AV_LOG_FATAL, "Option '%s' has been removed, use the crop filter instead\n", opt);
-    return AVERROR(EINVAL);
-}
-
-static int opt_pad(void *optctx, const char *opt, const char *arg)
-{
-    av_log(NULL, AV_LOG_FATAL, "Option '%s' has been removed, use the pad filter instead\n", opt);
-    return -1;
 }
 
 static int opt_sameq(void *optctx, const char *opt, const char *arg)
@@ -616,6 +606,8 @@ static void add_input_streams(OptionsContext *o, AVFormatContext *ic)
 
             break;
         case AVMEDIA_TYPE_AUDIO:
+            ist->guess_layout_max = INT_MAX;
+            MATCH_PER_STREAM_OPT(guess_layout_max, i, ist->guess_layout_max, ic, st);
             guess_input_channel_layout(ist);
 
             ist->resample_sample_fmt     = dec->sample_fmt;
@@ -965,6 +957,8 @@ static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, e
                    preset, ost->file_index, ost->index);
             exit(1);
         }
+    } else {
+        ost->opts = filter_codec_opts(o->g->codec_opts, AV_CODEC_ID_NONE, oc, st, NULL);
     }
 
     avcodec_get_context_defaults3(st->codec, ost->enc);
@@ -1011,9 +1005,12 @@ static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, e
         st->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
     av_opt_get_int(o->g->sws_opts, "sws_flags", 0, &ost->sws_flags);
-    av_opt_get_int   (o->g->swr_opts, "filter_type"  , 0, &ost->swr_filter_type);
-    av_opt_get_int   (o->g->swr_opts, "dither_method", 0, &ost->swr_dither_method);
-    av_opt_get_double(o->g->swr_opts, "dither_scale" , 0, &ost->swr_dither_scale);
+
+    av_dict_copy(&ost->swr_opts, o->g->swr_opts, 0);
+    if (ost->enc && av_get_exact_bits_per_sample(ost->enc->id) == 24)
+        av_dict_set(&ost->swr_opts, "output_sample_bits", "24", 0);
+
+    av_dict_copy(&ost->resample_opts, o->g->resample_opts, 0);
 
     ost->source_index = source_index;
     if (source_index >= 0) {
@@ -1662,6 +1659,20 @@ loop_end:
                 exit(1);
     }
 
+    if (o->stop_time != INT64_MAX && o->recording_time != INT64_MAX) {
+        o->stop_time = INT64_MAX;
+        av_log(NULL, AV_LOG_WARNING, "-t and -to cannot be used together; using -t.\n");
+    }
+
+    if (o->stop_time != INT64_MAX && o->recording_time == INT64_MAX) {
+        if (o->stop_time <= o->start_time) {
+            av_log(NULL, AV_LOG_WARNING, "-to value smaller than -ss; ignoring -to.\n");
+            o->stop_time = INT64_MAX;
+        } else {
+            o->recording_time = o->stop_time - o->start_time;
+        }
+    }
+
     GROW_ARRAY(output_files, nb_output_files);
     if (!(output_files[nb_output_files - 1] = av_mallocz(sizeof(*output_files[0]))))
         exit(1);
@@ -1695,7 +1706,8 @@ loop_end:
             print_error(filename, err);
             exit(1);
         }
-    }
+    } else if (strcmp(oc->oformat->name, "image2")==0 && !av_filename_number_test(filename))
+        assert_file_overwrite(filename);
 
     if (o->mux_preload) {
         uint8_t buf[64];
@@ -2117,12 +2129,14 @@ static int opt_vsync(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
+#if FF_API_DEINTERLACE
 static int opt_deinterlace(void *optctx, const char *opt, const char *arg)
 {
     av_log(NULL, AV_LOG_WARNING, "-%s is deprecated, use -filter:v yadif instead\n", opt);
     do_deinterlace = 1;
     return 0;
 }
+#endif
 
 static int opt_timecode(void *optctx, const char *opt, const char *arg)
 {
@@ -2297,7 +2311,7 @@ static int open_files(OptionGroupList *l, const char *inout,
                    inout, g->arg);
             return ret;
         }
-        av_log(NULL, AV_LOG_DEBUG, "Successfully openened the file.\n");
+        av_log(NULL, AV_LOG_DEBUG, "Successfully opened the file.\n");
     }
 
     return 0;
@@ -2395,6 +2409,8 @@ const OptionDef options[] = {
     { "t",              HAS_ARG | OPT_TIME | OPT_OFFSET,             { .off = OFFSET(recording_time) },
         "record or transcode \"duration\" seconds of audio/video",
         "duration" },
+    { "to",             HAS_ARG | OPT_TIME | OPT_OFFSET,             { .off = OFFSET(stop_time) },
+        "record or transcode stop time", "time_stop" },
     { "fs",             HAS_ARG | OPT_INT64 | OPT_OFFSET,            { .off = OFFSET(limit_filesize) },
         "set the limit file size in bytes", "limit_size" },
     { "ss",             HAS_ARG | OPT_TIME | OPT_OFFSET,             { .off = OFFSET(start_time) },
@@ -2461,7 +2477,7 @@ const OptionDef options[] = {
     { "profile",        HAS_ARG | OPT_EXPERT | OPT_PERFILE,          { .func_arg = opt_profile },
         "set profile", "profile" },
     { "filter",         HAS_ARG | OPT_STRING | OPT_SPEC,             { .off = OFFSET(filters) },
-        "set stream filterchain", "filter_list" },
+        "set stream filtergraph", "filter_graph" },
     { "reinit_filter",  HAS_ARG | OPT_INT | OPT_SPEC,                { .off = OFFSET(reinit_filters) },
         "reinit filtergraph on input parameter changes", "" },
     { "filter_complex", HAS_ARG | OPT_EXPERT,                        { .func_arg = opt_filter_complex },
@@ -2488,24 +2504,6 @@ const OptionDef options[] = {
         "set pixel format", "format" },
     { "bits_per_raw_sample", OPT_VIDEO | OPT_INT | HAS_ARG,                      { &frame_bits_per_raw_sample },
         "set the number of bits per raw sample", "number" },
-    { "croptop",      OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_frame_crop },
-        "Removed, use the crop filter instead", "size" },
-    { "cropbottom",   OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_frame_crop },
-        "Removed, use the crop filter instead", "size" },
-    { "cropleft",     OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_frame_crop },
-        "Removed, use the crop filter instead", "size" },
-    { "cropright",    OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_frame_crop },
-        "Removed, use the crop filter instead", "size" },
-    { "padtop",       OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_pad },
-        "Removed, use the pad filter instead", "size" },
-    { "padbottom",    OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_pad },
-        "Removed, use the pad filter instead", "size" },
-    { "padleft",      OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_pad },
-        "Removed, use the pad filter instead", "size" },
-    { "padright",     OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_pad },
-        "Removed, use the pad filter instead", "size" },
-    { "padcolor",     OPT_VIDEO | HAS_ARG,                                       { .func_arg = opt_pad },
-        "Removed, use the pad filter instead", "color" },
     { "intra",        OPT_VIDEO | OPT_BOOL | OPT_EXPERT,                         { &intra_only },
         "deprecated use -g 1" },
     { "vn",           OPT_VIDEO | OPT_BOOL  | OPT_OFFSET,                        { .off = OFFSET(video_disable) },
@@ -2526,8 +2524,10 @@ const OptionDef options[] = {
         "select the pass number (1 to 3)", "n" },
     { "passlogfile",  OPT_VIDEO | HAS_ARG | OPT_STRING | OPT_EXPERT | OPT_SPEC,  { .off = OFFSET(passlogfiles) },
         "select two pass log file name prefix", "prefix" },
+#if FF_API_DEINTERLACE
     { "deinterlace",  OPT_VIDEO | OPT_EXPERT ,                                   { .func_arg = opt_deinterlace },
         "this option is deprecated, use the yadif filter instead" },
+#endif
     { "psnr",         OPT_VIDEO | OPT_BOOL | OPT_EXPERT,                         { &do_psnr },
         "calculate PSNR of compressed frames" },
     { "vstats",       OPT_VIDEO | OPT_EXPERT ,                                   { &opt_vstats },
@@ -2535,7 +2535,7 @@ const OptionDef options[] = {
     { "vstats_file",  OPT_VIDEO | HAS_ARG | OPT_EXPERT ,                         { opt_vstats_file },
         "dump video coding statistics to file", "file" },
     { "vf",           OPT_VIDEO | HAS_ARG  | OPT_PERFILE,                        { .func_arg = opt_video_filters },
-        "video filters", "filter list" },
+        "set video filters", "filter_graph" },
     { "intra_matrix", OPT_VIDEO | HAS_ARG | OPT_EXPERT  | OPT_STRING | OPT_SPEC, { .off = OFFSET(intra_matrices) },
         "specify intra matrix coeffs", "matrix" },
     { "inter_matrix", OPT_VIDEO | HAS_ARG | OPT_EXPERT  | OPT_STRING | OPT_SPEC, { .off = OFFSET(inter_matrices) },
@@ -2580,7 +2580,9 @@ const OptionDef options[] = {
     { "channel_layout", OPT_AUDIO | HAS_ARG  | OPT_EXPERT | OPT_PERFILE,           { .func_arg = opt_channel_layout },
         "set channel layout", "layout" },
     { "af",             OPT_AUDIO | HAS_ARG  | OPT_PERFILE,                        { .func_arg = opt_audio_filters },
-        "audio filters", "filter list" },
+        "set audio filters", "filter_graph" },
+    { "guess_layout_max", OPT_AUDIO | HAS_ARG | OPT_INT | OPT_SPEC | OPT_EXPERT,   { .off = OFFSET(guess_layout_max) },
+      "set the maximum number of channels to try to guess the channel layout" },
 
     /* subtitle options */
     { "sn",     OPT_SUBTITLE | OPT_BOOL | OPT_OFFSET, { .off = OFFSET(subtitle_disable) },

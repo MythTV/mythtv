@@ -24,6 +24,7 @@
 #if HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
+#include "libavutil/attributes.h"
 #include "libavutil/ppc/types_altivec.h"
 #include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/dsputil.h"
@@ -476,7 +477,7 @@ static int pix_sum_altivec(uint8_t * pix, int line_size)
     return s;
 }
 
-static void get_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *pixels, int line_size)
+static void get_pixels_altivec(int16_t *restrict block, const uint8_t *pixels, int line_size)
 {
     int i;
     vector unsigned char perm = vec_lvsl(0, pixels);
@@ -502,7 +503,7 @@ static void get_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *pixels
     }
 }
 
-static void diff_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *s1,
+static void diff_pixels_altivec(int16_t *restrict block, const uint8_t *s1,
         const uint8_t *s2, int stride)
 {
     int i;
@@ -576,7 +577,7 @@ static void diff_pixels_altivec(DCTELEM *av_restrict block, const uint8_t *s1,
 }
 
 
-static void clear_block_altivec(DCTELEM *block) {
+static void clear_block_altivec(int16_t *block) {
     LOAD_ZERO;
     vec_st(zero_s16v,   0, block);
     vec_st(zero_s16v,  16, block);
@@ -607,7 +608,7 @@ static void add_bytes_altivec(uint8_t *dst, uint8_t *src, int w) {
 }
 
 /* next one assumes that ((line_size % 16) == 0) */
-void ff_put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+void ff_put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 {
     register vector unsigned char pixelsv1, pixelsv2;
     register vector unsigned char pixelsv1B, pixelsv2B;
@@ -616,9 +617,9 @@ void ff_put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_siz
 
     register vector unsigned char perm = vec_lvsl(0, pixels);
     int i;
-    register int line_size_2 = line_size << 1;
-    register int line_size_3 = line_size + line_size_2;
-    register int line_size_4 = line_size << 2;
+    register ptrdiff_t line_size_2 = line_size << 1;
+    register ptrdiff_t line_size_3 = line_size + line_size_2;
+    register ptrdiff_t line_size_4 = line_size << 2;
 
 // hand-unrolling the loop by 4 gains about 15%
 // mininum execution time goes from 74 to 60 cycles
@@ -649,7 +650,7 @@ void ff_put_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_siz
 
 /* next one assumes that ((line_size % 16) == 0) */
 #define op_avg(a,b)  a = ( ((a)|(b)) - ((((a)^(b))&0xFEFEFEFEUL)>>1) )
-void ff_avg_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+void ff_avg_pixels16_altivec(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 {
     register vector unsigned char pixelsv1, pixelsv2, pixelsv, blockv;
     register vector unsigned char perm = vec_lvsl(0, pixels);
@@ -668,7 +669,7 @@ void ff_avg_pixels16_altivec(uint8_t *block, const uint8_t *pixels, int line_siz
 }
 
 /* next one assumes that ((line_size % 8) == 0) */
-static void avg_pixels8_altivec(uint8_t * block, const uint8_t * pixels, int line_size, int h)
+static void avg_pixels8_altivec(uint8_t * block, const uint8_t * pixels, ptrdiff_t line_size, int h)
 {
     register vector unsigned char pixelsv1, pixelsv2, pixelsv, blockv;
     int i;
@@ -699,7 +700,7 @@ static void avg_pixels8_altivec(uint8_t * block, const uint8_t * pixels, int lin
 }
 
 /* next one assumes that ((line_size % 8) == 0) */
-static void put_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+static void put_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 {
     register int i;
     register vector unsigned char pixelsv1, pixelsv2, pixelsavg;
@@ -758,7 +759,7 @@ static void put_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int l
 }
 
 /* next one assumes that ((line_size % 8) == 0) */
-static void put_no_rnd_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+static void put_no_rnd_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 {
     register int i;
     register vector unsigned char pixelsv1, pixelsv2, pixelsavg;
@@ -818,7 +819,7 @@ static void put_no_rnd_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels
 }
 
 /* next one assumes that ((line_size % 16) == 0) */
-static void put_pixels16_xy2_altivec(uint8_t * block, const uint8_t * pixels, int line_size, int h)
+static void put_pixels16_xy2_altivec(uint8_t * block, const uint8_t * pixels, ptrdiff_t line_size, int h)
 {
     register int i;
     register vector unsigned char pixelsv1, pixelsv2, pixelsv3, pixelsv4;
@@ -886,7 +887,7 @@ static void put_pixels16_xy2_altivec(uint8_t * block, const uint8_t * pixels, in
 }
 
 /* next one assumes that ((line_size % 16) == 0) */
-static void put_no_rnd_pixels16_xy2_altivec(uint8_t * block, const uint8_t * pixels, int line_size, int h)
+static void put_no_rnd_pixels16_xy2_altivec(uint8_t * block, const uint8_t * pixels, ptrdiff_t line_size, int h)
 {
     register int i;
     register vector unsigned char pixelsv1, pixelsv2, pixelsv3, pixelsv4;
@@ -1283,31 +1284,8 @@ static int hadamard8_diff16_altivec(/*MpegEncContext*/ void *s, uint8_t *dst, ui
     return score;
 }
 
-static void vorbis_inverse_coupling_altivec(float *mag, float *ang,
-                                            int blocksize)
-{
-    int i;
-    vector float m, a;
-    vector bool int t0, t1;
-    const vector unsigned int v_31 = //XXX
-        vec_add(vec_add(vec_splat_u32(15),vec_splat_u32(15)),vec_splat_u32(1));
-    for (i = 0; i < blocksize; i += 4) {
-        m = vec_ld(0, mag+i);
-        a = vec_ld(0, ang+i);
-        t0 = vec_cmple(m, (vector float)vec_splat_u32(0));
-        t1 = vec_cmple(a, (vector float)vec_splat_u32(0));
-        a = vec_xor(a, (vector float) vec_sl((vector unsigned int)t0, v_31));
-        t0 = (vector bool int)vec_and(a, t1);
-        t1 = (vector bool int)vec_andc(a, t1);
-        a = vec_sub(m, (vector float)t1);
-        m = vec_add(m, (vector float)t0);
-        vec_stl(a, 0, ang+i);
-        vec_stl(m, 0, mag+i);
-    }
-}
-
 /* next one assumes that ((line_size % 8) == 0) */
-static void avg_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int line_size, int h)
+static void avg_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 {
     register int i;
     register vector unsigned char pixelsv1, pixelsv2, pixelsavg;
@@ -1369,7 +1347,7 @@ static void avg_pixels8_xy2_altivec(uint8_t *block, const uint8_t *pixels, int l
     }
 }
 
-void ff_dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
+av_cold void ff_dsputil_init_altivec(DSPContext *c, AVCodecContext *avctx)
 {
     const int high_bit_depth = avctx->bits_per_raw_sample > 8;
 
@@ -1403,6 +1381,4 @@ void ff_dsputil_init_altivec(DSPContext* c, AVCodecContext *avctx)
 
     c->hadamard8_diff[0] = hadamard8_diff16_altivec;
     c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;
-    if (CONFIG_VORBIS_DECODER)
-        c->vorbis_inverse_coupling = vorbis_inverse_coupling_altivec;
 }

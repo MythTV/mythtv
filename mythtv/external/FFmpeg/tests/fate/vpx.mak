@@ -1,10 +1,10 @@
-FATE_VP3-$(CONFIG_AVI_DEMUXER) += fate-vp31
+FATE_VP3-$(call DEMDEC, MATROSKA, THEORA) += fate-theora-coeff-level64
+fate-theora-coeff-level64: CMD = framecrc -i $(SAMPLES)/vp3/coeff_level64.mkv
+
+FATE_VP3-$(call DEMDEC, AVI, VP3) += fate-vp31
 fate-vp31: CMD = framecrc -i $(SAMPLES)/vp3/vp31.avi
 
-FATE_VP3-$(CONFIG_MATROSKA_DEMUXER) += fate-vp3-coeff-level64
-fate-vp3-coeff-level64: CMD = framecrc -i $(SAMPLES)/vp3/coeff_level64.mkv
-
-FATE_SAMPLES_AVCONV-$(CONFIG_VP3_DECODER) += $(FATE_VP3-yes)
+FATE_SAMPLES_AVCONV += $(FATE_VP3-yes)
 fate-vp3: $(FATE_VP3-yes)
 
 FATE_SAMPLES_AVCONV-$(call DEMDEC, AVI, VP5) += fate-vp5
@@ -21,6 +21,9 @@ fate-vp6a: CMD = framecrc -i $(SAMPLES)/flash-vp6/300x180-Scr-f8-056alpha.flv
 
 FATE_VP6-$(call DEMDEC, FLV, VP6F) += fate-vp6f
 fate-vp6f: CMD = framecrc -i $(SAMPLES)/flash-vp6/clip1024.flv
+
+FATE_VP8-$(call DEMDEC, FLV, VP8) += fate-vp8-alpha
+fate-vp8-alpha: CMD = framecrc -i $(SAMPLES)/vp8_alpha/vp8_video_with_alpha.webm -vcodec copy
 
 FATE_SAMPLES_AVCONV += $(FATE_VP6-yes)
 fate-vp6: $(FATE_VP6-yes)

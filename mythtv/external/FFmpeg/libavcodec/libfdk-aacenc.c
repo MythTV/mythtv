@@ -250,7 +250,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     }
 
     if (avctx->cutoff > 0) {
-        if (avctx->cutoff < (avctx->sample_rate + 255) >> 8) {
+        if (avctx->cutoff < (avctx->sample_rate + 255) >> 8 || avctx->cutoff > 20000) {
             av_log(avctx, AV_LOG_ERROR, "cutoff valid range is %d-20000\n",
                    (avctx->sample_rate + 255) >> 8);
             goto error;
@@ -339,7 +339,7 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     }
 
     /* The maximum packet size is 6144 bits aka 768 bytes per channel. */
-    if ((ret = ff_alloc_packet2(avctx, avpkt, FFMAX(8192, 768 * avctx->channels))))
+    if ((ret = ff_alloc_packet2(avctx, avpkt, FFMAX(8192, 768 * avctx->channels))) < 0)
         return ret;
 
     out_ptr                   = avpkt->data;

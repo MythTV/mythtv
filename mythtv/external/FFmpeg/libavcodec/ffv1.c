@@ -33,7 +33,6 @@
 #include "libavutil/timer.h"
 #include "avcodec.h"
 #include "internal.h"
-#include "dsputil.h"
 #include "rangecoder.h"
 #include "golomb.h"
 #include "mathops.h"
@@ -123,6 +122,10 @@ av_cold int ffv1_init_slice_contexts(FFV1Context *f)
         int sxe         = f->avctx->width  * (sx + 1) / f->num_h_slices;
         int sys         = f->avctx->height *  sy      / f->num_v_slices;
         int sye         = f->avctx->height * (sy + 1) / f->num_v_slices;
+
+        if (!fs)
+            return AVERROR(ENOMEM);
+
         f->slice_context[i] = fs;
         memcpy(fs, f, sizeof(*fs));
         memset(fs->rc_stat2, 0, sizeof(fs->rc_stat2));

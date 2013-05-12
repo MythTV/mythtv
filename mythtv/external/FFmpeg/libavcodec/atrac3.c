@@ -87,7 +87,6 @@ typedef struct ChannelUnit {
 } ChannelUnit;
 
 typedef struct ATRAC3Context {
-    AVFrame frame;
     GetBitContext gb;
     //@{
     /** stream data */
@@ -165,10 +164,7 @@ static int decode_bytes(const uint8_t *input, uint8_t *out, int bytes)
 
     off = (intptr_t)input & 3;
     buf = (const uint32_t *)(input - off);
-    if (off)
-        c = av_be2ne32((0x537F6103U >> (off * 8)) | (0x537F6103U << (32 - (off * 8))));
-    else
-        c = av_be2ne32(0x537F6103U);
+    c   = av_be2ne32((0x537F6103 >> (off * 8)) | (0x537F6103 << (32 - (off * 8))));
     bytes += 3 + off;
     for (i = 0; i < bytes / 4; i++)
         output[i] = c ^ buf[i];
@@ -743,7 +739,7 @@ static int decode_frame(AVCodecContext *avctx, const uint8_t *databuf,
 
 
         /* set the bitstream reader at the start of the second Sound Unit*/
-        init_get_bits(&q->gb, ptr1, avctx->block_align * 8);
+        init_get_bits8(&q->gb, ptr1, q->decoded_bytes_buffer + avctx->block_align - ptr1);
 
         /* Fill the Weighting coeffs delay buffer */
         memmove(q->weighting_delay, &q->weighting_delay[2],
@@ -802,6 +798,7 @@ static int decode_frame(AVCodecContext *avctx, const uint8_t *databuf,
 static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
                                int *got_frame_ptr, AVPacket *avpkt)
 {
+    AVFrame *frame     = data;
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     ATRAC3Context *q = avctx->priv_data;
@@ -815,8 +812,8 @@ static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
     }
 
     /* get output buffer */
-    q->frame.nb_samples = SAMPLES_PER_FRAME;
-    if ((ret = ff_get_buffer(avctx, &q->frame)) < 0) {
+    frame->nb_samples = SAMPLES_PER_FRAME;
+    if ((ret = ff_get_buffer(avctx, frame)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return ret;
     }
@@ -829,14 +826,13 @@ static int atrac3_decode_frame(AVCodecContext *avctx, void *data,
         databuf = buf;
     }
 
-    ret = decode_frame(avctx, databuf, (float **)q->frame.extended_data);
+    ret = decode_frame(avctx, databuf, (float **)frame->extended_data);
     if (ret) {
         av_log(NULL, AV_LOG_ERROR, "Frame decoding error!\n");
         return ret;
     }
 
-    *got_frame_ptr   = 1;
-    *(AVFrame *)data = q->frame;
+    *got_frame_ptr = 1;
 
     return avctx->block_align;
 }
@@ -911,7 +907,7 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
                    avctx->channels, frame_factor);
             return AVERROR_INVALIDDATA;
         }
-    } else if (avctx->extradata_size == 10) {
+    } else if (avctx->extradata_size == 12 || avctx->extradata_size == 10) {
         /* Parse the extradata, RM format. */
         version                = bytestream_get_be32(&edata_ptr);
         samples_per_frame      = bytestream_get_be16(&edata_ptr);
@@ -999,9 +995,6 @@ static av_cold int atrac3_decode_init(AVCodecContext *avctx)
         atrac3_decode_close(avctx);
         return AVERROR(ENOMEM);
     }
-
-    avcodec_get_frame_defaults(&q->frame);
-    avctx->coded_frame = &q->frame;
 
     return 0;
 }

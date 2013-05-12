@@ -81,7 +81,7 @@ static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
     return sign_extend(val, 5 + shift);
 }
 
-static inline int mpeg1_decode_block_intra(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg1_decode_block_intra(MpegEncContext *s, int16_t *block, int n)
 {
     int level, dc, diff, i, j, run;
     int component;
@@ -152,12 +152,12 @@ static inline int mpeg1_decode_block_intra(MpegEncContext *s, DCTELEM *block, in
    return 0;
 }
 
-int ff_mpeg1_decode_block_intra(MpegEncContext *s, DCTELEM *block, int n)
+int ff_mpeg1_decode_block_intra(MpegEncContext *s, int16_t *block, int n)
 {
     return mpeg1_decode_block_intra(s, block, n);
 }
 
-static inline int mpeg1_decode_block_inter(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg1_decode_block_inter(MpegEncContext *s, int16_t *block, int n)
 {
     int level, i, j, run;
     RLTable *rl = &ff_rl_mpeg1;
@@ -237,7 +237,7 @@ end:
  * Changing this would eat up any speed benefits it has.
  * Do not use "fast" flag if you need the code to be robust.
  */
-static inline int mpeg1_fast_decode_block_inter(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg1_fast_decode_block_inter(MpegEncContext *s, int16_t *block, int n)
 {
     int level, i, j, run;
     RLTable *rl = &ff_rl_mpeg1;
@@ -309,7 +309,7 @@ end:
 }
 
 
-static inline int mpeg2_decode_block_non_intra(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg2_decode_block_non_intra(MpegEncContext *s, int16_t *block, int n)
 {
     int level, i, j, run;
     RLTable *rl = &ff_rl_mpeg1;
@@ -394,7 +394,7 @@ end:
  * Do not use "fast" flag if you need the code to be robust.
  */
 static inline int mpeg2_fast_decode_block_non_intra(MpegEncContext *s,
-                                                    DCTELEM *block, int n)
+                                                    int16_t *block, int n)
 {
     int level, i, j, run;
     RLTable *rl = &ff_rl_mpeg1;
@@ -455,7 +455,7 @@ end:
 }
 
 
-static inline int mpeg2_decode_block_intra(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg2_decode_block_intra(MpegEncContext *s, int16_t *block, int n)
 {
     int level, dc, diff, i, j, run;
     int component;
@@ -538,7 +538,7 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s, DCTELEM *block, in
  * Changing this would eat up any speed benefits it has.
  * Do not use "fast" flag if you need the code to be robust.
  */
-static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s, DCTELEM *block, int n)
+static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s, int16_t *block, int n)
 {
     int level, dc, diff, j, run;
     int component;
@@ -737,7 +737,7 @@ static inline int get_qscale(MpegEncContext *s)
 
 static void exchange_uv(MpegEncContext *s)
 {
-    DCTELEM (*tmp)[64];
+    int16_t (*tmp)[64];
 
     tmp           = s->pblocks[4];
     s->pblocks[4] = s->pblocks[5];
@@ -750,7 +750,7 @@ static void exchange_uv(MpegEncContext *s)
 #define MT_16X8  2
 #define MT_DMV   3
 
-static int mpeg_decode_mb(MpegEncContext *s, DCTELEM block[12][64])
+static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
 {
     int i, j, k, cbp, val, mb_type, motion_type;
     const int mb_block_count = 4 + (1 << s->chroma_format);
@@ -1349,7 +1349,7 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
         avctx->hwaccel = ff_find_hwaccel(avctx->codec->id, avctx->pix_fmt);
         // until then pix_fmt may be changed right after codec init
         if (avctx->pix_fmt == AV_PIX_FMT_XVMC_MPEG2_IDCT ||
-            avctx->hwaccel )
+            avctx->hwaccel || uses_vdpau(avctx))
             if (avctx->idct_algo == FF_IDCT_AUTO)
                 avctx->idct_algo = FF_IDCT_SIMPLE;
 
@@ -1609,7 +1609,7 @@ static int mpeg_field_start(MpegEncContext *s, const uint8_t *buf, int buf_size)
         if (ff_MPV_frame_start(s, avctx) < 0)
             return -1;
 
-        ff_er_frame_start(s);
+        ff_mpeg_er_frame_start(s);
 
         /* first check if we must repeat the frame */
         s->current_picture_ptr->f.repeat_pict = 0;
@@ -1809,7 +1809,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
         if (++s->mb_x >= s->mb_width) {
             const int mb_size = 16 >> s->avctx->lowres;
 
-            ff_draw_horiz_band(s, mb_size*(s->mb_y >> field_pic), mb_size);
+            ff_mpeg_draw_horiz_band(s, mb_size*(s->mb_y >> field_pic), mb_size);
             ff_MPV_report_decode_progress(s);
 
             s->mb_x = 0;
@@ -1820,6 +1820,15 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
                 int is_d10 = s->chroma_format == 2 && s->pict_type == AV_PICTURE_TYPE_I && avctx->profile == 0 && avctx->level == 5
                              && s->intra_dc_precision == 2 && s->q_scale_type == 1 && s->alternate_scan == 0
                              && s->progressive_frame == 0 /* vbv_delay == 0xBBB || 0xE10*/;
+
+                if (left >= 32 && !is_d10) {
+                    GetBitContext gb = s->gb;
+                    align_get_bits(&gb);
+                    if (show_bits(&gb, 24) == 0x060E2B) {
+                        av_log(avctx, AV_LOG_DEBUG, "Invalid MXF data found in video stream\n");
+                        is_d10 = 1;
+                    }
+                }
 
                 if (left < 0 || (left && show_bits(&s->gb, FFMIN(left, 23)) && !is_d10)
                     || ((avctx->err_recognition & (AV_EF_BITSTREAM | AV_EF_AGGRESSIVE)) && left > 8)) {
@@ -1903,7 +1912,7 @@ static int slice_decode_thread(AVCodecContext *c, void *arg)
     int mb_y            = s->start_mb_y;
     const int field_pic = s->picture_structure != PICT_FRAME;
 
-    s->error_count = (3 * (s->end_mb_y - s->start_mb_y) * s->mb_width) >> field_pic;
+    s->er.error_count = (3 * (s->end_mb_y - s->start_mb_y) * s->mb_width) >> field_pic;
 
     for (;;) {
         uint32_t start_code;
@@ -1913,14 +1922,14 @@ static int slice_decode_thread(AVCodecContext *c, void *arg)
         emms_c();
         av_dlog(c, "ret:%d resync:%d/%d mb:%d/%d ts:%d/%d ec:%d\n",
                 ret, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y,
-                s->start_mb_y, s->end_mb_y, s->error_count);
+                s->start_mb_y, s->end_mb_y, s->er.error_count);
         if (ret < 0) {
             if (c->err_recognition & AV_EF_EXPLODE)
                 return ret;
             if (s->resync_mb_x >= 0 && s->resync_mb_y >= 0)
-                ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
+                ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
         } else {
-            ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
+            ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
         }
 
         if (s->mb_y == s->end_mb_y)
@@ -1965,7 +1974,7 @@ static int slice_end(AVCodecContext *avctx, AVFrame *pict)
 
         s->current_picture_ptr->f.qscale_type = FF_QSCALE_TYPE_MPEG2;
 
-        ff_er_frame_end(s);
+        ff_er_frame_end(&s->er);
 
         ff_MPV_frame_end(s);
 
@@ -2085,7 +2094,7 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     avctx->pix_fmt = mpeg_get_pixelformat(avctx);
     avctx->hwaccel = ff_find_hwaccel(avctx->codec->id, avctx->pix_fmt);
 
-    if( avctx->pix_fmt == AV_PIX_FMT_XVMC_MPEG2_IDCT || avctx->hwaccel )
+    if (avctx->pix_fmt == AV_PIX_FMT_XVMC_MPEG2_IDCT || avctx->hwaccel || uses_vdpau(avctx))
         if (avctx->idct_algo == FF_IDCT_AUTO)
             avctx->idct_algo = FF_IDCT_SIMPLE;
 
@@ -2446,6 +2455,7 @@ static int decode_chunks(AVCodecContext *avctx,
     const uint8_t *buf_end = buf + buf_size;
     int ret, input_size;
     int last_code = 0;
+    int picture_start_code_seen = 0;
 
     for (;;) {
         /* find next start code */
@@ -2459,7 +2469,7 @@ static int decode_chunks(AVCodecContext *avctx,
 
                     avctx->execute(avctx, slice_decode_thread,  &s2->thread_context[0], NULL, s->slice_count, sizeof(void*));
                     for (i = 0; i < s->slice_count; i++)
-                        s2->error_count += s2->thread_context[i]->error_count;
+                        s2->er.error_count += s2->thread_context[i]->er.error_count;
                 }
 
                 if (CONFIG_VDPAU && uses_vdpau(avctx))
@@ -2496,6 +2506,14 @@ static int decode_chunks(AVCodecContext *avctx,
             break;
 
         case PICTURE_START_CODE:
+            if (picture_start_code_seen && s2->picture_structure == PICT_FRAME) {
+               /* If it's a frame picture, there can't be more than one picture header.
+                  Yet, it does happen and we need to handle it. */
+               av_log(avctx, AV_LOG_WARNING, "ignoring extra picture following a frame-picture\n");
+               break;
+            }
+            picture_start_code_seen = 1;
+
             if (s2->width <= 0 || s2->height <= 0) {
                 av_log(avctx, AV_LOG_ERROR, "%dx%d is invalid\n", s2->width, s2->height);
                 return AVERROR_INVALIDDATA;
@@ -2512,7 +2530,7 @@ static int decode_chunks(AVCodecContext *avctx,
                                s2->thread_context, NULL,
                                s->slice_count, sizeof(void*));
                 for (i = 0; i < s->slice_count; i++)
-                    s2->error_count += s2->thread_context[i]->error_count;
+                    s2->er.error_count += s2->thread_context[i]->er.error_count;
                 s->slice_count = 0;
             }
             if (last_code == 0 || last_code == SLICE_MIN_START_CODE) {
@@ -2701,9 +2719,9 @@ static int decode_chunks(AVCodecContext *avctx,
                         if (avctx->err_recognition & AV_EF_EXPLODE)
                             return ret;
                         if (s2->resync_mb_x >= 0 && s2->resync_mb_y >= 0)
-                            ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x, s2->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
+                            ff_er_add_slice(&s2->er, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x, s2->mb_y, ER_AC_ERROR | ER_DC_ERROR | ER_MV_ERROR);
                     } else {
-                        ff_er_add_slice(s2, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x-1, s2->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
+                        ff_er_add_slice(&s2->er, s2->resync_mb_x, s2->resync_mb_y, s2->mb_x-1, s2->mb_y, ER_AC_END | ER_DC_END | ER_MV_END);
                     }
                 }
             }
