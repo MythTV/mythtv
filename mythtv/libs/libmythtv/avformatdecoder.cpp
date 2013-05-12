@@ -1978,6 +1978,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 continue;
         }
 
+        if (enc->codec && enc->codec->id != enc->codec_id)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Already opened codec not matching (%1 vs %2). Reopening")
+                .arg(ff_codec_id_string(enc->codec_id))
+                .arg(ff_codec_id_string(enc->codec->id)));
+            avcodec_close(enc);
+        }
+
         if (!enc->codec)
         {
             if (OpenAVCodec(enc, codec) < 0)
