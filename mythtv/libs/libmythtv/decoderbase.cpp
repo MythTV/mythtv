@@ -1145,23 +1145,23 @@ int to_track_type(const QString &str)
 {
     int ret = -1;
 
-    if (str.left(5) == "AUDIO")
+    if (str.startsWith("AUDIO"))
         ret = kTrackTypeAudio;
-    else if (str.left(5) == "VIDEO")
+    else if (str.startsWith("VIDEO"))
         ret = kTrackTypeVideo;
-    else if (str.left(8) == "SUBTITLE")
+    else if (str.startsWith("SUBTITLE"))
         ret = kTrackTypeSubtitle;
-    else if (str.left(5) == "CC608")
+    else if (str.startsWith("CC608"))
         ret = kTrackTypeCC608;
-    else if (str.left(5) == "CC708")
+    else if (str.startsWith("CC708"))
         ret = kTrackTypeCC708;
-    else if (str.left(3) == "TTC")
+    else if (str.startsWith("TTC"))
         ret = kTrackTypeTeletextCaptions;
-    else if (str.left(3) == "TTM")
+    else if (str.startsWith("TTM"))
         ret = kTrackTypeTeletextMenu;
-    else if (str.left(3) == "TFL")
+    else if (str.startsWith("TFL"))
         ret = kTrackTypeTextSubtitle;
-    else if (str.left(7) == "RAWTEXT")
+    else if (str.startsWith("RAWTEXT"))
         ret = kTrackTypeRawText;
     return ret;
 }

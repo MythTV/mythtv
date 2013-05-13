@@ -845,7 +845,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     }
 
     // Create video buffers
-    bool use_xv     = (renderer.left(2) == "xv");
+    bool use_xv     = (renderer.startsWith("xv"));
     bool use_shm    = (renderer == "xshm");
     bool ok = InitVideoBuffers(use_xv, use_shm);
 

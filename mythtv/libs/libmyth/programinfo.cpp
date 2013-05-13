@@ -866,8 +866,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 
     QString pn = _pathname;
     if ((!_pathname.startsWith("myth://")) &&
-        (_pathname.right(4).toLower() == ".iso" ||
-         _pathname.right(4).toLower() == ".img" ||
+        (_pathname.endsWith(".iso", Qt::CaseInsensitive) ||
+         _pathname.endsWith(".img", Qt::CaseInsensitive) ||
          QDir(_pathname + "/VIDEO_TS").exists()))
     {
         pn = QString("dvd:%1").arg(_pathname);
@@ -1676,7 +1676,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["yearstars"] = "";
 
     if (!originalAirDate.isValid() ||
-        (!programid.isEmpty() && (programid.left(2) == "MV")))
+        (!programid.isEmpty() && programid.startsWith("MV")))
     {
         progMap["originalairdate"] = "";
         progMap["shortoriginalairdate"] = "";
@@ -2176,13 +2176,13 @@ static ProgramInfoType discover_program_info_type(
         if (fn_lower.startsWith("dvd:") ||
             fn_lower.endsWith(".iso") ||
             fn_lower.endsWith(".img") ||
-            ((pathname.left(1) == "/") &&
+            ((pathname.startsWith("/")) &&
              QDir(pathname + "/VIDEO_TS").exists()))
         {
             pit = kProgramInfoTypeVideoDVD;
         }
         else if (fn_lower.startsWith("bd:") ||
-                 ((pathname.left(1) == "/") &&
+                 ((pathname.startsWith("/")) &&
                   QDir(pathname + "/BDMV").exists()))
         {
             pit = kProgramInfoTypeVideoBD;
@@ -4107,7 +4107,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
             return "";
 
         QString path = GetPlaybackURL(false, true);
-        if (path.left(1) == "/")
+        if (path.startsWith("/"))
         {
             QFileInfo testFile(path);
             return testFile.path();
@@ -4508,7 +4508,7 @@ QString ProgramInfo::i18n(const QString &msg)
 void ProgramInfo::SubstituteMatches(QString &str)
 {
     QString pburl = GetPlaybackURL(false, true);
-    if (pburl.left(7) == "myth://")
+    if (pburl.startsWith("myth://"))
     {
         str.replace(QString("%DIR%"), pburl);
     }

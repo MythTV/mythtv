@@ -3884,7 +3884,7 @@ void PlaybackBox::customEvent(QEvent *event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
-        if (message.left(21) == "RECORDING_LIST_CHANGE")
+        if (message.startsWith("RECORDING_LIST_CHANGE"))
         {
             QStringList tokens = message.simplified().split(" ");
             uint chanid = 0;
@@ -3920,7 +3920,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_programInfoCache.ScheduleLoad();
             }
         }
-        else if (message.left(15) == "NETWORK_CONTROL")
+        else if (message.startsWith("NETWORK_CONTROL"))
         {
             QStringList tokens = message.simplified().split(" ");
             if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
@@ -3948,7 +3948,7 @@ void PlaybackBox::customEvent(QEvent *event)
                                             keyevent);
             }
         }
-        else if (message.left(16) == "UPDATE_FILE_SIZE")
+        else if (message.startsWith("UPDATE_FILE_SIZE"))
         {
             QStringList tokens = message.simplified().split(" ");
             bool ok = false;

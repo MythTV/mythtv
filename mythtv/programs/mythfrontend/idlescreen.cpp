@@ -142,13 +142,13 @@ void IdleScreen::customEvent(QEvent* event)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
 
-        if (me->Message().left(18) == "SHUTDOWN_COUNTDOWN")
+        if (me->Message().startsWith("SHUTDOWN_COUNTDOWN"))
         {
             QString secs = me->Message().mid(19);
             m_secondsToShutdown = secs.toInt();
             UpdateStatus();
         }
-        else if (me->Message().left(12) == "SHUTDOWN_NOW")
+        else if (me->Message().startsWith("SHUTDOWN_NOW"))
         {
             if (gCoreContext->IsFrontendOnly())
             {

@@ -441,8 +441,8 @@ class MPUBLIC BooleanSetting : public Setting
     virtual void setValue(const QString &newValue)
     {
         setValue((newValue=="1" ||
-                  newValue.toLower().left(1)=="y" ||
-                  newValue.toLower().left(1)=="t"));
+                  newValue.toLower().startsWith("y") ||
+                  newValue.toLower().startsWith("t")));
     }
 
   signals:

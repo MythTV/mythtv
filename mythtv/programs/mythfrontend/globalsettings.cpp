@@ -920,7 +920,7 @@ void PlaybackProfileConfig::Save(void)
 
 void PlaybackProfileConfig::pressed(QString cmd)
 {
-    if (cmd.left(4) == "edit")
+    if (cmd.startsWith("edit"))
     {
         uint i = cmd.mid(4).toUInt();
         PlaybackProfileItemConfig itemcfg(items[i]);
@@ -931,7 +931,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         InitLabel(i);
         needs_save = true;
     }
-    else if (cmd.left(3) == "del")
+    else if (cmd.startsWith("del"))
     {
         uint i = cmd.mid(3).toUInt();
         del_items.push_back(items[i]);

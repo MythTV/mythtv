@@ -762,7 +762,7 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
     if (!password.isEmpty() && !checkPinCode(password))
         return true;
 
-    if (action.left(5) == "EXEC ")
+    if (action.startsWith("EXEC "))
     {
         QString rest = action.right(action.length() - 5);
         if (cbs && cbs->exec_program)
@@ -770,13 +770,13 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 
         return false;
     }
-    else if (action.left(7) == "EXECTV ")
+    else if (action.startsWith("EXECTV "))
     {
         QString rest = action.right(action.length() - 7).trimmed();
         if (cbs && cbs->exec_program_tv)
             cbs->exec_program_tv(rest);
     }
-    else if (action.left(5) == "MENU ")
+    else if (action.startsWith("MENU "))
     {
         QString menu = action.right(action.length() - 5);
 
@@ -789,40 +789,40 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
         else
             delete newmenu;
     }
-    else if (action.left(6) == "UPMENU")
+    else if (action.startsWith("UPMENU"))
     {
         m_wantpop = true;
     }
-    else if (action.left(12) == "CONFIGPLUGIN")
+    else if (action.startsWith("CONFIGPLUGIN"))
     {
         QString rest = action.right(action.length() - 13);
         if (cbs && cbs->configplugin)
             cbs->configplugin(rest);
     }
-    else if (action.left(6) == "PLUGIN")
+    else if (action.startsWith("PLUGIN"))
     {
         QString rest = action.right(action.length() - 7);
         if (cbs && cbs->plugin)
             cbs->plugin(rest);
     }
-    else if (action.left(8) == "SHUTDOWN")
+    else if (action.startsWith("SHUTDOWN"))
     {
         if (m_allocedstate)
         {
             m_wantpop = true;
         }
     }
-    else if (action.left(5) == "EJECT")
+    else if (action.startsWith("EJECT"))
     {
         if (cbs && cbs->eject)
             cbs->eject();
     }
-    else if (action.left(5) == "JUMP ")
+    else if (action.startsWith("JUMP "))
     {
         QString rest = action.right(action.length() - 5);
         GetMythMainWindow()->JumpTo(rest, false);
     }
-    else if (action.left(6) == "MEDIA ")
+    else if (action.startsWith("MEDIA "))
     {
         // the format is MEDIA HANDLER URL
         // TODO: allow spaces in the url

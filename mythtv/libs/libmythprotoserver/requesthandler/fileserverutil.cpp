@@ -58,7 +58,7 @@ QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
     else
     {
         result = pginfo->GetPlaybackURL(false, true);
-        if (storePath && result.left(1) == "/")
+        if (storePath && result.startsWith("/"))
             recordingPathCache[cacheKey] = result;
     }
 

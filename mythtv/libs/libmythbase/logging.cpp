@@ -1120,7 +1120,7 @@ int verboseArgParse(QString arg)
         option = (*it).toLower();
         bool reverseOption = false;
 
-        if (option != "none" && option.left(2) == "no")
+        if (option != "none" && option.startsWith("no"))
         {
             reverseOption = true;
             option = option.right(option.length() - 2);

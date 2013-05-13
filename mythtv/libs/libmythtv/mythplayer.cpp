@@ -1046,7 +1046,7 @@ void MythPlayer::InitFilters(void)
         }
         else
         {
-            if ((filters.length() > 1) && (filters.right(1) != ","))
+            if ((filters.length() > 1) && (!filters.endsWith(",")))
                 filters += ",";
             filters += videoFiltersForProgram.mid(1);
         }

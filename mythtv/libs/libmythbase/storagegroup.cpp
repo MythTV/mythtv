@@ -549,7 +549,7 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname,
                                         .toByteArray().constData());
             dirname.replace(QRegExp("^\\s*"), "");
             dirname.replace(QRegExp("\\s*$"), "");
-            if (dirname.right(1) == "/")
+            if (dirname.endsWith("/"))
                 dirname.remove(dirname.length() - 1, 1);
 
             if (dirlist)

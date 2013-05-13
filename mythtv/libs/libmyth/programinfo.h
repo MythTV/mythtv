@@ -320,12 +320,12 @@ class MPUBLIC ProgramInfo
         { return GetProgramInfoType() == kProgramInfoTypeVideoDVD; }
     bool IsVideoBD(void) const
         { return GetProgramInfoType() == kProgramInfoTypeVideoBD; }
-    bool IsLocal(void) const { return pathname.left(1) == "/"
+    bool IsLocal(void) const { return pathname.startsWith("/")
 #ifdef _WIN32
         || pathname.at(1) == ':'
 #endif
             ; }
-    bool IsMythStream(void) const { return pathname.left(7) == "myth://"; }
+    bool IsMythStream(void) const { return pathname.startsWith("myth://"); }
     bool IsPathSet(void) const { return GetBasename() != pathname; }
     bool HasPathname(void) const { return !GetPathname().isEmpty(); }
     bool IsFileReadable(void) const;

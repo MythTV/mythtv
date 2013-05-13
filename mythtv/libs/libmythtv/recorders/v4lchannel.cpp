@@ -158,11 +158,11 @@ static int format_to_mode(const QString &fmt)
     else if (fmt == "NTSC-JP")
         return V4L2_STD_NTSC_M_JP;
         // generics...
-    else if (fmt.left(4) == "NTSC")
+    else if (fmt.startsWith("NTSC"))
         return V4L2_STD_NTSC;
-    else if (fmt.left(4) == "ATSC")
+    else if (fmt.startsWith("ATSC"))
         return V4L2_STD_NTSC; // We've dropped V4L ATSC support...
-    else if (fmt.left(3) == "PAL")
+    else if (fmt.startsWith("PAL"))
         return V4L2_STD_PAL;
     return V4L2_STD_NTSC;
 }

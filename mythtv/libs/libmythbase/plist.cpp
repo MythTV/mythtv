@@ -233,7 +233,7 @@ void PList::ParseBinaryPList(const QByteArray &data)
         .arg(size).arg(data.left(8).data()));
 
     // check plist type & version
-    if ((data.left(6) != MAGIC) ||
+    if ((!data.startsWith(MAGIC)) ||
         (data.mid(MAGIC_SIZE, VERSION_SIZE) != VERSION))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unrecognised start sequence. Corrupt?");

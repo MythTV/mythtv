@@ -493,7 +493,7 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         // ------------------------------------------------------------------
         // Must generate Preview Image, Generate Image and save.
         // ------------------------------------------------------------------
-        if (!pginfo.IsLocal() && sFileName.left(1) == "/")
+        if (!pginfo.IsLocal() && sFileName.startsWith("/"))
             pginfo.SetPathname(sFileName);
 
         if (!pginfo.IsLocal())

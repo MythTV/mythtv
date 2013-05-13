@@ -96,7 +96,7 @@ void StorageGroupEditor::open(QString name)
         if (name.isEmpty())
             return;
 
-        if (name.right(1) != "/")
+        if (!name.endsWith("/"))
             name.append("/");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -118,7 +118,7 @@ void StorageGroupEditor::open(QString name)
         if (result == SGPopup_CANCEL)
             return;
 
-        if (name.right(1) != "/")
+        if (!name.endsWith("/"))
             name.append("/");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -257,7 +257,7 @@ void StorageGroupListEditor::open(QString name)
 {
     lastValue = name;
 
-    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
+    if (name.startsWith("__CREATE_NEW_STORAGE_GROUP__"))
     {
         if (name.length() > 28)
         {
@@ -286,7 +286,7 @@ void StorageGroupListEditor::open(QString name)
 void StorageGroupListEditor::doDelete(void) 
 {
     QString name = listbox->getValue();
-    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
+    if (name.startsWith("__CREATE_NEW_STORAGE_GROUP__"))
         return;
 
     bool is_master_host = gCoreContext->IsMasterHost();

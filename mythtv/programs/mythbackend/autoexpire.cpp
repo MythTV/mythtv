@@ -571,7 +571,7 @@ void AutoExpire::ExpireRecordings(void)
                         // Wasn't found so check locally
                         QString file = GetPlaybackURL(p);
 
-                        if (file.left(1) == "/")
+                        if (file.startsWith("/"))
                         {
                             p->SetPathname(file);
                             p->SetHostname(myHostName);

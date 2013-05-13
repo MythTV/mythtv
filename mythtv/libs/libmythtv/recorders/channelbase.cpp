@@ -1173,7 +1173,7 @@ ChannelBase *ChannelBase::CreateChannel(
     else if ((genOpt.cardtype == "IMPORT") ||
              (genOpt.cardtype == "DEMO") ||
              (genOpt.cardtype == "MPEG" &&
-              genOpt.videodev.toLower().left(5) == "file:"))
+              genOpt.videodev.toLower().startsWith("file:")))
     {
         channel = new DummyChannel(tvrec);
     }

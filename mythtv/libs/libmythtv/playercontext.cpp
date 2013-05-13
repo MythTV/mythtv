@@ -747,7 +747,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
         }
         else
         {
-            if (!filters.isEmpty() && (filters.right(1) != ","))
+            if (!filters.isEmpty() && (!filters.endsWith(",")))
                 filters += ",";
 
             filters += chanFilters.mid(1);

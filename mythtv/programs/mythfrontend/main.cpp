@@ -775,7 +775,7 @@ static void TVMenuCallback(void *data, QString &selection)
     (void)data;
     QString sel = selection.toLower();
 
-    if (sel.left(9) == "settings ")
+    if (sel.startsWith("settings "))
     {
         GetMythUI()->AddCurrentLocation("Setup");
         gCoreContext->ActivateSettingsCache(false);
@@ -786,7 +786,7 @@ static void TVMenuCallback(void *data, QString &selection)
         startTVNormal();
     else if (sel == "tv_watch_live_epg")
         startTVInGuide();
-    else if (sel.left(18) == "tv_watch_recording")
+    else if (sel.startsWith("tv_watch_recording"))
     {
         // use selection here because its case is untouched
         if ((selection.length() > 19) && (selection.mid(18, 1) == " "))
@@ -1000,7 +1000,7 @@ static void TVMenuCallback(void *data, QString &selection)
     else
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
 
-    if (sel.left(9) == "settings " || sel == "video_settings_general")
+    if (sel.startsWith("settings ") || sel == "video_settings_general")
     {
         GetMythUI()->RemoveCurrentLocation();
 

@@ -149,7 +149,7 @@ void WelcomeDialog::customEvent(QEvent *e)
     {
         MythEvent *me = (MythEvent *) e;
 
-        if (me->Message().left(21) == "RECORDING_LIST_CHANGE" ||
+        if (me->Message().startsWith("RECORDING_LIST_CHANGE") ||
             me->Message() == "UPDATE_PROG_INFO")
         {
             LOG(VB_GENERAL, LOG_NOTICE,
@@ -169,7 +169,7 @@ void WelcomeDialog::customEvent(QEvent *e)
                 setPendingRecListUpdate(true);
             }
         }
-        else if (me->Message().left(15) == "SCHEDULE_CHANGE")
+        else if (me->Message().startsWith("SCHEDULE_CHANGE"))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 "MythWelcome received a SCHEDULE_CHANGE event");
@@ -187,7 +187,7 @@ void WelcomeDialog::customEvent(QEvent *e)
                 setPendingSchedUpdate(true);
             }
         }
-        else if (me->Message().left(18) == "SHUTDOWN_COUNTDOWN")
+        else if (me->Message().startsWith("SHUTDOWN_COUNTDOWN"))
         {
 #if 0
             LOG(VB_GENERAL, LOG_NOTICE,
@@ -198,7 +198,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             updateStatusMessage();
             updateScreen();
         }
-        else if (me->Message().left(12) == "SHUTDOWN_NOW")
+        else if (me->Message().startsWith("SHUTDOWN_NOW"))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 "MythWelcome received a SHUTDOWN_NOW event");

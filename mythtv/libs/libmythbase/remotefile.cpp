@@ -268,10 +268,10 @@ bool RemoteFile::DeleteFile(const QString &url)
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.endsWith("#"))
         filename = filename + "#" + qurl.fragment();
 
-    if (filename.left(1) == "/")
+    if (filename.startsWith("/"))
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
@@ -301,10 +301,10 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.endsWith("#"))
         filename = filename + "#" + qurl.fragment();
 
-    if (filename.left(1) == "/")
+    if (filename.startsWith("/"))
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty())
@@ -356,10 +356,10 @@ QString RemoteFile::GetFileHash(const QString &url)
     QString hostname = qurl.host();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.endsWith("#"))
         filename = filename + "#" + qurl.fragment();
 
-    if (filename.left(1) == "/")
+    if (filename.startsWith("/"))
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())
@@ -651,10 +651,10 @@ QDateTime RemoteFile::LastModified(const QString &url)
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
-    if (!qurl.fragment().isEmpty() || url.right(1) == "#")
+    if (!qurl.fragment().isEmpty() || url.endsWith("#"))
         filename = filename + "#" + qurl.fragment();
 
-    if (filename.left(1) == "/")
+    if (filename.startsWith("/"))
         filename = filename.right(filename.length()-1);
 
     if (filename.isEmpty() || sgroup.isEmpty())

@@ -670,13 +670,13 @@ bool ProgFinder::formatSelectedData(QString& data)
 
     if (searchChar == "T")
     {
-        if (data.left(4) != "The " && data.left(2) != "A ")
+        if (!data.startsWith("The ") && !data.startsWith("A "))
         {
              // nothing, use as is
         }
-        else if (data.left(5) == "The T")
+        else if (data.startsWith("The T"))
             data = data.mid(4) + ", The";
-        else if (data.left(3) == "A T")
+        else if (data.startsWith("A T"))
             data = data.mid(2) + ", A";
         else
         {
@@ -686,15 +686,15 @@ bool ProgFinder::formatSelectedData(QString& data)
     }
     else if (searchChar == "A")
     {
-        if (data.left(4) != "The " && data.left(2) != "A ")
+        if (!data.startsWith("The ") && !data.startsWith("A "))
         {
              // nothing, use as is
         }
-        else if (data.left(5) == "The A")
+        else if (data.startsWith("The A"))
             data = data.mid(4) + ", The";
-        else if (data.left(3) == "A A")
+        else if (data.startsWith("A A"))
              data = data.mid(2) + ", A";
-        else if (data.left(4) == "An A")
+        else if (data.startsWith("An A"))
              data = data.mid(3) + ", An";
         else
         {
@@ -704,11 +704,11 @@ bool ProgFinder::formatSelectedData(QString& data)
     }
     else
     {
-        if (data.left(4) == "The ")
+        if (data.startsWith("The "))
             data = data.mid(4) + ", The";
-        else if (data.left(2) == "A ")
+        else if (data.startsWith("A "))
             data = data.mid(2) + ", A";
-        else if (data.left(3) == "An ")
+        else if (data.startsWith("An "))
             data = data.mid(3) + ", An";
     }
 
@@ -721,17 +721,17 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
 
     if (charNum == 29 || charNum == 10)
     {
-        if (data.left(5) == "The T" && charNum == 29)
+        if (data.startsWith("The T") && charNum == 29)
             data = data.mid(4) + ", The";
-        else if (data.left(5) == "The A" && charNum == 10)
+        else if (data.startsWith("The A") && charNum == 10)
             data = data.mid(4) + ", The";
-        else if (data.left(3) == "A T" && charNum == 29)
+        else if (data.startsWith("A T") && charNum == 29)
             data = data.mid(2) + ", A";
-        else if (data.left(3) == "A A" && charNum == 10)
+        else if (data.startsWith("A A") && charNum == 10)
             data = data.mid(2) + ", A";
-        else if (data.left(4) == "An A" && charNum == 10)
+        else if (data.startsWith("An A") && charNum == 10)
              data = data.mid(3) + ", An";
-        else if (data.left(4) != "The " && data.left(2) != "A ")
+        else if (!data.startsWith("The ") && !data.startsWith("A "))
         {
             // use as is
         }
@@ -743,11 +743,11 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
     }
     else
     {
-        if (data.left(4) == "The ")
+        if (data.startsWith("The "))
             data = data.mid(4) + ", The";
-        if (data.left(2) == "A ")
+        if (data.startsWith("A "))
             data = data.mid(2) + ", A";
-        if (data.left(3) == "An ")
+        if (data.startsWith("An "))
             data = data.mid(3) + ", An";
     }
 
@@ -756,9 +756,9 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
 
 void ProgFinder::restoreSelectedData(QString &data)
 {
-    if (data.right(5) == ", The")
+    if (data.endsWith(", The"))
         data = "The " + data.left(data.length() - 5);
-    if (data.right(3) == ", A")
+    if (data.endsWith(", A"))
         data = "A " + data.left(data.length() - 3);
 }
 

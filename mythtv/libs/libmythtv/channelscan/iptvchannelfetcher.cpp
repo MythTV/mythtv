@@ -210,7 +210,7 @@ void IPTVChannelFetcher::SetMessage(const QString &status)
 QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                                              bool inQtThread)
 {
-    if (url.left(4).toLower() == "file")
+    if (url.startsWith("file", Qt::CaseInsensitive))
     {
         QString ret = "";
         QUrl qurl(url);

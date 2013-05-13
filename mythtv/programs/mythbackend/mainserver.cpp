@@ -717,10 +717,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MESSAGE")
     {
-        if ((listline.size() >= 2) && (listline[1].left(11) == "SET_VERBOSE"))
+        if ((listline.size() >= 2) && (listline[1].startsWith("SET_VERBOSE")))
             HandleSetVerbose(listline, pbs);
         else if ((listline.size() >= 2) &&
-                 (listline[1].left(13) == "SET_LOG_LEVEL"))
+                 (listline[1].startsWith("SET_LOG_LEVEL")))
             HandleSetLogLevel(listline, pbs);
         else
             HandleMessage(listline, pbs);
@@ -1001,7 +1001,7 @@ void MainServer::customEvent(QEvent *e)
             broadcast += extra;
         }
 
-        if (me->Message().left(11) == "AUTO_EXPIRE")
+        if (me->Message().startsWith("AUTO_EXPIRE"))
         {
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
@@ -1041,7 +1041,7 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if (me->Message().left(21) == "QUERY_NEXT_LIVETV_DIR" && m_sched)
+        if (me->Message().startsWith("QUERY_NEXT_LIVETV_DIR") && m_sched)
         {
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
@@ -1057,8 +1057,8 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if ((me->Message().left(16) == "DELETE_RECORDING") ||
-            (me->Message().left(22) == "FORCE_DELETE_RECORDING"))
+        if ((me->Message().startsWith("DELETE_RECORDING")) ||
+            (me->Message().startsWith("FORCE_DELETE_RECORDING")))
         {
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
@@ -1090,14 +1090,14 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if (me->Message().left(21) == "RESCHEDULE_RECORDINGS" && m_sched)
+        if (me->Message().startsWith("RESCHEDULE_RECORDINGS") && m_sched)
         {
             QStringList request = me->ExtraDataList();
             m_sched->Reschedule(request);
             return;
         }
 
-        if (me->Message().left(23) == "SCHEDULER_ADD_RECORDING" && m_sched)
+        if (me->Message().startsWith("SCHEDULER_ADD_RECORDING") && m_sched)
         {
             ProgramInfo pi(me->ExtraDataList());
             if (!pi.GetChanID())
@@ -1110,7 +1110,7 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if (me->Message().left(23) == "UPDATE_RECORDING_STATUS" && m_sched)
+        if (me->Message().startsWith("UPDATE_RECORDING_STATUS") && m_sched)
         {
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
@@ -1131,7 +1131,7 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if (me->Message().left(13) == "LIVETV_EXITED")
+        if (me->Message().startsWith("LIVETV_EXITED"))
         {
             QString chainid = me->ExtraData();
             LiveTVChain *chain = GetExistingChain(chainid);
@@ -1144,7 +1144,7 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message() == "CLEAR_SETTINGS_CACHE")
             gCoreContext->ClearSettingsCache();
 
-        if (me->Message().left(14) == "RESET_IDLETIME" && m_sched)
+        if (me->Message().startsWith("RESET_IDLETIME") && m_sched)
             m_sched->ResetIdleTime();
 
         if (me->Message() == "LOCAL_RECONNECT_TO_MASTER")
@@ -1153,11 +1153,11 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message() == "LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE")
             HandleSlaveDisconnectedEvent(*me);
 
-        if (me->Message().left(6) == "LOCAL_")
+        if (me->Message().startsWith("LOCAL_"))
             return;
 
         MythEvent mod_me("");
-        if (me->Message().left(23) == "MASTER_UPDATE_PROG_INFO")
+        if (me->Message().startsWith("MASTER_UPDATE_PROG_INFO"))
         {
             QStringList tokens = me->Message().simplified().split(" ");
             uint chanid = 0;
@@ -1188,7 +1188,7 @@ void MainServer::customEvent(QEvent *e)
             }
         }
 
-        if (me->Message().left(13) == "DOWNLOAD_FILE")
+        if (me->Message().startsWith("DOWNLOAD_FILE"))
         {
             QStringList extraDataList = me->ExtraDataList();
             QString localFile = extraDataList[1];
@@ -1230,7 +1230,7 @@ void MainServer::customEvent(QEvent *e)
         sockListLock.unlock();
 
         bool sendGlobal = false;
-        if (ismaster && broadcast[1].left(7) == "GLOBAL_")
+        if (ismaster && broadcast[1].startsWith("GLOBAL_"))
         {
             broadcast[1].replace("GLOBAL_", "LOCAL_");
             MythEvent me(broadcast[1], broadcast[2]);
@@ -4483,7 +4483,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
              * value using QString::fromUtf8() to prevent corruption. */
             currentDir = QString::fromUtf8(query.value(1)
                                            .toByteArray().constData());
-            if (currentDir.right(1) == "/")
+            if (currentDir.endsWith("/"))
                 currentDir.remove(currentDir.length() - 1, 1);
 
             checkDir.setPath(currentDir);
@@ -6130,14 +6130,14 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
         lpath = lpath.section('/', -1);
 
         QString fpath = lpath;
-        if (fpath.right(4) == ".png")
+        if (fpath.endsWith(".png"))
             fpath = fpath.left(fpath.length() - 4);
 
         ProgramInfo pginfo(fpath);
         if (pginfo.GetChanID())
         {
             QString pburl = GetPlaybackURL(&pginfo);
-            if (pburl.left(1) == "/")
+            if (pburl.startsWith("/"))
             {
                 lpath = pburl.section('/', 0, -2) + "/" + lpath;
                 LOG(VB_FILE, LOG_INFO,

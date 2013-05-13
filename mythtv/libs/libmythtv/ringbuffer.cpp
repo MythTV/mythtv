@@ -150,7 +150,7 @@ RingBuffer *RingBuffer::Create(
 
     if (!stream_only && (dvdurl || dvddir || dvdext))
     {
-        if (lfilename.left(4) == "dvd:")        // URI "dvd:" + path
+        if (lfilename.startsWith("dvd:"))        // URI "dvd:" + path
             lfilename.remove(0,4);              // e.g. "dvd:/dev/dvd"
 
         if (!(mythurl || QFile::exists(lfilename)))
@@ -161,7 +161,7 @@ RingBuffer *RingBuffer::Create(
     }
     else if (!stream_only && (bdurl || bddir))
     {
-        if (lfilename.left(3) == "bd:")        // URI "bd:" + path
+        if (lfilename.startsWith("bd:"))        // URI "bd:" + path
             lfilename.remove(0,3);             // e.g. "bd:/videos/ET"
 
         if (!(mythurl || QFile::exists(lfilename)))

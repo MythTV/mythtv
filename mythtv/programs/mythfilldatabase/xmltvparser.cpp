@@ -85,7 +85,7 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
                 {
                     QString base = baseUrl.toString(QUrl::StripTrailingSlash);
                     chaninfo->icon = base +
-                        ((path.left(1) == "/") ? path : QString("/") + path);
+                        ((path.startsWith("/")) ? path : QString("/") + path);
                 }
                 else if (!path.isEmpty())
                 {

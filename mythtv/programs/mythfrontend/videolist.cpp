@@ -211,7 +211,7 @@ static QString path_to_node_name(const QString &path)
 {
     QString ret;
     int slashLoc = path.lastIndexOf('/', -2) + 1;
-    if (path.right(1) == "/")
+    if (path.endsWith("/"))
         ret = path.mid(slashLoc, path.length() - slashLoc - 1);
     else
         ret = path.mid(slashLoc);

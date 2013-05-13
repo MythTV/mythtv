@@ -1257,7 +1257,7 @@ void NetworkControl::customEvent(QEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(13) == "MUSIC_CONTROL")
+        if (message.startsWith("MUSIC_CONTROL"))
         {
             QStringList tokens = message.simplified().split(" ");
             if ((tokens.size() >= 4) &&
@@ -1271,7 +1271,7 @@ void NetworkControl::customEvent(QEvent *e)
             } 
 
         }
-        else if (message.left(15) == "NETWORK_CONTROL")
+        else if (message.startsWith("NETWORK_CONTROL"))
         {
             QStringList tokens = message.simplified().split(" ");
             if ((tokens.size() >= 3) &&

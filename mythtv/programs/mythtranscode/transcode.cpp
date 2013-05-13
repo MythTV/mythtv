@@ -644,7 +644,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
             }
 
-            if (encodingType.left(4).toLower() == "mpeg")
+            if (encodingType.startsWith("mpeg", Qt::CaseInsensitive))
             {
                 // make sure dimensions are valid for MPEG codecs
                 newHeight = (newHeight + 15) & ~0xF;

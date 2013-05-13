@@ -200,8 +200,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     bool is_local = 
-        (filename.left(4) != "/dev") &&
-        ((filename.left(1) == "/") || QFile::exists(filename));
+        (!filename.startsWith("/dev")) &&
+        ((filename.startsWith("/")) || QFile::exists(filename));
 
     if (is_local)
     {

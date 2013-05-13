@@ -3656,7 +3656,7 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
             ctx->player->ToggleCaptions();
         }
     }
-    else if (action.left(6) == "TOGGLE")
+    else if (action.startsWith("TOGGLE"))
     {
         int type = to_track_type(action.mid(6));
         if (type == kTrackTypeTeletextMenu)
@@ -3666,7 +3666,7 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
         else
             handled = false;
     }
-    else if (action.left(6) == "SELECT")
+    else if (action.startsWith("SELECT"))
     {
         int type = to_track_type(action.mid(6));
         int num = action.section("_", -1).toInt();
@@ -3675,13 +3675,13 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
         else
             handled = false;
     }
-    else if (action.left(4) == "NEXT" || action.left(4) == "PREV")
+    else if (action.startsWith("NEXT") || action.startsWith("PREV"))
     {
-        int dir = (action.left(4) == "NEXT") ? +1 : -1;
+        int dir = (action.startsWith("NEXT")) ? +1 : -1;
         int type = to_track_type(action.mid(4));
         if (type >= kTrackTypeAudio)
             ctx->player->ChangeTrack(type, dir);
-        else if (action.right(2) == "CC")
+        else if (action.endsWith("CC"))
             ctx->player->ChangeCaptionTrack(dir);
         else
             handled = false;
@@ -9315,7 +9315,7 @@ void TV::customEvent(QEvent *e)
     {
         GetStatus();
     }
-    else if (message.left(14) == "DONE_RECORDING")
+    else if (message.startsWith("DONE_RECORDING"))
     {
         int seconds = 0;
         //long long frames = 0;
@@ -9376,7 +9376,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(14) == "ASK_RECORDING ")
+    if (message.startsWith("ASK_RECORDING "))
     {
         int timeuntil = 0, hasrec = 0, haslater = 0;
         if (tokens.size() >= 5)
@@ -9413,7 +9413,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(11) == "QUIT_LIVETV")
+    if (message.startsWith("QUIT_LIVETV"))
     {
         cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
 
@@ -9452,7 +9452,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(12) == "LIVETV_WATCH")
+    if (message.startsWith("LIVETV_WATCH"))
     {
         int watch = 0;
         if (tokens.size() >= 3)
@@ -9493,7 +9493,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(12) == "LIVETV_CHAIN")
+    if (message.startsWith("LIVETV_CHAIN"))
     {
         QString id = QString::null;
         if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
@@ -9513,7 +9513,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(12) == "EXIT_TO_MENU")
+    if (message.startsWith("EXIT_TO_MENU"))
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         for (uint i = 0; mctx && (i < player.size()); i++)
@@ -9528,7 +9528,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(6) == "SIGNAL")
+    if (message.startsWith("SIGNAL"))
     {
         cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
         QStringList signalList = me->ExtraDataList();
@@ -9552,7 +9552,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(15) == "NETWORK_CONTROL")
+    if (message.startsWith("NETWORK_CONTROL"))
     {
         if ((tokens.size() >= 2) &&
             (tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
@@ -9570,17 +9570,17 @@ void TV::customEvent(QEvent *e)
         }
     }
 
-    if (message.left(9) == "START_EPG")
+    if (message.startsWith("START_EPG"))
     {
         int editType = tokens[1].toInt();
         DoEditSchedule(editType);
     }
 
-    if (message.left(11) == "EPG_EXITING" ||
-        message.left(18) == "PROGFINDER_EXITING" ||
-        message.left(21) == "VIEWSCHEDULED_EXITING" ||
-        message.left(19)   == "PLAYBACKBOX_EXITING" ||
-        message.left(22) == "SCHEDULEEDITOR_EXITING")
+    if (message.startsWith("EPG_EXITING") ||
+        message.startsWith("PROGFINDER_EXITING") ||
+        message.startsWith("VIEWSCHEDULED_EXITING") ||
+        message.startsWith("PLAYBACKBOX_EXITING") ||
+        message.startsWith("SCHEDULEEDITOR_EXITING"))
     {
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
@@ -9622,7 +9622,7 @@ void TV::customEvent(QEvent *e)
         isEmbedded = false;
         ignoreKeyPresses = false;
 
-        if (message.left(19) == "PLAYBACKBOX_EXITING")
+        if (message.startsWith("PLAYBACKBOX_EXITING"))
         {
             ProgramInfo pginfo(me->ExtraDataList());
             if (pginfo.HasPathname() || pginfo.GetChanID())
@@ -9633,7 +9633,7 @@ void TV::customEvent(QEvent *e)
 
     }
 
-    if (message.left(14) == "COMMFLAG_START" && (tokens.size() >= 2))
+    if (message.startsWith("COMMFLAG_START") && (tokens.size() >= 2))
     {
         uint evchanid = 0;
         QDateTime evrecstartts;
@@ -9660,7 +9660,7 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(15) == "COMMFLAG_UPDATE" && (tokens.size() >= 3))
+    if (message.startsWith("COMMFLAG_UPDATE") && (tokens.size() >= 3))
     {
         uint evchanid = 0;
         QDateTime evrecstartts;
@@ -10696,7 +10696,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         EnableUpmix(actx, true);
     else if (action == ACTION_DISABLEUPMIX)
         EnableUpmix(actx, false);
-    else if (action.left(13) == "ADJUSTSTRETCH")
+    else if (action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead;
         float stretch = action.right(action.length() - 13).toFloat(&floatRead);
@@ -10714,7 +10714,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
 
         ChangeTimeStretch(actx, 0, !floatRead);   // just display
     }
-    else if (action.left(11) == "SELECTSCAN_")
+    else if (action.startsWith("SELECTSCAN_"))
     {
         QString msg = QString::null;
         actx->LockDeletePlayer(__FILE__, __LINE__);
@@ -10725,7 +10725,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         if (!msg.isEmpty())
             SetOSDMessage(actx, msg);
     }
-    else if (action.left(15) == ACTION_TOGGELAUDIOSYNC)
+    else if (action.startsWith(ACTION_TOGGELAUDIOSYNC))
         ChangeAudioSync(actx, 0);
     else if (action == ACTION_TOGGLESUBTITLEZOOM)
         ChangeSubtitleZoom(actx, 0);
@@ -10737,17 +10737,17 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         EnableVisualisation(actx, true);
     else if (action == ACTION_DISABLEVISUALISATION)
         EnableVisualisation(actx, false);
-    else if (action.left(11) == ACTION_TOGGLESLEEP)
+    else if (action.startsWith(ACTION_TOGGLESLEEP))
     {
         ToggleSleepTimer(actx, action.left(13));
     }
-    else if (action.left(17) == "TOGGLEPICCONTROLS")
+    else if (action.startsWith("TOGGLEPICCONTROLS"))
     {
         adjustingPictureAttribute = (PictureAttribute)
             (action.right(1).toInt() - 1);
         DoTogglePictureAttribute(actx, kAdjustingPicture_Playback);
     }
-    else if (action.left(18) == ACTION_TOGGLESTUDIOLEVELS)
+    else if (action.startsWith(ACTION_TOGGLESTUDIOLEVELS))
     {
         DoToggleStudioLevels(actx);
     }
@@ -10755,12 +10755,12 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     {
         DoToggleNightMode(actx);
     }
-    else if (action.left(12) == "TOGGLEASPECT")
+    else if (action.startsWith("TOGGLEASPECT"))
     {
         ToggleAspectOverride(actx,
                              (AspectOverrideMode) action.right(1).toInt());
     }
-    else if (action.left(10) == "TOGGLEFILL")
+    else if (action.startsWith("TOGGLEFILL"))
     {
         ToggleAdjustFill(actx, (AdjustFillMode) action.right(1).toInt());
     }
@@ -10770,7 +10770,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (action == ACTION_GUIDE)
         EditSchedule(actx, kScheduleProgramGuide);
-    else if (action.left(10) == "CHANGROUP_" && db_use_channel_groups)
+    else if (action.startsWith("CHANGROUP_") && db_use_channel_groups)
     {
         if (action == "CHANGROUP_ALL_CHANNELS")
         {
@@ -10859,7 +10859,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             browsehelper->BrowseStart(actx);
         else if (action == "PREVCHAN")
             PopPreviousChannel(actx, true);
-        else if (action.left(14) == "SWITCHTOINPUT_")
+        else if (action.startsWith("SWITCHTOINPUT_"))
         {
             switchToInputId = action.mid(14).toUInt();
             QMutexLocker locker(&timerIdLock);
@@ -10897,17 +10897,17 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 actx->player->GoToMenu(menu);
             actx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
-        else if (action.left(13) == ACTION_JUMPCHAPTER)
+        else if (action.startsWith(ACTION_JUMPCHAPTER))
         {
             int chapter = action.right(3).toInt();
             DoJumpChapter(actx, chapter);
         }
-        else if (action.left(11) == ACTION_SWITCHTITLE)
+        else if (action.startsWith(ACTION_SWITCHTITLE))
         {
             int title = action.right(3).toInt();
             DoSwitchTitle(actx, title);
         }
-        else if (action.left(13) == ACTION_SWITCHANGLE)
+        else if (action.startsWith(ACTION_SWITCHANGLE))
         {
             int angle = action.right(3).toInt();
             DoSwitchAngle(actx, angle);
@@ -10919,7 +10919,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire(actx);
-        else if (action.left(14) == "TOGGLECOMMSKIP")
+        else if (action.startsWith("TOGGLECOMMSKIP"))
             SetAutoCommercialSkip(
                 actx, (CommSkipMode)(action.right(1).toInt()));
         else if (action == "QUEUETRANSCODE")
@@ -12355,7 +12355,7 @@ bool TV::HandleJumpToProgramAction(
     QStringList::const_iterator it = actions.begin();
     for (; it != actions.end(); ++it)
     {
-        if ((*it).left(8) != "JUMPPROG")
+        if (!(*it).startsWith("JUMPPROG"))
             continue;
 
         const QString &action = *it;

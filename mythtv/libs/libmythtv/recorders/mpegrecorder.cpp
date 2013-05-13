@@ -185,24 +185,24 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audvolume")
         audvolume = value;
-    else if (opt.right(16) == "_mpeg4avgbitrate")
+    else if (opt.endsWith("_mpeg4avgbitrate"))
     {
-        if (opt.left(3) == "low")
+        if (opt.startsWith("low"))
             low_mpeg4avgbitrate = value;
-        else if (opt.left(6) == "medium")
+        else if (opt.startsWith("medium"))
             medium_mpeg4avgbitrate = value;
-        else if (opt.left(4) == "high")
+        else if (opt.startsWith("high"))
             high_mpeg4avgbitrate = value;
         else
             V4LRecorder::SetOption(opt, value);
     }
-    else if (opt.right(17) == "_mpeg4peakbitrate")
+    else if (opt.endsWith("_mpeg4peakbitrate"))
     {
-        if (opt.left(3) == "low")
+        if (opt.startsWith("low"))
             low_mpeg4peakbitrate = value;
-        else if (opt.left(6) == "medium")
+        else if (opt.startsWith("medium"))
             medium_mpeg4peakbitrate = value;
-        else if (opt.left(4) == "high")
+        else if (opt.startsWith("high"))
             high_mpeg4peakbitrate = value;
         else
             V4LRecorder::SetOption(opt, value);
@@ -296,7 +296,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)audiodev;
     (void)vbidev;
 
-    if (videodev.toLower().left(5) == "file:")
+    if (videodev.toLower().startsWith("file:"))
     {
         deviceIsMpegFile = true;
         bufferSize = 64000;
@@ -755,7 +755,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     // Set controls
     if (driver != "hdpvr")
     {
-        if (driver.left(7) != "saa7164")
+        if (!driver.startsWith("saa7164"))
         {
             add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
                          GetFilteredAudioSampleRate());
@@ -783,7 +783,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     }
     maxbitrate = std::max(maxbitrate, bitrate);
 
-    if (driver == "hdpvr" || driver.left(7) == "saa7164")
+    if (driver == "hdpvr" || driver.startsWith("saa7164"))
     {
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
                      (maxbitrate == bitrate) ?

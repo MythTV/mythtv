@@ -244,7 +244,7 @@ void BrowserApi::customEvent(QEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(13) != "MUSIC_CONTROL")
+        if (!message.startsWith("MUSIC_CONTROL"))
             return;
 
         QStringList tokens = message.simplified().split(" ");

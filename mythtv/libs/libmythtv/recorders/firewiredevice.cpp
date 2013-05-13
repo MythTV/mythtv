@@ -230,12 +230,12 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     // the PACE is obviously not a Motorola channel changer, but the
     // same commands work for it as the Motorola.
-    bool is_mot = ((panel_model.toUpper().left(4) == "DCT-") ||
-                   (panel_model.toUpper().left(4) == "DCH-") ||
-                   (panel_model.toUpper().left(4) == "DCX-") ||
-                   (panel_model.toUpper().left(4) == "QIP-") ||
-                   (panel_model.toUpper().left(4) == "MOTO") ||
-                   (panel_model.toUpper().left(5) == "PACE-"));
+    bool is_mot = ((panel_model.toUpper().startsWith("DCT-")) ||
+                   (panel_model.toUpper().startsWith("DCH-")) ||
+                   (panel_model.toUpper().startsWith("DCX-")) ||
+                   (panel_model.toUpper().startsWith("QIP-")) ||
+                   (panel_model.toUpper().startsWith("MOTO")) ||
+                   (panel_model.toUpper().startsWith("PACE-")));
 
     if (is_mot && !alt_method)
     {

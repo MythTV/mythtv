@@ -223,7 +223,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
         return "";
 
     QString pburl = pginfo.GetPlaybackURL(true);
-    if (pburl.left(1) != "/")
+    if (!pburl.startsWith("/"))
         return "";
 
     QString basename(query.value(0).toString());

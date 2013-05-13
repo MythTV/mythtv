@@ -959,7 +959,7 @@ void wrapList(QStringList &list, int width)
         QString left   = string.left(width);
         bool inserted  = false;
 
-        while( !inserted && left.right(1) != " " )
+        while( !inserted && !left.endsWith(" " ))
         {
             if( string.mid(left.size(), 1) == " " )
             {

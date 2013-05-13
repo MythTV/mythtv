@@ -541,7 +541,7 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isEmpty() || outfile != "-") &&
+    if (infile.startsWith("myth://") && (outfile.isEmpty() || outfile != "-") &&
         fifodir.isEmpty() && !cmdline.toBool("hls") && !cmdline.toBool("avf"))
     {
         LOG(VB_GENERAL, LOG_ERR,

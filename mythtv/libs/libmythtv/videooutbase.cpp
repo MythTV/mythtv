@@ -1871,7 +1871,7 @@ int VideoOutput::CalcHueBase(const QString &adaptor_name)
     {
         hue_adj = 50;
     }
-    else if (adaptor_name.left(4) == "NV17") /* nVidia */
+    else if (adaptor_name.startsWith("NV17")) /* nVidia */
     {
         hue_adj = 0;
     }

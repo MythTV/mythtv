@@ -722,7 +722,7 @@ bool PreviewGenerator::IsLocal(void) const
 {
     QString tmppathname = pathname;
 
-    if (tmppathname.left(4) == "dvd:")
+    if (tmppathname.startsWith("dvd:"))
         tmppathname = tmppathname.section(":", 1, 1);
 
     if (!QFileInfo(tmppathname).isReadable())
@@ -779,7 +779,7 @@ char *PreviewGenerator::GetScreenGrab(
     }
 
     // pre-test local files for existence and size. 500 ms speed-up...
-    if (filename.left(1)=="/")
+    if (filename.startsWith("/"))
     {
         QFileInfo info(filename);
         bool invalid = (!info.exists() || !info.isReadable() ||

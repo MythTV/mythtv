@@ -856,7 +856,7 @@ QString UPnpDevice::toString(uint padding) const
     }
 
     // remove trailing newline
-    if (ret.right(1)=="\n")
+    if (ret.endsWith("\n"))
         ret = ret.left(ret.length()-1);
 
     // add any padding as necessary

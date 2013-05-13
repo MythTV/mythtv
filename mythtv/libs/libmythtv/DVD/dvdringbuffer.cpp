@@ -38,11 +38,11 @@ DVDInfo::DVDInfo(const QString &filename)
 {
     LOG(VB_PLAYBACK, LOG_INFO, QString("DVDInfo: Trying %1").arg(filename));
     QString name = filename;
-    if (name.left(6) == "dvd://")
+    if (name.startsWith("dvd://"))
         name.remove(0,5);
-    else if (name.left(5) == "dvd:/")
+    else if (name.startsWith("dvd:/"))
         name.remove(0,4);
-    else if (name.left(4) == "dvd:")
+    else if (name.startsWith("dvd:"))
         name.remove(0,4);
 
     QByteArray fname = name.toLocal8Bit();
