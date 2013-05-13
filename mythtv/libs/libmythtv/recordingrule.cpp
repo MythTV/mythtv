@@ -510,6 +510,16 @@ bool RecordingRule::Delete(bool sendSig)
         MythDB::DBError("ScheduledRecording::remove -- oldfind", query);
     }
 
+    if (m_searchType == kManualSearch)
+    {
+        query.prepare("DELETE FROM program WHERE manualid = :RECORDID");
+        query.bindValue(":RECORDID", m_recordID);
+        if (!query.exec())
+        {
+            MythDB::DBError("ScheduledRecording::remove -- oldfind", query);
+        }
+    }
+
     if (sendSig)
         ScheduledRecording::RescheduleMatch(m_recordID, 0, 0, QDateTime(),
             QString("DeleteRule %1").arg(m_title));
