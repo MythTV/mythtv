@@ -11474,9 +11474,9 @@ bool TV::MenuDisplayItem(const MenuItemContext &c)
                     QString name = CardUtil::GetDisplayName(inputs[i].inputid);
                     if (name.isEmpty())
                     {
-                        name = tr("C", "Card") + ":" +
-                            QString::number(*it) + " " +
-                            tr("I", "Input") + ":" + inputs[i].name;
+                        //: Playback OSD menu - Live TV input selection
+                        name = tr("C:%1 I:%2", "C=CardID, I=InputName")
+                            .arg(QString::number(*it)).arg(inputs[i].name);
                     }
 
                     QString action = prefix +
