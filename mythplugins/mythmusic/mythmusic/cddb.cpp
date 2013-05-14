@@ -12,12 +12,7 @@
 #include <mythversion.h>
 #include <mythlogging.h>
 #include <mythcontext.h>
-#ifdef USING_HTTPCOMMS
-#error httpcomms is no longer supported
-#include <httpcomms.h>
-#else
 #include "mythdownloadmanager.h"
-#endif
 
 /*
  * CDDB protocol docs:
@@ -119,24 +114,22 @@ bool Cddb::Query(Matches& res, const Toc& toc)
 
     // Construct query
     // cddb query discid ntrks off1 off2 ... nsecs
-    QString URL2 = URL +
-        QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
+    QString URL2 = URL + QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
+
     for (unsigned t = 0; t < totalTracks; ++t)
         URL2 += QString("%1+").arg(msf2lsn(toc[t]));
+
     URL2 += QString::number(secs);
 
     // Send the request
     URL2 += "&hello=" + helloID() + "&proto=5";
     LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL2);
-#ifdef USING_HTTPCOMMS
-    QString cddb = HttpComms::getHttp(URL2);
-#else
+
     QString cddb;
-    { QByteArray data;
+    QByteArray data;
     if (!GetMythDownloadManager()->download(URL2, &data))
         return false;
-    cddb = data; }
-#endif
+    cddb = data;
 
     // Check returned status
     const uint stat = cddb.left(3).toUInt(); // Extract 3 digit status:
@@ -204,23 +197,20 @@ bool Cddb::Query(Matches& res, const Toc& toc)
 // static
 bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
 {
-     // Is it cached?
+    // Is it cached?
     if (Dbase::Search(album, genre.toLower(), discID))
         return true;
 
-   // Lookup the details...
+    // Lookup the details...
     QString URL2 = URL + QString("cddb+read+") + genre.toLower() +
         QString("+%1").arg(discID,0,16) + "&hello=" + helloID() + "&proto=5";
     LOG(VB_MEDIA, LOG_INFO, "CDDB read: " + URL2);
-#ifdef USING_HTTPCOMMS
-    QString cddb = HttpComms::getHttp(URL2);
-#else
+
     QString cddb;
-    { QByteArray data;
+    QByteArray data;
     if (!GetMythDownloadManager()->download(URL2, &data))
         return false;
-    cddb = data; }
-#endif
+    cddb = data;
 
     // Check returned status
     const uint stat = cddb.left(3).toUInt(); // Get 3 digit status:
