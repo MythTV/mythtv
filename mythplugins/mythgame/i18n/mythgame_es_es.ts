@@ -207,22 +207,22 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gameui.cpp" line="153"/>
         <source>All Games</source>
-        <translation>Todos los Juegos</translation>
+        <translation>Todos los juegos</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="158"/>
         <source>-   By Genre</source>
-        <translation>- Por Género</translation>
+        <translation>- Por género</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="163"/>
         <source>-   By Year</source>
-        <translation>- Por Año</translation>
+        <translation>- Por año</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="168"/>
         <source>-   By Name</source>
-        <translation>- Por Nombre</translation>
+        <translation>- Por nombre</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="173"/>
@@ -234,7 +234,7 @@ Remove it from the database?</source>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
-        <translation>Elegir Sistema para:
+        <translation>Elegir sistema para:
 %1</translation>
     </message>
     <message>
@@ -246,37 +246,37 @@ Remove it from the database?</source>
         <location filename="../mythgame/gameui.cpp" line="440"/>
         <location filename="../mythgame/gameui.cpp" line="520"/>
         <source>Scan For Changes</source>
-        <translation>Buscar Cambios</translation>
+        <translation>Buscar cambios</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="446"/>
         <location filename="../mythgame/gameui.cpp" line="524"/>
         <source>Show Information</source>
-        <translation>Mostrar Información</translation>
+        <translation>Mostrar información</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="448"/>
         <location filename="../mythgame/gameui.cpp" line="529"/>
         <source>Remove Favorite</source>
-        <translation>Eliminar Favorito</translation>
+        <translation>Eliminar favorito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="450"/>
         <location filename="../mythgame/gameui.cpp" line="528"/>
         <source>Make Favorite</source>
-        <translation>Marcar como Favorito</translation>
+        <translation>Marcar como favorito</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="451"/>
         <location filename="../mythgame/gameui.cpp" line="533"/>
         <source>Retrieve Details</source>
-        <translation>Obtener Detalles</translation>
+        <translation>Obtener detalles</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="452"/>
         <location filename="../mythgame/gameui.cpp" line="516"/>
         <source>Edit Details</source>
-        <translation>Editar Detalles</translation>
+        <translation>Editar detalles</translation>
     </message>
     <message>
         <location filename="../mythgame/gameui.cpp" line="924"/>
@@ -287,7 +287,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gameui.cpp" line="480"/>
         <source>Game Search</source>
-        <translation>Búsqueda de Juegos</translation>
+        <translation>Búsqueda de juegos</translation>
     </message>
 </context>
 <context>
@@ -343,12 +343,12 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="68"/>
         <source>Indepth Game Scan</source>
-        <translation>Búsqueda Intensiva de Juegos</translation>
+        <translation>Búsqueda intensiva de juegos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="70"/>
         <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA, esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
+        <translation>Activarlo hace que la búsqueda de juegos recopile los valores CRC e intente obtener información más detallada sobre el juego: NOTA:  esto puede incrementar mucho el tiempo de exploración, dependiendo de la cantidad de juegos analizados.</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="82"/>
@@ -363,7 +363,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="94"/>
         <source>Display Files Names in Game Tree</source>
-        <translation>Mostrar nombres de archivo en el Árbol de Juegos</translation>
+        <translation>Mostrar nombres de archivo en el arbol de juegos</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="96"/>
@@ -421,12 +421,12 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="347"/>
         <source>(New Game Player)</source>
-        <translation>(Nuevo Emulador)</translation>
+        <translation>(Nuevo emulador)</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="372"/>
         <source>Game Player Menu</source>
-        <translation>Menú Jugador</translation>
+        <translation>Menú del emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="373"/>
@@ -441,12 +441,12 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="397"/>
         <source>Are you sure you want to delete this item?</source>
-        <translation>¿Seguro de borrar este elemento?</translation>
+        <translation>¿Seguro que desea eliminar este elemento?</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="399"/>
         <source>Yes, delete It</source>
-        <translation>Sí, bórralo</translation>
+        <translation>Sí, elimínalo</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="400"/>
@@ -456,7 +456,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="332"/>
         <source>Game Players</source>
-        <translation>Número jugadores</translation>
+        <translation>Emuladores</translation>
     </message>
 </context>
 <context>
@@ -505,7 +505,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="264"/>
         <source>Working Directory</source>
-        <translation>Directorio de Trabajo</translation>
+        <translation>Directorio de trabajo</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="265"/>
@@ -515,7 +515,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="277"/>
         <source>File Extensions</source>
-        <translation>Extensiones de Archivo</translation>
+        <translation>Extensiones de archivo</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="278"/>
@@ -525,7 +525,7 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="293"/>
         <source>Game Player Setup</source>
-        <translation>Configuración del Emulador</translation>
+        <translation>Configuración del emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="312"/>
@@ -537,12 +537,12 @@ Remove it from the database?</source>
     <message>
         <location filename="../mythgame/gamesettings.h" line="110"/>
         <source>Player Name</source>
-        <translation>Nombre del Emulador</translation>
+        <translation>Nombre del emulador</translation>
     </message>
     <message>
         <location filename="../mythgame/gamesettings.h" line="111"/>
         <source>Name of this Game and or Emulator</source>
-        <translation>Nombre de este Juego y/o Emulador</translation>
+        <translation>Nombre de este juego y/o emulador</translation>
     </message>
 </context>
 <context>
@@ -580,12 +580,12 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Edit Game Information</source>
-        <translation>Editar Información del Juego</translation>
+        <translation>Editar información del juego</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Game Name:</source>
-        <translation>Nombre del Juego:</translation>
+        <translation>Nombre del juego:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -595,12 +595,12 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="22"/>
         <source>Publisher:</source>
-        <translation>Publicado Por:</translation>
+        <translation>Publicado por:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Plot:</source>
-        <translation>Trama:</translation>
+        <translation>Argumento:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
@@ -630,7 +630,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Released %1</source>
-        <translation>Publicado %1</translation>
+        <translation>Publicado en %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
@@ -645,7 +645,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Edit Metadata</source>
-        <translation>Editar Metadatos</translation>
+        <translation>Editar metadatos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -665,7 +665,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Game is a Favorite</source>
-        <translation>Este juego es Favorito</translation>
+        <translation>Este juego es favorito</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
@@ -715,7 +715,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Filename:</source>
-        <translation>Nombre de Archivo:</translation>
+        <translation>Nombre de archivo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -746,7 +746,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>No Plot.</source>
-        <translation>Sin Trama.</translation>
+        <translation>Sin argumento.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
@@ -761,7 +761,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Game Information</source>
-        <translation>Información del Juego</translation>
+        <translation>Información del juego</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -771,7 +771,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>General Settings</source>
-        <translation>Configuración General</translation>
+        <translation>Configuración general</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
@@ -791,7 +791,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Scan for Games</source>
-        <translation>Buscar Juegos</translation>
+        <translation>Buscar juegos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -801,7 +801,7 @@ Remove it from the database?</source>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Clear Game Data</source>
-        <translation>Eliminar Datos de los Juegos</translation>
+        <translation>Eliminar datos de los juegos</translation>
     </message>
 </context>
 </TS>
