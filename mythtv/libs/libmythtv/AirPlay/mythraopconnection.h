@@ -157,7 +157,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     uint64_t        m_currentTimestamp;
     uint16_t        m_nextSequence;
     uint64_t        m_nextTimestamp;
-    uint64_t        m_bufferLength;
+    int64_t         m_bufferLength;
     uint64_t        m_timeLastSync;
     int64_t         m_cardLatency;
     int64_t         m_adjustedLatency;
