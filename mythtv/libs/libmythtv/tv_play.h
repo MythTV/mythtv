@@ -152,14 +152,18 @@ enum MenuShowContext {
     kMenuShowAlways
 };
 
+class MenuBase;
+
 class MenuItemContext
 {
 public:
     // Constructor for a menu element.
-    MenuItemContext(const QDomNode &node,
+    MenuItemContext(const MenuBase &menu,
+                    const QDomNode &node,
                     const QString &menuName,
                     bool setCurrentActive,
                     bool doDisplay) :
+        m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryMenu),
         m_menuName(menuName),
@@ -169,12 +173,14 @@ public:
         m_actionText(""),
         m_doDisplay(doDisplay) {}
     // Constructor for an item element.
-    MenuItemContext(const QDomNode &node,
+    MenuItemContext(const MenuBase &menu,
+                    const QDomNode &node,
                     MenuShowContext showContext,
                     bool setCurrentActive,
                     const QString &action,
                     const QString &actionText,
                     bool doDisplay) :
+        m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryItem),
         m_menuName(""),
@@ -184,11 +190,13 @@ public:
         m_actionText(actionText),
         m_doDisplay(doDisplay) {}
     // Constructor for an itemlist element.
-    MenuItemContext(const QDomNode &node,
+    MenuItemContext(const MenuBase &menu,
+                    const QDomNode &node,
                     MenuShowContext showContext,
                     bool setCurrentActive,
                     const QString &action,
                     bool doDisplay) :
+        m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryItemlist),
         m_menuName(""),
@@ -197,44 +205,53 @@ public:
         m_action(action),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
+    const MenuBase &m_menu;
     const QDomNode &m_node;
-    MenuCategory m_category;
-    const QString m_menuName;
+    MenuCategory    m_category;
+    const QString   m_menuName;
     MenuShowContext m_showContext;
-    bool m_setCurrentActive;
-    const QString m_action;
-    const QString m_actionText;
-    bool m_doDisplay;
+    bool            m_setCurrentActive;
+    const QString   m_action;
+    const QString   m_actionText;
+    bool            m_doDisplay;
+};
+
+class MenuItemDisplayer
+{
+public:
+    virtual bool MenuItemDisplay(const MenuItemContext &c) = 0;
 };
 
 class MenuBase
 {
 public:
-    MenuBase() : m_menuDocument(NULL), m_translationContext(""),
+    MenuBase() : m_document(NULL), m_translationContext(""),
                  m_recursionLevel(0) {}
     ~MenuBase();
-    bool MenuLoadFromFile(const QString &filename, const QString &menuname,
-                          const char *translationContext,
-                          const QString &keyBindingContext);
-    bool MenuIsLoaded(void) const { return (m_menuDocument != NULL); }
-    QDomElement MenuGetRoot(void) const;
-    QString MenuTranslate(const QString &text) const;
-    virtual void MenuShow(const QDomNode &node, const QDomNode &selected) {
-        MenuShowHelper(node, selected, true);
+    bool        Load(const QString &filename,
+                     const QString &menuname,
+                     const char *translationContext,
+                     const QString &keyBindingContext);
+    bool        IsLoaded(void) const { return (m_document != NULL); }
+    QDomElement GetRoot(void) const;
+    QString     Translate(const QString &text) const;
+    bool        Show(const QDomNode &node, const QDomNode &selected,
+                     MenuItemDisplayer &displayer,
+                     bool doDisplay = true) const;
+    QString     GetName(void) const { return m_menuName; }
+    const char *GetTranslationContext(void) const {
+        return m_translationContext;
     }
-protected:
-    virtual bool MenuShowHelper(const QDomNode &node,
-                                const QDomNode &selected,
-                                bool doDisplay);
-    virtual bool MenuDisplayItem(const MenuItemContext &c) { return false; }
-    virtual void MenuStrings(void) const {}
-    QDomDocument *m_menuDocument;
-    QString m_menuName;
-    const char *m_translationContext;
-    QString m_keyBindingContext;
+    const QString &GetKeyBindingContext(void) const {
+        return m_keyBindingContext;
+    }
 private:
-    void MenuProcessIncludes(QDomElement &root);
-    int m_recursionLevel; // guard against infinite recursion
+    void ProcessIncludes(QDomElement &root);
+    QDomDocument *m_document;
+    const char   *m_translationContext;
+    QString       m_menuName;
+    QString       m_keyBindingContext;
+    int           m_recursionLevel; // guard against infinite recursion
 };
 
 /**
@@ -255,7 +272,7 @@ private:
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject, public MenuBase
+class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 {
     friend class PlaybackBox;
     friend class GuideGrid;
@@ -710,11 +727,12 @@ class MTV_PUBLIC TV : public QObject, public MenuBase
     void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString category = "",
                               int level = 0, const QString selected = "");
 
-    virtual void MenuShow(const QDomNode &node, const QDomNode &selected);
-    virtual bool MenuDisplayItem(const MenuItemContext &c);
-    virtual void MenuInit(void);
-    virtual void MenuDeinit(void);
-    virtual void MenuStrings(void) const;
+    void PlaybackMenuShow(const MenuBase &menu,
+                          const QDomNode &node, const QDomNode &selected);
+    virtual bool MenuItemDisplay(const MenuItemContext &c);
+    void PlaybackMenuInit(void);
+    void PlaybackMenuDeinit(void);
+    void MenuStrings(void) const;
     void MenuLazyInit(void *field);
 
     // LCD
@@ -1014,6 +1032,7 @@ class MTV_PUBLIC TV : public QObject, public MenuBase
     QVariant m_tvm_jumprec_back_hack;
     // End of playback menu state caching
 
+    MenuBase m_playbackMenu;
     MenuBase m_compactMenu;
 
   public:
