@@ -697,7 +697,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Program editing support
     void ShowOSDCutpoint(PlayerContext *ctx, const QString &type);
-    bool HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame);
+    bool HandleOSDCutpoint(PlayerContext *ctx, QString action);
     void StartProgramEditMode(PlayerContext*);
 
     // Already editing dialog

@@ -8,8 +8,6 @@
 #include "playercontext.h"
 #include "mythtvexp.h"
 
-class DeleteMap;
-
 typedef struct DeleteMapUndoEntry
 {
     frm_dir_map_t deleteMap;
@@ -31,7 +29,7 @@ class MTV_PUBLIC DeleteMap
     }
 
     void SetPlayerContext(PlayerContext *ctx) { m_ctx = ctx; }
-    bool HandleAction(QString &action, uint64_t frame, uint64_t played);
+    bool HandleAction(QString &action, uint64_t frame);
     float GetSeekAmount(void) const { return m_seekamount; }
     void UpdateSeekAmount(int change);
     void SetSeekAmount(float amount) { m_seekamount = amount; }

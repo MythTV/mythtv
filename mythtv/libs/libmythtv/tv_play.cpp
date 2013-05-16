@@ -3794,8 +3794,8 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                     handled = true;
                 }
                 else
-                    handled |= actx->player->HandleProgramEditorActions(
-                                                      actions, current_frame);
+                    handled |=
+                        actx->player->HandleProgramEditorActions(actions);
             }
         }
         if (handled)
@@ -10025,60 +10025,47 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
                 if (previous_cut > 0)
                     osd->DialogAddButton(QObject::tr("Move Previous Cut End "
                                                      "Here"),
-                                         QString("DIALOG_CUTPOINT_MOVEPREV_%1")
-                                                 .arg(frame));
+                                         QString("DIALOG_CUTPOINT_MOVEPREV_0"));
                 else
                     osd->DialogAddButton(QObject::tr("Cut to Beginning"),
-                                   QString("DIALOG_CUTPOINT_CUTTOBEGINNING_%1")
-                                           .arg(frame));
+                                   QString("DIALOG_CUTPOINT_CUTTOBEGINNING_0"));
 
                 if (next_cut == total_frames)
                     osd->DialogAddButton(QObject::tr("Cut to End"),
-                                         QString("DIALOG_CUTPOINT_CUTTOEND_%1")
-                                                 .arg(frame));
+                                         QString("DIALOG_CUTPOINT_CUTTOEND_0"));
                 else
                     osd->DialogAddButton(QObject::tr("Move Next Cut Start "
                                                      "Here"),
-                                         QString("DIALOG_CUTPOINT_MOVENEXT_%1")
-                                                 .arg(frame));
+                                         QString("DIALOG_CUTPOINT_MOVENEXT_0"));
             }
             else
             {
                 osd->DialogAddButton(QObject::tr("Move Start of Cut Here"),
-                                     QString("DIALOG_CUTPOINT_MOVEPREV_%1")
-                                             .arg(frame));
+                                     QString("DIALOG_CUTPOINT_MOVEPREV_0"));
                 osd->DialogAddButton(QObject::tr("Move End of Cut Here"),
-                                     QString("DIALOG_CUTPOINT_MOVENEXT_%1")
-                                             .arg(frame));
+                                     QString("DIALOG_CUTPOINT_MOVENEXT_0"));
             }
             osd->DialogAddButton(QObject::tr("Delete This Cut"),
-                                 QString("DIALOG_CUTPOINT_DELETE_%1")
-                                         .arg(frame));
+                                 QString("DIALOG_CUTPOINT_DELETE_0"));
         }
         else
         {
             if (previous_cut > 0)
                 osd->DialogAddButton(QObject::tr("Move Previous Cut End Here"),
-                                     QString("DIALOG_CUTPOINT_MOVEPREV_%1")
-                                             .arg(frame));
+                                     QString("DIALOG_CUTPOINT_MOVEPREV_0"));
             else
                 osd->DialogAddButton(QObject::tr("Cut to Beginning"),
-                                  QString("DIALOG_CUTPOINT_CUTTOBEGINNING_%1")
-                                          .arg(frame));
+                                     QString("DIALOG_CUTPOINT_CUTTOBEGINNING_0"));
             if (next_cut == total_frames)
                 osd->DialogAddButton(QObject::tr("Cut to End"),
-                                     QString("DIALOG_CUTPOINT_CUTTOEND_%1")
-                                             .arg(frame));
+                                     QString("DIALOG_CUTPOINT_CUTTOEND_0"));
             else
                 osd->DialogAddButton(QObject::tr("Move Next Cut Start Here"),
-                                     QString("DIALOG_CUTPOINT_MOVENEXT_%1")
-                                             .arg(frame));
+                                     QString("DIALOG_CUTPOINT_MOVENEXT_0"));
             osd->DialogAddButton(QObject::tr("Add New Cut"),
-                                 QString("DIALOG_CUTPOINT_NEWCUT_%1")
-                                         .arg(frame));
+                                 QString("DIALOG_CUTPOINT_NEWCUT_0"));
             osd->DialogAddButton(QObject::tr("Join Surrounding Cuts"),
-                                 QString("DIALOG_CUTPOINT_DELETE_%1")
-                                         .arg(frame));
+                                 QString("DIALOG_CUTPOINT_DELETE_0"));
         }
         if (ctx->player->DeleteMapHasUndo())
             osd->DialogAddButton(QObject::tr("Undo") + " - " +
@@ -10131,7 +10118,7 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
     ReturnOSDLock(ctx, osd);
 }
 
-bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
+bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action)
 {
     bool res = true;
     if (!DialogIsVisible(ctx, OSD_DLG_CUTPOINT))
@@ -10149,7 +10136,7 @@ bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action, long long frame)
     else if (osd)
     {
         QStringList actions(action);
-        if (!ctx->player->HandleProgramEditorActions(actions, frame))
+        if (!ctx->player->HandleProgramEditorActions(actions))
             LOG(VB_GENERAL, LOG_ERR, LOC + "Unrecognised cutpoint action");
         else
             editmode = ctx->player->GetEditMode();
@@ -10657,7 +10644,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         }
         else if (valid && desc[0] == "CUTPOINT")
         {
-            hide = HandleOSDCutpoint(actx, desc[1], desc[2].toLongLong());
+            hide = HandleOSDCutpoint(actx, desc[1]);
         }
         else if (valid && desc[0] == "DELETE")
         {

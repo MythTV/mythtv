@@ -475,7 +475,7 @@ class MTV_PUBLIC MythPlayer
 
     // Edit mode stuff
     bool EnableEdit(void);
-    bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
+    bool HandleProgramEditorActions(QStringList &actions);
     bool GetEditMode(void) const { return deleteMap.IsEditing(); }
     void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
