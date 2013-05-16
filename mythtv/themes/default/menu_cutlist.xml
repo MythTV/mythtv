@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!-- All "text" attribute values need translations.  The "XXXtext"
+     attributes illustrate the default value if the "text" attribute
+     is omitted. -->
+
+<menu text="Edit Cut Points">
+  <item action="DIALOG_CUTPOINT_MOVEPREV_0"
+        XXXtext="Move Previous Cut End Here" show="active" />
+  <item action="DIALOG_CUTPOINT_MOVEPREV_0"
+        XXXtext="Move Start of Cut Here" show="inactive" />
+  <item action="DIALOG_CUTPOINT_CUTTOBEGINNING_0" XXXtext="Cut to Beginning" />
+  <item action="DIALOG_CUTPOINT_CUTTOEND_0" XXXtext="Cut to End" />
+  <item action="DIALOG_CUTPOINT_MOVENEXT_0"
+        XXXtext="Move Next Cut Start Here" show="active" />
+  <item action="DIALOG_CUTPOINT_MOVENEXT_0"
+        XXXtext="Move End of Cut Here" show="inactive" />
+  <item action="DIALOG_CUTPOINT_DELETE_0"
+	XXXtext="Delete This Cut" show="active" />
+  <item action="DIALOG_CUTPOINT_DELETE_0"
+        XXXtext="Join Surrounding Cuts" show="inactive" />
+  <item action="DIALOG_CUTPOINT_NEWCUT_0" XXXtext="Add New Cut" />
+  <item action="DIALOG_CUTPOINT_UNDO_0" XXXtext="Undo - %1" />
+  <item action="DIALOG_CUTPOINT_REDO_0" XXXtext="Redo - %1" />
+  <menu text="Cut List Options">
+    <item action="DIALOG_CUTPOINT_CLEARMAP_0" XXXtext="Clear Cuts" />
+    <item action="DIALOG_CUTPOINT_INVERTMAP_0" XXXtext="Reverse Cuts" />
+    <item action="DIALOG_CUTPOINT_LOADCOMMSKIP_0"
+          XXXtext="Load Detected Commercials" />
+    <item action="DIALOG_CUTPOINT_REVERT_0" XXXtext="Undo Changes" />
+    <item action="DIALOG_CUTPOINT_REVERTEXIT_0" XXXtext="Exit Without Saving" />
+    <item action="DIALOG_CUTPOINT_SAVEMAP_0" XXXtext="Save Cuts" />
+    <item action="DIALOG_CUTPOINT_SAVEEXIT_0" XXXtext="Save Cuts and Exit" />
+  </menu>
+</menu>

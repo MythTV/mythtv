@@ -729,9 +729,13 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     void PlaybackMenuShow(const MenuBase &menu,
                           const QDomNode &node, const QDomNode &selected);
+    void CutlistMenuShow(const MenuBase &menu,
+                         const QDomNode &node, const QDomNode &selected);
     virtual bool MenuItemDisplay(const MenuItemContext &c);
-    void PlaybackMenuInit(void);
-    void PlaybackMenuDeinit(void);
+    bool MenuItemDisplayPlayback(const MenuItemContext &c);
+    bool MenuItemDisplayCutlist(const MenuItemContext &c);
+    void PlaybackMenuInit(const MenuBase &menu);
+    void PlaybackMenuDeinit(const MenuBase &menu);
     void MenuStrings(void) const;
     void MenuLazyInit(void *field);
 
@@ -1034,6 +1038,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     MenuBase m_playbackMenu;
     MenuBase m_compactMenu;
+    MenuBase m_cutlistMenu;
+    MenuBase m_cutlistExitMenu;
 
   public:
     // Constants

@@ -3790,7 +3790,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
                     (actx->player->IsInDelete(current_frame)) &&
                     (!(actx->player->HasTemporaryMark())))
                 {
-                    ShowOSDCutpoint(actx, "EDIT_CUT_REGION");
+                    ShowOSDCutpoint(actx, "EDIT_CUT_POINTS");
                     handled = true;
                 }
                 else
@@ -10001,121 +10001,34 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
 
 void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
 {
-    OSD *osd = GetOSDLock(ctx);
-    if (!osd)
+    if (type == "EDIT_CUT_POINTS")
     {
-        ReturnOSDLock(ctx, osd);
-        return;
-    }
-
-
-    if (("EDIT_CUT_POINTS" == type) || ("EDIT_CUT_REGION" == type))
-    {
-        uint64_t frame   = ctx->player->GetFramesPlayed();
-        uint64_t previous_cut = ctx->player->GetNearestMark(frame, false);
-        uint64_t next_cut = ctx->player->GetNearestMark(frame, true);
-        uint64_t total_frames = ctx->player->GetTotalFrameCount();
-
-        osd->DialogShow(OSD_DLG_CUTPOINT,
-                        QObject::tr("Edit Cut Points"));
-        if (ctx->player->IsInDelete(frame))
+        if (!m_cutlistMenu.IsLoaded())
         {
-            if (ctx->player->IsTemporaryMark(frame))
-            {
-                if (previous_cut > 0)
-                    osd->DialogAddButton(QObject::tr("Move Previous Cut End "
-                                                     "Here"),
-                                         QString("DIALOG_CUTPOINT_MOVEPREV_0"));
-                else
-                    osd->DialogAddButton(QObject::tr("Cut to Beginning"),
-                                   QString("DIALOG_CUTPOINT_CUTTOBEGINNING_0"));
-
-                if (next_cut == total_frames)
-                    osd->DialogAddButton(QObject::tr("Cut to End"),
-                                         QString("DIALOG_CUTPOINT_CUTTOEND_0"));
-                else
-                    osd->DialogAddButton(QObject::tr("Move Next Cut Start "
-                                                     "Here"),
-                                         QString("DIALOG_CUTPOINT_MOVENEXT_0"));
-            }
-            else
-            {
-                osd->DialogAddButton(QObject::tr("Move Start of Cut Here"),
-                                     QString("DIALOG_CUTPOINT_MOVEPREV_0"));
-                osd->DialogAddButton(QObject::tr("Move End of Cut Here"),
-                                     QString("DIALOG_CUTPOINT_MOVENEXT_0"));
-            }
-            osd->DialogAddButton(QObject::tr("Delete This Cut"),
-                                 QString("DIALOG_CUTPOINT_DELETE_0"));
+            m_cutlistMenu.Load("menu_cutlist.xml",
+                               tr("Edit Cut Points"),
+                               // XXX which translation context to use?
+                               metaObject()->className(),
+                               "TV Editing");
         }
-        else
+        if (m_cutlistMenu.IsLoaded())
+            PlaybackMenuShow(m_cutlistMenu,
+                             m_cutlistMenu.GetRoot(), QDomNode());
+    }
+    else if (type == "EXIT_EDIT_MODE")
+    {
+        if (!m_cutlistExitMenu.IsLoaded())
         {
-            if (previous_cut > 0)
-                osd->DialogAddButton(QObject::tr("Move Previous Cut End Here"),
-                                     QString("DIALOG_CUTPOINT_MOVEPREV_0"));
-            else
-                osd->DialogAddButton(QObject::tr("Cut to Beginning"),
-                                     QString("DIALOG_CUTPOINT_CUTTOBEGINNING_0"));
-            if (next_cut == total_frames)
-                osd->DialogAddButton(QObject::tr("Cut to End"),
-                                     QString("DIALOG_CUTPOINT_CUTTOEND_0"));
-            else
-                osd->DialogAddButton(QObject::tr("Move Next Cut Start Here"),
-                                     QString("DIALOG_CUTPOINT_MOVENEXT_0"));
-            osd->DialogAddButton(QObject::tr("Add New Cut"),
-                                 QString("DIALOG_CUTPOINT_NEWCUT_0"));
-            osd->DialogAddButton(QObject::tr("Join Surrounding Cuts"),
-                                 QString("DIALOG_CUTPOINT_DELETE_0"));
+            m_cutlistExitMenu.Load("menu_cutlist_exit.xml",
+                                   tr("Exit Recording Editor"),
+                                   // XXX which translation context to use?
+                                   metaObject()->className(),
+                                   "TV Editing");
         }
-        if (ctx->player->DeleteMapHasUndo())
-            osd->DialogAddButton(QObject::tr("Undo") + " - " +
-                                 ctx->player->DeleteMapGetUndoMessage(),
-                                 QString("DIALOG_CUTPOINT_UNDO_0"));
-        if (ctx->player->DeleteMapHasRedo())
-            osd->DialogAddButton(QObject::tr("Redo") + " - " +
-                                 ctx->player->DeleteMapGetRedoMessage(),
-                                 QString("DIALOG_CUTPOINT_REDO_0"));
-        if ("EDIT_CUT_POINTS" == type)
-            osd->DialogAddButton(QObject::tr("Cut List Options"),
-                                 "DIALOG_CUTPOINT_CUTLISTOPTIONS_0", true);
+        if (m_cutlistExitMenu.IsLoaded())
+            PlaybackMenuShow(m_cutlistExitMenu,
+                             m_cutlistExitMenu.GetRoot(), QDomNode());
     }
-    else if ("CUT_LIST_OPTIONS" == type)
-    {
-        osd->DialogShow(OSD_DLG_CUTPOINT,
-                        QObject::tr("Cut List Options"));
-        osd->DialogAddButton(QObject::tr("Clear Cuts"),
-                             "DIALOG_CUTPOINT_CLEARMAP_0");
-        osd->DialogAddButton(QObject::tr("Reverse Cuts"),
-                             "DIALOG_CUTPOINT_INVERTMAP_0");
-        osd->DialogAddButton(QObject::tr("Load Detected Commercials"),
-                             "DIALOG_CUTPOINT_LOADCOMMSKIP_0");
-        osd->DialogAddButton(QObject::tr("Undo Changes"),
-                             "DIALOG_CUTPOINT_REVERT_0");
-        osd->DialogAddButton(QObject::tr("Exit Without Saving"),
-                             "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(QObject::tr("Save Cuts"),
-                             "DIALOG_CUTPOINT_SAVEMAP_0");
-        osd->DialogAddButton(QObject::tr("Save Cuts and Exit"),
-                             "DIALOG_CUTPOINT_SAVEEXIT_0");
-    }
-    else if ("EXIT_EDIT_MODE" == type)
-    {
-        osd->DialogShow(OSD_DLG_CUTPOINT,
-                        QObject::tr("Exit Recording Editor"));
-        osd->DialogAddButton(QObject::tr("Save Cuts and Exit"),
-                             "DIALOG_CUTPOINT_SAVEEXIT_0");
-        osd->DialogAddButton(QObject::tr("Exit Without Saving"),
-                             "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(QObject::tr("Save Cuts"),
-                             "DIALOG_CUTPOINT_SAVEMAP_0");
-        osd->DialogAddButton(QObject::tr("Undo Changes"),
-                             "DIALOG_CUTPOINT_REVERT_0");
-    }
-    osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
-    QHash<QString,QString> map;
-    map.insert("title", tr("Edit"));
-    osd->SetText("osd_program_editor", map, kOSDTimeout_None);
-    ReturnOSDLock(ctx, osd);
 }
 
 bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action)
@@ -10125,15 +10038,7 @@ bool TV::HandleOSDCutpoint(PlayerContext *ctx, QString action)
         return res;
 
     OSD *osd = GetOSDLock(ctx);
-    if (action == "CUTLISTOPTIONS" && osd)
-    {
-        ShowOSDCutpoint(ctx, "CUT_LIST_OPTIONS");
-        res = false;
-    }
-    else if (action == "DONOTHING" && osd)
-    {
-    }
-    else if (osd)
+    if (osd)
     {
         QStringList actions(action);
         if (!ctx->player->HandleProgramEditorActions(actions))
@@ -11140,8 +11045,9 @@ static bool matchesGroup(const QString &name, const QString &inPrefix,
 static void addButton(const MenuItemContext &c, OSD *osd, bool active,
                       bool &result, const QString &action,
                       const QString &defaultTextActive,
-                      const QString &defaultTextInactive = "",
-                      bool isMenu = false)
+                      const QString &defaultTextInactive,
+                      bool isMenu,
+                      const QString &textArg)
 {
     if (c.m_category == kMenuCategoryItemlist || action == c.m_action)
     {
@@ -11155,6 +11061,8 @@ static void addButton(const MenuItemContext &c, OSD *osd, bool active,
                 if (text.isEmpty())
                     text = (active || defaultTextInactive.isEmpty()) ?
                         defaultTextActive : defaultTextInactive;
+                if (!textArg.isEmpty())
+                    text = text.arg(textArg);
                 osd->DialogAddButton(text, action, isMenu,
                                      active && c.m_setCurrentActive);
             }
@@ -11163,21 +11071,185 @@ static void addButton(const MenuItemContext &c, OSD *osd, bool active,
 }
 
 #define BUTTON(action, text) \
-    addButton(c, osd, active, result, (action), (text))
+    addButton(c, osd, active, result, (action), (text), "", false, "")
 #define BUTTON2(action, textActive, textInactive) \
-    addButton(c, osd, active, result, (action), (textActive), (textInactive))
+    addButton(c, osd, active, result, (action), (textActive), \
+              (textInactive), false, "")
 #define BUTTON3(action, textActive, textInactive, isMenu)     \
     addButton(c, osd, active, result, (action), (textActive), \
-              (textInactive), (isMenu))
+              (textInactive), (isMenu), "")
 
-// Returns true if at least one item should be displayed.
 bool TV::MenuItemDisplay(const MenuItemContext &c)
 {
-    // Test &c.m_menu to determine which menu is being displayed and
-    // therefore which actions to test for.  For the regular and
-    // compact playback menus, we do the same thing so no test is
-    // needed, but as other playback-context menus are added, we'll
-    // want to test.
+    if (&c.m_menu == &m_playbackMenu ||
+        &c.m_menu == &m_compactMenu)
+    {
+        return MenuItemDisplayPlayback(c);
+    }
+    else if (&c.m_menu == &m_cutlistMenu ||
+             &c.m_menu == &m_cutlistExitMenu)
+    {
+        return MenuItemDisplayCutlist(c);
+    }
+    else
+        return false;
+}
+
+bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
+{
+    MenuCategory category = c.m_category;
+    const QString &actionName = c.m_action;
+
+    bool result = false;
+    bool active = true;
+    PlayerContext *ctx = m_tvmCtx;
+    OSD *osd = m_tvmOsd;
+    if (!osd)
+        return result;
+    if (category == kMenuCategoryMenu)
+    {
+        result = c.m_menu.Show(c.m_node, QDomNode(), *this, false);
+        if (result && c.m_doDisplay)
+        {
+            QVariant v;
+            v.setValue(MenuNodeTuple(c.m_menu, c.m_node));
+            osd->DialogAddButton(c.m_menuName, v, true, c.m_setCurrentActive);
+        }
+        return result;
+    }
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    uint64_t frame   = ctx->player->GetFramesPlayed();
+    uint64_t previous_cut = ctx->player->GetNearestMark(frame, false);
+    uint64_t next_cut = ctx->player->GetNearestMark(frame, true);
+    uint64_t total_frames = ctx->player->GetTotalFrameCount();
+    bool is_in_delete = ctx->player->IsInDelete(frame);
+    bool is_temporary_mark = ctx->player->IsTemporaryMark(frame);
+    if (category == kMenuCategoryItem)
+    {
+        if (actionName == "DIALOG_CUTPOINT_MOVEPREV_0")
+        {
+            if ((is_in_delete && is_temporary_mark &&
+                 previous_cut > 0) ||
+                (is_in_delete && !is_temporary_mark) ||
+                (!is_temporary_mark && previous_cut > 0))
+            {
+                active = !(is_in_delete && !is_temporary_mark);
+                BUTTON2(actionName, tr("Move Previous Cut End Here"),
+                        tr("Move Start of Cut Here"));
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_MOVENEXT_0")
+        {
+            if ((is_in_delete && is_temporary_mark &&
+                 next_cut != total_frames) ||
+                (is_in_delete && !is_temporary_mark) ||
+                (!is_temporary_mark && next_cut != total_frames))
+            {
+                active = !(is_in_delete && !is_temporary_mark);
+                BUTTON2(actionName, tr("Move Next Cut Start Here"),
+                        tr("Move End of Cut Here"));
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_CUTTOBEGINNING_0")
+        {
+            if (previous_cut <= 0 &&
+                (is_temporary_mark || !is_in_delete))
+            {
+                BUTTON(actionName, tr("Cut to Beginning"));
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_CUTTOEND_0")
+        {
+            if (next_cut == total_frames &&
+                (is_temporary_mark || !is_in_delete))
+            {
+                BUTTON(actionName, tr("Cut to End"));
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_DELETE_0")
+        {
+            active = is_in_delete;
+            BUTTON2(actionName, tr("Delete This Cut"),
+                    tr("Join Surrounding Cuts"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_NEWCUT_0")
+        {
+            if (!is_in_delete)
+                BUTTON(actionName, tr("Add New Cut"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_UNDO_0")
+        {
+            if (ctx->player->DeleteMapHasUndo())
+            {
+                //: %1 is the undo message
+                QString text = tr("Undo - %1");
+                addButton(c, osd, active, result, actionName, text, "", false,
+                          ctx->player->DeleteMapGetUndoMessage());
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_REDO_0")
+        {
+            if (ctx->player->DeleteMapHasRedo())
+            {
+                //: %1 is the redo message
+                QString text = tr("Redo - %1");
+                addButton(c, osd, active, result, actionName, text, "", false,
+                          ctx->player->DeleteMapGetRedoMessage());
+            }
+        }
+        else if (actionName == "DIALOG_CUTPOINT_CLEARMAP_0")
+        {
+            BUTTON(actionName, tr("Clear Cuts"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_INVERTMAP_0")
+        {
+            BUTTON(actionName, tr("Reverse Cuts"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_LOADCOMMSKIP_0")
+        {
+            BUTTON(actionName, tr("Load Detected Commercials"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_REVERT_0")
+        {
+            BUTTON(actionName, tr("Undo Changes"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_REVERTEXIT_0")
+        {
+            BUTTON(actionName, tr("Exit Without Saving"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_SAVEMAP_0")
+        {
+            BUTTON(actionName, tr("Save Cuts"));
+        }
+        else if (actionName == "DIALOG_CUTPOINT_SAVEEXIT_0")
+        {
+            BUTTON(actionName, tr("Save Cuts and Exit"));
+        }
+        else
+        {
+            // Allow an arbitrary action if it has a translated
+            // description available to be used as the button text.
+            // Look in the specified keybinding context as well as the
+            // Global context.
+            // XXX This doesn't work well (yet) because a keybinding
+            // action named "foo" is actually a menu action named
+            // "DIALOG_CUTPOINT_foo_0".
+            QString text = GetMythMainWindow()->
+                GetActionText(c.m_menu.GetKeyBindingContext(), actionName);
+            if (text.isEmpty())
+                text = GetMythMainWindow()->
+                    GetActionText("Global", actionName);
+            if (!text.isEmpty())
+                BUTTON(actionName, text);
+        }
+    }
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+    return result;
+}
+
+// Returns true if at least one item should be displayed.
+bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
+{
     MenuCategory category = c.m_category;
     const QString &actionName = c.m_action;
 
@@ -11918,10 +11990,13 @@ void TV::MenuLazyInit(void *field)
     }
 }
 
-void TV::PlaybackMenuInit(void)
+void TV::PlaybackMenuInit(const MenuBase &menu)
 {
     m_tvmCtx = GetPlayerReadLock(-1, __FILE__, __LINE__);
     m_tvmOsd = GetOSDLock(m_tvmCtx);
+    if (&menu != &m_playbackMenu && &menu != &m_compactMenu)
+        return;
+
     PlayerContext *ctx = m_tvmCtx;
 
     m_tvm_avsync   = true;
@@ -12064,7 +12139,7 @@ void TV::PlaybackMenuInit(void)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-void TV::PlaybackMenuDeinit(void)
+void TV::PlaybackMenuDeinit(const MenuBase &menu)
 {
     ReturnOSDLock(m_tvmCtx, m_tvmOsd);
     ReturnPlayerLock(m_tvmCtx);
@@ -12075,10 +12150,17 @@ void TV::PlaybackMenuDeinit(void)
 void TV::PlaybackMenuShow(const MenuBase &menu,
                           const QDomNode &node, const QDomNode &selected)
 {
-    PlaybackMenuInit();
+    PlaybackMenuInit(menu);
     if (m_tvmOsd)
     {
-        m_tvmOsd->DialogShow(OSD_DLG_MENU, menu.GetName());
+        bool isPlayback = (&menu == &m_playbackMenu ||
+                           &menu == &m_compactMenu);
+        bool isCutlist = (&menu == &m_cutlistMenu ||
+                          &menu == &m_cutlistExitMenu);
+        m_tvmOsd->DialogShow(isPlayback ? OSD_DLG_MENU :
+                             isCutlist ? OSD_DLG_CUTPOINT :
+                             "???",
+                             menu.GetName());
         menu.Show(node, selected, *this);
         QString text =
             menu.Translate(node.toElement().attribute("text", menu.GetName()));
@@ -12090,12 +12172,20 @@ void TV::PlaybackMenuShow(const MenuBase &menu,
             v.setValue(MenuNodeTuple(menu, node));
             m_tvmOsd->DialogBack("", v);
         }
+        if (isCutlist)
+        {
+            // hack to unhide the editbar
+            QHash<QString,QString> map;
+            map.insert("title", tr("Edit"));
+            m_tvmOsd->SetText("osd_program_editor", map, kOSDTimeout_None);
+        }
     }
-    PlaybackMenuDeinit();
+    PlaybackMenuDeinit(menu);
 }
 
 void TV::MenuStrings(void) const
 {
+    // Playback menu
     tr("Playback Menu");
     tr("Playback Compact Menu");
     tr("Audio");
@@ -12132,6 +12222,10 @@ void TV::MenuStrings(void) const
     tr("Switch Source");
     tr("Jobs");
     tr("Begin Transcoding");
+
+    // Cutlist editor menu
+    tr("Edit Cut Points");
+    tr("Cut List Options");
 }
 
 void TV::ShowOSDMenu(const PlayerContext *ctx, bool isCompact)

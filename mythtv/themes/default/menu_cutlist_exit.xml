@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<menu XXXtext="Exit Recording Editor">
+  <item action="DIALOG_CUTPOINT_SAVEEXIT_0"   XXXtext="Save Cuts and Exit" />
+  <item action="DIALOG_CUTPOINT_REVERTEXIT_0" XXXtext="Exit Without Saving" />
+  <item action="DIALOG_CUTPOINT_SAVEMAP_0"    XXXtext="Save Cuts" />
+  <item action="DIALOG_CUTPOINT_REVERT_0"     XXXtext="Undo Changes" />
+</menu>
