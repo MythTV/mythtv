@@ -10876,9 +10876,19 @@ void TV::HandleOSDInfo(PlayerContext *ctx, QString action)
 }
 
 bool MenuBase::Load(const QString &filename,
-                    const QString &menuname,
-                    const char *translationContext,
-                    const QString &keyBindingContext)
+                          const QString &menuname,
+                          const char *translationContext,
+                          const QString &keyBindingContext)
+{
+    return LoadHelper(filename, menuname, translationContext,
+                      keyBindingContext, 0);
+}
+
+bool MenuBase::LoadHelper(const QString &filename,
+                          const QString &menuname,
+                          const char *translationContext,
+                          const QString &keyBindingContext,
+                          int includeLevel)
 {
     bool result = false;
 
@@ -10901,7 +10911,7 @@ bool MenuBase::Load(const QString &filename,
                 result = true;
                 QDomElement root = GetRoot();
                 m_menuName = Translate(root.attribute("text", menuname));
-                ProcessIncludes(root);
+                ProcessIncludes(root, includeLevel);
             }
             else
             {
@@ -10919,9 +10929,9 @@ bool MenuBase::Load(const QString &filename,
     return result;
 }
 
-void MenuBase::ProcessIncludes(QDomElement &root)
+void MenuBase::ProcessIncludes(QDomElement &root, int includeLevel)
 {
-    const int maxRecursion = 10;
+    const int maxInclude = 10;
     for (QDomNode n = root.firstChild(); !n.isNull(); n = n.nextSibling())
     {
         if (n.isElement())
@@ -10932,21 +10942,20 @@ void MenuBase::ProcessIncludes(QDomElement &root)
                 QString include = e.attribute("file", "");
                 if (include.isEmpty())
                     continue;
-                int level = m_recursionLevel + 1;
-                if (level > maxRecursion)
+                if (includeLevel >= maxInclude)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Maximum include depth (%1) "
                                 "exceeded for %2")
-                        .arg(maxRecursion).arg(include));
+                        .arg(maxInclude).arg(include));
                     return;
                 }
                 MenuBase menu;
-                menu.m_recursionLevel = level;
-                if (menu.Load(include,
-                              include, // fallback menu name is filename
-                              m_translationContext,
-                              m_keyBindingContext))
+                if (menu.LoadHelper(include,
+                                    include, // fallback menu name is filename
+                                    m_translationContext,
+                                    m_keyBindingContext,
+                                    includeLevel + 1))
                 {
                     QDomNode newChild = menu.GetRoot();
                     newChild = m_document->importNode(newChild, true);
@@ -10956,7 +10965,7 @@ void MenuBase::ProcessIncludes(QDomElement &root)
             }
             else if (e.tagName() == "menu")
             {
-                ProcessIncludes(e);
+                ProcessIncludes(e, includeLevel + 1);
             }
         }
     }

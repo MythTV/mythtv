@@ -225,8 +225,7 @@ public:
 class MenuBase
 {
 public:
-    MenuBase() : m_document(NULL), m_translationContext(""),
-                 m_recursionLevel(0) {}
+    MenuBase() : m_document(NULL), m_translationContext("") {}
     ~MenuBase();
     bool        Load(const QString &filename,
                      const QString &menuname,
@@ -246,12 +245,16 @@ public:
         return m_keyBindingContext;
     }
 private:
-    void ProcessIncludes(QDomElement &root);
+    bool LoadHelper(const QString &filename,
+                    const QString &menuname,
+                    const char *translationContext,
+                    const QString &keyBindingContext,
+                    int includeLevel);
+    void ProcessIncludes(QDomElement &root, int includeLevel);
     QDomDocument *m_document;
     const char   *m_translationContext;
     QString       m_menuName;
     QString       m_keyBindingContext;
-    int           m_recursionLevel; // guard against infinite recursion
 };
 
 /**
