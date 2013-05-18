@@ -4,6 +4,24 @@
 #define MYTHSYSTEM_H_
 
 #include "mythbaseexp.h"
+
+// Note: The FIXME were added 2013-05-18, as part of a multi-pass
+// cleanup of MythSystem.
+//
+// MythSystem exists because the Qt QProcess has caused us numerous
+// headaches, most importantly:
+//   http://code.mythtv.org/trac/ticket/7135
+//   https://bugreports.qt-project.org/browse/QTBUG-5990
+// QProcess also demands that the thread in which it is used
+// and created run a Qt event loop, which MythSystem does not
+// require. A number of MythTV threads do not run an event loop
+// so this requirement is a bit onerous.
+// 
+// MythSystem has grown a bit fat around the middle as functionality
+// has been added and as a core functionality class is due for a code
+// review and some cleanup.
+
+// FIXME: compat.h && signal.h should not be pulled into a header file.
 #include "compat.h"
 #include <signal.h>
 
@@ -37,15 +55,20 @@ typedef enum MythSystemMask {
 #include <QStringList>
 #include <QBuffer>
 #include <QSemaphore>
-#include <QMap>
-#include <QPointer>
+#include <QMap> // FIXME: This shouldn't be needed, Setting_t is not public
+#include <QPointer> // FIXME: QPointer is deprecated
 
 #include "referencecounter.h"
 
+// FIXME: _t is not how we name types in MythTV...
 typedef QMap<QString, bool> Setting_t;
 
 void ShutdownMythSystem(void);
 
+// FIXME: Does MythSystem really need to inherit from QObject?
+//        we can probably create a private class that inherits
+//        from QObject to avoid exposing lots of thread-unsafe
+//        methods & complicated life-time management.
 class MythSystemPrivate;
 class MBASE_PUBLIC MythSystem : public QObject
 {
@@ -55,13 +78,20 @@ class MBASE_PUBLIC MythSystem : public QObject
     MythSystem();
     MythSystem(const QString &, uint);
     MythSystem(const QString &, const QStringList &, uint);
+    // FIXME: Do we really need to expose a public copy-constructor?
+    // FIXME: Should operator=() also be provided or banned?
     MythSystem(const MythSystem &other);
     ~MythSystem(void);
 
+    // FIXME: We should not allow a MythSystem to be reused for a new command.
     void SetCommand(const QString &, uint);
+    // FIXME: We should not allow a MythSystem to be reused for a new command.
     void SetCommand(const QString &, const QStringList &, uint);
+    // FIXME: This should only be in the constructor
     void SetDirectory(const QString &);
+    // FIXME: This should only be in the constructor
     bool SetNice(int nice);
+    // FIXME: This should only be in the constructor
     bool SetIOPrio(int prio);
 
     void Run(time_t timeout = 0);
@@ -70,9 +100,13 @@ class MBASE_PUBLIC MythSystem : public QObject
     int Write(const QByteArray&);
     QByteArray Read(int size);
     QByteArray ReadErr(int size);
+    // FIXME: We should not return a reference here
     QByteArray& ReadAll();
+    // FIXME: We should not return a reference here
     QByteArray& ReadAllErr();
 
+    // FIXME: Replace these with a single Signal() that accepts
+    //        an enum typedef defined in this header.
     void Term(bool force = false);
     void Kill(void)   { Signal(SIGKILL); }
     void Stop(void)   { Signal(SIGSTOP); }
@@ -82,40 +116,67 @@ class MBASE_PUBLIC MythSystem : public QObject
     void USR2(void)   { Signal(SIGUSR2); }
     void Signal(int sig);
 
+    // FIXME: Should be documented, and maybe should be called AbortJump()
     void JumpAbort(void);
 
+    // FIXME: Should be IsBackground() + documented
     bool isBackground(void)   { return GetSetting("RunInBackground"); }
+    // FIXME: Should be IsAutoCleanupProcess() + documented
     bool doAutoCleanup(void)  { return GetSetting("AutoCleanup"); }
+    // FIXME: No idea what this is querying but should be StudlyCase
+    //        and should be documented
     bool onlyLowExitVal(void) { return GetSetting("OnlyLowExitVal"); }
+    // FIXME: Why is this public?
     void HandlePreRun(void);
+    // FIXME: Why is this public?
     void HandlePostRun(void);
 
+    // FIXME: Rename "GetExitStatus" and document that this does not
+    //        block until an exit status exists.
     uint GetStatus(void)             { return m_status; }
+    // FIXME Make private.
     void SetStatus(uint status)      { m_status = status; }
 
+    // FIXME: We should not return a reference here, add a Set if necessary
+    // Do we even need this function? Should it then be better named?
     QString& GetLogCmd(void)         { return m_logcmd; }
+    // FIXME: We should not return a reference here
     QString& GetDirectory(void)      { return m_directory; }
 
+    // FIXME: Eliminate or make private, we don't allow any settings
+    //        that can not be enumerated.
     bool GetSetting(const char *setting) 
     { return m_settings.value(QString(setting)); }
 
+    // FIXME: We should not return a reference here
     QString& GetCommand(void)        { return m_command; }
+    // FIXME: Eliminate. We should not allow setting the command
+    //        after construcion.
     void SetCommand(QString &cmd)    { m_command = cmd; }
 
+    // FIXME: We should not return a reference here
+    // FIXME: Rename "GetArguments"
     QStringList &GetArgs(void)       { return m_args; }
+    // FIXME: Eliminate. We should not allow setting the arguements
+    //        after construcion.
     void SetArgs(QStringList &args)  { m_args = args; }
 
     int GetNice(void)                { return m_nice; }
     int GetIOPrio(void)              { return m_ioprio; }
 
+    // FIXME: We should not return a pointer to a QBuffer
     QBuffer *GetBuffer(int index)    { return &m_stdbuff[index]; }
 
+    // FIXME: We should not make locking public
     void Unlock(void)                { m_semReady.release(1); }
 
     friend class MythSystemPrivate;
 
+    // FIXME: This should be an independent function living elsewhere
     static QString ShellEscape(const QString &str);
 
+    // FIXME: Do we really need to expose Qt signals?
+    //        If so why are they lower case?
   signals:
     void started(void);
     void finished(void);
@@ -144,6 +205,9 @@ class MBASE_PUBLIC MythSystem : public QObject
     QBuffer     m_stdbuff[3];
 };
 
+// FIXME: do we really need reference counting?
+// it shouldn't be difficult to track the lifetime of a private object.
+// FIXME: This should not live in the same header as MythSystem
 class MythSystemPrivate : public QObject, public ReferenceCounter
 {
     Q_OBJECT
@@ -167,19 +231,29 @@ class MythSystemPrivate : public QObject, public ReferenceCounter
     uint GetStatus(void)             { return m_parent->GetStatus(); }
     void SetStatus(uint status)      { m_parent->SetStatus(status); }
 
+    // FIXME: We should not return a reference here
     QString& GetLogCmd(void)         { return m_parent->GetLogCmd(); }
+    // FIXME: We should not return a reference here
     QString& GetDirectory(void)      { return m_parent->GetDirectory(); }
 
     bool GetSetting(const char *setting) 
         { return m_parent->GetSetting(setting); }
 
+    // FIXME: We should not return a reference here
     QString& GetCommand(void)        { return m_parent->GetCommand(); }
     void SetCommand(QString &cmd)    { m_parent->SetCommand(cmd); }
 
+    // FIXME: We should not return a reference here
+    // FIXME: Rename "GetArguments"
     QStringList &GetArgs(void)       { return m_parent->GetArgs(); }
+    // FIXME: Rename "SetArguments"
     void SetArgs(QStringList &args)  { m_parent->SetArgs(args); }
 
+    // FIXME: This is likely a bad idea, but possibly manageable
+    //        since this is a private class.
     QBuffer *GetBuffer(int index)    { return m_parent->GetBuffer(index); }
+    // FIXME: This is likely a bad idea, but possibly manageable
+    //        since this is a private class.
     void Unlock(void)                { m_parent->Unlock(); }
 
   signals:
