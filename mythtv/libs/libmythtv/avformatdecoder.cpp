@@ -1989,7 +1989,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (!enc->codec)
         {
-            if (OpenAVCodec(enc, codec) < 0)
+            if (!OpenAVCodec(enc, codec))
                 continue;
         }
 
@@ -2248,7 +2248,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             {
                 QMutexLocker locker(avcodeclock);
 
-                if (OpenAVCodec(enc, codec) < 0)
+                if (!OpenAVCodec(enc, codec))
                 {
                     scanerror = -1;
                     break;
