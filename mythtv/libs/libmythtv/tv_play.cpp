@@ -11014,25 +11014,35 @@ bool MenuBase::Show(const QDomNode &node,
                 (show == "active" ? kMenuShowActive :
                  show == "inactive" ? kMenuShowInactive : kMenuShowAlways);
             QString current = e.attribute("current", "");
-            bool currentActive = (current == "active") && !hasSelected;
+            MenuCurrentContext currentContext;
+            if ((current == "active") && !hasSelected)
+                currentContext = kMenuCurrentActive;
+            else if (((current.startsWith("y") ||
+                       current.startsWith("t") ||
+                       current == "1")) && !hasSelected)
+                currentContext = kMenuCurrentAlways;
+            else
+                currentContext = kMenuCurrentDefault;
             if (e.tagName() == "menu")
             {
+                if (hasSelected && n == selected)
+                    currentContext = kMenuCurrentAlways;
                 MenuItemContext c(*this, n, text,
-                                  (hasSelected && n == selected),
+                                  currentContext,
                                   doDisplay);
                 displayed |= displayer.MenuItemDisplay(c);
             }
             else if (e.tagName() == "item")
             {
                 QString action = e.attribute("action", "");
-                MenuItemContext c(*this, n, showContext, currentActive,
+                MenuItemContext c(*this, n, showContext, currentContext,
                                   action, text, doDisplay);
                 displayed |= displayer.MenuItemDisplay(c);
             }
             else if (e.tagName() == "itemlist")
             {
                 QString actiongroup = e.attribute("actiongroup", "");
-                MenuItemContext c(*this, n, showContext, currentActive,
+                MenuItemContext c(*this, n, showContext, currentContext,
                                   actiongroup, doDisplay);
                 displayed |= displayer.MenuItemDisplay(c);
             }
@@ -11072,8 +11082,12 @@ static void addButton(const MenuItemContext &c, OSD *osd, bool active,
                         defaultTextActive : defaultTextInactive;
                 if (!textArg.isEmpty())
                     text = text.arg(textArg);
-                osd->DialogAddButton(text, action, isMenu,
-                                     active && c.m_setCurrentActive);
+                bool current = false;
+                if (c.m_currentContext == kMenuCurrentActive)
+                    current = active;
+                else if (c.m_currentContext == kMenuCurrentAlways)
+                    current = true;
+                osd->DialogAddButton(text, action, isMenu, current);
             }
         }
     }
@@ -11122,7 +11136,8 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
         {
             QVariant v;
             v.setValue(MenuNodeTuple(c.m_menu, c.m_node));
-            osd->DialogAddButton(c.m_menuName, v, true, c.m_setCurrentActive);
+            osd->DialogAddButton(c.m_menuName, v, true,
+                                 c.m_currentContext != kMenuCurrentDefault);
         }
         return result;
     }
@@ -11275,7 +11290,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
         {
             QVariant v;
             v.setValue(MenuNodeTuple(c.m_menu, c.m_node));
-            osd->DialogAddButton(c.m_menuName, v, true, c.m_setCurrentActive);
+            osd->DialogAddButton(c.m_menuName, v, true,
+                                 c.m_currentContext != kMenuCurrentDefault);
         }
         return result;
     }

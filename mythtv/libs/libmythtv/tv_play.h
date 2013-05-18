@@ -152,6 +152,12 @@ enum MenuShowContext {
     kMenuShowAlways
 };
 
+enum MenuCurrentContext {
+    kMenuCurrentDefault,
+    kMenuCurrentActive,
+    kMenuCurrentAlways
+};
+
 class MenuBase;
 
 class MenuItemContext
@@ -161,14 +167,14 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     const QString &menuName,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     bool doDisplay) :
         m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryMenu),
         m_menuName(menuName),
         m_showContext(kMenuShowAlways),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(""),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
@@ -176,7 +182,7 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     MenuShowContext showContext,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     const QString &action,
                     const QString &actionText,
                     bool doDisplay) :
@@ -185,7 +191,7 @@ public:
         m_category(kMenuCategoryItem),
         m_menuName(""),
         m_showContext(showContext),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(action),
         m_actionText(actionText),
         m_doDisplay(doDisplay) {}
@@ -193,7 +199,7 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     MenuShowContext showContext,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     const QString &action,
                     bool doDisplay) :
         m_menu(menu),
@@ -201,19 +207,19 @@ public:
         m_category(kMenuCategoryItemlist),
         m_menuName(""),
         m_showContext(showContext),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(action),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
-    const MenuBase &m_menu;
-    const QDomNode &m_node;
-    MenuCategory    m_category;
-    const QString   m_menuName;
-    MenuShowContext m_showContext;
-    bool            m_setCurrentActive;
-    const QString   m_action;
-    const QString   m_actionText;
-    bool            m_doDisplay;
+    const MenuBase    &m_menu;
+    const QDomNode    &m_node;
+    MenuCategory       m_category;
+    const QString      m_menuName;
+    MenuShowContext    m_showContext;
+    MenuCurrentContext m_currentContext;
+    const QString      m_action;
+    const QString      m_actionText;
+    bool               m_doDisplay;
 };
 
 class MenuItemDisplayer
