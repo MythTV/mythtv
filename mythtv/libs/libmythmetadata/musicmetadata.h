@@ -208,6 +208,7 @@ class META_PUBLIC MusicMetadata
 
     QDateTime LastPlay() const { return m_lastplay; }
     void setLastPlay();
+    void setLastPlay(QDateTime lastPlay);
 
     int PlayCount() const { return m_playcount; }
     void incPlayCount();

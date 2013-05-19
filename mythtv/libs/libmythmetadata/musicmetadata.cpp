@@ -816,6 +816,12 @@ void MusicMetadata::incRating()
     m_changed = true;
 }
 
+void MusicMetadata::setLastPlay(QDateTime lastPlay)
+{
+    m_templastplay = MythDate::as_utc(lastPlay);
+    m_changed = true;
+}
+
 void MusicMetadata::setLastPlay()
 {
     m_templastplay = MythDate::current();
