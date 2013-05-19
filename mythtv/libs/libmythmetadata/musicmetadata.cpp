@@ -1264,6 +1264,10 @@ void AllMusic::clearCDData(void)
 {
     while (!m_cdData.empty())
     {
+        MusicMetadata *mdata = m_cdData.back();
+        if (music_map.contains(mdata->ID()))
+            music_map.remove(mdata->ID());
+
         delete m_cdData.back();
         m_cdData.pop_back();
     }
