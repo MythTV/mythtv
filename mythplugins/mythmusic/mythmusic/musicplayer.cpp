@@ -709,6 +709,26 @@ void MusicPlayer::customEvent(QEvent *event)
 
             loadSettings();
         }
+        else if (me->Message().startsWith("MUSIC_METADATA_CHANGED"))
+        {
+            if (gMusicData->initialized)
+            {
+                QStringList list = me->Message().simplified().split(' ');
+                if (list.size() == 2)
+                {
+                    int songID = list[1].toInt();
+                    MusicMetadata *mdata =  gMusicData->all_music->getMetadata(songID);
+
+                    if (mdata)
+                    {
+                        mdata->reloadMetadata();
+
+                        // tell any listeners the metadata has changed for this track
+                        sendMetadataChangedEvent(songID);
+                    }
+                }
+            }
+        }
     }
 
     if (m_isAutoplay)
