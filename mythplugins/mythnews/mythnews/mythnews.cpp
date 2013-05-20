@@ -21,10 +21,13 @@
 #include <mythuiimage.h>
 #include <mythsystem.h>
 #include <mythuitext.h>
-#include <httpcomms.h>
 #include <mythdate.h>
 #include <mythdirs.h>
 #include <mythdb.h>
+
+#if QT_VERSION < 0x050000
+#include <httpcomms.h>
+#endif
 
 // MythNews headers
 #include "mythnews.h"
@@ -311,9 +314,13 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                     .arg(qChecksum(url.toLocal8Bit().constData(),
                                    url.toLocal8Bit().size()));
 
+#if QT_VERSION < 0x050000
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
                     HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
+#else
+#warning MythNews::updateInfoView() has not yet been ported to Qt5
+#endif
 
                 if (m_thumbnailImage)
                 {
@@ -351,9 +358,13 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                                                            .arg(sitename)
                                                            .arg(extension);
 
+#if QT_VERSION < 0x050000
                     bool exists = QFile::exists(sFilename);
                     if (!exists)
                         HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
+#else
+#warning MythNews::updateInfoView() has not yet been ported to Qt5
+#endif
 
                     if (m_thumbnailImage)
                     {
@@ -439,9 +450,13 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                                                         .arg(sitename)
                                                         .arg(extension);
 
+#if QT_VERSION < 0x050000
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
                     HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
+#else
+#warning MythNews::updateInfoView() has not yet been ported to Qt5
+#endif
 
                 if (m_thumbnailImage)
                 {
@@ -471,6 +486,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             m_updatedText->SetText(text);
         }
 
+#if QT_VERSION < 0x050000
         if (m_httpGrabber != NULL)
         {
             int progress = m_httpGrabber->getProgress();
@@ -485,6 +501,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 m_updatedText->SetText(text);
             }
         }
+#else
+#warning MythNews::updateInfoView() has not yet been ported to Qt5
+#endif
     }
 }
 
@@ -701,6 +720,7 @@ void MythNews::createProgress(const QString &title)
 
 bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
 {
+#if QT_VERSION < 0x050000
     QMutexLocker locker(&m_lock);
 
     int redirectCount = 0;
@@ -791,7 +811,12 @@ bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
     delete m_httpGrabber;
     m_httpGrabber = NULL;
     return res;
-
+#else
+#warning MythNews::getHttpFile() has not yet been ported to Qt5
+    (void) sFilename;
+    (void) cmdURL;
+    return false;
+#endif
 }
 
 void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
