@@ -7,7 +7,7 @@
 
 // myth
 #include "mythlogging.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
 
 // mythbrowser
 #include "mythbrowser.h"
