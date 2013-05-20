@@ -233,10 +233,14 @@ class MenuBase
 public:
     MenuBase() : m_document(NULL), m_translationContext("") {}
     ~MenuBase();
-    bool        Load(const QString &filename,
-                     const QString &menuname,
-                     const char *translationContext,
-                     const QString &keyBindingContext);
+    bool        LoadFromFile(const QString &filename,
+                             const QString &menuname,
+                             const char *translationContext,
+                             const QString &keyBindingContext);
+    bool        LoadFromString(const QString &text,
+                               const QString &menuname,
+                               const char *translationContext,
+                               const QString &keyBindingContext);
     bool        IsLoaded(void) const { return (m_document != NULL); }
     QDomElement GetRoot(void) const;
     QString     Translate(const QString &text) const;
@@ -251,11 +255,16 @@ public:
         return m_keyBindingContext;
     }
 private:
-    bool LoadHelper(const QString &filename,
-                    const QString &menuname,
-                    const char *translationContext,
-                    const QString &keyBindingContext,
-                    int includeLevel);
+    bool LoadFileHelper(const QString &filename,
+                        const QString &menuname,
+                        const char *translationContext,
+                        const QString &keyBindingContext,
+                        int includeLevel);
+    bool LoadStringHelper(const QString &text,
+                          const QString &menuname,
+                          const char *translationContext,
+                          const QString &keyBindingContext,
+                          int includeLevel);
     void ProcessIncludes(QDomElement &root, int includeLevel);
     QDomDocument *m_document;
     const char   *m_translationContext;
@@ -1046,9 +1055,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // End of playback menu state caching
 
     MenuBase m_playbackMenu;
-    MenuBase m_compactMenu;
+    MenuBase m_playbackCompactMenu;
     MenuBase m_cutlistMenu;
-    MenuBase m_cutlistExitMenu;
+    MenuBase m_cutlistCompactMenu;
 
   public:
     // Constants
