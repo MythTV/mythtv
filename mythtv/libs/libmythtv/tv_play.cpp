@@ -11203,23 +11203,19 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
         }
         else if (actionName == "DIALOG_CUTPOINT_UNDO_0")
         {
-            if (ctx->player->DeleteMapHasUndo())
-            {
-                //: %1 is the undo message
-                QString text = tr("Undo - %1");
-                addButton(c, osd, active, result, actionName, text, "", false,
-                          ctx->player->DeleteMapGetUndoMessage());
-            }
+            active = ctx->player->DeleteMapHasUndo();
+            //: %1 is the undo message
+            QString text = tr("Undo - %1");
+            addButton(c, osd, active, result, actionName, text, "", false,
+                      ctx->player->DeleteMapGetUndoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_REDO_0")
         {
-            if (ctx->player->DeleteMapHasRedo())
-            {
-                //: %1 is the redo message
-                QString text = tr("Redo - %1");
-                addButton(c, osd, active, result, actionName, text, "", false,
-                          ctx->player->DeleteMapGetRedoMessage());
-            }
+            active = ctx->player->DeleteMapHasRedo();
+            //: %1 is the redo message
+            QString text = tr("Redo - %1");
+            addButton(c, osd, active, result, actionName, text, "", false,
+                      ctx->player->DeleteMapGetRedoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_CLEARMAP_0")
         {
