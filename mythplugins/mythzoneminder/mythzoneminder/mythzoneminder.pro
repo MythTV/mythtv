@@ -3,6 +3,10 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
 QT += network
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythzoneminder
