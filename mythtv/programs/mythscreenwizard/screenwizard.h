@@ -56,8 +56,6 @@ class ScreenWizard : public MythScreenType
     MythUIText *m_size;
     MythUIText *m_offsets;
     MythUIText *m_changeamount;
-    MythUIButton *OKButton;
-    MythUIButton *updateButton;
     MythDialogBox *m_menuPopup;
 
     bool moveTLUp(void);
