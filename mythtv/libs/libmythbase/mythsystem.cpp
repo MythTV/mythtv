@@ -26,9 +26,9 @@
 #include "exitcodes.h"
 
 #if CONFIG_CYGWIN || defined(_WIN32)
-#include "system-windows.h"
+#include "mythsystemwindows.h"
 #else
-#include "system-unix.h"
+#include "mythsystemunix.h"
 #endif
 
 

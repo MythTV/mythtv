@@ -51,13 +51,13 @@ SOURCES += httpcomms.cpp mcodecs.cpp mythhttppool.cpp mythhttphandler.cpp
 }
 
 unix {
-    SOURCES += system-unix.cpp
-    HEADERS += system-unix.h
+    SOURCES += mythsystemunix.cpp
+    HEADERS += mythsystemunix.h
 }
 
 mingw {
-    SOURCES += system-windows.cpp
-    HEADERS += system-windows.h
+    SOURCES += mythsystemwindows.cpp
+    HEADERS += mythsystemwindows.h
 }
 
 # Install headers to same location as libmyth to make things easier

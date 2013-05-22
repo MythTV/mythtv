@@ -1,28 +1,26 @@
-#ifndef SYSTEM_UNIX_H_
-#define SYSTEM_UNIX_H_
+/// -*- Mode: c++ -*-
 
-#include <sys/select.h>
+#ifndef _MYTHSYSTEM_WINDOWS_H_
+#define _MYTHSYSTEM_WINDOWS_H_
+
 #include <signal.h>
 
-#include <QObject>
-#include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QList>
-#include <QBuffer>
 #include <QWaitCondition>
+#include <QBuffer>
+#include <QObject>
 #include <QMutex>
-#include <QPointer>
+#include <QList>
+#include <QMap>
 
 #include "mythbaseexp.h"
 #include "mythsystem.h"
 #include "mthread.h"
 
-class MythSystemUnix;
+class MythSystemWindows;
 
-typedef QMap<pid_t, QPointer<MythSystemUnix> > MSMap_t;
-typedef QMap<int, QBuffer *> PMap_t;
-typedef QList<QPointer<MythSystemUnix> > MSList_t;
+typedef QMap<HANDLE, MythSystemWindows *> MSMap_t;
+typedef QMap<HANDLE, QBuffer *> PMap_t;
+typedef QList<MythSystemWindows *> MSList_t;
 
 class MythSystemIOHandler: public MThread
 {
@@ -31,37 +29,40 @@ class MythSystemIOHandler: public MThread
         ~MythSystemIOHandler() { wait(); }
         void   run(void);
 
-        void   insert(int fd, QBuffer *buff);
-        void   remove(int fd);
+        void   insert(HANDLE h, QBuffer *buff);
+        void   remove(HANDLE h);
         void   wake();
 
     private:
-        void   HandleRead(int fd, QBuffer *buff);
-        void   HandleWrite(int fd, QBuffer *buff);
-        void   BuildFDs();
+        bool   HandleRead(HANDLE h, QBuffer *buff);
+        bool   HandleWrite(HANDLE h, QBuffer *buff);
 
         QMutex          m_pWaitLock;
         QWaitCondition  m_pWait;
         QMutex          m_pLock;
         PMap_t          m_pMap;
 
-        fd_set m_fds;
-        int    m_maxfd;
-        bool   m_read;
-        char   m_readbuf[65536];
+        bool    m_read;
+        char    m_readbuf[65536];
 };
 
 class MythSystemManager : public MThread
 {
     public:
         MythSystemManager();
-        ~MythSystemManager() { wait(); }
+        ~MythSystemManager();
         void run(void);
-        void append(MythSystemUnix *);
+        void append(MythSystemWindows *);
         void jumpAbort(void);
+
     private:
+        void ChildListRebuild();
+
+        int        m_childCount;
+        HANDLE    *m_children;
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
+
         bool       m_jumpAbort;
         QMutex     m_jumpLock;
 };
@@ -76,13 +77,13 @@ class MythSystemSignalManager : public MThread
 };
 
 
-class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
+class MBASE_PUBLIC MythSystemWindows : public MythSystemPrivate
 {
     Q_OBJECT
 
     public:
-        MythSystemUnix(MythSystem *parent);
-        ~MythSystemUnix();
+        MythSystemWindows(MythSystem *parent);
+        ~MythSystemWindows();
 
         virtual void Fork(time_t timeout);
         virtual void Manage();
@@ -99,13 +100,13 @@ class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
         friend class MythSystemIOHandler;
 
     private:
-        pid_t       m_pid;
+        HANDLE      m_child;
         time_t      m_timeout;
 
-        int         m_stdpipe[3];
+        HANDLE      m_stdpipe[3];
 };
 
-#endif
+#endif // _MYTHSYSTEM_WINDOWS_H_
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4

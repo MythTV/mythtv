@@ -1,7 +1,7 @@
 
 // Own header
 #include "mythsystem.h"
-#include "system-unix.h"
+#include "mythsystemunix.h"
 #include "mythmiscutil.h"
 
 // compat header

@@ -4,7 +4,7 @@
 
 // Own header
 #include "mythsystem.h"
-#include "system-windows.h"
+#include "mythsystemwindows.h"
 
 // C++/C headers
 #include <cerrno>
