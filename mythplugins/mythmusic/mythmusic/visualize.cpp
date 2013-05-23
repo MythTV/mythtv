@@ -672,7 +672,7 @@ bool Spectrum::process(VisualNode *node)
     // Take a bunch of data in *node
     // and break it down into spectrum
     // values
-    bool allZero = true;
+    bool MUNUSED allZero = true;
 
     uint i;
     long w = 0, index;
