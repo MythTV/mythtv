@@ -37,30 +37,30 @@
 
 LCD::LCD()
     : QObject(),
-      socket(NULL),                 socketLock(QMutex::Recursive),
-      hostname("localhost"),        port(6545),
-      bConnected(false),
+      m_socket(NULL),                 m_socketLock(QMutex::Recursive),
+      m_hostname("localhost"),        m_port(6545),
+      m_connected(false),
 
-      retryTimer(new QTimer(this)), LEDTimer(new QTimer(this)),
+      m_retryTimer(new QTimer(this)), m_LEDTimer(new QTimer(this)),
 
-      lcd_width(0),                 lcd_height(0),
+      m_lcdWidth(0),                 m_lcdHeight(0),
 
-      lcd_ready(false),             lcd_showtime(false),
-      lcd_showmenu(false),          lcd_showgeneric(false),
-      lcd_showmusic(false),         lcd_showchannel(false),
-      lcd_showvolume(false),        lcd_showrecstatus(false),
-      lcd_backlighton(false),       lcd_heartbeaton(false),
+      m_lcdReady(false),             m_lcdShowTime(false),
+      m_lcdShowMenu(false),          m_lcdShowGeneric(false),
+      m_lcdShowMusic(false),         m_lcdShowChannel(false),
+      m_lcdShowVolume(false),        m_lcdShowRecStatus(false),
+      m_lcdBacklightOn(false),       m_lcdHeartbeatOn(false),
 
-      lcd_popuptime(0),
+      m_lcdPopupTime(0),
 
-      lcd_showmusic_items(),
-      lcd_keystring(),
+      m_lcdShowMusicItems(),
+      m_lcdKeyString(),
 
-      lcd_ledmask(0),
+      m_lcdLedMask(0),
       GetLEDMask(NULL)
 {
-    send_buffer.clear(); last_command.clear();
-    lcd_showmusic_items.clear(); lcd_keystring.clear();
+    m_sendBuffer.clear(); m_lastCommand.clear();
+    m_lcdShowMusicItems.clear(); m_lcdKeyString.clear();
 
     setObjectName("LCD");
 
@@ -72,17 +72,17 @@ LCD::LCD()
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         "An LCD object now exists (LCD() was called)");
 
-    connect(retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
-    connect(LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
+    connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
+    connect(m_LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
 }
 
 bool LCD::m_enabled = false;
-bool LCD::m_server_unavailable = false;
+bool LCD::m_serverUnavailable = false;
 LCD *LCD::m_lcd = NULL;
 
 LCD *LCD::Get(void)
 {
-    if (m_enabled && m_lcd == NULL && m_server_unavailable == false)
+    if (m_enabled && m_lcd == NULL && m_serverUnavailable == false)
         m_lcd = new LCD;
     return m_lcd;
 }
@@ -96,7 +96,7 @@ void LCD::SetupLCD (void)
     {
         delete m_lcd;
         m_lcd = NULL;
-        m_server_unavailable = false;
+        m_serverUnavailable = false;
     }
 
     lcd_host = GetMythDB()->GetSetting("LCDServerHost", "localhost");
@@ -114,14 +114,14 @@ void LCD::SetupLCD (void)
         {
             delete m_lcd;
             m_lcd = NULL;
-            m_server_unavailable = false;
+            m_serverUnavailable = false;
         }
     }
 }
 
 bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 {
-    QMutexLocker locker(&socketLock);
+    QMutexLocker locker(&m_socketLock);
 
     LOG(VB_NETWORK, LOG_DEBUG, LOC +
         QString("connecting to host: %1 - port: %2")
@@ -129,15 +129,15 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     // Open communications
     // Store the hostname and port in case we need to reconnect.
-    hostname = lhostname;
-    port = lport;
+    m_hostname = lhostname;
+    m_port = lport;
 
     // Don't even try to connect if we're currently disabled.
     if (!(m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0)))
     {
-        bConnected = false;
-        m_server_unavailable = true;
-        return bConnected;
+        m_connected = false;
+        m_serverUnavailable = true;
+        return m_connected;
     }
 
     // check if the 'mythlcdserver' is running
@@ -150,13 +150,13 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         if (!startLCDServer())
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed start MythTV LCD Server");
-            return bConnected;
+            return m_connected;
         }
 
         usleep(500000);
     }
 
-    if (!bConnected)
+    if (!m_connected)
     {
         int count = 0;
         do
@@ -164,73 +164,73 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
             ++count;
 
             LOG(VB_GENERAL, LOG_INFO, QString("Connecting to lcd server: "
-                    "%1:%2 (try %3 of 10)").arg(hostname).arg(port)
+                    "%1:%2 (try %3 of 10)").arg(m_hostname).arg(m_port)
                                            .arg(count));
 
-            if (socket)
-                delete socket;
+            if (m_socket)
+                delete m_socket;
 
-            socket = new QTcpSocket();
+            m_socket = new QTcpSocket();
 
-            QObject::connect(socket, SIGNAL(readyRead()),
+            QObject::connect(m_socket, SIGNAL(readyRead()),
                              this, SLOT(ReadyRead()));
-            QObject::connect(socket, SIGNAL(disconnected()),
+            QObject::connect(m_socket, SIGNAL(disconnected()),
                              this, SLOT(Disconnected()));
 
-            socket->connectToHost(hostname, port);
-            if (socket->waitForConnected())
+            m_socket->connectToHost(m_hostname, m_port);
+            if (m_socket->waitForConnected())
             {
-                lcd_ready = false;
-                bConnected = true;
-                QTextStream os(socket);
+                m_lcdReady = false;
+                m_connected = true;
+                QTextStream os(m_socket);
                 os << "HELLO\n";
                 os.flush();
 
                 break;
             }
-            socket->close();
+            m_socket->close();
 
             usleep(500000);
         }
-        while (count < 10 && !bConnected);
+        while (count < 10 && !m_connected);
     }
 
-    if (bConnected == false)
-        m_server_unavailable = true;
+    if (m_connected == false)
+        m_serverUnavailable = true;
 
-    return bConnected;
+    return m_connected;
 }
 
 void LCD::sendToServer(const QString &someText)
 {
-    QMutexLocker locker(&socketLock);
+    QMutexLocker locker(&m_socketLock);
 
-    if (!socket || !lcd_ready)
+    if (!m_socket || !m_lcdReady)
         return;
 
     // Check the socket, make sure the connection is still up
-    if (QAbstractSocket::ConnectedState != socket->state())
+    if (QAbstractSocket::ConnectedState != m_socket->state())
     {
-        lcd_ready = false;
+        m_lcdReady = false;
 
         // Ack, connection to server has been severed try to re-establish the
         // connection
-        retryTimer->setSingleShot(false);
-        retryTimer->start(10000);
+        m_retryTimer->setSingleShot(false);
+        m_retryTimer->start(10000);
         LOG(VB_GENERAL, LOG_ERR,
             "Connection to LCDServer died unexpectedly. "
             "Trying to reconnect every 10 seconds...");
 
-        bConnected = false;
+        m_connected = false;
         return;
     }
 
-    QTextStream os(socket);
+    QTextStream os(m_socket);
     os.setCodec(QTextCodec::codecForName("ISO 8859-1"));
 
-    last_command = someText;
+    m_lastCommand = someText;
 
-    if (bConnected)
+    if (m_connected)
     {
         LOG(VB_NETWORK, LOG_DEBUG, LOC +
             QString(LOC + "Sending to Server: %1").arg(someText));
@@ -242,30 +242,30 @@ void LCD::sendToServer(const QString &someText)
     {
         // Buffer this up in the hope that the connection will open soon
 
-        send_buffer += someText;
-        send_buffer += '\n';
+        m_sendBuffer += someText;
+        m_sendBuffer += '\n';
     }
 }
 
 void LCD::restartConnection()
 {
     // Reset the flag
-    lcd_ready = false;
-    bConnected = false;
-    m_server_unavailable = false;
+    m_lcdReady = false;
+    m_connected = false;
+    m_serverUnavailable = false;
 
     // Retry to connect. . .  Maybe the user restarted LCDd?
-    connectToHost(hostname, port);
+    connectToHost(m_hostname, m_port);
 }
 
 void LCD::ReadyRead(void)
 {
-    QMutexLocker locker(&socketLock);
+    QMutexLocker locker(&m_socketLock);
 
-    if (!socket)
+    if (!m_socket)
         return;
 
-    QString lineFromServer, tempString;
+    QString lineFromServer;
     QStringList aList;
     QStringList::Iterator it;
 
@@ -275,10 +275,10 @@ void LCD::ReadyRead(void)
     // We currently spend most of our time (except for the first line sent
     // back) ignoring it.
 
-    int dataSize = socket->bytesAvailable() + 1;
+    int dataSize = m_socket->bytesAvailable() + 1;
     QByteArray data(dataSize + 1, 0);
 
-    socket->read(data.data(), dataSize);
+    m_socket->read(data.data(), dataSize);
 
     lineFromServer = data;
     lineFromServer = lineFromServer.replace( QRegExp("\n"), " " );
@@ -302,14 +302,14 @@ void LCD::ReadyRead(void)
         }
 
         bool bOK;
-        lcd_width = aList[1].toInt(&bOK);
+        m_lcdWidth = aList[1].toInt(&bOK);
         if (!bOK)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "received bad int for width in "
                                            "CONNECTED response from LCDServer");
         }
 
-        lcd_height = aList[2].toInt(&bOK);
+        m_lcdHeight = aList[2].toInt(&bOK);
         if (!bOK)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "received bad int for height in "
@@ -323,28 +323,28 @@ void LCD::ReadyRead(void)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Something is getting passed to "
                                        "LCDServer that it does not understand");
         LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("last command: %1").arg(last_command));
+            QString("last command: %1").arg(m_lastCommand));
     }
     else if (aList[0] == "KEY")
         handleKeyPress(aList.last().trimmed());
 }
 
-void LCD::handleKeyPress(QString key_pressed)
+void LCD::handleKeyPress(const QString &keyPressed)
 {
     int key = 0;
 
-    QChar mykey = key_pressed.at(0);
-    if (mykey == lcd_keystring.at(0))
+    QChar mykey = keyPressed.at(0);
+    if (mykey == m_lcdKeyString.at(0))
         key = Qt::Key_Up;
-    else if (mykey == lcd_keystring.at(1))
+    else if (mykey == m_lcdKeyString.at(1))
         key = Qt::Key_Down;
-    else if (mykey == lcd_keystring.at(2))
+    else if (mykey == m_lcdKeyString.at(2))
         key = Qt::Key_Left;
-    else if (mykey == lcd_keystring.at(3))
+    else if (mykey == m_lcdKeyString.at(3))
         key = Qt::Key_Right;
-    else if (mykey == lcd_keystring.at(4))
+    else if (mykey == m_lcdKeyString.at(4))
         key = Qt::Key_Space;
-    else if (mykey == lcd_keystring.at(5))
+    else if (mykey == m_lcdKeyString.at(5))
         key = Qt::Key_Escape;
 
     QCoreApplication::postEvent(
@@ -355,37 +355,37 @@ void LCD::handleKeyPress(QString key_pressed)
 void LCD::init()
 {
     // Stop the timer
-    retryTimer->stop();
+    m_retryTimer->stop();
 
     // Get LCD settings
-    lcd_showmusic = (GetMythDB()->GetSetting("LCDShowMusic", "1") == "1");
-    lcd_showtime = (GetMythDB()->GetSetting("LCDShowTime", "1") == "1");
-    lcd_showchannel = (GetMythDB()->GetSetting("LCDShowChannel", "1") == "1");
-    lcd_showgeneric = (GetMythDB()->GetSetting("LCDShowGeneric", "1") == "1");
-    lcd_showvolume = (GetMythDB()->GetSetting("LCDShowVolume", "1") == "1");
-    lcd_showmenu = (GetMythDB()->GetSetting("LCDShowMenu", "1") == "1");
-    lcd_showrecstatus = (GetMythDB()->GetSetting("LCDShowRecStatus", "1") == "1");
-    lcd_keystring = GetMythDB()->GetSetting("LCDKeyString", "ABCDEF");
+    m_lcdShowMusic = (GetMythDB()->GetSetting("LCDShowMusic", "1") == "1");
+    m_lcdShowTime = (GetMythDB()->GetSetting("LCDShowTime", "1") == "1");
+    m_lcdShowChannel = (GetMythDB()->GetSetting("LCDShowChannel", "1") == "1");
+    m_lcdShowGeneric = (GetMythDB()->GetSetting("LCDShowGeneric", "1") == "1");
+    m_lcdShowVolume = (GetMythDB()->GetSetting("LCDShowVolume", "1") == "1");
+    m_lcdShowMenu = (GetMythDB()->GetSetting("LCDShowMenu", "1") == "1");
+    m_lcdShowRecStatus = (GetMythDB()->GetSetting("LCDShowRecStatus", "1") == "1");
+    m_lcdKeyString = GetMythDB()->GetSetting("LCDKeyString", "ABCDEF");
 
-    bConnected = true;
-    lcd_ready = true;
+    m_connected = true;
+    m_lcdReady = true;
 
     // send buffer if there's anything in there
-    if (send_buffer.length() > 0)
+    if (m_sendBuffer.length() > 0)
     {
-        sendToServer(send_buffer);
-        send_buffer = "";
+        sendToServer(m_sendBuffer);
+        m_sendBuffer = "";
     }
 }
 
 void LCD::Disconnected(void)
 {
-    bConnected = false;
+    m_connected = false;
 }
 
 void LCD::stopAll()
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "stopAll");
@@ -395,87 +395,87 @@ void LCD::stopAll()
 
 void LCD::setSpeakerLEDs(enum LCDSpeakerSet speaker, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
-    lcd_ledmask &= ~SPEAKER_MASK;
+    m_lcdLedMask &= ~SPEAKER_MASK;
     if (on)
-        lcd_ledmask |= speaker;
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+        m_lcdLedMask |= speaker;
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setAudioFormatLEDs(enum LCDAudioFormatSet acodec, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
-    lcd_ledmask &= ~AUDIO_MASK;
+    m_lcdLedMask &= ~AUDIO_MASK;
     if (on)
-        lcd_ledmask |= (acodec & AUDIO_MASK);
+        m_lcdLedMask |= (acodec & AUDIO_MASK);
 
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setVideoFormatLEDs(enum LCDVideoFormatSet vcodec, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
-    lcd_ledmask &= ~VIDEO_MASK;
+    m_lcdLedMask &= ~VIDEO_MASK;
     if (on)
-        lcd_ledmask |= (vcodec & VIDEO_MASK);
+        m_lcdLedMask |= (vcodec & VIDEO_MASK);
 
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setVideoSrcLEDs(enum LCDVideoSourceSet vsrc, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
-    lcd_ledmask &= ~VSRC_MASK;
+    m_lcdLedMask &= ~VSRC_MASK;
     if (on)
-        lcd_ledmask |=  vsrc;
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+        m_lcdLedMask |=  vsrc;
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setFunctionLEDs(enum LCDFunctionSet func, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
-    lcd_ledmask &= ~FUNC_MASK;
+    m_lcdLedMask &= ~FUNC_MASK;
     if (on)
-        lcd_ledmask |=  func;
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+        m_lcdLedMask |=  func;
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setVariousLEDs(enum LCDVariousFlags various, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
     if (on) {
-        lcd_ledmask |=  various;
+        m_lcdLedMask |=  various;
         if (various == VARIOUS_SPDIF)
-            lcd_ledmask |= SPDIF_MASK;
+            m_lcdLedMask |= SPDIF_MASK;
     } else {
-        lcd_ledmask &=  ~various;
+        m_lcdLedMask &=  ~various;
         if (various == VARIOUS_SPDIF)
-            lcd_ledmask &= ~SPDIF_MASK;
+            m_lcdLedMask &= ~SPDIF_MASK;
     }
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setTunerLEDs(enum LCDTunerSet tuner, bool on)
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
-    lcd_ledmask &= ~TUNER_MASK;
+    m_lcdLedMask &= ~TUNER_MASK;
     if (on)
-        lcd_ledmask |=  tuner;
-    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+        m_lcdLedMask |=  tuner;
+    sendToServer(QString("UPDATE_LEDS %1").arg(m_lcdLedMask));
 }
 
 void LCD::setChannelProgress(const QString &time, float value)
 {
-    if (!lcd_ready || !lcd_showchannel)
+    if (!m_lcdReady || !m_lcdShowChannel)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
@@ -485,7 +485,7 @@ void LCD::setChannelProgress(const QString &time, float value)
 
 void LCD::setGenericProgress(float value)
 {
-    if (!lcd_ready || !lcd_showgeneric)
+    if (!m_lcdReady || !m_lcdShowGeneric)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
@@ -494,15 +494,15 @@ void LCD::setGenericProgress(float value)
 
 void LCD::setGenericBusy()
 {
-    if (!lcd_ready || !lcd_showgeneric)
+    if (!m_lcdReady || !m_lcdShowGeneric)
         return;
 
     sendToServer("SET_GENERIC_PROGRESS 1 0.0");
 }
 
-void LCD::setMusicProgress(QString time, float value)
+void LCD::setMusicProgress(const QString &time, float value)
 {
-    if (!lcd_ready || !lcd_showmusic)
+    if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
     value = std::min(std::max(0.0f, value), 1.0f);
@@ -512,7 +512,7 @@ void LCD::setMusicProgress(QString time, float value)
 
 void LCD::setMusicShuffle(int shuffle)
 {
-    if (!lcd_ready || !lcd_showmusic)
+    if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
     sendToServer(QString("SET_MUSIC_PLAYER_PROP SHUFFLE %1").arg(shuffle));
@@ -520,7 +520,7 @@ void LCD::setMusicShuffle(int shuffle)
 
 void LCD::setMusicRepeat(int repeat)
 {
-    if (!lcd_ready || !lcd_showmusic)
+    if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
     sendToServer(QString("SET_MUSIC_PLAYER_PROP REPEAT %1").arg(repeat));
@@ -528,7 +528,7 @@ void LCD::setMusicRepeat(int repeat)
 
 void LCD::setVolumeLevel(float value)
 {
-    if (!lcd_ready || !lcd_showvolume)
+    if (!m_lcdReady || !m_lcdShowVolume)
         return;
 
     if (value < 0.0)
@@ -543,8 +543,8 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 {
     GetLEDMask = LedMaskFunc;
     // update LED status every 10 seconds
-    LEDTimer->setSingleShot(false);
-    LEDTimer->start(10000);
+    m_LEDTimer->setSingleShot(false);
+    m_LEDTimer->start(10000);
 }
 
 void LCD::outputLEDs()
@@ -567,7 +567,7 @@ void LCD::outputLEDs()
 
 void LCD::switchToTime()
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToTime");
@@ -577,7 +577,7 @@ void LCD::switchToTime()
 
 void LCD::switchToMusic(const QString &artist, const QString &album, const QString &track)
 {
-    if (!lcd_ready || !lcd_showmusic)
+    if (!m_lcdReady || !m_lcdShowMusic)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToMusic");
@@ -587,9 +587,10 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
             + quotedString(track));
 }
 
-void LCD::switchToChannel(QString channum, QString title, QString subtitle)
+void LCD::switchToChannel(const QString &channum, const QString &title,
+                          const QString &subtitle)
 {
-    if (!lcd_ready || !lcd_showchannel)
+    if (!m_lcdReady || !m_lcdShowChannel)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToChannel");
@@ -599,10 +600,10 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
             + quotedString(subtitle));
 }
 
-void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
+void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, const QString &app_name,
                        bool popMenu)
 {
-    if (!lcd_ready || !lcd_showmenu)
+    if (!m_lcdReady || !m_lcdShowMenu)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToMenu");
@@ -643,7 +644,7 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
 
 void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
 {
-    if (!lcd_ready || !lcd_showgeneric)
+    if (!m_lcdReady || !m_lcdShowGeneric)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToGeneric");
@@ -679,9 +680,9 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
     sendToServer(s);
 }
 
-void LCD::switchToVolume(QString app_name)
+void LCD::switchToVolume(const QString &app_name)
 {
-    if (!lcd_ready || !lcd_showvolume)
+    if (!m_lcdReady || !m_lcdShowVolume)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToVolume");
@@ -691,7 +692,7 @@ void LCD::switchToVolume(QString app_name)
 
 void LCD::switchToNothing()
 {
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "switchToNothing");
@@ -701,22 +702,22 @@ void LCD::switchToNothing()
 
 void LCD::shutdown()
 {
-    QMutexLocker locker(&socketLock);
+    QMutexLocker locker(&m_socketLock);
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "shutdown");
 
-    if (socket)
-        socket->close();
+    if (m_socket)
+        m_socket->close();
 
-    lcd_ready = false;
-    bConnected = false;
+    m_lcdReady = false;
+    m_connected = false;
 }
 
 void LCD::resetServer()
 {
-    QMutexLocker locker(&socketLock);
+    QMutexLocker locker(&m_socketLock);
 
-    if (!lcd_ready)
+    if (!m_lcdReady)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "RESET");
@@ -731,17 +732,17 @@ LCD::~LCD()
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "An LCD device is being snuffed out of "
                                      "existence (~LCD() was called)");
 
-    if (socket)
+    if (m_socket)
     {
-        delete socket;
-        socket = NULL;
-        lcd_ready = false;
+        delete m_socket;
+        m_socket = NULL;
+        m_lcdReady = false;
     }
 }
 
-QString LCD::quotedString(const QString &s)
+QString LCD::quotedString(const QString &string)
 {
-    QString sRes = s;
+    QString sRes = string;
     sRes.replace(QRegExp("\""), QString("\"\""));
     sRes = "\"" + sRes + "\"";
 
