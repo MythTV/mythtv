@@ -1609,9 +1609,8 @@ void Blank::resize(const QSize &newsize)
 }
 
 
-bool Blank::process(VisualNode *node)
+bool Blank::process(VisualNode MUNUSED *node)
 {
-    node = node; // Sometimes I hate -Wall
     return false;
 }
 
