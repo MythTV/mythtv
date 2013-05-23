@@ -91,7 +91,7 @@ class MythCoreContextPrivate : public QObject
     QMap<QObject *, QByteArray> m_playbackClients;
     QMutex m_playbackLock;
     
-    MythPluginManager *pluginmanager;
+    MythPluginManager *m_pluginmanager;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -111,7 +111,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_locale(NULL),
       m_scheduler(NULL),
       m_blockingClient(false),
-      pluginmanager(NULL)
+      m_pluginmanager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
     srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
@@ -1470,21 +1470,21 @@ bool MythCoreContext::TestPluginVersion(const QString &name,
 
 void MythCoreContext::SetPluginManager(MythPluginManager *pmanager)
 {
-    if (d->pluginmanager == pmanager)
+    if (d->m_pluginmanager == pmanager)
         return;
 
-    if (d->pluginmanager)
+    if (d->m_pluginmanager)
     {
-        delete d->pluginmanager;
-        d->pluginmanager = NULL;
+        delete d->m_pluginmanager;
+        d->m_pluginmanager = NULL;
     }
 
-    d->pluginmanager = pmanager;
+    d->m_pluginmanager = pmanager;
 }
 
 MythPluginManager *MythCoreContext::GetPluginManager(void)
 {
-    return d->pluginmanager;
+    return d->m_pluginmanager;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
