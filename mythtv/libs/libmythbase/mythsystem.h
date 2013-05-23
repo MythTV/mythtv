@@ -56,9 +56,6 @@ typedef enum MythSystemMask {
 #include <QBuffer>
 #include <QSemaphore>
 #include <QMap> // FIXME: This shouldn't be needed, Setting_t is not public
-#include <QPointer> // FIXME: QPointer is deprecated
-
-#include "referencecounter.h"
 
 // FIXME: _t is not how we name types in MythTV...
 typedef QMap<QString, bool> Setting_t;
@@ -185,11 +182,12 @@ class MBASE_PUBLIC MythSystem : public QObject
 
   private:
     void initializePrivate(void);
-    MythSystemPrivate *d;
+    MythSystemPrivate *d; // FIXME we generally call this m_priv in MythTV
 
   protected:
     void ProcessFlags(uint flags);
 
+    // FIXME if we already have a private helper, why all this?
     uint        m_status;
     QSemaphore  m_semReady;
 
@@ -205,63 +203,6 @@ class MBASE_PUBLIC MythSystem : public QObject
     QBuffer     m_stdbuff[3];
 };
 
-// FIXME: do we really need reference counting?
-// it shouldn't be difficult to track the lifetime of a private object.
-// FIXME: This should not live in the same header as MythSystem
-class MythSystemPrivate : public QObject, public ReferenceCounter
-{
-    Q_OBJECT
-
-  public:
-    MythSystemPrivate(const QString &debugName);
-
-    virtual void Fork(time_t timeout) = 0;
-    virtual void Manage(void) = 0;
-
-    virtual void Term(bool force=false) = 0;
-    virtual void Signal(int sig) = 0;
-    virtual void JumpAbort(void) = 0;
-
-    virtual bool ParseShell(const QString &cmd, QString &abscmd,
-                            QStringList &args) = 0;
-
-  protected:
-    QPointer<MythSystem> m_parent;
-
-    uint GetStatus(void)             { return m_parent->GetStatus(); }
-    void SetStatus(uint status)      { m_parent->SetStatus(status); }
-
-    // FIXME: We should not return a reference here
-    QString& GetLogCmd(void)         { return m_parent->GetLogCmd(); }
-    // FIXME: We should not return a reference here
-    QString& GetDirectory(void)      { return m_parent->GetDirectory(); }
-
-    bool GetSetting(const char *setting) 
-        { return m_parent->GetSetting(setting); }
-
-    // FIXME: We should not return a reference here
-    QString& GetCommand(void)        { return m_parent->GetCommand(); }
-    void SetCommand(QString &cmd)    { m_parent->SetCommand(cmd); }
-
-    // FIXME: We should not return a reference here
-    // FIXME: Rename "GetArguments"
-    QStringList &GetArgs(void)       { return m_parent->GetArgs(); }
-    // FIXME: Rename "SetArguments"
-    void SetArgs(QStringList &args)  { m_parent->SetArgs(args); }
-
-    // FIXME: This is likely a bad idea, but possibly manageable
-    //        since this is a private class.
-    QBuffer *GetBuffer(int index)    { return m_parent->GetBuffer(index); }
-    // FIXME: This is likely a bad idea, but possibly manageable
-    //        since this is a private class.
-    void Unlock(void)                { m_parent->Unlock(); }
-
-  signals:
-    void started(void);
-    void finished(void);
-    void error(uint status);
-    void readDataReady(int fd);
-};
 
 
 MBASE_PUBLIC uint myth_system(const QString &command, 

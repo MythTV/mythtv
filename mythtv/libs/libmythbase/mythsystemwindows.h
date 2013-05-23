@@ -12,6 +12,7 @@
 #include <QList>
 #include <QMap>
 
+#include "mythsystemprivate.h"
 #include "mythbaseexp.h"
 #include "mythsystem.h"
 #include "mthread.h"
