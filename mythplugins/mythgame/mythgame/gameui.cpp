@@ -103,6 +103,13 @@ bool GameUI::Create()
 
 void GameUI::BuildTree()
 {
+    if (m_gameTree)
+    {
+        m_gameUITree->Reset();
+        delete m_gameTree;
+        m_gameTree = NULL;
+    }
+
     m_gameTree = new MythGenericTree("game root", 0, false);
 
     //  create system filter to only select games where handlers are present
@@ -1106,11 +1113,6 @@ void GameUI::reloadAllData(bool dbChanged)
     m_scanner = NULL;
 
     if (dbChanged)
-    {
-        m_gameUITree->Reset();
-        delete m_gameTree;
-        m_gameTree = NULL;
         BuildTree();
-    }
 }
 
