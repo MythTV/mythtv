@@ -110,7 +110,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
       m_scheduler(NULL),
-      m_blockingClient(false)
+      m_blockingClient(false),
+      pluginmanager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
     srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
@@ -1469,6 +1470,15 @@ bool MythCoreContext::TestPluginVersion(const QString &name,
 
 void MythCoreContext::SetPluginManager(MythPluginManager *pmanager)
 {
+    if (d->pluginmanager == pmanager)
+        return;
+
+    if (d->pluginmanager)
+    {
+        delete d->pluginmanager;
+        d->pluginmanager = NULL;
+    }
+
     d->pluginmanager = pmanager;
 }
 
