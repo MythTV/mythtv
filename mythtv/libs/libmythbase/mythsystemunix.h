@@ -86,15 +86,15 @@ class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
         MythSystemUnix(MythSystem *parent);
         ~MythSystemUnix();
 
-        virtual void Fork(time_t timeout);
-        virtual void Manage();
+        virtual void Fork(time_t timeout) MOVERRIDE;
+        virtual void Manage(void) MOVERRIDE;
 
-        virtual void Term(bool force=false);
-        virtual void Signal(int sig);
-        virtual void JumpAbort(void);
+        virtual void Term(bool force=false) MOVERRIDE;
+        virtual void Signal(int sig) MOVERRIDE;
+        virtual void JumpAbort(void) MOVERRIDE;
 
         virtual bool ParseShell(const QString &cmd, QString &abscmd,
-                                QStringList &args);
+                                QStringList &args) MOVERRIDE;
 
         friend class MythSystemManager;
         friend class MythSystemSignalManager;
