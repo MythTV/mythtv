@@ -39,6 +39,8 @@
 #endif
 
 #ifdef USING_ASI
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <dveo/asi.h>
 #include <dveo/master.h>
 #endif
