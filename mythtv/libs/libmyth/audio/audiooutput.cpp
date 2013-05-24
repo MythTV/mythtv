@@ -79,6 +79,10 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     QString &main_device = settings.main_device;
     AudioOutput *ret = NULL;
 
+    // Don't suspend Pulse if unnecessary.  This can save 100mS
+    if (settings.format == FORMAT_NONE || settings.channels <= 0)
+        willsuspendpa = false;
+
 #ifdef USING_PULSE
     bool pulsestatus = false;
 #else
