@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
-#include <signal.h>  // for kill()
+#include <signal.h> // for kill() and SIGXXX
 #include <string.h>
 
 // QT headers
@@ -279,7 +279,7 @@ void MythSystem::Term(bool force)
     d->Term(force);
 }
 
-void MythSystem::Signal(int sig)
+void MythSystem::Signal(MythSignal sig)
 {
     if (!d)
         m_status = GENERIC_EXIT_NO_HANDLER;
@@ -287,7 +287,30 @@ void MythSystem::Signal(int sig)
     if (m_status != GENERIC_EXIT_RUNNING)
         return;
 
-    d->Signal(sig);
+    int posix_signal = SIGTRAP;
+    switch (sig)
+    {
+        case kSignalHangup: posix_signal = SIGHUP; break;
+        case kSignalInterrupt: posix_signal = SIGINT; break;
+        case kSignalContinue: posix_signal = SIGCONT; break;
+        case kSignalQuit: posix_signal = SIGQUIT; break;
+        case kSignalKill: posix_signal = SIGKILL; break;
+        case kSignalUser1: posix_signal = SIGUSR1; break;
+        case kSignalUser2: posix_signal = SIGUSR2; break;
+        case kSignalTerm: posix_signal = SIGTERM; break;
+        case kSignalStop: posix_signal = SIGSTOP; break;
+    }
+
+    // The default less switch above will cause a compiler warning
+    // if someone adds a signal without updating the switch, but in
+    // case that is missed print out a message.
+    if (SIGTRAP == posix_signal)
+    {
+        LOG(VB_SYSTEM, LOG_ERR, "Programmer error: Unknown signal");
+        return;
+    }
+
+    d->Signal(posix_signal);
 }
 
 

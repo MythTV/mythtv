@@ -348,7 +348,8 @@ WeatherSource::~WeatherSource()
 {
     if (m_ms)
     {
-        m_ms->Kill();
+        m_ms->Signal(kSignalKill);
+        m_ms->Wait(5);
         delete m_ms;
     }
     delete m_updateTimer;

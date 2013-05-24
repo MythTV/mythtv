@@ -21,9 +21,8 @@
 // has been added and as a core functionality class is due for a code
 // review and some cleanup.
 
-// FIXME: compat.h && signal.h should not be pulled into a header file.
-#include "compat.h"
-#include <signal.h>
+// C headers
+#include <stdint.h>
 
 typedef enum MythSystemMask {
     kMSNone               = 0x00000000,
@@ -51,11 +50,25 @@ typedef enum MythSystemMask {
 } MythSystemFlag;
 
 #ifdef __cplusplus
-#include <QString>
+
 #include <QStringList>
-#include <QBuffer>
 #include <QSemaphore>
+#include <QBuffer>
+#include <QObject>
+#include <QString>
 #include <QMap> // FIXME: This shouldn't be needed, Setting_t is not public
+
+typedef enum MythSignal {
+    kSignalHangup,
+    kSignalInterrupt,
+    kSignalContinue,
+    kSignalQuit,
+    kSignalKill,
+    kSignalUser1,
+    kSignalUser2,
+    kSignalTerm,
+    kSignalStop,
+} MythSignal;
 
 // FIXME: _t is not how we name types in MythTV...
 typedef QMap<QString, bool> Setting_t;
@@ -102,16 +115,9 @@ class MBASE_PUBLIC MythSystem : public QObject
     // FIXME: We should not return a reference here
     QByteArray& ReadAllErr();
 
-    // FIXME: Replace these with a single Signal() that accepts
-    //        an enum typedef defined in this header.
+    // FIXME: Can Term be wrapped into Signal?
     void Term(bool force = false);
-    void Kill(void)   { Signal(SIGKILL); }
-    void Stop(void)   { Signal(SIGSTOP); }
-    void Cont(void)   { Signal(SIGCONT); }
-    void HangUp(void) { Signal(SIGHUP);  }
-    void USR1(void)   { Signal(SIGUSR1); }
-    void USR2(void)   { Signal(SIGUSR2); }
-    void Signal(int sig);
+    void Signal(MythSignal);
 
     // FIXME: Should be documented, and maybe should be called AbortJump()
     void JumpAbort(void);
@@ -209,18 +215,14 @@ MBASE_PUBLIC uint myth_system(const QString &command,
                               uint flags = kMSNone,
                               uint timeout = 0);
 MBASE_PUBLIC void myth_system_jump_abort(void);
-extern "C" {
-#endif
-
-/* C prototype */
-MBASE_PUBLIC uint myth_system_c(char *command, uint flags, uint timeout);
+#endif // __cplusplus
 
 #ifdef __cplusplus
-}
-#endif
+extern "C"
+#endif // __cplusplus
+MBASE_PUBLIC uint myth_system_c(char *command, uint flags, uint timeout);
 
-#endif
-
+#endif // MYTHSYSTEM_H_
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */
