@@ -1401,17 +1401,14 @@ void Ripper::customEvent(QEvent* event)
 
 RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
                      QVector<RipTrack*> *tracks, int quality)
-    : MythScreenType(parent, "ripstatus")
+    : MythScreenType(parent, "ripstatus"),
+    m_tracks(tracks),           m_quality(quality),
+    m_CDdevice(device),         m_overallText(NULL),
+    m_trackText(NULL),          m_statusText(NULL),
+    m_overallPctText(NULL),     m_trackPctText(NULL),
+    m_overallProgress(NULL),    m_trackProgress(NULL),
+    m_ripperThread(NULL)
 {
-    m_CDdevice = device;
-    m_tracks = tracks;
-    m_quality = quality;
-    m_ripperThread = NULL;
-
-    m_overallText = m_trackText = m_statusText = m_trackPctText =
-    m_overallPctText = NULL;
-
-    m_overallProgress = m_trackProgress = NULL;
 }
 
 RipStatus::~RipStatus(void)
