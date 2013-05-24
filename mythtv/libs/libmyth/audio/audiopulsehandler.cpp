@@ -1,6 +1,7 @@
 #include <QMutexLocker>
 #include <QString>
 #include <QMutex>
+#include <QTime>
 
 #include <unistd.h> // for usleep
 
@@ -52,10 +53,32 @@ bool PulseHandler::Suspend(enum PulseAction action)
         return true;
     }
 
-    // do nothing if PulseAudio is not currently running
-    if (!IsPulseAudioRunning())
+    static int s_iPulseRunning = -1;
+    static QTime s_time;
+    static enum PulseAction s_ePulseAction = PulseAction(-1);
+
+    // Use the last result of IsPulseAudioRunning if within time
+    if (!s_time.isNull() && s_time.elapsed() < 30000)
     {
+        if (!s_iPulseRunning)
+            return false;
+
+        // If the last action is repeated then do nothing
+        if (action == s_ePulseAction)
+            return true;
+    }
+    // NB IsPulseAudioRunning calls myth_system and can take up to 100mS
+    else if (IsPulseAudioRunning())
+    {
+        s_iPulseRunning = 1;
+        s_time.start();
+    }
+    else
+    {
+        // do nothing if PulseAudio is not currently running
         LOG(VB_AUDIO, LOG_INFO, LOC + "PulseAudio not running");
+        s_iPulseRunning = 0;
+        s_time.start();
         return false;
     }
 
@@ -91,6 +114,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
     // disable processing of incoming callbacks in case we delete/recreate our
     // instance due to a termination or other failure
     g_pulseHandlerActive = false;
+    s_ePulseAction = action;
     return result;
 }
 
