@@ -73,14 +73,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
                 m_drawArea(drawArea),               m_title(title),
                 m_category(category.trimmed()),     m_arrow(arrow),
                 m_recType(recType),                 m_recStat(recStat)
-        {
-            this->m_drawArea = drawArea;
-            this->m_title = title;
-            this->m_category = category.trimmed();
-            this->m_arrow = arrow;
-            this->m_recType = recType;
-            this->m_recStat = recStat;
-        }
+        {}
 
         UIGTCon(const UIGTCon &o)
         {
