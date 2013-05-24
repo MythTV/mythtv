@@ -19,7 +19,11 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdio.h>
+// POSIX headers
+#include <unistd.h> // for usleep
+
+// C headers
+#include <cstdio>
 
 #include <QDir>
 #include <QFile>
