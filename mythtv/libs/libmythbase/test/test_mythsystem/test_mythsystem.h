@@ -19,8 +19,8 @@
  */
 
 #include <QtTest/QtTest>
-
-#include <QDir>
+#include <QTemporaryFile>
+#include <QDateTime>
 
 #include <iostream>
 using namespace std;
@@ -57,10 +57,109 @@ class TestMythSystem: public QObject
 
     void constructed_command_is_run(void)
     {
-        MythSystem cmd("pwd", kMSStdOut);
+        MythSystem cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
         cmd.Run();
         int ret = cmd.Wait();
         QVERIFY(ret == 0);
-        QVERIFY(QString(cmd.ReadAll()).contains(QDir::currentPath()));
+        QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
     }
+
+    void exit_code_works(void)
+    {
+        MythSystem cmd("exit 34", kMSNone | kMSRunShell);
+        cmd.Run();
+        int ret = cmd.Wait();
+        QVERIFY(ret == 34);
+    }
+
+    // TODO kMSDontBlockInputDevs -- avoid blocking LIRC & Joystick Menu
+    // TODO kMSDontDisableDrawing -- avoid disabling UI drawing
+
+    // tests kMSRunBackground      -- run child in the background
+    void run_in_background_works(void)
+    {
+        MythSystem cmd("sleep 1", kMSRunBackground);
+        QDateTime before = QDateTime::currentDateTime();
+        cmd.Run();
+        (void) cmd.Wait();
+        QDateTime after = QDateTime::currentDateTime();
+        QVERIFY(before.msecsTo(after) < 500);
+    }
+
+    // TODO kMSProcessEvents      -- process events while waiting
+    // TODO kMSInUi               -- the parent is in the UI
+
+#if 0 /* FIXME currently this blocks forever :( */
+    // kMSStdIn              -- allow access to stdin
+    void stdin_works(void)
+    {
+        QTemporaryFile tempfile;
+        tempfile.open();
+        QByteArray in = QString(__FUNCTION__).toLatin1();
+        MythSystem cmd(QString("cat - > %1").arg(tempfile.fileName()),
+                       kMSStdIn);
+        cmd.Write(in);
+        cmd.Run();
+        int ret = cmd.Wait();
+        QVERIFY(ret == 0);
+        QByteArray out = tempfile.readAll();
+        QVERIFY(QString(out).contains(QString(in)));
+    }
+#endif
+
+    // kMSStdOut             -- allow access to stdout
+    void stdout_works(void)
+    {
+        MythSystem cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
+        cmd.Run();
+        int ret = cmd.Wait();
+        QVERIFY(ret == 0);
+        QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
+    }
+
+    // kMSStdErr             -- allow access to stderr
+    void stderr_works(void)
+    {
+        MythSystem cmd(QString("echo %1 >&2").arg(__FUNCTION__),
+                       kMSRunShell | kMSStdErr);
+        cmd.Run();
+        int ret = cmd.Wait();
+        QVERIFY(ret == 0);
+        QVERIFY(QString(cmd.ReadAllErr()).contains(__FUNCTION__));
+    }
+    // TODO kMSBuffered           -- buffer the IO channels
+
+    // kMSRunShell           -- run process through shell
+    void shell_used_when_requested(void)
+    {
+        MythSystem cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+                       kMSRunShell | kMSStdOut);
+        cmd.Run();
+        (void) cmd.Wait();
+        QVERIFY(QString(cmd.ReadAll()).contains("X"));
+    }
+
+    void shell_not_used_when_not_requested(void)
+    {
+        MythSystem cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+                       kMSStdOut);
+        cmd.Run();
+        (void) cmd.Wait();
+        QVERIFY(!QString(cmd.ReadAll()).contains("X"));
+    }
+
+    // no need to test kMSNoRunShell, it is a no-op
+    // TODO delete flag
+    // kMSNoRunShell         -- do NOT run process through shell
+
+    // TODO flags to test
+    // TODO kMSAnonLog            -- anonymize the logs
+    // TODO kMSAbortOnJump        -- abort this process on a jumppoint
+    // TODO kMSSetPGID            -- set the process group id
+    // TODO kMSAutoCleanup        -- automatically delete if backgrounded
+    // TODO kMSLowExitVal         -- allow exit values 0-127 only
+    // TODO kMSDisableUDPListener -- disable MythMessage UDP listener
+    //                               for the duration of application.
+    // TODO kMSPropagateLogs      -- add arguments for MythTV log propagation
+
 };

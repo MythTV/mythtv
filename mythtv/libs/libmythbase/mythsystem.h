@@ -105,6 +105,7 @@ class MBASE_PUBLIC MythSystem : public QObject
     bool SetIOPrio(int prio);
 
     void Run(time_t timeout = 0);
+    // FIXME: This should just return a bool telling us if we hit the timeout.
     uint Wait(time_t timeout = 0);
 
     int Write(const QByteArray&);
