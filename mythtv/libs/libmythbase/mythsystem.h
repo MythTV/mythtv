@@ -73,7 +73,7 @@ typedef enum MythSignal {
 // FIXME: _t is not how we name types in MythTV...
 typedef QMap<QString, bool> Setting_t;
 
-void ShutdownMythSystem(void);
+void MBASE_PUBLIC ShutdownMythSystem(void);
 
 // FIXME: Does MythSystem really need to inherit from QObject?
 //        we can probably create a private class that inherits
