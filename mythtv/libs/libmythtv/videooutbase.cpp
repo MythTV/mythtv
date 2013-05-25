@@ -213,43 +213,46 @@ VideoOutput *VideoOutput::Create(
 
         VideoOutput *vo = NULL;
 
+        /* these cases are mutually exlusive */
+        if (renderer == "null")
+            vo = new VideoOutputNull();
+
 #ifdef USING_MINGW
-        if (renderer == "direct3d")
+        else if (renderer == "direct3d")
             vo = new VideoOutputD3D();
 #endif // USING_MINGW
 
 #ifdef USING_QUARTZ_VIDEO
-        if (osxlist.contains(renderer))
+        else if (osxlist.contains(renderer))
             vo = new VideoOutputQuartz();
 #endif // Q_OS_MACX
 
 #ifdef USING_OPENGL_VIDEO
-        if (renderer.contains("opengl"))
+        else if (renderer.contains("opengl") && (renderer != "openglvaapi"))
             vo = new VideoOutputOpenGL(renderer);
 #endif // USING_OPENGL_VIDEO
 
 #ifdef USING_VDPAU
-        if (renderer == "vdpau")
+        else if (renderer == "vdpau")
             vo = new VideoOutputVDPAU();
-        if (renderer == "nullvdpau")
+        else if (renderer == "nullvdpau")
             vo = new VideoOutputNullVDPAU();
 #endif // USING_VDPAU
 
 #ifdef USING_VAAPI
-        if (renderer == "nullvaapi")
+        else if (renderer == "nullvaapi")
             vo = new VideoOutputNullVAAPI();
 #endif // USING_VAAPI
+
 #ifdef USING_GLVAAPI
-        if (renderer == "openglvaapi")
+        else if (renderer == "openglvaapi")
             vo = new VideoOutputOpenGLVAAPI();
 #endif // USING_GLVAAPI
+
 #ifdef USING_XV
-        if (xvlist.contains(renderer))
+        else if (xvlist.contains(renderer))
             vo = new VideoOutputXv();
 #endif // USING_XV
-
-        if (renderer == "null")
-            vo = new VideoOutputNull();
 
         if (vo && !(playerFlags & kVideoIsNull))
         {
