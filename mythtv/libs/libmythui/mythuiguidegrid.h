@@ -75,16 +75,12 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
                 m_recType(recType),                 m_recStat(recStat)
         {}
 
-        UIGTCon(const UIGTCon &o)
-        {
-            m_drawArea = o.m_drawArea;
-            m_title = o.m_title;
-            m_category = o.m_category;
-            m_categoryColor = o.m_categoryColor;
-            m_arrow = o.m_arrow;
-            m_recType = o.m_recType;
-            m_recStat = o.m_recStat;
-        }
+        UIGTCon(const UIGTCon &o) :
+                m_drawArea(o.m_drawArea),   m_title(o.m_title),
+                m_category(o.m_category),   m_categoryColor(o.m_categoryColor),
+                m_arrow(o.m_arrow),         m_recType(o.m_recType),
+                m_recStat(o.m_recStat)
+        {}
 
         QRect m_drawArea;
         QString m_title;
