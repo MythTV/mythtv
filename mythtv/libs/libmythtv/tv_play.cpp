@@ -2260,6 +2260,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     ctx->SetRecorder(testrec);
                     ctx->recorder->Setup();
                 }
+                else
+                    delete testrec; // If testrec isn't a valid recorder ...
             }
             else if (getit)
                 chanid = 0;
