@@ -2638,7 +2638,7 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
  */
 ProgramInfo::CategoryType ProgramInfo::QueryCategoryType(void) const
 {
-    CategoryType ret;
+    CategoryType ret = kCategoryNone;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
