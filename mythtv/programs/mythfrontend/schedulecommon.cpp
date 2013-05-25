@@ -187,6 +187,30 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
 }
 
 /**
+*  \brief Show the previous recordings for this recording rule
+*/
+void ScheduleCommon::ShowPrevious(ProgramInfo *pginfo) const
+{
+    if (!pginfo)
+        return;
+
+    ShowPrevious(pginfo->GetRecordingRuleID(), pginfo->GetTitle());
+}
+
+/**
+*  \brief Show the previous recordings for this recording rule
+*/
+void ScheduleCommon::ShowPrevious(uint recordid, const QString &title) const
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, recordid, title);
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+/**
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */

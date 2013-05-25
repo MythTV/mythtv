@@ -192,6 +192,8 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
             customEdit();
         else if (action == "UPCOMING")
             upcoming();
+        else if (action == "PREVRECORDED")
+            previous();
         else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "TOGGLERECORD")
@@ -237,6 +239,7 @@ void ProgFinder::ShowMenu(void)
             menuPopup->AddButton(tr("Toggle Record"));
             menuPopup->AddButton(tr("Program Details"));
             menuPopup->AddButton(tr("Upcoming"));
+            menuPopup->AddButton(tr("Previously Recorded"));
             menuPopup->AddButton(tr("Custom Edit"));
             menuPopup->AddButton(tr("Program Guide"));
         }
@@ -307,6 +310,10 @@ void ProgFinder::customEvent(QEvent *event)
             else if (resulttext == tr("Upcoming"))
             {
                 upcoming();
+            }
+            else if (resulttext == tr("Previously Recorded"))
+            {
+                previous();
             }
             else if (resulttext == tr("Custom Edit"))
             {
@@ -477,6 +484,20 @@ void ProgFinder::upcoming()
     {
         ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
         ShowUpcoming(pginfo);
+    }
+}
+
+void ProgFinder::previous()
+{
+    if (GetFocusWidget() == m_timesList)
+    {
+        ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
+        ShowPrevious(pginfo);
+    }
+    else if (GetFocusWidget() == m_showList &&
+             m_showList->GetCount() > 0)
+    {
+        ShowPrevious(0, m_showList->GetValue());
     }
 }
 

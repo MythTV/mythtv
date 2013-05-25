@@ -169,6 +169,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             upcoming();
         else if (action == "VIEWSCHEDULED")
             upcomingScheduled();
+        else if (action == "PREVRECORDED")
+            previous();
         else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "GUIDE")
@@ -218,6 +220,7 @@ void ViewScheduled::ShowMenu(void)
         menuPopup->AddButton(tr("Program Guide"));
         menuPopup->AddButton(tr("Upcoming by title"));
         menuPopup->AddButton(tr("Upcoming scheduled"));
+        menuPopup->AddButton(tr("Previously Recorded"));
         menuPopup->AddButton(tr("Custom Edit"));
         menuPopup->AddButton(tr("Delete Rule"));
         menuPopup->AddButton(tr("Show Cards"));
@@ -625,6 +628,20 @@ void ViewScheduled::upcomingScheduled()
     //EmbedTVWindow();
 }
 
+void ViewScheduled::previous()
+{
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+
+    ShowPrevious(pginfo);
+
+    //FIXME:
+    //EmbedTVWindow();
+}
+
 void ViewScheduled::details()
 {
     MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
@@ -764,6 +781,10 @@ void ViewScheduled::customEvent(QEvent *event)
             else if (resulttext == tr("Upcoming scheduled"))
             {
                 upcomingScheduled();
+            }
+            else if (resulttext == tr("Previously Recorded"))
+            {
+                previous();
             }
             else if (resulttext == tr("Custom Edit"))
             {

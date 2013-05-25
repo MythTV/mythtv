@@ -551,6 +551,8 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             deleteRule();
         else if (action == "UPCOMING")
             upcoming();
+        else if (action == "PREVRECORDED")
+            previous();
         else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == ACTION_TOGGLERECORD)
@@ -649,6 +651,7 @@ void GuideGrid::ShowRecordingMenu(void)
             menuPopup->AddButton(tr("Edit Recording Status"));
         menuPopup->AddButton(tr("Edit Schedule"));
         menuPopup->AddButton(tr("Show Upcoming"));
+        menuPopup->AddButton(tr("Previously Recorded"));
         menuPopup->AddButton(tr("Custom Edit"));
 
         if (pginfo && pginfo->GetRecordingRuleID())
@@ -1445,6 +1448,10 @@ void GuideGrid::customEvent(QEvent *event)
             {
                 upcoming();
             }
+            else if (resulttext == tr("Previously Recorded"))
+            {
+                previous();
+            }
             else if (resulttext == tr("Custom Edit"))
             {
                 customEdit();
@@ -2066,6 +2073,19 @@ void GuideGrid::upcoming()
         return;
 
     ShowUpcoming(pginfo);
+}
+
+void GuideGrid::previous()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
+
+    if (pginfo->GetTitle() == kUnknownTitle)
+        return;
+
+    ShowPrevious(pginfo);
 }
 
 void GuideGrid::details()

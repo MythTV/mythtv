@@ -569,6 +569,8 @@ void TV::InitKeys(void)
             "List upcoming episodes"), "O");
     REG_KEY("TV Frontend", ACTION_VIEWSCHEDULED, QT_TRANSLATE_NOOP("MythControls",
             "List scheduled upcoming episodes"), "");
+    REG_KEY("TV Frontend", ACTION_PREVRECORDED, QT_TRANSLATE_NOOP("MythControls",
+            "List previously recorded episodes"), "");
     REG_KEY("TV Frontend", "DETAILS", QT_TRANSLATE_NOOP("MythControls",
             "Show details"), "U");
     REG_KEY("TV Frontend", "VIEWCARD", QT_TRANSLATE_NOOP("MythControls",
@@ -808,6 +810,8 @@ void TV::InitKeys(void)
             "Display menu of recorded programs to jump to"), "");
     REG_KEY("TV Playback", ACTION_VIEWSCHEDULED, QT_TRANSLATE_NOOP("MythControls",
             "Display scheduled recording list"), "");
+    REG_KEY("TV Playback", ACTION_PREVRECORDED, QT_TRANSLATE_NOOP("MythControls",
+            "Display previously recorded episodes"), "");
     REG_KEY("TV Playback", ACTION_SIGNALMON, QT_TRANSLATE_NOOP("MythControls",
             "Monitor Signal Quality"), "Alt+F7");
     REG_KEY("TV Playback", ACTION_JUMPTODVDROOTMENU,
