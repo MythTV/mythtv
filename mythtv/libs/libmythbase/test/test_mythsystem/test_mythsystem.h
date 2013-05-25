@@ -25,8 +25,15 @@
 #include <iostream>
 using namespace std;
 
+#include "mythlogging_extra.h"
+#include "debugloghandler.h"
 #include "mythcorecontext.h"
 #include "mythsystem.h"
+
+static DebugLogHandler *console_dbg(void)
+{
+    return DebugLogHandler::Get("ConsoleLogHandler");
+}
 
 class TestMythSystem: public QObject
 {
@@ -37,6 +44,10 @@ class TestMythSystem: public QObject
     void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", NULL);
+        DebugLogHandler::AddReplacement("ConsoleLogHandler");
+        myth_logging::initialize_logging(
+            VB_GENERAL, LOG_INFO, kNoFacility, /*use_threads*/false,
+            /*logfile*/ QString(), /*logprefix*/QString());
     }
 
     // called at the end of these sets of tests
@@ -152,8 +163,19 @@ class TestMythSystem: public QObject
     // TODO delete flag
     // kMSNoRunShell         -- do NOT run process through shell
 
+    // kMSAnonLog            -- anonymize the logs
+    void logs_anonymized_when_requested(void)
+    {
+        console_dbg()->Clear();
+        MythSystem cmd(QString("echo %1").arg(__FUNCTION__), kMSAnonLog);
+        cmd.Run();
+        (void) cmd.Wait();
+        DebugLogHandlerEntry l = console_dbg()->LastEntry(kHandleLog);
+        QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
+        QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
+    }
+
     // TODO flags to test
-    // TODO kMSAnonLog            -- anonymize the logs
     // TODO kMSAbortOnJump        -- abort this process on a jumppoint
     // TODO kMSSetPGID            -- set the process group id
     // TODO kMSAutoCleanup        -- automatically delete if backgrounded

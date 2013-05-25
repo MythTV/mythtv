@@ -11,8 +11,8 @@ QT += testlib
 
 TEMPLATE = app
 TARGET = test_mythsystem
-DEPENDPATH += . ../..
-INCLUDEPATH += . ../..
+DEPENDPATH += . ../.. ../../logging
+INCLUDEPATH += . ../.. ../../logging
 LIBS += -L../.. -lmythbase-$$LIBVERSION
 LIBS += -Wl,-rpath,$${PWD}/../..
 
