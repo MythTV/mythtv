@@ -888,12 +888,10 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (sre.exactMatch(geometry))
     {
-        sre.indexIn(geometry);
         geo = sre.capturedTexts();
     }
     else if (lre.exactMatch(geometry))
     {
-        lre.indexIn(geometry);
         geo = lre.capturedTexts();
         longForm = true;
     }
