@@ -765,7 +765,8 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
             while (itr != m_handlerMap.end())
             {
-                if ((*itr).MythMediaType & (int)pDev->getMediaType())
+                if ((*itr).MythMediaType & (int)pDev->getMediaType() ||
+                    pDev->getStatus() == MEDIASTAT_OPEN)
                     (*itr).callback(pDev);
                 itr++;
             }
