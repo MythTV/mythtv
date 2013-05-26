@@ -26,26 +26,6 @@ void PlaylistLoadingThread::run()
 #define LOC_WARN QString("PlaylistContainer, Warning: ")
 #define LOC_ERR  QString("PlaylistContainer, Error: ")
 
-void PlaylistContainer::clearCDList()
-{
-    m_cdPlaylist.clear();
-}
-
-void PlaylistContainer::addCDTrack(int track)
-{
-    m_cdPlaylist.push_back(track);
-}
-
-void PlaylistContainer::removeCDTrack(int track)
-{
-    m_cdPlaylist.removeAll(track);
-}
-
-bool PlaylistContainer::checkCDTrack(int track)
-{
-    return m_cdPlaylist.contains(track);
-}
-
 PlaylistContainer::PlaylistContainer(AllMusic *all_music) :
     m_activePlaylist(NULL), m_streamPlaylist(NULL),
     m_allPlaylists(NULL),   m_allMusic(all_music),
@@ -101,8 +81,6 @@ void PlaylistContainer::load()
     m_streamPlaylist->setParent(this);
 
     m_allPlaylists = new QList<Playlist*>;
-
-    m_cdPlaylist.clear();
 
     m_activePlaylist->loadPlaylist("default_playlist_storage", m_myHost);
 

@@ -31,10 +31,6 @@ class PlaylistContainer
     Playlist*       getPlaylist(const QString &name);
     Playlist*       getStreamPlaylist(void) { return m_streamPlaylist; }
 
-    void            clearCDList();
-    void            addCDTrack(int x);
-    void            removeCDTrack(int x);
-    bool            checkCDTrack(int x);
     void            save();
 
     void            createNewPlaylist(QString name);
@@ -59,10 +55,9 @@ class PlaylistContainer
     QList<Playlist*> *getPlaylists(void) { return m_allPlaylists; }
     QStringList       getPlaylistNames(void);
 
-  private:  
+  private:
     Playlist            *m_activePlaylist;
     Playlist            *m_streamPlaylist;
-    QList<int>           m_cdPlaylist;
     QList<Playlist*>    *m_allPlaylists;
     AllMusic            *m_allMusic;
 
