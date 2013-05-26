@@ -162,6 +162,11 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
       parent(p), m_fontStretch(100)
 {
+    callbacks.exec_program = NULL;
+    callbacks.exec_program_tv = NULL;
+    callbacks.configplugin = NULL;
+    callbacks.plugin = NULL;
+    callbacks.eject = NULL;
 }
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
