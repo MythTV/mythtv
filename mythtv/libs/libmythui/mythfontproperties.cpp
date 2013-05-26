@@ -17,7 +17,8 @@
 
 MythFontProperties::MythFontProperties() :
     m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
-    m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false), m_stretch(100)
+    m_hasOutline(false), m_outlineAlpha(255), m_relativeSize(0.05f),
+    m_bFreeze(false), m_stretch(100)
 {
     CalcHash();
 }
