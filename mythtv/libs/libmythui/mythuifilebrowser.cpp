@@ -147,14 +147,19 @@ qint64 MFileInfo::size(void) const
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                                      const QString &startPath)
-    : MythScreenType(parent, "mythuifilebrowser")
+    : MythScreenType(parent, "mythuifilebrowser"),
+        m_isRemote(false),      m_previewTimer(NULL),
+        m_typeFilter(QDir::AllDirs | QDir::Drives | QDir::Files |
+                    QDir::Readable | QDir::Writable | QDir::Executable),
+        m_fileList(NULL),       m_locationEdit(NULL),
+        m_okButton(NULL),       m_cancelButton(NULL),
+        m_backButton(NULL),     m_homeButton(NULL),
+        m_previewImage(NULL),   m_infoText(NULL),
+        m_filenameText(NULL),   m_fullpathText(NULL),
+        m_retObject(NULL)
 {
-    m_retObject = NULL;
-
     SetPath(startPath);
 
-    m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
-                    QDir::Readable | QDir::Writable | QDir::Executable);
     m_nameFilter.clear();
     m_nameFilter << "*";
 
