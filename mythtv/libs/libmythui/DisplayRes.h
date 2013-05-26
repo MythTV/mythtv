@@ -138,7 +138,7 @@ class MUI_PUBLIC DisplayRes
 
   protected:
     /// \brief DisplayRes is an abstract class, instanciate with GetDisplayRes(void)
-    DisplayRes(void) : m_curMode(GUI), m_maxWidth(0), m_maxHeight(0) {;}
+    DisplayRes(void) : m_curMode(GUI), m_maxWidth(0), m_maxHeight(0), m_pixelAspectRatio(1.0) {;}
     virtual ~DisplayRes(void) {;}
 
     // These methods are implemented by the subclasses
