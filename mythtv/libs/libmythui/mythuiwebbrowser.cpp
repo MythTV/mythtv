@@ -120,7 +120,9 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
  * @brief Adds a JavaScript object
  * \note allows the browser to control the music player
  */
-BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
+BrowserApi::BrowserApi(QObject *parent)
+           : QObject(parent),
+            m_frame(NULL), m_gotAnswer(false)
 {
     gCoreContext->addListener(this);
 }
