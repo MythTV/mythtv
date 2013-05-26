@@ -52,13 +52,6 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
     m_currentTime = 0;
     m_maxTime = 0;
 
-#if 0
-    cd_reader_thread = NULL;
-    cd_watcher = NULL;
-    scan_for_cd = gContext->GetNumSetting("AutoPlayCD", 0);
-    m_CDdevice = dev;
-#endif
-
     m_cycleVisualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
 
     if (LCD *lcd = LCD::Get())
@@ -480,13 +473,6 @@ void MusicCommon::switchView(MusicView view)
 
     gPlayer->setAllowRestorePos(true);
 }
-
-#if 0
-bool MusicCommon::onMediaEvent(MythMediaDevice*)
-{
-    return scan_for_cd;
-}
-#endif
 
 bool MusicCommon::keyPressEvent(QKeyEvent *e)
 {

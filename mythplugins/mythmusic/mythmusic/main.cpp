@@ -48,10 +48,6 @@
 #include "cdrip.h"
 #endif
 
-
-// This stores the last MythMediaDevice that was detected:
-QString gCDdevice;
-
 /**
  * \brief Work out the best CD drive to use at this time
  */
@@ -588,7 +584,7 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    gPlayer = new MusicPlayer(NULL, chooseCD());
+    gPlayer = new MusicPlayer(NULL);
     gMusicData = new MusicData();
 
     return 0;
