@@ -231,7 +231,10 @@ bool CdDecoder::initialize()
             m_end = end2;
         }
 
-        m_paranoia = cdio_paranoia_init(m_device);
+        // FIXME can't use cdio_paranoia until we find a way to cleanly
+        // detect when the user has ejected a CD otherwise we enter a
+        // recursive loop in cdio_paranoia_read_limited()
+        //m_paranoia = cdio_paranoia_init(m_device);
         if (NULL != m_paranoia)
         {
             cdio_paranoia_modeset(m_paranoia, PARANOIA_MODE_DISABLE);
@@ -239,7 +242,7 @@ bool CdDecoder::initialize()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Warn: CD reading with paranoia is disabled");
+            LOG(VB_GENERAL, LOG_WARNING, "CD reading with paranoia is disabled");
         }
     }
     else
@@ -375,6 +378,9 @@ void CdDecoder::run()
                                 arg(m_curpos).arg(c));
                             memset( &m_output_buf[m_output_at],
                                 0, CDIO_CD_FRAMESIZE_RAW);
+
+                            // stop if we got an error
+                            m_user_stop = true;
                         }
                     }
 
