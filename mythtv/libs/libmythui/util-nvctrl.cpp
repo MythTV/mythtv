@@ -293,7 +293,6 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     h = strtol(buf[5], NULL, 10);
                     vfl = strtol(buf[8], NULL, 10);
                     hfl = strtol(buf[4], NULL, 10);
-                    h = strtol(buf[5], NULL, 10);
                     istringstream istr(buf[0]);
                     istr.imbue(locale("C"));
                     istr >> dcl;
