@@ -288,6 +288,12 @@
                             <filename>mm_compilations.png</filename>
                         </imagetype>
                     </state>
+                    <state name="cd">
+                        <imagetype name="cd">
+                            <area>0,0,80,80</area>
+                            <filename>mm_cd.png</filename>
+                        </imagetype>
+                    </state>
                     <state name="directory">
                         <imagetype name="directory">
                             <area>0,0,80,80</area>

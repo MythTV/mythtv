@@ -887,6 +887,11 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
             state = "compilations";
             artFile="blank.png";
         }
+        else if (mnode->getAction() == "cd")
+        {
+            state = "cd";
+            artFile="blank.png";
+        }
         else if (mnode->getAction() == "directory")
         {
             state = "directory";
