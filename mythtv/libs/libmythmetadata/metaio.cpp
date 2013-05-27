@@ -157,7 +157,7 @@ void MetaIO::readFromFilename(const QString &filename,
                 if (title.isEmpty())
                     title = part_str;
                 if (artist.isEmpty())
-                    title = part_str;
+                    artist = part_str;
             }
         }
     }
