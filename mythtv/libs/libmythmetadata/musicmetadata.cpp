@@ -966,7 +966,7 @@ QString MusicMetadata::getAlbumArtFile(void)
         res = albumart_image->filename;
 
     // check file exists
-    if (!res.isEmpty())
+    if (!res.isEmpty() && albumart_image)
     {
         int repo = ID_TO_REPO(m_id);
         if (repo == RT_Radio)
