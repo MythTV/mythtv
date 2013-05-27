@@ -795,7 +795,7 @@ void Metadata::toMap(MetadataMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "channel"] = m_channel;
     metadataMap[prefix + "genre"] = m_genre;
     
-    if (isRadio())
+    if (ID_TO_REPO(m_id) == RT_Radio)
     {
         QUrl url(m_filename);
         metadataMap[prefix + "url"] = url.toString(QUrl::RemoveUserInfo);
