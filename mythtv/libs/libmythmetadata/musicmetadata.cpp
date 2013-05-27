@@ -73,6 +73,7 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_albumArt(NULL),
             m_id(lid),
             m_filename(lurl),
+            m_fileSize(0),
             m_changed(false),
             m_station(lstation),
             m_channel(lchannel),
