@@ -97,7 +97,7 @@ class ShoutCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
@@ -151,7 +151,7 @@ class IceCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
