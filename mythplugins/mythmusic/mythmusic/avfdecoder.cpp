@@ -505,15 +505,20 @@ void avfDecoder::run()
                    !finish && !user_stop && seekTime <= 0.0)
             {
                 // Read a packet from the input context
-                if (av_read_frame(m_inputContext, &pkt) < 0)
+                int res = av_read_frame(m_inputContext, &pkt);
+                if (res < 0)
                 {
-                    LOG(VB_GENERAL, LOG_ERR, "Read frame failed");
-                    LOG(VB_FILE, LOG_ERR, ("... for file '" + filename) + "'");
+                    if (res != AVERROR_EOF)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, QString("Read frame failed: %1").arg(res));
+                        LOG(VB_FILE, LOG_ERR, ("... for file '" + filename) + "'");
+                    }
+
                     finish = true;
                     break;
                 }
 
-		av_init_packet(&tmp_pkt);
+                av_init_packet(&tmp_pkt);
                 tmp_pkt.data = pkt.data;
                 tmp_pkt.size = pkt.size;
 
