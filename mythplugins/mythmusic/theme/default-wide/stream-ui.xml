@@ -188,7 +188,7 @@
             <template>%STATION% - %CHANNEL%</template>
         </textarea>
 
-        <textarea name="filename" from="basetextarea">
+        <textarea name="url" from="basetextarea">
             <font>basesmall</font>
             <area>230,595,840,35</area>
         </textarea>
