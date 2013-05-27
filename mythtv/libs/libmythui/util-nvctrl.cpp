@@ -274,7 +274,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                 {
                     int w, h, vfl, hfl, i, irate;
                     double dcl, r;
-                    char *buf[256] = {NULL};
+                    char *buf[256];
                     uint64_t key, key2;
 
                     // skip name
