@@ -150,7 +150,7 @@ void HDHRStreamHandler::run(void)
             last_update.restart();
         }
 
-        size_t read_size = 64 * 1024; // read about 64KB
+        size_t read_size = VIDEO_DATA_BUFFER_SIZE_1S / 8; // read up to 1/8s
         read_size /= VIDEO_DATA_PACKET_SIZE;
         read_size *= VIDEO_DATA_PACKET_SIZE;
 
