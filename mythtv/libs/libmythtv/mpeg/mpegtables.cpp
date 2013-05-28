@@ -717,24 +717,27 @@ uint ProgramMapTable::FindPIDs(uint           type,
 uint ProgramMapTable::FindUnusedPID(uint desired_pid)
 {
     uint pid = desired_pid;
-    while (FindPID(pid) >= 0)
+    if (pid >= MPEG_NULL_PID)
+        pid = 0x20;
+
+    while (FindPID(pid) != -1)
         pid += 0x10;
 
-    if (desired_pid <= 0x1fff)
+    if (pid < MPEG_NULL_PID)
         return pid;
 
     pid = desired_pid;
-    while (FindPID(desired_pid) >= 0)
-        desired_pid += 1;
+    while (FindPID(pid) != -1)
+        pid += 1;
 
-    if (desired_pid <= 0x1fff)
+    if (pid < MPEG_NULL_PID)
         return pid;
 
     pid = 0x20;
-    while (FindPID(desired_pid) >= 0)
-        desired_pid += 1;
+    while (FindPID(pid) != -1)
+        pid += 1;
 
-    return desired_pid & 0x1fff;
+    return pid & 0x1fff;
 }
 
 QString PSIPTable::toString(void) const
