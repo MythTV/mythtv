@@ -121,11 +121,6 @@ void HDHRStreamHandler::run(void)
 
     SetRunning(true, false, false);
 
-    /* Calculate buffer size */
-    uint buffersize = 40000 * TSPacket::kSize;
-    buffersize /= VIDEO_DATA_PACKET_SIZE;
-    buffersize *= VIDEO_DATA_PACKET_SIZE;
-
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 
     int remainder = 0;
