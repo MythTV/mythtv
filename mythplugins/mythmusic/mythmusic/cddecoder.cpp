@@ -519,18 +519,6 @@ MusicMetadata* CdDecoder::getMetadata(int track)
     return getMetadata();
 }
 
-//public
-MusicMetadata *CdDecoder::getLastMetadata()
-{
-    for(int i = getNumTracks(); i > 0; --i)
-    {
-        MusicMetadata *m = getMetadata(i);
-        if(m)
-            return m;
-    }
-    return NULL;
-}
-
 // Create a TOC
 static lsn_t s_lastAudioLsn;
 static Cddb::Toc& GetToc(CdIo_t *cdio, Cddb::Toc& toc)
@@ -792,45 +780,6 @@ MusicMetadata *CdDecoder::getMetadata()
 
     return m;
 }
-
-// virtual
-void CdDecoder::commitMetadata(MusicMetadata *mdata)
-{
-    QMutexLocker lock(&getCdioMutex());
-
-    StCdioDevice cdio(m_devicename);
-    if (!cdio)
-        return;
-
-    Cddb::Toc toc;
-    GetToc(cdio, toc);
-
-    unsigned secs;
-    Cddb::discid_t discID = Cddb::Discid(secs, toc.data(), toc.size() - 1);
-
-    Cddb::Album album(discID, mdata->Genre().toLower().toUtf8());
-    if (!Cddb::Read(album, album.discGenre, discID))
-        album.toc = toc;
-
-    album.isCompilation = mdata->Compilation();
-    if (!mdata->Compilation())
-        album.artist = mdata->Artist();
-    else if (mdata->CompilationArtist() != album.artist)
-        album.artist = mdata->CompilationArtist();
-
-    album.title = mdata->Album();
-    album.year = mdata->Year();
-
-    if (album.tracks.size() < m_tracknum)
-        album.tracks.resize(m_tracknum);
-
-    Cddb::Track& track = album.tracks[m_tracknum - 1];
-    track.title = mdata->Title();
-    track.artist = mdata->Artist();
-
-    Cddb::Write(album);
-}
-
 
 // pure virtual
 bool CdDecoderFactory::supports(const QString &source) const
