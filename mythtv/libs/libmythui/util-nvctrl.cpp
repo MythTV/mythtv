@@ -115,7 +115,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!XNVCTRLIsNvScreen(dpy, screen))
     {
-        LOG(VB_PLAYBACK, LOG_INFO,
+        LOG(VB_GUI, LOG_INFO,
             QString("The NV-CONTROL X extension is not available on screen %1 "
                     "of '%2'.")
                 .arg(screen) .arg(XDisplayName(NULL)));
@@ -126,7 +126,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     ret = XNVCTRLQueryVersion(dpy, &major, &minor);
     if (ret != True)
     {
-        LOG(VB_PLAYBACK, LOG_INFO,
+        LOG(VB_GUI, LOG_INFO,
             QString("The NV-CONTROL X extension does not exist on '%1'.")
                 .arg(XDisplayName(NULL)));
         delete d;
@@ -137,14 +137,14 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!ret)
     {
-        LOG(VB_PLAYBACK, LOG_ERR,
+        LOG(VB_GUI, LOG_ERR,
              "Failed to query if Dynamic Twinview is enabled");
         XCloseDisplay(dpy);
         return -1;
     }
     if (!twinview)
     {
-        LOG(VB_PLAYBACK, LOG_ERR, "Dynamic Twinview not enabled, ignoring");
+        LOG(VB_GUI, LOG_ERR, "Dynamic Twinview not enabled, ignoring");
         delete d;
         return 0;
     }
@@ -159,7 +159,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
     if (!ret)
     {
-        LOG(VB_PLAYBACK, LOG_ERR,
+        LOG(VB_GUI, LOG_ERR,
             "Failed to query the enabled Display Devices.");
         delete d;
         return -1;
@@ -172,7 +172,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                            (unsigned char **)&pMetaModes, &MetaModeLen);
     if (!ret)
     {
-        LOG(VB_PLAYBACK, LOG_ERR,
+        LOG(VB_GUI, LOG_ERR,
             "Failed to query the metamode on selected display device.");
         delete d;
         return -1;
@@ -194,7 +194,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                                (unsigned char **)&str, &len);
         if (!ret)
         {
-            LOG(VB_PLAYBACK, LOG_ERR,
+            LOG(VB_GUI, LOG_ERR,
                "Unknown error. Failed to query the enabled Display Devices.");
             // Free Memory currently allocated
             for (j=0; j < nDisplayDevice; ++j)
@@ -274,7 +274,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                 {
                     int w, h, vfl, hfl, i, irate;
                     double dcl, r;
-                    char *buf[256];
+                    char *buf[8] = {NULL};
                     uint64_t key, key2;
 
                     // skip name
@@ -288,7 +288,18 @@ int GetNvidiaRates(t_screenrate& screenmap)
                          modeString = strtok_r(NULL, " ", &strtok_state))
                     {
                         buf[i++] = modeString;
+
+                        if (i == 9) // We're only interested in the first 8 tokens
+                            break;
                     }
+
+                    if (i < 9)
+                    {
+                        LOG(VB_GUI, LOG_WARNING, "Invalid modeline string "
+                                                      "received, skipping");
+                        continue;
+                    }
+
                     w = strtol(buf[1], NULL, 10);
                     h = strtol(buf[5], NULL, 10);
                     vfl = strtol(buf[8], NULL, 10);
