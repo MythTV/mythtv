@@ -95,4 +95,4 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/share/mythtv
 
 test:
-	-./programs/scripts/unittests.sh
+	-cd libs ; $(MAKE) test
