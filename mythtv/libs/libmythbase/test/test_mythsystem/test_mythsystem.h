@@ -30,6 +30,12 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsystem.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#define MSKIP(MSG) QSKIP(MSG, QTest::SkipSingle)
+#else
+#define MSKIP(MSG) QSKIP(MSG)
+#endif
+
 static DebugLogHandler *console_dbg(void)
 {
     return DebugLogHandler::Get("ConsoleLogHandler");
@@ -100,10 +106,10 @@ class TestMythSystem: public QObject
     // TODO kMSProcessEvents      -- process events while waiting
     // TODO kMSInUi               -- the parent is in the UI
 
-#if 0 /* FIXME currently this blocks forever :( */
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
     {
+        MSKIP("stdin_works -- currently blocks forever");
         QTemporaryFile tempfile;
         tempfile.open();
         QByteArray in = QString(__FUNCTION__).toLatin1();
@@ -116,7 +122,6 @@ class TestMythSystem: public QObject
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));
     }
-#endif
 
     // kMSStdOut             -- allow access to stdout
     void stdout_works(void)
