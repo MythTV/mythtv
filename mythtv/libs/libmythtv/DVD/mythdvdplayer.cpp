@@ -454,7 +454,11 @@ void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
 int MythDVDPlayer::SetTrack(uint type, int trackNo)
 {
     if (kTrackTypeAudio == type)
-        player_ctx->buffer->DVD()->SetTrack(type, trackNo);
+    {
+        StreamInfo stream = decoder->GetTrackInfo(type, trackNo);
+        player_ctx->buffer->DVD()->SetTrack(type, stream.stream_id);
+    }
+
     return MythPlayer::SetTrack(type, trackNo);
 }
 

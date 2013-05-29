@@ -2034,11 +2034,17 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 int logical_stream_id;
                 if (ringBuffer && ringBuffer->IsDVD())
                 {
-                    logical_stream_id =
-                        ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id);
+                    logical_stream_id = ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id);
+                    channels = ringBuffer->DVD()->GetNumAudioChannels(logical_stream_id);
                 }
                 else
                     logical_stream_id = ic->streams[i]->id;
+
+                if (logical_stream_id == -1)
+                {
+                    // This stream isn't mapped, so skip it
+                    continue;
+                }
 
                 tracks[kTrackTypeAudio].push_back(
                    StreamInfo(i, lang, lang_indx, logical_stream_id, channels,
@@ -2046,10 +2052,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
 
             LOG(VB_AUDIO, LOG_INFO, LOC +
-                QString("Audio Track #%1, of type (%2) is A/V stream #%3 "
-                        "and has %4 channels in the %5 language(%6).")
+                QString("Audio Track #%1, of type (%2) is A/V stream #%3 (id=0x%4) "
+                        "and has %5 channels in the %6 language(%7).")
                     .arg(tracks[kTrackTypeAudio].size()).arg(toString(type))
-                    .arg(i).arg(enc->channels)
+                    .arg(i).arg(ic->streams[i]->id,0,16).arg(enc->channels)
                     .arg(iso639_key_toName(lang)).arg(lang));
         }
     }
@@ -3817,9 +3823,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
     QString forcedString = forced ? QObject::tr(" (forced)") : "";
     if (kTrackTypeAudio == type)
     {
-        if (ringBuffer->IsDVD())
-            lang_key = ringBuffer->DVD()->GetAudioLanguage(trackNo);
-
         QString msg = iso639_key_toName(lang_key);
 
         switch (tracks[type][trackNo].audio_type)
@@ -3837,9 +3840,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
                         msg += QString(" %1").arg(s->codec->codec->name).toUpper();
 
                     int channels = 0;
-                    if (ringBuffer->IsDVD())
-                        channels = ringBuffer->DVD()->GetNumAudioChannels(trackNo);
-                    else if (s->codec->channels)
+                    if (ringBuffer->IsDVD() || s->codec->channels)
                         channels = tracks[kTrackTypeAudio][trackNo].orig_num_channels;
 
                     if (channels == 0)

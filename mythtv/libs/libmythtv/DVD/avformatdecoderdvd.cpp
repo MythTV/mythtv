@@ -85,18 +85,35 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
     {
         stable_sort(tracks[kTrackTypeAudio].begin(),
                     tracks[kTrackTypeAudio].end());
-        sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
-        for (; it != tracks[kTrackTypeAudio].end(); ++it)
+
+        int trackNo = -1;
+        int dvdTrack = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
+
+        for (uint i = 0; i < GetTrackCount(kTrackTypeAudio); i++)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("DVD Audio Track Map Stream id #%1, MPEG stream %2")
-                    .arg(it->stream_id)
-                    .arg(ic->streams[it->av_stream_index]->id));
+                QString("DVD Audio Track Map Stream id #%1, av_stream_idx %2, MPEG stream 0x%3, lang %4")
+                    .arg(tracks[kTrackTypeAudio][i].stream_id)
+                    .arg(tracks[kTrackTypeAudio][i].av_stream_index)
+                    .arg(ic->streams[tracks[kTrackTypeAudio][i].av_stream_index]->id,0,16)
+                    .arg(iso639_key_toName(tracks[kTrackTypeAudio][i].language)));
+
+            // Find the audio track in our list that maps to the
+            // selected track in the ringbuffer (the ringbuffer's
+            // list should be in the same order but can have gaps,
+            // so we look for the track with the same index)
+            if (tracks[kTrackTypeAudio][i].stream_id == dvdTrack)
+                trackNo = i;
         }
-        int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
-        if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
-            trackNo = GetTrackCount(kTrackTypeAudio) - 1;
-        SetTrack(kTrackTypeAudio, trackNo);
+
+        if (trackNo < 0 && GetTrackCount(kTrackTypeAudio) > 0)
+        {
+            // Take the first track
+            trackNo = 0;
+        }
+
+        if (trackNo >= 0)
+            SetTrack(kTrackTypeAudio, trackNo);
     }
 
     if (tracks[kTrackTypeSubtitle].size() > 0)
@@ -290,8 +307,11 @@ AudioTrackType AvFormatDecoderDVD::GetAudioTrackType(uint stream_index)
     int type = 0;
     
     if (ringBuffer && ringBuffer->DVD())
-        type = ringBuffer->DVD()->GetAudioTrackType(stream_index);
-    
+    {
+        int logical_idx = ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id);
+        type = ringBuffer->DVD()->GetAudioTrackType(logical_idx);
+    }
+
     if (type > 0 && type < 5) // These are the only types defined in unofficial documentation
     {
         AudioTrackType ret = kAudioTypeNormal;

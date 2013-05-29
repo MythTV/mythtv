@@ -709,13 +709,18 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
             // the audio stream changed
             case DVDNAV_AUDIO_STREAM_CHANGE:
             {
+                // get event details
+                dvdnav_audio_stream_change_event_t* audio =
+                    (dvdnav_audio_stream_change_event_t*)(blockBuf);
+
                 // retrieve the new track
-                int new_track = dvdnav_get_active_audio_stream(m_dvdnav);
+                int new_track = GetAudioTrackNum(audio->physical);
 
                 // debug
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                        QString("DVDNAV_AUDIO_STREAM_CHANGE: old %1 new %2")
-                        .arg(new_track).arg(m_curAudioTrack));
+                        QString("DVDNAV_AUDIO_STREAM_CHANGE: old %1 new %2, physical %3, logical %4")
+                        .arg(m_curAudioTrack).arg(new_track)
+                        .arg(audio->physical).arg(audio->logical));
 
                 // tell the decoder to reset the audio streams if necessary
                 if (new_track != m_curAudioTrack)
@@ -1585,36 +1590,69 @@ int DVDRingBuffer::NumMenuButtons(void) const
 
 /** \brief get the audio language from the dvd
  */
-uint DVDRingBuffer::GetAudioLanguage(int id)
+uint DVDRingBuffer::GetAudioLanguage(int idx)
 {
-    uint16_t lang = dvdnav_audio_stream_to_lang(m_dvdnav, id);
+    int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
+    uint16_t lang = dvdnav_audio_stream_to_lang(m_dvdnav, physicalStreamId);
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("StreamID: %1; lang: %2").arg(id).arg(lang));
+        QString("StreamID: %1; lang: %2").arg(idx).arg(lang));
     return ConvertLangCode(lang);
 }
 
-/** \brief get real dvd track audio number
+/** \brief get the logical track index (into PGC_AST_CTL) of
+  *        the element that maps the given physical stream id.
   * \param key stream_id
 */
 int DVDRingBuffer::GetAudioTrackNum(uint stream_id)
 {
-    return dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
+    const uint AC3_OFFSET  = 0x0080;
+    const uint DTS_OFFSET  = 0x0088;
+    const uint LPCM_OFFSET = 0x00A0;
+    const uint MP2_OFFSET  = 0x01C0;
+
+    int logical = -1;
+
+    if (stream_id >= MP2_OFFSET) {
+      stream_id -= MP2_OFFSET;
+    } else if (stream_id >= LPCM_OFFSET) {
+      stream_id -= LPCM_OFFSET;
+    } else if (stream_id >= DTS_OFFSET) {
+      stream_id -= DTS_OFFSET;
+    } else if (stream_id >= AC3_OFFSET) {
+      stream_id -= AC3_OFFSET;
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        // Get the physical stream number at the given index
+        // of the logical mapping table (function name is wrong!)
+        int phys = dvdnav_get_audio_logical_stream(m_dvdnav, i);
+
+        if ((uint)phys == stream_id)
+        {
+            logical = i;
+            break;
+        }
+    }
+
+    return logical;
 }
 
-int DVDRingBuffer::GetAudioTrackType(uint stream_id)
+int DVDRingBuffer::GetAudioTrackType(uint idx)
 {
     int ret = -1;
     audio_attr_t attributes;
-    int logicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
+    
+    int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
 
-    if (logicalStreamId < 0)
+    if (physicalStreamId < 0)
         return -1;
 
-    if (dvdnav_get_audio_attr(m_dvdnav, logicalStreamId, &attributes) >= 1)
+    if (dvdnav_get_audio_attr(m_dvdnav, physicalStreamId, &attributes) >= 1)
     {
         LOG(VB_AUDIO, LOG_INFO, QString("DVD Audio Track #%1 Language "
                                         "Extension Code - %2")
-                                        .arg(stream_id)
+                                        .arg(idx)
                                         .arg(attributes.code_extension));
         ret = attributes.code_extension;
     }
@@ -1715,9 +1753,10 @@ int DVDRingBuffer::GetTrack(uint type)
     return 0;
 }
 
-uint8_t DVDRingBuffer::GetNumAudioChannels(int id)
+uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
-    unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, id);
+    int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
+    unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
     if (channels == 0xff)
         return 0;
     return (uint8_t)channels;

@@ -94,9 +94,9 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
                          const uint8_t * buf, int buf_size, uint32_t startTime);
 
-    uint GetAudioLanguage(int id);
-    int  GetAudioTrackNum(uint key);
-    int  GetAudioTrackType(uint stream_id);
+    uint GetAudioLanguage(int idx);
+    int  GetAudioTrackNum(uint stream_id);
+    int  GetAudioTrackType(uint idx);
 
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     double GetFrameRate(void);
@@ -133,7 +133,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint TitleTimeLeft(void);
     void  SetTrack(uint type, int trackNo);
     int   GetTrack(uint type);
-    uint8_t GetNumAudioChannels(int id);
+    uint8_t GetNumAudioChannels(int idx);
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
     bool SwitchAngle(uint angle);
