@@ -193,6 +193,29 @@ void HDHRStreamHandler::run(void)
     RemoveAllPIDFilters();
 
     hdhomerun_device_stream_stop(_hdhomerun_device);
+
+    if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
+    {
+        struct hdhomerun_video_sock_t* vs;
+        struct hdhomerun_video_stats_t stats;
+        vs = hdhomerun_device_get_video_sock(_hdhomerun_device);
+        if (vs)
+        {
+            hdhomerun_video_get_stats(vs, &stats);
+            LOG(VB_RECORD, LOG_INFO, LOC + 
+                QString("stream stats: packet_count=%1 "
+                        "network_errors=%2 "
+                        "transport_errors=%3 "
+                        "sequence_errors=%4 "
+                        "overflow_errors=%5")
+                        .arg(stats.packet_count)
+                        .arg(stats.network_error_count)
+                        .arg(stats.transport_error_count)
+                        .arg(stats.sequence_error_count)
+                        .arg(stats.overflow_error_count));
+        }
+    }
+
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "end");
 
     if(tunerLock == 1)
