@@ -863,7 +863,10 @@ bool DBUtil::TryLockSchema(MSqlQuery &query, uint timeout_secs)
 void DBUtil::UnlockSchema(MSqlQuery &query)
 {
     query.prepare("SELECT RELEASE_LOCK('schemaLock')");
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("DBUtil UnlockSchema", query);
+    }
 }
 
 /** \fn CheckTimeZoneSupport(void)
