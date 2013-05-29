@@ -274,7 +274,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                 {
                     int w, h, vfl, hfl, i, irate;
                     double dcl, r;
-                    char *buf[8] = {NULL};
+                    char *buf[9] = {NULL};
                     uint64_t key, key2;
 
                     // skip name
@@ -289,7 +289,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     {
                         buf[i++] = modeString;
 
-                        if (i == 9) // We're only interested in the first 8 tokens
+                        if (i == 9) // We're only interested in the first 9 tokens [0 ... 8]
                             break;
                     }
 
