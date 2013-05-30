@@ -98,6 +98,13 @@ class TestMythSystem: public QObject
         QVERIFY(cmd.Wait() == 200);
     }
 
+    void getstatus_returns_exit_code(void)
+    {
+        MythSystem cmd("exit 200", kMSNone | kMSRunShell);
+        Go(cmd);
+        QVERIFY(cmd.GetStatus() == 200);
+    }
+
     // TODO kMSDontBlockInputDevs -- avoid blocking LIRC & Joystick Menu
     // TODO kMSDontDisableDrawing -- avoid disabling UI drawing
 
