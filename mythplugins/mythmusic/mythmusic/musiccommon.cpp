@@ -44,14 +44,28 @@ using namespace std;
 #include "searchview.h"
 
 MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
-            : MythScreenType(parent, name)
+            : MythScreenType(parent, name),
+    m_currentView(),            m_mainvisual(NULL),
+    m_fullscreenBlank(false),   m_randomVisualizer(false),
+    m_currentVisual(0),         m_moveTrackMode(false),
+    m_movingTrack(false),       m_controlVolume(true),
+    m_currentTrack(0),          m_currentTime(0),
+    m_maxTime(0),               m_playlistTrackCount(0),
+    m_playlistPlayedTime(0),    m_playlistMaxTime(0),
+    m_timeText(NULL),           m_infoText(NULL),
+    m_visualText(NULL),         m_noTracksText(NULL),
+    m_shuffleState(NULL),       m_repeatState(NULL),
+    m_movingTracksState(NULL),  m_ratingState(NULL),
+    m_trackProgress(NULL),      m_trackProgressText(NULL),
+    m_trackSpeedText(NULL),     m_trackState(NULL),
+    m_muteState(NULL),          m_volumeText(NULL),
+    m_playlistProgress(NULL),   m_prevButton(NULL),
+    m_rewButton(NULL),          m_pauseButton(NULL),
+    m_playButton(NULL),         m_stopButton(NULL),
+    m_ffButton(NULL),           m_nextButton(NULL),
+    m_coverartImage(NULL),      m_currentPlaylist(NULL),
+    m_playedTracksList(NULL),   m_visualizerVideo(NULL)
 {
-    m_mainvisual = NULL;
-    m_moveTrackMode = false;
-    m_movingTrack = false;
-    m_currentTime = 0;
-    m_maxTime = 0;
-
     m_cycleVisualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
 
     if (LCD *lcd = LCD::Get())
