@@ -11416,7 +11416,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
                     active = m_tvm_studio_levels;
                     if ((PictureAttribute)i == kPictureAttribute_StudioLevels)
                         BUTTON(ACTION_TOGGLESTUDIOLEVELS,
-                               toString((AdjustFillMode) i));
+                               toString((PictureAttribute) i));
                     else
                         BUTTON(action, toString((PictureAttribute) i));
                 }
@@ -12130,7 +12130,8 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     m_tvm_isbd              = (ctx->buffer && ctx->buffer->IsBD() &&
                                ctx->buffer->BD()->IsHDMVNavigation());
     m_tvm_jump              = (!m_tvm_num_chapters && !m_tvm_isdvd &&
-                               !m_tvm_isbd && ctx->buffer->IsSeekingAllowed());
+                               !m_tvm_isbd && ctx->buffer &&
+                               ctx->buffer->IsSeekingAllowed());
     m_tvm_islivetv          = StateIsLiveTV(m_tvm_state);
     m_tvm_previouschan      = false;
 
