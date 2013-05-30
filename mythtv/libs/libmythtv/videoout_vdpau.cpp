@@ -1190,7 +1190,7 @@ void VideoOutputVDPAU::RemovePIP(MythPlayer *pipplayer)
     if (m_pips[pipplayer].videoSurface && m_render)
         m_render->DestroyVideoSurface(m_pips[pipplayer].videoSurface);
 
-    if (m_pips[pipplayer].videoMixer)
+    if (m_pips[pipplayer].videoMixer && m_render)
         m_render->DestroyVideoMixer(m_pips[pipplayer].videoMixer);
 
     m_pips.remove(pipplayer);
