@@ -2570,9 +2570,11 @@ void MusicCommon::playFirstTrack()
 #define MUSICVOLUMEPOPUPTIME 4 * 1000
 
 MythMusicVolumeDialog::MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
-         : MythScreenType(parent, name, false)
+         : MythScreenType(parent, name, false),
+    m_displayTimer(NULL),  m_messageText(NULL),
+    m_volText(NULL),       m_muteState(NULL),
+    m_volProgress(NULL)
 {
-    m_displayTimer = NULL;
 }
 
 MythMusicVolumeDialog::~MythMusicVolumeDialog(void)
