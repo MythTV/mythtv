@@ -1130,6 +1130,7 @@ void ProgramInfo::clear(void)
     lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
     recstatus = rsUnknown;
+    oldrecstatus = rsUnknown;
 
     prefinput = 0;
     recpriority2 = 0;
