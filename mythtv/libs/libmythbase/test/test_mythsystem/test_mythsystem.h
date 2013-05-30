@@ -18,6 +18,8 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <unistd.h> // for usleep()
+
 #include <QtTest/QtTest>
 #include <QTemporaryFile>
 #include <QDateTime>
@@ -180,8 +182,35 @@ class TestMythSystem: public QObject
         QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
     }
 
+    // kMSAbortOnJump        -- abort this process on a jumppoint
+    void abort_on_jump_works_when_requested(void)
+    {
+        MythSystem cmd(QString("sleep 1"), kMSAbortOnJump);
+        QDateTime before = QDateTime::currentDateTime();
+        cmd.Run();
+        usleep(5000);
+        cmd.JumpAbort();
+        int ret = cmd.Wait();
+        QDateTime after = QDateTime::currentDateTime();
+        QVERIFY(before.msecsTo(after) < 500);
+        QVERIFY(0 != ret);
+    }
+
+    // ! kMSAbortOnJump      -- ! abort this process on a jumppoint
+    void abort_on_jump_noop_works_when_not_requested(void)
+    {
+        MythSystem cmd(QString("sleep 1"), kMSNone);
+        QDateTime before = QDateTime::currentDateTime();
+        cmd.Run();
+        usleep(5000);
+        cmd.JumpAbort();
+        int ret = cmd.Wait();
+        QDateTime after = QDateTime::currentDateTime();
+        QVERIFY(before.msecsTo(after) > 900);
+        QVERIFY(0 == ret);
+    }
+
     // TODO flags to test
-    // TODO kMSAbortOnJump        -- abort this process on a jumppoint
     // TODO kMSSetPGID            -- set the process group id
     // TODO kMSAutoCleanup        -- automatically delete if backgrounded
     // TODO kMSLowExitVal         -- allow exit values 0-127 only
@@ -189,4 +218,5 @@ class TestMythSystem: public QObject
     //                               for the duration of application.
     // TODO kMSPropagateLogs      -- add arguments for MythTV log propagation
 
+    // TODO test current GetStatus() results.
 };
