@@ -428,7 +428,8 @@ void StreamView::updateStreamList(void)
         item->DisplayState("default", "playstate");
 
         // if this is the current radio stream update its play state to match the player
-        if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && mdata &&
+            mdata->ID() == gPlayer->getCurrentMetadata()->ID())
         {
             if (gPlayer->isPlaying())
             {
