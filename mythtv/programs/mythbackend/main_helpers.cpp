@@ -30,7 +30,7 @@
 #include "mainserver.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
-#include "housekeeper.h"
+#include "backendhousekeeper.h"
 
 #include "mythcontext.h"
 #include "mythversion.h"
@@ -600,9 +600,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
                 sched->DisableScheduling();
         }
 
-        if (!cmdline.toBool("nohousekeeper"))
-            housekeeping = new HouseKeeper(true, ismaster, sched);
-
         if (!cmdline.toBool("noautoexpire"))
         {
             expirer = new AutoExpire(&tvList);
@@ -611,9 +608,21 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         }
         gCoreContext->SetScheduler(sched);
     }
-    else if (!cmdline.toBool("nohousekeeper"))
+
+    if (!cmdline.toBool("nohousekeeper"))
     {
-        housekeeping = new HouseKeeper(true, ismaster, NULL);
+        housekeeping = new HouseKeeper();
+
+        if (ismaster)
+        {
+            housekeeping->RegisterTask(new LogCleanerTask());
+            housekeeping->RegisterTask(new CleanupTask());
+            housekeeping->RegisterTask(new ThemeUpdateTask());
+            housekeeping->RegisterTask(new ArtworkTask());
+            housekeeping->RegisterTask(new MythFillDatabaseTask());
+        }
+
+        housekeeping->RegisterTask(new JobQueueRecoverTask());
     }
 
     if (!cmdline.toBool("nojobqueue"))
