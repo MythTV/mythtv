@@ -3890,13 +3890,11 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
 
-    if (!query.exec())
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("QueryAverageAspectRatio", query);
         return MARK_UNSET;
     }
-
-    query.next();
 
     return static_cast<MarkTypes>(query.value(0).toInt());
 }
@@ -3938,7 +3936,11 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  startts);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveVideoProperties", query);
+        return;
+    }
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
@@ -4000,7 +4002,11 @@ void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
     query.bindValue(":RECORDID",   recordid);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveSeasonEpisode", query);
+        return;
+    }
 
     SendUpdateEvent();
 }
