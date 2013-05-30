@@ -2515,10 +2515,10 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
 
                 break;
             }
-
-            gPlayer->changeCurrentTrack(trackPos);
-            m_currentTrack = trackPos;
         }
+
+        gPlayer->changeCurrentTrack(trackPos);
+        m_currentTrack = trackPos;
     }
 
     gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
