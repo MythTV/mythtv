@@ -27,21 +27,27 @@
 #include <iostream>
 using namespace std;
 
+//#define NEW_LOGGING
+#ifdef NEW_LOGGING
 #include "mythlogging_extra.h"
 #include "debugloghandler.h"
+#endif
+
 #include "mythcorecontext.h"
 #include "mythsystem.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, QTest::SkipSingle)
+#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
 #else
 #define MSKIP(MSG) QSKIP(MSG)
 #endif
 
+#ifdef NEW_LOGGING
 static DebugLogHandler *console_dbg(void)
 {
     return DebugLogHandler::Get("ConsoleLogHandler");
 }
+#endif
 
 class TestMythSystem: public QObject
 {
@@ -60,10 +66,12 @@ class TestMythSystem: public QObject
     void initTestCase(void)
     {
         gCoreContext = new MythCoreContext("bin_version", NULL);
+#ifdef NEW_LOGGING
         DebugLogHandler::AddReplacement("ConsoleLogHandler");
         myth_logging::initialize_logging(
             VB_GENERAL, LOG_INFO, kNoFacility, /*use_threads*/false,
             /*logfile*/ QString(), /*logprefix*/QString());
+#endif
     }
 
     // called at the end of these sets of tests
@@ -179,12 +187,16 @@ class TestMythSystem: public QObject
     // kMSAnonLog            -- anonymize the logs
     void logs_anonymized_when_requested(void)
     {
+#ifdef NEW_LOGGING
         console_dbg()->Clear();
         MythSystem cmd(QString("echo %1").arg(__FUNCTION__), kMSAnonLog);
         Go(cmd);
         DebugLogHandlerEntry l = console_dbg()->LastEntry(kHandleLog);
         QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
         QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
+#else
+	MSKIP("Log inspection not supported in old logging.");
+#endif
     }
 
     // kMSAbortOnJump        -- abort this process on a jumppoint
