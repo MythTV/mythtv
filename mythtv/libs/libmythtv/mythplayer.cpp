@@ -237,7 +237,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
 
     defaultDisplayAspect =
         gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                            gCoreContext->GetHostName(), 1.3333);
+                                            gCoreContext->GetHostName(), 1.7777);
     captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
