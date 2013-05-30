@@ -31,6 +31,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
       xds_net_call(QString::null),  xds_net_name(QString::null),
       xds_tsid(0)
 {
+    memset(last_seen, 0, sizeof(last_seen));
     for (uint i = 0; i < 2; i++)
     {
         badvbi[i]      =  0;
