@@ -1859,7 +1859,7 @@ int DVDRingBuffer::is_transp(const uint8_t *buf, int pitch, int n,
  */
 int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
 {
-    uint8_t transp_color[256];
+    uint8_t transp_color[256] = { 0 };
     int y1, y2, x1, x2, y, w, h, i;
     uint8_t *bitmap;
 
@@ -1869,10 +1869,9 @@ int DVDRingBuffer::find_smallest_bounding_rectangle(AVSubtitle *s)
         return 0;
     }
 
-    memset(transp_color, 0, 256);
-    for (i = 0; i < s->rects[0]->nb_colors * 4; i+=4)
+    for(i = 0; i < s->rects[0]->nb_colors; i++)
     {
-        if ((s->rects[0]->pict.data[1][i] >> 24) == 0)
+        if ((((uint32_t*)s->rects[0]->pict.data[1])[i] >> 24) == 0)
             transp_color[i] = 1;
     }
 
