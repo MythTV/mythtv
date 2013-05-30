@@ -194,7 +194,6 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
     bool           m_autoselectsubtitle;
-    long long      m_seekpos;
     const char    *m_dvdname;
     const char    *m_serialnumber;
     bool           m_seeking;
