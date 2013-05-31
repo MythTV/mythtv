@@ -471,9 +471,19 @@ void avfDecoder::run()
 
     AVPacket pkt, tmp_pkt;
     int data_size;
-    uint fill, total;
+    uint fill = 0, total = 0;
+
+    // sanity check sampleSize
+    // should never get here unless m_sampleFmt is good but check just in case
+    int sampleSize = AudioOutputSettings::SampleSize(m_sampleFmt);
+    if (sampleSize == 0)
+    {
+        RunEpilog();
+        return;
+    }
+
     // account for possible frame expansion in aobase (upmix, float conv)
-    uint thresh = m_bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
+    uint thresh = m_bks * 12 / sampleSize;
 
     m_stat = DecoderEvent::Decoding;
     {
