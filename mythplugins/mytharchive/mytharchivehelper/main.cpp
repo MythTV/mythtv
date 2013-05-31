@@ -1955,9 +1955,6 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
 
-    if (type)
-        fmt = av_find_input_format(type);
-
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("getFileInfo(): Opening '%1'")
             .arg(inFile));
