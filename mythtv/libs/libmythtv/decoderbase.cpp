@@ -12,7 +12,6 @@ using namespace std;
 #include "mythlogging.h"
 #include "decoderbase.h"
 #include "programinfo.h"
-#include "livetvchain.h"
 #include "iso639.h"
 #include "DVD/dvdringbuffer.h"
 #include "Bluray/bdringbuffer.h"
