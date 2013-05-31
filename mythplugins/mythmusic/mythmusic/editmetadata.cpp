@@ -278,12 +278,12 @@ void EditMetadataCommon::scanForImages(void)
     for (int x = 0; x < files.size(); x++)
     {
         AlbumArtImage *image = new AlbumArtImage();
-        //image->id = 0;
         image->filename = dir.absolutePath() + '/' + files.at(x);
         image->embedded = false;
         image->imageType = AlbumArtImages::guessImageType(image->filename);
         image->description = "";
         m_metadata->getAlbumArtImages()->addImage(image);
+        delete image;
     }
 
     // scan the tracks tag for any images
