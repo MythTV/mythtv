@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
     sockmanager->RegisterHandler(controlRequestHandler);
     controlRequestHandler->ConnectToMaster();
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
 
     int exitCode = a.exec();
 

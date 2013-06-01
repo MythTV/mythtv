@@ -27,7 +27,7 @@ using namespace std;
 #include <QMap>
 
 #include "mythmiscutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "scheduler.h"
 #include "encoderlink.h"
 #include "mainserver.h"
@@ -2355,7 +2355,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
         {
             if (!pendingEventSent)
             {
-                SendMythSystemRecEvent(
+                SendMythSystemLegacyRecEvent(
                     QString("REC_PENDING SECS %1").arg(secsleft), &ri);
             }
 

@@ -26,7 +26,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythdirs.h"
 #include "mythdb.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "videosource.h" // for is_grabber..
 
 // filldata headers
@@ -616,7 +616,7 @@ bool FillData::Run(SourceList &sourcelist)
         if (is_grabber_external(xmltv_grabber))
         {
             uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
-            MythSystem grabber_capabilities_proc(xmltv_grabber,
+            MythSystemLegacy grabber_capabilities_proc(xmltv_grabber,
                                                  QStringList("--capabilities"),
                                                  flags);
             grabber_capabilities_proc.Run(25);
@@ -660,7 +660,7 @@ bool FillData::Run(SourceList &sourcelist)
         if (hasprefmethod)
         {
             uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
-            MythSystem grabber_method_proc(xmltv_grabber,
+            MythSystemLegacy grabber_method_proc(xmltv_grabber,
                                            QStringList("--preferredmethod"),
                                            flags);
             grabber_method_proc.Run(15);

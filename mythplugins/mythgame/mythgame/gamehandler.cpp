@@ -9,7 +9,7 @@
 
 #include <mythdb.h>
 #include <mythdbcon.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythcontext.h>
 #include <mythdialogs.h>
 #include <mythuihelper.h>

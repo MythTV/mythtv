@@ -13,7 +13,7 @@
 
 class PlaylistContainer;
 class Playlist;
-class MythSystem;
+class MythSystemLegacy;
 
 enum InsertPLOption
 {
@@ -129,7 +129,7 @@ class Playlist : public QObject
     bool                  m_changed;
     bool                  m_doSave;
     MythProgressDialog   *m_progress;
-    MythSystem           *m_proc;
+    MythSystemLegacy           *m_proc;
     uint                  m_procExitVal;
 };
 

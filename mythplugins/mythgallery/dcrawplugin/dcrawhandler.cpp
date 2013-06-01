@@ -10,7 +10,7 @@
 #include <QIODevice>
 #include <QString>
 
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "../mythgallery/galleryutil.h"
 #include "mythlogging.h"
@@ -64,7 +64,7 @@ bool DcrawHandler::read(QImage *image)
     arguments << path;
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
-    MythSystem ms("dcraw", arguments, flags);
+    MythSystemLegacy ms("dcraw", arguments, flags);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
         return false;
@@ -84,7 +84,7 @@ int DcrawHandler::loadThumbnail(QImage *image, QString fileName)
     arguments << "'" + fileName + "'";
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
-    MythSystem ms("dcraw", arguments, flags);
+    MythSystemLegacy ms("dcraw", arguments, flags);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
         return -1;

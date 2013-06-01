@@ -1,6 +1,6 @@
 
 // Own header
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythsystemunix.h"
 #include "mythmiscutil.h"
 
@@ -44,25 +44,25 @@ if( (x) >= 0 ) { \
 
 typedef struct
 {
-    MythSystemUnix *ms;
+    MythSystemLegacyUnix *ms;
     int             type;
 } FDType_t;
 typedef QMap<int, FDType_t*> FDMap_t;
 
 /**********************************
- * MythSystemManager method defines
+ * MythSystemLegacyManager method defines
  *********************************/
 static bool                     run_system = true;
-static MythSystemManager       *manager = NULL;
-static MythSystemSignalManager *smanager = NULL;
-static MythSystemIOHandler     *readThread = NULL;
-static MythSystemIOHandler     *writeThread = NULL;
+static MythSystemLegacyManager       *manager = NULL;
+static MythSystemLegacySignalManager *smanager = NULL;
+static MythSystemLegacyIOHandler     *readThread = NULL;
+static MythSystemLegacyIOHandler     *writeThread = NULL;
 static MSList_t                 msList;
 static QMutex                   listLock;
 static FDMap_t                  fdMap;
 static QMutex                   fdLock;
 
-void ShutdownMythSystem(void)
+void ShutdownMythSystemLegacy(void)
 {
     run_system = false;
     if (manager)
@@ -75,7 +75,7 @@ void ShutdownMythSystem(void)
         writeThread->wait();
 }
 
-MythSystemIOHandler::MythSystemIOHandler(bool read) :
+MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
     MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
     m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
@@ -83,7 +83,7 @@ MythSystemIOHandler::MythSystemIOHandler(bool read) :
     m_readbuf[0] = '\0';
 }
 
-void MythSystemIOHandler::run(void)
+void MythSystemLegacyIOHandler::run(void)
 {
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, QString("Starting IO manager (%1)")
@@ -126,7 +126,7 @@ void MythSystemIOHandler::run(void)
 
             if( retval == -1 )
                 LOG(VB_SYSTEM, LOG_ERR,
-                    QString("MythSystemIOHandler: select(%1, %2) failed: %3")
+                    QString("MythSystemLegacyIOHandler: select(%1, %2) failed: %3")
                         .arg(m_maxfd+1).arg(m_read).arg(strerror(errno)));
 
             else if( retval > 0 )
@@ -152,7 +152,7 @@ void MythSystemIOHandler::run(void)
     RunEpilog();
 }
 
-void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
+void MythSystemLegacyIOHandler::HandleRead(int fd, QBuffer *buff)
 {
     int len;
     errno = 0;
@@ -168,19 +168,19 @@ void MythSystemIOHandler::HandleRead(int fd, QBuffer *buff)
     {
         buff->buffer().append(m_readbuf, len);
 
-        // Get the corresponding MythSystem instance, and the stdout/stderr
+        // Get the corresponding MythSystemLegacy instance, and the stdout/stderr
         // type
         fdLock.lock();
         FDType_t *fdType = fdMap.value(fd);
         fdLock.unlock();
 
         // Emit the data ready signal (1 = stdout, 2 = stderr)
-        MythSystemUnix *ms = fdType->ms;
+        MythSystemLegacyUnix *ms = fdType->ms;
         emit ms->readDataReady(fdType->type);
     }
 }
 
-void MythSystemIOHandler::HandleWrite(int fd, QBuffer *buff)
+void MythSystemLegacyIOHandler::HandleWrite(int fd, QBuffer *buff)
 {
     if( buff->atEnd() )
     {
@@ -208,7 +208,7 @@ void MythSystemIOHandler::HandleWrite(int fd, QBuffer *buff)
         buff->seek(pos+rlen);
 }
 
-void MythSystemIOHandler::insert(int fd, QBuffer *buff)
+void MythSystemLegacyIOHandler::insert(int fd, QBuffer *buff)
 {
     m_pLock.lock();
     m_pMap.insert(fd, buff);
@@ -217,7 +217,7 @@ void MythSystemIOHandler::insert(int fd, QBuffer *buff)
     wake();
 }
 
-void MythSystemIOHandler::remove(int fd)
+void MythSystemLegacyIOHandler::remove(int fd)
 {
     m_pLock.lock();
     if (m_read)
@@ -232,13 +232,13 @@ void MythSystemIOHandler::remove(int fd)
     m_pLock.unlock();
 }
 
-void MythSystemIOHandler::wake()
+void MythSystemLegacyIOHandler::wake()
 {
     QMutexLocker locker(&m_pWaitLock);
     m_pWait.wakeAll();
 }
 
-void MythSystemIOHandler::BuildFDs()
+void MythSystemLegacyIOHandler::BuildFDs()
 {
     // build descriptor list
     FD_ZERO(&m_fds);
@@ -252,12 +252,12 @@ void MythSystemIOHandler::BuildFDs()
     }
 }
 
-MythSystemManager::MythSystemManager() : MThread("SystemManager")
+MythSystemLegacyManager::MythSystemLegacyManager() : MThread("SystemManager")
 {
     m_jumpAbort = false;
 }
 
-void MythSystemManager::run(void)
+void MythSystemLegacyManager::run(void)
 {
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
@@ -281,7 +281,7 @@ void MythSystemManager::run(void)
         }
         m_mapLock.unlock();
 
-        MythSystemUnix     *ms;
+        MythSystemLegacyUnix     *ms;
         pid_t               pid;
         int                 status;
 
@@ -437,7 +437,7 @@ void MythSystemManager::run(void)
     RunEpilog();
 }
 
-void MythSystemManager::append(MythSystemUnix *ms)
+void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
 {
     m_mapLock.lock();
     ms->IncrRef();
@@ -470,7 +470,7 @@ void MythSystemManager::append(MythSystemUnix *ms)
     }
 }
 
-void MythSystemManager::jumpAbort(void)
+void MythSystemLegacyManager::jumpAbort(void)
 {
     m_jumpLock.lock();
     m_jumpAbort = true;
@@ -479,12 +479,12 @@ void MythSystemManager::jumpAbort(void)
 
 // spawn separate thread for signals to prevent manager
 // thread from blocking in some slot
-MythSystemSignalManager::MythSystemSignalManager() :
+MythSystemLegacySignalManager::MythSystemLegacySignalManager() :
     MThread("SystemSignalManager")
 {
 }
 
-void MythSystemSignalManager::run(void)
+void MythSystemLegacySignalManager::run(void)
 {
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
@@ -504,7 +504,7 @@ void MythSystemSignalManager::run(void)
                 listLock.unlock();
                 break;
             }
-            MythSystemUnix *ms = msList.takeFirst();
+            MythSystemLegacyUnix *ms = msList.takeFirst();
             listLock.unlock();
 
             // This can happen if it has been deleted already
@@ -546,11 +546,11 @@ void MythSystemSignalManager::run(void)
 }
 
 /*******************************
- * MythSystem method defines
+ * MythSystemLegacy method defines
  ******************************/
 
-MythSystemUnix::MythSystemUnix(MythSystem *parent) :
-    MythSystemPrivate("MythSystemUnix")
+MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
+    MythSystemLegacyPrivate("MythSystemLegacyUnix")
 {
     m_parent = parent;
 
@@ -563,34 +563,34 @@ MythSystemUnix::MythSystemUnix(MythSystem *parent) :
     // Start the threads if they haven't been started yet.
     if( manager == NULL )
     {
-        manager = new MythSystemManager;
+        manager = new MythSystemLegacyManager;
         manager->start();
     }
 
     if( smanager == NULL )
     {
-        smanager = new MythSystemSignalManager;
+        smanager = new MythSystemLegacySignalManager;
         smanager->start();
     }
 
     if( readThread == NULL )
     {
-        readThread = new MythSystemIOHandler(true);
+        readThread = new MythSystemLegacyIOHandler(true);
         readThread->start();
     }
 
     if( writeThread == NULL )
     {
-        writeThread = new MythSystemIOHandler(false);
+        writeThread = new MythSystemLegacyIOHandler(false);
         writeThread->start();
     }
 }
 
-MythSystemUnix::~MythSystemUnix(void)
+MythSystemLegacyUnix::~MythSystemLegacyUnix(void)
 {
 }
 
-bool MythSystemUnix::ParseShell(const QString &cmd, QString &abscmd,
+bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args)
 {
     QList<QChar> whitespace; whitespace << ' ' << '\t' << '\n' << '\r';
@@ -716,7 +716,7 @@ bool MythSystemUnix::ParseShell(const QString &cmd, QString &abscmd,
     return true;
 }
 
-void MythSystemUnix::Term(bool force)
+void MythSystemLegacyUnix::Term(bool force)
 {
     int status = GetStatus();
     if( (status != GENERIC_EXIT_RUNNING && status != GENERIC_EXIT_TIMEOUT) || 
@@ -736,7 +736,7 @@ void MythSystemUnix::Term(bool force)
     }
 }
 
-void MythSystemUnix::Signal( int sig )
+void MythSystemLegacyUnix::Signal( int sig )
 {
     int status = GetStatus();
     if( (status != GENERIC_EXIT_RUNNING && status != GENERIC_EXIT_TIMEOUT) || 
@@ -753,7 +753,7 @@ void MythSystemUnix::Signal( int sig )
 }
 
 #define MAX_BUFLEN 1024
-void MythSystemUnix::Fork(time_t timeout)
+void MythSystemLegacyUnix::Fork(time_t timeout)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
@@ -1056,21 +1056,21 @@ void MythSystemUnix::Fork(time_t timeout)
     }
 }
 
-void MythSystemUnix::Manage(void)
+void MythSystemLegacyUnix::Manage(void)
 {
     if( manager == NULL )
     {
-        manager = new MythSystemManager;
+        manager = new MythSystemLegacyManager;
         manager->start();
     }
     manager->append(this);
 }
 
-void MythSystemUnix::JumpAbort(void)
+void MythSystemLegacyUnix::JumpAbort(void)
 {
     if( manager == NULL )
     {
-        manager = new MythSystemManager;
+        manager = new MythSystemLegacyManager;
         manager->start();
     }
     manager->jumpAbort();

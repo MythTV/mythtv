@@ -13,7 +13,7 @@
 // MythTV header
 #include "referencecounter.h"
 #include "mythbaseexp.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 class QStringList;
 class QString;
@@ -21,13 +21,13 @@ class QBuffer;
 
 // FIXME: do we really need reference counting?
 // it shouldn't be difficult to track the lifetime of a private object.
-// FIXME: This should not live in the same header as MythSystem
-class MythSystemPrivate : public QObject, public ReferenceCounter
+// FIXME: This should not live in the same header as MythSystemLegacy
+class MythSystemLegacyPrivate : public QObject, public ReferenceCounter
 {
     Q_OBJECT
 
   public:
-    MythSystemPrivate(const QString &debugName);
+    MythSystemLegacyPrivate(const QString &debugName);
 
     virtual void Fork(time_t timeout) = 0;
     virtual void Manage(void) = 0;
@@ -41,7 +41,7 @@ class MythSystemPrivate : public QObject, public ReferenceCounter
 
   protected:
     // FIXME: QPointer uses global hash & is deprecated for good reason
-    QPointer<MythSystem> m_parent;
+    QPointer<MythSystemLegacy> m_parent;
 
     uint GetStatus(void)             { return m_parent->GetStatus(); }
     void SetStatus(uint status)      { m_parent->SetStatus(status); }

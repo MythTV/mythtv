@@ -18,7 +18,7 @@ using namespace std;
 
 // MythTV headers
 #include "housekeeper.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "jobqueue.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
@@ -52,7 +52,7 @@ HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched) :
     isMaster(master),           sched(lsched),
     houseKeepingRun(runthread), houseKeepingThread(NULL),
     fillDBThread(NULL),         fillDBStarted(false),
-    fillDBMythSystem(NULL)
+    fillDBMythSystemLegacy(NULL)
 {
     CleanupMyOldRecordings();
 
@@ -439,22 +439,22 @@ void HouseKeeper::RunMFD(void)
 
     {
         QMutexLocker locker(&fillDBLock);
-        fillDBMythSystem = new MythSystem(command, kMSRunShell |
+        fillDBMythSystemLegacy = new MythSystemLegacy(command, kMSRunShell |
                                                    kMSAutoCleanup);
-        fillDBMythSystem->Run(0);
+        fillDBMythSystemLegacy->Run(0);
         fillDBWait.wakeAll();
     }
 
     MythFillDatabaseThread::setTerminationEnabled(true);
 
-    uint result = fillDBMythSystem->Wait(0);
+    uint result = fillDBMythSystemLegacy->Wait(0);
 
     MythFillDatabaseThread::setTerminationEnabled(false);
 
     {
         QMutexLocker locker(&fillDBLock);
-        fillDBMythSystem->deleteLater();
-        fillDBMythSystem = NULL;
+        fillDBMythSystemLegacy->deleteLater();
+        fillDBMythSystemLegacy = NULL;
         fillDBWait.wakeAll();
     }
 
@@ -489,15 +489,15 @@ void HouseKeeper::KillMFD(void)
         return;
 
     QMutexLocker locker(&fillDBLock);
-    if (fillDBMythSystem && fillDBThread->isRunning())
+    if (fillDBMythSystemLegacy && fillDBThread->isRunning())
     {
-        fillDBMythSystem->Term(false);
+        fillDBMythSystemLegacy->Term(false);
         fillDBWait.wait(locker.mutex(), 50);
     }
 
-    if (fillDBMythSystem && fillDBThread->isRunning())
+    if (fillDBMythSystemLegacy && fillDBThread->isRunning())
     {
-        fillDBMythSystem->Term(true);
+        fillDBMythSystemLegacy->Term(true);
         fillDBWait.wait(locker.mutex(), 50);
     }
 
@@ -818,7 +818,7 @@ void HouseKeeper::UpdateRecordedArtwork(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Performing Artwork Refresh: %1 %2")
         .arg(command).arg(args.join(" ")));
 
-    MythSystem artupd(command, args, kMSRunShell | kMSAutoCleanup);
+    MythSystemLegacy artupd(command, args, kMSRunShell | kMSAutoCleanup);
 
     artupd.Run();
     artupd.Wait();

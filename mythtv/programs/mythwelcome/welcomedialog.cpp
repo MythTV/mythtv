@@ -18,7 +18,7 @@
 #include "compat.h"
 #include "mythdirs.h"
 #include "remoteutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"

@@ -1,5 +1,5 @@
 /*
- *  Class TestMythSystem
+ *  Class TestMythSystemLegacy
  *
  *  Copyright (C) Daniel Kristjansson 2013
  *
@@ -34,7 +34,7 @@ using namespace std;
 #endif
 
 #include "mythcorecontext.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
@@ -49,11 +49,17 @@ static DebugLogHandler *console_dbg(void)
 }
 #endif
 
-class TestMythSystem: public QObject
+class TestMythSystemLegacy: public QObject
 {
     Q_OBJECT
 
     QDateTime m_before;
+
+    void Go(MythSystemLegacy &s)
+    {
+        s.Run();
+        (void) s.Wait();
+    }
 
   private slots:
     // called at the beginning of these sets of tests
@@ -71,6 +77,7 @@ class TestMythSystem: public QObject
     // called at the end of these sets of tests
     void cleanupTestCase(void)
     {
+        ShutdownMythSystemLegacy();
     }
 
     // called before each test case
@@ -85,37 +92,25 @@ class TestMythSystem: public QObject
         m_before = QDateTime();
     }
 
-#if 0
     void constructed_command_is_run(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(
-                QString("echo %1").arg(__FUNCTION__), kMSStdOut));
-        cmd->Wait();
-        QVERIFY(QString(cmd->ReadAll()).contains(__FUNCTION__));
-    }
-#endif
-
-    void wait_returns_true_on_exit(void)
-    {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("exit 200", kMSRunShell));
-        QVERIFY(cmd->Wait());
+        MythSystemLegacy cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
+        Go(cmd);
+        QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
     }
 
-    void wait_returns_false_on_timeout(void)
+    void wait_returns_exit_code(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("sleep 2", kMSRunShell));
-        QVERIFY(!cmd->Wait(1));
+        MythSystemLegacy cmd("exit 200", kMSNone | kMSRunShell);
+        cmd.Run();
+        QVERIFY(cmd.Wait() == 200);
     }
 
     void getstatus_returns_exit_code(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("exit 200", kMSRunShell));
-        cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == 200);
+        MythSystemLegacy cmd("exit 200", kMSNone | kMSRunShell);
+        Go(cmd);
+        QVERIFY(cmd.GetStatus() == 200);
     }
 
     // TODO kMSDontBlockInputDevs -- avoid blocking LIRC & Joystick Menu
@@ -124,16 +119,14 @@ class TestMythSystem: public QObject
     // tests kMSRunBackground      -- run child in the background
     void run_in_background_works(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("sleep 0.5", kMSRunBackground));
-        cmd->Wait();
-        QVERIFY(m_before.msecsTo(QDateTime::currentDateTime()) < 400);
+        MythSystemLegacy cmd("sleep 1", kMSRunBackground);
+        Go(cmd);
+        QVERIFY(m_before.msecsTo(QDateTime::currentDateTime()) < 500);
     }
 
     // TODO kMSProcessEvents      -- process events while waiting
     // TODO kMSInUi               -- the parent is in the UI
 
-#if 0
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
     {
@@ -141,66 +134,51 @@ class TestMythSystem: public QObject
         QTemporaryFile tempfile;
         tempfile.open();
         QByteArray in = QString(__FUNCTION__).toLatin1();
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("cat - > %1").arg(tempfile.fileName()),
-                               kMSStdIn));
-        cmd->Write(in);
-        cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == 0);
+        MythSystemLegacy cmd(QString("cat - > %1").arg(tempfile.fileName()),
+                       kMSStdIn);
+        cmd.Write(in);
+        Go(cmd);
+        QVERIFY(cmd.GetStatus() == 0);
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));
     }
-#endif
 
-#if 0
     // kMSStdOut             -- allow access to stdout
     void stdout_works(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("echo %1").arg(__FUNCTION__),
-                               kMSStdOut));
-        cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == 0);
-        QVERIFY(QString(cmd->ReadAll()).contains(__FUNCTION__));
+        MythSystemLegacy cmd(QString("echo %1").arg(__FUNCTION__), kMSStdOut);
+        Go(cmd);
+        QVERIFY(cmd.GetStatus() == 0);
+        QVERIFY(QString(cmd.ReadAll()).contains(__FUNCTION__));
     }
-#endif
 
-#if 0
     // kMSStdErr             -- allow access to stderr
     void stderr_works(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("echo %1 >&2").arg(__FUNCTION__),
-                               kMSRunShell | kMSStdErr));
-        cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == 0);
-        QVERIFY(QString(cmd->ReadAllErr()).contains(__FUNCTION__));
+        MythSystemLegacy cmd(QString("echo %1 >&2").arg(__FUNCTION__),
+                       kMSRunShell | kMSStdErr);
+        Go(cmd);
+        QVERIFY(cmd.GetStatus() == 0);
+        QVERIFY(QString(cmd.ReadAllErr()).contains(__FUNCTION__));
     }
-#endif
     // TODO kMSBuffered           -- buffer the IO channels
 
-#if 0
     // kMSRunShell           -- run process through shell
     void shell_used_when_requested(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
-                               kMSRunShell | kMSStdOut));
-        cmd->Wait();
-        QVERIFY(QString(cmd->ReadAll()).contains("X"));
+        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+                       kMSRunShell | kMSStdOut);
+        Go(cmd);
+        QVERIFY(QString(cmd.ReadAll()).contains("X"));
     }
-#endif
 
-#if 0
     void shell_not_used_when_not_requested(void)
     {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
-                               kMSStdOut));
-        cmd->Wait();
-        QVERIFY(!QString(cmd->ReadAll()).contains("X"));
+        MythSystemLegacy cmd("if [ x != y ] ; then echo X ; else echo Y ; fi",
+                       kMSStdOut);
+        Go(cmd);
+        QVERIFY(!QString(cmd.ReadAll()).contains("X"));
     }
-#endif
 
     // no need to test kMSNoRunShell, it is a no-op
     // TODO delete flag
@@ -211,14 +189,13 @@ class TestMythSystem: public QObject
     {
 #ifdef NEW_LOGGING
         console_dbg()->Clear();
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create(QString("echo %1").arg(__FUNCTION__),
-                               kMSAnonLog));
-        cmd->Wait();
+        MythSystemLegacy cmd(QString("echo %1").arg(__FUNCTION__), kMSAnonLog);
+        Go(cmd);
         DebugLogHandlerEntry l = console_dbg()->LastEntry(kHandleLog);
         QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
+        QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
 #else
-        MSKIP("Log inspection not supported in old logging.");
+	MSKIP("Log inspection not supported in old logging.");
 #endif
     }
 
@@ -230,6 +207,5 @@ class TestMythSystem: public QObject
     //                               for the duration of application.
     // TODO kMSPropagateLogs      -- add arguments for MythTV log propagation
 
-    // TODO test current GetExitCode() results.
-    // TODO test current GetSignal() results.
+    // TODO test current GetStatus() results.
 };

@@ -49,7 +49,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 

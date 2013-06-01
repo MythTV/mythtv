@@ -26,7 +26,7 @@
 #include <mythuibuttonlist.h>
 #include <mythuiprogressbar.h>
 #include <mythdate.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythmiscutil.h>
 #include <exitcodes.h>
 

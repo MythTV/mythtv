@@ -6,11 +6,11 @@
 
 #include "mythdirs.h"
 #include "mythcontext.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythdate.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #include "netgrabbermanager.h"
 #include "netutils.h"
@@ -50,7 +50,7 @@ void GrabberScript::run()
     QMutexLocker locker(&m_lock);
 
     QString commandline = m_commandline;
-    MythSystem getTree(commandline, QStringList("-T"),
+    MythSystemLegacy getTree(commandline, QStringList("-T"),
                        kMSRunShell | kMSStdOut | kMSBuffered);
     getTree.Run(900);
     uint status = getTree.Wait();
@@ -264,7 +264,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     resetSearch();
 
     LOG(VB_GENERAL, LOG_DEBUG, "Search::executeSearch");
-    m_searchProcess = new MythSystem();
+    m_searchProcess = new MythSystemLegacy();
 
     connect(m_searchProcess, SIGNAL(finished()),
             this, SLOT(slotProcessSearchExit()));
@@ -283,7 +283,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 
     args.append("-S");
     QString term = query;
-    args.append(MythSystem::ShellEscape(term));
+    args.append(MythSystemLegacy::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));

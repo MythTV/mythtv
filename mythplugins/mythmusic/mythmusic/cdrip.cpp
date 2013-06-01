@@ -39,7 +39,7 @@ using namespace std;
 #include <mythuibutton.h>
 #include <mythuiprogressbar.h>
 #include <mythuibuttonlist.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>

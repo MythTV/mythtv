@@ -19,7 +19,7 @@
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythdirs.h"
 
 #include "rssparse.h"
@@ -187,7 +187,7 @@ void InternetContent::GetInternetSources( HTTPRequest *pRequest )
             i != Grabbers.end(); ++i)
     {
         QString commandline = GrabberDir + (*i);
-        MythSystem scriptcheck(commandline, QStringList("-v"),
+        MythSystemLegacy scriptcheck(commandline, QStringList("-v"),
                                kMSRunShell | kMSStdOut | kMSBuffered);
         scriptcheck.Run();
         scriptcheck.Wait();

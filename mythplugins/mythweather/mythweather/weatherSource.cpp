@@ -12,7 +12,7 @@
 #include <mythdb.h>
 #include <compat.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 
 // MythWeather headers
@@ -29,7 +29,7 @@ QStringList WeatherSource::ProbeTypes(QString workingDirectory,
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, arguments, flags);
+    MythSystemLegacy ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -72,7 +72,7 @@ bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, arguments, flags);
+    MythSystemLegacy ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -135,7 +135,7 @@ bool WeatherSource::ProbeInfo(ScriptInfo &info)
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(info.program, arguments, flags);
+    MythSystemLegacy ms(info.program, arguments, flags);
     ms.SetDirectory(info.path);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -385,7 +385,7 @@ QStringList WeatherSource::getLocationList(const QString &str)
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, args, flags);
+    MythSystemLegacy ms(program, args, flags);
     ms.SetDirectory(m_info->path);
     ms.Run();
     
@@ -487,7 +487,7 @@ void WeatherSource::startUpdate(bool forceUpdate)
 
     uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground |
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    m_ms = new MythSystem(program, args, flags);
+    m_ms = new MythSystemLegacy(program, args, flags);
     m_ms->SetDirectory(m_info->path);
 
     connect(m_ms, SIGNAL(finished()),  this, SLOT(processExit()));

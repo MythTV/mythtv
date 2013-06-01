@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QFileInfo>
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 // MythWeather headers
 #include "weatherUtils.h"
@@ -90,7 +90,7 @@ class WeatherSource : public QObject
     bool m_ready;
     bool m_inuse;
     ScriptInfo *m_info;
-    MythSystem *m_ms;
+    MythSystemLegacy *m_ms;
     QString m_dir;
     QString m_locale;
     QString m_cachefile;

@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 
     jobqueue = new JobQueue(false);
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
 
     int exitCode = a.exec();
 

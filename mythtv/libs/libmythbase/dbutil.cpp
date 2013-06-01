@@ -20,7 +20,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #define LOC QString("DBUtil: ")
