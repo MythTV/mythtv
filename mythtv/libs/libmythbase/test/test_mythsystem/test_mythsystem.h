@@ -85,16 +85,15 @@ class TestMythSystem: public QObject
         m_before = QDateTime();
     }
 
-#if 0
     void constructed_command_is_run(void)
     {
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(
                 QString("echo %1").arg(__FUNCTION__), kMSStdOut));
         cmd->Wait();
-        QVERIFY(QString(cmd->ReadAll()).contains(__FUNCTION__));
+        QVERIFY(QString(cmd->GetStandardOutputStream()->readAll())
+                .contains(__FUNCTION__));
     }
-#endif
 
     void wait_returns_true_on_exit(void)
     {
@@ -133,7 +132,6 @@ class TestMythSystem: public QObject
     // TODO kMSProcessEvents      -- process events while waiting
     // TODO kMSInUi               -- the parent is in the UI
 
-#if 0
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
     {
@@ -144,15 +142,14 @@ class TestMythSystem: public QObject
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(QString("cat - > %1").arg(tempfile.fileName()),
                                kMSStdIn));
-        cmd->Write(in);
+        cmd->GetStandardInputStream()->write(in);
+        cmd->GetStandardInputStream()->close();
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == 0);
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));
     }
-#endif
 
-#if 0
     // kMSStdOut             -- allow access to stdout
     void stdout_works(void)
     {
@@ -161,11 +158,12 @@ class TestMythSystem: public QObject
                                kMSStdOut));
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == 0);
-        QVERIFY(QString(cmd->ReadAll()).contains(__FUNCTION__));
+        QVERIFY(cmd->GetStandardOutputStream());
+        QVERIFY(cmd->GetStandardOutputStream()->isOpen());
+        QByteArray ba = cmd->GetStandardOutputStream()->readAll();
+        QVERIFY(QString(ba).contains(__FUNCTION__));
     }
-#endif
 
-#if 0
     // kMSStdErr             -- allow access to stderr
     void stderr_works(void)
     {
@@ -174,12 +172,14 @@ class TestMythSystem: public QObject
                                kMSRunShell | kMSStdErr));
         cmd->Wait();
         QVERIFY(cmd->GetExitCode() == 0);
-        QVERIFY(QString(cmd->ReadAllErr()).contains(__FUNCTION__));
+        QVERIFY(cmd->GetStandardErrorStream());
+        QVERIFY(cmd->GetStandardErrorStream()->isOpen());
+        QByteArray ba = cmd->GetStandardErrorStream()->readAll();
+        QVERIFY(QString(ba).contains(__FUNCTION__));
     }
-#endif
+
     // TODO kMSBuffered           -- buffer the IO channels
 
-#if 0
     // kMSRunShell           -- run process through shell
     void shell_used_when_requested(void)
     {
@@ -187,20 +187,19 @@ class TestMythSystem: public QObject
             MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
                                kMSRunShell | kMSStdOut));
         cmd->Wait();
-        QVERIFY(QString(cmd->ReadAll()).contains("X"));
+        QVERIFY(QString(cmd->GetStandardOutputStream()->readAll())
+                .contains("X"));
     }
-#endif
 
-#if 0
     void shell_not_used_when_not_requested(void)
     {
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("if [ x != y ] ; then echo X ; else echo Y ; fi",
                                kMSStdOut));
         cmd->Wait();
-        QVERIFY(!QString(cmd->ReadAll()).contains("X"));
+        QVERIFY(!QString(cmd->GetStandardOutputStream()->readAll())
+                .contains("X"));
     }
-#endif
 
     // no need to test kMSNoRunShell, it is a no-op
     // TODO delete flag

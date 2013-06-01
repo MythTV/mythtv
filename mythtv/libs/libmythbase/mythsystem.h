@@ -115,14 +115,17 @@ class MBASE_PUBLIC MythSystem
 
     /// Returns the standard input stream for the program
     /// if the kMSStdIn flag was passed to the constructor.
+    /// Note: The stream this returns is already open.
     virtual QIODevice *GetStandardInputStream(void) = 0;
 
     /// Returns the standard output stream for the program
     /// if the kMSStdOut flag was passed to the constructor.
+    /// Note: The stream this returns is already open.
     virtual QIODevice *GetStandardOutputStream(void) = 0;
 
     /// Returns the standard error stream for the program
     /// if the kMSStdErr flag was passed to the constructor.
+    /// Note: The stream this returns is already open.
     virtual QIODevice *GetStandardErrorStream(void) = 0;
 
     /// Sends the selected signal to the program

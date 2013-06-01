@@ -3,6 +3,8 @@
 
 // Qt headers
 #include <QStringList>
+#include <QByteArray>
+#include <QIODevice>
 #include <QRegExp>
 
 // MythTV headers
@@ -13,7 +15,6 @@
 // temporary debugging headers
 #include <iostream>
 using namespace std;
-
 
 class MythSystemLegacyWrapper : public MythSystem
 {
@@ -49,25 +50,25 @@ class MythSystemLegacyWrapper : public MythSystem
         Wait(0);
     }
 
-    virtual uint GetFlags(void) const MOVERRIDE
+    uint GetFlags(void) const MOVERRIDE
     {
         return m_flags;
     }
 
     /// Returns the starting path of the program
-    virtual QString GetStartingPath(void) const MOVERRIDE
+    QString GetStartingPath(void) const MOVERRIDE
     {
         return m_legacy->GetDirectory();
     }
 
     /// Return the CPU Priority of the program
-    virtual Priority GetCPUPriority(void) const MOVERRIDE
+    Priority GetCPUPriority(void) const MOVERRIDE
     {
         return kNormalPriority;
     }
 
     /// Return the Disk Priority of the program
-    virtual Priority GetDiskPriority(void) const MOVERRIDE
+    Priority GetDiskPriority(void) const MOVERRIDE
     {
         return kNormalPriority;
     }
@@ -78,7 +79,7 @@ class MythSystemLegacyWrapper : public MythSystem
     ///         think it is running even though it is not.
     /// WARNING The legacy timeout is in seconds not milliseconds,
     ///         timeout will be rounded.
-    virtual bool Wait(uint timeout_ms) MOVERRIDE
+    bool Wait(uint timeout_ms) MOVERRIDE
     {
         timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
             ((timeout_ms == 0) ? 0 : 1000);
@@ -90,27 +91,59 @@ class MythSystemLegacyWrapper : public MythSystem
 
     /// Returns the standard input stream for the program
     /// if the kMSStdIn flag was passed to the constructor.
-    virtual QIODevice *GetStandardInputStream(void) MOVERRIDE
+    /// Note: This is not safe!
+    QIODevice *GetStandardInputStream(void) MOVERRIDE
     {
-        return NULL;
+        if (!(kMSStdIn & m_flags))
+            return NULL;
+
+        if (!m_legacy->GetBuffer(0)->isOpen() &&
+            !m_legacy->GetBuffer(0)->open(QIODevice::WriteOnly))
+        {
+            return NULL;
+        }
+
+        return m_legacy->GetBuffer(0);
     }
 
     /// Returns the standard output stream for the program
     /// if the kMSStdOut flag was passed to the constructor.
-    virtual QIODevice *GetStandardOutputStream(void) MOVERRIDE
+    QIODevice *GetStandardOutputStream(void) MOVERRIDE
     {
-        return NULL;
+        if (!(kMSStdOut & m_flags))
+            return NULL;
+
+        Wait(0); // legacy getbuffer is not thread-safe, so wait
+
+        if (!m_legacy->GetBuffer(1)->isOpen() &&
+            !m_legacy->GetBuffer(1)->open(QIODevice::ReadOnly))
+        {
+            return NULL;
+        }
+
+        return m_legacy->GetBuffer(1);
     }
 
     /// Returns the standard error stream for the program
     /// if the kMSStdErr flag was passed to the constructor.
-    virtual QIODevice *GetStandardErrorStream(void) MOVERRIDE
+    QIODevice *GetStandardErrorStream(void) MOVERRIDE
     {
-        return NULL;
+        if (!(kMSStdErr & m_flags))
+            return NULL;
+
+        Wait(0); // legacy getbuffer is not thread-safe, so wait
+
+        if (!m_legacy->GetBuffer(2)->isOpen() &&
+            !m_legacy->GetBuffer(2)->open(QIODevice::ReadOnly))
+        {
+            return NULL;
+        }
+
+        return m_legacy->GetBuffer(2);
     }
 
     /// Sends the selected signal to the program
-    virtual void Signal(MythSignal sig) MOVERRIDE
+    void Signal(MythSignal sig) MOVERRIDE
     {
         m_legacy->Signal(sig);
     }
@@ -121,7 +154,7 @@ class MythSystemLegacyWrapper : public MythSystem
      *  Returns -2 if the program has not yet been collected.
      *  Returns an exit code 0..255 if the program exited with exit code.
      */
-    virtual int GetExitCode(void) const MOVERRIDE
+    int GetExitCode(void) const MOVERRIDE
     {
         // FIXME doesn't actually know why program exited.
         //       if program returns 142 then we will forever
@@ -149,7 +182,7 @@ class MythSystemLegacyWrapper : public MythSystem
      *        limited interface is just telling us if GetExitCode()
      *        will return -2 or -1, or 0..255, so it is redundant.
      */
-    virtual MythSignal GetSignal(void) const MOVERRIDE
+    MythSignal GetSignal(void) const MOVERRIDE
     {
         return kSignalNone;
 /*
@@ -185,7 +218,7 @@ class MythSystemLegacyWrapper : public MythSystem
     }
 
   private:
-    MythSystemLegacy *m_legacy;
+    QScopedPointer<MythSystemLegacy> m_legacy;
     uint m_flags;
 };
 
