@@ -274,7 +274,5 @@ class TestMythSystem: public QObject
         QVERIFY(cmd->GetExitCode() == -2);
     }
 
-    // TODO test current GetSignal() results.
-
     // TODO test Signal()
 };

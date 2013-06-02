@@ -68,7 +68,6 @@ typedef enum MythSignal {
     kSignalUser2,
     kSignalTerm,
     kSignalStop,
-    // add more signals for benefit of GetSignal()
 } MythSignal;
 
 class QStringList;
@@ -158,25 +157,6 @@ class MBASE_PUBLIC MythSystem
      *  Returns an exit code 0..255 if the program exited with exit code.
      */
     virtual int GetExitCode(void) const = 0;
-
-    /** \brief returns the signal, if any, that killed the program.
-     *
-     *  If the program was killed by a signal this returns the signal
-     *  that killed the program or signal unknown if it was not one of
-     *  the common signals. If the program is still running or if the
-     *  program did not exit due to a signal this returns kSignalNone.
-     *
-     *  Note: Platform agnostic code should only rely on kSignalNone
-     *        vs non-kSignalNone values, since querying the actual
-     *        signal is not possible on many platforms.
-     *
-     *  TODO: Should we just return a tristate: killed by signal,
-     *        still running, exited normally?
-     *  TODO: Should we just eliminate this entirely, i.e. a
-     *        limited interface is just telling us if GetExitCode()
-     *        will return -2 or -1, or 0..255, so it is redundant.
-     */
-    virtual MythSignal GetSignal(void) const = 0;
 
   protected:
     MythSystem() {}

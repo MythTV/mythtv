@@ -189,51 +189,6 @@ class MythSystemLegacyWrapper : public MythSystem
         return status;
     }
 
-    /** \brief returns the signal, if any, that killed the program.
-     *
-     *  If the program was killed by a signal this returns the signal
-     *  that killed the program or signal unknown if it was not one of
-     *  the common signals. If the program is still running or if the
-     *  program did not exit due to a signal this returns kSignalNone.
-     *
-     *  Note: Platform agnostic code should only rely on kSignalNone
-     *        vs non-kSignalNone values, since querying the actual
-     *        signal is not possible on many platforms.
-     *
-     *  TODO: Should we just return a tristate: killed by signal,
-     *        still running, exited normally?
-     *  TODO: Should we just eliminate this entirely, i.e. a
-     *        limited interface is just telling us if GetExitCode()
-     *        will return -2 or -1, or 0..255, so it is redundant.
-     */
-    MythSignal GetSignal(void) const MOVERRIDE
-    {
-        return kSignalNone;
-/*
-        int status = m_legacy->GetStatus();
-        if (!WIFSIGNALED(status))
-            return kSignalNone;
-        int posix_signal = -1; // sentinel, POSIX signals are all positive
-#ifdef WSTOPSIG
-        posix_signal = WSTOPSIG(status);
-#endif
-        switch (posix_signal)
-        {
-            case SIGHUP: return kSignalHangup;
-            case SIGINT: return kSignalInterrupt;
-            case SIGCONT: return kSignalContinue;
-            case SIGQUIT: return kSignalQuit;
-            case SIGSEGV: return kSignalSegfault;
-            case SIGKILL: return kSignalKill;
-            case SIGUSR1: return kSignalUser1;
-            case SIGUSR2: return kSignalUser2;
-            case SIGTERM: return kSignalTerm;
-            case SIGSTOP: return kSignalStop;
-            default: return kSignalUnknown;
-        }
-*/
-    }
-
   private:
     MythSystemLegacyWrapper(MythSystemLegacy *legacy, uint flags) :
         m_legacy(legacy), m_flags(flags)
