@@ -166,7 +166,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
         if (m_scope == kHKGlobal)
             query.bindValue(":HOST", gCoreContext->GetHostName());
         query.bindValue(":TAG", m_dbTag);
-        query.bindValue(":TIME", last);
+        query.bindValue(":TIME", MythDate::as_utc(last));
 
         if (!query.exec())
             MythDB::DBError("HouseKeeperTask::updateLastRun", query);
