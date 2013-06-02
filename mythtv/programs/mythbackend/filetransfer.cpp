@@ -41,6 +41,9 @@ FileTransfer::~FileTransfer()
 {
     Stop();
 
+    if (sock) // FileTransfer becomes responsible for deleting the socket
+        sock->DecrRef();
+
     if (rbuffer)
     {
         delete rbuffer;
