@@ -2373,7 +2373,7 @@ NULL
         const char *updates[] = {
 // Create a global enable/disable instead of one per-host
 // Any hosts previously running it mean all hosts do now
-"INSERT INTO `settings` (`value`, `hostname`, `data`),"
+"INSERT INTO `settings` (`value`, `hostname`, `data`)"
 "   SELECT 'HardwareProfileEnaled',"
 "          NULL,"
 "          IF((SELECT COUNT(1)"
@@ -2381,7 +2381,7 @@ NULL
 "               WHERE `value` = 'HardwareProfileLastUpdated' > 0),"
 "             1, 0);",
 // Create 'lastrun' times using existing data in settings
-"INSERT INTO `housekeeper` (`tag`, `hostname`, `lastrun`)"
+"INSERT INTO `housekeeping` (`tag`, `hostname`, `lastrun`)"
 "   SELECT 'HardwareProfiler',"
 "          `hostname`,"
 "          `data`"
