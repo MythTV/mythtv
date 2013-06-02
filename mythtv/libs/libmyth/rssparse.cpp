@@ -57,9 +57,10 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
     m_customhtml = customhtml;
 }
 
-ResultItem::ResultItem()
+ResultItem::ResultItem() :
+    m_date(QDateTime()), m_filesize(0), m_width(0), m_height(0),
+    m_downloadable(false), m_season(0), m_episode(0), m_customhtml(false)
 {
-    m_date = QDateTime();
 }
 
 ResultItem::~ResultItem()
