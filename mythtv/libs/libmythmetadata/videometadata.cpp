@@ -1142,7 +1142,7 @@ VideoMetadata::VideoMetadata(MSqlQuery &query)
     m_imp = new VideoMetadataImp(query);
 }
 
-VideoMetadata::VideoMetadata(const VideoMetadata &rhs)
+VideoMetadata::VideoMetadata(const VideoMetadata &rhs) : m_imp(NULL)
 {
     *this = rhs;
 }
