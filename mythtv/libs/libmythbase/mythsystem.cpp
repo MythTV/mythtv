@@ -184,6 +184,8 @@ class MythSystemLegacyWrapper : public MythSystem
         int status = m_legacy->GetStatus();
         if (GENERIC_EXIT_RUNNING == status)
             return -2;
+        if (GENERIC_EXIT_KILLED == status)
+            return -1;
         return status;
     }
 

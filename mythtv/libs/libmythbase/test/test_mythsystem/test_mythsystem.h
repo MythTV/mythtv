@@ -109,14 +109,6 @@ class TestMythSystem: public QObject
         QVERIFY(!cmd->Wait(1));
     }
 
-    void getstatus_returns_exit_code(void)
-    {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("exit 200", kMSRunShell));
-        cmd->Wait();
-        QVERIFY(cmd->GetExitCode() == 200);
-    }
-
     // TODO kMSDontBlockInputDevs -- avoid blocking LIRC & Joystick Menu
     // TODO kMSDontDisableDrawing -- avoid disabling UI drawing
 
@@ -230,6 +222,59 @@ class TestMythSystem: public QObject
     //                               for the duration of application.
     // TODO kMSPropagateLogs      -- add arguments for MythTV log propagation
 
-    // TODO test current GetExitCode() results.
+    void get_flags_returns_flags_sent(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("exit 5", kMSStdOut | kMSDontDisableDrawing));
+        QVERIFY(cmd->GetFlags() == (kMSStdOut | kMSDontDisableDrawing));
+    }
+
+    void get_starting_path_returns_path_sent(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("exit 5", kMSNone, "/tmp"));
+        QVERIFY(cmd->GetStartingPath() == "/tmp");
+    }
+
+    void get_starting_path_returns_a_path_when_none_sent(void)
+    {
+        MSKIP("Not working yet");
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("exit 5", kMSNone));
+        QVERIFY(!cmd->GetStartingPath().isEmpty());
+    }
+
+    // TODO test GetCPUPriority(void)
+    // TODO test GetDiskPriority(void)
+
+    // TODO test Wait()
+
+    void getexitcode_returns_exit_code_when_non_zero(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("exit 200", kMSRunShell));
+        cmd->Wait();
+        QVERIFY(cmd->GetExitCode() == 200);
+    }
+
+    void getexitcode_returns_neg_1_when_signal_seen(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("sleep 0.5", kMSRunShell));
+        usleep(50 * 1000);
+        cmd->Signal(kSignalQuit);
+        cmd->Wait();
+        QVERIFY(cmd->GetExitCode() == -1);
+    }
+
+    void getexitcode_returns_neg_2_when_still_running(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("sleep 0.25", kMSRunShell));
+        QVERIFY(cmd->GetExitCode() == -2);
+    }
+
     // TODO test current GetSignal() results.
+
+    // TODO test Signal()
 };
