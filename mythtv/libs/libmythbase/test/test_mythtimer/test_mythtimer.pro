@@ -16,9 +16,20 @@ contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage 
   QMAKE_LFLAGS += -fprofile-arcs 
 }
+
+macx {
+QMAKE_LFLAGS += -Wl,-rpath,$(PWD)/../../../../external/zeromq/src/.libs/
+QMAKE_LFLAGS += -Wl,-rpath,$(PWD)/../../../../external/nzmqt/src/
+QMAKE_LFLAGS += -Wl,-rpath,$(PWD)/../../../../external/qjson/lib/
+QMAKE_LFLAGS += -Wl,-rpath,$(PWD)/../..
+}
+
+linux | freebsd {
 QMAKE_LFLAGS += -Wl,-rpath=$(PWD)/../../../../external/zeromq/src/.libs/
 QMAKE_LFLAGS += -Wl,-rpath=$(PWD)/../../../../external/nzmqt/src/
 QMAKE_LFLAGS += -Wl,-rpath=$(PWD)/../../../../external/qjson/lib/
+QMAKE_LFLAGS += -Wl,-rpath=$(PWD)/../..
+}
 
 # Input
 HEADERS += test_mythtimer.h
