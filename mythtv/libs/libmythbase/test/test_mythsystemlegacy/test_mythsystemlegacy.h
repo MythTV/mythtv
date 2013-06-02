@@ -130,14 +130,14 @@ class TestMythSystemLegacy: public QObject
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
     {
-        MSKIP("stdin_works -- currently blocks forever");
         QTemporaryFile tempfile;
         tempfile.open();
         QByteArray in = QString(__FUNCTION__).toLatin1();
         MythSystemLegacy cmd(QString("cat - > %1").arg(tempfile.fileName()),
-                       kMSStdIn);
+                             kMSStdIn | kMSRunShell);
         cmd.Write(in);
-        Go(cmd);
+        cmd.Run();
+        cmd.Wait();
         QVERIFY(cmd.GetStatus() == 0);
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));

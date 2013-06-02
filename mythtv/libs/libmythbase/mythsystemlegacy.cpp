@@ -86,6 +86,13 @@ void MythSystemLegacy::SetCommand(const QString &command, uint flags)
 
         SetCommand(abscommand, args, flags);
     }
+
+    if (m_settings["UseStdin"])
+        m_stdbuff[0].open(QIODevice::WriteOnly);
+    if (m_settings["UseStdout"])
+        m_stdbuff[1].open(QIODevice::ReadOnly);
+    if (m_settings["UseStderr"])
+        m_stdbuff[2].open(QIODevice::ReadOnly);
 }
 
 
@@ -390,13 +397,16 @@ QByteArray& MythSystemLegacy::ReadAllErr(void)
     return m_stdbuff[2].buffer();
 }
 
+/** This writes to the standard input of the program being run.
+ *  All calls to this must be done before Run() is called.
+ *  All calls after Run() is called are silently ignored.
+ */
 int MythSystemLegacy::Write(const QByteArray &ba)
 {
     if (!GetSetting("UseStdin"))
         return 0;
 
-    m_stdbuff[0].buffer().append(ba.constData());
-    return ba.size();
+    return m_stdbuff[0].write(ba.constData());
 }
 
 void MythSystemLegacy::HandlePreRun(void)

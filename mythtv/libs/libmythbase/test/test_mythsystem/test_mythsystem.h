@@ -141,10 +141,11 @@ class TestMythSystem: public QObject
         QByteArray in = QString(__FUNCTION__).toLatin1();
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(QString("cat - > %1").arg(tempfile.fileName()),
-                               kMSStdIn));
+                               kMSStdIn | kMSRunShell));
         cmd->GetStandardInputStream()->write(in);
         cmd->GetStandardInputStream()->close();
-        cmd->Wait();
+        cerr << "stdin_works -- Wait starting" << endl;
+        cmd->Wait(0);
         QVERIFY(cmd->GetExitCode() == 0);
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));

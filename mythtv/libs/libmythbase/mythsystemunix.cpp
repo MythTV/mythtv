@@ -217,6 +217,17 @@ void MythSystemLegacyIOHandler::insert(int fd, QBuffer *buff)
     wake();
 }
 
+void MythSystemLegacyIOHandler::Wait(int fd)
+{
+    QMutexLocker locker(&m_pLock);
+    while (m_pMap.contains(fd))
+    {
+        locker.unlock();
+        usleep(10 * 1000);
+        locker.relock();
+    }
+}
+
 void MythSystemLegacyIOHandler::remove(int fd)
 {
     m_pLock.lock();
@@ -444,8 +455,16 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
     m_pMap.insert(ms->m_pid, ms);
     m_mapLock.unlock();
 
-    if( ms->GetSetting("UseStdin") )
-        writeThread->insert(ms->m_stdpipe[0], ms->GetBuffer(0));
+    if (ms->m_stdpipe[0] >= 0)
+    {
+        QByteArray ba = ms->GetBuffer(0)->data();
+        QBuffer wtb(&ba);
+        wtb.open(QIODevice::ReadOnly);
+        writeThread->insert(ms->m_stdpipe[0], &wtb);
+        writeThread->Wait(ms->m_stdpipe[0]);
+        writeThread->remove(ms->m_stdpipe[0]);
+        CLOSE(ms->m_stdpipe[0]);
+    }
 
     if( ms->GetSetting("UseStdout") )
     {
@@ -763,10 +782,6 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     locerr[MAX_BUFLEN-1] = '\0';
 
     LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
-
-    GetBuffer(0)->setBuffer(0);
-    GetBuffer(1)->setBuffer(0);
-    GetBuffer(2)->setBuffer(0);
 
     int p_stdin[]  = {-1,-1};
     int p_stdout[] = {-1,-1};

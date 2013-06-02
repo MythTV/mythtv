@@ -35,6 +35,7 @@ class MythSystemLegacyIOHandler: public MThread
         void   run(void);
 
         void   insert(int fd, QBuffer *buff);
+        void   Wait(int fd);
         void   remove(int fd);
         void   wake();
 
