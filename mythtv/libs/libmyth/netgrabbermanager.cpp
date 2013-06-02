@@ -245,7 +245,8 @@ void GrabberDownloadThread::run()
 }
 
 Search::Search()
-    : m_searchProcess(NULL)
+    : m_searchProcess(NULL), m_numResults(0),
+      m_numReturned(0), m_numIndex(0)
 {
     m_videoList.clear();
 }
