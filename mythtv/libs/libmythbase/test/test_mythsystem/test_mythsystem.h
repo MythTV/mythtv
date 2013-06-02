@@ -196,7 +196,15 @@ class TestMythSystem: public QObject
 
     // TODO flags to test
     // TODO kMSSetPGID            -- set the process group id
-    // TODO kMSAutoCleanup        -- automatically delete if backgrounded
+
+    // kMSAutoCleanup        -- automatically delete if backgrounded
+    void auto_cleanup_return_null(void)
+    {
+        MythSystem *ptr = MythSystem::Create(
+            "sleep 10", kMSAutoCleanup | kMSRunBackground);
+        QVERIFY(!ptr);
+    }
+
     // TODO kMSLowExitVal         -- allow exit values 0-127 only
     // TODO kMSDisableUDPListener -- disable MythMessage UDP listener
     //                               for the duration of application.
@@ -224,8 +232,24 @@ class TestMythSystem: public QObject
         QVERIFY(!cmd->GetStartingPath().isEmpty());
     }
 
-    // TODO test GetCPUPriority(void)
-    // TODO test GetDiskPriority(void)
+    void get_cpu_priority_returns_priority_sent(void)
+    {
+        MSKIP("Not working yet");
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create(
+                "exit 5", kMSNone, QString(), MythSystem::kLowPriority));
+        QVERIFY(cmd->GetCPUPriority() == MythSystem::kLowPriority);
+    }
+
+    void get_disk_priority_returns_priority_sent(void)
+    {
+        MSKIP("Not working yet");
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create(
+                "exit 5", kMSNone, QString(),
+                MythSystem::kInheritPriority, MythSystem::kLowPriority));
+        QVERIFY(cmd->GetDiskPriority() == MythSystem::kLowPriority);
+    }
 
     void wait_returns_true_on_exit(void)
     {

@@ -60,6 +60,13 @@ class MythSystemLegacyWrapper : public MythSystem
         if (!startPath.isEmpty())
             legacy->SetDirectory(startPath);
 
+        uint ac = kMSAutoCleanup | kMSRunBackground;
+        if ((ac & flags) == ac)
+        {
+            legacy->Run();
+            return NULL;
+        }
+
         MythSystemLegacyWrapper *wrapper =
             new MythSystemLegacyWrapper(legacy, flags);
 
