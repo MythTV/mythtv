@@ -50,6 +50,7 @@
 #include "mythtranslation.h"
 #include "mythtimezone.h"
 #include "signalhandling.h"
+#include "hardwareprofile.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -623,6 +624,13 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         }
 
         housekeeping->RegisterTask(new JobQueueRecoverTask());
+#ifdef __linux__
+ #ifdef CONFIG_BINDINGS_PYTHON
+        housekeeping->RegisterTask(new HardwareProfileTask());
+ #endif
+#endif
+
+        housekeeping->Start();
     }
 
     if (!cmdline.toBool("nojobqueue"))

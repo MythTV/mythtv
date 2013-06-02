@@ -1665,15 +1665,6 @@ int main(int argc, char **argv)
                    .arg(port));
     }
 
-#ifdef __linux__
-#ifdef CONFIG_BINDINGS_PYTHON
-    HardwareProfile *profile = new HardwareProfile();
-    if (profile && profile->NeedsUpdate())
-        profile->SubmitProfile();
-    delete profile;
-#endif
-#endif
-
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {
         return GENERIC_EXIT_NO_THEME;
@@ -1689,6 +1680,15 @@ int main(int argc, char **argv)
 
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kRemote, 50, 60);
+
+    HouseKeeper *housekeeping = new HouseKeeper();
+#ifdef __linux__
+ #ifdef CONFIG_BINDINGS_PYTHON
+    housekeeping->RegisterTask(new HardwareProfileTask());
+ #endif
+#endif
+    housekeeping->Start();
+
 
     if (cmdline.toBool("runplugin"))
     {
@@ -1730,6 +1730,8 @@ int main(int argc, char **argv)
     int ret = qApp->exec();
 
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
+
+    delete housekeeping;
 
     if (themeUpdateChecker)
         delete themeUpdateChecker;
