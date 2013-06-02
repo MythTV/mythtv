@@ -95,20 +95,6 @@ class TestMythSystem: public QObject
                 .contains(__FUNCTION__));
     }
 
-    void wait_returns_true_on_exit(void)
-    {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("exit 200", kMSRunShell));
-        QVERIFY(cmd->Wait());
-    }
-
-    void wait_returns_false_on_timeout(void)
-    {
-        QScopedPointer<MythSystem> cmd(
-            MythSystem::Create("sleep 2", kMSRunShell));
-        QVERIFY(!cmd->Wait(1));
-    }
-
     // TODO kMSDontBlockInputDevs -- avoid blocking LIRC & Joystick Menu
     // TODO kMSDontDisableDrawing -- avoid disabling UI drawing
 
@@ -171,8 +157,6 @@ class TestMythSystem: public QObject
         QVERIFY(QString(ba).contains(__FUNCTION__));
     }
 
-    // TODO kMSBuffered           -- buffer the IO channels
-
     // kMSRunShell           -- run process through shell
     void shell_used_when_requested(void)
     {
@@ -193,10 +177,6 @@ class TestMythSystem: public QObject
         QVERIFY(!QString(cmd->GetStandardOutputStream()->readAll())
                 .contains("X"));
     }
-
-    // no need to test kMSNoRunShell, it is a no-op
-    // TODO delete flag
-    // kMSNoRunShell         -- do NOT run process through shell
 
     // kMSAnonLog            -- anonymize the logs
     void logs_anonymized_when_requested(void)
@@ -247,7 +227,19 @@ class TestMythSystem: public QObject
     // TODO test GetCPUPriority(void)
     // TODO test GetDiskPriority(void)
 
-    // TODO test Wait()
+    void wait_returns_true_on_exit(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("exit 200", kMSRunShell));
+        QVERIFY(cmd->Wait());
+    }
+
+    void wait_returns_false_on_timeout(void)
+    {
+        QScopedPointer<MythSystem> cmd(
+            MythSystem::Create("sleep 2", kMSRunShell));
+        QVERIFY(!cmd->Wait(1));
+    }
 
     void getexitcode_returns_exit_code_when_non_zero(void)
     {
@@ -273,6 +265,4 @@ class TestMythSystem: public QObject
             MythSystem::Create("sleep 0.25", kMSRunShell));
         QVERIFY(cmd->GetExitCode() == -2);
     }
-
-    // TODO test Signal()
 };

@@ -42,7 +42,6 @@ typedef enum MythSystemMask {
     kMSStdIn              = 0x00000020, ///< allow access to stdin
     kMSStdOut             = 0x00000040, ///< allow access to stdout
     kMSStdErr             = 0x00000080, ///< allow access to stderr
-    kMSBuffered           = 0x00000100, ///< buffer the IO channels
     kMSRunShell           = 0x00000200, ///< run process through shell
     kMSAnonLog            = 0x00000800, ///< anonymize the logs
     kMSSetPGID            = 0x00002000, ///< set the process group id

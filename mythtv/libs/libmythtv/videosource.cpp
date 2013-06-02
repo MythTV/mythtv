@@ -568,7 +568,7 @@ void XMLTVConfig::Load(void)
     args += "baseline";
 
     MythSystemLegacy find_grabber_proc("tv_find_grabbers", args, 
-                                 kMSStdOut | kMSBuffered | kMSRunShell);
+                                 kMSStdOut | kMSRunShell);
     find_grabber_proc.Run(25);
     LOG(VB_GENERAL, LOG_INFO,
         loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");

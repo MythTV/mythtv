@@ -63,7 +63,7 @@ bool DcrawHandler::read(QImage *image)
 #endif // ICC_PROFILE
     arguments << path;
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    uint flags = kMSRunShell | kMSStdOut;
     MythSystemLegacy ms("dcraw", arguments, flags);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -83,7 +83,7 @@ int DcrawHandler::loadThumbnail(QImage *image, QString fileName)
     arguments << "-e" << "-c";
     arguments << "'" + fileName + "'";
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+    uint flags = kMSRunShell | kMSStdOut;
     MythSystemLegacy ms("dcraw", arguments, flags);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)

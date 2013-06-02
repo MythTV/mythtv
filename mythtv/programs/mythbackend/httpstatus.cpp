@@ -572,7 +572,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QDomElement misc = pDoc->createElement("Miscellaneous");
         root.appendChild(misc);
 
-        uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+        uint flags = kMSRunShell | kMSStdOut;
         MythSystemLegacy ms(info_script, flags);
         ms.Run(10);
         if (ms.Wait() != GENERIC_EXIT_OK)

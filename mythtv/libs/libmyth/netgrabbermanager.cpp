@@ -51,7 +51,7 @@ void GrabberScript::run()
 
     QString commandline = m_commandline;
     MythSystemLegacy getTree(commandline, QStringList("-T"),
-                       kMSRunShell | kMSStdOut | kMSBuffered);
+                       kMSRunShell | kMSStdOut);
     getTree.Run(900);
     uint status = getTree.Wait();
 
@@ -288,7 +288,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("Internet Search Query: %1 %2") .arg(cmd).arg(args.join(" ")));
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground;
+    uint flags = kMSRunShell | kMSStdOut | kMSRunBackground;
     m_searchProcess->SetCommand(cmd, args, flags);
     m_searchProcess->Run(40);
 }

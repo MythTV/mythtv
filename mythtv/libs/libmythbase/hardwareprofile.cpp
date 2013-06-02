@@ -51,7 +51,7 @@ void HardwareProfile::GenerateUUIDs(void)
         QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
         QStringList args;
         args << "-p";
-        MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+        MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
         system.Run();
         system.Wait();
@@ -183,7 +183,7 @@ bool HardwareProfile::SubmitProfile(void)
     QStringList args;
     args << "--submitOnly";
     args << "-a";
-    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
@@ -212,7 +212,7 @@ bool HardwareProfile::DeleteProfile(void)
 
     QString cmd = GetShareDir() + "hardwareprofile/deleteProfile.py";
     QStringList args;
-    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
@@ -246,7 +246,7 @@ QString HardwareProfile::GetHardwareProfile() const
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;
     args << "-p";
-    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     system.Wait();

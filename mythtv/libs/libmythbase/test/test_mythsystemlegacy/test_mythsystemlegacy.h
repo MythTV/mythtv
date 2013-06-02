@@ -161,7 +161,6 @@ class TestMythSystemLegacy: public QObject
         QVERIFY(cmd.GetStatus() == 0);
         QVERIFY(QString(cmd.ReadAllErr()).contains(__FUNCTION__));
     }
-    // TODO kMSBuffered           -- buffer the IO channels
 
     // kMSRunShell           -- run process through shell
     void shell_used_when_requested(void)
@@ -180,10 +179,6 @@ class TestMythSystemLegacy: public QObject
         QVERIFY(!QString(cmd.ReadAll()).contains("X"));
     }
 
-    // no need to test kMSNoRunShell, it is a no-op
-    // TODO delete flag
-    // kMSNoRunShell         -- do NOT run process through shell
-
     // kMSAnonLog            -- anonymize the logs
     void logs_anonymized_when_requested(void)
     {
@@ -195,7 +190,7 @@ class TestMythSystemLegacy: public QObject
         QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
         QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
 #else
-	MSKIP("Log inspection not supported in old logging.");
+        MSKIP("Log inspection not supported in old logging.");
 #endif
     }
 

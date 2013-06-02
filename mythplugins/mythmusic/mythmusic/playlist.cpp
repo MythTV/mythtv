@@ -1332,7 +1332,7 @@ int Playlist::CreateCDMP3(void)
     args << "-J";
     args << "-R";
 
-    uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
+    uint flags = kMSRunShell | kMSStdErr |
                  kMSDontDisableDrawing | kMSDontBlockInputDevs |
                  kMSRunBackground;
 
@@ -1383,7 +1383,7 @@ int Playlist::CreateCDMP3(void)
         args << "-data";
         args << tmprecordisofs;
 
-        flags = kMSRunShell | kMSStdErr | kMSStdOut | kMSBuffered |
+        flags = kMSRunShell | kMSStdErr | kMSStdOut |
                 kMSDontDisableDrawing | kMSDontBlockInputDevs |
                 kMSRunBackground;
 

@@ -188,7 +188,7 @@ void InternetContent::GetInternetSources( HTTPRequest *pRequest )
     {
         QString commandline = GrabberDir + (*i);
         MythSystemLegacy scriptcheck(commandline, QStringList("-v"),
-                               kMSRunShell | kMSStdOut | kMSBuffered);
+                               kMSRunShell | kMSStdOut);
         scriptcheck.Run();
         scriptcheck.Wait();
         QByteArray result = scriptcheck.ReadAll();

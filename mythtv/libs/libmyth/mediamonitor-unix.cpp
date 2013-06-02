@@ -368,7 +368,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     args << "info" << "-q"  << "name"
          << "-rp" << sysfs;
 
-    uint flags = kMSStdOut | kMSBuffered;
+    uint flags = kMSStdOut;
     if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
         flags |= kMSStdErr;
 

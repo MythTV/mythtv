@@ -249,7 +249,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    MythSystemLegacy grabber(cmd, args, kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(cmd, args, kMSStdOut);
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
@@ -311,7 +311,7 @@ bool MetadataDownload::runGrabberTest(const QString &grabberpath)
     QStringList args;
     args.append("-t");
 
-    MythSystemLegacy grabber(grabberpath, args, kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(grabberpath, args, kMSStdOut);
 
     grabber.Run();
     uint exitcode = grabber.Wait();

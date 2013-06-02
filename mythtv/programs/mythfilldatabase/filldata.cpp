@@ -615,7 +615,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (is_grabber_external(xmltv_grabber))
         {
-            uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+            uint flags = kMSRunShell | kMSStdOut;
             MythSystemLegacy grabber_capabilities_proc(xmltv_grabber,
                                                  QStringList("--capabilities"),
                                                  flags);
@@ -659,7 +659,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (hasprefmethod)
         {
-            uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
+            uint flags = kMSRunShell | kMSStdOut;
             MythSystemLegacy grabber_method_proc(xmltv_grabber,
                                            QStringList("--preferredmethod"),
                                            flags);
