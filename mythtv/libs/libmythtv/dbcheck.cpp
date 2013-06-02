@@ -2368,6 +2368,33 @@ NULL
             return false;
     }
 
+    if (dbver == "1311")
+    {
+        const char *updates[] = {
+// Create a global enable/disable instead of one per-host
+// Any hosts previously running it mean all hosts do now
+"INSERT INTO `settings` (`value`, `hostname`, `data`),"
+"   SELECT 'HardwareProfileEnaled',"
+"          NULL,"
+"          IF((SELECT COUNT(1)"
+"                FROM `settings`"
+"               WHERE `value` = 'HardwareProfileLastUpdated' > 0),"
+"             1, 0);",
+// Create 'lastrun' times using existing data in settings
+"INSERT INTO `housekeeper` (`tag`, `hostname`, `lastrun`)"
+"   SELECT 'HardwareProfiler',"
+"          `hostname`,"
+"          `data`"
+"     FROM `settings`"
+"    WHERE `value` = 'HardwareProfileLastUpdated';",
+// Clear out old settings
+"DELETE FROM `settings` WHERE `value` = 'HardwareProfileLastUpdated';",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1312", dbver))
+            return false;
+    }
+
     return true;
 }
 
