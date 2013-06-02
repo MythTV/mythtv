@@ -1275,7 +1275,7 @@ bool MythRenderVDPAU::UploadMythImage(uint id, MythImage *image)
         return false;
 
     void    *plane[1] = { image->bits() };
-    uint32_t pitch[1] = { image->bytesPerLine() };
+    uint32_t pitch[1] = { static_cast<uint32_t>(image->bytesPerLine()) };
     return UploadBitmap(id, plane, pitch);
 }
 
