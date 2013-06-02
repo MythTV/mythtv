@@ -12945,7 +12945,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
     {
         uint titleLength = dvdrb->GetTotalTimeOfTitle();
         uint chapterLength = dvdrb->GetChapterLength();
-        uint currentTime = dvdrb->GetCurrentTime();
+        uint currentTime = (uint)dvdrb->GetCurrentTime();
         if ((titleLength == chapterLength) &&
              (currentTime < (chapterLength - (ctx->jumptime * 60))) &&
              chapterLength > 300)
