@@ -9,7 +9,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
 {
@@ -380,7 +380,7 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
             args.append(cardtype);
         }
 
-        MythSystem getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
+        MythSystemLegacy getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
         getchan.Run();
         getchan.Wait();
     }

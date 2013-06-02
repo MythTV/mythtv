@@ -41,7 +41,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythlogging.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #ifdef USING_DVB
@@ -567,8 +567,8 @@ void XMLTVConfig::Load(void)
     QStringList args;
     args += "baseline";
 
-    MythSystem find_grabber_proc("tv_find_grabbers", args, 
-                                 kMSStdOut | kMSBuffered | kMSRunShell);
+    MythSystemLegacy find_grabber_proc("tv_find_grabbers", args, 
+                                 kMSStdOut | kMSRunShell);
     find_grabber_proc.Run(25);
     LOG(VB_GENERAL, LOG_INFO,
         loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");

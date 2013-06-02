@@ -21,7 +21,7 @@
 #include "mythversion.h"
 #include "mythdate.h"
 #include "dbutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythdownloadmanager.h"
 #include "mythtvexp.h"

@@ -8,7 +8,7 @@
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <remoteutil.h>
 #include <remotefile.h>
 #include <mythprogressdialog.h>

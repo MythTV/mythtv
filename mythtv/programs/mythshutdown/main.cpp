@@ -11,7 +11,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythversion.h"
 #include "jobqueue.h"
 #include "tv.h"

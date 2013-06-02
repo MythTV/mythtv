@@ -12,7 +12,7 @@
 #include <mythdb.h>
 #include <compat.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 
 // MythWeather headers
@@ -27,9 +27,9 @@ QStringList WeatherSource::ProbeTypes(QString workingDirectory,
         .arg(program).arg(arguments.join(" "));
     QStringList types;
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
+    uint flags = kMSRunShell | kMSStdOut | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, arguments, flags);
+    MythSystemLegacy ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -70,9 +70,9 @@ bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
     updateTimeout = DEFAULT_UPDATE_TIMEOUT;
     scriptTimeout = DEFAULT_SCRIPT_TIMEOUT;
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
+    uint flags = kMSRunShell | kMSStdOut | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, arguments, flags);
+    MythSystemLegacy ms(program, arguments, flags);
     ms.SetDirectory(workingDirectory);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -133,9 +133,9 @@ bool WeatherSource::ProbeInfo(ScriptInfo &info)
     const QString loc = QString("WeatherSource::ProbeInfo(%1 %2): ")
         .arg(info.program).arg(arguments.join(" "));
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
+    uint flags = kMSRunShell | kMSStdOut | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(info.program, arguments, flags);
+    MythSystemLegacy ms(info.program, arguments, flags);
     ms.SetDirectory(info.path);
     ms.Run();
     if (ms.Wait() != GENERIC_EXIT_OK)
@@ -383,9 +383,9 @@ QStringList WeatherSource::getLocationList(const QString &str)
     const QString loc = QString("WeatherSource::getLocationList(%1 %2): ")
         .arg(program).arg(args.join(" "));
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | 
+    uint flags = kMSRunShell | kMSStdOut | 
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    MythSystem ms(program, args, flags);
+    MythSystemLegacy ms(program, args, flags);
     ms.SetDirectory(m_info->path);
     ms.Run();
     
@@ -485,9 +485,9 @@ void WeatherSource::startUpdate(bool forceUpdate)
     }
     args << m_locale;
 
-    uint flags = kMSRunShell | kMSStdOut | kMSBuffered | kMSRunBackground |
+    uint flags = kMSRunShell | kMSStdOut | kMSRunBackground |
                  kMSDontDisableDrawing | kMSDontBlockInputDevs;
-    m_ms = new MythSystem(program, args, flags);
+    m_ms = new MythSystemLegacy(program, args, flags);
     m_ms->SetDirectory(m_info->path);
 
     connect(m_ms, SIGNAL(finished()),  this, SLOT(processExit()));

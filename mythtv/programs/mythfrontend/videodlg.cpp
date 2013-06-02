@@ -24,7 +24,7 @@
 #include "mythuimetadataresults.h"
 #include "mythdialogbox.h"
 #include "mythgenerictree.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "remotefile.h"
 #include "remoteutil.h"
 #include "storagegroup.h"

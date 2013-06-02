@@ -4,7 +4,7 @@
 #include <QTimer>
 
 #include <mythcontext.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 
 #include <mythuibuttonlist.h>
 #include <mythuistatetype.h>

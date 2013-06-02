@@ -37,7 +37,7 @@ using namespace std;
 // MythTV headers
 #include <mythdate.h>
 #include <mythdbcon.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythcontext.h>
 #include <mythlogging.h>
 #include <mythmainwindow.h>

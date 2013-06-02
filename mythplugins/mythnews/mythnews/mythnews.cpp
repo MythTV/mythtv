@@ -19,7 +19,7 @@
 #include <mythdialogbox.h>
 #include <mythcontext.h>
 #include <mythuiimage.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythuitext.h>
 #include <mythdate.h>
 #include <mythdirs.h>

@@ -12,7 +12,7 @@ using namespace std;
 #include <mythdirs.h>
 #include <mythuicheckbox.h>
 #include <mythuibuttonlist.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"

@@ -7,7 +7,7 @@
 
 // myth
 #include "mythcorecontext.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
 
@@ -99,7 +99,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(MovieScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();
@@ -126,7 +126,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(TVScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();
@@ -154,7 +154,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(GameScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();

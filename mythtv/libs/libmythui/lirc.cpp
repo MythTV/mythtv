@@ -20,7 +20,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythdb.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "lircevent.h"
 #include "lirc_client.h"
 

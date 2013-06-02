@@ -62,7 +62,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythdirs.h>
 #include <mythconfig.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythdate.h>
 #include <mythlogging.h>
 

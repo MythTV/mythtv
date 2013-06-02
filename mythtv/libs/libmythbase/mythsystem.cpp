@@ -1,524 +1,232 @@
-/// -*- Mode: c++ -*-
+/* -*- Mode: c++ -*-
+ *  Class MythSystem
+ *
+ *  Copyright (C) Daniel Kristjansson 2013
+ *  Copyright (C) Gavin Hurlbut 2012
+ *  Copyright (C) Issac Richards 2008
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
-// compat header
-#include "compat.h"
+// POSIX header
+#include <signal.h> // for SIGXXX
 
-// Own header
+// Qt headers
+#include <QStringList>
+#include <QByteArray>
+#include <QIODevice>
+#include <QRegExp>
+
+// MythTV headers
+#include "mythsystemlegacy.h"
 #include "mythsystem.h"
-
-// C++/C headers
-#include <cerrno>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <time.h>
-#include <signal.h> // for kill() and SIGXXX
-#include <string.h>
-
-// QT headers
-#include <QCoreApplication>
-
-// libmythbase headers
-#include "referencecounter.h"
-#include "mythcorecontext.h"
-#include "mythevent.h"
-#include "mythlogging.h"
 #include "exitcodes.h"
 
-#if CONFIG_CYGWIN || defined(_WIN32)
-#include "mythsystemwindows.h"
-#else
-#include "mythsystemunix.h"
-#endif
+// temporary debugging headers
+#include <iostream>
+using namespace std;
 
-
-/*******************************
- * MythSystem method defines
- ******************************/
-
-void MythSystem::initializePrivate(void)
+class MythSystemLegacyWrapper : public MythSystem
 {
-    m_nice = 0;
-    m_ioprio = 0;
-#if CONFIG_CYGWIN || defined(_WIN32)
-    d = new MythSystemWindows(this);
-#else
-    d = new MythSystemUnix(this);
-#endif
-}
-
-MythSystem::MythSystem()
-{
-    setObjectName("MythSystem()");
-    m_semReady.release(1);  // initialize
-    initializePrivate();
-}
-
-MythSystem::MythSystem(const QString &command, uint flags)
-{
-    setObjectName(QString("MythSystem(%1)").arg(command));
-    m_semReady.release(1);  // initialize
-    initializePrivate();
-    SetCommand(command, flags);
-}
-
-/** \fn MythSystem::setCommand(const QString &command)
- *  \brief Resets an existing MythSystem object to a new command
- */
-void MythSystem::SetCommand(const QString &command, uint flags)
-{
-    if (flags & kMSRunShell)
+  public:
+    static MythSystemLegacyWrapper *Create(
+        const QStringList &args,
+        uint flags,
+        QString startPath,
+        Priority cpuPriority,
+        Priority diskPriority)
     {
-        SetCommand(command, QStringList(), flags);
-    }
-    else
-    {
-        QString abscommand;
-        QStringList args;
-        if (!d->ParseShell(command, abscommand, args))
+        if (args.empty())
+            return NULL;
+
+        QString program = args[0];
+        QStringList other_args = args.mid(1);
+
+        MythSystemLegacy *legacy =
+            new MythSystemLegacy(args.join(" "), flags);
+
+        if (!startPath.isEmpty())
+            legacy->SetDirectory(startPath);
+
+        uint ac = kMSAutoCleanup | kMSRunBackground;
+        if ((ac & flags) == ac)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                    QString("MythSystem(%1) command not understood")
-                            .arg(command));
-            m_status = GENERIC_EXIT_INVALID_CMDLINE;
-            return;
+            legacy->Run();
+            return NULL;
         }
 
-        SetCommand(abscommand, args, flags);
+        MythSystemLegacyWrapper *wrapper =
+            new MythSystemLegacyWrapper(legacy, flags);
+
+        // TODO implement cpuPriority and diskPriority
+        return wrapper;
     }
-}
 
-
-MythSystem::MythSystem(const QString &command,
-                       const QStringList &args, uint flags)
-{
-    m_semReady.release(1);  // initialize
-    initializePrivate();
-    SetCommand(command, args, flags);
-}
-
-/** \fn MythSystem::setCommand(const QString &command,
-                               const QStringList &args)
- *  \brief Resets an existing MythSystem object to a new command
- */
-void MythSystem::SetCommand(const QString &command,
-                            const QStringList &args, uint flags)
-{
-    m_status = GENERIC_EXIT_START;
-    m_command = QString(command).trimmed();
-    m_args = QStringList(args);
-
-    ProcessFlags(flags);
-
-    // add logging arguments
-    if (GetSetting("PropagateLogs"))
+    ~MythSystemLegacyWrapper(void)
     {
-        if (GetSetting("UseShell") && m_args.isEmpty())
+        Wait(0);
+    }
+
+    uint GetFlags(void) const MOVERRIDE
+    {
+        return m_flags;
+    }
+
+    /// Returns the starting path of the program
+    QString GetStartingPath(void) const MOVERRIDE
+    {
+        return m_legacy->GetDirectory();
+    }
+
+    /// Return the CPU Priority of the program
+    Priority GetCPUPriority(void) const MOVERRIDE
+    {
+        return kNormalPriority;
+    }
+
+    /// Return the Disk Priority of the program
+    Priority GetDiskPriority(void) const MOVERRIDE
+    {
+        return kNormalPriority;
+    }
+
+    /// Blocks until child process is collected or timeout reached.
+    /// Returns true if program has exited and has been collected.
+    /// WARNING if program returns 142 then we will forever
+    ///         think it is running even though it is not.
+    /// WARNING The legacy timeout is in seconds not milliseconds,
+    ///         timeout will be rounded.
+    bool Wait(uint timeout_ms) MOVERRIDE
+    {
+        timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
+            ((timeout_ms == 0) ? 0 : 1000);
+        uint legacy_wait_ret = m_legacy->Wait(timeout_ms / 1000);
+        if (GENERIC_EXIT_RUNNING == legacy_wait_ret)
+            return false;
+        return true;
+    }
+
+    /// Returns the standard input stream for the program
+    /// if the kMSStdIn flag was passed to the constructor.
+    /// Note: This is not safe!
+    QIODevice *GetStandardInputStream(void) MOVERRIDE
+    {
+        if (!(kMSStdIn & m_flags))
+            return NULL;
+
+        if (!m_legacy->GetBuffer(0)->isOpen() &&
+            !m_legacy->GetBuffer(0)->open(QIODevice::WriteOnly))
         {
-            m_command += logPropagateArgs;
-            if (!logPropagateQuiet())
-                m_command += " --quiet";
+            return NULL;
         }
-        else
+
+        return m_legacy->GetBuffer(0);
+    }
+
+    /// Returns the standard output stream for the program
+    /// if the kMSStdOut flag was passed to the constructor.
+    QIODevice *GetStandardOutputStream(void) MOVERRIDE
+    {
+        if (!(kMSStdOut & m_flags))
+            return NULL;
+
+        Wait(0); // legacy getbuffer is not thread-safe, so wait
+
+        if (!m_legacy->GetBuffer(1)->isOpen() &&
+            !m_legacy->GetBuffer(1)->open(QIODevice::ReadOnly))
         {
-            m_args << logPropagateArgList;
-            if (!logPropagateQuiet())
-                m_args << "--quiet";
+            return NULL;
         }
+
+        return m_legacy->GetBuffer(1);
     }
 
-    // check for execute rights
-    if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK))
+    /// Returns the standard error stream for the program
+    /// if the kMSStdErr flag was passed to the constructor.
+    QIODevice *GetStandardErrorStream(void) MOVERRIDE
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("MythSystem(%1) command not executable, ")
-            .arg(command) + ENO);
-        m_status = GENERIC_EXIT_CMD_NOT_FOUND;
-    }
+        if (!(kMSStdErr & m_flags))
+            return NULL;
 
-    m_logcmd = (m_command + " " + m_args.join(" ")).trimmed();
+        Wait(0); // legacy getbuffer is not thread-safe, so wait
 
-    if (GetSetting("AnonLog"))
-    {
-        m_logcmd.truncate(m_logcmd.indexOf(" "));
-        m_logcmd.append(" (anonymized)");
-    }
-}
-
-
-MythSystem::MythSystem(const MythSystem &other) :
-    d(other.d),
-    m_status(other.m_status),
-
-    m_command(other.m_command),
-    m_logcmd(other.m_logcmd),
-    m_args(other.m_args),
-    m_directory(other.m_directory),
-
-    m_settings(other.m_settings)
-{
-    m_semReady.release(other.m_semReady.available());
-}
-
-// QBuffers may also need freeing
-MythSystem::~MythSystem(void)
-{
-    if (GetStatus() == GENERIC_EXIT_RUNNING)
-    {
-        Term(true);
-        Wait();
-    }
-    d->DecrRef();
-}
-
-
-void MythSystem::SetDirectory(const QString &directory)
-{
-    m_settings["SetDirectory"] = true;
-    m_directory = QString(directory);
-}
-
-bool MythSystem::SetNice(int nice)
-{
-    if (!d || (GetStatus() != GENERIC_EXIT_START))
-        return false;
-
-    m_nice = nice;
-    return true;
-}
-
-bool MythSystem::SetIOPrio(int prio)
-{
-    if (!d || (GetStatus() != GENERIC_EXIT_START))
-        return false;
-
-    m_ioprio = prio;
-    return true;
-}
-
-/// \brief Runs a command inside the /bin/sh shell. Returns immediately
-void MythSystem::Run(time_t timeout)
-{
-    if (!d)
-        m_status = GENERIC_EXIT_NO_HANDLER;
-
-    if (GetStatus() != GENERIC_EXIT_START)
-    {
-        emit error(GetStatus());
-        return;
-    }
-
-    // Handle any locking of drawing, etc
-    HandlePreRun();
-
-    d->Fork(timeout);
-
-    if (GetStatus() == GENERIC_EXIT_RUNNING)
-    {
-        m_semReady.acquire(1);
-        emit started();
-        d->Manage();
-    }
-    else
-    {
-        emit error(GetStatus());
-    }
-}
-
-// should there be a separate 'getstatus' call? or is using
-// Wait() for that purpose sufficient?
-uint MythSystem::Wait(time_t timeout)
-{
-    if (!d)
-        m_status = GENERIC_EXIT_NO_HANDLER;
-
-    if ((GetStatus() != GENERIC_EXIT_RUNNING) || GetSetting("RunInBackground"))
-        return GetStatus();
-
-    if (GetSetting("ProcessEvents"))
-    {
-        if (timeout > 0)
-            timeout += time(NULL);
-
-        while (!timeout || time(NULL) < timeout)
+        if (!m_legacy->GetBuffer(2)->isOpen() &&
+            !m_legacy->GetBuffer(2)->open(QIODevice::ReadOnly))
         {
-            // loop until timeout hits or process ends
-            if (m_semReady.tryAcquire(1,100))
-            {
-                m_semReady.release(1);
-                break;
-            }
-
-            qApp->processEvents();
+            return NULL;
         }
+
+        return m_legacy->GetBuffer(2);
     }
-    else
+
+    /// Sends the selected signal to the program
+    void Signal(MythSignal sig) MOVERRIDE
     {
-        if (timeout > 0)
-        {
-            if (m_semReady.tryAcquire(1, timeout*1000))
-                m_semReady.release(1);
-        }
-        else
-        {
-            m_semReady.acquire(1);
-            m_semReady.release(1);
-        }
+        m_legacy->Signal(sig);
     }
-    return GetStatus();
-}
 
-void MythSystem::Term(bool force)
-{
-    if (!d)
-        m_status = GENERIC_EXIT_NO_HANDLER;
-
-    if (m_status != GENERIC_EXIT_RUNNING)
-        return;
-
-    d->Term(force);
-}
-
-void MythSystem::Signal(MythSignal sig)
-{
-    if (!d)
-        m_status = GENERIC_EXIT_NO_HANDLER;
-
-    if (m_status != GENERIC_EXIT_RUNNING)
-        return;
-
-    int posix_signal = SIGTRAP;
-    switch (sig)
+    /** \brief returns the exit code, if any, that the program returned.
+     *
+     *  Returns -1 if the program exited without exit code.
+     *  Returns -2 if the program has not yet been collected.
+     *  Returns an exit code 0..255 if the program exited with exit code.
+     */
+    int GetExitCode(void) const MOVERRIDE
     {
-        case kSignalHangup: posix_signal = SIGHUP; break;
-        case kSignalInterrupt: posix_signal = SIGINT; break;
-        case kSignalContinue: posix_signal = SIGCONT; break;
-        case kSignalQuit: posix_signal = SIGQUIT; break;
-        case kSignalKill: posix_signal = SIGKILL; break;
-        case kSignalUser1: posix_signal = SIGUSR1; break;
-        case kSignalUser2: posix_signal = SIGUSR2; break;
-        case kSignalTerm: posix_signal = SIGTERM; break;
-        case kSignalStop: posix_signal = SIGSTOP; break;
+        // FIXME doesn't actually know why program exited.
+        //       if program returns 142 then we will forever
+        //       think it is running even though it is not.
+        int status = m_legacy->GetStatus();
+        if (GENERIC_EXIT_RUNNING == status)
+            return -2;
+        if (GENERIC_EXIT_KILLED == status)
+            return -1;
+        return status;
     }
 
-    // The default less switch above will cause a compiler warning
-    // if someone adds a signal without updating the switch, but in
-    // case that is missed print out a message.
-    if (SIGTRAP == posix_signal)
+  private:
+    MythSystemLegacyWrapper(MythSystemLegacy *legacy, uint flags) :
+        m_legacy(legacy), m_flags(flags)
     {
-        LOG(VB_SYSTEM, LOG_ERR, "Programmer error: Unknown signal");
-        return;
+        m_legacy->Run();
     }
 
-    d->Signal(posix_signal);
-}
+  private:
+    QScopedPointer<MythSystemLegacy> m_legacy;
+    uint m_flags;
+};
 
-
-void MythSystem::ProcessFlags(uint flags)
+MythSystem *MythSystem::Create(
+    const QStringList &args,
+    uint flags,
+    QString startPath,
+    Priority cpuPriority,
+    Priority diskPriority)
 {
-    if (m_status != GENERIC_EXIT_START)
-    {
-        LOG(VB_SYSTEM, LOG_DEBUG, QString("status: %1").arg(m_status));
-        return;
-    }
-
-    m_settings["IsInUI"] = gCoreContext->HasGUI() && gCoreContext->IsUIThread();
-
-    if (flags & kMSRunBackground)
-        m_settings["RunInBackground"] = true;
-
-    if (m_command.endsWith("&"))
-    {
-        if (!GetSetting("RunInBackground"))
-            LOG(VB_SYSTEM, LOG_DEBUG, "Adding background flag");
-
-        // Remove the &
-        m_command.chop(1);
-        m_command = m_command.trimmed();
-        m_settings["RunInBackground"] = true;
-        m_settings["UseShell"]        = true;
-        m_settings["IsInUI"]          = false;
-    }
-
-    if (GetSetting("IsInUI"))
-    {
-        // Check for UI-only locks
-        m_settings["BlockInputDevs"] = !(flags & kMSDontBlockInputDevs);
-        m_settings["DisableDrawing"] = !(flags & kMSDontDisableDrawing);
-        m_settings["ProcessEvents"]  = flags & kMSProcessEvents;
-        m_settings["DisableUDP"]     = flags & kMSDisableUDPListener;
-    }
-
-    if (flags & kMSStdIn)
-        m_settings["UseStdin"] = true;
-    if (flags & kMSStdOut)
-        m_settings["UseStdout"] = true;
-    if (flags & kMSStdErr)
-        m_settings["UseStderr"] = true;
-    if (flags & kMSRunShell)
-        m_settings["UseShell"] = true;
-    if (flags & kMSNoRunShell) // override for use with myth_system
-        m_settings["UseShell"] = false;
-    if (flags & kMSAbortOnJump)
-        m_settings["AbortOnJump"] = true;
-    if (flags & kMSSetPGID)
-        m_settings["SetPGID"] = true;
-    if (flags & kMSAutoCleanup && GetSetting("RunInBackground"))
-        m_settings["AutoCleanup"] = true;
-    if (flags & kMSAnonLog)
-        m_settings["AnonLog"] = true;
-    if (flags & kMSLowExitVal)
-        m_settings["OnlyLowExitVal"] = true;
-    if (flags & kMSPropagateLogs)
-        m_settings["PropagateLogs"] = true;
+    return MythSystemLegacyWrapper::Create(
+        args, flags, startPath, cpuPriority, diskPriority);
 }
 
-QByteArray  MythSystem::Read(int size)
+MythSystem *MythSystem::Create(
+    QString args,
+    uint flags,
+    QString startPath,
+    Priority cpuPriority,
+    Priority diskPriority)
 {
-    return m_stdbuff[1].read(size);
+    return MythSystem::Create(
+        args.split(QRegExp("\\s+")), flags, startPath,
+        cpuPriority, diskPriority);
 }
-
-QByteArray  MythSystem::ReadErr(int size)
-{
-    return m_stdbuff[2].read(size);
-}
-
-QByteArray& MythSystem::ReadAll(void)
-{
-    return m_stdbuff[1].buffer();
-}
-
-QByteArray& MythSystem::ReadAllErr(void)
-{
-    return m_stdbuff[2].buffer();
-}
-
-int MythSystem::Write(const QByteArray &ba)
-{
-    if (!GetSetting("UseStdin"))
-        return 0;
-
-    m_stdbuff[0].buffer().append(ba.constData());
-    return ba.size();
-}
-
-void MythSystem::HandlePreRun(void)
-{
-    // This needs to be a send event so that the MythUI locks the input devices
-    // immediately instead of after existing events are processed
-    // since this function could be called inside one of those events.
-    if (GetSetting("BlockInputDevs"))
-    {
-        QEvent event(MythEvent::kLockInputDevicesEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
-    }
-
-    // This needs to be a send event so that the listener is disabled
-    // immediately instead of after existing events are processed, since the
-    // listen server must be terminated before the spawned application tries
-    // to start its own
-    if (GetSetting("DisableUDP"))
-    {
-        QEvent event(MythEvent::kDisableUDPListenerEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
-    }
-
-    // This needs to be a send event so that the MythUI m_drawState change is
-    // flagged immediately instead of after existing events are processed
-    // since this function could be called inside one of those events.
-    if (GetSetting("DisableDrawing"))
-    {
-        QEvent event(MythEvent::kPushDisableDrawingEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
-    }
-}
-
-void MythSystem::HandlePostRun(void)
-{
-    // Since this is *not* running in the UI thread (but rather the signal
-    // handler thread), we need to use postEvents
-    if (GetSetting("DisableDrawing"))
-    {
-        QEvent *event = new QEvent(MythEvent::kPopDisableDrawingEventType);
-        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
-    }
-
-    // This needs to be a post event so we do not try to start listening on
-    // the UDP ports before the child application has stopped and terminated
-    if (GetSetting("DisableUDP"))
-    {
-        QEvent event(MythEvent::kEnableUDPListenerEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
-    }
-
-    // This needs to be a post event so that the MythUI unlocks input devices
-    // after all existing (blocked) events are processed and ignored.
-    if (GetSetting("BlockInputDevs"))
-    {
-        QEvent *event = new QEvent(MythEvent::kUnlockInputDevicesEventType);
-        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
-    }
-}
-
-void MythSystem::JumpAbort(void)
-{
-    if (!d)
-        return;
-
-    LOG(VB_SYSTEM, LOG_DEBUG, "Triggering Abort on Jumppoint");
-    d->JumpAbort();
-}
-
-QString MythSystem::ShellEscape(const QString &in)
-{
-    QString out = in;
-
-    if (out.contains("\""))
-        out = out.replace("\"", "\\\"");
-
-    if (out.contains("\'"))
-        out = out.replace("\'", "\\\'");
-
-    if (out.contains(" "))
-    {
-        out.prepend("\"");
-        out.append("\"");
-    }
-
-    return out;
-}
-
-MythSystemPrivate::MythSystemPrivate(const QString &debugName) :
-    ReferenceCounter(debugName)
-{
-}
-
-uint myth_system(const QString &command, uint flags, uint timeout)
-{
-    flags |= kMSRunShell | kMSAutoCleanup;
-    MythSystem *ms = new MythSystem(command, flags);
-    ms->Run(timeout);
-    uint result = ms->Wait(0);
-    if (!ms->GetSetting("RunInBackground"))
-        delete ms;
-
-    return result;
-}
-
-void myth_system_jump_abort(void)
-{
-    MythSystem ms;
-    ms.JumpAbort();
-}
-
-extern "C" {
-    unsigned int myth_system_c(char *command, uint flags, uint timeout)
-    {
-        QString cmd(command);
-        return myth_system(cmd, flags, timeout);
-    }
-}
-
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */

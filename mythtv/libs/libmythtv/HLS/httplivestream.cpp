@@ -37,7 +37,7 @@
 #include "mythdirs.h"
 #include "mythtimer.h"
 #include "mthreadpool.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "storagegroup.h"
