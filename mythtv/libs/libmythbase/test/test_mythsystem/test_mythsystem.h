@@ -108,7 +108,6 @@ class TestMythSystem: public QObject
     }
 
     // TODO kMSProcessEvents      -- process events while waiting
-    // TODO kMSInUi               -- the parent is in the UI
 
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
@@ -194,9 +193,6 @@ class TestMythSystem: public QObject
 #endif
     }
 
-    // TODO flags to test
-    // TODO kMSSetPGID            -- set the process group id
-
     // kMSAutoCleanup        -- automatically delete if backgrounded
     void auto_cleanup_return_null(void)
     {
@@ -205,7 +201,6 @@ class TestMythSystem: public QObject
         QVERIFY(!ptr);
     }
 
-    // TODO kMSLowExitVal         -- allow exit values 0-127 only
     // TODO kMSDisableUDPListener -- disable MythMessage UDP listener
     //                               for the duration of application.
     // TODO kMSPropagateLogs      -- add arguments for MythTV log propagation

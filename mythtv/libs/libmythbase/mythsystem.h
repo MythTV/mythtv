@@ -39,15 +39,19 @@ typedef enum MythSystemMask {
     kMSRunBackground      = 0x00000004, ///< run child in the background
     kMSProcessEvents      = 0x00000008, ///< process events while waiting
     kMSInUi               = 0x00000010, ///< the parent is in the UI
+    // ^ FIXME Eliminate? appears entirely unused.
     kMSStdIn              = 0x00000020, ///< allow access to stdin
     kMSStdOut             = 0x00000040, ///< allow access to stdout
     kMSStdErr             = 0x00000080, ///< allow access to stderr
     kMSRunShell           = 0x00000200, ///< run process through shell
     kMSAnonLog            = 0x00000800, ///< anonymize the logs
     kMSSetPGID            = 0x00002000, ///< set the process group id
+    // ^ FIXME Eliminate? appears to not be used + not available on windows
     kMSAutoCleanup        = 0x00004000, ///< automatically delete if
                                         ///  backgrounded
     kMSLowExitVal         = 0x00008000, ///< allow exit values 0-127 only
+    // ^ FIXME Eliminate? appears to be a hack for some "ubuntu", but
+    //                    doesn't appear to be needed with ubuntu 12.04
     kMSDisableUDPListener = 0x00010000, ///< disable MythMessage UDP listener
                                         ///  for the duration of application.
     kMSPropagateLogs      = 0x00020000, ///< add arguments for MythTV log
