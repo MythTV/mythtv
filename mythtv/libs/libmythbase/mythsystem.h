@@ -38,8 +38,6 @@ typedef enum MythSystemMask {
     kMSDontDisableDrawing = 0x00000002, ///< avoid disabling UI drawing
     kMSRunBackground      = 0x00000004, ///< run child in the background
     kMSProcessEvents      = 0x00000008, ///< process events while waiting
-    kMSInUi               = 0x00000010, ///< the parent is in the UI
-    // ^ FIXME Eliminate? appears entirely unused.
     kMSStdIn              = 0x00000020, ///< allow access to stdin
     kMSStdOut             = 0x00000040, ///< allow access to stdout
     kMSStdErr             = 0x00000080, ///< allow access to stderr
