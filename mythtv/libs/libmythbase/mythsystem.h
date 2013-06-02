@@ -43,8 +43,6 @@ typedef enum MythSystemMask {
     kMSStdErr             = 0x00000080, ///< allow access to stderr
     kMSRunShell           = 0x00000200, ///< run process through shell
     kMSAnonLog            = 0x00000800, ///< anonymize the logs
-    kMSSetPGID            = 0x00002000, ///< set the process group id
-    // ^ FIXME Eliminate? appears to not be used + not available on windows
     kMSAutoCleanup        = 0x00004000, ///< automatically delete if
                                         ///  backgrounded
     kMSLowExitVal         = 0x00008000, ///< allow exit values 0-127 only

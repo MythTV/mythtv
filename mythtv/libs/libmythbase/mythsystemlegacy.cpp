@@ -384,8 +384,6 @@ void MythSystemLegacy::ProcessFlags(uint flags)
         m_settings["UseStderr"] = true;
     if (flags & kMSRunShell)
         m_settings["UseShell"] = true;
-    if (flags & kMSSetPGID)
-        m_settings["SetPGID"] = true;
     if (flags & kMSAutoCleanup && GetSetting("RunInBackground"))
         m_settings["AutoCleanup"] = true;
     if (flags & kMSAnonLog)

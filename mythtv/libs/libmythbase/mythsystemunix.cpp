@@ -768,7 +768,7 @@ void MythSystemLegacyUnix::Signal( int sig )
 
     LOG(VB_GENERAL, LOG_INFO, QString("Child PID %1 killed with %2")
                     .arg(m_pid).arg(strsignal(sig)));
-    kill((GetSetting("SetPGID") ? -m_pid : m_pid), sig);
+    kill(m_pid, sig);
 }
 
 #define MAX_BUFLEN 1024
@@ -849,9 +849,6 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     QString dir = GetDirectory();
     if (GetSetting("SetDirectory") && !dir.isEmpty())
         directory = strdup(dir.toUtf8().constData());
-
-    // check before fork to avoid QString use in child
-    bool setpgidsetting = GetSetting("SetPGID");
 
     int niceval = m_parent->GetNice();
     int ioprioval = m_parent->GetIOPrio();
@@ -1012,16 +1009,6 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         {
             cerr << locerr
                  << "chdir() failed: "
-                 << strerror(errno) << endl;
-        }
-
-        /* Set the process group id to be the same as the pid of this child
-         * process.  This ensures that any subprocesses launched by this
-         * process can be killed along with the process itself. */ 
-        if (setpgidsetting && setpgid(0,0) < 0 ) 
-        {
-            cerr << locerr
-                 << "setpgid() failed: "
                  << strerror(errno) << endl;
         }
 
