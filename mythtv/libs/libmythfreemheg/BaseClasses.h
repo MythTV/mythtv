@@ -266,12 +266,12 @@ class MHParameter
 class MHUnion
 {
   public:
-    MHUnion() { m_Type = U_None; }
-    MHUnion(int nVal) { m_Type = U_Int; m_nIntVal = nVal; }
-    MHUnion(bool fVal)  { m_Type = U_Bool; m_fBoolVal = fVal; }
-    MHUnion(const MHOctetString &strVal) { m_Type = U_String; m_StrVal.Copy(strVal); }
-    MHUnion(const MHObjectRef &objVal) { m_Type = U_ObjRef; m_ObjRefVal.Copy(objVal); };
-    MHUnion(const MHContentRef &cnVal) { m_Type = U_ContentRef; m_ContentRefVal.Copy(cnVal); }
+    MHUnion() : m_Type(U_None), m_nIntVal(0), m_fBoolVal(false) {}
+    MHUnion(int nVal) : m_Type(U_Int), m_nIntVal(nVal), m_fBoolVal(false) {}
+    MHUnion(bool fVal) : m_Type(U_Bool), m_nIntVal(0), m_fBoolVal(fVal)  {}
+    MHUnion(const MHOctetString &strVal) : m_Type(U_String), m_nIntVal(0), m_fBoolVal(false) { m_StrVal.Copy(strVal); }
+    MHUnion(const MHObjectRef &objVal) : m_Type(U_ObjRef), m_nIntVal(0), m_fBoolVal(false) { m_ObjRefVal.Copy(objVal); };
+    MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef), m_nIntVal(0), m_fBoolVal(false) { m_ContentRefVal.Copy(cnVal); }
 
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
 
