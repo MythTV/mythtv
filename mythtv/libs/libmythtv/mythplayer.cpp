@@ -2659,7 +2659,7 @@ void MythPlayer::JumpToProgram(void)
         return;
     }
 
-    SendMythSystemLegacyPlayEvent("PLAY_CHANGED", pginfo);
+    SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
     if (player_ctx->buffer->GetType() == ICRingBuffer::kRingBufferType)
     {

@@ -12,7 +12,7 @@
 #include "exitcodes.h"
 #include "mythlogging.h"
 
-#define LOC      QString("MythSystemLegacyEventHandler: ")
+#define LOC      QString("MythSystemEventHandler: ")
 
 /** \class SystemEventThread
  *  \brief QRunnable class for running MythSystemLegacyEvent handler commands
@@ -69,28 +69,28 @@ class SystemEventThread : public QRunnable
 };
 
 
-/** \fn MythSystemLegacyEventHandler::MythSystemLegacyEventHandler(void)
+/** \fn MythSystemEventHandler::MythSystemEventHandler(void)
  *  \brief Null Constructor
  *
  *  Adds this object as a gContext event listener.
  */
-MythSystemLegacyEventHandler::MythSystemLegacyEventHandler(void)
+MythSystemEventHandler::MythSystemEventHandler(void)
 {
-    setObjectName("MythSystemLegacyEventHandler");
+    setObjectName("MythSystemEventHandler");
     gCoreContext->addListener(this);
 }
 
-/** \fn MythSystemLegacyEventHandler::~MythSystemLegacyEventHandler()
+/** \fn MythSystemEventHandler::~MythSystemEventHandler()
  *  \brief Destructor
  *
  *  Removes this object as a gContext event listener.
  */
-MythSystemLegacyEventHandler::~MythSystemLegacyEventHandler()
+MythSystemEventHandler::~MythSystemEventHandler()
 {
     gCoreContext->removeListener(this);
 }
 
-/** \fn MythSystemLegacyEventHandler::SubstituteMatches(const QStringList &tokens,
+/** \fn MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
                                                   QString &command)
  *  \brief Substitutes %MATCH% variables in given command line.
  *  \sa ProgramInfo::SubstituteMatches(QString &str)
@@ -103,7 +103,7 @@ MythSystemLegacyEventHandler::~MythSystemLegacyEventHandler()
  *  \param tokens  Const QStringList containing token list passed with event.
  *  \param command Command line containing %MATCH% variables to be substituted.
  */
-void MythSystemLegacyEventHandler::SubstituteMatches(const QStringList &tokens,
+void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
                                                QString &command)
 {
     if (command.isEmpty())
@@ -212,7 +212,7 @@ void MythSystemLegacyEventHandler::SubstituteMatches(const QStringList &tokens,
                                             .arg(command));
 }
 
-/** \fn MythSystemLegacyEventHandler::EventNameToSetting(const QString &name)
+/** \fn MythSystemEventHandler::EventNameToSetting(const QString &name)
  *  \brief Convert an MythSystemLegacyEvent name to a database setting name
  *
  *  Converts an underscored, all-capital-letters system event name of the form
@@ -221,7 +221,7 @@ void MythSystemLegacyEventHandler::SubstituteMatches(const QStringList &tokens,
  *
  *  \param name Const QString containing System Event name to convert
  */
-QString MythSystemLegacyEventHandler::EventNameToSetting(const QString &name)
+QString MythSystemEventHandler::EventNameToSetting(const QString &name)
 {
     QString result("EventCmd");
     QStringList parts = name.toLower().split('_', QString::SkipEmptyParts);
@@ -238,11 +238,11 @@ QString MythSystemLegacyEventHandler::EventNameToSetting(const QString &name)
     return result;
 }
 
-/** \fn MythSystemLegacyEventHandler::customEvent(QEvent *e)
+/** \fn MythSystemEventHandler::customEvent(QEvent *e)
  *  \brief Custom Event handler for receiving and processing System Events
- *  \sa MythSystemLegacyEventHandler::SubstituteMatches(const QStringList &tokens,
+ *  \sa MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
                                                   QString &command)
- *      MythSystemLegacyEventHandler::EventNameToSetting(const QString &name)
+ *      MythSystemEventHandler::EventNameToSetting(const QString &name)
  *
  *  This function listens for SYSTEM_EVENT messages and fires off any
  *  necessary event handler commands.  In addition to SYSTEM_EVENT messages,
@@ -253,7 +253,7 @@ QString MythSystemLegacyEventHandler::EventNameToSetting(const QString &name)
  *
  *  \param e Pointer to QEvent containing event to handle
  */
-void MythSystemLegacyEventHandler::customEvent(QEvent *e)
+void MythSystemEventHandler::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -313,13 +313,13 @@ void MythSystemLegacyEventHandler::customEvent(QEvent *e)
 
 /****************************************************************************/
 
-/** \fn SendMythSystemLegacyRecEvent(const QString msg, const RecordingInfo *pginfo)
+/** \fn SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
  *  \brief Sends a System Event for an in-progress recording
  *  \sa MythCoreContext::SendSystemEvent(const QString msg)
  *  \param msg    Const QString to send as a System Event
  *  \param pginfo Pointer to a RecordingInfo containing info on a recording
  */
-void SendMythSystemLegacyRecEvent(const QString msg, const RecordingInfo *pginfo)
+void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
     {
@@ -333,17 +333,17 @@ void SendMythSystemLegacyRecEvent(const QString msg, const RecordingInfo *pginfo
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            "SendMythSystemLegacyRecEvent() called with empty RecordingInfo");
+            "SendMythSystemRecEvent() called with empty RecordingInfo");
     }
 }
 
-/** \fn SendMythSystemLegacyPlayEvent(const QString msg, const ProgramInfo *pginfo)
+/** \fn SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
  *  \brief Sends a System Event for a previously recorded program
  *  \sa MythCoreContext::SendSystemEvent(const QString msg)
  *  \param msg    Const QString to send as a System Event
  *  \param pginfo Pointer to a RecordingInfo containing info on a recording
  */
-void SendMythSystemLegacyPlayEvent(const QString msg, const ProgramInfo *pginfo)
+void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
 {
     if (pginfo)
         gCoreContext->SendSystemEvent(
@@ -352,13 +352,13 @@ void SendMythSystemLegacyPlayEvent(const QString msg, const ProgramInfo *pginfo)
                     .arg(pginfo->GetChanID())
                     .arg(pginfo->GetRecordingStartTime(MythDate::ISODate)));
     else
-        LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemLegacyPlayEvent() called with "
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SendMythSystemPlayEvent() called with "
                                        "empty ProgramInfo");
 }
 
 /****************************************************************************/
 
-/** \fn MythSystemLegacyEventEditor::MythSystemLegacyEventEditor(MythScreenStack *parent,
+/** \fn MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
                                                      const char *name)
  *  \brief Constructor for the MythSystemLegacyEvent settings editor
  *
@@ -369,7 +369,7 @@ void SendMythSystemLegacyPlayEvent(const QString msg, const ProgramInfo *pginfo)
  *  \param parent Parent screen stack for this window
  *  \param name   Name of this window
  */
-MythSystemLegacyEventEditor::MythSystemLegacyEventEditor(MythScreenStack *parent,
+MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
                                              const char *name)
   : RawSettingsEditor(parent, name)
 {

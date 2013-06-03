@@ -1017,7 +1017,7 @@ void MainServer::customEvent(QEvent *e)
 
             if (recInfo.GetChanID())
             {
-                SendMythSystemLegacyPlayEvent("REC_EXPIRED", &recInfo);
+                SendMythSystemPlayEvent("REC_EXPIRED", &recInfo);
 
                 // allow re-record if auto expired but not expired live
                 // or already "deleted" programs

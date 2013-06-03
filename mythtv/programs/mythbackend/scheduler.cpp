@@ -2283,7 +2283,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
         {
             if (!pendingEventSent)
             {
-                SendMythSystemLegacyRecEvent(
+                SendMythSystemRecEvent(
                     QString("REC_PENDING SECS %1").arg(secsleft), &ri);
             }
 

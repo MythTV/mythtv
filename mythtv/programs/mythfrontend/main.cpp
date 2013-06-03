@@ -946,7 +946,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythSystemLegacyEventEditor *msee = new MythSystemLegacyEventEditor(
+        MythSystemEventEditor *msee = new MythSystemEventEditor(
                                     mainStack, "System Event Editor");
 
         if (msee->Create())
@@ -1687,7 +1687,7 @@ int main(int argc, char **argv)
     if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
         themeUpdateChecker = new ThemeUpdateChecker();
 
-    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 
     BackendConnectionManager bcm;
 

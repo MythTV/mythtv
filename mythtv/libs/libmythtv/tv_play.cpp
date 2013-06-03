@@ -356,7 +356,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     if (curProgram)
     {
         startSysEventSent = true;
-        SendMythSystemLegacyPlayEvent("PLAY_STARTED", curProgram);
+        SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
     }
 
     // Notify others that we are about to play
@@ -375,7 +375,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             else if (!startSysEventSent)
             {
                 startSysEventSent = true;
-                SendMythSystemLegacyPlayEvent("PLAY_STARTED", curProgram);
+                SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
             }
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->Playback() -- end");
@@ -429,7 +429,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
             curProgram = nextProgram;
 
-            SendMythSystemLegacyPlayEvent("PLAY_CHANGED", curProgram);
+            SendMythSystemPlayEvent("PLAY_CHANGED", curProgram);
             continue;
         }
 
@@ -463,7 +463,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
     if (curProgram)
     {
-        SendMythSystemLegacyPlayEvent("PLAY_STOPPED", curProgram);
+        SendMythSystemPlayEvent("PLAY_STOPPED", curProgram);
 
         if (deleterecording)
         {
@@ -6063,7 +6063,7 @@ void TV::DoPlay(PlayerContext *ctx)
         if (ctx->ff_rew_state)
             time = StopFFRew(ctx);
         else if (ctx->player->IsPaused())
-            SendMythSystemLegacyPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
+            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
 
         ctx->player->Play(ctx->ts_normal, true);
         gCoreContext->emitTVPlaybackUnpaused();
@@ -6185,9 +6185,9 @@ void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (paused)
-        SendMythSystemLegacyPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
+        SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
     else
-        SendMythSystemLegacyPlayEvent("PLAY_PAUSED", ctx->playingInfo);
+        SendMythSystemPlayEvent("PLAY_PAUSED", ctx->playingInfo);
 
     if (!ignore)
         DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);

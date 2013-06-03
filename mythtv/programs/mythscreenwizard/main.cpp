@@ -242,7 +242,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_CONNECT_ERROR;
     }
 
-    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 */
 
     startAppearWiz(GuiOffsetX, GuiOffsetY, GuiWidth, GuiHeight);

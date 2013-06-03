@@ -804,7 +804,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
         kAutoRunNone : kAutoRunProfile;
     InitAutoRunJobs(curRec, t, NULL, __LINE__);
 
-    SendMythSystemLegacyRecEvent("REC_STARTED", curRec);
+    SendMythSystemRecEvent("REC_STARTED", curRec);
 }
 
 /** \brief If not a premature stop, adds program to history of recorded
@@ -893,7 +893,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if (HasFlags(kFlagDummyRecorderRunning))
     {
         curRec->FinishedRecording(true); // so end time is updated
-        SendMythSystemLegacyRecEvent("REC_FINISHED", curRec);
+        SendMythSystemRecEvent("REC_FINISHED", curRec);
         return;
     }
 
@@ -939,7 +939,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
 
     // send out REC_FINISHED message
-    SendMythSystemLegacyRecEvent("REC_FINISHED", curRec);
+    SendMythSystemRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
     int secsSince = curRec->GetRecordingStartTime()

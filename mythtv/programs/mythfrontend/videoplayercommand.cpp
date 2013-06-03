@@ -133,20 +133,20 @@ class VideoPlayHandleMedia : public VideoPlayProc
 
 ////////////////////////////////////////////////////////////////////////
 
-class VideoPlayMythSystemLegacy : public VideoPlayProc
+class VideoPlayMythSystem : public VideoPlayProc
 {
   private:
-    VideoPlayMythSystemLegacy(const QString &disp_command,
+    VideoPlayMythSystem(const QString &disp_command,
             const QString &play_command) :
         m_display_command(disp_command), m_play_command(play_command)
     {
     }
 
   public:
-    static VideoPlayMythSystemLegacy *Create(const QString &command,
+    static VideoPlayMythSystem *Create(const QString &command,
             const QString &filename)
     {
-        return new VideoPlayMythSystemLegacy(command,
+        return new VideoPlayMythSystem(command,
                 ExpandPlayCommand(command, filename));
     }
 
@@ -166,9 +166,9 @@ class VideoPlayMythSystemLegacy : public VideoPlayProc
         return m_display_command;
     }
 
-    VideoPlayMythSystemLegacy *Clone() const
+    VideoPlayMythSystem *Clone() const
     {
-        return new VideoPlayMythSystemLegacy(*this);
+        return new VideoPlayMythSystem(*this);
     }
 
   private:
@@ -351,7 +351,7 @@ class VideoPlayerCommandPrivate
         m_player_procs.push_back(VideoPlayHandleMedia::Create(player, filename,
                         plot, title, subtitle, director, season, episode, inetref,
                         length, year, id));
-        m_player_procs.push_back(VideoPlayMythSystemLegacy::Create(player, filename));
+        m_player_procs.push_back(VideoPlayMythSystem::Create(player, filename));
     }
 
   private:

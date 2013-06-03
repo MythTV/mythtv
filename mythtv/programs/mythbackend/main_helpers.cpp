@@ -566,7 +566,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
-    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
 
     if (ismaster)
     {
