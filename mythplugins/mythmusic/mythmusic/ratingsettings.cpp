@@ -21,18 +21,18 @@ RatingSettings::~RatingSettings()
 
 bool RatingSettings::Create()
 {
-    bool err = false;
-
     // Load the theme for this screen
     if (!LoadWindowFromXML("musicsettings-ui.xml", "ratingsettings", this))
         return false;
 
-    m_ratingWeight = dynamic_cast<MythUISpinBox *> (GetChild("ratingweight"));
-    m_playCountWeight = dynamic_cast<MythUISpinBox *> (GetChild("playcountweight"));
-    m_lastPlayWeight = dynamic_cast<MythUISpinBox *> (GetChild("lastplayweight"));
-    m_randomWeight = dynamic_cast<MythUISpinBox *> (GetChild("randomweight"));
-    m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save"));
-    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
+    bool err = false;
+
+    UIUtilE::Assign(this, m_ratingWeight, "ratingweight", &err);
+    UIUtilE::Assign(this, m_playCountWeight, "playcountweight", &err);
+    UIUtilE::Assign(this, m_lastPlayWeight, "lastplayweight", &err);
+    UIUtilE::Assign(this, m_randomWeight, "randomweight", &err);
+    UIUtilE::Assign(this, m_saveButton, "save", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
     if (err)
     {
