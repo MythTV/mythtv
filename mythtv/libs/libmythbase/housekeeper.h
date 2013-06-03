@@ -78,6 +78,7 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
                             HouseKeeperStartup startup=kHKNormal);
     virtual bool DoCheckRun(QDateTime now);
     virtual bool InWindow(QDateTime now);
+    virtual bool PastWindow(QDateTime now);
     virtual QDateTime UpdateLastRun(QDateTime last);
     virtual void SetLastRun(QDateTime last);
     virtual void SetWindow(float min, float max);
@@ -101,6 +102,7 @@ class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
     virtual void SetHourWindow(int min, int max);
+    virtual bool InWindow(QDateTime now);
 
   protected:
     virtual void CalculateWindow(void);

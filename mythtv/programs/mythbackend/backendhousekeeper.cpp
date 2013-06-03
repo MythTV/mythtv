@@ -494,8 +494,11 @@ bool MythFillDatabaseTask::UseSuggestedTime(void)
 bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
 {
     if (!gCoreContext->GetNumSetting("MythFillEnabled", 1))
+    {
         // we don't want to run this manually, so abort early
+        LOG(VB_GENERAL, LOG_DEBUG, "MythFillDatabase is disabled. Cannot run.");
         return false;
+    }
 
 //    if (m_running)
 //        // we're still running from the previous pass, so abort early
@@ -506,6 +509,9 @@ bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
         QDateTime nextRun = MythDate::fromString(
             gCoreContext->GetSetting("MythFillSuggestedRunTime",
                                      "1970-01-01T00:00:00"));
+        LOG(VB_GENERAL, LOG_DEBUG,
+                QString("MythFillDatabase scheduled to run at %1.")
+                    .arg(nextRun.toString()));
         if (nextRun > now)
             // not yet time
             return false;
@@ -517,8 +523,11 @@ bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
         return false;
     }
     else
+    {
         // just let DailyHouseKeeperTask handle things
+        LOG(VB_GENERAL, LOG_DEBUG, "Performing daily run check.");
         return DailyHouseKeeperTask::DoCheckRun(now);
+    }
 }
 
 bool MythFillDatabaseTask::DoRun(void)

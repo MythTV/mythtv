@@ -66,6 +66,7 @@ HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
 
 bool HouseKeeperTask::CheckRun(QDateTime now)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Checking to run %1").arg(GetTag()));
     bool check = false;
     if (!m_confirm && (check = DoCheckRun(now)))
         // if m_confirm is already set, the task is already in the queue
@@ -278,6 +279,13 @@ bool PeriodicHouseKeeperTask::InWindow(QDateTime now)
     return false;
 }
 
+bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
+{
+    if (GetLastRun().secsTo(now) > m_windowElapsed.second)
+        return true;
+    return false;
+}
+
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
         HouseKeeperScope scope, HouseKeeperStartup startup) :
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, scope, startup),
@@ -308,6 +316,9 @@ void DailyHouseKeeperTask::CalculateWindow(void)
     // so add a 30 minute buffer prior to the end of the window
     if (GetLastRun().addSecs(m_windowElapsed.second) > tmp)
         m_windowElapsed.second = GetLastRun().secsTo(tmp);
+
+    LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Run window between %2 - %3.")
+        .arg(GetTag()).arg(m_windowElapsed.first).arg(m_windowElapsed.second));
 }
 
 void DailyHouseKeeperTask::SetHourWindow(int min, int max)
@@ -315,6 +326,21 @@ void DailyHouseKeeperTask::SetHourWindow(int min, int max)
     m_windowHour.first = min;
     m_windowHour.second = max;
     CalculateWindow();
+}
+
+bool DailyHouseKeeperTask::InWindow(QDateTime now)
+{
+    if (PeriodicHouseKeeperTask::InWindow(now))
+        // parent says we're in the window
+        return true;
+
+    int hour = now.time().hour();
+    if (PastWindow(now) && (m_windowHour.first <= hour)
+                        && (m_windowHour.second > hour))
+        // we've missed the window, but we're within our time constraints
+        return true;
+
+    return false;
 }
 
 void HouseKeepingThread::run(void)
