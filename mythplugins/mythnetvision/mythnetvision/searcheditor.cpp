@@ -118,11 +118,15 @@ void SearchEditor::slotLoadedData()
         type = grabber.firstChildElement("type").text();
         description = grabber.firstChildElement("description").text();
         version = grabber.firstChildElement("version").text().toDouble();
+
         QString treestring = grabber.firstChildElement("tree").text();
+
         if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
             treestring.toLower() == "yes" || treestring == "1"))
             tree = true;
+
         QString searchstring = grabber.firstChildElement("search").text();
+        
         if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
             searchstring.toLower() == "yes" || searchstring == "1"))
             search = true;
@@ -199,20 +203,21 @@ void SearchEditor::fillGrabberButtonList()
             item->SetData(qVariantFromValue(*i));
             QString img = (*i)->GetImage();
             QString thumb;
+
             if (!img.startsWith("/") && !img.isEmpty())
                 thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
                             .arg((*i)->GetImage());
             else
                 thumb = img;
+
             item->SetImage(thumb);
             item->setCheckable(true);
             item->setChecked(MythUIButtonListItem::NotChecked);
             QFileInfo fi((*i)->GetCommandline());
+
             if (findSearchGrabberInDB(fi.fileName(), VIDEO_FILE))
                 item->setChecked(MythUIButtonListItem::FullChecked);
         }
-        else
-            delete item;
     }
 }
 
@@ -236,13 +241,10 @@ void SearchEditor::toggleItem(MythUIButtonListItem *item)
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
-    else
+    else if (removeSearchFromDB(script))
     {
-        if (removeSearchFromDB(script))
-        {
-            m_changed = true;
-            item->setChecked(MythUIButtonListItem::NotChecked);
-        }
+        m_changed = true;
+        item->setChecked(MythUIButtonListItem::NotChecked);
     }
 }
 
