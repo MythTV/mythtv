@@ -59,9 +59,6 @@ bool NetSearch::Create()
 {
     bool foundtheme = false;
 
-    m_type = static_cast<DialogType>(gCoreContext->GetNumSetting(
-                       "mythnetvision.ViewMode", DLG_SEARCH));
-
     // Load the theme for this screen
     foundtheme = LoadWindowFromXML("netvision-ui.xml", "netsearch", this);
 
