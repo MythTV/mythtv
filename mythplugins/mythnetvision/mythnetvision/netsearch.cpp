@@ -290,14 +290,12 @@ void NetSearch::fillGrabberButtonList()
                     new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
         if (item)
         {
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetData((*i)->GetCommandline());
-        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*i)->GetImage());
-        item->SetImage(thumb);
+            item->SetText((*i)->GetTitle(), "title");
+            item->SetData((*i)->GetCommandline());
+            QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                                .arg((*i)->GetImage());
+            item->SetImage(thumb);
         }
-        else
-            delete item;
     }
 }
 
@@ -502,8 +500,6 @@ void NetSearch::populateResultList(ResultItem::resultList list)
                 }
             }
         }
-        else
-            delete item;
     }
 }
 
