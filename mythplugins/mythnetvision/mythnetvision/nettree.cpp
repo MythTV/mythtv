@@ -39,7 +39,7 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return 0;
+        return NULL;
     }
 }
 
@@ -360,6 +360,9 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 void NetTree::handleSelect(MythUIButtonListItem *item)
 {
     MythGenericTree *node = GetNodePtrFromButton(item);
+    if (!node)
+        return;
+
     int nodeInt = node->getInt();
 
     switch (nodeInt)
