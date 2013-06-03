@@ -25,7 +25,8 @@ MythBrowser::MythBrowser(MythScreenStack *parent,
       m_progressBar(NULL), m_titleText(NULL),
       m_statusText(NULL),  m_currentBrowser(-1),
       m_zoom(zoom),        m_menuPopup(NULL),
-      m_defaultFavIcon(NULL)
+      m_defaultFavIcon(NULL), m_backButton(NULL),
+      m_forwardButton(NULL),  m_exitButton(NULL)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
 }
