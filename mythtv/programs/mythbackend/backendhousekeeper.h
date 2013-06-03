@@ -7,7 +7,7 @@
 class LogCleanerTask : public DailyHouseKeeperTask
 {
   public:
-    LogCleanerTask(void) : DailyHouseKeeperTask("LogCleanup", kHKGlobal) {};
+    LogCleanerTask(void) : DailyHouseKeeperTask("LogClean", kHKGlobal) {};
     bool DoRun(void);
 };
 
@@ -15,7 +15,7 @@ class LogCleanerTask : public DailyHouseKeeperTask
 class CleanupTask : public DailyHouseKeeperTask
 {
   public:
-    CleanupTask(void) : DailyHouseKeeperTask("GeneralCleanup", kHKGlobal) {};
+    CleanupTask(void) : DailyHouseKeeperTask("DBCleanup", kHKGlobal) {};
     bool DoRun(void);
 
   private:
