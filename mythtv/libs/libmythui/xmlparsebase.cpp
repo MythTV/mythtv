@@ -517,7 +517,7 @@ MythUIType *XMLParseBase::ParseUIType(
         return NULL;
     }
 
-    if (olduitype)
+    if (olduitype && parent)
     {
         if (typeid(*olduitype) != typeid(*uitype))
         {
@@ -540,7 +540,8 @@ MythUIType *XMLParseBase::ParseUIType(
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                       QString("Type of new widget '%1' doesn't match old '%2'")
                         .arg(name).arg(inherits));
-            parent->DeleteChild(uitype);
+            if (parent)
+                parent->DeleteChild(uitype);
             return NULL;
         }
         else
