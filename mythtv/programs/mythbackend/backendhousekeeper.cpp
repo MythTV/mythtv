@@ -446,6 +446,11 @@ bool JobQueueRecoverTask::DoRun(void)
 MythFillDatabaseTask::MythFillDatabaseTask(void) :
     DailyHouseKeeperTask("MythFillDB"), m_msMFD(NULL)
 {
+    SetHourWindow();
+}
+
+void MythFillDatabaseTask::SetHourWindow(void)
+{
     // we need to set the time window from database settings, so we cannot
     // initialize these values in. grab them and set them afterwards
     int min = gCoreContext->GetNumSetting("MythFillMinHour", -1);
@@ -463,7 +468,7 @@ MythFillDatabaseTask::MythFillDatabaseTask(void) :
         max %= 24;
     }
 
-    SetHourWindow(min, max);
+    DailyHouseKeeperTask::SetHourWindow(min, max);
 }
 
 bool MythFillDatabaseTask::UseSuggestedTime(void)
