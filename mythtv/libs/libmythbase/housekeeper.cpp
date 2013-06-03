@@ -256,11 +256,11 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     bool res = (rand() > (int)(prob2 * RAND_MAX));
     m_currentProb = prob;
     if (res)
-        LOG(VB_GENERAL, LOG_DEBUG, QString("$1 will run: this=$2; total=$3")
-                    .arg(GetTag()).arg(prob2).arg(prob));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
+                    .arg(GetTag()).arg(1-prob2).arg(1-prob));
     else
-        LOG(VB_GENERAL, LOG_DEBUG, QString("$1 will not run: this=$2; total=$3")
-                    .arg(GetTag()).arg(prob2).arg(prob));
+        LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will not run: this=%2; total=%3")
+                    .arg(GetTag()).arg(1-prob2).arg(1-prob));
     return res;
 }
 
@@ -345,6 +345,7 @@ bool DailyHouseKeeperTask::InWindow(QDateTime now)
 
 void HouseKeepingThread::run(void)
 {
+    RunProlog();
     m_waitMutex.lock();
     HouseKeeperTask *task = NULL;
 
@@ -384,6 +385,7 @@ void HouseKeepingThread::run(void)
     }
 
     m_waitMutex.unlock();
+    RunEpilog();
 }
 
 HouseKeeper::HouseKeeper(void) : m_timer(NULL)
