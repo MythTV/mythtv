@@ -29,7 +29,6 @@ DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ./mpeg ./channelscan ./visualisations
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
-DEPENDPATH  += ./recorders/HLS
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
@@ -650,6 +649,10 @@ using_backend {
 
     SOURCES += recorders/rtp/packetbuffer.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
+
+    # Suppport for HLS recorder
+    HEADERS += recorders/hlsstreamhandler.h
+    SOURCES += recorders/hlsstreamhandler.cpp
 
     DEFINES += USING_IPTV
 
