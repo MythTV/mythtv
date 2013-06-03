@@ -87,13 +87,14 @@ bool NetSearch::Create()
         m_noSites->SetVisible(false);
 
     m_search = dynamic_cast<MythUITextEdit *> (GetChild("search"));
-    m_search->SetMaxLength(255);
 
     if (!m_siteList || !m_searchResultList || !m_search)
     {
         LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
+
+    m_search->SetMaxLength(255);
 
     // UI Hookups
     connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem *)),
