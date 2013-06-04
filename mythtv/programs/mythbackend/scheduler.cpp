@@ -59,7 +59,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     recordTable(tmptable),
     priorityTable("powerpriority"),
     schedLock(),
-    m_queueLock(),
     reclist_changed(false),
     specsched(master_sched),
     schedulingEnabled(true),
@@ -1644,7 +1643,7 @@ void Scheduler::GetAllScheduled(QStringList &strList)
 
 void Scheduler::Reschedule(const QStringList &request)
 {
-    QMutexLocker locker(&m_queueLock);
+    QMutexLocker locker(&schedLock);
     reschedQueue.enqueue(request);
     reschedWait.wakeOne();
 }
@@ -1789,10 +1788,10 @@ void Scheduler::run(void)
     // wait for slaves to connect
     sleep(3);
 
+    QMutexLocker lockit(&schedLock);
+
     ClearRequestQueue();
     EnqueueMatch(0, 0, 0, QDateTime(), "SchedulerInit");
-
-    QMutexLocker lockit(&schedLock);
 
     int       prerollseconds  = 0;
     int       wakeThreshold   = 300;
@@ -2122,9 +2121,7 @@ bool Scheduler::HandleReschedule(void)
 
     while (HaveQueuedRequests())
     {
-        m_queueLock.lock();
         QStringList request = reschedQueue.dequeue();
-        m_queueLock.unlock();
         QStringList tokens;
         if (request.size() >= 1)
             tokens = request[0].split(' ', QString::SkipEmptyParts);
