@@ -19,14 +19,14 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target installscripts installgiantbomb installgiantbombxsl
 
 # Input
-HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gameui.h
-HEADERS += rom_metadata.h romedit.h gamedetails.h gamescan.h
+HEADERS += gamehandler.h rominfo.h gamesettings.h gameui.h
+HEADERS += rom_metadata.h romedit.h gamedetails.h gamescan.h external/unzip.h
 
-SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp unzip.c
+SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp
 SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
-SOURCES += gamedetails.cpp gamescan.cpp
+SOURCES += gamedetails.cpp gamescan.cpp external/unzip.c
 
-DEFINES += MPLUGIN_API
+DEFINES += MPLUGIN_API NOUNCRYPT
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
