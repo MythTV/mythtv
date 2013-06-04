@@ -231,6 +231,8 @@ MHParseNode *MHParseBinary::DoParse()
                         int intVal = ParseInt(endOfItem); // May raise an exception
                         pNode->AddArg(new MHPEnum(intVal));
                     }
+
+                    break;
                 }
 
                 case C_INITIAL_PORTION:
@@ -265,6 +267,8 @@ MHParseNode *MHParseBinary::DoParse()
                         int intVal = ParseInt(endOfItem); // May raise an exception
                         pNode->AddArg(new MHPInt(intVal));
                     }
+
+                    break;
                 }
 
                 case C_OBJECT_INFORMATION:
@@ -280,6 +284,7 @@ MHParseNode *MHParseBinary::DoParse()
                     MHOctetString str;
                     ParseString(endOfItem, str);
                     pNode->AddArg(new MHPString(str));
+                    break;
                 }
 
                 default:
