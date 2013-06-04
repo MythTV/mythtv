@@ -100,7 +100,7 @@ ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_t
     static const char *cattype[] =
         { "", "movie", "series", "sports", "tvshow", };
 
-    for (uint i = 1; i < NUM_CAT_TYPES; i++)
+    for (int i = 1; i < NUM_CAT_TYPES; i++)
         if (category_type == cattype[i])
             return (ProgramInfo::CategoryType) i;
     return ProgramInfo::kCategoryNone;
