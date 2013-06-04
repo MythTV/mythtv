@@ -181,7 +181,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         // While this seems like a hack, it's better than what was done before
         QString isoDateString = QString("%1 %2").arg(tmpDT.toString(Qt::ISODate))
                                                 .arg(tmp);
-        dt = QDateTime::fromString(isoDateString, Qt::ISODate).toUTC();
+        // Work around Qt bug where zero offset dates are flagged as LocalTime
+        tmpDT = QDateTime::fromString(isoDateString, Qt::ISODate);
+        if (tmpDT.timeSpec() == Qt::LocalTime)
+            tmpDT.setTimeSpec(Qt::UTC);
+        dt = tmpDT.toUTC();
     }
     
     if (!dt.isValid())
