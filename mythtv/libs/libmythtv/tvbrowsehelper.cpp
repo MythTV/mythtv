@@ -487,7 +487,7 @@ void TVBrowseHelper::run()
             m_tv->channelGroupLock.lock();
             if (m_tv->channelGroupId > -1)
             {
-                int dir = direction;
+                int dir = CHANNEL_DIRECTION_SAME;
                 if ((direction == BROWSE_UP) || (direction == BROWSE_FAVORITE))
                     dir = CHANNEL_DIRECTION_UP;
                 else if (direction == BROWSE_DOWN)
