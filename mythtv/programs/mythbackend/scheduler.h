@@ -159,10 +159,6 @@ class Scheduler : public MThread, public MythScheduler
                          const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
-    int CalcTimeToNextHandleRecordingEvent(
-        const QDateTime &curtime,
-        RecConstIter startIter, const RecList &reclist,
-        int prerollseconds, int max_sleep /*ms*/);
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
                          const QString &subtitle, const QString &descrip,
@@ -171,11 +167,11 @@ class Scheduler : public MThread, public MythScheduler
     bool HandleRunSchedulerStartup(
         int prerollseconds, int idleWaitForRecordingTime);
     void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
-    bool HandleRecording(
-        RecordingInfo &ri, bool &statuschanged,
-        int prerollseconds, int tuningTimeout);
-    void HandleTuning(
-        RecordingInfo &ri, bool &statuschanged, int tuningTimeout);
+    bool HandleRecording(RecordingInfo &ri, bool &statuschanged,
+                         QDateTime &nextStartTime, QDateTime &nextWakeTime,
+                         int prerollseconds, int tuningTimeout);
+    void HandleTuning(RecordingInfo &ri, bool &statuschanged,
+                      QDateTime &nextWakeTime, int tuningTimeout);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
     void HandleIdleShutdown(
