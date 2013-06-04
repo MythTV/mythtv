@@ -15,7 +15,6 @@ using namespace std;
 #include "channelutil.h"
 #include "mythdb.h"
 #include "dvbtables.h"
-#include "tv.h" // for CHANNEL_DIRECTION
 
 #define LOC QString("ChanUtil: ")
 
@@ -2359,7 +2358,7 @@ uint ChannelUtil::GetNextChannel(
     const ChannelInfoList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
-    int               direction,
+    ChannelChangeDirection direction,
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {

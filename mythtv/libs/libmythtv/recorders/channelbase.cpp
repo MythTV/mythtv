@@ -236,7 +236,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     return true;
 }
 
-uint ChannelBase::GetNextChannel(uint chanid, int direction) const
+uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) const
 {
     if (!chanid)
     {
@@ -254,7 +254,7 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
         m_allchannels, chanid, mplexid_restriction, direction);
 }
 
-uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
+uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection direction) const
 {
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())

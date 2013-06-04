@@ -59,8 +59,8 @@ class ChannelBase
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
     // Gets
-    virtual uint GetNextChannel(uint chanid, int direction) const;
-    virtual uint GetNextChannel(const QString &channum, int direction) const;
+    virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
+    virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
     virtual int GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const

@@ -7435,7 +7435,7 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
     return commited;
 }
 
-void TV::ChangeChannel(PlayerContext *ctx, int direction)
+void TV::ChangeChannel(PlayerContext *ctx, ChannelChangeDirection direction)
 {
     if (db_use_channel_groups || (direction == CHANNEL_DIRECTION_FAVORITE))
     {

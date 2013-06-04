@@ -511,7 +511,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Channels
     void ToggleChannelFavorite(PlayerContext *ctx);
     void ToggleChannelFavorite(PlayerContext*, QString);
-    void ChangeChannel(PlayerContext*, int direction);
+    void ChangeChannel(PlayerContext*, ChannelChangeDirection direction);
     void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
 
     void ShowPreviousChannel(PlayerContext*);
