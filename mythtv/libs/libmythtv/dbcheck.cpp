@@ -2354,7 +2354,7 @@ NULL
 // Migrate old data over
 "INSERT INTO `housekeeping` (`tag`, `hostname`, `lastrun`)"
 "   SELECT SUBSTRING_INDEX(`tag`, '-', 1) AS `tag`,"
-"          IF(LOCATE('-', `tag` > 0),"
+"          IF(LOCATE('-', `tag`) > 0,"
 "             SUBSTRING_INDEX(`tag`, '-', -1),"
 "             NULL) AS `hostname`,"
 "          `lastrun`"
