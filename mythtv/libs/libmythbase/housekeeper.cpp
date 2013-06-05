@@ -165,6 +165,11 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
         }
 
         if (m_scope == kHKGlobal)
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Updating global run time for %1").arg(m_dbTag));
+        else
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Updating local run time for %1").arg(m_dbTag));
+
+        if (m_scope == kHKLocal)
             query.bindValue(":HOST", gCoreContext->GetHostName());
         query.bindValue(":TAG", m_dbTag);
         query.bindValue(":TIME", MythDate::as_utc(last));

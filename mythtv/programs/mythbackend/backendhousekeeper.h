@@ -48,7 +48,8 @@ class ArtworkTask : public DailyHouseKeeperTask
 class JobQueueRecoverTask : public DailyHouseKeeperTask
 {
   public:
-    JobQueueRecoverTask(void) : DailyHouseKeeperTask("JobQueueRecover") {};
+    JobQueueRecoverTask(void) : DailyHouseKeeperTask("JobQueueRecover",
+                                                     kHKLocal) {};
     bool DoRun(void);
 };
 
