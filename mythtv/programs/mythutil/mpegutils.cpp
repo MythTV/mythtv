@@ -313,27 +313,31 @@ class PTSListener :
         { return ProcessTSPacket(tspacket); }
     int64_t GetFirstPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
-        int64_t pts = -1LL;
-        for (; it != m_pts_streams.end(); ++it)
-        {
-            int64_t v = m_pts_first[*it];
-            if (v >= 0)
-                pts = min((pts < 0) ? v : pts, v);
-        }
-        return pts;
+    	QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+    	int64_t pts = -1LL;
+    	uint32_t pts_count = 0;
+    	for (; it != m_pts_streams.end(); ++it)
+    	{
+    		if(m_pts_count[*it] > pts_count){
+    			pts = m_pts_first[*it];
+    			pts_count = m_pts_count[*it];
+    		}
+    	}
+    	return pts;
     }
     int64_t GetLastPTS(void) const
     {
-        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
-        int64_t pts = -1LL;
-        for (; it != m_pts_streams.end(); ++it)
-        {
-            int64_t v = m_pts_last[*it];
-            if (v >= 0)
-                pts = max(pts, v);
-        }
-        return pts;
+    	QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+    	int64_t pts = -1LL;
+    	uint32_t pts_count = 0;
+    	for (; it != m_pts_streams.end(); ++it)
+    	{
+    		if(m_pts_count[*it] > pts_count){
+    			pts = m_pts_last[*it];
+    			pts_count = m_pts_count[*it];
+    		}
+    	}
+    	return pts;
     }
     int64_t GetElapsedPTS(void) const
     {
