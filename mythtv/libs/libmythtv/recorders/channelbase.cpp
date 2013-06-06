@@ -1154,7 +1154,7 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev, tvrec);
-        dynamic_cast<DVBChannel*>(channel)->SetSlowTuning(
+        static_cast<DVBChannel*>(channel)->SetSlowTuning(
             dvbOpt.dvb_tuning_delay);
 #endif
     }
