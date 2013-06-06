@@ -170,4 +170,7 @@ EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
 EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
 EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
-macx:using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+macx {
+    using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+    QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@rpath/
+}
