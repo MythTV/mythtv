@@ -4989,30 +4989,15 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream->codec);
         ctx = curstream->codec;
         orig_channels = selectedTrack[kTrackTypeAudio].orig_num_channels;
-        AudioFormat fmt;
+        AudioFormat fmt =
+            AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
+                                                        ctx->bits_per_raw_sample);
+
         AVSampleFormat format_pack = av_get_packed_sample_fmt(ctx->sample_fmt);
 
-        if (format_pack != ctx->sample_fmt)
+        if (av_sample_fmt_is_planar(ctx->sample_fmt))
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio data is planar"));
-        }
-
-        switch (format_pack)
-        {
-            case AV_SAMPLE_FMT_U8:     fmt = FORMAT_U8;    break;
-            case AV_SAMPLE_FMT_S16:    fmt = FORMAT_S16;   break;
-            case AV_SAMPLE_FMT_FLT:    fmt = FORMAT_FLT;   break;
-            case AV_SAMPLE_FMT_DBL:    fmt = FORMAT_NONE;  break;
-            case AV_SAMPLE_FMT_S32:
-                switch (ctx->bits_per_raw_sample)
-                {
-                    case  0:    fmt = FORMAT_S32;   break;
-                    case 24:    fmt = FORMAT_S24;   break;
-                    case 32:    fmt = FORMAT_S32;   break;
-                    default:    fmt = FORMAT_NONE;
-                }
-                break;
-            default:                fmt = FORMAT_NONE;
         }
 
         if (fmt == FORMAT_NONE)
