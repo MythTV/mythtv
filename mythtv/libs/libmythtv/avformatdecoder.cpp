@@ -3865,9 +3865,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
     }
     else if (kTrackTypeSubtitle == type)
     {
-        if (ringBuffer->IsDVD())
-            lang_key = ringBuffer->DVD()->GetSubtitleLanguage(trackNo);
-
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
             .arg(forcedString);

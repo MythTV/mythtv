@@ -1051,9 +1051,12 @@ int DecoderBase::AutoSelectTrack(uint type)
         for (uint i = 0; i < numStreams; i++)
         {
             if (wlang == tracks[type][i].language)
+            {
                 selTrack = i;
-            if (windx == tracks[type][i].language_index)
-                break;
+
+                if (windx == tracks[type][i].language_index)
+                    break;
+            }
         }
     }
 
@@ -1105,8 +1108,9 @@ int DecoderBase::AutoSelectTrack(uint type)
 
     int lang = tracks[type][currentTrack[type]].language;
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Selected track #%1 in the %2 language(%3)")
+        QString("Selected track #%1 (type %2) in the %3 language(%4)")
             .arg(currentTrack[type]+1)
+            .arg(type)
             .arg(iso639_key_toName(lang)).arg(lang));
 
     if (m_parent && (oldTrack != currentTrack[type]))

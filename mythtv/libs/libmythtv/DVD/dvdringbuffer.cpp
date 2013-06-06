@@ -1618,6 +1618,14 @@ uint DVDRingBuffer::GetSubtitleLanguage(int id)
     return ConvertLangCode(lang);
 }
 
+/** \brief get the logical subtitle track/stream number from the dvd
+ * \param stream_id the stream id, range 0-31
+ */
+int DVDRingBuffer::GetSubtitleTrackNum(uint stream_id)
+{
+    return dvdnav_get_spu_logical_stream(m_dvdnav, stream_id);
+}
+
 /** \brief converts the subtitle/audio lang code to iso639.
  */
 uint DVDRingBuffer::ConvertLangCode(uint16_t code)

@@ -101,27 +101,96 @@ void AvFormatDecoderDVD::PostProcessTracks(void)
 
     if (tracks[kTrackTypeSubtitle].size() > 0)
     {
-        stable_sort(tracks[kTrackTypeSubtitle].begin(),
-                    tracks[kTrackTypeSubtitle].end());
-        sinfo_vec_t::iterator it = tracks[kTrackTypeSubtitle].begin();
-        for(; it != tracks[kTrackTypeSubtitle].end(); ++it)
+        map<int,uint> lang_sub_cnt;
+        map<int,int>  stream2idx;
+
+        // First, create a map containing stream id -> track index
+        // of the subtitle streams that have been found so far.
+        for (uint n = 0; n < GetTrackCount(kTrackTypeSubtitle); n++)
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("DVD Subtitle Track Map Stream id #%1 ")
-                    .arg(it->stream_id));
+            int stream_id = tracks[kTrackTypeSubtitle][n].stream_id & 0x1f;
+
+            stream2idx[stream_id] = n;
         }
+
+        // Get all subtitle tracks from the DVD and filter out any that
+        // are not mapped in the current program chain.
+        sinfo_vec_t filteredTracks;
+
+        if (!ringBuffer->DVD()->IsInMenu())
+        {
+            for (uint i = 0; i < 32; ++i)
+            {
+                int streamid = ringBuffer->DVD()->GetSubtitleTrackNum(i);
+                if (streamid >= 0)
+                {
+                    // This stream is mapped in the current program chain
+                    int lang = ringBuffer->DVD()->GetSubtitleLanguage(i);
+                    int lang_indx = lang_sub_cnt[lang]++;
+                    int trackNo = -1;
+
+                    if (stream2idx.count(streamid) != 0)
+                        trackNo = stream2idx[streamid];
+
+                    if (trackNo == -1)
+                    {
+                        // Create a dummy track if the physical stream has not
+                        // yet been seen.
+                        filteredTracks.push_back(StreamInfo(-1, lang, lang_indx,
+                                                            streamid, 0, 0, false, false, false));
+                    }
+                    else
+                    {
+                        // Otherwise use the real data
+                        filteredTracks.push_back(tracks[kTrackTypeSubtitle][trackNo]);
+                        filteredTracks.back().stream_id &= 0x1f;
+                        filteredTracks.back().language = lang;
+                        filteredTracks.back().language_index = lang_indx;
+                    }
+                }
+            }
+        }
+        tracks[kTrackTypeSubtitle] = filteredTracks;
+
         stable_sort(tracks[kTrackTypeSubtitle].begin(),
                     tracks[kTrackTypeSubtitle].end());
-        int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
+
+        int trackNo = -1;
+        int selectedStream = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
+
+        // Now iterate over the sorted list and try to find the index of the
+        // currently selected track.
+        for (uint idx = 0; idx < GetTrackCount(kTrackTypeSubtitle); idx++)
+        {
+            const StreamInfo& stream = tracks[kTrackTypeSubtitle][idx];
+            int avidx = stream.av_stream_index;
+            QString mpegstream;
+
+            if (avidx >= 0)
+                mpegstream = QString( "0x%1").arg(ic->streams[avidx]->id,0,16);
+            else
+                mpegstream = "n/a";
+
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("DVD Subtitle Track Map Stream id #%1, av_stream_idx %2, MPEG #%3, lang %4")
+                    .arg(stream.stream_id)
+                    .arg(stream.av_stream_index)
+                    .arg(mpegstream)
+                    .arg(iso639_key_toName(stream.language)));
+
+            if ((selectedStream != -1) && (stream.stream_id == selectedStream))
+                trackNo = (int)idx;
+        }
+
         uint captionmode = m_parent->GetCaptionMode();
         int trackcount = (int)GetTrackCount(kTrackTypeSubtitle);
+
         if (captionmode == kDisplayAVSubtitle &&
             (trackNo < 0 || trackNo >= trackcount))
         {
             m_parent->EnableSubtitles(false);
         }
-        else if (trackNo >= 0 && trackNo < trackcount &&
-                 !ringBuffer->IsInDiscMenuOrStillFrame())
+        else if (trackNo >= 0 && trackNo < trackcount)
         {
             SetTrack(kTrackTypeSubtitle, trackNo);
             m_parent->EnableSubtitles(true);
