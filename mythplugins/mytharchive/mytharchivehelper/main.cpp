@@ -1948,8 +1948,6 @@ static int64_t getFrameCount(const QString &filename, float fps)
 
 static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
-    const char *type = NULL;
-
     av_register_all();
 
     AVFormatContext *inputFC = NULL;
