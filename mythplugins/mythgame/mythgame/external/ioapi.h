@@ -9,6 +9,9 @@
 #ifndef _ZLIBIOAPI_H
 #define _ZLIBIOAPI_H
 
+#ifndef OF
+#define OF(x) x
+#endif
 
 #define ZLIB_FILEFUNC_SEEK_CUR (1)
 #define ZLIB_FILEFUNC_SEEK_END (2)
