@@ -1380,8 +1380,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         FlagIsSet(kDecodeFewBlocks) || FlagIsSet(kDecodeNoLoopFilter)   ||
         FlagIsSet(kDecodeNoDecode))
     {
-        if ((AV_CODEC_ID_MPEG2VIDEO == codec->id) ||
-            (AV_CODEC_ID_MPEG1VIDEO == codec->id))
+        if (codec &&
+            ((AV_CODEC_ID_MPEG2VIDEO == codec->id) ||
+            (AV_CODEC_ID_MPEG1VIDEO == codec->id)))
         {
             if (FlagIsSet(kDecodeFewBlocks))
             {
@@ -1393,7 +1394,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             if (FlagIsSet(kDecodeLowRes))
                 enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
         }
-        else if (AV_CODEC_ID_H264 == codec->id)
+        else if (codec && (AV_CODEC_ID_H264 == codec->id))
         {
             if (FlagIsSet(kDecodeNoLoopFilter))
             {
