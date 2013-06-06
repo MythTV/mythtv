@@ -1004,6 +1004,9 @@ void MythUIWebBrowser::Init(void)
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);
+
+    m_zoom = gCoreContext->GetFloatSetting("WebBrowserZoomLevel", 1.0);
+
     SetZoom(m_zoom);
 
     if (!m_widgetUrl.isEmpty() && m_widgetUrl.isValid())
