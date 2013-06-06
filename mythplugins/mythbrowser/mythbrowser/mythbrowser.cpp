@@ -18,15 +18,14 @@
 
 using namespace std;
 
-MythBrowser::MythBrowser(MythScreenStack *parent,
-                         QStringList &urlList, float zoom)
+MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),
       m_urlList(urlList),   m_pageList(NULL),
       m_progressBar(NULL),  m_titleText(NULL),
       m_statusText(NULL),   m_backButton(NULL),
       m_forwardButton(NULL),  m_exitButton(NULL),
-      m_currentBrowser(-1), m_zoom(zoom),
-      m_menuPopup(NULL),    m_defaultFavIcon(NULL)
+      m_currentBrowser(-1),   m_menuPopup(NULL),
+      m_defaultFavIcon(NULL)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
 }
@@ -86,7 +85,6 @@ bool MythBrowser::Create(void)
     WebPage *page = new WebPage(this, browser);
 
     m_browserList.append(page);
-    page->getBrowser()->SetZoom(m_zoom);
     page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
     page->getBrowser()->SetDefaultSaveFilename(m_defaultSaveFilename);
 
@@ -164,8 +162,6 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
     WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
                                 name.toAscii().constData());
-    page->getBrowser()->SetZoom(m_zoom);
-
     m_browserList.append(page);
 
     QString newUrl = url;

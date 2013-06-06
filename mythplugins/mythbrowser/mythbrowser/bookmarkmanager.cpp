@@ -385,7 +385,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
         if (urls[0].startsWith("mythflash://"))
             mythbrowser = new MythFlashPlayer(mainStack, urls);
         else
-            mythbrowser = new MythBrowser(mainStack, urls, zoom.toFloat());
+            mythbrowser = new MythBrowser(mainStack, urls);
 
         if (mythbrowser->Create())
         {
@@ -605,7 +605,7 @@ void BookmarkManager::slotShowMarked(void)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom.toFloat());
+        MythBrowser *mythbrowser = new MythBrowser(mainStack, urls);
 
         if (mythbrowser->Create())
         {
