@@ -278,12 +278,12 @@ void EditMetadataCommon::scanForImages(void)
     for (int x = 0; x < files.size(); x++)
     {
         AlbumArtImage *image = new AlbumArtImage();
-        //image->id = 0;
         image->filename = dir.absolutePath() + '/' + files.at(x);
         image->embedded = false;
         image->imageType = AlbumArtImages::guessImageType(image->filename);
         image->description = "";
         m_metadata->getAlbumArtImages()->addImage(image);
+        delete image;
     }
 
     // scan the tracks tag for any images
@@ -304,13 +304,33 @@ void EditMetadataCommon::scanForImages(void)
 // EditMatadataDialog
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, MusicMetadata *source_metadata)
-                  : EditMetadataCommon(parent, source_metadata, "EditMetadataDialog")
+                  : EditMetadataCommon(parent, source_metadata, "EditMetadataDialog"),
+    m_artistEdit(NULL),             m_compArtistEdit(NULL),
+    m_albumEdit(NULL),              m_titleEdit(NULL),
+    m_genreEdit(NULL),              m_yearSpin(NULL),
+    m_trackSpin(NULL),              m_ratingSpin(NULL),
+    m_ratingState(NULL),            m_incRatingButton(NULL),
+    m_decRatingButton(NULL),        m_searchArtistButton(NULL),
+    m_searchCompArtistButton(NULL), m_searchAlbumButton(NULL),
+    m_searchGenreButton(NULL),      m_artistIcon(NULL),
+    m_albumIcon(NULL),              m_genreIcon(NULL),
+    m_compilationCheck(NULL),       m_albumartButton(NULL)
 {
     gCoreContext->addListener(this);
 }
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent)
-                  : EditMetadataCommon(parent, "EditMetadataDialog")
+                  : EditMetadataCommon(parent, "EditMetadataDialog"),
+    m_artistEdit(NULL),             m_compArtistEdit(NULL),
+    m_albumEdit(NULL),              m_titleEdit(NULL),
+    m_genreEdit(NULL),              m_yearSpin(NULL),
+    m_trackSpin(NULL),              m_ratingSpin(NULL),
+    m_ratingState(NULL),            m_incRatingButton(NULL),
+    m_decRatingButton(NULL),        m_searchArtistButton(NULL),
+    m_searchCompArtistButton(NULL), m_searchAlbumButton(NULL),
+    m_searchGenreButton(NULL),      m_artistIcon(NULL),
+    m_albumIcon(NULL),              m_genreIcon(NULL),
+    m_compilationCheck(NULL),       m_albumartButton(NULL)
 {
     gCoreContext->addListener(this);
 }
@@ -846,11 +866,13 @@ void EditMetadataDialog::customEvent(QEvent *event)
 // EditAlbumartDialog
 
 EditAlbumartDialog::EditAlbumartDialog(MythScreenStack *parent)
-                  : EditMetadataCommon(parent, "EditAlbumartDialog")
+                  : EditMetadataCommon(parent, "EditAlbumartDialog"),
+    m_albumArt(m_metadata->getAlbumArtImages()),
+    m_albumArtChanged(false),    m_metadataButton(NULL),
+    m_doneButton(NULL),          m_coverartImage(NULL),
+    m_coverartList(NULL),        m_imagetypeText(NULL),
+    m_imagefilenameText(NULL)
 {
-    m_albumArtChanged = false;
-    m_albumArt = m_metadata->getAlbumArtImages();
-
     gCoreContext->addListener(this);
 }
 

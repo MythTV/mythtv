@@ -1380,8 +1380,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         FlagIsSet(kDecodeFewBlocks) || FlagIsSet(kDecodeNoLoopFilter)   ||
         FlagIsSet(kDecodeNoDecode))
     {
-        if ((AV_CODEC_ID_MPEG2VIDEO == codec->id) ||
-            (AV_CODEC_ID_MPEG1VIDEO == codec->id))
+        if (codec &&
+            ((AV_CODEC_ID_MPEG2VIDEO == codec->id) ||
+            (AV_CODEC_ID_MPEG1VIDEO == codec->id)))
         {
             if (FlagIsSet(kDecodeFewBlocks))
             {
@@ -1393,7 +1394,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             if (FlagIsSet(kDecodeLowRes))
                 enc->lowres = 2; // 1 = 1/2 size, 2 = 1/4 size
         }
-        else if (AV_CODEC_ID_H264 == codec->id)
+        else if (codec && (AV_CODEC_ID_H264 == codec->id))
         {
             if (FlagIsSet(kDecodeNoLoopFilter))
             {
@@ -3865,9 +3866,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
     }
     else if (kTrackTypeSubtitle == type)
     {
-        if (ringBuffer->IsDVD())
-            lang_key = ringBuffer->DVD()->GetSubtitleLanguage(trackNo);
-
         return QObject::tr("Subtitle") + QString(" %1: %2%3")
             .arg(trackNo + 1).arg(iso639_key_toName(lang_key))
             .arg(forcedString);
@@ -4989,30 +4987,15 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream->codec);
         ctx = curstream->codec;
         orig_channels = selectedTrack[kTrackTypeAudio].orig_num_channels;
-        AudioFormat fmt;
+        AudioFormat fmt =
+            AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
+                                                        ctx->bits_per_raw_sample);
+
         AVSampleFormat format_pack = av_get_packed_sample_fmt(ctx->sample_fmt);
 
-        if (format_pack != ctx->sample_fmt)
+        if (av_sample_fmt_is_planar(ctx->sample_fmt))
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio data is planar"));
-        }
-
-        switch (format_pack)
-        {
-            case AV_SAMPLE_FMT_U8:     fmt = FORMAT_U8;    break;
-            case AV_SAMPLE_FMT_S16:    fmt = FORMAT_S16;   break;
-            case AV_SAMPLE_FMT_FLT:    fmt = FORMAT_FLT;   break;
-            case AV_SAMPLE_FMT_DBL:    fmt = FORMAT_NONE;  break;
-            case AV_SAMPLE_FMT_S32:
-                switch (ctx->bits_per_raw_sample)
-                {
-                    case  0:    fmt = FORMAT_S32;   break;
-                    case 24:    fmt = FORMAT_S24;   break;
-                    case 32:    fmt = FORMAT_S32;   break;
-                    default:    fmt = FORMAT_NONE;
-                }
-                break;
-            default:                fmt = FORMAT_NONE;
         }
 
         if (fmt == FORMAT_NONE)

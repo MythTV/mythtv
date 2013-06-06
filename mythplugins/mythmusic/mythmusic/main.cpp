@@ -395,7 +395,10 @@ static void runRipCD(void)
     if (rip->Create())
         mainStack->AddScreen(rip);
     else
+    {
         delete rip;
+        return;
+    }
 
     QObject::connect(rip, SIGNAL(ripFinished()),
                      gMusicData, SLOT(reloadMusic()),

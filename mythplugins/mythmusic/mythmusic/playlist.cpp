@@ -24,7 +24,7 @@ using namespace std;
 #include <compat.h>
 #include <mythmediamonitor.h>
 #include <mythmiscutil.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 
 const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
@@ -1332,11 +1332,11 @@ int Playlist::CreateCDMP3(void)
     args << "-J";
     args << "-R";
 
-    uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
+    uint flags = kMSRunShell | kMSStdErr |
                  kMSDontDisableDrawing | kMSDontBlockInputDevs |
                  kMSRunBackground;
 
-    m_proc = new MythSystem(command, args, flags);
+    m_proc = new MythSystemLegacy(command, args, flags);
 
     connect(m_proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)),
             Qt::DirectConnection);
@@ -1383,11 +1383,11 @@ int Playlist::CreateCDMP3(void)
         args << "-data";
         args << tmprecordisofs;
 
-        flags = kMSRunShell | kMSStdErr | kMSStdOut | kMSBuffered |
+        flags = kMSRunShell | kMSStdErr | kMSStdOut |
                 kMSDontDisableDrawing | kMSDontBlockInputDevs |
                 kMSRunBackground;
 
-        m_proc = new MythSystem(command, args, flags);
+        m_proc = new MythSystemLegacy(command, args, flags);
         connect(m_proc, SIGNAL(readDataReady(int)),
                 this, SLOT(cdrecordData(int)), Qt::DirectConnection);
         connect(m_proc, SIGNAL(finished()),

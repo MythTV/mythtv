@@ -54,6 +54,8 @@ class ZMPlayer : public MythScreenType
 
     void stopPlayer(void);
 
+    MythUIImage      *m_activeFrameImage;
+    MythUIImage      *m_frameImageFS;
     MythUIImage      *m_frameImage;
 
     MythUIText       *m_noEventsText;

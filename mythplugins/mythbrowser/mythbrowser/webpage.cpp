@@ -48,6 +48,8 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
 
     m_browser = browser;
 
+    m_active = false;
+
     connect(m_browser, SIGNAL(loadStarted()),
             this, SLOT(slotLoadStarted()));
     connect(m_browser, SIGNAL(loadFinished(bool)),

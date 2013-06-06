@@ -400,7 +400,7 @@ bool ClassicCommDetector::go()
 
 
     float flagFPS;
-    long long  currentFrameNumber;
+    long long  currentFrameNumber = 0LL;
     float aspect = player->GetVideoAspect();
     float newAspect = aspect;
     int prevpercent = -1;

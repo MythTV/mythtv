@@ -20,7 +20,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #define LOC QString("DBUtil: ")
@@ -863,7 +863,10 @@ bool DBUtil::TryLockSchema(MSqlQuery &query, uint timeout_secs)
 void DBUtil::UnlockSchema(MSqlQuery &query)
 {
     query.prepare("SELECT RELEASE_LOCK('schemaLock')");
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("DBUtil UnlockSchema", query);
+    }
 }
 
 /** \fn CheckTimeZoneSupport(void)

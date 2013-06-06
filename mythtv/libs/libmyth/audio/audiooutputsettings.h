@@ -71,6 +71,7 @@ class MPUBLIC AudioOutputSettings
         static int FormatToBits(AudioFormat format);
         static const char* FormatToString(AudioFormat format);
         static int SampleSize(AudioFormat format);
+        static AudioFormat AVSampleFormatToFormat(AVSampleFormat format, int bits = 0);
         void AddSupportedChannels(int channels);
         bool IsSupportedChannels(int channels);
         int  BestSupportedChannels();

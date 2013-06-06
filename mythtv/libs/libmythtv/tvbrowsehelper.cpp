@@ -359,7 +359,8 @@ void TVBrowseHelper::GetNextProgramDB(
     {
         chanid = ChannelUtil::GetNextChannel(
             db_all_visible_channels, chanid, 0 /*mplexid_restriction*/,
-            chandir, true /*skip non visible*/, true /*skip same callsign*/);
+            static_cast<ChannelChangeDirection>(chandir),
+            true /*skip non visible*/, true /*skip same callsign*/);
     }
 
     infoMap["chanid"]  = QString::number(chanid);
@@ -487,7 +488,7 @@ void TVBrowseHelper::run()
             m_tv->channelGroupLock.lock();
             if (m_tv->channelGroupId > -1)
             {
-                int dir = direction;
+                ChannelChangeDirection dir = CHANNEL_DIRECTION_SAME;
                 if ((direction == BROWSE_UP) || (direction == BROWSE_FAVORITE))
                     dir = CHANNEL_DIRECTION_UP;
                 else if (direction == BROWSE_DOWN)

@@ -14,23 +14,24 @@
 
 #include "mythsystemprivate.h"
 #include "mythbaseexp.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mthread.h"
 
-class MythSystemWindows;
+class MythSystemLegacyWindows;
 
-typedef QMap<HANDLE, MythSystemWindows *> MSMap_t;
+typedef QMap<HANDLE, MythSystemLegacyWindows *> MSMap_t;
 typedef QMap<HANDLE, QBuffer *> PMap_t;
-typedef QList<MythSystemWindows *> MSList_t;
+typedef QList<MythSystemLegacyWindows *> MSList_t;
 
-class MythSystemIOHandler: public MThread
+class MythSystemLegacyIOHandler: public MThread
 {
     public:
-        MythSystemIOHandler(bool read);
-        ~MythSystemIOHandler() { wait(); }
+        MythSystemLegacyIOHandler(bool read);
+        ~MythSystemLegacyIOHandler() { wait(); }
         void   run(void);
 
         void   insert(HANDLE h, QBuffer *buff);
+        void   Wait(HANDLE h);
         void   remove(HANDLE h);
         void   wake();
 
@@ -47,13 +48,13 @@ class MythSystemIOHandler: public MThread
         char    m_readbuf[65536];
 };
 
-class MythSystemManager : public MThread
+class MythSystemLegacyManager : public MThread
 {
     public:
-        MythSystemManager();
-        ~MythSystemManager();
+        MythSystemLegacyManager();
+        ~MythSystemLegacyManager();
         void run(void);
-        void append(MythSystemWindows *);
+        void append(MythSystemLegacyWindows *);
         void jumpAbort(void);
 
     private:
@@ -68,23 +69,23 @@ class MythSystemManager : public MThread
         QMutex     m_jumpLock;
 };
 
-class MythSystemSignalManager : public MThread
+class MythSystemLegacySignalManager : public MThread
 {
     public:
-        MythSystemSignalManager();
-        ~MythSystemSignalManager() { wait(); }
+        MythSystemLegacySignalManager();
+        ~MythSystemLegacySignalManager() { wait(); }
         void run(void);
     private:
 };
 
 
-class MBASE_PUBLIC MythSystemWindows : public MythSystemPrivate
+class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
 {
     Q_OBJECT
 
     public:
-        MythSystemWindows(MythSystem *parent);
-        ~MythSystemWindows();
+        MythSystemLegacyWindows(MythSystemLegacy *parent);
+        ~MythSystemLegacyWindows();
 
         virtual void Fork(time_t timeout) MOVERRIDE;
         virtual void Manage(void) MOVERRIDE;
@@ -96,9 +97,9 @@ class MBASE_PUBLIC MythSystemWindows : public MythSystemPrivate
         virtual bool ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args) MOVERRIDE;
 
-        friend class MythSystemManager;
-        friend class MythSystemSignalManager;
-        friend class MythSystemIOHandler;
+        friend class MythSystemLegacyManager;
+        friend class MythSystemLegacySignalManager;
+        friend class MythSystemLegacyIOHandler;
 
     private:
         HANDLE      m_child;

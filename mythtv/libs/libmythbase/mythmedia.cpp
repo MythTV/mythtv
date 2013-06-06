@@ -16,7 +16,7 @@
 #include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 using namespace std;

@@ -33,17 +33,12 @@
 const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a second
 
 ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent)
-             :MythScreenType(parent, "zmliveview")
+             :MythScreenType(parent, "zmliveview"),
+              m_frameTimer(new QTimer(this)), m_paused(false), m_monitorLayout(1),
+              m_monitorCount(0), m_players(NULL), m_monitors(NULL)
 {
-    m_paused = false;
-
-    m_players = NULL;
-    m_monitors = NULL;
-    m_monitorLayout = 1;
-
     GetMythUI()->DoDisableScreensaver();
 
-    m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
 

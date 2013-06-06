@@ -114,25 +114,21 @@ void FunctionDialog::setMonitorFunction(void)
 ///////////////////////////////////////////////////////////////////////////////
 
 ZMConsole::ZMConsole(MythScreenStack *parent)
-          :MythScreenType(parent, "zmconsole")
+          :MythScreenType(parent, "zmconsole"),
+           m_currentMonitor(0),  m_monitorListSize(0), m_monitorList(NULL),
+           m_monitor_list(NULL), m_running_text(NULL), m_status_text(NULL),
+           m_time_text(NULL), m_date_text(NULL), m_load_text(NULL),
+           m_disk_text(NULL), m_functionDialog(NULL),
+           m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
+           m_timeTimer(new QTimer(this)), m_updateTimer(new QTimer(this))
 {
-    m_monitorListSize = 0;
-    m_currentMonitor = 0;
-
-    m_monitorList = NULL;
-
     m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
-    m_timeTimer = new QTimer(this);
     connect(m_timeTimer, SIGNAL(timeout()), this,
             SLOT(updateTime()));
 
-    m_updateTimer = new QTimer(this);
     connect(m_updateTimer, SIGNAL(timeout()), this,
             SLOT(updateStatus()));
-
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_functionDialog = NULL;
 }
 
 ZMConsole::~ZMConsole()

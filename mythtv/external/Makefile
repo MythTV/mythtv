@@ -25,6 +25,9 @@ FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
 
 zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
+ifeq ($(CONFIG_DARWIN),yes)
+	install_name_tool -id "@rpath/$(LIBPREF)zmq.1$(SLIBSUF)" zeromq/src/.libs/$(LIBPREF)zmq.1$(SLIBSUF)
+endif
 
 zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
 	${MAKE} -C zeromq ${@:zeromq-%=%} DESTDIR=${INSTALL_ROOT}

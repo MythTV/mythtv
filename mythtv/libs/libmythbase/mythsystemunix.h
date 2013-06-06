@@ -18,23 +18,24 @@
 
 #include "mythsystemprivate.h"
 #include "mythbaseexp.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mthread.h"
 
-class MythSystemUnix;
+class MythSystemLegacyUnix;
 
-typedef QMap<pid_t, QPointer<MythSystemUnix> > MSMap_t;
+typedef QMap<pid_t, QPointer<MythSystemLegacyUnix> > MSMap_t;
 typedef QMap<int, QBuffer *> PMap_t;
-typedef QList<QPointer<MythSystemUnix> > MSList_t;
+typedef QList<QPointer<MythSystemLegacyUnix> > MSList_t;
 
-class MythSystemIOHandler: public MThread
+class MythSystemLegacyIOHandler: public MThread
 {
     public:
-        MythSystemIOHandler(bool read);
-        ~MythSystemIOHandler() { wait(); }
+        MythSystemLegacyIOHandler(bool read);
+        ~MythSystemLegacyIOHandler() { wait(); }
         void   run(void);
 
         void   insert(int fd, QBuffer *buff);
+        void   Wait(int fd);
         void   remove(int fd);
         void   wake();
 
@@ -54,13 +55,13 @@ class MythSystemIOHandler: public MThread
         char   m_readbuf[65536];
 };
 
-class MythSystemManager : public MThread
+class MythSystemLegacyManager : public MThread
 {
     public:
-        MythSystemManager();
-        ~MythSystemManager() { wait(); }
+        MythSystemLegacyManager();
+        ~MythSystemLegacyManager() { wait(); }
         void run(void);
-        void append(MythSystemUnix *);
+        void append(MythSystemLegacyUnix *);
         void jumpAbort(void);
     private:
         MSMap_t    m_pMap;
@@ -69,23 +70,23 @@ class MythSystemManager : public MThread
         QMutex     m_jumpLock;
 };
 
-class MythSystemSignalManager : public MThread
+class MythSystemLegacySignalManager : public MThread
 {
     public:
-        MythSystemSignalManager();
-        ~MythSystemSignalManager() { wait(); }
+        MythSystemLegacySignalManager();
+        ~MythSystemLegacySignalManager() { wait(); }
         void run(void);
     private:
 };
 
 
-class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
+class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
 {
     Q_OBJECT
 
     public:
-        MythSystemUnix(MythSystem *parent);
-        ~MythSystemUnix();
+        MythSystemLegacyUnix(MythSystemLegacy *parent);
+        ~MythSystemLegacyUnix();
 
         virtual void Fork(time_t timeout) MOVERRIDE;
         virtual void Manage(void) MOVERRIDE;
@@ -97,9 +98,9 @@ class MBASE_PUBLIC MythSystemUnix : public MythSystemPrivate
         virtual bool ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args) MOVERRIDE;
 
-        friend class MythSystemManager;
-        friend class MythSystemSignalManager;
-        friend class MythSystemIOHandler;
+        friend class MythSystemLegacyManager;
+        friend class MythSystemLegacySignalManager;
+        friend class MythSystemLegacyIOHandler;
 
     private:
         pid_t       m_pid;

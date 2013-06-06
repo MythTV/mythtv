@@ -62,7 +62,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythdirs.h>
 #include <mythconfig.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythdate.h>
 #include <mythlogging.h>
 
@@ -1948,15 +1948,10 @@ static int64_t getFrameCount(const QString &filename, float fps)
 
 static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
-    const char *type = NULL;
-
     av_register_all();
 
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
-
-    if (type)
-        fmt = av_find_input_format(type);
 
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("getFileInfo(): Opening '%1'")

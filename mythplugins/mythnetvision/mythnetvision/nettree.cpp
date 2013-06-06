@@ -8,7 +8,7 @@
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <remoteutil.h>
 #include <remotefile.h>
 #include <mythprogressdialog.h>
@@ -39,7 +39,7 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return 0;
+        return NULL;
     }
 }
 
@@ -360,6 +360,9 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 void NetTree::handleSelect(MythUIButtonListItem *item)
 {
     MythGenericTree *node = GetNodePtrFromButton(item);
+    if (!node)
+        return;
+
     int nodeInt = node->getInt();
 
     switch (nodeInt)
@@ -1038,13 +1041,13 @@ void NetTree::slotItemChanged()
     }
     else if (site)
     {
-        ResultItem *res = new ResultItem(site->GetTitle(), QString(), site->GetDescription(),
+        ResultItem res = ResultItem(site->GetTitle(), QString(), site->GetDescription(),
               site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (!site->GetImage().isEmpty() && m_thumbImage)

@@ -15,7 +15,7 @@
 #include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
 #include "mythdate.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 // Commercial Flagging headers

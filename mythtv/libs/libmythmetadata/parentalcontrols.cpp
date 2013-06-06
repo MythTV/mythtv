@@ -220,6 +220,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 gCoreContext->GetSetting("VideoAdminPasswordTwo"));
 
         m_passwordOK = false;
+        m_fromLevel = ParentalLevel::plNone;
+        m_toLevel = ParentalLevel::plNone;
     }
 
     void Check(ParentalLevel::Level fromLevel, ParentalLevel::Level toLevel)

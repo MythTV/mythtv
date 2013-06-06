@@ -31,7 +31,7 @@ using namespace std;
 #include "mythdownloadmanager.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mthreadpool.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
@@ -143,7 +143,7 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
 
     MThreadPool::ShutdownAllPools();
 
-    ShutdownMythSystem();
+    ShutdownMythSystemLegacy();
 
     ShutdownMythDownloadManager();
 

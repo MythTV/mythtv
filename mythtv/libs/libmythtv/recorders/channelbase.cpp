@@ -236,7 +236,7 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     return true;
 }
 
-uint ChannelBase::GetNextChannel(uint chanid, int direction) const
+uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) const
 {
     if (!chanid)
     {
@@ -254,7 +254,7 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
         m_allchannels, chanid, mplexid_restriction, direction);
 }
 
-uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
+uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection direction) const
 {
     InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (it == m_inputs.end())
@@ -786,7 +786,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &changer,
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Running command: %1").arg(command));
 
-    m_system = new MythSystem(command, kMSRunShell | kMSRunBackground);
+    m_system = new MythSystemLegacy(command, kMSRunShell | kMSRunBackground);
     m_system->Run();
 
     return true;
@@ -1154,7 +1154,7 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_DVB
         channel = new DVBChannel(genOpt.videodev, tvrec);
-        dynamic_cast<DVBChannel*>(channel)->SetSlowTuning(
+        static_cast<DVBChannel*>(channel)->SetSlowTuning(
             dvbOpt.dvb_tuning_delay);
 #endif
     }

@@ -160,7 +160,7 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    uint chanid;
+    uint chanid = 0;
     QDateTime starttime;
     QString infile, outfile;
     QString profilename = QString("autodetect");

@@ -20,7 +20,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythdb.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "lircevent.h"
 #include "lirc_client.h"
 
@@ -274,9 +274,21 @@ bool LIRC::Init(void)
   
         // Attempt to inline out-of-band messages and keep the connection open..
         int i = 1;
-        setsockopt(lircd_socket, SOL_SOCKET, SO_OOBINLINE, &i, sizeof(i));
+        ret = setsockopt(lircd_socket, SOL_SOCKET, SO_OOBINLINE, &i, sizeof(i));
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Failed setting OOBINLINE option for socket '%1'")
+                    .arg(lircdDevice) + ENO);
+        }
         i = 1;
-        setsockopt(lircd_socket, SOL_SOCKET, SO_KEEPALIVE, &i, sizeof(i));
+        ret = setsockopt(lircd_socket, SOL_SOCKET, SO_KEEPALIVE, &i, sizeof(i));
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("Failed setting KEEPALIVE option for socket '%1'")
+                    .arg(lircdDevice) + ENO);
+        }
     }
 
     d->lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", NULL, 0);

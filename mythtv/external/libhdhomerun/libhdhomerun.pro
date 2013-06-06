@@ -36,7 +36,7 @@ Makefile.lib {
 
     TEMPLATE = lib
     TARGET = mythhdhomerun-$$LIBVERSION
-    CONFIG += thread dll plugin
+    CONFIG += thread dll
     CONFIG -= qt
     target.path = $${LIBDIR}
     INSTALLS = target

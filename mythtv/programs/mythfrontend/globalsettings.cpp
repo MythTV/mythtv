@@ -1662,9 +1662,9 @@ static HostComboBox *XineramaMonitorAspectRatio()
 {
     HostComboBox *gc = new HostComboBox("XineramaMonitorAspectRatio");
     gc->setLabel(QObject::tr("Monitor aspect ratio"));
-    gc->addSelection(QObject::tr("4:3"),   "1.3333");
     gc->addSelection(QObject::tr("16:9"),  "1.7777");
     gc->addSelection(QObject::tr("16:10"), "1.6");
+    gc->addSelection(QObject::tr("4:3"),   "1.3333");
     gc->setHelpText(QObject::tr(
                         "The aspect ratio of a Xinerama display cannot be "
                         "queried from the display, so it must be specified."));

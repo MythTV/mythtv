@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
     jobqueue = new JobQueue(false);
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
 
     HouseKeeper *housekeeping = new HouseKeeper();
 #ifdef __linux__

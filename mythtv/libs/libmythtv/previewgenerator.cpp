@@ -30,7 +30,7 @@
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "remoteutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
@@ -245,11 +245,10 @@ bool PreviewGenerator::Run(void)
             cmdargs << "--outfile" << outFileName;
 
         // Timeout in 30s
-        MythSystem *ms = new MythSystem(command, cmdargs,
+        MythSystemLegacy *ms = new MythSystemLegacy(command, cmdargs,
                                         kMSDontBlockInputDevs |
                                         kMSDontDisableDrawing |
                                         kMSProcessEvents      |
-                                        kMSNoRunShell         |
                                         kMSAutoCleanup        |
                                         kMSPropagateLogs);
         ms->SetNice(10);

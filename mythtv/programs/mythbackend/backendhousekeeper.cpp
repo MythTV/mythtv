@@ -17,7 +17,7 @@
 #include "mythdirs.h"
 #include "jobqueue.h"
 #include "exitcodes.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythversion.h"
 #include "mythcoreutil.h"
 #include "programtypes.h"
@@ -428,7 +428,7 @@ bool ArtworkTask::DoRun(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Performing Artwork Refresh: %1 %2")
         .arg(command).arg(args.join(" ")));
 
-    MythSystem artupd(command, args, kMSRunShell | kMSAutoCleanup);
+    MythSystemLegacy artupd(command, args, kMSRunShell | kMSAutoCleanup);
 
     artupd.Run();
     artupd.Wait();
@@ -556,7 +556,7 @@ bool MythFillDatabaseTask::DoRun(void)
 
     QString cmd = QString("%1 %2").arg(mfpath).arg(mfarg);
 
-    m_msMFD = new MythSystem(cmd, opts);
+    m_msMFD = new MythSystemLegacy(cmd, opts);
     m_msMFD->Run();
     uint result = m_msMFD->Wait();
     m_msMFD = NULL;

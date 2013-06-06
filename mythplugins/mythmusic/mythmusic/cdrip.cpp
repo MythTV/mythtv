@@ -39,7 +39,7 @@ using namespace std;
 #include <mythuibutton.h>
 #include <mythuiprogressbar.h>
 #include <mythuibuttonlist.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>
@@ -1294,7 +1294,13 @@ void Ripper::toggleTrackActive(MythUIButtonListItem *item)
     if (m_tracks->isEmpty() || !item)
         return;
 
-    RipTrack *track = m_tracks->at(m_trackList->GetItemPos(item));
+    int pos = m_trackList->GetItemPos(item);
+
+    // sanity check item position
+    if (pos < 0 || pos > m_tracks->count() - 1)
+        return;
+
+    RipTrack *track = m_tracks->at(pos);
 
     if (!track->active && !track->isNew)
     {

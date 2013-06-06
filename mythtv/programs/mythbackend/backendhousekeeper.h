@@ -2,7 +2,7 @@
 #define BACKENDHOUSEKEEPER_H_
 
 #include "housekeeper.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 class LogCleanerTask : public DailyHouseKeeperTask
 {
@@ -68,7 +68,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 
     void SetHourWindow(void);
   private:
-    MythSystem *m_msMFD;
+    MythSystemLegacy *m_msMFD;
 //    bool m_running;
 };
 

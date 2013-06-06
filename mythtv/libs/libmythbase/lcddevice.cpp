@@ -29,7 +29,7 @@
 #include "mythdirs.h"
 #include "mythevent.h"
 #include "mythsocket.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 

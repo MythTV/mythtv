@@ -23,7 +23,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythmiscutil.h"
 
 #ifdef USING_DARWIN_DA

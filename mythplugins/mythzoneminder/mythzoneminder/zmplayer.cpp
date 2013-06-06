@@ -36,20 +36,18 @@ using namespace std;
 
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
                    vector<Event *> *eventList, int *currentEvent)
-         :MythScreenType(parent, name)
+         :MythScreenType(parent, name),
+          m_activeFrameImage(NULL), m_frameImageFS(NULL), m_frameImage(NULL),
+          m_noEventsText(NULL), m_eventText(NULL),
+          m_cameraText(NULL), m_frameText(NULL), m_dateText(NULL),
+          m_playButton(NULL), m_deleteButton(NULL), m_nextButton(NULL),
+          m_prevButton(NULL), m_currentEvent(currentEvent),
+          m_eventList(eventList), m_frameList(new vector<Frame*>),
+          m_frameTimer(new QTimer(this)), m_curFrame(0),  m_lastFrame(0),
+          m_paused(false), m_fullScreen(false), m_image(NULL)
 {
-    m_eventList = eventList;
-    m_currentEvent = currentEvent;
-
-    m_frameList = new vector<Frame*>;
-    m_paused = false;
-    m_image = NULL;
-
-    m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));
-
-    m_fullScreen = false;
 }
 
 ZMPlayer::~ZMPlayer()
@@ -79,11 +77,7 @@ bool ZMPlayer::Create(void)
 
     bool err = false;
 
-    // hide the fullscreen image
-    UIUtilE::Assign(this, m_frameImage,   "framefsimage", &err);
-    if (m_frameImage)
-        m_frameImage->SetVisible(false);
-
+    UIUtilE::Assign(this, m_frameImageFS, "framefsimage", &err);
     UIUtilE::Assign(this, m_frameImage,   "frameimage", &err);
     UIUtilE::Assign(this, m_noEventsText, "noevents_text", &err);
     UIUtilE::Assign(this, m_eventText,    "event_text", &err);
@@ -126,6 +120,10 @@ bool ZMPlayer::Create(void)
         connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
     }
 
+    // hide the fullscreen image
+    m_frameImageFS->SetVisible(false);
+    m_activeFrameImage = m_frameImage;
+
     BuildFocusList();
 
     SetFocusWidget(m_playButton);
@@ -147,8 +145,8 @@ void ZMPlayer::getEventInfo()
         if (m_noEventsText)
             m_noEventsText->SetVisible(true);
 
-        m_frameImage->SetFilename(QString("mz_black.png"));
-        m_frameImage->Load();
+        m_activeFrameImage->SetFilename(QString("mz_black.png"));
+        m_activeFrameImage->Load();
 
         m_eventText->Reset();
         m_cameraText->Reset();
@@ -253,15 +251,15 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
                 {
                     m_fullScreen = false;
                     m_frameImage->SetVisible(false);
-                    m_frameImage = dynamic_cast<MythUIImage *> (GetChild("frameimage"));
-                    m_frameImage->SetVisible(true);
+                    m_frameImageFS->SetVisible(true);
+                    m_activeFrameImage = m_frameImageFS;
                 }
                 else
                 {
                     m_fullScreen = true;
-                    m_frameImage->SetVisible(false);
-                    m_frameImage = dynamic_cast<MythUIImage *> (GetChild("framefsimage"));
+                    m_frameImageFS->SetVisible(false);
                     m_frameImage->SetVisible(true);
+                    m_activeFrameImage = m_frameImage;
                 }
 
                 if (!m_paused)
@@ -395,7 +393,7 @@ void ZMPlayer::getFrame(void)
 
         if (m_image)
         {
-            m_frameImage->SetImage(m_image);
+            m_activeFrameImage->SetImage(m_image);
             m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
         }
 

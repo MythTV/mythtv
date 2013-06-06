@@ -2706,7 +2706,7 @@ int MythCommandLineParser::Daemonize(void)
 #if CONFIG_DARWIN
     if (toBool("daemon"))
     {
-        cerr << "Daemonizing is unavaible in OSX" << ENO_STR << endl;
+        cerr << "Daemonizing is unavailable in OSX" << endl;
         LOG(VB_GENERAL, LOG_WARNING, "Unable to daemonize");
     }
 #else

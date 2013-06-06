@@ -98,7 +98,7 @@ class TestMythTimer: public QObject
         t.start();
         t.addMSecs(-25);
         usleep(52 * 1000);
-        QVERIFY(t.elapsed() > 25 && t.elapsed() < 30);
+        QVERIFY(t.elapsed() > 25 && t.elapsed() < 50);
     }
 
     void AddMSecsIsResetOnStart(void)

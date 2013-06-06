@@ -3,7 +3,7 @@
 #include "mythcontext.h"
 #include "mythdirs.h"
 #include "mythmainwindow.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythdialogbox.h"
 #include "mythuistatetype.h"
 #include "mythuiimage.h"

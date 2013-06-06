@@ -362,24 +362,9 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    AVSampleFormat format_pack = av_get_packed_sample_fmt(m_audioDec->sample_fmt);
-    switch (format_pack)
-    {
-        case AV_SAMPLE_FMT_U8:     m_sampleFmt = FORMAT_U8;    break;
-        case AV_SAMPLE_FMT_S16:    m_sampleFmt = FORMAT_S16;   break;
-        case AV_SAMPLE_FMT_FLT:    m_sampleFmt = FORMAT_FLT;   break;
-        case AV_SAMPLE_FMT_DBL:    m_sampleFmt = FORMAT_NONE;  break;
-        case AV_SAMPLE_FMT_S32:
-            switch (m_audioDec->bits_per_raw_sample)
-            {
-                case  0:    m_sampleFmt = FORMAT_S32;   break;
-                case 24:    m_sampleFmt = FORMAT_S24;   break;
-                case 32:    m_sampleFmt = FORMAT_S32;   break;
-                default:    m_sampleFmt = FORMAT_NONE;
-            }
-            break;
-        default:            m_sampleFmt = FORMAT_NONE;
-    }
+    m_sampleFmt =
+        AudioOutputSettings::AVSampleFormatToFormat(m_audioDec->sample_fmt,
+                                                    m_audioDec->bits_per_raw_sample);
 
     if (m_sampleFmt == FORMAT_NONE)
     {
@@ -471,9 +456,19 @@ void avfDecoder::run()
 
     AVPacket pkt, tmp_pkt;
     int data_size;
-    uint fill, total;
+    uint fill = 0, total = 0;
+
+    // sanity check sampleSize
+    // should never get here unless m_sampleFmt is good but check just in case
+    int sampleSize = AudioOutputSettings::SampleSize(m_sampleFmt);
+    if (sampleSize == 0)
+    {
+        RunEpilog();
+        return;
+    }
+
     // account for possible frame expansion in aobase (upmix, float conv)
-    uint thresh = m_bks * 12 / AudioOutputSettings::SampleSize(m_sampleFmt);
+    uint thresh = m_bks * 12 / sampleSize;
 
     m_stat = DecoderEvent::Decoding;
     {

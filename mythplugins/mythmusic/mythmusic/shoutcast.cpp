@@ -755,7 +755,7 @@ bool ShoutCastIODevice::parseMeta(void)
 /****************************************************************************/
 
 DecoderIOFactoryShoutCast::DecoderIOFactoryShoutCast(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL)
+    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL), m_prebuffer(160000)
 {
     m_timer = new QTimer(this);
 }

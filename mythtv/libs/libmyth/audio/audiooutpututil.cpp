@@ -681,7 +681,7 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
                     *samp32++ = 0;
             }
         }
-    }    
+    }
     return frames;
 }
 
@@ -694,7 +694,7 @@ char *AudioOutputUtil::GeneratePinkFrames(char *frames, int channels,
  */
 int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
                                  uint8_t *buffer, int &data_size,
-                                 AVPacket *pkt)
+                                 const AVPacket *pkt)
 {
     AVFrame frame;
     int got_frame = 0;
@@ -721,62 +721,26 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     }
 
     AVSampleFormat format = (AVSampleFormat)frame.format;
-    if (!av_sample_fmt_is_planar(format))
+
+    data_size = frame.nb_samples * frame.channels * av_get_bytes_per_sample(format);
+
+    if (av_sample_fmt_is_planar(format))
     {
-            // data is already compacted... simply copy it
-        data_size = av_samples_get_buffer_size(NULL, ctx->channels,
-                                               frame.nb_samples,
-                                               format, 1);
+        InterleaveSamples(AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample),
+                          frame.channels, buffer, (const uint8_t **)frame.extended_data,
+                          data_size);
+    }
+    else
+    {
+        // data is already compacted... simply copy it
         memcpy(buffer, frame.extended_data[0], data_size);
-        return ret;
     }
-
-        // Need to find a valid channels layout, as not all codecs provide one
-    int64_t channel_layout =
-        frame.channel_layout && frame.channels == av_get_channel_layout_nb_channels(frame.channel_layout) ?
-        frame.channel_layout : av_get_default_channel_layout(frame.channels);
-    SwrContext *swr = swr_alloc_set_opts(NULL,
-                                         channel_layout,
-                                         av_get_packed_sample_fmt(format),
-                                         frame.sample_rate,
-                                         channel_layout,
-                                         format,
-                                         frame.sample_rate,
-                                         0, NULL);
-    if (!swr)
-    {
-        LOG(VB_AUDIO, LOG_ERR, LOC + "error allocating resampler context");
-        return AVERROR(ENOMEM);
-    }
-        /* initialize the resampling context */
-    ret2 = swr_init(swr);
-    if (ret2 < 0)
-    {
-        LOG(VB_AUDIO, LOG_ERR, LOC +
-            QString("error initializing resampler context (%1)")
-            .arg(av_make_error_string(error, sizeof(error), ret2)));
-        swr_free(&swr);
-        return ret2;
-    }
-
-    uint8_t *out[] = {buffer};
-    ret2 = swr_convert(swr, out, frame.nb_samples,
-                       (const uint8_t **)frame.extended_data, frame.nb_samples);
-    swr_free(&swr);
-    if (ret2 < 0)
-    {
-        LOG(VB_AUDIO, LOG_ERR, LOC +
-            QString("error converting audio from planar format (%1)")
-            .arg(av_make_error_string(error, sizeof(error), ret2)));
-        return ret2;
-    }
-    data_size = ret2 * frame.channels * av_get_bytes_per_sample(format);
 
     return ret;
 }
 
 template <class AudioDataType>
-void _DeinterleaveSample(AudioDataType *out, AudioDataType *in, int channels, int frames)
+void _DeinterleaveSample(AudioDataType *out, const AudioDataType *in, int channels, int frames)
 {
     AudioDataType *outp[8];
 
@@ -799,20 +763,101 @@ void _DeinterleaveSample(AudioDataType *out, AudioDataType *in, int channels, in
  * Deinterleave audio samples and compact them
  */
 void AudioOutputUtil::DeinterleaveSamples(AudioFormat format, int channels,
-                                          uint8_t *output, uint8_t *input,
+                                          uint8_t *output, const uint8_t *input,
                                           int data_size)
 {
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _DeinterleaveSample((char *)output, (char *)input, channels, data_size/sizeof(char)/channels);
+        _DeinterleaveSample((char *)output, (const char *)input, channels, data_size/sizeof(char)/channels);
     }
     else if (bits == 16)
     {
-        _DeinterleaveSample((short *)output, (short *)input, channels, data_size/sizeof(short)/channels);
+        _DeinterleaveSample((short *)output, (const short *)input, channels, data_size/sizeof(short)/channels);
     }
     else
     {
-        _DeinterleaveSample((int *)output, (int *)input, channels, data_size/sizeof(int)/channels);
+        _DeinterleaveSample((int *)output, (const int *)input, channels, data_size/sizeof(int)/channels);
+    }
+}
+
+template <class AudioDataType>
+void _InterleaveSample(AudioDataType *out, const AudioDataType *in, int channels, int frames,
+                       const AudioDataType * const *inp = NULL)
+{
+    const AudioDataType *my_inp[8];
+
+    if (!inp)
+    {
+        // We're given an array of int, calculate pointers to each row
+        for (int i = 0; i < channels; i++)
+        {
+            my_inp[i] = in + (i * channels * frames);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < channels; i++)
+        {
+            my_inp[i] = inp[i];
+        }
+    }
+
+    for (int i = 0; i < frames; i++)
+    {
+        for (int j = 0; j < channels; j++)
+        {
+            *(out++) = *(my_inp[j]++);
+        }
+    }
+}
+
+/**
+ * Interleave input samples
+ * Planar audio is contained in array of pointers
+ * Interleave audio samples (convert from planar format)
+ */
+void AudioOutputUtil::InterleaveSamples(AudioFormat format, int channels,
+                                        uint8_t *output, const uint8_t * const *input,
+                                        int data_size)
+{
+    int bits = AudioOutputSettings::FormatToBits(format);
+    if (bits == 8)
+    {
+        _InterleaveSample((char *)output, (const char *)NULL, channels, data_size/sizeof(char)/channels,
+                          (const char * const *)input);
+    }
+    else if (bits == 16)
+    {
+        _InterleaveSample((short *)output, (const short *)NULL, channels, data_size/sizeof(short)/channels,
+                           (const short * const *)input);
+    }
+    else
+    {
+        _InterleaveSample((int *)output, (const int *)NULL, channels, data_size/sizeof(int)/channels,
+                          (const int * const *)input);
+    }
+}
+
+/**
+ * Interleave input samples
+ * Interleave audio samples (convert from planar format)
+ */
+void AudioOutputUtil::InterleaveSamples(AudioFormat format, int channels,
+                                        uint8_t *output, const uint8_t *input,
+                                        int data_size)
+{
+    int bits = AudioOutputSettings::FormatToBits(format);
+    if (bits == 8)
+    {
+        _InterleaveSample((char *)output, (const char *)input, channels, data_size/sizeof(char)/channels);
+    }
+    else if (bits == 16)
+    {
+        _InterleaveSample((short *)output, (const short *)input, channels, data_size/sizeof(short)/channels);
+    }
+    else
+    {
+        _InterleaveSample((int *)output, (const int *)input, channels, data_size/sizeof(int)/channels);
     }
 }

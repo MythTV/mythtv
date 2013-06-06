@@ -275,8 +275,8 @@ long long DVDRingBuffer::Seek(long long time)
     }
     else
     {
-        m_seektime = (uint64_t)time;
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime, 0);
+        m_seektime = time;
+        dvdRet = dvdnav_absolute_time_search(m_dvdnav, (uint64_t)m_seektime, 0);
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG,
@@ -776,7 +776,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
 
                 // update our status
-                m_currentTime = (uint)dvdnav_get_current_time(m_dvdnav);
+                m_currentTime = dvdnav_get_current_time(m_dvdnav);
                 m_currentpos = GetReadPosition();
 
                 if (m_seeking)
@@ -784,7 +784,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                     int relativetime =
                         (int)((m_seektime - m_currentTime)/ 90000);
-                    if (relativetime <= 1)
+                    if (abs(relativetime) <= 1)
                     {
                         m_seeking = false;
                         m_seektime = 0;
@@ -1616,6 +1616,14 @@ uint DVDRingBuffer::GetSubtitleLanguage(int id)
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("StreamID: %1; lang: %2").arg(id).arg(lang));
     return ConvertLangCode(lang);
+}
+
+/** \brief get the logical subtitle track/stream number from the dvd
+ * \param stream_id the stream id, range 0-31
+ */
+int DVDRingBuffer::GetSubtitleTrackNum(uint stream_id)
+{
+    return dvdnav_get_spu_logical_stream(m_dvdnav, stream_id);
 }
 
 /** \brief converts the subtitle/audio lang code to iso639.
