@@ -19,8 +19,7 @@ class MythBrowser : public MythScreenType
   Q_OBJECT
 
   public:
-    MythBrowser(MythScreenStack *parent,
-           QStringList &urlList, float zoom);
+    MythBrowser(MythScreenStack *parent, QStringList &urlList);
     ~MythBrowser();
 
     bool Create(void);
@@ -79,7 +78,6 @@ class MythBrowser : public MythScreenType
 
     int       m_currentBrowser;
     QUrl      m_url;
-    float     m_zoom;
     QString   m_defaultSaveDir;
     QString   m_defaultSaveFilename;
 
