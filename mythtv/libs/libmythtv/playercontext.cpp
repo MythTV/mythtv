@@ -481,12 +481,12 @@ void PlayerContext::StopPlaying(void)
         player->StopPlaying();
 }
 
-void PlayerContext::UpdateTVChain(void)
+void PlayerContext::UpdateTVChain(const QStringList &data)
 {
     QMutexLocker locker(&deletePlayerLock);
     if (tvchain && player)
     {
-        tvchain->ReloadAll();
+        tvchain->ReloadAll(data);
         player->CheckTVChain();
     }
 }

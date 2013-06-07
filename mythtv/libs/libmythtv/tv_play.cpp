@@ -2806,31 +2806,6 @@ void TV::timerEvent(QTimerEvent *te)
     if (handled)
         return;
 
-    // Check if it matches a tvchainUpdateTimerId
-    ctx = NULL;
-    {
-        QMutexLocker locker(&timerIdLock);
-        TimerContextMap::iterator it = tvchainUpdateTimerId.find(timer_id);
-        if (it != tvchainUpdateTimerId.end())
-        {
-            KillTimer(timer_id);
-            ctx = *it;
-            tvchainUpdateTimerId.erase(it);
-        }
-    }
-
-    if (ctx)
-    {
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool still_exists = find_player_index(ctx) >= 0;
-
-        if (still_exists)
-            ctx->UpdateTVChain();
-
-        ReturnPlayerLock(mctx);
-        handled = true;
-    }
-
     if (handled)
         return;
 
@@ -9527,10 +9502,10 @@ void TV::customEvent(QEvent *e)
         for (uint i = 0; mctx && (i < player.size()); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
-            if (ctx->tvchain && ctx->tvchain->GetID() == id)
+            if (ctx->tvchain && ctx->tvchain->GetID() == id &&
+                find_player_index(ctx) >= 0)
             {
-                QMutexLocker locker(&timerIdLock);
-                tvchainUpdateTimerId[StartTimer(1, __LINE__)] = ctx;
+                ctx->UpdateTVChain(me->ExtraDataList());
                 break;
             }
         }

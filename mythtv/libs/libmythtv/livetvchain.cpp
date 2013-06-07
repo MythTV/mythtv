@@ -63,13 +63,10 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 {
     QMutexLocker lock(&m_lock);
 
-    QTime tmptime = pginfo->GetRecordingStartTime().time();
-
     LiveTVChainEntry newent;
     newent.chanid = pginfo->GetChanID();
-    newent.starttime = QDateTime(
-        pginfo->GetRecordingStartTime().date(),
-        QTime(tmptime.hour(), tmptime.minute(), tmptime.second()), Qt::UTC);
+    newent.starttime = pginfo->GetRecordingStartTime();
+    newent.endtime = pginfo->GetRecordingEndTime();
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
     newent.cardtype = m_cardtype;
@@ -189,7 +186,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 void LiveTVChain::BroadcastUpdate(void)
 {
     QString message = QString("LIVETV_CHAIN UPDATE %1").arg(m_id);
-    MythEvent me(message);
+    MythEvent me(message, entriesToStringList());
     gCoreContext->dispatch(me);
 }
 
@@ -207,38 +204,42 @@ void LiveTVChain::DestroyChain(void)
         MythDB::DBError("LiveTVChain::DestroyChain", query);
 }
 
-void LiveTVChain::ReloadAll(void)
+void LiveTVChain::ReloadAll(const QStringList &data)
 {
     QMutexLocker lock(&m_lock);
 
     int prev_size = m_chain.size();
-    m_chain.clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime, endtime, discontinuity, "
-                  "chainpos, hostprefix, cardtype, channame, input "
-                  "FROM tvchain "
-                  "WHERE chainid = :CHAINID ORDER BY chainpos;");
-    query.bindValue(":CHAINID", m_id);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (data.isEmpty() || !entriesFromStringList(data))
     {
-        while (query.next())
+        m_chain.clear();
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT chanid, starttime, endtime, discontinuity, "
+                      "chainpos, hostprefix, cardtype, channame, input "
+                      "FROM tvchain "
+                      "WHERE chainid = :CHAINID ORDER BY chainpos;");
+        query.bindValue(":CHAINID", m_id);
+
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
+            while (query.next())
+            {
+                LiveTVChainEntry entry;
+                entry.chanid = query.value(0).toUInt();
+                entry.starttime =
+                    MythDate::as_utc(query.value(1).toDateTime());
+                entry.endtime =
+                    MythDate::as_utc(query.value(2).toDateTime());
+                entry.discontinuity = query.value(3).toInt();
+                entry.hostprefix = query.value(5).toString();
+                entry.cardtype = query.value(6).toString();
+                entry.channum = query.value(7).toString();
+                entry.inputname = query.value(8).toString();
 
-            LiveTVChainEntry entry;
-            entry.chanid = query.value(0).toUInt();
-            entry.starttime = MythDate::as_utc(query.value(1).toDateTime());
-            entry.endtime = MythDate::as_utc(query.value(2).toDateTime());
-            entry.discontinuity = query.value(3).toInt();
-            entry.hostprefix = query.value(5).toString();
-            entry.cardtype = query.value(6).toString();
-            entry.channum = query.value(7).toString();
-            entry.inputname = query.value(8).toString();
+                m_maxpos = query.value(4).toInt() + 1;
 
-            m_maxpos = query.value(4).toInt() + 1;
-
-            m_chain.append(entry);
+                m_chain.append(entry);
+            }
         }
     }
 
@@ -607,4 +608,76 @@ QString LiveTVChain::toString() const
                 ::toString(m_chain[i]) + "\n");
     }
     return ret;
+}
+
+QStringList LiveTVChain::entriesToStringList() const
+{
+    QMutexLocker lock(&m_lock);
+    QStringList ret;
+    ret << QString::number(m_maxpos);
+    for (int i = 0; i < m_chain.size(); i++)
+    {
+        ret << QString::number(m_chain[i].chanid);
+        ret << m_chain[i].starttime.toString(Qt::ISODate);
+        ret << m_chain[i].endtime.toString(Qt::ISODate);
+        ret << QString::number(m_chain[i].discontinuity);
+        ret << m_chain[i].hostprefix;
+        ret << m_chain[i].cardtype;
+        ret << m_chain[i].channum;
+        ret << m_chain[i].inputname;
+    }
+    return ret;
+}
+
+bool LiveTVChain::entriesFromStringList(const QStringList &items)
+{
+    int numItems = items.size();
+    QList<LiveTVChainEntry> chain;
+    int itemIdx = 0;
+    int maxpos = 0;
+    bool ok = false;
+    if (itemIdx < numItems)
+        maxpos = items[itemIdx++].toInt(&ok);
+    while (ok && itemIdx < numItems)
+    {
+        LiveTVChainEntry entry;
+        if (ok && itemIdx < numItems)
+            entry.chanid = items[itemIdx++].toUInt(&ok);
+        if (ok && itemIdx < numItems)
+        {
+            entry.starttime =
+                QDateTime::fromString(items[itemIdx++], Qt::ISODate);
+            ok = entry.starttime.isValid();
+        }
+        if (ok && itemIdx < numItems)
+        {
+            entry.endtime =
+                QDateTime::fromString(items[itemIdx++], Qt::ISODate);
+            ok = entry.endtime.isValid();
+        }
+        if (ok && itemIdx < numItems)
+            entry.discontinuity = items[itemIdx++].toInt(&ok);
+        if (ok && itemIdx < numItems)
+            entry.hostprefix = items[itemIdx++];
+        if (ok && itemIdx < numItems)
+            entry.cardtype = items[itemIdx++];
+        if (ok && itemIdx < numItems)
+            entry.channum = items[itemIdx++];
+        if (ok && itemIdx < numItems)
+            entry.inputname = items[itemIdx++];
+        if (ok)
+            chain.append(entry);
+    }
+    if (ok)
+    {
+        QMutexLocker lock(&m_lock);
+        m_maxpos = maxpos;
+        m_chain = chain;
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Failed to deserialize TVChain - ") + items.join("|"));
+    }
+    return ok;
 }
