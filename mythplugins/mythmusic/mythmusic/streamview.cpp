@@ -386,10 +386,11 @@ void StreamView::removeStream(void)
     {
         MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
 
-        ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
-                       "Station: %1 - Channel: %2")
-                       .arg(mdata->Station()).arg(mdata->Channel()),
-                    this, SLOT(doRemoveStream(bool)), true);
+        if (mdata)
+            ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
+                           "Station: %1 - Channel: %2")
+                           .arg(mdata->Station()).arg(mdata->Channel()),
+                        this, SLOT(doRemoveStream(bool)), true);
     }
 }
 
@@ -402,7 +403,9 @@ void StreamView::doRemoveStream(bool ok)
     if (item)
     {
         MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
-        deleteStream(mdata);
+
+        if (mdata)
+            deleteStream(mdata);
     }
 }
 
@@ -425,7 +428,8 @@ void StreamView::updateStreamList(void)
         item->DisplayState("default", "playstate");
 
         // if this is the current radio stream update its play state to match the player
-        if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && mdata &&
+            mdata->ID() == gPlayer->getCurrentMetadata()->ID())
         {
             if (gPlayer->isPlaying())
             {

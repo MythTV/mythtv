@@ -4,7 +4,7 @@
 
 #include <mythcontext.h>
 
-#include "unzip.h"
+#include "external/unzip.h"
 
 static int calcOffset(QString GameType, uLong filesize) {
     int result;

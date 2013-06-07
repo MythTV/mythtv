@@ -804,7 +804,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
         kAutoRunNone : kAutoRunProfile;
     InitAutoRunJobs(curRec, t, NULL, __LINE__);
 
-    SendMythSystemRecEvent("REC_STARTED", curRec);
+    SendMythSystemLegacyRecEvent("REC_STARTED", curRec);
 }
 
 /** \brief If not a premature stop, adds program to history of recorded
@@ -893,7 +893,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if (HasFlags(kFlagDummyRecorderRunning))
     {
         curRec->FinishedRecording(true); // so end time is updated
-        SendMythSystemRecEvent("REC_FINISHED", curRec);
+        SendMythSystemLegacyRecEvent("REC_FINISHED", curRec);
         return;
     }
 
@@ -939,7 +939,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     }
 
     // send out REC_FINISHED message
-    SendMythSystemRecEvent("REC_FINISHED", curRec);
+    SendMythSystemLegacyRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
     int secsSince = curRec->GetRecordingStartTime()
@@ -3431,8 +3431,9 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
 
     if (channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
+        // FIXME This is just horrible
         int dir     = channum.right(channum.length() - 12).toInt();
-        uint chanid = channel->GetNextChannel(0, dir);
+        uint chanid = channel->GetNextChannel(0, static_cast<ChannelChangeDirection>(dir));
         channum     = ChannelUtil::GetChanNum(chanid);
     }
 

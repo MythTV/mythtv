@@ -571,7 +571,9 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     DVBCardType                  *cardtype;
     SignalTimeout                *signal_timeout;
     ChannelTimeout               *channel_timeout;
+#if 0
     TransButtonSetting           *buttonAnalog;
+#endif
     DVBTuningDelay               *tuning_delay;
     DiSEqCDevTree                *diseqc_tree;
     TransButtonSetting           *diseqc_btn;

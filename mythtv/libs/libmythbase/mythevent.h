@@ -20,53 +20,48 @@ class MBASE_PUBLIC MythEvent : public QEvent
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t)
+    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t),
+            m_message(lmessage),    m_extradata("empty")
     {
-        message = lmessage;
-        extradata.append( "empty" );
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(int t, const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)t)
+           : QEvent((QEvent::Type)t),
+            m_message(lmessage),    m_extradata(lextradata)
     {
-        message = lmessage;
-        extradata = lextradata;
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(const QString lmessage) : QEvent(MythEventMessage)
+    MythEvent(const QString lmessage) : QEvent(MythEventMessage),
+            m_message(lmessage),    m_extradata("empty")
     {
-        message = lmessage;
-        extradata.append( "empty" );
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)MythEventMessage)
+           : QEvent((QEvent::Type)MythEventMessage),
+           m_message(lmessage),    m_extradata(lextradata)
     {
-        message = lmessage;
-        extradata = lextradata;
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QString lextradata)
-           : QEvent((QEvent::Type)MythEventMessage)
+           : QEvent((QEvent::Type)MythEventMessage),
+           m_message(lmessage),    m_extradata(lextradata)
     {
-        message = lmessage;
-        extradata.append( lextradata );
     }
 
 
     virtual ~MythEvent() {}
 
-    const QString& Message() const { return message; }
-    const QString& ExtraData(int idx = 0) const { return extradata[idx]; }
-    const QStringList& ExtraDataList() const { return extradata; }
-    int ExtraDataCount() const { return extradata.size(); }
+    const QString& Message() const { return m_message; }
+    const QString& ExtraData(int idx = 0) const { return m_extradata[idx]; }
+    const QStringList& ExtraDataList() const { return m_extradata; }
+    int ExtraDataCount() const { return m_extradata.size(); }
 
     virtual MythEvent *clone() const
-    { return new MythEvent(message, extradata); }
+    { return new MythEvent(m_message, m_extradata); }
 
     static Type MythEventMessage;
     static Type MythUserMessage;
@@ -84,22 +79,22 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kEnableUDPListenerEventType;
 
   private:
-    QString message;
-    QStringList extradata;
+    QString m_message;
+    QStringList m_extradata;
 };
 
 class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 {
   public:
     ExternalKeycodeEvent(const int key) :
-        QEvent(kEventType), keycode(key) {}
+        QEvent(kEventType), m_keycode(key) {}
 
-    int getKeycode() { return keycode; }
+    int getKeycode() { return m_keycode; }
 
     static Type kEventType;
 
   private:
-    int keycode;
+    int m_keycode;
 };
 
 class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
@@ -116,14 +111,14 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
   public:
     MythInfoMapEvent(const QString &lmessage,
                      const QHash<QString,QString> &linfoMap)
-      : MythEvent(lmessage), infoMap(linfoMap) { }
+      : MythEvent(lmessage), m_infoMap(linfoMap) { }
 
     virtual MythInfoMapEvent *clone() const
-        { return new MythInfoMapEvent(Message(), infoMap); }
-    const QHash<QString,QString>* InfoMap(void) { return &infoMap; }
+        { return new MythInfoMapEvent(Message(), m_infoMap); }
+    const QHash<QString,QString>* InfoMap(void) { return &m_infoMap; }
 
   private:
-    QHash<QString,QString> infoMap;
+    QHash<QString,QString> m_infoMap;
 };
 
 #endif /* MYTHEVENT_H */

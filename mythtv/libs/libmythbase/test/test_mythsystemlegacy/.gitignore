@@ -1,0 +1,5 @@
+test_mythsystemlegacy
+*.gcda
+*.gcno
+*.gcov
+

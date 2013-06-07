@@ -97,7 +97,7 @@ class ShoutCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
@@ -151,7 +151,7 @@ class IceCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
@@ -755,7 +755,7 @@ bool ShoutCastIODevice::parseMeta(void)
 /****************************************************************************/
 
 DecoderIOFactoryShoutCast::DecoderIOFactoryShoutCast(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL)
+    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL), m_prebuffer(160000)
 {
     m_timer = new QTimer(this);
 }

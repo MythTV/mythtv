@@ -452,7 +452,7 @@ bool RSSEditor::keyPressEvent(QKeyEvent *event)
         {
             slotDeleteSite();
         }
-        if (action == "EDIT" && GetFocusWidget() == m_sites)
+        else if (action == "EDIT" && GetFocusWidget() == m_sites)
         {
             slotEditSite();
         }
@@ -480,15 +480,13 @@ void RSSEditor::fillRSSButtonList()
                     new MythUIButtonListItem(m_sites, (*i)->GetTitle());
         if (item)
         {
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetText((*i)->GetDescription(), "description");
-        item->SetText((*i)->GetURL(), "url");
-        item->SetText((*i)->GetAuthor(), "author");
-        item->SetData(qVariantFromValue(*i));
-        item->SetImage((*i)->GetImage());
+            item->SetText((*i)->GetTitle(), "title");
+            item->SetText((*i)->GetDescription(), "description");
+            item->SetText((*i)->GetURL(), "url");
+            item->SetText((*i)->GetAuthor(), "author");
+            item->SetData(qVariantFromValue(*i));
+            item->SetImage((*i)->GetImage());
         }
-        else
-            delete item;
     }
 }
 

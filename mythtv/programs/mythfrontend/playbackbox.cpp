@@ -2286,6 +2286,13 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     }
 }
 
+void PlaybackBox::previous()
+{
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo)
+        ShowPrevious(pginfo);
+}
+
 void PlaybackBox::upcoming()
 {
     ProgramInfo *pginfo = CurrentItem();
@@ -3852,6 +3859,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 upcoming();
             else if (action == ACTION_VIEWSCHEDULED)
                 upcomingScheduled();
+            else if (action == ACTION_PREVRECORDED)
+                previous();
             else
                 handled = false;
         }

@@ -82,7 +82,17 @@ void MetadataImageDownload::run()
 
         bool exists = QFile::exists(sFilename);
         if (!exists && !thumb->url.isEmpty())
-            GetMythDownloadManager()->download(thumb->url, sFilename);
+        {
+            if (!GetMythDownloadManager()->download(thumb->url, sFilename))
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("MetadataImageDownload: failed to download thumbnail from: %1")
+                    .arg(thumb->url));
+
+                delete thumb;
+                continue;
+            }
+        }
 
         // inform parent we have thumbnail ready for it
         if (QFile::exists(sFilename) && m_parent)

@@ -21,7 +21,7 @@ using namespace std;
 #include "referencecounter.h"
 #include "mythmiscutil.h"
 #include "mythconfig.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "tv.h"
 #include "proglist.h"
 #include "progfind.h"
@@ -296,10 +296,10 @@ static void startAppearWiz(void)
     int curW = gCoreContext->GetNumSetting("GuiWidth", 0);
     int curH = gCoreContext->GetNumSetting("GuiHeight", 0);
 
-    MythSystem *wizard = new MythSystem(
-                    GetInstallPrefix() + "/bin/mythscreenwizard",
-                    QStringList(),
-                    kMSNoRunShell | kMSDisableUDPListener | kMSPropagateLogs);
+    MythSystemLegacy *wizard = new MythSystemLegacy(
+        GetInstallPrefix() + "/bin/mythscreenwizard",
+        QStringList(),
+        kMSDisableUDPListener | kMSPropagateLogs);
     wizard->Run();
 
     bool reload = false;
@@ -937,7 +937,7 @@ static void TVMenuCallback(void *data, QString &selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythSystemEventEditor *msee = new MythSystemEventEditor(
+        MythSystemLegacyEventEditor *msee = new MythSystemLegacyEventEditor(
                                     mainStack, "System Event Editor");
 
         if (msee->Create())
@@ -1548,7 +1548,11 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-    setuid(getuid());
+    if (setuid(getuid()) != 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to setuid(), exiting.");
+        return GENERIC_EXIT_NOT_OK;
+    }
 
 #ifdef USING_LIBDNS_SD
     // this needs to come after gCoreContext has been initialised
@@ -1683,7 +1687,7 @@ int main(int argc, char **argv)
     if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
         themeUpdateChecker = new ThemeUpdateChecker();
 
-    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
 
     BackendConnectionManager bcm;
 

@@ -461,16 +461,12 @@ void MonitorThreadDarwin::diskRemove(QString devName)
     LOG(VB_MEDIA, LOG_DEBUG,
             QString("MonitorThreadDarwin::diskRemove(%1)").arg(devName));
 
-    if (m_Monitor->m_SendEvent)
-    {
-        MythMediaDevice *pDevice = m_Monitor->GetMedia(devName);
+    MythMediaDevice *pDevice = m_Monitor->GetMedia(devName);
 
-        if (pDevice)  // Probably should ValidateAndLock() here?
-            pDevice->setStatus(MEDIASTAT_NODISK);
-        else
-            LOG(VB_MEDIA, LOG_INFO,
-                     "Couldn't find MythMediaDevice: " + devName);
-    }
+    if (pDevice)  // Probably should ValidateAndLock() here?
+        pDevice->setStatus(MEDIASTAT_NODISK);
+    else
+        LOG(VB_MEDIA, LOG_INFO, "Couldn't find MythMediaDevice: " + devName);
 
     m_Monitor->RemoveDevice(devName);
 }
@@ -492,15 +488,13 @@ void MonitorThreadDarwin::diskRename(const char *devName, const char *volName)
     if (m_Monitor->ValidateAndLock(pDevice))
     {
         // Send message to plugins to ignore this drive:
-        if (m_Monitor->m_SendEvent)
-            pDevice->setStatus(MEDIASTAT_NODISK);
+        pDevice->setStatus(MEDIASTAT_NODISK);
 
         pDevice->setVolumeID(volName);
         pDevice->setMountPath((QString("/Volumes/") + volName).toLatin1());
 
         // Plugins can now use it again:
-        if (m_Monitor->m_SendEvent)
-            pDevice->setStatus(MEDIASTAT_USEABLE);
+        pDevice->setStatus(MEDIASTAT_USEABLE);
 
         m_Monitor->Unlock(pDevice);
     }
@@ -560,13 +554,10 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
 
     // Devices on Mac OS X don't change status the way Linux ones do,
     // so we force a status change for mediaStatusChanged() to send an event
-    if (m_SendEvent)
-    {
-        pDevice->setStatus(MEDIASTAT_NODISK);
-        connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
-                this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
-        pDevice->setStatus(MEDIASTAT_USEABLE);
-    }
+    pDevice->setStatus(MEDIASTAT_NODISK);
+    connect(pDevice, SIGNAL(statusChanged(MythMediaStatus, MythMediaDevice*)),
+            this, SLOT(mediaStatusChanged(MythMediaStatus, MythMediaDevice*)));
+    pDevice->setStatus(MEDIASTAT_USEABLE);
 
 
     return true;

@@ -100,7 +100,7 @@ ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_t
     static const char *cattype[] =
         { "", "movie", "series", "sports", "tvshow", };
 
-    for (uint i = 1; i < NUM_CAT_TYPES; i++)
+    for (int i = 1; i < NUM_CAT_TYPES; i++)
         if (category_type == cattype[i])
             return (ProgramInfo::CategoryType) i;
     return ProgramInfo::kCategoryNone;
@@ -1130,6 +1130,7 @@ void ProgramInfo::clear(void)
     lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
     recstatus = rsUnknown;
+    oldrecstatus = rsUnknown;
 
     prefinput = 0;
     recpriority2 = 0;
@@ -2638,7 +2639,7 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
  */
 ProgramInfo::CategoryType ProgramInfo::QueryCategoryType(void) const
 {
-    CategoryType ret;
+    CategoryType ret = kCategoryNone;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -3889,13 +3890,11 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
 
-    if (!query.exec())
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("QueryAverageAspectRatio", query);
         return MARK_UNSET;
     }
-
-    query.next();
 
     return static_cast<MarkTypes>(query.value(0).toInt());
 }
@@ -3937,7 +3936,11 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  startts);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveVideoProperties", query);
+        return;
+    }
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
@@ -3999,7 +4002,11 @@ void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
     query.bindValue(":RECORDID",   recordid);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveSeasonEpisode", query);
+        return;
+    }
 
     SendUpdateEvent();
 }

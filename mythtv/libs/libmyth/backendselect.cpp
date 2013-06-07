@@ -93,9 +93,14 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     DeviceLocation *dev = qVariantValue<DeviceLocation *>(item->GetData());
 
     if (!dev)
+    {
         Cancel();
+        LOG(VB_GENERAL, LOG_ERR,
+            "Could not get device details from UI element?");
+        return;
+    }
 
-    if (ConnectBackend(dev))  // this does a Release()
+    if (ConnectBackend(dev))
     {
         if (m_pConfig)
         {

@@ -159,10 +159,6 @@ class Scheduler : public MThread, public MythScheduler
                          const RecList &reclist);
     void FillDirectoryInfoCache(bool force = false);
 
-    int CalcTimeToNextHandleRecordingEvent(
-        const QDateTime &curtime,
-        RecConstIter startIter, const RecList &reclist,
-        int prerollseconds, int max_sleep /*ms*/);
     void OldRecordedFixups(void);
     void ResetDuplicates(uint recordid, uint findid, const QString &title,
                          const QString &subtitle, const QString &descrip,
@@ -171,11 +167,11 @@ class Scheduler : public MThread, public MythScheduler
     bool HandleRunSchedulerStartup(
         int prerollseconds, int idleWaitForRecordingTime);
     void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
-    bool HandleRecording(
-        RecordingInfo &ri, bool &statuschanged,
-        int prerollseconds, int tuningTimeout);
-    void HandleTuning(
-        RecordingInfo &ri, bool &statuschanged, int tuningTimeout);
+    bool HandleRecording(RecordingInfo &ri, bool &statuschanged,
+                         QDateTime &nextStartTime, QDateTime &nextWakeTime,
+                         int prerollseconds, int tuningTimeout);
+    void HandleTuning(RecordingInfo &ri, bool &statuschanged,
+                      QDateTime &nextWakeTime, int tuningTimeout);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
     void HandleIdleShutdown(
@@ -185,27 +181,21 @@ class Scheduler : public MThread, public MythScheduler
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
                       const QDateTime maxstarttime, const QString &why)
-    { QMutexLocker locker(&m_queueLock);
-      reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid,
-                                      sourceid, mplexid, maxstarttime, why)); };
+    { reschedQueue.enqueue(ScheduledRecording::BuildMatchRequest(recordid,
+                                     sourceid, mplexid, maxstarttime, why)); };
     void EnqueueCheck(const RecordingInfo &recinfo, const QString &why)
-    { QMutexLocker locker(&m_queueLock);
-        reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo,
-                                                                    why)); };
+    { reschedQueue.enqueue(ScheduledRecording::BuildCheckRequest(recinfo,
+                                                                 why)); };
     void EnqueuePlace(const QString &why)
-    { QMutexLocker locker(&m_queueLock);
-      reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
+    { reschedQueue.enqueue(ScheduledRecording::BuildPlaceRequest(why)); };
 
     bool HaveQueuedRequests(void)
-    {  QMutexLocker locker(&m_queueLock); return !reschedQueue.empty(); };
+    { return !reschedQueue.empty(); };
     void ClearRequestQueue(void)
-    {  QMutexLocker locker(&m_queueLock); reschedQueue.clear(); };
-
-    
+    { reschedQueue.clear(); };
 
     MythDeque<QStringList> reschedQueue;
     mutable QMutex schedLock;
-    mutable QMutex m_queueLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;

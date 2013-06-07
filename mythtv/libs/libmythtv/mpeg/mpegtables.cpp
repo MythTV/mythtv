@@ -93,6 +93,7 @@ uint StreamID::Normalize(uint stream_id, const desc_list_t &desc,
 
 bool PSIPTable::HasCRC(void) const
 {
+    // default is false, but gets set to true for 0x80-0xfe at the end!
     bool has_crc = false;
 
     switch (TableID())
@@ -185,11 +186,19 @@ bool PSIPTable::HasCRC(void) const
                 has_crc = true;
             }
 
-            // Dishnet Longterm EIT data
+            // FIXME Dishnet Longterm EIT data, only on PID 0x300! Forces
+            // table_id 0x80-0xfe to true, unless handled before or after!
             if (TableID::DN_EITbego <= TableID() &&
                 TableID() <= TableID::DN_EITendo)
             {
                 has_crc = true;
+            }
+
+            // ATSC/DVB conditional access ECM/EMM, reset to false after Dishnet
+            if (TableID::ECM0 <= TableID() &&
+                TableID() <= TableID::ECMend)
+            {
+                has_crc = false;
             }
         }
         break;
@@ -717,24 +726,27 @@ uint ProgramMapTable::FindPIDs(uint           type,
 uint ProgramMapTable::FindUnusedPID(uint desired_pid)
 {
     uint pid = desired_pid;
-    while (FindPID(pid) >= 0)
+    if (pid >= MPEG_NULL_PID)
+        pid = 0x20;
+
+    while (FindPID(pid) != -1)
         pid += 0x10;
 
-    if (desired_pid <= 0x1fff)
+    if (pid < MPEG_NULL_PID)
         return pid;
 
     pid = desired_pid;
-    while (FindPID(desired_pid) >= 0)
-        desired_pid += 1;
+    while (FindPID(pid) != -1)
+        pid += 1;
 
-    if (desired_pid <= 0x1fff)
+    if (pid < MPEG_NULL_PID)
         return pid;
 
     pid = 0x20;
-    while (FindPID(desired_pid) >= 0)
-        desired_pid += 1;
+    while (FindPID(pid) != -1)
+        pid += 1;
 
-    return desired_pid & 0x1fff;
+    return pid & 0x1fff;
 }
 
 QString PSIPTable::toString(void) const

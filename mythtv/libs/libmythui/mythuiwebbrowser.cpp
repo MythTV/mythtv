@@ -120,7 +120,9 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
  * @brief Adds a JavaScript object
  * \note allows the browser to control the music player
  */
-BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
+BrowserApi::BrowserApi(QObject *parent)
+           : QObject(parent),
+            m_frame(NULL), m_gotAnswer(false)
 {
     gCoreContext->addListener(this);
 }
@@ -1002,6 +1004,9 @@ void MythUIWebBrowser::Init(void)
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);
+
+    m_zoom = gCoreContext->GetFloatSetting("WebBrowserZoomLevel", 1.0);
+
     SetZoom(m_zoom);
 
     if (!m_widgetUrl.isEmpty() && m_widgetUrl.isValid())
@@ -1509,6 +1514,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         if (action == "TOGGLEINPUT")
         {
             m_inputToggled = !m_inputToggled;
+
+            if (m_inputToggled)
+                slotStatusBarMessage(tr("Sending key presses to web page"));
+            else
+                slotStatusBarMessage(tr("Sending key presses to MythTV"));
+
             return true;
         }
 
@@ -1516,6 +1527,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         if (m_inputToggled)
         {
             m_browser->keyPressEvent(event);
+
             return true;
         }
 

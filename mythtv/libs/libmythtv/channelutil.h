@@ -18,6 +18,7 @@ using namespace std;
 #include "dtvmultiplex.h"
 #include "channelinfo.h"
 #include "iptvtuningdata.h"
+#include "tv.h" // for CHANNEL_DIRECTION
 
 class NetworkInformationTable;
 
@@ -214,7 +215,7 @@ class MTV_PUBLIC ChannelUtil
     static uint    GetNextChannel(const ChannelInfoList &sorted,
                                   uint old_chanid,
                                   uint mplexid_restriction,
-                                  int  direction,
+                                  ChannelChangeDirection direction,
                                   bool skip_non_visible = true,
                                   bool skip_same_channum_and_callsign = false);
 

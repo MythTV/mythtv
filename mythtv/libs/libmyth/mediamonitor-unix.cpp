@@ -40,7 +40,7 @@ using namespace std;
 #include "mythcdrom.h"
 #include "mythhdd.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #if HAVE_LIBUDEV
@@ -368,12 +368,12 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     args << "info" << "-q"  << "name"
          << "-rp" << sysfs;
 
-    uint flags = kMSStdOut | kMSBuffered;
+    uint flags = kMSStdOut;
     if (VERBOSE_LEVEL_CHECK(VB_MEDIA, LOG_DEBUG))
         flags |= kMSStdErr;
 
-    // TODO: change this to a MythSystem on the stack?
-    MythSystem *udevinfo = new MythSystem("udevinfo", args, flags);
+    // TODO: change this to a MythSystemLegacy on the stack?
+    MythSystemLegacy *udevinfo = new MythSystemLegacy("udevinfo", args, flags);
     udevinfo->Run(4);
     if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {

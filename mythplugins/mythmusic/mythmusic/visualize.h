@@ -19,6 +19,7 @@
 // MythTV headers
 #include <visual.h>
 #include <musicmetadata.h>
+#include <mythbaseexp.h>
 
 // MythMusic headers
 #include "constants.h"

@@ -17,7 +17,8 @@ HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h logging.h loggingserver.h
-HEADERS += mythcorecontext.h mythsystem.h mythlocale.h storagegroup.h
+HEADERS += mythcorecontext.h mythsystem.h mythsystemprivate.h
+HEADERS += mythlocale.h storagegroup.h
 HEADERS += mythcoreutil.h mythdownloadmanager.h mythtranslation.h
 HEADERS += unzip.h unzip_p.h zipentry_p.h iso639.h iso3166.h mythmedia.h
 HEADERS += mythmiscutil.h mythhdd.h mythcdrom.h autodeletedeque.h dbutil.h
@@ -27,6 +28,7 @@ HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
 HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += mythplugin.h mythpluginapi.h
 HEADERS += ffmpeg-mmx.h
+HEADERS += mythsystemlegacy.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -43,6 +45,7 @@ SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 SOURCES += mythplugin.cpp
+SOURCES += mythsystemlegacy.cpp
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
@@ -51,13 +54,13 @@ SOURCES += httpcomms.cpp mcodecs.cpp mythhttppool.cpp mythhttphandler.cpp
 }
 
 unix {
-    SOURCES += system-unix.cpp
-    HEADERS += system-unix.h
+    SOURCES += mythsystemunix.cpp
+    HEADERS += mythsystemunix.h
 }
 
 mingw {
-    SOURCES += system-windows.cpp
-    HEADERS += system-windows.h
+    SOURCES += mythsystemwindows.cpp
+    HEADERS += mythsystemwindows.h
 }
 
 # Install headers to same location as libmyth to make things easier
@@ -75,6 +78,7 @@ inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h
+inc.files += remotefile.h mythsystemlegacy.h
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {

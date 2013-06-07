@@ -18,10 +18,16 @@ class MPUBLIC AudioOutputUtil
                                     int channel, int count, int bits = 16);
     static int DecodeAudio(AVCodecContext *ctx,
                            uint8_t *buffer, int &data_size,
-                           AVPacket *pkt);
+                           const AVPacket *pkt);
     static void DeinterleaveSamples(AudioFormat format, int channels,
-                                    uint8_t *output, uint8_t *input,
+                                    uint8_t *output, const uint8_t *input,
                                     int data_size);
+    static void InterleaveSamples(AudioFormat format, int channels,
+                                  uint8_t *output, const uint8_t * const *input,
+                                  int data_size);
+    static void InterleaveSamples(AudioFormat format, int channels,
+                                  uint8_t *output, const uint8_t *input,
+                                  int data_size);
 };
 
 #endif

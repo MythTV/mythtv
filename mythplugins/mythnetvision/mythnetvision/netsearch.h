@@ -82,9 +82,6 @@ class NetSearch : public MythScreenType
     GrabberScript::scriptList m_grabberList;
     RSSSite::rssList    m_rssList;
     QMap<MythUIButtonListItem*,ResultItem> m_rssitems;
-    DialogType          m_dialogType;
-
-    NetSearch::DialogType m_type;
 
   private slots:
     void streamWebVideo(void);

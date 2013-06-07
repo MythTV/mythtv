@@ -25,9 +25,16 @@ using namespace std;
 #define LOC QString("MythUIGuideGrid: ")
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIType(parent, name),
+    m_allData(NULL)
 {
     // themeable setting defaults
+    for (uint x = 0; x < RECSTATUSSIZE; x++)
+        m_recImages[x] = NULL;
+
+    for (uint x = 0; x < ARROWIMAGESIZE; x++)
+        m_arrowImages[x] = NULL;
+
     m_channelCount = 5;
     m_timeCount = 4;
     m_verticalLayout = false;
@@ -40,12 +47,6 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_selType = "box";
     m_drawSelLine = QPen(Qt::NoPen);
     m_drawSelFill = QBrush(Qt::NoBrush);
-
-    for (uint x = 0; x < RECSTATUSSIZE; x++)
-        m_recImages[x] = NULL;
-
-    for (uint x = 0; x < ARROWIMAGESIZE; x++)
-        m_arrowImages[x] = NULL;
 
     m_fillType = Solid;
 
@@ -66,7 +67,7 @@ void MythUIGuideGrid::Finalize(void)
 {
     m_rowCount = m_channelCount;
 
-    allData = new QList<UIGTCon *>[m_rowCount];
+    m_allData = new QList<UIGTCon *>[m_rowCount];
 
     MythUIType::Finalize();
 }
@@ -76,7 +77,7 @@ MythUIGuideGrid::~MythUIGuideGrid()
     for (int i = 0; i < m_rowCount; i++)
         ResetRow(i);
 
-    delete [] allData;
+    delete [] m_allData;
 
     delete m_font;
     m_font = NULL;
@@ -298,33 +299,33 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 {
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon *>::iterator it = allData[i].begin();
+        QList<UIGTCon *>::iterator it = m_allData[i].begin();
 
-        for (; it != allData[i].end(); ++it)
+        for (; it != m_allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
 
-            if (data->recStat == 0)
+            if (data->m_recStat == 0)
                 drawBackground(p, data, alphaMod);
-            else if (data->recStat == 1)
+            else if (data->m_recStat == 1)
                 drawBox(p, data, m_recordingColor, alphaMod);
             else
                 drawBox(p, data, m_conflictingColor, alphaMod);
         }
     }
 
-    drawCurrent(p, &selectedItem, alphaMod);
+    drawCurrent(p, &m_selectedItem, alphaMod);
 
     for (int i = 0; i < m_rowCount; i++)
     {
-        QList<UIGTCon *>::iterator it = allData[i].begin();
+        QList<UIGTCon *>::iterator it = m_allData[i].begin();
 
-        for (; it != allData[i].end(); ++it)
+        for (; it != m_allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
             drawText(p, data, alphaMod);
 
-            if (data->recType != 0 || data->arrow != 0)
+            if (data->m_recType != 0 || data->m_arrow != 0)
                 drawRecType(p, data, alphaMod);
         }
     }
@@ -333,10 +334,10 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     int breakin = 2;
-    QRect area = data->drawArea;
+    QRect area = data->m_drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
-    int status = data->recStat;
+    int status = data->m_recStat;
 
     if (m_selType == "roundbox")
     {
@@ -354,8 +355,8 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
         QBrush brush = m_drawSelFill;
         QPen   pen   = m_drawSelLine;
 
-        if (m_drawCategoryColors && data->categoryColor.isValid())
-            brush.setColor(calcColor(data->categoryColor, m_categoryAlpha));
+        if (m_drawCategoryColors && data->m_categoryColor.isValid())
+            brush.setColor(calcColor(data->m_categoryColor, m_categoryAlpha));
         else
             brush.setColor(calcColor(m_solidColor, m_categoryAlpha));
 
@@ -384,14 +385,14 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
 void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     int breakin = 1;
-    QRect area = data->drawArea;
+    QRect area = data->m_drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
 
     // draw arrows
-    if (data->arrow != 0)
+    if (data->m_arrow != 0)
     {
-        if (data->arrow == 1 || data->arrow == 3)
+        if (data->m_arrow == 1 || data->m_arrow == 3)
         {
             if (m_verticalLayout)
             {
@@ -407,7 +408,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
             }
         }
 
-        if (data->arrow == 2 || data->arrow == 3)
+        if (data->m_arrow == 2 || data->m_arrow == 3)
         {
             if (m_verticalLayout)
             {
@@ -426,18 +427,18 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     }
 
     // draw recording status
-    if (data->recType != 0 && m_recImages[data->recType])
+    if (data->m_recType != 0 && m_recImages[data->m_recType])
     {
-        p->DrawImage(area.right() - m_recImages[data->recType]->width(),
-                     area.bottom() - m_recImages[data->recType]->height(),
-                     m_recImages[data->recType], alphaMod);
+        p->DrawImage(area.right() - m_recImages[data->m_recType]->width(),
+                     area.bottom() - m_recImages[data->m_recType]->height(),
+                     m_recImages[data->m_recType], alphaMod);
     }
 }
 
 void MythUIGuideGrid::drawBox(MythPainter *p, UIGTCon *data, const QColor &color, int alphaMod)
 {
     int breakin = 1;
-    QRect area = data->drawArea;
+    QRect area = data->m_drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
 
@@ -451,12 +452,12 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
     QRect overArea;
 
     int breakin = 1;
-    QRect area = data->drawArea;
+    QRect area = data->m_drawArea;
     area.translate(m_Area.x(), m_Area.y());
     QColor fillColor;
 
-    if (m_drawCategoryColors && data->categoryColor.isValid())
-        fillColor = calcColor(data->categoryColor, m_categoryAlpha);
+    if (m_drawCategoryColors && data->m_categoryColor.isValid())
+        fillColor = calcColor(data->m_categoryColor, m_categoryAlpha);
     else
         fillColor = calcColor(m_solidColor, m_categoryAlpha);
 
@@ -528,30 +529,30 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
 
 void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 {
-    QString msg = data->title;
+    QString msg = data->m_title;
 
-    if (m_drawCategoryText && !data->category.isEmpty())
-        msg += QString(" (%1)").arg(data->category);
+    if (m_drawCategoryText && !data->m_category.isEmpty())
+        msg += QString(" (%1)").arg(data->m_category);
 
-    QRect area = data->drawArea;
+    QRect area = data->m_drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(m_textOffset.x(), m_textOffset.y(),
                 -m_textOffset.x(), -m_textOffset.y());
 
     if (m_verticalLayout)
     {
-        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[2])
+        if ((data->m_arrow == 1 || data->m_arrow == 3) && m_arrowImages[2])
             area.setTop(area.top() + m_arrowImages[2]->height());
 
-        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[3])
+        if ((data->m_arrow == 2 || data->m_arrow == 3) && m_arrowImages[3])
             area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
     else
     {
-        if ((data->arrow == 1 || data->arrow == 3) && m_arrowImages[0])
+        if ((data->m_arrow == 1 || data->m_arrow == 3) && m_arrowImages[0])
             area.setLeft(area.left() + m_arrowImages[0]->width());
 
-        if ((data->arrow == 2 || data->arrow == 3) && m_arrowImages[1])
+        if ((data->m_arrow == 2 || data->m_arrow == 3) && m_arrowImages[1])
             area.setRight(area.right() - m_arrowImages[1]->width());
     }
 
@@ -568,18 +569,18 @@ void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
 {
     (void)col;
     UIGTCon *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
-    allData[row].append(data);
+    m_allData[row].append(data);
 
     if (m_drawCategoryColors)
     {
-        data->categoryColor = categoryColors[data->category.toLower()];
+        data->m_categoryColor = m_categoryColors[data->m_category.toLower()];
 
-        if (!data->categoryColor.isValid())
-            data->categoryColor = categoryColors["none"];
+        if (!data->m_categoryColor.isValid())
+            data->m_categoryColor = m_categoryColors["none"];
     }
 
     if (selected)
-        selectedItem = *data;
+        m_selectedItem = *data;
 }
 
 bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
@@ -644,7 +645,7 @@ void MythUIGuideGrid::SetCategoryColors(const QMap<QString, QString> &catC)
     for (QMap<QString, QString>::const_iterator it = catC.begin();
          it != catC.end(); ++it)
     {
-        categoryColors[it.key()] = createColor(*it);
+        m_categoryColors[it.key()] = createColor(*it);
     }
 }
 
@@ -690,10 +691,10 @@ void MythUIGuideGrid::ResetData(void)
 
 void MythUIGuideGrid::ResetRow(int row)
 {
-    while (!allData[row].empty())
+    while (!m_allData[row].empty())
     {
-        delete allData[row].back();
-        allData[row].pop_back();
+        delete m_allData[row].back();
+        m_allData[row].pop_back();
     }
 }
 

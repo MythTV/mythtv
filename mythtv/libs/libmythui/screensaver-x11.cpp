@@ -11,7 +11,7 @@
 #include "mythdb.h"
 
 // Mythui headers
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythxdisplay.h"
 
 // X11 headers

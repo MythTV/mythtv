@@ -152,6 +152,12 @@ enum MenuShowContext {
     kMenuShowAlways
 };
 
+enum MenuCurrentContext {
+    kMenuCurrentDefault,
+    kMenuCurrentActive,
+    kMenuCurrentAlways
+};
+
 class MenuBase;
 
 class MenuItemContext
@@ -161,14 +167,14 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     const QString &menuName,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     bool doDisplay) :
         m_menu(menu),
         m_node(node),
         m_category(kMenuCategoryMenu),
         m_menuName(menuName),
         m_showContext(kMenuShowAlways),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(""),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
@@ -176,7 +182,7 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     MenuShowContext showContext,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     const QString &action,
                     const QString &actionText,
                     bool doDisplay) :
@@ -185,7 +191,7 @@ public:
         m_category(kMenuCategoryItem),
         m_menuName(""),
         m_showContext(showContext),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(action),
         m_actionText(actionText),
         m_doDisplay(doDisplay) {}
@@ -193,7 +199,7 @@ public:
     MenuItemContext(const MenuBase &menu,
                     const QDomNode &node,
                     MenuShowContext showContext,
-                    bool setCurrentActive,
+                    MenuCurrentContext current,
                     const QString &action,
                     bool doDisplay) :
         m_menu(menu),
@@ -201,19 +207,19 @@ public:
         m_category(kMenuCategoryItemlist),
         m_menuName(""),
         m_showContext(showContext),
-        m_setCurrentActive(setCurrentActive),
+        m_currentContext(current),
         m_action(action),
         m_actionText(""),
         m_doDisplay(doDisplay) {}
-    const MenuBase &m_menu;
-    const QDomNode &m_node;
-    MenuCategory    m_category;
-    const QString   m_menuName;
-    MenuShowContext m_showContext;
-    bool            m_setCurrentActive;
-    const QString   m_action;
-    const QString   m_actionText;
-    bool            m_doDisplay;
+    const MenuBase    &m_menu;
+    const QDomNode    &m_node;
+    MenuCategory       m_category;
+    const QString      m_menuName;
+    MenuShowContext    m_showContext;
+    MenuCurrentContext m_currentContext;
+    const QString      m_action;
+    const QString      m_actionText;
+    bool               m_doDisplay;
 };
 
 class MenuItemDisplayer
@@ -225,13 +231,16 @@ public:
 class MenuBase
 {
 public:
-    MenuBase() : m_document(NULL), m_translationContext(""),
-                 m_recursionLevel(0) {}
+    MenuBase() : m_document(NULL), m_translationContext("") {}
     ~MenuBase();
-    bool        Load(const QString &filename,
-                     const QString &menuname,
-                     const char *translationContext,
-                     const QString &keyBindingContext);
+    bool        LoadFromFile(const QString &filename,
+                             const QString &menuname,
+                             const char *translationContext,
+                             const QString &keyBindingContext);
+    bool        LoadFromString(const QString &text,
+                               const QString &menuname,
+                               const char *translationContext,
+                               const QString &keyBindingContext);
     bool        IsLoaded(void) const { return (m_document != NULL); }
     QDomElement GetRoot(void) const;
     QString     Translate(const QString &text) const;
@@ -246,12 +255,21 @@ public:
         return m_keyBindingContext;
     }
 private:
-    void ProcessIncludes(QDomElement &root);
+    bool LoadFileHelper(const QString &filename,
+                        const QString &menuname,
+                        const char *translationContext,
+                        const QString &keyBindingContext,
+                        int includeLevel);
+    bool LoadStringHelper(const QString &text,
+                          const QString &menuname,
+                          const char *translationContext,
+                          const QString &keyBindingContext,
+                          int includeLevel);
+    void ProcessIncludes(QDomElement &root, int includeLevel);
     QDomDocument *m_document;
     const char   *m_translationContext;
     QString       m_menuName;
     QString       m_keyBindingContext;
-    int           m_recursionLevel; // guard against infinite recursion
 };
 
 /**
@@ -493,7 +511,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // Channels
     void ToggleChannelFavorite(PlayerContext *ctx);
     void ToggleChannelFavorite(PlayerContext*, QString);
-    void ChangeChannel(PlayerContext*, int direction);
+    void ChangeChannel(PlayerContext*, ChannelChangeDirection direction);
     void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
 
     void ShowPreviousChannel(PlayerContext*);
@@ -729,9 +747,13 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     void PlaybackMenuShow(const MenuBase &menu,
                           const QDomNode &node, const QDomNode &selected);
+    void CutlistMenuShow(const MenuBase &menu,
+                         const QDomNode &node, const QDomNode &selected);
     virtual bool MenuItemDisplay(const MenuItemContext &c);
-    void PlaybackMenuInit(void);
-    void PlaybackMenuDeinit(void);
+    bool MenuItemDisplayPlayback(const MenuItemContext &c);
+    bool MenuItemDisplayCutlist(const MenuItemContext &c);
+    void PlaybackMenuInit(const MenuBase &menu);
+    void PlaybackMenuDeinit(const MenuBase &menu);
     void MenuStrings(void) const;
     void MenuLazyInit(void *field);
 
@@ -1033,7 +1055,9 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     // End of playback menu state caching
 
     MenuBase m_playbackMenu;
-    MenuBase m_compactMenu;
+    MenuBase m_playbackCompactMenu;
+    MenuBase m_cutlistMenu;
+    MenuBase m_cutlistCompactMenu;
 
   public:
     // Constants

@@ -27,6 +27,7 @@
 #define ACTION_TOGGLESLEEP       QString("TOGGLESLEEP")
 #define ACTION_PLAY              "PLAY"
 #define ACTION_VIEWSCHEDULED     "VIEWSCHEDULED"
+#define ACTION_PREVRECORDED      "PREVRECORDED"
 #define ACTION_SIGNALMON         "SIGNALMON"
 
 /* Navigation */

@@ -111,8 +111,6 @@ class NetTree : public MythScreenType
     GrabberDownloadThread *m_gdt;
     QString               m_downloadFile;
 
-    QFile              *m_file;
-
     GrabberScript::scriptList m_grabberList;
     RSSSite::rssList m_rssList;
 

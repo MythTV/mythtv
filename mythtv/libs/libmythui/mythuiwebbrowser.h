@@ -7,6 +7,7 @@
 #include "mythuiexp.h"
 
 #if QT_VERSION >= 0x050000
+#include <QIcon>
 class MUI_PUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT
@@ -15,11 +16,26 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     MythUIWebBrowser(MythUIType *parent, const QString &name) :
     MythUIType(parent, name) {}
     ~MythUIWebBrowser() {}
-    void SetHtml(const QString &, const QUrl &baseUrl = QUrl()) {}
+    void SetHtml(const QString &, const QUrl &baseUrl = QUrl())
+        { (void) baseUrl; }
     void SetZoom(float) {}
     float GetZoom(void) { return 1.0; }
     void ZoomIn(void) {}
     void ZoomOut(void) {}
+
+    void Init(void) {}
+    void SetActive(bool) {}
+    void LoadPage(QUrl) {}
+    void SetDefaultSaveDirectory(const QString &) {}
+    void SetDefaultSaveFilename(const QString &) {}
+    bool CanGoForward(void) { return false; }
+    bool CanGoBack(void) { return false; }
+    void Back(void) {}
+    void Forward(void) {}
+    QIcon GetIcon(void) { return QIcon(); }
+    QUrl GetUrl(void) { return QUrl("http://example.com"); }
+    QString GetTitle(void) { return QString(); }
+    QVariant evaluateJavaScript(const QString&) { return QVariant(); }
 };
 #warning MythUIWebBrowser has not yet been ported to Qt5
 #else

@@ -128,11 +128,11 @@ void TreeEditor::slotLoadedData()
     QDomElement grabber = content.firstChildElement("grabber");
 
     while (!grabber.isNull())
-     {
+    {
         QString title, author, image, description, type, commandline;
-         double version;
-         bool search = false;
-         bool tree = false;
+        double version;
+        bool search = false;
+        bool tree = false;
 
         title = grabber.firstChildElement("name").text();
         commandline = grabber.firstChildElement("command").text();
@@ -141,25 +141,29 @@ void TreeEditor::slotLoadedData()
         type = grabber.firstChildElement("type").text();
         description = grabber.firstChildElement("description").text();
         version = grabber.firstChildElement("version").text().toDouble();
+
         QString treestring = grabber.firstChildElement("tree").text();
-         if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
-             treestring.toLower() == "yes" || treestring == "1"))
-             tree = true;
+
+        if (!treestring.isEmpty() && (treestring.toLower() == "true" ||
+            treestring.toLower() == "yes" || treestring == "1"))
+            tree = true;
+
         QString searchstring = grabber.firstChildElement("search").text();
-         if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
-             searchstring.toLower() == "yes" || searchstring == "1"))
-             search = true;
+
+        if (!searchstring.isEmpty() && (searchstring.toLower() == "true" ||
+            searchstring.toLower() == "yes" || searchstring == "1"))
+            search = true;
 
         if (type.toLower() == "video" && tree)
         {
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Found Browseable Source %1...").arg(title));
             m_grabberList.append(new GrabberScript(title, image, VIDEO_FILE, author,
-                       search, tree, description, commandline, version));
+                        search, tree, description, commandline, version));
         }
 
         grabber = grabber.nextSiblingElement("grabber");
-     }
+    }
 
     parsedData();
  }
@@ -205,24 +209,23 @@ void TreeEditor::fillGrabberButtonList()
                     new MythUIButtonListItem(m_grabbers, (*i)->GetTitle());
         if (item)
         {
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetData(qVariantFromValue(*i));
-        QString img = (*i)->GetImage();
-        QString thumb;
-        if (!img.startsWith("/") && !img.isEmpty())
-            thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*i)->GetImage());
-        else
-            thumb = img;
-        item->SetImage(thumb);
-        item->setCheckable(true);
-        item->setChecked(MythUIButtonListItem::NotChecked);
-        QFileInfo fi((*i)->GetCommandline());
-        if (findTreeGrabberInDB(fi.fileName(), VIDEO_FILE))
-            item->setChecked(MythUIButtonListItem::FullChecked);
+            item->SetText((*i)->GetTitle(), "title");
+            item->SetData(qVariantFromValue(*i));
+            QString img = (*i)->GetImage();
+            QString thumb;
+            if (!img.startsWith("/") && !img.isEmpty())
+                thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                                .arg((*i)->GetImage());
+            else
+                thumb = img;
+            item->SetImage(thumb);
+            item->setCheckable(true);
+            item->setChecked(MythUIButtonListItem::NotChecked);
+            QFileInfo fi((*i)->GetCommandline());
+
+            if (findTreeGrabberInDB(fi.fileName(), VIDEO_FILE))
+                item->setChecked(MythUIButtonListItem::FullChecked);
         }
-        else
-            delete item;
     }
 }
 

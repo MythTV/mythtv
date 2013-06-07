@@ -16,7 +16,7 @@
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
 #include <mythdialogbox.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 #include <mythdate.h>
 

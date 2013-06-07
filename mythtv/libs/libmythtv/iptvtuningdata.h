@@ -74,6 +74,8 @@ class MTV_PUBLIC IPTVTuningData
     QString GetDeviceKey(void) const
     {
         const QUrl u = GetDataURL();
+        if (IsHLS())
+            return u.toString();
         return QString("%1:%2:%3")
             .arg(u.host()).arg(u.userInfo()).arg(u.port()).toLower();
     }
@@ -131,7 +133,15 @@ class MTV_PUBLIC IPTVTuningData
 
     uint GetURLCount(void) const { return 3; }
 
-    bool IsValid(void) const { return m_data_url.port() != -1; }
+    bool IsHLS(void) const
+    {
+        return m_data_url.scheme().startsWith("http") && m_data_url.isValid();
+    }
+
+    bool IsValid(void) const
+    {
+        return IsHLS() || m_data_url.port() != -1;
+    }
 
   public:
     QUrl m_data_url;

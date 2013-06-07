@@ -2,14 +2,13 @@
 #define MYTHNEWS_H
 
 // MythTV headers
-#include <httpcomms.h>
 #include <mythscreentype.h>
 
 // MythNews headers
 #include "newssite.h"
 
 class QTimer;
-class HtppComms;
+class HttpComms;
 class MythUIText;
 class MythUIImage;
 class MythDialogBox;

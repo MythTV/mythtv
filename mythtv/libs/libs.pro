@@ -36,8 +36,12 @@ SUBDIRS += libmythprotoserver
 libmythprotoserver.depends = $$LIBMYTHTVDEPS libmythtv
 
 # unit tests
-SUBDIRS += $$files(lib*/test)
+libmythbase-test.depends = sub-libmythbase
+libmythbase-test.target = buildtest
+libmythbase-test.commands = cd libmythbase/test && $(QMAKE) && $(MAKE)
+unix:QMAKE_EXTRA_TARGETS += libmythbase-test
 
+unittest.depends = libmythbase-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

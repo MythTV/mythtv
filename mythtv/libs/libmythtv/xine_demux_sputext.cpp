@@ -887,7 +887,10 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
             }
         }
         *q = '\0';
-        current->text[current->lines] = strdup(line1);
+        if (current->lines < SUB_MAX_TEXT)
+            current->text[current->lines] = strdup(line1);
+        else
+            printf ("Too many lines in a subtitle\n");
     }
     current->lines++;
     return current;

@@ -131,7 +131,7 @@ static void SetupMenuCallback(void* data, QString& selection)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythSystemEventEditor *msee = new MythSystemEventEditor(
+        MythSystemLegacyEventEditor *msee = new MythSystemLegacyEventEditor(
                                     mainStack, "System Event Editor");
 
         if (msee->Create())

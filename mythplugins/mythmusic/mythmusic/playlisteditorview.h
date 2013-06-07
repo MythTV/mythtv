@@ -94,6 +94,8 @@ class PlaylistEditorView : public MusicCommon
     void getSmartPlaylists(MusicGenericTree *node);
     void getSmartPlaylistTracks(MusicGenericTree *node, int playlistID);
 
+    void getCDTracks(MusicGenericTree *node);
+
     void updateSelectedTracks(void);
     void updateSelectedTracks(MusicGenericTree *node);
     void updateSonglist(MusicGenericTree *node);

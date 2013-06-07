@@ -926,7 +926,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         DONE_WITH_PSIP_PACKET();
     }
 
-    // Don't do validation on tables withotu CRC
+    // Don't do validation on tables without CRC
     if (!psip->HasCRC())
     {
         HandleTables(tspacket->PID(), *psip);

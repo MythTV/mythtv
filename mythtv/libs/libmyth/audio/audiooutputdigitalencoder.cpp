@@ -98,7 +98,7 @@ bool AudioOutputDigitalEncoder::Init(
     AVCodec *codec;
     int ret;
 
-    LOG(VB_AUDIO, LOG_INFO, LOC + 
+    LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
@@ -219,10 +219,14 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     frame->extended_data = frame->data;
     frame->nb_samples    = av_context->frame_size;
     frame->pts           = AV_NOPTS_VALUE;
-        // init AVFrame for planar data (input is interleaved)
-    for (int j = 0, jj = 0; j < channels; j++, jj += samples_per_frame)
+
+    if (frames > 0)
     {
-        frame->data[j] = (uint8_t*)(inp + jj);
+            // init AVFrame for planar data (input is interleaved)
+        for (int j = 0, jj = 0; j < channels; j++, jj += av_context->frame_size)
+        {
+            frame->data[j] = (uint8_t*)(inp + jj);
+        }
     }
 
     while (i < frames)
@@ -246,12 +250,13 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         if (ret < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
+            avcodec_free_frame(&frame);
             return ret;
         }
-        av_free_packet(&pkt);
         i++;
         if (!got_packet)
             continue;
+        av_free_packet(&pkt);
 
         if (!m_spdifenc)
         {
@@ -270,6 +275,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                 (realloc(out, out_size, required_len));
             if (!tmp)
             {
+                avcodec_free_frame(&frame);
                 out = NULL;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
@@ -284,7 +290,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);
     }
-    av_free(frame);
+    avcodec_free_frame(&frame);
 
     memmove(in, in + i * samples_per_frame, inlen);
     return outlen;

@@ -260,9 +260,10 @@ void FileScanner::AddFileToDB(const QString &filename)
     LOG(VB_FILE, LOG_INFO,
         QString("Reading metadata from %1").arg(filename));
     MusicMetadata *data = MetaIO::readMetadata(filename);
-    data->setFileSize((quint64)QFileInfo(filename).size());
     if (data)
     {
+        data->setFileSize((quint64)QFileInfo(filename).size());
+
         QString album_cache_string;
 
         // Set values from cache

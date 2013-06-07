@@ -162,6 +162,11 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
       parent(p), m_fontStretch(100)
 {
+    callbacks.exec_program = NULL;
+    callbacks.exec_program_tv = NULL;
+    callbacks.configplugin = NULL;
+    callbacks.plugin = NULL;
+    callbacks.eject = NULL;
 }
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
@@ -883,12 +888,10 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 
     if (sre.exactMatch(geometry))
     {
-        sre.indexIn(geometry);
         geo = sre.capturedTexts();
     }
     else if (lre.exactMatch(geometry))
     {
-        lre.indexIn(geometry);
         geo = lre.capturedTexts();
         longForm = true;
     }
@@ -1512,7 +1515,10 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
     {
         // Now compare the time on the source versus our cached copy
         if (!(cacheMode & kCacheIgnoreDisk))
-            FindThemeFile(srcfile);
+        {
+            if (!FindThemeFile(srcfile))
+                return NULL;
+        }
 
         QDateTime srcLastModified;
         QFileInfo original(srcfile);

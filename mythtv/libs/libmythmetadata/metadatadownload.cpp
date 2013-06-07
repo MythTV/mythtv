@@ -8,7 +8,7 @@
 #include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "storagegroup.h"
 #include "metadatadownload.h"
 #include "mythmiscutil.h"
@@ -249,7 +249,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    MythSystem grabber(cmd, args, kMSNoRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(cmd, args, kMSStdOut);
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
@@ -311,7 +311,7 @@ bool MetadataDownload::runGrabberTest(const QString &grabberpath)
     QStringList args;
     args.append("-t");
 
-    MythSystem grabber(grabberpath, args, kMSNoRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(grabberpath, args, kMSStdOut);
 
     grabber.Run();
     uint exitcode = grabber.Wait();

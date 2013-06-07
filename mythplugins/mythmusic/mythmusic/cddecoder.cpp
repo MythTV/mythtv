@@ -231,7 +231,10 @@ bool CdDecoder::initialize()
             m_end = end2;
         }
 
-        m_paranoia = cdio_paranoia_init(m_device);
+        // FIXME can't use cdio_paranoia until we find a way to cleanly
+        // detect when the user has ejected a CD otherwise we enter a
+        // recursive loop in cdio_paranoia_read_limited()
+        //m_paranoia = cdio_paranoia_init(m_device);
         if (NULL != m_paranoia)
         {
             cdio_paranoia_modeset(m_paranoia, PARANOIA_MODE_DISABLE);
@@ -239,7 +242,7 @@ bool CdDecoder::initialize()
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, "Warn: CD reading with paranoia is disabled");
+            LOG(VB_GENERAL, LOG_WARNING, "CD reading with paranoia is disabled");
         }
     }
     else
@@ -375,6 +378,9 @@ void CdDecoder::run()
                                 arg(m_curpos).arg(c));
                             memset( &m_output_buf[m_output_at],
                                 0, CDIO_CD_FRAMESIZE_RAW);
+
+                            // stop if we got an error
+                            m_user_stop = true;
                         }
                     }
 
@@ -511,18 +517,6 @@ MusicMetadata* CdDecoder::getMetadata(int track)
 {
     m_settracknum = track;
     return getMetadata();
-}
-
-//public
-MusicMetadata *CdDecoder::getLastMetadata()
-{
-    for(int i = getNumTracks(); i > 0; --i)
-    {
-        MusicMetadata *m = getMetadata(i);
-        if(m)
-            return m;
-    }
-    return NULL;
 }
 
 // Create a TOC
@@ -786,45 +780,6 @@ MusicMetadata *CdDecoder::getMetadata()
 
     return m;
 }
-
-// virtual
-void CdDecoder::commitMetadata(MusicMetadata *mdata)
-{
-    QMutexLocker lock(&getCdioMutex());
-
-    StCdioDevice cdio(m_devicename);
-    if (!cdio)
-        return;
-
-    Cddb::Toc toc;
-    GetToc(cdio, toc);
-
-    unsigned secs;
-    Cddb::discid_t discID = Cddb::Discid(secs, toc.data(), toc.size() - 1);
-
-    Cddb::Album album(discID, mdata->Genre().toLower().toUtf8());
-    if (!Cddb::Read(album, album.discGenre, discID))
-        album.toc = toc;
-
-    album.isCompilation = mdata->Compilation();
-    if (!mdata->Compilation())
-        album.artist = mdata->Artist();
-    else if (mdata->CompilationArtist() != album.artist)
-        album.artist = mdata->CompilationArtist();
-
-    album.title = mdata->Album();
-    album.year = mdata->Year();
-
-    if (album.tracks.size() < m_tracknum)
-        album.tracks.resize(m_tracknum);
-
-    Cddb::Track& track = album.tracks[m_tracknum - 1];
-    track.title = mdata->Title();
-    track.artist = mdata->Artist();
-
-    Cddb::Write(album);
-}
-
 
 // pure virtual
 bool CdDecoderFactory::supports(const QString &source) const

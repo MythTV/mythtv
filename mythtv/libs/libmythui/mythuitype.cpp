@@ -182,6 +182,9 @@ void MythUIType::DeleteChild(const QString &name)
  */
 void MythUIType::DeleteChild(MythUIType *child)
 {
+    if (!child)
+        return;
+
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
 
     while (it.hasNext())

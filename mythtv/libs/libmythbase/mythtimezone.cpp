@@ -301,41 +301,6 @@ QString getTimeZoneID(void)
     return zone_id;
 }
 
-/* Helper function for checkTimeZone() that compares zone ID's.
-   In the event that the zone ID's differ, checks to see if the local
-   zoneinfo database has both zone ID's and if they're equivalent. */
-static bool compare_zone_IDs(QString firstZoneID, QString secondZoneID)
-{
-    // Some distros use spaces rather than underscores in the zone ID, so
-    // allow matches where the only difference is space vs. underscore.
-    firstZoneID.replace(' ', '_');
-    secondZoneID.replace(' ', '_');
-    if (firstZoneID == secondZoneID)
-        return true;
-
-    // Although the zone ID names don't match, they may refer to equivalent
-    // rules, so compare the files
-    QString zoneinfo_dir_path("/usr/share/zoneinfo");
-    QFileInfo firstInfo(zoneinfo_dir_path + "/" + firstZoneID);
-    QFileInfo secondInfo(zoneinfo_dir_path + "/" + secondZoneID);
-    if (compare_zone_files(firstInfo, secondInfo))
-        return true;
-
-    return false;
-}
-
-static void print_timezone_info(QString master_zone_id, QString local_zone_id,
-                                int master_utc_offset, int local_utc_offset,
-                                QString master_time, QString local_time)
-{
-    LOG(VB_GENERAL, LOG_NOTICE,
-        QString("Detected time zone settings:\n"
-            "    Master: Zone ID: '%1', UTC Offset: '%2', Current Time: '%3'\n"
-            "     Local: Zone ID: '%4', UTC Offset: '%5', Current Time: '%6'\n")
-            .arg(master_zone_id).arg(master_utc_offset).arg(master_time)
-            .arg(local_zone_id).arg(local_utc_offset).arg(local_time));
-}
-
 /** \fn checkTimeZone()
  *  \brief Verifies the time zone settings on this system agree with those
  *         on the master backend
@@ -343,112 +308,12 @@ static void print_timezone_info(QString master_zone_id, QString local_zone_id,
 bool checkTimeZone(void)
 {
     return true;
-
-    if (gCoreContext->IsMasterBackend())
-        return true;
-
-    QStringList master_settings(QString("QUERY_TIME_ZONE"));
-    if (!gCoreContext->SendReceiveStringList(master_settings))
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-            "Unable to determine master backend time zone "
-            "settings.  If those settings differ from local "
-            "settings, some functionality will fail.");
-        return true;
-    }
-
-    return checkTimeZone(master_settings);
 }
 
 /// This overloaded version allows for the use of an existing (not managed by
 /// MythContext) connection to the backend.
 bool checkTimeZone(const QStringList &master_settings)
 {
-    return true;
-
-    QDateTime local_time = QDateTime::currentDateTime();
-    QString local_time_string = local_time.toString(Qt::ISODate);
-
-    bool have_zone_IDs = true;
-
-    QString master_time_zone_ID = master_settings[0];
-    int master_utc_offset       = master_settings[1].toInt();
-    QString master_time_string  = master_settings[2];
-    QString local_time_zone_ID  = getTimeZoneID();
-    int local_utc_offset        = calc_utc_offset();
-
-    if (master_time_zone_ID == "UNDEF")
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-            "Unable to determine master backend time zone "
-            "settings. If local time zone settings differ "
-            "from master backend settings, some functionality will fail.");
-        have_zone_IDs = false;
-    }
-    if (local_time_zone_ID == "UNDEF")
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-             "Unable to determine local time zone settings. "
-             "If local time zone settings differ from "
-             "master backend settings, some functionality will fail.");
-        have_zone_IDs = false;
-    }
-
-    if (have_zone_IDs &&
-        !compare_zone_IDs(master_time_zone_ID, local_time_zone_ID))
-    {
-        LOG(VB_GENERAL, LOG_CRIT, "Time zone settings on the master backend "
-                                  "differ from those on this system.");
-
-        print_timezone_info(master_time_zone_ID, local_time_zone_ID,
-                            master_utc_offset, local_utc_offset,
-                            master_time_string, local_time_string);
-        return false;
-    }
-
-    // Verify offset
-    if (master_utc_offset != local_utc_offset)
-    {
-        LOG(VB_GENERAL, LOG_CRIT, "UTC offset on the master backend differs "
-                                  "from offset on this system.");
-
-        print_timezone_info(master_time_zone_ID, local_time_zone_ID,
-                            master_utc_offset, local_utc_offset,
-                            master_time_string, local_time_string);
-        return false;
-    }
-
-    // Verify current time
-    if (master_time_string == "UNDEF")
-    {
-        LOG(VB_GENERAL, LOG_CRIT,
-            "Unable to determine current time on the master "
-            "backend . If local time or time zone settings "
-            "differ from those on the master backend, some "
-            "functionality will fail.");
-    }
-    else
-    {
-        QDateTime master_time = MythDate::fromString(master_time_string);
-        uint timediff = abs(master_time.secsTo(local_time));
-        if (timediff > 300)
-        {
-            LOG(VB_GENERAL, LOG_CRIT, "Current time on the master backend "
-                                      "differs from time on this system.");
-            print_timezone_info(master_time_zone_ID, local_time_zone_ID,
-                                master_utc_offset, local_utc_offset,
-                                master_time_string, local_time_string);
-            return false;
-        }
-        else if (timediff > 20)
-        {
-            LOG(VB_GENERAL, LOG_CRIT,
-                    QString("Warning! Time difference between the master "
-                            "backend and this system is %1 seconds.")
-                    .arg(timediff));
-        }
-    }
-
     return true;
 }
 

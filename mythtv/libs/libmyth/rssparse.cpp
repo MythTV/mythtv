@@ -57,9 +57,10 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
     m_customhtml = customhtml;
 }
 
-ResultItem::ResultItem()
+ResultItem::ResultItem() :
+    m_date(QDateTime()), m_filesize(0), m_width(0), m_height(0),
+    m_downloadable(false), m_season(0), m_episode(0), m_customhtml(false)
 {
-    m_date = QDateTime();
 }
 
 ResultItem::~ResultItem()
@@ -204,6 +205,9 @@ class MRSSParser
         QList<MRSSComment> Comments;
         QList<MRSSPeerLink> PeerLinks;
         QList<MRSSScene> Scenes;
+
+        ArbitraryLocatedData() : RatingAverage(0), RatingCount(0), RatingMin(0),
+                                 RatingMax(0), Views(0), Favs(0) {}
 
         /**  Updates *this's fields according to the
          * child. Some kind of merge.
@@ -655,29 +659,27 @@ private:
             }
         }
 
-        ArbitraryLocatedData result =
-        {
-            GetURL(element),
-            rating,
-            rscheme,
-            GetTitle(element),
-            GetDescription(element),
-            GetKeywords(element),
-            curl,
-            ctext,
-            raverage,
-            rcount,
-            rmin,
-            rmax,
-            views,
-            favs,
-            tags,
-            GetThumbnails(element),
-            GetCredits(element),
-            GetComments(element),
-            GetPeerLinks(element),
-            GetScenes(element)
-        };
+        ArbitraryLocatedData result;
+        result.URL = GetURL(element);
+        result.Rating = rating;
+        result.RatingScheme = rscheme;
+        result.Title = GetTitle(element);
+        result.Description = GetDescription(element);
+        result.Keywords = GetKeywords(element);
+        result.CopyrightURL = curl;
+        result.CopyrightText = ctext;
+        result.RatingAverage = raverage;
+        result.RatingCount = rcount;
+        result.RatingMin = rmin;
+        result.RatingMax = rmax;
+        result.Views = views;
+        result.Favs = favs;
+        result.Tags = tags;
+        result.Thumbnails = GetThumbnails(element);
+        result.Credits = GetCredits(element);
+        result.Comments = GetComments(element);
+        result.PeerLinks = GetPeerLinks(element);
+        result.Scenes = GetScenes(element);
 
         return result;
     }

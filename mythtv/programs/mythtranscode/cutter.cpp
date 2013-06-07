@@ -191,7 +191,18 @@ bool Cutter::InhibitDropFrame()
         // amount to drop is sufficient then we can drop less
         // audio rather than drop a frame
         audioFramesToCut -= (int64_t)(audioFramesPerVideoFrame + 0.5);
-        return true;
+
+        // But if it's a frame we are supposed to drop anyway, still do so,
+        // and record that we have
+        if (videoFramesToCut > 0)
+        {
+            videoFramesToCut-- ;
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     else
     {

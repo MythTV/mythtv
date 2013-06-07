@@ -1,3 +1,3 @@
 #include "test_mythtimer.h"
 
-QTEST_MAIN(TestMythTimer)
+QTEST_APPLESS_MAIN(TestMythTimer)

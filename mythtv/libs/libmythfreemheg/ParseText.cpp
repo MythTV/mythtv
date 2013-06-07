@@ -800,12 +800,13 @@ void MHParseText::NextSym()
                             Error("Insufficient memory");
                         }
 
+                        m_String = str;
                         m_String[0] = colourTable[i].r;
                         m_String[1] = colourTable[i].g;
                         m_String[2] = colourTable[i].b;
                         m_String[3] = colourTable[i].t;
-                        m_String = str;
                         m_nStringLength = 4;
+                        m_String[m_nStringLength] = 0;
                         return;
                     }
                 }

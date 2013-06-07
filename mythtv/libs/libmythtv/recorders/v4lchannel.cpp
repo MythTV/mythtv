@@ -706,8 +706,6 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
     if ((cfield == -1) || (sfield == -1))
         return false;
 
-    int field = (cfield + sfield) & 0xFFFF;
-
     QString loc = LOC +
         QString("InitPictureAttribute(%1): ").arg(db_col_name, 10);
 
@@ -745,7 +743,7 @@ bool V4LChannel::InitPictureAttribute(const QString db_col_name)
     }
 
     int dfield = pict_attr_default[db_col_name];
-    field      = (cfield + sfield + dfield) & 0xFFFF;
+    int field  = (cfield + sfield + dfield) & 0xFFFF;
     int value0 = (int) ((scl_range * field) + qctrl.minimum);
     int value1 = min(value0, (int)qctrl.maximum);
     ctrl.value = max(value1, (int)qctrl.minimum);

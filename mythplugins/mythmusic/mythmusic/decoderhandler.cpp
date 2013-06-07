@@ -165,16 +165,16 @@ void DecoderIOFactorySG::start(void)
 
 /**********************************************************************/
 
-DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent) : DecoderIOFactory(parent)
+DecoderIOFactoryUrl::DecoderIOFactoryUrl(DecoderHandler *parent)
+    : DecoderIOFactory(parent), m_started(false),
+    m_accessManager(new QNetworkAccessManager(this)),
+    m_reply(NULL), m_input(new MusicIODevice()),
+    m_redirectCount(0), m_bytesWritten(0)
+
 {
-    m_accessManager = new QNetworkAccessManager(this);
-    m_input = new MusicIODevice();
     connect(m_input, SIGNAL(freeSpaceAvailable()), SLOT(readyRead()));
 
     m_input->open(QIODevice::ReadWrite);
-
-    m_bytesWritten = 0;
-    m_redirectCount = 0;
 }
 
 DecoderIOFactoryUrl::~DecoderIOFactoryUrl(void)

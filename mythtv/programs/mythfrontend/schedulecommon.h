@@ -25,6 +25,8 @@ class ScheduleCommon : public MythScreenType
     void ShowUpcoming(const QString &title, const QString &seriesid) const;
     void ShowUpcoming(ProgramInfo *pginfo) const;
     void ShowUpcomingScheduled(ProgramInfo *pginfo) const;
+    void ShowPrevious(ProgramInfo *pginfo) const;
+    void ShowPrevious(uint recordid, const QString &title) const;
     void QuickRecord(ProgramInfo *pginfo);
     void EditRecording(ProgramInfo *pginfo);
     void EditScheduled(ProgramInfo *pginfo);

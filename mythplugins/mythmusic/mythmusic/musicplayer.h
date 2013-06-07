@@ -15,7 +15,6 @@
 class AudioOutput;
 class MainVisual;
 class Playlist;
-class CDWatcherThread;
 
 class MusicPlayerEvent : public MythEvent
 {
@@ -53,7 +52,7 @@ class MusicPlayer : public QObject, public MythObservable
     Q_OBJECT
 
   public:
-     MusicPlayer(QObject *parent, const QString &dev);
+     MusicPlayer(QObject *parent);
     ~MusicPlayer(void);
 
     enum PlayMode
@@ -72,8 +71,6 @@ class MusicPlayer : public QObject, public MythObservable
 
     void addVisual(MainVisual *visual);
     void removeVisual(MainVisual *visual);
-
-    void setCDDevice(const QString &dev) { m_CDdevice = dev; }
 
     void      toggleMute(void);
     MuteState getMuteState(void) const;
@@ -209,8 +206,6 @@ class MusicPlayer : public QObject, public MythObservable
 
     QSet<QObject*>  m_visualisers;
 
-    QString      m_CDdevice;
-
     PlayMode     m_playMode;
     bool         m_isPlaying;
     bool         m_isAutoplay;
@@ -228,9 +223,6 @@ class MusicPlayer : public QObject, public MythObservable
 
     float        m_playSpeed;
 
-    // cd stuff
-    CDWatcherThread *m_cdWatcher;
-
     // radio stuff
     QList<MusicMetadata*>  m_playedList;
     int               m_lastTrackStart;
@@ -244,25 +236,7 @@ Q_DECLARE_METATYPE(MusicPlayer::ShuffleMode);
 // This global variable contains the MusicPlayer instance for the application
 extern MPUBLIC MusicPlayer *gPlayer;
 
-
-///////////////////////////////////////////////////////////////////////////////
-
-class CDWatcherThread : public QThread
-{
-  public:
-
-    CDWatcherThread(const QString &dev);
-    virtual void run(void);
-    bool    statusChanged(void) { return m_cdStatusChanged; }
-    QMutex *getLock(void) { return &m_musicLock; }
-    void    stop(void) { m_stopped = true; }
-
-  private:
-
-    bool    m_stopped;
-    QString m_cdDevice;
-    bool    m_cdStatusChanged;
-    QMutex  m_musicLock;
-};
+ // This stores the last MythMediaDevice that was detected:
+extern MPUBLIC QString gCDdevice;
 
 #endif

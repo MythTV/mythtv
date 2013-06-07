@@ -64,7 +64,12 @@ void MHParseBinary::ParseString(int endStr, MHOctetString &str)
     }
 
     int nLength = endStr - m_p;
-    unsigned char *stringValue = (unsigned char *)malloc(endStr - m_p);
+    unsigned char *stringValue = (unsigned char *)malloc(nLength + 1);
+    if (stringValue == NULL)
+    {
+        MHERROR("Out of memory");
+    }
+
     unsigned char *p = stringValue;
 
     while (m_p < endStr)
@@ -231,6 +236,8 @@ MHParseNode *MHParseBinary::DoParse()
                         int intVal = ParseInt(endOfItem); // May raise an exception
                         pNode->AddArg(new MHPEnum(intVal));
                     }
+
+                    break;
                 }
 
                 case C_INITIAL_PORTION:
@@ -265,6 +272,8 @@ MHParseNode *MHParseBinary::DoParse()
                         int intVal = ParseInt(endOfItem); // May raise an exception
                         pNode->AddArg(new MHPInt(intVal));
                     }
+
+                    break;
                 }
 
                 case C_OBJECT_INFORMATION:
@@ -280,6 +289,7 @@ MHParseNode *MHParseBinary::DoParse()
                     MHOctetString str;
                     ParseString(endOfItem, str);
                     pNode->AddArg(new MHPString(str));
+                    break;
                 }
 
                 default:

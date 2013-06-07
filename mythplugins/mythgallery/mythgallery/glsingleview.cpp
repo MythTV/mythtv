@@ -100,6 +100,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f),
       m_effect_kenBurns_image_ready(true),
+      m_effect_kenBurns_item(NULL),
       m_effect_kenBurns_initialized(false),
       m_effect_kenBurns_new_image_started(true)
 {

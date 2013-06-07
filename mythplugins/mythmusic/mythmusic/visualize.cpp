@@ -544,10 +544,8 @@ static class StereoScopeFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new StereoScope();
     }
 }StereoScopeFactory;
@@ -572,10 +570,8 @@ static class MonoScopeFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new MonoScope();
     }
 }MonoScopeFactory;
@@ -672,7 +668,7 @@ bool Spectrum::process(VisualNode *node)
     // Take a bunch of data in *node
     // and break it down into spectrum
     // values
-    bool allZero = true;
+    bool MUNUSED allZero = true;
 
     uint i;
     long w = 0, index;
@@ -819,10 +815,8 @@ static class SpectrumFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new Spectrum();
     }
 }SpectrumFactory;
@@ -913,10 +907,8 @@ static class SquaresFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new Squares();
     }
 }SquaresFactory;
@@ -1116,10 +1108,8 @@ bool Piano::process(VisualNode *node)
     return false;
 }
 
-bool Piano::process_all_types(VisualNode *node, bool this_will_be_displayed)
+bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 {
-    (void) this_will_be_displayed;
-
     // Take a bunch of data in *node and break it down into piano key spectrum values
     // NB: Remember the state data between calls, so as to accumulate more accurate results.
     bool allZero = true;
@@ -1385,10 +1375,8 @@ static class PianoFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new Piano();
     }
 }PianoFactory;
@@ -1457,9 +1445,8 @@ void AlbumArt::resize(const QSize &newsize)
     m_size = newsize;
 }
 
-bool AlbumArt::process(VisualNode *node)
+bool AlbumArt::process(VisualNode */*node*/)
 {
-    (void) node;
     return false;
 }
 
@@ -1585,10 +1572,8 @@ static class AlbumArtFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void) parent;
-        (void)pluginName;
         return new AlbumArt();
     }
 }AlbumArtFactory;
@@ -1609,9 +1594,8 @@ void Blank::resize(const QSize &newsize)
 }
 
 
-bool Blank::process(VisualNode *node)
+bool Blank::process(VisualNode MUNUSED *node)
 {
-    node = node; // Sometimes I hate -Wall
     return false;
 }
 
@@ -1638,10 +1622,8 @@ static class BlankFactory : public VisFactory
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual */*parent*/, const QString &/*pluginName*/) const
     {
-        (void)parent;
-        (void)pluginName;
         return new Blank();
     }
 }BlankFactory;

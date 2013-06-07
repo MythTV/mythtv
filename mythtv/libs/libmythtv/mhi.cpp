@@ -52,7 +52,7 @@ class MHIImageData
 
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(new Dsmcc()),
-      m_keyProfile(0),
+      m_notify(0),          m_keyProfile(0),
       m_engine(MHCreateEngine(this)), m_stop(false),
       m_updated(false),
       m_face_loaded(false), m_engineThread(NULL), m_currentChannel(-1),

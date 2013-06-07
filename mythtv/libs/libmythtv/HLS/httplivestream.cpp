@@ -19,7 +19,11 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdio.h>
+// POSIX headers
+#include <unistd.h> // for usleep
+
+// C headers
+#include <cstdio>
 
 #include <QDir>
 #include <QFile>
@@ -33,7 +37,7 @@
 #include "mythdirs.h"
 #include "mythtimer.h"
 #include "mthreadpool.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "storagegroup.h"

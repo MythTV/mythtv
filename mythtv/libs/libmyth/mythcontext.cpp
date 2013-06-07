@@ -36,7 +36,7 @@ using namespace std;
 #include "mythxmlclient.h"
 #include "upnp.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythmiscutil.h"
 
 #include "mythplugin.h"

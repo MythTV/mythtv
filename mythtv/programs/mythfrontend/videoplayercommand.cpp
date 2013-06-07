@@ -3,7 +3,7 @@
 #include "mythcontext.h"
 
 #include "mythmainwindow.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "remoteutil.h"
 #include "lcddevice.h"
 #include "mythmiscutil.h"
@@ -133,20 +133,20 @@ class VideoPlayHandleMedia : public VideoPlayProc
 
 ////////////////////////////////////////////////////////////////////////
 
-class VideoPlayMythSystem : public VideoPlayProc
+class VideoPlayMythSystemLegacy : public VideoPlayProc
 {
   private:
-    VideoPlayMythSystem(const QString &disp_command,
+    VideoPlayMythSystemLegacy(const QString &disp_command,
             const QString &play_command) :
         m_display_command(disp_command), m_play_command(play_command)
     {
     }
 
   public:
-    static VideoPlayMythSystem *Create(const QString &command,
+    static VideoPlayMythSystemLegacy *Create(const QString &command,
             const QString &filename)
     {
-        return new VideoPlayMythSystem(command,
+        return new VideoPlayMythSystemLegacy(command,
                 ExpandPlayCommand(command, filename));
     }
 
@@ -166,9 +166,9 @@ class VideoPlayMythSystem : public VideoPlayProc
         return m_display_command;
     }
 
-    VideoPlayMythSystem *Clone() const
+    VideoPlayMythSystemLegacy *Clone() const
     {
-        return new VideoPlayMythSystem(*this);
+        return new VideoPlayMythSystemLegacy(*this);
     }
 
   private:
@@ -351,7 +351,7 @@ class VideoPlayerCommandPrivate
         m_player_procs.push_back(VideoPlayHandleMedia::Create(player, filename,
                         plot, title, subtitle, director, season, episode, inetref,
                         length, year, id));
-        m_player_procs.push_back(VideoPlayMythSystem::Create(player, filename));
+        m_player_procs.push_back(VideoPlayMythSystemLegacy::Create(player, filename));
     }
 
   private:

@@ -67,36 +67,28 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     class UIGTCon
     {
       public:
-        UIGTCon() { arrow = recType = recStat = 0; };
+        UIGTCon() { m_arrow = m_recType = m_recStat = 0; };
         UIGTCon(const QRect &drawArea, const QString &title,
-                const QString &category, int arrow, int recType, int recStat)
-        {
-            this->drawArea = drawArea;
-            this->title = title;
-            this->category = category.trimmed();
-            this->arrow = arrow;
-            this->recType = recType;
-            this->recStat = recStat;
-        }
+                const QString &category, int arrow, int recType, int recStat) :
+                m_drawArea(drawArea),               m_title(title),
+                m_category(category.trimmed()),     m_arrow(arrow),
+                m_recType(recType),                 m_recStat(recStat)
+        {}
 
-        UIGTCon(const UIGTCon &o)
-        {
-            drawArea = o.drawArea;
-            title = o.title;
-            category = o.category;
-            categoryColor = o.categoryColor;
-            arrow = o.arrow;
-            recType = o.recType;
-            recStat = o.recStat;
-        }
+        UIGTCon(const UIGTCon &o) :
+                m_drawArea(o.m_drawArea),   m_title(o.m_title),
+                m_category(o.m_category),   m_categoryColor(o.m_categoryColor),
+                m_arrow(o.m_arrow),         m_recType(o.m_recType),
+                m_recStat(o.m_recStat)
+        {}
 
-        QRect drawArea;
-        QString title;
-        QString category;
-        QColor categoryColor;
-        int arrow;
-        int recType;
-        int recStat;
+        QRect m_drawArea;
+        QString m_title;
+        QString m_category;
+        QColor m_categoryColor;
+        int m_arrow;
+        int m_recType;
+        int m_recStat;
     };
 
     void drawBackground(MythPainter *p, UIGTCon *data, int alpaMod);
@@ -107,8 +99,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     QColor calcColor(const QColor &color, int alpha);
 
-    QList<UIGTCon*> *allData;
-    UIGTCon selectedItem;
+    QList<UIGTCon*> *m_allData;
+    UIGTCon m_selectedItem;
 
     MythImage *m_recImages[RECSTATUSSIZE];
     MythImage *m_arrowImages[ARROWIMAGESIZE];
@@ -117,29 +109,32 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     int  m_channelCount;
     int  m_timeCount;
     bool m_verticalLayout;
-    int  m_categoryAlpha;
     QPoint m_textOffset;
+
+    MythFontProperties *m_font;
     int    m_justification;
     bool   m_multilineText;
-    MythFontProperties *m_font;
-    QColor m_solidColor;
+    bool   m_cutdown;
 
     QString m_selType;
     QPen    m_drawSelLine;
     QBrush  m_drawSelFill;
 
+    QColor m_solidColor;
     QColor m_recordingColor;
     QColor m_conflictingColor;
 
     int    m_fillType;
-    bool   m_cutdown;
-    bool   m_drawCategoryColors;
-    bool   m_drawCategoryText;
-
-    QMap<QString, QColor> categoryColors;
 
     int  m_rowCount;
     int  m_progPastCol;
+
+    bool   m_drawCategoryColors;
+    bool   m_drawCategoryText;
+    int    m_categoryAlpha;
+
+    QMap<QString, QColor> m_categoryColors;
+
 };
 
 #endif

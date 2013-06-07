@@ -45,7 +45,7 @@ static bool operator<(const SortData &lhs, const SortData &rhs)
     return ret < 0;
 }
 
-VideoMetadata::SortKey::SortKey() : m_sd(0)
+VideoMetadata::SortKey::SortKey() : m_sd(NULL)
 {
 }
 
@@ -54,7 +54,7 @@ VideoMetadata::SortKey::SortKey(const SortData &data)
     m_sd = new SortData(data);
 }
 
-VideoMetadata::SortKey::SortKey(const SortKey &other)
+VideoMetadata::SortKey::SortKey(const SortKey &other) : m_sd(NULL)
 {
     *this = other;
 }
@@ -1142,7 +1142,7 @@ VideoMetadata::VideoMetadata(MSqlQuery &query)
     m_imp = new VideoMetadataImp(query);
 }
 
-VideoMetadata::VideoMetadata(const VideoMetadata &rhs)
+VideoMetadata::VideoMetadata(const VideoMetadata &rhs) : m_imp(NULL)
 {
     *this = rhs;
 }

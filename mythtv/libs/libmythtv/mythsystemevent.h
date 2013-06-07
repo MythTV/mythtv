@@ -8,29 +8,29 @@
 #include "recordinginfo.h"
 #include "rawsettingseditor.h"
 
-// Helper commands for formatting and sending a MythSystemEvent
-MTV_PUBLIC void SendMythSystemRecEvent(const QString msg,
+// Helper commands for formatting and sending a MythSystemLegacyEvent
+MTV_PUBLIC void SendMythSystemLegacyRecEvent(const QString msg,
                                     const RecordingInfo *pginfo);
-MTV_PUBLIC void SendMythSystemPlayEvent(const QString msg,
+MTV_PUBLIC void SendMythSystemLegacyPlayEvent(const QString msg,
                                      const ProgramInfo *pginfo);
 
-/** \class MythSystemEventHandler
- *  \brief Handles incoming MythSystemEvent messages
+/** \class MythSystemLegacyEventHandler
+ *  \brief Handles incoming MythSystemLegacyEvent messages
  *
- *  MythSystemEventHandler handles incoming MythSystemEvent messages and runs
+ *  MythSystemLegacyEventHandler handles incoming MythSystemLegacyEvent messages and runs
  *  the appropriate event handler command on the local system if one is
  *  configured.
  */
-class MTV_PUBLIC MythSystemEventHandler : public QObject
+class MTV_PUBLIC MythSystemLegacyEventHandler : public QObject
 {
     Q_OBJECT
 
   public:
     // Constructor
-    MythSystemEventHandler();
+    MythSystemLegacyEventHandler();
 
     // Destructor
-   ~MythSystemEventHandler();
+   ~MythSystemLegacyEventHandler();
 
   private:
     // Helpers for converting incoming events to command lines
@@ -41,18 +41,18 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
     void customEvent(QEvent *e);
 };
 
-/** \class MythSystemEventEditor
- *  \brief An editor for MythSystemEvent handler commands
+/** \class MythSystemLegacyEventEditor
+ *  \brief An editor for MythSystemLegacyEvent handler commands
  *
  *  This class extends RawSettingsEditor and automatically populates the
- *  settings list with the MythSystemEvent handler command settings names.
+ *  settings list with the MythSystemLegacyEvent handler command settings names.
  */
-class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
+class MTV_PUBLIC MythSystemLegacyEventEditor : public RawSettingsEditor
 {
     Q_OBJECT
 
   public:
-    MythSystemEventEditor(MythScreenStack *parent, const char *name = 0);
+    MythSystemLegacyEventEditor(MythScreenStack *parent, const char *name = 0);
 };
 
 #endif

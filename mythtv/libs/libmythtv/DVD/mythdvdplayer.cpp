@@ -50,8 +50,16 @@ void MythDVDPlayer::DisableCaptions(uint mode, bool osd_msg)
 void MythDVDPlayer::EnableCaptions(uint mode, bool osd_msg)
 {
     if ((kDisplayAVSubtitle & mode) && player_ctx->buffer->IsDVD())
-        player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle,
-                                            GetTrack(kTrackTypeSubtitle));
+    {
+        int track = GetTrack(kTrackTypeSubtitle);
+        if (track >= 0 && track < (int)decoder->GetTrackCount(kTrackTypeSubtitle))
+        {
+            StreamInfo stream = decoder->GetTrackInfo(kTrackTypeSubtitle,
+                                                      track);
+            player_ctx->buffer->DVD()->SetTrack(kTrackTypeSubtitle,
+                                                stream.stream_id);
+        }
+    }
     MythPlayer::EnableCaptions(mode, osd_msg);
 }
 
@@ -528,7 +536,6 @@ void MythDVDPlayer::DisplayDVDButton(void)
     // clear any buttons
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0))
     {
-        SetCaptionsEnabled(false, false);
         osdLock.lock();
         if (osd)
             osd->ClearSubtitles();

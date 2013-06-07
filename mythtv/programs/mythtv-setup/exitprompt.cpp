@@ -7,7 +7,7 @@
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "remoteutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #include "checksetup.h"
 #include "exitprompt.h"

@@ -34,7 +34,9 @@ NewsSite::NewsSite(const QString   &name,
 void NewsSite::deleteLater()
 {
     QMutexLocker locker(&m_lock);
+#if QT_VERSION < 0x050000
     MythHttpPool::GetSingleton()->RemoveListener(this);
+#endif
     m_articleList.clear();
     QObject::deleteLater();
 }
@@ -42,7 +44,9 @@ void NewsSite::deleteLater()
 NewsSite::~NewsSite()
 {
     QMutexLocker locker(&m_lock);
+#if QT_VERSION < 0x050000
     MythHttpPool::GetSingleton()->RemoveListener(this);
+#endif
 }
 
 void NewsSite::insertNewsArticle(const NewsArticle &item)
@@ -68,13 +72,17 @@ void NewsSite::retrieve(void)
     m_updateErrorString = QString::null;
     m_articleList.clear();
     m_urlReq = QUrl(m_url);
+#if QT_VERSION < 0x050000
     MythHttpPool::GetSingleton()->AddUrlRequest(m_urlReq, this);
+#endif
 }
 
 void NewsSite::stop(void)
 {
     QMutexLocker locker(&m_lock);
+#if QT_VERSION < 0x050000
     MythHttpPool::GetSingleton()->RemoveUrlRequest(m_urlReq, this);
+#endif
 }
 
 bool NewsSite::successful(void) const
@@ -148,6 +156,7 @@ unsigned int NewsSite::timeSinceLastUpdate(void) const
     return min;
 }
 
+#if QT_VERSION < 0x050000
 void NewsSite::Update(QHttp::Error      error,
                       const QString    &error_str,
                       const QUrl       &url,
@@ -215,6 +224,7 @@ void NewsSite::Update(QHttp::Error      error,
 
     emit finished(this);
 }
+#endif
 
 void NewsSite::process(void)
 {

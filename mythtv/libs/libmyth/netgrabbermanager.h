@@ -11,7 +11,7 @@
 
 #include "rssparse.h"
 #include "mythexp.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 class MPUBLIC GrabberScript : public QObject, public MThread
 {
@@ -160,7 +160,7 @@ class MPUBLIC Search : public QObject
 
   private:
 
-    MythSystem             *m_searchProcess;
+    MythSystemLegacy             *m_searchProcess;
 
     QByteArray              m_data;
     QDomDocument            m_document;

@@ -496,7 +496,7 @@ void ScheduleEditor::ShowSchedInfo()
             menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Upcoming Episodes"));
         menuPopup->AddButton(tr("Upcoming Recordings"));
-        menuPopup->AddButton(tr("Previously Scheduled"));
+        menuPopup->AddButton(tr("Previously Recorded"));
 
         popupStack->AddScreen(menuPopup);
     }
@@ -581,7 +581,7 @@ void ScheduleEditor::customEvent(QEvent *event)
                 showUpcomingByTitle();
             else if (resulttext == tr("Upcoming Recordings"))
                 showUpcomingByRule();
-            else if (resulttext == tr("Previously Scheduled"))
+            else if (resulttext == tr("Previously Recorded"))
                 showPrevious();
         }
         else if (resultid == "newrecgroup")
@@ -599,13 +599,8 @@ void ScheduleEditor::showPrevious(void)
     QString title;
     if (m_recInfo)
         title = m_recInfo->GetTitle();
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, m_recordingRule->m_recordID,
-                                    title);
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+
+    ShowPrevious(m_recordingRule->m_recordID, title);
 }
 
 void ScheduleEditor::showUpcomingByRule(void)

@@ -25,8 +25,10 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
 	libs/libmythbase/version.h force
 
-all: libs/libmythbase/version.h subdirs
+all: all_no_test test
 force:
+
+all_no_test: libs/libmythbase/version.h subdirs
 
 config.mak:
 	$(error run configure to create $@)
@@ -94,5 +96,5 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/lib/mythtv
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/share/mythtv
 
-test:
-	-./programs/scripts/unittests.sh
+test: libs/libmythbase/version.h subdirs
+	-cd libs ; $(MAKE) test

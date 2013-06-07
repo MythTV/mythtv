@@ -16,7 +16,7 @@
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythuihelper.h"
 #include "lcddevice.h"
 #include "mythcorecontext.h"

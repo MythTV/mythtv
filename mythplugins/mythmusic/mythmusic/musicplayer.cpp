@@ -34,6 +34,7 @@
 #define LASTPLAY_DELAY 15
 
 MusicPlayer  *gPlayer = NULL;
+QString gCDdevice = "";
 
 ////////////////////////////////////////////////////////////////
 
@@ -49,15 +50,13 @@ QEvent::Type MusicPlayerEvent::CDChangedEvent = (QEvent::Type) QEvent::registerE
 QEvent::Type MusicPlayerEvent::PlaylistChangedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::PlayedTracksChangedEvent = (QEvent::Type) QEvent::registerEventType();
 
-MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
+MusicPlayer::MusicPlayer(QObject *parent)
     :QObject(parent)
 {
     setObjectName("MusicPlayer");
 
-    m_CDdevice = dev;
     m_output = NULL;
     m_decoderHandler = NULL;
-    m_cdWatcher = NULL;
     m_currentPlaylist = NULL;
     m_currentTrack = -1;
 
@@ -107,14 +106,6 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
 
 MusicPlayer::~MusicPlayer()
 {
-    if (m_cdWatcher)
-    {
-        m_cdWatcher->stop();
-        m_cdWatcher->wait();
-        delete m_cdWatcher;
-        m_cdWatcher = NULL;
-    }
-
     if (!hasClient())
         savePosition();
 
@@ -236,15 +227,6 @@ void MusicPlayer::loadSettings(void )
     m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
 
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
-
-    //  Do we check the CD?
-    bool checkCD = gCoreContext->GetNumSetting("AutoLookupCD");
-    if (checkCD)
-    {
-        m_cdWatcher = new CDWatcherThread(m_CDdevice);
-        // don't start the cd watcher here
-        // since the playlists haven't been loaded yet
-    }
 }
 
 // this stops playing the playlist and plays the file pointed to by mdata
@@ -295,12 +277,6 @@ void MusicPlayer::stop(bool stopAll)
         m_output->removeListener(this);
         delete m_output;
         m_output = NULL;
-    }
-
-    if (stopAll && m_cdWatcher)
-    {
-        m_cdWatcher->stop();
-        m_cdWatcher->wait();
     }
 
     // because we don't actually stop the audio output we have to fake a Stopped
@@ -709,6 +685,26 @@ void MusicPlayer::customEvent(QEvent *event)
 
             loadSettings();
         }
+        else if (me->Message().startsWith("MUSIC_METADATA_CHANGED"))
+        {
+            if (gMusicData->initialized)
+            {
+                QStringList list = me->Message().simplified().split(' ');
+                if (list.size() == 2)
+                {
+                    int songID = list[1].toInt();
+                    MusicMetadata *mdata =  gMusicData->all_music->getMetadata(songID);
+
+                    if (mdata)
+                    {
+                        mdata->reloadMetadata();
+
+                        // tell any listeners the metadata has changed for this track
+                        sendMetadataChangedEvent(songID);
+                    }
+                }
+            }
+        }
     }
 
     if (m_isAutoplay)
@@ -883,10 +879,6 @@ void MusicPlayer::loadPlaylist(void)
     }
 
     m_currentMetadata = NULL;
-
-    // now we have the playlist loaded we can start the cd watcher
-    if (m_cdWatcher)
-        m_cdWatcher->start();
 }
 
 void MusicPlayer::loadStreamPlaylist(void)
@@ -1374,7 +1366,7 @@ void MusicPlayer::decoderHandlerReady(void)
 #ifdef HAVE_CDIO
     CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(getDecoder());
     if (cddecoder)
-        cddecoder->setDevice(m_CDdevice);
+        cddecoder->setDevice(gCDdevice);
 #endif
 
     getDecoder()->setOutput(m_output);
@@ -1452,112 +1444,4 @@ void MusicPlayer::addTrack(int trackID, bool updateUI)
 StreamList  *MusicPlayer::getStreamList(void) 
 {
     return gMusicData->all_streams->getStreams();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-CDWatcherThread::CDWatcherThread(const QString &dev)
-{
-    m_cdDevice = dev;
-    m_cdStatusChanged = false;
-    m_stopped = false;
-}
-
-void CDWatcherThread::run()
-{
-#ifdef HAVE_CDIO
-    while (!m_stopped)
-    {
-        // lock all_music and cd_status_changed while running thread
-        QMutexLocker locker(getLock());
-
-        m_cdStatusChanged = false;
-
-        CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
-        decoder->setDevice(m_cdDevice);
-        int numTracks = decoder->getNumCDAudioTracks();
-        bool redo = false;
-
-        if (numTracks != gMusicData->all_music->getCDTrackCount())
-        {
-            m_cdStatusChanged = true;
-            LOG(VB_GENERAL, LOG_NOTICE, QString("CD status has changed."));
-        }
-
-        if (numTracks == 0)
-        {
-            // No CD, or no recognizable CD
-            gMusicData->all_music->clearCDData();
-            gMusicData->all_playlists->clearCDList();
-        }
-        else if (numTracks > 0)
-        {
-            // Check the last track to see if it's changed
-            MusicMetadata *checker = decoder->getLastMetadata();
-            if (checker)
-            {
-                if (!gMusicData->all_music->checkCDTrack(checker))
-                {
-                    redo = true;
-                    m_cdStatusChanged = true;
-                    gMusicData->all_music->clearCDData();
-                    gMusicData->all_playlists->clearCDList();
-                }
-                else
-                    m_cdStatusChanged = false;
-                delete checker;
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, "The cddecoder said it had audio tracks, "
-                                         "but it won't tell me about them");
-            }
-        }
-
-        int tracks = decoder->getNumTracks();
-        bool setTitle = false;
-
-        for (int actual_tracknum = 1;
-            redo && actual_tracknum <= tracks; actual_tracknum++)
-        {
-            MusicMetadata *track = decoder->getMetadata(actual_tracknum);
-            if (track)
-            {
-                gMusicData->all_music->addCDTrack(*track);
-
-                if (!setTitle)
-                {
-
-                    QString parenttitle = " ";
-                    if (track->FormatArtist().length() > 0)
-                    {
-                        parenttitle += track->FormatArtist();
-                        parenttitle += " ~ ";
-                    }
-
-                    if (track->Album().length() > 0)
-                        parenttitle += track->Album();
-                    else
-                    {
-                        parenttitle = " " + QObject::tr("Unknown");
-                        LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
-                        " CD. It may not be in the freedb database.\n"
-                        "    More likely, however, is that you need to delete\n"
-                        "    ~/.cddb and ~/.cdserverrc and restart MythMusic.");
-                    }
-                    gMusicData->all_music->setCDTitle(parenttitle);
-                    setTitle = true;
-                }
-                delete track;
-            }
-        }
-
-        delete decoder;
-
-        if (m_cdStatusChanged)
-            gPlayer->sendCDChangedEvent();
-
-        usleep(1000000);
-    }
-#endif // HAVE_CDIO
 }
