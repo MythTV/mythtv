@@ -1313,17 +1313,17 @@ Por favor, espere...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="925"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Salir y guardar miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="926"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Salir y no guardar miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="918"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>
@@ -1331,28 +1331,28 @@ Por favor, espere...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="158"/>
+        <location filename="../mytharchive/videoselector.cpp" line="160"/>
         <source>Clear All</source>
         <translation>Desmarcar todos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="159"/>
+        <location filename="../mytharchive/videoselector.cpp" line="161"/>
         <source>Select All</source>
         <translation>Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="544"/>
+        <location filename="../mytharchive/videoselector.cpp" line="546"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Debe introducir una contraseña válida para este nivel parental</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="357"/>
-        <location filename="../mytharchive/videoselector.cpp" line="487"/>
+        <location filename="../mytharchive/videoselector.cpp" line="359"/>
+        <location filename="../mytharchive/videoselector.cpp" line="489"/>
         <source>All Videos</source>
         <translation>Todos los vídeos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="151"/>
+        <location filename="../mytharchive/videoselector.cpp" line="153"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>

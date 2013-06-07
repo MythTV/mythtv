@@ -27,58 +27,58 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="463"/>
+        <location filename="../mythnews/mythnews.cpp" line="478"/>
         <source>Updated</source>
         <translation>Actualizadas</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="470"/>
+        <location filename="../mythnews/mythnews.cpp" line="485"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="126"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>No ha configurado MythNews para acceder a ningún sitio.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="481"/>
-        <location filename="../mythnews/mythnews.cpp" line="740"/>
+        <location filename="../mythnews/mythnews.cpp" line="497"/>
+        <location filename="../mythnews/mythnews.cpp" line="760"/>
         <source>%1 of %2 (%3 percent)</source>
         <translation>%1 de %2 (%3 por ciento)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="713"/>
+        <location filename="../mythnews/mythnews.cpp" line="733"/>
         <source>Downloading media...</source>
         <translation>Descargando medios...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="818"/>
+        <location filename="../mythnews/mythnews.cpp" line="843"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>¡No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="910"/>
+        <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Manage Feeds</source>
         <translation>Gestionar Canales</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="911"/>
+        <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Add Feed</source>
         <translation>Añadir Canal</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="939"/>
         <source>Edit Feed</source>
         <translation>Editar Canal</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="915"/>
+        <location filename="../mythnews/mythnews.cpp" line="940"/>
         <source>Delete Feed</source>
         <translation>Eliminar Canal</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="897"/>
+        <location filename="../mythnews/mythnews.cpp" line="922"/>
         <source>Options</source>
         <translation>Opciones</translation>
     </message>
@@ -129,34 +129,34 @@
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="234"/>
-        <location filename="../mythnews/newssite.cpp" line="243"/>
-        <location filename="../mythnews/newssite.cpp" line="252"/>
+        <location filename="../mythnews/newssite.cpp" line="244"/>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <location filename="../mythnews/newssite.cpp" line="262"/>
         <source>Failed to retrieve news</source>
         <translation>Fallo al descargar las noticias</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="235"/>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
         <source>No Cached News.</source>
         <translation>No hay noticias en el archivo temporal.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="254"/>
+        <location filename="../mythnews/newssite.cpp" line="264"/>
         <source>Failed to read downloaded file.</source>
         <translation>Fallo al leer el archivo descargado.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="262"/>
+        <location filename="../mythnews/newssite.cpp" line="272"/>
         <source>Showing Cached News.</source>
         <translation>Mostrando noticias almacenadas temporalmente.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="283"/>
+        <location filename="../mythnews/newssite.cpp" line="293"/>
         <source>XML-file is not valid RSS-feed</source>
         <translation>El archivo XML no es un canal RSS válido</translation>
     </message>
     <message>
-        <location filename="../mythnews/newssite.cpp" line="227"/>
+        <location filename="../mythnews/newssite.cpp" line="237"/>
         <source>Retrieve Failed. </source>
         <translation>Fallo en la Descarga.</translation>
     </message>
