@@ -1084,13 +1084,13 @@ void NetTree::slotItemChanged()
                 thumb = node->GetData().toString();
         }
 
-        ResultItem *res = new ResultItem(title, QString(), QString(),
+        ResultItem res = ResultItem(title, QString(), QString(),
               QString(), thumb, QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (m_thumbImage)
