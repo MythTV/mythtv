@@ -698,7 +698,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 {
     AVFrame frame;
     int got_frame = 0;
-    int ret, ret2;
+    int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
