@@ -1826,7 +1826,8 @@ void Scheduler::run(void)
 
         nextWakeTime = min(nextWakeTime, nextStartTime);
         QDateTime curtime = MythDate::current();
-        int secs_to_next = max(curtime.secsTo(nextStartTime), 0);
+        int secs_to_next =
+            max(qint64(curtime.secsTo(nextStartTime)), qint64(0));
         int sched_sleep = max(curtime.msecsTo(nextWakeTime), qint64(0));
         bool queuedRequests = HaveQueuedRequests();
 
