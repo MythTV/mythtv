@@ -46,6 +46,8 @@ namespace
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
+      m_siteGeneric(NULL),           m_rssGeneric(NULL),
+      m_searchGeneric(NULL),         m_currentNode(NULL),
       m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
