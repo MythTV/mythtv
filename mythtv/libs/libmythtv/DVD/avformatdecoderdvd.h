@@ -19,6 +19,7 @@ class AvFormatDecoderDVD : public AvFormatDecoder
   protected:
     virtual int  ReadPacket(AVFormatContext *ctx, AVPacket *pkt);
     virtual bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
+    virtual bool ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic);
     virtual bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                                    DecodeType decodetype);
 
@@ -31,13 +32,17 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual AudioTrackType GetAudioTrackType(uint stream_index);
 
     void CheckContext(int64_t pts);
+    void ReleaseLastVideoPkt();
+    void ReleaseContext(MythDVDContext *&context);
 
     long long DVDFindPosition(long long desiredFrame);
 
     MythDVDContext*        m_curContext;
     QList<MythDVDContext*> m_contextList;
     AVPacket*              m_lastVideoPkt;
+    uint32_t               m_lbaLastVideoPkt;
     int                    m_framesReq;
+    MythDVDContext*        m_returnContext;
 };
 
 #endif // AVFORMATDECODERDVD_H

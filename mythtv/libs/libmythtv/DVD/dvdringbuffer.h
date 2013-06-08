@@ -20,6 +20,12 @@ extern "C" {
 
 #include "dvdnav/dvdnav.h"
 
+/** \class MythDVDContext
+ *  \brief Encapsulates playback context at any given moment.
+ *
+ * This class is mainly represents a single VOBU (video object unit)
+ * on a DVD
+ */
 class MTV_PUBLIC MythDVDContext : public ReferenceCounter
 {
     friend class DVDRingBuffer;
@@ -27,13 +33,14 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
   public:
     virtual ~MythDVDContext();
 
-    int64_t  GetStartPTS()         const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
-    int64_t  GetEndPTS()           const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
-    int64_t  GetSeqEndPTS()        const { return (int64_t)m_pci.pci_gi.vobu_se_e_ptm; }
-    uint32_t GetLBA()              const { return m_pci.pci_gi.nv_pck_lbn;             }
-    int      GetNumFrames()        const;
-    int      GetNumFramesPresent() const;
-    int      GetFPS()              const { return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25; }
+    int64_t  GetStartPTS()          const { return (int64_t)m_pci.pci_gi.vobu_s_ptm;    }
+    int64_t  GetEndPTS()            const { return (int64_t)m_pci.pci_gi.vobu_e_ptm;    }
+    int64_t  GetSeqEndPTS()         const { return (int64_t)m_pci.pci_gi.vobu_se_e_ptm; }
+    uint32_t GetLBA()               const { return m_pci.pci_gi.nv_pck_lbn;             }
+    uint32_t GetLBAPrevVideoFrame() const;
+    int      GetNumFrames()         const;
+    int      GetNumFramesPresent()  const;
+    int      GetFPS()               const { return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25; }
 
   protected:
     MythDVDContext();
@@ -104,6 +111,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint32_t AdjustTimestamp(uint32_t timestamp);
     int64_t AdjustTimestamp(int64_t timestamp);
     MythDVDContext* GetDVDContext(void);
+    int32_t GetLastEvent(void) const     { return m_dvdEvent; }
 
     // Public menu/button stuff
     AVSubtitle *GetMenuSubtitle(uint &version);
@@ -143,6 +151,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     virtual int safe_read(void *data, uint sz);
     virtual long long Seek(long long pos, int whence, bool has_lock);
     long long NormalSeek(long long time);
+    bool SectorSeek(uint64_t sector);
     void SkipStillFrame(void);
     void WaitSkip(void);
     void SkipDVDWaitingForPlayer(void)    { m_playerWait = false;           }

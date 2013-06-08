@@ -696,7 +696,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
       for (i = 0; i < 19; i++) {
         if (stime[i]/2.0 <= length/2.0) {
           offset = dsi->vobu_sri.fwda[i];
-          if (offset >> 31) {
+          if (offset != 0x3fffffff) {
             new_vobu = cur_vobu + (offset & 0xffff);
           } else {
             if (cell_nr == last_cell_nr) {
@@ -715,7 +715,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
         if (stime[18 - i]/2.0 >= abs(length)/2.0)
         {
           offset = dsi->vobu_sri.bwda[i];
-          if (offset >> 31) {
+          if (offset != 0x3fffffff) {
             new_vobu = cur_vobu - (offset & 0xffff);
           } else {
             if (cell_nr == first_cell_nr) {

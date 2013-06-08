@@ -87,11 +87,17 @@ MythDVDContext::~MythDVDContext()
 {
 }
 
+/** \brief Returns the duration of this VOBU in frames
+ *  \sa GetNumFramesPresent
+ */
 int MythDVDContext::GetNumFrames() const
 {
     return ((GetEndPTS() - GetStartPTS()) * GetFPS()) / 90000;
 }
 
+/** \brief Returns the number of video frames present in this VOBU
+ *  \sa GetNumFrames
+ */
 int MythDVDContext::GetNumFramesPresent() const
 {
     int frames = 0;
@@ -110,6 +116,25 @@ int MythDVDContext::GetNumFramesPresent() const
     }
 
     return frames;
+}
+
+/** \brief Returns the logical block address of the previous
+ * VOBU containing video.
+ * \return LBA or 0xbfffffff if no previous VOBU with video exists
+ */
+uint32_t MythDVDContext::GetLBAPrevVideoFrame() const
+{
+    uint32_t lba = m_dsi.vobu_sri.prev_video;
+
+    if (lba != 0xbfffffff)
+    {
+        // If there is a previous video frame in this
+        // cell, calculate the absolute LBA from the
+        // offset
+        lba = GetLBA() - (lba & 0x7ffffff);
+    }
+
+    return lba;
 }
 
 DVDRingBuffer::DVDRingBuffer(const QString &lfilename) :
@@ -293,6 +318,28 @@ long long DVDRingBuffer::NormalSeek(long long time)
 {
     QMutexLocker lock(&m_seekLock);
     return Seek(time);
+}
+
+bool DVDRingBuffer::SectorSeek(uint64_t sector)
+{
+    dvdnav_status_t dvdRet = DVDNAV_STATUS_OK;
+
+    QMutexLocker lock(&m_seekLock);
+
+    dvdRet = dvdnav_sector_search(m_dvdnav, sector, SEEK_SET);
+
+    if (dvdRet == DVDNAV_STATUS_ERR)
+    {
+        LOG(VB_PLAYBACK, LOG_ERR, LOC +
+            QString("SectorSeek() to sector %1 failed").arg(sector));
+        return false;
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+            QString("DVD Playback SectorSeek() sector: %1").arg(sector));
+        return true;
+    }
 }
 
 long long DVDRingBuffer::Seek(long long time)
@@ -944,9 +991,18 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
             case DVDNAV_HOP_CHANNEL:
             {
-                // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
-                WaitForPlayer();
+                if (!bReprocessing && !m_skipstillorwait)
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL - waiting");
+                    m_processState = PROCESS_WAIT;
+                    break;
+                }
+                else
+                {
+                    // debug
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_HOP_CHANNEL");
+                    WaitForPlayer();
+                }
             }
             break;
 
