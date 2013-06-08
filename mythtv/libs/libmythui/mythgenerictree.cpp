@@ -47,7 +47,6 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
             case SORT_SELECTABLE:
                 qSort(begin(), end(), sortBySelectable);
                 break;
-                break;
         }
     }
 
