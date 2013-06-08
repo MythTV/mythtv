@@ -15,6 +15,8 @@ extern "C" {
 
 #define LOC QString("AOUtil: ")
 
+#define ISALIGN(x) (((unsigned long)x & 0xf) == 0)
+
 #if ARCH_X86
 static int has_sse2 = -1;
 
@@ -60,7 +62,7 @@ static inline float clipcheck(float f) {
 }
 
 /*
- All toFloat variants require 16 byte aligned input and output buffers on x86
+ All toFloat variants require 16 byte aligned input and output buffers on x86 for SSE optimised operation
  The SSE code processes 16 bytes at a time and leaves any remainder for the C
  - there is no remainder in practice */
 
@@ -70,7 +72,7 @@ static int toFloat8(float *out, uchar *in, int len)
     float f = 1.0f / ((1<<7) - 1);
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -137,7 +139,7 @@ static int fromFloat8(uchar *out, float *in, int len)
     float f = (1<<7) - 1;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -188,7 +190,7 @@ static int toFloat16(float *out, short *in, int len)
     float f = 1.0f / ((1<<15) - 1);
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -242,7 +244,7 @@ static int fromFloat16(short *out, float *in, int len)
     float f = (1<<15) - 1;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -293,7 +295,7 @@ static int toFloat32(AudioFormat format, float *out, int *in, int len)
         shift = 0;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         i = loops << 4;
@@ -349,7 +351,7 @@ static int fromFloat32(AudioFormat format, int *out, float *in, int len)
         shift = 0;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16 && ((unsigned long)out & 0xf) == 0)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         float o = 1, mo = -1;
         int loops = len >> 4;
@@ -414,7 +416,7 @@ static int fromFloatFLT(float *out, float *in, int len)
     int i = 0;
 
 #if ARCH_X86
-    if (sse_check() && len >= 16 && ((unsigned long)in & 0xf) == 0)
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
         int loops = len >> 4;
         float o = 1, mo = -1;
