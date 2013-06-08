@@ -4991,8 +4991,6 @@ bool AvFormatDecoder::SetupAudioStream(void)
             AudioOutputSettings::AVSampleFormatToFormat(ctx->sample_fmt,
                                                         ctx->bits_per_raw_sample);
 
-        AVSampleFormat format_pack = av_get_packed_sample_fmt(ctx->sample_fmt);
-
         if (av_sample_fmt_is_planar(ctx->sample_fmt))
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + QString("Audio data is planar"));
