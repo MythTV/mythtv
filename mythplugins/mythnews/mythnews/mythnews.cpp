@@ -45,7 +45,26 @@
  */
 MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
-    m_lock(QMutex::Recursive)
+    m_lock(QMutex::Recursive),
+    m_RetrieveTimer(new QTimer(this)),
+    m_TimerTimeout(10*60*1000),
+    m_UpdateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30)),
+    m_zoom(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0")),
+    m_browser(gCoreContext->GetSetting("WebBrowserCommand", "")),
+    m_menuPopup(NULL),
+    m_progressPopup(NULL),
+    m_httpGrabber(NULL),
+    m_abortHttp(false),
+    m_sitesList(NULL),
+    m_articlesList(NULL),
+    m_nositesText(NULL),
+    m_updatedText(NULL),
+    m_titleText(NULL),
+    m_descText(NULL),
+    m_thumbnailImage(NULL),
+    m_downloadImage(NULL),
+    m_enclosureImage(NULL),
+    m_podcastImage(NULL)
 {
     // Setup cache directory
 
@@ -59,25 +78,8 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    m_zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
-    m_browser = gCoreContext->GetSetting("WebBrowserCommand", "");
-
-    // Initialize variables
-
-    m_sitesList = m_articlesList = NULL;
-    m_updatedText = m_titleText = m_descText = NULL;
-    m_thumbnailImage = m_downloadImage = m_enclosureImage = NULL;
-    m_menuPopup = NULL;
-    m_progressPopup = NULL;
-
-    m_TimerTimeout = 10*60*1000;
-    m_httpGrabber = NULL;
-
-    // Now do the actual work
-    m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
             this, SLOT(slotRetrieveNews()));
-    m_UpdateFreq = gCoreContext->GetNumSetting("NewsUpdateFrequency", 30);
 
     m_RetrieveTimer->stop();
     m_RetrieveTimer->setSingleShot(false);
