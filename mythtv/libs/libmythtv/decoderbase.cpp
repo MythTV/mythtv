@@ -1040,7 +1040,7 @@ int DecoderBase::AutoSelectTrack(uint type)
     int selTrack = (1 == numStreams) ? 0 : -1;
 
     if ((selTrack < 0) &&
-        wantedTrack[type].language>=-1 && numStreams)
+        wantedTrack[type].language>=-1)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Trying to reselect track");
         // Try to reselect user selected track stream.
@@ -1060,7 +1060,7 @@ int DecoderBase::AutoSelectTrack(uint type)
         }
     }
 
-    if (selTrack < 0 && numStreams)
+    if (selTrack < 0)
     {
         // Select the best track.  Primary attribute is to favor a
         // forced track.  Secondary attribute is language preference,
