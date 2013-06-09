@@ -385,8 +385,6 @@ void ThemeChooser::Init(void)
             if (curTheme == themeinfo->GetDirectoryName())
                 curThemeInfo = themeinfo;
         }
-        else
-            delete item;
     }
 
     SetFocusWidget(m_themes);
