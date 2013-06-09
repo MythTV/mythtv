@@ -51,7 +51,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        lastError(QString::null), lastWarn(QString::null) {}
+        lastError(QString::null), lastWarn(QString::null), pulsewassuspended(false) {}
 
     virtual ~AudioOutput();
 

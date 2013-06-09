@@ -976,7 +976,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     mutable volatile int exitPlayerTimerId;
     TimerContextMap      stateChangeTimerId;
     TimerContextMap      signalMonitorTimerId;
-    TimerContextMap      tvchainUpdateTimerId;
 
     // Playback menu state caching
     PlayerContext *m_tvmCtx;

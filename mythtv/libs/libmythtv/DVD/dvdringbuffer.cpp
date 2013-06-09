@@ -1317,7 +1317,8 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
 
     int cmd_pos, pos, cmd, next_cmd_pos, offset1, offset2;
     int x1, x2, y1, y2;
-    uint8_t alpha[4], palette[4];
+    uint8_t alpha[4] = {0, 0, 0, 0};
+    uint8_t palette[4] = {0, 0, 0, 0};
     uint i;
     int date;
 

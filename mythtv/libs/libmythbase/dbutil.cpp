@@ -544,7 +544,11 @@ bool DBUtil::CreateTemporaryDBConf(
     }
     else
     {
-        chmod(tmpfile.constData(), S_IRUSR);
+        if (chmod(tmpfile.constData(), S_IRUSR))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error changing permissions '%1'")
+                    .arg(tmpfile.constData()) + ENO);
+        }
 
         QByteArray outarr = privateinfo.toLocal8Bit();
         fprintf(fp, "%s", outarr.constData());

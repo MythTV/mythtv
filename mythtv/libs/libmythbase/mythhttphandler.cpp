@@ -15,6 +15,7 @@
 const uint MythHttpHandler::kMaxRedirectCount = 32;
 
 MythHttpHandler::MythHttpHandler(MythHttpPool *pool) :
+    m_cur_status_id(0), m_cur_get_id(0), m_cur_redirect_cnt(0),
     m_pool(pool), m_qhttp(new QHttp())
 {
     connect(m_qhttp, SIGNAL(done(bool)),

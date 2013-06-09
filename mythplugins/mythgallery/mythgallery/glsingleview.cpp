@@ -99,12 +99,18 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       m_effect_cube_xrot(0.0f),
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f),
+      m_effect_kenBurns_image_timeout(0.0f),
+      m_effect_kenBurns_imageLoadThread(NULL),
       m_effect_kenBurns_image_ready(true),
       m_effect_kenBurns_item(NULL),
       m_effect_kenBurns_initialized(false),
       m_effect_kenBurns_new_image_started(true)
 {
     m_scaleMax = (ScaleMax) gCoreContext->GetNumSetting("GalleryScaleMax", 0);
+
+    m_effect_kenBurns_location_x[0] = m_effect_kenBurns_location_x[1] = 0;
+    m_effect_kenBurns_location_y[0] = m_effect_kenBurns_location_y[1] = 0;
+    m_effect_kenBurns_projection[0] = m_effect_kenBurns_projection[1] = 0;
 
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();

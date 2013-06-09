@@ -37,21 +37,21 @@ using namespace std;
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_searchResultList(NULL),      m_siteList(NULL),
-      m_search(NULL),                m_thumbImage(NULL),
+      m_search(NULL),                m_pageText(NULL),
+      m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
-      m_popupStack(),                m_progressDialog(NULL),
-      m_netSearch(NULL),             m_reply(NULL),
-      m_currentSearch(QString()),    m_currentGrabber(0),
-      m_currentCmd(QString()),       m_downloadFile(QString()),
-      m_pagenum(0)
+      m_menuPopup(NULL),
+      m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
+      m_progressDialog(NULL),        m_netSearch(NULL),
+      m_reply(NULL),                 m_download(new MythDownloadManager()),
+      m_imageDownload(new MetadataImageDownload(this)),
+      m_file(NULL),                  m_currentSearch(QString()),
+      m_currentGrabber(0),           m_currentCmd(QString()),
+      m_downloadFile(QString()),     m_pagenum(0),
+      m_maxpage(0),                  m_playing(false),
+      m_redirects(0),                m_mythXML(GetMythXMLURL())
 {
-    m_mythXML = GetMythXMLURL();
-    m_playing = false;
-    m_download = new MythDownloadManager();
-    m_imageDownload = new MetadataImageDownload(this);
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_menuPopup = NULL;
     gCoreContext->addListener(this);
 }
 

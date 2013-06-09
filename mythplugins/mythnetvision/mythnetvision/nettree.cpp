@@ -46,6 +46,8 @@ namespace
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
+      m_siteGeneric(NULL),           m_rssGeneric(NULL),
+      m_searchGeneric(NULL),         m_currentNode(NULL),
       m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
@@ -1084,13 +1086,13 @@ void NetTree::slotItemChanged()
                 thumb = node->GetData().toString();
         }
 
-        ResultItem *res = new ResultItem(title, QString(), QString(),
+        ResultItem res = ResultItem(title, QString(), QString(),
               QString(), thumb, QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
         MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (m_thumbImage)

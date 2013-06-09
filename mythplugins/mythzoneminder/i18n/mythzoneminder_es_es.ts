@@ -342,12 +342,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Ejecutándose</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="217"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Detenido</translation>
     </message>
@@ -406,12 +406,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>No es posible mostrar la vista en directo.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>¡No ha definido ningún monitor!</translation>
     </message>
@@ -419,29 +419,29 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="292"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Previous</source>
         <translation>Anterior</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Next</source>
         <translation>Siguiente</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="299"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="378"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Reproducir</translation>
     </message>

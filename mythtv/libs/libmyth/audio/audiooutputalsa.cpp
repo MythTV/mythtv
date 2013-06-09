@@ -746,7 +746,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     if (err < 0)
     {
         int dir         = -1;
-        int buftmp      = buffer_time;
+        uint buftmp     = buffer_time;
         int attempt     = 0;
         do
         {

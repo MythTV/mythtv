@@ -32,7 +32,7 @@ class MSqlDatabase
    ~MSqlDatabase(void);
 
     bool OpenDatabase(bool skipdb = false);
-    void SetDBParams(DatabaseParams params) { m_dbparms = params; };
+    void SetDBParams(const DatabaseParams &params) { m_dbparms = params; };
 
   private:
     bool isOpen(void);

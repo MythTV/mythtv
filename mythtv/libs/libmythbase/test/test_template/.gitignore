@@ -1,0 +1,5 @@
+test_template
+*.gcda
+*.gcno
+*.gcov
+

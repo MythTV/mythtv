@@ -698,7 +698,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
 {
     AVFrame frame;
     int got_frame = 0;
-    int ret, ret2;
+    int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
@@ -746,7 +746,7 @@ void _DeinterleaveSample(AudioDataType *out, const AudioDataType *in, int channe
 
     for (int i = 0; i < channels; i++)
     {
-        outp[i] = out + (i * channels * frames);
+        outp[i] = out + (i * frames);
     }
 
     for (int i = 0; i < frames; i++)
@@ -792,7 +792,7 @@ void _InterleaveSample(AudioDataType *out, const AudioDataType *in, int channels
         // We're given an array of int, calculate pointers to each row
         for (int i = 0; i < channels; i++)
         {
-            my_inp[i] = in + (i * channels * frames);
+            my_inp[i] = in + (i * frames);
         }
     }
     else

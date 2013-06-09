@@ -115,7 +115,6 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
 
   private:
     QString settingValue;
-    bool    changed;
     ID     *id;
     Name   *name;
 };

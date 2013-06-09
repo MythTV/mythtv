@@ -104,7 +104,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
     m_configure_succeeded(false),m_length_last_data(0),
-    m_spdifenc(NULL),           m_forcedprocessing(false)
+    m_spdifenc(NULL),           m_forcedprocessing(false),
+    m_previousbpf(0)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
