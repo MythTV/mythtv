@@ -94,7 +94,15 @@ bool HouseKeeperTask::Run(void)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Running HouseKeeperTask '%1'.")
                                 .arg(m_dbTag));
-    return DoRun();
+    bool res = DoRun();
+    if (res)
+        LOG(VB_GENERAL, LOG_INFO, QString("HouseKeeperTask '%1' Failed.")
+                                .arg(m_dbTag));
+    else
+        LOG(VB_GENERAL, LOG_INFO,
+                QString("HouseKeeperTask '%1' Finished Successfully.")
+                    .arg(m_dbTag));
+    return res;
 }
 
 QDateTime HouseKeeperTask::QueryLastRun(void)
@@ -260,12 +268,12 @@ bool PeriodicHouseKeeperTask::DoCheckRun(QDateTime now)
     //      a necessarily low probability
     bool res = (rand() > (int)(prob2 * RAND_MAX));
     m_currentProb = prob;
-    if (res)
-        LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
-                    .arg(GetTag()).arg(1-prob2).arg(1-prob));
-    else
-        LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will not run: this=%2; total=%3")
-                    .arg(GetTag()).arg(1-prob2).arg(1-prob));
+//  if (res)
+//      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
+//                  .arg(GetTag()).arg(1-prob2).arg(1-prob));
+//  else
+//      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will not run: this=%2; total=%3")
+//                  .arg(GetTag()).arg(1-prob2).arg(1-prob));
     return res;
 }
 
