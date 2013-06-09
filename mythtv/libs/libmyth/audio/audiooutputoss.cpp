@@ -202,7 +202,8 @@ bool AudioOutputOSS::OpenDevice()
     }
 
     audio_buf_info info;
-    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+    if (ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info) < 0)
+        VBERRENO("Error retrieving card buffer size");
     // align by frame size
     fragment_size = info.fragsize - (info.fragsize % output_bytes_per_frame);
 
@@ -269,7 +270,8 @@ int AudioOutputOSS::GetBufferedOnSoundcard(void) const
     int soundcard_buffer=0;
 //GREG This is needs to be fixed for sure!
 #ifdef SNDCTL_DSP_GETODELAY
-    ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer); // bytes
+    if(ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer) < 0) // bytes
+        VBERRNOCONST("Error retrieving buffering delay");
 #endif
     return soundcard_buffer;
 }
