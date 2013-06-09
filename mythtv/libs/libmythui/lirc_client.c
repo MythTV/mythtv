@@ -1865,7 +1865,7 @@ int lirc_nextcode(struct lirc_state *state, char **code)
 		end_len+=len;
 		state->lirc_buffer[end_len]=0;
 		/* return if next code not yet available completely */
-		if((end=strchr(state->lirc_buffer,'\n'))==NULL)
+		if(strchr(state->lirc_buffer,'\n')==NULL)
 		{
 			return(0);
 		}
