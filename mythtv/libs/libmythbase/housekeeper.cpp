@@ -57,6 +57,42 @@
 #include "housekeeper.h"
 #include "mythcorecontext.h"
 
+/** \class HouseKeeperTask
+ *  \ingroup housekeeper
+ *  \brief Definition for a single task to be run by the HouseKeeper
+ *
+ *  This class contains instructions for tasks to be run periodically by the 
+ *  housekeeper. Each task requires an indentification tag, and can be given
+ *  a two options to control scope and startup behavior. Each child class
+ *  should override at least two methods: DoCheckRun() and DoRun().
+ *
+ *  DoCheckRun() is to perform a check as to whether the task should be run,
+ *  returning a boolean 'true' if it should.
+ *
+ *  DoRun() actually implements the task to be run.
+ *
+ *  Child classes can also implement a Terminate() method, which is to be used
+ *  to stop in-progress tasks when the application is shutting down.
+ *
+ *  The HouseKeeperScope attribute passed to the class in the constructor
+ *  controls in what scope the task should operate. <b>kHKGlobal</b> means the
+ *  task should only operate once globally. If another housekeeper in another
+ *  or on another machine runs a task, this instance should track that and not
+ *  run itself until the next time to run comes. <b>kHKLocal</b> has similar
+ *  meaning, but only on the local machine, rather than the whole MythTV
+ *  cluster. <b>kHKInst</b> means no communication is necessary, as each
+ *  process instance is to operate independently.
+ *
+ *  The HouseKeeperStartup attribute passed to the class in the constructor
+ *  controls the startup behavior of the task. <b>kHKNormal</b> means the task
+ *  will never run until application control has passed to the main event loop
+ *  and the HouseKeeper's check scan has run at least once.
+ *  <b>kHKRunOnStartup</b> means the task is queued to run when on startup,
+ *  and will be run as soon as a HouseKeeperThread is started to handle it.
+ *  <b>kHKRunImmediatelyOnStartup</b> means the task will be run immediately
+ *  in the primary thread. <b>Do not use this for long tasks as it will delay
+ *  application startup and handoff to the main event loop.</b>
+ */
 HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
                                  HouseKeeperStartup startup):
     ReferenceCounter(dbTag), m_dbTag(dbTag), m_confirm(false), m_scope(scope),
@@ -173,9 +209,11 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
         }
 
         if (m_scope == kHKGlobal)
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Updating global run time for %1").arg(m_dbTag));
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Updating global run time for %1").arg(m_dbTag));
         else
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Updating local run time for %1").arg(m_dbTag));
+            LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("Updating local run time for %1").arg(m_dbTag));
 
         if (m_scope == kHKLocal)
             query.bindValue(":HOST", gCoreContext->GetHostName());
@@ -197,6 +235,19 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
     return last;
 }
 
+/** \class PeriodicHouseKeeperTask
+ *  \ingroup housekeeper
+ *  \brief Modified HouseKeeperTask for tasks to be run at a regular interval.
+ *
+ *  This task type is to be used for tasks that need to be run at a regular
+ *  interval. The <i>period</i> argument in the constructor defines this
+ *  interval in integer seconds. The <i>min</i> and <i>max</i> attributes
+ *  control the region over which the task can be run, given as a float
+ *  multiple of the period. The defaults are 0.5-1.5. The test for running
+ *  is a linearly increasing probability from the start to end of this period,
+ *  and the task is forced to run if the end of the period is reached.
+ *
+ */
 PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
             int period, float min, float max, HouseKeeperScope scope,
             HouseKeeperStartup startup) :
@@ -299,6 +350,19 @@ bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
     return false;
 }
 
+/** \class DailyHouseKeeperTask
+ *  \ingroup housekeeper
+ *  \brief Modified PeriodicHouseKeeperTask for tasks to be run once daily.
+ *
+ *  This task type is for tasks that should only be run once daily. It follows
+ *  the same behavior as the PeriodicHouseKeeperTask, but will restrict the
+ *  run window to prevent a task from running a second time on the same day,
+ *  and forces a task to at least thirty minutes before midnight if it has not
+ *  yet run that day. This class supports a <i>minhour</i> and <i>maxhour<i>
+ *  integer inputs to the constructer to allow further limiting of the window
+ *  in which the task is allowed to run.
+ *
+ */
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
         HouseKeeperScope scope, HouseKeeperStartup startup) :
     PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, scope, startup),
@@ -356,6 +420,16 @@ bool DailyHouseKeeperTask::InWindow(QDateTime now)
     return false;
 }
 
+/** \class HouseKeepingThread
+ *  \ingroup housekeeper
+ *  \brief Thread used to perform queued HouseKeeper tasks.
+ *
+ *  This class is a long-running thread that pulls tasks out of the
+ *  HouseKeeper queue and runs them sequentially. It performs one last check
+ *  of the task to make sure something else in the same scope has not
+ *  pre-empted it, before running the task.
+ *
+ */
 void HouseKeepingThread::run(void)
 {
     RunProlog();
@@ -401,6 +475,22 @@ void HouseKeepingThread::run(void)
     RunEpilog();
 }
 
+/** \class HouseKeeperk
+ *  \ingroup housekeeper
+ *  \brief Manages registered HouseKeeperTasks and queues tasks for operation
+ *
+ *  This class operates threadless, in the main application event loop. Its
+ *  only role is to check whether tasks are ready to be run, so computation
+ *  in those methods should be kept to a minimum to not stall the event loop.
+ *  Tasks ready to run are placed into a queue for the run thread to run.
+ *
+ *  To use, one instance of this should be created at application init. All
+ *  housekeeping tasks should be registered using <b>RegisterTask()</b>, and
+ *  then the housekeeper started using <b>Start</b>. Tasks <i>can</i> be added
+ *  at a later time, however special startup behavior will not be honored.
+ *  Tasks cannot be removed from the housekeeper once added.
+ *
+ */
 HouseKeeper::HouseKeeper(void) : m_timer(NULL)
 {
     m_timer = new QTimer(this);
@@ -608,6 +698,19 @@ void HouseKeeper::Run(void)
     }
 }
 
+/** \brief Wake the primary run thread, or create a new one
+ *
+ *  The HouseKeeper maintains one primary thread, but allows for multiple to
+ *  allow task processing to continue should one long-running thread stall.
+ *
+ *  The HouseKeeper scans to queue tasks once a minute. If any tasks are in
+ *  the queue at the end of the scan, this method will be run. If the primary
+ *  thread is still in use from the previous scan, it will be marked for
+ *  destruction and a replacement thread will be started to pick up the
+ *  remainder of the queue. The in-progress thread will terminate itself once
+ *  its current task has finished, and will be eventually cleaned up by this
+ *  method.
+ */
 void HouseKeeper::StartThread(void)
 {
     QMutexLocker threadLock(&m_threadLock);
