@@ -26,7 +26,7 @@ HEADERS += mythdeque.h mythlogging.h
 HEADERS += mythbaseutil.h referencecounter.h version.h mythcommandlineparser.h
 HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
 HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
-HEADERS += mythplugin.h mythpluginapi.h
+HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += ffmpeg-mmx.h
 HEADERS += mythsystemlegacy.h
 
@@ -44,7 +44,7 @@ SOURCES += logging.cpp loggingserver.cpp
 SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
-SOURCES += mythplugin.cpp
+SOURCES += mythplugin.cpp housekeeper.cpp
 SOURCES += mythsystemlegacy.cpp
 
 # This stuff is not Qt5 compatible..

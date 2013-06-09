@@ -2339,6 +2339,62 @@ NULL
             return false;
     }
 
+    if (dbver == "1310")
+    {
+        const char *updates[] = {
+// Move old table temporarily
+"RENAME TABLE `housekeeping` TO `oldhousekeeping`;",
+// Create new table in its place
+"CREATE TABLE `housekeeping` ("
+"  `tag`        VARCHAR(64) NOT NULL,"
+"  `hostname`   VARCHAR(64),"
+"  `lastrun`    DATETIME,"
+"  UNIQUE KEY `task` (`tag`, `hostname`)"
+") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+// Migrate old data over
+"INSERT INTO `housekeeping` (`tag`, `hostname`, `lastrun`)"
+"   SELECT SUBSTRING_INDEX(`tag`, '-', 1) AS `tag`,"
+"          IF(LOCATE('-', `tag`) > 0,"
+"             SUBSTRING_INDEX(`tag`, '-', -1),"
+"             NULL) AS `hostname`,"
+"          `lastrun`"
+"     FROM `oldhousekeeping`;",
+// Delete old data
+"DROP TABLE `oldhousekeeping`;",
+NULL
+};
+
+        if (!performActualUpdate(&updates[0], "1311", dbver))
+            return false;
+    }
+
+    if (dbver == "1311")
+    {
+        const char *updates[] = {
+// Create a global enable/disable instead of one per-host
+// Any hosts previously running it mean all hosts do now
+"INSERT INTO `settings` (`value`, `hostname`, `data`)"
+"   SELECT 'HardwareProfileEnaled',"
+"          NULL,"
+"          IF((SELECT COUNT(1)"
+"                FROM `settings`"
+"               WHERE `value` = 'HardwareProfileLastUpdated' > 0),"
+"             1, 0);",
+// Create 'lastrun' times using existing data in settings
+"INSERT INTO `housekeeping` (`tag`, `hostname`, `lastrun`)"
+"   SELECT 'HardwareProfiler',"
+"          `hostname`,"
+"          `data`"
+"     FROM `settings`"
+"    WHERE `value` = 'HardwareProfileLastUpdated';",
+// Clear out old settings
+"DELETE FROM `settings` WHERE `value` = 'HardwareProfileLastUpdated';",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1312", dbver))
+            return false;
+    }
+
     return true;
 }
 

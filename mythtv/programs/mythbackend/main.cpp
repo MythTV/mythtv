@@ -24,7 +24,6 @@
 #include "main_helpers.h"
 #include "mythmiscutil.h"
 #include "storagegroup.h"
-#include "housekeeper.h"
 #include "mediaserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"

@@ -29,6 +29,8 @@
 #include "mythsystemevent.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "housekeeper.h"
+#include "hardwareprofile.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
@@ -139,6 +141,14 @@ int main(int argc, char *argv[])
     jobqueue = new JobQueue(false);
 
     MythSystemLegacyEventHandler *sysEventHandler = new MythSystemLegacyEventHandler();
+
+    HouseKeeper *housekeeping = new HouseKeeper();
+#ifdef __linux__
+ #ifdef CONFIG_BINDINGS_PYTHON
+    housekeeping->RegisterTask(new HardwareProfileTask());
+ #endif
+#endif
+    housekeeping->Start();
 
     int exitCode = a.exec();
 
