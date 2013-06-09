@@ -55,7 +55,8 @@ static av_always_inline av_const long int lrintf(float x)
 }
 #endif /* HAVE_LRINTF */
 
-static inline float clipcheck(float f) {
+static inline float clipcheck(float f)
+{
     if (f > 1.0f) f = 1.0f;
     else if (f < -1.0f) f = -1.0f;
     return f;
@@ -69,7 +70,7 @@ static inline float clipcheck(float f) {
 static int toFloat8(float *out, uchar *in, int len)
 {
     int i = 0;
-    float f = 1.0f / ((1<<7) - 1);
+    float f = 1.0f / ((1<<7));
 
 #if ARCH_X86
     if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
@@ -133,10 +134,16 @@ static int toFloat8(float *out, uchar *in, int len)
   The SSE code processes 16 bytes at a time and leaves any remainder for the C
   - there is no remainder in practice */
 
+static inline uchar clip_uchar(int a)
+{
+    if (a&(~0xFF)) return (-a)>>31;
+    else           return a;
+}
+
 static int fromFloat8(uchar *out, float *in, int len)
 {
     int i = 0;
-    float f = (1<<7) - 1;
+    float f = (1<<7);
 
 #if ARCH_X86
     if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
@@ -180,14 +187,14 @@ static int fromFloat8(uchar *out, float *in, int len)
     }
 #endif //ARCH_x86
     for (;i < len; i++)
-        *out++ = lrintf(clipcheck(*in++) * f) + 0x80;
+        *out++ = clip_uchar(lrintf(*in++ * f) + 0x80);
     return len;
 }
 
 static int toFloat16(float *out, short *in, int len)
 {
     int i = 0;
-    float f = 1.0f / ((1<<15) - 1);
+    float f = 1.0f / ((1<<15));
 
 #if ARCH_X86
     if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
@@ -238,10 +245,16 @@ static int toFloat16(float *out, short *in, int len)
     return len << 2;
 }
 
+static inline short clip_short(int a)
+{
+    if ((a+0x8000) & ~0xFFFF) return (a>>31) ^ 0x7FFF;
+    else                      return a;
+}
+
 static int fromFloat16(short *out, float *in, int len)
 {
     int i = 0;
-    float f = (1<<15) - 1;
+    float f = (1<<15);
 
 #if ARCH_X86
     if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
@@ -280,7 +293,7 @@ static int fromFloat16(short *out, float *in, int len)
     }
 #endif //ARCH_x86
     for (;i < len;i++)
-        *out++ = lrintf(clipcheck(*in++) * f);
+        *out++ = clip_short(lrintf(*in++ * f));
     return len << 1;
 }
 
@@ -288,7 +301,7 @@ static int toFloat32(AudioFormat format, float *out, int *in, int len)
 {
     int i = 0;
     int bits = AudioOutputSettings::FormatToBits(format);
-    float f = 1.0f / ((uint)(1<<(bits-1)) - 128);
+    float f = 1.0f / ((uint)(1<<(bits-1)));
     int shift = 32 - bits;
 
     if (format == FORMAT_S24LSB)
@@ -344,7 +357,7 @@ static int fromFloat32(AudioFormat format, int *out, float *in, int len)
 {
     int i = 0;
     int bits = AudioOutputSettings::FormatToBits(format);
-    float f = (uint)(1<<(bits-1)) - 128;
+    float f = (uint)(1<<(bits-1));
     int shift = 32 - bits;
 
     if (format == FORMAT_S24LSB)
