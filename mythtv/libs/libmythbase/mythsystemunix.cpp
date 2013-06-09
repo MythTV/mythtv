@@ -279,13 +279,10 @@ void MythSystemLegacyManager::run(void)
     // exit during shutdown.
     while( run_system )
     {
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 100 * 1000 * 1000; // 100ms
-        nanosleep(&ts, NULL); // sleep 100ms
+        m_mapLock.lock();
+        m_wait.wait(&m_mapLock, m_pMap.isEmpty() ? 100 : 20);
 
         // check for any running processes
-        m_mapLock.lock();
 
         if( m_pMap.isEmpty() )
         {
@@ -455,6 +452,7 @@ void MythSystemLegacyManager::append(MythSystemLegacyUnix *ms)
     m_mapLock.lock();
     ms->IncrRef();
     m_pMap.insert(ms->m_pid, ms);
+    m_wait.wakeAll();
     m_mapLock.unlock();
 
     if (ms->m_stdpipe[0] >= 0)

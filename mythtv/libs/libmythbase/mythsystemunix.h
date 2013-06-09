@@ -68,6 +68,7 @@ class MythSystemLegacyManager : public MThread
         QMutex     m_mapLock;
         bool       m_jumpAbort;
         QMutex     m_jumpLock;
+        QWaitCondition m_wait;
 };
 
 class MythSystemLegacySignalManager : public MThread
