@@ -336,7 +336,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 if (m_thumbnailImage)
                     m_thumbnailImage->Hide();
 
-                if (!site->imageURL().isEmpty())
+                if (site && !site->imageURL().isEmpty())
                 {
                     QString fileprefix = GetConfDir();
 
