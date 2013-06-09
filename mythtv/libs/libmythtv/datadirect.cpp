@@ -1581,7 +1581,11 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     LOG(VB_GENERAL, LOG_INFO, LOC + "SaveLineupToCache("+lineupid+
         ") -- success");
 
-    makeFileAccessible(fna.constData()); // Let anybody update it
+    bool ret = makeFileAccessible(fna.constData()); // Let anybody update it
+    if (!ret)
+    {
+        // Nothing, makeFileAccessible will print an error
+    }
 
     return true;
 }

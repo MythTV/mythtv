@@ -583,7 +583,14 @@ bool PreviewGenerator::SavePreview(QString filename,
     if (f.open() && small_img.save(&f, "PNG"))
     {
         // Let anybody update it
-        makeFileAccessible(f.fileName().toLocal8Bit().constData());
+        bool ret = makeFileAccessible(f.fileName().toLocal8Bit().constData());
+        if (!ret)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Unable to change permissions on "
+                                     "preview image. Backends and frontends "
+                                     "running under different users will be "
+                                     "unable to access it");
+        }
         QFile of(filename);
         of.remove();
         if (f.rename(filename))
