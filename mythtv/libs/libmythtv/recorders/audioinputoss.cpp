@@ -67,7 +67,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &chk) < 0)
     {
         LOG(VB_GENERAL, LOG_WARNING,
-            LOC_DEV + "failed to disable audio device" + ENO);
+            LOC_DEV + "failed to disable audio device: " + ENO);
     }
 
     // Set format
@@ -172,7 +172,7 @@ bool AudioInputOSS::Start(void)
         if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
         {
             LOG(VB_GENERAL, LOG_WARNING,
-                LOC_DEV + "failed to disable audio device" + ENO);
+                LOC_DEV + "failed to disable audio device: " + ENO);
         }
         trig = PCM_ENABLE_INPUT; // enable input
         if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
