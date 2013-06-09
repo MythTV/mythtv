@@ -57,9 +57,6 @@ class AudioReencodeBuffer : public AudioOutput
     virtual void      ToggleMute(void)              { }
     virtual MuteState GetMuteState(void) const      { return kMuteOff; }
     virtual MuteState IterateMutedChannels(void)    { return kMuteOff; }
-    virtual bool      IsUpmixing(void)              { return false; }
-    virtual bool      ToggleUpmix(void)             { return false; }
-    virtual bool      CanUpmix(void)                { return false; }
     virtual void      SetSWVolume(int new_volume, bool save) { return; }
     virtual int       GetSWVolume(void)             { return 100; }
     virtual bool      CanPassthrough(int, int, int, int) const
