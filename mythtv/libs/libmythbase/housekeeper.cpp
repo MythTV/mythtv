@@ -475,7 +475,7 @@ void HouseKeepingThread::run(void)
     RunEpilog();
 }
 
-/** \class HouseKeeperk
+/** \class HouseKeeper
  *  \ingroup housekeeper
  *  \brief Manages registered HouseKeeperTasks and queues tasks for operation
  *
