@@ -188,16 +188,14 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
         return false;
     }
 
-    m_message_size  = ((buf[off + 0] << 24) | (buf[off+1] << 16) |
-                       (buf[off + 2] << 8)  | (buf[off + 3]));
+    m_message_size  = COMBINE32(buf, off);
     off += 4;
 
     uint nObjLen = buf[off++];
     m_objkey = DSMCCCacheKey((const char*)buf + off, nObjLen);
     off += nObjLen;
 
-    m_objkind_len = ((buf[off + 0] << 24) | (buf[off + 1] << 16) |
-                     (buf[off + 2] << 8)  | (buf[off + 3]));
+    m_objkind_len = COMBINE32(buf, off);
     off += 4;
     m_objkind = (char*) malloc(m_objkind_len);
     memcpy(m_objkind, buf + off, m_objkind_len);
@@ -242,8 +240,7 @@ bool BiopMessage::ProcessDir(
         return false; // Error
     }
 
-    unsigned long msgbody_len = ((buf[off + 0] << 24) | (buf[off + 1] << 16) |
-                                 (buf[off + 2] <<  8) | (buf[off + 3]));
+    unsigned long msgbody_len = COMBINE32(buf, off);
     off += 4;
     int const start = off;
 
@@ -313,11 +310,9 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
         return false; // Error
     }
 
-    msgbody_len = ((buf[off    ] << 24) | (buf[off + 1] << 16) |
-                   (buf[off + 2] <<  8) | (buf[off + 3]));
+    msgbody_len = COMBINE32(buf, off);
     off += 4;
-    content_len = ((buf[off    ] << 24) | (buf[off + 1] << 16) |
-                   (buf[off + 2] <<  8) | (buf[off + 3]));
+    content_len = COMBINE32(buf, off);
     off += 4;
     if (content_len + 4 != msgbody_len)
         LOG(VB_DSMCC, LOG_WARNING, "[biop] ProcessFile incorrect msgbody_len");
@@ -362,8 +357,7 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
             case 0x09: // Compressed.
                 // Skip the method.
                 isCompressed = true;
-                originalSize = ((data[1] << 24) | (data[2] << 16) |
-                                (data[3] <<  8) | (data[4]));
+                originalSize = COMBINE32(data, 1);
                 break;
             default:
                 break;
@@ -376,12 +370,9 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
 int BiopModuleInfo::Process(const unsigned char *data)
 {
     int off, ret;
-    mod_timeout   = ((data[0]  << 24) | (data[1] << 16) |
-                     (data[2]  <<  8) | (data[3]));
-    block_timeout = ((data[4]  << 24) | (data[5] << 16) |
-                     (data[6]  <<  8) | (data[7]));
-    min_blocktime = ((data[8]  << 24) | (data[9] << 16) |
-                     (data[10] <<  8) | (data[11]));
+    mod_timeout   = COMBINE32(data, 0);
+    block_timeout = COMBINE32(data, 4);
+    min_blocktime = COMBINE32(data, 8);
 
     taps_count = data[12];
     off = 13;
@@ -430,11 +421,9 @@ int BiopTap::Process(const unsigned char *data)
         if (selector_len >= 10 && selector_type == 0x0001)
         {
             off += 2;
-            unsigned long transactionId = ((data[off] << 24) | (data[off + 1] << 16) |
-                         (data[off + 2] << 8)  | (data[off + 3]));
+            unsigned long transactionId = COMBINE32(data, off);
             off += 4;
-            unsigned long timeout = ((data[off] << 24) | (data[off + 1] << 16) |
-                         (data[off + 2] << 8)  | (data[off + 3]));
+            unsigned long timeout = COMBINE32(data, off);
             LOG(VB_DSMCC, LOG_DEBUG, QString("[biop] BIOP_DELIVERY_PARA_USE tag %1 id 0x%2 timeout %3uS")
                 .arg(assoc_tag).arg(transactionId,0,16).arg(timeout));
             off += 4;
@@ -450,8 +439,7 @@ int BiopConnbinder::Process(const unsigned char *data)
 {
     int off = 0, ret;
 
-    component_tag = ((data[0] << 24) | (data[1] << 16) |
-                     (data[2] << 8)  | (data[3]));
+    component_tag = COMBINE32(data, 0);
     if (0x49534F40 != component_tag)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] Invalid Connbinder tag");
@@ -480,8 +468,7 @@ int BiopObjLocation::Process(const unsigned char *data)
 {
     int off = 0;
 
-    component_tag = ((data[0] << 24) | (data[1] << 16) |
-                     (data[2] <<  8) | (data[3]));
+    component_tag = COMBINE32(data, 0);
     if (0x49534F50 != component_tag)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] Invalid ObjectLocation tag");
@@ -490,9 +477,7 @@ int BiopObjLocation::Process(const unsigned char *data)
     off += 4;
 
     component_data_len = data[off++];
-    m_Reference.m_nCarouselId =
-        ((data[off    ] << 24) | (data[off + 1] << 16) |
-         (data[off + 2] <<  8) | (data[off + 3]));
+    m_Reference.m_nCarouselId = COMBINE32(data, off);
 
     off += 4;
 
@@ -525,8 +510,7 @@ int ProfileBodyFull::Process(const unsigned char *data)
 {
     int off = 0, ret;
 
-    data_len = ((data[off    ] << 24) | (data[off + 1] << 16) |
-                (data[off + 2] <<  8) | (data[off + 3]));
+    data_len = COMBINE32(data, off);
     off += 4;
 
     /* bit order */
@@ -563,15 +547,13 @@ int ProfileBodyFull::Process(const unsigned char *data)
 int BiopIor::Process(const unsigned char *data)
 {
     int off = 0, ret;
-    type_id_len = ((data[0] << 24) | (data[1] << 16) |
-                   (data[2] << 8)  | (data[3]));
+    type_id_len = COMBINE32(data, 0);
     type_id = (char*) malloc(type_id_len);
     off += 4;
     memcpy(type_id, data + off, type_id_len);
     off += type_id_len;
 
-    tagged_profiles_count = ((data[off    ] << 24) | (data[off + 1] << 16) |
-                             (data[off + 2] <<  8) | (data[off + 3]));
+    tagged_profiles_count = COMBINE32(data, off);
     if (tagged_profiles_count < 1)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[biop] IOR missing taggedProfile");
@@ -579,8 +561,7 @@ int BiopIor::Process(const unsigned char *data)
     }
     off += 4;
 
-    profile_id_tag = ((data[off    ] << 24) | (data[off + 1] << 16) |
-                      (data[off + 2] <<  8) | (data[off + 3]));
+    profile_id_tag = COMBINE32(data, off);
     off += 4;
 
     if (profile_id_tag == 0x49534F06) // profile_id_tag == 0x49534F06
