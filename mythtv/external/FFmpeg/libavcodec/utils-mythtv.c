@@ -212,6 +212,8 @@ const char *ff_codec_id_string(enum CodecID codec_id)
 
         case AV_CODEC_ID_DSMCC_B:          return "DSMCC_B";
 
+        case AV_CODEC_ID_DVD_NAV:          return "DVD NAV";
+
         case AV_CODEC_ID_MPEG2TS:          return "MPEG2TS";
 
             /* Attachment codecs */
