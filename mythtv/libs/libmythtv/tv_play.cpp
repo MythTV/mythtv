@@ -2806,9 +2806,6 @@ void TV::timerEvent(QTimerEvent *te)
     if (handled)
         return;
 
-    if (handled)
-        return;
-
     // Check if it matches networkControlTimerId
     QString netCmd = QString::null;
     {
