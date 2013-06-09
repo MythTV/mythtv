@@ -25,7 +25,6 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
       m_firstRun(true),
       m_nextpageInterval(gCoreContext->GetNumSetting("weatherTimeout", 10)),
       m_nextpage_Timer(new QTimer(this)),
-      //m_gotDataHook(false),
       m_firstSetup(true),
       m_createdSrcMan(false),
       m_srcMan(NULL),
