@@ -117,7 +117,7 @@ class TestAudioUtils: public QObject
         for (size_t i = 0; i < SIZEARRAY; i++)
         {
             arrays1[i+offsetshort] = INT16_MIN + i;
-            arrays2[i] = INT16_MIN + i;
+            arrays2[i] = INT16_MIN + 1;
         }
 
         // Done by C
