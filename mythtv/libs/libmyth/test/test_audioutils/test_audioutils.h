@@ -50,9 +50,9 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc(SIZEARRAY * sizeof(short));
         float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i] = INT16_MIN + i;
+            arrays1[i] = j;
         }
 
         int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf, arrays1, SIZEARRAY * sizeof(short));
@@ -81,9 +81,9 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+1] = INT16_MIN + i;
+            arrays1[i+1] = j;
         }
 
         int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+1, arrays1+1, SIZEARRAY * sizeof(short));
@@ -114,10 +114,10 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+offsetshort] = INT16_MIN + i;
-            arrays2[i] = INT16_MIN + 1;
+            arrays1[i+offsetshort] = j;
+            arrays2[i] = j;
         }
 
         // Done by C
@@ -159,9 +159,9 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i] = INT16_MIN + i;
+            arrays1[i] = j;
         }
 
         uint32_t pattern        = 0xbcbcbcbc;
@@ -285,9 +285,9 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc(SIZEARRAY * sizeof(uchar));
         float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = 0; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i] = INT8_MIN + i;
+            arrays1[i] = j;
         }
 
         int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf, arrays1, SIZEARRAY * sizeof(uchar));
@@ -315,9 +315,9 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+1] = INT8_MIN + i;
+            arrays1[i+1] = j;
         }
 
         int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf+1, arrays1+1, SIZEARRAY * sizeof(uchar));
@@ -348,10 +348,10 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+offsetuchar] = INT8_MIN + i;
-            arrays2[i] = INT8_MIN + i;
+            arrays1[i+offsetuchar] = j;
+            arrays2[i] = j;
         }
 
         // Done by C
@@ -390,9 +390,9 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i] = INT8_MIN + i;
+            arrays1[i] = j;
         }
 
         uint32_t pattern        = 0xbcbcbcbc;
@@ -521,10 +521,10 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = INT_MIN; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+offsetint32_t] = INT32_MIN + i;
-            arrays2[i] = INT32_MIN + i;
+            arrays1[i+offsetint32_t] = j;
+            arrays2[i] = j;
         }
 
         // Done by C
@@ -568,9 +568,9 @@ class TestAudioUtils: public QObject
         int32_t *arrays2      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (size_t i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i] = INT16_MIN + i;
+            arrays1[i] = j;
         }
 
         uint32_t pattern        = 0xbcbcbcbc;
