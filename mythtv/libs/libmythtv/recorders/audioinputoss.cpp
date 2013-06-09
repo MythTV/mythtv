@@ -64,11 +64,15 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     }
 
     chk = 0; // disable input for now
-    ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &chk);
+    if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &chk) < 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC_DEV +
+            QString("failed to disable audio device %1: ").arg(tag) + ENO);
+    }
 
     // Set format
     int format, choice;
-    QString tag = QString::null;
+    QString tag;
     switch (sample_bits)
     {
         case 8:
@@ -165,7 +169,11 @@ bool AudioInputOSS::Start(void)
     if (IsOpen())
     {
         int trig = 0; // clear
-        ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig);
+        if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC_DEV +
+                QString("failed to disable audio device %1: ").arg(tag) + ENO);
+        }
         trig = PCM_ENABLE_INPUT; // enable input
         if (ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig) < 0)
         {
