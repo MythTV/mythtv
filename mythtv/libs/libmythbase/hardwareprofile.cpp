@@ -288,10 +288,12 @@ QString HardwareProfile::GetHardwareProfile() const
 
 bool HardwareProfileTask::DoCheckRun(QDateTime now)
 {
-    if (GetLastRun().secsTo(now) > 2592000 && // 60*60*24*30
-        (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 1))
-            return true;
-    return false;
+    if (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 0)
+        // global disable, we don't want to run
+        return false;
+
+    // leave it up to the standard periodic calculation, 30 +-1 days
+    return PeriodicHouseKeeperTask::DoCheckRun(now);
 }
 
 bool HardwareProfileTask::DoRun(void)

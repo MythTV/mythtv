@@ -49,10 +49,13 @@ class MBASE_PUBLIC HardwareProfile : public QObject
     QString   m_hardwareProfile;
 };
 
-class MBASE_PUBLIC HardwareProfileTask : public HouseKeeperTask
+class MBASE_PUBLIC HardwareProfileTask : public PeriodicHouseKeeperTask
 {
   public:
-    HardwareProfileTask(void) : HouseKeeperTask("HardwareProfiler",
+    HardwareProfileTask(void) : PeriodicHouseKeeperTask("HardwareProfiler",
+                                            2592000, // 30 days in seconds
+                                            0.96667, // up to one day early
+                                            1.03333, // up to one day late
                                             kHKLocal, kHKRunOnStartup) {}
     virtual bool DoCheckRun(QDateTime now);
     virtual bool DoRun(void);
