@@ -296,31 +296,40 @@ static void startAppearWiz(void)
     int curW = gCoreContext->GetNumSetting("GuiWidth", 0);
     int curH = gCoreContext->GetNumSetting("GuiHeight", 0);
 
-    MythSystemLegacy *wizard = new MythSystemLegacy(
-        GetInstallPrefix() + "/bin/mythscreenwizard",
-        QStringList(),
-        kMSDisableUDPListener | kMSPropagateLogs);
-    wizard->Run();
+    bool isWindowed =
+            (gCoreContext->GetNumSetting("RunFrontendInWindow", 0) == 1);
 
     bool reload = false;
 
-    if (!wizard->Wait())
+    if (isWindowed)
+        ShowOkPopup(QObject::tr("The ScreenSetupWizard cannot be used while "
+                              "mythfrontend is operating in windowed mode."));
+    else
     {
-        // no reported errors, check for changed geometry parameters
-        gCoreContext->ClearSettingsCache("GuiOffsetX");
-        gCoreContext->ClearSettingsCache("GuiOffsetY");
-        gCoreContext->ClearSettingsCache("GuiWidth");
-        gCoreContext->ClearSettingsCache("GuiHeight");
+        MythSystemLegacy *wizard = new MythSystemLegacy(
+            GetInstallPrefix() + "/bin/mythscreenwizard",
+            QStringList(),
+            kMSDisableUDPListener | kMSPropagateLogs);
+        wizard->Run();
 
-        if ((curX != gCoreContext->GetNumSetting("GuiOffsetX", 0)) ||
-            (curY != gCoreContext->GetNumSetting("GuiOffsetY", 0)) ||
-            (curW != gCoreContext->GetNumSetting("GuiWidth", 0)) ||
-            (curH != gCoreContext->GetNumSetting("GuiHeight", 0)))
-                reload = true;
+        if (!wizard->Wait())
+        {
+            // no reported errors, check for changed geometry parameters
+            gCoreContext->ClearSettingsCache("GuiOffsetX");
+            gCoreContext->ClearSettingsCache("GuiOffsetY");
+            gCoreContext->ClearSettingsCache("GuiWidth");
+            gCoreContext->ClearSettingsCache("GuiHeight");
+
+            if ((curX != gCoreContext->GetNumSetting("GuiOffsetX", 0)) ||
+                (curY != gCoreContext->GetNumSetting("GuiOffsetY", 0)) ||
+                (curW != gCoreContext->GetNumSetting("GuiWidth", 0)) ||
+                (curH != gCoreContext->GetNumSetting("GuiHeight", 0)))
+                    reload = true;
+        }
+
+        delete wizard;
+        wizard = NULL;
     }
-
-    delete wizard;
-    wizard = NULL;
 
     if (reload)
         GetMythMainWindow()->JumpTo("Reload Theme");
