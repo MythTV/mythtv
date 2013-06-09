@@ -131,7 +131,7 @@ bool HouseKeeperTask::Run(void)
     LOG(VB_GENERAL, LOG_INFO, QString("Running HouseKeeperTask '%1'.")
                                 .arg(m_dbTag));
     bool res = DoRun();
-    if (res)
+    if (!res)
         LOG(VB_GENERAL, LOG_INFO, QString("HouseKeeperTask '%1' Failed.")
                                 .arg(m_dbTag));
     else
