@@ -286,7 +286,8 @@ void ZMServer::tokenize(const string &command, vector<string> &tokens)
     }
 }
 
-void ZMServer::processRequest(char* buf, int nbytes)
+// returns true if we get a QUIT command from the client
+bool ZMServer::processRequest(char* buf, int nbytes)
 {
 #if 0
     // first 8 bytes is the length of the following data
@@ -302,13 +303,15 @@ void ZMServer::processRequest(char* buf, int nbytes)
     tokenize(s, tokens);
 
     if (tokens.empty())
-        return;
+        return false;
 
     if (m_debug)
         cout << "Processing: '" << tokens[0] << "'" << endl;
 
     if (tokens[0] == "HELLO")
         handleHello();
+    else if (tokens[0] == "QUIT")
+        return true;
     else if (tokens[0] == "GET_SERVER_STATUS")
         handleGetServerStatus();
     else if (tokens[0] == "GET_MONITOR_STATUS")
@@ -339,6 +342,8 @@ void ZMServer::processRequest(char* buf, int nbytes)
         handleSetMonitorFunction(tokens);
     else
         send("UNKNOWN_COMMAND");
+
+    return false;
 }
 
 bool ZMServer::send(const string s) const

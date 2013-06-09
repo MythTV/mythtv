@@ -343,7 +343,7 @@ int main(int argc, char **argv)
                     else
                     {
                         ZMServer *server = serverList[i];
-                        server->processRequest(buf, nbytes);
+                        quit = server->processRequest(buf, nbytes);
                     }
                 }
             }

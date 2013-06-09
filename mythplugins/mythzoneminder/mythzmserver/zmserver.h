@@ -152,7 +152,7 @@ class ZMServer
     ZMServer(int sock, bool debug);
     ~ZMServer();
 
-    void processRequest(char* buf, int nbytes);
+    bool processRequest(char* buf, int nbytes);
 
   private:
     string getZMSetting(const string &setting);
