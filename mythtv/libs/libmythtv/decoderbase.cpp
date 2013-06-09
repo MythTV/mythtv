@@ -1099,7 +1099,7 @@ int DecoderBase::AutoSelectTrack(uint type)
     }
 
     int oldTrack = currentTrack[type];
-    currentTrack[type] = (selTrack < 0) ? -1 : selTrack;
+    currentTrack[type] = selTrack;
     StreamInfo tmp = tracks[type][currentTrack[type]];
     selectedTrack[type] = tmp;
 
