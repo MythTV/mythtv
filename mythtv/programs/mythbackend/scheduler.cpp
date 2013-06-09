@@ -1811,9 +1811,6 @@ void Scheduler::run(void)
 
     while (doRun)
     {
-        if (!doRun)
-            break;
-
         // If something changed, it might have short circuited a pass
         // through the list or changed the next run times.  Start a
         // new pass immediately to take care of anything that still
@@ -1829,44 +1826,52 @@ void Scheduler::run(void)
         int secs_to_next =
             max(qint64(curtime.secsTo(nextStartTime)), qint64(0));
         int sched_sleep = max(curtime.msecsTo(nextWakeTime), qint64(0));
-        bool queuedRequests = HaveQueuedRequests();
+        bool haveRequests = HaveQueuedRequests();
+        bool checkSlaves = lastSleepCheck.secsTo(curtime) >= 300;
 
         // If we're about to start a recording don't do any reschedules...
         // instead sleep for a bit
-        if (secs_to_next < schedRunTime || !queuedRequests)
+        if (secs_to_next < schedRunTime ||
+            (!haveRequests && !checkSlaves))
         {
-            LOG(VB_SCHEDULE, LOG_INFO,
-                QString("sleeping for %1 ms (s2n: %2 sr: %3 qr: %4)")
-                .arg(sched_sleep).arg(secs_to_next).arg(schedRunTime)
-                .arg(HaveQueuedRequests()));
-            if (reschedWait.wait(&schedLock, sched_sleep))
-                continue;
+            if (sched_sleep)
+            {
+                LOG(VB_SCHEDULE, LOG_INFO,
+                    QString("sleeping for %1 ms "
+                            "(s2n: %2 sr: %3 qr: %4 cs: %5)")
+                    .arg(sched_sleep).arg(secs_to_next).arg(schedRunTime)
+                    .arg(haveRequests).arg(checkSlaves));
+                if (reschedWait.wait(&schedLock, sched_sleep))
+                    continue;
+            }
         }
         else
         {
-            // The master backend is a long lived program, so
-            // we reload some key settings on each reschedule.
-            prerollseconds  =
-                gCoreContext->GetNumSetting("RecordPreRoll", 0);
-            wakeThreshold =
-                gCoreContext->GetNumSetting("WakeUpThreshold", 300);
-            idleTimeoutSecs =
-                gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
-            idleWaitForRecordingTime =
-                gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
-            tuningTimeout =
-                gCoreContext->GetNumSetting("tuningTimeout", 180);
-
-            QTime t; t.start();
-
-            if (HandleReschedule())
+            if (haveRequests)
             {
-                statuschanged = true;
-                startIter = reclist.begin();
-            }
+                // The master backend is a long lived program, so
+                // we reload some key settings on each reschedule.
+                prerollseconds  =
+                    gCoreContext->GetNumSetting("RecordPreRoll", 0);
+                wakeThreshold =
+                    gCoreContext->GetNumSetting("WakeUpThreshold", 300);
+                idleTimeoutSecs =
+                    gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
+                idleWaitForRecordingTime =
+                    gCoreContext->GetNumSetting("idleWaitForRecordingTime",
+                                                15);
+                tuningTimeout =
+                    gCoreContext->GetNumSetting("tuningTimeout", 180);
 
-            schedRunTime = max(int(((t.elapsed() + 999) / 1000) * 1.5 + 2),
-                               schedRunTime);
+                QTime t; t.start();
+                if (HandleReschedule())
+                {
+                    statuschanged = true;
+                    startIter = reclist.begin();
+                }
+                schedRunTime = max(int(((t.elapsed() + 999) / 1000) * 1.5 + 2),
+                                   schedRunTime);
+            }
 
             if (firstRun)
             {
@@ -1881,22 +1886,16 @@ void Scheduler::run(void)
                     continue;
             }
 
-            // Unless a recording is about to start, check for slaves
-            // that can be put to sleep if it has been at least five
-            // minutes since we last put slaves to sleep.
-            curtime = MythDate::current();
-            secs_to_next = (startIter != reclist.end()) ?
-                curtime.secsTo((*startIter)->GetRecordingStartTime()) : 60*60;
-            if ((secs_to_next > schedRunTime * 1.5f) &&
-                (lastSleepCheck.secsTo(curtime) > 300))
+            if (checkSlaves)
             {
+                // Check for slaves that can be put to sleep.
                 PutInactiveSlavesToSleep();
                 lastSleepCheck = MythDate::current();
             }
         }
 
         nextStartTime = MythDate::current().addDays(14);
-        nextWakeTime = nextStartTime;
+        nextWakeTime = lastSleepCheck.addSecs(300);
 
         // Skip past recordings that are already history
         // (i.e. AddHistory() has been called setting oldrecstatus)
@@ -2406,7 +2405,7 @@ bool Scheduler::HandleRecording(
     // needs to be shorter than the related one in SchedLiveTV().
     if (secsleft - prerollseconds > 60)
     {
-        nextStartTime = min(nextStartTime, nextrectime);
+        nextStartTime = min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = min(nextWakeTime,
                             nextrectime.addSecs(-prerollseconds - 60));
         return true;
@@ -2425,7 +2424,7 @@ bool Scheduler::HandleRecording(
 
     if (secsleft - prerollseconds > 35)
     {
-        nextStartTime = min(nextStartTime, nextrectime);
+        nextStartTime = min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = min(nextWakeTime,
                             nextrectime.addSecs(-prerollseconds - 35));
         return false;
@@ -2488,7 +2487,7 @@ bool Scheduler::HandleRecording(
 
     if (secsleft - prerollseconds > 30)
     {
-        nextStartTime = min(nextStartTime, nextrectime);
+        nextStartTime = min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = min(nextWakeTime,
                             nextrectime.addSecs(-prerollseconds - 30));
         return false;
