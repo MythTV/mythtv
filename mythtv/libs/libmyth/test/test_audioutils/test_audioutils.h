@@ -50,7 +50,7 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc(SIZEARRAY * sizeof(short));
         float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -59,7 +59,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -81,7 +81,7 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+1] = j;
         }
@@ -90,7 +90,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+1, arrayf+1, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+1], arrays2[i+1]);
         }
@@ -114,7 +114,7 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetshort] = j;
             arrays2[i] = j;
@@ -130,7 +130,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+offsetshort], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat], arrayf2[i]);
@@ -159,7 +159,7 @@ class TestAudioUtils: public QObject
         short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -263,7 +263,7 @@ class TestAudioUtils: public QObject
         // arrays2 is produced by SSE
         AudioOutputUtil::fromFloat(FORMAT_S16, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
         AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
@@ -285,7 +285,7 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc(SIZEARRAY * sizeof(uchar));
         float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
 
-        for (int i = 0, j = 0; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -294,7 +294,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -315,7 +315,7 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+1] = j;
         }
@@ -324,7 +324,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2+1, arrayf+1, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+1], arrays2[i+1]);
         }
@@ -348,7 +348,7 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetuchar] = j;
             arrays2[i] = j;
@@ -364,7 +364,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+offsetuchar], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat], arrayf2[i]);
@@ -390,7 +390,7 @@ class TestAudioUtils: public QObject
         uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -493,7 +493,7 @@ class TestAudioUtils: public QObject
         // arrays2 is produced by SSE
         AudioOutputUtil::fromFloat(FORMAT_U8, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
         AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
@@ -521,7 +521,7 @@ class TestAudioUtils: public QObject
         float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
         float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
 
-        for (int i = 0, j = INT_MIN; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = INT_MIN; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetint32_t] = j;
             arrays2[i] = j;
@@ -537,7 +537,7 @@ class TestAudioUtils: public QObject
         QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
         val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
         QCOMPARE((size_t)val2, SIZEARRAY * sizeof(int32_t));
-        for (int i = 0; i < SIZEARRAY; i++)
+        for (size_t i = 0; i < SIZEARRAY; i++)
         {
             //fprintf(stderr, "arrayf1[%d]=%f (%.14g) arrayf2[%d]=%f arrayf1[i]: >=-1:%d <=1:%d\n",
             //        i, arrayf1[i+offsetfloat1], (double)arrayf1[i+offsetfloat1],
@@ -568,7 +568,7 @@ class TestAudioUtils: public QObject
         int32_t *arrays2      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        for (size_t i = 0, int j = -32768; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -672,7 +672,7 @@ class TestAudioUtils: public QObject
         // arrays2 is produced by SSE
         AudioOutputUtil::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
         AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
@@ -708,7 +708,7 @@ class TestAudioUtils: public QObject
         // arrayf3 is produced by SSE
         AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
         AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf3, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             QCOMPARE(arrayf2[i], arrayf3[i]);
             QVERIFY(arrayf2[i] >= -1.0);
@@ -721,7 +721,7 @@ class TestAudioUtils: public QObject
         // also test in-place float conversion
         AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf1+offsetfloat1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
         AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2+offsetfloat2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
-        for (int i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
