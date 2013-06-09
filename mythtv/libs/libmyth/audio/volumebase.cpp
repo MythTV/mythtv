@@ -10,7 +10,7 @@ using namespace std;
 #include "mythcorecontext.h"
 
 VolumeBase::VolumeBase() :
-    volume(80), current_mute_state(kMuteOff)
+    volume(80), current_mute_state(kMuteOff), channels(0)
 {
     internal_vol = gCoreContext->GetNumSetting("MythControlsVolume", 1);
     swvol = swvol_setting =
