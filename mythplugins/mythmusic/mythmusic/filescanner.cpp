@@ -167,28 +167,31 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
                 "WHERE path = :DIRECTORY ;");
     query.bindValue(":DIRECTORY", directory);
 
-    if (query.exec() && query.next())
+    if (!query.exec())
     {
-            return query.value(0).toInt();
-    }
-    else
-    {
-        query.prepare("INSERT INTO music_directories (path, parent_id) "
-                    "VALUES (:DIRECTORY, :PARENTID);");
-        query.bindValue(":DIRECTORY", directory);
-        query.bindValue(":PARENTID", parentid);
-
-        if (!query.exec() || !query.isActive()
-        || query.numRowsAffected() <= 0)
-        {
-            MythDB::DBError("music insert directory", query);
-            return -1;
-        }
-        return query.lastInsertId().toInt();
+        MythDB::DBError("music select directory id", query);
+        return -1;
     }
 
-    MythDB::DBError("music select directory id", query);
-    return -1;
+    if (query.next())
+    {
+        // we have found the directory already in the DB
+        return query.value(0).toInt();
+    }
+
+    // directory is not in the DB so insert it
+    query.prepare("INSERT INTO music_directories (path, parent_id) "
+                "VALUES (:DIRECTORY, :PARENTID);");
+    query.bindValue(":DIRECTORY", directory);
+    query.bindValue(":PARENTID", parentid);
+
+    if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+    {
+        MythDB::DBError("music insert directory", query);
+        return -1;
+    }
+
+    return query.lastInsertId().toInt();
 }
 
 /*!
