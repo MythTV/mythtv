@@ -48,6 +48,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
 
     QString         GetTag(void)                    { return m_dbTag;       }
     QDateTime       GetLastRun(void)                { return m_lastRun;     }
+    HouseKeeperScope    GetScope(void)              { return m_scope;       }
     QDateTime       QueryLastRun(void);
     QDateTime       UpdateLastRun(void)
                            { return UpdateLastRun(MythDate::current());     }

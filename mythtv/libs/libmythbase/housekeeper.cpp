@@ -663,7 +663,15 @@ void HouseKeeper::customEvent(QEvent *e)
 
             QMutexLocker mapLock(&m_mapLock);
             if (m_taskMap.contains(tag))
-                m_taskMap[tag]->SetLastRun(last);
+            {
+                if ((m_taskMap[tag]->GetScope() == kHKGlobal) ||
+                        ((m_taskMap[tag]->GetScope() == kHKLocal) &&
+                         (gCoreContext->GetHostName() == hostname)))
+                    // task being run in the same scope as us.
+                    // update the run time so we don't attempt to run
+                    //      it ourselves
+                    m_taskMap[tag]->SetLastRun(last);
+            }
         }
     }
 }
