@@ -78,7 +78,7 @@ MMulticastSocketDevice::~MMulticastSocketDevice()
 {
     if (!m_address.isNull() &&
         (setsockopt(socket(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
-                    (char*)(&m_imr), sizeof(m_imr) < 0)))
+                    (char*)(&m_imr), sizeof(m_imr)) < 0))
     {
         // This isn't really an error, we will drop out of
         // the group anyway when we close the socket.
