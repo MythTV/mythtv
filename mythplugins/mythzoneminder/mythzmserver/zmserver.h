@@ -129,6 +129,8 @@ typedef struct
     int palette;
     int controllable;
     int trackMotion;
+    int mapFile;
+    void *shm_ptr;
 
     string getIdStr()
     {

@@ -350,6 +350,13 @@ int main(int argc, char **argv)
         }
     }
 
+    // cleanly remove all the ZMServer's
+    for (std::map<int, ZMServer*>::iterator it = serverList.begin();
+         it != serverList.end(); ++it)
+    {
+        delete it->second;
+    }
+
     mysql_close(&g_dbConn);
 
     return EXIT_OK;

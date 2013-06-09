@@ -260,6 +260,23 @@ ZMServer::ZMServer(int sock, bool debug)
 
 ZMServer::~ZMServer()
 {
+    for (std::map<int, MONITOR*>::iterator it = m_monitors.begin(); it != m_monitors.end(); ++it)
+    {
+        MONITOR *mon = it->second;
+        if (mon->mapFile != -1)
+        {
+            if (close(mon->mapFile) == -1)
+                cout << "Failed to close mapFile" << endl;
+            else
+                if (m_debug)
+                    cout << "Closed mapFile for monitor: " << mon->name << endl;
+        }
+
+        delete mon;
+    }
+
+    m_monitors.clear();
+
     if (m_debug)
         cout << "ZMServer destroyed\n";
 }
@@ -1350,8 +1367,8 @@ void ZMServer::getMonitorList(void)
 
 void ZMServer::initMonitor(MONITOR *monitor)
 {
-    void *shm_ptr = NULL;
-
+    monitor->shm_ptr = NULL;
+    monitor->mapFile = -1;
     monitor->shared_data = NULL;
     monitor->shared_images = NULL;
 
@@ -1382,22 +1399,27 @@ void ZMServer::initMonitor(MONITOR *monitor)
     stringstream mmap_filename;
     mmap_filename << m_mmapPath << "/zm.mmap." << monitor->mon_id;
 
-    int mapFile = open(mmap_filename.str().c_str(), O_RDONLY, 0x0);
-    if (mapFile >= 0)
+    monitor->mapFile = open(mmap_filename.str().c_str(), O_RDONLY, 0x0);
+    if (monitor->mapFile >= 0)
     {
         if (m_debug)
             cout << "Opened mmap file: " << mmap_filename << endl;
 
-        shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
-                                            MAP_SHARED, mapFile, 0x0);
-        if (shm_ptr == MAP_FAILED)
+        monitor->shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
+                                MAP_SHARED, monitor->mapFile, 0x0);
+        if (monitor->shm_ptr == MAP_FAILED)
         {
-            cout << "Failed to map shared memory from file [" << 
-                mmap_filename << "] " <<
-                "for monitor: " << 
-                monitor->mon_id << 
-                endl;
+            cout << "Failed to map shared memory from file ["
+                 << mmap_filename << "] " << "for monitor: "
+                 << monitor->mon_id << endl;
             monitor->status = "Error";
+
+            if (close(monitor->mapFile) == -1)
+                cout << "Failed to close mmap file" << endl;
+
+            monitor->mapFile = -1;
+            monitor->shm_ptr = NULL;
+
             return;
         }
     }
@@ -1407,18 +1429,15 @@ void ZMServer::initMonitor(MONITOR *monitor)
         // using the legacy shared memory support
         if (m_debug)
         {
-            cout << "Failed to open mmap file [" <<
-                mmap_filename << "] " <<
-                "for monitor: " <<
-                monitor->mon_id <<
-                " : " << strerror(errno) <<
-                endl;
+            cout << "Failed to open mmap file [" << mmap_filename << "] "
+                 << "for monitor: " << monitor->mon_id
+                 << " : " << strerror(errno) << endl;
             cout << "Falling back to the legacy shared memory method" << endl;
         }
     }
 #endif
 
-    if (shm_ptr == NULL)
+    if (monitor->shm_ptr == NULL)
     {
         // fail back to shmget() functionality if mapping memory above failed.
         int shmid;
@@ -1442,10 +1461,10 @@ void ZMServer::initMonitor(MONITOR *monitor)
             return;
         }
 
-        shm_ptr = shmat(shmid, 0, SHM_RDONLY);
+        monitor->shm_ptr = shmat(shmid, 0, SHM_RDONLY);
 
 
-        if (shm_ptr == NULL)
+        if (monitor->shm_ptr == NULL)
         {
             cout << "Failed to shmat for monitor: " << monitor->mon_id << endl;
             monitor->status = "Error";
@@ -1453,15 +1472,15 @@ void ZMServer::initMonitor(MONITOR *monitor)
         }
     }
 
-    monitor->shared_data = (SharedData*)shm_ptr;
+    monitor->shared_data = (SharedData*)monitor->shm_ptr;
 
     if (g_zmversion == "1.22.2")
-        monitor->shared_images = (unsigned char*) shm_ptr +
+        monitor->shared_images = (unsigned char*) monitor->shm_ptr +
             sizeof(SharedData) +
             sizeof(TriggerData_old) +
             ((monitor->image_buffer_count) * sizeof(struct timeval));
     else
-        monitor->shared_images = (unsigned char*) shm_ptr +
+        monitor->shared_images = (unsigned char*) monitor->shm_ptr +
             sizeof(SharedData) +
             sizeof(TriggerData) +
             ((monitor->image_buffer_count) * sizeof(struct timeval));
