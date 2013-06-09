@@ -446,10 +446,10 @@ bool JobQueueRecoverTask::DoRun(void)
 MythFillDatabaseTask::MythFillDatabaseTask(void) :
     DailyHouseKeeperTask("MythFillDB"), m_msMFD(NULL)
 {
-    SetHourWindow();
+    SetHourWindowFromDB();
 }
 
-void MythFillDatabaseTask::SetHourWindow(void)
+void MythFillDatabaseTask::SetHourWindowFromDB(void)
 {
     // we need to set the time window from database settings, so we cannot
     // initialize these values in. grab them and set them afterwards

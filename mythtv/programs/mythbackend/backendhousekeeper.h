@@ -66,7 +66,7 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 
     virtual void Terminate(void);
 
-    void SetHourWindow(void);
+    void SetHourWindowFromDB(void);
   private:
     MythSystemLegacy *m_msMFD;
 //    bool m_running;
