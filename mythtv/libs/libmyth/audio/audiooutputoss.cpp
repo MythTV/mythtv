@@ -144,7 +144,10 @@ bool AudioOutputOSS::OpenDevice()
         return false;
     }
 
-    fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
+    if (fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK) == -1)
+    {
+        VBERRENO(QString("Error removing the O_NONBLOCK flag from audio device FD (%1)").arg(main_device));
+    }
 
     bool err = false;
     int  format;
