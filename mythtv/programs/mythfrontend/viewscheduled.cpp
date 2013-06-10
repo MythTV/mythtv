@@ -596,8 +596,7 @@ void ViewScheduled::showGuide()
     QString startchannel = pginfo->GetChanNum();
     uint startchanid = pginfo->GetChanID();
     QDateTime starttime = pginfo->GetScheduledStartTime();
-    GuideGrid::RunProgramGuide(startchanid, startchannel, starttime,
-                               m_player, this, -2);
+    GuideGrid::RunProgramGuide(startchanid, startchannel, starttime);
 }
 
 void ViewScheduled::upcoming()

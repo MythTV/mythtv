@@ -797,8 +797,7 @@ void ProgLister::ShowGuide(void)
     if (pi)
     {
         GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
-                                   pi->GetScheduledStartTime(),
-                                   NULL, this, -2);
+                                   pi->GetScheduledStartTime());
     }
 }
 
