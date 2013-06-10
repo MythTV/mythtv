@@ -953,6 +953,7 @@ NULL
         {
             MythDB::DBError("Unable to retrieve IndividualMuteControl values.",
                             select);
+            return false;
         }
         else
         {
@@ -974,9 +975,9 @@ NULL
 
                     if (!update.exec())
                     {
-                         MythDB::DBError("Unable to update keybindings",
+                        MythDB::DBError("Unable to update keybindings",
                                          update);
-                         continue;
+                        return false;
                     }
 
                     update.prepare("UPDATE keybindings "
@@ -991,9 +992,9 @@ NULL
 
                     if (!update.exec())
                     {
-                         MythDB::DBError("Unable to update keybindings",
+                        MythDB::DBError("Unable to update keybindings",
                                          update);
-                         continue;
+                        return false;
                     }
 
                     update.prepare("REPLACE INTO keybindings "
@@ -1004,17 +1005,17 @@ NULL
                     update.bindValue(":HOSTNAME", hostname);
                     if (!update.exec())
                     {
-                         MythDB::DBError("Unable to update keybindings",
+                        MythDB::DBError("Unable to update keybindings",
                                          update);
-                         continue;
+                        return false;
                     }
                     update.bindValue(":CONTEXT", "TV Frontend");
                     update.bindValue(":HOSTNAME", hostname);
                     if (!update.exec())
                     {
-                         MythDB::DBError("Unable to update keybindings",
+                        MythDB::DBError("Unable to update keybindings",
                                          update);
-                         continue;
+                        return false;
                     }
 
                 }
@@ -1036,6 +1037,7 @@ NULL
         if (!query.exec())
         {
             MythDB::DBError("Unable to update keybindings", query);
+            return false;
         }
 
         query.prepare("SELECT data FROM settings "
@@ -1045,6 +1047,7 @@ NULL
         {
             MythDB::DBError("Unable to retrieve EPGEnableJumpToChannel values.",
                             query);
+            return false;
         }
         else
         {
@@ -1064,9 +1067,9 @@ NULL
 
                     if (!bindings.exec())
                     {
-                         MythDB::DBError("Unable to update keybindings",
+                        MythDB::DBError("Unable to update keybindings",
                                          bindings);
-                         continue;
+                        return false;
                     }
                     else
                     {
@@ -1104,7 +1107,7 @@ NULL
                             {
                                 MythDB::DBError("Unable to update keybindings",
                                                 update);
-                                continue;
+                                return false;
                             }
                         }
                     }
