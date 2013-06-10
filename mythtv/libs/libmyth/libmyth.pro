@@ -28,6 +28,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
 HEADERS += audio/audiooutpututil.h audio/audiooutputdownmix.h
+HEADERS += audio/audioconvert.h
 HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
@@ -55,6 +56,7 @@ SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
 SOURCES += audio/audiooutputnull.cpp
 SOURCES += audio/audiooutpututil.cpp audio/audiooutputdownmix.cpp
+SOURCES += audio/audioconvert.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.c
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 
@@ -121,6 +123,7 @@ inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
+inc.files += audio/audioconvert.h
 inc.files += audio/volumebase.h audio/eldutils.h
 inc.files += inetcomms.h mythwizard.h schemawizard.h
 inc.files += mythmediamonitor.h

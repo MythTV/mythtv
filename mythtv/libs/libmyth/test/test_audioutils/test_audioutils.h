@@ -319,7 +319,7 @@ class TestAudioUtils: public QObject
         }
 
         QFETCH(bool, useSSE);
-        
+
         if (useSSE)
         {
             QBENCHMARK
