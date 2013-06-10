@@ -39,6 +39,9 @@ AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
         in_size = INBUFSIZE;
     }
     inp = (inbuf_t *)av_malloc(INBUFSIZE);
+
+    for (int i = 0; i < FF_MIN_BUFFER_SIZE; i++)
+        m_encodebuffer[i] = 0;
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
