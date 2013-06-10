@@ -1761,6 +1761,10 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     int bdiff = kAudioRingBufferSize - raud;
 
     int obytes = output_settings->SampleSize(output_format);
+
+    if (obytes <= 0)
+        return 0;
+
     bool fromFloats = processing && !enc && output_format != FORMAT_FLT;
 
     // Scale if necessary
