@@ -353,12 +353,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             tv->SetLastProgram(&pginfo);
     }
 
-    if (curProgram)
-    {
-        startSysEventSent = true;
-        SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
-    }
-
     // Notify others that we are about to play
     gCoreContext->WantingPlayback(tv);
 
@@ -463,7 +457,8 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
     if (curProgram)
     {
-        SendMythSystemPlayEvent("PLAY_STOPPED", curProgram);
+        if (startSysEventSent)
+            SendMythSystemPlayEvent("PLAY_STOPPED", curProgram);
 
         if (deleterecording)
         {
@@ -483,7 +478,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 
         delete curProgram;
     }
-    else
+    else if (startSysEventSent)
         gCoreContext->SendSystemEvent("PLAY_STOPPED");
 
     if (!playerError.isEmpty())
