@@ -838,6 +838,7 @@ bool RecordingRule::IsValid(QString &msg)
     case kOverrideRecord:
     case kDontRecord:
         isOverride = true;
+        break;
     case kNotRecording:
     default:
         msg = QString("Invalid recording type.");
