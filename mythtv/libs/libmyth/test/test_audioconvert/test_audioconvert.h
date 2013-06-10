@@ -46,24 +46,35 @@ class TestAudioConvert: public QObject
         gCoreContext = new MythCoreContext("bin_version", NULL);
     }
 
+    void Identical_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test s16 -> float -> s16
     void Identical(void)
     {
-        int    SIZEARRAY    = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int    SIZEARRAY    = SAMPLES;
         short* arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         short* arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
 
         AudioConvert ac = AudioConvert(FORMAT_S16, FORMAT_S16);
 
-        int val1 = ac.Process(arrays2, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac.Process(arrays2, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -71,16 +82,27 @@ class TestAudioConvert: public QObject
         av_free(arrays2);
     }
 
+    void S16ToFloat_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test s16 -> float -> s16 is lossless
     void S16ToFloat(void)
     {
-        int    SIZEARRAY    = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int    SIZEARRAY    = SAMPLES;
         short* arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         short* arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         float* arrayf       = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -88,11 +110,11 @@ class TestAudioConvert: public QObject
         AudioConvert acf = AudioConvert(FORMAT_S16, FORMAT_FLT);
         AudioConvert acs = AudioConvert(FORMAT_FLT, FORMAT_S16);
 
-        int val1 = acf.Process(arrayf, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrayf[0]));
-        int val2 = acs.Process(arrays2, arrayf, SIZEARRAY * ISIZEOF(arrayf[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = acf.Process(arrayf, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrayf[0]));
+        int val2 = acs.Process(arrays2, arrayf, SAMPLES * ISIZEOF(arrayf[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -102,17 +124,28 @@ class TestAudioConvert: public QObject
         av_free(arrayf);
     }
 
+    void S16ToS24LSB_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test S16 -> S24LSB -> S16 is lossless
     void S16ToS24LSB(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int SIZEARRAY       = SAMPLES;
 
         short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         int32_t* arrays24   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -120,11 +153,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac24   = AudioConvert(FORMAT_S16, FORMAT_S24LSB);
         AudioConvert acs    = AudioConvert(FORMAT_S24LSB, FORMAT_S16);
 
-        int val1 = ac24.Process(arrays24, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays24[0]));
-        int val2 = acs.Process(arrays2, arrays24, SIZEARRAY * ISIZEOF(arrays24[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac24.Process(arrays24, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays24[0]));
+        int val2 = acs.Process(arrays2, arrays24, SAMPLES * ISIZEOF(arrays24[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
             // Check we are indeed getting a 24 bits int
@@ -137,16 +170,27 @@ class TestAudioConvert: public QObject
         av_free(arrays24);
     }
 
+    void S24LSBToS32_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     void S24LSBToS32(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
 
-        int32_t*   arrays1  = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
-        int32_t*   arrays2  = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
-        int32_t*   arrays32 = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
+        int SIZEARRAY       = SAMPLES;
+
+        int32_t*   arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        int32_t*   arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        int32_t*   arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -154,11 +198,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac24   = AudioConvert(FORMAT_S24LSB, FORMAT_S32);
         AudioConvert acs    = AudioConvert(FORMAT_S32, FORMAT_S24LSB);
 
-        int val1 = ac24.Process(arrays32, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays32[0]));
-        int val2 = acs.Process(arrays2, arrays32, SIZEARRAY * ISIZEOF(arrays32[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac24.Process(arrays32, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays32[0]));
+        int val2 = acs.Process(arrays2, arrays32, SAMPLES * ISIZEOF(arrays32[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -168,17 +212,28 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
+    void S16ToS24_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test S16 -> S24 -> S16 is lossless
     void S16ToS24(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int SIZEARRAY       = SAMPLES;
 
         short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         int32_t* arrays24   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j << 8;
         }
@@ -186,11 +241,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac24   = AudioConvert(FORMAT_S16, FORMAT_S24);
         AudioConvert acs    = AudioConvert(FORMAT_S24, FORMAT_S16);
 
-        int val1 = ac24.Process(arrays24, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays24[0]));
-        int val2 = acs.Process(arrays2, arrays24, SIZEARRAY * ISIZEOF(arrays24[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac24.Process(arrays24, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays24[0]));
+        int val2 = acs.Process(arrays2, arrays24, SAMPLES * ISIZEOF(arrays24[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
             // Check we are indeed getting a 24 bits int
@@ -202,16 +257,27 @@ class TestAudioConvert: public QObject
         av_free(arrays24);
     }
 
+    void S24ToS32_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     void S24ToS32(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
 
-        int32_t*   arrays1  = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
-        int32_t*   arrays2  = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
-        int32_t*   arrays32 = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
+        int SIZEARRAY       = SAMPLES;
+
+        int32_t*   arrays1  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        int32_t*   arrays2  = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
+        int32_t*   arrays32 = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j << 8;
         }
@@ -219,11 +285,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac32   = AudioConvert(FORMAT_S24, FORMAT_S32);
         AudioConvert acs    = AudioConvert(FORMAT_S32, FORMAT_S24);
 
-        int val1 = ac32.Process(arrays32, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays32[0]));
-        int val2 = acs.Process(arrays2, arrays32, SIZEARRAY * ISIZEOF(arrays32[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac32.Process(arrays32, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays32[0]));
+        int val2 = acs.Process(arrays2, arrays32, SAMPLES * ISIZEOF(arrays32[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -233,17 +299,28 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
+    void S16ToS32_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test S16 -> S24 -> S16 is lossless
     void S16ToS32(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
 
-        short*   arrays1    = (short*)av_malloc((SIZEARRAY+1) * ISIZEOF(short));
-        short*   arrays2    = (short*)av_malloc((SIZEARRAY+1) * ISIZEOF(short));
-        int32_t* arrays32   = (int32_t*)av_malloc((SIZEARRAY+1) * ISIZEOF(int32_t));
+        int SIZEARRAY       = SAMPLES;
+
+        short*   arrays1    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        short*   arrays2    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        int32_t* arrays32   = (int32_t*)av_malloc(SIZEARRAY * ISIZEOF(int32_t));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -251,11 +328,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac32   = AudioConvert(FORMAT_S16, FORMAT_S32);
         AudioConvert acs    = AudioConvert(FORMAT_S32, FORMAT_S16);
 
-        int val1 = ac32.Process(arrays32, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays32[0]));
-        int val2 = acs.Process(arrays2, arrays32, SIZEARRAY * ISIZEOF(arrays32[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac32.Process(arrays32, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays32[0]));
+        int val2 = acs.Process(arrays2, arrays32, SAMPLES * ISIZEOF(arrays32[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
@@ -265,17 +342,28 @@ class TestAudioConvert: public QObject
         av_free(arrays32);
     }
 
+    void U8ToS16_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << 256;
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test U8 -> S16 -> U8 is lossless
     void U8ToS16(void)
     {
+        QFETCH(int, SAMPLES);
+
         int SIZEARRAY       = 256;
 
-        uchar*   arrays1    = (uchar*)av_malloc((SIZEARRAY+1) * ISIZEOF(uchar));
-        uchar*   arrays2    = (uchar*)av_malloc((SIZEARRAY+1) * ISIZEOF(uchar));
-        short*  arrays32    = (short*)av_malloc((SIZEARRAY+1) * ISIZEOF(short));
+        uchar*   arrays1    = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
+        uchar*   arrays2    = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
+        short*  arrays32    = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
 
         uchar j = 0;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -283,11 +371,11 @@ class TestAudioConvert: public QObject
         AudioConvert ac32   = AudioConvert(FORMAT_U8, FORMAT_S16);
         AudioConvert acs    = AudioConvert(FORMAT_S16, FORMAT_U8);
 
-        int val1 = ac32.Process(arrays32, arrays1, SIZEARRAY * ISIZEOF(arrays1[0]));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(arrays32[0]));
-        int val2 = acs.Process(arrays2, arrays32, SIZEARRAY * ISIZEOF(arrays32[0]));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(arrays2[0]));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = ac32.Process(arrays32, arrays1, SAMPLES * ISIZEOF(arrays1[0]));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(arrays32[0]));
+        int val2 = acs.Process(arrays2, arrays32, SAMPLES * ISIZEOF(arrays32[0]));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(arrays2[0]));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
         }
