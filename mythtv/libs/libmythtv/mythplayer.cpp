@@ -3236,6 +3236,9 @@ void MythPlayer::DecoderLoop(bool pause)
 
 bool MythPlayer::DecoderGetFrameFFREW(void)
 {
+    if (!decoder)
+        return false;
+
     if (ffrew_skip > 0)
     {
         long long delta = decoder->GetFramesRead() - framesPlayed;
