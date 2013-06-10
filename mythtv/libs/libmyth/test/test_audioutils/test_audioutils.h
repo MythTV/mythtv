@@ -31,6 +31,10 @@
 
 #define AOALIGN(x) (((long)&x + 15) & ~0xf);
 
+#define SSEALIGN 16     // for 16 bytes memory alignment
+
+#define ISIZEOF(type) ((int)sizeof(type))
+
 class TestAudioUtils: public QObject
 {
     Q_OBJECT
@@ -45,23 +49,27 @@ class TestAudioUtils: public QObject
     // test s16 -> float -> s16 is lossless (SSE code)
     void S16ToFloatSSE(void)
     {
-        size_t SIZEARRAY    = 65536;
-        short *arrays1      = (short*)av_malloc(SIZEARRAY * sizeof(short));
-        short *arrays2      = (short*)av_malloc(SIZEARRAY * sizeof(short));
-        float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        short *arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        short *arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
+        float *arrayf       = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf, arrays1, SIZEARRAY * sizeof(short));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf, arrays1, SIZEARRAY * ISIZEOF(short));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
+            // test that it's bound between -1 and 1
+            QVERIFY(arrayf[i] >= -1.0);
+            QVERIFY(arrayf[i] <= 1.0);
         }
         av_free(arrays1);
         av_free(arrays2);
@@ -71,28 +79,31 @@ class TestAudioUtils: public QObject
     // test s16 -> float -> s16 is lossless (C code)
     void S16ToFloatC(void)
     {
-        size_t SIZEARRAY    = 65536;
-        // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetshort = 16 / sizeof(short);
-        int offsetfloat = 16 / sizeof(float);
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        int offsetshort     = 1;
+        int offsetfloat     = 1;
 
-        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
-        // has to be 16 short for 16 bytes boundary * 2
-        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
-        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
-            arrays1[i+1] = j;
+            arrays1[i+offsetshort] = j;
         }
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+1, arrays1+1, SIZEARRAY * sizeof(short));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+1, arrayf+1, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
+        // +1 will never be 16-bytes aligned, forcing C-code
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(short));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
         for (int i = 0; i < SIZEARRAY; i++)
         {
-            QCOMPARE(arrays1[i+1], arrays2[i+1]);
+            QCOMPARE(arrays1[i+offsetshort], arrays2[i+offsetshort]);
+            // test that it's bound between -1 and 1
+            QVERIFY(arrayf[i+offsetfloat] >= -1.0);
+            QVERIFY(arrayf[i+offsetfloat] <= 1.0);
         }
 
         av_free(arrays1);
@@ -103,33 +114,34 @@ class TestAudioUtils: public QObject
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
     void S16ToFloatCvsSSE(void)
     {
-        size_t SIZEARRAY    = 65536;
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetshort = 1;
-        int offsetfloat = 0;
+        int offsetshort     = 1;
+        int offsetfloat     = 0;
 
-        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
+        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
         // has to be 16 short for 16 bytes boundary * 2
-        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetshort] = j;
             arrays2[i] = j;
         }
 
         // Done by C
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf1+offsetfloat, arrays1+offsetshort, SIZEARRAY * sizeof(short));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf1+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(short));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
         // Done by SSE
-        val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf2, arrays2, SIZEARRAY * sizeof(short));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
+        val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf2, arrays2, SIZEARRAY * ISIZEOF(short));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+offsetshort], arrays2[i]);
@@ -150,16 +162,17 @@ class TestAudioUtils: public QObject
     // Test that float conversion only write where it's supposed to (SSE code)
     void S16ToFloatBoundsSSE(void)
     {
-        size_t SIZEARRAY    = 65536;
-        int offsetshort = 16 / sizeof(short);
-        int offsetfloat = 16 / sizeof(float);
+        int SIZEARRAY    = (INT16_MAX - INT16_MIN);
+        int offsetshort = SSEALIGN / ISIZEOF(short);
+        int offsetfloat = SSEALIGN / ISIZEOF(float);
 
-        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
+        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
         // has to be 16 short for 16 bytes boundary * 2
-        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
-        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -183,7 +196,7 @@ class TestAudioUtils: public QObject
         arrayf[SIZEARRAY+offsetfloat+3]     = *(float*)&pattern;
 
         // sanity tests
-        QCOMPARE(SIZEARRAY*2, SIZEARRAY * sizeof(arrays1[0]));
+        QCOMPARE(SIZEARRAY*2, SIZEARRAY * ISIZEOF(arrays1[0]));
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-2],pattern);
@@ -203,10 +216,10 @@ class TestAudioUtils: public QObject
         QCOMPARE(arrayf+4,&arrayf[4]);
         QCOMPARE(arrays2+4,&arrays2[4]);
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1, SIZEARRAY * sizeof(short));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(short));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1, SIZEARRAY * ISIZEOF(short));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
 
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
@@ -232,17 +245,18 @@ class TestAudioUtils: public QObject
 
     void S16ClipTest(void)
     {
-        size_t SIZEARRAY    = 65536;
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetshort  = 0;
-        int offsetfloat1 = 1;
-        int offsetfloat2 = 0;
+        int offsetshort     = 0;
+        int offsetfloat1    = 1;
+        int offsetfloat2    = 0;
 
-        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
+        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
         // has to be 16 short for 16 bytes boundary * 2
-        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * sizeof(short));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
+        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
         arrayf1[2+offsetfloat1] = -1.0;
@@ -261,8 +275,8 @@ class TestAudioUtils: public QObject
         arrayf2[7+offsetfloat2] = 1.2;
         // arrays1 is produced by C-code
         // arrays2 is produced by SSE
-        AudioOutputUtil::fromFloat(FORMAT_S16, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
+        AudioOutputUtil::fromFloat(FORMAT_S16, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
             // sanity check
@@ -277,26 +291,89 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
+    void S16ToFloatCvsSSESpeed_data(void)
+    {
+        QTest::addColumn<bool>("useSSE");
+        QTest::newRow("Use SSE accelerated code") << true;
+        QTest::newRow("Use C code") << false;
+    }
+
+    void S16ToFloatCvsSSESpeed(void)
+    {
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        // +1 will never be 16-bytes aligned, forcing C-code
+        int offsetshort     = 1;
+        int offsetfloat     = 0;
+
+        short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        // has to be 16 short for 16 bytes boundary * 2
+        short *arrays2      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
+        {
+            arrays1[i+offsetshort] = j;
+            arrays2[i] = j;
+        }
+
+        QFETCH(bool, useSSE);
+        
+        if (useSSE)
+        {
+            QBENCHMARK
+            {
+                for (int i = 0; i < 128; i++)
+                {
+                    // Done by SSE
+                    AudioOutputUtil::toFloat(FORMAT_S16, arrayf2, arrays2, SIZEARRAY * ISIZEOF(short));
+                    AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf2, SIZEARRAY * ISIZEOF(float));
+                }
+            }
+        }
+        else
+        {
+            QBENCHMARK
+            {
+                for (int i = 0; i < 128; i++)
+                {
+                    // Done by C
+                    AudioOutputUtil::toFloat(FORMAT_S16, arrayf1+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(short));
+                    AudioOutputUtil::fromFloat(FORMAT_S16, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(float));
+                }
+            }
+        }
+        av_free(arrays1);
+        av_free(arrays2);
+        av_free(arrayf1);
+        av_free(arrayf2);
+    }
+
     // test u8 -> float -> u8 is lossless (SSE code)
     void U8ToFloatSSE(void)
     {
-        size_t SIZEARRAY    = 256;
-        uchar *arrays1      = (uchar*)av_malloc(SIZEARRAY * sizeof(uchar));
-        uchar *arrays2      = (uchar*)av_malloc(SIZEARRAY * sizeof(uchar));
-        float *arrayf       = (float*)av_malloc(SIZEARRAY * sizeof(float));
+        int SIZEARRAY       = 256;
+        uchar *arrays1      = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
+        uchar *arrays2      = (uchar*)av_malloc(SIZEARRAY * ISIZEOF(uchar));
+        float *arrayf       = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
 
-        for (int i = 0, j = 0; i < SIZEARRAY; i++, j++)
+        uchar j = 0;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf, arrays1, SIZEARRAY * sizeof(uchar));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf, arrays1, SIZEARRAY * ISIZEOF(uchar));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(uchar));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
+            // test that it's bound between -1 and 1
+            QVERIFY(arrayf[i] >= -1.0);
+            QVERIFY(arrayf[i] <= 1.0);
         }
         av_free(arrays1);
         av_free(arrays2);
@@ -306,27 +383,31 @@ class TestAudioUtils: public QObject
     // test u8 -> float -> u8 is lossless (C code)
     void U8ToFloatC(void)
     {
-        size_t SIZEARRAY    = 256;
+        int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetuchar = 16 / sizeof(uchar);
-        int offsetfloat = 16 / sizeof(float);
+        int offsetuchar     = SSEALIGN / ISIZEOF(uchar);
+        int offsetfloat     = SSEALIGN / ISIZEOF(float);
 
-        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        uchar j = 0;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+1] = j;
         }
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf+1, arrays1+1, SIZEARRAY * sizeof(uchar));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2+1, arrayf+1, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf+1, arrays1+1, SIZEARRAY * ISIZEOF(uchar));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2+1, arrayf+1, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(uchar));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+1], arrays2[i+1]);
+            // test that it's bound between -1 and 1
+            QVERIFY(arrayf[i+1] >= -1.0);
+            QVERIFY(arrayf[i+1] <= 1.0);
         }
 
         av_free(arrays1);
@@ -337,40 +418,41 @@ class TestAudioUtils: public QObject
     // test u8 -> float -> u8 SSE vs C-code. Also compare converted floats
     void U8ToFloatCvsSSE(void)
     {
-        size_t SIZEARRAY    = 256;
+        int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetuchar = 1;
-        int offsetfloat = 0;
+        int offsetuchar     = 1;
+        int offsetfloat =   0;
 
-        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
+        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
         // has to be 16 short for 16 bytes boundary * 2
-        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        uchar j = 0;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetuchar] = j;
             arrays2[i] = j;
         }
 
         // Done by C
-        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf1+offsetfloat, arrays1+offsetuchar, SIZEARRAY * sizeof(uchar));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays1+offsetuchar, arrayf1+offsetfloat, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf1+offsetfloat, arrays1+offsetuchar, SIZEARRAY * ISIZEOF(uchar));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays1+offsetuchar, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(uchar));
         // Done by SSE
-        val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf2, arrays2, SIZEARRAY * sizeof(uchar));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
+        val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf2, arrays2, SIZEARRAY * ISIZEOF(uchar));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(uchar));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             QCOMPARE(arrays1[i+offsetuchar], arrays2[i]);
             QCOMPARE(arrayf1[i+offsetfloat], arrayf2[i]);
             // test that it's bound between -1 and 1
             QVERIFY(arrayf1[i+offsetfloat] >= -1.0);
-            QVERIFY(arrayf2[i+offsetfloat] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat] <= 1.0);
         }
 
         av_free(arrays1);
@@ -382,15 +464,16 @@ class TestAudioUtils: public QObject
     // Test that float conversion only write where it's supposed to (SSE code)
     void U8ToFloatBoundsSSE(void)
     {
-        size_t SIZEARRAY    = 256;
-        int offsetuchar= 16 / sizeof(uchar);
-        int offsetfloat = 16 / sizeof(float);
+        int SIZEARRAY       = 256;
+        int offsetuchar     = SSEALIGN / ISIZEOF(uchar);
+        int offsetfloat     = SSEALIGN / ISIZEOF(float);
 
-        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        uchar j = 0;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -414,7 +497,7 @@ class TestAudioUtils: public QObject
         arrayf[SIZEARRAY+offsetfloat+3]     = *(float*)&pattern;
 
         // sanity tests
-        QCOMPARE(SIZEARRAY*1, SIZEARRAY * sizeof(arrays1[0]));
+        QCOMPARE(SIZEARRAY*1, SIZEARRAY * ISIZEOF(arrays1[0]));
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-2],pattern);
@@ -434,10 +517,10 @@ class TestAudioUtils: public QObject
         QCOMPARE(arrayf+4,&arrayf[4]);
         QCOMPARE(arrays2+4,&arrays2[4]);
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf+offsetfloat, arrays1, SIZEARRAY * sizeof(uchar));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2+offsetuchar, arrayf+offsetfloat, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(uchar));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_U8, arrayf+offsetfloat, arrays1, SIZEARRAY * ISIZEOF(uchar));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_U8, arrays2+offsetuchar, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(uchar));
 
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
@@ -463,16 +546,17 @@ class TestAudioUtils: public QObject
 
     void U8ClipTest(void)
     {
-        size_t SIZEARRAY    = 256;
+        int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetuchar  = 0;
-        int offsetfloat1 = 1;
-        int offsetfloat2 = 0;
+        int offsetuchar     = 0;
+        int offsetfloat1    = 1;
+        int offsetfloat2    = 0;
 
-        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * sizeof(uchar));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
+        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetuchar+4) * ISIZEOF(uchar));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
         arrayf1[2+offsetfloat1] = -1.0;
@@ -491,8 +575,8 @@ class TestAudioUtils: public QObject
         arrayf2[7+offsetfloat2] = 1.2;
         // arrays1 is produced by C-code
         // arrays2 is produced by SSE
-        AudioOutputUtil::fromFloat(FORMAT_U8, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
+        AudioOutputUtil::fromFloat(FORMAT_U8, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        AudioOutputUtil::fromFloat(FORMAT_U8, arrays2, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
             // sanity check
@@ -509,34 +593,35 @@ class TestAudioUtils: public QObject
     // test s16 -> float -> s16 SSE vs C-code. Also compare converted floats
     void S32ToFloatCvsSSE(void)
     {
-        size_t SIZEARRAY    = 65536;
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetint32_t = 1;
-        int offsetfloat1 = 0;
-        int offsetfloat2 = 0;
+        int offsetint32_t   = 1;
+        int offsetfloat1    = 0;
+        int offsetfloat2    = 0;
 
-        int32_t *arrays1      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
+        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        int32_t *arrays2      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
+        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
 
-        for (int i = 0, j = INT_MIN; i < SIZEARRAY; i++, j++)
+        int j = INT_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i+offsetint32_t] = j;
             arrays2[i] = j;
         }
 
         // Done by C
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf1+offsetfloat1, arrays1+offsetint32_t, SIZEARRAY * sizeof(int32_t));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays1+offsetint32_t, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(int32_t));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf1+offsetfloat1, arrays1+offsetint32_t, SIZEARRAY * ISIZEOF(int32_t));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays1+offsetint32_t, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(int32_t));
         // Done by SSE
-        val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf2+offsetfloat2, arrays2, SIZEARRAY * sizeof(int32_t));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(int32_t));
+        val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf2+offsetfloat2, arrays2, SIZEARRAY * ISIZEOF(int32_t));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(int32_t));
         for (int i = 0; i < SIZEARRAY; i++)
         {
             //fprintf(stderr, "arrayf1[%d]=%f (%.14g) arrayf2[%d]=%f arrayf1[i]: >=-1:%d <=1:%d\n",
@@ -547,7 +632,7 @@ class TestAudioUtils: public QObject
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i]+offsetfloat2);
             // test that it's bound between -1 and 1
             QVERIFY(arrayf1[i+offsetfloat1] >= -1.0);
-            QVERIFY(arrayf2[i+offsetfloat2] <= 1.0);
+            QVERIFY(arrayf1[i+offsetfloat1] <= 1.0);
         }
 
         av_free(arrays1);
@@ -559,16 +644,17 @@ class TestAudioUtils: public QObject
     // Test that float conversion only write where it's supposed to (SSE code)
     void S32ToFloatBoundsSSE(void)
     {
-        size_t SIZEARRAY    = 65536;
-        int offsetint32_t = 16 / sizeof(int32_t);
-        int offsetfloat = 16 / sizeof(float);
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        int offsetint32_t   = SSEALIGN / ISIZEOF(int32_t);
+        int offsetfloat     = SSEALIGN / ISIZEOF(float);
 
-        int32_t *arrays1      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
+        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        int32_t *arrays2      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
-        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * sizeof(float));
+        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
-        for (int i = 0, j = -32768; i < SIZEARRAY; i++, j++)
+        int j = INT_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -592,7 +678,7 @@ class TestAudioUtils: public QObject
         arrayf[SIZEARRAY+offsetfloat+3]     = *(float*)&pattern;
 
         // sanity tests
-        QCOMPARE(SIZEARRAY*4, SIZEARRAY * sizeof(arrays1[0]));
+        QCOMPARE(SIZEARRAY*4, SIZEARRAY * ISIZEOF(arrays1[0]));
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-2],pattern);
@@ -612,10 +698,10 @@ class TestAudioUtils: public QObject
         QCOMPARE(arrayf+4,&arrayf[4]);
         QCOMPARE(arrays2+4,&arrays2[4]);
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf+offsetfloat, arrays1, SIZEARRAY * sizeof(int32_t));
-        QCOMPARE((size_t)val1, SIZEARRAY * sizeof(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays2+offsetint32_t, arrayf+offsetfloat, SIZEARRAY * sizeof(float));
-        QCOMPARE((size_t)val2, SIZEARRAY * sizeof(int32_t));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S32, arrayf+offsetfloat, arrays1, SIZEARRAY * ISIZEOF(int32_t));
+        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S32, arrays2+offsetint32_t, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
+        QCOMPARE(val2, SIZEARRAY * ISIZEOF(int32_t));
 
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
@@ -641,17 +727,18 @@ class TestAudioUtils: public QObject
 
     void S32ClipTest(void)
     {
-        size_t SIZEARRAY    = 256;
+        int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetint32_t  = 0;
-        int offsetfloat1 = 1;
-        int offsetfloat2 = 0;
+        int offsetint32_t   = 0;
+        int offsetfloat1    = 1;
+        int offsetfloat2    = 0;
 
-        int32_t *arrays1      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
+        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
         // has to be 16 int32_t for 16 bytes boundary * 2
-        int32_t *arrays2      = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * sizeof(int32_t));
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
+        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(int32_t));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
         arrayf1[2+offsetfloat1] = -1.0;
@@ -670,8 +757,8 @@ class TestAudioUtils: public QObject
         arrayf2[7+offsetfloat2] = 1.2;
         // arrays1 is produced by C-code
         // arrays2 is produced by SSE
-        AudioOutputUtil::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
+        AudioOutputUtil::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
             // sanity check
@@ -688,14 +775,15 @@ class TestAudioUtils: public QObject
 
     void FloatClipping(void)
     {
-        size_t SIZEARRAY    = 256;
+        int SIZEARRAY       = 256;
         // +1 will never be 16-bytes aligned, forcing C-code
-        int offsetfloat1 = 1;
-        int offsetfloat2 = 0;
+        int offsetfloat1    = 1;
+        int offsetfloat2    = 0;
 
-        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * sizeof(float));
-        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
-        float *arrayf3      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * sizeof(float));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+        float *arrayf3      = (float*)av_malloc((SIZEARRAY+offsetfloat2+4) * ISIZEOF(float));
+
         arrayf1[0+offsetfloat1] = -1.2;
         arrayf1[1+offsetfloat1] = -1.1;
         arrayf1[2+offsetfloat1] = -1.0;
@@ -704,10 +792,18 @@ class TestAudioUtils: public QObject
         arrayf1[5+offsetfloat1] = 1.0;
         arrayf1[6+offsetfloat1] = 1.1;
         arrayf1[7+offsetfloat1] = 1.2;
+        arrayf2[0+offsetfloat2] = -1.2;
+        arrayf2[1+offsetfloat2] = -1.1;
+        arrayf2[2+offsetfloat2] = -1.0;
+        arrayf2[3+offsetfloat2] = -0.5;
+        arrayf2[4+offsetfloat2] = 0.5;
+        arrayf2[5+offsetfloat2] = 1.0;
+        arrayf2[6+offsetfloat2] = 1.1;
+        arrayf2[7+offsetfloat2] = 1.2;
         // arrayf2 is produced by C-code
         // arrayf3 is produced by SSE
-        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf3, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
+        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf3, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
             QCOMPARE(arrayf2[i], arrayf3[i]);
@@ -719,8 +815,8 @@ class TestAudioUtils: public QObject
         // arrays1 is produced by C-code
         // arrays2 is produced by SSE
         // also test in-place float conversion
-        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf1+offsetfloat1, arrayf1+offsetfloat1, SIZEARRAY * sizeof(float));
-        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2+offsetfloat2, arrayf2+offsetfloat2, SIZEARRAY * sizeof(float));
+        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf1+offsetfloat1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        AudioOutputUtil::fromFloat(FORMAT_FLT, arrayf2+offsetfloat2, arrayf2+offsetfloat2, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
             // sanity check
