@@ -862,7 +862,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         }
     }
 
-    if (commDetectMethod & COMM_DETECT_BLANKS)
+    if ((commDetectMethod & COMM_DETECT_BLANKS) && blankPixelsChecked)
     {
         for(int y = commDetectBorder; y < (height - commDetectBorder);
                 y += vertSpacing)
