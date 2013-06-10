@@ -46,25 +46,36 @@ class TestAudioUtils: public QObject
         gCoreContext = new MythCoreContext("bin_version", NULL);
     }
 
+    void S16ToFloatSSE_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test s16 -> float -> s16 is lossless (SSE code)
     void S16ToFloatSSE(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int SIZEARRAY       = SAMPLES;
         short *arrays1      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         short *arrays2      = (short*)av_malloc(SIZEARRAY * ISIZEOF(short));
         float *arrayf       = (float*)av_malloc(SIZEARRAY * ISIZEOF(float));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf, arrays1, SIZEARRAY * ISIZEOF(short));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf, SIZEARRAY * ISIZEOF(float));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf, arrays1, SAMPLES * ISIZEOF(short));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2, arrayf, SAMPLES * ISIZEOF(float));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(short));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i], arrays2[i]);
             // test that it's bound between -1 and 1
@@ -76,10 +87,21 @@ class TestAudioUtils: public QObject
         av_free(arrayf);
     }
 
+    void S16ToFloatC_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // test s16 -> float -> s16 is lossless (C code)
     void S16ToFloatC(void)
     {
-        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int SIZEARRAY       = SAMPLES;
         int offsetshort     = 1;
         int offsetfloat     = 1;
 
@@ -88,17 +110,17 @@ class TestAudioUtils: public QObject
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i+offsetshort] = j;
         }
 
         // +1 will never be 16-bytes aligned, forcing C-code
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(short));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
-        for (int i = 0; i < SIZEARRAY; i++)
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1+offsetshort, SAMPLES * ISIZEOF(short));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SAMPLES * ISIZEOF(float));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(short));
+        for (int i = 0; i < SAMPLES; i++)
         {
             QCOMPARE(arrays1[i+offsetshort], arrays2[i+offsetshort]);
             // test that it's bound between -1 and 1
@@ -159,10 +181,21 @@ class TestAudioUtils: public QObject
         av_free(arrayf2);
     }
 
+    void S16ToFloatBoundsSSE_data(void)
+    {
+        QTest::addColumn<int>("SAMPLES");
+        QTest::newRow("Full Range") << (INT16_MAX - INT16_MIN);
+        QTest::newRow("8 bytes") << 8;
+        QTest::newRow("24 bytes") << 24;
+        QTest::newRow("0 bytes") << 0;
+    }
+
     // Test that float conversion only write where it's supposed to (SSE code)
     void S16ToFloatBoundsSSE(void)
     {
-        int SIZEARRAY    = (INT16_MAX - INT16_MIN);
+        QFETCH(int, SAMPLES);
+
+        int SIZEARRAY    = SAMPLES;
         int offsetshort = SSEALIGN / ISIZEOF(short);
         int offsetfloat = SSEALIGN / ISIZEOF(float);
 
@@ -172,7 +205,7 @@ class TestAudioUtils: public QObject
         float *arrayf       = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
 
         short j = INT16_MIN;
-        for (int i = 0; i < SIZEARRAY; i++, j++)
+        for (int i = 0; i < SAMPLES; i++, j++)
         {
             arrays1[i] = j;
         }
@@ -186,57 +219,57 @@ class TestAudioUtils: public QObject
         arrayf[offsetfloat-3]   = *(float*)&pattern;
         arrayf[offsetfloat-2]   = *(float*)&pattern;
         arrayf[offsetfloat-1]   = *(float*)&pattern;
-        arrays2[SIZEARRAY+offsetshort+0]    = *(short*)&pattern;
-        arrays2[SIZEARRAY+offsetshort+1]    = *(short*)&pattern;
-        arrays2[SIZEARRAY+offsetshort+2]    = *(short*)&pattern;
-        arrays2[SIZEARRAY+offsetshort+3]    = *(short*)&pattern;
-        arrayf[SIZEARRAY+offsetfloat+0]     = *(float*)&pattern;
-        arrayf[SIZEARRAY+offsetfloat+1]     = *(float*)&pattern;
-        arrayf[SIZEARRAY+offsetfloat+2]     = *(float*)&pattern;
-        arrayf[SIZEARRAY+offsetfloat+3]     = *(float*)&pattern;
+        arrays2[SAMPLES+offsetshort+0]    = *(short*)&pattern;
+        arrays2[SAMPLES+offsetshort+1]    = *(short*)&pattern;
+        arrays2[SAMPLES+offsetshort+2]    = *(short*)&pattern;
+        arrays2[SAMPLES+offsetshort+3]    = *(short*)&pattern;
+        arrayf[SAMPLES+offsetfloat+0]     = *(float*)&pattern;
+        arrayf[SAMPLES+offsetfloat+1]     = *(float*)&pattern;
+        arrayf[SAMPLES+offsetfloat+2]     = *(float*)&pattern;
+        arrayf[SAMPLES+offsetfloat+3]     = *(float*)&pattern;
 
         // sanity tests
-        QCOMPARE(SIZEARRAY*2, SIZEARRAY * ISIZEOF(arrays1[0]));
+        QCOMPARE(SAMPLES*2, SAMPLES * ISIZEOF(arrays1[0]));
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-2],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-1],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+0],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+1],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+2],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+3],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+0],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+1],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+2],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+3],pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-4],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-3],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-2],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-1],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+0],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+1],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+2],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+3],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+0],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+1],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+2],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+3],*(short*)&pattern);
         QCOMPARE(arrayf+4,&arrayf[4]);
         QCOMPARE(arrays2+4,&arrays2[4]);
 
-        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1, SIZEARRAY * ISIZEOF(short));
-        QCOMPARE(val1, SIZEARRAY * ISIZEOF(float));
-        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SIZEARRAY * ISIZEOF(float));
-        QCOMPARE(val2, SIZEARRAY * ISIZEOF(short));
+        int val1 = AudioOutputUtil::toFloat(FORMAT_S16, arrayf+offsetfloat, arrays1, SAMPLES * ISIZEOF(short));
+        QCOMPARE(val1, SAMPLES * ISIZEOF(float));
+        int val2 = AudioOutputUtil::fromFloat(FORMAT_S16, arrays2+offsetshort, arrayf+offsetfloat, SAMPLES * ISIZEOF(float));
+        QCOMPARE(val2, SAMPLES * ISIZEOF(short));
 
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-4],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-3],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-2],pattern);
         QCOMPARE(*(uint32_t*)&arrayf[offsetfloat-1],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+0],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+1],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+2],pattern);
-        QCOMPARE(*(uint32_t*)&arrayf[SIZEARRAY+offsetfloat+3],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+0],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+1],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+2],pattern);
+        QCOMPARE(*(uint32_t*)&arrayf[SAMPLES+offsetfloat+3],pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-4],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-3],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-2],*(short*)&pattern);
         QCOMPARE(*(short*)&arrays2[offsetshort-1],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+0],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+1],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+2],*(short*)&pattern);
-        QCOMPARE(*(short*)&arrays2[SIZEARRAY+offsetshort+3],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+0],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+1],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+2],*(short*)&pattern);
+        QCOMPARE(*(short*)&arrays2[SAMPLES+offsetshort+3],*(short*)&pattern);
 
         av_free(arrays1);
         av_free(arrays2);
