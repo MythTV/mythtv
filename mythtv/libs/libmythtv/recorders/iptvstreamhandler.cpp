@@ -180,6 +180,12 @@ void IPTVStreamHandler::run(void)
         // we need to open the descriptor ourselves so we
         // can set some socket options
         int fd = socket(AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
+        if (fd < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "Unable to create socket " + ENO);
+            continue;
+        }
         int buf_size = 2 * 1024 * max(tuning.GetBitrate(i)/1000, 500U);
         if (!tuning.GetBitrate(i))
             buf_size = 2 * 1024 * 1024;
