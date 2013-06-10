@@ -135,16 +135,20 @@ void LCDServer::endConnection(void)
 void LCDServer::readSocket()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
-    m_lastSocket = socket;
 
-    while(socket->canReadLine())
+    if (socket)
     {
-        QString incoming_data = socket->readLine();
-        incoming_data = incoming_data.replace( QRegExp("\n"), "" );
-        incoming_data = incoming_data.replace( QRegExp("\r"), "" );
-        incoming_data.simplified();
-        QStringList tokens = parseCommand(incoming_data);
-        parseTokens(tokens, socket);
+        m_lastSocket = socket;
+
+        while(socket->canReadLine())
+        {
+            QString incoming_data = socket->readLine();
+            incoming_data = incoming_data.replace( QRegExp("\n"), "" );
+            incoming_data = incoming_data.replace( QRegExp("\r"), "" );
+            incoming_data.simplified();
+            QStringList tokens = parseCommand(incoming_data);
+            parseTokens(tokens, socket);
+        }
     }
 }
 
