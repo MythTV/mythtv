@@ -180,8 +180,15 @@ bool AudioOutputDigitalEncoder::Init(
 
 size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
+    int sampleSize = AudioOutputSettings::SampleSize(format);
+    if (sampleSize <= 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error, sample size is zero");
+        return 0;
+    }
+
     // Check if there is enough space in incoming buffer
-    int required_len = inlen + len / AudioOutputSettings::SampleSize(format) *
+    int required_len = inlen + len / sampleSize *
         AudioOutputSettings::SampleSize(FORMAT_S16);
     if (required_len > (int)in_size)
     {
