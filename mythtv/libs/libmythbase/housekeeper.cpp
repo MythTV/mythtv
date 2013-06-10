@@ -501,6 +501,8 @@ HouseKeeper::HouseKeeper(void) : m_timer(NULL)
 
 HouseKeeper::~HouseKeeper(void)
 {
+    gCoreContext->removeListener(this);
+
     if (m_timer)
     {
         m_timer->stop();
