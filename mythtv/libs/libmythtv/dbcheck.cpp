@@ -1033,7 +1033,10 @@ NULL
         query.prepare("DELETE FROM keybindings WHERE "
                       "action IN ('PAGEUP','PAGEDOWN') AND "
                       "context = 'TV FRONTEND'");
-        query.exec();
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to update keybindings", query);
+        }
 
         query.prepare("SELECT data FROM settings "
                        " WHERE value = 'EPGEnableJumpToChannel'");
