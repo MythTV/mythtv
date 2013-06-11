@@ -159,7 +159,7 @@ bool AudioOutputPulseAudio::OpenDevice()
     pa_channel_map *pmap = NULL;
 
     if(!(pmap = pa_channel_map_init_auto(&channel_map, channels,
-                                         PA_CHANNEL_MAP_WAVEEX)) < 0)
+                                         PA_CHANNEL_MAP_WAVEEX)))
     {
         VBERROR(fn_log_tag + "failed to init channel map");
         return false;
