@@ -471,8 +471,8 @@ void MythSystemLegacy::HandlePostRun(void)
     // the UDP ports before the child application has stopped and terminated
     if (GetSetting("DisableUDP"))
     {
-        QEvent event(MythEvent::kEnableUDPListenerEventType);
-        QCoreApplication::sendEvent(gCoreContext->GetGUIObject(), &event);
+        QEvent *event = new QEvent(MythEvent::kEnableUDPListenerEventType);
+        QCoreApplication::postEvent(gCoreContext->GetGUIObject(), event);
     }
 
     // This needs to be a post event so that the MythUI unlocks input devices
