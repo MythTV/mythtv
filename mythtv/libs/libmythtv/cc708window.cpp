@@ -548,7 +548,7 @@ void CC708Pen::SetPenStyle(uint style)
     attr.bg_opacity = (style<6) ?
         k708AttrOpacitySolid : k708AttrOpacityTransparent;
     attr.edge_color = k708AttrColorBlack;
-    attr.override_fg_color = false;
+    attr.actual_fg_color = QColor();
 }
 
 CC708Character::CC708Character(const CC708Window &win)
