@@ -295,21 +295,3 @@ void CC708Reader::TextWrite(uint service_num,
     LOG(VB_VBI, LOG_INFO, LOC + QString("AddText to %1->%2 |%3|")
         .arg(service_num).arg(CC708services[service_num].current_window).arg(debug));
 }
-
-void CC708Reader::SetOSDFontName(const QString osdfonts[22],
-                                       const QString &prefix)
-{
-    osdfontname   = osdfonts[0]; osdfontname.detach();
-    osdccfontname = osdfonts[1]; osdccfontname.detach();
-    for (int i = 2; i < 22; i++)
-    {
-        QString tmp = osdfonts[i]; tmp.detach();
-        osd708fontnames[i - 2] = tmp;
-    }
-    osdprefix = prefix; osdprefix.detach();
-}
-
-void CC708Reader::SetOSDThemeName(const QString themename)
-{
-    osdtheme = themename; osdtheme.detach();
-}

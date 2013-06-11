@@ -107,12 +107,6 @@ class CC708CharacterAttribute
     {
     }
 
-    // remove this
-    uint FontIndex(void) const
-    {
-        return (((font_tag & 0x7) * 6) + ((italics) ? 3 : 0) +
-                (pen_size & 0x3));
-    }
     static QColor ConvertToQColor(uint eia708color);
     QColor GetFGColor(void) const
     {

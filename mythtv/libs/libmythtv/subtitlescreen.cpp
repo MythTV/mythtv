@@ -1447,7 +1447,8 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr) const
+MythFontProperties *
+SubtitleScreen::GetFont(const CC708CharacterAttribute &attr) const
 {
     return m_format->GetFont(m_family, attr, m_fontSize,
                              m_textFontZoom, m_fontStretch);

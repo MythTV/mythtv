@@ -20,8 +20,6 @@ class CC708Reader
     void SetCurrentService(int service) { currentservice = service; }
     CC708Service* GetCurrentService(void) { return &CC708services[currentservice]; }
     void SetEnabled(bool enable) { enabled = enable; }
-    void SetOSDFontName(const QString osdfonts[22], const QString &prefix);
-    void SetOSDThemeName(const QString themename);
     void ClearBuffers(void);
 
     CC708Service* GetService(uint service_num)
