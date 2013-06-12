@@ -378,9 +378,18 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
     : ScheduleCommon(parent, name),
       m_prefixes(QObject::tr("^(The |A |An )")),
       m_titleChaff(" \\(.*\\)$"),
+      // UI variables
+      m_recgroupList(NULL),
+      m_groupList(NULL),
+      m_recordingList(NULL),
+      m_noRecordingsText(NULL),
+      m_previewImage(NULL),
       // Artwork Variables
       m_artHostOverride(),
       // Settings
+      m_titleView(false),
+      m_useCategories(false),
+      m_useRecGroups(false),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
       m_listOrder(1),
@@ -397,11 +406,13 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
       m_doToggleMenu(true),
       // Main Recording List support
       m_progsInDB(0),
+      m_isFilling(false),
       // Other state
       m_op_on_playlist(false),
       m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
+      m_haveGroupInfoSet(false),
       // Other
       m_player(NULL),
       m_helper(this),
