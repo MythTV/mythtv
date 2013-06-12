@@ -21,7 +21,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "RecRules", "type=DTC::RecRule");
-	Q_CLASSINFO( "AsOf"	   , "transient=true"   );
+    Q_CLASSINFO( "AsOf"	   , "transient=true"   );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
@@ -34,7 +34,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
     PROPERTYIMP       ( int         , StartIndex      )
     PROPERTYIMP       ( int         , Count           )
-    PROPERTYIMP       ( int         , TotalAvailable  )    
+    PROPERTYIMP       ( int         , TotalAvailable  )
     PROPERTYIMP       ( QDateTime   , AsOf            )
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
@@ -48,7 +48,10 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     public:
 
         RecRuleList(QObject *parent = 0)
-            : QObject( parent )
+            : QObject          ( parent ),
+              m_StartIndex     ( 0      ),
+              m_Count          ( 0      ),
+              m_TotalAvailable ( 0      )
         {
         }
 
