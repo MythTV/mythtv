@@ -1,4 +1,4 @@
-test_audioutils
+test_audioconvert
 *.gcda
 *.gcno
 *.gcov
