@@ -40,7 +40,61 @@
 
 int lcdStartCol = LCD_START_COL;
 
-LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL)
+LCDProcClient::LCDProcClient(LCDServer *lparent)
+              : QObject(NULL),
+                socket(new QTcpSocket(this)),
+                timeTimer(new QTimer(this)),
+                scrollWTimer(new QTimer(this)),
+                preScrollWTimer(new QTimer(this)),
+                menuScrollTimer(new QTimer(this)),
+                menuPreScrollTimer(new QTimer(this)),
+                popMenuTimer(new QTimer(this)),
+                checkConnectionsTimer(new QTimer(this)),
+                recStatusTimer(new QTimer(this)),
+                scrollListTimer(new QTimer(this)),
+                showMessageTimer(new QTimer(this)),
+                updateRecInfoTimer(new QTimer(this)),
+                lcdWidth(5),
+                lcdHeight(1),
+                cellWidth(1),
+                cellHeight(1),
+                pVersion(0),
+                progress(0.0),
+                busy_progress(false),
+                busy_pos(0),
+                busy_indicator_size(0.0),
+                busy_direction(1),
+                generic_progress(0.0),
+                volume_level(0.0),
+                music_progress(0.0),
+                music_repeat(0),
+                music_shuffle(0),
+                lcdTextItems(new QList<LCDTextItem>),
+                scrollPosition(0),
+                scrollListRow(0),
+                scrollListItem(0),
+                menuScrollPosition(0),
+                lcdMenuItems(new QList<LCDMenuItem>),
+                connected(false),
+                timeFlash(false),
+                port(13666),
+                lcd_ready(false),
+                lcd_showtime(true),
+                lcd_showmenu(true),
+                lcd_showgeneric(true),
+                lcd_showmusic(true),
+                lcd_showchannel(true),
+                lcd_showvolume(true),
+                lcd_showrecstatus(true),
+                lcd_backlighton(true),
+                lcd_heartbeaton(true),
+                lcd_bigclock(true),
+                lcd_popuptime(0),
+                m_parent(lparent),
+                startup_showtime(0),
+                isRecording(false),
+                isTimeVisible(false),
+                lcdTunerNo(0)
 {
     // Constructor for LCDProcClient
     //
@@ -51,19 +105,10 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL)
         LOG(VB_GENERAL, LOG_INFO,
             "LCDProcClient: An LCDProcClient object now exists");
 
-    socket = new QTcpSocket(this);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
             this, SLOT(veryBadThings(QAbstractSocket::SocketError)));
     connect(socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
 
-    m_parent = lparent;
-
-    lcd_ready = false;
-
-    lcdWidth = 5;
-    lcdHeight = 1;
-    cellWidth = 1;
-    cellHeight = 1;
     lcdStartCol = LCD_START_COL;
     if (lcdWidth < 12)
     {
@@ -73,65 +118,39 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL)
            lcdStartCol = 1;
     }
 
-    hostname = "";
-    port = 13666;
-
-    timeFlash = false;
-    scrollingText = "";
-    progress = 0.0;
-    generic_progress = 0.0;
-    volume_level = 0.0;
-    connected = false;
-    send_buffer = "";
-    lcdMenuItems = new QList<LCDMenuItem>;
-    lcdTextItems = new QList<LCDTextItem>;
-
-    timeTimer = new QTimer(this);
     connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));
 
-    scrollWTimer = new QTimer(this);
     connect(scrollWTimer, SIGNAL(timeout()), this, SLOT(scrollWidgets()));
 
-    preScrollWTimer = new QTimer(this);
     preScrollWTimer->setSingleShot(true);
     connect(preScrollWTimer, SIGNAL(timeout()), this,
             SLOT(beginScrollingWidgets()));
 
-    popMenuTimer = new QTimer(this);
     popMenuTimer->setSingleShot(true);
     connect(popMenuTimer, SIGNAL(timeout()), this, SLOT(unPopMenu()));
 
-    menuScrollTimer = new QTimer(this);
     connect(menuScrollTimer, SIGNAL(timeout()), this, SLOT(scrollMenuText()));
 
-    menuPreScrollTimer = new QTimer(this);
     connect(menuPreScrollTimer, SIGNAL(timeout()), this,
             SLOT(beginScrollingMenuText()));
 
-    checkConnectionsTimer = new QTimer(this);
     connect(checkConnectionsTimer, SIGNAL(timeout()), this,
             SLOT(checkConnections()));
     checkConnectionsTimer->start(10000);
 
-    recStatusTimer = new QTimer(this);
     connect(recStatusTimer, SIGNAL(timeout()), this, SLOT(outputRecStatus()));
 
-    scrollListTimer = new QTimer(this);
     connect(scrollListTimer, SIGNAL(timeout()), this, SLOT(scrollList()));
 
-    showMessageTimer = new QTimer(this);
     showMessageTimer->setSingleShot(true);
     connect(showMessageTimer, SIGNAL(timeout()), this,
             SLOT(removeStartupMessage()));
 
-    updateRecInfoTimer = new QTimer(this);
     updateRecInfoTimer->setSingleShot(true);
     connect(updateRecInfoTimer, SIGNAL(timeout()), this,
             SLOT(updateRecordingList()));
 
     gCoreContext->addListener(this);
-
-    isRecording = false;
 }
 
 bool LCDProcClient::SetupLCD ()
