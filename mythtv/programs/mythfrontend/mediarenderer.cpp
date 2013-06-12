@@ -197,7 +197,7 @@ class MythFrontendStatus : public HttpServerExtension
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MediaRenderer::MediaRenderer()
+MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
 {
     LOG(VB_UPNP, LOG_INFO, "MediaRenderer::Begin");
 
