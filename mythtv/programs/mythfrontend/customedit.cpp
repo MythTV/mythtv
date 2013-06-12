@@ -24,7 +24,19 @@
 #include "proglist.h"
 
 CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
-              : MythScreenType(parent, "CustomEdit")
+              : MythScreenType(parent, "CustomEdit"),
+                m_maxex(0),
+                m_evaluate(true),
+                m_ruleList(NULL),
+                m_clauseList(NULL),
+                m_titleEdit(NULL),
+                m_descriptionEdit(NULL),
+                m_subtitleEdit(NULL),
+                m_clauseText(NULL),
+                m_testButton(NULL),
+                m_recordButton(NULL),
+                m_storeButton(NULL),
+                m_cancelButton(NULL)
 {
     if (pginfo)
         m_pginfo = new ProgramInfo(*pginfo);
@@ -34,8 +46,6 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
     m_baseTitle = m_pginfo->GetTitle();
     m_baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
-    m_maxex = 0;
-    m_evaluate = true;
     m_seSuffix = QString(" (%1)").arg(tr("stored search"));
     m_exSuffix = QString(" (%1)").arg(tr("stored example"));
 
