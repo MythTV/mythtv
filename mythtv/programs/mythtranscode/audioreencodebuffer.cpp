@@ -64,13 +64,12 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
 
 AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
-  : m_saveBuffer(NULL)
+  : m_last_audiotime(0),        m_audioFrameSize(0),
+    m_initpassthru(passthru),   m_saveBuffer(NULL)
 {
     Reset();
     const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
     Reconfigure(settings);
-    m_initpassthru = passthru;
-    m_audioFrameSize = 0;
 }
 
 AudioReencodeBuffer::~AudioReencodeBuffer()

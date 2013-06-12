@@ -12,8 +12,11 @@
 class Cutter
 {
   public:
-    Cutter() : active(false), videoFramesToCut(0), audioFramesToCut(0),
-        audioFramesPerVideoFrame(0.0) {};
+    Cutter()
+      : active(false),                 totalFrames(0),
+        videoFramesToCut(0),           audioFramesToCut(0),
+        audioFramesPerVideoFrame(0.0)
+    {};
 
     void          SetCutList(frm_dir_map_t &deleteMap, PlayerContext *ctx);
     frm_dir_map_t AdjustedCutList() const;

@@ -1004,7 +1004,15 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                 QFile checkFile(oldfileprev);
 
                 if ((oldfileprev != newfileprev) && (checkFile.exists()))
-                    rename(aoldfileprev.constData(), anewfileprev.constData());
+                {
+                    if(rename(aoldfileprev.constData(), 
+                              anewfileprev.constData()) == -1)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("mythtranscode: Error renaming %1 to %2")
+                                    .arg(oldfileprev).arg(newfileprev) + ENO);
+                    }
+                }
             }
         }
 

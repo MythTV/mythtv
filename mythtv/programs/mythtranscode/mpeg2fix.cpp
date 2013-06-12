@@ -1164,7 +1164,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     int got_packet = 0;
     int ret;
-    bool initial = true;
 
     // Need to call this repeatedly as it seems to be pipelined.  The first
     // call will return no packet, then the second one will flush it.  In case
@@ -1172,8 +1171,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     // out.
     while (!got_packet)
     {
-        ret = avcodec_encode_video2(c, pkt, (initial ? picture : NULL),
-                                             &got_packet);
+        ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
 
         if (ret < 0)
         {
