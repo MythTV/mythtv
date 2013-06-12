@@ -742,6 +742,11 @@ int MHApplication::FindOnStack(const MHRoot *pVis) // Returns the index on the s
 MHScene::MHScene()
 {
     m_fIsApp = false;
+
+    m_nEventReg = 0;
+    m_nSceneCoordX = 0;
+    m_nSceneCoordY = 0;
+
     // TODO: In UK MHEG 1.06 the aspect ratio is optional and if not specified "the
     // scene has no aspect ratio".
     m_nAspectRatioW = 4;
