@@ -67,7 +67,6 @@ class AudioReencodeBuffer : public AudioOutput
     virtual int       readOutputData(unsigned char*, int ) { return 0; }
 
     int                  m_channels;
-    int                  m_bits;
     int                  m_bytes_per_frame;
     int                  m_eff_audiorate;
     long long            m_last_audiotime;
