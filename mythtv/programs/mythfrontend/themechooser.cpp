@@ -72,6 +72,8 @@ class ThemeExtractThread : public QRunnable
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString name) :
     MythScreenType(parent, name),
+    m_themes(NULL),
+    m_preview(NULL),
     m_fullPreviewShowing(false),
     m_fullPreviewStateType(NULL),
     m_fullScreenName(NULL),
