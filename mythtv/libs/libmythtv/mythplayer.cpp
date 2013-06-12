@@ -374,6 +374,8 @@ bool MythPlayer::Pause(void)
     audio.Pause(true);
     PauseDecoder();
     PauseBuffer();
+    if (!decoderPaused)
+        PauseDecoder(); // Retry in case audio only stream
     allpaused = decoderPaused && videoPaused && bufferPaused;
     {
         if (FlagIsSet(kVideoIsNull) && decoder)
@@ -398,6 +400,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
         return false;
     }
 
+    SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
     if (unpauseaudio)
