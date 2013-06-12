@@ -224,27 +224,38 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
          : ScheduleCommon(parent, "guidegrid"),
-    m_allowFinder(allowFinder),
-    m_player(player),
-    m_usingNullVideo(false), m_embedVideo(embedVideo),
-    m_previewVideoRefreshTimer(new QTimer(this)),
-    m_updateTimer(NULL),
-    m_jumpToChannelLock(QMutex::Recursive),
-    m_jumpToChannel(NULL)
+           m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
+           m_allowFinder(allowFinder),
+           m_currentStartChannel(0),
+           m_startChanID(chanid),
+           m_startChanNum(channum),
+           m_currentRow(0),
+           m_currentCol(0),
+           m_sortReverse(gCoreContext->GetNumSetting("EPGSortReverse", 0)),
+           m_channelCount(5),
+           m_timeCount(30),
+           m_verticalLayout(false),
+           m_player(player),
+           m_usingNullVideo(false),
+           m_embedVideo(embedVideo),
+           m_previewVideoRefreshTimer(new QTimer(this)),
+           m_channelOrdering(gCoreContext->GetSetting("ChannelOrdering", "channum")),
+           m_updateTimer(NULL),
+           m_changrpid(changrpid),
+           m_changrplist(ChannelGroup::GetChannelGroups(false)),
+           m_jumpToChannelLock(QMutex::Recursive),
+           m_jumpToChannel(NULL),
+           m_timeList(NULL),
+           m_channelList(NULL),
+           m_guideGrid(NULL),
+           m_dateText(NULL),
+           m_longdateText(NULL),
+           m_jumpToText(NULL),
+           m_changroupname(NULL),
+           m_channelImage(NULL)
 {
     connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));
-
-    m_channelCount = 5;
-    m_timeCount = 30;
-    m_currentStartChannel = 0;
-    m_changrpid = changrpid;
-    m_changrplist = ChannelGroup::GetChannelGroups(false);
-
-    m_sortReverse = gCoreContext->GetNumSetting("EPGSortReverse", 0);
-    m_selectRecThreshold = gCoreContext->GetNumSetting("SelChangeRecThreshold", 16);
-
-    m_channelOrdering = gCoreContext->GetSetting("ChannelOrdering", "channum");
 
     for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
         m_programs.push_back(NULL);
@@ -263,8 +274,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
-    m_startChanID  = chanid;
-    m_startChanNum = channum;
 }
 
 bool GuideGrid::Create()
