@@ -33,7 +33,6 @@ class IdleScreen : public MythScreenType
 
     QTimer        *m_updateStatusTimer;
 
-    MythUIButtonList *m_upcomingList;
     MythUIStateType  *m_statusState;
 
     int m_secondsToShutdown;
