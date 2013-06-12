@@ -334,6 +334,8 @@ MHListGroup::MHListGroup()
     m_nFirstItem = 1;
     m_nLastFirstItem = m_nFirstItem;
     m_nLastCount = 0;
+    m_fFirstItemDisplayed = false;
+    m_fLastItemDisplayed = false;
 }
 MHListGroup::~MHListGroup()
 {
