@@ -32,24 +32,25 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 }
 
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
-             : ScheduleCommon(parent, "ViewScheduled")
+             : ScheduleCommon(parent, "ViewScheduled"),
+               m_conflictBool(false),
+               m_conflictDate(QDate()),
+               m_schedulesList(NULL),
+               m_groupList(NULL),
+               m_showAll(!gCoreContext->GetNumSetting("ViewSchedShowLevel", 0)),
+               m_inEvent(false),
+               m_inFill(false),
+               m_needFill(false),
+               m_listPos(0),
+               m_currentGroup(QDate()),
+               m_defaultGroup(QDate()),
+               m_maxcard(0),
+               m_curcard(0),
+               m_inputref(),
+               m_maxinput(0),
+               m_curinput(0),
+               m_player(player)
 {
-    m_showAll = !gCoreContext->GetNumSetting("ViewSchedShowLevel", 0);
-
-    m_player = player;
-
-    m_inEvent = false;
-    m_inFill = false;
-    m_needFill = false;
-
-    m_curcard  = 0;
-    m_maxcard  = 0;
-    m_curinput = 0;
-    m_maxinput = 0;
-
-    m_defaultGroup = QDate();
-    m_currentGroup = m_defaultGroup;
-
     gCoreContext->addListener(this);
 }
 
