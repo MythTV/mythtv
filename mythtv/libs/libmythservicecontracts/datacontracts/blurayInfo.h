@@ -75,8 +75,27 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
     public:
 
         BlurayInfo(QObject *parent = 0)
-                 : QObject         ( parent    ),
-                   m_Path          ( QString() )
+                 : QObject                ( parent    ),
+                   m_Path                 ( QString() ),
+                   m_Title                ( QString() ),
+                   m_AltTitle             ( QString() ),
+                   m_DiscLang             ( QString() ),
+                   m_DiscNum              ( 0         ),
+                   m_TotalDiscNum         ( 0         ),
+                   m_TitleCount           ( 0         ),
+                   m_ThumbCount           ( 0         ),
+                   m_ThumbPath            ( QString() ),
+                   m_TopMenuSupported     ( false     ),
+                   m_FirstPlaySupported   ( false     ),
+                   m_NumHDMVTitles        ( 0         ),
+                   m_NumBDJTitles         ( 0         ),
+                   m_NumUnsupportedTitles ( 0         ),
+                   m_AACSDetected         ( false     ),
+                   m_LibAACSDetected      ( false     ),
+                   m_AACSHandled          ( false     ),
+                   m_BDPlusDetected       ( false     ),
+                   m_LibBDPlusDetected    ( false     ),
+                   m_BDPlusHandled        ( false     )
         {
         }
 
@@ -87,15 +106,26 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
         void Copy( const BlurayInfo &src )
         {
-            m_Path          = src.m_Path            ;
-            m_Title         = src.m_Title           ;
-            m_AltTitle      = src.m_AltTitle        ;
-            m_DiscLang      = src.m_DiscLang        ;
-            m_DiscNum       = src.m_DiscNum         ;
-            m_TotalDiscNum  = src.m_TotalDiscNum    ;
-            m_TitleCount    = src.m_TitleCount      ;
-            m_ThumbCount    = src.m_ThumbCount      ;
-            m_ThumbPath     = src.m_ThumbPath       ;
+            m_Path                 = src.m_Path                 ;
+            m_Title                = src.m_Title                ;
+            m_AltTitle             = src.m_AltTitle             ;
+            m_DiscLang             = src.m_DiscLang             ;
+            m_DiscNum              = src.m_DiscNum              ;
+            m_TotalDiscNum         = src.m_TotalDiscNum         ;
+            m_TitleCount           = src.m_TitleCount           ;
+            m_ThumbCount           = src.m_ThumbCount           ;
+            m_ThumbPath            = src.m_ThumbPath            ;
+            m_TopMenuSupported     = src.m_TopMenuSupported     ;
+            m_FirstPlaySupported   = src.m_FirstPlaySupported   ;
+            m_NumHDMVTitles        = src.m_NumHDMVTitles        ;
+            m_NumBDJTitles         = src.m_NumBDJTitles         ;
+            m_NumUnsupportedTitles = src.m_NumUnsupportedTitles ;
+            m_AACSDetected         = src.m_AACSDetected         ;
+            m_LibAACSDetected      = src.m_LibAACSDetected      ;
+            m_AACSHandled          = src.m_AACSHandled          ;
+            m_BDPlusDetected       = src.m_BDPlusDetected       ;
+            m_LibBDPlusDetected    = src.m_LibBDPlusDetected    ;
+            m_BDPlusHandled        = src.m_BDPlusHandled        ;
         }
 };
 
