@@ -725,9 +725,9 @@ AudioTest::AudioTest(QString main, QString passthrough,
     : VerticalConfigurationGroup(false, true, false, false),
       m_frontleft(NULL), m_frontright(NULL), m_center(NULL),
       m_surroundleft(NULL), m_surroundright(NULL),
-      m_rearleft(NULL), m_rearright(NULL), m_lfe(NULL), m_hd(NULL),
-      m_main(main), m_passthrough(passthrough), m_settings(settings),
-      m_quality(false)
+      m_rearleft(NULL), m_rearright(NULL), m_lfe(NULL), m_button(NULL),
+      m_hd(NULL), m_main(main), m_passthrough(passthrough),
+      m_settings(settings), m_quality(false)
 {
     m_channels = gCoreContext->GetNumSetting("TestingChannels", channels);
     setLabel(QObject::tr("Audio Configuration Testing"));
