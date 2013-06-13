@@ -101,6 +101,8 @@ class TestMythSystem: public QObject
     // tests kMSRunBackground      -- run child in the background
     void run_in_background_works(void)
     {
+        MSKIP("MythSystemLegacyPrivate calls MythSystem::Unlock"
+              "after the instance is deleted");
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("sleep 0.5", kMSRunBackground));
         cmd->Wait();
