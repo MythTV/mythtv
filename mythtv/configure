@@ -6479,5 +6479,9 @@ fi
 echo "Configuring libmythbluray..."
 (cd external/libmythbluray ; \
        ${qmakeconf} -o Makefile)
+echo "Configuring libsamplerate..."
+(cd external/libsamplerate ; \
+       ${qmakeconf} -o Makefile)
+
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

@@ -15,7 +15,9 @@ using namespace std;
 
 // MythTV headers
 #include "audiooutput.h"
+// external/libsamplerate
 #include "samplerate.h"
+
 #include "mythlogging.h"
 #include "mthread.h"
 

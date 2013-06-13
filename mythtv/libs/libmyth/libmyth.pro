@@ -87,17 +87,17 @@ SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 }
 
-INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
+INCLUDEPATH += ../../external/libsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg
-DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
+DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 
-LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
+LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
@@ -109,7 +109,7 @@ LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 
-POST_TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)

@@ -102,7 +102,7 @@ There are also a few simple \ref testing "testing shortcuts".
       and some old UI widgets are implemented by libmyth.
 
       This library depends on libav*, libmythbase, libmythui, libmythupnp,
-      libmythsamplerate, libmythsoundtouch and libmythfreesurround.
+      libsamplerate, libmythsoundtouch and libmythfreesurround.
 
       Any changes to this library's ABI may trigger a MythTV binary version
       change because the plugins depend on it.
@@ -144,7 +144,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythsamplerate      <dd>Audio resampling library.
+  <dt>libsamplerate      <dd>Audio resampling library.
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
       We use this to support different output sample rates than the sample
       rate used in the audio streams we play.
@@ -190,9 +190,9 @@ There are also a few simple \ref testing "testing shortcuts".
       This library does not depend on any of our libraries.
 
 </dl>
-Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
+Two libraries libmythmpeg2 and libsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
-libmythsamplerate resamples audio with better quality when we only need
+libsamplerate resamples audio with better quality when we only need
 to match the hardware sample rate to the A/V streams audio sample rate.
 
 \section db Database Schema
