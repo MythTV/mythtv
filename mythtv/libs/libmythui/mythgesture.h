@@ -90,7 +90,6 @@ class MythGestureEvent : public QEvent
     MythGestureEvent(Gesture gesture, Button button = LeftButton) :
         QEvent(kEventType), m_gesture(Unknown)
     {
-        m_position = QPoint(0,0);
         m_button = button;
         (gesture >= MaxGesture) ? m_gesture = MaxGesture : m_gesture = gesture;
     }
