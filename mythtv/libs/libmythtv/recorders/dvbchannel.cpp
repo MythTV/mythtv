@@ -80,7 +80,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     master_map_lock.lockForWrite();
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     master_map[devname].push_back(this); // == RegisterForMaster
-    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
     if (master == this)
     {
         dvbcam = new DVBCam(device);
@@ -102,7 +102,7 @@ DVBChannel::~DVBChannel()
     // whether we are the master or not remove us from the map..
     master_map_lock.lockForWrite();
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
     if (master == this)
     {
         master_map[devname].pop_front();
