@@ -44,7 +44,7 @@ inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
 inc_dvdread.files = dvdread/dvd_reader.h dvdread/nav_types.h dvdread/ifo_types.h
 inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
 
-INSTALLS += target inc_dvdnav inc_dvdread
+INSTALLS += inc_dvdnav inc_dvdread
 
 
 mingw:DEFINES += STDC_HEADERS

@@ -26,7 +26,7 @@ SOURCES += bluray.c register.c bdnav/*.c hdmv/*.c file/*.c util/*.c decoders/*.c
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
 inc_bdnav.files = bluray.h bdnav/*.h hdmv/*.h file/*.h util/*.h
 
-INSTALLS += target inc_bdnav
+INSTALLS += inc_bdnav
 
 mingw:DEFINES += STDC_HEADERS
 
