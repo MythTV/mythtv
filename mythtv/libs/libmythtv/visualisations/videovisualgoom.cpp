@@ -142,7 +142,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter *painter,
             if (m_buffer != last)
             {
                 void    *plane[1] = { m_buffer };
-                uint32_t pitch[1] = { m_area.width() * 4 };
+                uint32_t pitch[1] = { static_cast<uint32_t>(m_area.width() * 4) };
                 render->UploadBitmap(m_surface, plane, pitch);
             }
             render->DrawBitmap(m_surface, 0, NULL, NULL, kVDPBlendNull, 255, 255, 255, 255);
