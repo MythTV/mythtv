@@ -285,7 +285,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         return false;
     }
 
-    MHApplication *pProgram = (MHApplication*)ParseProgram(text);
+    MHApplication *pProgram = dynamic_cast<MHApplication*>(ParseProgram(text));
     if (! pProgram)
     {
         MHLOG(MHLogWarning, "Empty application");
