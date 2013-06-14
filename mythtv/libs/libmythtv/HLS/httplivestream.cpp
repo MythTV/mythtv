@@ -937,16 +937,19 @@ DTC::LiveStreamInfo *HTTPLiveStream::GetLiveStreamInfo(
     info->setPercentComplete((int)m_percentComplete);
     info->setCreated(m_created);
     info->setLastModified(m_lastModified);
-    info->setRelativeURL(m_relativeURL);
-    info->setFullURL(m_fullURL);
     info->setStatusStr(StatusToString(m_status));
     info->setStatusInt((int)m_status);
     info->setStatusMessage(m_statusMessage);
     info->setSourceFile(m_sourceFile);
     info->setSourceHost(m_sourceHost);
-    info->setSourceWidth(m_sourceWidth);
-    info->setSourceHeight(m_sourceHeight);
     info->setAudioOnlyBitrate((int)m_audioOnlyBitrate);
+
+    if (m_width && m_height) {
+        info->setRelativeURL(m_relativeURL);
+        info->setFullURL(m_fullURL);
+        info->setSourceWidth(m_sourceWidth);
+        info->setSourceHeight(m_sourceHeight);
+    }
 
     return info;
 }
