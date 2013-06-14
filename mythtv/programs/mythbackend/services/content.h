@@ -79,7 +79,7 @@ class Content : public ContentServices
         QFileInfo           GetMusic            ( int Id );
         QFileInfo           GetVideo            ( int Id );
 
-        QString             GetHash             ( const QString   &storageGroup,
+        QString             GetHash             ( const QString   &StorageGroup,
                                                   const QString   &FileName );
 
         bool                DownloadFile        ( const QString   &URL,
@@ -149,6 +149,23 @@ class ScriptableContent : public QObject
         Q_INVOKABLE ScriptableContent( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
+        QObject* GetRecordingArtworkList(       int        ChanId,
+                                          const QDateTime &StartTime  )
+        {
+            return m_obj.GetRecordingArtworkList( ChanId, StartTime );
+        }
+
+        QObject* GetProgramArtworkList( const QString &Inetref,
+                                              int      Season  )
+        {
+            return m_obj.GetProgramArtworkList( Inetref, Season );
+        }
+
+        QString GetHash ( const QString   &StorageGroup,
+                          const QString   &FileName )
+        {
+            return m_obj.GetHash( StorageGroup, FileName );
+        }
 
         QObject* GetLiveStream(      int              Id )
         {
@@ -166,7 +183,7 @@ class ScriptableContent : public QObject
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableContent, QObject*);
 
 #endif
 

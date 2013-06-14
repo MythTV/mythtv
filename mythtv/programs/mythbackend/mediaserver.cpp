@@ -150,7 +150,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
      pEngine->globalObject().setProperty("Guide"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableGuide   >() );
      pEngine->globalObject().setProperty("Content",
-         pEngine->scriptValueFromQMetaObject< Content           >() );
+         pEngine->scriptValueFromQMetaObject< ScriptableContent >() );
      pEngine->globalObject().setProperty("Dvr"    ,
          pEngine->scriptValueFromQMetaObject< ScriptableDvr     >() );
      pEngine->globalObject().setProperty("Channel",
