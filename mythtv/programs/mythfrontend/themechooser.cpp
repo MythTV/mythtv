@@ -154,6 +154,10 @@ void ThemeChooser::Load(void)
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
+    // Treat devel branches as master
+    if (MythVersion.startsWith("devel/"))
+        MythVersion = "master";
+
     // FIXME: For now, treat git master the same as svn trunk
     if (MythVersion == "master")
         MythVersion = "trunk";
@@ -880,6 +884,10 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
     m_updateTimer(new QTimer(this))
 {
     m_mythVersion = MYTH_SOURCE_PATH;
+
+    // Treat devel branches as master
+    if (m_mythVersion.startsWith("devel/"))
+        m_mythVersion = "master";
 
     // FIXME: For now, treat git master the same as svn trunk
     if (m_mythVersion == "master")
