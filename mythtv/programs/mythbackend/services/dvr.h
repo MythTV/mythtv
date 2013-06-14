@@ -73,6 +73,7 @@ class Dvr : public DvrServices
 
         QStringList       GetTitleList        ( );
 
+        DTC::TitleInfoList* GetTitleInfoList  ( );
 
         // Recording Rules
 
@@ -247,6 +248,8 @@ class ScriptableDvr : public QObject
         QStringList GetRecGroupList () { return m_obj.GetRecGroupList(); }
 
         QStringList GetTitleList    () { return m_obj.GetTitleList(); }
+
+        QObject* GetTitleInfoList   () { return m_obj.GetTitleInfoList(); }
 
 };
 

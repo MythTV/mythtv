@@ -18,6 +18,7 @@
 #include "datacontracts/programList.h"
 #include "datacontracts/encoderList.h"
 #include "datacontracts/recRuleList.h"
+#include "datacontracts/titleInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -56,6 +57,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::ProgramList::InitializeCustomTypes();
             DTC::EncoderList::InitializeCustomTypes();
             DTC::RecRuleList::InitializeCustomTypes();
+            DTC::TitleInfoList::InitializeCustomTypes();
         }
 
     public slots:
@@ -92,6 +94,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual QStringList        GetRecGroupList       ( ) = 0;
 
         virtual QStringList        GetTitleList          ( ) = 0;
+
+        virtual DTC::TitleInfoList* GetTitleInfoList     ( ) = 0;
 
         // Recording Rules
 

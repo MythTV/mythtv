@@ -382,6 +382,40 @@ QStringList Dvr::GetTitleList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::TitleInfoList* Dvr::GetTitleInfoList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString(
+        "SELECT DISTINCT title, inetref "
+        "    FROM recorded "
+        "    WHERE inetref <> '' "
+        "    ORDER BY title");
+
+    query.prepare(querystr);
+
+    DTC::TitleInfoList *pTitleInfos = new DTC::TitleInfoList();
+    if (!query.exec())
+    {
+        MythDB::DBError("GetTitleList recorded", query);
+        return pTitleInfos;
+    }
+
+    while (query.next())
+    {
+        DTC::TitleInfo *pTitleInfo = pTitleInfos->AddNewTitleInfo();
+
+        pTitleInfo->setTitle(query.value(0).toString());
+        pTitleInfo->setInetref(query.value(1).toString());
+    }
+
+    return pTitleInfos;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll )
