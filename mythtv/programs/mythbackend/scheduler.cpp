@@ -1899,7 +1899,8 @@ void Scheduler::run(void)
         for ( ; startIter != reclist.end(); ++startIter)
         {
             if ((*startIter)->GetRecordingStatus() !=
-                (*startIter)->oldrecstatus)
+                (*startIter)->oldrecstatus ||
+                (*startIter)->GetRecordingStatus() == rsTuning)
             {
                 break;
             }
