@@ -34,13 +34,7 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< TitleInfo   >();
-            qRegisterMetaType< TitleInfo*  >();
-        }
-
-    public:
+        static inline void InitializeCustomTypes();
 
         TitleInfo(QObject *parent = 0) 
             : QObject            ( parent )
@@ -63,5 +57,14 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::TitleInfo  )
 Q_DECLARE_METATYPE( DTC::TitleInfo* )
+
+namespace DTC
+{
+inline void TitleInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< TitleInfo   >();
+    qRegisterMetaType< TitleInfo*  >();
+}
+}
 
 #endif
