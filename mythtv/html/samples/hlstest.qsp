@@ -259,10 +259,13 @@ function listFiles() {
 
 function listRecordings() {
     var filter = $("#recFilter").val().toLowerCase();
+    var recgroup = $("#recGroup").val();
 
     $("#links").html("<i18n>Loading</i18n>...");
-    $.getJSON("/Dvr/GetRecordedList",
-              { Descending: 1, StartIndex: 0, nCount: 20000 }, function(data) {
+    $.getJSON("/Dvr/GetFilteredRecordedList",
+              { Descending: 1, StartIndex: 0, Count: 20000,
+                RecGroup: recgroup },
+              function(data) {
         $("#links").html("");
 
         var str = getFormStart();
@@ -330,6 +333,19 @@ function listRecordings() {
 <div>
     <b><i18n>Recordings:</i18n></b><br>
     <i18n>Filter</i18n>: <input id='recFilter' size=20>&nbsp;
+    Recording Group: <select id='recGroup'>
+<%
+    var dvr = new Dvr();
+    var recGroups = dvr.GetRecGroupList();
+
+    for (var i=0; i < recGroups.length; i++)
+    {
+%>
+        <option value='<%= recGroups[i] %>'><%= recGroups[i] %></option>
+<%
+    }
+%>
+    </select>
     <input type='button' onClick='javascript:listRecordings()' value='<i18n>List Recordings</i18n>'>
 </div>
 <div id="links"></div>
