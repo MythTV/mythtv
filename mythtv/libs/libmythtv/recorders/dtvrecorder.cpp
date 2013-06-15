@@ -27,6 +27,7 @@
 #include "mpegtables.h"
 #include "ringbuffer.h"
 #include "tv_rec.h"
+#include "mythsystemevent.h"
 
 extern "C" {
 #include "libavcodec/mpegvideo.h"
@@ -771,7 +772,11 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
     CheckForRingBufferSwitch();
 
     uint64_t frameNum = _frames_written_count;
-    _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
+    if (_first_keyframe < 0)
+    {
+        _first_keyframe = frameNum;
+        SendMythSystemRecEvent("REC_STARTED_WRITING", curRecording);
+    }
 
     // Add key frame to position map
     positionMapLock.lock();
@@ -995,6 +1000,7 @@ void DTVRecorder::HandleH264Keyframe(void)
     {
         _first_keyframe = frameNum;
         startpos = 0;
+        SendMythSystemRecEvent("REC_STARTED_WRITING", curRecording);
     }
     else
         startpos = m_h264_parser.keyframeAUstreamOffset();
