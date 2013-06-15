@@ -401,6 +401,16 @@ void ThemeChooser::Init(void)
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
         itemChanged(current);
+
+    QString testFile = m_userThemeDir + "/.test";
+    QFile test(testFile);
+    if (test.open(QIODevice::WriteOnly))
+        test.remove();
+    else
+    {
+        ShowOkPopup(tr("Error creating test file, %1 themes directory is "
+                       "not writable.").arg(m_userThemeDir));
+    }
 }
 
 ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
@@ -600,6 +610,17 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
     if (!info->GetDownloadURL().isEmpty())
     {
+        QString testFile = m_userThemeDir + "/.test";
+        QFile test(testFile);
+        if (test.open(QIODevice::WriteOnly))
+            test.remove();
+        else
+        {
+            ShowOkPopup(tr("Unable to install theme, %1 themes directory is "
+                           "not writable.").arg(m_userThemeDir));
+            return;
+        }
+
         QString downloadURL = info->GetDownloadURL();
         QFileInfo qfile(downloadURL);
         QString baseName = qfile.fileName();
