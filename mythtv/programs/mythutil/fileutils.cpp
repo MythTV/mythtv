@@ -2,6 +2,7 @@
 #include "exitcodes.h"
 #include "mythlogging.h"
 #include "ringbuffer.h"
+#include "mythdownloadmanager.h"
 
 // local headers
 #include "fileutils.h"
@@ -108,9 +109,43 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
     return result;
 }
 
+static int DownloadFile(const MythUtilCommandLineParser &cmdline)
+{
+    int result = GENERIC_EXIT_OK;
+
+    if (cmdline.toString("infile").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Missing --infile option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    QString url = cmdline.toString("infile");
+
+    if (cmdline.toString("outfile").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Missing --outfile option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    QString dest = cmdline.toString("outfile");
+
+    bool ok = GetMythDownloadManager()->download(url, dest);
+
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Error downloading file.");
+        result = GENERIC_EXIT_NOT_OK;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, "File downloaded.");
+    }
+
+    return result;
+}
+
 void registerFileUtils(UtilMap &utilMap)
 {
     utilMap["copyfile"]             = &CopyFile;
+    utilMap["download"]             = &DownloadFile;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

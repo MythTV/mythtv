@@ -13,7 +13,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
         // fileutils.cpp
         << add("--copyfile", "copyfile", false,
-                "Copy a MythTV Storage Group file", "")
+                "Copy a MythTV Storage Group file using RingBuffers", "")
+                ->SetGroup("File")
+                ->SetRequiredChild(QStringList("infile") << "outfile")
+        << add("--download", "download", false,
+                "Download a file using MythDownloadManager", "")
                 ->SetGroup("File")
                 ->SetRequiredChild(QStringList("infile") << "outfile")
 
