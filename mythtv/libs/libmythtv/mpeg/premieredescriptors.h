@@ -19,10 +19,11 @@ using namespace std;
 class PremiereContentTransmissionDescriptor : public MPEGDescriptor
 {
   public:
-    PremiereContentTransmissionDescriptor(
-        const unsigned char *data, int len = 300) :
-        MPEGDescriptor(
-            data, len, PrivateDescriptorID::premiere_content_transmission)
+    PremiereContentTransmissionDescriptor(const unsigned char *data,
+                                          int len = 300)
+        : MPEGDescriptor(data, len,
+                         PrivateDescriptorID::premiere_content_transmission),
+          _transmission_count(0)
     {
         if (_data && !Parse())
             _data = NULL;
