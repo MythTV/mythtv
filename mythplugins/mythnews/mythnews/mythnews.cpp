@@ -651,6 +651,9 @@ void MythNews::processAndShowNews(NewsSite *site)
     if (site != qVariantValue<NewsSite*>(siteUIItem->GetData()))
         return;
 
+    QString currItem = m_articlesList->GetValue();
+    int topPos = m_articlesList->GetTopItemPos();
+
     m_articlesList->Reset();
     m_articles.clear();
 
@@ -662,6 +665,9 @@ void MythNews::processAndShowNews(NewsSite *site)
             new MythUIButtonListItem(m_articlesList, (*it).title());
         m_articles[item] = *it;
     }
+
+    if (m_articlesList->MoveToNamedPosition(currItem))
+        m_articlesList->SetItemCurrent(m_articlesList->GetCurrentPos(), topPos);
 }
 
 void MythNews::slotSiteSelected(MythUIButtonListItem *item)
