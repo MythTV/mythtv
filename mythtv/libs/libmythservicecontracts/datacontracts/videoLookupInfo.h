@@ -48,6 +48,8 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
         ArtworkItem(QObject *parent = 0)
                         : QObject         ( parent )
         {
+            m_Width            = 0                      ;
+            m_Height           = 0                      ;
         }
 
         ArtworkItem( const ArtworkItem &src )
@@ -131,6 +133,14 @@ class SERVICE_PUBLIC VideoLookup : public QObject
         VideoLookup(QObject *parent = 0)
                         : QObject         ( parent )
         {
+            m_Season           = 0                      ;
+            m_Episode          = 0                      ;
+            m_Year             = 0                      ;
+            m_UserRating       = 0.0                    ;
+            m_Length           = 0.0                    ;
+            m_Popularity       = 0                      ;
+            m_Budget           = 0                      ;
+            m_Revenue          = 0                      ;
         }
 
         VideoLookup( const VideoLookup &src )
@@ -154,6 +164,11 @@ class SERVICE_PUBLIC VideoLookup : public QObject
             m_ReleaseDate      = src.m_ReleaseDate      ;
             m_UserRating       = src.m_UserRating       ;
             m_Length           = src.m_Length           ;
+            m_Popularity       = src.m_Popularity       ;
+            m_Budget           = src.m_Budget           ;
+            m_Revenue          = src.m_Revenue          ;
+            m_IMDB             = src.m_IMDB             ;
+            m_TMSRef           = src.m_TMSRef           ;
 
             CopyListContents< ArtworkItem >( this, m_Artwork, src.m_Artwork );
         }
