@@ -737,8 +737,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     int breaksFound = 0;
 
     // configure commercial detection method
-    SkipTypes commDetectMethod =
-            (enum SkipTypes)gCoreContext->GetNumSetting(
+    SkipTypes commDetectMethod = (SkipTypes)gCoreContext->GetNumSetting(
                                     "CommercialSkipMethod", COMM_DETECT_ALL);
 
     if (cmdline.toBool("commmethod"))
@@ -774,16 +773,19 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                     return GENERIC_EXIT_INVALID_CMDLINE;
                 }
 
-                // append flag method to list
-                commDetectMethod = (SkipTypes) ((int)commDetectMethod
-                                             || (int)skipTypes->value(val));
+                if (commDetectMethod == COMM_DETECT_UNINIT) {
+                    commDetectMethod = (SkipTypes) skipTypes->value(val);
+                } else {
+                    commDetectMethod = (SkipTypes) ((int)commDetectMethod
+                                                  | (int)skipTypes->value(val));
+                }
             }
 
         }
         if (commDetectMethod == COMM_DETECT_UNINIT)
             return GENERIC_EXIT_INVALID_CMDLINE;
     }
-    else if (!cmdline.toBool("skipdb"))
+    else if (useDB)
     {
         // if not manually specified, and we have a database to access
         // pull the commflag type from the channel
@@ -823,9 +825,11 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         }
 
     }
-    else if (cmdline.toBool("skipdb"))
+    else if (!useDB)
+    {
         // default to a cheaper method for debugging purposes
         commDetectMethod = COMM_DETECT_BLANK;
+    }
 
     // if selection has failed, or intentionally disabled, drop out
     if (commDetectMethod == COMM_DETECT_UNINIT)
@@ -1149,6 +1153,13 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
+    if (cmdline.toBool("outputmethod"))
+    {
+        QString om = cmdline.toString("outputmethod");
+        if (outputTypes->contains(om))
+            outputMethod = outputTypes->value(om);
+    }
+    
     if (cmdline.toBool("chanid") && cmdline.toBool("starttime"))
     {
         // operate on a recording in the database
