@@ -6,11 +6,13 @@
 
         <buttonlist name="siteslist" from="basebuttonlist">
             <area>20,20,200,300</area>
+            <wrapstyle>selection</wrapstyle>
             <showarrow>yes</showarrow>
         </buttonlist>
 
         <buttonlist name="articleslist" from="basebuttonlist">
             <area>250,20,530,300</area>
+            <wrapstyle>selection</wrapstyle>
             <showarrow>no</showarrow>
         </buttonlist>
 
