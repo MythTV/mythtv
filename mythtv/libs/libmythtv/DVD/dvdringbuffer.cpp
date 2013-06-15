@@ -1597,6 +1597,10 @@ int DVDRingBuffer::GetAudioTrackType(uint stream_id)
     int ret = -1;
     audio_attr_t attributes;
     int logicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
+
+    if (logicalStreamId < 0)
+        return -1;
+
     if (dvdnav_get_audio_attr(m_dvdnav, logicalStreamId, &attributes) >= 1)
     {
         LOG(VB_AUDIO, LOG_INFO, QString("DVD Audio Track #%1 Language "
