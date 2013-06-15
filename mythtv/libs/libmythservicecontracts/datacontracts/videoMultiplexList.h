@@ -52,7 +52,12 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
     public:
 
         VideoMultiplexList(QObject *parent = 0)
-            : QObject( parent )
+            : QObject( parent ),
+              m_StartIndex      ( 0       ),
+              m_Count           ( 0       ),
+              m_CurrentPage     ( 0       ),
+              m_TotalPages      ( 0       ),
+              m_TotalAvailable  ( 0       )
         {
         }
 
