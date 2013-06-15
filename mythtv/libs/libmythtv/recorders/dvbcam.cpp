@@ -76,7 +76,7 @@ DVBCam::DVBCam(const QString &aDevice)
         if (ioctl(cafd, CA_GET_CAP, &caps) >= 0)
             numslots = caps.slot_num;
         else
-            LOG(VB_GENERAL, LOG_ERR, "ioctl CA_GET_CAP failed");
+            LOG(VB_GENERAL, LOG_ERR, "ioctl CA_GET_CAP failed: " + ENO);
 
         close(cafd);
     }
