@@ -5,6 +5,8 @@
 #include <mythdate.h>
 #include <mythlogging.h>
 #include <mythdirs.h>
+#include <mythdownloadmanager.h>
+#include <mythevent.h>
 
 // MythNews headers
 #include "newssite.h"
@@ -22,7 +24,6 @@ NewsSite::NewsSite(const QString   &name,
     m_name(name),  m_url(url), m_urlReq(url),
     m_desc(QString::null), m_updated(updated),
     m_destDir(GetConfDir()+"/MythNews"),
-    /*m_data(),*/
     m_state(NewsSite::Success),
     m_errorString(QString::null),
     m_updateErrorString(QString::null),
@@ -34,9 +35,8 @@ NewsSite::NewsSite(const QString   &name,
 void NewsSite::deleteLater()
 {
     QMutexLocker locker(&m_lock);
-#if QT_VERSION < 0x050000
-    MythHttpPool::GetSingleton()->RemoveListener(this);
-#endif
+    GetMythDownloadManager()->removeListener(this);
+    GetMythDownloadManager()->cancelDownload(m_url);
     m_articleList.clear();
     QObject::deleteLater();
 }
@@ -44,9 +44,8 @@ void NewsSite::deleteLater()
 NewsSite::~NewsSite()
 {
     QMutexLocker locker(&m_lock);
-#if QT_VERSION < 0x050000
-    MythHttpPool::GetSingleton()->RemoveListener(this);
-#endif
+    GetMythDownloadManager()->removeListener(this);
+    GetMythDownloadManager()->cancelDownload(m_url);
 }
 
 void NewsSite::insertNewsArticle(const NewsArticle &item)
@@ -67,22 +66,18 @@ void NewsSite::retrieve(void)
 
     stop();
     m_state = NewsSite::Retrieving;
-    m_data.resize(0);
     m_errorString = QString::null;
     m_updateErrorString = QString::null;
     m_articleList.clear();
-    m_urlReq = QUrl(m_url);
-#if QT_VERSION < 0x050000
-    MythHttpPool::GetSingleton()->AddUrlRequest(m_urlReq, this);
-#endif
+    QString destFile = QString("%1/%2").arg(m_destDir).arg(m_name);
+    GetMythDownloadManager()->queueDownload(m_url, destFile, this);
 }
 
 void NewsSite::stop(void)
 {
     QMutexLocker locker(&m_lock);
-#if QT_VERSION < 0x050000
-    MythHttpPool::GetSingleton()->RemoveUrlRequest(m_urlReq, this);
-#endif
+    GetMythDownloadManager()->removeListener(this);
+    GetMythDownloadManager()->cancelDownload(m_url);
 }
 
 bool NewsSite::successful(void) const
@@ -156,75 +151,70 @@ unsigned int NewsSite::timeSinceLastUpdate(void) const
     return min;
 }
 
-#if QT_VERSION < 0x050000
-void NewsSite::Update(QHttp::Error      error,
-                      const QString    &error_str,
-                      const QUrl       &url,
-                      uint              http_status_id,
-                      const QString    &http_status_str,
-                      const QByteArray &data)
+void NewsSite::customEvent(QEvent *event)
 {
-    QMutexLocker locker(&m_lock);
-
-    if (url != m_urlReq)
+    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        return;
-    }
+        MythEvent *me = (MythEvent *)event;
+        QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
-    if (QHttp::NoError != error)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Connection Error" +
-            QString("\n\t\t\tExplanation: %1: %2")
-                .arg(error).arg(error_str));
+        if (tokens.isEmpty())
+            return;
 
-        m_state = NewsSite::RetrieveFailed;
-        m_updateErrorString = QString("%1: %2").arg(error).arg(error_str);
-        emit finished(this);
-        return;
-    }
-
-    if (200 != http_status_id)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Protocol Error" +
-            QString("\n\t\t\tExplanation: %1: %2")
-                .arg(http_status_id).arg(http_status_str));
-
-        m_state = NewsSite::RetrieveFailed;
-        m_updateErrorString =
-            QString("%1: %2").arg(http_status_id).arg(http_status_str);
-        emit finished(this);
-        return;
-    }
-
-    m_updateErrorString = QString::null;
-    m_data = data;
-
-    if (m_name.isEmpty())
-    {
-        m_state = NewsSite::WriteFailed;
-    }
-    else
-    {
-        QFile xmlFile(QString("%1/%2").arg(m_destDir).arg(m_name));
-        if (xmlFile.open(QIODevice::WriteOnly))
+        if (tokens[0] == "DOWNLOAD_FILE")
         {
-            xmlFile.write(m_data);
-            xmlFile.close();
-            m_updated = MythDate::current();
-            m_state = NewsSite::Success;
-        }
-        else
-        {
-            m_state = NewsSite::WriteFailed;
+            QStringList args = me->ExtraDataList();
+
+            if (tokens[1] == "UPDATE")
+            {
+                // could update a progressbar here
+            }
+            else if (tokens[1] == "FINISHED")
+            {
+                QString filename = args[1];
+                int fileSize  = args[2].toInt();
+                QString errorStr = args[3];
+                int errorCode = args[4].toInt();
+
+                if ((errorCode != 0) || (fileSize == 0))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "HTTP Connection Error" +
+                        QString("\n\t\t\tExplanation: %1: %2")
+                                .arg(errorCode).arg(errorStr));
+
+                    m_state = NewsSite::RetrieveFailed;
+                    m_updateErrorString = QString("%1: %2").arg(errorCode).arg(errorStr);
+                    emit finished(this);
+                    return;
+                }
+                else
+                {
+                    m_updateErrorString = QString::null;
+                    //m_data = data;
+
+                    if (m_name.isEmpty())
+                    {
+                        m_state = NewsSite::WriteFailed;
+                    }
+                    else
+                    {
+                        if (QFile::exists(filename))
+                        {
+                            m_updated = MythDate::current();
+                            m_state = NewsSite::Success;
+                        }
+                        else
+                        {
+                            m_state = NewsSite::WriteFailed;
+                        }
+                    }
+
+                    emit finished(this);
+                }
+            }
         }
     }
-
-    if (NewsSite::WriteFailed == m_state)
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Write failed");
-
-    emit finished(this);
 }
-#endif
 
 void NewsSite::process(void)
 {

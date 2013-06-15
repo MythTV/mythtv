@@ -52,9 +52,6 @@ Q_DECLARE_METATYPE(NewsCategory*)
 
 class NewsSite;
 class NewsSite : public QObject
-#if QT_VERSION < 0x050000
-, public MythHttpListener
-#endif
 {
     Q_OBJECT
 
@@ -85,6 +82,8 @@ class NewsSite : public QObject
              const QDateTime &updated, const bool     podcast);
     virtual void deleteLater();
 
+    void customEvent(QEvent *event);
+
     QString   url(void)  const;
     QString   name(void) const;
     QString   description(void) const;
@@ -106,15 +105,6 @@ class NewsSite : public QObject
 
     bool     successful(void) const;
     QString  errorMsg(void) const;
-
-#if QT_VERSION < 0x050000
-    virtual void Update(QHttp::Error      error,
-                        const QString    &error_str,
-                        const QUrl       &url,
-                        uint              http_status_id,
-                        const QString    &http_status_str,
-                        const QByteArray &data);
-#endif
 
   private:
     ~NewsSite();

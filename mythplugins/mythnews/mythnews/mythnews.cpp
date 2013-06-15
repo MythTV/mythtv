@@ -13,7 +13,6 @@
 #include <QUrl>
 
 // MythTV headers
-#include <mythprogressdialog.h>
 #include <mythuibuttonlist.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
@@ -24,10 +23,7 @@
 #include <mythdate.h>
 #include <mythdirs.h>
 #include <mythdb.h>
-
-#if QT_VERSION < 0x050000
-#include <httpcomms.h>
-#endif
+#include <mythdownloadmanager.h>
 
 // MythNews headers
 #include "mythnews.h"
@@ -52,9 +48,6 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     m_zoom(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0")),
     m_browser(gCoreContext->GetSetting("WebBrowserCommand", "")),
     m_menuPopup(NULL),
-    m_progressPopup(NULL),
-    m_httpGrabber(NULL),
-    m_abortHttp(false),
     m_sitesList(NULL),
     m_articlesList(NULL),
     m_nositesText(NULL),
@@ -298,35 +291,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
             if (!article.thumbnail().isEmpty())
             {
-                QString fileprefix = GetConfDir();
-
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                fileprefix += "/MythNews/tcache";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                QString url = article.thumbnail();
-                QString sFilename = QString("%1/%2")
-                    .arg(fileprefix)
-                    .arg(qChecksum(url.toLocal8Bit().constData(),
-                                   url.toLocal8Bit().size()));
-
-#if QT_VERSION < 0x050000
-                bool exists = QFile::exists(sFilename);
-                if (!exists)
-                    HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
-#else
-#warning MythNews::updateInfoView() has not yet been ported to Qt5
-#endif
-
                 if (m_thumbnailImage)
                 {
-                    m_thumbnailImage->SetFilename(sFilename);
+                    m_thumbnailImage->SetFilename(article.thumbnail());
                     m_thumbnailImage->Load();
 
                     if (!m_thumbnailImage->IsVisible())
@@ -335,47 +302,21 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             }
             else
             {
-                if (m_thumbnailImage)
-                    m_thumbnailImage->Hide();
-
                 if (site && !site->imageURL().isEmpty())
                 {
-                    QString fileprefix = GetConfDir();
-
-                    QDir dir(fileprefix);
-                    if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                    fileprefix += "/MythNews/scache";
-
-                    dir = QDir(fileprefix);
-                    if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                    QString url = site->imageURL();
-                    QString extension = url.section('.', -1);
-
-                    QString sitename = site->name();
-                    QString sFilename = QString("%1/%2.%3").arg(fileprefix)
-                                                           .arg(sitename)
-                                                           .arg(extension);
-
-#if QT_VERSION < 0x050000
-                    bool exists = QFile::exists(sFilename);
-                    if (!exists)
-                        HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
-#else
-#warning MythNews::updateInfoView() has not yet been ported to Qt5
-#endif
-
                     if (m_thumbnailImage)
                     {
-                        m_thumbnailImage->SetFilename(sFilename);
+                        m_thumbnailImage->SetFilename(site->imageURL());
                         m_thumbnailImage->Load();
 
                         if (!m_thumbnailImage->IsVisible())
                             m_thumbnailImage->Show();
                     }
+                }
+                else
+                {
+                    if (m_thumbnailImage)
+                        m_thumbnailImage->Hide();
                 }
             }
 
@@ -432,37 +373,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
             if (!site->imageURL().isEmpty())
             {
-                QString fileprefix = GetConfDir();
-
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                        dir.mkdir(fileprefix);
-
-                fileprefix += "/MythNews/scache";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                QString url = site->imageURL();
-                QString extension = url.section('.', -1);
-
-                QString sitename = site->name();
-                QString sFilename = QString("%1/%2.%3").arg(fileprefix)
-                                                        .arg(sitename)
-                                                        .arg(extension);
-
-#if QT_VERSION < 0x050000
-                bool exists = QFile::exists(sFilename);
-                if (!exists)
-                    HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
-#else
-#warning MythNews::updateInfoView() has not yet been ported to Qt5
-#endif
-
                 if (m_thumbnailImage)
                 {
-                    m_thumbnailImage->SetFilename(sFilename);
+                    m_thumbnailImage->SetFilename(site->imageURL());
                     m_thumbnailImage->Load();
 
                     if (!m_thumbnailImage->IsVisible())
@@ -481,31 +394,12 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             QDateTime updated(site->lastUpdated());
             if (updated.toTime_t() != 0) {
                 text += MythDate::toString(site->lastUpdated(),
-                                             MythDate::kDateTimeFull | MythDate::kSimplify);
+                                           MythDate::kDateTimeFull | MythDate::kSimplify);
             }
             else
                 text += tr("Unknown");
             m_updatedText->SetText(text);
         }
-
-#if QT_VERSION < 0x050000
-        if (m_httpGrabber != NULL)
-        {
-            int progress = m_httpGrabber->getProgress();
-            int total = m_httpGrabber->getTotal();
-            if ((progress > 0) && (total > 0) && (progress < total))
-            {
-                float fProgress = (float)progress/total;
-                QString text = tr("%1 of %2 (%3 percent)")
-                        .arg(formatSize(progress, 2))
-                        .arg(formatSize(total, 2))
-                        .arg(floor(fProgress*100));
-                m_updatedText->SetText(text);
-            }
-        }
-#else
-#warning MythNews::updateInfoView() has not yet been ported to Qt5
-#endif
     }
 }
 
@@ -556,25 +450,6 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
             ShowEditDialog(true);
         else if (action == "DELETE")
             deleteNewsSite();
-        else if (action == "ESCAPE")
-        {
-            {
-                QMutexLocker locker(&m_lock);
-
-                if (m_progressPopup)
-                {
-                    m_progressPopup->Close();
-                    m_progressPopup = NULL;
-                }
-
-                m_RetrieveTimer->stop();
-
-                if (m_httpGrabber)
-                    m_abortHttp = true;
-            }
-
-            Close();
-        }
         else
             handled = false;
     }
@@ -694,137 +569,6 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     }
 
     updateInfoView(item);
-}
-
-void MythNews::slotProgressCancelled(void)
-{
-    QMutexLocker locker(&m_lock);
-
-    m_abortHttp = true;
-}
-
-void MythNews::createProgress(const QString &title)
-{
-    QMutexLocker locker(&m_lock);
-
-    if (m_progressPopup)
-        return;
-
-    QString message = title;
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    m_progressPopup = new MythUIProgressDialog(message, popupStack,
-                                               "mythnewsprogressdialog");
-
-    if (m_progressPopup->Create())
-        popupStack->AddScreen(m_progressPopup, false);
-    else
-    {
-        delete m_progressPopup;
-        m_progressPopup = NULL;
-    }
-}
-
-bool MythNews::getHttpFile(const QString &sFilename, const QString &cmdURL)
-{
-#if QT_VERSION < 0x050000
-    QMutexLocker locker(&m_lock);
-
-    int redirectCount = 0;
-    QByteArray data(0);
-    bool res = false;
-    m_httpGrabber = NULL;
-    QString hostname;
-    QString fileUrl = cmdURL;
-
-    createProgress(tr("Downloading media..."));
-    while (1)
-    {
-        QUrl qurl(fileUrl);
-        if (hostname.isEmpty())
-            hostname = qurl.host();  // hold onto original host
-
-        if (qurl.host().isEmpty()) // can occur on redirects to partial paths
-            qurl.setHost(hostname);
-
-        if (m_httpGrabber != NULL)
-            delete m_httpGrabber;
-
-        m_httpGrabber = new HttpComms;
-        m_abortHttp = false;
-
-        m_httpGrabber->request(qurl, -1, true);
-
-        while ((!m_httpGrabber->isDone()) && (!m_abortHttp))
-        {
-            int progress = m_httpGrabber->getProgress();
-            int total = m_httpGrabber->getTotal();
-            if ((progress > 0) && (total > 5120) && (progress < total)) // Ignore total less than 5kb as we're probably looking at a redirect page or similar
-            {
-                m_progressPopup->SetTotal(total);
-                m_progressPopup->SetProgress(progress);
-                float fProgress = (float)progress/total;
-                QString text = tr("%1 of %2 (%3 percent)")
-                        .arg(formatSize(progress, 2))
-                        .arg(formatSize(total, 2))
-                        .arg(floor(fProgress*100));
-                if (m_updatedText)
-                    m_updatedText->SetText(text);
-            }
-            qApp->processEvents();
-            usleep(100000);
-        }
-
-        if (m_abortHttp)
-            break;
-
-        // Check for redirection
-        if (!m_httpGrabber->getRedirectedURL().isEmpty())
-        {
-            if (redirectCount++ < 3)
-                fileUrl = m_httpGrabber->getRedirectedURL();
-
-            // Try again
-            continue;
-        }
-
-        if (m_httpGrabber->getStatusCode() > 400)
-        {
-            // Error, request failed
-            break;
-        }
-
-        data = m_httpGrabber->getRawData();
-
-        if (data.size() > 0)
-        {
-            QFile file(sFilename);
-            if (file.open(QIODevice::WriteOnly))
-            {
-                file.write(data);
-                file.close();
-                res = true;
-            }
-        }
-        break;
-    }
-
-    if (m_progressPopup)
-    {
-        m_progressPopup->Close();
-        m_progressPopup = NULL;
-    }
-
-    delete m_httpGrabber;
-    m_httpGrabber = NULL;
-    return res;
-#else
-#warning MythNews::getHttpFile() has not yet been ported to Qt5
-    (void) sFilename;
-    (void) cmdURL;
-    return false;
-#endif
 }
 
 void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
