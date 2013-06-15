@@ -38,7 +38,7 @@ class MBroadcastSocketDevice : public MSocketDevice
 
         int one = 1;
         if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST,
-                       (const char *)&one, sizeof(one)) < 0) 
+                       (const char *)&one, sizeof(one)) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, "setsockopt - SO_BROADCAST Error" + ENO);
         }
@@ -51,8 +51,11 @@ class MBroadcastSocketDevice : public MSocketDevice
     virtual ~MBroadcastSocketDevice()
     {
         int zero = 0;
-        setsockopt(socket(), SOL_SOCKET, SO_BROADCAST, (const char *)&zero,
-                   sizeof(zero));
+        if (setsockopt(socket(), SOL_SOCKET, SO_BROADCAST, (const char *)&zero,
+                       sizeof(zero)) < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "setsockopt - SO_BROADCAST Error" + ENO);
+        }
     }
 
     virtual QHostAddress address() const { return m_address; }
