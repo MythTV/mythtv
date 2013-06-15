@@ -8,16 +8,16 @@
 #include "recordinginfo.h"
 #include "rawsettingseditor.h"
 
-// Helper commands for formatting and sending a MythSystemLegacyEvent
+// Helper commands for formatting and sending a MythSystemEvent
 MTV_PUBLIC void SendMythSystemRecEvent(const QString msg,
                                     const RecordingInfo *pginfo);
 MTV_PUBLIC void SendMythSystemPlayEvent(const QString msg,
                                      const ProgramInfo *pginfo);
 
 /** \class MythSystemEventHandler
- *  \brief Handles incoming MythSystemLegacyEvent messages
+ *  \brief Handles incoming MythSystemEvent messages
  *
- *  MythSystemEventHandler handles incoming MythSystemLegacyEvent messages and runs
+ *  MythSystemEventHandler handles incoming MythSystemEvent messages and runs
  *  the appropriate event handler command on the local system if one is
  *  configured.
  */
@@ -42,10 +42,10 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
 };
 
 /** \class MythSystemEventEditor
- *  \brief An editor for MythSystemLegacyEvent handler commands
+ *  \brief An editor for MythSystemEvent handler commands
  *
  *  This class extends RawSettingsEditor and automatically populates the
- *  settings list with the MythSystemLegacyEvent handler command settings names.
+ *  settings list with the MythSystemEvent handler command settings names.
  */
 class MTV_PUBLIC MythSystemEventEditor : public RawSettingsEditor
 {

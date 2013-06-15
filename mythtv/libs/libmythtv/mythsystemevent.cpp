@@ -15,7 +15,7 @@
 #define LOC      QString("MythSystemEventHandler: ")
 
 /** \class SystemEventThread
- *  \brief QRunnable class for running MythSystemLegacyEvent handler commands
+ *  \brief QRunnable class for running MythSystemEvent handler commands
  *
  *  The SystemEventThread class runs a system event handler command in
  *  non-blocking mode.  The commands are run in the MThreadPool::globalInstance,
@@ -213,7 +213,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 }
 
 /** \fn MythSystemEventHandler::EventNameToSetting(const QString &name)
- *  \brief Convert an MythSystemLegacyEvent name to a database setting name
+ *  \brief Convert an MythSystemEvent name to a database setting name
  *
  *  Converts an underscored, all-capital-letters system event name of the form
  *  NET_CTRL_CONNECTED to the corresponding CamelCase database setting
@@ -360,7 +360,7 @@ void SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
 
 /** \fn MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
                                                      const char *name)
- *  \brief Constructor for the MythSystemLegacyEvent settings editor
+ *  \brief Constructor for the MythSystemEvent settings editor
  *
  *  Populates the settings name list with the System Event settings names
  *  and sets the title of the RawSettingsEditor screen to indicate that

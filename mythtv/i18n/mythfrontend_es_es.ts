@@ -6685,7 +6685,7 @@ Delete the current cut or preserved region</extracomment>
     </message>
 </context>
 <context>
-    <name>MythSystemLegacyEventEditor</name>
+    <name>MythSystemEventEditor</name>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="376"/>
         <source>System Event Command Editor</source>
