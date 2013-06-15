@@ -834,6 +834,14 @@ void ThemeChooser::customEvent(QEvent *e)
             gCoreContext->SendSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
+
+            // Send a message to ourself so we trigger a reload our next chance
+            MythEvent *me = new MythEvent("THEME_RELOAD");
+            qApp->postEvent(this, me);
+        }
+        else if ((me->Message() == "THEME_RELOAD") &&
+                 (m_downloadState == dsIdle))
+        {
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
