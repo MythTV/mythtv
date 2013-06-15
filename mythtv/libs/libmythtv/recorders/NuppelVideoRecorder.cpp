@@ -1580,11 +1580,13 @@ void NuppelVideoRecorder::DoV4L2(void)
         memset(buffers[i], 0, bufferlen[i]);
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         vbuf.index = i;
-        ioctl(fd, VIDIOC_QBUF, &vbuf);
+        if (ioctl(fd, VIDIOC_QBUF, &vbuf) < 0)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "unable to enqueue capture buffer (VIDIOC_QBUF failed) " + ENO);
     }
 
     int turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    ioctl(fd, VIDIOC_STREAMON, &turnon);
+    if (ioctl(fd, VIDIOC_STREAMON, &turnon) < 0)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "unable to start capture (VIDIOC_STREAMON failed) " + ENO);
 
     struct timeval tv;
     fd_set rdset;
@@ -1656,17 +1658,20 @@ again:
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Resetting and re-queueing");
             turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            ioctl(fd, VIDIOC_STREAMOFF, &turnon);
+            if (ioctl(fd, VIDIOC_STREAMOFF, &turnon) < 0)
+                LOG(VB_GENERAL, LOG_ERR, LOC + "unable to stop capture (VIDIOC_STREAMOFF failed) " + ENO);
 
             for (uint i = 0; i < numbuffers; i++)
             {
                 memset(buffers[i], 0, bufferlen[i]);
                 vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 vbuf.index = i;
-                ioctl(fd, VIDIOC_QBUF, &vbuf);
+                if (ioctl(fd, VIDIOC_QBUF, &vbuf) < 0)
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "unable to enqueue capture buffer (VIDIOC_QBUF failed) " + ENO);
              }
 
-             ioctl(fd, VIDIOC_STREAMON, &turnon);
+             if (ioctl(fd, VIDIOC_STREAMON, &turnon) < 0)
+                LOG(VB_GENERAL, LOG_ERR, LOC + "unable to start capture (VIDIOC_STREAMON failed) " + ENO);
              resetcapture = false;
         }
 
@@ -1744,12 +1749,14 @@ again:
         }
 
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        ioctl(fd, VIDIOC_QBUF, &vbuf);
+        if (ioctl(fd, VIDIOC_QBUF, &vbuf) < 0)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "unable to enqueue capture buffer (VIDIOC_QBUF failed) " + ENO);
     }
 
     KillChildren();
 
-    ioctl(fd, VIDIOC_STREAMOFF, &turnon);
+    if (ioctl(fd, VIDIOC_STREAMOFF, &turnon) < 0)
+        LOG(VB_GENERAL, LOG_ERR, LOC + "unable to stop capture (VIDIOC_STREAMOFF failed) " + ENO);
 
     for (uint i = 0; i < numbuffers; i++)
     {
