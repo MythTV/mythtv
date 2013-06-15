@@ -244,7 +244,8 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
 int AvFormatDecoderDVD::GetAudioLanguage(uint audio_index, uint stream_index)
 {
     (void)audio_index;
-    if (ringBuffer && ringBuffer->IsDVD())
+    if ((ic->streams[stream_index]->id >= 0) &&
+        ringBuffer && ringBuffer->IsDVD())
     {
         return ringBuffer->DVD()->GetAudioLanguage(
             ringBuffer->DVD()->GetAudioTrackNum(ic->streams[stream_index]->id));
