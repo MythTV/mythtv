@@ -1026,6 +1026,12 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 .arg(reply->url().toString())
                 .arg(dlInfo->m_redirectedTo.toString()));
 
+        if (dlInfo->m_data)
+            dlInfo->m_data->clear();
+
+        dlInfo->m_bytesReceived = 0;
+        dlInfo->m_bytesTotal    = 0;
+
         QNetworkRequest request(dlInfo->m_redirectedTo);
         if (dlInfo->m_preferCache)
             request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
