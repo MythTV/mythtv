@@ -848,6 +848,7 @@ void Scheduler::SlaveConnected(RecordingList &slavelist)
 
         if (sp->GetInputID() && !found)
         {
+            sp->mplexid = sp->QueryMplexID();
             reclist.push_back(new RecordingInfo(*sp));
             reclist_changed = true;
             sp->AddHistory(false);
@@ -1084,15 +1085,14 @@ bool Scheduler::FindNextConflict(
                      .arg(p->GetCardID()).arg(q->GetCardID())
                      .arg(igrp.GetSharedInputGroup(
                               p->GetInputID(), q->GetInputID()))
-                     .arg(p->QueryMplexID()).arg(q->QueryMplexID()));
+                     .arg(p->mplexid).arg(q->mplexid));
         }
 
         // if two inputs are in the same input group we have a conflict
         // unless the programs are on the same multiplex.
         if (p->GetCardID() != q->GetCardID())
         {
-            uint p_mplexid = p->QueryMplexID();
-            if (p_mplexid && (p_mplexid == q->QueryMplexID()))
+            if (p->mplexid && (p->mplexid == q->mplexid))
                 continue;
         }
 
@@ -1700,6 +1700,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
         QString("Adding '%1' to reclist.").arg(pi.GetTitle()));
 
     RecordingInfo * new_pi = new RecordingInfo(pi);
+    new_pi->mplexid = new_pi->QueryMplexID();
     reclist.push_back(new_pi);
     reclist_changed = true;
 
@@ -3997,7 +3998,8 @@ void Scheduler::AddNewRecords(void)
         "    p.subtitletypes+0, p.audioprop+0,   RECTABLE.storagegroup, "//40-42
         "    capturecard.hostname, recordmatch.oldrecstatus, NULL, "//43-45
         "    oldrecstatus.future, cardinput.schedorder, " //46-47
-        "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, ") + //48-50
+        "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, " //48-50
+        "    c.mplexid, ") +                                         //51
         pwrpri + QString(
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
@@ -4055,6 +4057,10 @@ void Scheduler::AddNewRecords(void)
             && title == lastp->GetTitle()
             && callsign == lastp->GetChannelSchedulingID())
             continue;
+
+        uint mplexid = result.value(51).toUInt();
+        if (mplexid == 32767)
+            mplexid = 0;
 
         RecordingInfo *p = new RecordingInfo(
             title,
@@ -4119,7 +4125,8 @@ void Scheduler::AddNewRecords(void)
             result.value(39).toUInt(),//videoproperties
             result.value(41).toUInt(),//audioproperties
             result.value(46).toInt(),//future
-            result.value(47).toInt());//schedorder
+            result.value(47).toInt(),//schedorder
+            mplexid);                //mplexid
 
         if (!p->future && !p->IsReactivated() &&
             p->oldrecstatus != rsAborted &&
@@ -4128,7 +4135,7 @@ void Scheduler::AddNewRecords(void)
             p->SetRecordingStatus(p->oldrecstatus);
         }
 
-        p->SetRecordingPriority2(result.value(51).toInt());
+        p->SetRecordingPriority2(result.value(52).toInt());
 
         // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
