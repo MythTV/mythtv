@@ -10422,7 +10422,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     if (best_match != (*it_key).end())
     {
         InfoMap::const_iterator it_field = (*best_match).find(field);
-        if (it_field != (*it_val).end())
+        if (it_field != (*best_match).end())
         {
             QString ret = *it_field;
             ret.detach();
