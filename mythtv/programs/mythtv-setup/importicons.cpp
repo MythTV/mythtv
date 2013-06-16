@@ -9,10 +9,7 @@
 #include "mythlogging.h"
 #include "importicons.h"
 #include "mythdate.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include "httpcomms.h"
-#endif
+#include "mythdownloadmanager.h"
 
 // MythUI
 #include "mythuitext.h"
@@ -520,38 +517,35 @@ QStringList ImportIconsWizard::extract_csv(const QString &line)
     return ret;
 }
 
-QString ImportIconsWizard::wget(QUrl& url,const QString& strParam )
+QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QByteArray raw(strParam.toLatin1());
-    QBuffer data(&raw);
-    QHttpRequestHeader header;
+    QByteArray data(strParam.toLatin1());
 
-    header.setContentType(QString("application/x-www-form-urlencoded"));
-    header.setContentLength(raw.size());
+    QNetworkRequest *req = new QNetworkRequest(url);
+    req->setHeader(QNetworkRequest::ContentTypeHeader, QString("application/x-www-form-urlencoded"));
+    req->setHeader(QNetworkRequest::ContentLengthHeader, data.size());
 
-    header.setValue("User-Agent", "MythTV Channel Icon lookup bot");
+    LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: posting to: %1, params: ")
+                                       .arg(url.toString()).arg(strParam));
 
-    QString str = HttpComms::postHttp(url,&header,&data);
+    if (GetMythDownloadManager()->post(req, &data))
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("ImportIconsWizard: result: %1").arg(QString(data)));
+        return QString(data);
+    }
 
-    return str;
-#else
-#warning ImportIconsWizard::wget() not ported to Qt5
     return QString();
-#endif
 }
 
 bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& localChanId)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QString iconUrl = url;
     QString filename = url.section('/', -1);
     QFileInfo file(m_strChannelDir+filename);
 
     bool fRet;
-    // Since DNS for lyngsat-logos.com times out, set a 20s timeout
     if (!file.exists())
-        fRet = HttpComms::getHttpFile(file.absoluteFilePath(),iconUrl,20000);
+        fRet = GetMythDownloadManager()->download(iconUrl, file.absoluteFilePath());
     else
         fRet = true;
 
@@ -574,10 +568,6 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     }
 
     return fRet;
-#else
-#warning ImportIconsWizard::checkAndDownload() not ported to Qt5
-    return false;
-#endif
 }
 
 bool ImportIconsWizard::lookup(const QString& strParam)
