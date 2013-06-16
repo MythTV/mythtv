@@ -92,6 +92,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         return;
     }
 
+    CreateConflictLists();
+
     fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
 
     if (doRun)
@@ -129,6 +131,12 @@ Scheduler::~Scheduler()
     {
         delete worklist.back();
         worklist.pop_back();
+    }
+
+    while (!conflictlists.empty())
+    {
+        delete conflictlists.back();
+        conflictlists.pop_back();
     }
 
     locker.unlock();
@@ -961,6 +969,8 @@ void Scheduler::PruneOverlaps(void)
 
 void Scheduler::BuildListMaps(void)
 {
+    QMap<uint, uint> badinputs;
+
     RecIter i = worklist.begin();
     for ( ; i != worklist.end(); ++i)
     {
@@ -970,16 +980,31 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == rsWillRecord ||
             p->GetRecordingStatus() == rsUnknown)
         {
-            conflictlist.push_back(p);
+            RecList *conflictlist = conflictlistmap[p->GetInputID()];
+            if (!conflictlist)
+            {
+                ++badinputs[p->GetInputID()];
+                continue;
+            }
+            conflictlist->push_back(p);
             titlelistmap[p->GetTitle().toLower()].push_back(p);
             recordidlistmap[p->GetRecordingRuleID()].push_back(p);
         }
+    }
+
+    QMap<uint, uint>::iterator it;
+    for (it = badinputs.begin(); it != badinputs.end(); ++it)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC_WARN +
+            QString("Ignored %1 entries for invalid input %2")
+            .arg(badinputs[it.value()]).arg(it.key()));
     }
 }
 
 void Scheduler::ClearListMaps(void)
 {
-    conflictlist.clear();
+    for (uint i = 0; i < conflictlists.size(); ++i)
+        conflictlists[i]->clear();
     titlelistmap.clear();
     recordidlistmap.clear();
     cache_is_same_program.clear();
@@ -1087,6 +1112,7 @@ const RecordingInfo *Scheduler::FindConflict(
     const RecordingInfo        *p,
     int openend) const
 {
+    RecList &conflictlist = *conflictlistmap[p->GetInputID()];
     RecConstIter k = conflictlist.begin();
     if (FindNextConflict(conflictlist, p, k, openend))
         return *k;
@@ -1334,6 +1360,7 @@ void Scheduler::MoveHigherRecords(bool livetv)
         p->SetRecordingStatus(rsWillRecord);
         MarkOtherShowings(p);
 
+        RecList &conflictlist = *conflictlistmap[p->GetInputID()];
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
@@ -1366,6 +1393,7 @@ void Scheduler::MoveHigherRecords(bool livetv)
         if (!livetv)
             MarkOtherShowings(p);
 
+        RecList &conflictlist = *conflictlistmap[p->GetInputID()];
         RecConstIter k = conflictlist.begin();
         for ( ; FindNextConflict(conflictlist, p, k); ++k)
         {
@@ -5111,6 +5139,86 @@ bool Scheduler::WasStartedAutomatically()
                 .arg(s));
 
     return autoStart;
+}
+
+void Scheduler::CreateConflictLists(void)
+{
+    // For each input, build a set of inputs that it can conflict
+    // with, including itself.
+    QStringList queryStrs;
+    queryStrs <<
+        QString("SELECT ci1.cardinputid, ci2.cardinputid "
+                "FROM cardinput ci1, cardinput ci2 "
+                "WHERE ci1.cardid = ci2.cardid AND "
+                "      ci1.cardinputid <= ci2.cardinputid "
+                "ORDER BY ci1.cardinputid, ci2.cardinputid");
+    queryStrs <<
+        QString("SELECT DISTINCT ci1.cardinputid, ci2.cardinputid "
+                "FROM cardinput ci1, cardinput ci2, "
+                "     inputgroup ig1, inputgroup ig2 "
+                "WHERE ci1.cardinputid = ig1.cardinputid AND "
+                "      ci2.cardinputid = ig2.cardinputid AND"
+                "      ig1.inputgroupid = ig2.inputgroupid AND "
+                "      ci1.cardinputid < ci2.cardinputid "
+                "ORDER BY ci1.cardinputid, ci2.cardinputid");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QMap<uint, QSet<uint> > inputSets;
+
+    // For each input, create a set containing all of the inputs
+    // (including itself) that are grouped with it.  Inputs can either
+    // be implicitly group by belonging to the same card or explicitly
+    // grouped by belonging to the same input group.
+    for (int i = 0; i < queryStrs.size(); ++i)
+    {
+        query.prepare(queryStrs[i]);
+        if (!query.exec())
+        {
+            MythDB::DBError(QString("BuildConflictLists%1").arg(i), query);
+            return;
+        }
+        while (query.next())
+        {
+            uint id0 = query.value(0).toUInt();
+            uint id1 = query.value(1).toUInt();
+            inputSets[id0].insert(id1);
+            inputSets[id1].insert(id0);
+        }
+    }
+
+    QMap<uint, QSet<uint> >::iterator mit;
+    for (mit = inputSets.begin(); mit != inputSets.end(); ++mit)
+    {
+        uint inputid = mit.key();
+        if (conflictlistmap.contains(inputid))
+            continue;
+
+        // Find the union of all inputs grouped with those already in
+        // the set.  Keep doing so until no new inputs get added.
+        // This might not be the most efficient way, but it's simple
+        // and more than fast enough for our needs.
+        QSet<uint> fullset = mit.value();
+        QSet<uint> checkset;
+        QSet<uint>::const_iterator sit;
+        while (checkset != fullset)
+        {
+            checkset = fullset;
+            for (sit = checkset.begin(); sit != checkset.end(); ++sit)
+                fullset += inputSets[*sit];
+        }
+
+        // Create a new conflict list for the resulting set of inputs
+        // and point each inputs list at it.
+        RecList *conflictlist = new RecList();
+        conflictlists.push_back(conflictlist);
+        for (sit = checkset.begin(); sit != checkset.end(); ++sit)
+        {
+            LOG(VB_SCHEDULE, LOG_INFO,
+                QString("### Assigning input %1 to conflict set %2")
+                .arg(*sit).arg(conflictlists.size()));
+            conflictlistmap[*sit] = conflictlists.back();
+        }
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

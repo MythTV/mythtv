@@ -194,6 +194,8 @@ class Scheduler : public MThread, public MythScheduler
     void ClearRequestQueue(void)
     { reschedQueue.clear(); };
 
+    void CreateConflictLists(void);
+
     MythDeque<QStringList> reschedQueue;
     mutable QMutex schedLock;
     QMutex recordmatchLock;
@@ -201,7 +203,8 @@ class Scheduler : public MThread, public MythScheduler
     RecList reclist;
     RecList worklist;
     RecList retrylist;
-    RecList conflictlist;
+    vector<RecList *> conflictlists;
+    QMap<uint, RecList *> conflictlistmap;
     QMap<uint, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
     InputGroupMap igrp;
