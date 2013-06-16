@@ -15,10 +15,7 @@
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "mythlogging.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include "httpcomms.h"
-#endif
+#include "mythdownloadmanager.h"
 
 #define LOC QString("IPTVChanFetch: ")
 
@@ -230,25 +227,18 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
         return ret;
     }
 
-    // Use Myth HttpComms for http URLs
-    QString redirected_url = url;
+    // Use MythDownloadManager for http URLs
+    QByteArray data;
+    QString tmp;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QString tmp = HttpComms::getHttp(
-        redirected_url,
-        10000 /* ms        */, 3     /* retries      */,
-        3     /* redirects */, true  /* allow gzip   */,
-        NULL  /* login     */, inQtThread);
-#else
-#warning IPTVChannelFetcher::DownloadPlaylist not yet ported to Qt5.
-    QString tmp("");
-#endif
-
-    if (redirected_url != url)
+    if (!GetMythDownloadManager()->download(url, &data))
     {
-        LOG(VB_CHANNEL, LOG_INFO, QString("Channel URL redirected to %1")
-                .arg(redirected_url));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("IPTVChannelFetcher::DownloadPlaylist failed to "
+                    "download from %1").arg(url));
     }
+    else
+        tmp = QString(data);
 
     return QString::fromUtf8(tmp.toLatin1().constData());
 }
