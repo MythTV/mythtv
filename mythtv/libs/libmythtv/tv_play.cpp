@@ -5109,6 +5109,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     {
         if (tokens[2] == "POSITION")
         {
+            if (!ctx->player)
+                return;
             QString speedStr;
             if (ContextIsPaused(ctx, __FILE__, __LINE__))
             {
@@ -5301,6 +5303,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
         }
         else if (tokens[2] == "VOLUME")
         {
+            if (!ctx->player)
+                return;
             QString infoStr = QString("%1%").arg(ctx->player->GetVolume());
 
             QString message = QString("NETWORK_CONTROL ANSWER %1")
@@ -7010,7 +7014,8 @@ void TV::SwitchCards(PlayerContext *ctx,
         // pause the decoder first, so we're not reading too close to the end.
         ctx->buffer->IgnoreLiveEOF(true);
         ctx->buffer->StopReads();
-        ctx->player->PauseDecoder();
+        if (ctx->player)
+            ctx->player->PauseDecoder();
 
         // shutdown stuff
         ctx->buffer->Pause();
