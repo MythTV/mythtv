@@ -116,7 +116,12 @@ class VDPAUColor
 class VDPAULayer
 {
   public:
-    VDPAULayer() {}
+    VDPAULayer()
+    {
+        memset(&m_layer, 0, sizeof(m_layer));
+        memset(&m_src, 0, sizeof(m_src));
+        memset(&m_dst, 0, sizeof(m_dst));
+    }
     VDPAULayer(uint surface, const QRect *src, const QRect *dst)
     {
         if (src)
@@ -126,6 +131,8 @@ class VDPAULayer
             m_src.x1 = src->left() + src->width();
             m_src.y1 = src->top() +  src->height();
         }
+        else
+            memset(&m_src, 0, sizeof(m_src));
         if (dst)
         {
             m_dst.x0 = dst->left();
@@ -133,6 +140,8 @@ class VDPAULayer
             m_dst.x1 = dst->left() + dst->width();
             m_dst.y1 = dst->top() +  dst->height();
         }
+        else
+            memset(&m_dst, 0, sizeof(m_dst));
         m_layer.struct_version   = VDP_LAYER_VERSION;
         m_layer.source_surface   = surface;
         m_layer.source_rect      = src ? &m_src : NULL;
