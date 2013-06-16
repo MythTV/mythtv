@@ -295,8 +295,8 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
                     if (i < 9)
                     {
-                        LOG(VB_GUI, LOG_WARNING, "Invalid modeline string "
-                                                      "received, skipping");
+                        LOG(VB_GUI, LOG_WARNING, QString("Invalid modeline string "
+                                                         "received, skipping: %1").arg(modeLine));
                         continue;
                     }
 
