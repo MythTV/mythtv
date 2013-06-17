@@ -289,7 +289,7 @@ public:
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;
         unsigned char iv[AES_BLOCK_SIZE];
-        char *decrypted_data = new char[aeslen];
+        char *decrypted_data = new char[m_data.size()];
         if (IV == NULL)
         {
             /*
