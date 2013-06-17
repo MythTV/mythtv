@@ -55,6 +55,9 @@ bool MythRAOPDevice::Create(void)
         QObject::connect(
             gMythRAOPDeviceThread->qthread(), SIGNAL(started()),
             gMythRAOPDevice,                  SLOT(Start()));
+        QObject::connect(
+            gMythRAOPDeviceThread->qthread(), SIGNAL(finished()),
+            gMythRAOPDevice,                  SLOT(Stop()));
         gMythRAOPDeviceThread->start(QThread::LowestPriority);
     }
 
@@ -66,9 +69,6 @@ bool MythRAOPDevice::Create(void)
 void MythRAOPDevice::Cleanup(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Cleaning up.");
-
-    if (gMythRAOPDevice)
-        gMythRAOPDevice->Teardown();
 
     QMutexLocker locker(gMythRAOPDeviceMutex);
     if (gMythRAOPDeviceThread)
@@ -92,8 +92,6 @@ MythRAOPDevice::MythRAOPDevice()
 
 MythRAOPDevice::~MythRAOPDevice()
 {
-    Teardown();
-
     delete m_lock;
     m_lock = NULL;
 }
@@ -147,6 +145,11 @@ void MythRAOPDevice::Start(void)
 
     m_valid = true;
     return;
+}
+
+void MythRAOPDevice::Stop(void)
+{
+    Teardown();
 }
 
 bool MythRAOPDevice::RegisterForBonjour(void)

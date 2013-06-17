@@ -30,6 +30,7 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
 
   private slots:
     void Start();
+    void Stop();
     void newConnection(QTcpSocket *client);
     void deleteClient();
 
