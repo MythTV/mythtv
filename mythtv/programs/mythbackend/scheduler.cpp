@@ -5221,7 +5221,7 @@ void Scheduler::CreateConflictLists(void)
         for (sit = checkset.begin(); sit != checkset.end(); ++sit)
         {
             LOG(VB_SCHEDULE, LOG_INFO,
-                QString("### Assigning input %1 to conflict set %2")
+                QString("Assigning input %1 to conflict set %2")
                 .arg(*sit).arg(conflictlists.size()));
             conflictlistmap[*sit] = conflictlists.back();
         }
