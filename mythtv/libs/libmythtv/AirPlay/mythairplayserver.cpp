@@ -357,6 +357,9 @@ bool MythAirplayServer::Create(void)
         QObject::connect(
             gMythAirplayServerThread->qthread(), SIGNAL(started()),
             gMythAirplayServer,                  SLOT(Start()));
+        QObject::connect(
+            gMythAirplayServerThread->qthread(), SIGNAL(finished()),
+            gMythAirplayServer,                  SLOT(Stop()));
         gMythAirplayServerThread->start(QThread::LowestPriority);
     }
 
@@ -367,9 +370,6 @@ bool MythAirplayServer::Create(void)
 void MythAirplayServer::Cleanup(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Cleaning up.");
-
-    if (gMythAirplayServer)
-        gMythAirplayServer->Teardown();
 
     QMutexLocker locker(gMythAirplayServerMutex);
     if (gMythAirplayServerThread)
@@ -393,8 +393,6 @@ MythAirplayServer::MythAirplayServer()
 
 MythAirplayServer::~MythAirplayServer()
 {
-    Teardown();
-
     delete m_lock;
     m_lock = NULL;
 }
@@ -480,6 +478,11 @@ void MythAirplayServer::Start(void)
     }
     m_valid = true;
     return;
+}
+
+void MythAirplayServer::Stop(void)
+{
+    Teardown();
 }
 
 void MythAirplayServer::newConnection(QTcpSocket *client)

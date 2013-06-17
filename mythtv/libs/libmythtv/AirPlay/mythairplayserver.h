@@ -66,6 +66,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
 
   private slots:
     void Start();
+    void Stop();
     void newConnection(QTcpSocket *client);
     void deleteConnection();
     void read(void);
