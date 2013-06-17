@@ -926,6 +926,15 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                             "\n\t\t\tfailed to duplicate file descriptor: " 
                          << strerror(errno) << endl;
                 }
+                if (fd != 0)    // if fd was zero, do not close
+                {
+                    if (close(fd) < 0)
+                    {
+                        cerr << locerr
+                             << "Unable to close stdin redirect /dev/null: "
+                             << strerror(errno) << endl;
+                    }
+                }
             }
             else
             {
@@ -961,6 +970,15 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                             "\n\t\t\tfailed to duplicate file descriptor: " 
                          << strerror(errno) << endl;
                 }
+                if (fd != 1)    // if fd was one, do not close
+                {
+                   if (close(fd) < 0)
+                   {
+                       cerr << locerr
+                            << "Unable to close stdout redirect /dev/null: "
+                            << strerror(errno) << endl;
+                   }
+                }
             }
             else
             {
@@ -995,6 +1013,15 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                          << "Cannot redirect standard error to /dev/null,"
                             "\n\t\t\tfailed to duplicate file descriptor: " 
                          << strerror(errno) << endl;
+                }
+                if (fd != 2)    // if fd was two, do not close
+                {
+                   if (close(fd) < 0)
+                   {
+                       cerr << locerr
+                            << "Unable to close stderr redirect /dev/null: "
+                            << strerror(errno) << endl;
+                   }
                 }
             }
             else
