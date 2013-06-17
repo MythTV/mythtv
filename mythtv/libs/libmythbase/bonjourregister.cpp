@@ -8,6 +8,8 @@
 
 #define LOC QString("Bonjour: ")
 
+QMutex BonjourRegister::m_lock;
+
 BonjourRegister::BonjourRegister(QObject *parent)
   : QObject(parent), m_dnssref(0), m_socket(NULL)
 {
@@ -41,6 +43,8 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
         return true;
     }
 
+    m_lock.lock();
+
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
         DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
@@ -66,6 +70,7 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+    m_lock.unlock();
     return false;
 }
 
@@ -87,6 +92,7 @@ void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
     (void)flags;
 
     BonjourRegister *bonjour = static_cast<BonjourRegister *>(object);
+    bonjour->m_lock.unlock();
     if (kDNSServiceErr_NoError != errorcode)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Callback Error: %1")

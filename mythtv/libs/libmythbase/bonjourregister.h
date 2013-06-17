@@ -2,6 +2,7 @@
 #define BONJOURREGISTER_H
 
 #include <QObject>
+#include <QMutex>
 #include <dns_sd.h>
 #include "mythbaseexp.h"
 
@@ -31,5 +32,6 @@ class MBASE_PUBLIC BonjourRegister : public QObject
                                           const char *domain, void *object);
     DNSServiceRef    m_dnssref;
     QSocketNotifier *m_socket;
+    static QMutex    m_lock;
 };
 #endif
