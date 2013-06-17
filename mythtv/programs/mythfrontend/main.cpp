@@ -113,6 +113,9 @@ static void resetAllKeys(void);
 void handleSIGUSR1(void);
 void handleSIGUSR2(void);
 
+#if CONFIG_DARWIN
+static bool gLoaded = false;
+#endif
 
 namespace
 {
@@ -1234,7 +1237,7 @@ static int reloadTheme(void)
         menu->Close();
     }
 #if CONFIG_DARWIN
-    GetMythMainWindow()->Init(OPENGL_PAINTER);
+    GetMythMainWindow()->Init(gLoaded ? OPENGL_PAINTER : QT_PAINTER);
 #else
     GetMythMainWindow()->Init();
 #endif
@@ -1618,7 +1621,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
 #if CONFIG_DARWIN
-    mainWindow->Init(OPENGL_PAINTER);
+    mainWindow->Init(QT_PAINTER);
 #else
     mainWindow->Init();
 #endif
@@ -1678,11 +1681,17 @@ int main(int argc, char **argv)
                    .arg(port));
     }
 
+#if CONFIG_DARWIN
+    GetMythMainWindow()->SetEffectsEnabled(false);
+    GetMythMainWindow()->Init(OPENGL_PAINTER);
+    GetMythMainWindow()->ReinitDone();
+    GetMythMainWindow()->SetEffectsEnabled(true);
+    gLoaded = true;
+#endif
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {
         return GENERIC_EXIT_NO_THEME;
     }
-
     ThemeUpdateChecker *themeUpdateChecker = NULL;
     if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
         themeUpdateChecker = new ThemeUpdateChecker();
