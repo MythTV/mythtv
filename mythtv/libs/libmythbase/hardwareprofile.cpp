@@ -252,8 +252,7 @@ bool HardwareProfile::DeleteProfile(void)
     {
         gCoreContext->SaveSetting("HardwareProfileUUID", "");
         gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
-        gCoreContext->SaveSetting("HardwareProfileLastUpdated",
-                                  MythDate::current_iso_string());
+        Disable();
         return true;
     }
     else
