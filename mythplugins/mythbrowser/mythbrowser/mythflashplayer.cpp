@@ -28,6 +28,7 @@ MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
     m_jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
     GetMythMainWindow()->PauseIdleTimer(true);
+    GetMythUI()->DisableScreensaver();
 }
 
 
@@ -42,6 +43,7 @@ MythFlashPlayer::~MythFlashPlayer()
         m_browser = NULL;
     }
     GetMythMainWindow()->PauseIdleTimer(false);
+    GetMythUI()->RestoreScreensaver();
 }
 
 bool MythFlashPlayer::Create(void)
