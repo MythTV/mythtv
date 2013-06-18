@@ -2381,7 +2381,7 @@ NULL
 // Create a global enable/disable instead of one per-host
 // Any hosts previously running it mean all hosts do now
 "INSERT INTO `settings` (`value`, `hostname`, `data`)"
-"   SELECT 'HardwareProfileEnaled',"
+"   SELECT 'HardwareProfileEnabled',"
 "          NULL,"
 "          IF((SELECT COUNT(1)"
 "                FROM `settings`"
