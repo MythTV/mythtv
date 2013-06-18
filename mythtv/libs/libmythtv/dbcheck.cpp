@@ -2402,6 +2402,17 @@ NULL
             return false;
     }
 
+    if (dbver == "1312")
+    {
+        const char *updates[] = {
+// DVD bookmark updates
+"DELETE FROM `dvdbookmark` WHERE `framenum` = 0;",
+"ALTER TABLE dvdbookmark ADD COLUMN dvdstate varchar(1024) NOT NULL DEFAULT '';",
+NULL
+};
+        if (!performActualUpdate(&updates[0], "1313", dbver))
+            return false;
+    }
     return true;
 }
 

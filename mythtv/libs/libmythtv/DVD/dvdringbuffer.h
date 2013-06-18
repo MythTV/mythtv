@@ -132,6 +132,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int  GetAudioTrackType(uint idx);
 
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
+    bool GetDVDStateSnapshot(QString& state);
+    bool RestoreDVDStateSnapshot(QString& state);
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (m_part == 0); }
     bool EndOfTitle(void)   { return ((!m_titleParts) ||

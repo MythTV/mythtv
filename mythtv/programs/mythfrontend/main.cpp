@@ -1121,7 +1121,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
 
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
-    int64_t pos = 0;
+    bool bookmarkPresent = false;
 
     if (pginfo->IsVideoDVD())
     {
@@ -1133,11 +1133,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             if (dvd->GetNameAndSerialNum(name, serialid))
             {
                 QStringList fields = pginfo->QueryDVDBookmark(serialid);
-                if (!fields.empty())
-                {
-                    QStringList::Iterator it = fields.begin();
-                    pos = (int64_t)((*++it).toLongLong() & 0xffffffffLL);
-                }
+                bookmarkPresent = (fields.count() > 0);
             }
         }
         else
@@ -1150,9 +1146,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         delete dvd;
     }
     else if (pginfo->IsVideo())
-        pos = pginfo->QueryBookmark();
+        bookmarkPresent = (pginfo->QueryBookmark() > 0);
 
-    if (useBookmark && pos > 0)
+    if (useBookmark && bookmarkPresent)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);

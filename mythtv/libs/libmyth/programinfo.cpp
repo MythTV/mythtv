@@ -2579,15 +2579,25 @@ QStringList ProgramInfo::QueryDVDBookmark(
 
     if (!(programflags & FL_IGNOREBOOKMARK))
     {
-        query.prepare(" SELECT title, framenum, audionum, subtitlenum "
+        query.prepare(" SELECT dvdstate, title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
                         " WHERE serialid = :SERIALID ");
         query.bindValue(":SERIALID", serialid);
 
         if (query.exec() && query.next())
         {
-            for(int i = 0; i < 4; i++)
-                fields.append(query.value(i).toString());
+            QString dvdstate = query.value(0).toString();
+
+            if (!dvdstate.isEmpty())
+            {
+                fields.append(dvdstate);
+            }
+            else
+            {
+                // Legacy bookmark
+                for(int i = 1; i < 5; i++)
+                    fields.append(query.value(i).toString());
+            }
         }
     }
 
@@ -2601,32 +2611,35 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
 
     QString serialid    = *(it);
     QString name        = *(++it);
-    QString title       = *(++it);
-    QString audionum    = *(++it);
-    QString subtitlenum = *(++it);
-    QString frame       = *(++it);
 
-    query.prepare("INSERT IGNORE INTO dvdbookmark "
-                    " (serialid, name)"
-                    " VALUES ( :SERIALID, :NAME );");
-    query.bindValue(":SERIALID", serialid);
-    query.bindValue(":NAME", name);
+    if( fields.count() == 3 )
+    {
+        // We have a state field, so update/create the bookmark
+        QString state = *(++it);
 
-    if (!query.exec())
-        MythDB::DBError("SetDVDBookmark inserting", query);
+        query.prepare("INSERT IGNORE INTO dvdbookmark "
+                        " (serialid, name)"
+                        " VALUES ( :SERIALID, :NAME );");
+        query.bindValue(":SERIALID", serialid);
+        query.bindValue(":NAME", name);
 
-    query.prepare(" UPDATE dvdbookmark "
-                    " SET title       = :TITLE , "
-                    "     audionum    = :AUDIONUM , "
-                    "     subtitlenum = :SUBTITLENUM , "
-                    "     framenum    = :FRAMENUM , "
-                    "     timestamp   = NOW() "
-                    " WHERE serialid = :SERIALID");
-    query.bindValue(":TITLE",title);
-    query.bindValue(":AUDIONUM",audionum);
-    query.bindValue(":SUBTITLENUM",subtitlenum);
-    query.bindValue(":FRAMENUM",frame);
-    query.bindValue(":SERIALID",serialid);
+        if (!query.exec())
+            MythDB::DBError("SetDVDBookmark inserting", query);
+
+        query.prepare(" UPDATE dvdbookmark "
+                        " SET dvdstate    = :STATE , "
+                        "     timestamp   = NOW() "
+                        " WHERE serialid = :SERIALID");
+        query.bindValue(":STATE",state);
+        query.bindValue(":SERIALID",serialid);
+    }
+    else
+    {
+        // No state field, delete the bookmark
+        query.prepare("DELETE FROM dvdbookmark "
+                        "WHERE serialid = :SERIALID");
+        query.bindValue(":SERIALID",serialid);
+    }
 
     if (!query.exec())
         MythDB::DBError("SetDVDBookmark updating", query);

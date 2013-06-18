@@ -1938,6 +1938,31 @@ bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
     return true;
 }
 
+/** \brief Get a snapshot of the current DVD VM state
+ */
+bool DVDRingBuffer::GetDVDStateSnapshot(QString& state)
+{
+    state.clear();
+    char* dvdstate = dvdnav_get_state(m_dvdnav);
+
+    if (dvdstate)
+    {
+        state = dvdstate;
+        free(dvdstate);
+    }
+
+    return (!state.isEmpty());
+}
+
+/** \brief Restore a DVD VM from a snapshot
+ */
+bool DVDRingBuffer::RestoreDVDStateSnapshot(QString& state)
+{
+    QByteArray ba_state = state.toAscii();
+
+    return (dvdnav_set_state(m_dvdnav, ba_state.constData()) == DVDNAV_STATUS_OK);
+}
+
 /** \brief used by DecoderBase for the total frame number calculation
  * for position map support and ffw/rew.
  * FPS for a dvd is determined by AFD::normalized_fps
