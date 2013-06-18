@@ -802,7 +802,25 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
-            fcntl(p_stdin[1], F_SETFL, O_NONBLOCK);
+        {
+            int flags = fcntl(p_stdin[1], F_GETFL, 0);
+            if (flags == -1)
+            {
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                    "fcntl on stdin pipe getting flags failed" +
+                    ENO);
+            }
+            else
+            {
+                flags |= O_NONBLOCK;
+                if(fcntl(p_stdin[1], F_SETFL, flags) == -1)
+                {
+                    LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                        "fcntl on stdin pipe setting non-blocking failed" +
+                        ENO);
+                }
+            }
+        }
     }
     if( GetSetting("UseStdout") )
     {
@@ -812,7 +830,25 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
-            fcntl(p_stdout[0], F_SETFL, O_NONBLOCK);
+        {
+            int flags = fcntl(p_stdout[0], F_GETFL, 0);
+            if (flags == -1)
+            {
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                    "fcntl on stdout pipe getting flags failed" +
+                    ENO);
+            }
+            else
+            {
+                flags |= O_NONBLOCK;
+                if(fcntl(p_stdout[0], F_SETFL, flags) == -1)
+                {
+                    LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                        "fcntl on stdout pipe setting non-blocking failed" +
+                        ENO);
+                }
+            }
+        }
     }
     if( GetSetting("UseStderr") )
     {
@@ -822,7 +858,25 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
             SetStatus( GENERIC_EXIT_NOT_OK );
         }
         else
-            fcntl(p_stderr[0], F_SETFL, O_NONBLOCK);
+        {
+            int flags = fcntl(p_stderr[0], F_GETFL, 0);
+            if (flags == -1)
+            {
+                LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                    "fcntl on stderr pipe getting flags failed" +
+                    ENO);
+            }
+            else
+            {
+                flags |= O_NONBLOCK;
+                if(fcntl(p_stderr[0], F_SETFL, flags) == -1)
+                {
+                    LOG(VB_SYSTEM, LOG_ERR, LOC_ERR +
+                        "fcntl on stderr pipe setting non-blocking failed" +
+                        ENO);
+                }
+            }
+        }
     }
 
     // set up command args
