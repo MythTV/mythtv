@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.11';
+    $VERSION        = '1.0.12';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1067,7 +1067,7 @@ EOF
         my $command = shift;
         my $allow_untaint = 0;
     # Only allow directories from @d_allowed_paths that exist in the PATH
-        if (!defined(@allowed_paths))
+        unless (@allowed_paths)
         {
             foreach my $path (split(/:/, $old_env_path))
             {
