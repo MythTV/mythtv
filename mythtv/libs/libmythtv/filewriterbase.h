@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "frame.h"
+#include "audiooutputsettings.h"
 
 class MTV_PUBLIC FileWriterBase
 {
@@ -35,14 +36,16 @@ class MTV_PUBLIC FileWriterBase
     void SetAudioCodec(QString codec)   { m_audioCodec = codec; }
     void SetAudioBitrate(int bitrate)   { m_audioBitrate = bitrate; }
     void SetAudioChannels(int channels) { m_audioChannels = channels; }
-    void SetAudioBits(int bits)         { m_audioBits = bits; }
-    void SetAudioSampleRate(int rate)   { m_audioSampleRate = rate; }
-    void SetAudioSampleBytes(int bps)   { m_audioBytesPerSample = bps; }
+    void SetAudioFrameRate(int rate)    { m_audioFrameRate = rate; }
+    void SetAudioFormat(AudioFormat f)  { m_audioFormat = f; }
     void SetThreadCount(int count)      { m_encodingThreadCount = count; }
     void SetTimecodeOffset(long long o) { m_startingTimecodeOffset = o; }
 
     long long GetFramesWritten(void)  const { return m_framesWritten; }
     long long GetTimecodeOffset(void) const { return m_startingTimecodeOffset; }
+    /**
+     * number of audio samples (per channel) in an AVFrame
+     */
     int       GetAudioFrameSize(void) const { return m_audioFrameSize; }
 
  protected:
@@ -58,9 +61,8 @@ class MTV_PUBLIC FileWriterBase
     QString     m_audioCodec;
     int         m_audioBitrate;
     int         m_audioChannels;
-    int         m_audioBits;
-    int         m_audioSampleRate;
-    int         m_audioBytesPerSample;
+    int         m_audioFrameRate;
+    AudioFormat m_audioFormat;
     int         m_audioFrameSize;
     int         m_encodingThreadCount;
     long long   m_framesWritten;

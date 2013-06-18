@@ -1,5 +1,6 @@
 
 #include "audioreencodebuffer.h"
+#include "audioconvert.h"
 
 extern "C" {
 #include "libavutil/mem.h"
@@ -35,10 +36,14 @@ AudioBuffer::~AudioBuffer()
     av_free(m_buffer);
 }
 
-void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
-                             long long time)
+/**
+ * checkSize
+ * Check that buffer can fit provided len, if not resize buffer
+ * return true if resize was possible, false if not
+ */
+bool AudioBuffer::checkSize(int len)
 {
-    if ((m_size + len) > m_realsize)
+    if (len > m_realsize)
     {
         // buffer is too small to fit all
         // can't use av_realloc as it doesn't guarantee reallocated memory
@@ -47,13 +52,22 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
         uint8_t *tmp = (uint8_t *)av_malloc(m_realsize);
         if (tmp == NULL)
         {
-            throw std::bad_alloc();
+            return false;
         }
         memcpy(tmp, m_buffer, m_size);
         av_free(m_buffer);
         m_buffer = tmp;
     }
+    return true;
+}
 
+void AudioBuffer::appendData(uint8_t *buffer, int len, int frames,
+                             long long time)
+{
+    if (!checkSize(m_size+len))
+    {
+        throw std::bad_alloc();
+    }
     memcpy(m_buffer + m_size, buffer, len);
     m_size   += len;
     m_frames += frames;
@@ -64,11 +78,12 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
 
 AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
-  : m_last_audiotime(0),        m_audioFrameSize(0),
-    m_initpassthru(passthru),   m_saveBuffer(NULL)
+  : m_last_audiotime(0),     m_passthru(false),        m_audioFrameSize(0),
+    m_format(audio_format),  m_initpassthru(passthru), m_saveBuffer(NULL),
+    m_convertBuffer(new AudioBuffer()),                m_audioConverter(NULL)
 {
     Reset();
-    const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
+    const AudioSettings settings(audio_format, audio_channels, 0, 0, m_passthru);
     Reconfigure(settings);
 }
 
@@ -77,6 +92,10 @@ AudioReencodeBuffer::~AudioReencodeBuffer()
     Reset();
     if (m_saveBuffer)
         delete m_saveBuffer;
+    delete m_convertBuffer;
+    m_convertBuffer = NULL;
+    delete m_audioConverter;
+    m_audioConverter = NULL;
 }
 
 // reconfigure sound out for new params
@@ -84,11 +103,25 @@ void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
 {
     ClearError();
 
+    if (settings.format != m_format || m_passthru != settings.use_passthru)
+    {
+        delete m_audioConverter;
+        if (!m_passthru)
+        {
+            // will convert all audio to S16 internally
+            m_audioConverter = new AudioConvert(settings.format, FORMAT_S16);
+        }
+        else
+        {
+            m_audioConverter = NULL;
+        }
+    }
     m_passthru        = settings.use_passthru;
     m_channels        = settings.channels;
     m_bytes_per_frame = m_channels *
         AudioOutputSettings::SampleSize(settings.format);
     m_eff_audiorate   = settings.samplerate;
+    m_format          = settings.format;
 }
 
 // dsprate is in 100 * frames/second
@@ -117,7 +150,28 @@ bool AudioReencodeBuffer::AddFrames(void *buffer, int frames, int64_t timecode)
 bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
                                   int frames)
 {
-    unsigned char *buf = (unsigned char *)buffer;
+    uint8_t *buf;
+
+    if (!m_passthru)
+    {
+        if (!m_convertBuffer->checkSize(len))
+        {
+            // not enough space to process it
+            return false;
+        }
+        if (!m_audioConverter)
+        {
+            // will never happen, but I'm guessing coverity will complain otherwise
+            m_audioConverter = new AudioConvert(m_format, FORMAT_S16);
+        }
+        m_audioConverter->Process(m_convertBuffer->m_buffer, buffer, len);
+        len = len * AudioOutputSettings::SampleSize(FORMAT_S16) / AudioOutputSettings::SampleSize(m_format);
+        buf = m_convertBuffer->m_buffer;
+    }
+    else
+    {
+        buf = (uint8_t *)buffer;
+    }
 
     // Test if target is using a fixed buffer size.
     if (m_audioFrameSize)
@@ -137,7 +191,7 @@ bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
             // left in the buffer.
             int bufsize = m_saveBuffer->size();
             int part = min(len - index, m_audioFrameSize - bufsize);
-            int out_frames = part / m_bytes_per_frame;
+            int out_frames = part / m_channels / AudioOutputSettings::SampleSize(FORMAT_S16);
             timecode += out_frames * 1000 / m_eff_audiorate;
 
             // Store frames in buffer, basing frame count on number of

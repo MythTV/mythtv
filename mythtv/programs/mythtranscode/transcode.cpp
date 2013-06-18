@@ -418,9 +418,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         avfw->SetAspect(video_aspect);
         avfw->SetAudioBitrate(cmdAudioBitrate);
         avfw->SetAudioChannels(arb->m_channels);
-        avfw->SetAudioBits(16);
-        avfw->SetAudioSampleRate(arb->m_eff_audiorate);
-        avfw->SetAudioSampleBytes(2);
+        avfw->SetAudioFrameRate(arb->m_eff_audiorate);
+        avfw->SetAudioFormat(FORMAT_S16);
 
         if (hlsMode)
         {
@@ -432,16 +431,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 audioOnlyBitrate = 48000;
 
                 avfw2 = new AVFormatWriter();
-                if (!avfw2)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error "
-                        "creating low-bitrate AVFormatWriter.");
-                    SetPlayerContext(NULL);
-                    if (hls)
-                        delete hls;
-                    delete avfw;
-                    return REENCODE_ERROR;
-                }
 
                 avfw2->SetContainer("mpegts");
 
@@ -460,9 +449,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
-                avfw2->SetAudioBits(16);
-                avfw2->SetAudioSampleRate(arb->m_eff_audiorate);
-                avfw2->SetAudioSampleBytes(2);
+                avfw2->SetAudioFrameRate(arb->m_eff_audiorate);
+                avfw2->SetAudioFormat(FORMAT_S16);
             }
 
             avfw->SetContainer("mpegts");

@@ -6,6 +6,8 @@
 
 #define ABLOCK_SIZE   8192
 
+class AudioConvert;
+
 class AudioBuffer
 {
   public:
@@ -13,8 +15,9 @@ class AudioBuffer
     AudioBuffer(const AudioBuffer &old);
     ~AudioBuffer();
 
-    void appendData(unsigned char *buffer, int len, int frames, long long time);
+    void appendData(uint8_t *buffer, int len, int frames, long long time);
     char *data(void) { return (char *)m_buffer; }
+    bool  checkSize(int len);
     int   size(void) { return m_size; }
 
     uint8_t    *m_buffer;
@@ -72,12 +75,15 @@ class AudioReencodeBuffer : public AudioOutput
     long long            m_last_audiotime;
     bool                 m_passthru;
     int                  m_audioFrameSize;
+    AudioFormat          m_format;
 
   private:
     bool                 m_initpassthru;
     QMutex               m_bufferMutex;
     QList<AudioBuffer *> m_bufferList;
     AudioBuffer         *m_saveBuffer;
+    AudioBuffer         *m_convertBuffer;
+    AudioConvert        *m_audioConverter;
 };
 
 #endif
