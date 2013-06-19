@@ -26,10 +26,9 @@ MetaIOAVFComment::~MetaIOAVFComment(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOAVFComment::write(const MusicMetadata* mdata)
+bool MetaIOAVFComment::write(const MusicMetadata* /*mdata*/)
 {
     // Wont implement....
-    (void)mdata; // -Wall annoyance
     return false;
 }
 
