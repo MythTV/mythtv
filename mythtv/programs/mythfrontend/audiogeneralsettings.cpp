@@ -276,7 +276,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         return settings;
 
     bool bAC3 = true;
-    bool bDTS = true;
+    //bool bDTS = true;
     bool bLPCM = true;
     bool bEAC3 = true;
     bool bTRUEHD = true;
@@ -302,8 +302,8 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
 
         bAC3  = settingsdigital.canFeature(FEATURE_AC3) &&
             m_AC3PassThrough->boolValue();
-        bDTS  = settingsdigital.canFeature(FEATURE_DTS)  &&
-            m_DTSPassThrough->boolValue();
+        //bDTS  = settingsdigital.canFeature(FEATURE_DTS)  &&
+        //    m_DTSPassThrough->boolValue();
         bLPCM = settings.canFeature(FEATURE_LPCM) &&
             !gCoreContext->GetNumSetting("StereoPCM", false);
         bEAC3 = settingsdigital.canFeature(FEATURE_EAC3) &&
