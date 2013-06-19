@@ -745,12 +745,6 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
 
     const float fps = player->GetFrameRate();
 
-    if (samplesNeeded > UINT_MAX)
-    {
-        /* Max value of "scores" data type */
-        samplesNeeded = UINT_MAX;
-    }
-
     frameInterval = (int)roundf(sampleTime * fps / samplesNeeded);
     endFrame = 0 + frameInterval * samplesNeeded - 1;
 
