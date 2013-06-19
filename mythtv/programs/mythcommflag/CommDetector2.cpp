@@ -645,7 +645,7 @@ bool CommDetector2::go(void)
                 *currentPass, finishedAnalyzers,
                 deadAnalyzers, currentFrame, currentFrameNumber);
 
-            if (((currentFrameNumber >= 1) &&
+            if (((currentFrameNumber >= 1) && (nframes > 0) &&
                  (((nextFrame * 10) / nframes) !=
                   ((currentFrameNumber * 10) / nframes))) ||
                 (nextFrame >= nframes))
