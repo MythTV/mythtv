@@ -44,12 +44,24 @@ public:
      *
      * Return Value: size in bytes of samples converted or <= 0 if error
      */
-    int Process(void* out, const void* in, int bytes);
+    int Process(void* out, const void* in, int bytes, bool noclip = false);
+    AudioFormat Out(void) { return m_out; }
+    AudioFormat In(void)  { return m_in;  }
 
     bool operator==(AudioConvert& rhs) const
     { return m_in == rhs.m_in && m_out == rhs.m_out; }
     bool operator!=(AudioConvert& rhs) const
     { return m_in != m_out; }
+
+    void DeinterleaveSamples(int channels,
+                             uint8_t* output, const uint8_t* input,
+                             int data_size);
+    void InterleaveSamples(int channels,
+                           uint8_t* output, const uint8_t*  const* input,
+                           int data_size);
+    void InterleaveSamples(int channels,
+                           uint8_t* output, const uint8_t* input,
+                           int data_size);
 
     // static utilities
     static int  toFloat(AudioFormat format, void* out, const void* in, int bytes);

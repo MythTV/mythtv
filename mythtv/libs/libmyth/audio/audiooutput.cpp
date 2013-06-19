@@ -37,6 +37,13 @@ using namespace std;
 #include "audiopulsehandler.h"
 #endif
 
+extern "C" {
+#include "libavcodec/avcodec.h"  // to get codec id
+}
+#include "audioconvert.h"
+
+#define LOC QString("AO: ")
+
 void AudioOutput::Cleanup(void)
 {
 #ifdef USING_PULSE
@@ -325,7 +332,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
                 // We have an ELD, show actual reported capabilities
             capabilities += " (" + aosettings.getELD().codecs_desc() + ")";
         }
-        else 
+        else
         {
                 // build capabilities string, in a similar fashion as reported
                 // by ELD
@@ -530,4 +537,90 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         delete adc;
     }
     return list;
+}
+
+/**
+ * DecodeAudio
+ * Decode an audio packet, and compact it if data is planar
+ * Return negative error code if an error occurred during decoding
+ * or the number of bytes consumed from the input AVPacket
+ * data_size contains the size of decoded data copied into buffer
+ */
+int AudioOutput::DecodeAudio(AVCodecContext *ctx,
+                             uint8_t *buffer, int &data_size,
+                             const AVPacket *pkt)
+{
+    AVFrame frame;
+    int got_frame = 0;
+    int ret;
+    char error[AV_ERROR_MAX_STRING_SIZE];
+
+    data_size = 0;
+    avcodec_get_frame_defaults(&frame);
+    ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
+    if (ret < 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC +
+            QString("audio decode error: %1 (%2)")
+            .arg(av_make_error_string(error, sizeof(error), ret))
+            .arg(got_frame));
+        return ret;
+    }
+
+    if (!got_frame)
+    {
+        LOG(VB_AUDIO, LOG_DEBUG, LOC +
+            QString("audio decode, no frame decoded (%1)").arg(ret));
+        return ret;
+    }
+
+    AVSampleFormat format = (AVSampleFormat)frame.format;
+    AudioFormat fmt =
+        AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample);
+
+    data_size = frame.nb_samples * frame.channels * av_get_bytes_per_sample(format);
+
+    // May need to convert audio to S16
+    AudioConvert converter(fmt, CanProcess(fmt) ? fmt : FORMAT_S16);
+    uint8_t* src;
+
+    if (av_sample_fmt_is_planar(format))
+    {
+        src = buffer;
+        converter.InterleaveSamples(frame.channels,
+                                    src,
+                                    (const uint8_t **)frame.extended_data,
+                                    data_size);
+    }
+    else
+    {
+        // data is already compacted...
+        src = frame.extended_data[0];
+    }
+
+    uint8_t* transit = buffer;
+
+    if (!CanProcess(fmt) &&
+        av_get_bytes_per_sample(ctx->sample_fmt) < AudioOutputSettings::SampleSize(converter.Out()))
+    {
+        // this conversion can't be done in place
+        transit = (uint8_t*)av_malloc(data_size * av_get_bytes_per_sample(ctx->sample_fmt)
+                                      / AudioOutputSettings::SampleSize(converter.Out()));
+        if (!transit)
+        {
+            LOG(VB_AUDIO, LOG_ERR, LOC +
+                QString("audio decode, out of memory"));
+            data_size = 0;
+            return ret;
+        }
+    }
+    if (!CanProcess(fmt) || src != transit)
+    {
+        data_size = converter.Process(transit, src, data_size, true);
+    }
+    if (transit != buffer)
+    {
+        av_free(transit);
+    }
+    return ret;
 }

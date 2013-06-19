@@ -4374,7 +4374,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            ret = AudioOutputUtil::DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+            ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
@@ -4425,7 +4425,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    ret = AudioOutputUtil::DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+                    ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                     decoded_size = data_size;
                 }
                 else
@@ -4449,7 +4449,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                 else
                     ctx->request_channels = 0;
 
-                ret = AudioOutputUtil::DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
+                ret = m_audio->DecodeAudio(ctx, audioSamples, data_size, &tmp_pkt);
                 decoded_size = data_size;
             }
 
@@ -4487,9 +4487,9 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             extract_mono_channel(audSubIdx, &audioOut,
                                  (char *)audioSamples, data_size);
 
-        int frames = (ctx->channels <= 0 || decoded_size < 0) ? -1 :
-            decoded_size / (ctx->channels *
-                            av_get_bytes_per_sample(ctx->sample_fmt));
+        int samplesize = AudioOutputSettings::SampleSize(m_audio->GetFormat());
+        int frames = (ctx->channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
+            decoded_size / (ctx->channels * samplesize);
         m_audio->AddAudioData((char *)audioSamples, data_size, temppts, frames);
         if (audioOut.do_passthru && !m_audio->NeedDecodingBeforePassthrough())
         {

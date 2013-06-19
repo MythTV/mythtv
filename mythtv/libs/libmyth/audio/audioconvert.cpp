@@ -631,12 +631,18 @@ AudioConvert::~AudioConvert()
  * Consumes 'bytes' bytes from in and returns the numer of bytes written to out
  * return negative number if error
  */
-int AudioConvert::Process(void* out, const void* in, int bytes)
+int AudioConvert::Process(void* out, const void* in, int bytes, bool noclip)
 {
     if (bytes <= 0)
         return 0;
     if (m_out == FORMAT_NONE || m_in == FORMAT_NONE)
         return 0;
+
+    if (noclip && m_in == m_out)
+    {
+        memcpy(out, in, bytes);
+        return bytes;
+    }
 
     /* use conversion routines to perform clipping on samples */
     if (m_in == FORMAT_FLT)
@@ -832,4 +838,25 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     {
         _InterleaveSample((int*)output, (const int*)input, channels, data_size/sizeof(int)/channels);
     }
+}
+
+void AudioConvert::DeinterleaveSamples(int channels,
+                                       uint8_t* output, const uint8_t* input,
+                                       int data_size)
+{
+    DeinterleaveSamples(m_in, channels, output, input, data_size);
+}
+
+void AudioConvert::InterleaveSamples(int channels,
+                                     uint8_t* output, const uint8_t*  const* input,
+                                     int data_size)
+{
+    InterleaveSamples(m_in, channels, output, input, data_size);
+}
+
+void AudioConvert::InterleaveSamples(int channels,
+                                     uint8_t* output, const uint8_t* input,
+                                     int data_size)
+{
+    InterleaveSamples(m_in, channels, output, input, data_size);
 }

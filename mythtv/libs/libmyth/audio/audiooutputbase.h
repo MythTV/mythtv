@@ -80,6 +80,12 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool IsUpmixing(void);
     virtual bool ToggleUpmix(void);
     virtual bool CanUpmix(void);
+    virtual bool CanProcess(AudioFormat fmt) { return true; }
+    virtual uint32_t CanProcess(void)
+    {
+        // we support all codec
+        return ~(((~0ULL) >> FORMAT_FLT) << FORMAT_FLT);
+    }
 
     virtual void Reset(void);
 

@@ -20,7 +20,7 @@
 #include "spdifencoder.h"
 #include "mythlogging.h"
 
-#define LOC QString("AO: ")
+#define LOC QString("AOBase: ")
 
 #define WPOS audiobuffer + org_waud
 #define RPOS audiobuffer + raud
