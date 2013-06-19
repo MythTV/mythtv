@@ -432,6 +432,7 @@ int connect_to_master(void)
         {
             LOG(VB_GENERAL, LOG_ERR, "Master backend is incompatible with "
                     "this backend.\nCannot become a slave.");
+            tempMonitorConnection->DecrRef();
             return GENERIC_EXIT_CONNECT_ERROR;
         }
 
@@ -464,12 +465,14 @@ int connect_to_master(void)
         {
             timeCheck.push_back("QUERY_TIME_ZONE");
             tempMonitorConnection->SendReceiveStringList(timeCheck);
+            tempMonitorConnection->WriteStringList(tempMonitorDone);
         }
         if (timeCheck.size() < 3)
         {
+            if (tempMonitorConnection)
+                tempMonitorConnection->DecrRef();
             return GENERIC_EXIT_SOCKET_ERROR;
         }
-        tempMonitorConnection->WriteStringList(tempMonitorDone);
 
         QDateTime our_time = MythDate::current();
         QDateTime master_time = MythDate::fromString(timeCheck[2]);
@@ -481,7 +484,8 @@ int connect_to_master(void)
                 QString("Current time on the master backend differs by "
                         "%1 seconds from time on this system. Exiting.")
                 .arg(timediff));
-            tempMonitorConnection->DecrRef();
+            if (tempMonitorConnection)
+                tempMonitorConnection->DecrRef();
             return GENERIC_EXIT_INVALID_TIME;
         }
 
