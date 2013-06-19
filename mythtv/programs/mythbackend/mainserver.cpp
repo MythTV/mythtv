@@ -227,6 +227,7 @@ MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *tvList,
                        Scheduler *sched, AutoExpire *expirer) :
     encoderList(tvList), mythserver(NULL),
+    metadatafactory(NULL),
     masterFreeSpaceListUpdater(NULL),
     masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), threadPool("ProcessRequestPool"),
