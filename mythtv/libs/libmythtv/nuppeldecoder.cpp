@@ -1277,8 +1277,8 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 {
                     int data_size = 0;
 
-                    ret = AudioOutputUtil::DecodeAudio(mpa_audctx, m_audioSamples,
-                                                       data_size, &pkt);
+                    ret = m_audio->DecodeAudio(mpa_audctx, m_audioSamples,
+                                               data_size, &pkt);
                     if (ret < 0)
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown audio decoding error");
