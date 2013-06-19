@@ -526,7 +526,7 @@ DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
     return pPrograms;
 }
 
-int Dvr::AddRecordSchedule   (
+uint Dvr::AddRecordSchedule   (
                                QString   sTitle,
                                QString   sSubtitle,
                                QString   sDescription,
@@ -655,12 +655,12 @@ int Dvr::AddRecordSchedule   (
 
     rule.Save();
 
-    int recid = rule.m_recordID;
+    uint recid = rule.m_recordID;
 
     return recid;
 }
 
-bool Dvr::UpdateRecordSchedule ( int       nRecordId,
+bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  QString   sTitle,
                                  QString   sSubtitle,
                                  QString   sDescription,
@@ -883,9 +883,6 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
                                       QDateTime dStartTimeRaw,
                                       bool      bMakeOverride )
 {
-    if (nRecordId < 0 )
-        throw QString("Record ID is invalid.");
-
     RecordingRule rule;
 
     if (nRecordId > 0)

@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.7" );
+    Q_CLASSINFO( "version"    , "1.8" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -99,7 +99,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         // Recording Rules
 
-        virtual int                AddRecordSchedule     ( QString   Title,
+        virtual uint               AddRecordSchedule     ( QString   Title,
                                                            QString   Subtitle,
                                                            QString   Description,
                                                            QString   Category,
@@ -141,7 +141,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            bool      AutoUserJob4,
                                                            int       Transcoder        ) = 0;
 
-        virtual bool               UpdateRecordSchedule  ( int       RecordId,
+        virtual bool               UpdateRecordSchedule  ( uint      RecordId,
                                                            QString   Title,
                                                            QString   Subtitle,
                                                            QString   Description,

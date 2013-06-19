@@ -77,7 +77,7 @@ class Dvr : public DvrServices
 
         // Recording Rules
 
-        int               AddRecordSchedule   ( QString   Title,
+        uint              AddRecordSchedule   ( QString   Title,
                                                 QString   Subtitle,
                                                 QString   Description,
                                                 QString   Category,
@@ -119,7 +119,7 @@ class Dvr : public DvrServices
                                                 bool      AutoUserJob4,
                                                 int       Transcoder);
 
-        bool               UpdateRecordSchedule ( int       RecordId,
+        bool               UpdateRecordSchedule ( uint    RecordId,
         		                                  QString   Title,
                                                   QString   Subtitle,
         		                                  QString   Description,
