@@ -320,9 +320,10 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
     int got_packet = 0;
     int ret = 0;
     int samples_per_avframe  = m_audioFrameSize * m_audioChannels;
-    int sampleSize = AudioOutputSettings::SampleSize(FORMAT_S16);
+    int sampleSizeIn   = AudioOutputSettings::SampleSize(FORMAT_S16);
     AudioFormat format =
         AudioOutputSettings::AVSampleFormatToFormat(m_audioStream->codec->sample_fmt);
+    int sampleSizeOut  = AudioOutputSettings::SampleSize(format);
 
     AVPacket pkt;
     av_init_packet(&pkt);
@@ -332,7 +333,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
     if (av_get_packed_sample_fmt(m_audioStream->codec->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
         AudioOutputUtil::toFloat(FORMAT_S16, (void *)m_audioInBuf, (void *)buf,
-                                 samples_per_avframe * sampleSize);
+                                 samples_per_avframe * sampleSizeIn);
         buf = m_audioInBuf;
     }
     if (av_sample_fmt_is_planar(m_audioStream->codec->sample_fmt))
@@ -341,12 +342,12 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
                                              m_audioChannels,
                                              m_audioInPBuf,
                                              buf,
-                                             samples_per_avframe * sampleSize);
+                                             samples_per_avframe * sampleSizeOut);
 
         // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < m_audioChannels; j++, jj += m_audioFrameSize)
         {
-            m_audPicture->data[j] = (uint8_t*)(m_audioInPBuf + jj * sampleSize);
+            m_audPicture->data[j] = (uint8_t*)(m_audioInPBuf + jj * sampleSizeOut);
         }
     }
     else
