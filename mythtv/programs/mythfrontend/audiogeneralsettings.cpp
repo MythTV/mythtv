@@ -242,7 +242,7 @@ void AudioConfigSettings::AudioRescan()
 
 void AudioConfigSettings::UpdateVisibility(const QString &device)
 {
-    if (!m_MaxAudioChannels && !m_AudioUpmix && !m_AudioUpmixType)
+    if (!m_MaxAudioChannels || !m_AudioUpmix || !m_AudioUpmixType)
         return;
 
     int cur_speakers = m_MaxAudioChannels->getValue().toInt();
