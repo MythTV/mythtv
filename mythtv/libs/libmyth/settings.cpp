@@ -442,7 +442,7 @@ SpinBoxSetting::SpinBoxSetting(
     Storage *_storage, int _min, int _max, int _step,
     bool _allow_single_step, QString _special_value_text) :
     BoundedIntegerSetting(_storage, _min, _max, _step),
-    spinbox(NULL), relayEnabled(true),
+    bxwidget(NULL), spinbox(NULL), relayEnabled(true),
     sstep(_allow_single_step), svtext("")
 {
     if (!_special_value_text.isEmpty())
