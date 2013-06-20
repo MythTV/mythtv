@@ -40,7 +40,9 @@ using namespace std;
  */
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-    : QFrame(parent), rescode(kDialogCodeAccepted)
+    : QFrame(parent), wmult(0.0), hmult(0.0),
+      screenwidth(0), screenheight(0), xbase(0), ybase(0),
+      m_parent(NULL), in_loop(false), rescode(kDialogCodeAccepted)
 {
     setObjectName(name);
     if (!parent)
@@ -50,7 +52,6 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
         return;
     }
 
-    in_loop = false;
     MythUIHelper *ui = GetMythUI();
 
     ui->GetScreenSettings(xbase, screenwidth, wmult,
