@@ -140,10 +140,12 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 LoggingItem::LoggingItem() :
         ReferenceCounter("LoggingItem", false),
         m_pid(-1), m_tid(-1), m_threadId(-1), m_usec(0), m_line(0),
-        m_type(kMessage), m_level((LogLevel_t)LOG_INFO), m_facility(0),
+        m_type(kMessage), m_level((LogLevel_t)LOG_INFO), m_facility(0), m_epoch(0),
         m_file(NULL), m_function(NULL), m_threadName(NULL), m_appName(NULL),
         m_table(NULL), m_logFile(NULL)
 {
+    m_message[0]='\0';
+    m_message[LOGLINE_MAX]='\0';
 }
 
 LoggingItem::LoggingItem(const char *_file, const char *_function,
