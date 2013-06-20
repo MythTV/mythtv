@@ -643,4 +643,162 @@
 
     </window>
 
+    <window name="backendselection">
+
+        <textarea name="label">
+            <font>baselarge</font>
+            <area>100,20,1080,30</area>
+            <value>MythTV Servers</value>
+            <align>allcenter</align>
+        </textarea>
+
+        <shape name="listbackground" from="basebackground">
+            <area>100,55,1080,410</area>
+        </shape>
+
+        <buttonlist name="backends">
+            <area>110,65,1060,390</area>
+            <spacing>4</spacing>
+            <layout>vertical</layout>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,55</area>
+                    <shape name="buttonbackground">
+                        <area>0,2,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical"  />
+                        </fill>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>10,2,450,25</area>
+                        <font>basemedium</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                    <textarea name="modelname" from="buttontext" /> <!-- Workaround for vanishing buttontext bug -->
+                    <textarea name="protocolversion">
+                        <area>15,30,300,25</area>
+                        <font>basesmallgrey</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+
+                    <textarea name="version">
+                        <area>570,2,100,50</area>
+                        <font>basesmall</font>
+                        <cutdown>yes</cutdown>
+                        <align>right,vcenter</align>
+                    </textarea>
+
+                    <statetype name="connection">
+                        <area>470,2,100,50</area>
+                        <state name="good">
+                            <area>0,0,100,50</area>
+                        </state>
+                        <state name="protocolmismatch" from="good">
+                            <textarea name="description">
+                                <area>0,0,100%,100%</area>
+                                <align>hcenter</align>
+                                <value>Version Mismatch</value>
+                                <font>basesmallred</font>
+                                <multiline>yes</multiline>
+                            </textarea>
+                        </state>
+                        <state name="blocked" from="protocolmismatch">
+                            <textarea name="description">
+                                <value>Firewall</value>
+                            </textarea>
+                        </state>
+                    </statetype>
+
+                    <statetype name="securitypin">
+                        <area>1010,10,40,40</area>
+                        <state name="yes">
+                            <area>0,0,40,40</area>
+                            <shape name="pin">
+                                <area>0,0,40,40</area>
+                                <type>roundbox</type>
+                                <cornerradius>6</cornerradius>
+                                <fill color="#990000" />
+                            </shape>
+                            <imagetype name="locked">
+                                <position>6,5</position>
+                                <filename>shared/secure.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="no">
+                            <area>0,0,40,40</area>
+                            <shape name="nopin">
+                                <area>0,0,40,40</area>
+                                <type>roundbox</type>
+                                <cornerradius>6</cornerradius>
+                                <fill color="#009900" />
+                            </shape>
+                            <imagetype name="unlocked">
+                                <position>2,5</position>
+                                <filename>shared/unsecure.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="inactive" from="active" />
+                <state name="selectedactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="100" />
+                        </fill>
+                    </shape>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>10,96%</position>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>40,96%</position>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <helptext>Select the server you wish to connect to</helptext>
+        </buttonlist>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>200,530,880,60</area>
+            <align>allcenter</align>
+            <multiline>true</multiline>
+        </textarea>
+
+        <button name="save" from="basebutton">
+            <position>990,630</position>
+            <value>Save</value>
+        </button>
+
+        <button name="manual" from="basebutton">
+            <position>510,630</position>
+            <value>Manual</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>40,630</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
