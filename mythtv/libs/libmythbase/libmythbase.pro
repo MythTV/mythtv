@@ -49,8 +49,8 @@ SOURCES += mythsystemlegacy.cpp
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-HEADERS += httpcomms.h mcodecs.h
-SOURCES += httpcomms.cpp mcodecs.cpp
+HEADERS += mcodecs.h
+SOURCES += mcodecs.cpp
 }
 
 unix {
@@ -79,11 +79,6 @@ inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h
 inc.files += remotefile.h mythsystemlegacy.h
-
-# This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-inc.files += httpcomms.h
-}
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase
