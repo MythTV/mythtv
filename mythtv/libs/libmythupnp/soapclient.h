@@ -59,8 +59,7 @@ class UPNP_PUBLIC SOAPClient
     QDomDocument SendSOAPRequest(const QString &sMethod,
                                  QStringMap    &list,
                                  int           &nErrCode,
-                                 QString       &sErrDesc,
-                                 bool           bInQtThread);
+                                 QString       &sErrDesc);
   private:
     QDomNode FindNodeInternal(QStringList    &sParts,
                               const QDomNode &curNode) const;

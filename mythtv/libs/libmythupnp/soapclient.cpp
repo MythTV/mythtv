@@ -17,10 +17,7 @@
 #include "mythlogging.h"
 #include "httprequest.h"
 #include "upnp.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include "httpcomms.h"
-#endif
+#include "mythdownloadmanager.h"
 
 #define LOC      QString("SOAPClient: ")
 
@@ -175,16 +172,13 @@ QString SOAPClient::GetNodeValue(
  *
  * \param sErrCode returns error description from device, when applicable.
  *
- * \param bInQtThread May be set to true if this is run from within
- *                    a QThread with a running an event loop.
- *
  * \return Returns a QDomDocument containing output parameters on success.
  */
+
 QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
                                          QStringMap    &list,
                                          int           &nErrCode,
-                                         QString       &sErrDesc,
-                                         bool           bInQtThread)
+                                         QString       &sErrDesc)
 {
     QUrl url(m_url);
 
@@ -204,15 +198,13 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     // --------------------------------------------------------------
     // Add appropriate headers
     // --------------------------------------------------------------
+    QHash<QByteArray, QByteArray> headers;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QHttpRequestHeader header("POST", sMethod, 1, 0);
-
-    header.setValue("CONTENT-TYPE", "text/xml; charset=\"utf-8\"" );
-    header.setValue("SOAPACTION",
-                    QString("\"%1#%2\"").arg(m_sNamespace).arg(sMethod));
-#endif
-
+    headers.insert("Content-Type", "text/xml; charset=\"utf-8\"");
+    QString soapHeader = QString("\"%1#%2\"").arg(m_sNamespace).arg(sMethod);
+    headers.insert("SOAPACTION", soapHeader.toAscii());
+    headers.insert("User-Agent", "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
+                                 "Gecko/25250101 Netscape/5.432b1");
     // --------------------------------------------------------------
     // Build request payload
     // --------------------------------------------------------------
@@ -250,30 +242,18 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     // Perform Request
     // --------------------------------------------------------------
 
-    QBuffer buff(&aBuffer);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     LOG(VB_UPNP, LOG_DEBUG,
-        QString("SOAPClient(%1) sending:\n").arg(url.toString()) +
-        header.toString() + QString("\n%1\n").arg(aBuffer.constData()));
+        QString("SOAPClient(%1) sending:\n %2").arg(url.toString()).arg(aBuffer.constData()));
 
-    QString sXml =
-        HttpComms::postHttp(url,
-                            &header,
-                            &buff, // QIODevice*
-                            10000, // ms -- Technically should be 30ms per spec
-                            3,     // retries
-                            0,     // redirects
-                            false, // allow gzip
-                            NULL,  // login
-                            bInQtThread,
-                            QString() // userAgent, UPnP/1.0 very strict on
-                                      // format if set
-        );
-#else
-    #warning This needs to be ported to Qt5
-    QString sXml("This needs to be ported to Qt5");
-#endif
+    QString sXml;
+
+    if (!GetMythDownloadManager()->postAuth(url.toString(), &aBuffer, NULL, NULL, &headers))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("SOAPClient::SendSOAPRequest: request failed: %1")
+                                         .arg(url.toString()));
+    }
+    else
+        sXml = QString(aBuffer);
 
     // --------------------------------------------------------------
     // Parse response

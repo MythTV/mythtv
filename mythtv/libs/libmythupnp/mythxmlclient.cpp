@@ -20,12 +20,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MythXMLClient::MythXMLClient( const QUrl &url, bool bInQtThread )
+MythXMLClient::MythXMLClient( const QUrl &url )
               :   SOAPClient( url,
                               "urn:schemas-mythtv-org:service:MythTV:1",
                               "/Myth")
 {
-    m_bInQtThread = bInQtThread;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -54,7 +53,7 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
     list.insert( "Pin", sPin );
 
     QDomDocument xmlResults = SendSOAPRequest(
-        "GetConnectionInfo", list, nErrCode, sErrDesc, m_bInQtThread);
+        "GetConnectionInfo", list, nErrCode, sErrDesc);
 
     // --------------------------------------------------------------
     // Is this a valid response?
