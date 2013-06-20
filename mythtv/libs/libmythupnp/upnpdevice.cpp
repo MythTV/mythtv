@@ -642,8 +642,11 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpDeviceDesc::Retrieve( %1 )")
         .arg(sURL));
 
-    QString sXml;
-    bool ok = GetMythDownloadManager()->download(sURL, sXml);
+    QByteArray buffer;
+
+    bool ok = GetMythDownloadManager()->download(sURL, &buffer);
+
+    QString sXml(buffer);
 
     if (ok && sXml.startsWith( QString("<?xml") ))
     {
