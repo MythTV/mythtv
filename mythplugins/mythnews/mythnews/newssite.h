@@ -7,9 +7,6 @@ using namespace std;
 
 // MythTV headers
 #include <QObject>
-#if QT_VERSION < 0x050000
-#include <mythhttppool.h>
-#endif
 
 // QT headers
 #include <QDomDocument>

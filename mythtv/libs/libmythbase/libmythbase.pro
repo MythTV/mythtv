@@ -49,8 +49,8 @@ SOURCES += mythsystemlegacy.cpp
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-HEADERS += httpcomms.h mcodecs.h mythhttppool.h mythhttphandler.h
-SOURCES += httpcomms.cpp mcodecs.cpp mythhttppool.cpp mythhttphandler.cpp 
+HEADERS += httpcomms.h mcodecs.h
+SOURCES += httpcomms.cpp mcodecs.cpp
 }
 
 unix {
@@ -82,7 +82,7 @@ inc.files += remotefile.h mythsystemlegacy.h
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-inc.files += httpcomms.h mythhttppool.h
+inc.files += httpcomms.h
 }
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
