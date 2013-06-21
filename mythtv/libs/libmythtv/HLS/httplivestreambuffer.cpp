@@ -111,6 +111,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
+        memset(&m_aeskey, 0, sizeof(m_aeskey));
 #endif
         m_downloading   = false;
     }
