@@ -1226,7 +1226,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
     int bpf   = bytes_per_frame;
     int off   = 0;
 
-    if (!needs_upmix)
+    if (!needs_upmix || !upmixer)
     {
         int num  = len;
 
@@ -1260,9 +1260,6 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         org_waud = (org_waud + frames * bpf) % kAudioRingBufferSize;
         return len;
     }
-
-    if (!upmixer)
-        return 0;
 
     // Upmix to 6ch via FreeSurround
     // Calculate frame size of input
