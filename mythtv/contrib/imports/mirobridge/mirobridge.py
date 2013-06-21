@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: mirobridge.py   Maintains MythTV database with Miro's downloaded video files.
+# Name: mirobridge.py   Maintains MythTV database with Miro's downloaded
+#                       video files.
 # Python Script
 # Author:   R.D. Vaughan
-# Purpose:  This python script is intended to perform synchronise Miro's video files with MythTV's
-#           "Watch Recordings" and MythVideo.
+# Purpose:  This python script is intended to perform synchronise Miro's
+#           video files with MythTV's "Watch Recordings" and MythVideo.
 #
 #           The source of all video files is from those downloaded my Miro.
-#           The source of all cover art and screen shoots are from those downloaded and maintained by
-#           Miro.
-#           Miro v2.03 or later must be already installed and configured and already capable of
-#           downloading videos.
+#           The source of all cover art and screen shoots are from those
+#           downloaded and maintained by Miro.
+#           Miro v2.03 or later must be already installed and configured
+#           and already capable of downloading videos.
 #
 # Command line examples:
 # See help (-u and -h) options
@@ -22,15 +23,18 @@
 __title__ ="mirobridge - Maintains Miro's Video files with MythTV";
 __author__="R.D.Vaughan"
 __purpose__='''
-This python script is intended to synchronise Miro's video files with MythTV's "Watch Recordings" and MythVideo.
+This python script is intended to synchronise Miro's video files with
+MythTV's "Watch Recordings" and MythVideo.
 
 The source of all video files are from those downloaded my Miro.
 The source of all meta data for the video files is from the Miro data base.
-The source of all cover art and screen shots are from those downloaded and maintained by Miro.
-Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
+The source of all cover art and screen shots are from those downloaded
+and maintained by Miro.
+Miro v2.0.3 or later must already be installed and configured and
+capable of downloading videos.
 '''
 
-__version__=u"v0.7.0"
+__version__=u"v0.7.1"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -211,9 +215,12 @@ __version__=u"v0.7.0"
 # 0.6.8 Sometimes Miro metadata has no video filename. Skip these invalid videos.
 # 0.6.9 Adjust to datetime issues with MythTV v0.26's move to UTC datatimes in DB
 # 0.7.0 Fix bug introduced with v0.6.9, ticket reported as #11219 and #11220
+# 0.7.1 Added support for Miro 6.x. Miro 5.x can never be supported due to
+#       miro cli support being broken.
 
 examples_txt=u'''
-For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wiki/MiroBridge
+For examples, please see the Mirobridge's wiki page at
+http://www.mythtv.org/wiki/MiroBridge
 '''
 
 # Common function imports
@@ -431,7 +438,6 @@ try:
         utils.initialize_locale()
     except:
         pass
-
     # Set up gettext before everything else
     from miro import config             # New for Miro4 (Changed import location)
     from miro import eventloop          # New for Miro4
@@ -452,29 +458,33 @@ try:
     from miro import startup
     from miro import app
     from miro.frontends.cli.events import EventHandler
-
     # Required for Miro 4 as the configuration calls changed location
     # and additional Miro 4 specific imports are required
     try:
-        dummy = app.config.get(prefs.APP_VERSION)
-        # A test to see if this is Miro v4 before the version can be read.
-        # If there is no exception this is Miro v4
+        version = app.config.get(prefs.APP_VERSION)
+        # A test to see if this is Miro v4 or v6 before the version can be read.
+        # If there is no exception this is Miro v4 or v6
         eventloop.setup_config_watcher()
         from miro import signals
         from miro import messages
         from miro import eventloop
         from miro import feed
         from miro import workerprocess
-        from miro.frontends.cli.application import InfoUpdaterCallbackList
-        from miro.frontends.cli.application import InfoUpdater
-        from miro.plat.renderers.gstreamerrenderer import movie_data_program_info
+        if version[0] == '4':
+            from miro.frontends.cli.application import InfoUpdaterCallbackList
+            from miro.frontends.cli.application import InfoUpdater
+            from miro.plat.renderers.gstreamerrenderer import movie_data_program_info
+        else:
+            from miro import util
+            app.startup_timer = util.DebuggingTimer()
+            utils.register_exec_prefix()
+        #
         miroConfiguration = app.config.get
         from miro import controller
         app.controller = controller.Controller()
     except:
         miroConfiguration = config.get
         pass
-
 except Exception, e:
     logger.critical(u"Importing Miro functions has an issue. Miro must be installed "\
                     u"and functional, error(%s)", e)
@@ -501,9 +511,17 @@ try:
     elif miroConfiguration(prefs.APP_VERSION) < u"4.0":
         logger.info("Using mirobridge_interpreter_3_5_0")
         from mirobridge.mirobridge_interpreter_3_5_0 import MiroInterpreter
-    else:
+    elif miroConfiguration(prefs.APP_VERSION) < u"5.0":
         logger.info("Using mirobridge_interpreter_4_0_2")
         from mirobridge.mirobridge_interpreter_4_0_2 import MiroInterpreter
+    elif miroConfiguration(prefs.APP_VERSION) < u"6.0":
+        logger.critical('''
+Miro version 5.x cannot be supported due to that version not supporting
+a CLI mode. Use versions 4.0.2+ or 6.0+ but not any v5.''')
+        sys.exit(1)
+    else:
+        logger.info("Using mirobridge_interpreter_6_0_0")
+        from mirobridge.mirobridge_interpreter_6_0_0 import MiroInterpreter
     from mirobridge.metadata import MetaData
 except Exception, e:
     logger.critical(u"Importing mirobridge functions has failed. At least a 'mirobridge_interpreter' "\
@@ -1165,26 +1183,34 @@ def getOldrecordedOrphans():
     # Prevents accidental deletions.
     metadata.convertOldMiroVideos()
 
-    recorded_array = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
+    recorded_array = list(mythdb.searchRecorded(chanid=channel_id,
+                                                hostname=localhostname))
     oldrecorded_array = list(mythdb.searchOldRecorded(chanid=channel_id, ))
     videometadata = list(mythdb.searchVideos(category=u'Miro'))
 
     orphans = []
     for record in oldrecorded_array:
         for recorded in recorded_array:
-            if recorded[u'starttime'] == record[u'starttime'] and recorded[u'endtime'] == \
-                                         record[u'endtime']:
+            # First check if the recording was marked for deletion
+            # by the user. The BE actually deletes the recorded record.
+            if recorded['autoexpire'] == 9999:
+                continue
+            #
+            if recorded[u'starttime'] == record[u'starttime'] and \
+                            recorded[u'endtime'] == record[u'endtime']:
                 break
         else:
             for video in videometadata:
-                if video[u'title'] == record[u'title'] and video[u'subtitle'] == record[u'subtitle']:
+                if video[u'title'] == record[u'title'] and \
+                            video[u'subtitle'] == record[u'subtitle']:
                     break
             else:
                 orphans.append(record)
 
     for data in orphans:
         if simulation:
-            logger.info(u"Simulation: Remove orphaned oldrecorded record (%s - %s)" % \
+            logger.info(
+            u"Simulation: Remove orphaned oldrecorded record (%s - %s)" % \
                             (data[u'title'], data[u'subtitle']))
         else:
             try:
@@ -1198,26 +1224,29 @@ def getOldrecordedOrphans():
 
             # Attempt a clean up for orphaned recorded video files and/or graphics
             metadata.cleanupVideoAndGraphics(u'%s%s_%s.%s' % \
-                                (vid_graphics_dirs[u'default'], channel_id,
-                                 data[u'starttime'].strftime('%Y%m%d%H%M%S'), u'png'))
+                    (vid_graphics_dirs[u'default'], channel_id,
+                     data[u'starttime'].strftime('%Y%m%d%H%M%S'), u'png'))
 
-            # Attempt a clean up for orphaned MythVideo files and/or graphics from the Default directory
+            # Attempt a clean up for orphaned MythVideo files and/or
+            # graphics from the Default directory
             metadata.cleanupVideoAndGraphics(u'%s%s - %s.%s' % \
-                                (vid_graphics_dirs[u'default'], data[u'title'],
-                                 data[u'subtitle'], u'png'))
+                    (vid_graphics_dirs[u'default'], data[u'title'],
+                     data[u'subtitle'], u'png'))
 
             # Attempt a clean up for orphaned MythVideo screenshot
             metadata.cleanupVideoAndGraphics(u'%s%s - %s%s.%s' % \
-                                (vid_graphics_dirs[u'episodeimagedir'], data[u'title'],
-                                 data[u'subtitle'], graphic_suffix[u'episodeimagedir'], u'png'))
+                (vid_graphics_dirs[u'episodeimagedir'], data[u'title'],
+                 data[u'subtitle'], graphic_suffix[u'episodeimagedir'],
+                 u'png'))
 
             # Remove any unique cover art graphic files
             if data[u'title'].lower() in channel_icon_override:
                 metadata.cleanupVideoAndGraphics(u'%s%s - %s%s.%s' % \
-                                (vid_graphics_dirs[u'posterdir'], data[u'title'],
-                                 data[u'subtitle'], graphic_suffix[u'posterdir'], u'png'))
+                (vid_graphics_dirs[u'posterdir'], data[u'title'],
+                 data[u'subtitle'], graphic_suffix[u'posterdir'], u'png'))
 
-            displayMessage(u"Removed orphaned Miro video and graphics files (%s - %s)" % \
+            displayMessage(
+                u"Removed orphaned Miro video and graphics files (%s - %s)" % \
                                 (data[u'title'], data[u'subtitle']))
 
     return orphans
@@ -1700,7 +1729,9 @@ def getPlayedMiroVideos():
     filenames=[]
     recorded = list(mythdb.searchRecorded(chanid=channel_id, hostname=localhostname))
     for record in recorded:
-        if record[u'watched'] == 0:    # Skip if the video has NOT been watched
+        # Skip if the video has NOT been watched or has been marked for
+        # deletion
+        if record[u'watched'] == 0 or record['autoexpire'] == 9999:
             continue
         try:
             filenames.append(os.path.realpath(storagegroups[u'default']+record[u'basename']))
@@ -2317,25 +2348,33 @@ def main():
     #
     displayMessage(u"Starting Miro Frontend and Backend")
     startup.initialize(miroConfiguration(prefs.THEME_NAME))
-    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+    #
+    # Only required for Miro 4
+    if miroConfiguration(prefs.APP_VERSION)[0] == u"4":
         app.info_updater = InfoUpdater()
     app.cli_events = EventHandler()
     app.cli_events.connect_to_signals()
 
-    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+    # Only required for Miro 4 and higher
+    if miroConfiguration(prefs.APP_VERSION) > u"4.0":
         startup.install_first_time_handler(app.cli_events.handle_first_time)
 
     startup.startup()
     app.cli_events.startup_event.wait()
     if app.cli_events.startup_failure:
-        logger.critical(u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % \
-                            (app.cli_events.startup_failure[0], app.cli_events.startup_failure[1]))
+        logger.critical(
+u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % \
+            (app.cli_events.startup_failure[0],
+            app.cli_events.startup_failure[1]))
         app.controller.shutdown()
         time.sleep(5) # Let the shutdown processing complete
         sys.exit(1)
 
-    if miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+    # Only required for Miro 4
+    if miroConfiguration(prefs.APP_VERSION)[0] == u"4":
         app.movie_data_program_info = movie_data_program_info
+    # Only required for Miro 4 and higher
+    if miroConfiguration(prefs.APP_VERSION) > u"4.0":
         messages.FrontendStarted().send_to_backend()
 
     app.cli_interpreter = MiroInterpreter()
@@ -2346,15 +2385,19 @@ def main():
     app.cli_interpreter.simulation = opts.simulation
     app.cli_interpreter.videofiles = []
     app.cli_interpreter.downloading = False
-    app.cli_interpreter.icon_cache_dir = miroConfiguration(prefs.ICON_CACHE_DIRECTORY)
+    app.cli_interpreter.icon_cache_dir = miroConfiguration(
+                                                prefs.ICON_CACHE_DIRECTORY)
     app.cli_interpreter.imagemagick = imagemagick
     app.cli_interpreter.statistics = statistics
+    #
+    ## Version specific logic
     if miroConfiguration(prefs.APP_VERSION) < u"2.5.0":
         app.renderer = app.cli_interpreter
-    elif miroConfiguration(prefs.APP_VERSION) > u"4.0": # Only required for Miro 4
+    elif miroConfiguration(prefs.APP_VERSION) > u"4.0":
         pass
     else:
-        app.movie_data_program_info = app.cli_interpreter.movie_data_program_info
+        app.movie_data_program_info = \
+                               app.cli_interpreter.movie_data_program_info
 
     #
     # Attempt to import an opml file
@@ -2363,9 +2406,11 @@ def main():
         results = 0
         try:
             app.cli_interpreter.do_mythtv_import_opml(opts.import_opml)
-            time.sleep(30) # Let the Miro backend process the OPML file before shutting down
+            # Let the Miro backend process the OPML file before shutting down
+            time.sleep(30)
         except Exception, e:
-            logger.critical(u"Import of OPML file (%s) failed, error(%s)." % (opts.import_opml, e))
+            logger.critical(u"Import of OPML file (%s) failed, error(%s)." %
+                                    (opts.import_opml, e))
             results = 1
         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
         app.controller.shutdown()
@@ -2409,22 +2454,23 @@ def main():
             app.cli_interpreter.verbose = True
 
     # Deal with orphaned oldrecorded records.
-    # These records indicate that the MythTV user deleted the video from the Watched Recordings screen
-    # or from MythVideo
+    # These records indicate that the MythTV user deleted the video
+    # from the Watched Recordings screen or from MythVideo
     # These video items must also be deleted from Miro
     videostodelete = getOldrecordedOrphans()
     if len(videostodelete):
-        displayMessage(u"Starting Miro delete of videos deleted in the MythTV "\
+        displayMessage(
+            u"Starting Miro delete of videos deleted in the MythTV "\
                        u"Watched Recordings screen.")
         for video in videostodelete:
             # Completely remove the video and item information from Miro
-            app.cli_interpreter.do_mythtv_item_remove([video[u'title'], video[u'subtitle']])
+            app.cli_interpreter.do_mythtv_item_remove(
+                            [video[u'title'], video[u'subtitle']])
 
     #
     # Collect the set of played Miro video files
     #
     app.cli_interpreter.videofiles = getPlayedMiroVideos()
-
     #
     # Updated the played status of items
     #
@@ -2437,13 +2483,11 @@ def main():
     #
     app.cli_interpreter.do_mythtv_getunwatched(u'')
     unwatched = app.cli_interpreter.videofiles
-
     #
     # Get the watched videos details from Miro
     #
     app.cli_interpreter.do_mythtv_getwatched(u'')
     watched = app.cli_interpreter.videofiles
-
     #
     # Massage empty titles and subtitles from Miro
     #
@@ -2470,17 +2514,21 @@ def main():
         unwatched_copy.append(item)
     for item in unwatched_copy: # Check for a duplicate against already watched Miro videos
         for x in watched:
-            if item[u'channelTitle'] == x[u'channelTitle'] and item[u'title'] == x[u'title']:
+            if item[u'channelTitle'] == x[u'channelTitle'] and \
+                                        item[u'title'] == x[u'title']:
                 try:
                     unwatched.remove(item)
                     # Completely remove this duplicate video and item information from Miro
-                    app.cli_interpreter.do_mythtv_item_remove(item[u'videoFilename'])
-                    displayMessage((u"Skipped adding a duplicate Miro video to the MythTV "\
-                                    u"Watch Recordings screen (%s - %s) which is already in "\
-                                    u"MythVideo.\nSometimes a Miro channel has the same video "\
-                                    u"downloaded multiple times.\nThis is a Miro/Channel web "\
-                                    u"site issue and often rectifies itself overtime.") % \
-                                            (item[u'channelTitle'], item[u'title']))
+                    app.cli_interpreter.do_mythtv_item_remove(
+                                                item[u'videoFilename'])
+                    displayMessage((
+u'''Skipped adding a duplicate Miro video to the MythTV
+Watch Recordings screen (%s - %s) which is already in
+MythVideo.
+Sometimes a Miro channel has the same video
+downloaded multiple times.
+This is a Miro/Channel web site issue and often
+rectifies itself overtime.''') % (item[u'channelTitle'], item[u'title']))
                 except ValueError:
                     pass
     duplicates = []
