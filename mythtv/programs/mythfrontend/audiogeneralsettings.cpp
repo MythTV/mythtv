@@ -555,7 +555,7 @@ void AudioConfigSettings::StartAudioTest()
 AudioTestThread::AudioTestThread(QObject *parent,
                                  QString main, QString passthrough,
                                  int channels,
-                                 AudioOutputSettings settings,
+                                 AudioOutputSettings &settings,
                                  bool hd) :
     MThread("AudioTest"),
     m_parent(parent), m_channels(channels), m_device(main),
@@ -721,7 +721,7 @@ void AudioTestThread::run()
 }
 
 AudioTest::AudioTest(QString main, QString passthrough,
-                     int channels, AudioOutputSettings settings) 
+                     int channels, AudioOutputSettings &settings)
     : VerticalConfigurationGroup(false, true, false, false),
       m_frontleft(NULL), m_frontright(NULL), m_center(NULL),
       m_surroundleft(NULL), m_surroundright(NULL),
@@ -969,7 +969,7 @@ bool AudioTest::event(QEvent *event)
 
 
 AudioTestGroup::AudioTestGroup(QString main, QString passthrough,
-                               int channels, AudioOutputSettings settings)
+                               int channels, AudioOutputSettings &settings)
 {
     addChild(new AudioTest(main, passthrough, channels, settings));
 }

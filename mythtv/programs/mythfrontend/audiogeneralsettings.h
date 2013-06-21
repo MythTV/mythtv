@@ -129,7 +129,7 @@ class AudioTestGroup : public ConfigurationWizard
 {
   public:
     AudioTestGroup(QString main, QString passthrough,
-                   int channels, AudioOutputSettings settings);
+                   int channels, AudioOutputSettings &settings);
 };
 
 class ChannelChangedEvent : public QEvent
@@ -150,7 +150,7 @@ class AudioTestThread : public MThread
   public:
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
-                    int channels, AudioOutputSettings settings, bool hd);
+                    int channels, AudioOutputSettings &settings, bool hd);
     ~AudioTestThread();
 
     void cancel();
@@ -178,7 +178,7 @@ class AudioTest : public VerticalConfigurationGroup
     Q_OBJECT
   public:
     AudioTest(QString main, QString passthrough,
-              int channels, AudioOutputSettings settings);
+              int channels, AudioOutputSettings &settings);
     ~AudioTest();
     bool event(QEvent *event);
 
