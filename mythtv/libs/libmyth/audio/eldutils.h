@@ -120,6 +120,7 @@ class MPUBLIC ELD
         int      spk_alloc;
         int      sad_count;
         struct cea_sad sad[ELD_MAX_SAD];
+        eld_data() { memset(this, 0, sizeof(*this)); }
     };
     eld_data m_e;
 };
