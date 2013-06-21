@@ -145,7 +145,8 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     processed(true),
     processed_size(0),
     surround_mode(smode),
-    latency_frames(0)
+    latency_frames(0),
+    channels(0)
 {
     LOG(VB_AUDIO, LOG_DEBUG,
         QString("FreeSurround::FreeSurround rate %1 moviemode %2")
