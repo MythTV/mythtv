@@ -4502,11 +4502,19 @@ static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
     return false;
 }
 
-// prefer dirs with less weight (disk I/O) over dirs with more weight
+// prefer dirs with less weight (disk I/O) over dirs with more weight.
+// if weights are equal, prefer dirs with more absolute free space over less
 static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 {
     if (a->getWeight() < b->getWeight())
+    {
         return true;
+    }
+    else if (a->getWeight() == b->getWeight())
+    {
+        if (a->getFreeSpace() > b->getFreeSpace())
+            return true;
+    }
 
     return false;
 }
