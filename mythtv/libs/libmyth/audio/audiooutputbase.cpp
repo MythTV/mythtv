@@ -821,19 +821,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
 
-    if (needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
-        configured_channels > 2)
+    if (needs_upmix && configured_channels > 2)
     {
         surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
-        if ((upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
-                                    (FreeSurround::SurroundMode)surround_mode)))
-            VBAUDIO(QString("Create %1 quality upmixer done")
-                    .arg(quality_string(surround_mode)));
-        else
-        {
-            VBERROR("Failed to create upmixer");
-            needs_upmix = false;
-        }
+        upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
+                                   (FreeSurround::SurroundMode)surround_mode);
+        VBAUDIO(QString("Create %1 quality upmixer done")
+                .arg(quality_string(surround_mode)));
     }
 
     VBAUDIO(QString("Audio Stretch Factor: %1").arg(stretchfactor));
@@ -1244,8 +1238,10 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
     }
 
     // Convert mono to stereo as most devices can't accept mono
-    if (configured_channels == 2 && source_channels == 1)
+    if (!upmixer)
     {
+        // we're always in the case
+        // configured_channels == 2 && source_channels == 1
         int bdFrames = bdiff / bpf;
         if (bdFrames <= frames)
         {
@@ -1650,7 +1646,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     int zero_fragment_size = 8 * samplerate * output_bytes_per_frame / 1000;
     if (zero_fragment_size > fragment_size)
         zero_fragment_size = fragment_size;
-           
+
     while (!killaudio)
     {
         if (pauseaudio)
