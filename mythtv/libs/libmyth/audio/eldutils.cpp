@@ -158,8 +158,6 @@ ELD::ELD(const char *buf, int size)
 
 ELD::ELD()
 {
-    memset(&m_e, 0 , sizeof(m_e));
-
     m_e.formats = 0LL;
     m_e.eld_valid = false;
 }
