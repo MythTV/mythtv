@@ -42,7 +42,6 @@ AVFormatWriter::AVFormatWriter()
     : FileWriterBase(),
 
       m_avfRingBuffer(NULL), m_ringBuffer(NULL),
-
       m_ctx(NULL),
       m_videoStream(NULL),   m_avVideoCodec(NULL),
       m_audioStream(NULL),   m_avAudioCodec(NULL),
@@ -52,6 +51,7 @@ AVFormatWriter::AVFormatWriter()
 {
     av_register_all();
     avcodec_register_all();
+    memset(&m_fmt, 0, sizeof(m_fmt));
 }
 
 AVFormatWriter::~AVFormatWriter()
