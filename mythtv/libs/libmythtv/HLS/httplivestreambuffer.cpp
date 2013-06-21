@@ -2883,6 +2883,12 @@ long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
     }
     else
     {
+        if (segment == NULL) // can never happen, make coverity happy
+        {
+            // stream doesn't contain segment error can't continue,
+            // unknown error
+            return -1;
+        }
         int32_t skip = ((postime - starttime) * segment->Size()) / segment->Duration();
         segment->Read(NULL, skip);
     }
