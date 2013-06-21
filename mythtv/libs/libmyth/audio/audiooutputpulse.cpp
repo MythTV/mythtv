@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Alan Calvert, 2010 foobum@gmail.com
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -33,6 +33,10 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     volume_control.channels = 0;
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
         volume_control.values[i] = PA_VOLUME_MUTED;
+
+    // unecessary initialization to keep coverity happy
+    memset(&sample_spec, 0, sizeof(sample_spec));
+    memset(&channel_map, 0, sizeof(channel_map));
 
     InitSettings(settings);
     if (settings.init)
@@ -156,16 +160,11 @@ bool AudioOutputPulseAudio::OpenDevice()
         VBAUDIO(fn_log_tag + QString("using sample spec %1").arg(spec));
     }
 
-    pa_channel_map *pmap = NULL;
-
-    if(!(pmap = pa_channel_map_init_auto(&channel_map, channels,
-                                         PA_CHANNEL_MAP_WAVEEX)))
+    if(!pa_channel_map_init_auto(&channel_map, channels, PA_CHANNEL_MAP_WAVEEX))
     {
         VBERROR(fn_log_tag + "failed to init channel map");
         return false;
     }
-
-    channel_map = *pmap;
 
     mainloop = pa_threaded_mainloop_new();
     if (!mainloop)
