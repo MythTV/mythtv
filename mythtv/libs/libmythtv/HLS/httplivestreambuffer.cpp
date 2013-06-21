@@ -394,6 +394,7 @@ public:
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
         m_ivloaded      = false;
+        memset(m_AESIV, 0, sizeof(m_AESIV));
 #endif
     }
 
@@ -439,6 +440,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
+        memcpy(m_AESIV, rhs.m_AESIV, sizeof(m_AESIV));
 #endif
         return *this;
     }
