@@ -26,18 +26,14 @@ class avfDecoder : public Decoder
   private:
     void run();
 
-    void writeBlock();
     void deinit();
 
     bool m_inited, m_userStop;
     int m_stat;
     uint8_t *m_outputBuffer;
-    ulong m_outputAt;
 
-    unsigned int m_bks, m_bksFrames, m_decodeBytes;
     bool m_finish;
     long m_freq, m_bitrate;
-    AudioFormat m_sampleFmt;
     int m_channels;
     double m_seekTime;
 
@@ -45,7 +41,6 @@ class avfDecoder : public Decoder
 
     AVInputFormat *m_inputFormat;
     AVFormatContext *m_inputContext;
-    AVCodec *m_codec;
     AVCodecContext *m_audioDec;
 
     bool m_inputIsFile;
