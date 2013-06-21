@@ -765,6 +765,13 @@ void _InterleaveSample(AudioDataType* out, const AudioDataType* in, int channels
 {
     const AudioDataType* my_inp[8];
 
+    if (channels == 1)
+    {
+        //special case for mono
+        memcpy(out, inp ? inp[0] : in, sizeof(AudioDataType) * frames);
+        return;
+    }
+
     if (!inp)
     {
         // We're given an array of int, calculate pointers to each row
