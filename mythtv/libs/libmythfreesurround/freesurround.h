@@ -75,10 +75,7 @@ private:
     uint srate;
 
     // info about the current setup
-    bool open_;                         // whether a stream is currently open
-    bool initialized_;                  // whether the thing is intialized	
     struct buffers *bufs;               // our buffers
-    struct int16buffers *int16bufs;     // our buffers
     class fsurround_decoder *decoder;   // the surround decoder
     int in_count;                       // amount in lt,rt
     int out_count;                      // amount in output bufs

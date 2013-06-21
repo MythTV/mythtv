@@ -136,8 +136,6 @@ int channel_select = -1;
 
 FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     srate(srate),
-    open_(false),
-    initialized_(false),
     bufs(NULL),
     decoder(0),
     in_count(0),
