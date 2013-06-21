@@ -366,6 +366,10 @@ bool ThemeUpdateTask::DoRun(void)
 {
     QString MythVersion = MYTH_SOURCE_PATH;
 
+    // Treat devel branches as master
+    if (MythVersion.startsWith("devel/"))
+        MythVersion = "master";
+
     // FIXME: For now, treat git master the same as svn trunk
     if (MythVersion == "master")
         MythVersion = "trunk";
