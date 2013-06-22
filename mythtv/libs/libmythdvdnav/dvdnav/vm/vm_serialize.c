@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <inttypes.h>
 
@@ -10,6 +12,7 @@
 #include "remap.h"
 #include "decoder.h"
 #include "vm.h"
+#include "vm_serialize.h"
 
 /*
 "navstate",<version>,<sprm x 24>,<gprm x 16>,
@@ -212,4 +215,3 @@ int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
 
   return ret;
 }
-
