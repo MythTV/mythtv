@@ -11,7 +11,7 @@ AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
     m_stretchfactor(1.0f),m_passthru(false),
     m_lock(QMutex::Recursive), m_muted_on_creation(muted),
     m_main_device(QString::null), m_passthru_device(QString::null),
-    m_no_audio_in(false), m_no_audio_out(false), m_controls_volume(true)
+    m_no_audio_in(false), m_no_audio_out(true), m_controls_volume(true)
 {
     m_controls_volume = gCoreContext->GetNumSetting("MythControlsVolume", 1);
 }

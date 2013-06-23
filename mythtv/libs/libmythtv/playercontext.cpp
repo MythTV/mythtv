@@ -427,7 +427,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
-        if (audio->HasAudioOut())
+        if (IsAudioNeeded())
         {
             QString errMsg = audio->ReinitAudio();
         }

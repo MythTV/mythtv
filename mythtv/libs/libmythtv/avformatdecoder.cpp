@@ -4387,7 +4387,8 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
         }
 
-        if (!(decodetype & kDecodeAudio) || (pkt->stream_index != audIdx))
+        if (!(decodetype & kDecodeAudio) || (pkt->stream_index != audIdx)
+            || !m_audio->HasAudioOut())
             break;
 
         if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
