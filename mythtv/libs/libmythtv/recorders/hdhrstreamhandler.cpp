@@ -96,7 +96,7 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
     StreamHandler(device),
     _hdhomerun_device(NULL),
     _tuner(-1),
-
+    _tune_mode(hdhrTuneModeNone),
     _hdhr_lock(QMutex::Recursive)
 {
     setObjectName("HDHRStreamHandler");
