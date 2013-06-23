@@ -408,20 +408,22 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
 
     player->SetVideoFilters((useNullVideo) ? "onefield" : "");
 
+    bool isWatchingRecording = (desiredState == kState_WatchingRecording);
+    player->SetWatchingRecording(isWatchingRecording);
+
     if (!IsAudioNeeded())
         audio->SetNoAudio();
     else
     {
         QString subfn = buffer->GetSubtitleFilename();
+        bool isInProgress =
+            desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
         if (!subfn.isEmpty() && player->GetSubReader())
-            player->GetSubReader()->LoadExternalSubtitles(subfn);
+            player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
     }
 
     if (embed && !embedbounds.isNull())
         player->EmbedInWidget(embedbounds);
-
-    bool isWatchingRecording = (desiredState == kState_WatchingRecording);
-    player->SetWatchingRecording(isWatchingRecording);
 
     SetPlayer(player);
 

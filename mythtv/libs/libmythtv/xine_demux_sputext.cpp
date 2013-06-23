@@ -104,8 +104,13 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
   // an error back, we check for empty reads so that we can stop reading
   // when there is no more data to read
   if (demuxstr->emptyReads == 0 && (len - demuxstr->buflen) > 512) {
-    nread = demuxstr->rbuffer->Read(
-        &demuxstr->buf[demuxstr->buflen], len - demuxstr->buflen);
+    nread = len - demuxstr->buflen;
+    if (nread > demuxstr->rbuffer_len - demuxstr->rbuffer_cur)
+        nread = demuxstr->rbuffer_len - demuxstr->rbuffer_cur;
+    memcpy(&demuxstr->buf[demuxstr->buflen],
+           &demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
+           nread);
+    demuxstr->rbuffer_cur += nread;
     if (nread < 0) {
       printf("read failed.\n");
       return NULL;
@@ -1111,10 +1116,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   };
 
   /* Rewind (sub_autodetect() needs to read input from the beginning) */
-  if(demuxstr->rbuffer->Seek(0, SEEK_SET) == -1) {
-    printf("seek failed.\n");
-    return NULL;
-  }
+  demuxstr->rbuffer_cur = 0;
   demuxstr->buflen = 0;
   demuxstr->emptyReads = 0;
 
@@ -1126,10 +1128,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   /*printf("Detected subtitle file format: %d\n", demuxstr->format);*/
 
   /* Rewind */
-  if(demuxstr->rbuffer->Seek(0, SEEK_SET) == -1) {
-    printf("seek failed.\n");
-    return NULL;
-  }
+  demuxstr->rbuffer_cur = 0;
   demuxstr->buflen = 0;
   demuxstr->emptyReads = 0;
 

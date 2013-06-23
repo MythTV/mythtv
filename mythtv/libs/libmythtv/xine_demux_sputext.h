@@ -21,7 +21,9 @@ typedef struct {
 
 typedef struct {
 
-  RingBuffer*        rbuffer;
+  char              *rbuffer_text;
+  off_t              rbuffer_len;
+  off_t              rbuffer_cur;
 
   int                status;
 

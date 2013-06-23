@@ -2672,6 +2672,12 @@ void MythPlayer::JumpToProgram(void)
 
     player_ctx->buffer->OpenFile(
         pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
+    QString subfn = player_ctx->buffer->GetSubtitleFilename();
+    TVState desiredState = player_ctx->GetState();
+    bool isInProgress =
+        desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
+    if (!subfn.isEmpty() && GetSubReader())
+        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
 
     if (!player_ctx->buffer->IsOpen())
     {

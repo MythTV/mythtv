@@ -18,9 +18,10 @@ using std::lower_bound;
 
 // MythTV
 #include "mythcorecontext.h"
-#include "ringbuffer.h"
+#include "remotefile.h"
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
+#include "mythlogging.h"
 
 static bool operator<(const text_subtitle_t& left,
                       const text_subtitle_t& right)
@@ -51,10 +52,10 @@ bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
  *         current video position.
  *  \return The subtitles as a list of strings.
  */
-QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
+QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
 {
     QStringList list;
-    if (m_subtitles.empty())
+    if (!m_isInProgress && m_subtitles.empty())
         return list;
 
     text_subtitle_t searchTarget(timecode, timecode);
@@ -84,9 +85,27 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
 
     if (nextSubPos == m_subtitles.end())
     {
-        // at the end of video, the blank subtitle should last until
-        // forever
-        endCode = startCode + INT_MAX;
+        if (m_isInProgress)
+        {
+            const int maxReloadInterval = 1000; // ms
+            if (IsFrameBasedTiming())
+                // Assume conservative 24fps
+                endCode = startCode + maxReloadInterval / 24;
+            else
+                endCode = startCode + maxReloadInterval;
+            QDateTime now = QDateTime::currentDateTimeUtc();
+            if (!m_fileName.isEmpty() &&
+                m_lastLoaded.msecsTo(now) >= maxReloadInterval)
+            {
+                TextSubtitleParser::LoadSubtitles(m_fileName, *this);
+            }
+        }
+        else
+        {
+            // at the end of video, the blank subtitle should last
+            // until forever
+            endCode = startCode + INT_MAX;
+        }
     }
     else
     {
@@ -104,35 +123,70 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
 
 void TextSubtitles::AddSubtitle(const text_subtitle_t &newSub)
 {
-    m_lock.lock();
+    QMutexLocker locker(&m_lock);
     m_subtitles.push_back(newSub);
-    m_lock.unlock();
 }
 
 void TextSubtitles::Clear(void)
 {
-    m_lock.lock();
+    QMutexLocker locker(&m_lock);
     m_subtitles.clear();
-    m_lock.unlock();
 }
 
-bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
+void TextSubtitles::SetLastLoaded(void)
+{
+    QMutexLocker locker(&m_lock);
+    m_lastLoaded = QDateTime::currentDateTimeUtc();
+}
+
+bool TextSubtitleParser::LoadSubtitles(const QString &fileName,
+                                       TextSubtitles &target)
 {
     demux_sputext_t sub_data;
-    sub_data.rbuffer = RingBuffer::Create(fileName, 0, false);
+    RemoteFile rfile(fileName, false, false, 0);
 
-    if (!sub_data.rbuffer)
+    LOG(VB_VBI, LOG_INFO,
+        QString("Preparing to load subtitle file (%1)").arg(fileName));
+    if (!rfile.Open())
+    {
+        LOG(VB_VBI, LOG_INFO,
+            QString("Failed to load subtitle file (%1)").arg(fileName));
         return false;
+    }
+    target.SetHasSubtitles(true);
+    target.SetFilename(fileName);
 
+    // Only reload if rfile.GetRealFileSize() has changed.
+    off_t new_len = rfile.GetFileSize();
+    if (target.GetByteCount() == new_len)
+    {
+        LOG(VB_VBI, LOG_INFO,
+            QString("Filesize unchanged (%1), not reloading subs (%2)")
+            .arg(new_len).arg(fileName));
+        target.SetLastLoaded();
+        return new_len;
+    }
+    LOG(VB_VBI, LOG_INFO,
+        QString("Preparing to read %1 subtitle bytes from %2")
+        .arg(new_len).arg(fileName));
+    target.SetByteCount(new_len);
+    sub_data.rbuffer_len = new_len;
+    sub_data.rbuffer_text = new char[sub_data.rbuffer_len + 1];
+    sub_data.rbuffer_cur = 0;
     sub_data.errs = 0;
+    int numread = rfile.Read(sub_data.rbuffer_text, sub_data.rbuffer_len);
+    LOG(VB_VBI, LOG_INFO,
+        QString("Finished reading %1 subtitle bytes (requested %2)")
+        .arg(numread).arg(new_len));
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {
-        delete sub_data.rbuffer;
+        delete sub_data.rbuffer_text;
         return false;
     }
 
     target.SetFrameBasedTiming(!sub_data.uses_time);
+    target.Clear();
 
     QTextCodec *textCodec = NULL;
     QString codec = gCoreContext->GetSetting("SubtitleCodec", "");
@@ -142,7 +196,7 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
         textCodec = QTextCodec::codecForName("utf-8");
     if (!textCodec)
     {
-        delete sub_data.rbuffer;
+        delete sub_data.rbuffer_text;
         return false;
     }
 
@@ -175,7 +229,9 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     // textCodec object is managed by Qt, do not delete...
 
     free(loaded_subs);
-    delete sub_data.rbuffer;
+    delete sub_data.rbuffer_text;
+
+    target.SetLastLoaded();
 
     return true;
 }
