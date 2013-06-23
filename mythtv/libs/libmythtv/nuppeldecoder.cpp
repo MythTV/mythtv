@@ -1273,7 +1273,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                 QMutexLocker locker(avcodeclock);
 
-                while (pkt.size > 0)
+                while (pkt.size > 0 && m_audio->HasAudioOut())
                 {
                     int data_size = 0;
 
