@@ -1678,7 +1678,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             for (it = checkfiles.begin(); it != checkfiles.end(); ++it)
             {
                 if (dir.exists(*it) &&
-                    QFileInfo(dir, *it).size() >= kReadTestSize)
+                    ((*it).endsWith(".srt") ||
+                     QFileInfo(dir, *it).size() >= kReadTestSize))
                 {
                     retlist<<*it;
                 }
