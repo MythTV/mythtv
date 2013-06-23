@@ -117,6 +117,8 @@ int StreamingRingBuffer::safe_read(void *data, uint sz)
                 errno = ret;
                 break;
             }
+            if (ret == 0) // nothing read, exit early
+                break;    // should EOF be set ??
             len += ret;
         }
     }
