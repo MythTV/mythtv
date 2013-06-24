@@ -147,7 +147,7 @@ bool TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
     LOG(VB_VBI, LOG_INFO,
         QString("Preparing to load subtitle file (%1)").arg(fileName));
-    if (!rfile.Open())
+    if (!rfile.isOpen())
     {
         LOG(VB_VBI, LOG_INFO,
             QString("Failed to load subtitle file (%1)").arg(fileName));
