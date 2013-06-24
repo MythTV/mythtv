@@ -48,7 +48,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
       directrendering(false),
-      lastct('1'), strm(0), buf(0), buf2(0),
+      lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
     // initialize structures
