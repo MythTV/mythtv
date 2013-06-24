@@ -1,6 +1,4 @@
 Makefile
 themenop
-config.ep
-config.pro
-config.log
+config.*
 mythconfig.mak
