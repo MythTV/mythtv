@@ -1729,7 +1729,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Film - categories are usually not Films
     if (event.category.startsWith("Film -"))
     {
-        event.categoryType = ProgramInfo::                                                                      kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
 
     // Get stereo info
