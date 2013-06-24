@@ -503,9 +503,15 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "LEFT" || action == "UP" || action == "PREVIOUS")
-            NextPrevWidgetFocus(false);
+        {
+            if (!NextPrevWidgetFocus(false))
+                handled = false;
+        }
         else if (action == "RIGHT" || action == "DOWN" || action == "NEXT")
-            NextPrevWidgetFocus(true);
+        {
+            if (!NextPrevWidgetFocus(true))
+                handled = false;
+        }
         else if (action == "ESCAPE")
             Close();
         else if (action == "MENU")
