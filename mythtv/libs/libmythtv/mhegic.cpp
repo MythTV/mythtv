@@ -165,11 +165,11 @@ void MHInteractionChannel::slotFinished(QObject *obj)
     if (!p)
         return;
 
-    QString url = p->Url().toString();
+    QByteArray url = p->Url().toEncoded();
 
     if (p->GetError() == QNetworkReply::NoError)
     {
-        LOG(VB_MHEG, LOG_DEBUG, LOC + QString("Finished %1").arg(url) );
+        LOG(VB_MHEG, LOG_DEBUG, LOC + QString("Finished %1").arg(url.constData()) );
     }
     else
     {
@@ -180,8 +180,9 @@ void MHInteractionChannel::slotFinished(QObject *obj)
 
     QMutexLocker locker(&m_mutex);
 
-    m_pending.remove(url);
-    m_finished.insert(url, p);
+    if (m_pending.remove(url.constData()) < 1)
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Finished %1 wasn't pending").arg(url.constData()) );
+    m_finished.insert(url.constData(), p);
 }
 
 /* End of file */

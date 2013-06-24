@@ -30,6 +30,7 @@
 #include "freemheg.h"
 
 #include <QStringList>
+#include <QUrl>
 #if HAVE_GETTIMEOFDAY == 0
 #include <sys/timeb.h>
 #endif
@@ -778,6 +779,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 result.Append(engine->GetContext()->GetReceiverId());
                 result.Append(" ");
                 result.Append(engine->GetContext()->GetDSMCCId());
+                MHLOG(MHLogNotifications, "NOTE WhoAmI -> " + QString::fromUtf8((const char *)result.Bytes(), result.Size()) );
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
@@ -787,6 +789,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
         }
 
+        // Optional resident programs
         else if (m_Name.Equal("DBG"))   // Debug - optional
         {
             QString message = "DEBUG: ";
@@ -821,6 +824,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             MHLOG(MHLogNotifications, message);
         }
 
+        // NativeApplicationExtension
         else if (m_Name.Equal("SBI"))   // SetBroadcastInterrupt
         {
             // Required for NativeApplicationExtension
@@ -853,51 +857,36 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 MHOctetString string;
                 GetString(args.GetAt(0), string, engine);
-                QString url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                QUrl url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
 
                 // Variable name/value pairs
-                QStringList params;
                 int i = 1;
                 for (; i + 2 < args.Size(); i += 2)
                 {
                     GetString(args.GetAt(i), string, engine);
                     QString name = QString::fromUtf8((const char *)string.Bytes(), string.Size());
-                    QString val;
                     MHUnion un;
                     un.GetValueFrom(*(args.GetAt(i+1)), engine);
-                    switch (un.m_Type) {
-                    case MHUnion::U_Int:
-                        val = QString::number(un.m_nIntVal);
-                        break;
-                    case MHParameter::P_Bool:
-                        val = un.m_fBoolVal ? "true" : "false";
-                        break;
-                    case MHParameter::P_String:
-                        val = QString::fromUtf8((const char*)un.m_StrVal.Bytes(), un.m_StrVal.Size());
-                        break;
-                    case MHParameter::P_ObjRef:
-                        val = un.m_ObjRefVal.Printable();
-                        break;
-                    case MHParameter::P_ContentRef:
-                        val = un.m_ContentRefVal.Printable();
-                        break;
-                    case MHParameter::P_Null:
-                        val = "<NULL>";
-                        break;
-                    default:
-                        val = QString("<type %1>").arg(un.m_Type);
-                        break;
-                    }
-                    params += name + "=" + val;
+                    url.addQueryItem(name, un.Printable());
                 }
-                // TODO
-                MHLOG(MHLogNotifications, "NOTE ReturnData '" + url + "' { " + params.join(" ") + " }");
+
+                MHLOG(MHLogNotifications, QString("NOTE ReturnData %1")
+                    .arg(url.toEncoded().constData()) );
+                // NB MHEG-5 says this should be 'post' but 'get; seems to work ok
+                QByteArray text;
+                bool ok = engine->GetContext()->GetCarouselData(url.toEncoded(), text);
+
+                MHLOG(MHLogNotifications, QString("NOTE ReturnData got %1 bytes")
+                    .arg(text.size()) );
+
                 // HTTP response code, 0= none
-                engine->FindObject(*(args.GetAt(i)->GetReference()))->SetVariableValue(0);
+                engine->FindObject(*(args.GetAt(i)->GetReference()))->SetVariableValue(ok ? 200 : 0);
                 // HTTP response data
-                string = "";
-                engine->FindObject(*(args.GetAt(i+1)->GetReference()))->SetVariableValue(string);
-                SetSuccessFlag(success, false, engine);
+                MHOctetString result;
+                result.Append(text.constData());
+                engine->FindObject(*(args.GetAt(i+1)->GetReference()))->SetVariableValue(result);
+
+                SetSuccessFlag(success, true, engine);
             }
             else SetSuccessFlag(success, false, engine);
         }
@@ -916,6 +905,102 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             }
             else SetSuccessFlag(success, false, engine);
         }
+        else if (m_Name.Equal("PST")) { // PersistentStorageInfo
+            if (args.Size() == 1)
+            {
+                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("SCk")) { // SetCookie
+            if (args.Size() == 4)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString id = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                int iExpiry = GetInt(args.GetAt(1), engine);
+                GetString(args.GetAt(2), string, engine);
+                QString val = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                bool bSecure = GetBool(args.GetAt(3), engine);
+                // TODO
+                MHLOG(MHLogNotifications, QString("NOTE SetCookie id=%1 MJD=%2 value=%3 secure=%4")
+                    .arg(id).arg(iExpiry).arg(val).arg(bSecure) );
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("GCk")) { // GetCookie
+            MHERROR("GetCookie ResidentProgram is not implemented");
+        }
+
+        // ICStreamingExtension
+        else if (m_Name.Equal("MSP")) // MeasureStreamPerformance
+        {
+            if (args.Size() == 2)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString url = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                // TODO
+                MHLOG(MHLogNotifications, QString("NOTE MeasureStreamPerformance '%1' %2 bytes")
+                    .arg(url).arg(GetInt(args.GetAt(1), engine)) );
+
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(-1);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("PFG")) { // PromptForGuidance
+            if (args.Size() == 2)
+            {
+                MHOctetString string;
+                GetString(args.GetAt(0), string, engine);
+                QString info = QString::fromUtf8((const char *)string.Bytes(), string.Size());
+                MHLOG(MHLogNotifications, QString("NOTE PromptForGuidance '%1'").arg(info) );
+
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(true);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+
+        }
+        else if (m_Name.Equal("GAP")) { // GetAudioDescPref
+            if (args.Size() == 1)
+            {
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(false);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("GSP")) { // GetSubtitlePref
+            if (args.Size() == 1)
+            {
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(false);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+        else if (m_Name.Equal("GPS")) { // GetPINSupport
+            if (args.Size() == 1)
+            {
+                // -1= PIN is not supported
+                //  0= PIN is supported and disabled
+                //  1= PIN is supported and enabled
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(0);
+                SetSuccessFlag(success, true, engine);
+            }
+            else SetSuccessFlag(success, false, engine);
+        }
+
+        // Undocumented functions
+        else if (m_Name.Equal("XBM")) {
+            // BBC Freeview passes 1 boolean arg
+            // Required for BBC Freeview iPlayer
+            MHLOG(MHLogNotifications, "NOTE Undocumented ResidentProgram XBM" );
+            if (args.Size() == 1)
+                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
+            SetSuccessFlag(success, true, engine);
+        }
 
         else
         {
@@ -924,6 +1009,15 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
     }
     catch (char const *)
     {
+        QStringList params;
+        for (int i = 0; i < args.Size(); ++i)
+        {
+            MHUnion un;
+            un.GetValueFrom(*(args.GetAt(i)), engine);
+            params += QString(MHUnion::GetAsString(un.m_Type)) + "=" + un.Printable();
+        }
+        MHLOG(MHLogWarning, QString("Arguments (%1)").arg(params.join(",")) );
+
         // If something went wrong set the succeeded flag to false
         SetSuccessFlag(success, false, engine);
         // And continue on.  In particular we need to deactivate.
