@@ -5175,7 +5175,8 @@ InteractiveTV *MythPlayer::GetInteractiveTV(void)
     {
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&itvLock);
-        interactiveTV = new InteractiveTV(this);
+        if (!interactiveTV && osd)
+            interactiveTV = new InteractiveTV(this);
     }
 #endif // USING_MHEG
     return interactiveTV;
