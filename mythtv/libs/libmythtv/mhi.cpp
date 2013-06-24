@@ -411,7 +411,11 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
         }
 
         if (t.elapsed() > 60000) // TODO get this from carousel info
-             return false; // Not there.
+        {
+            if (bReported)
+                LOG(VB_MHEG, LOG_INFO, QString("[mhi] timed out %1").arg(objectPath));
+            return false; // Not there.
+        }
         // Otherwise we block.
         if (!bReported)
         {

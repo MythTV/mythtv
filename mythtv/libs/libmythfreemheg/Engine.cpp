@@ -49,6 +49,14 @@ MHEngine::MHEngine(MHContext *context): m_Context(context)
     m_fInTransition = false;
     m_fBooting = true;
     m_Interacting = 0;
+
+    // Required for BBC Freeview iPlayer
+    MHPSEntry *pEntry = new MHPSEntry;
+    pEntry->m_FileName.Copy("ram://bbcipstr");
+    pEntry->m_Data.Append(new MHUnion(true)); // Default true
+    // The next value must be true to enable Freeview interaction channel
+    pEntry->m_Data.Append(new MHUnion(true)); // Default false
+    m_PersistentStore.Append(pEntry);
 }
 
 MHEngine::~MHEngine()
@@ -1117,6 +1125,9 @@ void MHEngine::CheckContentRequests()
 
 bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, const MHSequence<MHObjectRef *> &variables)
 {
+    QString const csFile = QString::fromUtf8(
+            (const char *)fileName.Bytes(), fileName.Size() );
+
     // See if there is an entry there already.
     MHPSEntry *pEntry = NULL;
     int i;
@@ -1136,6 +1147,9 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         // If we're loading then we've failed.
         if (fIsLoad)
         {
+            MHLOG(MHLogNotifications, QString(
+                "Load Persistent(%1) #%2: no such file")
+                .arg(csFile).arg(variables.Size()) );
             return false;
         }
 
@@ -1150,12 +1164,17 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         // Check that we have sufficient data before we continue?
         if (pEntry->m_Data.Size() < variables.Size())
         {
+            MHLOG(MHLogWarning, QString(
+                "Load Persistent(%1): size mismatch").arg(csFile));
             return false;
         }
 
         for (i = 0; i < variables.Size(); i++)
         {
-            FindObject(*(variables.GetAt(i)))->SetVariableValue(*(pEntry->m_Data.GetAt(i)));
+            MHUnion *pValue = pEntry->m_Data.GetAt(i);
+            MHLOG(MHLogNotifications, QString("Load Persistent(%1) #%2=%3")
+                .arg(csFile).arg(i).arg(pValue->Printable()) );
+            FindObject(*(variables.GetAt(i)))->SetVariableValue(*pValue);
         }
     }
 
@@ -1173,6 +1192,8 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
             MHUnion *pValue = new MHUnion;
             pEntry->m_Data.Append(pValue);
             FindObject(*(variables.GetAt(i)))->GetVariableValue(*pValue, this);
+            MHLOG(MHLogNotifications, QString("Store Persistent(%1) %2=>#%3")
+                .arg(csFile).arg(pValue->Printable()).arg(i) );
         }
     }
 

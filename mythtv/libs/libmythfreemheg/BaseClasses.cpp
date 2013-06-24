@@ -707,6 +707,19 @@ void MHUnion::CheckType(enum UnionTypes t) const
     }
 }
 
+QString MHUnion::Printable() const
+{
+    switch (m_Type)
+    {
+    case U_Int: return QString::number(m_nIntVal);
+    case U_Bool: return m_fBoolVal ? "true" : "false";
+    case U_String: return m_StrVal.Printable();
+    case U_ObjRef: return m_ObjRefVal.Printable();
+    case U_ContentRef: return m_ContentRefVal.Printable();
+    case U_None: break;
+    }
+    return "";
+}
 
 // A parameter is a generic whose argument is either the value itself or an indirect reference.
 void MHParameter::Initialise(MHParseNode *p, MHEngine *engine)
