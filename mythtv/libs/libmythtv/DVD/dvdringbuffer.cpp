@@ -442,6 +442,13 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     m_context = new MythDVDContext();
 
+    // Set preferred languages
+    QString lang = gCoreContext->GetSetting("Language").section('_', 0, 0);
+
+    dvdnav_menu_language_select(m_dvdnav, lang.toLatin1().data());
+    dvdnav_audio_language_select(m_dvdnav, lang.toLatin1().data());
+    dvdnav_spu_language_select(m_dvdnav, lang.toLatin1().data());
+
     dvdnav_set_readahead_flag(m_dvdnav, 0);
     dvdnav_set_PGC_positioning_flag(m_dvdnav, 1);
 
@@ -494,8 +501,16 @@ bool DVDRingBuffer::StartFromBeginning(void)
 
     if (m_dvdnav)
     {
+        // Set preferred languages
+        QString lang = gCoreContext->GetSetting("Language").section('_', 0, 0);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setting DVD languages to %1")
+            .arg(lang));
+
         QMutexLocker lock(&m_seekLock);
         dvdnav_reset(m_dvdnav);
+        dvdnav_menu_language_select(m_dvdnav, lang.toLatin1().data());
+        dvdnav_audio_language_select(m_dvdnav, lang.toLatin1().data());
+        dvdnav_spu_language_select(m_dvdnav, lang.toLatin1().data());
         dvdnav_first_play(m_dvdnav);
         m_audioStreamsChanged = true;
     }
