@@ -1186,7 +1186,13 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
     }
 
     QFile file(inputfile);
-    file.open(QIODevice::ReadOnly);
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open file: %1").arg(inputfile));
+        return false;
+    }
+
     QByteArray data = file.readAll();
     file.close();
 
