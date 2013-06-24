@@ -64,7 +64,6 @@ class MBroadcastSocketDevice : public MSocketDevice
   private:
     QHostAddress    m_address;
     quint16         m_port;
-    struct ip_mreq  m_imr;
 };
 
 #endif // _MBROADCAST_SOCKET_DEVICE_H_
