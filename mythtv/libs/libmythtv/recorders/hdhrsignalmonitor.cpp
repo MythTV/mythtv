@@ -41,8 +41,7 @@
 HDHRSignalMonitor::HDHRSignalMonitor(
     int db_cardnum, HDHRChannel* _channel, uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    streamHandlerStarted(false), streamHandler(NULL),
-    lock_timeout(1000 * 30 /* 30 seconds */)
+    streamHandlerStarted(false), streamHandler(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
@@ -90,9 +89,6 @@ HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
  */
 void HDHRSignalMonitor::UpdateValues(void)
 {
-    if (lock_timer.elapsed() > lock_timeout)
-        error = "Timed out.";
-
     if (!running || exit)
         return;
 

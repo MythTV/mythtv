@@ -34,7 +34,6 @@ class CetonSignalMonitor: public DTVSignalMonitor
   protected:
     bool                streamHandlerStarted;
     CetonStreamHandler *streamHandler;
-    int                 lock_timeout;
 };
 
 #endif // CETONSIGNALMONITOR_H

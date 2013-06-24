@@ -302,7 +302,6 @@ void SignalMonitor::run(void)
     running = true;
     startStopWait.wakeAll();
 
-    lock_timer.start();
     while (!exit)
     {
         locker.unlock();

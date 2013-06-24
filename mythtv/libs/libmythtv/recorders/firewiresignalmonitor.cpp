@@ -52,8 +52,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(
     tableMonitorThread(NULL),
     stb_needs_retune(true),
     stb_needs_to_wait_for_pat(false),
-    stb_needs_to_wait_for_power(false),
-    lock_timeout(1000 * 30 /* 30 seconds */)
+    stb_needs_to_wait_for_power(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
@@ -192,9 +191,6 @@ void FirewireSignalMonitor::AddData(const unsigned char *data, uint len)
  */
 void FirewireSignalMonitor::UpdateValues(void)
 {
-    if (lock_timer.elapsed() > lock_timeout)
-        error = "Timed out.";
-
     if (!running || exit)
         return;
 

@@ -29,7 +29,6 @@ class ASISignalMonitor: public DTVSignalMonitor
   protected:
     bool              streamHandlerStarted;
     ASIStreamHandler *streamHandler;
-    int               lock_timeout;
 };
 
 #endif // ASISIGNALMONITOR_H

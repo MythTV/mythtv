@@ -53,8 +53,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       rotorPosition    (QObject::tr("Rotor Progress"),     "pos",
                         100,    true,      0,   100, 0),
       streamHandlerStarted(false),
-      streamHandler(NULL),
-      lock_timeout(1000 * 60 * 2 /* 2 minutes */)
+      streamHandler(NULL)
 {
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
@@ -210,9 +209,6 @@ DVBChannel *DVBSignalMonitor::GetDVBChannel(void)
  */
 void DVBSignalMonitor::UpdateValues(void)
 {
-    if (lock_timer.elapsed() > lock_timeout)
-        error = "Timed out.";
-
     if (!running || exit)
         return;
 
