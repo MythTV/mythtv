@@ -652,7 +652,8 @@ class MythDB( DBCache ):
             init.require = ('livetv',)
             init.joins = (init.Join(table='recordedprogram',
                                     tableto='recorded',
-                                    fields=('chanid','starttime')),
+                                    fieldsfrom=('chanid','starttime'),
+                                    fieldsto=('chanid','progstart')),
                           init.Join(table='recordedcredits',
                                     tableto='recorded',
                                     fieldsfrom=('chanid','starttime'),
