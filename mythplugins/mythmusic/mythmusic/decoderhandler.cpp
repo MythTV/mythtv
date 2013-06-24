@@ -756,7 +756,6 @@ MusicSGIODevice::MusicSGIODevice(const QString &url)
 
 MusicSGIODevice::~MusicSGIODevice(void)
 {
-    m_remotefile->Close();
     delete m_remotefile;
 }
 

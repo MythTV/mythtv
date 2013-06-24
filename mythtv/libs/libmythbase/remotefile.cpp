@@ -188,6 +188,9 @@ MythSocket *RemoteFile::openSocket(bool control)
 
 bool RemoteFile::Open(void)
 {
+    if (isOpen())
+        return true;
+
     QMutexLocker locker(&lock);
     controlSock = openSocket(true);
     if (!controlSock)
