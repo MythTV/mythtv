@@ -556,7 +556,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
                         "WHERE chanid = :CHANID";
 
         query.prepare(qstr);
-        query.bindValue(":ICON", file.absoluteFilePath());
+        query.bindValue(":ICON", filename);
         query.bindValue(":CHANID", localChanId);
 
         if (!query.exec())

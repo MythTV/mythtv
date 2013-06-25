@@ -193,6 +193,8 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     QString("Failed to fetch icon from '%1'")
                         .arg((*i).icon));
             }
+
+            localfile = filename;
         }
 
         MSqlQuery query(MSqlQuery::InitCon());
