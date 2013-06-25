@@ -176,11 +176,7 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device.
-
-      This library does not depend on any of our libraries.
-
-  <dt>libmythhdhomerun
+  <dt>libhdhomerun
       <dd>Interface to the SiliconDust HDHomeRun EtherNet connected TV tuner
       products.
 
