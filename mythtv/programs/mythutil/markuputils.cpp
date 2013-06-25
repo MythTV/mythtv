@@ -180,6 +180,7 @@ static int ClearSeekTable(const MythUtilCommandLineParser &cmdline)
     pginfo.ClearPositionMap(MARK_GOP_BYFRAME);
     pginfo.ClearPositionMap(MARK_GOP_START);
     pginfo.ClearPositionMap(MARK_KEYFRAME);
+    pginfo.ClearPositionMap(MARK_DURATION_MS);
 
     return GENERIC_EXIT_OK;
 }
