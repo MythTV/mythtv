@@ -3851,7 +3851,16 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             SetFlags(kFlagSignalMonitorRunning);
             ClearFlags(kFlagWaitingForSignal);
             if (!antadj)
+            {
                 SetFlags(kFlagWaitingForSignal);
+
+                QDateTime expire = curRecording->GetScheduledStartTime() >
+                                   MythDate::current() ?
+                                   curRecording->GetScheduledStartTime() :
+                                   MythDate::current();
+                signalMonitorDeadline =
+                    expire.addMSecs(genOpt.channel_timeout * 2);
+            }
         }
 
         if (has_dummy && ringBuffer)
@@ -3891,13 +3900,15 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     RecStatusType newRecStatus = rsRecording;
     if (signalMonitor->IsAllGood())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + "Got good signal");
+        LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Have a good signal");
     }
-    else if (signalMonitor->IsErrored())
+    else if (signalMonitor->IsErrored() ||
+             MythDate::current() > signalMonitorDeadline)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "SignalMonitor failed");
-        ClearFlags(kFlagNeedToStartRecorder);
+        LOG(VB_RECORD, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
+            (signalMonitor->IsErrored() ? "failed" : "timed out"));
 
+        ClearFlags(kFlagNeedToStartRecorder);
         newRecStatus = rsFailed;
 
         if (scanner && HasFlags(kFlagEITScannerRunning))
@@ -3908,6 +3919,9 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     }
     else
     {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("TuningSignalCheck: Still waiting.  Will timeout @ %1")
+            .arg(signalMonitorDeadline.toLocalTime().toString("hh:mm:ss.zzz")));
         return NULL;
     }
 

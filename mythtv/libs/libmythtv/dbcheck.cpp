@@ -1786,7 +1786,7 @@ NULL
 
         if (gCoreContext->GetNumSetting("LastFreeCard", 0))
         {
-            updates[2] = 
+            updates[2] =
                 "UPDATE cardinput SET livetvorder = "
                 "  (SELECT MAX(cardid) FROM capturecard) - cardid + 1;";
         }
@@ -2092,7 +2092,7 @@ NULL
                                  "SET airdate = "
                                  "    CONVERT_TZ(airdate, 'SYSTEM', 'UTC') "
                                  "ORDER BY %3")
-                         .arg((utc_offset > 0) ? "-airdate" : 
+                         .arg((utc_offset > 0) ? "-airdate" :
                               "airdate").toLocal8Bit());
 
             updates_ba.push_back(
@@ -2147,7 +2147,7 @@ NULL
             };
             const char *without_endtime[] = {
                 "recordedseek", "recordedmarkup", "recordedrating",
-                "recordedcredits", 
+                "recordedcredits",
             };
             QString order = (utc_offset > 0) ? "-starttime" : "starttime";
 
@@ -2292,7 +2292,7 @@ NULL
         if (!performActualUpdate(&updates[0], "1308", dbver))
             return false;
     }
-    
+
     if (dbver == "1308")
     {
         const char *updates[] = {
@@ -2413,6 +2413,30 @@ NULL
         if (!performActualUpdate(&updates[0], "1313", dbver))
             return false;
     }
+
+    if (dbver == "1313")
+    {
+        // Make sure channel timeouts are long enough.  No actual
+        // schema change.
+        const char *updates[] = {
+            "UPDATE capturecard SET channel_timeout = 3000 WHERE "
+            "cardtype = \"DVB\" AND channel_timeout < 3000;",
+            "UPDATE capturecard SET channel_timeout = 30000 WHERE "
+            "cardtype = \"FREEBOX\" AND channel_timeout < 30000;",
+            "UPDATE capturecard SET channel_timeout = 9000 WHERE "
+            "cardtype = \"FIREWIRE\" AND channel_timeout < 9000;",
+            "UPDATE capturecard SET channel_timeout = 3000 WHERE "
+            "cardtype = \"HDHOMERUN\" AND channel_timeout < 3000;",
+            "UPDATE capturecard SET channel_timeout = 15000 WHERE "
+            "cardtype = \"HDPVR\" AND channel_timeout < 15000;",
+            "UPDATE capturecard SET channel_timeout = 12000 WHERE "
+            "cardtype = \"MPEG\" AND channel_timeout < 12000;",
+            NULL
+        };
+        if (!performActualUpdate(&updates[0], "1314", dbver))
+            return false;
+    }
+
     return true;
 }
 
