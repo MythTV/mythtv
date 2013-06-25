@@ -67,6 +67,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Clear the commercial skip list.", "")
                 ->SetGroup("Recording Markup")
                 ->SetRequiredChild(QStringList("chanid") << "starttime")
+        << add("--clearseektable", "clearseektable", false,
+                "Clear the seek table.", "")
+                ->SetGroup("Recording Markup")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
 
         // backendutils.cpp
         << add("--resched", "resched", false,
