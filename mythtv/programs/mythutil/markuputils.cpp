@@ -166,6 +166,25 @@ static int ClearSkipList(const MythUtilCommandLineParser &cmdline)
     return SetMarkupList(cmdline, QString("skiplist"), QString(""));
 }
 
+static int ClearSeekTable(const MythUtilCommandLineParser &cmdline)
+{
+    ProgramInfo pginfo;
+    if (!GetProgramInfo(cmdline, pginfo))
+        return GENERIC_EXIT_NO_RECORDING_DATA;
+
+    cout << "Clearing Seek Table\n";
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Clearing Seek Table for Channel ID %1 @ %2")
+                .arg(pginfo.GetChanID())
+                .arg(pginfo.GetScheduledStartTime().toString()));
+    pginfo.ClearPositionMap(MARK_GOP_BYFRAME);
+    pginfo.ClearPositionMap(MARK_GOP_START);
+    pginfo.ClearPositionMap(MARK_KEYFRAME);
+    pginfo.ClearPositionMap(MARK_DURATION_MS);
+
+    return GENERIC_EXIT_OK;
+}
+
 void registerMarkupUtils(UtilMap &utilMap)
 {
     utilMap["gencutlist"]             = &CopySkipListToCutList;
@@ -175,6 +194,7 @@ void registerMarkupUtils(UtilMap &utilMap)
     utilMap["getskiplist"]            = &GetSkipList;
     utilMap["setskiplist"]            = &SetSkipList;
     utilMap["clearskiplist"]          = &ClearSkipList;
+    utilMap["clearseektable"]         = &ClearSeekTable;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

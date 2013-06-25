@@ -20,6 +20,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "settings.h"
+#include "mythdirs.h"
 #include "mythdb.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
@@ -210,7 +211,10 @@ void ChannelEditor::itemChanged(MythUIButtonListItem *item)
         QString iconpath = item->GetImageFilename();
         if (!iconpath.isEmpty())
         {
-            m_preview->SetFilename(iconpath);
+            // mythtv-setup needs direct access to channel icon dir to import.  We
+            // also can't rely on the backend to be running, so access the file directly
+            QString tmpIcon = GetConfDir() + "/channels/" + iconpath;
+            m_preview->SetFilename(tmpIcon);
             m_preview->Load();
         }
     }
@@ -335,8 +339,13 @@ void ChannelEditor::fillList(void)
             item->SetText(chanid, "chanid");
             item->SetText(callsign, "callsign");
             item->SetText(sourceid, "sourcename");
-            item->SetImage(icon);
-            item->SetImage(icon, "icon");
+
+            // mythtv-setup needs direct access to channel icon dir to import.  We
+            // also can't rely on the backend to be running, so access the file directly
+            QString tmpIcon = GetConfDir() + "/channels/" + icon;
+            item->SetImage(tmpIcon);
+            item->SetImage(tmpIcon, "icon");
+
             item->DisplayState(state, "status");
         }
     }
@@ -669,7 +678,16 @@ void ChannelEditor::customEvent(QEvent *event)
                 mainStack->AddScreen(iconwizard);
             }
             else
+            {
                 delete iconwizard;
+
+                if (buttonnum == 2)
+                {
+                    // Reload the list since ImportIconsWizard::Create() will return false
+                    // if it automatically downloaded an icon for the selected channel
+                    fillList();
+                }
+            }
         }
     }
 }
