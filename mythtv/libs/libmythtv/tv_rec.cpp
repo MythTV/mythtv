@@ -4248,6 +4248,7 @@ void TVRec::TuningRestartRecorder(void)
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
         RecordingInfo recinfo(*progInfo);
         delete progInfo;
+        recinfo.SetCardID(cardid);
         recorder->SetRecording(&recinfo);
     }
     recorder->Reset();
