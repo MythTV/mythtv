@@ -349,9 +349,13 @@ bool MHIContext::CheckCarouselObject(QString objectPath)
 {
     if (objectPath.startsWith("http:") || objectPath.startsWith("https:"))
     {
-        // TODO verify access to server in carousel file auth.servers
-        // TODO use TLS cert from carousel auth.tls.<x>
-        return m_ic.CheckFile(objectPath);
+        QByteArray cert;
+
+        // Verify access to server
+        if (!CheckAccess(objectPath, cert))
+            return false;
+
+        return m_ic.CheckFile(objectPath, cert);
     }
 
     QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
@@ -361,11 +365,64 @@ bool MHIContext::CheckCarouselObject(QString objectPath)
     return res == 0; // It's available now.
 }
 
+bool MHIContext::GetDSMCCObject(const QString &objectPath, QByteArray &result)
+{
+    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
+    QMutexLocker locker(&m_dsmccLock);
+    int res = m_dsmcc->GetDSMCCObject(path, result);
+    return (res == 0);
+}
+
+bool MHIContext::CheckAccess(const QString &objectPath, QByteArray &cert)
+{
+    cert.clear();
+
+    // Verify access to server
+    QByteArray servers;
+    if (!GetDSMCCObject("/auth.servers", servers))
+    {
+        LOG(VB_MHEG, LOG_INFO, QString(
+            "[mhi] CheckAccess(%1) No auth.servers").arg(objectPath) );
+        return false;
+    }
+
+    QByteArray host = QUrl(objectPath).host().toLocal8Bit();
+    if (!servers.contains(host))
+    {
+        LOG(VB_MHEG, LOG_INFO, QString("[mhi] CheckAccess(%1) Host not known")
+            .arg(objectPath) );
+        LOG(VB_MHEG, LOG_DEBUG, QString("[mhi] Permitted servers: %1")
+            .arg(servers.constData()) );
+
+        // BUG: https://securegate.iplayer.bbc.co.uk is not listed
+        if (!objectPath.startsWith("https:"))
+            return false;
+    }
+
+    if (!objectPath.startsWith("https:"))
+        return true;
+
+    // Use TLS cert from carousel file auth.tls.<x>
+    if (!GetDSMCCObject("/auth.tls.1", cert))
+        return false;
+
+    // The cert has a 5 byte header: 16b cert_count + 24b cert_len
+    cert = cert.mid(5);
+    return true;
+}
+
 // Called by the engine to request data from the carousel.
 // Caller must hold m_runLock
 bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 {
+    QByteArray cert;
     bool const isIC = objectPath.startsWith("http:") || objectPath.startsWith("https:");
+    if (isIC)
+    {
+        // Verify access to server
+        if (!CheckAccess(objectPath, cert))
+            return false;
+    }
 
     // Get the path components.  The string will normally begin with "//"
     // since this is an absolute path but that will be removed by split.
@@ -380,9 +437,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
     {
         if (isIC)
         {
-            // TODO verify access to server in carousel file auth.servers
-            // TODO use TLS cert from carousel file auth.tls.<x>
-            switch (m_ic.GetFile(objectPath, result))
+            switch (m_ic.GetFile(objectPath, result, cert))
             {
             case MHInteractionChannel::kSuccess:
                 if (bReported)
