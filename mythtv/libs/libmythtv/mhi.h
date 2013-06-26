@@ -165,6 +165,9 @@ class MHIContext : public MHContext, public QRunnable
     void NetworkBootRequested(void);
     void ClearDisplay(void);
     void ClearQueue(void);
+    bool LoadChannelCache();
+    bool GetDSMCCObject(const QString &objectPath, QByteArray &result);
+    bool CheckAccess(const QString &objectPath, QByteArray &cert);
 
     InteractiveTV   *m_parent;
 
