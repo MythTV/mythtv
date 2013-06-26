@@ -200,7 +200,7 @@ int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
     // Resume SPRM
     for(idx = 0; idx < 5 && consumed > 0; idx++)
     {
-      sscanf(buf, "0x%hx,%n", &new_state.registers.SPRM[idx], &consumed);
+      sscanf(buf, "0x%hx,%n", &new_state.rsm_regs[idx], &consumed);
       buf += consumed;
     }
 
