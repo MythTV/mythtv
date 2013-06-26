@@ -3854,10 +3854,19 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             {
                 SetFlags(kFlagWaitingForSignal);
 
-                QDateTime expire = curRecording->GetScheduledStartTime() >
-                                   MythDate::current() ?
-                                   curRecording->GetScheduledStartTime() :
-                                   MythDate::current();
+                QDateTime expire;
+                if (curRecording)
+                {
+                    expire = curRecording->GetScheduledStartTime() >
+                             MythDate::current() ?
+                             curRecording->GetScheduledStartTime() :
+                             MythDate::current();
+                }
+                else
+                {
+                    expire = MythDate::current();
+                }
+
                 signalMonitorDeadline =
                     expire.addMSecs(genOpt.channel_timeout * 2);
             }
