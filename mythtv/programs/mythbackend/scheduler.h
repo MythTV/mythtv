@@ -169,9 +169,7 @@ class Scheduler : public MThread, public MythScheduler
     void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
     bool HandleRecording(RecordingInfo &ri, bool &statuschanged,
                          QDateTime &nextStartTime, QDateTime &nextWakeTime,
-                         int prerollseconds, int tuningTimeout);
-    void HandleTuning(RecordingInfo &ri, bool &statuschanged,
-                      QDateTime &nextWakeTime, int tuningTimeout);
+                         int prerollseconds);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatusTypes recStatus, const QString &details);
     void HandleIdleShutdown(
