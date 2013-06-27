@@ -18,6 +18,7 @@
 #include "mythscreentype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuiprogressbar.h"
 
 #define LOC QString("NotificationCenter: ")
 
@@ -45,24 +46,44 @@ public:
 
     void UpdateArtwork(const QImage &image);
     void UpdateMetaData(const DMAP &data);
+    void UpdatePlayback(int duration, int position);
 
-    int             m_id;
-    QImage          m_image;
-    QString         m_title;
-    QString         m_artist;
-    QString         m_album;
-    QString         m_format;
-    MythUIImage    *m_artworkImage;
-    MythUIText     *m_titleText;
-    MythUIText     *m_artistText;
-    MythUIText     *m_albumText;
-    MythUIText     *m_formatText;
-    bool            m_added;
+    QString stringFromSeconds(int time);
+
+    enum Update {
+        kForce      = 0,
+        kImage      = 1 << 0,
+        kDuration   = 1 << 1,
+        kMetaData   = 1 << 2,
+    };
+
+    int                 m_id;
+    QImage              m_image;
+    QString             m_title;
+    QString             m_artist;
+    QString             m_album;
+    QString             m_format;
+    int                 m_duration;
+    int                 m_position;
+    bool                m_added;
+    uint32_t            m_update;
+    MythUIImage        *m_artworkImage;
+    MythUIText         *m_titleText;
+    MythUIText         *m_artistText;
+    MythUIText         *m_albumText;
+    MythUIText         *m_formatText;
+    MythUIText         *m_timeText;
+    MythUIProgressBar  *m_progressBar;
 };
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
-    : MythScreenType(stack, "mythuinotification"), m_id(id), m_added(false)
+    : MythScreenType(stack, "mythuinotification"),  m_id(id),
+      m_duration(-1),       m_position(-1),         m_added(false),
+      m_update(0),
+      m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
+      m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
+      m_progressBar(NULL)
 {
 }
 
@@ -70,11 +91,89 @@ MythUINotificationScreen::~MythUINotificationScreen()
 {
 }
 
+/**
+ * stringFromSeconds:
+ *
+ * Usage: stringFromSeconds(seconds)
+ * Description: create a string in the format HH:mm:ss from a duration in seconds
+ * HH: will not be displayed if there's less than one hour
+ */
+QString MythUINotificationScreen::stringFromSeconds(int time)
+{
+    int   hour    = time / 3600;
+    int   minute  = (time - hour * 3600) / 60;
+    int seconds   = time - hour * 3600 - minute * 60;
+    QString str;
+
+    if (hour)
+    {
+        str += QString("%1:").arg(hour);
+    }
+    if (minute < 10)
+    {
+        str += "0";
+    }
+    str += QString("%1:").arg(minute);
+    if (seconds < 10)
+    {
+        str += "0";
+    }
+    str += QString::number(seconds);
+    return str;
+}
+
 void MythUINotificationScreen::SetNotification(MythNotification &notification)
 {
-    if (dynamic_cast<MythImageNotification*>(&notification))
+    bool update = notification.type() == MythNotification::Update;
+    m_update = kForce;
+
+    MythImageNotification *img =
+        dynamic_cast<MythImageNotification*>(&notification);
+    if (img)
     {
-        UpdateArtwork(static_cast<MythImageNotification*>(&notification)->GetImage());
+        UpdateArtwork(img->GetImage());
+        m_update |= kImage;
+        if (m_artworkImage)
+        {
+            m_artworkImage->SetVisible(true);
+        }
+    }
+    else if (!update)
+    {
+        if (m_artworkImage)
+        {
+            m_artworkImage->SetVisible(false);
+        }
+    }
+    MythPlaybackNotification *play =
+        dynamic_cast<MythPlaybackNotification*>(&notification);
+    if (play)
+    {
+        UpdatePlayback(play->GetDuration(), play->GetPosition());
+        m_update |= kDuration;
+        if (m_progressBar)
+        {
+            m_progressBar->SetVisible(true);
+        }
+        if (m_timeText)
+        {
+            m_timeText->SetVisible(true);
+        }
+    }
+    else if (!update)
+    {
+        if (m_progressBar)
+        {
+            m_progressBar->SetVisible(false);
+        }
+        if (m_timeText)
+        {
+            m_timeText->SetVisible(false);
+        }
+    }
+    if (update)
+    {
+        m_update |= kMetaData;
     }
     UpdateMetaData(notification.GetMetaData());
 }
@@ -97,20 +196,26 @@ bool MythUINotificationScreen::Create(void)
     m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("coverart"));
     if (!m_artworkImage)
         return false;
-
+    m_artworkImage->SetVisible(false);
     m_titleText     = dynamic_cast<MythUIText*>(GetChild("title"));
     m_artistText    = dynamic_cast<MythUIText*>(GetChild("artist"));
     m_albumText     = dynamic_cast<MythUIText*>(GetChild("album"));
     m_formatText    = dynamic_cast<MythUIText*>(GetChild("info"));
+    m_timeText      = dynamic_cast<MythUIText*>(GetChild("time"));
+    m_timeText->SetVisible(false);
+    m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
+    m_progressBar->SetVisible(false);
     return true;
 }
 
 /**
  * Update the various fields of a MythUINotificationScreen
+ * If metadata update flag is set; a Null string means to leave the text field
+ * unchanged
  */
 void MythUINotificationScreen::Init(void)
 {
-    if (m_artworkImage)
+    if (m_artworkImage && (m_update & kImage))
     {
         if (!m_image.isNull())
         {
@@ -129,9 +234,9 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_titleText)
+    if (m_titleText && !(m_title.isNull() && (m_update & kMetaData)))
     {
-        if (!m_title.isEmpty())
+        if (!m_title.isNull())
         {
             m_titleText->SetText(m_title);
         }
@@ -143,9 +248,9 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_artistText)
+    if (m_artistText && !(m_artist.isNull() && (m_update & kMetaData)))
     {
-        if (!m_artist.isEmpty())
+        if (!m_artist.isNull())
         {
             m_artistText->SetText(m_artist);
         }
@@ -157,9 +262,9 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_albumText)
+    if (m_albumText && !(m_album.isNull() && (m_update & kMetaData)))
     {
-        if (!m_album.isEmpty())
+        if (!m_album.isNull())
         {
             m_albumText->SetText(m_album);
         }
@@ -171,9 +276,9 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_formatText)
+    if (m_formatText && !(m_title.isNull() && (m_update & kMetaData)))
     {
-        if (!m_format.isEmpty())
+        if (!m_format.isNull())
         {
             m_formatText->SetText(m_format);
         }
@@ -184,6 +289,40 @@ void MythUINotificationScreen::Init(void)
             m_formatText->Reset();
         }
     }
+
+    if (m_timeText && (m_update & kDuration))
+    {
+        if (m_duration >= 0)
+        {
+            m_timeText->SetText(stringFromSeconds(m_duration));
+        }
+        else
+        {
+            // Same as above, calling Reset() allows for a sane, themer defined
+            //default to be displayed
+            m_timeText->Reset();
+        }
+    }
+
+    if (m_progressBar && (m_update & kDuration))
+    {
+        if (m_duration >= 0 && m_position >= 0)
+        {
+            m_progressBar->SetStart(0);
+            m_progressBar->SetTotal(m_duration);
+            m_progressBar->SetUsed(m_position);
+        }
+        else
+        {
+            // Same as above, calling Reset() allows for a sane, themer defined
+            //default to be displayed
+            m_progressBar->Reset();
+        }
+    }
+
+    // All field will be refreshed the next time unless specified otherwise
+    m_update = kForce;
+
     if (!m_added)
     {
         GetScreenStack()->AddScreen(this);
@@ -203,13 +342,43 @@ void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 /**
  * Read some DMAP tag to extract title, artist, album and file format
  * must call Init() for screen to be updated
+ * If metadata update flag is set; a Null string means to leave the text field
+ * unchanged
  */
 void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
 {
-    m_title     = data["minm"];
-    m_artist    = data["asar"];
-    m_album     = data["asal"];
-    m_format    = data["asfm"];
+    QString tmp;
+
+    tmp = data["minm"];
+    if (!(tmp.isNull() && (m_update & kMetaData)))
+    {
+        m_title = tmp;
+    }
+    tmp = data["asar"];
+    if (!(tmp.isNull() && (m_update & kMetaData)))
+    {
+        m_artist = tmp;
+    }
+    tmp = data["asal"];
+    if (!(tmp.isNull() && (m_update & kMetaData)))
+    {
+        m_album = tmp;
+    }
+    tmp = data["asfm"];
+    if (!(tmp.isNull() && (m_update & kMetaData)))
+    {
+        m_format = tmp;
+    }
+}
+
+/**
+ * Update playback position information
+ * must call Init() for screen to be updated
+ */
+void MythUINotificationScreen::UpdatePlayback(int duration, int position)
+{
+    m_duration  = duration;
+    m_position  = position;
 }
 
 /////////////////////// MythUINotificationCenter
@@ -378,7 +547,7 @@ void MythUINotificationCenter::ProcessQueue(void)
             }
         }
         screen->SetNotification(*n);
-        screen->Init();
+        screen->doInit();
         delete n;
     }
     m_notifications.clear();

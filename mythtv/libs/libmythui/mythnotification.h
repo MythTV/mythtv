@@ -20,15 +20,15 @@ typedef QMap<QString,QString> DMAP;
 
 class MUI_PUBLIC MythNotification : public MythEvent
 {
-  public:
+public:
 
     static Type New;
     static Type Update;
     static Type Info;
     static Type Error;
 
-    MythNotification(Type t, void *parent = NULL) :
-        MythEvent(t), m_id(-1), m_parent(parent), m_fullScreen(false),
+    MythNotification(Type t, void *parent = NULL)
+        : MythEvent(t), m_id(-1), m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
 
     {
@@ -75,7 +75,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
         kMusic      = (1 << 5),
         kRecordings = (1 << 6),
     };
-    
+
     // Setter
     /**
      * Optional MythNotification elements
@@ -127,8 +127,9 @@ class MUI_PUBLIC MythNotification : public MythEvent
     Visibility  GetVisibility(void)     { return m_visibility; }
     Priority    GetPriority(void)       { return m_priority; }
 
-  protected:
-    MythNotification(const MythNotification &o) : MythEvent(o),
+protected:
+    MythNotification(const MythNotification &o)
+        : MythEvent(o),
         m_id(o.m_id),      m_parent(o.m_parent),   m_fullScreen(o.m_fullScreen),
         m_description(o.m_description),
         m_duration(o.m_duration),                  m_metadata(o.m_metadata),
@@ -138,10 +139,10 @@ class MUI_PUBLIC MythNotification : public MythEvent
 
     MythNotification &operator=(const MythNotification&);
 
-  protected:
-    int         m_id;       
+protected:
+    int         m_id;
     void       *m_parent;
-    bool        m_fullScreen; 
+    bool        m_fullScreen;
     QString     m_description;
     int         m_duration;
     DMAP        m_metadata;
@@ -149,11 +150,16 @@ class MUI_PUBLIC MythNotification : public MythEvent
     Priority    m_priority;
 };
 
-class MUI_PUBLIC MythImageNotification : public MythNotification
+class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 {
 public:
-    MythImageNotification(Type t, QImage &image, DMAP &metadata) :
-        MythNotification(t), m_image(image)
+    MythImageNotification(Type t)
+        : MythNotification(t)
+    {
+    }
+
+    MythImageNotification(Type t, QImage &image, DMAP &metadata)
+        : MythNotification(t), m_image(image)
     {
         m_metadata = metadata;
     }
@@ -170,15 +176,75 @@ public:
     QImage GetImage(void)               { return m_image; }
 
 protected:
-    MythImageNotification(const MythImageNotification &o) : MythNotification(o),
-        m_image(o.m_image)
+    MythImageNotification(const MythImageNotification &o)
+        : MythNotification(o), m_image(o.m_image)
     {
     }
 
     MythImageNotification &operator=(const MythImageNotification&);
 
-private:
+protected:
     QImage      m_image;
+};
+
+class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
+{
+public:
+    MythPlaybackNotification(Type t, int duration, int position)
+        : MythNotification(t), m_duration(duration), m_position(position)
+    {
+    }
+
+    virtual MythEvent *clone(void) const { return new MythPlaybackNotification(*this); }
+
+    // Setter
+    /**
+     * duration to be displayed with the notification
+     */
+    void SetDuration(int duration)      { m_duration = duration; }
+    /**
+     * current playback position to be displayed with the notification
+     */
+    void SetPosition(int position)      { m_position = position; }
+
+    //Getter
+    int GetDuration(void)               { return m_duration; }
+    int GetPosition(void)               { return m_position; }
+
+protected:
+    MythPlaybackNotification(const MythPlaybackNotification &o)
+        : MythNotification(o),
+        m_duration(o.m_duration), m_position(o.m_position)
+    {
+    }
+
+    MythPlaybackNotification &operator=(const MythPlaybackNotification&);
+
+protected:
+    int         m_duration;
+    int         m_position;
+};
+
+class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
+                                         public MythPlaybackNotification
+{
+public:
+    MythMediaNotification(Type t, QImage &image, DMAP &metadata,
+                          int duration, int position)
+        : MythNotification(t), MythImageNotification(t, image, metadata),
+        MythPlaybackNotification(t, duration, position)
+    {
+    }
+
+    virtual MythEvent *clone(void) const { return new MythMediaNotification(*this); }
+
+protected:
+    MythMediaNotification(const MythMediaNotification &o)
+        : MythNotification(o), MythImageNotification(o), MythPlaybackNotification(o)
+    {
+    }
+
+    MythMediaNotification &operator=(const MythMediaNotification&);
 };
 
 #endif /* defined(__MythTV__mythnotification__) */
