@@ -1371,15 +1371,15 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         .arg(stringFromSeconds(length)));
                 }
             }
-            else if(tags["Content-Type"] == "image/jpeg")
-            {
-                // Receiving image coverart
-                m_artwork = content;
-                SendNotification();
-            }
             else if(tags["Content-Type"] == "image/none")
             {
                 m_artwork.clear();
+                SendNotification();
+            }
+            else if(tags["Content-Type"].startsWith("image/"))
+            {
+                // Receiving image coverart
+                m_artwork = content;
                 SendNotification();
             }
             else if (tags["Content-Type"] == "application/x-dmap-tagged")
