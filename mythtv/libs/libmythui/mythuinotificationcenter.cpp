@@ -226,15 +226,24 @@ MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
     if (g_singleton)
         return g_singleton;
 
-    g_singleton = new MythUINotificationCenter();
+    const bool isGuiThread =
+        QThread::currentThread() == QCoreApplication::instance()->thread();
 
+    if (!isGuiThread)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Constructor not called from GUI thread");
+    }
+    else
+    {
+        g_singleton = new MythUINotificationCenter();
+    }
     return g_singleton;
 }
 
 MythUINotificationCenter::MythUINotificationCenter() : m_screenStack(NULL)
 {
     const bool isGuiThread =
-    QThread::currentThread() == QCoreApplication::instance()->thread();
+        QThread::currentThread() == QCoreApplication::instance()->thread();
 
     if (!isGuiThread)
     {
@@ -244,8 +253,34 @@ MythUINotificationCenter::MythUINotificationCenter() : m_screenStack(NULL)
 
 MythUINotificationCenter::~MythUINotificationCenter()
 {
+    const bool isGuiThread =
+        QThread::currentThread() == QCoreApplication::instance()->thread();
+
+    if (!isGuiThread)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Destructor not called from GUI thread");
+    }
+
+    QMutexLocker lock(&m_lock);
+
+    DeleteAllScreens();
+
+    // Delete all outstanding queued notifications
+    foreach(MythNotification *n, m_notifications)
+    {
+        delete n;
+    }
+    m_notifications.clear();
+
     delete m_screenStack;
     m_screenStack = NULL;
+
+    // if we're deleting global instancce; set g_singleton to 0
+    // in practice this is always the case
+    if (this == g_singleton)
+    {
+        g_singleton = NULL;
+    }
 }
 
 /**
@@ -276,6 +311,10 @@ void MythUINotificationCenter::ScreenDeleted(void)
 bool MythUINotificationCenter::Queue(MythNotification &notification)
 {
     QMutexLocker lock(&m_lock);
+
+    // Just in case we got deleted half-way while GUI thread was quitting
+    if (!g_singleton)
+        return false;
 
     int id = notification.GetId();
     void *parent = notification.GetParent();
@@ -316,16 +355,7 @@ void MythUINotificationCenter::ProcessQueue(void)
         return;
     }
 
-    // delete all screens waiting to be deleted
-    while(!m_deletedScreens.isEmpty())
-    {
-        MythUINotificationScreen *screen = m_deletedScreens.last();
-        // we remove the screen from the list before deleting the screen
-        // so the MythScreenType::Exiting() signal won't process it a second time
-        m_deletedScreens.removeLast();
-        screen->GetScreenStack()->PopScreen(screen, true, true);
-    }
-    m_deletedScreens.clear();
+    DeleteAllScreens();
 
     foreach (MythNotification *n, m_notifications)
     {
@@ -378,6 +408,10 @@ int MythUINotificationCenter::Register(void *from)
 {
     QMutexLocker lock(&m_lock);
 
+    // Just in case we got deleted half-way while GUI thread was quitting
+    if (!g_singleton)
+        return false;
+
     if (!from)
         return -1;
 
@@ -391,6 +425,10 @@ int MythUINotificationCenter::Register(void *from)
 void MythUINotificationCenter::UnRegister(void *from, int id)
 {
     QMutexLocker lock(&m_lock);
+
+    // Just in case we got deleted half-way while GUI thread was quitting
+    if (!g_singleton)
+        return;
 
     if (!m_registrations.contains(id))
     {
@@ -431,4 +469,17 @@ MythScreenStack *MythUINotificationCenter::GetScreenStack(void)
                                             "mythuinotification");
     }
     return m_screenStack;
+}
+
+void MythUINotificationCenter::DeleteAllScreens(void)
+{
+    // delete all screens waiting to be deleted
+    while(!m_deletedScreens.isEmpty())
+    {
+        MythUINotificationScreen *screen = m_deletedScreens.last();
+        // we remove the screen from the list before deleting the screen
+        // so the MythScreenType::Exiting() signal won't process it a second time
+        m_deletedScreens.removeLast();
+        screen->GetScreenStack()->PopScreen(screen, true, true);
+    }
 }

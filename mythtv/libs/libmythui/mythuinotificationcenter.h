@@ -79,6 +79,7 @@ private slots:
 private:
     MythUINotificationScreen *CreateScreen(int id);
     MythScreenStack *GetScreenStack(void);
+    void DeleteAllScreens(void);
 
 private:
     MythScreenStack                        *m_screenStack;

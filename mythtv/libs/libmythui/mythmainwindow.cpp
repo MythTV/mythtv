@@ -195,8 +195,6 @@ class MythMainWindowPrivate
         standby(false),
         enteringStandby(false)
     {
-        // Will create Notification Center singleton
-        (void)MythUINotificationCenter::GetInstance();
     }
 
     int TranslateKeyNum(QKeyEvent *e);
@@ -523,6 +521,9 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     d->idleTimer->start();
+
+    // Will create Notification Center singleton
+    (void)MythUINotificationCenter::GetInstance();
 }
 
 MythMainWindow::~MythMainWindow()
@@ -588,6 +589,8 @@ MythMainWindow::~MythMainWindow()
 #endif
 
     delete d;
+
+    delete MythUINotificationCenter::GetInstance();
 }
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)
