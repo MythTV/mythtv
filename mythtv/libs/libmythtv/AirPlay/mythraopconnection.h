@@ -13,6 +13,8 @@
 
 #include "mythtvexp.h"
 
+#include "mythnotification.h"
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
@@ -106,6 +108,9 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     QString     stringFromSeconds(int seconds);
     uint64_t    framesToMs(uint64_t frames);
 
+    // notification functions
+    void        SendNotification(void);
+
     QTimer         *m_watchdogTimer;
     // comms socket
     QTcpSocket     *m_socket;
@@ -177,10 +182,13 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     uint32_t        m_progressCurrent;
     uint32_t        m_progressEnd;
     QByteArray      m_artwork;
-    QByteArray      m_dmap;
+    DMAP            m_dmap;
 
     //Authentication
     QString         m_nonce;
+
+    // Notification Center registration Id
+    int             m_id;
 
   private slots:
     void ProcessAudio(void);

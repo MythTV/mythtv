@@ -15,6 +15,8 @@
 #include "mythraopconnection.h"
 #include "mythairplayserver.h"
 
+#include "mythuinotificationcenter.h"
+
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
 
@@ -82,6 +84,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_audioTimer(NULL),
     m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0)
 {
+    m_id = MythUINotificationCenter::GetInstance()->Register(this);
 }
 
 MythRAOPConnection::~MythRAOPConnection()
@@ -116,6 +119,11 @@ MythRAOPConnection::~MythRAOPConnection()
     {
         delete m_textStream;
         m_textStream = NULL;
+    }
+
+    if (m_id > 0)
+    {
+        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
     }
 }
 
@@ -1367,15 +1375,22 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             {
                 // Receiving image coverart
                 m_artwork = content;
+                SendNotification();
+            }
+            else if(tags["Content-Type"] == "image/none")
+            {
+                m_artwork.clear();
+                SendNotification();
             }
             else if (tags["Content-Type"] == "application/x-dmap-tagged")
             {
                 // Receiving DMAP metadata
-                QMap<QString,QString> map = decodeDMAP(content);
+                m_dmap = decodeDMAP(content);
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Receiving Title:%1 Artist:%2 Album:%3 Format:%4")
-                    .arg(map["minm"]).arg(map["asar"])
-                    .arg(map["asal"]).arg(map["asfm"]));
+                    .arg(m_dmap["minm"]).arg(m_dmap["asar"])
+                    .arg(m_dmap["asal"]).arg(m_dmap["asfm"]));
+                SendNotification();
             }
         }
     }
@@ -1737,4 +1752,16 @@ void MythRAOPConnection::deleteEventClient(void)
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("%1:%2 disconnected from RAOP events server.")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
+}
+
+void MythRAOPConnection::SendNotification(void)
+{
+    QImage image = m_artwork.isEmpty() ? QImage() : QImage::fromData(m_artwork);
+    MythImageNotification *notification =
+    new MythImageNotification(MythImageNotification::Update,
+                              image, m_dmap);
+    notification->SetId(m_id);
+    notification->SetParent(this);
+    MythUINotificationCenter::GetInstance()->Queue(*notification);
+    delete notification;
 }
