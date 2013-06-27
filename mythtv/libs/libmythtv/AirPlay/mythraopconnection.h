@@ -109,7 +109,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     uint64_t    framesToMs(uint64_t frames);
 
     // notification functions
-    void        SendNotification(void);
+    void        SendNotification(bool update = false);
 
     QTimer         *m_watchdogTimer;
     // comms socket

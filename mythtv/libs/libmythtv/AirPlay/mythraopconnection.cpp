@@ -267,8 +267,8 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
             return;
 
         case FIRSTAUDIO_DATA:
-            m_nextSequence  = seq;
-            m_nextTimestamp = timestamp;
+            m_nextSequence      = seq;
+            m_nextTimestamp     = timestamp;
             // With iTunes we know what the first sequence is going to be.
             // iOS device do not tell us before streaming start what the first
             // packet is going to be.
@@ -304,9 +304,9 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         if (m_streamingStarted && seq != m_nextSequence)
             SendResendRequest(timestamp, m_nextSequence, seq);
 
-        m_nextSequence     = seq + 1;
-        m_nextTimestamp    = timestamp;
-        m_streamingStarted = true;
+        m_nextSequence      = seq + 1;
+        m_nextTimestamp     = timestamp;
+        m_streamingStarted  = true;
     }
 
     if (!m_streamingStarted)
@@ -359,6 +359,12 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
     m_currentTimestamp  = current;
     m_nextTimestamp     = next;
     m_bufferLength      = m_nextTimestamp - m_currentTimestamp;
+
+    if (current_ts > m_progressStart)
+    {
+        m_progressCurrent = next_ts;
+        SendNotification(false);
+    }
 
     if (first)
     {
@@ -1318,7 +1324,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (gotRTP)
         {
             m_nextSequence     = RTPseq;
-            m_nextTimestamp    = RTPtimestamp;
+            m_nextTimestamp    = framesToMs(RTPtimestamp);
             m_currentTimestamp = m_nextTimestamp - m_bufferLength;
         }
         // determine RTP timestamp of last sample played
@@ -1369,18 +1375,19 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                         LOC +QString("Progress: %1/%2")
                         .arg(stringFromSeconds(current))
                         .arg(stringFromSeconds(length)));
+                    SendNotification(true);
                 }
             }
             else if(tags["Content-Type"] == "image/none")
             {
                 m_artwork.clear();
-                SendNotification();
+                SendNotification(false);
             }
             else if(tags["Content-Type"].startsWith("image/"))
             {
                 // Receiving image coverart
                 m_artwork = content;
-                SendNotification();
+                SendNotification(false);
             }
             else if (tags["Content-Type"] == "application/x-dmap-tagged")
             {
@@ -1390,7 +1397,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                     QString("Receiving Title:%1 Artist:%2 Album:%3 Format:%4")
                     .arg(m_dmap["minm"]).arg(m_dmap["asar"])
                     .arg(m_dmap["asal"]).arg(m_dmap["asfm"]));
-                SendNotification();
+                SendNotification(false);
             }
         }
     }
@@ -1754,14 +1761,28 @@ void MythRAOPConnection::deleteEventClient(void)
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 }
 
-void MythRAOPConnection::SendNotification(void)
+void MythRAOPConnection::SendNotification(bool update)
 {
     QImage image = m_artwork.isEmpty() ? QImage() : QImage::fromData(m_artwork);
-    MythImageNotification *notification =
-    new MythImageNotification(MythImageNotification::Update,
-                              image, m_dmap);
-    notification->SetId(m_id);
-    notification->SetParent(this);
-    MythUINotificationCenter::GetInstance()->Queue(*notification);
-    delete notification;
+    int duration  =
+        (float)(m_progressEnd-m_progressStart) / m_frameRate + 0.5f;
+    int position =
+        (m_progressCurrent-m_progressStart) / m_frameRate;
+
+    MythNotification *n;
+
+    if (!update)
+    {
+        n = new MythMediaNotification(MythNotification::New,
+                                      image, m_dmap, duration, position);
+    }
+    else
+    {
+        n = new MythPlaybackNotification(MythNotification::Update,
+                                         duration, position);
+    }
+    n->SetId(m_id);
+    n->SetParent(this);
+    MythUINotificationCenter::GetInstance()->Queue(*n);
+    delete n;
 }
