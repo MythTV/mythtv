@@ -182,8 +182,8 @@ class MTV_PUBLIC MythPlayer
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
-    virtual  int64_t GetSecondsPlayed(bool honorCutList);
-    virtual  int64_t GetTotalSeconds(void) const;
+    virtual  int64_t GetSecondsPlayed(bool honorCutList) const;
+    virtual  int64_t GetTotalSeconds(bool honorCutList) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const

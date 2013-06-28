@@ -459,20 +459,37 @@ long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
     return MythPlayer::CalcMaxFFTime(ff, setjump);
 }
 
-int64_t MythDVDPlayer::GetSecondsPlayed(bool)
+int64_t MythDVDPlayer::GetSecondsPlayed(bool) const
 {
     if (!player_ctx->buffer->IsDVD())
         return 0;
 
-    return (m_stillFrameLength > 0) ?
-                (m_stillFrameTimer.elapsed() / 1000) :
-                (player_ctx->buffer->DVD()->GetCurrentTime());
+    int64_t played = player_ctx->buffer->DVD()->GetCurrentTime();
 
+    if (m_stillFrameLength > 0)
+    {
+        if (m_stillFrameLength == 255)
+            played = -1;
+        else
+            played = m_stillFrameTimer.elapsed() / 1000;
+    }
+
+    return played;
 }
 
-int64_t MythDVDPlayer::GetTotalSeconds(void) const
+int64_t MythDVDPlayer::GetTotalSeconds(bool /*honorCutList*/) const
 {
-    return (m_stillFrameLength > 0) ? m_stillFrameLength: totalLength;
+    int64_t total = totalLength;
+
+    if (m_stillFrameLength > 0)
+    {
+        if (m_stillFrameLength == 255)
+            total = -1;
+        else
+            total = m_stillFrameLength;
+    }
+
+    return total;
 }
 
 void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
