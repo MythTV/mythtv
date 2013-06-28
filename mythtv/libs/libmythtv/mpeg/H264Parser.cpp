@@ -116,14 +116,16 @@ void H264Parser::Reset(void)
     prev_pic_parameter_set_id = pic_parameter_set_id = -1;
     prev_field_pic_flag = field_pic_flag = -1;
     prev_bottom_field_flag = bottom_field_flag = -1;
-    prev_nal_ref_idc = nal_ref_idc = 0;
+    prev_nal_ref_idc = nal_ref_idc = 111;  //  != [0|1|2|3]
     prev_pic_order_cnt_type = pic_order_cnt_type =
     prev_pic_order_cnt_lsb = pic_order_cnt_lsb = 0;
     prev_delta_pic_order_cnt_bottom = delta_pic_order_cnt_bottom = 0;
     prev_delta_pic_order_cnt[0] = delta_pic_order_cnt[0] = 0;
     prev_delta_pic_order_cnt[1] = delta_pic_order_cnt[1] = 0;
     prev_nal_unit_type = nal_unit_type = UNKNOWN;
-    prev_idr_pic_id = idr_pic_id = 0;
+
+    // The value of idr_pic_id shall be in the range of 0 to 65535, inclusive.
+    prev_idr_pic_id = idr_pic_id = 65536;
 
     log2_max_frame_num = log2_max_pic_order_cnt_lsb = 0;
     seq_parameter_set_id = 0;
@@ -370,7 +372,8 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
     /* If we've found the next start code then that, plus the first byte of
      * the next NAL, plus the preceding zero bytes will all be in the rbsp
      * buffer. Move rbsp_index++ back to the end of the actual rbsp data. We
-     * need to know the correct size of the rbsp to decode some NALs. */
+     * need to know the correct size of the rbsp to decode some NALs.
+     */
     if (found_start_code)
     {
         if (rbsp_index >= 4)
@@ -401,6 +404,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
     const uint8_t *startP = bytes;
     const uint8_t *endP;
     bool           found_start_code;
+    bool           good_nal_unit;
 
     state_changed = false;
     on_frame      = false;
@@ -415,7 +419,8 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 
         /* Between startP and endP we potentially have some more
          * bytes of a NAL that we've been parsing (plus some bytes of
-         * start code) */
+         * start code)
+         */
         if (have_unfinished_NAL)
         {
             if (!fillRBSP(startP, endP - startP, found_start_code))
@@ -449,8 +454,10 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
             /* If we find the start of an AU somewhere from here
              * to the next start code, the offset to associate with
              * it is the one passed in to this call, not any of the
-             * subsequent calls. */
+             * subsequent calls.
+             */
             pkt_offset = stream_offset; // + (startP - bytes);
+
 /*
   nal_unit_type specifies the type of RBSP data structure contained in
   the NAL unit as specified in Table 7-1. VCL NAL units
@@ -474,23 +481,50 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
             nal_unit_type = sync_accumulator & 0x1f;
             nal_ref_idc = (sync_accumulator >> 5) & 0x3;
 
-            if (nal_unit_type == SPS || nal_unit_type == PPS ||
-                nal_unit_type == SEI || NALisSlice(nal_unit_type))
+            good_nal_unit = true;
+            if (nal_ref_idc)
             {
-                /* This is a NAL we need to parse. We may have the body
-                 * of it in the part of the stream past to us this call,
-                 * or we may get the rest in subsequent calls to addBytes.
-                 * Either way, we set have_unfinished_NAL, so that we
-                 * start filling the rbsp buffer */
-                have_unfinished_NAL = true;
+                /* nal_ref_idc shall be equal to 0 for all NAL units having
+                 * nal_unit_type equal to 6, 9, 10, 11, or 12.
+                 */
+                if (nal_unit_type == SEI ||
+                    (nal_unit_type >= AU_DELIMITER &&
+                     nal_unit_type <= FILLER_DATA))
+                    good_nal_unit = false;
             }
-            else if (nal_unit_type == AU_DELIMITER ||
-                    (nal_unit_type > SPS_EXT &&
-                     nal_unit_type < AUXILIARY_SLICE))
+            else
             {
-                set_AU_pending();
+                /* nal_ref_idc shall not be equal to 0 for NAL units with
+                 * nal_unit_type equal to 5
+                 */
+                if (nal_unit_type == SLICE_IDR)
+                    good_nal_unit = false;
             }
-        }
+
+            if (good_nal_unit)
+            {
+                if (nal_unit_type == SPS || nal_unit_type == PPS ||
+                    nal_unit_type == SEI || NALisSlice(nal_unit_type))
+                {
+                    /* This is a NAL we need to parse. We may have the body
+                     * of it in the part of the stream past to us this call,
+                     * or we may get the rest in subsequent calls to addBytes.
+                     * Either way, we set have_unfinished_NAL, so that we
+                     * start filling the rbsp buffer
+                     */
+                      have_unfinished_NAL = true;
+                }
+                else if (nal_unit_type == AU_DELIMITER ||
+                        (nal_unit_type > SPS_EXT &&
+                         nal_unit_type < AUXILIARY_SLICE))
+                {
+                    set_AU_pending();
+                }
+            }
+            else
+                LOG(VB_GENERAL, LOG_ERR,
+                    "H264Parser::addbytes: malformed NAL units");
+        } //found start code
     }
 
     return startP - bytes;
@@ -507,7 +541,8 @@ void H264Parser::processRBSP(bool rbsp_complete)
     {
         /* SEI cannot be parsed without knowing its size. If
          * we haven't got the whole rbsp, return and wait for
-         * the rest */
+         * the rest
+         */
         if (!rbsp_complete)
             return;
 
@@ -522,6 +557,9 @@ void H264Parser::processRBSP(bool rbsp_complete)
             return;
 
         set_AU_pending();
+
+        if (!seen_sps)
+            SPS_offset = pkt_offset;
 
         decode_SPS(&gb);
     }
@@ -555,8 +593,8 @@ void H264Parser::processRBSP(bool rbsp_complete)
     if (AU_pending && NALisSlice(nal_unit_type))
     {
         /* Once we know the slice type of a new AU, we can
-         * determine if it is a keyframe or just a frame */
-
+         * determine if it is a keyframe or just a frame
+         */
         AU_pending = false;
         state_changed = true;
 
@@ -601,8 +639,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       that precedes the current slice in decoding order and has the
       same value of colour_plane_id.
      */
-    //uint first_mb_in_slice = get_ue_golomb(gb);
-    get_ue_golomb(gb); // Replaced above line
+    /* uint first_mb_in_slice = */ get_ue_golomb(gb);
 
     /*
       slice_type specifies the coding type of the slice according to
@@ -611,7 +648,10 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       When nal_unit_type is equal to 5 (IDR picture), slice_type shall
       be equal to 2, 4, 7, or 9 (I or SI)
      */
-    slice_type = get_ue_golomb(gb);
+    slice_type = get_ue_golomb_31(gb);
+
+    /* s->pict_type = golomb_to_pict_type[slice_type % 5];
+     */
 
     /*
       pic_parameter_set_id specifies the picture parameter set in
@@ -642,8 +682,10 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       bitstream....
 
       If the current picture is an IDR picture, frame_num shall be equal to 0.
-    */
 
+      When max_num_ref_frames is equal to 0, slice_type shall be equal
+          to 2, 4, 7, or 9.
+    */
     frame_num = get_bits(gb, log2_max_frame_num);
 
     /*
@@ -657,7 +699,6 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       picture is a coded top field. When this syntax element is not present
       for the current slice, it shall be inferred to be equal to 0.
     */
-
     if (!frame_mbs_only_flag)
     {
         field_pic_flag = get_bits1(gb);
@@ -678,14 +719,14 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       second such IDR access unit. The value of idr_pic_id shall be in
       the range of 0 to 65535, inclusive.
      */
-
     if (nal_unit_type == SLICE_IDR)
     {
         idr_pic_id = get_ue_golomb(gb);
         is_keyframe = true;
     }
     else
-        is_keyframe |= I_is_keyframe && isKeySlice(slice_type);
+        is_keyframe = (I_is_keyframe && isKeySlice(slice_type));
+
     /*
       pic_order_cnt_lsb specifies the picture order count modulo
       MaxPicOrderCntLsb for the top field of a coded frame or for a coded
@@ -702,7 +743,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
     {
         pic_order_cnt_lsb = get_bits(gb, log2_max_pic_order_cnt_lsb);
 
-        if (pic_order_present_flag && !field_pic_flag)
+        if ((pic_order_present_flag == 1) && !field_pic_flag)
             delta_pic_order_cnt_bottom = get_se_golomb(gb);
         else
             delta_pic_order_cnt_bottom = 0;
@@ -711,33 +752,44 @@ bool H264Parser::decode_Header(GetBitContext *gb)
         delta_pic_order_cnt_bottom = 0;
 
     /*
-      delta_pic_order_cnt[ 0 ] specifies the picture order count
-      difference from the expected picture order count for the top
-      field of a coded frame or for a coded field as specified in
-      subclause 8.2.1. The value of delta_pic_order_cnt[ 0 ] shall be
-      in the range of -231 to 231 - 1, inclusive. When this syntax
-      element is not present in the bitstream for the current slice,
-      it shall be inferred to be equal to 0.
-
-      delta_pic_order_cnt[ 1 ] specifies the picture order count
-      difference from the expected picture order count for the bottom
-      field of a coded frame specified in subclause 8.2.1. The value
-      of delta_pic_order_cnt[ 1 ] shall be in the range of -231 to 231
-      - 1, inclusive. When this syntax element is not present in the
-      bitstream for the current slice, it shall be inferred to be
-      equal to 0.
-     */
-    if (pic_order_cnt_type == 1 && !delta_pic_order_always_zero_flag)
+      delta_pic_order_always_zero_flag equal to 1 specifies that
+      delta_pic_order_cnt[ 0 ] and delta_pic_order_cnt[ 1 ] are not
+      present in the slice headers of the sequence and shall be
+      inferred to be equal to 0. delta_pic_order_always_zero_flag
+      equal to 0 specifies that delta_pic_order_cnt[ 0 ] is present in
+      the slice headers of the sequence and delta_pic_order_cnt[ 1 ]
+      may be present in the slice headers of the sequence.
+    */
+    if (delta_pic_order_always_zero_flag)
     {
+        delta_pic_order_cnt[1] = delta_pic_order_cnt[0] = 0;
+    }
+    else if (pic_order_cnt_type == 1)
+    {
+        /*
+          delta_pic_order_cnt[ 0 ] specifies the picture order count
+          difference from the expected picture order count for the top
+          field of a coded frame or for a coded field as specified in
+          subclause 8.2.1. The value of delta_pic_order_cnt[ 0 ] shall
+          be in the range of -2^31 to 2^31 - 1, inclusive. When this
+          syntax element is not present in the bitstream for the
+          current slice, it shall be inferred to be equal to 0.
+
+          delta_pic_order_cnt[ 1 ] specifies the picture order count
+          difference from the expected picture order count for the
+          bottom field of a coded frame specified in subclause
+          8.2.1. The value of delta_pic_order_cnt[ 1 ] shall be in the
+          range of -2^31 to 2^31 - 1, inclusive. When this syntax
+          element is not present in the bitstream for the current
+          slice, it shall be inferred to be equal to 0.
+        */
         delta_pic_order_cnt[0] = get_se_golomb(gb);
 
-        if (pic_order_present_flag && !field_pic_flag)
+        if ((pic_order_present_flag == 1) && !field_pic_flag)
             delta_pic_order_cnt[1] = get_se_golomb(gb);
         else
             delta_pic_order_cnt[1] = 0;
-    }
-    else
-        delta_pic_order_cnt[0] = 0;
+     }
 
     /*
       redundant_pic_cnt shall be equal to 0 for slices and slice data
@@ -748,7 +800,6 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       be equal to 0. The value of redundant_pic_cnt shall be in the
       range of 0 to 127, inclusive.
     */
-
     redundant_pic_cnt = redundant_pic_cnt_present_flag ? get_ue_golomb(gb) : 0;
 
     return true;
@@ -760,10 +811,13 @@ bool H264Parser::decode_Header(GetBitContext *gb)
 void H264Parser::decode_SPS(GetBitContext * gb)
 {
     int profile_idc;
+    int lastScale;
+    int nextScale;
+    int deltaScale;
 
     seen_sps = true;
 
-    profile_idc = get_bits(gb, 8); // profile_idc
+    profile_idc = get_bits(gb, 8);
     get_bits1(gb);      // constraint_set0_flag
     get_bits1(gb);      // constraint_set1_flag
     get_bits1(gb);      // constraint_set2_flag
@@ -772,9 +826,11 @@ void H264Parser::decode_SPS(GetBitContext * gb)
     get_bits(gb, 8);    // level_idc
     get_ue_golomb(gb);  // sps_id
 
-    if (profile_idc >= 100)
+    if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 ||
+        profile_idc == 244 || profile_idc == 44  || profile_idc == 83  ||
+        profile_idc == 86  || profile_idc == 118 || profile_idc == 128 )
     { // high profile
-        if ((chroma_format_idc = get_ue_golomb(gb)) == 3) // chroma_format_idc
+        if ((chroma_format_idc = get_ue_golomb(gb)) == 3)
             separate_colour_plane_flag = (get_bits1(gb) == 1);
 
         get_ue_golomb(gb);     // bit_depth_luma_minus8
@@ -785,12 +841,18 @@ void H264Parser::decode_SPS(GetBitContext * gb)
         {
             for (int idx = 0; idx < ((chroma_format_idc != 3) ? 8 : 12); ++idx)
             {
-                if (get_bits1(gb)) // Scaling list presnent
+                if (get_bits1(gb)) // Scaling list present
                 {
+                    lastScale = nextScale = 8;
                     int sl_n = ((idx < 6) ? 16 : 64);
-                    for(int sl_i = 0; sl_i < sl_n; sl_i++)
+                    for(int sl_i = 0; sl_i < sl_n; ++sl_i)
                     {
-                        get_se_golomb(gb);
+                        if (nextScale != 0)
+                        {
+                            deltaScale = get_se_golomb(gb);
+                            nextScale = (lastScale + deltaScale + 256) % 256;
+                        }
+                        lastScale = (nextScale == 0) ? lastScale : nextScale;
                     }
                 }
             }
@@ -841,6 +903,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           0. delta_pic_order_always_zero_flag
          */
         delta_pic_order_always_zero_flag = get_bits1(gb);
+
         /*
           offset_for_non_ref_pic is used to calculate the picture
           order count of a non-reference picture as specified in
@@ -848,6 +911,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           range of -231 to 231 - 1, inclusive.
          */
         offset_for_non_ref_pic = get_se_golomb(gb);
+
         /*
           offset_for_top_to_bottom_field is used to calculate the
           picture order count of a bottom field as specified in
@@ -855,6 +919,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           shall be in the range of -231 to 231 - 1, inclusive.
          */
         offset_for_top_to_bottom_field = get_se_golomb(gb);
+
         /*
           offset_for_ref_frame[ i ] is an element of a list of
           num_ref_frames_in_pic_order_cnt_cycle values used in the
@@ -886,8 +951,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
       decoding process in case of an inferred gap between values of
       frame_num as specified in subclause 8.2.5.2.
      */
-    //bool gaps_in_frame_num_allowed_flag = get_bits1(gb);
-    get_bits1(gb); // Replaced above line
+    /* bool gaps_in_frame_num_allowed_flag = */ get_bits1(gb);
 
     /*
       pic_width_in_mbs_minus1 plus 1 specifies the width of each
@@ -912,6 +976,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
     if (!frame_mbs_only_flag)
     {
         pic_height *= 2;
+
         /*
           mb_adaptive_frame_field_flag equal to 0 specifies no
           switching between frame and field macroblocks within a
@@ -969,6 +1034,7 @@ void H264Parser::decode_PPS(GetBitContext * gb)
       inclusive.
      */
     pic_parameter_set_id = get_ue_golomb(gb);
+
     /*
       seq_parameter_set_id refers to the active sequence parameter
       set. The value of seq_parameter_set_id shall be in the range of
@@ -976,6 +1042,7 @@ void H264Parser::decode_PPS(GetBitContext * gb)
      */
     seq_parameter_set_id = get_ue_golomb(gb);
     get_bits1(gb); // entropy_coding_mode_flag;
+
     /*
       pic_order_present_flag equal to 1 specifies that the picture
       order count related syntax elements are present in the slice
@@ -1049,25 +1116,27 @@ void H264Parser::decode_SEI(GetBitContext *gb)
     {
         do {
             type += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
+        } while (get_bits(gb, 8) == 0xFF);
 
         do {
             size += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
+        } while (get_bits(gb, 8) == 0xFF);
 
         switch (type)
         {
-            case SEI_TYPE_RECOVERY_POINT:
-                recovery_frame_cnt = get_ue_golomb(gb);
-                exact_match_flag = get_bits1(gb);
-                broken_link_flag = get_bits1(gb);
-                changing_group_slice_idc = get_bits(gb, 2);
-                au_contains_keyframe_message = (recovery_frame_cnt == 0);
-                return;
+          case SEI_TYPE_RECOVERY_POINT:
+            recovery_frame_cnt = get_ue_golomb(gb);
+            exact_match_flag = get_bits1(gb);
+            broken_link_flag = get_bits1(gb);
+            changing_group_slice_idc = get_bits(gb, 2);
+            au_contains_keyframe_message = (recovery_frame_cnt == 0);
+            if ((size - 12) > 0)
+                skip_bits(gb, (size - 12) * 8);
+            return;
 
-            default:
-                skip_bits(gb, size * 8);
-                break;
+          default:
+            skip_bits(gb, size * 8);
+            break;
         }
     }
 
