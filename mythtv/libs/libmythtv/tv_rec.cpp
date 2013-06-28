@@ -186,11 +186,7 @@ TVRec::~TVRec()
 {
     QMutexLocker locker(&cardsLock);
     cards.remove(cardid);
-    TeardownAll();
-}
 
-void TVRec::TeardownAll(void)
-{
     if (HasFlags(kFlagRunMainLoop))
     {
         ClearFlags(kFlagRunMainLoop);
@@ -199,18 +195,21 @@ void TVRec::TeardownAll(void)
         eventThread = NULL;
     }
 
+    if (channel)
+    {
+        delete channel;
+        channel = NULL;
+    }
+}
+
+void TVRec::TeardownAll(void)
+{
     TeardownSignalMonitor();
 
     if (scanner)
     {
         delete scanner;
         scanner = NULL;
-    }
-
-    if (channel)
-    {
-        delete channel;
-        channel = NULL;
     }
 
     TeardownRecorder(kFlagKillRec);
@@ -1283,6 +1282,7 @@ void TVRec::run(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "RunTV encountered fatal error, exiting event thread.");
             ClearFlags(kFlagRunMainLoop);
+            TeardownAll();
             return;
         }
 
@@ -1456,6 +1456,8 @@ void TVRec::run(void)
         ChangeState(kState_None);
         HandleStateChange();
     }
+
+    TeardownAll();
 }
 
 /** \fn TVRec::WaitForEventThreadSleep(bool wake, ulong time)
