@@ -58,7 +58,7 @@ class H264Parser {
     // ITU-T Rec. H.264 table 7-1
     enum NAL_unit_type {
         UNKNOWN         = 0,
-        SLICE           = 1,
+        SLICE           = 1,   // 1 - 5 are VCL NAL units
         SLICE_DPA       = 2,
         SLICE_DPB       = 3,
         SLICE_DPC       = 4,
@@ -71,11 +71,15 @@ class H264Parser {
         END_STREAM      = 11,
         FILLER_DATA     = 12,
         SPS_EXT         = 13,
-        AUXILIARY_SLICE = 19
+        NALU_prefix     = 14,
+        SPS_subset      = 15,
+        AUXILIARY_SLICE = 19,
+        SLICE_EXTENSION = 20
     };
 
     enum SEI_type {
         SEI_TYPE_PIC_TIMING             = 1,
+        SEI_FILLER_PAYLOAD              = 3,
         SEI_TYPE_USER_DATA_UNREGISTERED = 5,
         SEI_TYPE_RECOVERY_POINT         = 6
     };
@@ -142,7 +146,9 @@ class H264Parser {
 
     uint64_t frameAUstreamOffset(void) const {return frame_start_offset;}
     uint64_t keyframeAUstreamOffset(void) const {return keyframe_start_offset;}
+    uint64_t SPSstreamOffset(void) const {return SPS_offset;}
 
+    // == NAL_type AU_delimiter: primary_pic_type = 5
     static int isKeySlice(uint slice_type)
         {
             return (slice_type == SLICE_I   ||
@@ -159,6 +165,7 @@ class H264Parser {
         }
 
     void use_I_forKeyframes(bool val) { I_is_keyframe = val; }
+    bool using_I_forKeyframes(void) const { return I_is_keyframe; }
 
     uint32_t GetTimeScale(void) const { return timeScale; }
 
@@ -166,6 +173,11 @@ class H264Parser {
 
     void parse_SPS(uint8_t *sps, uint32_t sps_size,
                    bool& interlaced, int32_t& max_ref_frames);
+
+    void reset_SPS(void) { seen_sps = false; }
+    bool seen_SPS(void) const { return seen_sps; }
+
+    bool found_AU(void) const { return AU_pending; }
 
   private:
     enum constants {EXTENDED_SAR = 255};
@@ -226,6 +238,7 @@ class H264Parser {
     int8_t     frame_mbs_only_flag;
     int8_t     pic_order_present_flag;
     int8_t     redundant_pic_cnt_present_flag;
+    int8_t     chroma_format_idc;
 
     uint       num_ref_frames;
     uint       redundant_pic_cnt;
@@ -241,6 +254,7 @@ class H264Parser {
     bool       fixedRate;
 
     uint64_t   pkt_offset, AU_offset, frame_start_offset, keyframe_start_offset;
+    uint64_t   SPS_offset;
     bool       on_frame, on_key_frame;
 };
 
