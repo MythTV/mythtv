@@ -22,24 +22,17 @@
 
 IPTVChannel::IPTVChannel(TVRec *rec, const QString&) :
     DTVChannel(rec), m_open(false), m_firsttune(true),
-    m_stream_handler(NULL), m_stream_data(NULL), m_timer(0)
+    m_stream_handler(NULL), m_stream_data(NULL), m_timer(startTimer(5000)),
+    m_keepalive(0), m_wantdeletion(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-}
-
-void IPTVChannel::KillTimer(void)
-{
-    if (m_timer)
-    {
-        killTimer(m_timer);
-        m_timer = 0;
-    }
 }
 
 IPTVChannel::~IPTVChannel()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Close();
+    killTimer(m_timer);
 }
 
 bool IPTVChannel::Open(void)
@@ -84,7 +77,7 @@ void IPTVChannel::SetStreamDataInternal(MPEGStreamData *sd, bool closeimmediatel
 
     if (m_stream_handler)
     {
-        KillTimer();
+        m_wantdeletion = false;
 
         if (m_stream_data)
         {
@@ -104,7 +97,8 @@ void IPTVChannel::SetStreamDataInternal(MPEGStreamData *sd, bool closeimmediatel
                 LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                     QString("Scheduling for deletion: StreamHandler(0x%1)")
                     .arg((intptr_t)m_stream_handler,0,16));
-                m_timer = startTimer(5000);
+                m_keepalive = 1;
+                m_wantdeletion = true;
             }
             else
             {
@@ -126,9 +120,13 @@ void IPTVChannel::SetStreamDataInternal(MPEGStreamData *sd, bool closeimmediatel
 
 void IPTVChannel::timerEvent(QTimerEvent*)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "timerEvent()");
+    QMutexLocker lock(&m_lock);
 
-    CloseStreamHandler();
+    if (m_wantdeletion && m_keepalive-- == 0)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "timerEvent()");
+        CloseStreamHandler();
+    }
 }
 
 void IPTVChannel::Close(void)
@@ -155,7 +153,7 @@ void IPTVChannel::OpenStreamHandler(void)
 
 void IPTVChannel::CloseStreamHandler(void)
 {
-    KillTimer();
+    m_wantdeletion = false;
 
     if (m_stream_handler)
     {

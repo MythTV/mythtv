@@ -44,10 +44,11 @@ class IPTVChannel : QObject, public DTVChannel
     bool IsOpen(void) const;
     virtual bool IsIPTV(void) const { return true; } // DTVChannel
 
+  protected:
+    void timerEvent(QTimerEvent*);
+
   private:
     void SetStreamDataInternal(MPEGStreamData*, bool closeimmediately);
-    void timerEvent(QTimerEvent*);
-    void KillTimer(void);
     void OpenStreamHandler(void);
     void CloseStreamHandler(void);
 
@@ -57,7 +58,9 @@ class IPTVChannel : QObject, public DTVChannel
     IPTVTuningData m_last_tuning;
     IPTVStreamHandler *m_stream_handler;
     MPEGStreamData *m_stream_data;
-    int m_timer;
+    int  m_timer;
+    int  m_keepalive;
+    bool m_wantdeletion;
 };
 
 #endif // _IPTV_CHANNEL_H_
