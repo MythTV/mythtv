@@ -656,6 +656,7 @@ class Collection( NameRepr, Element ):
     poster   = Datapoint('poster_path', handler=Poster, \
                             raw=False, default=None)
     members  = Datalist('parts', handler=Movie)
+    overview = Datapoint('overview')
 
     def _populate(self):
         return Request('collection/{0}'.format(self.id), \
