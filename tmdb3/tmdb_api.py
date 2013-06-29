@@ -197,6 +197,8 @@ class Image( Element ):
     height          = Datapoint('height')
     width           = Datapoint('width')
     language        = Datapoint('iso_639_1')
+    userrating      = Datapoint('vote_average')                                                                                                                                                                                         
+    votes           = Datapoint('vote_count') 
 
     def sizes(self):
         return ['original']
