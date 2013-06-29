@@ -4693,19 +4693,19 @@ int MythPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-int64_t MythPlayer::GetSecondsPlayed(bool honorCutList) const
+int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const
 {
-    return TranslatePositionFrameToMs(framesPlayed, honorCutList) / 1000;
+    return TranslatePositionFrameToMs(framesPlayed, honorCutList) / divisor;
 }
 
-int64_t MythPlayer::GetTotalSeconds(bool honorCutList) const
+int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
 {
     uint64_t pos = totalFrames;
 
     if (IsWatchingInprogress())
-        pos = (uint64_t)-1;
+        return (uint64_t)-1;
 
-    return TranslatePositionFrameToMs(pos, honorCutList) / 1000;
+    return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
 }
 
 // Returns the total frame count, as totalFrames for a completed

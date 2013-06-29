@@ -1112,7 +1112,11 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //    playPos = (uint64_t)
         //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
         //else
-        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
+        //playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
+        //
+        // Change of plans.  Just ask the player how many milliseconds
+        // have been played so far.
+        playPos = m_player->GetSecondsPlayed(false, 1);
     }
     playPos -= playPosAdj;
     if (playPos != 0)
