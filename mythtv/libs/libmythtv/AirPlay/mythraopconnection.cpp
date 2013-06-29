@@ -363,7 +363,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
     if (current_ts > m_progressStart)
     {
         m_progressCurrent = next_ts;
-        SendNotification(false);
+        SendNotification(true);
     }
 
     if (first)
