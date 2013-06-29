@@ -198,9 +198,10 @@ trailers offer multiple sizes.
 Collection:
   integer               id
   string                name
+  string                overview
   Backdrop              backdrop
   Poster                poster
-  list(Movie)           members             (sorted by release date)
+  list(Movie)           members
   list(Backdrop)        backdrops
   list(Poster)          posters
 
@@ -299,6 +300,8 @@ Image:
   integer               height              (not available for default images)
   integer               width               (not available for default images)
   integer               language            (not available for default images)
+  float                 userrating
+  integer               votes
   list(string)          sizes()
   string                geturl(size='original')
 
