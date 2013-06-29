@@ -45,6 +45,7 @@ public:
     void SetNotification(MythNotification &notification);
 
     void UpdateArtwork(const QImage &image);
+    void UpdateArtwork(const QString &image);
     void UpdateMetaData(const DMAP &data);
     void UpdatePlayback(int duration, int position);
 
@@ -59,6 +60,7 @@ public:
 
     int                 m_id;
     QImage              m_image;
+    QString             m_imagePath;
     QString             m_title;
     QString             m_artist;
     QString             m_album;
@@ -131,7 +133,17 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         dynamic_cast<MythImageNotification*>(&notification);
     if (img)
     {
-        UpdateArtwork(img->GetImage());
+        QString path = img->GetImagePath();
+        
+        if (path.isNull())
+        {
+            UpdateArtwork(img->GetImage());
+        }
+        else
+        {
+            UpdateArtwork(path);
+        }
+
         m_update |= kImage;
         if (m_artworkImage)
         {
@@ -145,6 +157,7 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
             m_artworkImage->SetVisible(false);
         }
     }
+
     MythPlaybackNotification *play =
         dynamic_cast<MythPlaybackNotification*>(&notification);
     if (play)
@@ -217,8 +230,15 @@ void MythUINotificationScreen::Init(void)
 {
     if (m_artworkImage && (m_update & kImage))
     {
-        if (!m_image.isNull())
+        if (!m_imagePath.isNull())
         {
+            // We have a path to the image, use it
+            m_artworkImage->SetFilename(m_imagePath);
+            m_artworkImage->Load();
+        }
+        else if (!m_image.isNull())
+        {
+            // We don't have a path to the image, but the image itself
             MythImage *img = new MythImage(m_artworkImage->GetPainter());
             img->Assign(m_image);
             m_artworkImage->SetImage(img);
@@ -337,6 +357,15 @@ void MythUINotificationScreen::Init(void)
 void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 {
     m_image = image;
+}
+
+/**
+ * Update artwork image via URL or file path
+ * must call Init() for screen to be updated
+ */
+void MythUINotificationScreen::UpdateArtwork(const QString &image)
+{
+    m_imagePath = image;
 }
 
 /**

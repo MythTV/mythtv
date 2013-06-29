@@ -164,6 +164,12 @@ public:
         m_metadata = metadata;
     }
 
+    MythImageNotification(Type t, QString &imagePath, DMAP &metadata)
+        : MythNotification(t), m_imagePath(imagePath)
+    {
+        m_metadata = metadata;
+    }
+
     virtual MythEvent *clone(void) const { return new MythImageNotification(*this); }
 
     // Setter
@@ -171,13 +177,18 @@ public:
      * image to be displayed with the notification
      */
     void SetImage(QImage &image)        { m_image = image; }
+    /**
+     * image filename to be displayed with the notification
+     */
+    void SetImagePath(QString &image)   { m_imagePath = image; }
 
     //Getter
     QImage GetImage(void)               { return m_image; }
+    QString GetImagePath(void)          { return m_imagePath; }
 
 protected:
     MythImageNotification(const MythImageNotification &o)
-        : MythNotification(o), m_image(o.m_image)
+        : MythNotification(o), m_image(o.m_image), m_imagePath(o.m_imagePath)
     {
     }
 
@@ -185,6 +196,7 @@ protected:
 
 protected:
     QImage      m_image;
+    QString     m_imagePath;
 };
 
 class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
@@ -232,6 +244,13 @@ public:
     MythMediaNotification(Type t, QImage &image, DMAP &metadata,
                           int duration, int position)
         : MythNotification(t), MythImageNotification(t, image, metadata),
+        MythPlaybackNotification(t, duration, position)
+    {
+    }
+
+    MythMediaNotification(Type t, QString imagePath, DMAP &metadata,
+                          int duration, int position)
+        : MythNotification(t), MythImageNotification(t, imagePath, metadata),
         MythPlaybackNotification(t, duration, position)
     {
     }
