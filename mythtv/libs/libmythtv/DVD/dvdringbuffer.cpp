@@ -653,6 +653,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     char           *dest         = (char*) data;
     int             offset       = 0;
     bool            bReprocessing = false;
+    bool            stillSeen    = false;
 
     if (m_gotStop)
     {
@@ -1149,7 +1150,12 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_STILL_FRAME");
+                if (!stillSeen)
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
+                        .arg(still->length));
+                    stillSeen = true;
+                }
 
                 // release buffer
                 if (blockBuf != m_dvdBlockWriteBuf)
