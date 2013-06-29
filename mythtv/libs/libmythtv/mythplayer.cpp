@@ -4703,7 +4703,7 @@ int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
     uint64_t pos = totalFrames;
 
     if (IsWatchingInprogress())
-        return (uint64_t)-1;
+        pos = (uint64_t)-1;
 
     return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
 }
