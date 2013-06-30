@@ -437,7 +437,21 @@ uint64_t MythDVDPlayer::GetBookmark(void)
 
 void MythDVDPlayer::ChangeSpeed(void)
 {
+    if (m_stillFrameLength > 0)
+    {
+        m_stillFrameTimerLock.lock();
+        // Get the timestretched elapsed time and transform
+        // it to what the unstretched value would have been
+        // had we been playing with the new timestretch value
+        // all along
+        int elapsed = (int)(m_stillFrameTimer.elapsed() * play_speed / next_play_speed);
+        m_stillFrameTimer.restart();
+        m_stillFrameTimer.addMSecs(elapsed);
+        m_stillFrameTimerLock.unlock();
+    }
+
     MythPlayer::ChangeSpeed();
+
     if (decoder)
         decoder->UpdateFramesPlayed();
     if (play_speed != normal_speed && player_ctx->buffer->IsDVD())
@@ -471,7 +485,7 @@ int64_t MythDVDPlayer::GetSecondsPlayed(bool, int divisor) const
         if (m_stillFrameLength == 255)
             played = -1;
         else
-            played = m_stillFrameTimer.elapsed() / 1000;
+            played = m_stillFrameTimer.elapsed() * play_speed / divisor;
     }
 
     return played;
@@ -671,6 +685,11 @@ void MythDVDPlayer::GoToDVDProgram(bool direction)
         player_ctx->buffer->DVD()->GoToNextProgram();
 }
 
+bool MythDVDPlayer::IsInStillFrame() const
+{
+    return (m_stillFrameLength > 0);
+}
+
 int MythDVDPlayer::GetNumAngles(void) const
 {
     if (player_ctx->buffer->DVD() && player_ctx->buffer->DVD()->IsOpen())
@@ -732,13 +751,14 @@ void MythDVDPlayer::StillFrameCheck(void)
        (m_stillFrameLength > 0) && (m_stillFrameLength < 0xff))
     {
         m_stillFrameTimerLock.lock();
-        int elapsedTime = m_stillFrameTimer.elapsed() / 1000;
+        int elapsedTime = (int)(m_stillFrameTimer.elapsed() * play_speed / 1000);
         m_stillFrameTimerLock.unlock();
         if (elapsedTime >= m_stillFrameLength)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Stillframe timeout after %1 seconds")
-                    .arg(m_stillFrameLength));
+                QString("Stillframe timeout after %1 seconds (timestretch %2)")
+                    .arg(m_stillFrameLength)
+                    .arg(play_speed));
             player_ctx->buffer->DVD()->SkipStillFrame();
             m_stillFrameLength = 0;
         }

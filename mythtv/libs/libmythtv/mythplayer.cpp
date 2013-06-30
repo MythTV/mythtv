@@ -3087,15 +3087,18 @@ void MythPlayer::UnpauseDecoder(void)
         return;
     }
 
-    int tries = 0;
-    unpauseDecoder = true;
-    while (decoderThread && !killdecoder && (tries++ < 100) &&
-          !decoderThreadUnpause.wait(&decoderPauseLock, 100))
+    if (!IsInStillFrame())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Waited 100ms for decoder to unpause");
+        int tries = 0;
+        unpauseDecoder = true;
+        while (decoderThread && !killdecoder && (tries++ < 100) &&
+              !decoderThreadUnpause.wait(&decoderPauseLock, 100))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Waited 100ms for decoder to unpause");
+        }
+        unpauseDecoder = false;
     }
-    unpauseDecoder = false;
     decoderPauseLock.unlock();
 }
 

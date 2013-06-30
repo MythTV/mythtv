@@ -28,6 +28,7 @@ class MythDVDPlayer : public MythPlayer
     // DVD public stuff
     virtual bool GoToMenu(QString str);
     virtual void GoToDVDProgram(bool direction);
+    virtual bool IsInStillFrame() const;
 
     // DVD ringbuffer methods
     void ResetStillFrameTimer(void);

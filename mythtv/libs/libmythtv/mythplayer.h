@@ -327,6 +327,7 @@ class MTV_PUBLIC MythPlayer
     // DVD public stuff
     virtual bool GoToMenu(QString str)          { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
+    virtual bool IsInStillFrame() const         { return false;     }
 
     // Position Map Stuff
     bool PosMapFromEnc(uint64_t start,
