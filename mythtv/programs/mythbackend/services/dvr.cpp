@@ -116,7 +116,7 @@ DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
     }
     else
     {
-        int nMax      = nCount;
+        int nMax      = (nCount > 0) ? nCount : progList.size();
 
         nAvailable = 0;
         nCount = 0;
