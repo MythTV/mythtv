@@ -4,6 +4,10 @@
 extern "C" {
 #include "libavcodec/vaapi.h"
 }
+#include "va/va_version.h"
+#if VA_CHECK_VERSION(0,34,0)
+#include "va/va_compat.h"
+#endif
 #include "va/va_x11.h"
 #include "va/va_glx.h"
 #include "videocolourspace.h"
