@@ -746,7 +746,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
 
     if (visible.isEmpty() || (!alignx && !aligny))
         return visible;
-    
+
     // assist yuv blending with some friendly alignments
     QRegion aligned;
     QVector<QRect> rects = visible.rects();
