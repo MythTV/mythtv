@@ -17,11 +17,13 @@
 #include "mythuinotificationcenter.h"
 #include "mythuinotificationcenter_private.h"
 
+#include "mythpainter.h"
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
+#include "mythdate.h"
 
 #define LOC QString("NotificationCenter: ")
 
@@ -32,6 +34,34 @@
 
 QEvent::Type MythUINotificationCenterEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
+
+//// class MythScreenNotificationStack
+
+class MythNotificationScreenStack : public MythScreenStack
+{
+public:
+    MythNotificationScreenStack(MythMainWindow *parent, const QString& name)
+        : MythScreenStack(parent, name)
+    {
+    }
+
+    virtual ~MythNotificationScreenStack()
+    {
+    }
+
+    void CheckDeletes()
+    {
+        QVector<MythScreenType*>::const_iterator it;
+
+        for (it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
+        {
+            (*it)->SetAlpha(0);
+            (*it)->SetVisible(false);
+            (*it)->Close();
+        }
+        MythScreenStack::CheckDeletes();
+    }
+};
 
 //// class MythUINotificationScreen
 
@@ -436,7 +466,7 @@ MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
 }
 
 MythUINotificationCenter::MythUINotificationCenter()
-    : m_screenStack(NULL), m_currentId(0)
+    : m_screenStack(NULL), m_currentId(0), m_refresh(false)
 {
     const bool isGuiThread =
         QThread::currentThread() == QCoreApplication::instance()->thread();
@@ -525,6 +555,8 @@ void MythUINotificationCenter::ScreenDeleted(void)
             }
         }
     }
+    // so screen will be refreshed by Draw() or DrawDirect()
+    m_refresh = true;
 }
 
 bool MythUINotificationCenter::Queue(MythNotification &notification)
@@ -705,12 +737,12 @@ void MythUINotificationCenter::UnRegister(void *from, int id)
         GetMythMainWindow(), new MythUINotificationCenterEvent());
 }
 
-MythScreenStack *MythUINotificationCenter::GetScreenStack(void)
+MythNotificationScreenStack *MythUINotificationCenter::GetScreenStack(void)
 {
     if (!m_screenStack)
     {
-        m_screenStack = new MythScreenStack(GetMythMainWindow(),
-                                            "mythuinotification");
+        m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
+                                                        "mythuinotification");
     }
     return m_screenStack;
 }
@@ -794,4 +826,170 @@ void MythUINotificationCenter::AdjustScreenPosition(int from, bool down)
     {
         (*it)->AdjustYPosition(((*it)->GetHeight() + HGAP) * (down ? 1 : -1));
     }
+}
+
+bool MythUINotificationCenter::DrawDirect(MythPainter* painter, QSize size,
+                                          bool repaint)
+{
+    if (!painter)
+        return false;
+
+    bool visible = false;
+    bool redraw  = m_refresh;
+    m_refresh    = false;
+    QTime now = MythDate::current().time();
+
+    GetScreenStack()->CheckDeletes();
+
+    QVector<MythScreenType*> screens;
+    GetScreenStack()->GetScreenList(screens);
+
+    GetScreenStack()->CheckDeletes();
+
+    QVector<MythScreenType*>::const_iterator it;
+    for (it = screens.begin(); it != screens.end(); ++it)
+    {
+        if ((*it)->IsVisible())
+        {
+            visible = true;
+            (*it)->Pulse();
+            if ((*it)->NeedsRedraw())
+            {
+                redraw = true;
+            }
+        }
+    }
+
+    redraw |= repaint;
+
+    if (redraw && visible)
+    {
+        QRect cliprect = QRect(QPoint(0, 0), size);
+        painter->Begin(NULL);
+        for (it = screens.begin(); it != screens.end(); ++it)
+        {
+            if ((*it)->IsVisible())
+            {
+                (*it)->Draw(painter, 0, 0, 255, cliprect);
+                (*it)->SetAlpha(255);
+                (*it)->ResetNeedsRedraw();
+            }
+        }
+        painter->End();
+    }
+
+    return visible;
+}
+
+QRegion MythUINotificationCenter::Draw(MythPainter* painter, QPaintDevice *device,
+                                       QSize size, QRegion &changed,
+                                       int alignx, int aligny)
+{
+    bool redraw     = m_refresh;
+    QRegion visible = QRegion();
+    QRect rect      = GetMythMainWindow()->GetUIScreenRect();
+    QRegion dirty   = m_refresh ? QRegion(QRect(QPoint(0,0), rect.size())) :
+                                  QRegion();
+    m_refresh       = false;
+
+    if (!painter || !device)
+        return visible;
+
+    GetScreenStack()->CheckDeletes();
+
+    QTime now = MythDate::current().time();
+
+    QVector<MythScreenType*> screens;
+    GetScreenStack()->GetScreenList(screens);
+
+    QVector<MythScreenType*>::const_iterator it;
+    // first update for alpha pulse and fade
+    for (it = screens.begin(); it != screens.end(); ++it)
+    {
+        if ((*it)->IsVisible())
+        {
+            QRect vis = (*it)->GetArea().toQRect();
+            if (visible.isEmpty())
+                visible = QRegion(vis);
+            else
+                visible = visible.united(vis);
+
+            (*it)->Pulse();
+//            if (m_Effects && m_ExpireTimes.contains((*it)))
+//            {
+//                QTime expires = m_ExpireTimes.value((*it)).time();
+//                int left = now.msecsTo(expires);
+//                if (left < m_FadeTime)
+//                    (*it)->SetAlpha((255 * left) / m_FadeTime);
+//            }
+        }
+
+        if ((*it)->NeedsRedraw())
+        {
+            QRegion area = (*it)->GetDirtyArea();
+            dirty = dirty.united(area);
+            redraw = true;
+        }
+    }
+
+    if (redraw)
+    {
+        // clear the dirty area
+        painter->Clear(device, dirty);
+
+        // set redraw for any widgets that may now need a partial repaint
+        for (it = screens.begin(); it != screens.end(); ++it)
+        {
+            if ((*it)->IsVisible() && !(*it)->NeedsRedraw() &&
+                dirty.intersects((*it)->GetArea().toQRect()))
+            {
+                (*it)->SetRedraw();
+            }
+        }
+
+        // and finally draw
+        QRect cliprect = dirty.boundingRect();
+        painter->Begin(device);
+        painter->SetClipRegion(dirty);
+        // TODO painting in reverse may be more efficient...
+        for (it = screens.begin(); it != screens.end(); ++it)
+        {
+            if ((*it)->NeedsRedraw())
+            {
+                if ((*it)->IsVisible())
+                    (*it)->Draw(painter, 0, 0, 255, cliprect);
+                (*it)->SetAlpha(255);
+                (*it)->ResetNeedsRedraw();
+            }
+        }
+        painter->End();
+    }
+
+    changed = dirty;
+
+    if (visible.isEmpty() || (!alignx && !aligny))
+        return visible;
+
+    // assist yuv blending with some friendly alignments
+    QRegion aligned;
+    QVector<QRect> rects = visible.rects();
+    for (int i = 0; i < rects.size(); i++)
+    {
+        QRect r   = rects[i];
+        int left  = r.left() & ~(alignx - 1);
+        int top   = r.top()  & ~(aligny - 1);
+        int right = (r.left() + r.width());
+        int bot   = (r.top() + r.height());
+        if (right & (alignx - 1))
+        {
+            right += alignx - (right & (alignx - 1));
+        }
+        if (bot % aligny)
+        {
+            bot += aligny - (bot % aligny);
+        }
+        aligned = aligned.united(QRegion(left, top, right - left, bot - top));
+    }
+
+    return aligned.intersected(QRect(QPoint(0,0), size));
 }

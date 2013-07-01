@@ -12,6 +12,7 @@
 #include <QMutex>
 #include <QList>
 #include <QMap>
+#include <QRect>
 
 #include "mythuiexp.h"
 #include "mythevent.h"
@@ -22,6 +23,9 @@
 
 class MythUINotificationScreen;
 class MythScreenStack;
+class MythPainter;
+class QPaintDevice;
+class MythNotificationScreenStack;
 
 class MUI_PUBLIC MythUINotificationCenterEvent : public MythEvent
 {
@@ -67,6 +71,14 @@ public:
     void UnRegister(void *from, int id);
 
     /**
+     * For UI screens not using MythUIScreenStack for display (e.g. video playback),
+     * provide own custom drawing routine.
+     */
+    QRegion Draw(MythPainter *painter, QPaintDevice *device, QSize size,
+                 QRegion &changed, int alignx = 0, int aligny = 0);
+    bool    DrawDirect(MythPainter *painter, QSize size, bool repaint = false);
+
+    /**
      * ProcessQueue will be called by the GUI event handler and will process
      * all queued MythNotifications and delete screens marked to be deleted
      * ProcessQueue must be called from GUI thread
@@ -79,22 +91,22 @@ private slots:
 private:
     MythUINotificationScreen *CreateScreen(MythNotification *notification,
                                            int id = -1);
-    MythScreenStack *GetScreenStack(void);
+    MythNotificationScreenStack *GetScreenStack(void);
     void DeleteAllScreens(void);
     int InsertScreen(MythUINotificationScreen *screen);
     int RemoveScreen(MythUINotificationScreen *screen);
     void AdjustScreenPosition(int from, bool down);
 
 private:
-    MythScreenStack                        *m_screenStack;
+    MythNotificationScreenStack            *m_screenStack;
     QList<MythNotification*>                m_notifications;
     QList<MythUINotificationScreen*>        m_screens;
     QList<MythUINotificationScreen*>        m_deletedScreens;
     QMap<int, MythUINotificationScreen*>    m_registrations;
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
-    // protected by m_lock
     int                                     m_currentId;
+    bool                                    m_refresh;
     // protected by g_lock
     static QMutex                           g_lock;
     static MythUINotificationCenter        *g_singleton;
