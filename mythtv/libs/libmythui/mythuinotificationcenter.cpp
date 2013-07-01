@@ -604,15 +604,8 @@ void MythUINotificationCenter::ScreenDeleted(void)
             // Copy old content
             *newscreen = *screen;
             m_registrations[screen->m_id] = newscreen;
-            int pos = InsertScreen(newscreen);
-            // adjust vertical position
-            newscreen->AdjustYPosition((newscreen->GetHeight() + HGAP) * pos);
-
-            if (pos < n - 1)
-            {
-                // screen was inserted before others, adjust their positions
-                AdjustScreenPosition(pos, true);
-            }
+            // Screen was deleted, add it to suspended list
+            m_suspended.append(screen->m_id);
         }
     }
     // so screen will be refreshed by Draw() or DrawDirect()
@@ -643,6 +636,22 @@ bool MythUINotificationCenter::Queue(MythNotification &notification)
                 .arg(id));
             id = -1;
         }
+        else
+        {
+            // check if notification card has been suspended, in which case
+            // refuse all notification updates
+            if (m_suspended.contains(id))
+            {
+                if (notification.type() == MythNotification::Update)
+                {
+                    delete tmp;
+                    return false;
+                }
+                // got something else than an update, remove it from the
+                // suspended list
+                m_suspended.removeAll(id);
+            }
+        }
     }
     m_notifications.append(tmp);
 
@@ -671,6 +680,7 @@ void MythUINotificationCenter::ProcessQueue(void)
     foreach (MythNotification *n, m_notifications)
     {
         int id = n->GetId();
+        bool created = false;
         MythUINotificationScreen *screen = NULL;
 
         if (id > 0)
@@ -691,6 +701,11 @@ void MythUINotificationCenter::ProcessQueue(void)
             {
                 m_registrations[id] = screen;
             }
+            created = true;
+        }
+
+        if (created || !m_screens.contains(screen))
+        {
             int pos = InsertScreen(screen);
             // adjust vertical position
             screen->AdjustYPosition((screen->GetHeight() + HGAP) * pos);

@@ -103,6 +103,7 @@ private:
     QList<MythUINotificationScreen*>        m_screens;
     QList<MythUINotificationScreen*>        m_deletedScreens;
     QMap<int, MythUINotificationScreen*>    m_registrations;
+    QList<int>                              m_suspended;
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
     int                                     m_currentId;
