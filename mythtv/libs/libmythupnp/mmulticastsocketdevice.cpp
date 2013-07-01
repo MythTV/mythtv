@@ -106,8 +106,13 @@ qint64 MMulticastSocketDevice::writeBlock(
                 continue; // skip localhost address
 
             uint32_t interface_addr = (*it).toIPv4Address();
-            setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_IF,
-                       (const char *)&interface_addr, sizeof(interface_addr));
+            if (setsockopt(socket(), IPPROTO_IP, IP_MULTICAST_IF,
+                           (const char *)&interface_addr,
+                           sizeof(interface_addr)) < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "setsockopt - IP_MULTICAST_IF " + ENO);
+            }
             retx = MSocketDevice::writeBlock(data, len, host, port);
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
