@@ -97,6 +97,10 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
 
 MythUINotificationScreen::~MythUINotificationScreen()
 {
+    // We can't rely on Exiting() default MythScreenType signal as
+    // by the time it is emitted, the destructor would have already been called
+    // making the members unusable
+    emit ScreenDeleted();
 }
 
 /**
@@ -439,6 +443,60 @@ void MythUINotificationScreen::ProcessTimer(void)
     GetScreenStack()->PopScreen(this, true, true);
 }
 
+MythUINotificationScreen &MythUINotificationScreen::operator=(MythUINotificationScreen &s)
+{
+    m_id        = s.m_id;
+    m_image     = s.m_image;
+    m_imagePath = s.m_imagePath;
+    m_title     = s.m_title;
+    m_artist    = s.m_artist;
+    m_album     = s.m_album;
+    m_format    = s.m_format;
+    m_duration  = s.m_duration;
+    m_position  = s.m_position;
+
+    // Adjust visibility
+    if (m_artworkImage)
+    {
+        m_artworkImage->SetVisible(s.m_artworkImage ? s.m_artworkImage->IsVisible() : false);
+    }
+    if (m_titleText)
+    {
+        m_titleText->SetVisible(s.m_titleText ? s.m_titleText->IsVisible() : false);
+    }
+    if (m_artistText)
+    {
+        m_artistText->SetVisible(s.m_artistText ? s.m_artistText->IsVisible() : false);
+    }
+    if (m_albumText)
+    {
+        m_albumText->SetVisible(s.m_albumText ? s.m_albumText->IsVisible() : false);
+    }
+    if (m_formatText)
+    {
+        m_formatText->SetVisible(s.m_formatText ? s.m_formatText->IsVisible() : false);
+    }
+    if (m_titleText)
+    {
+        m_titleText->SetVisible(s.m_titleText ? s.m_titleText->IsVisible() : false);
+    }
+    if (m_timeText)
+    {
+        m_timeText->SetVisible(s.m_timeText ? s.m_timeText->IsVisible() : false);
+    }
+    if (m_progressBar)
+    {
+        m_progressBar->SetVisible(s.m_progressBar ? s.m_progressBar->IsVisible() : false);
+    }
+
+    m_update = ~kMetaData; // so all fields are initialised regardless of notification type
+    m_added = true;        // so the screen won't be added to display
+    Init();
+    m_added = false;
+
+    return *this;
+}
+
 /////////////////////// MythUINotificationCenter
 
 MythUINotificationCenter *MythUINotificationCenter::g_singleton = NULL;
@@ -543,6 +601,8 @@ void MythUINotificationCenter::ScreenDeleted(void)
             // don't remove the id from the list, as the application is still registered
             // re-create the screen
             MythUINotificationScreen *newscreen = CreateScreen(NULL, screen->m_id);
+            // Copy old content
+            *newscreen = *screen;
             m_registrations[screen->m_id] = newscreen;
             int pos = InsertScreen(newscreen);
             // adjust vertical position
@@ -673,7 +733,7 @@ MythUINotificationScreen *MythUINotificationCenter::CreateScreen(MythNotificatio
         delete screen;
         return NULL;
     }
-    connect(screen, SIGNAL(Exiting()), this, SLOT(ScreenDeleted()));
+    connect(screen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
     return screen;
 }
 

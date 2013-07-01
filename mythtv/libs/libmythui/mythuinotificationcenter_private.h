@@ -56,6 +56,11 @@ public:
         kMetaData   = 1 << 2,
     };
 
+    MythUINotificationScreen &operator=(MythUINotificationScreen &s);
+
+signals:
+    void ScreenDeleted();
+
 public slots:
     void ProcessTimer(void);
 
@@ -78,6 +83,7 @@ public:
     MythUIText         *m_formatText;
     MythUIText         *m_timeText;
     MythUIProgressBar  *m_progressBar;
+
 };
 
 #endif
