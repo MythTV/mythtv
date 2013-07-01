@@ -911,16 +911,7 @@ DTC::LiveStreamInfo *Content::GetLiveStream( int nId )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::LiveStreamInfoList *Content::GetLiveStreamList( void )
-{
-    return HTTPLiveStream::GetLiveStreamInfoList();
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-DTC::LiveStreamInfoList *Content::GetFilteredLiveStreamList( const QString   &FileName )
+DTC::LiveStreamInfoList *Content::GetLiveStreamList( const QString   &FileName )
 {
     return HTTPLiveStream::GetLiveStreamInfoList(FileName);
 }

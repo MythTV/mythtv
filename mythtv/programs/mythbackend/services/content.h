@@ -114,8 +114,7 @@ class Content : public ContentServices
                                                           int              SampleRate );
 
         DTC::LiveStreamInfo     *GetLiveStream            ( int Id );
-        DTC::LiveStreamInfoList *GetLiveStreamList        ( void );
-        DTC::LiveStreamInfoList *GetFilteredLiveStreamList( const QString &FileName );
+        DTC::LiveStreamInfoList *GetLiveStreamList        ( const QString &FileName );
 
         DTC::LiveStreamInfo     *StopLiveStream         ( int Id );
         bool                     RemoveLiveStream       ( int Id );
@@ -172,14 +171,9 @@ class ScriptableContent : public QObject
             return m_obj.GetLiveStream( Id );
         }
 
-        QObject* GetLiveStreamList(  void )
+        QObject* GetLiveStreamList(  const QString &FileName )
         {
-            return m_obj.GetLiveStreamList();
-        }
-
-        QObject* GetFilteredLiveStreamList(  const QString &FileName )
-        {
-            return m_obj.GetFilteredLiveStreamList( FileName );
+            return m_obj.GetLiveStreamList( FileName );
         }
 };
 
