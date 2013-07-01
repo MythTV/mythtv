@@ -18,6 +18,7 @@
 #include "mythuistatetracker.h"
 #include "plist.h"
 #include "tv_play.h"
+#include "mythuinotificationcenter.h"
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
@@ -491,6 +492,10 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
+    MythNotification n(tr("New Connection"), tr("AirPlay"),
+                       tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
+    MythUINotificationCenter::GetInstance()->Queue(n);
+
     m_sockets.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteConnection()));
     connect(client, SIGNAL(readyRead()), this, SLOT(read()));
@@ -505,6 +510,9 @@ void MythAirplayServer::deleteConnection(void)
 
     if (!m_sockets.contains(socket))
         return;
+
+    MythNotification n(tr("Client disconnected"), tr("AirPlay"));
+    MythUINotificationCenter::GetInstance()->Queue(n);
 
     deleteConnection(socket);
 }
