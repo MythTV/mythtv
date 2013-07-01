@@ -521,9 +521,6 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->idleTimer->setInterval(1000 * 60 * idletime); // 30 minutes
     connect(d->idleTimer, SIGNAL(timeout()), SLOT(IdleTimeout()));
     d->idleTimer->start();
-
-    // Will create Notification Center singleton
-    (void)MythUINotificationCenter::GetInstance();
 }
 
 MythMainWindow::~MythMainWindow()
@@ -1093,6 +1090,9 @@ void MythMainWindow::Init(QString forcedpainter)
         d->m_themeBase->Reload();
     else
         d->m_themeBase = new MythThemeBase();
+
+    // Will create Notification Center singleton
+    (void)MythUINotificationCenter::GetInstance();
 }
 
 void MythMainWindow::InitKeys()
