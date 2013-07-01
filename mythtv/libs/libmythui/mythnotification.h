@@ -40,7 +40,7 @@ public:
     {
     }
 
-    MythNotification(QString title, QString author)
+    MythNotification(QString title, QString author, QString details = QString())
         : MythEvent(New), m_id(-1), m_parent(NULL), m_fullScreen(false),
         m_description(title), m_duration(0), m_visibility(kAll),
         m_priority(kDefault)
@@ -48,6 +48,7 @@ public:
         DMAP map;
         map["minm"] = title;
         map["asar"] = author;
+        map["asal"] = details;
         m_metadata = map;
     }
 
