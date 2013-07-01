@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.8" );
+    Q_CLASSINFO( "version"    , "1.9" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -67,14 +67,10 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
                                                            int              StartIndex,
-                                                           int              Count      ) = 0;
-
-        virtual DTC::ProgramList*  GetFilteredRecordedList ( bool             Descending,
-                                                             int              StartIndex,
-                                                             int              Count,
-                                                             const QString   &TitleRegEx,
-                                                             const QString   &RecGroup,
-                                                             const QString   &StorageGroup ) = 0;
+                                                           int              Count,
+                                                           const QString   &TitleRegEx,
+                                                           const QString   &RecGroup,
+                                                           const QString   &StorageGroup ) = 0;
 
         virtual DTC::Program*      GetRecorded           ( int              ChanId,
                                                             const QDateTime &StartTime  ) = 0;

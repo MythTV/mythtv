@@ -142,7 +142,7 @@ function listFiles() {
     var group = $("#rgName").val();
     var filter = $("#rgFilter").val().toLowerCase();
     $("#links").html("<i18n>Loading</i18n>...");
-    $.getJSON("/Dvr/GetFilteredRecordedList", { Descending: "1", StartIndex: "1", Count: "2000", TitleRegEx : filter, RecGroup : group }, function(data) {
+    $.getJSON("/Dvr/GetRecordedList", { Descending: "1", StartIndex: "1", Count: "2000", TitleRegEx : filter, RecGroup : group }, function(data) {
         $("#links").html("");
         var str = "<hr><form id='playform'>";
         str += "Width: <select name='Width'>" +

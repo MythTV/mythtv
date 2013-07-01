@@ -49,20 +49,12 @@ extern AutoExpire  *expirer;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ProgramList* Dvr::GetRecordedList( bool bDescending,
-                                        int  nStartIndex,
-                                        int  nCount      )
-{
-    return GetFilteredRecordedList( bDescending, nStartIndex, nCount,
-                                    QString(), QString(), QString() );
-}
-
-DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
-                                                int            nStartIndex,
-                                                int            nCount,
-                                                const QString &sTitleRegEx,
-                                                const QString &sRecGroup,
-                                                const QString &sStorageGroup )
+DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
+                                        int            nStartIndex,
+                                        int            nCount,
+                                        const QString &sTitleRegEx,
+                                        const QString &sRecGroup,
+                                        const QString &sStorageGroup )
 {
     QMap< QString, ProgramInfo* > recMap;
 
@@ -92,58 +84,33 @@ DTC::ProgramList* Dvr::GetFilteredRecordedList( bool           bDescending,
     DTC::ProgramList *pPrograms = new DTC::ProgramList();
     int nAvailable = 0;
 
-    if ((sTitleRegEx.isEmpty()) &&
-        (sRecGroup.isEmpty()) &&
-        (sStorageGroup.isEmpty()))
+    int nMax      = (nCount > 0) ? nCount : progList.size();
+
+    nAvailable = 0;
+    nCount = 0;
+
+    QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
+
+    for( unsigned int n = 0; n < progList.size(); n++)
     {
-        nStartIndex   = min( nStartIndex, (int)progList.size() );
-        nCount        = (nCount > 0) ? min( nCount, (int)progList.size() ) : progList.size();
-        int nEndIndex = min((nStartIndex + nCount), (int)progList.size() );
-        nCount        = nEndIndex - nStartIndex;
+        ProgramInfo *pInfo = progList[ n ];
 
-        nAvailable = progList.size();
+        if ((!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
+            (!sRecGroup.isEmpty() && sRecGroup != pInfo->GetRecordingGroup()) ||
+            (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
+            continue;
 
-        for( int n = nStartIndex; n < nEndIndex; n++)
-        {
-            ProgramInfo *pInfo = progList[ n ];
-            if (pInfo->GetRecordingGroup() != "Deleted")
-            {
-                DTC::Program *pProgram = pPrograms->AddNewProgram();
+        ++nAvailable;
 
-                FillProgramInfo( pProgram, pInfo, true );
-            }
-        }
-    }
-    else
-    {
-        int nMax      = (nCount > 0) ? nCount : progList.size();
+        if ((nAvailable < nStartIndex) ||
+            (nCount >= nMax))
+            continue;
 
-        nAvailable = 0;
-        nCount = 0;
+        ++nCount;
 
-        QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
+        DTC::Program *pProgram = pPrograms->AddNewProgram();
 
-        for( unsigned int n = 0; n < progList.size(); n++)
-        {
-            ProgramInfo *pInfo = progList[ n ];
-
-            if ((!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
-                (!sRecGroup.isEmpty() && sRecGroup != pInfo->GetRecordingGroup()) ||
-                (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
-                continue;
-
-            ++nAvailable;
-
-            if ((nAvailable < nStartIndex) ||
-                (nCount >= nMax))
-                continue;
-
-            ++nCount;
-
-            DTC::Program *pProgram = pPrograms->AddNewProgram();
-
-            FillProgramInfo( pProgram, pInfo, true );
-        }
+        FillProgramInfo( pProgram, pInfo, true );
     }
 
     // ----------------------------------------------------------------------

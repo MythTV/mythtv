@@ -262,7 +262,7 @@ function listRecordings() {
     var recgroup = $("#recGroup").val();
 
     $("#links").html("<i18n>Loading</i18n>...");
-    $.getJSON("/Dvr/GetFilteredRecordedList",
+    $.getJSON("/Dvr/GetRecordedList",
               { Descending: 1, StartIndex: 0, Count: 20000,
                 RecGroup: recgroup },
               function(data) {
