@@ -80,6 +80,7 @@ MythSystemLegacyIOHandler::MythSystemLegacyIOHandler(bool read) :
     m_pWaitLock(), m_pWait(), m_pLock(), m_pMap(PMap_t()), m_maxfd(-1),
     m_read(read)
 {
+    FD_ZERO(&m_fds);
     m_readbuf[0] = '\0';
 }
 
