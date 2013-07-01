@@ -525,9 +525,14 @@ void MythSystemLegacySignalManager::run(void)
  ******************************/
 
 MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
-    MythSystemLegacyPrivate("MythSystemLegacyWindows")
+    MythSystemLegacyPrivate("MythSystemLegacyWindows"),
+    m_child(NULL), m_timeout(0)
 {
     m_parent = parent;
+
+    m_stdpipe[0] = NULL;
+    m_stdpipe[1] = NULL;
+    m_stdpipe[2] = NULL;
 
     connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
     connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
