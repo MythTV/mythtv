@@ -34,9 +34,27 @@ public:
     {
     }
 
-    MythNotification(int id, void *parent) :
-        MythEvent(Update), m_id(id), m_parent(parent), m_fullScreen(false),
+    MythNotification(int id, void *parent)
+        : MythEvent(Update), m_id(id), m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
+    {
+    }
+
+    MythNotification(QString title, QString author)
+        : MythEvent(New), m_id(-1), m_parent(NULL), m_fullScreen(false),
+        m_description(title), m_duration(0), m_visibility(kAll),
+        m_priority(kDefault)
+    {
+        DMAP map;
+        map["minm"] = title;
+        map["asar"] = author;
+        m_metadata = map;
+    }
+
+    MythNotification(Type t, DMAP &metadata)
+        : MythEvent(t), m_id(-1), m_parent(NULL), m_fullScreen(false),
+        m_duration(0), m_metadata(metadata),
+        m_visibility(kAll), m_priority(kDefault)
     {
     }
 
@@ -153,21 +171,24 @@ protected:
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 {
 public:
-    MythImageNotification(Type t)
-        : MythNotification(t)
+    MythImageNotification(Type t, QImage &image)
+        : MythNotification(t), m_image(image)
+    {
+    }
+
+    MythImageNotification(Type t, QString &imagePath)
+        : MythNotification(t), m_imagePath(imagePath)
     {
     }
 
     MythImageNotification(Type t, QImage &image, DMAP &metadata)
-        : MythNotification(t), m_image(image)
+        : MythNotification(t, metadata), m_image(image)
     {
-        m_metadata = metadata;
     }
 
     MythImageNotification(Type t, QString &imagePath, DMAP &metadata)
-        : MythNotification(t), m_imagePath(imagePath)
+        : MythNotification(t, metadata), m_imagePath(imagePath)
     {
-        m_metadata = metadata;
     }
 
     virtual MythEvent *clone(void) const { return new MythImageNotification(*this); }
@@ -243,14 +264,14 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
 public:
     MythMediaNotification(Type t, QImage &image, DMAP &metadata,
                           int duration, int position)
-        : MythNotification(t), MythImageNotification(t, image, metadata),
+        : MythNotification(t, metadata), MythImageNotification(t, image),
         MythPlaybackNotification(t, duration, position)
     {
     }
 
     MythMediaNotification(Type t, QString imagePath, DMAP &metadata,
                           int duration, int position)
-        : MythNotification(t), MythImageNotification(t, imagePath, metadata),
+        : MythNotification(t, metadata), MythImageNotification(t, imagePath),
         MythPlaybackNotification(t, duration, position)
     {
     }
