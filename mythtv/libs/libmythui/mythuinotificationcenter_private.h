@@ -9,6 +9,8 @@
 #ifndef MythTV_mythuinotificationcenter_private_h
 #define MythTV_mythuinotificationcenter_private_h
 
+#include <stdint.h>
+
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
 #include "mythuiimage.h"
