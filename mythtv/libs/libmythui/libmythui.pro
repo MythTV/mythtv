@@ -84,6 +84,7 @@ inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
 inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
+inc.files += mythuinotificationcenter.h mythnotification.h
 
 INSTALLS += inc
 
