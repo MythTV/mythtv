@@ -186,6 +186,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     filename = lfilename;
     safefilename = lfilename;
+    subtitlefilename.clear();
 
     if (remotefile)
     {

@@ -2676,8 +2676,9 @@ void MythPlayer::JumpToProgram(void)
     TVState desiredState = player_ctx->GetState();
     bool isInProgress =
         desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
-    if (!subfn.isEmpty() && GetSubReader())
-        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
+    if (GetSubReader())
+        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress &&
+                                              !subfn.isEmpty());
 
     if (!player_ctx->buffer->IsOpen())
     {
