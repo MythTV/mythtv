@@ -15,6 +15,7 @@
 #include "mythuibutton.h"
 #include "mythuieditbar.h"
 #include "mythuistatetype.h"
+#include "mythuinotificationcenter.h"
 
 // libmythtv
 #include "channelutil.h"
@@ -649,7 +650,10 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
         painter->End();
     }
 
-    return visible;
+    bool visible2 =
+        MythUINotificationCenter::GetInstance()->DrawDirect(painter, size, repaint);
+
+    return visible || visible2;
 }
 
 QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
@@ -734,6 +738,14 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
 
     if (visible.isEmpty() || (!alignx && !aligny))
         return visible;
+
+    // display notifications stack
+    QRegion changed2;
+    QRegion notification =
+        MythUINotificationCenter::GetInstance()->Draw(painter, device, size,
+                                                      changed2, alignx, aligny);
+    changed = changed.united(changed2);
+    visible = visible.united(notification);
 
     // assist yuv blending with some friendly alignments
     QRegion aligned;
