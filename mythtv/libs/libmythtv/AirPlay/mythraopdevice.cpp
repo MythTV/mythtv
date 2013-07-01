@@ -7,6 +7,7 @@
 #include "mthread.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "mythuinotificationcenter.h"
 
 #include "bonjourregister.h"
 #include "mythraopconnection.h"
@@ -60,7 +61,6 @@ bool MythRAOPDevice::Create(void)
             gMythRAOPDevice,                  SLOT(Stop()));
         gMythRAOPDeviceThread->start(QThread::LowestPriority);
     }
-
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "Created RAOP device objects.");
     return true;
@@ -209,6 +209,10 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
+    MythNotification n(tr("New Connection"), tr("AirTunes"),
+                       tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
+    MythUINotificationCenter::GetInstance()->Queue(n);
+
     MythRAOPConnection *obj =
             new MythRAOPConnection(this, client, m_hardwareId, 6000);
 
@@ -232,6 +236,9 @@ void MythRAOPDevice::deleteClient(void)
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Entering DeleteClient.");
     QMutexLocker locker(m_lock);
     QList<MythRAOPConnection *>::iterator it = m_clients.begin();
+
+    MythNotification n(tr("Client disconnected"), tr("AirTunes"));
+    MythUINotificationCenter::GetInstance()->Queue(n);
 
     while (it != m_clients.end())
     {
