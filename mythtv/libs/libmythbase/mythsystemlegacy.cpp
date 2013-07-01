@@ -181,6 +181,9 @@ MythSystemLegacy::MythSystemLegacy(const MythSystemLegacy &other) :
     m_args(other.m_args),
     m_directory(other.m_directory),
 
+    m_nice(other.m_nice),
+    m_ioprio(other.m_ioprio),
+
     m_settings(other.m_settings)
 {
     m_semReady.release(other.m_semReady.available());
