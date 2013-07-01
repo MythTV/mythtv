@@ -77,19 +77,26 @@ private slots:
     void ScreenDeleted(void);
 
 private:
-    MythUINotificationScreen *CreateScreen(int id);
+    MythUINotificationScreen *CreateScreen(MythNotification *notification,
+                                           int id = -1);
     MythScreenStack *GetScreenStack(void);
     void DeleteAllScreens(void);
+    int InsertScreen(MythUINotificationScreen *screen);
+    int RemoveScreen(MythUINotificationScreen *screen);
+    void AdjustScreenPosition(int from, bool down);
 
 private:
     MythScreenStack                        *m_screenStack;
     QList<MythNotification*>                m_notifications;
+    QList<MythUINotificationScreen*>        m_screens;
     QList<MythUINotificationScreen*>        m_deletedScreens;
     QMap<int, MythUINotificationScreen*>    m_registrations;
     QMap<int, void*>                        m_clients;
-    static QMutex                           m_lock;
+    QMutex                                  m_lock;
     // protected by m_lock
-    static int                              m_currentId;
+    int                                     m_currentId;
+    // protected by g_lock
+    static QMutex                           g_lock;
     static MythUINotificationCenter        *g_singleton;
 };
 

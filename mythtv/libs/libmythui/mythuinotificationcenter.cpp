@@ -10,9 +10,12 @@
 #include <QEvent>
 #include <QObject>
 #include <QThread>
+#include <QTimer>
+
 #include "mythcorecontext.h"
 
 #include "mythuinotificationcenter.h"
+#include "mythuinotificationcenter_private.h"
 
 #include "mythscreenstack.h"
 #include "mythscreentype.h"
@@ -22,6 +25,9 @@
 
 #define LOC QString("NotificationCenter: ")
 
+#define HGAP 5
+#define DEFAULT_DURATION 5000  // in ms
+
 //// MythUINotificationCenterEvent
 
 QEvent::Type MythUINotificationCenterEvent::kEventType =
@@ -29,64 +35,34 @@ QEvent::Type MythUINotificationCenterEvent::kEventType =
 
 //// class MythUINotificationScreen
 
-class MythUINotificationScreen : public MythScreenType
-{
-public:
-    MythUINotificationScreen(MythScreenStack *stack,
-                             int id = -1);
-
-    virtual ~MythUINotificationScreen();
-
-    // These two methods are declared by MythScreenType and their signatures
-    // should not be changed
-    virtual bool Create(void);
-    virtual void Init(void);
-
-    void SetNotification(MythNotification &notification);
-
-    void UpdateArtwork(const QImage &image);
-    void UpdateArtwork(const QString &image);
-    void UpdateMetaData(const DMAP &data);
-    void UpdatePlayback(int duration, int position);
-
-    QString stringFromSeconds(int time);
-
-    enum Update {
-        kForce      = 0,
-        kImage      = 1 << 0,
-        kDuration   = 1 << 1,
-        kMetaData   = 1 << 2,
-    };
-
-    int                 m_id;
-    QImage              m_image;
-    QString             m_imagePath;
-    QString             m_title;
-    QString             m_artist;
-    QString             m_album;
-    QString             m_format;
-    int                 m_duration;
-    int                 m_position;
-    bool                m_added;
-    uint32_t            m_update;
-    MythUIImage        *m_artworkImage;
-    MythUIText         *m_titleText;
-    MythUIText         *m_artistText;
-    MythUIText         *m_albumText;
-    MythUIText         *m_formatText;
-    MythUIText         *m_timeText;
-    MythUIProgressBar  *m_progressBar;
-};
-
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythuinotification"),  m_id(id),
       m_duration(-1),       m_position(-1),         m_added(false),
-      m_update(0),
+      m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
 {
+}
+
+MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
+                                                   MythNotification &notification)
+    : MythScreenType(stack, "mythuinotification"),  m_id(notification.GetId()),
+      m_duration(notification.GetDuration()),       m_position(-1),
+      m_added(false),       m_update(kForce),
+      m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
+      m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
+      m_progressBar(NULL)
+{
+    SetNotification(notification);
+    // Set timer if need be
+    if (m_id <= 0)
+    {
+        QTimer::singleShot(
+            m_duration <= DEFAULT_DURATION ? DEFAULT_DURATION : m_duration,
+            this, SLOT(ProcessTimer()));
+    }
 }
 
 MythUINotificationScreen::~MythUINotificationScreen()
@@ -96,9 +72,9 @@ MythUINotificationScreen::~MythUINotificationScreen()
 /**
  * stringFromSeconds:
  *
- * Usage: stringFromSeconds(seconds)
- * Description: create a string in the format HH:mm:ss from a duration in seconds
- * HH: will not be displayed if there's less than one hour
+ * Usage: stringFromSeconds(seconds).
+ * Description: create a string in the format HH:mm:ss from a duration in seconds.
+ * HH: will not be displayed if there's less than one hour.
  */
 QString MythUINotificationScreen::stringFromSeconds(int time)
 {
@@ -134,7 +110,7 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
     if (img)
     {
         QString path = img->GetImagePath();
-        
+
         if (path.isNull())
         {
             UpdateArtwork(img->GetImage());
@@ -218,13 +194,14 @@ bool MythUINotificationScreen::Create(void)
     m_timeText->SetVisible(false);
     m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
     m_progressBar->SetVisible(false);
+
     return true;
 }
 
 /**
- * Update the various fields of a MythUINotificationScreen
+ * Update the various fields of a MythUINotificationScreen.
  * If metadata update flag is set; a Null string means to leave the text field
- * unchanged
+ * unchanged.
  */
 void MythUINotificationScreen::Init(void)
 {
@@ -351,8 +328,8 @@ void MythUINotificationScreen::Init(void)
 }
 
 /**
- * Update artwork image
- * must call Init() for screen to be updated
+ * Update artwork image.
+ * must call Init() for screen to be updated.
  */
 void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 {
@@ -360,8 +337,8 @@ void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 }
 
 /**
- * Update artwork image via URL or file path
- * must call Init() for screen to be updated
+ * Update artwork image via URL or file path.
+ * must call Init() for screen to be updated.
  */
 void MythUINotificationScreen::UpdateArtwork(const QString &image)
 {
@@ -369,10 +346,10 @@ void MythUINotificationScreen::UpdateArtwork(const QString &image)
 }
 
 /**
- * Read some DMAP tag to extract title, artist, album and file format
- * must call Init() for screen to be updated
+ * Read some DMAP tag to extract title, artist, album and file format.
+ * must call Init() for screen to be updated.
  * If metadata update flag is set; a Null string means to leave the text field
- * unchanged
+ * unchanged.
  */
 void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
 {
@@ -401,8 +378,8 @@ void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
 }
 
 /**
- * Update playback position information
- * must call Init() for screen to be updated
+ * Update playback position information.
+ * must call Init() for screen to be updated.
  */
 void MythUINotificationScreen::UpdatePlayback(int duration, int position)
 {
@@ -410,16 +387,36 @@ void MythUINotificationScreen::UpdatePlayback(int duration, int position)
     m_position  = position;
 }
 
+/**
+ * Update Y position of the screen by height pixels.
+ * All children elements will be relocated.
+ */
+void MythUINotificationScreen::AdjustYPosition(int height)
+{
+    MythPoint point = GetPosition();
+    point.setY(point.getY().toInt() + height);
+    SetPosition(point);
+}
+
+int MythUINotificationScreen::GetHeight(void)
+{
+    return GetArea().getHeight().toInt();
+}
+
+void MythUINotificationScreen::ProcessTimer(void)
+{
+    // delete screen
+    GetScreenStack()->PopScreen(this, true, true);
+}
+
 /////////////////////// MythUINotificationCenter
 
 MythUINotificationCenter *MythUINotificationCenter::g_singleton = NULL;
-
-int MythUINotificationCenter::m_currentId = 0;
-QMutex MythUINotificationCenter::m_lock(QMutex::Recursive);
+QMutex MythUINotificationCenter::g_lock;
 
 MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
 {
-    QMutexLocker lock(&m_lock);
+    QMutexLocker lock(&g_lock);
 
     if (g_singleton)
         return g_singleton;
@@ -438,7 +435,8 @@ MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
     return g_singleton;
 }
 
-MythUINotificationCenter::MythUINotificationCenter() : m_screenStack(NULL)
+MythUINotificationCenter::MythUINotificationCenter()
+    : m_screenStack(NULL), m_currentId(0)
 {
     const bool isGuiThread =
         QThread::currentThread() == QCoreApplication::instance()->thread();
@@ -482,8 +480,8 @@ MythUINotificationCenter::~MythUINotificationCenter()
 }
 
 /**
- * Remove screen from screens list
- * Qt slot called upong MythScreenType::Exiting()
+ * Remove screen from screens list.
+ * Qt slot called upon MythScreenType::Exiting().
  */
 void MythUINotificationCenter::ScreenDeleted(void)
 {
@@ -492,17 +490,40 @@ void MythUINotificationCenter::ScreenDeleted(void)
 
     QMutexLocker lock(&m_lock);
 
+    bool duefordeletion = m_deletedScreens.contains(screen);
+
+    // Check that screen wasn't about to be deleted
+    if (duefordeletion)
+    {
+        m_deletedScreens.removeAll(screen);
+    }
+
+    int n = m_screens.indexOf(screen);
+    if (n >= 0)
+    {
+        m_screens.removeAll(screen);
+        AdjustScreenPosition(n, false);
+    }
+
     // search if an application had registered for it
     if (m_registrations.contains(screen->m_id))
     {
-        // don't remove the id from the list, as the application is still registered
-        m_registrations[screen->m_id] = NULL;
-    }
+        if (!duefordeletion)
+        {
+            // don't remove the id from the list, as the application is still registered
+            // re-create the screen
+            MythUINotificationScreen *newscreen = CreateScreen(NULL, screen->m_id);
+            m_registrations[screen->m_id] = newscreen;
+            int pos = InsertScreen(newscreen);
+            // adjust vertical position
+            newscreen->AdjustYPosition((newscreen->GetHeight() + HGAP) * pos);
 
-    // Check that screen wasn't about to be deleted
-    if (m_deletedScreens.contains(screen))
-    {
-        m_deletedScreens.removeAll(screen);
+            if (pos < n - 1)
+            {
+                // screen was inserted before others, adjust their positions
+                AdjustScreenPosition(pos, true);
+            }
+        }
     }
 }
 
@@ -567,12 +588,25 @@ void MythUINotificationCenter::ProcessQueue(void)
         if (!screen)
         {
             // We have a registration, but no screen. Create one and display it
-            screen = CreateScreen(id);
+            screen = CreateScreen(n);
             if (!screen) // Reads screen definition from xml, and constructs screen
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("ProcessQueue: couldn't create required screen"));
                 continue; // something is wrong ; ignore
+            }
             if (id > 0)
             {
                 m_registrations[id] = screen;
+            }
+            int pos = InsertScreen(screen);
+            // adjust vertical position
+            screen->AdjustYPosition((screen->GetHeight() + HGAP) * pos);
+            int n = m_screens.size();
+            if (pos < n - 1)
+            {
+                // screen was inserted before others, adjust their positions
+                AdjustScreenPosition(pos + 1, true);
             }
         }
         screen->SetNotification(*n);
@@ -583,13 +617,22 @@ void MythUINotificationCenter::ProcessQueue(void)
 }
 
 /**
- * CreateScreen will create a MythUINotificationScreen instance
- * This screen will not be displayed until it is used
+ * CreateScreen will create a MythUINotificationScreen instance.
+ * This screen will not be displayed until it is used.
  */
-MythUINotificationScreen *MythUINotificationCenter::CreateScreen(int id)
+MythUINotificationScreen *MythUINotificationCenter::CreateScreen(MythNotification *n,
+                                                                 int id)
 {
-    MythUINotificationScreen *screen =
-        new MythUINotificationScreen(GetScreenStack(), id);
+    MythUINotificationScreen *screen;
+
+    if (n)
+    {
+        screen = new MythUINotificationScreen(GetScreenStack(), *n);
+    }
+    else
+    {
+        screen = new MythUINotificationScreen(GetScreenStack(), id);
+    }
 
     if (!screen->Create()) // Reads screen definition from xml, and constructs screen
     {
@@ -645,13 +688,16 @@ void MythUINotificationCenter::UnRegister(void *from, int id)
             .arg(id));
     }
 
-    MythUINotificationScreen *screen = m_registrations[id];
-    if (screen != NULL)
+    if (m_registrations.contains(id))
     {
-        // mark the screen for deletion
-        m_deletedScreens.append(screen);
+        MythUINotificationScreen *screen = m_registrations[id];
+        if (screen != NULL)
+        {
+            // mark the screen for deletion
+            m_deletedScreens.append(screen);
+        }
+        m_registrations.remove(id);
     }
-    m_registrations.remove(id);
     m_clients.remove(id);
 
     // Tell the GUI thread we have something to process
@@ -679,5 +725,73 @@ void MythUINotificationCenter::DeleteAllScreens(void)
         // so the MythScreenType::Exiting() signal won't process it a second time
         m_deletedScreens.removeLast();
         screen->GetScreenStack()->PopScreen(screen, true, true);
+    }
+}
+
+/**
+ * Insert screen into list of screens.
+ * Returns index in screens list.
+ */
+int MythUINotificationCenter::InsertScreen(MythUINotificationScreen *screen)
+{
+    QList<MythUINotificationScreen*>::iterator it       = m_screens.begin();
+    QList<MythUINotificationScreen*>::iterator itend    = m_screens.end();
+
+//    if (screen->m_id > 0)
+//    {
+//        // we want a permanent screen; add it after the existing one
+//        for (; it != itend; ++it)
+//        {
+//            if ((*it)->m_id <= 0 ||
+//                (*it)->m_id > screen->m_id)
+//                break; // reached the temporary screens
+//        }
+//        // it points to where we want to insert item
+//    }
+//    else
+    {
+        it = itend;
+    }
+    it = m_screens.insert(it, screen);
+
+    return it - m_screens.begin();
+}
+
+/**
+ * Remove screen from list of screens.
+ * Returns index in screens list.
+ */
+int MythUINotificationCenter::RemoveScreen(MythUINotificationScreen *screen)
+{
+    QList<MythUINotificationScreen*>::iterator it       = m_screens.begin();
+    QList<MythUINotificationScreen*>::iterator itend    = m_screens.end();
+
+    for (; it != itend; ++it)
+    {
+        if (*it == screen)
+            break;
+    }
+
+    if (it != itend)
+    {
+        it = m_screens.erase(it);
+    }
+
+    return it - m_screens.begin();
+}
+
+/**
+ * Re-position screens on display.
+ */
+void MythUINotificationCenter::AdjustScreenPosition(int from, bool down)
+{
+    QList<MythUINotificationScreen*>::iterator it       = m_screens.begin();
+    QList<MythUINotificationScreen*>::iterator itend    = m_screens.end();
+
+    it += from;
+
+    for (; it != itend; ++it)
+    {
+        (*it)->AdjustYPosition(((*it)->GetHeight() + HGAP) * (down ? 1 : -1));
     }
 }
