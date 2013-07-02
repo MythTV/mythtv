@@ -75,6 +75,7 @@ public:
     float               m_progress;
     QString             m_progressText;
     bool                m_added;
+    bool                m_created;
     uint32_t            m_update;
     MythUIImage        *m_artworkImage;
     MythUIText         *m_titleText;

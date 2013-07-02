@@ -92,7 +92,7 @@ private:
     friend class MythNotificationScreenStack;
 
     MythUINotificationScreen *CreateScreen(MythNotification *notification,
-                                           int id = -1);
+                                           int id = -1, bool nocreate = false);
     MythNotificationScreenStack *GetScreenStack(void);
     void ScreenStackDeleted(void);
     void DeleteAllScreens(void);

@@ -41,7 +41,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythuinotification"),  m_id(id),
       m_duration(-1),       m_progress(-1.0),       m_added(false),
-      m_update(kForce),
+      m_created(false),     m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
@@ -54,7 +54,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    MythNotification &notification)
     : MythScreenType(stack, "mythuinotification"),  m_id(notification.GetId()),
       m_duration(notification.GetDuration()),       m_progress(-1.0),
-      m_added(false),       m_update(kForce),
+      m_added(false),       m_created(false),       m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
@@ -171,6 +171,8 @@ bool MythUINotificationScreen::Create(void)
     {
         m_progressBar->SetVisible(false);
     }
+
+    m_created = true;
 
     return true;
 }
@@ -557,7 +559,8 @@ void MythUINotificationCenter::ScreenDeleted(void)
         {
             // don't remove the id from the list, as the application is still registered
             // re-create the screen
-            MythUINotificationScreen *newscreen = CreateScreen(NULL, screen->m_id);
+            MythUINotificationScreen *newscreen = CreateScreen(NULL, screen->m_id,
+                                                               true);
             // Copy old content
             *newscreen = *screen;
             m_registrations[screen->m_id] = newscreen;
@@ -666,6 +669,16 @@ void MythUINotificationCenter::ProcessQueue(void)
             created = true;
         }
 
+        // if the screen got allocated, but did't read theme yet, do it now
+        if (screen && !screen->m_created)
+        {
+            if (!screen->Create())
+            {
+                delete screen;
+                continue;
+            }
+        }
+
         if (created || !m_screens.contains(screen))
         {
             int pos = InsertScreen(screen);
@@ -690,7 +703,7 @@ void MythUINotificationCenter::ProcessQueue(void)
  * This screen will not be displayed until it is used.
  */
 MythUINotificationScreen *MythUINotificationCenter::CreateScreen(MythNotification *n,
-                                                                 int id)
+                                                                 int id, bool nocreate)
 {
     MythUINotificationScreen *screen;
 
@@ -703,7 +716,7 @@ MythUINotificationScreen *MythUINotificationCenter::CreateScreen(MythNotificatio
         screen = new MythUINotificationScreen(GetScreenStack(), id);
     }
 
-    if (!screen->Create()) // Reads screen definition from xml, and constructs screen
+    if (!nocreate && !screen->Create()) // Reads screen definition from xml, and constructs screen
     {
         // If we can't create the screen then we can't display it, so delete
         // and abort
