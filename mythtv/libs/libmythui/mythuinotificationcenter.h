@@ -89,9 +89,12 @@ private slots:
     void ScreenDeleted(void);
 
 private:
+    friend class MythNotificationScreenStack;
+
     MythUINotificationScreen *CreateScreen(MythNotification *notification,
                                            int id = -1);
     MythNotificationScreenStack *GetScreenStack(void);
+    void ScreenStackDeleted(void);
     void DeleteAllScreens(void);
     int InsertScreen(MythUINotificationScreen *screen);
     int RemoveScreen(MythUINotificationScreen *screen);

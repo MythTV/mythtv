@@ -35,34 +35,6 @@
 QEvent::Type MythUINotificationCenterEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
-//// class MythScreenNotificationStack
-
-class MythNotificationScreenStack : public MythScreenStack
-{
-public:
-    MythNotificationScreenStack(MythMainWindow *parent, const QString& name)
-        : MythScreenStack(parent, name)
-    {
-    }
-
-    virtual ~MythNotificationScreenStack()
-    {
-    }
-
-    void CheckDeletes()
-    {
-        QVector<MythScreenType*>::const_iterator it;
-
-        for (it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
-        {
-            (*it)->SetAlpha(0);
-            (*it)->SetVisible(false);
-            (*it)->Close();
-        }
-        MythScreenStack::CheckDeletes();
-    }
-};
-
 //// class MythUINotificationScreen
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
@@ -185,16 +157,20 @@ bool MythUINotificationScreen::Create(void)
     // The xml should contain an <imagetype> named 'coverart', if it doesn't
     // then we cannot display the image and may as well abort
     m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("coverart"));
-    if (!m_artworkImage)
-        return false;
-    m_artworkImage->SetVisible(false);
+    if (m_artworkImage)
+    {
+        m_artworkImage->SetVisible(false);
+    }
     m_titleText     = dynamic_cast<MythUIText*>(GetChild("title"));
     m_artistText    = dynamic_cast<MythUIText*>(GetChild("artist"));
     m_albumText     = dynamic_cast<MythUIText*>(GetChild("album"));
     m_formatText    = dynamic_cast<MythUIText*>(GetChild("info"));
     m_timeText      = dynamic_cast<MythUIText*>(GetChild("time"));
     m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
-    m_progressBar->SetVisible(false);
+    if (m_progressBar)
+    {
+        m_progressBar->SetVisible(false);
+    }
 
     return true;
 }
@@ -593,6 +569,11 @@ void MythUINotificationCenter::ScreenDeleted(void)
     m_refresh = true;
 }
 
+void MythUINotificationCenter::ScreenStackDeleted(void)
+{
+    m_screenStack = NULL;
+}
+
 bool MythUINotificationCenter::Queue(MythNotification &notification)
 {
     QMutexLocker lock(&m_lock);
@@ -798,7 +779,8 @@ MythNotificationScreenStack *MythUINotificationCenter::GetScreenStack(void)
     if (!m_screenStack)
     {
         m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
-                                                        "mythuinotification");
+                                                        "mythuinotification",
+                                                        this);
     }
     return m_screenStack;
 }

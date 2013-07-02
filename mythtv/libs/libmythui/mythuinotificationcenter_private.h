@@ -16,7 +16,7 @@
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
-#include "mythnotification.h"
+#include "mythuinotificationcenter.h"
 
 class MythUINotificationScreen : public MythScreenType
 {
@@ -83,6 +83,40 @@ public:
     MythUIText         *m_formatText;
     MythUIText         *m_timeText;
     MythUIProgressBar  *m_progressBar;
+
+};
+
+//// class MythScreenNotificationStack
+
+class MythNotificationScreenStack : public MythScreenStack
+{
+public:
+    MythNotificationScreenStack(MythMainWindow *parent, const QString& name,
+                                MythUINotificationCenter *owner)
+        : MythScreenStack(parent, name), m_owner(owner)
+    {
+    }
+
+    virtual ~MythNotificationScreenStack()
+    {
+        m_owner->ScreenStackDeleted();
+    }
+
+    void CheckDeletes()
+    {
+        QVector<MythScreenType*>::const_iterator it;
+
+        for (it = m_ToDelete.begin(); it != m_ToDelete.end(); ++it)
+        {
+            (*it)->SetAlpha(0);
+            (*it)->SetVisible(false);
+            (*it)->Close();
+        }
+        MythScreenStack::CheckDeletes();
+    }
+
+private:
+    MythUINotificationCenter *m_owner;
 
 };
 
