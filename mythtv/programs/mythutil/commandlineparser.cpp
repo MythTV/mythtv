@@ -124,7 +124,13 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--message", "message", false,
                 "Display a message on a frontend", "")
                 ->SetGroup("Messaging")
-        << add("--print-template", "printtemplate", false,
+        << add("--print-message-template", "printmtemplate", false,
+                "Print the template to be sent to the frontend", "")
+                ->SetGroup("Messaging")
+        << add("--notification", "notification", false,
+                "Display a notification on a frontend", "")
+                ->SetGroup("Messaging")
+        << add("--print-notification-template", "printntemplate", false,
                 "Print the template to be sent to the frontend", "")
                 ->SetGroup("Messaging")
         );
@@ -144,10 +150,18 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("pidprinter");
 
     // messageutils.cpp
+    add("--message_text", "message_text", "message", "(optional) message to send", "")
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
+    add("--timeout", "timeout", 0, "(optional) notification duration", "")
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
     add("--udpport", "udpport", 6948, "(optional) UDP Port to send to", "")
-        ->SetChildOf("message");
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
     add("--bcastaddr", "bcastaddr", "127.0.0.1", "(optional) IP address to send to", "")
-        ->SetChildOf("message");
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
 
     // Generic Options used by more than one utility
     addRecording();

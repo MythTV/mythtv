@@ -21,9 +21,21 @@ const QString kMessage =
 "  <timeout>%timeout%</timeout>\n"
 "</mythmessage>";
 
-static int PrintTemplate(const MythUtilCommandLineParser &cmdline)
+const QString kNotification =
+"<mythnotification version=\"1\">\n"
+"  <text>%message_text%</text>\n"
+"  <timeout>%timeout%</timeout>\n"
+"</mythnotification>";
+
+static int PrintMTemplate(const MythUtilCommandLineParser &cmdline)
 {
     cerr << kMessage.toLocal8Bit().constData() << endl;
+    return GENERIC_EXIT_OK;
+}
+
+static int PrintNTemplate(const MythUtilCommandLineParser &cmdline)
+{
+    cerr << kNotification.toLocal8Bit().constData() << endl;
     return GENERIC_EXIT_OK;
 }
 
@@ -31,13 +43,23 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
 {
     QHostAddress address = QHostAddress::Broadcast;
     unsigned short port = 6948;
+    QString name = cmdline.GetPassthrough();
+    bool notification = cmdline.toBool("notification");
+    QString text = "message";
+    QString timeout = "0";
 
-    QString message = kMessage;
+    QString message = notification ? kNotification : kMessage;
 
     if (cmdline.toBool("udpport"))
         port = (unsigned short)cmdline.toUInt("udpport");
     if (cmdline.toBool("bcastaddr"))
         address.setAddress(cmdline.toString("bcastaddr"));
+    if (cmdline.toBool("message_text"))
+        text = cmdline.toString("message_text");
+    if (cmdline.toBool("timeout"))
+        timeout = cmdline.toString("timeout");
+    message.replace("%message_text%", text);
+    message.replace("%timeout%", timeout);
 
     QMap<QString,QString>::const_iterator i;
     QMap<QString,QString> extras = cmdline.GetExtra();
@@ -81,7 +103,9 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
 void registerMessageUtils(UtilMap &utilMap)
 {
     utilMap["message"]                 = &SendMessage;
-    utilMap["printtemplate"]           = &PrintTemplate;
+    utilMap["printmtemplate"]          = &PrintMTemplate;
+    utilMap["notification"]            = &SendMessage;
+    utilMap["printntemplate"]          = &PrintNTemplate;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
