@@ -104,7 +104,7 @@ public:
      * contains the application registration id
      * Required to update an existing notification screen owned by an application
      */
-    void SetId(int id)                      { m_id = id; }
+    void SetId(int id);
     /**
      * contains the parent address. Required if id is set
      * Id provided must match the parent address as provided during the

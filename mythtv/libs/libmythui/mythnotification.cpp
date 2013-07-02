@@ -19,6 +19,16 @@ QEvent::Type MythNotification::Info =
 QEvent::Type MythNotification::Error =
     (QEvent::Type) QEvent::registerEventType();
 
+void MythNotification::SetId(int id)
+{
+    m_id = id;
+    // default registered notification is to not expire
+    if (m_id > 0 && m_duration == 0)
+    {
+        m_duration = -1;
+    }
+}
+
 /**
  * stringFromSeconds:
  *

@@ -74,6 +74,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
 {
+    // Set timer if need be
+    SetSingleShotTimer(m_duration);
 }
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
@@ -87,12 +89,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
 {
     SetNotification(notification);
     // Set timer if need be
-    if (m_id <= 0)
-    {
-        QTimer::singleShot(
-            m_duration <= DEFAULT_DURATION ? DEFAULT_DURATION : m_duration,
-            this, SLOT(ProcessTimer()));
-    }
+    SetSingleShotTimer(m_duration);
 }
 
 MythUINotificationScreen::~MythUINotificationScreen()
@@ -168,6 +165,8 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         m_update |= kMetaData;
     }
     UpdateMetaData(notification.GetMetaData());
+
+    m_duration = notification.GetDuration();
 }
 
 bool MythUINotificationScreen::Create(void)
@@ -464,6 +463,19 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(MythUINotification
     m_added = false;
 
     return *this;
+}
+
+void MythUINotificationScreen::SetSingleShotTimer(int s)
+{
+    // only registered application can display non-expiring notification
+    if (m_id > 0 && s < 0)
+        return;
+
+    int ms = s * 1000;
+
+    QTimer::singleShot(
+        ms <= DEFAULT_DURATION ? DEFAULT_DURATION : ms,
+        this, SLOT(ProcessTimer()));
 }
 
 /////////////////////// MythUINotificationCenter

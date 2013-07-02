@@ -42,6 +42,8 @@ public:
     void UpdateMetaData(const DMAP &data);
     void UpdatePlayback(float progress, const QString &text);
 
+    void SetSingleShotTimer(int s);
+
     // UI methods
     void AdjustYPosition(int height);
     int  GetHeight(void);
