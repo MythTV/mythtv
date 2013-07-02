@@ -279,18 +279,6 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
 /// \brief LoggerThread destructor.  Triggers the deletion of all loggers.
 LoggerThread::~LoggerThread()
 {
-    if (m_initialTimer)
-    {
-        m_initialTimer->stop();
-        delete m_initialTimer;
-    }
-
-    if (m_heartbeatTimer)
-    {
-        m_heartbeatTimer->stop();
-        delete m_heartbeatTimer;
-    }
-
     stop();
     wait();
 
@@ -406,6 +394,13 @@ void LoggerThread::run(void)
     // This must be before the timer stop below or we deadlock when the timer
     // thread tries to deregister, and we wait for it.
     logThreadFinished = true;
+
+    if (m_initialTimer)
+    {
+        m_initialTimer->stop();
+        delete m_initialTimer;
+        m_initialTimer = NULL;
+    }
 
     if (m_heartbeatTimer)
     {
