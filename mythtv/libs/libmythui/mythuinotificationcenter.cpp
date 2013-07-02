@@ -68,7 +68,7 @@ public:
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythuinotification"),  m_id(id),
-      m_duration(-1),       m_position(-1),         m_added(false),
+      m_duration(-1),       m_progress(-1.0),       m_added(false),
       m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
@@ -79,7 +79,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    MythNotification &notification)
     : MythScreenType(stack, "mythuinotification"),  m_id(notification.GetId()),
-      m_duration(notification.GetDuration()),       m_position(-1),
+      m_duration(notification.GetDuration()),       m_progress(-1.0),
       m_added(false),       m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
@@ -101,37 +101,6 @@ MythUINotificationScreen::~MythUINotificationScreen()
     // by the time it is emitted, the destructor would have already been called
     // making the members unusable
     emit ScreenDeleted();
-}
-
-/**
- * stringFromSeconds:
- *
- * Usage: stringFromSeconds(seconds).
- * Description: create a string in the format HH:mm:ss from a duration in seconds.
- * HH: will not be displayed if there's less than one hour.
- */
-QString MythUINotificationScreen::stringFromSeconds(int time)
-{
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
-    QString str;
-
-    if (hour)
-    {
-        str += QString("%1:").arg(hour);
-    }
-    if (minute < 10)
-    {
-        str += "0";
-    }
-    str += QString("%1:").arg(minute);
-    if (seconds < 10)
-    {
-        str += "0";
-    }
-    str += QString::number(seconds);
-    return str;
 }
 
 void MythUINotificationScreen::SetNotification(MythNotification &notification)
@@ -172,7 +141,7 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         dynamic_cast<MythPlaybackNotification*>(&notification);
     if (play)
     {
-        UpdatePlayback(play->GetDuration(), play->GetPosition());
+        UpdatePlayback(play->GetProgress(), play->GetProgressText());
         m_update |= kDuration;
         if (m_progressBar)
         {
@@ -225,7 +194,6 @@ bool MythUINotificationScreen::Create(void)
     m_albumText     = dynamic_cast<MythUIText*>(GetChild("album"));
     m_formatText    = dynamic_cast<MythUIText*>(GetChild("info"));
     m_timeText      = dynamic_cast<MythUIText*>(GetChild("time"));
-    m_timeText->SetVisible(false);
     m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
     m_progressBar->SetVisible(false);
 
@@ -323,9 +291,9 @@ void MythUINotificationScreen::Init(void)
 
     if (m_timeText && (m_update & kDuration))
     {
-        if (m_duration >= 0)
+        if (!m_progressText.isEmpty())
         {
-            m_timeText->SetText(stringFromSeconds(m_duration));
+            m_timeText->SetText(m_progressText);
         }
         else
         {
@@ -337,11 +305,11 @@ void MythUINotificationScreen::Init(void)
 
     if (m_progressBar && (m_update & kDuration))
     {
-        if (m_duration >= 0 && m_position >= 0)
+        if (m_progress >= 0)
         {
             m_progressBar->SetStart(0);
-            m_progressBar->SetTotal(m_duration);
-            m_progressBar->SetUsed(m_position);
+            m_progressBar->SetTotal(100);
+            m_progressBar->SetUsed(100 * m_progress);
         }
         else
         {
@@ -415,10 +383,10 @@ void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
  * Update playback position information.
  * must call Init() for screen to be updated.
  */
-void MythUINotificationScreen::UpdatePlayback(int duration, int position)
+void MythUINotificationScreen::UpdatePlayback(float progress, const QString &text)
 {
-    m_duration  = duration;
-    m_position  = position;
+    m_progress      = progress;
+    m_progressText  = text;
 }
 
 /**
@@ -445,15 +413,16 @@ void MythUINotificationScreen::ProcessTimer(void)
 
 MythUINotificationScreen &MythUINotificationScreen::operator=(MythUINotificationScreen &s)
 {
-    m_id        = s.m_id;
-    m_image     = s.m_image;
-    m_imagePath = s.m_imagePath;
-    m_title     = s.m_title;
-    m_artist    = s.m_artist;
-    m_album     = s.m_album;
-    m_format    = s.m_format;
-    m_duration  = s.m_duration;
-    m_position  = s.m_position;
+    m_id            = s.m_id;
+    m_image         = s.m_image;
+    m_imagePath     = s.m_imagePath;
+    m_title         = s.m_title;
+    m_artist        = s.m_artist;
+    m_album         = s.m_album;
+    m_format        = s.m_format;
+    m_duration      = s.m_duration;
+    m_progress      = s.m_progress;
+    m_progressText  = s.m_progressText;
 
     // Adjust visibility
     if (m_artworkImage)

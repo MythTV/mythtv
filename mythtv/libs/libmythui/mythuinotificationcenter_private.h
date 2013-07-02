@@ -40,14 +40,11 @@ public:
     void UpdateArtwork(const QImage &image);
     void UpdateArtwork(const QString &image);
     void UpdateMetaData(const DMAP &data);
-    void UpdatePlayback(int duration, int position);
+    void UpdatePlayback(float progress, const QString &text);
 
     // UI methods
     void AdjustYPosition(int height);
     int  GetHeight(void);
-
-    // utility methods
-    QString stringFromSeconds(int time);
 
     enum Update {
         kForce      = 0,
@@ -73,7 +70,8 @@ public:
     QString             m_album;
     QString             m_format;
     int                 m_duration;
-    int                 m_position;
+    float               m_progress;
+    QString             m_progressText;
     bool                m_added;
     uint32_t            m_update;
     MythUIImage        *m_artworkImage;

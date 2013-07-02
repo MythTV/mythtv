@@ -19,3 +19,33 @@ QEvent::Type MythNotification::Info =
 QEvent::Type MythNotification::Error =
     (QEvent::Type) QEvent::registerEventType();
 
+/**
+ * stringFromSeconds:
+ *
+ * Usage: stringFromSeconds(seconds).
+ * Description: create a string in the format HH:mm:ss from a duration in seconds.
+ * HH: will not be displayed if there's less than one hour.
+ */
+QString MythPlaybackNotification::stringFromSeconds(int time)
+{
+    int   hour    = time / 3600;
+    int   minute  = (time - hour * 3600) / 60;
+    int seconds   = time - hour * 3600 - minute * 60;
+    QString str;
+    
+    if (hour)
+    {
+        str += QString("%1:").arg(hour);
+    }
+    if (minute < 10)
+    {
+        str += "0";
+    }
+    str += QString("%1:").arg(minute);
+    if (seconds < 10)
+    {
+        str += "0";
+    }
+    str += QString::number(seconds);
+    return str;
+}
