@@ -49,7 +49,7 @@ class TextSubtitles
         m_lastReturnedSubtitle.end   = 0;
     }
 
-    virtual ~TextSubtitles() {}
+    virtual ~TextSubtitles();
 
     bool HasSubtitleChanged(uint64_t timecode) const;
     QStringList GetSubtitles(uint64_t timecode);
@@ -115,7 +115,8 @@ class TextSubtitles
 class TextSubtitleParser
 {
   public:
-    static bool LoadSubtitles(const QString &fileName, TextSubtitles &target);
+    static void LoadSubtitles(const QString &fileName, TextSubtitles &target,
+                              bool inBackground);
 };
 
 #endif
