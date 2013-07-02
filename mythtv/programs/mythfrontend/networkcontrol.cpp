@@ -24,6 +24,7 @@
 // libmythui
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythuinotificationcenter.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -287,6 +288,8 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
         result = processHelp(nc);
     else if (is_abbrev("message", nc->getArg(0)))
         result = processMessage(nc);
+    else if (is_abbrev("notification", nc->getArg(0)))
+        result = processNotification(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
         QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
@@ -1180,6 +1183,11 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         helpText +=
             "message               - Displays a simple text message popup\r\n";
     }
+    else if ((is_abbrev("notification", command)))
+    {
+        helpText +=
+            "notification          - Displays a simple text message notification\r\n";
+    }
 
     if (!helpText.isEmpty())
         return helpText;
@@ -1197,6 +1205,7 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         "set                - Changes\r\n"
         "screenshot         - Capture screenshot\r\n"
         "message            - Display a simple text message\r\n"
+        "notification       - Display a simple text notification\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
@@ -1214,6 +1223,18 @@ QString NetworkControl::processMessage(NetworkCommand *nc)
     MythMainWindow *window = GetMythMainWindow();
     MythEvent* me = new MythEvent(MythEvent::MythUserMessage, message);
     qApp->postEvent(window, me);
+    return QString("OK");
+}
+
+QString NetworkControl::processNotification(NetworkCommand *nc)
+{
+    if (nc->getArgCount() < 2)
+        return QString("ERROR: See 'help %1' for usage information")
+        .arg(nc->getArg(0));
+
+    QString message = nc->getCommand().remove(0, 12).trimmed();
+    MythNotification n(message, tr("Network Control"));
+    MythUINotificationCenter::GetInstance()->Queue(n);
     return QString("OK");
 }
 
