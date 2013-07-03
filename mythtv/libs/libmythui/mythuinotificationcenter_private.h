@@ -48,8 +48,9 @@ public:
     void AdjustYPosition(int height);
     int  GetHeight(void);
 
-    enum Update {
+    enum Content {
         kForce      = 0,
+        kNone       = 0,
         kImage      = 1 << 0,
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
@@ -74,8 +75,10 @@ public:
     int                 m_duration;
     float               m_progress;
     QString             m_progressText;
+    bool                m_fullscreen;
     bool                m_added;
     bool                m_created;
+    uint32_t            m_content;
     uint32_t            m_update;
     MythUIImage        *m_artworkImage;
     MythUIText         *m_titleText;

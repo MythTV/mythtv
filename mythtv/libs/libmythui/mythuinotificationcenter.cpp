@@ -40,8 +40,9 @@ QEvent::Type MythUINotificationCenterEvent::kEventType =
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythuinotification"),  m_id(id),
-      m_duration(-1),       m_progress(-1.0),       m_added(false),
-      m_created(false),     m_update(kForce),
+      m_duration(-1),       m_progress(-1.0),       m_fullscreen(false),
+      m_added(false),
+      m_created(false),     m_content(kNone),       m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
@@ -54,7 +55,9 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    MythNotification &notification)
     : MythScreenType(stack, "mythuinotification"),  m_id(notification.GetId()),
       m_duration(notification.GetDuration()),       m_progress(-1.0),
-      m_added(false),       m_created(false),       m_update(kForce),
+      m_fullscreen(false),
+      m_added(false),       m_created(false),       m_content(kNone),
+      m_update(kForce),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
       m_progressBar(NULL)
@@ -75,6 +78,8 @@ MythUINotificationScreen::~MythUINotificationScreen()
 void MythUINotificationScreen::SetNotification(MythNotification &notification)
 {
     bool update = notification.type() == MythNotification::Update;
+    uint32_t newcontent = kNone;
+
     m_update = kForce;
 
     MythImageNotification *img =
@@ -82,6 +87,9 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
     if (img)
     {
         QString path = img->GetImagePath();
+
+        m_update |= kImage;
+        newcontent |= kImage;
 
         if (path.isNull())
         {
@@ -91,27 +99,18 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         {
             UpdateArtwork(path);
         }
-
-        m_update |= kImage;
-        if (m_artworkImage)
-        {
-            m_artworkImage->SetVisible(true);
-        }
-    }
-    else if (!update)
-    {
-        if (m_artworkImage)
-        {
-            m_artworkImage->SetVisible(false);
-        }
     }
 
     MythPlaybackNotification *play =
         dynamic_cast<MythPlaybackNotification*>(&notification);
+    m_content &= ~kDuration;
     if (play)
     {
         UpdatePlayback(play->GetProgress(), play->GetProgressText());
+
         m_update |= kDuration;
+        newcontent |= kDuration;
+
         if (m_progressBar)
         {
             m_progressBar->SetVisible(true);
@@ -132,12 +131,25 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
             m_timeText->SetVisible(false);
         }
     }
-    if (update)
+
+    newcontent &= ~kMetaData;
+    if (!notification.GetMetaData().isEmpty())
     {
+        UpdateMetaData(notification.GetMetaData());
+        m_update  |= kMetaData;
+        newcontent |= kMetaData;
+    }
+    else if (!update)
+    {
+        // A new notification, will always update the metadata field
         m_update |= kMetaData;
     }
-    UpdateMetaData(notification.GetMetaData());
 
+    if (!update)
+    {
+        m_content = newcontent;
+        m_fullscreen = notification.GetFullScreen();
+    }
     m_duration = notification.GetDuration();
 }
 
@@ -149,7 +161,22 @@ bool MythUINotificationScreen::Create(void)
     // The xml file containing the screen definition is airplay-ui.xml in this
     // example, the name of the screen in the xml is airplaypicture. This
     // should make sense when you look at the xml below
-    foundtheme = LoadWindowFromXML("music-ui.xml", "miniplayer", this);
+
+    QString theme;
+    if (m_fullscreen)
+    {
+        theme = "notification-full";
+    }
+    else if (m_content & kImage)
+    {
+        theme = "notification-image";
+    }
+    else
+    {
+        theme = "notification";
+    }
+
+    foundtheme = LoadWindowFromXML("notification-ui.xml", theme, this);
 
     if (!foundtheme) // If we cannot load the theme for any reason ...
         return false;
@@ -157,20 +184,12 @@ bool MythUINotificationScreen::Create(void)
     // The xml should contain an <imagetype> named 'coverart', if it doesn't
     // then we cannot display the image and may as well abort
     m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("coverart"));
-    if (m_artworkImage)
-    {
-        m_artworkImage->SetVisible(false);
-    }
     m_titleText     = dynamic_cast<MythUIText*>(GetChild("title"));
     m_artistText    = dynamic_cast<MythUIText*>(GetChild("artist"));
     m_albumText     = dynamic_cast<MythUIText*>(GetChild("album"));
     m_formatText    = dynamic_cast<MythUIText*>(GetChild("info"));
     m_timeText      = dynamic_cast<MythUIText*>(GetChild("time"));
     m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
-    if (m_progressBar)
-    {
-        m_progressBar->SetVisible(false);
-    }
 
     m_created = true;
 
@@ -179,8 +198,6 @@ bool MythUINotificationScreen::Create(void)
 
 /**
  * Update the various fields of a MythUINotificationScreen.
- * If metadata update flag is set; a Null string means to leave the text field
- * unchanged.
  */
 void MythUINotificationScreen::Init(void)
 {
@@ -210,7 +227,7 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_titleText && !(m_title.isNull() && (m_update & kMetaData)))
+    if (m_titleText && (m_update & kMetaData))
     {
         if (!m_title.isNull())
         {
@@ -224,7 +241,7 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_artistText && !(m_artist.isNull() && (m_update & kMetaData)))
+    if (m_artistText && (m_update & kMetaData))
     {
         if (!m_artist.isNull())
         {
@@ -238,7 +255,7 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_albumText && !(m_album.isNull() && (m_update & kMetaData)))
+    if (m_albumText && (m_update & kMetaData))
     {
         if (!m_album.isNull())
         {
@@ -252,7 +269,7 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_formatText && !(m_title.isNull() && (m_update & kMetaData)))
+    if (m_formatText && (m_update & kMetaData))
     {
         if (!m_format.isNull())
         {
@@ -400,40 +417,8 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(MythUINotification
     m_duration      = s.m_duration;
     m_progress      = s.m_progress;
     m_progressText  = s.m_progressText;
-
-    // Adjust visibility
-    if (m_artworkImage)
-    {
-        m_artworkImage->SetVisible(s.m_artworkImage ? s.m_artworkImage->IsVisible() : false);
-    }
-    if (m_titleText)
-    {
-        m_titleText->SetVisible(s.m_titleText ? s.m_titleText->IsVisible() : false);
-    }
-    if (m_artistText)
-    {
-        m_artistText->SetVisible(s.m_artistText ? s.m_artistText->IsVisible() : false);
-    }
-    if (m_albumText)
-    {
-        m_albumText->SetVisible(s.m_albumText ? s.m_albumText->IsVisible() : false);
-    }
-    if (m_formatText)
-    {
-        m_formatText->SetVisible(s.m_formatText ? s.m_formatText->IsVisible() : false);
-    }
-    if (m_titleText)
-    {
-        m_titleText->SetVisible(s.m_titleText ? s.m_titleText->IsVisible() : false);
-    }
-    if (m_timeText)
-    {
-        m_timeText->SetVisible(s.m_timeText ? s.m_timeText->IsVisible() : false);
-    }
-    if (m_progressBar)
-    {
-        m_progressBar->SetVisible(s.m_progressBar ? s.m_progressBar->IsVisible() : false);
-    }
+    m_content       = s.m_content;
+    m_fullscreen    = s.m_fullscreen;
 
     m_update = ~kMetaData; // so all fields are initialised regardless of notification type
     m_added = true;        // so the screen won't be added to display
@@ -677,18 +662,22 @@ void MythUINotificationCenter::ProcessQueue(void)
                 delete screen;
                 continue;
             }
+            created = true;
         }
 
         if (created || !m_screens.contains(screen))
         {
             int pos = InsertScreen(screen);
-            // adjust vertical position
-            screen->AdjustYPosition((screen->GetHeight() + HGAP) * pos);
-            int n = m_screens.size();
-            if (pos < n - 1)
+            if (!screen->m_fullscreen)
             {
-                // screen was inserted before others, adjust their positions
-                AdjustScreenPosition(pos + 1, true);
+                // adjust vertical position
+                screen->AdjustYPosition((screen->GetHeight() + HGAP) * pos);
+                int n = m_screens.size();
+                if (pos < n - 1)
+                {
+                    // screen was inserted before others, adjust their positions
+                    AdjustScreenPosition(pos + 1, true);
+                }
             }
         }
         screen->SetNotification(*n);
