@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.xsd">
+
+<mythuitheme>
+
+    <baseres>1920x1080</baseres>
+
+    <window name="notification">
+        <area>100%-800,20,780,180</area>
+        <!--
+        <animation trigger="AboutToShow">
+            <section duration="500" centre="middle">
+                <position start="100%,20" end="-1,-1" easingcurve="OutBack" />
+            </section>
+        </animation>
+        <animation trigger="AboutToHide">
+            <section duration="500" centre="middle">
+                <position start="-1,-1" end="100%,20" easingcurve="InBack" />
+            </section>
+        </animation>-->
+
+        <shape name="background" from="basewidgetshape">
+            <area>0,0,100%,100%</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>18,10,-10,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>18,45,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="album" from="basetextarea">
+            <area>18,75,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="info" from="basetextarea">
+            <area>18,105,300,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="time" from="basetextarea">
+            <area>370,105,-10,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+        </textarea>
+
+        <progressbar name="progress" from="baseprogressbar">
+            <area>18,140,100%-28,10</area>
+        </progressbar>
+    </window>
+
+    <window name="notification-image">
+        <area>100%-800,20,780,180</area>
+        <!--
+         <animation trigger="AboutToShow">
+         <section duration="500" centre="middle">
+         <position start="100%,20" end="-1,-1" easingcurve="OutBack" />
+         </section>
+         </animation>
+         <animation trigger="AboutToHide">
+         <section duration="500" centre="middle">
+         <position start="-1,-1" end="100%,20" easingcurve="InBack" />
+         </section>
+         </animation>-->
+        
+        <shape name="background" from="basewidgetshape">
+            <area>0,0,100%,100%</area>
+        </shape>
+        
+        <imagetype name="coverart">
+            <filename>damaged.png</filename>
+            <area>18,18,144,144</area>
+        </imagetype>
+        
+        <textarea name="title" from="basetextarea">
+            <area>170,10,-10,35</area>
+            <font>baselarge</font>
+        </textarea>
+        
+        <textarea name="artist" from="basetextarea">
+            <area>170,45,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+        
+        <textarea name="album" from="basetextarea">
+            <area>170,75,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+        
+        <textarea name="info" from="basetextarea">
+            <area>170,105,300,30</area>
+            <font>basesmall</font>
+        </textarea>
+        
+        <textarea name="time" from="basetextarea">
+            <area>370,105,-10,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+        </textarea>
+        
+        <progressbar name="progress" from="baseprogressbar">
+            <area>170,140,100%-180,10</area>
+        </progressbar>
+    </window>
+
+    <window name="notification-full">
+        <area>0,0,100%,100%</area>
+
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <fill color="#000000"/>
+        </shape>
+
+        <imagetype name="coverart">
+            <filename>damaged.png</filename>
+            <area>-1,-1,100%,100%</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>170,10,-10,35</area>
+            <font>mysmall</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>170,45,-10,30</area>
+            <font>myverysmall</font>
+        </textarea>
+
+        <textarea name="album" from="basetextarea">
+            <area>170,75,-10,30</area>
+            <font>myverysmall</font>
+        </textarea>
+
+        <textarea name="info" from="basetextarea">
+            <area>170,105,300,30</area>
+            <font>myverysmall</font>
+        </textarea>
+
+        <textarea name="time" from="basetextarea">
+            <area>370,105,-10,30</area>
+            <font>myverysmall</font>
+            <align>right</align>
+        </textarea>
+
+        <progressbar name="progress" from="baseprogressbar">
+            <area>170,140,10,10</area>
+        </progressbar>
+    </window>
+
+</mythuitheme>
