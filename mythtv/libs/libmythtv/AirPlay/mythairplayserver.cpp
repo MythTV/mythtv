@@ -116,13 +116,16 @@ QString AirPlayHardwareId()
     QString key = "AirPlayId";
     QString id = gCoreContext->GetSetting(key);
     int size = id.size();
-    if (size == 12)
+    if (size == 12 && id.toUpper() == id)
         return id;
-
-    QByteArray ba;
-    for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
-        ba.append((random() % 80) + 33);
-    id = ba.toHex();
+    if (size == 12)
+    {
+        QByteArray ba;
+        for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
+            ba.append((random() % 80) + 33);
+        id = ba.toHex();
+    }
+    id = id.toUpper();
 
     gCoreContext->SaveSetting(key, id);
     return id;
