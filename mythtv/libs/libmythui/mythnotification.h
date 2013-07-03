@@ -117,7 +117,7 @@ public:
      * this request may not be fullfilled should the theme not handle full screen
      * notification
      */
-    void SetFullScreem(bool f)              { m_fullScreen = f; }
+    void SetFullScreen(bool f)              { m_fullScreen = f; }
     /**
      * contains a short description of the notification
      */
@@ -141,6 +141,7 @@ public:
     // Getter
     int         GetId(void)                 { return m_id; }
     void       *GetParent(void)             { return m_parent; }
+    bool        GetFullScreen(void)         { return m_fullScreen; }
     QString     GetDescription(void)        { return m_description; }
     DMAP        GetMetaData(void)           { return m_metadata; }
     int         GetDuration(void)           { return m_duration; };
