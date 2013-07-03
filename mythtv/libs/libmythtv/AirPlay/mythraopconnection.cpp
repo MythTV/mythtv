@@ -82,7 +82,8 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
     m_clockSkew(0),
     m_audioTimer(NULL),
-    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0)
+    m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
+    m_firstsend(false)
 {
     m_id = MythUINotificationCenter::GetInstance()->Register(this);
 }
@@ -1771,7 +1772,7 @@ void MythRAOPConnection::SendNotification(bool update)
 
     MythNotification *n;
 
-    if (!update)
+    if (!update || !m_firstsend)
     {
         n = new MythMediaNotification(MythNotification::New,
                                       image, m_dmap, duration, position);
@@ -1784,5 +1785,6 @@ void MythRAOPConnection::SendNotification(bool update)
     n->SetId(m_id);
     n->SetParent(this);
     MythUINotificationCenter::GetInstance()->Queue(*n);
+    m_firstsend = true;
     delete n;
 }
