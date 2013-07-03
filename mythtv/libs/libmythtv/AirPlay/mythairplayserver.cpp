@@ -388,7 +388,7 @@ void MythAirplayServer::Cleanup(void)
 
 MythAirplayServer::MythAirplayServer()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
-    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100)
+    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100), m_id(-1)
 {
 }
 
@@ -396,6 +396,11 @@ MythAirplayServer::~MythAirplayServer()
 {
     delete m_lock;
     m_lock = NULL;
+    if (m_id > 0)
+    {
+        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        m_id = -1;
+    }
 }
 
 void MythAirplayServer::Teardown(void)
@@ -423,6 +428,12 @@ void MythAirplayServer::Teardown(void)
         delete request;
     }
     m_incoming.clear();
+
+    if (m_id > 0)
+    {
+        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        m_id = -1;
+    }
 }
 
 void MythAirplayServer::Start(void)
@@ -492,10 +503,6 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
-    MythNotification n(tr("New Connection"), tr("AirPlay"),
-                       tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
-    MythUINotificationCenter::GetInstance()->Queue(n);
-
     m_sockets.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteConnection()));
     connect(client, SIGNAL(readyRead()), this, SLOT(read()));
@@ -510,9 +517,6 @@ void MythAirplayServer::deleteConnection(void)
 
     if (!m_sockets.contains(socket))
         return;
-
-    MythNotification n(tr("Client disconnected"), tr("AirPlay"));
-    MythUINotificationCenter::GetInstance()->Queue(n);
 
     deleteConnection(socket);
 }
@@ -550,6 +554,14 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing session '%1'")
             .arg(remove.data()));
         m_connections.remove(remove);
+
+        // close any photos that could be displayed
+        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        m_id = -1;
+
+        MythNotification n(tr("Client disconnected"), tr("AirPlay"),
+                           tr("from %1").arg(socket->peerAddress().toString()));
+        MythUINotificationCenter::GetInstance()->Queue(n);
     }
 
     socket->deleteLater();
@@ -686,6 +698,13 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         // Got a full connection, disconnect any other clients
         DisconnectAllClients(session);
         m_connections[session].initialized = true;
+
+        MythNotification n(tr("New Connection"), tr("AirPlay"),
+                           tr("from %1").arg(socket->peerAddress().toString()));
+        MythUINotificationCenter::GetInstance()->Queue(n);
+
+        m_id = MythUINotificationCenter::GetInstance()->Register(this);
+
     }
 
     double position    = 0.0f;
@@ -800,11 +819,19 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         if (req->GetMethod() == "PUT")
         {
             // this may be received before playback starts...
+            QImage image = QImage::fromData(req->GetBody());
             bool png =
                 req->GetBody().size() > 3 && req->GetBody()[1] == 'P' &&
                 req->GetBody()[2] == 'N' && req->GetBody()[3] == 'G';
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Received %1 photo").arg(png ? "jpeg" : "png"));
+
+            // send full screen display notification
+            MythImageNotification n(MythNotification::New, image);
+            n.SetId(m_id);
+            n.SetParent(this);
+            n.SetFullScreen(true);
+            MythUINotificationCenter::GetInstance()->Queue(n);
         }
     }
     else if (req->GetURI() == "/slideshow-features")

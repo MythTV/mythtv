@@ -115,6 +115,9 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
 
     //Incoming data
     QHash<QTcpSocket*, APHTTPRequest*> m_incoming;
+
+    // Notification
+    int             m_id;
 };
 
 #endif // MYTHAIRPLAYSERVER_H
