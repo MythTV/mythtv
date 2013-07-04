@@ -183,12 +183,12 @@ bool MythUINotificationScreen::Create(void)
 
     // The xml should contain an <imagetype> named 'coverart', if it doesn't
     // then we cannot display the image and may as well abort
-    m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("coverart"));
+    m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("image"));
     m_titleText     = dynamic_cast<MythUIText*>(GetChild("title"));
-    m_artistText    = dynamic_cast<MythUIText*>(GetChild("artist"));
-    m_albumText     = dynamic_cast<MythUIText*>(GetChild("album"));
-    m_formatText    = dynamic_cast<MythUIText*>(GetChild("info"));
-    m_timeText      = dynamic_cast<MythUIText*>(GetChild("time"));
+    m_artistText    = dynamic_cast<MythUIText*>(GetChild("origin"));
+    m_albumText     = dynamic_cast<MythUIText*>(GetChild("description"));
+    m_formatText    = dynamic_cast<MythUIText*>(GetChild("extra"));
+    m_timeText      = dynamic_cast<MythUIText*>(GetChild("progress_text"));
     m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
 
     m_created = true;
