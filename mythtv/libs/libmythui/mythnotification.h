@@ -231,6 +231,13 @@ public:
     {
     }
 
+    MythPlaybackNotification(Type t, float progress, const QString &progressText,
+                             const DMAP &metadata)
+        : MythNotification(t, metadata),
+        m_progress(progress), m_progressText(progressText)
+    {
+    }
+
     MythPlaybackNotification(Type t, int duration, int position)
         : MythNotification(t)
     {
@@ -277,6 +284,13 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
                                          public MythPlaybackNotification
 {
 public:
+    MythMediaNotification(Type t, const QImage &image, const DMAP &metadata,
+                          float progress, const QString &durationText)
+        : MythNotification(t, metadata), MythImageNotification(t, image),
+        MythPlaybackNotification(t, progress, durationText)
+    {
+    }
+
     MythMediaNotification(Type t, const QImage &image, const DMAP &metadata,
                           int duration, int position)
         : MythNotification(t, metadata), MythImageNotification(t, image),
