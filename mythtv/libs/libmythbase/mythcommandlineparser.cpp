@@ -74,9 +74,10 @@ const int kEnd          = 0,
           kEmpty        = 1,
           kOptOnly      = 2,
           kOptVal       = 3,
-          kArg          = 4,
-          kPassthrough  = 5,
-          kInvalid      = 6;
+          kCombOptVal   = 4,
+          kArg          = 5,
+          kPassthrough  = 6,
+          kInvalid      = 7;
 
 const char* NamedOptType(int type);
 bool openPidfile(ofstream &pidfs, const QString &pidfile);
@@ -118,6 +119,9 @@ const char* NamedOptType(int type)
 
       case kOptVal:
         return "kOptVal";
+
+      case kCombOptVal:
+        return "kCombOptVal";
 
       case kArg:
         return "kArg";
@@ -1383,7 +1387,7 @@ int MythCommandLineParser::getOpt(int argc, const char * const * argv,
 
             opt = QString(blist[0]);
             val = blist[1];
-            return kOptVal;
+            return kCombOptVal;
         }
 
         opt = QString(tmp);
@@ -1564,12 +1568,13 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             }
         }
         // argument has keyword and value
-        else if (res == kOptVal)
+        else if ((res == kOptVal) || (res == kCombOptVal))
         {
             if (!argdef->Set(opt, val))
             {
-                // try testing keyword with no value
-                if (!argdef->Set(opt))
+                // if option and value were combined with a '=', abort directly
+                // otherwise, attempt processing them independenly
+                if ((res == kCombOptVal) || !argdef->Set(opt))
                 {
                     SetValue("showhelp", "");
                     return false;
