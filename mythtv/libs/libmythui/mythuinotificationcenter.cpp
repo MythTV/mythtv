@@ -103,7 +103,7 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
 
     MythPlaybackNotification *play =
         dynamic_cast<MythPlaybackNotification*>(&notification);
-    m_content &= ~kDuration;
+    newcontent &= ~kDuration;
     if (play)
     {
         UpdatePlayback(play->GetProgress(), play->GetProgressText());
