@@ -25,6 +25,13 @@ const QString kNotification =
 "<mythnotification version=\"1\">\n"
 "  <text>%message_text%</text>\n"
 "  <timeout>%timeout%</timeout>\n"
+"  <image>%image%</image>\n"
+"  <origin>%origin%</origin>\n"
+"  <description>%description%</description>\n"
+"  <extra>%extra%</extra>\n"
+"  <progress_text>%progress_text%</progress_text>\n"
+"  <progress>%progress%</progress>\n"
+"  <fullscreen>%fullscreen%</fullscreen>\n"
 "</mythnotification>";
 
 static int PrintMTemplate(const MythUtilCommandLineParser &cmdline)
@@ -47,6 +54,13 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     bool notification = cmdline.toBool("notification");
     QString text = "message";
     QString timeout = "0";
+    QString image = "";
+    QString origin = "MythUtils";
+    QString description = "";
+    QString extra = "";
+    QString progress_text = "";
+    QString progress = "-1";
+    QString fullscreen = "false";
 
     QString message = notification ? kNotification : kMessage;
 
@@ -56,11 +70,38 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
         address.setAddress(cmdline.toString("bcastaddr"));
     if (cmdline.toBool("message_text"))
         text = cmdline.toString("message_text");
+    message.replace("%message_text%", text);
     if (cmdline.toBool("timeout"))
         timeout = cmdline.toString("timeout");
-    message.replace("%message_text%", text);
     message.replace("%timeout%", timeout);
+    if (notification)
+    {
+        if (cmdline.toBool("image"))
+            image = cmdline.toString("image");
+        message.replace("%image%", image);
+        if (cmdline.toBool("origin"))
+            origin = cmdline.toString("origin");
+        message.replace("%origin%", origin);
+        if (cmdline.toBool("description"))
+            description = cmdline.toString("description");
+        message.replace("%description%", description);
+        if (cmdline.toBool("extra"))
+            extra = cmdline.toString("extra");
+        message.replace("%extra%", extra);
+        if (cmdline.toBool("progress_text"))
+            progress_text = cmdline.toString("progress_text");
+        message.replace("%progress_text%", progress_text);
+        if (cmdline.toBool("progress"))
+            progress = cmdline.toString("progress");
+        message.replace("%progress%", progress);
+        if (cmdline.toBool("fullscreen"))
+            fullscreen = cmdline.toString("fullscreen");
+        message.replace("%fullscreen%", fullscreen);
+    }
 
+    // extra optional argument
+    // in effeect not use as the above code provides default for all possible
+    // cases
     QMap<QString,QString>::const_iterator i;
     QMap<QString,QString> extras = cmdline.GetExtra();
     for (i = extras.begin(); i != extras.end(); ++i)
