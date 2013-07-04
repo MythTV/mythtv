@@ -118,7 +118,7 @@ QString AirPlayHardwareId()
     int size = id.size();
     if (size == 12 && id.toUpper() == id)
         return id;
-    if (size == 12)
+    if (size != 12)
     {
         QByteArray ba;
         for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
