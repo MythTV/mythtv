@@ -210,7 +210,7 @@ void OSD::SetPainter(MythPainter *painter)
     }
 }
 
-void OSD::OverrideUIScale(void)
+void OSD::OverrideUIScale(bool log)
 {
     QRect uirect = GetMythMainWindow()->GetUIScreenRect();
     if (uirect == m_Rect)
@@ -224,13 +224,16 @@ void OSD::OverrideUIScale(void)
                                                  height, m_SavedHMult);
     QSize theme_size = MythUIHelper::getMythUI()->GetBaseSize();
     m_SavedUIRect = uirect;
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Base theme size: %1x%2")
-               .arg(theme_size.width()).arg(theme_size.height()));
     float tmp_wmult = (float)m_Rect.size().width() / (float)theme_size.width();
     float tmp_hmult = (float)m_Rect.size().height() /
                       (float)theme_size.height();
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scaling factors: %1x%2")
-               .arg(tmp_wmult).arg(tmp_hmult));
+    if (log)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Base theme size: %1x%2")
+            .arg(theme_size.width()).arg(theme_size.height()));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scaling factors: %1x%2")
+            .arg(tmp_wmult).arg(tmp_hmult));
+    }
     m_UIScaleOverride = true;
     GetMythMainWindow()->SetScalingFactors(tmp_wmult, tmp_hmult);
     GetMythMainWindow()->SetUIScreenRect(m_Rect);
@@ -615,21 +618,64 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     QMap<QString,MythScreenType*>::const_iterator it;
     for (it = m_Children.begin(); it != m_Children.end(); ++it)
     {
-        if (it.value()->IsVisible())
+        if ((*it)->IsVisible())
         {
             visible = true;
-            it.value()->Pulse();
-            if (m_Effects && m_ExpireTimes.contains(it.value()))
+            (*it)->Pulse();
+            if (m_Effects && m_ExpireTimes.contains((*it)))
             {
-                QTime expires = m_ExpireTimes.value(it.value()).time();
+                QTime expires = m_ExpireTimes.value((*it)).time();
                 int left = now.msecsTo(expires);
                 if (left < m_FadeTime)
                     (*it)->SetAlpha((255 * left) / m_FadeTime);
             }
-            if (it.value()->NeedsRedraw())
+            if ((*it)->NeedsRedraw())
                 redraw = true;
         }
     }
+
+    MythUINotificationCenter *nc = MythUINotificationCenter::GetInstance();
+    QList<MythScreenType*> notifications;
+    nc->GetNotificationScreens(notifications);
+    QList<MythScreenType*>::iterator it2 = notifications.begin();
+    while (it2 != notifications.end())
+    {
+        if (!MythUINotificationCenter::GetInstance()->ScreenCreated(*it2))
+        {
+            if (!m_UIScaleOverride)
+            {
+                OverrideUIScale(false);
+            }
+            (*it2)->SetPainter(m_CurrentPainter);
+            if (!(*it2)->Create())
+            {
+                it2 = notifications.erase(it2);
+                continue;
+            }
+        }
+        if ((*it2)->IsVisible())
+        {
+            if (!m_UIScaleOverride)
+            {
+                OverrideUIScale(false);
+            }
+            nc->UpdateScreen(*it2);
+
+            visible = true;
+            (*it2)->Pulse();
+            if (m_Effects)
+            {
+                QTime expires = nc->ScreenExpiryTime(*it2).time();
+                int left = now.msecsTo(expires);
+                if (left < m_FadeTime)
+                    (*it2)->SetAlpha((255 * left) / m_FadeTime);
+            }
+            if ((*it2)->NeedsRedraw())
+                redraw = true;
+        }
+        ++it2;
+    }
+    RevertUIScale();
 
     redraw |= repaint;
 
@@ -639,20 +685,26 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
         painter->Begin(NULL);
         for (it = m_Children.begin(); it != m_Children.end(); ++it)
         {
-            if (it.value()->IsVisible())
+            if ((*it)->IsVisible())
             {
-                it.value()->Draw(painter, 0, 0, 255, cliprect);
-                it.value()->SetAlpha(255);
-                it.value()->ResetNeedsRedraw();
+                (*it)->Draw(painter, 0, 0, 255, cliprect);
+                (*it)->SetAlpha(255);
+                (*it)->ResetNeedsRedraw();
+            }
+        }
+        for (it2 = notifications.begin(); it2 != notifications.end(); ++it2)
+        {
+            if ((*it2)->IsVisible())
+            {
+                (*it2)->Draw(painter, 0, 0, 255, cliprect);
+                (*it2)->SetAlpha(255);
+                (*it2)->ResetNeedsRedraw();
             }
         }
         painter->End();
     }
 
-    bool visible2 =
-        MythUINotificationCenter::GetInstance()->DrawDirect(painter, size, repaint);
-
-    return visible || visible2;
+    return visible;
 }
 
 QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
@@ -674,31 +726,84 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
     QMap<QString,MythScreenType*>::const_iterator it;
     for (it = m_Children.begin(); it != m_Children.end(); ++it)
     {
-        if (it.value()->IsVisible())
+        if ((*it)->IsVisible())
         {
-            QRect vis = it.value()->GetArea().toQRect();
+            QRect vis = (*it)->GetArea().toQRect();
             if (visible.isEmpty())
                 visible = QRegion(vis);
             else
                 visible = visible.united(vis);
 
-            it.value()->Pulse();
-            if (m_Effects && m_ExpireTimes.contains(it.value()))
+            (*it)->Pulse();
+            if (m_Effects && m_ExpireTimes.contains((*it)))
             {
-                QTime expires = m_ExpireTimes.value(it.value()).time();
+                QTime expires = m_ExpireTimes.value((*it)).time();
                 int left = now.msecsTo(expires);
                 if (left < m_FadeTime)
                     (*it)->SetAlpha((255 * left) / m_FadeTime);
             }
         }
 
-        if (it.value()->NeedsRedraw())
+        if ((*it)->NeedsRedraw())
         {
-            QRegion area = it.value()->GetDirtyArea();
+            QRegion area = (*it)->GetDirtyArea();
             dirty = dirty.united(area);
             redraw = true;
         }
     }
+
+    MythUINotificationCenter *nc = MythUINotificationCenter::GetInstance();
+    QList<MythScreenType*> notifications;
+    nc->GetNotificationScreens(notifications);
+    QList<MythScreenType*>::iterator it2 = notifications.begin();
+    while (it2 != notifications.end())
+    {
+        if (!MythUINotificationCenter::GetInstance()->ScreenCreated(*it2))
+        {
+            if (!m_UIScaleOverride)
+            {
+                OverrideUIScale(false);
+            }
+            (*it2)->SetPainter(m_CurrentPainter);
+            if (!(*it2)->Create())
+            {
+                it2 = notifications.erase(it2);
+                continue;
+            }
+        }
+        if ((*it2)->IsVisible())
+        {
+            if (!m_UIScaleOverride)
+            {
+                OverrideUIScale(false);
+            }
+            nc->UpdateScreen(*it2);
+
+            QRect vis = (*it2)->GetArea().toQRect();
+            if (visible.isEmpty())
+                visible = QRegion(vis);
+            else
+                visible = visible.united(vis);
+
+            (*it2)->Pulse();
+            if (m_Effects)
+            {
+                QTime expires = nc->ScreenExpiryTime(*it2).time();
+                int left = now.msecsTo(expires);
+                if (left < m_FadeTime)
+                    (*it2)->SetAlpha((255 * left) / m_FadeTime);
+            }
+        }
+
+        if ((*it2)->NeedsRedraw())
+        {
+            QRegion area = (*it2)->GetDirtyArea();
+            dirty = dirty.united(area);
+            redraw = true;
+        }
+        ++it2;
+    }
+    RevertUIScale();
 
     if (redraw)
     {
@@ -708,10 +813,19 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
         // set redraw for any widgets that may now need a partial repaint
         for (it = m_Children.begin(); it != m_Children.end(); ++it)
         {
-            if (it.value()->IsVisible() && !it.value()->NeedsRedraw() &&
-                dirty.intersects(it.value()->GetArea().toQRect()))
+            if ((*it)->IsVisible() && !(*it)->NeedsRedraw() &&
+                dirty.intersects((*it)->GetArea().toQRect()))
             {
-                it.value()->SetRedraw();
+                (*it)->SetRedraw();
+            }
+        }
+
+        for (it2 = notifications.begin(); it2 != notifications.end(); ++it2)
+        {
+            if ((*it2)->IsVisible() && !(*it2)->NeedsRedraw() &&
+                dirty.intersects((*it2)->GetArea().toQRect()))
+            {
+                (*it2)->SetRedraw();
             }
         }
 
@@ -722,26 +836,30 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
         // TODO painting in reverse may be more efficient...
         for (it = m_Children.begin(); it != m_Children.end(); ++it)
         {
-            if (it.value()->NeedsRedraw())
+            if ((*it)->NeedsRedraw())
             {
-                if (it.value()->IsVisible())
-                    it.value()->Draw(painter, 0, 0, 255, cliprect);
-                it.value()->SetAlpha(255);
-                it.value()->ResetNeedsRedraw();
+                if ((*it)->IsVisible())
+                    (*it)->Draw(painter, 0, 0, 255, cliprect);
+                (*it)->SetAlpha(255);
+                (*it)->ResetNeedsRedraw();
             }
         }
+
+        for (it2 = notifications.begin(); it2 != notifications.end(); ++it2)
+        {
+            if ((*it2)->NeedsRedraw())
+            {
+                if ((*it2)->IsVisible())
+                    (*it2)->Draw(painter, 0, 0, 255, cliprect);
+                (*it2)->SetAlpha(255);
+                (*it2)->ResetNeedsRedraw();
+            }
+        }
+
         painter->End();
     }
 
     changed = dirty;
-
-    // display notifications stack
-    QRegion changed2;
-    QRegion notification =
-        MythUINotificationCenter::GetInstance()->Draw(painter, device, size,
-                                                      changed2, alignx, aligny);
-    changed = changed.united(changed2);
-    visible = visible.united(notification);
 
     if (visible.isEmpty() || (!alignx && !aligny))
         return visible;

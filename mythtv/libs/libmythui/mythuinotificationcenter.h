@@ -13,6 +13,7 @@
 #include <QList>
 #include <QMap>
 #include <QRect>
+#include <QDateTime>
 
 #include "mythuiexp.h"
 #include "mythevent.h"
@@ -24,6 +25,7 @@
 class MythUINotificationScreen;
 class MythScreenStack;
 class MythPainter;
+class MythScreenType;
 class QPaintDevice;
 class MythNotificationScreenStack;
 
@@ -70,14 +72,31 @@ public:
      */
     void UnRegister(void *from, int id);
 
-    /**
-     * For UI screens not using MythUIScreenStack for display (e.g. video playback),
-     * provide own custom drawing routine.
+    /*
+     * OSD drawing utilities
      */
-    QRegion Draw(MythPainter *painter, QPaintDevice *device, QSize size,
-                 QRegion &changed, int alignx = 0, int aligny = 0);
-    bool    DrawDirect(MythPainter *painter, QSize size, bool repaint = false);
 
+    /**
+     * Return when the given screen is going to expire
+     * will return an invalid QDateTime if screen isn't a MythUINotificationScreen
+     */
+    QDateTime ScreenExpiryTime(MythScreenType *screen);
+    /**
+     * Return true if ::Create() has been called on screen.
+     * will always return true should screen not be a MythUINotificationScreen
+     */
+    bool ScreenCreated(MythScreenType *screen);
+    /**
+     * Return the list of notification screens being currently displayed.
+     * The list contains pointer of existing screen's copies, with ::Create()
+     * not called yet.
+     */
+    void GetNotificationScreens(QList<MythScreenType*> &screens);
+    /**
+     * Will call ::doInit() if the screen is a MythUINotificationScreen and
+     * ::Create() has been called for it already
+     */
+    void UpdateScreen(MythScreenType *screen);
     /**
      * ProcessQueue will be called by the GUI event handler and will process
      * all queued MythNotifications and delete screens marked to be deleted
@@ -90,9 +109,10 @@ private slots:
 
 private:
     friend class MythNotificationScreenStack;
+    friend class MythUINotificationScreen;
 
     MythUINotificationScreen *CreateScreen(MythNotification *notification,
-                                           int id = -1, bool nocreate = false);
+                                           int id = -1);
     MythNotificationScreenStack *GetScreenStack(void);
     void ScreenStackDeleted(void);
     void DeleteAllScreens(void);
@@ -110,7 +130,8 @@ private:
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
     int                                     m_currentId;
-    bool                                    m_refresh;
+    QMap<MythUINotificationScreen*, MythUINotificationScreen*> m_converted;
+
     // protected by g_lock
     static QMutex                           g_lock;
     static MythUINotificationCenter        *g_singleton;

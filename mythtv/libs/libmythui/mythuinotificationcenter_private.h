@@ -27,6 +27,8 @@ public:
                              int id = -1);
     MythUINotificationScreen(MythScreenStack *stack,
                              MythNotification &notification);
+    MythUINotificationScreen(MythScreenStack *stack,
+                             const MythUINotificationScreen &screen);
 
     virtual ~MythUINotificationScreen();
 
@@ -45,18 +47,19 @@ public:
     void SetSingleShotTimer(int s);
 
     // UI methods
-    void AdjustYPosition(int height);
+    void AdjustYPosition(void);
+    void AdjustIndex(int by, bool set=false);
     int  GetHeight(void);
 
     enum Content {
-        kForce      = 0,
         kNone       = 0,
         kImage      = 1 << 0,
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
+        kAll        = ~kNone,
     };
 
-    MythUINotificationScreen &operator=(MythUINotificationScreen &s);
+    MythUINotificationScreen &operator=(const MythUINotificationScreen &s);
 
 signals:
     void ScreenDeleted();
@@ -87,7 +90,9 @@ public:
     MythUIText         *m_formatText;
     MythUIText         *m_timeText;
     MythUIProgressBar  *m_progressBar;
-
+    QDateTime           m_expiry;
+    int                 m_index;
+    MythPoint           m_position;
 };
 
 //// class MythScreenNotificationStack

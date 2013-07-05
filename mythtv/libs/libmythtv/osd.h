@@ -130,7 +130,7 @@ class OSD
     void    SetPainter(MythPainter *painter);
     QRect   Bounds(void) const { return m_Rect; }
     int     GetFontStretch(void) const { return m_fontStretch; }
-    void    OverrideUIScale(void);
+    void    OverrideUIScale(bool log = true);
     void    RevertUIScale(void);
     bool    Reinit(const QRect &rect, float font_aspect);
     void    DisableFade(void) { m_Effects = false; }
