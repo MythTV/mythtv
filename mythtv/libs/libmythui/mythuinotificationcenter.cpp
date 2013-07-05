@@ -45,10 +45,11 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),     m_content(kNone),       m_update(kAll),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL),  m_index(0)
+      m_progressBar(NULL),  m_index(0),             m_timer(new QTimer(this))
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 }
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
@@ -60,11 +61,10 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_update(kAll),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL),  m_index(0)
+      m_progressBar(NULL),  m_index(0),             m_timer(new QTimer(this))
 {
     SetNotification(notification);
-    // Set timer if need be
-    SetSingleShotTimer(m_duration);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 }
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
@@ -75,13 +75,16 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),     m_content(kNone),       m_update(kAll),
       m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
       m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL)
+      m_progressBar(NULL),  m_timer(new QTimer(this))
 {
     *this = s;
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
 }
 
 MythUINotificationScreen::~MythUINotificationScreen()
 {
+    m_timer->stop();
+    LOG(VB_GUI, LOG_DEBUG, LOC + "MythUINotificationScreen dtor");
     // We can't rely on Exiting() default MythScreenType signal as
     // by the time it is emitted, the destructor would have already been called
     // making the members unusable
@@ -144,6 +147,9 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         m_fullscreen = notification.GetFullScreen();
     }
     m_duration = notification.GetDuration();
+
+    // Set timer if need be
+    SetSingleShotTimer(m_duration);
 }
 
 bool MythUINotificationScreen::Create(void)
@@ -424,6 +430,7 @@ int MythUINotificationScreen::GetHeight(void)
 
 void MythUINotificationScreen::ProcessTimer(void)
 {
+    LOG(VB_GUI, LOG_DEBUG, LOC + "ProcessTimer()");
     // delete screen
     GetScreenStack()->PopScreen(this, true, true);
 }
@@ -461,7 +468,9 @@ void MythUINotificationScreen::SetSingleShotTimer(int s)
 
     m_expiry = MythDate::current().addMSecs(ms);
 
-    QTimer::singleShot(ms, this, SLOT(ProcessTimer()));
+    m_timer->stop();
+    m_timer->setSingleShot(true);
+    m_timer->start(ms);
 }
 
 /////////////////////// MythUINotificationCenter
@@ -545,6 +554,8 @@ void MythUINotificationCenter::ScreenDeleted(void)
 
     bool duefordeletion = m_deletedScreens.contains(screen);
 
+    LOG(VB_GUI, LOG_DEBUG, LOC +
+        QString("ScreenDeleted: Entering (%1)").arg(duefordeletion));
     // Check that screen wasn't about to be deleted
     if (duefordeletion)
     {
@@ -556,6 +567,11 @@ void MythUINotificationCenter::ScreenDeleted(void)
     {
         m_screens.removeAll(screen);
         AdjustScreenPosition(n, false);
+    }
+    else
+    {
+        LOG(VB_GUI, LOG_DEBUG, LOC +
+            QString("Screen[%1] not found in screens list").arg(screen->m_id));
     }
 
     // remove the converted equivalent screen if any
@@ -574,9 +590,17 @@ void MythUINotificationCenter::ScreenDeleted(void)
             // re-create the screen
             MythUINotificationScreen *newscreen =
                 new MythUINotificationScreen(GetScreenStack(), *screen);
+            connect(newscreen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
             m_registrations[screen->m_id] = newscreen;
             // Screen was deleted, add it to suspended list
             m_suspended.append(screen->m_id);
+            LOG(VB_GUI, LOG_DEBUG, LOC +
+                "ScreenDeleted: Suspending registered screen");
+        }
+        else
+        {
+            LOG(VB_GUI, LOG_DEBUG, LOC +
+                "ScreenDeleted: Deleting registered screen");
         }
     }
 }
@@ -677,6 +701,10 @@ void MythUINotificationCenter::ProcessQueue(void)
             }
             created = true;
         }
+        else
+        {
+            screen->SetNotification(*n);
+        }
 
         // if the screen got allocated, but did't read theme yet, do it now
         if (screen && !screen->m_created)
@@ -704,7 +732,6 @@ void MythUINotificationCenter::ProcessQueue(void)
                 }
             }
         }
-        screen->SetNotification(*n);
         screen->doInit();
         delete n;
     }
@@ -788,8 +815,11 @@ void MythUINotificationCenter::UnRegister(void *from, int id)
         MythUINotificationScreen *screen = m_registrations[id];
         if (screen != NULL)
         {
-            // mark the screen for deletion
-            m_deletedScreens.append(screen);
+            // mark the screen for deletion if no timer is set
+            if (screen->m_duration <= 0)
+            {
+                m_deletedScreens.append(screen);
+            }
         }
         m_registrations.remove(id);
     }

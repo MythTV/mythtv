@@ -9,6 +9,7 @@
 #ifndef MythTV_mythuinotificationcenter_private_h
 #define MythTV_mythuinotificationcenter_private_h
 
+#include <QTimer>
 #include <stdint.h>
 
 #include "mythscreenstack.h"
@@ -93,6 +94,7 @@ public:
     QDateTime           m_expiry;
     int                 m_index;
     MythPoint           m_position;
+    QTimer             *m_timer;
 };
 
 //// class MythScreenNotificationStack
