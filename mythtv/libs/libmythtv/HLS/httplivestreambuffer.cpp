@@ -1883,10 +1883,13 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString line, const QStri
     attr = ParseAttributes(line, "PROGRAM-ID");
     if (attr.isNull())
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>");
-        return NULL;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>, using -1");
+        id = -1;
     }
-    id = attr.toInt();
+    else
+    {
+        id = attr.toInt();
+    }
 
     attr = ParseAttributes(line, "BANDWIDTH");
     if (attr.isNull())
