@@ -321,7 +321,7 @@ bool DXVA2Decoder::CreateSurfaces(void)
 
     HRESULT hr = IDirectXVideoDecoderService_CreateSurface(
         m_service, (m_width + 15) & ~15, (m_height + 15) & ~15,
-        m_context.surface_count, m_format.Format,
+        m_context.surface_count - 1, m_format.Format,
         D3DPOOL_DEFAULT, 0, DXVA2_VideoDecoderRenderTarget,
         m_context.surface, NULL);
 
