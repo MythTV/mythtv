@@ -62,6 +62,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "icringbuffer.h"
+#include "audiooutput.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -2940,8 +2941,11 @@ void MythPlayer::EventLoop(void)
             return;
         }
 
-        if (eof != kEofStateDelayed ||
-            (videoOutput && videoOutput->ValidVideoFrames() < 1))
+        bool videoDrained =
+            videoOutput && videoOutput->ValidVideoFrames() < 1;
+        bool audioDrained =
+            audio.GetAudioOutput()->GetAudioBufferedTime() < 100;
+        if (eof != kEofStateDelayed || (videoDrained && audioDrained))
         {
             if (eof == kEofStateDelayed)
                 LOG(VB_PLAYBACK, LOG_INFO,
