@@ -331,16 +331,19 @@ bool DXVA2Decoder::CreateSurfaces(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 decoder surfaces.")
                                          .arg(m_context.surface_count));
 
-    for (uint i = 0; i < m_context.surface_count; i++)
-        m_context.surface[i]->AddRef();
     return true;
 }
 
 void DXVA2Decoder::DestroySurfaces(void)
 {
     for (uint i = 0; i < m_context.surface_count; i++)
+    {
         if (m_context.surface[i])
+        {
             m_context.surface[i]->Release();
+            m_context.surface[i] = NULL;
+        }
+    }
     m_context.surface = NULL;
     m_context.surface_count = 0;
 }
