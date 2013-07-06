@@ -158,7 +158,8 @@ QString AudioPlayer::ReinitAudio(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                 QString(", reason is: %1").arg(errMsg));
-        MythNotification n(QObject::tr("Disabling Audio"), QObject::tr("AudioPlayer"), errMsg);
+        MythErrorNotification n(QObject::tr("Disabling Audio"),
+                                QObject::tr("AudioPlayer"), errMsg);
         MythUINotificationCenter::GetInstance()->Queue(n);
         m_no_audio_out = true;
     }
