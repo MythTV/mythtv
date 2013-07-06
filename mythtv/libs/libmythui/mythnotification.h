@@ -334,4 +334,23 @@ protected:
     MythMediaNotification &operator=(const MythMediaNotification&);
 };
 
+class MUI_PUBLIC MythErrorNotification : public MythImageNotification
+{
+public:
+    MythErrorNotification(const QString &title, const QString &author,
+                          const QString &details = QString())
+        : MythNotification(title, author, details), MythImageNotification(New, "error.png")
+    {
+    }
+
+    virtual MythEvent *clone(void) const { return new MythErrorNotification(*this); }
+
+protected:
+    MythErrorNotification(const MythErrorNotification &o)
+        : MythNotification(o), MythImageNotification(o)
+    {
+    }
+
+    MythErrorNotification &operator=(const MythErrorNotification&);
+};
 #endif /* defined(__MythTV__mythnotification__) */
