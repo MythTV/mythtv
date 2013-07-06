@@ -40,12 +40,12 @@ QEvent::Type MythUINotificationCenterEvent::kEventType =
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    int id)
     : MythScreenType(stack, "mythuinotification"),  m_id(id),
-      m_duration(-1),       m_progress(-1.0),       m_fullscreen(false),
+      m_duration(-1),           m_progress(-1.0),   m_fullscreen(false),
       m_added(false),
-      m_created(false),     m_content(kNone),       m_update(kAll),
-      m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
-      m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL),  m_index(0),             m_timer(new QTimer(this))
+      m_created(false),         m_content(kNone),   m_update(kAll),
+      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
+      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
+      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this))
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
@@ -57,11 +57,11 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
     : MythScreenType(stack, "mythuinotification"),  m_id(notification.GetId()),
       m_duration(notification.GetDuration()),       m_progress(-1.0),
       m_fullscreen(false),
-      m_added(false),       m_created(false),       m_content(kNone),
+      m_added(false),           m_created(false),   m_content(kNone),
       m_update(kAll),
-      m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
-      m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL),  m_index(0),             m_timer(new QTimer(this))
+      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
+      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
+      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this))
 {
     SetNotification(notification);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -70,12 +70,12 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
                                                    const MythUINotificationScreen &s)
     : MythScreenType(stack, "mythuinotification"),
-      m_duration(-1),       m_progress(-1.0),       m_fullscreen(false),
+      m_duration(-1),           m_progress(-1.0),   m_fullscreen(false),
       m_added(false),
-      m_created(false),     m_content(kNone),       m_update(kAll),
-      m_artworkImage(NULL), m_titleText(NULL),      m_artistText(NULL),
-      m_albumText(NULL),    m_formatText(NULL),     m_timeText(NULL),
-      m_progressBar(NULL),  m_timer(new QTimer(this))
+      m_created(false),         m_content(kNone),   m_update(kAll),
+      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
+      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
+      m_progressBar(NULL),      m_timer(new QTimer(this))
 {
     *this = s;
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -190,13 +190,13 @@ bool MythUINotificationScreen::Create(void)
 
     // The xml should contain an <imagetype> named 'coverart', if it doesn't
     // then we cannot display the image and may as well abort
-    m_artworkImage = dynamic_cast<MythUIImage*>(GetChild("image"));
-    m_titleText     = dynamic_cast<MythUIText*>(GetChild("title"));
-    m_artistText    = dynamic_cast<MythUIText*>(GetChild("origin"));
-    m_albumText     = dynamic_cast<MythUIText*>(GetChild("description"));
-    m_formatText    = dynamic_cast<MythUIText*>(GetChild("extra"));
-    m_timeText      = dynamic_cast<MythUIText*>(GetChild("progress_text"));
-    m_progressBar   = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
+    m_artworkImage      = dynamic_cast<MythUIImage*>(GetChild("image"));
+    m_titleText         = dynamic_cast<MythUIText*>(GetChild("title"));
+    m_originText        = dynamic_cast<MythUIText*>(GetChild("origin"));
+    m_descriptionText   = dynamic_cast<MythUIText*>(GetChild("description"));
+    m_extraText         = dynamic_cast<MythUIText*>(GetChild("extra"));
+    m_progresstextText  = dynamic_cast<MythUIText*>(GetChild("progress_text"));
+    m_progressBar       = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
 
     // store original position
     m_position      = GetPosition();
@@ -252,59 +252,59 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_artistText && (m_update & kMetaData))
+    if (m_originText && (m_update & kMetaData))
     {
-        if (!m_artist.isNull())
+        if (!m_origin.isNull())
         {
-            m_artistText->SetText(m_artist);
+            m_originText->SetText(m_origin);
         }
         else
         {
             // Same as above, calling Reset() allows for a sane, themer defined
             //default to be displayed
-            m_artistText->Reset();
+            m_originText->Reset();
         }
     }
 
-    if (m_albumText && (m_update & kMetaData))
+    if (m_descriptionText && (m_update & kMetaData))
     {
-        if (!m_album.isNull())
+        if (!m_description.isNull())
         {
-            m_albumText->SetText(m_album);
+            m_descriptionText->SetText(m_description);
         }
         else
         {
             // Same as above, calling Reset() allows for a sane, themer defined
             //default to be displayed
-            m_albumText->Reset();
+            m_descriptionText->Reset();
         }
     }
 
-    if (m_formatText && (m_update & kMetaData))
+    if (m_extraText && (m_update & kMetaData))
     {
-        if (!m_format.isNull())
+        if (!m_extra.isNull())
         {
-            m_formatText->SetText(m_format);
+            m_extraText->SetText(m_extra);
         }
         else
         {
             // Same as above, calling Reset() allows for a sane, themer defined
             //default to be displayed
-            m_formatText->Reset();
+            m_extraText->Reset();
         }
     }
 
-    if (m_timeText && (m_update & kDuration))
+    if (m_progresstextText && (m_update & kDuration))
     {
-        if (!m_progressText.isEmpty())
+        if (!m_progresstext.isEmpty())
         {
-            m_timeText->SetText(m_progressText);
+            m_progresstextText->SetText(m_progresstext);
         }
         else
         {
             // Same as above, calling Reset() allows for a sane, themer defined
             //default to be displayed
-            m_timeText->Reset();
+            m_progresstextText->Reset();
         }
     }
 
@@ -312,9 +312,9 @@ void MythUINotificationScreen::Init(void)
     {
         m_progressBar->SetVisible((m_content & kDuration) != 0);
     }
-    if (m_timeText)
+    if (m_progresstextText)
     {
-        m_timeText->SetVisible((m_content & kDuration) != 0);
+        m_progresstextText->SetVisible((m_content & kDuration) != 0);
     }
 
     if (m_progressBar && (m_update & kDuration))
@@ -379,17 +379,17 @@ void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
     tmp = data["asar"];
     if (!(tmp.isNull() && (m_update & kMetaData)))
     {
-        m_artist = tmp;
+        m_origin = tmp;
     }
     tmp = data["asal"];
     if (!(tmp.isNull() && (m_update & kMetaData)))
     {
-        m_album = tmp;
+        m_description = tmp;
     }
     tmp = data["asfm"];
     if (!(tmp.isNull() && (m_update & kMetaData)))
     {
-        m_format = tmp;
+        m_extra = tmp;
     }
 }
 
@@ -400,7 +400,7 @@ void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
 void MythUINotificationScreen::UpdatePlayback(float progress, const QString &text)
 {
     m_progress      = progress;
-    m_progressText  = text;
+    m_progresstext  = text;
 }
 
 /**
@@ -449,12 +449,12 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_image         = s.m_image;
     m_imagePath     = s.m_imagePath;
     m_title         = s.m_title;
-    m_artist        = s.m_artist;
-    m_album         = s.m_album;
-    m_format        = s.m_format;
+    m_origin        = s.m_origin;
+    m_description         = s.m_description;
+    m_extra        = s.m_extra;
     m_duration      = s.m_duration;
     m_progress      = s.m_progress;
-    m_progressText  = s.m_progressText;
+    m_progresstext  = s.m_progresstext;
     m_content       = s.m_content;
     m_fullscreen    = s.m_fullscreen;
     m_expiry        = s.m_expiry;
