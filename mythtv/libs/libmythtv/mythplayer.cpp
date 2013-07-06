@@ -2944,6 +2944,7 @@ void MythPlayer::EventLoop(void)
         bool videoDrained =
             videoOutput && videoOutput->ValidVideoFrames() < 1;
         bool audioDrained =
+            !audio.GetAudioOutput() ||
             audio.GetAudioOutput()->GetAudioBufferedTime() < 100;
         if (eof != kEofStateDelayed || (videoDrained && audioDrained))
         {
