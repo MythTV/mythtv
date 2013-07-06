@@ -278,7 +278,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
 
 QString MetadataDownload::GetMovieGrabber()
 {
-    QString def_cmd = "metadata/Movie/tmdb.py";
+    QString def_cmd = "metadata/Movie/tmdb3.py";
     QString db_cmd = gCoreContext->GetSetting("MovieGrabber", def_cmd);
 
     return QDir::cleanPath(QString("%1/%2")

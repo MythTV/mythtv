@@ -2437,6 +2437,19 @@ NULL
             return false;
     }
 
+    if (dbver == "1314")
+    {
+        // Migrate users from tmdb.py to tmdb3.py
+        // The web interface tmdb.py uses will be shut down 2013-09-15
+        const char *updates[] = {
+            "UPDATE settings SET data=REPLACE(data, 'tmdb.py', 'tmdb3.py') "
+             "WHERE value='MovieGrabber'",
+            NULL
+        };
+        if (!performActualUpdate(&updates[0], "1315", dbver))
+            return false;
+    }
+
     return true;
 }
 
