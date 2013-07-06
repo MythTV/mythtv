@@ -57,6 +57,7 @@ public:
         kImage      = 1 << 0,
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
+        kStyle      = 1 << 3,
         kAll        = ~kNone,
     };
 
@@ -95,6 +96,7 @@ public:
     int                 m_index;
     MythPoint           m_position;
     QTimer             *m_timer;
+    QString             m_style;
 };
 
 //// class MythScreenNotificationStack

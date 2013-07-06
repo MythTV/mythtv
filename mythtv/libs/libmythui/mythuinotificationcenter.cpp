@@ -94,8 +94,6 @@ MythUINotificationScreen::~MythUINotificationScreen()
 void MythUINotificationScreen::SetNotification(MythNotification &notification)
 {
     bool update = notification.type() == MythNotification::Update;
-    uint32_t newcontent = kNone;
-
     m_update = kNone;
 
     MythImageNotification *img =
@@ -105,7 +103,6 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         QString path = img->GetImagePath();
 
         m_update |= kImage;
-        newcontent |= kImage;
 
         if (path.isNull())
         {
@@ -119,21 +116,17 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
 
     MythPlaybackNotification *play =
         dynamic_cast<MythPlaybackNotification*>(&notification);
-    newcontent &= ~kDuration;
     if (play)
     {
         UpdatePlayback(play->GetProgress(), play->GetProgressText());
 
         m_update |= kDuration;
-        newcontent |= kDuration;
     }
 
-    newcontent &= ~kMetaData;
     if (!notification.GetMetaData().isEmpty())
     {
         UpdateMetaData(notification.GetMetaData());
         m_update  |= kMetaData;
-        newcontent |= kMetaData;
     }
     else if (!update)
     {
@@ -141,11 +134,18 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         m_update |= kMetaData;
     }
 
+    if (!notification.GetStyle().isEmpty())
+    {
+        m_style = notification.GetStyle();
+        m_update |= kStyle;
+    }
+
     if (!update)
     {
-        m_content = newcontent;
+        m_content = m_update;
         m_fullscreen = notification.GetFullScreen();
     }
+
     m_duration = notification.GetDuration();
 
     // Set timer if need be
@@ -175,7 +175,15 @@ bool MythUINotificationScreen::Create(void)
         theme = "notification";
     }
 
-    foundtheme = LoadWindowFromXML("notification-ui.xml", theme, this);
+    QString theme_attempt = theme + (m_style.isEmpty() ? "" : "-" + m_style);
+
+    // See if we have an alternative theme available as defined in the notification
+    foundtheme = LoadWindowFromXML("notification-ui.xml", theme_attempt, this);
+    if (!foundtheme && theme_attempt != theme)
+    {
+        // if not, default to the main one
+        foundtheme = LoadWindowFromXML("notification-ui.xml", theme, this);
+    }
 
     if (!foundtheme) // If we cannot load the theme for any reason ...
         return false;
@@ -451,6 +459,7 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_fullscreen    = s.m_fullscreen;
     m_expiry        = s.m_expiry;
     m_index         = s.m_index;
+    m_style         = s.m_style;
 
     m_update = kAll; // so all fields are initialised regardless of notification type
 
