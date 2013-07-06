@@ -238,99 +238,76 @@ void MythUINotificationScreen::Init(void)
         }
     }
 
-    if (m_titleText && (m_update & kMetaData))
+    if (m_update != kNone)
     {
-        if (!m_title.isNull())
+        InfoMap tmap;
+        
+        tmap["title"]               = m_title;
+        if (m_update & kImage)
         {
-            m_titleText->SetText(m_title);
+            tmap["image"]           = m_imagePath;
         }
-        else
+        tmap["origin"]              = m_origin;
+        tmap["description"]         = m_description;
+        tmap["extra"]               = m_extra;
+        if (m_update & kDuration)
         {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
+            tmap["progress_text"]   = m_progresstext;
+            tmap["progress"]        = QString("%1").arg((int)(m_progress * 100));
+        }
+        SetTextFromMap(tmap);
+    }
+
+    if (m_update & kMetaData)
+    {
+        if (m_titleText && m_title.isNull())
+        {
             m_titleText->Reset();
         }
-    }
-
-    if (m_originText && (m_update & kMetaData))
-    {
-        if (!m_origin.isNull())
+        if (m_originText && m_origin.isNull())
         {
-            m_originText->SetText(m_origin);
-        }
-        else
-        {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
             m_originText->Reset();
         }
-    }
-
-    if (m_descriptionText && (m_update & kMetaData))
-    {
-        if (!m_description.isNull())
+        if (m_descriptionText && m_description.isNull())
         {
-            m_descriptionText->SetText(m_description);
-        }
-        else
-        {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
             m_descriptionText->Reset();
         }
-    }
-
-    if (m_extraText && (m_update & kMetaData))
-    {
-        if (!m_extra.isNull())
+        if (m_extraText && m_extra.isNull())
         {
-            m_extraText->SetText(m_extra);
-        }
-        else
-        {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
             m_extraText->Reset();
         }
     }
 
-    if (m_progresstextText && (m_update & kDuration))
+    if (m_update & kDuration)
     {
-        if (!m_progresstext.isEmpty())
+        if (m_progresstextText && m_progresstext.isEmpty())
         {
-            m_progresstextText->SetText(m_progresstext);
-        }
-        else
-        {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
             m_progresstextText->Reset();
         }
+        if (m_progressBar)
+        {
+            if (m_progress >= 0)
+            {
+                m_progressBar->SetStart(0);
+                m_progressBar->SetTotal(100);
+                m_progressBar->SetUsed(100 * m_progress);
+            }
+            else
+            {
+                // Same as above, calling Reset() allows for a sane, themer defined
+                //default to be displayed
+                m_progressBar->Reset();
+            }
+        }
     }
-
     if (m_progressBar)
     {
         m_progressBar->SetVisible((m_content & kDuration) != 0);
+
     }
     if (m_progresstextText)
     {
         m_progresstextText->SetVisible((m_content & kDuration) != 0);
-    }
-
-    if (m_progressBar && (m_update & kDuration))
-    {
-        if (m_progress >= 0)
-        {
-            m_progressBar->SetStart(0);
-            m_progressBar->SetTotal(100);
-            m_progressBar->SetUsed(100 * m_progress);
-        }
-        else
-        {
-            // Same as above, calling Reset() allows for a sane, themer defined
-            //default to be displayed
-            m_progressBar->Reset();
-        }
     }
 
     // No field will be refreshed the next time unless specified otherwise
