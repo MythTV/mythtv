@@ -885,6 +885,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
                     id = cursor.fetchone()[0]
                     self._evalwheredat([id])
                     self._pull()
+                    self._postinit()
                     return self
 
         # create new entry
