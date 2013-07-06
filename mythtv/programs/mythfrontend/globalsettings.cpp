@@ -2520,6 +2520,16 @@ static HorizontalConfigurationGroup *AirPlayPasswordSettings()
     return hc;
 }
 
+static HostCheckBox *AirPlayFullScreen()
+{
+    HostCheckBox *gc = new HostCheckBox("AirPlayFullScreen");
+    gc->setLabel(QObject::tr("Full screen"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("During audio playback, displays album cover "
+                                "and various media information in full screen mode"));
+    return gc;
+}
+
 static TransLabelSetting *AirPlayInfo()
 {
     TransLabelSetting *ts = new TransLabelSetting();
@@ -3124,6 +3134,7 @@ MainGeneralSettings::MainGeneralSettings()
     new VerticalConfigurationGroup(false, true, false, false);
     airplay->setLabel(QObject::tr("AirPlay Settings"));
     airplay->addChild(AirPlayEnabled());
+    airplay->addChild(AirPlayFullScreen());
     airplay->addChild(AirPlayAudioOnly());
     airplay->addChild(AirPlayPasswordSettings());
     airplay->addChild(AirPlayInfo());
