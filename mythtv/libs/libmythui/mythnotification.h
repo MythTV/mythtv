@@ -121,7 +121,7 @@ public:
     /**
      * contains a short description of the notification
      */
-    void SetDescription(const QString desc) { m_description = desc; }
+    void SetDescription(const QString &desc) { m_description = desc; }
     /**
      * metadata of the notification.
      * In DMAP format. DMAP can contains various information such as artist,
@@ -129,12 +129,21 @@ public:
      */
     void SetMetaData(const DMAP &data)      { m_metadata = data; }
     /**
-     * contains a duration during which the notification will be displayed.
+     * contains a duration during which the notification will be displayed for.
      * The duration is informative only as the MythUINotificationCenter will
      * determine automatically how long a notification can be displayed for
      * and will depend on priority, visibility and other factors
      */
     void SetDuration(int duration)          { m_duration = duration; };
+    /**
+     * contains an alternative notification style.
+     * Should a style be defined, the Notification Center will attempt to load
+     * an alternative theme and fall back to the default one if unsuccessful
+     */
+    void SetStyle(const QString &style)     { m_style = style; }
+    /**
+     * For future use, not implemented at this stage
+     */
     void SetVisibility(Visibility n)        { m_visibility = n; }
     void SetPriority(Priority n)            { m_priority = n; }
 
@@ -145,6 +154,7 @@ public:
     QString     GetDescription(void)        { return m_description; }
     DMAP        GetMetaData(void)           { return m_metadata; }
     int         GetDuration(void)           { return m_duration; };
+    QString     GetStyle(void)              { return m_style; }
     Visibility  GetVisibility(void)         { return m_visibility; }
     Priority    GetPriority(void)           { return m_priority; }
 
@@ -167,6 +177,7 @@ protected:
     QString     m_description;
     int         m_duration;
     DMAP        m_metadata;
+    QString     m_style;
     Visibility  m_visibility;
     Priority    m_priority;
 };
