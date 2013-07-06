@@ -140,6 +140,7 @@ bool AudioOutputOSS::OpenDevice()
 
     if (audiofd == -1)
     {
+        Error(QObject::tr("Error opening audio device (%1)").arg(main_device));
         VBERRENO(QString("Error opening audio device (%1)").arg(main_device));
         return false;
     }

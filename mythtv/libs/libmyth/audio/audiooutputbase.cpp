@@ -650,8 +650,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (needs_downmix && source_channels > 8)
     {
-        Error("Aborting Audio Reconfigure. "
-              "Can't handle audio with more than 8 channels.");
+        Error(QObject::tr("Aborting Audio Reconfigure. "
+              "Can't handle audio with more than 8 channels."));
         return;
     }
 
@@ -702,7 +702,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         src_ctx = src_new(2-src_quality, chans, &error);
         if (error)
         {
-            Error(QString("Error creating resampler: %1")
+            Error(QObject::tr("Error creating resampler: %1")
                   .arg(src_strerror(error)));
             src_ctx = NULL;
             return;
@@ -738,7 +738,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (!encoder->Init(AV_CODEC_ID_AC3, 448000, samplerate,
                            configured_channels))
         {
-            Error("AC-3 encoder initialization failed");
+            Error(QObject::tr("AC-3 encoder initialization failed"));
             delete encoder;
             encoder = NULL;
             enc = false;
@@ -799,7 +799,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (!OpenDevice())
     {
         if (GetError().isEmpty())
-            Error("Aborting reconfigure");
+            Error(QObject::tr("Aborting reconfigure"));
         else
             VBGENERAL("Aborting reconfigure");
         m_configure_succeeded = false;
