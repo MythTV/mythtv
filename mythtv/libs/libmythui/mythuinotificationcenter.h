@@ -68,9 +68,12 @@ public:
      */
     int  Register(void *from);
     /**
-     * Unregister the client and release/remove the corresponding screen
+     * Unregister the client.
+     * If the notification had set a duration, the screen will be left to
+     * laps, unless forcedisconnect is set; in which case the screen will
+     * be closed immediately.
      */
-    void UnRegister(void *from, int id);
+    void UnRegister(void *from, int id, bool closeimemdiately = false);
 
     /*
      * OSD drawing utilities

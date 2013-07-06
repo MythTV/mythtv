@@ -667,7 +667,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
             {
                 QTime expires = nc->ScreenExpiryTime(*it2).time();
                 int left = now.msecsTo(expires);
-                if (left < m_FadeTime)
+                if (expires.isValid() && left < m_FadeTime)
                     (*it2)->SetAlpha((255 * left) / m_FadeTime);
             }
             if ((*it2)->NeedsRedraw())
@@ -790,7 +790,7 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
             {
                 QTime expires = nc->ScreenExpiryTime(*it2).time();
                 int left = now.msecsTo(expires);
-                if (left < m_FadeTime)
+                if (expires.isValid() && left < m_FadeTime)
                     (*it2)->SetAlpha((255 * left) / m_FadeTime);
             }
         }

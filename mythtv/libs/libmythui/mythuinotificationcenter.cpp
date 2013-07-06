@@ -785,7 +785,7 @@ int MythUINotificationCenter::Register(void *from)
     return m_currentId;
 }
 
-void MythUINotificationCenter::UnRegister(void *from, int id)
+void MythUINotificationCenter::UnRegister(void *from, int id, bool closeimemdiately)
 {
     QMutexLocker lock(&m_lock);
 
@@ -816,7 +816,7 @@ void MythUINotificationCenter::UnRegister(void *from, int id)
         if (screen != NULL)
         {
             // mark the screen for deletion if no timer is set
-            if (screen->m_duration <= 0)
+            if (screen->m_duration <= 0 || closeimemdiately)
             {
                 m_deletedScreens.append(screen);
             }
