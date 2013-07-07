@@ -12912,7 +12912,7 @@ void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
     if (ctx->HasPlayer() && ctx->tvchain)
     {
         ctx->ReloadTVChain();
-        ctx->tvchain->JumpTo(-1, 1);
+        ctx->tvchain->SwitchTo(-1);
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->player)
             ctx->player->Play(ctx->ts_normal, true, false);
