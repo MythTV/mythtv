@@ -381,7 +381,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // no title, no point trying any longer
         bd_close(bdnav);
         bdnav = NULL;
-        lastError = QObject::tr("Can't find any Blu-ray-compatible title");
+        lastError = QObject::tr("Can't find any Bluray-compatible title");
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
@@ -461,17 +461,31 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // Loop through the relevant titles and find the longest
         uint64_t titleLength = 0;
         BLURAY_TITLE_INFO *titleInfo = NULL;
+        bool found = false;
         for( unsigned i = 0; i < m_numTitles; ++i)
         {
             titleInfo = GetTitleInfo(i);
+            if (!titleInfo)
+                continue;
             if (titleLength == 0 ||
                 (titleInfo->duration > titleLength))
             {
                 m_mainTitle = titleInfo->idx;
                 titleLength = titleInfo->duration;
+                found = true;
             }
         }
 
+        if (!found)
+        {
+            // no title, no point trying any longer
+            bd_close(bdnav);
+            bdnav = NULL;
+            lastError = QObject::tr("Can't find any usable Bluray title");
+            rwlock.unlock();
+            mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+            return false;
+        }
         SwitchTitle(m_mainTitle);
     }
 
@@ -1083,9 +1097,9 @@ bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
 {
     if (!bdnav)
         return false;
-        
+
     const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
-    
+
     if (!metaDiscLibrary)
         return false;
 
