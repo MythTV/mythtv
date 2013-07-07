@@ -11,7 +11,7 @@
 #-----------------------
 __title__ = "TheMovieDB.org V3"
 __author__ = "Raymond Wagner"
-__version__ = "0.3.4"
+__version__ = "0.3.5"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -20,6 +20,7 @@ __version__ = "0.3.4"
 #       parental ratings
 # 0.3.3 Use translated title if available
 # 0.3.4 Add support for finding by IMDB under -D (simulate previous version)
+# 0.3.5 Add debugging mode
 
 from optparse import OptionParser
 import sys
@@ -227,6 +228,9 @@ def main():
                       dest="language", help="Specify language for filtering.")
     parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
                       dest="country", help="Specify country for custom data.")
+    parser.add_option('--debug', action="store_true", default=False,
+                      dest="debug", help=("Disable caching and enable raw "
+                                          "data output."))
 
     opts, args = parser.parse_args()
 
@@ -238,7 +242,13 @@ def main():
 
     from MythTV.tmdb3 import set_key, set_cache, set_locale
     set_key('c27cb71cff5bd76e1a7a009380562c62')
-    set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
+
+    if opts.debug:
+        import MythTV.tmdb3
+        MythTV.tmdb3.request.DEBUG = True
+        set_cache(engine='null')
+    else:
+        set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
 
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)
