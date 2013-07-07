@@ -146,7 +146,9 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         m_fullscreen = notification.GetFullScreen();
     }
 
-    m_duration = notification.GetDuration();
+    m_duration      = notification.GetDuration();
+    m_visibility    = notification.GetVisibility();
+    m_priority      = notification.GetPriority();
 
     // Set timer if need be
     SetSingleShotTimer(m_duration);
@@ -202,6 +204,12 @@ bool MythUINotificationScreen::Create(void)
     m_position      = GetPosition();
     m_created = true;
 
+    if ((m_visibility & ~MythNotification::kPlayback) == 0)
+    {
+        // Visibility will be set automatically during video playback
+        // so can be ignored here
+        SetVisible(false);
+    }
     return true;
 }
 
@@ -241,7 +249,7 @@ void MythUINotificationScreen::Init(void)
     if (m_update != kNone)
     {
         InfoMap tmap;
-        
+
         tmap["title"]               = m_title;
         if (m_update & kImage)
         {
@@ -437,6 +445,8 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_expiry        = s.m_expiry;
     m_index         = s.m_index;
     m_style         = s.m_style;
+    m_visibility    = s.m_visibility;
+    m_priority      = s.m_priority;
 
     m_update = kAll; // so all fields are initialised regardless of notification type
 
@@ -552,7 +562,7 @@ void MythUINotificationCenter::ScreenDeleted(void)
     if (n >= 0)
     {
         m_screens.removeAll(screen);
-        AdjustScreenPosition(n, false);
+        RefreshScreenPosition();
     }
     else
     {
@@ -706,18 +716,10 @@ void MythUINotificationCenter::ProcessQueue(void)
         if (created || !m_screens.contains(screen))
         {
             int pos = InsertScreen(screen);
-            if (!screen->m_fullscreen)
-            {
-                // adjust vertical position
-                screen->AdjustIndex(pos, true);
-                int n = m_screens.size();
-                if (pos < n - 1)
-                {
-                    // screen was inserted before others, adjust their positions
-                    AdjustScreenPosition(pos + 1, true);
-                }
-            }
+            // adjust vertical positions
+            RefreshScreenPosition(pos);
         }
+
         screen->doInit();
         delete n;
     }
@@ -895,16 +897,30 @@ int MythUINotificationCenter::RemoveScreen(MythUINotificationScreen *screen)
 /**
  * Re-position screens on display.
  */
-void MythUINotificationCenter::AdjustScreenPosition(int from, bool down)
+void MythUINotificationCenter::RefreshScreenPosition(int from)
 {
     QList<MythUINotificationScreen*>::iterator it       = m_screens.begin();
     QList<MythUINotificationScreen*>::iterator itend    = m_screens.end();
 
     it += from;
+    int position = 0;
+
+    if (from > 0)
+    {
+        position = (*(it-1))->m_fullscreen ? 0 : (*(it-1))->m_index+1;
+    }
 
     for (; it != itend; ++it)
     {
-        (*it)->AdjustIndex(down ? 1 : -1, false);
+        if ((*it)->IsVisible())
+        {
+            (*it)->AdjustIndex(position++, true);
+        }
+        if ((*it)->m_fullscreen)
+        {
+            position = 0;
+            continue;
+        }
     }
 }
 
@@ -942,6 +958,7 @@ void MythUINotificationCenter::GetNotificationScreens(QList<MythScreenType*> &_s
     QVector<MythScreenType*>::const_iterator it       = screens.begin();
     QVector<MythScreenType*>::const_iterator itend    = screens.end();
 
+    int position = 0;
     for (; it != itend; ++it)
     {
         MythUINotificationScreen *screen =
@@ -949,6 +966,9 @@ void MythUINotificationCenter::GetNotificationScreens(QList<MythScreenType*> &_s
 
         if (screen)
         {
+            if ((screen->m_visibility & MythNotification::kPlayback) == 0)
+                continue;
+
             MythUINotificationScreen *newscreen;
 
             if (!m_converted.contains(screen))
@@ -963,6 +983,12 @@ void MythUINotificationCenter::GetNotificationScreens(QList<MythScreenType*> &_s
                 newscreen = m_converted[screen];
                 // Copy old content in case it changed
                 *newscreen = *screen;
+            }
+            newscreen->SetVisible(true);
+            newscreen->m_index = position++;
+            if (screen->m_fullscreen)
+            {
+                position = 0;
             }
             list.append(newscreen);
         }

@@ -121,7 +121,7 @@ private:
     void DeleteAllScreens(void);
     int InsertScreen(MythUINotificationScreen *screen);
     int RemoveScreen(MythUINotificationScreen *screen);
-    void AdjustScreenPosition(int from, bool down);
+    void RefreshScreenPosition(int from = 0);
 
 private:
     MythNotificationScreenStack            *m_screenStack;
