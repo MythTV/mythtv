@@ -919,12 +919,13 @@ void AudioOutputBase::KillAudio()
 
 void AudioOutputBase::Pause(bool paused)
 {
-    if (unpause_when_ready)
+    if (!paused && unpause_when_ready)
         return;
     VBAUDIO(QString("Pause %1").arg(paused));
     if (pauseaudio != paused)
         was_paused = pauseaudio;
     pauseaudio = paused;
+    unpause_when_ready = false;
     actually_paused = false;
 }
 
