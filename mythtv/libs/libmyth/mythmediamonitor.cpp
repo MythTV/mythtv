@@ -33,6 +33,9 @@ using namespace std;
 #else
 #include "mediamonitor-unix.h"
 #endif
+#include "mythuinotificationcenter.h"
+
+static const QString _Location = QObject::tr("Media Monitor");
 
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
@@ -231,7 +234,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     if (!selected)
     {
-        ShowOkPopup(tr("No devices to eject"));
+        ShowNotification(tr("No devices to eject"), _Location);
         return;
     }
 
@@ -249,12 +252,12 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
         if (device->eject(false) != MEDIAERR_OK)
         {
-            QString msg = QObject::tr(
-                "Unable to open or close the empty drive %1.\n\n"
-                "You may have to use the eject button under its tray.");
-            ShowOkPopup(msg.arg(dev));
+            QString msg =
+                QObject::tr("Unable to open or close the empty drive %1");
+            QString extra =
+                QObject::tr("You may have to use the eject button under its tray");
+            ShowNotificationError(msg.arg(dev), _Location, extra);
         }
-
         return;
     }
 
@@ -264,11 +267,14 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
                  QString("Disk %1 is mounted? Unmounting").arg(dev));
         device->unmount();
 
+#if !CONFIG_DARWIN
         if (device->isMounted())
         {
-            ShowOkPopup(tr("Failed to unmount %1").arg(dev));
+            ShowNotificationError(tr("Failed to unmount %1").arg(dev),
+                                  _Location);
             return;
         }
+#endif
     }
 
     LOG(VB_MEDIA, LOG_INFO,
@@ -281,11 +287,11 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
     {
         // Physical ejection isn't possible (there is no tray or slot),
         // but logically the device is now ejected (ignored by the OS).
-        ShowOkPopup(tr("You may safely remove %1").arg(dev));
+        ShowNotification(tr("You may safely remove %1").arg(dev), _Location);
     }
     else if (err == MEDIAERR_FAILED)
     {
-        ShowOkPopup(tr("Failed to eject %1").arg(dev));
+        ShowNotificationError(tr("Failed to eject %1").arg(dev), _Location);
     }
 }
 
@@ -930,8 +936,8 @@ void MediaMonitor::ejectOpticalDisc()
         myth_system("eject -T");
 #elif CONFIG_DARWIN
         QString def = DEFAULT_CD;
-        LOG(VB_MEDIA, LOG_INFO, "Trying 'disktool -e " + def);
-        myth_system("disktool -e " + def);
+        LOG(VB_MEDIA, LOG_INFO, "Trying 'diskutil eject " + def);
+        myth_system("diskutil eject " + def);
 #endif
     }
 }
