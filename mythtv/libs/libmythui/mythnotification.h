@@ -12,6 +12,7 @@
 #include <QMutex>
 #include <QMap>
 #include <QImage>
+#include <stdint.h>
 
 #include "mythevent.h"
 #include "mythuiexp.h"
@@ -142,10 +143,13 @@ public:
      */
     void SetStyle(const QString &style)     { m_style = style; }
     /**
+     * define a bitmask of Visibility
+     */
+    void SetVisibility(uint32_t n)          { m_visibility = n; }
+    /**
      * For future use, not implemented at this stage
      */
-    void SetVisibility(Visibility n)        { m_visibility = n; }
-    void SetPriority(Priority n)            { m_priority = n; }
+    void SetPriority(uint32_t n)            { m_priority = n; }
 
     // Getter
     int         GetId(void)                 { return m_id; }
@@ -155,8 +159,8 @@ public:
     DMAP        GetMetaData(void)           { return m_metadata; }
     int         GetDuration(void)           { return m_duration; };
     QString     GetStyle(void)              { return m_style; }
-    Visibility  GetVisibility(void)         { return m_visibility; }
-    Priority    GetPriority(void)           { return m_priority; }
+    uint32_t    GetVisibility(void)         { return m_visibility; }
+    uint32_t    GetPriority(void)           { return m_priority; }
 
 protected:
     MythNotification(const MythNotification &o)
@@ -178,8 +182,8 @@ protected:
     int         m_duration;
     DMAP        m_metadata;
     QString     m_style;
-    Visibility  m_visibility;
-    Priority    m_priority;
+    uint32_t    m_visibility;
+    uint32_t    m_priority;
 };
 
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
