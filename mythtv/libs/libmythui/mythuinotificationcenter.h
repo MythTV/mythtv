@@ -140,4 +140,15 @@ private:
     static MythUINotificationCenter        *g_singleton;
 };
 
+/**
+ * convenience utility to display error message as notification
+ */
+MUI_PUBLIC void ShowNotificationError(const QString &msg,
+                                      const QString &from = "",
+                                      const QString &detail = "");
+
+MUI_PUBLIC void ShowNotification(const QString &msg,
+                                 const QString &from = "",
+                                 const QString &detail = "");
+
 #endif /* defined(__MythTV__mythnotifications__) */

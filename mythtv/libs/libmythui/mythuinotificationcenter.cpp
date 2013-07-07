@@ -987,3 +987,19 @@ void MythUINotificationCenter::UpdateScreen(MythScreenType *screen)
         s->doInit();
     }
 }
+
+void ShowNotificationError(const QString &msg,
+                           const QString &from,
+                           const QString &detail)
+{
+    MythErrorNotification n(msg, from, detail);
+    MythUINotificationCenter::GetInstance()->Queue(n);
+}
+
+void ShowNotification(const QString &msg,
+                      const QString &from,
+                      const QString &detail)
+{
+    MythNotification n(msg, from, detail);
+    MythUINotificationCenter::GetInstance()->Queue(n);
+}
