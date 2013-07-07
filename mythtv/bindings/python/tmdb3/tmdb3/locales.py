@@ -6,6 +6,7 @@
 # Author: Raymond Wagner
 #-----------------------
 
+from tmdb_exceptions import *
 import locale
 
 syslocale = None
