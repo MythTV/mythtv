@@ -5,6 +5,8 @@
 
 #define LOC QString("AudioPlayer: ")
 
+static const QString _Location = QObject::tr("Audio Player");
+
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
     m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
@@ -158,9 +160,8 @@ QString AudioPlayer::ReinitAudio(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                 QString(", reason is: %1").arg(errMsg));
-        MythErrorNotification n(QObject::tr("Disabling Audio"),
-                                QObject::tr("AudioPlayer"), errMsg);
-        MythUINotificationCenter::GetInstance()->Queue(n);
+        ShowNotificationError(QObject::tr("Disabling Audio"),
+                              _Location, errMsg);
         m_no_audio_out = true;
     }
     else if (m_no_audio_out && m_audioOutput)
