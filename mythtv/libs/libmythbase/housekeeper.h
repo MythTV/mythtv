@@ -21,18 +21,18 @@ class Scheduler;
 class HouseKeeper;
 
 enum HouseKeeperScope {
-    kHKGlobal = 0,              // task should only run once per cluster
-                                //      e.g. mythfilldatabase
-    kHKLocal,                   // task should only run once per machine
-                                //      e.g. hardware profile update
-    kHKInst                     // task should run on every process
-                                //      e.g. ServerPool update
+    kHKGlobal = 0,              ///< task should only run once per cluster
+                                ///<      e.g. mythfilldatabase
+    kHKLocal,                   ///< task should only run once per machine
+                                ///<      e.g. hardware profile update
+    kHKInst                     ///< task should run on every process
+                                ///<      e.g. ServerPool update
 };
 
 enum HouseKeeperStartup {
-    kHKNormal = 0,              // task is checked normally
-    kHKRunOnStartup,            // task is queued when HouseKeeper is started
-    kHKRunImmediateOnStartup    // task is run during HouseKeeper startup
+    kHKNormal = 0,              ///< task is checked normally
+    kHKRunOnStartup,            ///< task is queued when HouseKeeper is started
+    kHKRunImmediateOnStartup    ///< task is run during HouseKeeper startup
 };
 
 class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
