@@ -118,6 +118,7 @@ private:
                                            int id = -1);
     MythNotificationScreenStack *GetScreenStack(void);
     void ScreenStackDeleted(void);
+    void DeleteAllRegistrations(void);
     void DeleteAllScreens(void);
     int InsertScreen(MythUINotificationScreen *screen);
     int RemoveScreen(MythUINotificationScreen *screen);

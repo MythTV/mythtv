@@ -519,6 +519,7 @@ MythUINotificationCenter::~MythUINotificationCenter()
 
     QMutexLocker lock(&m_lock);
 
+    DeleteAllRegistrations();
     DeleteAllScreens();
 
     // Delete all outstanding queued notifications
@@ -827,6 +828,18 @@ MythNotificationScreenStack *MythUINotificationCenter::GetScreenStack(void)
                                                         this);
     }
     return m_screenStack;
+}
+
+void MythUINotificationCenter::DeleteAllRegistrations(void)
+{
+    QMap<int, MythUINotificationScreen*>::iterator it = m_registrations.begin();
+    
+    for (; it != m_registrations.end();)
+    {
+        m_deletedScreens.append(*it);
+        it = m_registrations.erase(it);
+    }
+    m_registrations.clear();
 }
 
 void MythUINotificationCenter::DeleteAllScreens(void)
