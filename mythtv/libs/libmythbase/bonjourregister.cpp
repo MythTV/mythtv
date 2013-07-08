@@ -11,7 +11,7 @@
 QMutex BonjourRegister::m_lock;
 
 BonjourRegister::BonjourRegister(QObject *parent)
-  : QObject(parent), m_dnssref(0), m_socket(NULL)
+    : QObject(parent), m_dnssref(0), m_socket(NULL), m_haslock(false)
 {
     setenv("AVAHI_COMPAT_NOWARN", "1", 1);
 }
@@ -32,6 +32,11 @@ BonjourRegister::~BonjourRegister()
 
     m_socket->deleteLater();
     m_socket = NULL;
+
+    if (m_haslock)
+    {
+        m_lock.unlock();
+    }
 }
 
 bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
@@ -44,6 +49,7 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
     }
 
     m_lock.lock();
+    m_haslock = true;
 
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
@@ -70,7 +76,9 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
+    m_haslock = false;
     m_lock.unlock();
+
     return false;
 }
 
@@ -92,6 +100,7 @@ void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
     (void)flags;
 
     BonjourRegister *bonjour = static_cast<BonjourRegister *>(object);
+    bonjour->m_haslock = false;
     bonjour->m_lock.unlock();
     if (kDNSServiceErr_NoError != errorcode)
     {
