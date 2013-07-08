@@ -9,25 +9,18 @@
 #ifndef __MythTV__mythnotifications__
 #define __MythTV__mythnotifications__
 
-#include <QMutex>
 #include <QList>
-#include <QMap>
-#include <QRect>
 #include <QDateTime>
+#include <QMutex>
 
 #include "mythuiexp.h"
-#include "mythevent.h"
 
 #include "mythnotification.h"
 
 // .h
 
-class MythUINotificationScreen;
-class MythScreenStack;
-class MythPainter;
 class MythScreenType;
-class QPaintDevice;
-class MythNotificationScreenStack;
+class NCPrivate;
 
 class MUI_PUBLIC MythUINotificationCenterEvent : public MythEvent
 {
@@ -37,10 +30,8 @@ public:
     static Type kEventType;
 };
 
-class MUI_PUBLIC MythUINotificationCenter : public QObject
+class MUI_PUBLIC MythUINotificationCenter
 {
-    Q_OBJECT
-
 public:
     MythUINotificationCenter(void);
     virtual ~MythUINotificationCenter();
@@ -107,37 +98,27 @@ public:
      */
     void ProcessQueue(void);
 
-private slots:
-    void ScreenDeleted(void);
-
 private:
-    friend class MythNotificationScreenStack;
-    friend class MythUINotificationScreen;
+    NCPrivate *d;
 
-    MythUINotificationScreen *CreateScreen(MythNotification *notification,
-                                           int id = -1);
-    MythNotificationScreenStack *GetScreenStack(void);
-    void ScreenStackDeleted(void);
-    void DeleteAllScreens(void);
-    int InsertScreen(MythUINotificationScreen *screen);
-    int RemoveScreen(MythUINotificationScreen *screen);
-    void AdjustScreenPosition(int from, bool down);
-
-private:
-    MythNotificationScreenStack            *m_screenStack;
-    QList<MythNotification*>                m_notifications;
-    QList<MythUINotificationScreen*>        m_screens;
-    QList<MythUINotificationScreen*>        m_deletedScreens;
-    QMap<int, MythUINotificationScreen*>    m_registrations;
-    QList<int>                              m_suspended;
-    QMap<int, void*>                        m_clients;
-    QMutex                                  m_lock;
-    int                                     m_currentId;
-    QMap<MythUINotificationScreen*, MythUINotificationScreen*> m_converted;
-
-    // protected by g_lock
     static QMutex                           g_lock;
+    // protected by g_lock
     static MythUINotificationCenter        *g_singleton;
 };
+
+/**
+ * convenience utility to display error message as notification
+ */
+MUI_PUBLIC void ShowNotificationError(const QString &msg,
+                                      const QString &from = QString(),
+                                      const QString &detail = QString(),
+                                      const PNMask priority = MythNotification::kDefault,
+                                      const VNMask visibility = MythNotification::kAll);
+
+MUI_PUBLIC void ShowNotification(const QString &msg,
+                                 const QString &from = QString(),
+                                 const QString &detail = QString(),
+                                 const PNMask priority = MythNotification::kDefault,
+                                 const VNMask visibility = MythNotification::kAll);
 
 #endif /* defined(__MythTV__mythnotifications__) */

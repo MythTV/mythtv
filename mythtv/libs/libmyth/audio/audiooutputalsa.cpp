@@ -475,7 +475,7 @@ bool AudioOutputALSA::OpenDevice()
         case FORMAT_S32:    format = SND_PCM_FORMAT_S32;   break;
         case FORMAT_FLT:    format = SND_PCM_FORMAT_FLOAT; break;
         default:
-            Error(QString("Unknown sample format: %1").arg(output_format));
+            Error(QObject::tr("Unknown sample format: %1").arg(output_format));
             return false;
     }
 
@@ -679,7 +679,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     if (handle == NULL)
     {
-        Error("SetParameters() called with handle == NULL!");
+        Error(QObject::tr("SetParameters() called with handle == NULL!"));
         return -1;
     }
 

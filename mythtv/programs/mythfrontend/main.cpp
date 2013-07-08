@@ -70,6 +70,7 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythcontrols.h"
 #include "mythuihelper.h"
+#include "mythuinotificationcenter.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "backendconnectionmanager.h"
@@ -116,6 +117,8 @@ void handleSIGUSR2(void);
 #if CONFIG_DARWIN
 static bool gLoaded = false;
 #endif
+
+static const QString _Location = QObject::tr("MythFrontend");
 
 namespace
 {
@@ -1126,7 +1129,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     if (pginfo->IsVideoDVD())
     {
         DVDInfo *dvd = new DVDInfo(pginfo->GetPlaybackURL());
-        if (dvd && dvd->IsValid())
+        if (dvd->IsValid())
         {
             QString name;
             QString serialid;
@@ -1138,8 +1141,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         else
         {
-            if (dvd)
-                delete dvd;
+            ShowNotificationError(QObject::tr("DVD Failure"),
+                                  _Location, dvd->GetLastError());
+            delete dvd;
             delete pginfo;
             return res;
         }

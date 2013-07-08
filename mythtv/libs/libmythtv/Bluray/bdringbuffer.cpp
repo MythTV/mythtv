@@ -312,6 +312,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     if (!bdnav)
     {
+        lastError = QObject::tr("Couldn't open Blu-ray device: %1").arg(filename);
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
@@ -335,36 +336,6 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_topMenuSupported   = false;
     m_firstPlaySupported = false;
     const BLURAY_DISC_INFO *discinfo = bd_get_disc_info(bdnav);
-    if (discinfo)
-    {
-        m_topMenuSupported   = discinfo->top_menu_supported;
-        m_firstPlaySupported = discinfo->first_play_supported;
-
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
-                .arg(discinfo->first_play_supported ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Top Menu Supported: %1")
-                .arg(discinfo->top_menu_supported ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of HDMV Titles: %1")
-                .arg(discinfo->num_hdmv_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of BD-J Titles: %1")
-                .arg(discinfo->num_bdj_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Number of Unsupported Titles: %1")
-                .arg(discinfo->num_unsupported_titles));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS present on disc: %1")
-                .arg(discinfo->aacs_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libaacs used: %1")
-                .arg(discinfo->libaacs_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS handled: %1")
-                .arg(discinfo->aacs_handled ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ present on disc: %1")
-                .arg(discinfo->bdplus_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libbdplus used: %1")
-                .arg(discinfo->libbdplus_detected ? "yes" : "no"));
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ handled: %1")
-                .arg(discinfo->bdplus_handled ? "yes" : "no"));
-    }
 
     // The following settings affect HDMV navigation
     // (default audio track selection,
@@ -405,6 +376,47 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_numTitles = bd_get_titles(bdnav, TITLES_RELEVANT, 30);
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Found %1 titles.").arg(m_numTitles));
+    if (!m_numTitles)
+    {
+        // no title, no point trying any longer
+        bd_close(bdnav);
+        bdnav = NULL;
+        lastError = QObject::tr("Can't find any Bluray-compatible title");
+        rwlock.unlock();
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+        return false;
+    }
+
+    if (discinfo)
+    {
+        m_topMenuSupported   = discinfo->top_menu_supported;
+        m_firstPlaySupported = discinfo->first_play_supported;
+
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "*** Blu-ray Disc Information ***");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("First Play Supported: %1")
+                .arg(discinfo->first_play_supported ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Top Menu Supported: %1")
+                .arg(discinfo->top_menu_supported ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of HDMV Titles: %1")
+                .arg(discinfo->num_hdmv_titles));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Number of BD-J Titles: %1")
+                .arg(discinfo->num_bdj_titles));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Number of Unsupported Titles: %1")
+                .arg(discinfo->num_unsupported_titles));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS present on disc: %1")
+                .arg(discinfo->aacs_detected ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libaacs used: %1")
+                .arg(discinfo->libaacs_detected ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AACS handled: %1")
+                .arg(discinfo->aacs_handled ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ present on disc: %1")
+                .arg(discinfo->bdplus_detected ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("libbdplus used: %1")
+                .arg(discinfo->libbdplus_detected ? "yes" : "no"));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("BD+ handled: %1")
+                .arg(discinfo->bdplus_handled ? "yes" : "no"));
+    }
     m_mainTitle = 0;
     m_currentTitleLength = 0;
     m_titlesize = 0;
@@ -449,17 +461,31 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // Loop through the relevant titles and find the longest
         uint64_t titleLength = 0;
         BLURAY_TITLE_INFO *titleInfo = NULL;
+        bool found = false;
         for( unsigned i = 0; i < m_numTitles; ++i)
         {
             titleInfo = GetTitleInfo(i);
+            if (!titleInfo)
+                continue;
             if (titleLength == 0 ||
                 (titleInfo->duration > titleLength))
             {
                 m_mainTitle = titleInfo->idx;
                 titleLength = titleInfo->duration;
+                found = true;
             }
         }
 
+        if (!found)
+        {
+            // no title, no point trying any longer
+            bd_close(bdnav);
+            bdnav = NULL;
+            lastError = QObject::tr("Can't find any usable Bluray title");
+            rwlock.unlock();
+            mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+            return false;
+        }
         SwitchTitle(m_mainTitle);
     }
 
@@ -1071,9 +1097,9 @@ bool BDRingBuffer::GetNameAndSerialNum(QString &name, QString &serial)
 {
     if (!bdnav)
         return false;
-        
+
     const meta_dl *metaDiscLibrary = bd_get_meta(bdnav);
-    
+
     if (!metaDiscLibrary)
         return false;
 

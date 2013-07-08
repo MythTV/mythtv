@@ -17,6 +17,8 @@
 #include "mythuiexp.h"
 
 typedef QMap<QString,QString> DMAP;
+typedef unsigned int    PNMask;
+typedef unsigned int    VNMask;
 
 class MUI_PUBLIC MythNotification : public MythEvent
 {
@@ -142,10 +144,13 @@ public:
      */
     void SetStyle(const QString &style)     { m_style = style; }
     /**
+     * define a bitmask of Visibility
+     */
+    void SetVisibility(VNMask n)            { m_visibility = n; }
+    /**
      * For future use, not implemented at this stage
      */
-    void SetVisibility(Visibility n)        { m_visibility = n; }
-    void SetPriority(Priority n)            { m_priority = n; }
+    void SetPriority(PNMask n)              { m_priority = n; }
 
     // Getter
     int         GetId(void)                 { return m_id; }
@@ -155,8 +160,8 @@ public:
     DMAP        GetMetaData(void)           { return m_metadata; }
     int         GetDuration(void)           { return m_duration; };
     QString     GetStyle(void)              { return m_style; }
-    Visibility  GetVisibility(void)         { return m_visibility; }
-    Priority    GetPriority(void)           { return m_priority; }
+    VNMask      GetVisibility(void)         { return m_visibility; }
+    PNMask      GetPriority(void)           { return m_priority; }
 
 protected:
     MythNotification(const MythNotification &o)
@@ -178,8 +183,8 @@ protected:
     int         m_duration;
     DMAP        m_metadata;
     QString     m_style;
-    Visibility  m_visibility;
-    Priority    m_priority;
+    VNMask      m_visibility;
+    PNMask      m_priority;
 };
 
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
@@ -334,4 +339,23 @@ protected:
     MythMediaNotification &operator=(const MythMediaNotification&);
 };
 
+class MUI_PUBLIC MythErrorNotification : public MythImageNotification
+{
+public:
+    MythErrorNotification(const QString &title, const QString &author,
+                          const QString &details = QString())
+        : MythNotification(title, author, details), MythImageNotification(New, "error.png")
+    {
+    }
+
+    virtual MythEvent *clone(void) const { return new MythErrorNotification(*this); }
+
+protected:
+    MythErrorNotification(const MythErrorNotification &o)
+        : MythNotification(o), MythImageNotification(o)
+    {
+    }
+
+    MythErrorNotification &operator=(const MythErrorNotification&);
+};
 #endif /* defined(__MythTV__mythnotification__) */

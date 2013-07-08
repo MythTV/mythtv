@@ -435,7 +435,7 @@ bool AudioOutputDX::OpenDevice(void)
     m_priv->InitDirectSound(m_UseSPDIF);
     if (!m_priv->dsobject || !m_priv->dsound_dll)
     {
-        Error("DirectSound initialization failed");
+        Error(QObject::tr("DirectSound initialization failed"));
         return false;
     }
 
@@ -507,10 +507,10 @@ bool AudioOutputDX::OpenDevice(void)
         if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
-                Error(QString("Unsupported format for device %1:%2")
+                Error(QObject::tr("Unsupported format for device %1:%2")
                       .arg(m_priv->device_num).arg(m_priv->device_name));
             else
-                Error(QString("Failed to create DS buffer 0x%1")
+                Error(QObject::tr("Failed to create DS buffer 0x%1")
                       .arg((DWORD)dsresult, 0, 16));
             return false;
         }

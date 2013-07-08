@@ -1582,6 +1582,14 @@ QString RingBuffer::GetSubtitleFilename(void) const
     return tmp;
 }
 
+QString RingBuffer::GetLastError(void) const
+{
+    rwlock.lockForRead();
+    QString tmp = lastError;
+    rwlock.unlock();
+    return tmp;
+}
+
 /** \fn RingBuffer::GetWritePosition(void) const
  *  \brief Returns how far into a ThreadedFileWriter file we have written.
  */

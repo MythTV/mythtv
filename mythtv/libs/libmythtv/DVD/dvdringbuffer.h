@@ -65,11 +65,13 @@ class MTV_PUBLIC DVDInfo
    ~DVDInfo(void);
     bool IsValid(void) const { return m_nav != NULL; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
+    QString GetLastError(void) const { return m_lastError; }
 
   protected:
     dvdnav_t   *m_nav;
     const char *m_name;
     const char *m_serialnumber;
+    QString     m_lastError;
 };
 
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer

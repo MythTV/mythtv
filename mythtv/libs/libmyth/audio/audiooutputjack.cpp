@@ -65,8 +65,8 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     client = _jack_client_open();
     if (!client)
     {
-        JERROR("Cannot start/connect to jack server "
-               "(to check supported rate/channels)");
+        JERROR(QObject::tr("Cannot start/connect to jack server "
+               "(to check supported rate/channels)"));
         delete settings;
         return NULL;
     }
@@ -76,7 +76,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     if (!rate)
     {
-        JERROR("Unable to retrieve jack server sample rate");
+        JERROR(QObject::tr("Unable to retrieve jack server sample rate"));
         goto err_out;
     }
     else
@@ -90,7 +90,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     if (!matching_ports || !matching_ports[0])
     {
-        JERROR("No ports available to connect to");
+        JERROR(QObject::tr("No ports available to connect to"));
         goto err_out;
     }
     // Count matching ports from 2nd port upwards
@@ -130,7 +130,7 @@ bool AudioOutputJACK::OpenDevice()
     // We have a hard coded channel limit - check we haven't exceeded it
     if (channels > JACK_CHANNELS_MAX)
     {
-        JERROR(QString("Requested more channels: (%1), than the maximum: %2")
+        JERROR(QObject::tr("Requested more channels: (%1), than the maximum: %2")
                    .arg(channels).arg(JACK_CHANNELS_MAX));
         return false;
     }
@@ -146,7 +146,7 @@ bool AudioOutputJACK::OpenDevice()
     client = _jack_client_open();
     if (!client)
     {
-        JERROR("Cannot start/connect to jack server");
+        JERROR(QObject::tr("Cannot start/connect to jack server"));
         goto err_out;
     }
 
@@ -154,7 +154,7 @@ bool AudioOutputJACK::OpenDevice()
     matching_ports = _jack_get_ports();
     if (!matching_ports || !matching_ports[0])
     {
-        JERROR("No ports available to connect to");
+        JERROR(QObject::tr("No ports available to connect to"));
         goto err_out;
     }
 
@@ -165,7 +165,7 @@ bool AudioOutputJACK::OpenDevice()
     // ensure enough ports to satisfy request
     if (channels > i)
     {
-        JERROR("Not enough ports available to connect to");
+        JERROR(QObject::tr("Not enough ports available to connect to"));
         goto err_out;
     }
 
@@ -178,7 +178,7 @@ bool AudioOutputJACK::OpenDevice()
                                       JackPortIsOutput, 0);
         if (!ports[i])
         {
-            JERROR(QString("Error while registering new jack port: %1").arg(i));
+            JERROR(QObject::tr("Error while registering new jack port: %1").arg(i));
             goto err_out;
         }
     }
@@ -199,16 +199,16 @@ bool AudioOutputJACK::OpenDevice()
     // These will actually get called after jack_activate()!
     // ...Possibly even before this OpenDevice sub returns...
     if (jack_set_process_callback(client, _JackCallback, this))
-        JERROR("Error. Unable to set process callback?!");
+        JERROR(QObject::tr("Error. Unable to set process callback?!"));
     if (jack_set_xrun_callback(client, _JackXRunCallback, this))
-        JERROR("Error. Unable to set xrun callback?!");
+        JERROR(QObject::tr("Error. Unable to set xrun callback?!"));
     if (jack_set_graph_order_callback(client, _JackGraphOrderCallback, this))
-        JERROR("Error. Unable to set graph order change callback?!");
+        JERROR(QObject::tr("Error. Unable to set graph order change callback?!"));
 
     // Activate! Everything comes into life after here. Beware races
     if (jack_activate(client))
     {
-        JERROR("Calling jack_activate failed");
+        JERROR(QObject::tr("Calling jack_activate failed"));
         goto err_out;
     }
 
@@ -615,7 +615,7 @@ bool AudioOutputJACK::_jack_connect_ports(const char** matching_ports)
     {
         if (jack_connect(client, jack_port_name(ports[i]), matching_ports[i]))
         {
-            JERROR(QString("Calling jack_connect failed on port: %1\n").arg(i));
+            JERROR(QObject::tr("Calling jack_connect failed on port: %1\n").arg(i));
             return false;
         }
     }
@@ -629,7 +629,7 @@ void AudioOutputJACK::_jack_client_close(jack_client_t **client)
     {
         int err = jack_client_close(*client);
         if (err != 0)
-            JERROR(QString("Error closing Jack output device. Error: %1")
+            JERROR(QObject::tr("Error closing Jack output device. Error: %1")
                        .arg(err));
         *client = NULL;
     }

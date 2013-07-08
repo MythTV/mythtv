@@ -1,8 +1,11 @@
 #include "mythplayer.h"
 #include "audiooutput.h"
 #include "audioplayer.h"
+#include "mythuinotificationcenter.h"
 
 #define LOC QString("AudioPlayer: ")
+
+static const QString _Location = QObject::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
@@ -155,11 +158,10 @@ QString AudioPlayer::ReinitAudio(void)
 
     if (!errMsg.isEmpty())
     {
-        if (!firstinit)
-        {
-            LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
-                    QString(", reason is: %1").arg(errMsg));
-        }
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
+                QString(", reason is: %1").arg(errMsg));
+        ShowNotificationError(QObject::tr("Disabling Audio"),
+                              _Location, errMsg);
         m_no_audio_out = true;
     }
     else if (m_no_audio_out && m_audioOutput)

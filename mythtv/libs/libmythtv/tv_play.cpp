@@ -51,6 +51,7 @@ using namespace std;
 #include "channelutil.h"
 #include "compat.h"
 #include "mythuihelper.h"
+#include "mythuinotificationcenter.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
@@ -96,6 +97,8 @@ using namespace std;
     if (osd) \
         osd->HideWindow(WINDOW); \
     ReturnOSDLock(CTX, osd); }
+
+static const QString _Location = QObject::tr("TV Player");
 
 const int  TV::kInitFFRWSpeed                = 0;
 const uint TV::kInputKeysMax                 = 6;
@@ -2349,7 +2352,15 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-        ctx->SetRingBuffer(RingBuffer::Create(playbackURL, false));
+        RingBuffer *buffer = RingBuffer::Create(playbackURL, false);
+        if (buffer && !buffer->GetLastError().isEmpty())
+        {
+            ShowNotificationError(tr("Can't start playback"),
+                                  _Location, buffer->GetLastError());
+            delete buffer;
+            buffer = NULL;
+        }
+        ctx->SetRingBuffer(buffer);
 
         if (ctx->buffer && ctx->buffer->IsOpen())
         {

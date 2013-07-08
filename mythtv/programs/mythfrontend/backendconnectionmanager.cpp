@@ -89,8 +89,12 @@ void BackendConnectionManager::customEvent(QEvent *event)
             delete m_reconnecting;
             m_reconnecting = NULL;
 
+            if (!m_reconnect_again)
+            {
+                m_reconnect_again = message == "RECONNECT_FAILURE";
+            }
             reconnect = m_reconnect_again;
-            m_reconnect_again = false;
+            m_reconnect_again = message == "RECONNECT_FAILURE";
         }
     }
 
