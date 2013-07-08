@@ -145,10 +145,14 @@ private:
  */
 MUI_PUBLIC void ShowNotificationError(const QString &msg,
                                       const QString &from = "",
-                                      const QString &detail = "");
+                                      const QString &detail = "",
+                                      const PNMask priority = MythNotification::kDefault,
+                                      const VNMask visibility = MythNotification::kAll);
 
 MUI_PUBLIC void ShowNotification(const QString &msg,
                                  const QString &from = "",
-                                 const QString &detail = "");
+                                 const QString &detail = "",
+                                 const PNMask priority = MythNotification::kDefault,
+                                 const VNMask visibility = MythNotification::kAll);
 
 #endif /* defined(__MythTV__mythnotifications__) */

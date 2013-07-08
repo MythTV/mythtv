@@ -97,8 +97,8 @@ public:
     MythPoint           m_position;
     QTimer             *m_timer;
     QString             m_style;
-    uint32_t            m_visibility;
-    uint32_t            m_priority;
+    VNMask              m_visibility;
+    PNMask              m_priority;
 };
 
 //// class MythScreenNotificationStack

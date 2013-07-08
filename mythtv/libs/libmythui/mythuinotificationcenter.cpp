@@ -1016,16 +1016,26 @@ void MythUINotificationCenter::UpdateScreen(MythScreenType *screen)
 
 void ShowNotificationError(const QString &msg,
                            const QString &from,
-                           const QString &detail)
+                           const QString &detail,
+                           const PNMask priority,
+                           const VNMask visibility)
 {
     MythErrorNotification n(msg, from, detail);
+    n.SetPriority(priority);
+    n.SetVisibility(visibility);
+
     MythUINotificationCenter::GetInstance()->Queue(n);
 }
 
 void ShowNotification(const QString &msg,
                       const QString &from,
-                      const QString &detail)
+                      const QString &detail,
+                      const PNMask priority,
+                      const VNMask visibility)
 {
     MythNotification n(msg, from, detail);
+    n.SetPriority(priority);
+    n.SetVisibility(visibility);
+
     MythUINotificationCenter::GetInstance()->Queue(n);
 }
