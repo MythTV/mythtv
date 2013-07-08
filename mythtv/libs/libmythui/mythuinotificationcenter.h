@@ -100,10 +100,6 @@ public:
 
 private:
     NCPrivate *d;
-
-    static QMutex                           g_lock;
-    // protected by g_lock
-    static MythUINotificationCenter        *g_singleton;
 };
 
 /**

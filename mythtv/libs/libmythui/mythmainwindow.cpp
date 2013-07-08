@@ -193,7 +193,8 @@ class MythMainWindowPrivate
 
         idleTimer(NULL),
         standby(false),
-        enteringStandby(false)
+        enteringStandby(false),
+        NC(NULL)
     {
     }
 
@@ -286,6 +287,7 @@ class MythMainWindowPrivate
     QTimer *idleTimer;
     bool standby;
     bool enteringStandby;
+    MythUINotificationCenter *NC;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -371,6 +373,14 @@ void DestroyMythMainWindow(void)
 MythPainter *GetMythPainter(void)
 {
     return MythMainWindow::getMainWindow()->GetCurrentPainter();
+}
+
+MythUINotificationCenter *GetNotificationCenter(void)
+{
+    if (!MythMainWindow::getMainWindow() ||
+        !MythMainWindow::getMainWindow()->GetCurrentNotificationCenter())
+        return NULL;
+    return MythMainWindow::getMainWindow()->GetCurrentNotificationCenter();
 }
 
 #ifdef USE_OPENGL_PAINTER
@@ -585,14 +595,20 @@ MythMainWindow::~MythMainWindow()
         delete d->cecAdapter;
 #endif
 
+    delete d->NC;
+
     delete d;
 
-    delete MythUINotificationCenter::GetInstance();
 }
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)
 {
     return d->painter;
+}
+
+MythUINotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
+{
+    return d->NC;
 }
 
 QWidget *MythMainWindow::GetPaintWindow(void)
@@ -1091,8 +1107,7 @@ void MythMainWindow::Init(QString forcedpainter)
     else
         d->m_themeBase = new MythThemeBase();
 
-    // Will create Notification Center singleton
-    (void)MythUINotificationCenter::GetInstance();
+    d->NC = new MythUINotificationCenter();
 }
 
 void MythMainWindow::InitKeys()

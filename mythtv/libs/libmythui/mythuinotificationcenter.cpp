@@ -13,6 +13,7 @@
 #include <QTimer>
 
 #include "mythcorecontext.h"
+#include "mythmainwindow.h"
 
 #include "mythuinotificationcenter.h"
 #include "mythuinotificationcenter_private.h"
@@ -939,28 +940,9 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
 
 /////////////////////// MythUINotificationCenter
 
-MythUINotificationCenter *MythUINotificationCenter::g_singleton = NULL;
-QMutex MythUINotificationCenter::g_lock;
-
 MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
 {
-    QMutexLocker lock(&g_lock);
-
-    if (g_singleton)
-        return g_singleton;
-
-    const bool isGuiThread =
-        QThread::currentThread() == QCoreApplication::instance()->thread();
-
-    if (!isGuiThread)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Constructor not called from GUI thread");
-    }
-    else
-    {
-        g_singleton = new MythUINotificationCenter();
-    }
-    return g_singleton;
+    return GetNotificationCenter();
 }
 
 MythUINotificationCenter::MythUINotificationCenter()
@@ -987,13 +969,6 @@ MythUINotificationCenter::~MythUINotificationCenter()
 
     delete d;
     d = NULL;
-
-    // if we're deleting global instancce; set g_singleton to 0
-    // in practice this is always the case
-    if (this == g_singleton)
-    {
-        g_singleton = NULL;
-    }
 }
 
 bool MythUINotificationCenter::Queue(MythNotification &notification)
@@ -1017,19 +992,11 @@ void MythUINotificationCenter::ProcessQueue(void)
 
 int MythUINotificationCenter::Register(void *from)
 {
-    // Just in case we got deleted half-way while GUI thread was quitting
-    if (!g_singleton)
-        return false;
-
     return d->Register(from);
 }
 
 void MythUINotificationCenter::UnRegister(void *from, int id, bool closeimemdiately)
 {
-    // Just in case we got deleted half-way while GUI thread was quitting
-    if (!g_singleton)
-        return;
-
     d->UnRegister(from, id, closeimemdiately);
 }
 
