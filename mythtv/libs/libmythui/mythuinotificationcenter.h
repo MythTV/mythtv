@@ -144,14 +144,14 @@ private:
  * convenience utility to display error message as notification
  */
 MUI_PUBLIC void ShowNotificationError(const QString &msg,
-                                      const QString &from = "",
-                                      const QString &detail = "",
+                                      const QString &from = QString(),
+                                      const QString &detail = QString(),
                                       const PNMask priority = MythNotification::kDefault,
                                       const VNMask visibility = MythNotification::kAll);
 
 MUI_PUBLIC void ShowNotification(const QString &msg,
-                                 const QString &from = "",
-                                 const QString &detail = "",
+                                 const QString &from = QString(),
+                                 const QString &detail = QString(),
                                  const PNMask priority = MythNotification::kDefault,
                                  const VNMask visibility = MythNotification::kAll);
 
