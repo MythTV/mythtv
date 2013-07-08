@@ -243,7 +243,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
  *  interval. The <i>period</i> argument in the constructor defines this
  *  interval in integer seconds. The <i>min</i> and <i>max</i> attributes
  *  control the region over which the task can be run, given as a float
- *  multiple of the period. The defaults are 0.5-1.5. The test for running
+ *  multiple of the period. The defaults are 0.5-1.1. The test for running
  *  is a linearly increasing probability from the start to end of this period,
  *  and the task is forced to run if the end of the period is reached.
  *
