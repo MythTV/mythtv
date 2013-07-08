@@ -473,9 +473,11 @@ void MythUINotificationScreen::SetSingleShotTimer(int s)
 /////////////////////// NCPrivate
 
 NCPrivate::NCPrivate()
-    : m_screenStack(NULL), m_currentId(0)
+    : m_currentId(0)
 {
-
+    m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
+                                                    "mythuinotification",
+                                                    this);
 }
 
 NCPrivate::~NCPrivate()
@@ -547,16 +549,24 @@ void NCPrivate::ScreenDeleted(void)
     {
         if (!duefordeletion)
         {
-            // don't remove the id from the list, as the application is still registered
-            // re-create the screen
-            MythUINotificationScreen *newscreen =
-                new MythUINotificationScreen(GetScreenStack(), *screen);
-            connect(newscreen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
-            m_registrations[screen->m_id] = newscreen;
-            // Screen was deleted, add it to suspended list
-            m_suspended.append(screen->m_id);
-            LOG(VB_GUI, LOG_DEBUG, LOC +
-                "ScreenDeleted: Suspending registered screen");
+            if (!m_screenStack)
+            {
+                // we're in the middle of being deleted
+                m_registrations.remove(screen->m_id);
+            }
+            else
+            {
+                // don't remove the id from the list, as the application is still registered
+                // re-create the screen
+                MythUINotificationScreen *newscreen =
+                    new MythUINotificationScreen(m_screenStack, *screen);
+                connect(newscreen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
+                m_registrations[screen->m_id] = newscreen;
+                // Screen was deleted, add it to suspended list
+                m_suspended.append(screen->m_id);
+                LOG(VB_GUI, LOG_DEBUG, LOC +
+                    "ScreenDeleted: Suspending registered screen");
+            }
         }
         else
         {
@@ -688,11 +698,11 @@ MythUINotificationScreen *NCPrivate::CreateScreen(MythNotification *n, int id)
 
     if (n)
     {
-        screen = new MythUINotificationScreen(GetScreenStack(), *n);
+        screen = new MythUINotificationScreen(m_screenStack, *n);
     }
     else
     {
-        screen = new MythUINotificationScreen(GetScreenStack(), id);
+        screen = new MythUINotificationScreen(m_screenStack, id);
     }
 
     if (!screen->Create()) // Reads screen definition from xml, and constructs screen
@@ -759,17 +769,6 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
     // Tell the GUI thread we have something to process
     QCoreApplication::postEvent(
         GetMythMainWindow(), new MythUINotificationCenterEvent());
-}
-
-MythNotificationScreenStack *NCPrivate::GetScreenStack(void)
-{
-    if (!m_screenStack)
-    {
-        m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
-                                                        "mythuinotification",
-                                                        this);
-    }
-    return m_screenStack;
 }
 
 void NCPrivate::DeleteAllRegistrations(void)
@@ -884,11 +883,14 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
     QList<MythScreenType*> list;
     QVector<MythScreenType*> screens;
 
-    GetScreenStack()->CheckDeletes();
+    if (!m_screenStack)
+        return;
+
+    m_screenStack->CheckDeletes();
 
     QMutexLocker lock(&m_lock);
 
-    GetScreenStack()->GetScreenList(screens);
+    m_screenStack->GetScreenList(screens);
 
     QVector<MythScreenType*>::const_iterator it       = screens.begin();
     QVector<MythScreenType*>::const_iterator itend    = screens.end();
