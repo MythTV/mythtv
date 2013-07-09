@@ -770,7 +770,10 @@ void NCPrivate::DeleteAllRegistrations(void)
 
     for (; it != m_registrations.end();)
     {
-        m_deletedScreens.append(*it);
+        if (*it)
+        {
+            m_deletedScreens.append(*it);
+        }
         it = m_registrations.erase(it);
     }
     m_registrations.clear();
