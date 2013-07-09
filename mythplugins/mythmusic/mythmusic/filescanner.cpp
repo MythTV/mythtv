@@ -333,7 +333,7 @@ void FileScanner::cleanDB()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = QObject::tr("Cleaning music database");
+    QString message = tr("Cleaning music database");
     MythUIProgressDialog *clean_progress = new MythUIProgressDialog(message,
                                                     popupStack,
                                                     "cleaningprogressdialog");
@@ -568,7 +568,7 @@ void FileScanner::SearchDir(QString &directory)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = QObject::tr("Searching for music files");
+    QString message = tr("Searching for music files");
 
     MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
                                                   "musicscanbusydialog");
@@ -586,7 +586,7 @@ void FileScanner::SearchDir(QString &directory)
     ScanMusic(music_files);
     ScanArtwork(music_files);
 
-    message = QObject::tr("Updating music database");
+    message = tr("Updating music database");
     MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
                                                     popupStack,
                                                     "scalingprogressdialog");
@@ -660,7 +660,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = QObject::tr("Scanning music files");
+    QString message = tr("Scanning music files");
     MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
                                                     popupStack,
                                                     "scalingprogressdialog");
@@ -742,7 +742,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString message = QObject::tr("Scanning Album Artwork");
+    QString message = tr("Scanning Album Artwork");
     MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
                                                     popupStack,
                                                     "albumprogressdialog");

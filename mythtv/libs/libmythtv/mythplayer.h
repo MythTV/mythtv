@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QEvent>
+#include <QCoreApplication>
 
 #include "playercontext.h"
 #include "volumebase.h"
