@@ -33,17 +33,17 @@
             <font>basesmall</font>
         </textarea>
 
-        <textarea name="description" from="basetextarea">
+        <textarea name="description" from="basetextarea" depends="progress">
             <area>18,75,-10,30</area>
             <font>basesmall</font>
         </textarea>
 
-        <textarea name="extra" from="basetextarea">
+        <textarea name="extra" from="basetextarea" depends="progress">
             <area>18,105,300,30</area>
             <font>basesmall</font>
         </textarea>
 
-        <textarea name="progress_text" from="basetextarea">
+        <textarea name="progress_text" from="basetextarea" depends="progress">
             <area>370,105,-10,30</area>
             <font>basesmall</font>
             <align>right</align>
@@ -52,6 +52,14 @@
         <progressbar name="progress" from="baseprogressbar">
             <area>18,140,100%-28,10</area>
         </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>18,75,-10,115</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
     </window>
 
     <window name="notification-image">
@@ -67,45 +75,53 @@
          <position start="-1,-1" end="100%,20" easingcurve="InBack" />
          </section>
          </animation>-->
-        
+
         <shape name="background" from="basewidgetshape">
             <area>0,0,100%,100%</area>
         </shape>
-        
+
         <imagetype name="image">
             <filename>damaged.png</filename>
             <area>18,18,144,144</area>
         </imagetype>
-        
+
         <textarea name="title" from="basetextarea">
             <area>170,10,-10,35</area>
             <font>baselarge</font>
         </textarea>
-        
+
         <textarea name="origin" from="basetextarea">
             <area>170,45,-10,30</area>
             <font>basesmall</font>
         </textarea>
-        
-        <textarea name="description" from="basetextarea">
+
+        <textarea name="description" from="basetextarea" depends="progress">
             <area>170,75,-10,30</area>
             <font>basesmall</font>
         </textarea>
-        
-        <textarea name="extra" from="basetextarea">
+
+        <textarea name="extra" from="basetextarea" depends="progress">
             <area>170,105,300,30</area>
             <font>basesmall</font>
         </textarea>
-        
-        <textarea name="progress_text" from="basetextarea">
+
+        <textarea name="progress_text" from="basetextarea" depends="progress">
             <area>370,105,-10,30</area>
             <font>basesmall</font>
             <align>right</align>
         </textarea>
-        
+
         <progressbar name="progress" from="baseprogressbar">
             <area>170,140,100%-180,10</area>
         </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>170,75,-10,115</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
     </window>
 
     <window name="notification-full">
@@ -132,17 +148,17 @@
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="description" from="basetextarea">
+        <textarea name="description" from="basetextarea" depends="progress">
             <area>170,100%-165,-10,30</area>
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="extra" from="basetextarea">
+        <textarea name="extra" from="basetextarea" depends="progress">
             <area>170,100%-135,300,30</area>
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="progress_text" from="basetextarea">
+        <textarea name="progress_text" from="basetextarea" depends="progress">
             <area>370,100%-135,-10,30</area>
             <font>basemedium</font>
             <align>right</align>
@@ -151,6 +167,14 @@
         <progressbar name="progress" from="baseprogressbar">
             <area>170,100%-100,10,10</area>
         </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>170,100%-165,-10,115</area>
+            <font>basemedium</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
     </window>
 
 </mythuitheme>
