@@ -1038,11 +1038,15 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     if (!GetNotificationCenter())
         return;
 
+    if (!m_lastCheck.isValid())
+        return;
+
     MythNotification n(QObject::tr("Backend is online"), _Location);
     n.SetId(m_registration);
     n.SetParent(this);
     n.SetDuration(5);
     GetNotificationCenter()->Queue(n);
+    m_lastCheck = MythDate::current();
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
