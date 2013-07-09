@@ -441,9 +441,8 @@ static void DoSetTextFromMap(MythUIType *UItype, QHash<QString, QString> &infoMa
         MythUIType *type = i.next();
 
         textType = dynamic_cast<MythUIText *> (type);
-        if (textType && infoMap.contains(textType->objectName()))
+        if (textType)
             textType->SetTextFromMap(infoMap);
-
 
         MythUIGroup *group = dynamic_cast<MythUIGroup *> (type);
         if (group)

@@ -151,51 +151,47 @@ void MythUIText::SetText(const QString &text)
 
 void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
 {
-    if (map.contains(objectName()))
+    QString newText = GetTemplateText();
+
+    if (newText.isEmpty())
+        newText = GetDefaultText();
+
+    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
+    regexp.setMinimal(true);
+
+    if (!newText.isEmpty() && newText.contains(regexp))
     {
-        QString newText = GetTemplateText();
+        int pos = 0;
 
-        if (newText.isEmpty())
-            newText = GetDefaultText();
+        QString translatedTemplate = qApp->translate("ThemeUI",
+                                                     newText.toUtf8(),
+                                                     NULL,
+                                             QCoreApplication::UnicodeUTF8);
 
-        QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
-        regexp.setMinimal(true);
+        QString tempString = translatedTemplate;
 
-        if (!newText.isEmpty() && newText.contains(regexp))
+        while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
         {
-            int pos = 0;
+            QString key = regexp.cap(4).toLower().trimmed();
+            QString replacement;
 
-            QString translatedTemplate = qApp->translate("ThemeUI",
-                                                         newText.toUtf8(),
-                                                         NULL,
-                                                 QCoreApplication::UnicodeUTF8);
-
-            QString tempString = translatedTemplate;
-
-            while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
+            if (!map.value(key).isEmpty())
             {
-                QString key = regexp.cap(4).toLower().trimmed();
-                QString replacement;
-
-                if (!map.value(key).isEmpty())
-                {
-                    replacement = QString("%1%2%3%4")
-                                  .arg(regexp.cap(2))
-                                  .arg(regexp.cap(3))
-                                  .arg(map.value(key))
-                                  .arg(regexp.cap(6));
-                }
-
-                tempString.replace(regexp.cap(0), replacement);
-                pos += regexp.matchedLength();
+                replacement = QString("%1%2%3%4")
+                              .arg(regexp.cap(2))
+                              .arg(regexp.cap(3))
+                              .arg(map.value(key))
+                              .arg(regexp.cap(6));
             }
 
-            newText = tempString;
+            tempString.replace(regexp.cap(0), replacement);
+            pos += regexp.matchedLength();
         }
-        else
-            newText = map.value(objectName());
-
-        SetText(newText);
+        SetText(tempString);
+    }
+    else if (map.contains(objectName()))
+    {
+        SetText(map.value(objectName()));
     }
 }
 
