@@ -151,9 +151,6 @@ void MythUIText::SetText(const QString &text)
 
 void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
 {
-    if (!IsVisible())
-        return;
-
     if (map.contains(objectName()))
     {
         QString newText = GetTemplateText();
