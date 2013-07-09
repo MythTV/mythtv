@@ -153,15 +153,15 @@ public:
     void SetPriority(PNMask n)              { m_priority = n; }
 
     // Getter
-    int         GetId(void)                 { return m_id; }
-    void       *GetParent(void)             { return m_parent; }
-    bool        GetFullScreen(void)         { return m_fullScreen; }
-    QString     GetDescription(void)        { return m_description; }
-    DMAP        GetMetaData(void)           { return m_metadata; }
-    int         GetDuration(void)           { return m_duration; };
-    QString     GetStyle(void)              { return m_style; }
-    VNMask      GetVisibility(void)         { return m_visibility; }
-    PNMask      GetPriority(void)           { return m_priority; }
+    int         GetId(void) const           { return m_id; }
+    void       *GetParent(void) const       { return m_parent; }
+    bool        GetFullScreen(void) const   { return m_fullScreen; }
+    QString     GetDescription(void) const  { return m_description; }
+    DMAP        GetMetaData(void) const     { return m_metadata; }
+    int         GetDuration(void) const     { return m_duration; };
+    QString     GetStyle(void) const        { return m_style; }
+    VNMask      GetVisibility(void) const   { return m_visibility; }
+    PNMask      GetPriority(void) const     { return m_priority; }
 
 protected:
     MythNotification(const MythNotification &o)
@@ -223,8 +223,8 @@ public:
     void SetImagePath(const QString &image) { m_imagePath = image; }
 
     //Getter
-    QImage GetImage(void)                   { return m_image; }
-    QString GetImagePath(void)              { return m_imagePath; }
+    QImage GetImage(void) const             { return m_image; }
+    QString GetImagePath(void) const        { return m_imagePath; }
 
 protected:
     MythImageNotification(const MythImageNotification &o)
@@ -276,8 +276,8 @@ public:
     void SetProgressText(const QString &text) { m_progressText = text; }
 
     //Getter
-    float GetProgress(void)                 { return m_progress; }
-    QString GetProgressText(void)           { return m_progressText; }
+    float GetProgress(void) const           { return m_progress; }
+    QString GetProgressText(void) const     { return m_progressText; }
 
     // utility methods
     static QString stringFromSeconds(int time);
