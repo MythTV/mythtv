@@ -314,10 +314,6 @@ void MythUINotificationScreen::Init(void)
         m_progressBar->SetVisible((m_content & kDuration) != 0);
 
     }
-    if (m_progresstextText)
-    {
-        m_progresstextText->SetVisible((m_content & kDuration) != 0);
-    }
 
     // No field will be refreshed the next time unless specified otherwise
     m_update = kNone;
