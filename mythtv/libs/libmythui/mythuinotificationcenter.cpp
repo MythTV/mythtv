@@ -578,7 +578,7 @@ void NCPrivate::ScreenStackDeleted(void)
     m_screenStack = NULL;
 }
 
-bool NCPrivate::Queue(MythNotification &notification)
+bool NCPrivate::Queue(const MythNotification &notification)
 {
     QMutexLocker lock(&m_lock);
 
@@ -967,7 +967,7 @@ MythUINotificationCenter::~MythUINotificationCenter()
     d = NULL;
 }
 
-bool MythUINotificationCenter::Queue(MythNotification &notification)
+bool MythUINotificationCenter::Queue(const MythNotification &notification)
 {
     return d->Queue(notification);
 }
@@ -996,20 +996,20 @@ void MythUINotificationCenter::UnRegister(void *from, int id, bool closeimemdiat
     d->UnRegister(from, id, closeimemdiately);
 }
 
-QDateTime MythUINotificationCenter::ScreenExpiryTime(MythScreenType *screen)
+QDateTime MythUINotificationCenter::ScreenExpiryTime(const MythScreenType *screen)
 {
-    MythUINotificationScreen *s =
-        dynamic_cast<MythUINotificationScreen*>(screen);
+    const MythUINotificationScreen *s =
+        dynamic_cast<const MythUINotificationScreen*>(screen);
 
     if (!s)
         return QDateTime();
     return s->m_expiry;
 }
 
-bool MythUINotificationCenter::ScreenCreated(MythScreenType *screen)
+bool MythUINotificationCenter::ScreenCreated(const MythScreenType *screen)
 {
-    MythUINotificationScreen *s =
-        dynamic_cast<MythUINotificationScreen*>(screen);
+    const MythUINotificationScreen *s =
+        dynamic_cast<const MythUINotificationScreen*>(screen);
 
     if (!s)
         return true;;

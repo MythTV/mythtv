@@ -41,7 +41,7 @@ public:
      * Queue() is thread-safe and can be called from anywhere.
      * Typical use would be MythUINotificationCenter::GetInstance()->Queue(notification)
      */
-    bool Queue(MythNotification &notification);
+    bool Queue(const MythNotification &notification);
 
     /**
      * returns the MythUINotificationCenter singleton
@@ -74,12 +74,12 @@ public:
      * Return when the given screen is going to expire
      * will return an invalid QDateTime if screen isn't a MythUINotificationScreen
      */
-    QDateTime ScreenExpiryTime(MythScreenType *screen);
+    QDateTime ScreenExpiryTime(const MythScreenType *screen);
     /**
      * Return true if ::Create() has been called on screen.
      * will always return true should screen not be a MythUINotificationScreen
      */
-    bool ScreenCreated(MythScreenType *screen);
+    bool ScreenCreated(const MythScreenType *screen);
     /**
      * Return the list of notification screens being currently displayed.
      * The list contains pointer of existing screen's copies, with ::Create()
