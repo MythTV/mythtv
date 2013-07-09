@@ -1540,7 +1540,7 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     sub->rects = NULL;
     sub->num_rects = 0;
     sub->start_display_time = startTime;
-    sub->end_display_time = 0xFFFFFFFF;
+    sub->end_display_time = startTime;
 
     cmd_pos = GETBE16(spu_pkt + 2);
     while ((cmd_pos + 4) < buf_size)

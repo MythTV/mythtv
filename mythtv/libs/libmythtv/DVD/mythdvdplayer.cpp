@@ -618,6 +618,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     }
 
     if (dvdSubtitle &&
+        (dvdSubtitle->end_display_time > dvdSubtitle->start_display_time) &&
         (dvdSubtitle->end_display_time < currentFrame->timecode))
     {
         expired = true;
