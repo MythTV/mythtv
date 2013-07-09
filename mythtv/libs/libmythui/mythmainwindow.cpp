@@ -377,10 +377,10 @@ MythPainter *GetMythPainter(void)
 
 MythUINotificationCenter *GetNotificationCenter(void)
 {
-    if (!MythMainWindow::getMainWindow() ||
-        !MythMainWindow::getMainWindow()->GetCurrentNotificationCenter())
+    if (!mainWin ||
+        !mainWin->GetCurrentNotificationCenter())
         return NULL;
-    return MythMainWindow::getMainWindow()->GetCurrentNotificationCenter();
+    return mainWin->GetCurrentNotificationCenter();
 }
 
 #ifdef USE_OPENGL_PAINTER
