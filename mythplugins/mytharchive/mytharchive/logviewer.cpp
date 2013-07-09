@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <QFile>
 #include <QTextStream>
+#include <QCoreApplication>
 
 // mythtv
 #include <mythcontext.h>
@@ -73,7 +74,8 @@ void showLogViewer(void)
             mainStack->AddScreen(viewer);
     }
     else
-        showWarningDialog(QObject::tr("Cannot find any logs to show!"));
+        showWarningDialog(QCoreApplication::translate("LogViewer",
+            "Cannot find any logs to show!"));
 }
 
 LogViewer::LogViewer(MythScreenStack *parent) :
@@ -211,8 +213,8 @@ void LogViewer::cancelClicked(void)
     lockFile.write("Cancel\n\r");
     lockFile.close();
 
-    ShowOkPopup(QObject::tr("Background creation has been asked to stop.\n" 
-                            "This may take a few minutes."));
+    ShowOkPopup(tr("Background creation has been asked to stop.\n" 
+                   "This may take a few minutes."));
 }
 
 void LogViewer::updateClicked(void)
