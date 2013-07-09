@@ -108,6 +108,7 @@ private:
                                            int id = -1);
     void DeleteAllRegistrations(void);
     void DeleteAllScreens(void);
+    void DeleteUnregistered(void);
     int InsertScreen(MythUINotificationScreen *screen);
     int RemoveScreen(MythUINotificationScreen *screen);
     void RefreshScreenPosition(int from = 0);
@@ -118,6 +119,7 @@ private:
     QList<MythUINotificationScreen*>        m_deletedScreens;
     QMap<int, MythUINotificationScreen*>    m_registrations;
     QList<int>                              m_suspended;
+    QMap<int,bool>                          m_unregistered;
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
     int                                     m_currentId;

@@ -489,6 +489,7 @@ NCPrivate::~NCPrivate()
 
     QMutexLocker lock(&m_lock);
 
+    DeleteUnregistered();
     DeleteAllRegistrations();
     DeleteAllScreens();
 
@@ -550,6 +551,7 @@ void NCPrivate::ScreenDeleted(void)
             {
                 // we're in the middle of being deleted
                 m_registrations.remove(screen->m_id);
+                m_unregistered.remove(screen->m_id);
             }
             else
             {
@@ -648,6 +650,7 @@ void NCPrivate::ProcessQueue(void)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("ProcessQueue: couldn't create required screen"));
+                delete n;
                 continue; // something is wrong ; ignore
             }
             if (id > 0)
@@ -667,6 +670,7 @@ void NCPrivate::ProcessQueue(void)
             if (!screen->Create())
             {
                 delete screen;
+                delete n;
                 continue;
             }
             created = true;
@@ -683,6 +687,8 @@ void NCPrivate::ProcessQueue(void)
         delete n;
     }
     m_notifications.clear();
+
+    DeleteUnregistered();
 }
 
 /**
@@ -748,19 +754,9 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
             .arg(id));
     }
 
-    if (m_registrations.contains(id))
-    {
-        MythUINotificationScreen *screen = m_registrations[id];
-        if (screen != NULL)
-        {
-            // mark the screen for deletion if no timer is set
-            if (screen->m_duration <= 0 || closeimemdiately)
-            {
-                m_deletedScreens.append(screen);
-            }
-        }
-        m_registrations.remove(id);
-    }
+    // queue the de-registration
+    m_unregistered[id] = closeimemdiately;
+
     m_clients.remove(id);
 
     // Tell the GUI thread we have something to process
@@ -790,6 +786,47 @@ void NCPrivate::DeleteAllScreens(void)
         // so the MythScreenType::Exiting() signal won't process it a second time
         m_deletedScreens.removeLast();
         screen->GetScreenStack()->PopScreen(screen, true, true);
+    }
+}
+
+void NCPrivate::DeleteUnregistered(void)
+{
+    QMap<int,bool>::iterator it = m_unregistered.begin();
+    bool needdelete = false;
+
+    for (; it != m_unregistered.end(); ++it)
+    {
+        int id = it.key();
+        bool closeimemdiately = it.value();
+        MythUINotificationScreen *screen = NULL;
+
+        if (m_registrations.contains(id))
+        {
+            screen = m_registrations[id];
+            if (screen != NULL && !m_suspended.contains(id))
+            {
+                // mark the screen for deletion if no timer is set
+                if (screen->m_duration <= 0 || closeimemdiately)
+                {
+                    m_deletedScreens.append(screen);
+                    needdelete = true;
+                }
+            }
+            m_registrations.remove(id);
+        }
+
+        if (m_suspended.contains(id))
+        {
+            // screen had been suspended, delete suspended screen
+            delete screen;
+            m_suspended.removeAll(id);
+        }
+    }
+    m_unregistered.clear();
+
+    if (needdelete)
+    {
+        DeleteAllScreens();
     }
 }
 
