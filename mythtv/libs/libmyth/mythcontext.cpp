@@ -1025,9 +1025,18 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
 
+    QString description = (persistent) ?
+        QObject::tr(
+            "The connection to the master backend "
+            "server has gone away for some reason. "
+            "Is it running?") :
+        QObject::tr(
+            "Could not connect to the master backend server. Is "
+            "it running?  Is the IP address set for it in "
+            "mythtv-setup correct?");
+
     QString message = QObject::tr("Could not connect to master backend");
-    MythErrorNotification n(message, _Location,
-                            QObject::tr("Is it running? Check IP address set in mythtv-setup"));
+    MythErrorNotification n(message, _Location, description);
     n.SetId(m_registration);
     n.SetParent(this);
     GetNotificationCenter()->Queue(n);
