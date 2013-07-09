@@ -768,13 +768,12 @@ void NCPrivate::DeleteAllRegistrations(void)
 {
     QMap<int, MythUINotificationScreen*>::iterator it = m_registrations.begin();
 
-    for (; it != m_registrations.end();)
+    for (; it != m_registrations.end(); ++it)
     {
         if (*it)
         {
             m_deletedScreens.append(*it);
         }
-        it = m_registrations.erase(it);
     }
     m_registrations.clear();
 }
