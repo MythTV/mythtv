@@ -186,7 +186,7 @@ bool MythDVDPlayer::VideoLoop(void)
         }
 
         // the still frame is treated as a pause frame
-        if (player_ctx->buffer->DVD()->IsInStillFrame())
+        if (player_ctx->buffer->DVD()->IsStillFramePending())
         {
             // ensure we refresh the pause frame
             if (!dvd_stillframe_showing)

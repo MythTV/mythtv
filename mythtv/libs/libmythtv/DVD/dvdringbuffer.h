@@ -105,6 +105,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool PGCLengthChanged(void);
     bool CellChanged(void);
     virtual bool IsInStillFrame(void)   const { return m_still > 0;             }
+    bool IsStillFramePending(void) const { return dvdnav_get_next_still_flag(m_dvdnav) > 0; }
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
     int  NumPartsInTitle(void)     const { return m_titleParts;          }
