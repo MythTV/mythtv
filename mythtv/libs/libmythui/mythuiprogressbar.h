@@ -26,6 +26,7 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
     void SetUsed(int);
     void SetTotal(int);
     int  GetUsed(void) { return m_current; }
+    virtual void SetVisible(bool visible);
 
   protected:
     virtual bool ParseElement(
@@ -40,6 +41,7 @@ class MUI_PUBLIC MythUIProgressBar : public MythUIType
     int m_total;
     int m_start;
     int m_current;
+    int m_firstdepend;
 
     void CalculatePosition(void);
 };
