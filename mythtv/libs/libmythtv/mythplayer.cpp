@@ -2998,8 +2998,8 @@ void MythPlayer::EventLoop(void)
             SetOSDStatus(tr("Not Flagged"), kOSDTimeout_Med);
             QString message = "COMMFLAG_REQUEST ";
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            message += player_ctx->playingInfo->GetChanID() + " " +
-                   player_ctx->playingInfo->MakeUniqueKey();
+            message += QString("%1").arg(player_ctx->playingInfo->GetChanID()) +
+                " " + player_ctx->playingInfo->MakeUniqueKey();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             gCoreContext->SendMessage(message);
         }
