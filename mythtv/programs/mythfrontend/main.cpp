@@ -1581,17 +1581,6 @@ int main(int argc, char **argv)
     }
 #endif
 
-#ifdef USING_AIRPLAY
-    if (gCoreContext->GetNumSetting("AirPlayEnabled", true))
-    {
-        MythRAOPDevice::Create();
-        if (!gCoreContext->GetNumSetting("AirPlayAudioOnly", false))
-        {
-            MythAirplayServer::Create();
-        }
-    }
-#endif
-
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
         lcd->setupLEDs(RemoteGetRecordingMask);
@@ -1626,6 +1615,17 @@ int main(int argc, char **argv)
     mainWindow->Init();
 #endif
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
+
+#ifdef USING_AIRPLAY
+    if (gCoreContext->GetNumSetting("AirPlayEnabled", true))
+    {
+        MythRAOPDevice::Create();
+        if (!gCoreContext->GetNumSetting("AirPlayAudioOnly", false))
+        {
+            MythAirplayServer::Create();
+        }
+    }
+#endif
 
     // We must reload the translation after a language change and this
     // also means clearing the cached/loaded theme strings, so reload the
