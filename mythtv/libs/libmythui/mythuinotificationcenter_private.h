@@ -94,6 +94,19 @@ public:
      */
     void UpdateScreen(MythScreenType *screen);
     /**
+     * Returns number of notifications currently displayed
+     */
+    int DisplayedNotifications(void) const;
+    /**
+     * Returns number of notifications currently queued
+     */
+    int QueuedNotifications(void) const;
+    /**
+     * Will remove the oldest notification from the stack
+     * return true if a screen was removed; or false if nothing was done
+     */
+    bool RemoveFirst(void);
+    /**
      * ProcessQueue will be called by the GUI event handler and will process
      * all queued MythNotifications and delete screens marked to be deleted
      * ProcessQueue must be called from GUI thread

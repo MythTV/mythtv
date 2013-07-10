@@ -993,6 +993,29 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
     _screens = list;
 }
 
+int NCPrivate::DisplayedNotifications(void) const
+{
+    return m_screens.size();
+}
+
+int NCPrivate::QueuedNotifications(void) const
+{
+    return m_notifications.size();
+}
+
+bool NCPrivate::RemoveFirst(void)
+{
+    QMutexLocker lock(&m_lock);
+
+    if (m_screens.isEmpty())
+        return false;
+
+    MythUINotificationScreen *screen = m_screens.first();
+    // simulate time-out
+    screen->ProcessTimer();
+    return true;
+}
+
 /////////////////////// MythUINotificationCenter
 
 MythUINotificationCenter *MythUINotificationCenter::GetInstance(void)
@@ -1092,6 +1115,21 @@ void MythUINotificationCenter::UpdateScreen(MythScreenType *screen)
     {
         s->doInit();
     }
+}
+
+int MythUINotificationCenter::DisplayedNotifications(void) const
+{
+    return d->DisplayedNotifications();
+}
+
+int MythUINotificationCenter::QueuedNotifications(void) const
+{
+    return d->QueuedNotifications();
+}
+
+bool MythUINotificationCenter::RemoveFirst(void)
+{
+    return d->RemoveFirst();
 }
 
 void ShowNotificationError(const QString &msg,
