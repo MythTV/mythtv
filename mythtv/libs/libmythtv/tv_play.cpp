@@ -7765,7 +7765,7 @@ bool TV::ClearOSD(const PlayerContext *ctx)
     if (osd)
     {
         osd->DialogQuit();
-        osd->HideAll();
+        osd->HideAll(true, NULL, true); // pop OSD screen
         res = true;
     }
     ReturnOSDLock(ctx, osd);
