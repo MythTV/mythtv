@@ -27,6 +27,8 @@
 class MythUINotificationScreen;
 class MythNotificationScreenStack;
 
+#define MIN_LIFE 1000
+
 class NCPrivate : public QObject
 {
     Q_OBJECT
@@ -94,6 +96,19 @@ public:
      */
     void UpdateScreen(MythScreenType *screen);
     /**
+     * Returns number of notifications currently displayed
+     */
+    int DisplayedNotifications(void) const;
+    /**
+     * Returns number of notifications currently queued
+     */
+    int QueuedNotifications(void) const;
+    /**
+     * Will remove the oldest notification from the stack
+     * return true if a screen was removed; or false if nothing was done
+     */
+    bool RemoveFirst(void);
+    /**
      * ProcessQueue will be called by the GUI event handler and will process
      * all queued MythNotifications and delete screens marked to be deleted
      * ProcessQueue must be called from GUI thread
@@ -113,6 +128,7 @@ private:
     int RemoveScreen(MythUINotificationScreen *screen);
     void RefreshScreenPosition(int from = 0);
 
+    MythNotificationScreenStack            *m_originalScreenStack;
     MythNotificationScreenStack            *m_screenStack;
     QList<MythNotification*>                m_notifications;
     QList<MythUINotificationScreen*>        m_screens;
@@ -140,6 +156,8 @@ public:
 
     virtual ~MythUINotificationScreen();
 
+    bool keyPressEvent(QKeyEvent *event);
+
     // These two methods are declared by MythScreenType and their signatures
     // should not be changed
     virtual bool Create(void);
@@ -152,7 +170,7 @@ public:
     void UpdateMetaData(const DMAP &data);
     void UpdatePlayback(float progress, const QString &text);
 
-    void SetSingleShotTimer(int s);
+    void SetSingleShotTimer(int s, bool update = false);
 
     // UI methods
     void AdjustYPosition(void);
@@ -199,7 +217,7 @@ public:
     MythUIText         *m_extraText;
     MythUIText         *m_progresstextText;
     MythUIProgressBar  *m_progressBar;
-    QDateTime           m_expiry;
+    QDateTime           m_creation, m_expiry;
     int                 m_index;
     MythPoint           m_position;
     QTimer             *m_timer;

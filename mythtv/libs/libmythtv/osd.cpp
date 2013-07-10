@@ -269,6 +269,9 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
 
 bool OSD::IsVisible(void)
 {
+    if (MythUINotificationCenter::GetInstance()->DisplayedNotifications() > 0)
+        return true;
+
     foreach(MythScreenType* child, m_Children)
     {
         if (child->IsVisible() &&
@@ -282,8 +285,13 @@ bool OSD::IsVisible(void)
     return false;
 }
 
-void OSD::HideAll(bool keepsubs, MythScreenType* except)
+void OSD::HideAll(bool keepsubs, MythScreenType* except, bool dropnotification)
 {
+    if (dropnotification)
+    {
+        if (MythUINotificationCenter::GetInstance()->RemoveFirst())
+            return; // we've removed the top window, don't process any further
+    }
     QMutableMapIterator<QString, MythScreenType*> it(m_Children);
     while (it.hasNext())
     {

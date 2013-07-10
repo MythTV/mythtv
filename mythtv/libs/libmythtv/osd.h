@@ -139,7 +139,8 @@ class OSD
     void    SetTimeouts(int _short, int _medium, int _long);
 
     bool    IsVisible(void);
-    void    HideAll(bool keepsubs = true, MythScreenType *except = NULL);
+    void    HideAll(bool keepsubs = true, MythScreenType *except = NULL,
+                    bool dropnotification = false);
 
     MythScreenType *GetWindow(const QString &window);
     void    SetExpiry(const QString &window, enum OSDTimeout timeout,

@@ -735,7 +735,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 m_lastStill = m_still;
                 uint32_t pos;
                 uint32_t length;
-                m_still = dvdnav_get_next_still_flag(m_dvdnav);
+                uint32_t stillTimer = dvdnav_get_next_still_flag(m_dvdnav);
+                m_still = 0;
                 m_titleParts = 0;
                 dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
                 dvdnav_get_number_of_parts(m_dvdnav, m_title, &m_titleParts);
@@ -758,8 +759,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                             "#%1 Menu %2 Length %3")
                       .arg(cell_event->cellN).arg(m_inMenu ? "Yes" : "No")
                       .arg((float)cell_event->cell_length / 90000.0f,0,'f',1));
-                QString still = m_still ? ((m_still < 0xff) ?
-                    QString("Stillframe: %1 seconds").arg(m_still) :
+                QString still = stillTimer ? ((stillTimer < 0xff) ?
+                    QString("Stillframe: %1 seconds").arg(stillTimer) :
                     QString("Infinite stillframe")) :
                     QString("Length: %1 seconds")
                         .arg((float)m_pgcLength / 90000.0f, 0, 'f', 1);
@@ -777,18 +778,17 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 // wait unless it is a transition from one normal video cell to
                 // another or the same menu id
-                if (((m_still != m_lastStill) || (m_title != m_lastTitle)) &&
+                if ((m_title != m_lastTitle) &&
                     !((m_title == 0 && m_lastTitle == 0) &&
                       (m_part == m_lastPart)))
                 {
                     WaitForPlayer();
                 }
 
-                // Make sure the still frame timer is updated (if this isn't
-                // a still frame, this will ensure the timer knows about it).
+                // Make sure the still frame timer is reset.
                 if (m_parent)
                 {
-                    m_parent->SetStillFrameTimeout(m_still);
+                    m_parent->SetStillFrameTimeout(0);
                 }
 
                 // clear menus/still frame selections
@@ -1126,14 +1126,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
 
-                // sense check
-                if (!m_still)
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + "DVDNAV_STILL_FRAME in "
-                            "cell that is not marked as a still frame");
-
-                if (still->length != m_still)
-                    LOG(VB_GENERAL, LOG_WARNING, LOC + "DVDNAV_STILL_FRAME "
-                            "length does not match cell still length");
+                m_still = still->length;
 
                 // pause a little as the dvdnav VM will continue to return
                 // this event until it has been skipped
@@ -1147,15 +1140,14 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     SkipStillFrame();
                 else if (m_parent)
                 {
-                    if ((still->length > 0) && (still->length < 0xff))
-                        m_parent->SetStillFrameTimeout(still->length);
+                    m_parent->SetStillFrameTimeout(m_still);
                 }
 
                 // debug
                 if (!stillSeen)
                 {
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
-                        .arg(still->length));
+                        .arg(m_still));
                     stillSeen = true;
                 }
 
@@ -1301,6 +1293,8 @@ void DVDRingBuffer::SkipStillFrame(void)
 {
     QMutexLocker locker(&m_seekLock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Skipping still frame.");
+
+    m_still = 0;
     dvdnav_still_skip(m_dvdnav);
 
     // Make sure the still frame timer is disabled.
@@ -1345,6 +1339,52 @@ bool DVDRingBuffer::GoToMenu(const QString str)
     if (ret == DVDNAV_STATUS_OK)
         return true;
     return false;
+}
+
+/** \brief Attempts to back-up by trying to jump to the 'Go up' PGC,
+ *         the root menu or the title menu in turn.
+ * \return true if a jump was possible, false if not.
+ */
+bool DVDRingBuffer::GoBack(void)
+{
+    bool success = false;
+    QString target;
+
+    QMutexLocker locker(&m_seekLock);
+
+    if (dvdnav_is_domain_vts(m_dvdnav) && !m_inMenu)
+    {
+        if(dvdnav_go_up(m_dvdnav) == DVDNAV_STATUS_OK)
+        {
+            target = "GoUp";
+            success = true;
+        }
+        else
+        if(dvdnav_menu_call(m_dvdnav, DVD_MENU_Root) == DVDNAV_STATUS_OK)
+        {
+            target = "Root";
+            success = true;
+        }
+        else
+        if(dvdnav_menu_call(m_dvdnav, DVD_MENU_Title) == DVDNAV_STATUS_OK)
+        {
+            target = "Title";
+            success = true;
+        }
+        else
+        {
+            target = "Nothing available";
+        }
+    }
+    else
+    {
+        target = QString("No jump, %1 menu").arg(m_inMenu ? "in" : "not in");
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO,
+        LOC + QString("DVDRingBuf: GoBack - %1").arg(target));
+
+    return success;
 }
 
 void DVDRingBuffer::GoToNextProgram(void)
@@ -1546,7 +1586,7 @@ bool DVDRingBuffer::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     sub->rects = NULL;
     sub->num_rects = 0;
     sub->start_display_time = startTime;
-    sub->end_display_time = 0xFFFFFFFF;
+    sub->end_display_time = startTime;
 
     cmd_pos = GETBE16(spu_pkt + 2);
     while ((cmd_pos + 4) < buf_size)

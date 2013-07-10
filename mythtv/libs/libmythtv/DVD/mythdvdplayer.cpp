@@ -186,7 +186,7 @@ bool MythDVDPlayer::VideoLoop(void)
         }
 
         // the still frame is treated as a pause frame
-        if (player_ctx->buffer->DVD()->IsInStillFrame())
+        if (player_ctx->buffer->DVD()->IsStillFramePending())
         {
             // ensure we refresh the pause frame
             if (!dvd_stillframe_showing)
@@ -618,6 +618,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     }
 
     if (dvdSubtitle &&
+        (dvdSubtitle->end_display_time > dvdSubtitle->start_display_time) &&
         (dvdSubtitle->end_display_time < currentFrame->timecode))
     {
         expired = true;

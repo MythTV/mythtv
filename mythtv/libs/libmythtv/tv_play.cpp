@@ -2408,6 +2408,15 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         {
             SET_LAST();
             SetErrored(ctx);
+            if (ctx && ctx->IsPlayerErrored())
+            {
+                ShowNotificationError(ctx->player->GetError(),
+                                      _Location,
+                                      buffer->GetFilename());
+                // We're going to display this error as notification
+                // no need to display it later as popup
+                ctx->player->ResetErrored();
+            }
         }
         else if (mctx != ctx)
         {
@@ -4454,14 +4463,11 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             else
             {
                 // If it's a DVD, and we're not trying to execute a
-                // jumppoint, and it's not in a menu, then first try
-                // jumping to the title or root menu.
+                // jumppoint, try to back up.
                 if (isDVD &&
                     !GetMythMainWindow()->IsExitingToMain() &&
                     has_action("BACK", actions) &&
-                    !ctx->buffer->DVD()->IsInMenu() &&
-                    (ctx->player->GoToMenu("title") ||
-                     ctx->player->GoToMenu("root")))
+                    ctx->buffer->DVD()->GoBack())
                 {
                     return handled;
                 }
@@ -7756,7 +7762,7 @@ bool TV::ClearOSD(const PlayerContext *ctx)
     if (osd)
     {
         osd->DialogQuit();
-        osd->HideAll();
+        osd->HideAll(true, NULL, true); // pop OSD screen
         res = true;
     }
     ReturnOSDLock(ctx, osd);
