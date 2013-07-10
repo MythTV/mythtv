@@ -1341,6 +1341,52 @@ bool DVDRingBuffer::GoToMenu(const QString str)
     return false;
 }
 
+/** \brief Attempts to back-up by trying to jump to the 'Go up' PGC,
+ *         the root menu or the title menu in turn.
+ * \return true if a jump was possible, false if not.
+ */
+bool DVDRingBuffer::GoBack(void)
+{
+    bool success = false;
+    QString target;
+
+    QMutexLocker locker(&m_seekLock);
+
+    if (dvdnav_is_domain_vts(m_dvdnav) && !m_inMenu)
+    {
+        if(dvdnav_go_up(m_dvdnav) == DVDNAV_STATUS_OK)
+        {
+            target = "GoUp";
+            success = true;
+        }
+        else
+        if(dvdnav_menu_call(m_dvdnav, DVD_MENU_Root) == DVDNAV_STATUS_OK)
+        {
+            target = "Root";
+            success = true;
+        }
+        else
+        if(dvdnav_menu_call(m_dvdnav, DVD_MENU_Title) == DVDNAV_STATUS_OK)
+        {
+            target = "Title";
+            success = true;
+        }
+        else
+        {
+            target = "Nothing available";
+        }
+    }
+    else
+    {
+        target = QString("No jump, %1 menu").arg(m_inMenu ? "in" : "not in");
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO,
+        LOC + QString("DVDRingBuf: GoBack - %1").arg(target));
+
+    return success;
+}
+
 void DVDRingBuffer::GoToNextProgram(void)
 {
     QMutexLocker locker(&m_seekLock);

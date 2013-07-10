@@ -165,6 +165,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool GoToMenu(const QString str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
+    bool GoBack(void);
 
     virtual void IgnoreWaitStates(bool ignore) { m_skipstillorwait = ignore; }
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }

@@ -4463,14 +4463,11 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             else
             {
                 // If it's a DVD, and we're not trying to execute a
-                // jumppoint, and it's not in a menu, then first try
-                // jumping to the title or root menu.
+                // jumppoint, try to back up.
                 if (isDVD &&
                     !GetMythMainWindow()->IsExitingToMain() &&
                     has_action("BACK", actions) &&
-                    !ctx->buffer->DVD()->IsInMenu() &&
-                    (ctx->player->GoToMenu("title") ||
-                     ctx->player->GoToMenu("root")))
+                    ctx->buffer->DVD()->GoBack())
                 {
                     return handled;
                 }
