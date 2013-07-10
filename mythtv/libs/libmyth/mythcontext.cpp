@@ -1055,7 +1055,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     n.SetParent(this);
     n.SetDuration(5);
     GetNotificationCenter()->Queue(n);
-    m_lastCheck = MythDate::current();
+    m_lastCheck = QDateTime();
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
