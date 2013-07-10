@@ -13,7 +13,7 @@ class MBASE_PUBLIC BonjourRegister : public QObject
     Q_OBJECT
   public:
     BonjourRegister(QObject *parent = 0);
-   ~BonjourRegister();
+    virtual ~BonjourRegister();
 
     bool Register(uint16_t port, const QByteArray &type, const QByteArray &name,
                   const QByteArray &txt);
@@ -32,7 +32,7 @@ class MBASE_PUBLIC BonjourRegister : public QObject
                                           const char *domain, void *object);
     DNSServiceRef    m_dnssref;
     QSocketNotifier *m_socket;
-    static QMutex    m_lock;
-    bool             m_haslock;
+    QMutexLocker    *m_lock;
+    static QMutex    g_lock;
 };
 #endif
