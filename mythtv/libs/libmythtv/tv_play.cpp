@@ -2408,6 +2408,15 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         {
             SET_LAST();
             SetErrored(ctx);
+            if (ctx && ctx->IsPlayerErrored())
+            {
+                ShowNotificationError(ctx->player->GetError(),
+                                      _Location,
+                                      buffer->GetFilename());
+                // We're going to display this error as notification
+                // no need to display it later as popup
+                ctx->player->ResetErrored();
+            }
         }
         else if (mctx != ctx)
         {

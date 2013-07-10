@@ -575,7 +575,7 @@ void MythPlayer::ReinitVideo(void)
     if (!videoOutput->IsPreferredRenderer(video_disp_dim))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Need to switch video renderer.");
-        SetErrored(tr("Need to switch video renderer."));
+        SetErrored(tr("Need to switch video renderer"));
         errorType |= kError_Switch_Renderer;
         return;
     }
@@ -934,6 +934,7 @@ int MythPlayer::OpenFile(uint retries)
                         .arg(testreadsize)
                         .arg(player_ctx->buffer->GetFilename()));
                 delete[] testbuf;
+                SetErrored(tr("Could not read first %1 bytes").arg(testreadsize));
                 return -1;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenFile() waiting on data");
@@ -953,6 +954,7 @@ int MythPlayer::OpenFile(uint retries)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Couldn't find an A/V decoder for: '%1'")
                 .arg(player_ctx->buffer->GetFilename()));
+        SetErrored(tr("Could not find an A/V decoder"));
 
         delete[] testbuf;
         return -1;
@@ -961,6 +963,7 @@ int MythPlayer::OpenFile(uint retries)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
         SetDecoder(NULL);
+        SetErrored(tr("Could not initialize A/V decoder"));
 
         delete[] testbuf;
         return -1;
@@ -985,6 +988,7 @@ int MythPlayer::OpenFile(uint retries)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't open decoder for: %1")
                 .arg(player_ctx->buffer->GetFilename()));
+        SetErrored(tr("Could not open decoder"));
         return -1;
     }
 
@@ -5226,7 +5230,7 @@ bool MythPlayer::PosMapFromEnc(uint64_t start,
     return true;
 }
 
-void MythPlayer::SetErrored(const QString &reason) const
+void MythPlayer::SetErrored(const QString &reason)
 {
     QMutexLocker locker(&errorLock);
 
@@ -5242,6 +5246,13 @@ void MythPlayer::SetErrored(const QString &reason) const
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("%1").arg(reason));
     }
+}
+
+void MythPlayer::ResetErrored(void)
+{
+    QMutexLocker locker(&errorLock);
+
+    errorMsg = QString();
 }
 
 bool MythPlayer::IsErrored(void) const
