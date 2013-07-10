@@ -23,6 +23,7 @@
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "mythuihelper.h"
+#include "mythuinotificationcenter.h"
 #include "storagegroup.h"
 #include "mythuibutton.h"
 #include "mythlogging.h"
@@ -46,6 +47,8 @@
 #define LOC      QString("PlaybackBox: ")
 #define LOC_WARN QString("PlaybackBox Warning: ")
 #define LOC_ERR  QString("PlaybackBox Error: ")
+
+static const QString _Location = "Playback Box";
 
 static int comp_programid(const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -2663,41 +2666,48 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
         case asAvailable:
             if (pginfo.QueryIsInUse(byWho))
             {
-                ShowOkPopup(tr("Recording Available\n") + msg +
-                            tr("This recording is currently in "
-                               "use by:") + "\n" + byWho);
+                ShowNotification(tr("Recording Available\n"),
+                                      _Location, msg +
+                                 tr("This recording is currently in "
+                                    "use by:") + "\n" + byWho);
             }
             else
             {
-                ShowOkPopup(tr("Recording Available\n") + msg +
-                            tr("This recording is currently "
-                               "Available"));
+                ShowNotification(tr("Recording Available\n"),
+                                      _Location, msg +
+                                 tr("This recording is currently "
+                                    "Available"));
             }
             break;
         case asPendingDelete:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording is currently being "
-                           "deleted and is unavailable"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording is currently being "
+                                     "deleted and is unavailable"));
             break;
         case asDeleted:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording has been "
-                           "deleted and is unavailable"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording has been "
+                                     "deleted and is unavailable"));
             break;
         case asFileNotFound:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("The file for this recording can "
-                           "not be found"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("The file for this recording can "
+                                     "not be found"));
             break;
         case asZeroByte:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("The file for this recording is "
-                           "empty."));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("The file for this recording is "
+                                     "empty."));
             break;
         case asNotYetAvailable:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording is not yet "
-                           "available."));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording is not yet "
+                                     "available."));
     }
 }
 
