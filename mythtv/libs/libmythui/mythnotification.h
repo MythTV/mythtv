@@ -346,6 +346,7 @@ public:
                           const QString &details = QString())
         : MythNotification(title, author, details), MythImageNotification(New, "error.png")
     {
+        SetDuration(10);
     }
 
     virtual MythEvent *clone(void) const { return new MythErrorNotification(*this); }
