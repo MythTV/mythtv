@@ -152,7 +152,7 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
     m_priority      = notification.GetPriority();
 
     // Set timer if need be
-    SetSingleShotTimer(m_duration);
+    SetSingleShotTimer(m_duration, update);
 }
 
 bool MythUINotificationScreen::Create(void)
@@ -450,7 +450,7 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     return *this;
 }
 
-void MythUINotificationScreen::SetSingleShotTimer(int s)
+void MythUINotificationScreen::SetSingleShotTimer(int s, bool update)
 {
     // only registered application can display non-expiring notification
     if (m_id > 0 && s < 0)
@@ -459,6 +459,10 @@ void MythUINotificationScreen::SetSingleShotTimer(int s)
     int ms = s * 1000;
     ms = ms <= DEFAULT_DURATION ? DEFAULT_DURATION : ms;
 
+    if (!update)
+    {
+        m_creation = MythDate::current();
+    }
     m_expiry = MythDate::current().addMSecs(ms);
 
     m_timer->stop();
@@ -466,6 +470,28 @@ void MythUINotificationScreen::SetSingleShotTimer(int s)
     m_timer->start(ms);
 }
 
+// Public event handling
+bool MythUINotificationScreen::keyPressEvent(QKeyEvent *event)
+{
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+
+        if (action == "ESCAPE")
+        {
+            if (MythDate::current() < m_creation.addMSecs(MIN_LIFE))
+                return true; // was updated less than 1s ago, ignore
+        }
+    }
+    if (!handled)
+    {
+        handled = MythScreenType::keyPressEvent(event);
+    }
+    return handled;
+}
 
 /////////////////////// NCPrivate
 
@@ -1011,6 +1037,9 @@ bool NCPrivate::RemoveFirst(void)
         return false;
 
     MythUINotificationScreen *screen = m_screens.first();
+    if (MythDate::current() < screen->m_creation.addMSecs(MIN_LIFE))
+        return false;
+
     // simulate time-out
     screen->ProcessTimer();
     return true;

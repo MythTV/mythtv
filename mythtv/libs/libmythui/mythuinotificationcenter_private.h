@@ -27,6 +27,8 @@
 class MythUINotificationScreen;
 class MythNotificationScreenStack;
 
+#define MIN_LIFE 1000
+
 class NCPrivate : public QObject
 {
     Q_OBJECT
@@ -154,6 +156,8 @@ public:
 
     virtual ~MythUINotificationScreen();
 
+    bool keyPressEvent(QKeyEvent *event);
+
     // These two methods are declared by MythScreenType and their signatures
     // should not be changed
     virtual bool Create(void);
@@ -166,7 +170,7 @@ public:
     void UpdateMetaData(const DMAP &data);
     void UpdatePlayback(float progress, const QString &text);
 
-    void SetSingleShotTimer(int s);
+    void SetSingleShotTimer(int s, bool update = false);
 
     // UI methods
     void AdjustYPosition(void);
@@ -213,7 +217,7 @@ public:
     MythUIText         *m_extraText;
     MythUIText         *m_progresstextText;
     MythUIProgressBar  *m_progressBar;
-    QDateTime           m_expiry;
+    QDateTime           m_creation, m_expiry;
     int                 m_index;
     MythPoint           m_position;
     QTimer             *m_timer;
