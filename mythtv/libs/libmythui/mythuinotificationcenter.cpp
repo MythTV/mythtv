@@ -475,6 +475,7 @@ NCPrivate::NCPrivate()
     m_screenStack = new MythNotificationScreenStack(GetMythMainWindow(),
                                                     "mythuinotification",
                                                     this);
+    m_originalScreenStack = m_screenStack;
 }
 
 NCPrivate::~NCPrivate()
@@ -501,7 +502,7 @@ NCPrivate::~NCPrivate()
     m_notifications.clear();
 
     delete m_screenStack;
-    m_screenStack = NULL;
+    m_originalScreenStack = m_screenStack = NULL;
 }
 
 /**
@@ -787,7 +788,26 @@ void NCPrivate::DeleteAllScreens(void)
         // we remove the screen from the list before deleting the screen
         // so the MythScreenType::Exiting() signal won't process it a second time
         m_deletedScreens.removeLast();
-        screen->GetScreenStack()->PopScreen(screen, true, true);
+        if (m_screenStack == NULL &&
+            screen->GetScreenStack() == m_originalScreenStack)
+        {
+            // our screen stack got deleted already and all its children
+            // would have been marked for deletion during the
+            // ScreenStack destruction but not yet deleted as the event loop may
+            // not be running; so we can leave the screen alone.
+            // However for clarity, call deleteLater()
+            // as it is safe to call deleteLater more than once
+            screen->deleteLater();
+        }
+        else if (screen->GetScreenStack() == m_screenStack)
+        {
+            screen->GetScreenStack()->PopScreen(screen, true, true);
+        }
+        else if (screen->GetScreenStack() == NULL)
+        {
+            // this screen was never added to a screen stack, delete it now
+            delete screen;
+        }
     }
 }
 

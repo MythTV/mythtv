@@ -113,6 +113,7 @@ private:
     int RemoveScreen(MythUINotificationScreen *screen);
     void RefreshScreenPosition(int from = 0);
 
+    MythNotificationScreenStack            *m_originalScreenStack;
     MythNotificationScreenStack            *m_screenStack;
     QList<MythNotification*>                m_notifications;
     QList<MythUINotificationScreen*>        m_screens;
