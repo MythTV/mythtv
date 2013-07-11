@@ -40,41 +40,41 @@
 <context>
     <name>DecoderIOFactoryShoutCast</name>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="806"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="803"/>
         <source>Connecting</source>
         <translation>Conectando</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="922"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="919"/>
         <source>Finding radio stream</source>
         <translation>Buscando emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="925"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="922"/>
         <source>Cannot find radio.
 Check the URL is correct.</source>
         <translation>No fue posible encontrar la radio.
 Compruebe que el URL sea correcto.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="928"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="925"/>
         <source>Connecting to radio stream</source>
         <translation>Conectando con la emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="931"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="928"/>
         <source>Cannot connect to radio.
 Check the URL is correct.</source>
         <translation>No fue posible conectar con la radio.
 Compruebe que el URL sea correcto.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="935"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="932"/>
         <source>Connected to radio stream</source>
         <translation>Conectado a la emisión de radio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="945"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="942"/>
         <source>Buffering</source>
         <translation>Almacenando</translation>
     </message>
@@ -231,6 +231,34 @@ Compruebe que el URL sea correcto.</translation>
     </message>
 </context>
 <context>
+    <name>FileScanner</name>
+    <message>
+        <location filename="../mythmusic/filescanner.cpp" line="336"/>
+        <source>Cleaning music database</source>
+        <translation>Vaciando base de datos de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/filescanner.cpp" line="571"/>
+        <source>Searching for music files</source>
+        <translation>Buscando archivos de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/filescanner.cpp" line="589"/>
+        <source>Updating music database</source>
+        <translation>Actualizando la base de datos de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/filescanner.cpp" line="663"/>
+        <source>Scanning music files</source>
+        <translation>Explorando archivos de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/filescanner.cpp" line="745"/>
+        <source>Scanning Album Artwork</source>
+        <translation>Explorando arte del álbum</translation>
+    </message>
+</context>
+<context>
     <name>GeneralSettings</name>
     <message>
         <location filename="../mythmusic/generalsettings.cpp" line="71"/>
@@ -281,42 +309,42 @@ Compruebe que el URL sea correcto.</translation>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="946"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1118"/>
+        <location filename="../mythmusic/importmusic.cpp" line="948"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1120"/>
         <source>Front Cover</source>
         <translation>Portada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="948"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1120"/>
+        <location filename="../mythmusic/importmusic.cpp" line="950"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1122"/>
         <source>Back Cover</source>
         <translation>Contraportada</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="950"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1124"/>
+        <location filename="../mythmusic/importmusic.cpp" line="952"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1126"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="952"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1122"/>
+        <location filename="../mythmusic/importmusic.cpp" line="954"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1124"/>
         <source>Inlay</source>
         <translation>Interior</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="954"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1126"/>
+        <location filename="../mythmusic/importmusic.cpp" line="956"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1128"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Desconocido&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1093"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1095"/>
         <source>File Already Exists</source>
         <translation>El archivo ya existe</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1095"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1097"/>
         <source>New File</source>
         <translation>Nuevo archivo</translation>
     </message>
@@ -324,81 +352,93 @@ Compruebe que el URL sea correcto.</translation>
 <context>
     <name>ImportMusicDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="157"/>
+        <location filename="../mythmusic/importmusic.cpp" line="159"/>
         <source>New File</source>
         <translation>Nuevo archivo</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="457"/>
+        <location filename="../mythmusic/importmusic.cpp" line="459"/>
         <source>This track is already in the database</source>
         <translation>Esta pista ya existe en la base de datos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="162"/>
+        <location filename="../mythmusic/importmusic.cpp" line="164"/>
         <source>Already in Database</source>
         <translation>Ya existe en la base de datos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="168"/>
+        <location filename="../mythmusic/importmusic.cpp" line="143"/>
+        <source>%1 of %2</source>
+        <comment>Current track position</comment>
+        <extracomment>%1 is the current track, %2 is the number of tracks</extracomment>
+        <translation>%1 de %2</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="170"/>
         <source>Not found</source>
         <translation>No encontrado</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="231"/>
+        <location filename="../mythmusic/importmusic.cpp" line="233"/>
         <source>You might have unsaved changes.
 Are you sure you want to exit this screen?</source>
         <translation>Podría tener cambios sin guardar.
 ¿Seguro que desea salir de esta pantalla?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="415"/>
+        <location filename="../mythmusic/importmusic.cpp" line="417"/>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation>Error en la copia
 No fue posible copiar el archivo a: %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="486"/>
+        <location filename="../mythmusic/importmusic.cpp" line="488"/>
         <source>%1 new tracks were added to the database</source>
         <translation>Se añadieron %1 pistas nuevas a la base de datos</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="648"/>
+        <location filename="../mythmusic/importmusic.cpp" line="513"/>
+        <source>Searching for music files</source>
+        <translation>Buscando archivos de música</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="650"/>
         <source>Save Defaults</source>
         <translation>Guardar valores predeterminados</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="652"/>
+        <location filename="../mythmusic/importmusic.cpp" line="654"/>
         <source>Change Compilation Flag</source>
         <translation>Cambiar marca de recopilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="653"/>
+        <location filename="../mythmusic/importmusic.cpp" line="655"/>
         <source>Change Compilation Artist</source>
         <translation>Cambiar intérprete de recopilación</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="655"/>
+        <location filename="../mythmusic/importmusic.cpp" line="657"/>
         <source>Change Artist</source>
         <translation>Cambiar intérprete</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="656"/>
+        <location filename="../mythmusic/importmusic.cpp" line="658"/>
         <source>Change Album</source>
         <translation>Cambiar álbum</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="657"/>
+        <location filename="../mythmusic/importmusic.cpp" line="659"/>
         <source>Change Genre</source>
         <translation>Cambiar género</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="658"/>
+        <location filename="../mythmusic/importmusic.cpp" line="660"/>
         <source>Change Year</source>
         <translation>Cambiar año</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="659"/>
+        <location filename="../mythmusic/importmusic.cpp" line="661"/>
         <source>Change Rating</source>
         <translation>Cambiar puntuación</translation>
     </message>
@@ -1320,17 +1360,6 @@ Nombre: %1</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="568"/>
-        <location filename="../mythmusic/importmusic.cpp" line="511"/>
-        <source>Searching for music files</source>
-        <translation>Buscando archivos de música</translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/filescanner.cpp" line="586"/>
-        <source>Updating music database</source>
-        <translation>Actualizando la base de datos de música</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/cddecoder.cpp" line="765"/>
         <source>Various Artists</source>
         <translation>Varios intérpretes</translation>
@@ -1381,11 +1410,6 @@ Nombre: %1</translation>
         <translation>Pista %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="660"/>
-        <source>Scanning music files</source>
-        <translation>Explorando archivos de música</translation>
-    </message>
-    <message>
         <location filename="../mythmusic/musicdata.cpp" line="52"/>
         <source>Rebuilding music tree</source>
         <translation>Reconstruyendo árbol de música</translation>
@@ -1401,17 +1425,7 @@ Nombre: %1</translation>
         <translation>Explorando CD. Por favor, espere...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/filescanner.cpp" line="333"/>
-        <source>Cleaning music database</source>
-        <translation>Vaciando base de datos de música</translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/filescanner.cpp" line="742"/>
-        <source>Scanning Album Artwork</source>
-        <translation>Explorando arte del álbum</translation>
-    </message>
-    <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="610"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="562"/>
         <source>Internal Decoder</source>
         <translation>Descodificador interno</translation>
     </message>
@@ -1431,7 +1445,7 @@ Nombre: %1</translation>
         <translation>No encuentro su directorio de música. ¿Lo ha configurado correctamente en la página &apos;Configuración general&apos; de MythMusic?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/shoutcast.cpp" line="868"/>
+        <location filename="../mythmusic/shoutcast.cpp" line="865"/>
         <source>Unsupported content type for ShoutCast stream: %1</source>
         <translation>Tipo de contenido no admitido para la emisión ShoutCast: %1</translation>
     </message>

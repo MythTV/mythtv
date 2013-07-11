@@ -6089,7 +6089,7 @@ void MainServer::DeleteChain(LiveTVChain *chain)
     }
     liveTVChains = newChains;
 
-    delete chain;
+    chain->DecrRef();
 }
 
 void MainServer::SetExitCode(int exitCode, bool closeApplication)

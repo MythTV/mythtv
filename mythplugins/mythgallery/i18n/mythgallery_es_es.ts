@@ -4,7 +4,7 @@
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="237"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="243"/>
         <source>Press SELECT to play again</source>
         <translation>Pulse SELECT para reproducir de nuevo</translation>
     </message>
