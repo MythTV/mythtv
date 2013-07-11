@@ -13,6 +13,7 @@ using namespace std;
 #include <QDateTime>
 #include <QImage>
 #include <QMetaType>
+#include <QCoreApplication>
 
 // mythtv
 #include "mythmetaexp.h"
@@ -70,6 +71,8 @@ enum RepoType
 
 class META_PUBLIC MusicMetadata
 {
+    Q_DECLARE_TR_FUNCTIONS(MusicMetadata)
+
   public:
 
     typedef uint32_t IdType;
@@ -350,6 +353,8 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
 class META_PUBLIC AllMusic
 {
+    Q_DECLARE_TR_FUNCTIONS(AllMusic)
+
   public:
 
     AllMusic(void);
@@ -433,6 +438,8 @@ class META_PUBLIC AllStream
 
 class META_PUBLIC AlbumArtImages
 {
+    Q_DECLARE_TR_FUNCTIONS(AlbumArtImages)
+
   public:
     AlbumArtImages(MusicMetadata *metadata);
     ~AlbumArtImages();

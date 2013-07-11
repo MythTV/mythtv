@@ -643,16 +643,16 @@ inline QString MusicMetadata::formatReplaceSymbols(const QString &format)
 void MusicMetadata::checkEmptyFields()
 {
     if (m_artist.isEmpty())
-        m_artist = QObject::tr("Unknown Artist");
+        m_artist = tr("Unknown Artist", "Default artist if no artist");
     // This should be the same as Artist if it's a compilation track or blank
     if (!m_compilation || m_compilation_artist.isEmpty())
         m_compilation_artist = m_artist;
     if (m_album.isEmpty())
-        m_album = QObject::tr("Unknown Album");
+        m_album = tr("Unknown Album", "Default album if no album");
     if (m_title.isEmpty())
         m_title = m_filename;
     if (m_genre.isEmpty())
-        m_genre = QObject::tr("Unknown Genre");
+        m_genre = tr("Unknown Genre", "Default genre if no genre");
 
 }
 
@@ -830,7 +830,7 @@ void MusicMetadata::toMap(MetadataMap &metadataMap, const QString &prefix)
         metadataMap[prefix + "lastplayed"] =
             MythDate::toString(m_lastplay, kDateFull | kSimplify | kAddYear);
     else
-        metadataMap[prefix + "lastplayed"] = QObject::tr("Never Played");
+        metadataMap[prefix + "lastplayed"] = tr("Never Played");
 
     metadataMap[prefix + "dateadded"] = MythDate::toString(
         m_dateadded, kDateFull | kSimplify | kAddYear);
@@ -1335,7 +1335,7 @@ void AllMusic::clearCDData(void)
         m_cdData.pop_back();
     }
 
-    m_cdTitle = QObject::tr("CD -- none");
+    m_cdTitle = tr("CD -- none");
 }
 
 void AllMusic::addCDTrack(const MusicMetadata &the_track)
@@ -1734,19 +1734,19 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
     ImageType type = IT_FRONTCOVER;
 
     if (filename.contains("front", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("front"), Qt::CaseInsensitive))
+             filename.contains(tr("front"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
     else if (filename.contains("back", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("back"),  Qt::CaseInsensitive))
+             filename.contains(tr("back"),  Qt::CaseInsensitive))
         type = IT_BACKCOVER;
     else if (filename.contains("inlay", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("inlay"), Qt::CaseInsensitive))
+             filename.contains(tr("inlay"), Qt::CaseInsensitive))
         type = IT_INLAY;
     else if (filename.contains("cd", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("cd"), Qt::CaseInsensitive))
+             filename.contains(tr("cd"), Qt::CaseInsensitive))
         type = IT_CD;
     else if (filename.contains("cover", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("cover"), Qt::CaseInsensitive))
+             filename.contains(tr("cover"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
 
     return type;
