@@ -588,6 +588,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
             QString message = QString("LIVETV_EXITED");
             MythEvent me(message, tvchain->GetID());
             gCoreContext->dispatch(me);
+            tvchain->DecrRef();
             tvchain = NULL;
         }
 
@@ -2605,6 +2606,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     QMutexLocker lock(&stateChangeLock);
 
     tvchain = newchain;
+    tvchain->IncrRef(); // mark it for TVRec use
     tvchain->ReloadAll();
 
     QString hostprefix = gCoreContext->GenMythURL(
@@ -2862,6 +2864,10 @@ void TVRec::StopLiveTV(void)
     WaitForEventThreadSleep();
 
     // We are done with the tvchain...
+    if (tvchain)
+    {
+        tvchain->DecrRef();
+    }
     tvchain = NULL;
 }
 

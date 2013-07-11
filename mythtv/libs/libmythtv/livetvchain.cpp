@@ -23,16 +23,18 @@ static inline void clear(LiveTVChainEntry &entry)
 /** \class LiveTVChain
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
-LiveTVChain::LiveTVChain() :
+LiveTVChain::LiveTVChain() : ReferenceCounter("LiveTVChain"),
     m_id(""), m_maxpos(0), m_lock(QMutex::Recursive),
     m_curpos(0), m_cur_chanid(0),
     m_switchid(-1), m_jumppos(0)
 {
     clear(m_switchentry);
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "ctor");
 }
 
 LiveTVChain::~LiveTVChain()
 {
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "dtor");
 }
 
 QString LiveTVChain::InitializeNewChain(const QString &seed)

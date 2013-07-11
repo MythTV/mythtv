@@ -8,6 +8,8 @@
 #include <QList>
 
 #include "mythtvexp.h"
+#include "referencecounter.h"
+
 
 class ProgramInfo;
 class MythSocket;
@@ -24,7 +26,7 @@ struct MTV_PUBLIC LiveTVChainEntry
     QString inputname;
 };
 
-class MTV_PUBLIC LiveTVChain
+class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 {
   public:
     LiveTVChain();
