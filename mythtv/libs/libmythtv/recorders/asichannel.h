@@ -12,9 +12,6 @@ using namespace std;
 // MythTV headers
 #include "dtvchannel.h"
 
-class ASIStreamHandler;
-class ASIChannel;
-
 class ASIChannel : public DTVChannel
 {
   public:
