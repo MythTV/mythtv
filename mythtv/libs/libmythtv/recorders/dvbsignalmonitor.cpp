@@ -21,7 +21,7 @@
 #include "dvbrecorder.h"
 #include "dvbstreamhandler.h"
 
-#define LOC QString("DVBSM[%1](%2): ") \
+#define LOC QString("DVBSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 /**
