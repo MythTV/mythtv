@@ -177,9 +177,9 @@ static void startDatabaseTree(void)
 
 static void startRipper(void)
 {
+#if defined HAVE_CDIO
     loadMusic();
 
-#if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -193,6 +193,10 @@ static void startRipper(void)
     }
     else
         delete rip;
+
+#else
+    ShowOkPopup(QObject::tr("MythMusic hasn't been built with libcdio support "
+                            "so ripping CD's is not possible"));
 #endif
 }
 
