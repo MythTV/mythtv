@@ -17,7 +17,6 @@
 #include "mythuiexp.h"
 
 typedef QMap<QString,QString> DMAP;
-typedef unsigned int    PNMask;
 typedef unsigned int    VNMask;
 
 class MUI_PUBLIC MythNotification : public MythEvent
@@ -150,7 +149,7 @@ public:
     /**
      * For future use, not implemented at this stage
      */
-    void SetPriority(PNMask n)              { m_priority = n; }
+    void SetPriority(Priority n)              { m_priority = n; }
 
     // Getter
     int         GetId(void) const           { return m_id; }
@@ -161,7 +160,7 @@ public:
     int         GetDuration(void) const     { return m_duration; };
     QString     GetStyle(void) const        { return m_style; }
     VNMask      GetVisibility(void) const   { return m_visibility; }
-    PNMask      GetPriority(void) const     { return m_priority; }
+    Priority    GetPriority(void) const     { return m_priority; }
 
 protected:
     MythNotification(const MythNotification &o)
@@ -184,7 +183,7 @@ protected:
     DMAP        m_metadata;
     QString     m_style;
     VNMask      m_visibility;
-    PNMask      m_priority;
+    Priority    m_priority;
 };
 
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
