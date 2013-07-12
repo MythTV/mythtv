@@ -169,6 +169,7 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
                                              QCoreApplication::UnicodeUTF8);
 
         QString tempString = translatedTemplate;
+        bool replaced = false;
 
         while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
         {
@@ -182,12 +183,16 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
                               .arg(regexp.cap(3))
                               .arg(map.value(key))
                               .arg(regexp.cap(6));
+                replaced = true;
             }
 
             tempString.replace(regexp.cap(0), replacement);
             pos += regexp.matchedLength();
         }
-        SetText(tempString);
+        if (replaced)
+        {
+            SetText(tempString);
+        }
     }
     else if (map.contains(objectName()))
     {
