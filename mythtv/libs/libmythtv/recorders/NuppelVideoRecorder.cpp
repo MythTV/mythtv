@@ -2950,6 +2950,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (!hardware_encode)
         {
             AVPacket packet;
+            av_init_packet(&packet);
             packet.data = (uint8_t *)strm;
             packet.size = len;
 
