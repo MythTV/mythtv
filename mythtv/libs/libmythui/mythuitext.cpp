@@ -169,7 +169,7 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
                                              QCoreApplication::UnicodeUTF8);
 
         QString tempString = translatedTemplate;
-        bool replaced = false;
+        bool replaced = map.contains(objectName());
 
         while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
         {
