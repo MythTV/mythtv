@@ -171,11 +171,12 @@ bool AVFormatWriter::OpenFile(void)
 
     m_ringBuffer = RingBuffer::Create(m_filename, true);
 
-    if (!m_ringBuffer)
+    if (!m_ringBuffer || !m_ringBuffer->GetLastError().isEmpty())
     {
-        Cleanup();
         LOG(VB_RECORD, LOG_ERR, LOC +
-            "OpenFile(): RingBuffer::Create() failed");
+            QString("OpenFile(): RingBuffer::Create() failed: '%1'")
+            .arg(m_ringBuffer ? m_ringBuffer->GetLastError() : ""));
+        Cleanup();
         return false;
     }
 

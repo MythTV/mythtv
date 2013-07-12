@@ -253,9 +253,20 @@ int Transcode::TranscodeFile(const QString &inputname,
     // Input setup
     PlayerContext *player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
-    player_ctx->SetRingBuffer((hls && (hlsStreamID != -1)) ?
+    RingBuffer *rb = (hls && (hlsStreamID != -1)) ?
         RingBuffer::Create(hls->GetSourceFile(), false, false) :
-        RingBuffer::Create(inputname, false, false));
+        RingBuffer::Create(inputname, false, false);
+    if (!rb || !rb->GetLastError().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Transcoding aborted, error: '%1'")
+            .arg(rb? rb->GetLastError() : ""));
+        delete player_ctx;
+        if (hls)
+            delete hls;
+        return REENCODE_ERROR;
+    }
+    player_ctx->SetRingBuffer(rb);
     player_ctx->SetPlayer(new MythPlayer(kVideoIsNull));
     SetPlayerContext(player_ctx);
     GetPlayer()->SetPlayerInfo(NULL, NULL, GetPlayerContext());
