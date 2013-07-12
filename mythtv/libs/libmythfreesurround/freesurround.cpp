@@ -61,16 +61,17 @@ class object_pool
 {
 public:
     typedef void* (*callback)();
+    typedef void* (*dcallback)(void*);
     // initialize
-    object_pool(callback cbf):construct(cbf) { }
+    object_pool(callback cbf, dcallback dbf):construct(cbf), destruct(dbf) { }
     ~object_pool()
     {
         for (std::map<void*,void*>::iterator i=pool.begin(),e=pool.end();
              i != e; i++)
-            delete i->second;
+            destruct(i->second);
         for (std::list<void*>::iterator i=freelist.begin(),e=freelist.end();
              i != e; i++)
-            delete *i;
+            destruct(*i);
     }
     // (re)acquire an object
     void *acquire(void *who)
@@ -97,6 +98,7 @@ public:
     }
 public:
     callback construct;            // object constructor callback
+    dcallback destruct;            // object destructor callback
     std::list<void*> freelist;     // list of available objects
     std::map<void*,void*> pool;    // pool of used objects, by class
 };
@@ -125,9 +127,19 @@ struct buffers
 // construction methods
 void *new_decoder() { return new fsurround_decoder(block_size); }
 void *new_buffers() { return new buffers(block_size/2); }
+void *delete_decoder(void *_p)
+{
+    fsurround_decoder *p = static_cast<fsurround_decoder*>(_p);
+    delete p;
+}
+void *delete_buffers(void *_p)
+{
+    buffers *p = static_cast<buffers*>(_p);
+    delete p;
+}
 
-object_pool dp(&new_decoder);
-object_pool bp(&new_buffers);
+object_pool dp(&new_decoder, &delete_decoder);
+object_pool bp(&new_buffers, &delete_buffers);
 
 //#define SPEAKERTEST
 #ifdef SPEAKERTEST
@@ -520,7 +532,7 @@ void FreeSurround::close()
 {
     if (decoder)
     {
-        dp.release(this);
+        dp.release((void*)1);
         decoder = 0;
     }
 }
