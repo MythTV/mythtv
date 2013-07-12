@@ -176,7 +176,7 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
             QString key = regexp.cap(4).toLower().trimmed();
             QString replacement;
 
-            if (!map.value(key).isEmpty())
+            if (map.contains(key))
             {
                 replacement = QString("%1%2%3%4")
                               .arg(regexp.cap(2))
