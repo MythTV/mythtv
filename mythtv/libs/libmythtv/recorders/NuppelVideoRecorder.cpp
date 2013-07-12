@@ -1620,6 +1620,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         if (!convert_ctx)
         {
             _error = "Cannot initialize image conversion context";
+            av_free(output_buffer);
             LOG(VB_GENERAL, LOG_ERR, LOC + _error);
             return;
         }
