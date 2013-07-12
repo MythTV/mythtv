@@ -121,13 +121,13 @@ private:
 MUI_PUBLIC void ShowNotificationError(const QString &msg,
                                       const QString &from = QString(),
                                       const QString &detail = QString(),
-                                      const PNMask priority = MythNotification::kDefault,
-                                      const VNMask visibility = MythNotification::kAll);
+                                      const VNMask visibility = MythNotification::kAll,
+                                      const MythNotification::Priority priority = MythNotification::kDefault);
 
 MUI_PUBLIC void ShowNotification(const QString &msg,
                                  const QString &from = QString(),
                                  const QString &detail = QString(),
-                                 const PNMask priority = MythNotification::kDefault,
-                                 const VNMask visibility = MythNotification::kAll);
+                                 const VNMask visibility = MythNotification::kAll,
+                                 const MythNotification::Priority priority = MythNotification::kDefault);
 
 #endif /* defined(__MythTV__mythnotifications__) */

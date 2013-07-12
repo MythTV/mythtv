@@ -46,7 +46,9 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this))
+      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this)),
+      m_visibility(MythNotification::kAll),
+      m_priority(MythNotification::kDefault)
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
@@ -62,7 +64,9 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this))
+      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this)),
+      m_visibility(MythNotification::kAll),
+      m_priority(MythNotification::kDefault)
 {
     SetNotification(notification);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -76,7 +80,9 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_timer(new QTimer(this))
+      m_progressBar(NULL),      m_timer(new QTimer(this)),
+      m_visibility(MythNotification::kAll),
+      m_priority(MythNotification::kDefault)
 {
     *this = s;
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -1164,8 +1170,8 @@ bool MythUINotificationCenter::RemoveFirst(void)
 void ShowNotificationError(const QString &msg,
                            const QString &from,
                            const QString &detail,
-                           const PNMask priority,
-                           const VNMask visibility)
+                           const VNMask visibility,
+                           const MythNotification::Priority priority)
 {
     MythErrorNotification n(msg, from, detail);
     n.SetPriority(priority);
@@ -1177,8 +1183,8 @@ void ShowNotificationError(const QString &msg,
 void ShowNotification(const QString &msg,
                       const QString &from,
                       const QString &detail,
-                      const PNMask priority,
-                      const VNMask visibility)
+                      const VNMask visibility,
+                      const MythNotification::Priority priority)
 {
     MythNotification n(msg, from, detail);
     n.SetPriority(priority);
