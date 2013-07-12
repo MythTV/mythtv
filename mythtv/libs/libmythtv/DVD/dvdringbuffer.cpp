@@ -2013,11 +2013,18 @@ int DVDRingBuffer::GetTrack(uint type)
 
 uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
 {
+    uint8_t numChannels = 0u;
+
     int physical = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
-    unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
-    if (channels == 0xff)
-        return 0;
-    return (uint8_t)channels;
+
+    if (physical >= 0)
+    {
+        unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
+        if (channels != 0xff)
+            numChannels = (uint8_t)channels;
+    }
+
+    return numChannels;
 }
 
 /** \brief Get the dvd title and serial num
