@@ -2171,6 +2171,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HandleStateChange(%1) -- begin")
             .arg(find_player_index(ctx)));
 
+    if (!ctx)   // can never happen, but keep coverity happy
+        return;
+
     if (ctx->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -2408,7 +2411,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         {
             SET_LAST();
             SetErrored(ctx);
-            if (ctx && ctx->IsPlayerErrored())
+            if (ctx->IsPlayerErrored())
             {
                 ShowNotificationError(ctx->player->GetError(),
                                       _Location,
