@@ -191,6 +191,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
 
     go7007 = false;
     resetcapture = false;
+    memset(&mpa_picture, 0, sizeof(mpa_picture));
 
     SetPositionMapType(MARK_KEYFRAME);
 }
