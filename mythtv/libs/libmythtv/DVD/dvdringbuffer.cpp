@@ -79,8 +79,10 @@ bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
     return true;
 }
 
-MythDVDContext::MythDVDContext() :
-    ReferenceCounter("MythDVDContext")
+MythDVDContext::MythDVDContext(const dsi_t* dsi, const pci_t* pci) :
+    ReferenceCounter("MythDVDContext"),
+    m_dsi(*dsi),
+    m_pci(*pci)
 {
 }
 
@@ -440,9 +442,10 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             .arg(fname.constData()));
 
     if (m_context)
+    {
         m_context->DecrRef();
-
-    m_context = new MythDVDContext();
+        m_context = NULL;
+    }
 
     // Set preferred languages
     QString lang = gCoreContext->GetSetting("Language").section('_', 0, 0);
@@ -522,9 +525,10 @@ bool DVDRingBuffer::StartFromBeginning(void)
 
     QMutexLocker contextLocker(&m_contextLock);
     if (m_context)
+    {
         m_context->DecrRef();
-
-    m_context = new MythDVDContext();
+        m_context = NULL;
+    }
 
     return m_dvdnav;
 }
@@ -929,24 +933,22 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 }
                 else
                 {
+                    pci_t pci_copy = *pci;
+
+                    pci_copy.pci_gi.vobu_s_ptm = AdjustTimestamp(pci->pci_gi.vobu_s_ptm);
+                    pci_copy.pci_gi.vobu_e_ptm = AdjustTimestamp(pci->pci_gi.vobu_e_ptm);
+
+                    if (pci->pci_gi.vobu_se_e_ptm != 0)
+                        pci_copy.pci_gi.vobu_se_e_ptm = AdjustTimestamp(pci->pci_gi.vobu_se_e_ptm);
+
                     QMutexLocker contextLocker(&m_contextLock);
                     if (m_context)
                         m_context->DecrRef();
 
-                    m_context = new MythDVDContext();
-
-                    m_context->m_pci = *pci;
-
-                    m_context->m_pci.pci_gi.vobu_s_ptm = AdjustTimestamp(m_context->m_pci.pci_gi.vobu_s_ptm);
-                    m_context->m_pci.pci_gi.vobu_e_ptm = AdjustTimestamp(m_context->m_pci.pci_gi.vobu_e_ptm);
-
-                    if (pci->pci_gi.vobu_se_e_ptm != 0)
-                        m_context->m_pci.pci_gi.vobu_se_e_ptm = AdjustTimestamp(m_context->m_pci.pci_gi.vobu_se_e_ptm);
+                    m_context = new MythDVDContext(dsi, &pci_copy);
 
                     // get the latest nav
                     m_lastNav = (dvdnav_t *)blockBuf;
-
-                    m_context->m_dsi = *dsi;
 
                     if (m_inMenu != lastInMenu)
                     {
