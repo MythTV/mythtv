@@ -95,7 +95,8 @@ static void loadMusic()
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = QObject::tr("Loading Music. Please wait ...");
+    QString message = qApp->translate("(MythMusicMain)", 
+                                      "Loading Music. Please wait ...");
 
     MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
                                                   "musicscanbusydialog");
@@ -195,8 +196,9 @@ static void startRipper(void)
         delete rip;
 
 #else
-    ShowOkPopup(QObject::tr("MythMusic hasn't been built with libcdio support "
-                            "so ripping CD's is not possible"));
+    ShowOkPopup(qApp->translate("(MythMusicMain)", 
+                                "MythMusic hasn't been built with libcdio "
+                                "support so ripping CD's is not possible"));
 #endif
 }
 
@@ -205,15 +207,20 @@ static void runScan(void)
     // if we don't have a valid start dir warn the user and give up
     if (getMusicDirectory().isEmpty())
     {
-        ShowOkPopup(QObject::tr("You need to tell me where to find your music on the "
-                                "'General Settings' page of MythMusic's settings pages."));
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "You need to tell me where to find your "
+                                    "music on the 'General Settings' page of "
+                                    "MythMusic's settings pages."));
        return;
     }
 
     if (!QFile::exists(getMusicDirectory()))
     {
-        ShowOkPopup(QObject::tr("Can't find your music directory. Have you set it correctly on the "
-                                "'General Settings' page of MythMusic's settings pages?"));
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "Can't find your music directory. Have "
+                                    "you set it correctly on the 'General "
+                                    "Settings' page of MythMusic's settings "
+                                    "pages?"));
        return;
     }
 
@@ -509,7 +516,8 @@ static void handleCDMedia(MythMediaDevice *cd)
                     parenttitle += track->Album();
                 else
                 {
-                    parenttitle = " " + QObject::tr("Unknown");
+                    parenttitle = " " + qApp->translate("(MythMusicMain)", 
+                                                        "Unknown");
                     LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
                     " CD. It may not be in the freedb database.\n"
                     "    More likely, however, is that you need to delete\n"
