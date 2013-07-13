@@ -106,11 +106,15 @@ MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device
                                    RenderType type)
   : QGLContext(format, device), MythRender(type)
 {
+    ResetVars();
+    ResetProcs();
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, RenderType type)
   : QGLContext(format), MythRender(type)
 {
+    ResetVars();
+    ResetProcs();
 }
 
 MythRenderOpenGL::~MythRenderOpenGL()
