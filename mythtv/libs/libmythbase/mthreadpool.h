@@ -39,9 +39,6 @@ class MBASE_PUBLIC MThreadPool
 
     int activeThreadCount(void) const;
 
-    //void reserveThread(void) MDEPRECATED;
-    //void releaseThread(void) MDEPRECATED;
-
     void waitForDone(void);
 
   private:
