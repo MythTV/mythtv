@@ -1017,10 +1017,10 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 {
     QDateTime now = MythDate::current();
 
-    if (m_lastCheck.isValid() && now < m_lastCheck)
+    if (!GetNotificationCenter() || !m_ui || !m_ui->IsScreenSetup())
         return;
 
-    if (!GetNotificationCenter())
+    if (m_lastCheck.isValid() && now < m_lastCheck)
         return;
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s

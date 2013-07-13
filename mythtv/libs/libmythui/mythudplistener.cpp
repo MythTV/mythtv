@@ -111,7 +111,7 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
     QString extra = "";
     QString progress_text = "";
     float progress = -1.0f;
-    bool fullscreen;
+    bool fullscreen = false;
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())

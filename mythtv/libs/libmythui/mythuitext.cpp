@@ -169,25 +169,30 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
                                              QCoreApplication::UnicodeUTF8);
 
         QString tempString = translatedTemplate;
+        bool replaced = map.contains(objectName());
 
         while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
         {
             QString key = regexp.cap(4).toLower().trimmed();
             QString replacement;
 
-            if (!map.value(key).isEmpty())
+            if (map.contains(key))
             {
                 replacement = QString("%1%2%3%4")
                               .arg(regexp.cap(2))
                               .arg(regexp.cap(3))
                               .arg(map.value(key))
                               .arg(regexp.cap(6));
+                replaced = true;
             }
 
             tempString.replace(regexp.cap(0), replacement);
             pos += regexp.matchedLength();
         }
-        SetText(tempString);
+        if (replaced)
+        {
+            SetText(tempString);
+        }
     }
     else if (map.contains(objectName()))
     {

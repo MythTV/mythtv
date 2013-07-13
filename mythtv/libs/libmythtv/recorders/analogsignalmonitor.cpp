@@ -14,7 +14,7 @@
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
 
-#define LOC QString("AnalogSM[%1](%2): ") \
+#define LOC QString("AnalogSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 AnalogSignalMonitor::AnalogSignalMonitor(

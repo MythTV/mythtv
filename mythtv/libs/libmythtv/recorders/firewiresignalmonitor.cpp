@@ -13,7 +13,7 @@
 #include "firewiresignalmonitor.h"
 #include "mythlogging.h"
 
-#define LOC QString("FireSM[%1](%2): ") \
+#define LOC QString("FireSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 void FirewireTableMonitorThread::run(void)

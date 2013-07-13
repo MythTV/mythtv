@@ -251,6 +251,7 @@ void MythRenderOpenGL2::ResetProcs(void)
     m_glAttachShader = NULL;
     m_glLinkProgram = NULL;
     m_glUseProgram = NULL;
+    m_glDeleteProgram = NULL;
     m_glGetProgramInfoLog = NULL;
     m_glGetProgramiv = NULL;
     m_glDetachShader = NULL;

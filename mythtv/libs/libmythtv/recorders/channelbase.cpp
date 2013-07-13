@@ -248,7 +248,7 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
     }
 
     uint mplexid_restriction = 0;
-    IsInputAvailable(m_currentInputID, mplexid_restriction);
+    (void)IsInputAvailable(m_currentInputID, mplexid_restriction);
 
     return ChannelUtil::GetNextChannel(
         m_allchannels, chanid, mplexid_restriction, direction);

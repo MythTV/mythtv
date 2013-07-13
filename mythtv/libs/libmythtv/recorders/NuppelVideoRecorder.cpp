@@ -191,6 +191,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
 
     go7007 = false;
     resetcapture = false;
+    memset(&mpa_picture, 0, sizeof(mpa_picture));
 
     SetPositionMapType(MARK_KEYFRAME);
 }
@@ -1620,6 +1621,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         if (!convert_ctx)
         {
             _error = "Cannot initialize image conversion context";
+            av_free(output_buffer);
             LOG(VB_GENERAL, LOG_ERR, LOC + _error);
             return;
         }
@@ -2950,6 +2952,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (!hardware_encode)
         {
             AVPacket packet;
+            av_init_packet(&packet);
             packet.data = (uint8_t *)strm;
             packet.size = len;
 

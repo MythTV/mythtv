@@ -2738,6 +2738,34 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
     return used;
 }
 
+/**
+ * returns an estimated duration in ms for size amount of data
+ * returns 0 if we can't estimate the duration
+ */
+int HLSRingBuffer::DurationForBytes(uint size)
+{
+    int segnum = m_playback->Segment();
+    int stream = m_streamworker->StreamForSegment(segnum);
+    if (stream < 0)
+    {
+        return 0;
+    }
+    HLSStream *hls = GetStream(stream);
+    if (hls == NULL)
+    {
+        return 0;
+    }
+    HLSSegment *segment = hls->GetSegment(segnum);
+    if (segment == NULL)
+    {
+        return 0;
+    }
+    uint64_t byterate = (uint64_t)(((double)segment->Size()) /
+                                   ((double)segment->Duration()));
+
+    return (int)((size * 1000.0) / byterate);
+}
+
 long long HLSRingBuffer::GetRealFileSize(void) const
 {
     QReadLocker lock(&rwlock);

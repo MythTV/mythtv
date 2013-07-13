@@ -63,6 +63,7 @@ public:
     int Read(void *data, uint i_read) { return safe_read(data, i_read); }
     void Interrupt(void);
     void Continue(void);
+    int DurationForBytes(uint size);
 
 protected:
     virtual int safe_read(void *data, uint i_read);

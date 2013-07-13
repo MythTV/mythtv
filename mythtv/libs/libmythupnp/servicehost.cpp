@@ -25,6 +25,7 @@
 
 MethodInfo::MethodInfo()
 {
+    m_nMethodIndex = 0;
     m_eRequestType = (RequestType)(RequestTypeGet | RequestTypePost |
                                    RequestTypeHead);
 }

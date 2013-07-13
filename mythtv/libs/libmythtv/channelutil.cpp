@@ -2378,8 +2378,14 @@ uint ChannelUtil::GetNextChannel(
         do
         {
             if (it == sorted.begin())
+            {
                 it = find(sorted.begin(), sorted.end(),
                           sorted.rbegin()->chanid);
+                if (it == sorted.end())
+                {
+                    --it;
+                }
+            }
             else
                 --it;
         }
