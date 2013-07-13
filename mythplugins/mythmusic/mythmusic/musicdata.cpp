@@ -49,7 +49,7 @@ void MusicData::reloadMusic(void)
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = QObject::tr("Rebuilding music tree");
+    QString message = tr("Rebuilding music tree");
 
     MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
                                                   "musicscanbusydialog");

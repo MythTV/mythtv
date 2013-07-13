@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QEvent>
 #include <QMutex>
+#include <QCoreApplication>
 
 #include "config.h"
 
@@ -123,6 +124,8 @@ public:
 
 class CdDecoderFactory : public DecoderFactory
 {
+    Q_DECLARE_TR_FUNCTIONS(CdDecoderFactory)
+
 public:
     bool supports(const QString &) const;
     const QString &extension() const;
@@ -132,6 +135,8 @@ public:
 
 class avfDecoderFactory : public DecoderFactory
 {
+    Q_DECLARE_TR_FUNCTIONS(avfDecoderFactory)
+
 public:
     bool supports(const QString &) const;
     const QString &extension() const;

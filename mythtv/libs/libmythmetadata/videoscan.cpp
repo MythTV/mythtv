@@ -168,7 +168,7 @@ void VideoScannerThread::run()
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_directories.size(),
-                          QObject::tr("Searching for video files"));
+                          tr("Searching for video files"));
     for (QStringList::const_iterator iter = m_directories.begin();
          iter != m_directories.end(); ++iter)
     {
@@ -245,7 +245,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
 
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
-                          QObject::tr("Verifying video files"));
+                          tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
     for (VideoMetadataListManager::metadata_list::const_iterator p =
@@ -301,7 +301,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
     uint counter = 0;
     if (m_HasGUI)
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
-                          QObject::tr("Updating video database"));
+                          tr("Updating video database"));
 
     for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
     {

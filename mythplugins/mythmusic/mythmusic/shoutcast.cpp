@@ -862,8 +862,8 @@ void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
         doConnectDecoder("create-aac-decoder.aac");
     else
     {
-        doFailed(QObject::tr("Unsupported content type for ShoutCast stream: %1")
-                             .arg (response.getContent()));
+        doFailed(tr("Unsupported content type for ShoutCast stream: %1")
+                    .arg (response.getContent()));
     }
 
     m_timer->disconnect();

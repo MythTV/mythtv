@@ -1,6 +1,12 @@
 #ifndef OSD_H
 #define OSD_H
 
+// Qt headers
+
+#include <QCoreApplication>
+
+// MythTV headers
+
 #include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"
@@ -122,6 +128,8 @@ class MythOSDWindow : public MythScreenType
 
 class OSD
 {
+    Q_DECLARE_TR_FUNCTIONS(OSD)
+
   public:
     OSD(MythPlayer *player, QObject *parent, MythPainter *painter);
    ~OSD();

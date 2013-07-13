@@ -1,6 +1,8 @@
 #ifndef _PLAYLIST_CONTAINER_H_
 #define _PLAYLIST_CONTAINER_H_
 
+#include <QCoreApplication>
+
 #include "mthread.h"
 
 #include "playlist.h"
@@ -19,6 +21,8 @@ class PlaylistLoadingThread : public MThread
 
 class PlaylistContainer
 {
+    Q_DECLARE_TR_FUNCTIONS(PlaylistContainer)
+
   public:
     PlaylistContainer(AllMusic *all_music);
    ~PlaylistContainer();

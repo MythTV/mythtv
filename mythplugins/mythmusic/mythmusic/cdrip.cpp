@@ -654,7 +654,7 @@ void Ripper::startScanCD(void)
     if (m_scanThread)
         return;
 
-    QString message = QObject::tr("Scanning CD. Please Wait ...");
+    QString message = tr("Scanning CD. Please Wait ...");
     OpenBusyPopup(message);
 
     m_scanThread = new CDScannerThread(this);

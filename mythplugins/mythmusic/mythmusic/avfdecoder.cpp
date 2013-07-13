@@ -559,7 +559,7 @@ const QString &avfDecoderFactory::extension() const
 
 const QString &avfDecoderFactory::description() const
 {
-    static QString desc(QObject::tr("Internal Decoder"));
+    static QString desc(tr("Internal Decoder"));
     return desc;
 }
 
