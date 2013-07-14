@@ -219,7 +219,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QGLContext, public MythRender
     GLuint                       m_fence;
 
     // Locking
-    QMutex  *m_lock;
+    QMutex   m_lock;
     int      m_lock_level;
 
     // profile

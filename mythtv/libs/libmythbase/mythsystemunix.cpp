@@ -570,9 +570,14 @@ void MythSystemLegacySignalManager::run(void)
  ******************************/
 
 MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
-    MythSystemLegacyPrivate("MythSystemLegacyUnix")
+    MythSystemLegacyPrivate("MythSystemLegacyUnix"),
+    m_pid(0), m_timeout(0)
 {
     m_parent = parent;
+
+    m_stdpipe[0] = -1;
+    m_stdpipe[1] = -1;
+    m_stdpipe[2] = -1;
 
     connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
     connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
