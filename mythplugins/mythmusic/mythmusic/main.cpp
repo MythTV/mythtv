@@ -196,9 +196,9 @@ static void startRipper(void)
         delete rip;
 
 #else
-    ShowOkPopup(qApp->translate("(MythMusicMain)", 
+    ShowOkPopup(qApp->translate("(MythMusicMain)",
                                 "MythMusic hasn't been built with libcdio "
-                                "support so ripping CD's is not possible"));
+                                "support so ripping CDs is not possible"));
 #endif
 }
 
