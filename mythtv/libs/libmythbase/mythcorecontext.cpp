@@ -113,6 +113,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_locale(NULL),
       m_scheduler(NULL),
       m_blockingClient(false),
+      m_inwanting(false),
+      m_intvwanting(false),
       m_pluginmanager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
