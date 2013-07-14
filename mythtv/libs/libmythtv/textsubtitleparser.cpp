@@ -16,6 +16,7 @@ using std::lower_bound;
 // Qt
 #include <QRunnable>
 #include <QTextCodec>
+#include <QFile>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -77,6 +78,76 @@ class SubtitleLoadHelper : public QRunnable
 QMutex                    SubtitleLoadHelper::s_lock;
 QWaitCondition            SubtitleLoadHelper::s_wait;
 QMap<TextSubtitles*,uint> SubtitleLoadHelper::s_loading;
+
+// Work around the fact that RemoteFile doesn't work when the target
+// file is actually local.
+class RemoteFileWrapper
+{
+public:
+    RemoteFileWrapper(const QString &filename) {
+        // This test stolen from FileRingBuffer::OpenFile()
+        bool is_local =
+            (!filename.startsWith("/dev")) &&
+            ((filename.startsWith("/")) || QFile::exists(filename));
+        m_isRemote = !is_local;
+        if (m_isRemote)
+        {
+            m_localFile = NULL;
+            m_remoteFile = new RemoteFile(filename, false, false, 0);
+        }
+        else
+        {
+            m_remoteFile = NULL;
+            m_localFile = new QFile(filename);
+            if (!m_localFile->open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                delete m_localFile;
+                m_localFile = NULL;
+            }
+        }
+    }
+    ~RemoteFileWrapper() {
+        if (m_remoteFile)
+            delete m_remoteFile;
+        if (m_localFile)
+            delete m_localFile;
+    }
+    bool isOpen(void) const {
+        if (m_isRemote)
+            return m_remoteFile->isOpen();
+        else
+            return m_localFile;
+    }
+    long long GetFileSize(void) const {
+        if (m_isRemote)
+            return m_remoteFile->GetFileSize();
+        else
+        {
+            if (m_localFile)
+                return m_localFile->size();
+            else
+                return 0;
+        }
+    }
+    int Read(void *data, int size) {
+        if (m_isRemote)
+            return m_remoteFile->Read(data, size);
+        else
+        {
+            if (m_localFile)
+            {
+                QDataStream stream(m_localFile);
+                return stream.readRawData(static_cast<char*>(data), size);
+            }
+            else
+                return 0;
+        }
+    }
+private:
+    bool m_isRemote;
+    RemoteFile *m_remoteFile;
+    QFile *m_localFile;
+};
 
 static bool operator<(const text_subtitle_t& left,
                       const text_subtitle_t& right)
@@ -212,7 +283,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         return;
     }
     demux_sputext_t sub_data;
-    RemoteFile rfile(fileName, false, false, 0);
+    RemoteFileWrapper rfile(fileName/*, false, false, 0*/);
 
     LOG(VB_VBI, LOG_INFO,
         QString("Preparing to load subtitle file (%1)").arg(fileName));
@@ -225,7 +296,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     target.SetHasSubtitles(true);
     target.SetFilename(fileName);
 
-    // Only reload if rfile.GetRealFileSize() has changed.
+    // Only reload if rfile.GetFileSize() has changed.
     off_t new_len = rfile.GetFileSize();
     if (target.GetByteCount() == new_len)
     {

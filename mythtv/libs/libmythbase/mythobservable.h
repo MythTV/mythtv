@@ -19,8 +19,6 @@ class MBASE_PUBLIC MythObservable
 
     void dispatch(const MythEvent &event);
 
-    void dispatchNow(const MythEvent &event); // MDEPRECATED;
-
     bool hasListeners(void) { return !m_listeners.isEmpty(); }
 
   protected:

@@ -43,6 +43,10 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     int      GetFPS()               const { return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25; }
 
   protected:
+    MythDVDContext(const dsi_t& dsi, const pci_t& pci);
+
+  private:
+    // Default constructor should not be called
     MythDVDContext();
 
   protected:

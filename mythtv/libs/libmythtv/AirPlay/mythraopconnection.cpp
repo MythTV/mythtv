@@ -83,7 +83,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_clockSkew(0),
     m_audioTimer(NULL),
     m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
-    m_firstsend(false)
+    m_firstsend(false),    m_playbackStarted(false)
 {
     m_id = MythUINotificationCenter::GetInstance()->Register(this);
 }
@@ -182,6 +182,11 @@ void MythRAOPConnection::CleanUp(void)
 
     // close audio device
     CloseAudioDevice();
+    // Tell listeners we're done
+    if (m_playbackStarted)
+    {
+        gCoreContext->emitTVPlaybackStopped();
+    }
 }
 
 bool MythRAOPConnection::Init(void)
@@ -1123,6 +1128,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             // New client is trying to play audio, disconnect all the other clients
             ((MythRAOPDevice*)parent())->DeleteAllClients(this);
             gCoreContext->WantingPlayback(parent());
+            m_playbackStarted = true;
 
             int control_port = 0;
             int timing_port = 0;

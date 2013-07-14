@@ -330,7 +330,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
         if (context)
             m_contextList.append(context);
 
-        if (m_curContext == NULL)
+        if ((m_curContext == NULL) && (m_contextList.size() > 0))
         {
             // If we don't have a current context, use
             // the first in the list

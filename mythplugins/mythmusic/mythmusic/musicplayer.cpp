@@ -102,6 +102,9 @@ MusicPlayer::MusicPlayer(QObject *parent)
     loadSettings();
 
     gCoreContext->addListener(this);
+    gCoreContext->RegisterForPlayback(this, SLOT(StopPlayback()));
+    connect(gCoreContext, SIGNAL(TVPlaybackStopped()), this, SLOT(StartPlayback()));
+    connect(gCoreContext, SIGNAL(TVPlaybackAborted()), this, SLOT(StartPlayback()));
 }
 
 MusicPlayer::~MusicPlayer()
@@ -110,6 +113,7 @@ MusicPlayer::~MusicPlayer()
         savePosition();
 
     gCoreContext->removeListener(this);
+    gCoreContext->UnregisterForPlayback(this);
 
     stop(true);
 
@@ -502,6 +506,30 @@ void MusicPlayer::nextAuto(void)
     }
 }
 
+void MusicPlayer::StartPlayback(void)
+{
+    if (!gCoreContext->InWantingPlayback() && m_wasPlaying)
+    {
+        play();
+        seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
+        gCoreContext->SaveSetting("MusicBookmark", "");
+        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+
+        m_wasPlaying = false;
+    }
+}
+
+void MusicPlayer::StopPlayback(void)
+{
+    if (m_isPlaying)
+    {
+        m_wasPlaying = m_isPlaying;
+
+        savePosition();
+        stop(true);
+    }
+}
+
 void MusicPlayer::customEvent(QEvent *event)
 {
     // handle decoderHandler events
@@ -552,36 +580,7 @@ void MusicPlayer::customEvent(QEvent *event)
         if (!me)
             return;
 
-        if (me->Message().left(14) == "PLAYBACK_START")
-        {
-            m_wasPlaying = m_isPlaying;
-            QString hostname = me->Message().mid(15);
-
-            if (hostname == gCoreContext->GetHostName())
-            {
-                if (m_isPlaying)
-                    savePosition();
-                stop(true);
-            }
-        }
-        else if (me->Message().left(12) == "PLAYBACK_END")
-        {
-            if (m_wasPlaying)
-            {
-                QString hostname = me->Message().mid(13);
-                if (hostname == gCoreContext->GetHostName())
-                {
-                    play();
-                    seek(gCoreContext->GetNumSetting(
-                                "MusicBookmarkPosition", 0));
-                    gCoreContext->SaveSetting("MusicBookmark", "");
-                    gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
-                }
-
-                m_wasPlaying = false;
-            }
-        }
-        else if (me->Message().left(13) == "MUSIC_COMMAND")
+        if (me->Message().left(13) == "MUSIC_COMMAND")
         {
             QStringList list = me->Message().simplified().split(' ');
 

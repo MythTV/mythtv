@@ -488,6 +488,9 @@ UnzipPrivate::UnzipPrivate()
 	headers = 0;
 	device = 0;
 
+    memset(buffer1, 0, sizeof(buffer1));
+    memset(buffer2, 0, sizeof(buffer2));
+
 	uBuffer = (unsigned char*) buffer1;
 	crcTable = (quint32*) get_crc_table();
 

@@ -90,7 +90,9 @@ class MythCoreContextPrivate : public QObject
 
     QMap<QObject *, QByteArray> m_playbackClients;
     QMutex m_playbackLock;
-    
+    bool m_inwanting;
+    bool m_intvwanting;
+
     MythPluginManager *m_pluginmanager;
 };
 
@@ -111,6 +113,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_locale(NULL),
       m_scheduler(NULL),
       m_blockingClient(false),
+      m_inwanting(false),
+      m_intvwanting(false),
       m_pluginmanager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
@@ -1227,13 +1231,6 @@ void MythCoreContext::dispatch(const MythEvent &event)
     MythObservable::dispatch(event);
 }
 
-void MythCoreContext::dispatchNow(const MythEvent &event)
-{
-    LOG(VB_NETWORK, LOG_INFO, QString("MythEvent: %1").arg(event.Message()));
-
-    MythObservable::dispatchNow(event);
-}
-
 void MythCoreContext::SetLocalHostname(const QString &hostname)
 {
     QMutexLocker locker(&d->m_localHostLock);
@@ -1397,6 +1394,9 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
  */
 void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
 {
+    if (!sender || !method)
+        return;
+
     QMutexLocker lock(&d->m_playbackLock);
 
     if (!d->m_playbackClients.contains(sender))
@@ -1438,20 +1438,94 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     QMutexLocker lock(&d->m_playbackLock);
     QByteArray ba;
     const char *method = NULL;
+    d->m_inwanting = true;
 
+    // If any registered client are in the same thread, they will deadlock, so rebuild
+    // connections for any clients in the same thread as non-blocking connection
+    QThread *currentThread = QThread::currentThread();
+
+    QMap<QObject *, QByteArray>::iterator it = d->m_playbackClients.begin();
+    for (; it != d->m_playbackClients.end(); ++it)
+    {
+        if (it.key() == sender)
+            continue;   // will be done separately, no need to do it again
+
+        QThread *thread = it.key()->thread();
+
+        if (thread != currentThread)
+            continue;
+
+        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
+        connect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
+    }
+
+    // disconnect sender so it won't receive the message
     if (d->m_playbackClients.contains(sender))
     {
         ba = d->m_playbackClients.value(sender);
         method = ba.constData();
         disconnect(this, SIGNAL(TVPlaybackAboutToStart()), sender, method);
     }
+
+    // emit signal
     emit TVPlaybackAboutToStart();
+
+    // reconnect sender
     if (method)
     {
         connect(this, SIGNAL(TVPlaybackAboutToStart()),
                 sender, method,
                 Qt::BlockingQueuedConnection);
     }
+    // Restore blocking connections
+    for (; it != d->m_playbackClients.end(); ++it)
+    {
+        if (it.key() == sender)
+            continue;   // already done above, no need to do it again
+
+        QThread *thread = it.key()->thread();
+
+        if (thread != currentThread)
+            continue;
+
+        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
+        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+                it.key(), it.value(), Qt::BlockingQueuedConnection);
+    }
+    d->m_inwanting = false;
+}
+
+/**
+ * Let the TV class tell us if we was interrupted following a call to
+ * WantingPlayback(). TV playback will later issue a TVPlaybackStopped() signal
+ * which we want to be able to filter
+ */
+void MythCoreContext::TVInWantingPlayback(bool b)
+{
+    // when called, it will be while the m_playbackLock is held
+    // following a call to WantingPlayback
+    d->m_intvwanting = b;
+}
+
+/**
+ * Returns true if a client has requested playback.
+ * this can be used when one of the TVPlayback* is emitted to find out if you
+ * can assume playback has stopped
+ */
+bool MythCoreContext::InWantingPlayback(void)
+{
+    bool locked = d->m_playbackLock.tryLock();
+    bool intvplayback = d->m_intvwanting;
+
+    if (!locked && d->m_inwanting)
+        return true; // we're in the middle of WantingPlayback
+
+    if (!locked)
+        return false;
+
+    d->m_playbackLock.unlock();
+
+    return intvplayback;
 }
 
 bool MythCoreContext::TestPluginVersion(const QString &name,

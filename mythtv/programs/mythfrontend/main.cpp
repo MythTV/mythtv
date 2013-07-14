@@ -746,10 +746,10 @@ static void playDisc()
                 command_string =
                         command_string.replace(QRegExp("%d"), dvd_device);
             }
-            sendPlaybackStart();
+            gCoreContext->emitTVPlaybackStarted();
             GetMythMainWindow()->PauseIdleTimer(true);
             myth_system(command_string);
-            sendPlaybackEnd();
+            gCoreContext->emitTVPlaybackStopped();
             GetMythMainWindow()->PauseIdleTimer(false);
             if (GetMythMainWindow())
             {

@@ -180,6 +180,10 @@ class MusicPlayer : public QObject, public MythObservable
 
     void getBufferStatus(int *bufferAvailable, int *bufferSize);
 
+  public slots:
+    void StartPlayback(void);
+    void StopPlayback(void);
+
   protected:
     void customEvent(QEvent *event);
 

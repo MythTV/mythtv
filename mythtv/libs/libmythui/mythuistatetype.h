@@ -4,7 +4,7 @@
 #include <QString>
 #include <QMap>
 
-#include "mythuitype.h"
+#include "mythuicomposite.h"
 #include "mythimage.h"
 
 /** \class MythUIStateType
@@ -18,7 +18,7 @@
  *
  * \ingroup MythUI_Widgets
  */
-class MUI_PUBLIC MythUIStateType : public MythUIType
+class MUI_PUBLIC MythUIStateType : public MythUIComposite
 {
   public:
     enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.
@@ -50,12 +50,15 @@ class MUI_PUBLIC MythUIStateType : public MythUIType
     virtual void LoadNow(void);
     virtual void RecalculateArea(bool recurse = true);
 
+    virtual void SetTextFromMap(InfoMap &infoMap);
+
   protected:
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
+    virtual void AdjustDependence(void);
 
     QMap<QString, MythUIType *> m_ObjectsByName;
     QMap<int, MythUIType *> m_ObjectsByState;

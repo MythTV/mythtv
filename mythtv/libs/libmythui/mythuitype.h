@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QRegion>
 #include <QMap>
+#include <QHash>
 #include <QList>
 #include <QFont>
 #include <QColor>

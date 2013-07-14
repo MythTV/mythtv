@@ -149,7 +149,7 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
-void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
+void MythUIText::SetTextFromMap(InfoMap &map)
 {
     QString newText = GetTemplateText();
 
@@ -178,12 +178,15 @@ void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
 
             if (map.contains(key))
             {
-                replacement = QString("%1%2%3%4")
-                              .arg(regexp.cap(2))
-                              .arg(regexp.cap(3))
-                              .arg(map.value(key))
-                              .arg(regexp.cap(6));
                 replaced = true;
+            }
+            if (!map.value(key).isEmpty())
+            {
+                replacement = QString("%1%2%3%4")
+                .arg(regexp.cap(2))
+                .arg(regexp.cap(3))
+                .arg(map.value(key))
+                .arg(regexp.cap(6));
             }
 
             tempString.replace(regexp.cap(0), replacement);

@@ -22,6 +22,7 @@
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
 #include "mythuinotificationcenter.h"
+#include "mythuistatetype.h"
 
 // Forward declarations
 class MythUINotificationScreen;
@@ -183,6 +184,7 @@ public:
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
         kStyle      = 1 << 3,
+        kError      = 1 << 4,
         kAll        = ~kNone,
     };
 
@@ -217,6 +219,7 @@ public:
     MythUIText                 *m_extraText;
     MythUIText                 *m_progresstextText;
     MythUIProgressBar          *m_progressBar;
+    MythUIStateType            *m_errorState;
     QDateTime                   m_creation, m_expiry;
     int                         m_index;
     MythPoint                   m_position;

@@ -12,9 +12,6 @@
  *  events to listening QObjects.
  *
  *  MythEvents can be dispatched to all listeners by calling dispatch
- *  or dispatchNow. The former is much preferred as it uses
- *  QCoreApplication::postEvent() while the latter uses the blocking
- *  QCoreApplication::sendEvent().
  *
  *  The name MythObservable is 'wrong', since all the methods refer to
  *  the observers as listeners (ie. addListener), however,
@@ -85,21 +82,3 @@ void MythObservable::dispatch(const MythEvent &event)
     for (; it != m_listeners.end() ; ++it)
         QCoreApplication::postEvent(*it, event.clone());
 }
-
-/** \brief Dispatch an event to all listeners
- *
- *  This sends an event using the current thread, this is
- *  almost always unsafe.
- *
- *  \param event a MythEvent to dispatch.
- *  \deprecated Do not use in new code
- */
-void MythObservable::dispatchNow(const MythEvent &event)
-{
-    QMutexLocker locker(m_lock);
-
-    QSet<QObject*>::const_iterator it = m_listeners.begin();
-    for (; it != m_listeners.end() ; ++it)
-        QCoreApplication::sendEvent(*it, event.clone());
-}
-

@@ -39,7 +39,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     QString GetText(void) const;
     QString GetDefaultText(void) const;
 
-    void SetTextFromMap(QHash<QString, QString> &map);
+    void SetTextFromMap(InfoMap &map);
 
     void SetTemplateText(const QString &text) { m_TemplateText = text; }
     QString GetTemplateText(void) const { return m_TemplateText; }

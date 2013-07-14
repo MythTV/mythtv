@@ -12,10 +12,11 @@
 #include "mythmainwindow.h"
 
 MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIComposite(parent, name)
 {
     m_CurrentState = NULL;
     m_ShowEmpty = true;
+    emit DependChanged(false);
 }
 
 MythUIStateType::~MythUIStateType()
@@ -112,6 +113,7 @@ bool MythUIStateType::DisplayState(const QString &name)
                 m_CurrentState->SetVisible(true);
         }
     }
+    AdjustDependence();
 
     return (m_CurrentState != NULL);
 }
@@ -141,6 +143,7 @@ bool MythUIStateType::DisplayState(StateType type)
                 m_CurrentState->SetVisible(true);
         }
     }
+    AdjustDependence();
 
     return (m_CurrentState != NULL);
 }
@@ -364,3 +367,59 @@ void MythUIStateType::RecalculateArea(bool recurse)
     }
 }
 
+void MythUIStateType::AdjustDependence(void)
+{
+    if (m_CurrentState == NULL || !m_CurrentState->IsVisible())
+    {
+        emit DependChanged(true);
+        return;
+    }
+    QList<MythUIType *> *children = m_CurrentState->GetAllChildren();
+    QList<MythUIType *>::iterator it = children->begin();
+
+    for (; it != children->end(); ++it)
+    {
+        if ((*it)->IsVisible())
+        {
+            emit DependChanged(false);
+            return;
+        }
+    }
+    emit DependChanged(true);
+}
+
+void MythUIStateType::SetTextFromMap(InfoMap &infoMap)
+{
+    if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
+        return;
+
+    QMap<QString, MythUIType *>::Iterator i;
+
+    for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
+    {
+        MythUIType *type = i.value();
+
+        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        if (textType)
+            textType->SetTextFromMap(infoMap);
+
+        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        if (group)
+            group->SetTextFromMap(infoMap);
+    }
+
+    QMap<int, MythUIType *>::Iterator j;
+
+    for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
+    {
+        MythUIType *type = j.value();
+
+        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        if (textType)
+            textType->SetTextFromMap(infoMap);
+
+        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        if (group)
+            group->SetTextFromMap(infoMap);
+    }
+}
