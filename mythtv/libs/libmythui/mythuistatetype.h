@@ -56,6 +56,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
+    virtual void AdjustDependence(void);
 
     QMap<QString, MythUIType *> m_ObjectsByName;
     QMap<int, MythUIType *> m_ObjectsByState;
