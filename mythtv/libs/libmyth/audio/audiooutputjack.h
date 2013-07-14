@@ -1,6 +1,9 @@
 #ifndef AUDIOOUTPUTJACK
 #define AUDIOOUTPUTJACK
 
+// Qt headers
+#include <QCoreApplication>
+
 #include <jack/jack.h>
 #include <jack/statistics.h>
 #include "audiooutputbase.h"
@@ -14,6 +17,8 @@ using namespace std;
 
 class AudioOutputJACK : public AudioOutputBase
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioOutputJACK)
+
   public:
     AudioOutputJACK(const AudioSettings &settings);
     virtual ~AudioOutputJACK();
