@@ -176,6 +176,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void RegisterForPlayback(QObject *sender, const char *method);
     void UnregisterForPlayback(QObject *sender);
     void WantingPlayback(QObject *sender);
+    bool InWantingPlayback(void);
 
     // Plugin related methods
     bool TestPluginVersion(const QString &name, const QString &libversion,
