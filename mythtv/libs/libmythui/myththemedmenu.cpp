@@ -579,7 +579,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
                                       "menu file %1").arg(menuname));
 
         if (menuname != "mainmenu.xml")
-            ShowOkPopup(QObject::tr("MythTV could not locate the menu file %1")
+            ShowOkPopup(tr("MythTV could not locate the menu file %1")
                         .arg(menuname));
         return false;
     }
@@ -596,7 +596,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
         f.close();
 
         if (menuname != "mainmenu.xml")
-            ShowOkPopup(QObject::tr("The menu file %1 is incomplete.")
+            ShowOkPopup(tr("The menu file %1 is incomplete.")
                         .arg(menuname));
         return false;
     }
