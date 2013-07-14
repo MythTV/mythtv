@@ -343,7 +343,7 @@ class MUI_PUBLIC MythErrorNotification : public MythImageNotification
 public:
     MythErrorNotification(const QString &title, const QString &author,
                           const QString &details = QString())
-        : MythNotification(title, author, details), MythImageNotification(New, "error.png")
+        : MythNotification(title, author, details), MythImageNotification(New, QImage())
     {
         SetDuration(10);
     }
