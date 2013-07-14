@@ -16,6 +16,8 @@ typedef QHash<QString,QString> MetadataMap;
 struct meta_dl;
 class META_PUBLIC BlurayMetadata : public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(BlurayMetadata)
+
   public:
     BlurayMetadata(const QString path);
     ~BlurayMetadata();
