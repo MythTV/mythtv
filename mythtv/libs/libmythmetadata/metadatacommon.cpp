@@ -1,4 +1,6 @@
+// Qt headers
 #include <QLocale>
+#include <QCoreApplication>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -437,8 +439,17 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
         m_releasedate, MythDate::kDateFull);
     metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
 
-    metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
-    metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
+    metadataMap["runtime"] = QCoreApplication::translate("(Common)",
+                                                         "%n minute(s)",
+                                                         "",
+                                                         QCoreApplication::UnicodeUTF8,
+                                                         m_runtime);
+
+    metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
+                                                             "%n second(s)",
+                                                             "",
+                                                             QCoreApplication::UnicodeUTF8,
+                                                             m_runtimesecs);
     metadataMap["inetref"] = m_inetref;
     metadataMap["collectionref"] = m_collectionref;
     metadataMap["tmsref"] = m_tmsref;

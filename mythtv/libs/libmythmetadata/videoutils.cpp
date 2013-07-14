@@ -147,7 +147,7 @@ QString GetDisplayLength(int length)
 {
     // The disambiguation string must be an empty string and not a 
     // NULL to get extracted by the Qt tools.
-    return QCoreApplication::translate("(Common)", "%n minutes", "", 
+    return QCoreApplication::translate("(Common)", "%n minute(s)", "", 
                QCoreApplication::UnicodeUTF8, length);
 }
 
