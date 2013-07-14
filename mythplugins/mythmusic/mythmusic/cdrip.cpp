@@ -247,7 +247,7 @@ void CDRipperThread::run(void)
 
     if (LCD *lcd = LCD::Get())
     {
-        QString lcd_tots = QObject::tr("Importing ") + tots;
+        QString lcd_tots = tr("Importing %1").arg(tots);
         QList<LCDTextItem> textItems;
         textItems.append(LCDTextItem(1, ALIGN_CENTERED,
                                          lcd_tots, "Generic", false));
