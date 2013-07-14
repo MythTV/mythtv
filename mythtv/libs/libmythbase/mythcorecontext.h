@@ -162,7 +162,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void ClearOverrideSettingForSession(const QString &key);
 
     void dispatch(const MythEvent &event);
-    void dispatchNow(const MythEvent &event); // MDEPRECATED;
 
     void InitLocale(void);
     void ReInitLocale(void);

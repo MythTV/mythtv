@@ -332,9 +332,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
         curProgram->SetIgnoreBookmark(flags & kStartTVIgnoreBookmark);
     }
 
-    // Must be before Init() otherwise we swallow the PLAYBACK_START event
-    // with the event filter
-    sendPlaybackStart();
     GetMythMainWindow()->PauseIdleTimer(true);
 
     // Initialize TV
@@ -342,7 +339,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed initializing TV");
         ReleaseTV(tv);
-        sendPlaybackEnd();
         GetMythMainWindow()->PauseIdleTimer(false);
         delete curProgram;
         gCoreContext->emitTVPlaybackAborted();
@@ -454,9 +450,9 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->requestDelete;
 
-    gCoreContext->emitTVPlaybackStopped();
-
     ReleaseTV(tv);
+
+    gCoreContext->emitTVPlaybackStopped();
 
     if (curProgram)
     {
@@ -495,7 +491,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
             ss->AddScreen(dlg);
     }
 
-    sendPlaybackEnd();
     GetMythMainWindow()->PauseIdleTimer(false);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- end");

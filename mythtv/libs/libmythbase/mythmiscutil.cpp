@@ -541,18 +541,6 @@ QString getSymlinkTarget(const QString &start_file,
     return (!fi.isSymLink()) ? cur_file : QString::null;
 }
 
-void sendPlaybackStart(void)
-{
-    MythEvent me(QString("PLAYBACK_START %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
-}
-
-void sendPlaybackEnd(void)
-{
-    MythEvent me(QString("PLAYBACK_END %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
-}
-
 bool IsMACAddress(QString MAC)
 {
     QStringList tokens = MAC.split(':');

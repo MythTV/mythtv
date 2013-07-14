@@ -1228,13 +1228,6 @@ void MythCoreContext::dispatch(const MythEvent &event)
     MythObservable::dispatch(event);
 }
 
-void MythCoreContext::dispatchNow(const MythEvent &event)
-{
-    LOG(VB_NETWORK, LOG_INFO, QString("MythEvent: %1").arg(event.Message()));
-
-    MythObservable::dispatchNow(event);
-}
-
 void MythCoreContext::SetLocalHostname(const QString &hostname)
 {
     QMutexLocker locker(&d->m_localHostLock);
