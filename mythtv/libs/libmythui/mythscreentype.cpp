@@ -429,7 +429,7 @@ void MythScreenType::ShowMenu(void)
     // Virtual
 }
 
-static void DoSetTextFromMap(MythUIType *UItype, QHash<QString, QString> &infoMap)
+static void DoSetTextFromMap(MythUIType *UItype, InfoMap &infoMap)
 {
     QList<MythUIType *> *children = UItype->GetAllChildren();
 
@@ -450,12 +450,12 @@ static void DoSetTextFromMap(MythUIType *UItype, QHash<QString, QString> &infoMa
     }
 }
 
-void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
+void MythScreenType::SetTextFromMap(InfoMap &infoMap)
 {
     DoSetTextFromMap((MythUIType*) this, infoMap);
 }
 
-static void DoResetMap(MythUIType *UItype, QHash<QString, QString> &infoMap)
+static void DoResetMap(MythUIType *UItype, InfoMap &infoMap)
 {
     if (infoMap.isEmpty())
         return;
@@ -480,7 +480,7 @@ static void DoResetMap(MythUIType *UItype, QHash<QString, QString> &infoMap)
     }
 }
 
-void MythScreenType::ResetMap(QHash<QString, QString> &infoMap)
+void MythScreenType::ResetMap(InfoMap &infoMap)
 {
     DoResetMap(this, infoMap);
 }

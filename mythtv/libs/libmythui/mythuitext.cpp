@@ -149,7 +149,7 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
-void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
+void MythUIText::SetTextFromMap(InfoMap &map)
 {
     QString newText = GetTemplateText();
 
