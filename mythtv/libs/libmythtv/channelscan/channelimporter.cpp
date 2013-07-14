@@ -1303,12 +1303,11 @@ ChannelImporter::QueryUserDelete(const QString &msg)
             cin >> ret;
             bool ok;
             uint val = QString(ret.c_str()).toUInt(&ok);
-            if (ok && (1 <= val) && (val <= 3))
+            if (ok && (val == 1 || val == 2 || val == 4))
             {
                 action = (1 == val) ? kDeleteAll       : action;
                 action = (2 == val) ? kDeleteInvisibleAll : action;
                 //action = (3 == val) ? kDeleteManual    : action;
-                action = (3 == val) ? kDeleteIgnoreAll : action;
                 action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }
