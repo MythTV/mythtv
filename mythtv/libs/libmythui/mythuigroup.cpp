@@ -2,7 +2,7 @@
 #include "mythuigroup.h"
 
 MythUIGroup::MythUIGroup(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIComposite(parent, name)
 {
 }
 

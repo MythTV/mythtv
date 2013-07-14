@@ -12,7 +12,7 @@
 #include "mythmainwindow.h"
 
 MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name)
+    : MythUIComposite(parent, name)
 {
     m_CurrentState = NULL;
     m_ShowEmpty = true;
@@ -386,4 +386,40 @@ void MythUIStateType::AdjustDependence(void)
         }
     }
     emit DependChanged(true);
+}
+
+void MythUIStateType::SetTextFromMap(InfoMap &infoMap)
+{
+    if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
+        return;
+
+    QMap<QString, MythUIType *>::Iterator i;
+
+    for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
+    {
+        MythUIType *type = i.value();
+
+        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        if (textType)
+            textType->SetTextFromMap(infoMap);
+
+        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        if (group)
+            group->SetTextFromMap(infoMap);
+    }
+
+    QMap<int, MythUIType *>::Iterator j;
+
+    for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
+    {
+        MythUIType *type = j.value();
+
+        MythUIText *textType = dynamic_cast<MythUIText *> (type);
+        if (textType)
+            textType->SetTextFromMap(infoMap);
+
+        MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
+        if (group)
+            group->SetTextFromMap(infoMap);
+    }
 }

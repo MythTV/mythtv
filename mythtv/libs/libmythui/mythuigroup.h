@@ -1,14 +1,14 @@
 #ifndef MYTHUI_GROUP_H_
 #define MYTHUI_GROUP_H_
 
-#include "mythuitype.h"
+#include "mythuicomposite.h"
 
 /** \class MythUIGroup
  *
  * \brief Create a group of widgets.
  * \ingroup MythUI_Widgets
  */
-class MUI_PUBLIC MythUIGroup : public MythUIType
+class MUI_PUBLIC MythUIGroup : public MythUIComposite
 {
 
   public:
