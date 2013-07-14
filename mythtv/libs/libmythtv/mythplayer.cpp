@@ -5108,7 +5108,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream buffer OpenFile failed");
         SetEof(kEofStateImmediate);
-        SetErrored(QObject::tr("Error opening remote stream buffer"));
+        SetErrored(tr("Error opening remote stream buffer"));
         return;
     }
 
@@ -5121,7 +5121,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream OpenFile failed.");
         SetEof(kEofStateImmediate);
-        SetErrored(QObject::tr("Error opening remote stream"));
+        SetErrored(tr("Error opening remote stream"));
         return;
     }
 
