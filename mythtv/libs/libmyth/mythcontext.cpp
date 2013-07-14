@@ -1050,7 +1050,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     if (!m_lastCheck.isValid())
         return;
 
-    MythNotification n(QObject::tr("Backend is online"), _Location);
+    MythErrorNotification n(QObject::tr("Backend is online"), _Location);
     n.SetId(m_registration);
     n.SetParent(this);
     n.SetDuration(5);
