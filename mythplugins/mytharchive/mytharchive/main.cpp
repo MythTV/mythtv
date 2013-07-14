@@ -90,8 +90,9 @@ static bool checkLockFile(const QString &lockFile)
         // Is the process that created the lock still alive?
         if (!checkProcess(lockFile))
         {
-            showWarningDialog(QObject::tr("Found a lock file but the owning process isn't running!\n"
-                                          "Removing stale lock file."));
+            showWarningDialog(qApp->translate("(MythArchiveMain)",
+                "Found a lock file but the owning process isn't running!\n"
+                "Removing stale lock file."));
             if (!file.remove())
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Failed to remove stale lock file - %1")
@@ -208,13 +209,15 @@ static void runTestDVD(void)
 {
     if (!gCoreContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
     {
-        showWarningDialog(QObject::tr("Last run did not create a playable DVD."));
+        showWarningDialog(qApp->translate("(MythArchiveMain)",
+            "Last run did not create a playable DVD."));
         return;
     }
 
     if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
-        showWarningDialog(QObject::tr("Last run failed to create a DVD."));
+        showWarningDialog(qApp->translate("(MythArchiveMain)", 
+                                          "Last run failed to create a DVD."));
         return;
     }
 
