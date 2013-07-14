@@ -91,6 +91,7 @@ class MythCoreContextPrivate : public QObject
     QMap<QObject *, QByteArray> m_playbackClients;
     QMutex m_playbackLock;
     bool m_inwanting;
+    bool m_intvwanting;
 
     MythPluginManager *m_pluginmanager;
 };
@@ -1493,6 +1494,18 @@ void MythCoreContext::WantingPlayback(QObject *sender)
 }
 
 /**
+ * Let the TV class tell us if we was interrupted following a call to
+ * WantingPlayback(). TV playback will later issue a TVPlaybackStopped() signal
+ * which we want to be able to filter
+ */
+void MythCoreContext::TVInWantingPlayback(bool b)
+{
+    // when called, it will be while the m_playbackLock is held
+    // following a call to WantingPlayback
+    d->m_intvwanting = b;
+}
+
+/**
  * Returns true if a client has requested playback.
  * this can be used when one of the TVPlayback* is emitted to find out if you
  * can assume playback has stopped
@@ -1500,13 +1513,17 @@ void MythCoreContext::WantingPlayback(QObject *sender)
 bool MythCoreContext::InWantingPlayback(void)
 {
     bool locked = d->m_playbackLock.tryLock();
+    bool intvplayback = d->m_intvwanting;
 
     if (!locked && d->m_inwanting)
         return true; // we're in the middle of WantingPlayback
+
     if (!locked)
         return false;
+
     d->m_playbackLock.unlock();
-    return false;
+
+    return intvplayback;
 }
 
 bool MythCoreContext::TestPluginVersion(const QString &name,

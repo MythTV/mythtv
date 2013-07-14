@@ -301,6 +301,7 @@ void TV::StopPlayback(void)
         PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
         ReturnPlayerLock(ctx);
+        gCoreContext->TVInWantingPlayback(true);
     }
 }
 
@@ -453,6 +454,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags)
     ReleaseTV(tv);
 
     gCoreContext->emitTVPlaybackStopped();
+    gCoreContext->TVInWantingPlayback(false);
 
     if (curProgram)
     {
@@ -2084,6 +2086,7 @@ int TV::Playback(const ProgramInfo &rcinfo)
     jumpToProgram = false;
     allowRerecord = false;
     requestDelete = false;
+    gCoreContext->TVInWantingPlayback(false);
 
     PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     if (mctx->GetState() != kState_None)

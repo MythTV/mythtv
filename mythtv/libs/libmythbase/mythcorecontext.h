@@ -176,6 +176,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void UnregisterForPlayback(QObject *sender);
     void WantingPlayback(QObject *sender);
     bool InWantingPlayback(void);
+    void TVInWantingPlayback(bool b);
 
     // Plugin related methods
     bool TestPluginVersion(const QString &name, const QString &libversion,
@@ -196,6 +197,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
   signals:
     void TVPlaybackStarted(void);
+    //// TVPlaybackStopped signal should be used in combination with
+    //// InWantingPlayback() and treat it accordingly
     void TVPlaybackStopped(void);
     void TVPlaybackSought(qint64 position);
     void TVPlaybackPaused(void);
