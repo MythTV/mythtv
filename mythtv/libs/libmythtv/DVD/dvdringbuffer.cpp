@@ -1842,11 +1842,23 @@ int DVDRingBuffer::NumMenuButtons(void) const
  */
 uint DVDRingBuffer::GetAudioLanguage(int idx)
 {
+    uint audioLang = 0;
     int physicalStreamId = dvdnav_get_audio_logical_stream(m_dvdnav, idx);
-    uint16_t lang = dvdnav_audio_stream_to_lang(m_dvdnav, physicalStreamId);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("StreamID: %1; lang: %2").arg(idx).arg(lang));
-    return ConvertLangCode(lang);
+
+    if (physicalStreamId >= 0)
+    {
+        uint16_t lang = dvdnav_audio_stream_to_lang(m_dvdnav, physicalStreamId);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("Audio StreamID: %1; lang: %2").arg(idx).arg(lang));
+        audioLang = ConvertLangCode(lang);
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("Audio StreamID: %1 - not found!").arg(idx));
+    }
+
+    return audioLang;
 }
 
 /** \brief get the logical track index (into PGC_AST_CTL) of
