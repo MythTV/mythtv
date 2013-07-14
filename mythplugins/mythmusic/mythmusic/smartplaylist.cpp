@@ -358,7 +358,7 @@ QString SmartPLCriteriaRow::toString(void)
         else
         {
             result = Field + " " + Operator + " " + Value1;
-            result += " " + QObject::tr("and") + " " + Value2;
+            result += " " + tr("and") + " " + Value2;
         }
 
         return result;

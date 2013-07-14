@@ -1540,7 +1540,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
     if (m_image.isNull())
     {
-        drawWarning(p, back, m_size, QObject::tr("?"), 100);
+        drawWarning(p, back, m_size, tr("?"), 100);
         return true;
     }
 
