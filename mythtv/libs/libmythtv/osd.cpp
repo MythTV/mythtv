@@ -914,8 +914,13 @@ void OSD::CheckExpiry(void)
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
                 {
-                    QString replace = tr("%n second(s)", NULL,
-                                         now.secsTo(it.value()));
+                    // The disambiguation string must be an empty string and not a
+                    // NULL to get extracted by the Qt tools.
+                    QString replace = QCoreApplication::translate("(Common)", 
+                                          "%n second(s)", 
+                                          "", 
+                                          QCoreApplication::UnicodeUTF8, 
+                                          now.secsTo(it.value()));
                     dialog->SetText(newtext.replace("%d", replace));
                 }
                 MythConfirmationDialog *cdialog = dynamic_cast<MythConfirmationDialog*>(m_Dialog);

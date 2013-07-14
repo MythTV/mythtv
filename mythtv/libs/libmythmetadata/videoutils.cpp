@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QCoreApplication>
 
 #include "mythcontext.h"
 #include "mythdirs.h"
@@ -14,8 +15,10 @@
 
 namespace
 {
-    const QString VIDEO_COVERFILE_DEFAULT_OLD = QObject::tr("None");
-    const QString VIDEO_COVERFILE_DEFAULT_OLD2 = QObject::tr("No Cover");
+    const QString VIDEO_COVERFILE_DEFAULT_OLD = 
+        QCoreApplication::translate("(VideoUtils)", "None", "No cover");
+    const QString VIDEO_COVERFILE_DEFAULT_OLD2 = 
+        QCoreApplication::translate("(VideoUtils)", "No Cover");
 
     template <typename T>
     void CopySecond(const T &src, QStringList &dest)
@@ -142,22 +145,52 @@ QString GetDisplayUserRating(float userrating)
 
 QString GetDisplayLength(int length)
 {
-    return QString("%1 minutes").arg(length);
+    // The disambiguation string must be an empty string and not a 
+    // NULL to get extracted by the Qt tools.
+    return QCoreApplication::translate("(Common)", "%n minutes", "", 
+               QCoreApplication::UnicodeUTF8, length);
 }
 
 QString GetDisplayBrowse(bool browse)
 {
-    return browse ? QObject::tr("Yes") : QObject::tr("No");
+    QString ret;
+
+    if (browse)
+        ret = QCoreApplication::translate("(Common)", 
+                                           "Yes");
+    else
+        ret = QCoreApplication::translate("(Common)", 
+                                           "No");
+
+    return ret;
 }
 
 QString GetDisplayWatched(bool watched)
 {
-    return watched ? QObject::tr("Yes") : QObject::tr("No");
+    QString ret;
+
+    if (watched)
+        ret = QCoreApplication::translate("(Common)", 
+                                           "Yes");
+    else
+        ret = QCoreApplication::translate("(Common)", 
+                                           "No");
+
+    return ret;
 }
 
 QString GetDisplayProcessed(bool processed)
 {
-    return processed ? QObject::tr("Details Downloaded") : QObject::tr("Waiting for Detail Download");
+    QString ret;
+
+    if (processed)
+        ret = QCoreApplication::translate("(VideoUtils)", 
+                                           "Details Downloaded");
+    else
+        ret = QCoreApplication::translate("(VideoUtils)", 
+                                           "Waiting for Detail Download");
+
+    return ret;
 }
 
 QString GetDisplayYear(int year)
@@ -168,7 +201,7 @@ QString GetDisplayYear(int year)
 QString GetDisplayRating(const QString &rating)
 {
     if (rating == "<NULL>")
-        return QObject::tr("No rating available.");
+        return QCoreApplication::translate("(VideoUtils)", "No rating available.");
     return rating;
 }
 
@@ -198,7 +231,7 @@ QString ParentalLevelToState(const ParentalLevel &level)
     QString ret;
     switch (level.GetLevel())
     {
-         case ParentalLevel::plLowest :
+        case ParentalLevel::plLowest :
             ret = "Lowest";
             break;
         case ParentalLevel::plLow :
