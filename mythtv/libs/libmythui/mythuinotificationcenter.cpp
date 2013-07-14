@@ -46,7 +46,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this)),
+      m_progressBar(NULL),      m_errorState(NULL), m_index(0),
+      m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
 {
@@ -64,7 +65,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_index(0),         m_timer(new QTimer(this)),
+      m_progressBar(NULL),      m_errorState(NULL), m_index(0),
+      m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
 {
@@ -80,7 +82,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_timer(new QTimer(this)),
+      m_progressBar(NULL),      m_errorState(NULL),
+      m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
 {
@@ -102,6 +105,13 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
 {
     bool update = notification.type() == MythNotification::Update;
     m_update = kNone;
+
+    MythErrorNotification *error =
+        dynamic_cast<MythErrorNotification*>(&notification);
+    if (error)
+    {
+        m_update |= kError;
+    }
 
     MythImageNotification *img =
         dynamic_cast<MythImageNotification*>(&notification);
@@ -197,8 +207,6 @@ bool MythUINotificationScreen::Create(void)
     if (!foundtheme) // If we cannot load the theme for any reason ...
         return false;
 
-    // The xml should contain an <imagetype> named 'coverart', if it doesn't
-    // then we cannot display the image and may as well abort
     m_artworkImage      = dynamic_cast<MythUIImage*>(GetChild("image"));
     m_titleText         = dynamic_cast<MythUIText*>(GetChild("title"));
     m_originText        = dynamic_cast<MythUIText*>(GetChild("origin"));
@@ -206,6 +214,7 @@ bool MythUINotificationScreen::Create(void)
     m_extraText         = dynamic_cast<MythUIText*>(GetChild("extra"));
     m_progresstextText  = dynamic_cast<MythUIText*>(GetChild("progress_text"));
     m_progressBar       = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
+    m_errorState        = dynamic_cast<MythUIStateType*>(GetChild("errorstate"));
 
     // store original position
     m_position      = GetPosition();
@@ -319,6 +328,11 @@ void MythUINotificationScreen::Init(void)
     {
         m_progressBar->SetVisible((m_content & kDuration) != 0);
 
+    }
+
+    if (m_errorState)
+    {
+        m_errorState->DisplayState(m_update & kError ? "error" : "ok");
     }
 
     // No field will be refreshed the next time unless specified otherwise
