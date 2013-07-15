@@ -366,9 +366,9 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
             if (line.startsWith("DISCID="))
             {
                 bool isValid = false;
-                ulong discID = value.toULong(&isValid,16);
+                ulong discID2 = value.toULong(&isValid,16);
                 if (isValid)
-                    discID = discID;
+                    discID = discID2;
             }
             else if (line.startsWith("DTITLE="))
             {
