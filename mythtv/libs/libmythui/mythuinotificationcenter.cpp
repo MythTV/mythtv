@@ -46,7 +46,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL), m_index(0),
+      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
+      m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
@@ -65,7 +66,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL), m_index(0),
+      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
+      m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
@@ -82,7 +84,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_created(false),         m_content(kNone),   m_update(kAll),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL),
+      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
       m_priority(MythNotification::kDefault)
@@ -138,6 +140,13 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
         UpdatePlayback(play->GetProgress(), play->GetProgressText());
 
         m_update |= kDuration;
+    }
+
+    MythMediaNotification *media =
+        dynamic_cast<MythMediaNotification*>(&notification);
+    if (media && m_imagePath.isEmpty() && m_image.isNull())
+    {
+        m_update |= kNoArtwork;
     }
 
     if (!notification.GetMetaData().isEmpty())
@@ -215,6 +224,16 @@ bool MythUINotificationScreen::Create(void)
     m_progresstextText  = dynamic_cast<MythUIText*>(GetChild("progress_text"));
     m_progressBar       = dynamic_cast<MythUIProgressBar*>(GetChild("progress"));
     m_errorState        = dynamic_cast<MythUIStateType*>(GetChild("errorstate"));
+    m_mediaState        = dynamic_cast<MythUIStateType*>(GetChild("mediastate"));
+
+    if (m_errorState)
+    {
+        m_errorState->DisplayState(m_content & kError ? "error" : "ok");
+    }
+    if (m_mediaState && (m_update & kImage))
+    {
+        m_mediaState->DisplayState(m_content & kNoArtwork ? "noartwork" : "ok");
+    }
 
     // store original position
     m_position      = GetPosition();
@@ -333,6 +352,10 @@ void MythUINotificationScreen::Init(void)
     if (m_errorState)
     {
         m_errorState->DisplayState(m_update & kError ? "error" : "ok");
+    }
+    if (m_mediaState && (m_update & kImage))
+    {
+        m_mediaState->DisplayState(m_update & kNoArtwork ? "noartwork" : "ok");
     }
 
     // No field will be refreshed the next time unless specified otherwise
