@@ -1,7 +1,3 @@
-#include <iostream>
-#include <set>
-#include <map>
-
 // qt
 #include <QString>
 #include <QMetaType>
@@ -473,7 +469,7 @@ void NetSearch::populateResultList(ResultItem::resultList list)
                     m_searchResultList, title);
         if (item)
         {
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             (*i)->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
 
@@ -731,7 +727,7 @@ void NetSearch::slotItemChanged()
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         item->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -768,7 +764,7 @@ void NetSearch::slotItemChanged()
                        QString(), QStringList(), 0, 0, QString(),
                        0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
