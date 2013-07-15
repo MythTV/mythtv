@@ -1107,7 +1107,10 @@ void MythMainWindow::Init(QString forcedpainter)
     else
         d->m_themeBase = new MythThemeBase();
 
-    d->NC = new MythUINotificationCenter();
+    if (!d->NC)
+    {
+        d->NC = new MythUINotificationCenter();
+    }
 }
 
 void MythMainWindow::InitKeys()
