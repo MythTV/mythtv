@@ -185,6 +185,7 @@ public:
         kMetaData   = 1 << 2,
         kStyle      = 1 << 3,
         kError      = 1 << 4,
+        kNoArtwork  = 1 << 5,
         kAll        = ~kNone,
     };
 
@@ -220,6 +221,7 @@ public:
     MythUIText                 *m_progresstextText;
     MythUIProgressBar          *m_progressBar;
     MythUIStateType            *m_errorState;
+    MythUIStateType            *m_mediaState;
     QDateTime                   m_creation, m_expiry;
     int                         m_index;
     MythPoint                   m_position;
