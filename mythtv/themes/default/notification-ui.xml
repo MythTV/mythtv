@@ -80,6 +80,19 @@
             <area>0,0,100%,100%</area>
         </shape>
 
+        <statetype name="mediastate">
+            <area>0,0,100%,100%</area>
+            <state name="ok"/>
+            <state name="noartwork">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageartwork">
+                    <!-- Artist: Vargas21 http://www.iconarchive.com/show/aquave-metal-icons-by-vargas21/Music-icon.html -->
+                    <filename>noartwork.png</filename>
+                    <area>18,18,144,144</area>
+                </imagetype>
+            </state>
+        </statetype>
+
         <statetype name="errorstate">
             <area>0,0,100%,100%</area>
             <state name="ok"/>
@@ -93,7 +106,7 @@
             </state>
         </statetype>
 
-        <imagetype name="image" depends="!errorstate">
+        <imagetype name="image" depends="!mediastate&amp;!errorstate">
             <filename>damaged.png</filename>
             <area>18,18,144,144</area>
         </imagetype>
