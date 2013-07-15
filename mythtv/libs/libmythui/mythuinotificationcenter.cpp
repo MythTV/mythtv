@@ -320,10 +320,12 @@ bool MythUINotificationScreen::Create(void)
     if (m_errorState)
     {
         m_errorState->DisplayState(m_content & kError ? "error" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set error state to %1").arg(m_content & kError ? "error" : "ok"));
     }
     if (m_mediaState && (m_update & kImage))
     {
         m_mediaState->DisplayState(m_content & kNoArtwork ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set media state to %1").arg(m_content & kNoArtwork ? "noartwork" : "ok"));
     }
 
     // store original position
@@ -443,10 +445,12 @@ void MythUINotificationScreen::Init(void)
     if (m_errorState)
     {
         m_errorState->DisplayState(m_update & kError ? "error" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set error state to %1").arg(m_update & kError ? "error" : "ok"));
     }
     if (m_mediaState && (m_update & kImage))
     {
         m_mediaState->DisplayState(m_update & kNoArtwork ? "noartwork" : "ok");
+        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set media state to %1").arg(m_update & kNoArtwork ? "noartwork" : "ok"));
     }
 
     // No field will be refreshed the next time unless specified otherwise
@@ -566,8 +570,8 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_imagePath     = s.m_imagePath;
     m_title         = s.m_title;
     m_origin        = s.m_origin;
-    m_description         = s.m_description;
-    m_extra        = s.m_extra;
+    m_description   = s.m_description;
+    m_extra         = s.m_extra;
     m_duration      = s.m_duration;
     m_progress      = s.m_progress;
     m_progresstext  = s.m_progresstext;
@@ -579,7 +583,7 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_visibility    = s.m_visibility;
     m_priority      = s.m_priority;
 
-    m_update = kAll; // so all fields are initialised regardless of notification type
+    m_update = m_content; // so all fields are initialised regardless of notification type
 
     return *this;
 }
