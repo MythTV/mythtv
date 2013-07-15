@@ -34,6 +34,8 @@ class ThumbItem;
 
 class ImageView
 {
+     Q_DECLARE_TR_FUNCTIONS(ImageView)
+
   public:
     ImageView(const ThumbList &itemList,
               int *pos, int slideShow, int sortorder);
