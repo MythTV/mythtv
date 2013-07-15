@@ -367,8 +367,13 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
             m_previousbpf = bytes_per_frame;
             bytes_per_frame = source_channels *
                               AudioOutputSettings::SampleSize(FORMAT_FLT);
+            audbuf_timecode = audiotime = frames_buffered = 0;
             waud = raud = 0;
             reset_active.Ref();
+            was_paused = pauseaudio;
+            pauseaudio = true;
+            actually_paused = false;
+            unpause_when_ready = true;
         }
     }
 }
