@@ -260,6 +260,11 @@ public:
         MythScreenStack::CheckDeletes();
     }
 
+    static const int kFadeVal = 20;
+
+    virtual void PopScreen(MythScreenType *screen, bool allowFade = true,
+                           bool deleteScreen = true);
+    virtual MythScreenType *GetTopScreen(void) const;
 private:
     NCPrivate *m_owner;
 

@@ -36,6 +36,97 @@
 QEvent::Type MythUINotificationCenterEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
+//// class MythNotificationScreenStack
+
+void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
+                                            bool deleteScreen)
+{
+    if (!screen || screen->IsDeleting())
+        return;
+
+    bool poppedFullscreen = screen->IsFullscreen();
+
+    screen->aboutToHide();
+
+    if (m_Children.isEmpty())
+        return;
+
+    MythMainWindow *mainwindow = GetMythMainWindow();
+
+    screen->setParent(0);
+    if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
+    {
+        screen->SetFullscreen(false);
+        if (deleteScreen)
+        {
+            screen->SetDeleting(true);
+            m_ToDelete.push_back(screen);
+        }
+        screen->AdjustAlpha(1, -kFadeVal);
+    }
+    else
+    {
+        for (int i = 0; i < m_Children.size(); ++i)
+        {
+            if (m_Children.at(i) == screen)
+            {
+                m_Children.remove(i);
+                break;
+            }
+        }
+        if (deleteScreen)
+            screen->deleteLater();
+
+        screen = NULL;
+    }
+
+    m_topScreen = NULL;
+
+    RecalculateDrawOrder();
+
+    // If we're fading it, we still want to draw it.
+    if (screen && !m_DrawOrder.contains(screen))
+        m_DrawOrder.push_back(screen);
+
+    if (!m_Children.isEmpty())
+    {
+        QVector<MythScreenType *>::Iterator it;
+        for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
+        {
+            if (*it != screen && !(*it)->IsDeleting())
+            {
+                m_topScreen = (*it);
+                (*it)->SetAlpha(255);
+                if (poppedFullscreen)
+                    (*it)->aboutToShow();
+            }
+        }
+    }
+
+    if (m_topScreen)
+    {
+        m_topScreen->SetRedraw();
+    }
+    else
+    {
+        // Screen still needs to be redrawn if we have popped the last screen
+        // off the popup stack, or similar
+        if (mainwindow->GetMainStack())
+        {
+            MythScreenType *mainscreen = mainwindow->GetMainStack()->GetTopScreen();
+            if (mainscreen)
+                mainscreen->SetRedraw();
+        }
+    }
+}
+
+MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
+{
+    if (!m_Children.isEmpty())
+        return m_Children.front();
+    return NULL;
+}
+
 //// class MythUINotificationScreen
 
 MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
