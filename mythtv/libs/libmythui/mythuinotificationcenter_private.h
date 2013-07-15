@@ -176,6 +176,7 @@ public:
     // UI methods
     void AdjustYPosition(void);
     void AdjustIndex(int by, bool set=false);
+    void SetIndex(int value);
     int  GetHeight(void);
 
     enum Content {
@@ -229,6 +230,7 @@ public:
     QString                     m_style;
     VNMask                      m_visibility;
     MythNotification::Priority  m_priority;
+    bool                        m_refresh;
 };
 
 //// class MythScreenNotificationStack

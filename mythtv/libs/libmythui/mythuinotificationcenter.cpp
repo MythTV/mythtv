@@ -141,7 +141,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault)
+      m_priority(MythNotification::kDefault),
+      m_refresh(true)
 {
     // Set timer if need be
     SetSingleShotTimer(m_duration);
@@ -161,7 +162,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault)
+      m_priority(MythNotification::kDefault),
+      m_refresh(true)
 {
     SetNotification(notification);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -178,7 +180,8 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
-      m_priority(MythNotification::kDefault)
+      m_priority(MythNotification::kDefault),
+      m_refresh(true)
 {
     *this = s;
     connect(m_timer, SIGNAL(timeout()), this, SLOT(ProcessTimer()));
@@ -269,6 +272,9 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
 
     // Set timer if need be
     SetSingleShotTimer(m_duration, update);
+
+    // We need to re-run init
+    m_refresh = true;
 }
 
 bool MythUINotificationScreen::Create(void)
@@ -338,6 +344,10 @@ bool MythUINotificationScreen::Create(void)
         // so can be ignored here
         SetVisible(false);
     }
+
+    // We need to re-run init
+    m_refresh = true;
+
     return true;
 }
 
@@ -346,6 +356,9 @@ bool MythUINotificationScreen::Create(void)
  */
 void MythUINotificationScreen::Init(void)
 {
+    if (!m_refresh) // nothing got changed so far, return
+        return;
+
     AdjustYPosition();
 
     if (m_artworkImage && (m_update & kImage))
@@ -436,6 +449,7 @@ void MythUINotificationScreen::Init(void)
             }
         }
     }
+
     if (m_progressBar)
     {
         m_progressBar->SetVisible((m_content & kDuration) != 0);
@@ -461,6 +475,7 @@ void MythUINotificationScreen::Init(void)
         GetScreenStack()->AddScreen(this);
         m_added = true;
     }
+    m_refresh = false;
 }
 
 /**
@@ -470,6 +485,8 @@ void MythUINotificationScreen::Init(void)
 void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 {
     m_image = image;
+    // We need to re-run init
+    m_refresh = true;
 }
 
 /**
@@ -479,6 +496,8 @@ void MythUINotificationScreen::UpdateArtwork(const QImage &image)
 void MythUINotificationScreen::UpdateArtwork(const QString &image)
 {
     m_imagePath = image;
+    // We need to re-run init
+    m_refresh = true;
 }
 
 /**
@@ -511,6 +530,8 @@ void MythUINotificationScreen::UpdateMetaData(const DMAP &data)
     {
         m_extra = tmp;
     }
+    // We need to re-run init
+    m_refresh = true;
 }
 
 /**
@@ -521,6 +542,8 @@ void MythUINotificationScreen::UpdatePlayback(float progress, const QString &tex
 {
     m_progress      = progress;
     m_progresstext  = text;
+    // We need to re-run init
+    m_refresh = true;
 }
 
 /**
@@ -536,6 +559,8 @@ void MythUINotificationScreen::AdjustYPosition(void)
         return;
 
     SetPosition(point);
+    // We need to re-run init
+    m_refresh = true;
 }
 
 void MythUINotificationScreen::AdjustIndex(int by, bool set)
@@ -549,6 +574,18 @@ void MythUINotificationScreen::AdjustIndex(int by, bool set)
         m_index += by;
     }
     AdjustYPosition();
+}
+
+/**
+ * set index, without recalculating coordinates
+ */
+void MythUINotificationScreen::SetIndex(int index)
+{
+    if (index != m_index)
+    {
+        m_refresh = true;
+        m_index = index;
+    }
 }
 
 int MythUINotificationScreen::GetHeight(void)
@@ -565,6 +602,27 @@ void MythUINotificationScreen::ProcessTimer(void)
 
 MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotificationScreen &s)
 {
+    // check if anything have changed
+    m_refresh = !(
+                  m_id == s.m_id &&
+                  m_image == s.m_image &&
+                  m_imagePath == s.m_imagePath &&
+                  m_title == s.m_title &&
+                  m_origin == s.m_origin &&
+                  m_description == s.m_description &&
+                  m_extra == s.m_extra &&
+                  m_duration == s.m_duration &&
+                  m_progress == s.m_progress &&
+                  m_progresstext == s.m_progresstext &&
+                  m_content == s.m_content &&
+                  m_fullscreen == s.m_fullscreen &&
+                  m_expiry == s.m_expiry &&
+                  m_index == s.m_index &&
+                  m_style == s.m_style &&
+                  m_visibility == s.m_visibility &&
+                  m_priority == s.m_priority
+                  );
+
     m_id            = s.m_id;
     m_image         = s.m_image;
     m_imagePath     = s.m_imagePath;
@@ -1142,7 +1200,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
                 *newscreen = *screen;
             }
             newscreen->SetVisible(true);
-            newscreen->m_index = position++;
+            newscreen->SetIndex(position++);
             if (screen->m_fullscreen)
             {
                 position = 0;
