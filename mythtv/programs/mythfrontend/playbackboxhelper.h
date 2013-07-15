@@ -6,12 +6,11 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QMutex>
-#include <QHash>
-#include <QMap>
 
 #include "mythcorecontext.h"
 #include "metadatacommon.h"
 #include "mthread.h"
+#include "mythtypes.h"
 
 class PreviewGenerator;
 class PBHEventHandler;
@@ -66,7 +65,7 @@ class PlaybackBoxHelper : public MThread
     uint64_t            m_freeSpaceUsedMB;
 
     // Artwork Variables //////////////////////////////////////////////////////
-    QHash<QString, QString>    m_artworkCache;
+    InfoMap             m_artworkCache;
 };
 
 #endif // _FREE_SPACE_H_

@@ -9,8 +9,8 @@ public:
     MythUIComposite(QObject *parent, const QString &name);
     virtual ~MythUIComposite() { }
 
-    virtual void SetTextFromMap(InfoMap &infoMap);
-    virtual void ResetMap(InfoMap &infoMap);
+    virtual void SetTextFromMap(const InfoMap &infoMap);
+    virtual void ResetMap(const InfoMap &infoMap);
 };
 
 #endif /* defined(__MythTV__mythuicomposite__) */

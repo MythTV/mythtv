@@ -1600,7 +1600,7 @@ void MusicCommon::customEvent(QEvent *event)
 
                 if (mdata)
                 {
-                    MetadataMap metadataMap;
+                    InfoMap metadataMap;
                     mdata->toMap(metadataMap);
 
                     MythUIButtonListItem *item =
@@ -1660,7 +1660,7 @@ void MusicCommon::customEvent(QEvent *event)
 
                 if (mdata && mdata->ID() == trackID)
                 {
-                    MetadataMap metadataMap;
+                    InfoMap metadataMap;
                     mdata->toMap(metadataMap);
                     item->SetTextFromMap(metadataMap);
 
@@ -1678,7 +1678,7 @@ void MusicCommon::customEvent(QEvent *event)
 
                 if (mdata && mdata->ID() == trackID)
                 {
-                    MetadataMap metadataMap;
+                    InfoMap metadataMap;
                     mdata->toMap(metadataMap);
                     item->SetTextFromMap(metadataMap);
                 }
@@ -1748,7 +1748,7 @@ void MusicCommon::updateVolume(void)
 
     if (m_volumeText)
     {
-        QHash<QString, QString> map;
+        InfoMap map;
         gPlayer->toMap(map);
         m_volumeText->SetTextFromMap(map);
     }
@@ -1782,7 +1782,7 @@ void MusicCommon::updateTrackInfo(MusicMetadata *mdata)
 {
     if (!mdata)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         MusicMetadata metadata;
         metadata.toMap(metadataMap);
         metadata.toMap(metadataMap, "next");
@@ -1811,7 +1811,7 @@ void MusicCommon::updateTrackInfo(MusicMetadata *mdata)
         m_maxTime = mdata->Length() / 1000;
 
     // get map for current track
-    MetadataMap metadataMap;
+    InfoMap metadataMap;
     mdata->toMap(metadataMap);
 
     // add the map from the next track
@@ -1904,7 +1904,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
 
         if (item->GetText() == " ")
         {
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             mdata->toMap(metadataMap);
             item->SetText("");
             item->SetTextFromMap(metadataMap);
@@ -1979,7 +1979,7 @@ void MusicCommon::updateUIPlayedList(void)
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_playedTracksList, "", qVariantFromValue(mdata));
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         mdata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 
@@ -1994,7 +1994,7 @@ void MusicCommon::updatePlaylistStats(void)
 {
     int trackCount = gPlayer->getPlaylist()->getSongs().size();
 
-    QHash<QString, QString> map;
+    InfoMap map;
     if (gPlayer->isPlaying() && trackCount > 0)
     {
         QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
@@ -2671,7 +2671,7 @@ void MythMusicVolumeDialog::updateDisplay()
 
     if (m_volText)
     {
-        QHash<QString, QString> map;
+        InfoMap map;
         gPlayer->toMap(map);
         m_volText->SetTextFromMap(map);
     }
@@ -2695,7 +2695,7 @@ bool TrackInfoDialog::Create(void)
     if (!LoadWindowFromXML("music-ui.xml", "trackdetail_popup", this))
         return false;
 
-    MetadataMap metadataMap;
+    InfoMap metadataMap;
     m_metadata->toMap(metadataMap);
     SetTextFromMap(metadataMap);
 

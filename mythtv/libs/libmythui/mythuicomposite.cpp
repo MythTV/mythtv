@@ -6,7 +6,7 @@ MythUIComposite::MythUIComposite(QObject *parent, const QString &name) :
 {
 }
 
-void MythUIComposite::SetTextFromMap(InfoMap &infoMap)
+void MythUIComposite::SetTextFromMap(const InfoMap &infoMap)
 {
     QList<MythUIType *> *children = GetAllChildren();
     QMutableListIterator<MythUIType *> i(*children);
@@ -25,7 +25,7 @@ void MythUIComposite::SetTextFromMap(InfoMap &infoMap)
     }
 }
 
-void MythUIComposite::ResetMap(InfoMap &infoMap)
+void MythUIComposite::ResetMap(const InfoMap &infoMap)
 {
     if (infoMap.isEmpty())
         return;

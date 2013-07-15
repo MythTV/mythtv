@@ -388,7 +388,7 @@ void MythUIStateType::AdjustDependence(void)
     emit DependChanged(true);
 }
 
-void MythUIStateType::SetTextFromMap(InfoMap &infoMap)
+void MythUIStateType::SetTextFromMap(const InfoMap &infoMap)
 {
     if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
         return;

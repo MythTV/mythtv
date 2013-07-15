@@ -94,7 +94,7 @@ bool BlurayMetadata::ParseDisc(void)
     return true;
 }
 
-void BlurayMetadata::toMap(MetadataMap &metadataMap)
+void BlurayMetadata::toMap(InfoMap &metadataMap)
 {
     metadataMap["title"] = m_title;
     metadataMap["alttitle"] = m_alttitle;

@@ -81,7 +81,7 @@ void ChannelEditor::Probe(void)
     sendResult(2);
 }
 
-void ChannelEditor::SetText(QHash<QString,QString>&map)
+void ChannelEditor::SetText(const InfoMap &map)
 {
     if (map.contains("callsign"))
         m_callsignEdit->SetText(map.value("callsign"));
@@ -93,7 +93,7 @@ void ChannelEditor::SetText(QHash<QString,QString>&map)
         m_xmltvidEdit->SetText(map.value("XMLTV"));
 }
 
-void ChannelEditor::GetText(QHash<QString,QString>&map)
+void ChannelEditor::GetText(InfoMap &map)
 {
     map["callsign"] = m_callsignEdit->GetText();
     map["channum"]  = m_channumEdit->GetText();
@@ -335,7 +335,7 @@ void OSD::LoadWindows(void)
     }
 }
 
-void OSD::SetValues(const QString &window, QHash<QString,int> &map,
+void OSD::SetValues(const QString &window, const QHash<QString,int> &map,
                     OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
@@ -372,7 +372,7 @@ void OSD::SetValues(const QString &window, QHash<QString,int> &map,
         SetExpiry(window, timeout);
 }
 
-void OSD::SetValues(const QString &window, QHash<QString,float> &map,
+void OSD::SetValues(const QString &window, const QHash<QString,float> &map,
                     OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
@@ -391,7 +391,7 @@ void OSD::SetValues(const QString &window, QHash<QString,float> &map,
         SetExpiry(window, timeout);
 }
 
-void OSD::SetText(const QString &window, QHash<QString,QString> &map,
+void OSD::SetText(const QString &window, const InfoMap &map,
                   OSDTimeout timeout)
 {
     MythScreenType *win = GetWindow(window);
@@ -1197,7 +1197,7 @@ void OSD::DialogAddButton(QString text, QVariant data, bool menu, bool current)
         dialog->AddButton(text, data, menu, current);
 }
 
-void OSD::DialogGetText(QHash<QString,QString> &map)
+void OSD::DialogGetText(InfoMap &map)
 {
     ChannelEditor *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
     if (edit)

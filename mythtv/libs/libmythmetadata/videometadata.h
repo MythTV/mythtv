@@ -105,9 +105,9 @@ class META_PUBLIC VideoMetadata
     VideoMetadata(const VideoMetadata &rhs);
     VideoMetadata &operator=(const VideoMetadata &rhs);
 
-    void toMap(MetadataMap &metadataMap);
-    void GetStateMap(MetadataMap &stateMap);
-    void GetImageMap(MetadataMap &imageMap);
+    void toMap(InfoMap &metadataMap);
+    void GetStateMap(InfoMap &stateMap);
+    void GetImageMap(InfoMap &imageMap);
 
     // returns a string to use when sorting
     bool HasSortKey() const;
@@ -253,7 +253,7 @@ class META_PUBLIC VideoMetadata
     class VideoMetadataImp *m_imp;
 };
 
-META_PUBLIC void ClearMap(MetadataMap &metadataMap);
+META_PUBLIC void ClearMap(InfoMap &metadataMap);
 
 META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
 META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);

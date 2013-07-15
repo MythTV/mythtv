@@ -5369,7 +5369,7 @@ void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
     if (!osd)
         return;
 
-    QHash<QString,QString> info;
+    InfoMap info;
     info.insert("message_text", msg);
     osd->SetText("osd_message", info, timeout);
 }

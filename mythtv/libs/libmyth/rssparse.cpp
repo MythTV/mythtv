@@ -67,7 +67,7 @@ ResultItem::~ResultItem()
 {
 }
 
-void ResultItem::toMap(MetadataMap &metadataMap)
+void ResultItem::toMap(InfoMap &metadataMap)
 {
     metadataMap["title"] = m_title;
     metadataMap["subtitle"] = m_subtitle;

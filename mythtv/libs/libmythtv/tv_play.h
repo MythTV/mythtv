@@ -21,7 +21,6 @@ using namespace std;
 #include <QString>
 #include <QEvent>
 #include <QMutex>
-#include <QHash>
 #include <QTime>
 #include <QMap>
 #include <QSet>

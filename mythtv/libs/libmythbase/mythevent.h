@@ -3,8 +3,7 @@
 
 #include <QStringList>
 #include <QEvent>
-#include <QHash>
-
+#include "mythtypes.h"
 #include "mythbaseexp.h"
 
 /** \class MythEvent
@@ -100,9 +99,9 @@ class MBASE_PUBLIC ExternalKeycodeEvent : public QEvent
 class MBASE_PUBLIC UpdateBrowseInfoEvent : public QEvent
 {
   public:
-    UpdateBrowseInfoEvent(const QHash<QString,QString> &infoMap) :
+    UpdateBrowseInfoEvent(const InfoMap &infoMap) :
         QEvent(MythEvent::kUpdateBrowseInfoEventType), im(infoMap) {}
-    QHash<QString,QString> im;
+    InfoMap im;
 };
 
 // TODO combine with UpdateBrowseInfoEvent above
@@ -110,15 +109,15 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
 {
   public:
     MythInfoMapEvent(const QString &lmessage,
-                     const QHash<QString,QString> &linfoMap)
+                     const InfoMap &linfoMap)
       : MythEvent(lmessage), m_infoMap(linfoMap) { }
 
     virtual MythInfoMapEvent *clone() const
         { return new MythInfoMapEvent(Message(), m_infoMap); }
-    const QHash<QString,QString>* InfoMap(void) { return &m_infoMap; }
+    const InfoMap* GetInfoMap(void) { return &m_infoMap; }
 
   private:
-    QHash<QString,QString> m_infoMap;
+    InfoMap m_infoMap;
 };
 
 #endif /* MYTHEVENT_H */

@@ -16,6 +16,7 @@ using namespace std;
 #include <QCoreApplication>
 
 // mythtv
+#include "mythtypes.h"
 #include "mythmetaexp.h"
 #include <mthread.h>
 
@@ -51,8 +52,6 @@ class META_PUBLIC AlbumArtImage
 };
 
 typedef QList<AlbumArtImage*> AlbumArtList;
-typedef QHash<QString,QString> MetadataMap;
-
 
 enum RepoType
 {
@@ -248,7 +247,7 @@ class META_PUBLIC MusicMetadata
     void dumpToDatabase(void);
     void setField(const QString &field, const QString &data);
     void getField(const QString& field, QString *data);
-    void toMap(MetadataMap &metadataMap, const QString &prefix = "");
+    void toMap(InfoMap &metadataMap, const QString &prefix = "");
 
     void persist(void);
     void UpdateModTime(void) const;

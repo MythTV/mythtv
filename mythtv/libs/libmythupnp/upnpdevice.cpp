@@ -742,7 +742,7 @@ QString UPnpDevice::GetUDN(void) const
     return m_sUDN;
 }
 
-void UPnpDevice::toMap(QHash<QString, QString> &map)
+void UPnpDevice::toMap(InfoMap &map)
 {
     map["name"] = m_sFriendlyName;
     map["modelname"] = m_sModelName;

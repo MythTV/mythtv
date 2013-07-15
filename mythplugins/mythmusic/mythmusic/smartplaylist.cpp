@@ -1813,7 +1813,7 @@ void SmartPLResultViewer::setSQL(QString sql)
             MusicMetadata *mdata = gMusicData->all_music->getMetadata(query.value(0).toInt());
             if (mdata)
             {
-                MetadataMap metadataMap;
+                InfoMap metadataMap;
                 mdata->toMap(metadataMap);
 
                 MythUIButtonListItem *item = new MythUIButtonListItem(m_trackList, "", qVariantFromValue(mdata));

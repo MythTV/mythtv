@@ -125,7 +125,7 @@ void MythUIText::Reset()
     MythUIType::Reset();
 }
 
-void MythUIText::ResetMap(InfoMap &map)
+void MythUIText::ResetMap(const InfoMap &map)
 {
     QString newText = GetTemplateText();
 
@@ -188,7 +188,7 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
-void MythUIText::SetTextFromMap(InfoMap &map)
+void MythUIText::SetTextFromMap(const InfoMap &map)
 {
     QString newText = GetTemplateText();
 

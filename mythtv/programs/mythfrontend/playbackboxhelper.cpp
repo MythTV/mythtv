@@ -6,6 +6,8 @@ using namespace std;
 #include <QDateTime>
 #include <QFileInfo>
 #include <QDir>
+#include <QMap>
+#include <QHash>
 
 #include "previewgeneratorqueue.h"
 #include "metadataimagehelper.h"
@@ -441,7 +443,7 @@ QString PlaybackBoxHelper::LocateArtwork(
 
     QMutexLocker locker(&m_lock);
 
-    QHash<QString,QString>::const_iterator it =
+    InfoMap::const_iterator it =
         m_artworkCache.find(cacheKey);
 
     if (it != m_artworkCache.end())
