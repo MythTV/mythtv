@@ -38,8 +38,8 @@ void MythUIComposite::ResetMap(InfoMap &infoMap)
         MythUIType *type = i.next();
 
         MythUIText *textType = dynamic_cast<MythUIText *> (type);
-        if (textType && infoMap.contains(textType->objectName()))
-            textType->Reset();
+        if (textType)
+            textType->ResetMap(infoMap);
 
         MythUIComposite *group = dynamic_cast<MythUIComposite *> (type);
         if (group)

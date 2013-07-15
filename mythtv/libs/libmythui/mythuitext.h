@@ -34,6 +34,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     ~MythUIText();
 
     void Reset(void);
+    void ResetMap(InfoMap &map);
 
     virtual void SetText(const QString &text);
     QString GetText(void) const;
