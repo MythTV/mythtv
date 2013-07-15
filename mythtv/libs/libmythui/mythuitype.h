@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QHash>
 #include <QList>
+#include <QPair>
 #include <QFont>
 #include <QColor>
 
@@ -174,7 +175,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetVerticalZoom(float zoom);
     void SetAngle(float angle);
     void SetDependIsDefault(bool isDefault);
-    void SetReverseDependence(bool reverse);
+    void SetReverseDependence(MythUIType *dependee, bool reverse);
     void SetDependsMap(QMap<QString, QString> dependsMap);
     QMap<QString, QString> GetDependsMap() const { return m_dependsMap; }
 
@@ -190,6 +191,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void Show(void);
     void Refresh(void);
     void UpdateDependState(bool isDefault);
+    void UpdateDependState(MythUIType *dependee, bool isDefault);
 
   signals:
     void RequestUpdate();
@@ -228,6 +230,11 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     QList<MythUIType *> m_ChildrenList;
     QMap<QString, QString> m_dependsMap;
+    // the number of dependencies is assumed to be small (1 or 2 elements on average)
+    // so we use a QList as we want the element ordered in the order they were defined
+    // and speed isn't going to be a factor
+    QList< QPair<MythUIType *, bool> >m_dependsValue;
+    QList<int> m_dependOperator;
 
     bool m_Visible;
     bool m_HasFocus;
@@ -238,7 +245,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     bool m_Vanish;
     bool m_Vanished;
     bool m_IsDependDefault;
-    bool m_ReverseDepend;
+    QMap<MythUIType *, bool> m_ReverseDepend;
 
     int m_focusOrder;
 
