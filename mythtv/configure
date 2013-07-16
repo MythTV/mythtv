@@ -4115,8 +4115,6 @@ case $target_os in
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         # Workaround compile errors from missing ru_maxrss
         add_cppflags -D_DARWIN_C_SOURCE
-        # weird non-working h264 without it when compiling with llvm without -O3
-        add_cflags -O3
 
         ###### Standard ffmpeg configure stuff follows:
         gas="gas-preprocessor.pl $cc"
