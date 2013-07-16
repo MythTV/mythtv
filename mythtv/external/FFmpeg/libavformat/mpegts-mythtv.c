@@ -2700,7 +2700,7 @@ static int mpegts_read_header(AVFormatContext *s)
 {
     MpegTSContext *ts = s->priv_data;
     AVIOContext *pb = s->pb;
-    uint8_t buf[8*1024];
+    uint8_t buf[8*1024] = {0};
     int len, sid, i;
     int64_t pos;
 
@@ -2709,13 +2709,7 @@ static int mpegts_read_header(AVFormatContext *s)
     /* read the first 8192 bytes to get packet size */
     pos = avio_tell(pb);
     len = avio_read(pb, buf, sizeof(buf));
-    if (len != sizeof(buf))
-    {
-        av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: "
-               "unable to read first 8192 bytes\n");
-        goto fail;
-    }
-    ts->raw_packet_size = get_packet_size(buf, sizeof(buf));
+    ts->raw_packet_size = get_packet_size(buf, len);
     av_log(NULL, AV_LOG_DEBUG, "mpegts_read_header: TS packet size = %d\n",
            ts->raw_packet_size);
     if (ts->raw_packet_size <= 0) {
