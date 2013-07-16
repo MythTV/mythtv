@@ -969,20 +969,38 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-#if 0
-    fmt->flags |= AVFMT_NOFILE;
-#endif
-
-    ic = avformat_alloc_context();
-    if (!ic)
+    int err;
+    while (true)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
-        return -1;
+        ic = avformat_alloc_context();
+        if (!ic)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
+            return -1;
+        }
+
+        InitByteContext();
+
+        err = avformat_open_input(&ic, filename, fmt, NULL);
+        if (err < 0)
+        {
+            if (!strcmp(fmt->name, "mpegts"))
+            {
+                fmt = av_find_input_format("mpegts-ffmpeg");
+                if (fmt)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("avformat_open_input failed with '%1' error.").arg(err));
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Attempting using original FFmpeg MPEG-TS demuxer."));
+                    // ic would have been freed due to the earlier failure
+                    continue;
+                }
+                break;
+            }
+        }
+        break;
     }
-
-    InitByteContext();
-
-    int err = avformat_open_input(&ic, filename, fmt, NULL);
     if (err < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
