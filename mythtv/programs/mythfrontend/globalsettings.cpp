@@ -59,6 +59,18 @@ static HostCheckBox *DecodeExtraAudio()
     return gc;
 }
 
+#if CONFIG_DEBUGTYPE
+static HostCheckBox *FFmpegDemuxer()
+{
+    HostCheckBox *gc = new HostCheckBox("FFMPEGTS");
+    gc->setLabel(QObject::tr("Use FFmpeg's original MPEG-TS demuxer"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Experimental: Enable this setting to use FFmpeg's native demuxer. "
+                                "Things will be broken."));
+    return gc;
+}
+#endif
+
 static HostComboBox *PIPLocationComboBox()
 {
     HostComboBox *gc = new HostComboBox("PIPLocation");
@@ -3175,6 +3187,9 @@ PlaybackSettings::PlaybackSettings()
     column1->addChild(RealtimePriority());
     column1->addChild(DecodeExtraAudio());
     column1->addChild(JumpToProgramOSD());
+#if CONFIG_DEBUGTYPE
+    column1->addChild(FFmpegDemuxer());
+#endif
     columns->addChild(column1);
 
     VerticalConfigurationGroup *column2 =
