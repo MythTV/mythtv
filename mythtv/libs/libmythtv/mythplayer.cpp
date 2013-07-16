@@ -2393,6 +2393,8 @@ bool MythPlayer::VideoLoop(void)
 
     if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
+    else if (decoder && decoder->GetEof() != kEofStateNone)
+        ++framesPlayed;
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
