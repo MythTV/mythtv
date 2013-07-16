@@ -14,14 +14,11 @@ TARGET = test_mpegtables
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 
-# FIXME hack to make the linker to its thing
-LIBS += ../../pespacket.o ../../mpegtables.o ../../mpegdescriptors.o ../../dvbdescriptors.o ../../atscdescriptors.o ../../sctedescriptors.o ../../iso6937tables.o ../../freesat_huffman.o ../../atsc_huffman.o
-
-LIBS += -L../.. -lmythtv-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
+LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
-LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
-LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
+LIBS += -L../.. -lmythtv-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
