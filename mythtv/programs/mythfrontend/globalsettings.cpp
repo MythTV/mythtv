@@ -2133,6 +2133,7 @@ static HostComboBox *MythTimeFormat()
     return gc;
 }
 
+#if ! CONFIG_DARWIN
 static HostComboBox *ThemePainter()
 {
     HostComboBox *gc = new HostComboBox("ThemePainter");
@@ -2151,6 +2152,7 @@ static HostComboBox *ThemePainter()
                     "drivers or windowing systems) where only Qt works."));
     return gc;
 }
+#endif
 
 static HostComboBox *ChannelFormat()
 {
