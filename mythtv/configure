@@ -1815,6 +1815,8 @@ MYTHTV_CONFIG_LIST='
     x11
     xrandr
     xv
+    profiletype
+    debugtype
 '
 
 MYTHTV_HAVE_LIST='
@@ -4391,9 +4393,11 @@ if test x$compile_type = x"profile" ; then
     add_cxxflags -DNDEBUG
     enable debug
     disable stripping
+    enable profiletype
 elif test x$compile_type = x"debug"; then
     enable debug
     disable optimizations stripping
+    enable debugtype
 fi
 
 enabled silent_cc && append CCONFIG "silent"
