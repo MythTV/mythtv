@@ -969,6 +969,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
+    if (!strcmp(fmt->name, "mpegts") &&
+        gCoreContext->GetNumSetting("FFMPEGTS", false))
+    {
+        AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
+        if (fmt2)
+        {
+            fmt = fmt2;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
+        }
+    }
+
     int err;
     while (true)
     {
