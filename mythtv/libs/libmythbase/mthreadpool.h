@@ -11,6 +11,9 @@ class MThreadPoolPrivate;
 class MPoolThread;
 class QRunnable;
 
+/**
+  * \ingroup mthreadpool
+  */
 class MBASE_PUBLIC MThreadPool
 {
     friend class MPoolThread;
