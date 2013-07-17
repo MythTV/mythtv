@@ -61,7 +61,7 @@ static HostComboBox *ZMDateFormat()
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
     gc->addSelection(sampdate.toString("ddd dd MMM yyyy"), "ddd dd MMM yyyy");
 
-    //: %1 gives additionnal info on the date used
+    //: %1 gives additional info on the date used
     gc->setHelpText(ZMSettings::tr("Your preferred date format to use on the "
                                    "events screens. %1") 
                                    .arg(sampleStr));
