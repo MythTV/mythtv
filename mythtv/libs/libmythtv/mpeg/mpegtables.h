@@ -371,6 +371,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     PSIPTable(const PESPacket& pkt, bool)
         : PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false)
         { ; }
+    /// Constructor for viewing a section, does not create it's own data
+    PSIPTable(const unsigned char *pesdata, bool)
+        : PESPacket(pesdata, false)
+    {
+        // fixup wrong assumption about length for sections without CRC
+        _pesdataSize = SectionLength();
+    }
   public:
     PSIPTable(const PSIPTable& table) : PESPacket(table)
     {
@@ -394,6 +401,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
     static PSIPTable View(TSPacket& tspacket)
         { return PSIPTable(PESPacket::View(tspacket), false); }
+
+    static const PSIPTable ViewData(const unsigned char* pesdata)
+        { return PSIPTable(pesdata, false); }
 
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
