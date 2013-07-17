@@ -7,6 +7,7 @@ using namespace std;
 
 // qt
 #include <QString>
+#include <QCoreApplication>
 
 // mythtv
 #include "mythtvexp.h"
@@ -34,6 +35,8 @@ typedef vector<ChannelGroupItem> ChannelGroupList;
 */
 class MTV_PUBLIC ChannelGroup
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelGroup)
+
   public:
     // ChannelGroup 
     static ChannelGroupList  GetChannelGroups(bool includeEmpty = true);

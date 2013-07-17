@@ -198,7 +198,7 @@ QString ChannelGroup::GetChannelGroupName(int grpid)
 {
     // All Channels
     if (grpid == -1)
-        return QObject::tr("All Channels");
+        return tr("All Channels");
 
     // No group
     if (grpid == 0)
