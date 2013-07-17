@@ -1470,7 +1470,7 @@ RSA *MythRAOPConnection::LoadKey(void)
 
     if ( !file )
     {
-        g_rsaLastError = QObject::tr("Failed to read key from: %1").arg(GetConfDir() + sName);
+        g_rsaLastError = tr("Failed to read key from: %1").arg(GetConfDir() + sName);
         g_rsa = NULL;
         LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
         return NULL;
@@ -1487,7 +1487,7 @@ RSA *MythRAOPConnection::LoadKey(void)
         return g_rsa;
     }
 
-    g_rsaLastError = QObject::tr("Failed to load RSA private key.");
+    g_rsaLastError = tr("Failed to load RSA private key.");
     g_rsa = NULL;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
     return NULL;
