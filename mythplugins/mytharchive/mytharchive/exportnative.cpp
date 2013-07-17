@@ -492,8 +492,8 @@ void ExportNative::runScript()
     uint retval = myth_system(commandline, flags);
     if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
     {
-        ShowOkPopup(QObject::tr("It was not possible to create the DVD. "
-                                "An error occured when running the scripts") );
+        ShowOkPopup(tr("It was not possible to create the DVD. "
+                       "An error occured when running the scripts") );
         return;
     }
 
