@@ -155,6 +155,7 @@ void MythUIText::ResetMap(const InfoMap &map)
                 replaced = true;
                 break;
             }
+            pos += regexp.matchedLength();
         }
     }
 
