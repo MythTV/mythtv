@@ -21,6 +21,7 @@
 #include <QtTest/QtTest>
 
 #include "mpegtables.h"
+#include "dvbtables.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
@@ -101,5 +102,49 @@ class TestMPEGTables: public QObject
 
         // first PID that is a real PMT PID and not the NIT PID
         QCOMPARE (pat.FindAnyPID(),        (uint32_t)  6100);
+    }
+
+    void dvbdate(void)
+    {
+        unsigned char dvbdate_data[] = {
+            0xdc, 0xa9, 0x12, 0x33, 0x37 /* day 0xdca9, 12:33:37 UTC */
+        };
+
+        QCOMPARE (dvbdate2unix (dvbdate_data), (time_t) 1373978017);
+        QCOMPARE (dvbdate2qt (dvbdate_data), MythDate::fromString("2013-07-16 12:33:37 Z"));
+    }
+
+    void tdt_test(void)
+    {
+        const unsigned char si_data[] = {
+            0x70, 0x70, 0x05, 0xdc, 0xa9, 0x12, 0x33, 0x37                                                    /* pp....37 */
+        };
+
+        PSIPTable si_table = PSIPTable::ViewData(si_data);
+
+//      test for the values needed for the copy constructor, especially the length
+//        QCOMPARE (si_table._pesdataSize, 8); // is protected, so use TSSizeInBuffer() instead
+        QCOMPARE (si_table.TSSizeInBuffer(), (unsigned int) 8);
+
+        TimeDateTable tdt = si_table;
+
+        QVERIFY  (tdt.IsGood());
+
+        QVERIFY  (!tdt.HasCRC());
+        QVERIFY  (tdt.VerifyCRC());
+
+        for (size_t i=0; i<5; i++) {
+            QCOMPARE (si_table.pesdata()[i+3], (uint8_t) si_data[i+3]);
+        }
+
+        const unsigned char *dvbDateBuf = tdt.UTCdata();
+
+        for (size_t i=0; i<5; i++) {
+            QCOMPARE (dvbDateBuf[i], (uint8_t) si_data[i+3]);
+        }
+
+        // actual is 2013-03-30 01:00:00 UTC, 24 hours before the switch to DST in europe
+        QCOMPARE (tdt.UTCUnix(), (time_t) 1373978017);
+        QCOMPARE (tdt.UTC(), MythDate::fromString("2013-07-16 12:33:37 Z"));
     }
 };

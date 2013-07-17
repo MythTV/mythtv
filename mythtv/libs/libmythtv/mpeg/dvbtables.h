@@ -10,8 +10,8 @@
 #include "mpegtables.h"
 #include "mythtvexp.h"
 
-QDateTime dvbdate2qt(const unsigned char*);
-time_t dvbdate2unix(const unsigned char*);
+MTV_PUBLIC QDateTime dvbdate2qt(const unsigned char*);
+MTV_PUBLIC time_t dvbdate2unix(const unsigned char*);
 uint32_t dvbdate2key(const unsigned char*);
 
 /** \class NetworkInformationTable
