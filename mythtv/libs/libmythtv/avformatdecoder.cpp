@@ -1557,9 +1557,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         return;
     }
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     uint i;
     for (i = 0; i < pmt.StreamCount(); i++)
@@ -1684,9 +1682,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     if (!ic->cur_pmt_sect || tracks[kTrackTypeTeletextCaptions].size())
         return;
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1761,9 +1757,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     if (!itv && ! (itv = m_parent->GetInteractiveTV()))
         return;
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -2461,9 +2455,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
 
     if (ic->cur_pmt_sect) // mpeg-ts
     {
-        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-        const PSIPTable psip(pes);
-        const ProgramMapTable pmt(psip);
+        const ProgramMapTable pmt(ic->cur_pmt_sect);
         switch (pmt.GetAudioType(stream_index))
         {
             case 0x01 :
@@ -4853,9 +4845,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 {
     if (ic && ic->cur_pmt_sect)
     {
-        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-        const PSIPTable psip(pes);
-        const ProgramMapTable pmt(psip);
+        const ProgramMapTable pmt(ic->cur_pmt_sect);
 
         for (uint i = 0; i < pmt.StreamCount(); i++)
         {
