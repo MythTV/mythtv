@@ -1326,13 +1326,12 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
-#ifndef Q_OS_MAC
     child->winId();
-#endif
     child->raise();
     child->setFocus();
     child->setMouseTracking(true);
 }
+
 
 void MythMainWindow::detach(QWidget *child)
 {
@@ -1347,13 +1346,12 @@ void MythMainWindow::detach(QWidget *child)
 
     d->widgetList.erase(it);
     QWidget *current = currentWidget();
+    if (!current)
+        current = this;
 
-    if (current)
-    {
-        current->setEnabled(true);
-        current->setFocus();
-        current->setMouseTracking(true);
-    }
+    current->setEnabled(true);
+    current->setFocus();
+    current->setMouseTracking(true);
 
     if (d->exitingtomain)
     {
