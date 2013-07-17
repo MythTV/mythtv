@@ -220,7 +220,7 @@ static HostComboBox *ChapterMenuAspectRatio()
 static HostComboBox *MythArchiveDateFormat()
 {
     HostComboBox *gc = new HostComboBox("MythArchiveDateFormat");
-    gc->setLabel(QObject::tr("Date format"));
+    gc->setLabel(ArchiveSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
     QString sampleStr = ArchiveSettings::tr("Samples are shown using today's "
