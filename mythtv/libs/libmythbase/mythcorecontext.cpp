@@ -210,10 +210,9 @@ bool MythCoreContext::Init(void)
                     "match libraries (%2)")
                 .arg(d->m_appBinaryVersion) .arg(MYTH_BINARY_VERSION));
 
-        QString warning = QObject::tr(
-            "This application is not compatible "
-            "with the installed MythTV libraries. "
-            "Please recompile after a make distclean");
+        QString warning = tr("This application is not compatible with the "
+                             "installed MythTV libraries. Please recompile "
+                             "after a make distclean");
         LOG(VB_GENERAL, LOG_WARNING, warning);
 
         return false;
