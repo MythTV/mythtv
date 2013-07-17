@@ -943,6 +943,10 @@ void wrapList(QStringList &list, int width)
 {
     int i;
 
+    // if this is triggered, something has gone seriously wrong
+    // the result won't really be usable, but at least it won't crash
+    width = max(width, 5);
+
     for(i = 0; i < list.size(); i++)
     {
         QString string = list.at(i);
