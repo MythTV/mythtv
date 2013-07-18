@@ -112,6 +112,8 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
     QString progress_text = "";
     float progress = -1.0f;
     bool fullscreen = false;
+    bool error = false;
+    int visibility = 0;
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -135,6 +137,10 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
                 progress_text = e.text();
             else if (notification && e.tagName() == "fullscreen")
                 fullscreen = e.text().toLower() == "true";
+            else if (notification && e.tagName() == "error")
+                error = e.text().toLower() == "true";
+            else if (e.tagName() == "visibility")
+                visibility = e.text().toUInt();
             else if (notification && e.tagName() == "progress")
             {
                 bool ok;
@@ -160,39 +166,10 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
             timeout = notification ? 5 : 0;
         if (notification)
         {
-            DMAP data;
-            data["minm"] = msg;
-            data["asar"] = origin.isNull() ? tr("UDP Listener") : origin;
-            data["asal"] = description;
-            data["asfm"] = extra;
-
-            MythNotification *n;
-            if (!image.isEmpty())
-            {
-                if (progress >= 0)
-                {
-                    n = new MythMediaNotification(MythNotification::New,
-                                                  image, data,
-                                                  progress, progress_text);
-                }
-                else
-                {
-                    n = new MythImageNotification(MythNotification::New, image, data);
-                }
-            }
-            else if (progress >= 0)
-            {
-                n = new MythPlaybackNotification(MythNotification::New,
-                                                 progress, progress_text, data);
-            }
-            else
-            {
-                n = new MythNotification(MythNotification::New, data);
-            }
-            n->SetDuration(timeout);
-            n->SetFullScreen(fullscreen);
-            MythUINotificationCenter::GetInstance()->Queue(*n);
-            delete n;
+            origin = origin.isNull() ? tr("UDP Listener") : origin;
+            ShowNotification(error, msg, origin, description, image, extra,
+                             progress_text, progress, timeout, fullscreen,
+                             visibility);
         }
         else
         {
