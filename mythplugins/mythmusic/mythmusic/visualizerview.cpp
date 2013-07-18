@@ -162,7 +162,7 @@ bool TrackInfoPopup::Create(void)
         return false;
 
     // get map for current track
-    MetadataMap metadataMap; 
+    InfoMap metadataMap;
     m_metadata->toMap(metadataMap); 
 
     // add the map from the next track

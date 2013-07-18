@@ -1157,7 +1157,7 @@ VideoMetadata &VideoMetadata::operator=(const VideoMetadata &rhs)
     return *this;
 }
 
-void VideoMetadata::toMap(MetadataMap &metadataMap)
+void VideoMetadata::toMap(InfoMap &metadataMap)
 {
     if (this == NULL)
         return;
@@ -1215,7 +1215,7 @@ void VideoMetadata::toMap(MetadataMap &metadataMap)
 }
 
 
-void VideoMetadata::GetStateMap(MetadataMap& stateMap)
+void VideoMetadata::GetStateMap(InfoMap &stateMap)
 {
     stateMap["trailerstate"] = TrailerToState(GetTrailer());
     stateMap["userratingstate"] =
@@ -1224,7 +1224,7 @@ void VideoMetadata::GetStateMap(MetadataMap& stateMap)
     stateMap["videolevel"] = ParentalLevelToState(GetShowLevel());
 }
 
-void VideoMetadata::GetImageMap(MetadataMap& imageMap)
+void VideoMetadata::GetImageMap(InfoMap &imageMap)
 {
     QString coverfile;
     if (IsHostSet()
@@ -1294,7 +1294,7 @@ void VideoMetadata::GetImageMap(MetadataMap& imageMap)
     imageMap["smartimage"] = smartimage;
 }
 
-void ClearMap(MetadataMap &metadataMap)
+void ClearMap(InfoMap &metadataMap)
 {
     metadataMap["coverfile"] = "";
     metadataMap["screenshotfile"] = "";

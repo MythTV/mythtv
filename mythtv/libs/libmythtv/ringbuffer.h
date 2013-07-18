@@ -154,7 +154,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
 
     long long SetAdjustFilesize(void);
 
-    /// Calls SetOldFile(), do not use
+    /// \deprecated Calls SetOldFile(), do not use
     void SetTimeout(bool is_old) MDEPRECATED { SetOldFile(is_old); }
 
     static const int kDefaultOpenTimeout;

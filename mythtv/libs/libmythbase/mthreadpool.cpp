@@ -19,6 +19,59 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/** \defgroup mthreadpool MThreadPool
+ *  \ingroup libmythbase
+ *  \brief Framework for managing threads.
+ *
+ *  Commit 47d67e6722 added two new classes MThread and MThreadPool to be used
+ *  instead of QThread and QThreadPool. These mirror the API's of the Qt classes
+ *  but also add a requirement for a QString naming the thread or naming the
+ *  runnable which are used for debugging. These wrappers also make sure mysql
+ *  connections are torn down properly and have a number of safety checks and
+ *  assurances. The destructor for MThread also makes sure that a thread has
+ *  stopped running before we allow the QThread to be deleted. And MThreaPool
+ *  makes sure all it's threads have stopped running. MThread has a Cleanup()
+ *  method that attempts to shut down any threads that are running, it only
+ *  works for threads that exit on a call to exit(), which includes any threads
+ *  using the Qt event loop. It will also print out the names of the threads
+ *  that are still running for debugging purposes.
+ *
+ *  MThread has one special constructor. It takes a QRunnable* and runs it
+ *  instead of the Qt event loop in the default run() implementation. Unlike
+ *  MThreadPool and QThreadPool, MThread does not delete this runnable when it
+ *  exits. This allows you to run something with less boilerplate code. Just
+ *  like with QThread in Qt4 it really is better to use the Qt event loop rather
+ *  than write your own. As you don't use the Qt event loop QObject
+ *  deleteLater's are not executed until the thread exits, Qt events and timers
+ *  do not work making Qt networking classes misbehave and signals/slots are
+ *  generally unsafe. However, many of the threads with event loops in MythTV
+ *  were written before Qt allowed an event loop outside the main thread so this
+ *  syntactic sugar just lets us handle that with less lines of code.
+ *
+ *  There are a few other differences with respect to Qt's classes other than
+ *  requiring a name.
+ *
+ *  \li MThread does not inherit from QObject, if you need QObject services
+ *  in a threading class you will need to inherit from QObject seperately. Note
+ *  when you inherit from QObject, you must inherit from no more than one
+ *  QObject based class and it must be first in the list of classes your class
+ *  inherits from (a Qt restriction).
+ *
+ *  \li QThread doesn't implement most of QThread's static methods, notably
+ *  QThread::currentThread(). It does make the underlying QThread available via
+ *  the qthread() method. But the usual reason to use QThread::currentThread()
+ *  is to check which thread you are running in. For this there is a set of
+ *  helper functions is_current_thread(MThread&), is_current_thread(QThread*),
+ *  and is_current_thread(MThread*) which you can use instead.
+ *
+ *  \li MThreadPool does not have reserveThread() and releaseThread()
+ *  calls; instead use startReserved(). The reserveThread() and releaseThread()
+ *  API is not a good API because it doesn't ensure that your runnable starts
+ *  right away even though the thread will eventually not be counted amoung
+ *  those forcing other threads to go to the queue rather than running right
+ *  away.
+ */
+
 // C++ headers
 #include <algorithm>
 using namespace std;

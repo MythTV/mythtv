@@ -187,7 +187,7 @@ int VideoSync::CalcDelay()
  *   delay > 0 which would cause continous rapid fire stuttering.
  *   This method is only useful for those sync methods where WaitForFrame
  *   targets hardware retrace rather than targeting nexttrigger.
- *   NOTE: deprecated in favor of handling phase issues in mythplayer's AVSync.
+ *   \deprecated deprecated in favor of handling phase issues in mythplayer's AVSync.
  */
 void VideoSync::KeepPhase()
 {

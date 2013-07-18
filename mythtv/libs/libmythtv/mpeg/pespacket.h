@@ -14,15 +14,15 @@ using namespace std;
 #include "tspacket.h"
 #include "mythlogging.h"
 
-unsigned char *pes_alloc(uint size);
-void pes_free(unsigned char *ptr);
+MTV_PUBLIC unsigned char *pes_alloc(uint size);
+MTV_PUBLIC void pes_free(unsigned char *ptr);
 
 /** \class PESPacket
  *  \brief Allows us to transform TS packets to PES packets, which
  *         are used to hold PSIP tables as well as multimedia streams.
  *  \sa PSIPTable, TSPacket
  */
-class PESPacket
+class MTV_PUBLIC PESPacket
 {
     /// Only handles single TS packet PES packets, for PMT/PAT tables basically
     void InitPESPacket(TSPacket& tspacket)

@@ -152,7 +152,7 @@ void SearchView::customEvent(QEvent *event)
             MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
             if (mdata && mdata->ID() == trackID)
             {
-                MetadataMap metadataMap;
+                InfoMap metadataMap;
                 mdata->toMap(metadataMap);
                 item->SetTextFromMap(metadataMap);
             }
@@ -421,7 +421,7 @@ void SearchView::updateTracksList(void)
         {
             MythUIButtonListItem *newitem = new MythUIButtonListItem(m_tracksList, "");
             newitem->SetData(qVariantFromValue(mdata));
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             mdata->toMap(metadataMap);
             newitem->SetTextFromMap(metadataMap);
 

@@ -227,7 +227,7 @@ class OAuthRequest(object):
         except:
             pass
         # Escape key values before sorting.
-        key_values = [(_utf8_str(k), _utf8_str(v)) \
+        key_values = [(escape(_utf8_str(k)), escape(_utf8_str(v))) \
             for k,v in params.items()]
         # Sort lexicographically, first after key, then after value.
         key_values.sort()
@@ -324,6 +324,7 @@ class OAuthRequest(object):
         elif callback:
             # 1.0a support for callback in the request token request.
             parameters['oauth_callback'] = callback
+
         return OAuthRequest(http_method, http_url, parameters)
     from_consumer_and_token = staticmethod(from_consumer_and_token)
 
@@ -623,6 +624,7 @@ class OAuthSignatureMethod_HMAC_SHA1(OAuthSignatureMethod):
         """Builds the base signature string."""
         key, raw = self.build_signature_base_string(oauth_request, consumer,
             token)
+
         # HMAC object.
         try:
             import hashlib # 2.5

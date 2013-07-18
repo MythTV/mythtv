@@ -314,12 +314,12 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
 
     // Text
-    QHash<QString, QString> textMap;
+    InfoMap textMap;
     metadata->toMap(textMap);
     sub_node->SetTextFromMap(textMap);
 
     // Images
-    QHash<QString, QString> imageMap;
+    InfoMap imageMap;
     metadata->GetImageMap(imageMap);
     sub_node->SetImageFromMap(imageMap);
     sub_node->SetImage("buttonimage", imageMap["smartimage"]);
@@ -333,7 +333,7 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     }
 
     // Statetypes
-    QHash<QString, QString> stateMap;
+    InfoMap stateMap;
     metadata->GetStateMap(stateMap);
     sub_node->DisplayStateFromMap(stateMap);
 

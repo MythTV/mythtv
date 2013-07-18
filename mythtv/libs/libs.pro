@@ -47,7 +47,13 @@ libmythbase-test.target = buildtestmythbase
 libmythbase-test.commands = cd libmythbase/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythbase-test
 
-unittest.depends = libmyth-test libmythbase-test
+# unit tests libmythtv
+libmythtv-test.depends = sub-libmythtv
+libmythtv-test.target = buildtestmythtv
+libmythtv-test.commands = cd libmythtv/test && $(QMAKE) && $(MAKE)
+unix:QMAKE_EXTRA_TARGETS += libmythtv-test
+
+unittest.depends = libmyth-test libmythbase-test libmythtv-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

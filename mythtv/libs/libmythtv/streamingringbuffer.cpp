@@ -75,6 +75,7 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to open stream (error %1)") .arg(res));
         lastError = QObject::tr("Failed to open stream (%1)").arg(res);
+        rwlock.unlock();
         return false;
     }
 

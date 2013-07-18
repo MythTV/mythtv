@@ -123,7 +123,7 @@ void StreamView::customEvent(QEvent *event)
             MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_playedTracksList, "", qVariantFromValue(mdata), 0);
 
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             mdata->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
             item->SetFontState("normal");
@@ -419,7 +419,7 @@ void StreamView::updateStreamList(void)
     {
         MusicMetadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         if (mdata)
             mdata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
@@ -578,7 +578,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
                 playedmdata->setStation(mdata->Station());
                 playedmdata->setChannel(mdata->Channel());
 
-                MetadataMap metadataMap;
+                InfoMap metadataMap;
                 playedmdata->toMap(metadataMap);
                 item->SetTextFromMap(metadataMap);
             }
@@ -927,7 +927,7 @@ void SearchStream::updateStreams(void)
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, 
                 "", qVariantFromValue(mdata));
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         mdata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 

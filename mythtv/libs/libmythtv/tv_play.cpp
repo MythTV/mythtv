@@ -83,7 +83,7 @@ using namespace std;
     OSD *osd = GetOSDLock(CTX); \
     if (osd) \
     { \
-        QHash<QString,QString> map; \
+        InfoMap map; \
         map.insert(FIELD,TEXT); \
         osd->SetText(GROUP, map, TIMEOUT); \
     } \
@@ -1645,10 +1645,9 @@ void TV::GetStatus(void)
 
     ReturnPlayerLock(ctx);
 
-    QHashIterator<QString,QString> tit(info.text);
-    while (tit.hasNext())
+    InfoMap::const_iterator tit =info.text.begin();
+    for (; tit != info.text.end(); ++tit)
     {
-        tit.next();
         status.insert(tit.key(), tit.value());
     }
 
@@ -9747,7 +9746,7 @@ void TV::QuickRecord(PlayerContext *ctx)
         if (osd)
         {
             osd->SetText("browse_info", infoMap, kOSDTimeout_Med);
-            QHash<QString,QString> map;
+            InfoMap map;
             map.insert("message_text", tr("Record"));
             osd->SetText("osd_message", map, kOSDTimeout_Med);
         }
@@ -10053,7 +10052,7 @@ void TV::ShowOSDCutpoint(PlayerContext *ctx, const QString &type)
         osd->DialogAddButton(tr("Undo Changes"),
                              "DIALOG_CUTPOINT_REVERT_0");
         osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
-        QHash<QString,QString> map;
+        InfoMap map;
         map.insert("title", tr("Edit"));
         osd->SetText("osd_program_editor", map, kOSDTimeout_None);
         ReturnOSDLock(ctx, osd);
@@ -12261,7 +12260,7 @@ void TV::PlaybackMenuShow(const MenuBase &menu,
         if (isCutlist)
         {
             // hack to unhide the editbar
-            QHash<QString,QString> map;
+            InfoMap map;
             map.insert("title", tr("Edit"));
             m_tvmOsd->SetText("osd_program_editor", map, kOSDTimeout_None);
         }

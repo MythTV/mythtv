@@ -259,6 +259,17 @@ QString CommandLineArg::GetHelpString(int off, QString group, bool force) const
     QString helpstr;
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
     int termwidth = GetTermWidth();
+    if (termwidth < off)
+    {
+        if (off > 70)
+            // developer has configured some absurdly long command line
+            // arguments, but we still need to do something
+            termwidth = off+40;
+        else
+            // user is running uselessly narrow console, use a sane console
+            // width instead
+            termwidth = 79;
+    }
 
     if (m_help.isEmpty() && !force)
         // only print if there is a short help to print

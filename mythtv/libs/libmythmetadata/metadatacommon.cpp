@@ -396,7 +396,7 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
     return ret;
 }
 
-void MetadataLookup::toMap(MetadataMap &metadataMap)
+void MetadataLookup::toMap(InfoMap &metadataMap)
 {
     metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
@@ -1526,7 +1526,7 @@ MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
                              type, typestring, description, version);
 }
 
-void MetaGrabberScript::toMap(MetadataMap &metadataMap)
+void MetaGrabberScript::toMap(InfoMap &metadataMap)
 {
     metadataMap["name"] = m_name;
     metadataMap["author"] = m_author;

@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QRegion>
 #include <QMap>
-#include <QHash>
 #include <QList>
 #include <QPair>
 #include <QFont>
@@ -15,6 +14,7 @@
 #include "mythrect.h"
 #include "mythgesture.h"
 #include "mythmedia.h"
+#include "mythtypes.h"
 
 class MythImage;
 class MythPainter;
@@ -40,8 +40,6 @@ class MythUIWebBrowser;
 #define OPENGL_PAINTER  "opengl"
 #define AUTO_PAINTER    "auto"
 #define D3D9_PAINTER    "d3d9"
-
-typedef QHash<QString,QString> InfoMap;
 
 /**
  * \defgroup MythUI MythTV User Interface Library

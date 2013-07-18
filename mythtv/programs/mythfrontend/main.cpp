@@ -1631,11 +1631,11 @@ int main(int argc, char **argv)
 #ifdef USING_AIRPLAY
     if (gCoreContext->GetNumSetting("AirPlayEnabled", true))
     {
-        MythRAOPDevice::Create();
         if (!gCoreContext->GetNumSetting("AirPlayAudioOnly", false))
         {
             MythAirplayServer::Create();
         }
+        MythRAOPDevice::Create();
     }
 #endif
 

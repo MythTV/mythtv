@@ -50,7 +50,7 @@ class MUI_PUBLIC MythUIStateType : public MythUIComposite
     virtual void LoadNow(void);
     virtual void RecalculateArea(bool recurse = true);
 
-    virtual void SetTextFromMap(InfoMap &infoMap);
+    virtual void SetTextFromMap(const InfoMap &infoMap);
 
   protected:
     virtual bool ParseElement(

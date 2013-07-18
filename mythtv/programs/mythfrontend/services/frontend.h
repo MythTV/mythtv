@@ -17,6 +17,18 @@ class Frontend : public FrontendServices
     DTC::FrontendStatus* GetStatus(void);
     bool                 SendMessage(const QString &Message,
                                      uint Timeout);
+    bool                 SendNotification(bool  Error,
+                                          const QString &Message,
+                                          const QString &Origin,
+                                          const QString &Description,
+                                          const QString &Image,
+                                          const QString &Extra,
+                                          const QString &ProgressText,
+                                          float Progress,
+                                          int   Timeout,
+                                          bool  Fullscreen,
+                                          int   Visibility, int   Priority);
+
     bool                 SendAction(const QString &Action,
                                     const QString &Value,
                                     uint Width, uint Height);

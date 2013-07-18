@@ -246,6 +246,7 @@ void ViewScheduled::LoadList(bool useExistingData)
 
     QString callsign;
     QDateTime startts, recstartts;
+    QDate group = m_currentGroup;
 
     if (currentItem)
     {
@@ -330,8 +331,14 @@ void ViewScheduled::LoadList(bool useExistingData)
                                      qVariantFromValue(dateit.key()));
             ++dateit;
         }
-        if (!m_recgroupList.contains(m_currentGroup))
-            m_groupList->SetValueByData(qVariantFromValue(m_currentGroup));
+
+        // Restore group
+        if (m_recgroupList.contains(group))
+            m_currentGroup = group;
+        else
+            m_currentGroup = m_defaultGroup;
+
+        m_groupList->SetValueByData(qVariantFromValue(m_currentGroup));
     }
 
     FillList();
@@ -339,12 +346,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     // Restore position after a list update
     if (!callsign.isEmpty())
     {
-        ProgramList plist;
-
-        if (!m_recgroupList.contains(m_currentGroup))
-            m_currentGroup = m_defaultGroup;
-
-        plist = m_recgroupList[m_currentGroup];
+        ProgramList plist = m_recgroupList[m_currentGroup];
 
         int listPos = ((int) plist.size()) - 1;
         int i;

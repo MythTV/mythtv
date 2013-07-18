@@ -44,8 +44,6 @@ MPUBLIC extern const char *kPreviewGeneratorInUseID;
 MPUBLIC extern const char *kJobQueueInUseID;
 MPUBLIC extern const char *kCCExtractorInUseID;
 
-typedef QHash<QString,QString> InfoMap;
-
 /// Frame # -> File offset map
 typedef QMap<uint64_t, uint64_t> frm_pos_map_t;
 

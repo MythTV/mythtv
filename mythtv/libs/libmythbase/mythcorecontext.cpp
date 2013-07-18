@@ -1382,7 +1382,7 @@ void MythCoreContext::WaitUntilSignals(const char *signal1, ...)
     }
     va_end(vl);
 
-    eventLoop.exec(QEventLoop::ExcludeUserInputEvents);
+    eventLoop.exec(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
 }
 
 /**

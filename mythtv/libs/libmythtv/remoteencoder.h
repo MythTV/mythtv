@@ -11,6 +11,7 @@
 #include "mythtvexp.h"
 #include "videoouttypes.h"
 #include "tv.h"
+#include "mythtypes.h"
 #include "programtypes.h"
 
 class QStringList;
@@ -70,8 +71,8 @@ class MTV_PUBLIC RemoteEncoder
                         QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid);
-    void GetChannelInfo(QHash<QString, QString> &infoMap, uint chanid = 0);
-    bool SetChannelInfo(const QHash<QString, QString> &infoMap);
+    void GetChannelInfo(InfoMap &infoMap, uint chanid = 0);
+    bool SetChannelInfo(const InfoMap &infoMap);
     bool GetErrorStatus(void) { bool v = backendError; backendError = false; 
                                 return v; }
  

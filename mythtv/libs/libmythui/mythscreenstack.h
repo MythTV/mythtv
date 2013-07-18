@@ -21,12 +21,12 @@ class MUI_PUBLIC MythScreenStack : public QObject
                     bool main = false);
     virtual ~MythScreenStack();
 
-    void AddScreen(MythScreenType *screen, bool allowFade = true);
-    void PopScreen(bool allowFade = true, bool deleteScreen = true);
-    void PopScreen(MythScreenType *screen, bool allowFade = true,
-                   bool deleteScreen = true);
+    virtual void AddScreen(MythScreenType *screen, bool allowFade = true);
+    virtual void PopScreen(bool allowFade = true, bool deleteScreen = true);
+    virtual void PopScreen(MythScreenType *screen, bool allowFade = true,
+                           bool deleteScreen = true);
 
-    MythScreenType *GetTopScreen(void) const;
+    virtual MythScreenType *GetTopScreen(void) const;
 
     void GetDrawOrder(QVector<MythScreenType *> &screens);
     void GetScreenList(QVector<MythScreenType *> &screens);
@@ -48,7 +48,7 @@ class MUI_PUBLIC MythScreenStack : public QObject
     void doInit(void);
 
   protected:
-    void RecalculateDrawOrder(void);
+    virtual void RecalculateDrawOrder(void);
     void DoNewFadeTransition();
     void CheckNewFadeTransition();
     void CheckDeletes(bool force = false);

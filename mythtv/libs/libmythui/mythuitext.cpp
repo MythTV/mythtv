@@ -125,6 +125,46 @@ void MythUIText::Reset()
     MythUIType::Reset();
 }
 
+void MythUIText::ResetMap(const InfoMap &map)
+{
+    QString newText = GetTemplateText();
+
+    if (newText.isEmpty())
+        newText = GetDefaultText();
+
+    QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?(\\w+)(\\|(.+))?%");
+    regexp.setMinimal(true);
+
+    bool replaced = map.contains(objectName());
+
+    if (!replaced && !newText.isEmpty() && newText.contains(regexp))
+    {
+        int pos = 0;
+
+        QString translatedTemplate = qApp->translate("ThemeUI",
+                                                     newText.toUtf8(),
+                                                     NULL,
+                                                     QCoreApplication::UnicodeUTF8);
+
+        while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
+        {
+            QString key = regexp.cap(4).toLower().trimmed();
+
+            if (map.contains(key))
+            {
+                replaced = true;
+                break;
+            }
+            pos += regexp.matchedLength();
+        }
+    }
+
+    if (replaced)
+    {
+        Reset();
+    }
+}
+
 void MythUIText::SetText(const QString &text)
 {
     QString newtext = text;
@@ -149,7 +189,7 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
-void MythUIText::SetTextFromMap(InfoMap &map)
+void MythUIText::SetTextFromMap(const InfoMap &map)
 {
     QString newText = GetTemplateText();
 

@@ -10,6 +10,7 @@
 #include <QQueue>
 #include <QList>
 #include <QMap>
+#include <QPair>
 
 #include "mthread.h"
 #include "mythdate.h"

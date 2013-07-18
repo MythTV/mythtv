@@ -34,12 +34,13 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     ~MythUIText();
 
     void Reset(void);
+    void ResetMap(const InfoMap &map);
 
     virtual void SetText(const QString &text);
     QString GetText(void) const;
     QString GetDefaultText(void) const;
 
-    void SetTextFromMap(InfoMap &map);
+    void SetTextFromMap(const InfoMap &map);
 
     void SetTemplateText(const QString &text) { m_TemplateText = text; }
     QString GetTemplateText(void) const { return m_TemplateText; }

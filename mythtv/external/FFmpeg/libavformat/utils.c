@@ -50,6 +50,13 @@
 #undef NDEBUG
 #include <assert.h>
 
+/* MYTHTV CHANGES */
+extern AVInputFormat ff_mythtv_mpegts_demuxer;
+extern AVInputFormat ff_mythtv_mpegtsraw_demuxer;
+extern AVInputFormat ff_mpegts_demuxer;
+extern AVInputFormat ff_mpegtsraw_demuxer;
+/* END MYTHTV CHANGES */
+
 /**
  * @file
  * various utility functions for use within FFmpeg
@@ -364,8 +371,19 @@ AVInputFormat *av_probe_input_format3(AVProbeData *pd, int is_opened, int *score
         if (score > score_max) {
             score_max = score;
             fmt = fmt1;
-        }else if (score == score_max)
-            fmt = NULL;
+        }else if (score == score_max){
+            // if the conflict is between Myth MPEGTS demux and FFMPEG's original one
+            // use mythtv's one
+            if ((fmt1 == &ff_mpegts_demuxer && fmt == &ff_mythtv_mpegts_demuxer) ||
+                (fmt == &ff_mpegts_demuxer && fmt1 == &ff_mythtv_mpegts_demuxer)){
+                fmt = &ff_mythtv_mpegts_demuxer;
+            }else if ((fmt1 == &ff_mpegts_demuxer && fmt == &ff_mythtv_mpegtsraw_demuxer) ||
+                      (fmt == &ff_mpegts_demuxer && fmt1 == &ff_mythtv_mpegtsraw_demuxer)){
+                fmt = &ff_mythtv_mpegtsraw_demuxer;
+            }else{
+                fmt = NULL;
+            }
+        }
     }
     *score_ret= score_max;
 
@@ -1497,6 +1515,9 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             st->skip_to_keyframe = 0;
         if (st->skip_to_keyframe) {
             av_free_packet(&cur_pkt);
+            if (got_packet) {
+                *pkt = cur_pkt;
+            }
             got_packet = 0;
         }
     }

@@ -1,7 +1,3 @@
-#include <iostream>
-#include <set>
-#include <map>
-
 #include <QDomDocument>
 #include <QDateTime>
 #include <QImageReader>

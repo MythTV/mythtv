@@ -43,8 +43,8 @@ class MUI_PUBLIC MythUIButtonListItem
 
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
-    void SetTextFromMap(InfoMap &infoMap, const QString &state="");
-    void SetTextFromMap(QMap<QString, TextProperties> &stringMap);
+    void SetTextFromMap(const InfoMap &infoMap, const QString &state="");
+    void SetTextFromMap(const QMap<QString, TextProperties> &stringMap);
     QString GetText(const QString &name="") const;
 
     bool FindText(const QString &searchStr, const QString &fieldList = "**ALL**",

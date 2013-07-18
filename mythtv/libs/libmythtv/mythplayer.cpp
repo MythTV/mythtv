@@ -810,16 +810,19 @@ void MythPlayer::SetScanType(FrameScanType scan)
 void MythPlayer::SetVideoParams(int width, int height, double fps,
                                 FrameScanType scan)
 {
-    if (width < 1 || height < 1 || qIsNaN(fps))
-        return;
+    bool paramsChanged = false;
 
-    video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
-    video_disp_dim = QSize(width, height);
-    if (height)
-        video_aspect = (float)width / height;
-
-    if (fps > 0.0f && fps < 121.0f)
+    if (width >= 1 && height >= 1)
     {
+        paramsChanged  = true;
+        video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
+        video_disp_dim = QSize(width, height);
+        video_aspect   = (float)width / height;
+    }
+
+    if (!qIsNaN(fps) && fps > 0.0f && fps < 121.0f)
+    {
+        paramsChanged    = true;
         video_frame_rate = fps;
         if (ffrew_skip != 0 && ffrew_skip != 1)
         {
@@ -834,6 +837,9 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
                              1.0 / (video_frame_rate * temp_speed));
         }
     }
+
+    if (!paramsChanged)
+        return;
 
     if (videoOutput)
         ReinitVideo();
@@ -2393,6 +2399,8 @@ bool MythPlayer::VideoLoop(void)
 
     if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
+    else if (decoder && decoder->GetEof() != kEofStateNone)
+        ++framesPlayed;
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
@@ -4708,6 +4716,10 @@ int MythPlayer::GetSecondsBehind(void) const
 
 int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const
 {
+    int64_t pos = TranslatePositionFrameToMs(framesPlayed, honorCutList);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("GetSecondsPlayed: framesPlayed %1, honorCutList %2, divisor %3, pos %4")
+        .arg(framesPlayed).arg(honorCutList).arg(divisor).arg(pos));
     return TranslatePositionFrameToMs(framesPlayed, honorCutList) / divisor;
 }
 
@@ -5369,7 +5381,7 @@ void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
     if (!osd)
         return;
 
-    QHash<QString,QString> info;
+    InfoMap info;
     info.insert("message_text", msg);
     osd->SetText("osd_message", info, timeout);
 }

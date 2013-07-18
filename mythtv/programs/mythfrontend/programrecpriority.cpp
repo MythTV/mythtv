@@ -116,7 +116,7 @@ void ProgramRecPriorityInfo::clear(void)
     profile.clear();
 }
 
-void ProgramRecPriorityInfo::ToMap(QHash<QString, QString> &progMap,
+void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
                                    bool showrerecord, uint star_range) const
 {
     RecordingInfo::ToMap(progMap, showrerecord, star_range);

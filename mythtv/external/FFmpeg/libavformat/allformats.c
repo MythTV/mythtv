@@ -179,11 +179,10 @@ void av_register_all(void)
     REGISTER_MUXER   (MPEG2VIDEO,       mpeg2video);
     REGISTER_MUXER   (MPEG2VOB,         mpeg2vob);
     REGISTER_DEMUXER (MPEGPS,           mpegps);
-//    REGISTER_MUXDEMUX(MPEGTS,           mpegts);
-    REGISTER_MUXER   (MPEGTS,           mpegts);
     REGISTER_DEMUXER (MPEGTS,           mythtv_mpegts);
-//    REGISTER_DEMUXER (MPEGTSRAW,        mpegtsraw);
     REGISTER_DEMUXER (MPEGTSRAW,        mythtv_mpegtsraw);
+    REGISTER_MUXDEMUX(MPEGTS,           mpegts);
+    REGISTER_DEMUXER (MPEGTSRAW,        mpegtsraw);
     REGISTER_DEMUXER (MPEGVIDEO,        mpegvideo);
     REGISTER_MUXER   (MPJPEG,           mpjpeg);
     REGISTER_DEMUXER (MPL2,             mpl2);

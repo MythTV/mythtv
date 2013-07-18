@@ -1815,6 +1815,8 @@ MYTHTV_CONFIG_LIST='
     x11
     xrandr
     xv
+    profiletype
+    debugtype
 '
 
 MYTHTV_HAVE_LIST='
@@ -4115,8 +4117,6 @@ case $target_os in
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         # Workaround compile errors from missing ru_maxrss
         add_cppflags -D_DARWIN_C_SOURCE
-        # weird non-working h264 without it when compiling with llvm without -O3
-        add_cflags -O3
 
         ###### Standard ffmpeg configure stuff follows:
         gas="gas-preprocessor.pl $cc"
@@ -4393,9 +4393,11 @@ if test x$compile_type = x"profile" ; then
     add_cxxflags -DNDEBUG
     enable debug
     disable stripping
+    enable profiletype
 elif test x$compile_type = x"debug"; then
     enable debug
     disable optimizations stripping
+    enable debugtype
 fi
 
 enabled silent_cc && append CCONFIG "silent"
@@ -5258,7 +5260,10 @@ check_cflags -Wno-pointer-sign
 check_cflags -Wwrite-strings
 check_cflags -Wtype-limits
 check_cflags -Wundef
-check_cflags -Wmissing-prototypes
+#-Wmissing-prototypes breaks zeromq compilation in universal mode
+if [ "$target_os" != "darwin" ]; then
+    check_cflags -Wmissing-prototypes
+fi
 check_cflags -Wno-pointer-to-int-cast
 check_cflags -Wstrict-prototypes
 enabled extra_warnings && check_cflags -Winline
@@ -5624,7 +5629,7 @@ elif enabled clang; then
     check_cflags -mllvm -stack-alignment=16
     check_cflags -Qunused-arguments
     check_cflags -Werror=implicit-function-declaration
-    check_cflags -Werror=missing-prototypes
+#   check_cflags -Werror=missing-prototypes
     check_cflags -Werror=return-type
 elif enabled armcc; then
     # 2523: use of inline assembler is deprecated

@@ -11,6 +11,7 @@
 #include <QDomElement>
 #include <QEvent>
 
+#include "mythtypes.h"
 #include "mythmetaexp.h"
 #include "metadataimagehelper.h"
 
@@ -76,8 +77,6 @@ enum PeopleType {
 typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
 
 typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
-
-typedef QHash<QString,QString> MetadataMap;
 
 class META_PUBLIC MetadataLookup : public QObject
 {
@@ -225,7 +224,7 @@ class META_PUBLIC MetadataLookup : public QObject
         const ArtworkMap artwork,
         DownloadMap downloads);
 
-    void toMap(MetadataMap &map);
+    void toMap(InfoMap &map);
 
     // SETS (Only a limited number needed)
 
@@ -514,7 +513,7 @@ class META_PUBLIC MetaGrabberScript : public QObject
     QString GetDescription(void) const { return m_description; };
     float GetVersion(void) const { return m_version; };
 
-    void toMap(MetadataMap &metadataMap);
+    void toMap(InfoMap &metadataMap);
 
   private:
     QString m_name;
