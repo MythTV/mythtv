@@ -43,7 +43,7 @@ class TestMPEGTables: public QObject
             0xc0, 0x79, 0xa6, 0x2b                                                                            /* .y.+ */
         };
 
-        PSIPTable si_table = PSIPTable::ViewData(si_data);
+        PSIPTable si_table(si_data);
 
         QVERIFY  (si_table.IsGood());
 
@@ -120,7 +120,7 @@ class TestMPEGTables: public QObject
             0x70, 0x70, 0x05, 0xdc, 0xa9, 0x12, 0x33, 0x37                                                    /* pp....37 */
         };
 
-        PSIPTable si_table = PSIPTable::ViewData(si_data);
+        PSIPTable si_table(si_data);
 
 //      test for the values needed for the copy constructor, especially the length
 //        QCOMPARE (si_table._pesdataSize, 8); // is protected, so use TSSizeInBuffer() instead

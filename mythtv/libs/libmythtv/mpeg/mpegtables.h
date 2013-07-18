@@ -403,9 +403,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     static PSIPTable View(TSPacket& tspacket)
         { return PSIPTable(PESPacket::View(tspacket), false); }
 
-    static const PSIPTable ViewData(const unsigned char* pesdata)
-        { return PSIPTable(pesdata); }
-
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
     // table_id             8       0.0       0
