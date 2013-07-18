@@ -56,7 +56,7 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     if ((sSecurityPin != "0000" ) && ( sPin != sSecurityPin ))
         throw( QString( "Not Authorized" ));
         //SB: UPnPResult_ActionNotAuthorized );
-  
+
     DatabaseParams params = gCoreContext->GetDatabaseParams();
 
     // ----------------------------------------------------------------------
@@ -160,7 +160,7 @@ QStringList Myth::GetHosts( )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Myth::GetKeys() 
+QStringList Myth::GetKeys()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -181,7 +181,7 @@ QStringList Myth::GetKeys()
     // ----------------------------------------------------------------------
 
     QStringList oResults;
-    
+
     //pResults->setObjectName( "KeyList" );
 
     while (query.next())
@@ -195,7 +195,7 @@ QStringList Myth::GetKeys()
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
-                                                     const QString &sHostName ) 
+                                                     const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -249,7 +249,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
     while (query.next())
     {
         DTC::StorageGroupDir *pStorageGroupDir = pList->AddNewStorageGroupDir();
-            
+
         pStorageGroupDir->setId            ( query.value(0).toInt()       );
         pStorageGroupDir->setGroupName     ( query.value(1).toString()    );
         pStorageGroupDir->setHostName      ( query.value(2).toString()    );
@@ -264,7 +264,7 @@ DTC::StorageGroupDirList *Myth::GetStorageGroupDirs( const QString &sGroupName,
 /////////////////////////////////////////////////////////////////////////////
 
 bool Myth::AddStorageGroupDir( const QString &sGroupName,
-                               const QString &sDirName, 
+                               const QString &sDirName,
                                const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -326,7 +326,7 @@ bool Myth::AddStorageGroupDir( const QString &sGroupName,
 /////////////////////////////////////////////////////////////////////////////
 
 bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
-                                  const QString &sDirName, 
+                                  const QString &sDirName,
                                   const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -510,8 +510,8 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::SettingList *Myth::GetSetting( const QString &sHostName, 
-                                    const QString &sKey, 
+DTC::SettingList *Myth::GetSetting( const QString &sHostName,
+                                    const QString &sKey,
                                     const QString &sDefault )
 {
 
@@ -574,7 +574,7 @@ DTC::SettingList *Myth::GetSetting( const QString &sHostName,
     else
     {
         // ------------------------------------------------------------------
-        // Looking to return all Setting for supplied hostname 
+        // Looking to return all Setting for supplied hostname
         // ------------------------------------------------------------------
 
         if (sHostName.isEmpty())
@@ -618,9 +618,9 @@ DTC::SettingList *Myth::GetSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::PutSetting( const QString &sHostName, 
-                       const QString &sKey, 
-                       const QString &sValue ) 
+bool Myth::PutSetting( const QString &sHostName,
+                       const QString &sKey,
+                       const QString &sValue )
 {
     bool bResult = false;
 
@@ -759,7 +759,7 @@ bool Myth::SendMessage( const QString &sMessage,
     }
     else
     {
-        LOG(VB_GENERAL, LOG_DEBUG, 
+        LOG(VB_GENERAL, LOG_DEBUG,
             QString("UDP/XML packet sent! (Message: %1 Address: %2 Port: %3")
                 .arg(sMessage)
                 .arg(address.toString().toLocal8Bit().constData()).arg(port));
@@ -832,7 +832,7 @@ bool Myth::SendNotification( bool  bError,
     }
     else
     {
-        LOG(VB_GENERAL, LOG_DEBUG, 
+        LOG(VB_GENERAL, LOG_DEBUG,
             QString("UDP/XML packet sent! (Notification: %1 Address: %2 Port: %3")
                 .arg(sMessage)
                 .arg(address.toString().toLocal8Bit().constData()).arg(port));
