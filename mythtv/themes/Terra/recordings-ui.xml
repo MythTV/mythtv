@@ -254,18 +254,6 @@
             </state>
         </statetype>
 
-<!--
-        <textarea name="filesize_str" from="basetextarea">
-            <area>360,647,200,30</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="freereport" from="basetextarea">
-            <area>570,647,300,30</area>
-            <align>left</align>
-        </textarea>
--->
-
         <statetype name="ratingstate" from="baserating">
             <position>1193,435</position>
         </statetype>
@@ -622,12 +610,12 @@
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
-            <position>877,78</position>
+            <area>650,78,635,515</area>
             <filename>popups/alt_menu_background.png</filename>
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>889,93,378,125</area>
+            <area>662,93,615,125</area>
             <font>basemedium</font>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
@@ -635,36 +623,67 @@
         </textarea>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>889,225,378,30</area>
+            <area>680,230,615,30</area>
             <value>Title</value>
-            <align>hcenter</align>
+            <align>left</align>
             <font>basemedium</font>
         </textarea>
 
-        <textedit name="title" from="baseshorttextedit">
-            <position>919,250</position>
+        <textedit name="title" from="basetextedit">
+            <position>825,230</position>
         </textedit>
 
-        <textarea name="subtitlelabel" from="titlelabel">
-            <position>889,305</position>
+        <textarea name="subtitlelabel" from="basetextarea">
+            <area>680,280,565,30</area>
             <value>Subtitle</value>
+            <align>left</align>
+            <font>basemedium</font>
         </textarea>
 
-        <textedit name="subtitle" from="baseshorttextedit">
-            <position>919,330</position>
+        <textedit name="subtitle" from="basetextedit">
+            <position>825,280</position>
         </textedit>
 
-        <textarea name="descriptionlabel" from="titlelabel">
-            <position>889,385</position>
+        <textarea name="descriptionlabel" from="basetextarea">
+            <area>680,330,565,30</area>
             <value>Description</value>
+            <align>left</align>
+            <font>basemedium</font>
         </textarea>
 
-        <textedit name="description" from="baseshortmultilinetextedit">
-            <position>919,415</position>
+
+        <textedit name="description" from="basemultilinetextedit">
+            <area>825,330,437,90</area>
         </textedit>
+
+        <textarea name="inetreflabel" from="basetextarea">
+            <area>680,425,565,30</area>
+            <align>left</align>
+            <value>Inetref</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <textedit name="inetref" from="basetextedit">
+            <position>825,425</position>
+        </textedit>
+
+        <textarea name="seaslabel" from="basetextarea">
+            <area>680,475,565,30</area>
+            <align>left</align>
+            <value>Season/Epsiode</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <spinbox name="season" from="basespinbox">
+            <position>897,475</position>
+        </spinbox>
+
+        <spinbox name="episode" from="basespinbox">
+            <position>1077,475</position>
+        </spinbox>
 
         <button name="ok" from="basebutton">
-            <position>968,515</position>
+            <position>853,520</position>
             <value>OK</value>
         </button>
     </window>
