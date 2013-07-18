@@ -668,7 +668,7 @@ bool MythDVDPlayer::GoToMenu(QString str)
 
     if (!ret)
     {
-        SetOSDMessage(QObject::tr("DVD Menu Not Available"), kOSDTimeout_Med);
+        SetOSDMessage(tr("DVD Menu Not Available"), kOSDTimeout_Med);
         LOG(VB_GENERAL, LOG_ERR, "No DVD Menu available.");
         return false;
     }
@@ -709,7 +709,7 @@ QString MythDVDPlayer::GetAngleName(int angle) const
 {
     if (angle >= 1 && angle <= GetNumAngles())
     {
-        QString name = QObject::tr("Angle %1").arg(angle);
+        QString name = tr("Angle %1").arg(angle);
         return name;
     }
     return QString();
