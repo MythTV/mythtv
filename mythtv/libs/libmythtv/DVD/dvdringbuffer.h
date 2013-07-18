@@ -5,11 +5,14 @@
 #define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
+// Qt headers
 #include <QMap>
 #include <QString>
 #include <QMutex>
 #include <QRect>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "ringbuffer.h"
 #include "mythdate.h"
 #include "referencecounter.h"
@@ -64,6 +67,8 @@ class MythDVDPlayer;
 
 class MTV_PUBLIC DVDInfo
 {
+    Q_DECLARE_TR_FUNCTIONS(DVDInfo)
+
   public:
     DVDInfo(const QString &filename);
    ~DVDInfo(void);
@@ -80,6 +85,8 @@ class MTV_PUBLIC DVDInfo
 
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
+    Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
+
   public:
     DVDRingBuffer(const QString &lfilename);
     virtual ~DVDRingBuffer();

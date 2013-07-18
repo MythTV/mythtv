@@ -49,8 +49,8 @@ DVDInfo::DVDInfo(const QString &filename)
     dvdnav_status_t res = dvdnav_open(&m_nav, fname.constData());
     if (res == DVDNAV_STATUS_ERR)
     {
-        m_lastError = QObject::tr("Failed to open device at %1")
-                        .arg(fname.constData());
+        m_lastError = tr("Failed to open device at %1")
+                         .arg(fname.constData());
         LOG(VB_GENERAL, LOG_ERR, QString("DVDInfo: ") + m_lastError);
         return;
     }
@@ -402,12 +402,12 @@ void DVDRingBuffer::GetDescForPos(QString &desc)
     {
         if ((m_part <= DVD_MENU_MAX) && dvdnav_menu_table[m_part] )
         {
-            desc = QString("%1 Menu").arg(dvdnav_menu_table[m_part]);
+            desc = tr("%1 Menu").arg(dvdnav_menu_table[m_part]);
         }
     }
     else
     {
-        desc = QObject::tr("Title %1 chapter %2").arg(m_title).arg(m_part);
+        desc = tr("Title %1 chapter %2").arg(m_title).arg(m_part);
     }
 }
 
@@ -430,7 +430,7 @@ bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     dvdnav_status_t res = dvdnav_open(&m_dvdnav, fname.constData());
     if (res == DVDNAV_STATUS_ERR)
     {
-        lastError = QObject::tr("Failed to open DVD device at %1").arg(filename);
+        lastError = tr("Failed to open DVD device at %1").arg(filename);
         LOG(VB_GENERAL, LOG_ERR,
             LOC + QString("Failed to open DVD device at %1")
                 .arg(fname.constData()));
