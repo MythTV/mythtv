@@ -5260,7 +5260,10 @@ check_cflags -Wno-pointer-sign
 check_cflags -Wwrite-strings
 check_cflags -Wtype-limits
 check_cflags -Wundef
-check_cflags -Wmissing-prototypes
+#-Wmissing-prototypes breaks zeromq compilation in universal mode
+if [ "$target_os" != "darwin" ]; then
+    check_cflags -Wmissing-prototypes
+fi
 check_cflags -Wno-pointer-to-int-cast
 check_cflags -Wstrict-prototypes
 enabled extra_warnings && check_cflags -Winline
@@ -5626,7 +5629,7 @@ elif enabled clang; then
     check_cflags -mllvm -stack-alignment=16
     check_cflags -Qunused-arguments
     check_cflags -Werror=implicit-function-declaration
-    check_cflags -Werror=missing-prototypes
+#   check_cflags -Werror=missing-prototypes
     check_cflags -Werror=return-type
 elif enabled armcc; then
     # 2523: use of inline assembler is deprecated
