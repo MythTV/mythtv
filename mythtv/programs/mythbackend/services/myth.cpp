@@ -771,6 +771,79 @@ bool Myth::SendMessage( const QString &sMessage,
     return bResult;
 }
 
+bool Myth::SendNotification( bool  bError,
+                             const QString &sMessage,
+                             const QString &sOrigin,
+                             const QString &sDecription,
+                             const QString &sImage,
+                             const QString &sExtra,
+                             const QString &sProgressText,
+                             float fProgress,
+                             int   Duration,
+                             bool  bFullscreen,
+                             int   Visibility,
+                             int   Priority,
+                             const QString &sAddress,
+                             int   udpPort )
+{
+    bool bResult = false;
+
+    if (sMessage.isEmpty())
+        return bResult;
+
+    if (Duration < 0 || Duration > 999)
+        Duration = -1;
+
+    QString xmlMessage =
+        "<mythnotification version=\"1\">\n"
+        "  <text>" + sMessage + "</text>\n"
+        "  <origin>" + (sOrigin.isNull() ? tr("MythServices") : sOrigin) + "</origin>\n"
+        "  <description>" + sDecription + "</description>\n"
+        "  <error>" + (bError ? "true" : "false") + "</error>\n"
+        "  <timeout>" + QString::number(Duration) + "</timeout>\n"
+        "  <image>" + sImage + "</image>\n"
+        "  <extra>" + sExtra + "</extra>\n"
+        "  <progress_text>" + sProgressText + "</progress_text>\n"
+        "  <progress>" + QString::number(fProgress) + "</progress>\n"
+        "  <fullscreen>" + (bFullscreen ? "true" : "false") + "</fullscreen>\n"
+        "  <visibility>" + QString::number(Visibility) + "</visibility>\n"
+        "  <priority>" + QString::number(Priority) + "</priority>\n"
+        "</mythnotification>";
+
+    QHostAddress address = QHostAddress::Broadcast;
+    unsigned short port = 6948;
+
+    if (!sAddress.isEmpty())
+        address.setAddress(sAddress);
+
+    if (udpPort != 0)
+        port = udpPort;
+
+    QUdpSocket *sock = new QUdpSocket();
+    QByteArray utf8 = xmlMessage.toUtf8();
+    int size = utf8.length();
+
+    if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Failed to send UDP/XML packet (Notification: %1 "
+                    "Address: %2 Port: %3")
+                .arg(sMessage).arg(sAddress).arg(port));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, 
+            QString("UDP/XML packet sent! (Notification: %1 Address: %2 Port: %3")
+                .arg(sMessage)
+                .arg(address.toString().toLocal8Bit().constData()).arg(port));
+        bResult = true;
+    }
+
+    sock->deleteLater();
+
+    return bResult;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////

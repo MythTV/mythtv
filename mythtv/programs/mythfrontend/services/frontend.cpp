@@ -11,6 +11,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "tv_play.h"
+#include "mythuinotificationcenter.h"
 
 #include "videometadatalistmanager.h"
 #include "videometadata.h"
@@ -42,6 +43,32 @@ bool Frontend::SendMessage(const QString &Message, uint Timeout)
     qApp->postEvent(GetMythMainWindow(),
                     new MythEvent(MythEvent::MythUserMessage, Message,
                     data));
+    return true;
+}
+
+bool  Frontend::SendNotification(bool  Error,
+                                 const QString &Message,
+                                 const QString &Origin,
+                                 const QString &Description,
+                                 const QString &Image,
+                                 const QString &Extra,
+                                 const QString &ProgressText,
+                                 float Progress,
+                                 int   Timeout,
+                                 bool  Fullscreen,
+                                 int   Visibility,
+                                 int   Priority)
+{
+    if (Message.isEmpty())
+        return false;
+    if (!GetNotificationCenter())
+        false;
+
+    ShowNotification(Error, Message,
+                     Origin.isNull() ? tr("FrontendServices") : Origin,
+                     Description, Image, Extra,
+                     ProgressText, Progress, Timeout,
+                     Fullscreen, Visibility, (MythNotification::Priority)Priority);
     return true;
 }
 

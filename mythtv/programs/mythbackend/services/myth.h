@@ -96,6 +96,21 @@ class Myth : public MythServices
                                                   int   udpPort,
                                                   int   Timeout);
 
+        bool                SendNotification    ( bool  Error,
+                                                  const QString &Message,
+                                                  const QString &Origin,
+                                                  const QString &Description,
+                                                  const QString &Image,
+                                                  const QString &Extra,
+                                                  const QString &ProgressText,
+                                                  float Progress,
+                                                  int   Duration,
+                                                  bool  Fullscreen,
+                                                  int   Visibility,
+                                                  int   Priority,
+                                                  const QString &Address,
+                                                  int   udpPort );
+
         bool                BackupDatabase      ( void );
 
         bool                CheckDatabase       ( bool Repair );
