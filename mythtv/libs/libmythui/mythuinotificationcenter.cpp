@@ -268,6 +268,11 @@ void MythUINotificationScreen::SetNotification(MythNotification &notification)
 
     m_duration      = notification.GetDuration();
     m_visibility    = notification.GetVisibility();
+    if (!m_visibility)
+    {
+        // no visibility is all visibility to get around QVariant always making 0 the default
+        m_visibility = ~0;
+    }
     m_priority      = notification.GetPriority();
 
     // Set timer if need be
@@ -749,7 +754,9 @@ void NCPrivate::ScreenDeleted(void)
     int n = m_screens.indexOf(screen);
     if (n >= 0)
     {
-        m_screens.removeAll(screen);
+        int num = m_screens.removeAll(screen);
+        LOG(VB_GUI, LOG_DEBUG, LOC +
+            QString("%1 screen removed from screens list").arg(num));
         RefreshScreenPosition();
     }
     else
@@ -1134,19 +1141,17 @@ void NCPrivate::RefreshScreenPosition(int from)
     QList<MythUINotificationScreen*>::iterator it       = m_screens.begin();
     QList<MythUINotificationScreen*>::iterator itend    = m_screens.end();
 
-    it += from;
     int position = 0;
-
-    if (from > 0)
-    {
-        position = (*(it-1))->m_fullscreen ? 0 : (*(it-1))->m_index+1;
-    }
 
     for (; it != itend; ++it)
     {
         if ((*it)->IsVisible())
         {
             (*it)->AdjustIndex(position++, true);
+        }
+        else
+        {
+            (*it)->AdjustIndex(position, true);
         }
         if ((*it)->m_fullscreen)
         {
@@ -1363,11 +1368,7 @@ void ShowNotificationError(const QString &msg,
                            const VNMask visibility,
                            const MythNotification::Priority priority)
 {
-    MythErrorNotification n(msg, from, detail);
-    n.SetPriority(priority);
-    n.SetVisibility(visibility);
-
-    MythUINotificationCenter::GetInstance()->Queue(n);
+    ShowNotification(true, msg, from, detail);
 }
 
 void ShowNotification(const QString &msg,
@@ -1376,9 +1377,70 @@ void ShowNotification(const QString &msg,
                       const VNMask visibility,
                       const MythNotification::Priority priority)
 {
-    MythNotification n(msg, from, detail);
-    n.SetPriority(priority);
-    n.SetVisibility(visibility);
+    ShowNotification(false, msg, from, detail,
+                     QString(), QString(), QString(), -1, -1, false,
+                     visibility, priority);
+}
 
-    MythUINotificationCenter::GetInstance()->Queue(n);
+void ShowNotification(bool  error,
+                      const QString &msg,
+                      const QString &origin,
+                      const QString &detail,
+                      const QString &image,
+                      const QString &extra,
+                      const QString &progress_text, float progress,
+                      int   duration,
+                      bool  fullscreen,
+                      const VNMask visibility,
+                      const MythNotification::Priority priority,
+                      const QString &style)
+{
+    if (!GetNotificationCenter())
+        return;
+
+    MythNotification *n;
+
+    if (error)
+    {
+        n = new MythErrorNotification(msg, origin, detail);
+    }
+    else
+    {
+        DMAP data;
+
+        data["minm"] = msg;
+        data["asar"] = origin.isNull() ? QObject::tr("MythTV") : origin;
+        data["asal"] = detail;
+        data["asfm"] = extra;
+
+        if (!image.isEmpty())
+        {
+            if (progress >= 0)
+            {
+                n = new MythMediaNotification(MythNotification::New,
+                                              image, data,
+                                              progress, progress_text);
+            }
+            else
+            {
+                n = new MythImageNotification(MythNotification::New, image, data);
+            }
+        }
+        else if (progress >= 0)
+        {
+            n = new MythPlaybackNotification(MythNotification::New,
+                                             progress, progress_text, data);
+        }
+        else
+        {
+            n = new MythNotification(MythNotification::New, data);
+        }
+        n->SetFullScreen(fullscreen);
+    }
+    n->SetDuration(duration);
+    n->SetPriority(priority);
+    n->SetVisibility(visibility);
+
+    MythUINotificationCenter::GetInstance()->Queue(*n);
+    delete n;
 }
