@@ -106,8 +106,8 @@ class Myth : public MythServices
                                                   float Progress,
                                                   int   Duration,
                                                   bool  Fullscreen,
-                                                  int   Visibility,
-                                                  int   Priority,
+                                                  uint  Visibility,
+                                                  uint  Priority,
                                                   const QString &Address,
                                                   int   udpPort );
 

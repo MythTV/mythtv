@@ -56,8 +56,8 @@ bool  Frontend::SendNotification(bool  Error,
                                  float Progress,
                                  int   Timeout,
                                  bool  Fullscreen,
-                                 int   Visibility,
-                                 int   Priority)
+                                 uint  Visibility,
+                                 uint  Priority)
 {
     if (Message.isEmpty())
         return false;

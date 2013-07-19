@@ -135,8 +135,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                           float Progress,
                                                           int   Timeout,
                                                           bool  Fullscreen,
-                                                          int   Visibility,
-                                                          int   Priority,
+                                                          uint  Visibility,
+                                                          uint  Priority,
                                                           const QString &Address,
                                                           int   udpPort ) = 0;
 

@@ -27,7 +27,7 @@ class Frontend : public FrontendServices
                                           float Progress,
                                           int   Timeout,
                                           bool  Fullscreen,
-                                          int   Visibility, int   Priority);
+                                          uint  Visibility, uint Priority);
 
     bool                 SendAction(const QString &Action,
                                     const QString &Value,

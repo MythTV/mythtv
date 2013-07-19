@@ -32,8 +32,8 @@ class SERVICE_PUBLIC FrontendServices : public Service
                                                   float Progress,
                                                   int   Timeout,
                                                   bool  Fullscreen,
-                                                  int   Visibility,
-                                                  int   Priority ) = 0;
+                                                  uint  Visibility,
+                                                  uint  Priority ) = 0;
     virtual bool                 SendAction(const QString &Action,
                                             const QString &Value,
                                             uint Width, uint Height) = 0;

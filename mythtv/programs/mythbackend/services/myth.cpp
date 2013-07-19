@@ -781,8 +781,8 @@ bool Myth::SendNotification( bool  bError,
                              float fProgress,
                              int   Duration,
                              bool  bFullscreen,
-                             int   Visibility,
-                             int   Priority,
+                             uint  Visibility,
+                             uint  Priority,
                              const QString &sAddress,
                              int   udpPort )
 {
