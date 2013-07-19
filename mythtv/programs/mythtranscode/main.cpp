@@ -905,6 +905,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
 
         if (!gCoreContext->GetNumSetting("SaveTranscoding", 0))
         {
+            int err;
             bool followLinks =
                 gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
 
@@ -917,7 +918,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             {
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
-                if (transUnlink(alink.constData(), pginfo))
+                err = transUnlink(alink.constData(), pginfo);
+                if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1' "
@@ -926,7 +928,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                             .arg(aoldfile.constData()) + ENO);
                 }
 
-                if (unlink(aoldfile.constData()))
+                err = unlink(aoldfile.constData());
+                if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1', "
@@ -937,7 +940,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             }
             else
             {
-                if (transUnlink(aoldfile.constData(), pginfo))
+                err = transUnlink(aoldfile.constData(), pginfo);
+                if (err)
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1': ")
                             .arg(oldfile) + ENO);
