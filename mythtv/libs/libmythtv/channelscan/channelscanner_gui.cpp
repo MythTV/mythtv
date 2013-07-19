@@ -112,12 +112,13 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             transports = sigmonScanner->GetChannelList();
         }
 
+        bool wasIPTV = iptvScanner != NULL;
         Teardown();
 
         int ret = scanEvent->intValue();
         if (!transports.empty() || (MythDialog::Rejected != ret))
         {
-            Process(transports);
+            Process(transports, wasIPTV);
         }
     }
     else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
@@ -147,10 +148,10 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         scanStage->SetStatusSignalStrength(scanEvent->intValue());
 }
 
-void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports)
+void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports, bool success)
 {
     ChannelImporter ci(true, true, true, true, true,
-                       freeToAirOnly, serviceRequirements);
+                       freeToAirOnly, serviceRequirements, success);
     ci.Process(_transports);
 }
 
