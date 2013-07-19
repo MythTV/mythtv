@@ -89,12 +89,12 @@ public:
     enum Visibility {
         kNone       = 0,
         kAll        = ~0,
-        kPlayback   = (1 << 1),
-        kSettings   = (1 << 2),
-        kWizard     = (1 << 3),
-        kVideos     = (1 << 4),
-        kMusic      = (1 << 5),
-        kRecordings = (1 << 6),
+        kPlayback   = (1 << 0),
+        kSettings   = (1 << 1),
+        kWizard     = (1 << 2),
+        kVideos     = (1 << 3),
+        kMusic      = (1 << 4),
+        kRecordings = (1 << 5),
     };
 
     // Setter
