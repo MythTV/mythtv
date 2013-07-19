@@ -1360,7 +1360,7 @@ QString ChannelUtil::GetIcon(uint chanid)
 
 QString ChannelUtil::GetUnknownCallsign(void)
 {
-    QString tmp = QObject::tr("UNKNOWN", "Synthesized callsign");
+    QString tmp = tr("UNKNOWN", "Synthesized callsign");
     tmp.detach();
     return tmp;
 }

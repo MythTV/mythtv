@@ -12,6 +12,7 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "mythtvexp.h"
@@ -48,6 +49,8 @@ typedef vector<pid_cache_item_t> pid_cache_t;
  */
 class MTV_PUBLIC ChannelUtil
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelUtil)
+
   public:
     // Multiplex Stuff
 
