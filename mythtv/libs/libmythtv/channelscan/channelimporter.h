@@ -83,8 +83,8 @@ class MTV_PUBLIC ChannelImporter
         use_gui(gui), is_interactive(interactive),
         do_delete(_delete),
         do_insert(insert), do_save(save), m_fta_only(fta_only),
-        m_service_requirements(service_requirements),
-        m_success(success) { }
+        m_success(success),
+        m_service_requirements(service_requirements) { }
 
     void Process(const ScanDTVTransportList&);
 

@@ -97,7 +97,8 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         post_event(scanMonitor, ScannerEvent::ScanShutdown,
                    kDialogCodeAccepted);
     }
-    else if (scanEvent->type() == ScannerEvent::ScanShutdown)
+    else if (scanEvent->type() == ScannerEvent::ScanShutdown ||
+             scanEvent->type() == ScannerEvent::ScanErrored)
     {
         if (scanEvent->ConfigurableValue())
         {
@@ -115,10 +116,19 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         bool wasIPTV = iptvScanner != NULL;
         Teardown();
 
-        int ret = scanEvent->intValue();
-        if (!transports.empty() || (MythDialog::Rejected != ret))
+        if (scanEvent->type() == ScannerEvent::ScanErrored)
         {
-            Process(transports, wasIPTV);
+            QString error = scanEvent->strValue();
+            InformUser(error);
+            return;
+        }
+        else
+        {
+            int ret = scanEvent->intValue();
+            if (!transports.empty() || (MythDialog::Rejected != ret))
+            {
+                Process(transports, wasIPTV);
+            }
         }
     }
     else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
