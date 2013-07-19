@@ -1435,8 +1435,8 @@ void ShowNotification(bool  error,
         {
             n = new MythNotification(MythNotification::New, data);
         }
-        n->SetFullScreen(fullscreen);
     }
+    n->SetFullScreen(fullscreen);
     n->SetDuration(duration);
     n->SetPriority(priority);
     n->SetVisibility(visibility);
