@@ -1,11 +1,17 @@
 #ifndef CHANNELGROUPSETTINGS_H
 #define CHANNELGROUPSETTINGS_H
 
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "mythtvexp.h"
 #include "settings.h"
 
 class MTV_PUBLIC ChannelGroupConfig: public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelGroupConfig)
+
  public:
     ChannelGroupConfig(QString _name);
     QString getName(void) const { return name; }
