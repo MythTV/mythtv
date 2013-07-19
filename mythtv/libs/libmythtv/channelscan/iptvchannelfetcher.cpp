@@ -363,7 +363,7 @@ static bool parse_chan_info(const QString   &rawdata,
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
-                QString data = line.mid(line.indexOf(':'));
+                QString data = line.mid(line.indexOf(':')+1);
                 QString key = data.left(data.indexOf('='));
                 if (!key.isEmpty())
                     values[key] = data.mid(data.indexOf('=')+1);
