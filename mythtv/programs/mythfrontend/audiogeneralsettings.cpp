@@ -117,10 +117,10 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     devicegroup->addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
         // Rescan button
     TransButtonSetting *rescan = new TransButtonSetting("rescan");
-    rescan->setLabel(QObject::tr("Rescan"));
-    rescan->setHelpText(QObject::tr("Rescan for available audio devices. "
-                                    "Current entry will be checked and "
-                                    "capability entries populated."));
+    rescan->setLabel(tr("Rescan"));
+    rescan->setHelpText(tr("Rescan for available audio devices. "
+                           "Current entry will be checked and "
+                           "capability entries populated."));
     devicegroup->addChild(rescan);
     connect(rescan, SIGNAL(pressed()), this, SLOT(AudioRescan()));
     addChild(devicegroup);
@@ -151,7 +151,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_DTSHDPassThrough = DTSHDPassThrough();
 
     m_cgsettings = new HorizontalConfigurationGroup();
-    m_cgsettings->setLabel(QObject::tr("Digital Audio Capabilities"));
+    m_cgsettings->setLabel(tr("Digital Audio Capabilities"));
     m_cgsettings->addChild(m_AC3PassThrough);
     m_cgsettings->addChild(m_DTSPassThrough);
     m_cgsettings->addChild(m_EAC3PassThrough);
@@ -167,9 +167,9 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     maingroup->addChild((m_AudioUpmixType = AudioUpmixType()));
 
     TransButtonSetting *test = new TransButtonSetting("test");
-    test->setLabel(QObject::tr("Test"));
-    test->setHelpText(QObject::tr("Will play a test pattern on all configured "
-                                  "speakers"));
+    test->setLabel(tr("Test"));
+    test->setHelpText(tr("Will play a test pattern on all configured "
+                         "speakers"));
     connect(test, SIGNAL(pressed()), this, SLOT(StartAudioTest()));
     addChild(test);
 
@@ -210,14 +210,18 @@ void AudioConfigSettings::AudioRescan()
     QString name = m_OutputDevice->getValue();
     if (!audiodevs.contains(name))
     {
-            // Scan for possible custom entry that isn't in the list
+        // Scan for possible custom entry that isn't in the list
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, name, true);
         if (adc->settings.IsInvalid())
         {
-            QString msg = name + QObject::tr(" is invalid or not useable.");
+            QString msg = tr("%1 is invalid or not useable.").arg(name);
+
             MythPopupBox::showOkPopup(
-                GetMythMainWindow(), QObject::tr("Warning"), msg);
+                GetMythMainWindow(), 
+                QCoreApplication::translate("(Common)", "Warning"), 
+                msg);
+
             LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                     .arg(name));
         }
@@ -228,11 +232,15 @@ void AudioConfigSettings::AudioRescan()
     m_OutputDevice->AudioRescan();
     if (!CheckPassthrough())
     {
-        QString msg =QObject::tr("Passthrough device is invalid or not useable."
-                                 " Check configuration in Advanced Settings:") +
+        QString msg = tr("Passthrough device is invalid or not useable. Check "
+                         "configuration in Advanced Settings:") +
             gCoreContext->GetSetting("PassThruOutputDevice");
+
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Warning"), msg);
+            GetMythMainWindow(), 
+            QCoreApplication::translate("(Common)", "Warning"),
+            msg);
+
         LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
                 .arg(name));
     }
@@ -362,13 +370,13 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
             switch (i)
             {
                 case 2:
-                    txt = QObject::tr("Stereo");
+                    txt = QCoreApplication::translate("(Common)", "Stereo");
                     break;
                 case 6:
-                    txt = QObject::tr("5.1");
+                    txt = QCoreApplication::translate("(Common)", "5.1");
                     break;
                 case 8:
-                    txt = QObject::tr("7.1");
+                    txt = QCoreApplication::translate("(Common)", "7.1");
                     break;
                 default:
                     continue;
@@ -429,21 +437,29 @@ void AudioConfigSettings::AudioAdvanced()
 HostComboBox *AudioConfigSettings::MaxAudioChannels()
 {
     QString name = "MaxChannels";
+
     HostComboBox *gc = new HostComboBox(name, false);
-    gc->setLabel(QObject::tr("Speaker configuration"));
-    gc->addSelection(QObject::tr("Stereo"), "2", true); // default
-    gc->setHelpText(QObject::tr("Select the maximum number of audio "
-                                "channels supported by your receiver "
-                                "and speakers."));
+
+    gc->setLabel(tr("Speaker configuration"));
+
+    gc->addSelection(QCoreApplication::translate("(Common)", "Stereo"), 
+                     "2", true); // default
+
+    gc->setHelpText(tr("Select the maximum number of audio "
+                       "channels supported by your receiver "
+                       "and speakers."));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::AudioUpmix()
 {
     HostCheckBox *gc = new HostCheckBox("AudioDefaultUpmix");
-    gc->setLabel(QObject::tr("Upconvert stereo to 5.1 surround"));
+
+    gc->setLabel(tr("Upconvert stereo to 5.1 surround"));
+
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will upconvert stereo "
+
+    gc->setHelpText(tr("If enabled, MythTV will upconvert stereo "
                     "to 5.1 audio. You can enable or disable "
                     "the upconversion during playback at any time."));
     return gc;
@@ -452,64 +468,83 @@ HostCheckBox *AudioConfigSettings::AudioUpmix()
 HostComboBox *AudioConfigSettings::AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
-    gc->setLabel(QObject::tr("Upmix Quality"));
-    gc->addSelection(QObject::tr("Passive"), "0");
-    gc->addSelection(QObject::tr("Hall"), "3");
-    gc->addSelection(QObject::tr("Good"), "1");
-    gc->addSelection(QObject::tr("Best"), "2", true);  // default
-    gc->setHelpText(QObject::tr("Set the audio surround-upconversion quality."));
+
+    gc->setLabel(tr("Upmix Quality"));
+
+    gc->addSelection(tr("Passive"), "0");
+    gc->addSelection(tr("Hall", "Upmix Quality"), "3");
+    gc->addSelection(tr("Good", "Upmix Quality"), "1");
+    gc->addSelection(tr("Best", "Upmix Quality"), "2", true);  // default
+
+    gc->setHelpText(tr("Set the audio surround-upconversion quality."));
+
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::AC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("AC3PassThru");
-    gc->setLabel(QObject::tr("Dolby Digital"));
+
+    gc->setLabel(tr("Dolby Digital"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports AC-3/Dolby Digital. You must use a digital "
-                    "connection. Uncheck if using an analog connection."));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder "
+                       "supports AC-3/Dolby Digital. You must use a digital "
+                       "connection. Uncheck if using an analog connection."));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::DTSPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("DTSPassThru");
-    gc->setLabel(QObject::tr("DTS"));
+
+    gc->setLabel(tr("DTS"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports DTS. You must use a digital connection. Uncheck "
-                    "if using an analog connection"));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder supports "
+                       "DTS. You must use a digital connection. Uncheck "
+                       "if using an analog connection"));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::EAC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("EAC3PassThru");
-    gc->setLabel(QObject::tr("E-AC-3"));
+
+    gc->setLabel(tr("E-AC-3"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports E-AC-3 (DD+). You must use a HDMI connection."));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder supports "
+                       "E-AC-3 (DD+). You must use a HDMI connection."));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::TrueHDPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("TrueHDPassThru");
-    gc->setLabel(QObject::tr("TrueHD"));
+
+    gc->setLabel(tr("TrueHD"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports Dolby TrueHD. You must use a HDMI connection."));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder supports "
+                        "Dolby TrueHD. You must use a HDMI connection."));
     return gc;
 }
 
 HostCheckBox *AudioConfigSettings::DTSHDPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("DTSHDPassThru");
-    gc->setLabel(QObject::tr("DTS-HD"));
+
+    gc->setLabel(tr("DTS-HD"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "supports DTS-HD. You must use a HDMI connection."));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder supports "
+                       "DTS-HD. You must use a HDMI connection."));
     return gc;
 }
 
@@ -595,7 +630,7 @@ QString AudioTestThread::result()
 {
     QString errMsg;
     if (!m_audioOutput)
-        errMsg = QObject::tr("Unable to create AudioOutput.");
+        errMsg = tr("Unable to create AudioOutput.");
     else
         errMsg = m_audioOutput->GetError();
     return errMsg;
@@ -730,22 +765,22 @@ AudioTest::AudioTest(QString main, QString passthrough,
       m_settings(settings), m_quality(false)
 {
     m_channels = gCoreContext->GetNumSetting("TestingChannels", channels);
-    setLabel(QObject::tr("Audio Configuration Testing"));
+    setLabel(tr("Audio Configuration Testing"));
 
     m_at = new AudioTestThread(this, m_main, m_passthrough, m_channels,
                                m_settings, m_quality);
     if (!m_at->result().isEmpty())
     {
-        QString msg = main + QObject::tr(" is invalid or not "
-                                         "useable.");
+        QString msg = tr("%1 is invalid or not useable.").arg(main);
+
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Warning"), msg);
+            GetMythMainWindow(), tr("Warning"), msg);
         return;
     }
 
     m_button = new TransButtonSetting("start");
-    m_button->setLabel(QObject::tr("Test All"));
-    m_button->setHelpText(QObject::tr("Start all channels test"));
+    m_button->setLabel(tr("Test All"));
+    m_button->setHelpText(tr("Start all channels test"));
     connect(m_button, SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
     ConfigurationGroup *frontgroup =
@@ -771,15 +806,15 @@ AudioTest::AudioTest(QString main, QString passthrough,
     {
         case 8:
             m_rearleft = new TransButtonSetting("5");
-            m_rearleft->setLabel(QObject::tr("Rear Left"));
+            m_rearleft->setLabel(tr("Rear Left"));
             connect(m_rearleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             reargroup->addChild(m_rearleft);
 
         case 7:
             m_rearright = new TransButtonSetting("4");
-            m_rearright->setLabel(QObject::tr(m_channels == 8 ?
-                                              "Rear Right" : "Rear Center"));
+            m_rearright->setLabel(m_channels == 8 ?
+                                  tr("Rear Right") : tr("Rear Center"));
             connect(m_rearright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
@@ -788,22 +823,22 @@ AudioTest::AudioTest(QString main, QString passthrough,
         case 6:
             m_lfe = new TransButtonSetting(m_channels == 6 ? "5" :
                                            m_channels == 7 ? "6" : "7");
-            m_lfe->setLabel(QObject::tr("LFE"));
+            m_lfe->setLabel(tr("LFE"));
             connect(m_lfe,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
 
         case 5:
             m_surroundleft = new TransButtonSetting(m_channels == 6 ? "4" :
                                                     m_channels == 7 ? "5" : "6");
-            m_surroundleft->setLabel(QObject::tr("Surround Left"));
+            m_surroundleft->setLabel(tr("Surround Left"));
             connect(m_surroundleft,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             m_surroundright = new TransButtonSetting("3");
-            m_surroundright->setLabel(QObject::tr("Surround Right"));
+            m_surroundright->setLabel(tr("Surround Right"));
             connect(m_surroundright,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             m_center = new TransButtonSetting("1");
-            m_center->setLabel(QObject::tr("Center"));
+            m_center->setLabel(tr("Center"));
             connect(m_center,
                     SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
             frontgroup->addChild(m_center);
@@ -822,11 +857,11 @@ AudioTest::AudioTest(QString main, QString passthrough,
     addChild(m_button);
 
     m_hd = new TransCheckBoxSetting();
-    m_hd->setLabel(QObject::tr("Use Highest Quality Mode"));
-    m_hd->setHelpText(QObject::tr("Use the highest audio quality settings "
-                                  "supported by your audio card. This will be "
-                                  "a good place to start troubleshooting "
-                                  "potential errors"));
+    m_hd->setLabel(tr("Use Highest Quality Mode"));
+    m_hd->setHelpText(tr("Use the highest audio quality settings "
+                         "supported by your audio card. This will be "
+                         "a good place to start troubleshooting "
+                         "potential errors"));
     addChild(m_hd);
     connect(m_hd, SIGNAL(valueChanged(QString)), this, SLOT(togglequality()));
 }
@@ -845,7 +880,7 @@ void AudioTest::toggle(QString str)
         if (m_at->isRunning())
         {
             m_at->cancel();
-            m_button->setLabel(QObject::tr("Test All"));
+            m_button->setLabel(tr("Test All"));
             if (m_frontleft)
                 m_frontleft->setEnabled(true);
             if (m_frontright)
@@ -867,7 +902,7 @@ void AudioTest::toggle(QString str)
         {
             m_at->setChannel(-1);
             m_at->start();
-            m_button->setLabel(QObject::tr("Stop"));
+            m_button->setLabel(QCoreApplication::translate("(Common)", "Stop"));
         }
         return;
     }
@@ -896,9 +931,11 @@ void AudioTest::togglequality()
                                m_settings, m_quality);
     if (!m_at->result().isEmpty())
     {
-        QString msg = QObject::tr("Audio device is invalid or not useable.");
+        QString msg = tr("Audio device is invalid or not useable.");
+
         MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Warning"), msg);
+            GetMythMainWindow(), QCoreApplication::translate("(Common)", 
+                                                             "Warning"), msg);
     }
 }
 
@@ -977,19 +1014,23 @@ AudioTestGroup::AudioTestGroup(QString main, QString passthrough,
 HostCheckBox *AudioMixerSettings::MythControlsVolume()
 {
     HostCheckBox *gc = new HostCheckBox("MythControlsVolume");
-    gc->setLabel(QObject::tr("Use internal volume controls"));
+
+    gc->setLabel(tr("Use internal volume controls"));
+
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will control the PCM and "
-                    "master mixer volume. Disable this option if you prefer "
-                    "to control the volume externally (for example, using "
-                    "your amplifier) or if you use an external mixer program."));
+
+    gc->setHelpText(tr("If enabled, MythTV will control the PCM and "
+                       "master mixer volume. Disable this option if you "
+                       "prefer to control the volume externally (for "
+                       "example, using your amplifier) or if you use an "
+                       "external mixer program."));
     return gc;
 }
 
 HostComboBox *AudioMixerSettings::MixerDevice()
 {
     HostComboBox *gc = new HostComboBox("MixerDevice", true);
-    gc->setLabel(QObject::tr("Mixer device"));
+    gc->setLabel(tr("Mixer device"));
 
 #ifdef USING_OSS
     QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
@@ -1009,11 +1050,13 @@ HostComboBox *AudioMixerSettings::MixerDevice()
     gc->addSelection("Windows:", "Windows:");
 #endif
 #if !defined(USING_MINGW)
-    gc->addSelection("software", "software");
-    gc->setHelpText(QObject::tr("Setting the mixer device to \"software\" "
-                    "lets MythTV control the volume of all audio at the "
-                    "expense of a slight quality loss."));
+    gc->addSelection(tr("software"), "software");
 #endif
+
+    gc->setHelpText(tr("Setting the mixer device to \"%1\" lets MythTV control "
+                       "the volume of all audio at the expense of a slight "
+                       "quality loss.")
+                       .arg(tr("software")));
 
     return gc;
 }
@@ -1024,7 +1067,9 @@ const char* AudioMixerSettings::MixerControlControls[] = { "PCM",
 HostComboBox *AudioMixerSettings::MixerControl()
 {
     HostComboBox *gc = new HostComboBox("MixerControl", true);
-    gc->setLabel(QObject::tr("Mixer controls"));
+
+    gc->setLabel(tr("Mixer controls"));
+
     for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*);
          ++i)
     {
@@ -1032,35 +1077,43 @@ HostComboBox *AudioMixerSettings::MixerControl()
                          MixerControlControls[i]);
     }
 
-    gc->setHelpText(QObject::tr("Changing the volume adjusts the selected mixer."));
+    gc->setHelpText(tr("Changing the volume adjusts the selected mixer."));
+
     return gc;
 }
 
 HostSlider *AudioMixerSettings::MixerVolume()
 {
     HostSlider *gs = new HostSlider("MasterMixerVolume", 0, 100, 1);
-    gs->setLabel(QObject::tr("Master mixer volume"));
+
+    gs->setLabel(tr("Master mixer volume"));
+
     gs->setValue(70);
-    gs->setHelpText(QObject::tr("Initial volume for the Master mixer. "
-                    "This affects all sound created by the audio device. "
-                    "Note: Do not set this too low."));
+
+    gs->setHelpText(tr("Initial volume for the Master mixer. This affects "
+                       "all sound created by the audio device. Note: Do not "
+                       "set this too low."));
     return gs;
 }
 
 HostSlider *AudioMixerSettings::PCMVolume()
 {
     HostSlider *gs = new HostSlider("PCMMixerVolume", 0, 100, 1);
-    gs->setLabel(QObject::tr("PCM mixer volume"));
+
+    gs->setLabel(tr("PCM mixer volume"));
+
     gs->setValue(70);
-    gs->setHelpText(QObject::tr("Initial volume for PCM output. Using the "
-                    "volume keys in MythTV will adjust this parameter."));
+
+    gs->setHelpText(tr("Initial volume for PCM output. Using the volume "
+                       "keys in MythTV will adjust this parameter."));
     return gs;
 }
 
 AudioMixerSettings::AudioMixerSettings() :
     TriggeredConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Audio Mixer"));
+    setLabel(tr("Audio Mixer"));
+
     setUseLabel(false);
 
     Setting *volumeControl = MythControlsVolume();
@@ -1092,59 +1145,75 @@ AudioGeneralSettings::AudioGeneralSettings()
 HostCheckBox *AudioAdvancedSettings::MPCM()
 {
     HostCheckBox *gc = new HostCheckBox("StereoPCM");
-    gc->setLabel(QObject::tr("Stereo PCM Only"));
+
+    gc->setLabel(tr("Stereo PCM Only"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder "
-                    "only supports 2 channel PCM (typically an old HDMI 1.0 "
-                    "device). Multichannel audio will be re-encoded to AC-3 "
-                    "when required"));
+
+    gc->setHelpText(tr("Enable if your amplifier or sound decoder only "
+                       "supports 2 channel PCM (typically an old HDMI 1.0 "
+                       "device). Multichannel audio will be re-encoded to "
+                       "AC-3 when required"));
     return gc;
 }
 
 HostCheckBox *AudioAdvancedSettings::SRCQualityOverride()
 {
     HostCheckBox *gc = new HostCheckBox("SRCQualityOverride");
-    gc->setLabel(QObject::tr("Override SRC quality"));
+
+    gc->setLabel(tr("Override SRC quality"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable to override audio sample rate "
-                    "conversion quality."));
+
+    gc->setHelpText(tr("Enable to override audio sample rate "
+                       "conversion quality."));
     return gc;
 }
 
 HostComboBox *AudioAdvancedSettings::SRCQuality()
 {
     HostComboBox *gc = new HostComboBox("SRCQuality", false);
+
     gc->setLabel(QObject::tr("Sample rate conversion"));
-    gc->addSelection(QObject::tr("Disabled"), "-1");
-    gc->addSelection(QObject::tr("Fastest"), "0");
-    gc->addSelection(QObject::tr("Good"), "1", true); // default
-    gc->addSelection(QObject::tr("Best"), "2");
-    gc->setHelpText(QObject::tr("Set the quality of audio sample-rate "
-                    "conversion. \"Good\" (default) provides the best "
-                    "compromise between CPU usage and quality. \"Disabled\" "
-                    "lets the audio device handle sample-rate conversion."));
+
+    gc->addSelection(tr("Disabled", "Sample rate conversion"), "-1");
+    gc->addSelection(tr("Fastest", "Sample rate conversion"), "0");
+    gc->addSelection(tr("Good", "Sample rate conversion"), "1", true); // default
+    gc->addSelection(tr("Best", "Sample rate conversion"), "2");
+
+    gc->setHelpText(tr("Set the quality of audio sample-rate "
+                       "conversion. \"%1\" (default) provides the best "
+                       "compromise between CPU usage and quality. \"%2\" "
+                       "lets the audio device handle sample-rate conversion.")
+                       .arg(tr("Good", "Sample rate conversion"))
+                       .arg(tr("Disabled", "Sample rate conversion")));
+
     return gc;
 }
 
 HostCheckBox *AudioAdvancedSettings::Audio48kOverride()
 {
     HostCheckBox *gc = new HostCheckBox("Audio48kOverride");
-    gc->setLabel(QObject::tr("Force audio device output to 48kHz"));
+
+    gc->setLabel(tr("Force audio device output to 48kHz"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Force audio sample rate to 48kHz. "
-                                "Some audio devices will report various rates, "
-                                "but they ultimately crash."));
+
+    gc->setHelpText(tr("Force audio sample rate to 48kHz. Some audio devices "
+                        "will report various rates, but they ultimately "
+                        "crash."));
     return gc;
 }
 
 HostCheckBox *AudioAdvancedSettings::PassThroughOverride()
 {
     HostCheckBox *gc = new HostCheckBox("PassThruDeviceOverride");
-    gc->setLabel(QObject::tr("Separate digital output device"));
+
+    gc->setLabel(tr("Separate digital output device"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use a distinct digital output device from "
-                                "default."
-                                " (default is not checked)"));
+
+    gc->setHelpText(tr("Use a distinct digital output device from default. "
+                        "(default is not checked)"));
     return gc;
 }
 
@@ -1152,8 +1221,10 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
 {
     HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
 
-    gc->setLabel(QObject::tr("Digital output device"));
-    gc->addSelection(QObject::tr("Default"), "Default");
+    gc->setLabel(tr("Digital output device"));
+
+    gc->addSelection(QCoreApplication::translate("(Common)", "Default"), 
+                     "Default");
 #ifdef USING_MINGW
     gc->addSelection("DirectX:Primary Sound Driver");
 #else
@@ -1163,35 +1234,41 @@ HostComboBox *AudioAdvancedSettings::PassThroughOutputDevice()
     gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
 #endif
 
-    gc->setHelpText(QObject::tr("Audio output device to use for "
-                        "digital audio. This value is currently only used "
-                        "with ALSA and DirectX sound output."));
+    gc->setHelpText(tr("Audio output device to use for digital audio. This "
+                       "value is currently only used with ALSA and DirectX "
+                       "sound output."));
     return gc;
 }
 
 HostCheckBox *AudioAdvancedSettings::SPDIFRateOverride()
 {
     HostCheckBox *gc = new HostCheckBox("SPDIFRateOverride");
-    gc->setLabel(QObject::tr("SPDIF 48kHz rate override"));
+
+    gc->setLabel(tr("SPDIF 48kHz rate override"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("ALSA only. By default, let ALSA determine "
-                        "the passthrough sampling rate. If checked "
-                        "set the sampling rate to 48kHz for passthrough."
-                        " (default is not checked)"));
+
+    gc->setHelpText(tr("ALSA only. By default, let ALSA determine the "
+                       "passthrough sampling rate. If checked set the sampling "
+                       "rate to 48kHz for passthrough. (default is not "
+                       "checked)"));
     return gc;
 }
 
 HostCheckBox *AudioAdvancedSettings::HBRPassthrough()
 {
     HostCheckBox *gc = new HostCheckBox("HBRPassthru");
-    gc->setLabel(QObject::tr("HBR passthrough support"));
+
+    gc->setLabel(tr("HBR passthrough support"));
+
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("HBR support is required for TrueHD and DTS-HD "
-                        "passthrough. If unchecked, Myth will limit the "
-                        "passthrough bitrate to 6.144Mbit/s."
-                        "This will disable True-HD passthrough, however will "
-                        "allow DTS-HD content to be sent as DTS-HD Hi-Res."
-                        " (default is checked)"));
+
+    gc->setHelpText(tr("HBR support is required for TrueHD and DTS-HD "
+                       "passthrough. If unchecked, Myth will limit the "
+                       "passthrough bitrate to 6.144Mbit/s. This will "
+                       "disable True-HD passthrough, however will allow "
+                       "DTS-HD content to be sent as DTS-HD Hi-Res. (default "
+                       "is checked)"));
     return gc;
 }
 

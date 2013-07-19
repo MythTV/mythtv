@@ -85,6 +85,8 @@ class AudioDeviceComboBox : public HostComboBox
 
 class AudioMixerSettings : public TriggeredConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     AudioMixerSettings();
   private:
@@ -104,6 +106,8 @@ class AudioGeneralSettings : public ConfigurationWizard
 
 class AudioAdvancedSettings : public VerticalConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     AudioAdvancedSettings(bool mpcm);
 
@@ -147,6 +151,8 @@ class ChannelChangedEvent : public QEvent
 
 class AudioTestThread : public MThread
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioTestThread)
+
   public:
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
