@@ -50,7 +50,7 @@ class TriggeredItem : public TriggeredConfigurationGroup
 AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     HostComboBox("AudioOutputDevice", true), m_parent(parent)
 {
-    setLabel(QObject::tr("Audio output device"));
+    setLabel(tr("Audio output device"));
 #ifdef USING_ALSA
     QString dflt = "ALSA:default";
 #elif USING_PULSEOUTPUT
@@ -109,7 +109,7 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     m_EAC3PassThrough(NULL),m_TrueHDPassThrough(NULL), m_DTSHDPassThrough(NULL),
     m_parent(parent),       m_lastAudioDevice("")
 {
-    setLabel(QObject::tr("Audio System"));
+    setLabel(tr("Audio System"));
     setUseLabel(false);
 
     ConfigurationGroup *devicegroup = new HorizontalConfigurationGroup(false,
@@ -174,9 +174,9 @@ AudioConfigSettings::AudioConfigSettings(ConfigurationWizard *parent) :
     addChild(test);
 
     TransButtonSetting *advanced = new TransButtonSetting("advanced");
-    advanced->setLabel(QObject::tr("Advanced Audio Settings"));
-    advanced->setHelpText(QObject::tr("Enable extra audio settings. Under most "
-                                  "usage all options should be left alone"));
+    advanced->setLabel(tr("Advanced Audio Settings"));
+    advanced->setHelpText(tr("Enable extra audio settings. Under most "
+                             "usage all options should be left alone"));
     connect(advanced, SIGNAL(pressed()), this, SLOT(AudioAdvanced()));
     addChild(advanced);
 
@@ -793,11 +793,11 @@ AudioTest::AudioTest(QString main, QString passthrough,
         new HorizontalConfigurationGroup(false,
                                          false);
     m_frontleft = new TransButtonSetting("0");
-    m_frontleft->setLabel(QObject::tr("Front Left"));
+    m_frontleft->setLabel(tr("Front Left"));
     connect(m_frontleft,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
     m_frontright = new TransButtonSetting(m_channels == 2 ? "1" : "2");
-    m_frontright->setLabel(QObject::tr("Front Right"));
+    m_frontright->setLabel(tr("Front Right"));
     connect(m_frontright,
             SIGNAL(pressed(QString)), this, SLOT(toggle(QString)));
     frontgroup->addChild(m_frontleft);
@@ -1061,8 +1061,8 @@ HostComboBox *AudioMixerSettings::MixerDevice()
     return gc;
 }
 
-const char* AudioMixerSettings::MixerControlControls[] = { "PCM",
-                                                           "Master" };
+const char* AudioMixerSettings::MixerControlControls[] = { QT_TR_NOOP("PCM"),
+                                                           QT_TR_NOOP("Master")};
 
 HostComboBox *AudioMixerSettings::MixerControl()
 {
@@ -1073,7 +1073,7 @@ HostComboBox *AudioMixerSettings::MixerControl()
     for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*);
          ++i)
     {
-        gc->addSelection(QObject::tr(MixerControlControls[i]),
+        gc->addSelection(tr(MixerControlControls[i]),
                          MixerControlControls[i]);
     }
 
@@ -1174,7 +1174,7 @@ HostComboBox *AudioAdvancedSettings::SRCQuality()
 {
     HostComboBox *gc = new HostComboBox("SRCQuality", false);
 
-    gc->setLabel(QObject::tr("Sample rate conversion"));
+    gc->setLabel(tr("Sample rate conversion"));
 
     gc->addSelection(tr("Disabled", "Sample rate conversion"), "-1");
     gc->addSelection(tr("Fastest", "Sample rate conversion"), "0");
