@@ -2537,9 +2537,9 @@ static HorizontalConfigurationGroup *AirPlayPasswordSettings()
 static HostCheckBox *AirPlayFullScreen()
 {
     HostCheckBox *gc = new HostCheckBox("AirPlayFullScreen");
-    gc->setLabel(QObject::tr("Full screen"));
+    gc->setLabel(QObject::tr("AirPlay full screen playback"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("During audio playback, displays album cover "
+    gc->setHelpText(QObject::tr("During music playback, displays album cover "
                                 "and various media information in full screen mode"));
     return gc;
 }
@@ -3454,6 +3454,9 @@ AppearanceSettings::AppearanceSettings()
     column2->addChild(HideMouseCursor());
     column2->addChild(RunInWindow());
     column2->addChild(UseFixedWindowSize());
+#ifdef USING_AIRPLAY
+    column2->addChild(AirPlayFullScreen());
+#endif
 
     HorizontalConfigurationGroup *columns =
         new HorizontalConfigurationGroup(false, false, false, false);
