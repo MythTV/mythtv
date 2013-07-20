@@ -117,53 +117,53 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="148"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>Enter URL</source>
         <translation>Inserire URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="280"/>
         <source>Loading...</source>
         <translation>Caricamento...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="350"/>
         <source>Actions</source>
         <translation>Azioni</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Back</source>
         <translation>Indietro</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Forward</source>
         <translation>Avanti</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Zoom In</source>
         <translation>Ingrandire</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
         <source>Zoom Out</source>
         <translation>Ridurre</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="371"/>
         <source>New Tab</source>
         <translation>Nuova scheda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
         <source>Delete Tab</source>
         <translation>Eliminare scheda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
         <source>Add Bookmark</source>
         <translation>Aggiungere segnalibro</translation>
     </message>
@@ -171,17 +171,17 @@ Usare l&apos;opzione di menù &quot;Aggiungere segnalibro&quot; per aggiungere n
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="66"/>
+        <location filename="../mythbrowser/main.cpp" line="65"/>
         <source>Move to next browser tab</source>
         <translation>Muovere alla prossima scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="68"/>
+        <location filename="../mythbrowser/main.cpp" line="67"/>
         <source>Move to previous browser tab</source>
         <translation>Muovere alla precedente scheda del browser</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="71"/>
+        <location filename="../mythbrowser/main.cpp" line="70"/>
         <source>Internal Web Browser</source>
         <translation>Browser web interno</translation>
     </message>
@@ -341,7 +341,7 @@ Quando si è finito di modificare, selezionare &quot;OK&quot; o &quot;Annulla&qu
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="126"/>
+        <location filename="../mythbrowser/webpage.cpp" line="128"/>
         <source>Loading...</source>
         <translation>Caricamento...</translation>
     </message>
