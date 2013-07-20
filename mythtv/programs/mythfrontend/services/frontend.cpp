@@ -47,6 +47,7 @@ bool Frontend::SendMessage(const QString &Message, uint Timeout)
 }
 
 bool  Frontend::SendNotification(bool  Error,
+                                 const QString &Type,
                                  const QString &Message,
                                  const QString &Origin,
                                  const QString &Description,
@@ -56,15 +57,17 @@ bool  Frontend::SendNotification(bool  Error,
                                  float Progress,
                                  int   Timeout,
                                  bool  Fullscreen,
-                                 int   Visibility,
-                                 int   Priority)
+                                 uint  Visibility,
+                                 uint  Priority)
 {
     if (Message.isEmpty())
         return false;
     if (!GetNotificationCenter())
-        false;
+        return false;
 
-    ShowNotification(Error, Message,
+    ShowNotification(Error ? MythNotification::Error :
+                             MythNotification::TypeFromString(Type),
+                     Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,
                      Description, Image, Extra,
                      ProgressText, Progress, Timeout,

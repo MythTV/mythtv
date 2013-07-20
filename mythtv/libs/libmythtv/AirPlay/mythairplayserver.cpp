@@ -566,6 +566,8 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
         }
         MythNotification n(tr("Client disconnected"), tr("AirPlay"),
                            tr("from %1").arg(socket->peerAddress().toString()));
+        // Don't show it during playback
+        n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
         MythUINotificationCenter::GetInstance()->Queue(n);
     }
 
@@ -706,6 +708,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
         MythNotification n(tr("New Connection"), tr("AirPlay"),
                            tr("from %1").arg(socket->peerAddress().toString()));
+        // Don't show it during playback
+        n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
         MythUINotificationCenter::GetInstance()->Queue(n);
     }
 

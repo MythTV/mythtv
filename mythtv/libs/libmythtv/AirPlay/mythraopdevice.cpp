@@ -211,6 +211,8 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
 
     MythNotification n(tr("New Connection"), tr("AirTunes"),
                        tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
+    // Don't show it during playback
+    n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
     MythUINotificationCenter::GetInstance()->Queue(n);
 
     MythRAOPConnection *obj =
@@ -238,6 +240,8 @@ void MythRAOPDevice::deleteClient(void)
     QList<MythRAOPConnection *>::iterator it = m_clients.begin();
 
     MythNotification n(tr("Client disconnected"), tr("AirTunes"));
+    // Don't show it during playback
+    n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
     MythUINotificationCenter::GetInstance()->Queue(n);
 
     while (it != m_clients.end())

@@ -637,9 +637,6 @@ MythGenericTree *VideoListImp::buildVideoList(
 {
     refreshList(filebrowser, parental_level, flatlist, group_type);
 
-    typedef map<QString, MythGenericTree *> string_to_tree;
-    string_to_tree prefix_tree_map;
-
     video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                                               kRootNode, false));
 
@@ -943,9 +940,6 @@ void VideoListImp::buildTVList(void)
 
     metadata_path_sort mps(true);
     sort(mlist.begin(), mlist.end(), mps);
-
-    typedef map<QString, meta_dir_node *> group_to_node_map;
-    group_to_node_map gtnm;
 
     meta_dir_node *video_root = &m_metadata_tree;
 

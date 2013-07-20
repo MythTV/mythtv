@@ -97,6 +97,7 @@ class Myth : public MythServices
                                                   int   Timeout);
 
         bool                SendNotification    ( bool  Error,
+                                                  const QString &Type,
                                                   const QString &Message,
                                                   const QString &Origin,
                                                   const QString &Description,
@@ -106,8 +107,8 @@ class Myth : public MythServices
                                                   float Progress,
                                                   int   Duration,
                                                   bool  Fullscreen,
-                                                  int   Visibility,
-                                                  int   Priority,
+                                                  uint  Visibility,
+                                                  uint  Priority,
                                                   const QString &Address,
                                                   int   udpPort );
 

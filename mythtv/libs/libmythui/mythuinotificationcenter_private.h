@@ -172,6 +172,7 @@ public:
     void UpdatePlayback(float progress, const QString &text);
 
     void SetSingleShotTimer(int s, bool update = false);
+    void SetErrorState(void);
 
     // UI methods
     void AdjustYPosition(void);
@@ -185,8 +186,7 @@ public:
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
         kStyle      = 1 << 3,
-        kError      = 1 << 4,
-        kNoArtwork  = 1 << 5,
+        kNoArtwork  = 1 << 4,
         kAll        = ~kNone,
     };
 
@@ -214,6 +214,7 @@ public:
     bool                        m_created;
     uint32_t                    m_content;
     uint32_t                    m_update;
+    MythNotification::Type      m_type;
     MythUIImage                *m_artworkImage;
     MythUIText                 *m_titleText;
     MythUIText                 *m_originText;

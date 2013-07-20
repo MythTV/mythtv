@@ -3806,7 +3806,7 @@ void Scheduler::AddNewRecords(void)
     while (rlist.next())
     {
         int recid = rlist.value(0).toInt();
-        QString qtitle = rlist.value(1).toString();
+        // QString qtitle = rlist.value(1).toString();
         int maxEpisodes = rlist.value(2).toInt();
         int maxNewest = rlist.value(3).toInt();
 
@@ -4497,8 +4497,6 @@ int Scheduler::FillRecordingDir(
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<QString, FileSystemInfo>::Iterator fsit;
     QMap<QString, FileSystemInfo>::Iterator fsit2;
-    QString dirKey;
-    QStringList strlist;
     RecordingInfo *thispg;
     StorageGroup mysgroup(storagegroup, hostname);
     QStringList dirlist = mysgroup.GetDirList();

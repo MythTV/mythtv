@@ -780,7 +780,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "SET_BOOKMARK")
     {
-        if (tokens.size() != 5)
+        if (tokens.size() != 4)
             LOG(VB_GENERAL, LOG_ERR, "Bad SET_BOOKMARK");
         else
             HandleSetBookmark(tokens, pbs);
@@ -4930,7 +4930,7 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
                                    PlaybackSock *pbs)
 {
 // Bookmark query
-// Format:  SET_BOOKMARK <chanid> <starttime> <long part1> <long part2>
+// Format:  SET_BOOKMARK <chanid> <starttime> <position>
 // chanid is chanid, starttime is startime of program in
 //   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
 //   a ProgramInfo structure in a string list.  The two longs are the two

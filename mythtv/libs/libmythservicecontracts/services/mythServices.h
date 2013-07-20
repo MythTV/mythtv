@@ -126,6 +126,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                           int   Timeout ) = 0;
 
         virtual bool                SendNotification    ( bool  Error,
+                                                          const QString &Type,
                                                           const QString &Message,
                                                           const QString &Origin,
                                                           const QString &Description,
@@ -135,8 +136,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                           float Progress,
                                                           int   Timeout,
                                                           bool  Fullscreen,
-                                                          int   Visibility,
-                                                          int   Priority,
+                                                          uint  Visibility,
+                                                          uint  Priority,
                                                           const QString &Address,
                                                           int   udpPort ) = 0;
 

@@ -299,7 +299,6 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
             return false;
         }
 
-        vector<unsigned char*> _ptrs;
         const unsigned char *pos = cpos;
         uint i = 0;
         for (; pos < psipdata() + Length() - 9; i++)

@@ -105,6 +105,12 @@ void IPTVChannelFetcher::run(void)
 
     if (_stop_now || playlist.isEmpty())
     {
+        if (playlist.isNull() && _scan_monitor)
+        {
+            _scan_monitor->ScanAppendTextToLog(QObject::tr("Error"));
+            _scan_monitor->ScanPercentComplete(100);
+            _scan_monitor->ScanErrored(QObject::tr("Downloading Playlist Failed"));
+        }
         _thread_running = false;
         _stop_now = true;
         return;
@@ -240,7 +246,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
     else
         tmp = QString(data);
 
-    return QString::fromUtf8(tmp.toLatin1().constData());
+    return tmp.isNull() ? tmp : QString::fromUtf8(tmp.toLatin1().constData());
 }
 
 static uint estimate_number_of_channels(const QString &rawdata)
@@ -363,7 +369,7 @@ static bool parse_chan_info(const QString   &rawdata,
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
-                QString data = line.mid(line.indexOf(':'));
+                QString data = line.mid(line.indexOf(':')+1);
                 QString key = data.left(data.indexOf('='));
                 if (!key.isEmpty())
                     values[key] = data.mid(data.indexOf('=')+1);

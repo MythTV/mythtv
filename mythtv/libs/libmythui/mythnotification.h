@@ -27,11 +27,12 @@ public:
     static Type Update;
     static Type Info;
     static Type Error;
+    static Type Warning;
+    static Type Check;
 
     MythNotification(Type t, void *parent = NULL)
         : MythEvent(t), m_id(-1), m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
-
     {
     }
 
@@ -44,6 +45,19 @@ public:
     MythNotification(const QString &title, const QString &author,
                      const QString &details = QString())
         : MythEvent(New), m_id(-1), m_parent(NULL), m_fullScreen(false),
+        m_description(title), m_duration(0), m_visibility(kAll),
+        m_priority(kDefault)
+    {
+        DMAP map;
+        map["minm"] = title;
+        map["asar"] = author;
+        map["asal"] = details;
+        m_metadata = map;
+    }
+
+    MythNotification(Type t, const QString &title, const QString &author,
+                     const QString &details = QString())
+        : MythEvent(t), m_id(-1), m_parent(NULL), m_fullScreen(false),
         m_description(title), m_duration(0), m_visibility(kAll),
         m_priority(kDefault)
     {
@@ -89,12 +103,12 @@ public:
     enum Visibility {
         kNone       = 0,
         kAll        = ~0,
-        kPlayback   = (1 << 1),
-        kSettings   = (1 << 2),
-        kWizard     = (1 << 3),
-        kVideos     = (1 << 4),
-        kMusic      = (1 << 5),
-        kRecordings = (1 << 6),
+        kPlayback   = (1 << 0),
+        kSettings   = (1 << 1),
+        kWizard     = (1 << 2),
+        kVideos     = (1 << 3),
+        kMusic      = (1 << 4),
+        kRecordings = (1 << 5),
     };
 
     // Setter
@@ -150,6 +164,11 @@ public:
      * For future use, not implemented at this stage
      */
     void SetPriority(Priority n)              { m_priority = n; }
+
+    /**
+     * return Type object from type name
+     */
+    static Type TypeFromString(const QString &type);
 
     // Getter
     int         GetId(void) const           { return m_id; }
@@ -265,7 +284,7 @@ public:
     // Setter
     /**
      * current playback position to be displayed with the notification.
-     * Value to be between 0 <= x <= 1. 
+     * Value to be between 0 <= x <= 1.
      * Note: x < 0 means no progress bar to be displayed.
      */
     void SetProgress(float progress)        { m_progress = progress; }
@@ -338,24 +357,34 @@ protected:
     MythMediaNotification &operator=(const MythMediaNotification&);
 };
 
-class MUI_PUBLIC MythErrorNotification : public MythImageNotification
+class MUI_PUBLIC MythErrorNotification : public MythNotification
 {
 public:
     MythErrorNotification(const QString &title, const QString &author,
                           const QString &details = QString())
-        : MythNotification(title, author, details), MythImageNotification(New, QImage())
+        : MythNotification(Error, title, author, details)
     {
         SetDuration(10);
     }
-
-    virtual MythEvent *clone(void) const { return new MythErrorNotification(*this); }
-
-protected:
-    MythErrorNotification(const MythErrorNotification &o)
-        : MythNotification(o), MythImageNotification(o)
-    {
-    }
-
-    MythErrorNotification &operator=(const MythErrorNotification&);
 };
+
+class MUI_PUBLIC MythWarningNotification : public MythNotification
+{
+public:
+    MythWarningNotification(const QString &title, const QString &author,
+                            const QString &details = QString())
+    : MythNotification(Warning, title, author, details)
+    {
+        SetDuration(10);
+    }
+};
+
+class MUI_PUBLIC MythCheckNotification : public MythNotification
+{
+public:
+    MythCheckNotification(const QString &title, const QString &author,
+                          const QString &details = QString())
+    : MythNotification(Check, title, author, details) { }
+};
+
 #endif /* defined(__MythTV__mythnotification__) */

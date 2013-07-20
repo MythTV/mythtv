@@ -18,6 +18,10 @@ QEvent::Type MythNotification::Info =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythNotification::Error =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythNotification::Warning =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythNotification::Check =
+    (QEvent::Type) QEvent::registerEventType();
 
 void MythNotification::SetId(int id)
 {
@@ -58,4 +62,24 @@ QString MythPlaybackNotification::stringFromSeconds(int time)
     }
     str += QString::number(seconds);
     return str;
+}
+
+MythNotification::Type MythNotification::TypeFromString(const QString &type)
+{
+    if (type == "error")
+    {
+        return MythNotification::Error;
+    }
+    else if (type == "warning")
+    {
+        return MythNotification::Warning;
+    }
+    else if (type == "check")
+    {
+        return MythNotification::Check;
+    }
+    else
+    {
+        return MythNotification::New;
+    }
 }

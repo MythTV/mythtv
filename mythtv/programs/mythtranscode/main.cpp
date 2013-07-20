@@ -919,7 +919,6 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
                 err = transUnlink(alink.constData(), pginfo);
-
                 if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
@@ -941,7 +940,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             }
             else
             {
-                if ((err = transUnlink(aoldfile.constData(), pginfo)))
+                err = transUnlink(aoldfile.constData(), pginfo);
+                if (err)
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1': ")
                             .arg(oldfile) + ENO);

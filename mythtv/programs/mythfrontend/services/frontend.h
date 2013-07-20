@@ -18,6 +18,7 @@ class Frontend : public FrontendServices
     bool                 SendMessage(const QString &Message,
                                      uint Timeout);
     bool                 SendNotification(bool  Error,
+                                          const QString &Type,
                                           const QString &Message,
                                           const QString &Origin,
                                           const QString &Description,
@@ -27,7 +28,7 @@ class Frontend : public FrontendServices
                                           float Progress,
                                           int   Timeout,
                                           bool  Fullscreen,
-                                          int   Visibility, int   Priority);
+                                          uint  Visibility, uint Priority);
 
     bool                 SendAction(const QString &Action,
                                     const QString &Value,

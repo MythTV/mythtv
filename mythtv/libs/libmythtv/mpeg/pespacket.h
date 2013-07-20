@@ -137,9 +137,6 @@ class MTV_PUBLIC PESPacket
     static PESPacket View(TSPacket& tspacket)
         { return PESPacket(&tspacket, false); }
 
-    static const PESPacket ViewData(const unsigned char* pesdata)
-        { return PESPacket(pesdata, false); }
-
     bool IsClone() const { return bool(_allocSize); }
 
     // return true if complete or broken

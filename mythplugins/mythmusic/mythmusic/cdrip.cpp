@@ -672,7 +672,6 @@ void Ripper::ScanFinished()
     bool isCompilation = false;
     if (m_decoder)
     {
-        QString label;
         MusicMetadata *metadata;
 
         m_artistName.clear();
@@ -1116,7 +1115,6 @@ void Ripper::updateTrackList(void)
     if (m_tracks->isEmpty())
         return;
 
-    QString tmptitle;
     if (m_trackList)
     {
         m_trackList->Reset();

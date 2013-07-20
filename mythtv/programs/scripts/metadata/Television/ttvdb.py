@@ -136,6 +136,7 @@ __version__="1.1.5"
 # Version 1.1.4 Add test mode (replaces --toprated)
 # Version 1.1.5 Add the -C (collection option) with corresponding XML output
 #               and add a <collectionref> XML tag to Search and Query XML output
+# Version 1.1.6 Honor series name overrides during TV series search
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDSC [parameters]
@@ -1343,7 +1344,10 @@ def main():
     # Fetch a list of matching series names
     if opts.list ==True:
         try:
-            allSeries=t._getSeries(series_season_ep[0])
+            if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
+                allSeries = t._getSeries(override[series_season_ep[0].lower()][0])
+            else:
+                allSeries=t._getSeries(series_season_ep[0])
         except tvdb_shownotfound:
             sys.exit(0) # No matching series
         except Exception, e:

@@ -114,6 +114,7 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
     bool fullscreen = false;
     bool error = false;
     int visibility = 0;
+    QString type = "normal";
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -141,6 +142,8 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
                 error = e.text().toLower() == "true";
             else if (e.tagName() == "visibility")
                 visibility = e.text().toUInt();
+            else if (e.tagName() == "type")
+                type = e.text();
             else if (notification && e.tagName() == "progress")
             {
                 bool ok;
@@ -152,7 +155,6 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
                     .arg(e.tagName()));
-                return;
             }
         }
         n = n.nextSibling();
@@ -167,7 +169,9 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
         if (notification)
         {
             origin = origin.isNull() ? tr("UDP Listener") : origin;
-            ShowNotification(error, msg, origin, description, image, extra,
+            ShowNotification(error ? MythNotification::Error :
+                                     MythNotification::TypeFromString(type),
+                             msg, origin, description, image, extra,
                              progress_text, progress, timeout, fullscreen,
                              visibility);
         }

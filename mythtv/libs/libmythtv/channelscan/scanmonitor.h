@@ -61,6 +61,7 @@ class ScanMonitor :
     void ScanUpdateStatusTitleText(const QString &status);
     void ScanAppendTextToLog(const QString &status);
     void ScanComplete(void);
+    void ScanErrored(const QString &error);
 
     // SignalMonitorListener
     virtual void AllGood(void) { }
@@ -103,6 +104,7 @@ class ScannerEvent : public QEvent
 
     static Type ScanComplete;
     static Type ScanShutdown;
+    static Type ScanErrored;
     static Type AppendTextToLog;
     static Type SetStatusText;
     static Type SetStatusTitleText;
