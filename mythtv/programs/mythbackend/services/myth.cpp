@@ -772,6 +772,7 @@ bool Myth::SendMessage( const QString &sMessage,
 }
 
 bool Myth::SendNotification( bool  bError,
+                             const QString &Type,
                              const QString &sMessage,
                              const QString &sOrigin,
                              const QString &sDecription,
@@ -799,7 +800,6 @@ bool Myth::SendNotification( bool  bError,
         "  <text>" + sMessage + "</text>\n"
         "  <origin>" + (sOrigin.isNull() ? tr("MythServices") : sOrigin) + "</origin>\n"
         "  <description>" + sDecription + "</description>\n"
-        "  <error>" + (bError ? "true" : "false") + "</error>\n"
         "  <timeout>" + QString::number(Duration) + "</timeout>\n"
         "  <image>" + sImage + "</image>\n"
         "  <extra>" + sExtra + "</extra>\n"
@@ -808,6 +808,7 @@ bool Myth::SendNotification( bool  bError,
         "  <fullscreen>" + (bFullscreen ? "true" : "false") + "</fullscreen>\n"
         "  <visibility>" + QString::number(Visibility) + "</visibility>\n"
         "  <priority>" + QString::number(Priority) + "</priority>\n"
+        "  <type>" + (bError ? "error" : Type) + "</type>\n"
         "</mythnotification>";
 
     QHostAddress address = QHostAddress::Broadcast;

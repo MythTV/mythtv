@@ -144,4 +144,18 @@ MUI_PUBLIC void ShowNotification(bool  error,
                                  const MythNotification::Priority priority = MythNotification::kDefault,
                                  const QString &style = QString());
 
+MUI_PUBLIC void ShowNotification(MythNotification::Type type,
+                                 const QString &msg,
+                                 const QString &origin = QString(),
+                                 const QString &detail = QString(),
+                                 const QString &image = QString(),
+                                 const QString &extra = QString(),
+                                 const QString &progress_text = QString(),
+                                 float progress = -1.0f,
+                                 int   duration = -1,
+                                 bool  fullscreen = false,
+                                 const VNMask visibility = MythNotification::kAll,
+                                 const MythNotification::Priority priority = MythNotification::kDefault,
+                                 const QString &style = QString());
+
 #endif /* defined(__MythTV__mythnotifications__) */

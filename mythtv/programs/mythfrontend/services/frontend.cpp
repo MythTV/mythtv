@@ -47,6 +47,7 @@ bool Frontend::SendMessage(const QString &Message, uint Timeout)
 }
 
 bool  Frontend::SendNotification(bool  Error,
+                                 const QString &Type,
                                  const QString &Message,
                                  const QString &Origin,
                                  const QString &Description,
@@ -64,7 +65,9 @@ bool  Frontend::SendNotification(bool  Error,
     if (!GetNotificationCenter())
         return false;
 
-    ShowNotification(Error, Message,
+    ShowNotification(Error ? MythNotification::Error :
+                             MythNotification::TypeFromString(Type),
+                     Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,
                      Description, Image, Extra,
                      ProgressText, Progress, Timeout,

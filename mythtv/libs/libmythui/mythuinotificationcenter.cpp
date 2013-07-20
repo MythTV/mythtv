@@ -135,6 +135,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_duration(-1),           m_progress(-1.0),   m_fullscreen(false),
       m_added(false),
       m_created(false),         m_content(kNone),   m_update(kAll),
+      m_type(MythNotification::New),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
       m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
@@ -155,7 +156,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_duration(notification.GetDuration()),       m_progress(-1.0),
       m_fullscreen(false),
       m_added(false),           m_created(false),   m_content(kNone),
-      m_update(kAll),
+      m_update(kAll),           m_type(MythNotification::New),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
       m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
@@ -175,6 +176,7 @@ MythUINotificationScreen::MythUINotificationScreen(MythScreenStack *stack,
       m_duration(-1),           m_progress(-1.0),   m_fullscreen(false),
       m_added(false),
       m_created(false),         m_content(kNone),   m_update(kAll),
+      m_type(MythNotification::New),
       m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
       m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
       m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
@@ -199,14 +201,25 @@ MythUINotificationScreen::~MythUINotificationScreen()
 
 void MythUINotificationScreen::SetNotification(MythNotification &notification)
 {
-    bool update = notification.type() == MythNotification::Update;
+    bool update;
     m_update = kNone;
 
-    MythErrorNotification *error =
-        dynamic_cast<MythErrorNotification*>(&notification);
-    if (error)
+    m_type = notification.type();
+
+    if (m_type == MythNotification::Error   ||
+        m_type == MythNotification::Warning ||
+        m_type == MythNotification::Check)
     {
-        m_update |= kError;
+        m_update |= kImage;
+        update = false;
+    }
+    else if (m_type == MythNotification::Update)
+    {
+        update = true;
+    }
+    else
+    {
+        update = false;
     }
 
     MythImageNotification *img =
@@ -328,11 +341,8 @@ bool MythUINotificationScreen::Create(void)
     m_errorState        = dynamic_cast<MythUIStateType*>(GetChild("errorstate"));
     m_mediaState        = dynamic_cast<MythUIStateType*>(GetChild("mediastate"));
 
-    if (m_errorState)
-    {
-        m_errorState->DisplayState(m_content & kError ? "error" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Create: Set error state to %1").arg(m_content & kError ? "error" : "ok"));
-    }
+    SetErrorState();
+
     if (m_mediaState && (m_update & kImage))
     {
         m_mediaState->DisplayState(m_content & kNoArtwork ? "noartwork" : "ok");
@@ -461,11 +471,8 @@ void MythUINotificationScreen::Init(void)
 
     }
 
-    if (m_errorState)
-    {
-        m_errorState->DisplayState(m_update & kError ? "error" : "ok");
-        LOG(VB_GUI, LOG_DEBUG, LOC + QString("Init: Set error state to %1").arg(m_update & kError ? "error" : "ok"));
-    }
+    SetErrorState();
+
     if (m_mediaState && (m_update & kImage))
     {
         m_mediaState->DisplayState(m_update & kNoArtwork ? "noartwork" : "ok");
@@ -481,6 +488,33 @@ void MythUINotificationScreen::Init(void)
         m_added = true;
     }
     m_refresh = false;
+}
+
+void MythUINotificationScreen::SetErrorState(void)
+{
+    if (!m_errorState)
+        return;
+
+    const char *state;
+
+    if (m_type == MythNotification::Error)
+    {
+        state = "error";
+    }
+    else if (m_type == MythNotification::Warning)
+    {
+        state = "warning";
+    }
+    else if (m_type == MythNotification::Check)
+    {
+        state = "check";
+    }
+    else
+    {
+        state = "ok";
+    }
+    LOG(VB_GUI, LOG_DEBUG, LOC + QString("SetErrorState: Set error state to %1").arg(state));
+    m_errorState->DisplayState(state);
 }
 
 /**
@@ -625,7 +659,8 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
                   m_index == s.m_index &&
                   m_style == s.m_style &&
                   m_visibility == s.m_visibility &&
-                  m_priority == s.m_priority
+                  m_priority == s.m_priority &&
+                  m_type == m_type
                   );
 
     m_id            = s.m_id;
@@ -645,6 +680,7 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
     m_style         = s.m_style;
     m_visibility    = s.m_visibility;
     m_priority      = s.m_priority;
+    m_type          = s.m_type;
 
     m_update = m_content; // so all fields are initialised regardless of notification type
 
@@ -1395,49 +1431,73 @@ void ShowNotification(bool  error,
                       const MythNotification::Priority priority,
                       const QString &style)
 {
+    ShowNotification(error ? MythNotification::Error : MythNotification::New,
+                     msg, origin, detail, image, extra, progress_text, progress,
+                     duration, fullscreen, visibility, priority, style);
+}
+
+void ShowNotification(MythNotification::Type type,
+                      const QString &msg,
+                      const QString &origin,
+                      const QString &detail,
+                      const QString &image,
+                      const QString &extra,
+                      const QString &progress_text, float progress,
+                      int   duration,
+                      bool  fullscreen,
+                      const VNMask visibility,
+                      const MythNotification::Priority priority,
+                      const QString &style)
+{
     if (!GetNotificationCenter())
         return;
 
     MythNotification *n;
+    DMAP data;
 
-    if (error)
+    data["minm"] = msg;
+    data["asar"] = origin.isNull() ? QObject::tr("MythTV") : origin;
+    data["asal"] = detail;
+    data["asfm"] = extra;
+
+    if (type == MythNotification::Error   ||
+        type == MythNotification::Warning ||
+        type == MythNotification::Check)
     {
-        n = new MythErrorNotification(msg, origin, detail);
+        n = new MythNotification(type, data);
+        if (!duration && type != MythNotification::Check)
+        {
+            // default duration for those type of notifications is 10s
+            duration = 10;
+        }
     }
     else
     {
-        DMAP data;
-
-        data["minm"] = msg;
-        data["asar"] = origin.isNull() ? QObject::tr("MythTV") : origin;
-        data["asal"] = detail;
-        data["asfm"] = extra;
-
         if (!image.isEmpty())
         {
             if (progress >= 0)
             {
-                n = new MythMediaNotification(MythNotification::New,
+                n = new MythMediaNotification(type,
                                               image, data,
                                               progress, progress_text);
             }
             else
             {
-                n = new MythImageNotification(MythNotification::New, image, data);
+                n = new MythImageNotification(type, image, data);
             }
         }
         else if (progress >= 0)
         {
-            n = new MythPlaybackNotification(MythNotification::New,
+            n = new MythPlaybackNotification(type,
                                              progress, progress_text, data);
         }
         else
         {
-            n = new MythNotification(MythNotification::New, data);
+            n = new MythNotification(type, data);
         }
     }
-    n->SetFullScreen(fullscreen);
     n->SetDuration(duration);
+    n->SetFullScreen(fullscreen);
     n->SetPriority(priority);
     n->SetVisibility(visibility);
 

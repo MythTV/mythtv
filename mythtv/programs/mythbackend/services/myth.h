@@ -97,6 +97,7 @@ class Myth : public MythServices
                                                   int   Timeout);
 
         bool                SendNotification    ( bool  Error,
+                                                  const QString &Type,
                                                   const QString &Message,
                                                   const QString &Origin,
                                                   const QString &Description,

@@ -34,6 +34,7 @@ const QString kNotification =
 "  <progress>%progress%</progress>\n"
 "  <fullscreen>%fullscreen%</fullscreen>\n"
 "  <visibility>%visibility%</visibility>\n"
+"  <type>%type%</type>\n"
 "</mythnotification>";
 
 static int PrintMTemplate(const MythUtilCommandLineParser &cmdline)
@@ -65,6 +66,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     QString fullscreen = "false";
     QString error = "false";
     QString visibility = "0";
+    QString type = "normal";
 
     QString message = notification ? kNotification : kMessage;
 
@@ -107,6 +109,9 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
         if (cmdline.toBool("visibility"))
             visibility = cmdline.toString("visibility");
         message.replace("%visibility%", visibility);
+        if (cmdline.toBool("type"))
+            type = cmdline.toString("type");
+        message.replace("%type%", type);
     }
 
     // extra optional argument

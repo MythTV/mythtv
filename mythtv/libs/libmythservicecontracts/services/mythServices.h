@@ -126,6 +126,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                           int   Timeout ) = 0;
 
         virtual bool                SendNotification    ( bool  Error,
+                                                          const QString &Type,
                                                           const QString &Message,
                                                           const QString &Origin,
                                                           const QString &Description,

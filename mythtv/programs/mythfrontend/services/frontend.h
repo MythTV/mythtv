@@ -18,6 +18,7 @@ class Frontend : public FrontendServices
     bool                 SendMessage(const QString &Message,
                                      uint Timeout);
     bool                 SendNotification(bool  Error,
+                                          const QString &Type,
                                           const QString &Message,
                                           const QString &Origin,
                                           const QString &Description,
