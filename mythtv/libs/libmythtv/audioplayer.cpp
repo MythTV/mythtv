@@ -5,7 +5,7 @@
 
 #define LOC QString("AudioPlayer: ")
 
-static const QString _Location = QObject::tr("Audio Player");
+static const QString _Location = AudioPlayer::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
@@ -138,7 +138,7 @@ QString AudioPlayer::ReinitAudio(void)
         m_audioOutput = AudioOutput::OpenAudio(aos);
         if (!m_audioOutput)
         {
-            errMsg = QObject::tr("Unable to create AudioOutput.");
+            errMsg = tr("Unable to create AudioOutput.");
         }
         else
         {
@@ -160,7 +160,7 @@ QString AudioPlayer::ReinitAudio(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                 QString(", reason is: %1").arg(errMsg));
-        ShowNotificationError(QObject::tr("Disabling Audio"),
+        ShowNotificationError(tr("Disabling Audio"),
                               _Location, errMsg);
         m_no_audio_out = true;
     }
