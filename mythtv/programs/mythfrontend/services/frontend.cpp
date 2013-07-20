@@ -62,7 +62,7 @@ bool  Frontend::SendNotification(bool  Error,
     if (Message.isEmpty())
         return false;
     if (!GetNotificationCenter())
-        false;
+        return false;
 
     ShowNotification(Error, Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,
