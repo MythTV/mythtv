@@ -122,9 +122,31 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
 MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
 {
-    if (!m_Children.isEmpty())
-        return m_Children.front();
-    return NULL;
+    if (m_Children.isEmpty())
+        return NULL;
+    // The top screen is the only currently displayed first, if there's a
+    // fullscreen notification displayed, it's the last one
+    MythScreenType *top = m_Children.front();
+    QVector<MythScreenType *>::const_iterator it = m_Children.end() - 1;
+
+    // loop from last to 2nd
+    for (; it != m_Children.begin(); --it)
+    {
+        MythUINotificationScreen *s = dynamic_cast<MythUINotificationScreen *>(*it);
+
+        if (!s)
+        {
+            // if for whatever reason it's not a notification on our screen
+            // it will be dropped as we don't know how it appears
+            top = s;
+        }
+        if (s->m_fullscreen)
+        {
+            top = s;
+            break;
+        }
+    }
+    return top;
 }
 
 //// class MythUINotificationScreen
@@ -1273,12 +1295,28 @@ bool NCPrivate::RemoveFirst(void)
     if (m_screens.isEmpty())
         return false;
 
-    MythUINotificationScreen *screen = m_screens.first();
-    if (MythDate::current() < screen->m_creation.addMSecs(MIN_LIFE))
+    // The top screen is the only currently displayed first, if there's a
+    // fullscreen notification displayed, it's the last one
+    MythUINotificationScreen *top = m_screens.front();
+    QList<MythUINotificationScreen *>::const_iterator it = m_screens.end() - 1;
+
+    // loop from last to 2nd
+    for (; it != m_screens.begin(); --it)
+    {
+        MythUINotificationScreen *s = *it;
+
+        if (s->m_fullscreen)
+        {
+            top = s;
+            break;
+        }
+    }
+
+    if (MythDate::current() < top->m_creation.addMSecs(MIN_LIFE))
         return false;
 
     // simulate time-out
-    screen->ProcessTimer();
+    top->ProcessTimer();
     return true;
 }
 
