@@ -1,6 +1,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "mythconfig.h"
 
 #include "dvdringbuffer.h"
@@ -25,12 +29,12 @@ static const char *dvdnav_menu_table[] =
 {
     NULL,
     NULL,
-    "Title",
-    "Root",
-    "Subpicture",
-    "Audio",
-    "Angle",
-    "Part",
+    QT_TRANSLATE_NOOP("(DVD menu)", "Title Menu"),
+    QT_TRANSLATE_NOOP("(DVD menu)", "Root Menu"),
+    QT_TRANSLATE_NOOP("(DVD menu)", "Subpicture Menu"),
+    QT_TRANSLATE_NOOP("(DVD menu)", "Audio Menu"),
+    QT_TRANSLATE_NOOP("(DVD menu)", "Angle Menu"),
+    QT_TRANSLATE_NOOP3("(DVD menu)", "Part Menu", "DVD part/chapter menu"),
 };
 
 DVDInfo::DVDInfo(const QString &filename)
@@ -402,7 +406,8 @@ void DVDRingBuffer::GetDescForPos(QString &desc)
     {
         if ((m_part <= DVD_MENU_MAX) && dvdnav_menu_table[m_part] )
         {
-            desc = tr("%1 Menu").arg(dvdnav_menu_table[m_part]);
+            desc = QCoreApplication::translate("(DVD menu)",
+                                               dvdnav_menu_table[m_part]);
         }
     }
     else
