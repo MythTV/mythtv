@@ -104,6 +104,22 @@
                     <area>18,18,144,144</area>
                 </imagetype>
             </state>
+            <state name="check">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Select-icon.html -->
+                    <filename>check.png</filename>
+                    <area>18,18,144,144</area>
+                </imagetype>
+            </state>
+            <state name="warning">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Alert-icon.html -->
+                    <filename>warning.png</filename>
+                    <area>18,18,144,144</area>
+                </imagetype>
+            </state>
         </statetype>
 
         <imagetype name="image" depends="!mediastate&amp;!errorstate">
@@ -180,7 +196,25 @@
                 <imagetype name="imageerror">
                     <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Error-icon.html -->
                     <filename>error.png</filename>
-                    <area>0,0,100%,100%</area>
+                    <area>704,189,512,512</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="check">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Select-icon.html -->
+                    <filename>check.png</filename>
+                    <area>704,189,512,512</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="warning">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Alert-icon.html -->
+                    <filename>warning.png</filename>
+                    <area>704,189,512,512</area>
                     <preserveaspect>true</preserveaspect>
                 </imagetype>
             </state>
