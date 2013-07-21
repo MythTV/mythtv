@@ -34,7 +34,8 @@ static const char *dvdnav_menu_table[] =
     QT_TRANSLATE_NOOP("(DVD menu)", "Subpicture Menu"),
     QT_TRANSLATE_NOOP("(DVD menu)", "Audio Menu"),
     QT_TRANSLATE_NOOP("(DVD menu)", "Angle Menu"),
-    QT_TRANSLATE_NOOP3("(DVD menu)", "Part Menu", "DVD part/chapter menu"),
+    //: DVD part/chapter menu
+    QT_TRANSLATE_NOOP("(DVD menu)", "Part Menu")
 };
 
 DVDInfo::DVDInfo(const QString &filename)
