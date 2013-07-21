@@ -63,8 +63,9 @@ The schema contains the following tables:
 <tr><td>people                     <td>pk(person) uk(name)
 <tr><td>pidcache                   <td>
 <tr><td>profilegroups              <td>pk(id) uk(name,hostname)
-<tr><td>program                    <td>k(endtime) k(title) k(title_pronounce) k(seriesid)
-                                       k(programid) k(chanid,starttime,endtime)
+<tr><td>program                    <td>k(endtime) k(title_pronounce) k(seriesid)
+                                       k(programid,starttime) k(chanid,starttime,endtime)
+                                       k(title,subtitle,starttime)
 <tr><td>programgenres              <td>pk(chanid,starttime,relevance)
 <tr><td>programrating              <td>uk(chanid,starttime,system,rating)
                                        k(starttime,system)
@@ -2449,6 +2450,18 @@ NULL
         if (!performActualUpdate(&updates[0], "1315", dbver))
             return false;
     }
+
+    if (dbver == "1315")
+    {
+        const char *updates[] = {
+"ALTER TABLE program ADD INDEX title_subtitle_start (title, subtitle, starttime);",
+"ALTER TABLE program DROP INDEX title;",
+NULL
+};
+        if (!performActualUpdate(updates, "1316", dbver))
+            return false;
+    }
+
 
     return true;
 }
