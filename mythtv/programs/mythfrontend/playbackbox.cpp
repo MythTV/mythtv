@@ -3149,17 +3149,17 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if ((asFileNotFound  == pginfo.GetAvailableStatus()) ||
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
-        m_popupMenu->AddItem(tr("Show Recording Details"), SLOT(showProgramDetails()));
-        m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
-
         if (m_playList.filter(pginfo.MakeUniqueKey()).size())
-        {
             m_popupMenu->AddItem(tr("Remove from Playlist"), SLOT(togglePlayListItem()));
-        }
         else
-        {
             m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
-        }
+
+        if (m_playList.size())
+            m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
+
+        m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
+
+        m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
         DisplayPopupMenu();
 
