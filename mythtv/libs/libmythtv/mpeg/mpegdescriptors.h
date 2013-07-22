@@ -356,6 +356,7 @@ class AVCVideoDescriptor : public MPEGDescriptor
 /// ISO 13818-1:2000/Amd.3:2004 page 12
 class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 {
+  public:
     AVCTimingAndHRDDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::avc_timing_and_hrd) { }
     //       Name             bits  loc  expected value
