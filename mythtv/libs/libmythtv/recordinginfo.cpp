@@ -1268,7 +1268,7 @@ void RecordingInfo::ForgetHistory(void)
     result.bindValue(":NEVER", rsNeverRecord);
 
     if (!result.exec())
-        MythDB::DBError("forgetNeverHisttory", result);
+        MythDB::DBError("forgetNeverHistory", result);
 
     if (findid)
     {
