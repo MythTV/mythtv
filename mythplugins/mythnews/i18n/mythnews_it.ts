@@ -27,12 +27,12 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="463"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Aggiornamento</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="470"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
@@ -45,43 +45,40 @@
         <translation type="obsolete">Modifica</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Nessun sito configurato in MythNews.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="481"/>
-        <location filename="../mythnews/mythnews.cpp" line="740"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 di %2 (%3 percento)</translation>
+        <translation type="obsolete">%1 di %2 (%3 percento)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="713"/>
         <source>Downloading media...</source>
-        <translation>Scaricamento media...</translation>
+        <translation type="obsolete">Scaricamento media...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="818"/>
+        <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Nessun browser disponibile! MythNews necessita di MythBrowser installato.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="910"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
         <translation>Gestire feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="911"/>
+        <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
         <translation>Aggiungere feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
         <translation>Modificare feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="915"/>
+        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
         <translation>Cancellare feed</translation>
     </message>
@@ -94,7 +91,7 @@
         <translation type="obsolete">Eliminare sito di notizie</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="897"/>
+        <location filename="../mythnews/mythnews.cpp" line="674"/>
         <source>Options</source>
         <translation>Opzioni</translation>
     </message>
