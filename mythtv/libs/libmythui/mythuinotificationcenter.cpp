@@ -682,7 +682,7 @@ MythUINotificationScreen &MythUINotificationScreen::operator=(const MythUINotifi
                   m_style == s.m_style &&
                   m_visibility == s.m_visibility &&
                   m_priority == s.m_priority &&
-                  m_type == m_type
+                  m_type == s.m_type
                   );
 
     m_id            = s.m_id;
