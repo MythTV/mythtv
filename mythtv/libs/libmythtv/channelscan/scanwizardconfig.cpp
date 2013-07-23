@@ -179,11 +179,11 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                          QString::number(CurrentTransportScan), true);
             return;
         case CardUtil::ERROR_PROBE:
-            addSelection(QObject::tr("Failed to probe the card"),
+            addSelection(tr("Failed to probe the card"),
                          QString::number(Error_Probe), true);
             return;
         default:
-            addSelection(QObject::tr("Failed to open the card"),
+            addSelection(tr("Failed to open the card"),
                          QString::number(Error_Open), true);
             return;
     }
@@ -216,9 +216,9 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     setSaveAll(false);
 
     addTarget(QString::number(ScanTypeSetting::Error_Open),
-              new PaneError(QObject::tr("Failed to open the card")));
+              new PaneError(tr("Failed to open the card")));
     addTarget(QString::number(ScanTypeSetting::Error_Probe),
-              new PaneError(QObject::tr("Failed to probe the card")));
+              new PaneError(tr("Failed to probe the card")));
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBC),
               paneDVBC);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS),
