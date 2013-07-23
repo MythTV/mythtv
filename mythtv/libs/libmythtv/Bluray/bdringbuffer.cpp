@@ -169,7 +169,7 @@ void BDRingBuffer::GetDescForPos(QString &desc)
 {
     if (!m_infoLock.tryLock())
         return;
-    desc = QObject::tr("Title %1 chapter %2")
+    desc = tr("Title %1 chapter %2")
                        .arg(m_currentTitleInfo->idx)
                        .arg(m_currentTitleInfo->chapters->idx);
     m_infoLock.unlock();
@@ -312,7 +312,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     if (!bdnav)
     {
-        lastError = QObject::tr("Couldn't open Blu-ray device: %1").arg(filename);
+        lastError = tr("Couldn't open Blu-ray device: %1").arg(filename);
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
@@ -381,7 +381,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // no title, no point trying any longer
         bd_close(bdnav);
         bdnav = NULL;
-        lastError = QObject::tr("Can't find any Bluray-compatible title");
+        lastError = tr("Can't find any Bluray-compatible title");
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
@@ -481,7 +481,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             // no title, no point trying any longer
             bd_close(bdnav);
             bdnav = NULL;
-            lastError = QObject::tr("Can't find any usable Bluray title");
+            lastError = tr("Can't find any usable Bluray title");
             rwlock.unlock();
             mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
             return false;

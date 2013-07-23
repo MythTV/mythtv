@@ -251,7 +251,7 @@ QString MythBDPlayer::GetAngleName(int angle) const
 {
     if (angle >= 1 && angle <= GetNumAngles())
     {
-        QString name = QObject::tr("Angle %1").arg(angle);
+        QString name = tr("Angle %1").arg(angle);
         return name;
     }
     return QString();
@@ -274,7 +274,7 @@ bool MythBDPlayer::SwitchTitle(int title)
         ResetCaptions();
         if (OpenFile() != 0)
         {
-            SetErrored(QObject::tr("Failed to switch title."));
+            SetErrored(tr("Failed to switch title."));
         }
         else
         {
