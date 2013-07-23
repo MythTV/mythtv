@@ -17,6 +17,7 @@ AvFormatDecoderDVD::AvFormatDecoderDVD(
   , m_lbaLastVideoPkt(INVALID_LBA)
   , m_framesReq(0)
   , m_returnContext(NULL)
+  , m_oldLowBuffers(lowbuffers)
 {
 }
 
@@ -57,6 +58,14 @@ void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool rese
     SyncPositionMap();
 }
 
+void AvFormatDecoderDVD::SetLowBuffers(bool low)
+{
+    if (lowbuffers == m_oldLowBuffers)
+        DecoderBase::SetLowBuffers(low);
+
+    m_oldLowBuffers = low;
+}
+
 void AvFormatDecoderDVD::UpdateFramesPlayed(void)
 {
     if (!ringBuffer->IsDVD())
@@ -73,7 +82,7 @@ bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
     return AvFormatDecoder::GetFrame( kDecodeAV );
 }
 
-int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
+int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
 {
     int result = 0;
 
@@ -106,33 +115,66 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
         {
             gotPacket = true;
 
-            result = av_read_frame(ctx, pkt);
-
-            while (result == AVERROR_EOF && errno == EAGAIN)
+            do
             {
                 if (ringBuffer->DVD()->IsReadingBlocked())
                 {
-                    if (ringBuffer->DVD()->GetLastEvent() == DVDNAV_HOP_CHANNEL)
+                    switch(ringBuffer->DVD()->GetLastEvent())
                     {
-                        // Non-seamless jump - clear all buffers
-                        m_framesReq = 0;
-                        ReleaseContext(m_curContext);
+                        case DVDNAV_HOP_CHANNEL:
+                            // Non-seamless jump - clear all buffers
+                            m_framesReq = 0;
+                            ReleaseContext(m_curContext);
 
-                        while (m_contextList.size() > 0)
-                            m_contextList.takeFirst()->DecrRef();
+                            while (m_contextList.size() > 0)
+                                m_contextList.takeFirst()->DecrRef();
 
-                        Reset(true, false, false);
-                        m_audio->Reset();
-                        m_parent->DiscardVideoFrames(false);
+                            Reset(true, false, false);
+                            m_audio->Reset();
+                            m_parent->DiscardVideoFrames(false);
+                            break;
+
+                        case DVDNAV_WAIT:
+                        case DVDNAV_STILL_FRAME:
+                            if (storedPackets.count() > 0)
+                            {
+                                // Ringbuffer is waiting for the player
+                                // to empty its buffers but we have one or
+                                // more frames in our buffer that have not
+                                // yet been sent to the player.
+                                // Make sure no more frames will be buffered
+                                // for the time being and start emptying our
+                                // buffer.
+                                m_oldLowBuffers = lowbuffers;
+                                lowbuffers = false;
+
+                                // Force AvFormatDecoder to stop buffering frames
+                                storePacket = false;
+
+                                // Return the first buffered packet
+                                AVPacket *storedPkt = storedPackets.takeFirst();
+                                av_copy_packet(pkt, storedPkt);
+                                delete storedPkt;
+
+                                return 0;
+                            }
+                            else
+                            {
+                                // Our buffers are empty, frames may be
+                                // buffered again if necessary.
+                                lowbuffers = m_oldLowBuffers;
+                            }
+                            break;
+
+                        default:
+                            break;
                     }
+
                     ringBuffer->DVD()->UnblockReading();
-                    result = av_read_frame(ctx, pkt);
                 }
-                else
-                {
-                    break;
-                }
-            }
+
+                result = av_read_frame(ctx, pkt);
+            }while (result == AVERROR_EOF && errno == EAGAIN);
 
             if (result >= 0)
             {

@@ -143,7 +143,7 @@ class DecoderBase
     // Must be done while player is paused.
     void SetProgramInfo(const ProgramInfo &pginfo);
 
-    void SetLowBuffers(bool low) { lowbuffers = low; }
+    virtual void SetLowBuffers(bool low) { lowbuffers = low; }
     /// Disables AC3/DTS pass through
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 

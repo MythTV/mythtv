@@ -666,6 +666,7 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     int             offset       = 0;
     bool            bReprocessing = false;
     bool            stillSeen    = false;
+    bool            waiting      = false;
 
     if (m_gotStop)
     {
@@ -1146,55 +1147,76 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
 
                 m_still = still->length;
 
-                // pause a little as the dvdnav VM will continue to return
-                // this event until it has been skipped
-                rwlock.unlock();
-                usleep(10000);
-                rwlock.lockForWrite();
-
-                // when scanning the file or exiting playback, skip immediately
-                // otherwise update the timeout in the player
-                if (m_skipstillorwait)
-                    SkipStillFrame();
-                else if (m_parent)
+                if (!bReprocessing && !m_skipstillorwait && !waiting)
                 {
-                    m_parent->SetStillFrameTimeout(m_still);
-                }
-
-                // debug
-                if (!stillSeen)
-                {
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1) - waiting")
                         .arg(m_still));
-                    stillSeen = true;
+                    m_processState = PROCESS_WAIT;
                 }
+                else
+                {
+                    waiting = true;
 
-                // release buffer
-                if (blockBuf != m_dvdBlockWriteBuf)
-                    dvdnav_free_cache_block(m_dvdnav, blockBuf);
+                    // pause a little as the dvdnav VM will continue to return
+                    // this event until it has been skipped
+                    rwlock.unlock();
+                    usleep(10000);
+                    rwlock.lockForWrite();
+
+                    // when scanning the file or exiting playback, skip immediately
+                    // otherwise update the timeout in the player
+                    if (m_skipstillorwait)
+                        SkipStillFrame();
+                    else if (m_parent)
+                    {
+                        m_parent->SetStillFrameTimeout(m_still);
+                    }
+
+                    // debug
+                    if (!stillSeen)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
+                            .arg(m_still));
+                        stillSeen = true;
+                    }
+
+                    // release buffer
+                    if (blockBuf != m_dvdBlockWriteBuf)
+                        dvdnav_free_cache_block(m_dvdnav, blockBuf);
+                }
             }
             break;
 
             // wait for the player
             case DVDNAV_WAIT:
             {
-                //debug
-                LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_WAIT");
-
-                // skip if required, otherwise wait (and loop)
-                if (m_skipstillorwait)
-                    WaitSkip();
+                if (!bReprocessing && !m_skipstillorwait && !waiting)
+                {
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_WAIT - waiting");
+                    m_processState = PROCESS_WAIT;
+                }
                 else
                 {
-                    m_dvdWaiting = true;
-                    rwlock.unlock();
-                    usleep(10000);
-                    rwlock.lockForWrite();
-                }
+                    waiting = true;
 
-                // release buffer
-                if (blockBuf != m_dvdBlockWriteBuf)
-                    dvdnav_free_cache_block(m_dvdnav, blockBuf);
+                    //debug
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "DVDNAV_WAIT");
+
+                    // skip if required, otherwise wait (and loop)
+                    if (m_skipstillorwait)
+                        WaitSkip();
+                    else
+                    {
+                        m_dvdWaiting = true;
+                        rwlock.unlock();
+                        usleep(10000);
+                        rwlock.lockForWrite();
+                    }
+
+                    // release buffer
+                    if (blockBuf != m_dvdBlockWriteBuf)
+                        dvdnav_free_cache_block(m_dvdnav, blockBuf);
+                }
             }
             break;
 

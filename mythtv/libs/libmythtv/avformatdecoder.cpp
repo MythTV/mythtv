@@ -4661,7 +4661,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
 
             int retval = 0;
-            if (!ic || ((retval = ReadPacket(ic, pkt)) < 0))
+            if (!ic || ((retval = ReadPacket(ic, pkt, storevideoframes)) < 0))
             {
                 if (retval == -EAGAIN)
                     continue;
@@ -4836,7 +4836,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     return true;
 }
 
-int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt)
+int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
     return av_read_frame(ctx, pkt);
 }
