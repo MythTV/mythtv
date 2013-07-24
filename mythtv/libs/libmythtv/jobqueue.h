@@ -21,25 +21,25 @@ using namespace std;
 
 // Strings are used by JobQueue::StatusText()
 #define JOBSTATUS_MAP(F) \
-    F(JOB_UNKNOWN,      0x0000, QObject::tr("Unknown")) \
-    F(JOB_QUEUED,       0x0001, QObject::tr("Queued")) \
-    F(JOB_PENDING,      0x0002, QObject::tr("Pending")) \
-    F(JOB_STARTING,     0x0003, QObject::tr("Starting")) \
-    F(JOB_RUNNING,      0x0004, QObject::tr("Running")) \
-    F(JOB_STOPPING,     0x0005, QObject::tr("Stopping")) \
-    F(JOB_PAUSED,       0x0006, QObject::tr("Paused")) \
-    F(JOB_RETRY,        0x0007, QObject::tr("Retrying")) \
-    F(JOB_ERRORING,     0x0008, QObject::tr("Erroring")) \
-    F(JOB_ABORTING,     0x0009, QObject::tr("Aborting")) \
+    F(JOB_UNKNOWN,      0x0000, JobQueue::tr("Unknown")) \
+    F(JOB_QUEUED,       0x0001, JobQueue::tr("Queued")) \
+    F(JOB_PENDING,      0x0002, JobQueue::tr("Pending")) \
+    F(JOB_STARTING,     0x0003, JobQueue::tr("Starting")) \
+    F(JOB_RUNNING,      0x0004, JobQueue::tr("Running")) \
+    F(JOB_STOPPING,     0x0005, JobQueue::tr("Stopping")) \
+    F(JOB_PAUSED,       0x0006, JobQueue::tr("Paused")) \
+    F(JOB_RETRY,        0x0007, JobQueue::tr("Retrying")) \
+    F(JOB_ERRORING,     0x0008, JobQueue::tr("Erroring")) \
+    F(JOB_ABORTING,     0x0009, JobQueue::tr("Aborting")) \
     /* \
      * JOB_DONE is a mask to indicate the job is done no matter what the \
      * status \
      */ \
-    F(JOB_DONE,         0x0100, QObject::tr("Done (Invalid status!)")) \
-    F(JOB_FINISHED,     0x0110, QObject::tr("Finished")) \
-    F(JOB_ABORTED,      0x0120, QObject::tr("Aborted")) \
-    F(JOB_ERRORED,      0x0130, QObject::tr("Errored")) \
-    F(JOB_CANCELLED,    0x0140, QObject::tr("Cancelled")) \
+    F(JOB_DONE,         0x0100, JobQueue::tr("Done (Invalid status!)")) \
+    F(JOB_FINISHED,     0x0110, JobQueue::tr("Finished")) \
+    F(JOB_ABORTED,      0x0120, JobQueue::tr("Aborted")) \
+    F(JOB_ERRORED,      0x0130, JobQueue::tr("Errored")) \
+    F(JOB_CANCELLED,    0x0140, JobQueue::tr("Cancelled")) \
 
 enum JobStatus {
 #define JOBSTATUS_ENUM(A,B,C)   A = B ,
