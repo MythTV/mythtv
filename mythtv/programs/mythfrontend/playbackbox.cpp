@@ -23,7 +23,7 @@
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "mythuihelper.h"
-#include "mythuinotificationcenter.h"
+#include "mythnotificationcenter.h"
 #include "storagegroup.h"
 #include "mythuibutton.h"
 #include "mythlogging.h"

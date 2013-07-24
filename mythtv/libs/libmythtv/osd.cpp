@@ -15,7 +15,7 @@
 #include "mythuibutton.h"
 #include "mythuieditbar.h"
 #include "mythuistatetype.h"
-#include "mythuinotificationcenter.h"
+#include "mythnotificationcenter.h"
 
 // libmythtv
 #include "channelutil.h"
@@ -269,7 +269,7 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
 
 bool OSD::IsVisible(void)
 {
-    if (MythUINotificationCenter::GetInstance()->DisplayedNotifications() > 0)
+    if (MythNotificationCenter::GetInstance()->DisplayedNotifications() > 0)
         return true;
 
     foreach(MythScreenType* child, m_Children)
@@ -289,7 +289,7 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except, bool dropnotification)
 {
     if (dropnotification)
     {
-        if (MythUINotificationCenter::GetInstance()->RemoveFirst())
+        if (MythNotificationCenter::GetInstance()->RemoveFirst())
             return; // we've removed the top window, don't process any further
     }
     QMutableMapIterator<QString, MythScreenType*> it(m_Children);
@@ -642,13 +642,13 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
         }
     }
 
-    MythUINotificationCenter *nc = MythUINotificationCenter::GetInstance();
+    MythNotificationCenter *nc = MythNotificationCenter::GetInstance();
     QList<MythScreenType*> notifications;
     nc->GetNotificationScreens(notifications);
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!MythUINotificationCenter::GetInstance()->ScreenCreated(*it2))
+        if (!MythNotificationCenter::GetInstance()->ScreenCreated(*it2))
         {
             if (!m_UIScaleOverride)
             {
@@ -760,13 +760,13 @@ QRegion OSD::Draw(MythPainter* painter, QPaintDevice *device, QSize size,
         }
     }
 
-    MythUINotificationCenter *nc = MythUINotificationCenter::GetInstance();
+    MythNotificationCenter *nc = MythNotificationCenter::GetInstance();
     QList<MythScreenType*> notifications;
     nc->GetNotificationScreens(notifications);
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
-        if (!MythUINotificationCenter::GetInstance()->ScreenCreated(*it2))
+        if (!MythNotificationCenter::GetInstance()->ScreenCreated(*it2))
         {
             if (!m_UIScaleOverride)
             {

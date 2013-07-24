@@ -33,7 +33,7 @@ using namespace std;
 #else
 #include "mediamonitor-unix.h"
 #endif
-#include "mythuinotificationcenter.h"
+#include "mythnotificationcenter.h"
 
 static const QString _Location = QObject::tr("Media Monitor");
 
