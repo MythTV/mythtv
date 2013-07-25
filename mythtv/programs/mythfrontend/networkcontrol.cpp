@@ -24,7 +24,6 @@
 // libmythui
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythnotificationcenter.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -1234,7 +1233,7 @@ QString NetworkControl::processNotification(NetworkCommand *nc)
 
     QString message = nc->getCommand().remove(0, 12).trimmed();
     MythNotification n(message, tr("Network Control"));
-    MythNotificationCenter::GetInstance()->Queue(n);
+    GetNotificationCenter()->Queue(n);
     return QString("OK");
 }
 

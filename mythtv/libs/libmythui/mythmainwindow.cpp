@@ -83,8 +83,6 @@ using namespace std;
 #include "mythpainter_d3d9.h"
 #endif
 
-#include "mythnotificationcenter.h"
-
 #define GESTURE_TIMEOUT 1000
 #define STANDBY_TIMEOUT 90 // Minutes
 
@@ -2429,7 +2427,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if ((MythEvent::Type)(ce->type()) == MythNotificationCenterEvent::kEventType)
     {
-        MythNotificationCenter::GetInstance()->ProcessQueue();
+        GetNotificationCenter()->ProcessQueue();
     }
 }
 

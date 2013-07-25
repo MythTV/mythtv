@@ -44,7 +44,7 @@ public:
     /**
      * Queue a notification
      * Queue() is thread-safe and can be called from anywhere.
-     * Typical use would be MythNotificationCenter::GetInstance()->Queue(notification)
+     * Typical use would be GetNotificationCenter()->Queue(notification)
      */
     bool Queue(const MythNotification &notification);
 

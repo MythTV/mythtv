@@ -39,7 +39,6 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsystemlegacy.h"
 #include "mythmiscutil.h"
-#include "mythnotificationcenter.h"
 
 #include "mythplugin.h"
 
