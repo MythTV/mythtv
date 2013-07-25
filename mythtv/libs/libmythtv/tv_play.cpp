@@ -51,7 +51,6 @@ using namespace std;
 #include "channelutil.h"
 #include "compat.h"
 #include "mythuihelper.h"
-#include "mythuinotificationcenter.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"

@@ -15,7 +15,7 @@
 #include "mythraopconnection.h"
 #include "mythairplayserver.h"
 
-#include "mythuinotificationcenter.h"
+#include "mythmainwindow.h"
 
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
@@ -85,7 +85,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
     m_firstsend(false),    m_playbackStarted(false)
 {
-    m_id = MythUINotificationCenter::GetInstance()->Register(this);
+    m_id = GetNotificationCenter()->Register(this);
 }
 
 MythRAOPConnection::~MythRAOPConnection()
@@ -124,7 +124,7 @@ MythRAOPConnection::~MythRAOPConnection()
 
     if (m_id > 0)
     {
-        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        GetNotificationCenter()->UnRegister(this, m_id);
     }
 }
 
@@ -1792,7 +1792,7 @@ void MythRAOPConnection::SendNotification(bool update)
     n->SetParent(this);
     n->SetDuration(5);
     n->SetFullScreen(gCoreContext->GetNumSetting("AirPlayFullScreen"));
-    MythUINotificationCenter::GetInstance()->Queue(*n);
+    GetNotificationCenter()->Queue(*n);
     m_firstsend = true;
     delete n;
 }

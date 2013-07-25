@@ -8,7 +8,6 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythudplistener.h"
-#include "mythuinotificationcenter.h"
 
 #define LOC QString("UDPListener: ")
 

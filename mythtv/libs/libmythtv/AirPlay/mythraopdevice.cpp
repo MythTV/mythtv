@@ -7,7 +7,7 @@
 #include "mthread.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
-#include "mythuinotificationcenter.h"
+#include "mythmainwindow.h"
 
 #include "bonjourregister.h"
 #include "mythraopconnection.h"
@@ -213,7 +213,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
                        tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
     // Don't show it during playback
     n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
-    MythUINotificationCenter::GetInstance()->Queue(n);
+    GetNotificationCenter()->Queue(n);
 
     MythRAOPConnection *obj =
             new MythRAOPConnection(this, client, m_hardwareId, 6000);
@@ -242,7 +242,7 @@ void MythRAOPDevice::deleteClient(void)
     MythNotification n(tr("Client disconnected"), tr("AirTunes"));
     // Don't show it during playback
     n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
-    MythUINotificationCenter::GetInstance()->Queue(n);
+    GetNotificationCenter()->Queue(n);
 
     while (it != m_clients.end())
     {

@@ -97,6 +97,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void downloadError(QNetworkReply::NetworkError errorCode);
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
+    void downloadCanceled(const QString &url);
+
   private:
     // Notification from RemoteFile downloads
     void downloadFinished(MythDownloadInfo *dlInfo);

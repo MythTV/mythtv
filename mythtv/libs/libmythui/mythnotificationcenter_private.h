@@ -1,13 +1,13 @@
 //
-//  mythuinotificationcenter_private.h
+//  mythnotificationcenter_private.h
 //  MythTV
 //
 //  Created by Jean-Yves Avenard on 30/06/13.
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
-#ifndef MythTV_mythuinotificationcenter_private_h
-#define MythTV_mythuinotificationcenter_private_h
+#ifndef MythTV_mythnotificationcenter_private_h
+#define MythTV_mythnotificationcenter_private_h
 
 #include <QTimer>
 #include <QMutex>
@@ -21,11 +21,11 @@
 #include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
-#include "mythuinotificationcenter.h"
+#include "mythnotificationcenter.h"
 #include "mythuistatetype.h"
 
 // Forward declarations
-class MythUINotificationScreen;
+class MythNotificationScreen;
 class MythNotificationScreenStack;
 
 #define MIN_LIFE 1000
@@ -44,14 +44,14 @@ public:
     /**
      * Queue a notification
      * Queue() is thread-safe and can be called from anywhere.
-     * Typical use would be MythUINotificationCenter::GetInstance()->Queue(notification)
+     * Typical use would be GetNotificationCenter()->Queue(notification)
      */
     bool Queue(const MythNotification &notification);
 
     /**
-     * returns the MythUINotificationCenter singleton
+     * returns the MythNotificationCenter singleton
      */
-    static MythUINotificationCenter *GetInstance(void);
+    static MythNotificationCenter *GetInstance(void);
 
     /**
      * An application can register in which case it will be assigned a
@@ -77,12 +77,12 @@ public:
 
     /**
      * Return when the given screen is going to expire
-     * will return an invalid QDateTime if screen isn't a MythUINotificationScreen
+     * will return an invalid QDateTime if screen isn't a MythNotificationScreen
      */
     QDateTime ScreenExpiryTime(const MythScreenType *screen);
     /**
      * Return true if ::Create() has been called on screen.
-     * will always return true should screen not be a MythUINotificationScreen
+     * will always return true should screen not be a MythNotificationScreen
      */
     bool ScreenCreated(const MythScreenType *screen);
     /**
@@ -92,7 +92,7 @@ public:
      */
     void GetNotificationScreens(QList<MythScreenType*> &screens);
     /**
-     * Will call ::doInit() if the screen is a MythUINotificationScreen and
+     * Will call ::doInit() if the screen is a MythNotificationScreen and
      * ::Create() has been called for it already
      */
     void UpdateScreen(MythScreenType *screen);
@@ -120,42 +120,42 @@ public:
 
 private:
 
-    MythUINotificationScreen *CreateScreen(MythNotification *notification,
+    MythNotificationScreen *CreateScreen(MythNotification *notification,
                                            int id = -1);
     void DeleteAllRegistrations(void);
     void DeleteAllScreens(void);
     void DeleteUnregistered(void);
-    int InsertScreen(MythUINotificationScreen *screen);
-    int RemoveScreen(MythUINotificationScreen *screen);
+    int InsertScreen(MythNotificationScreen *screen);
+    int RemoveScreen(MythNotificationScreen *screen);
     void RefreshScreenPosition(int from = 0);
 
     MythNotificationScreenStack            *m_originalScreenStack;
     MythNotificationScreenStack            *m_screenStack;
     QList<MythNotification*>                m_notifications;
-    QList<MythUINotificationScreen*>        m_screens;
-    QList<MythUINotificationScreen*>        m_deletedScreens;
-    QMap<int, MythUINotificationScreen*>    m_registrations;
+    QList<MythNotificationScreen*>        m_screens;
+    QList<MythNotificationScreen*>        m_deletedScreens;
+    QMap<int, MythNotificationScreen*>    m_registrations;
     QList<int>                              m_suspended;
     QMap<int,bool>                          m_unregistered;
     QMap<int, void*>                        m_clients;
     QMutex                                  m_lock;
     int                                     m_currentId;
-    QMap<MythUINotificationScreen*, MythUINotificationScreen*> m_converted;
+    QMap<MythNotificationScreen*, MythNotificationScreen*> m_converted;
 };
 
-class MythUINotificationScreen : public MythScreenType
+class MythNotificationScreen : public MythScreenType
 {
     Q_OBJECT
 
 public:
-    MythUINotificationScreen(MythScreenStack *stack,
+    MythNotificationScreen(MythScreenStack *stack,
                              int id = -1);
-    MythUINotificationScreen(MythScreenStack *stack,
+    MythNotificationScreen(MythScreenStack *stack,
                              MythNotification &notification);
-    MythUINotificationScreen(MythScreenStack *stack,
-                             const MythUINotificationScreen &screen);
+    MythNotificationScreen(MythScreenStack *stack,
+                             const MythNotificationScreen &screen);
 
-    virtual ~MythUINotificationScreen();
+    virtual ~MythNotificationScreen();
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -190,7 +190,7 @@ public:
         kAll        = ~kNone,
     };
 
-    MythUINotificationScreen &operator=(const MythUINotificationScreen &s);
+    MythNotificationScreen &operator=(const MythNotificationScreen &s);
 
 signals:
     void ScreenDeleted();

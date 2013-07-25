@@ -70,7 +70,6 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythcontrols.h"
 #include "mythuihelper.h"
-#include "mythuinotificationcenter.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 #include "backendconnectionmanager.h"

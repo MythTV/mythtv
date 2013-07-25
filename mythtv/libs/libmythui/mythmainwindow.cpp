@@ -83,8 +83,6 @@ using namespace std;
 #include "mythpainter_d3d9.h"
 #endif
 
-#include "mythuinotificationcenter.h"
-
 #define GESTURE_TIMEOUT 1000
 #define STANDBY_TIMEOUT 90 // Minutes
 
@@ -287,7 +285,7 @@ class MythMainWindowPrivate
     QTimer *idleTimer;
     bool standby;
     bool enteringStandby;
-    MythUINotificationCenter *NC;
+    MythNotificationCenter *NC;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -375,7 +373,7 @@ MythPainter *GetMythPainter(void)
     return MythMainWindow::getMainWindow()->GetCurrentPainter();
 }
 
-MythUINotificationCenter *GetNotificationCenter(void)
+MythNotificationCenter *GetNotificationCenter(void)
 {
     if (!mainWin ||
         !mainWin->GetCurrentNotificationCenter())
@@ -606,7 +604,7 @@ MythPainter *MythMainWindow::GetCurrentPainter(void)
     return d->painter;
 }
 
-MythUINotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
+MythNotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
 {
     return d->NC;
 }
@@ -1109,7 +1107,7 @@ void MythMainWindow::Init(QString forcedpainter)
 
     if (!d->NC)
     {
-        d->NC = new MythUINotificationCenter();
+        d->NC = new MythNotificationCenter();
     }
 }
 
@@ -2427,9 +2425,9 @@ void MythMainWindow::customEvent(QEvent *ce)
         if (!message.isEmpty())
             ShowOkPopup(message);
     }
-    else if ((MythEvent::Type)(ce->type()) == MythUINotificationCenterEvent::kEventType)
+    else if ((MythEvent::Type)(ce->type()) == MythNotificationCenterEvent::kEventType)
     {
-        MythUINotificationCenter::GetInstance()->ProcessQueue();
+        GetNotificationCenter()->ProcessQueue();
     }
 }
 

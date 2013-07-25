@@ -1,5 +1,5 @@
 //
-//  mythuinotificationcenter.h
+//  mythnotificationcenter.h
 //  MythTV
 //
 //  Created by Jean-Yves Avenard on 25/06/13.
@@ -22,31 +22,31 @@
 class MythScreenType;
 class NCPrivate;
 
-class MUI_PUBLIC MythUINotificationCenterEvent : public MythEvent
+class MUI_PUBLIC MythNotificationCenterEvent : public MythEvent
 {
 public:
-    MythUINotificationCenterEvent() : MythEvent(kEventType) { }
+    MythNotificationCenterEvent() : MythEvent(kEventType) { }
 
     static Type kEventType;
 };
 
-class MUI_PUBLIC MythUINotificationCenter
+class MUI_PUBLIC MythNotificationCenter
 {
 public:
-    MythUINotificationCenter(void);
-    virtual ~MythUINotificationCenter();
+    MythNotificationCenter(void);
+    virtual ~MythNotificationCenter();
 
     /**
      * Queue a notification
      * Queue() is thread-safe and can be called from anywhere.
-     * Typical use would be MythUINotificationCenter::GetInstance()->Queue(notification)
+     * Typical use would be GetNotificationCenter()->Queue(notification)
      */
     bool Queue(const MythNotification &notification);
 
     /**
-     * returns the MythUINotificationCenter singleton
+     * returns the MythNotificationCenter singleton
      */
-    static MythUINotificationCenter *GetInstance(void);
+    static MythNotificationCenter *GetInstance(void);
 
     /**
      * An application can register in which case it will be assigned a
@@ -72,12 +72,12 @@ public:
 
     /**
      * Return when the given screen is going to expire
-     * will return an invalid QDateTime if screen isn't a MythUINotificationScreen
+     * will return an invalid QDateTime if screen isn't a MythNotificationScreen
      */
     QDateTime ScreenExpiryTime(const MythScreenType *screen);
     /**
      * Return true if ::Create() has been called on screen.
-     * will always return true should screen not be a MythUINotificationScreen
+     * will always return true should screen not be a MythNotificationScreen
      */
     bool ScreenCreated(const MythScreenType *screen);
     /**
@@ -87,7 +87,7 @@ public:
      */
     void GetNotificationScreens(QList<MythScreenType*> &screens);
     /**
-     * Will call ::doInit() if the screen is a MythUINotificationScreen and
+     * Will call ::doInit() if the screen is a MythNotificationScreen and
      * ::Create() has been called for it already
      */
     void UpdateScreen(MythScreenType *screen);

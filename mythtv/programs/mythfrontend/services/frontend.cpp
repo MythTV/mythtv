@@ -11,7 +11,6 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "tv_play.h"
-#include "mythuinotificationcenter.h"
 
 #include "videometadatalistmanager.h"
 #include "videometadata.h"
