@@ -314,12 +314,12 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
 
     // Text
-    QHash<QString, QString> textMap;
+    InfoMap textMap;
     metadata->toMap(textMap);
     sub_node->SetTextFromMap(textMap);
 
     // Images
-    QHash<QString, QString> imageMap;
+    InfoMap imageMap;
     metadata->GetImageMap(imageMap);
     sub_node->SetImageFromMap(imageMap);
     sub_node->SetImage("buttonimage", imageMap["smartimage"]);
@@ -333,7 +333,7 @@ static int AddFileNode(MythGenericTree *where_to_add, QString name,
     }
 
     // Statetypes
-    QHash<QString, QString> stateMap;
+    InfoMap stateMap;
     metadata->GetStateMap(stateMap);
     sub_node->DisplayStateFromMap(stateMap);
 
@@ -636,9 +636,6 @@ MythGenericTree *VideoListImp::buildVideoList(
     const ParentalLevel &parental_level, bool include_updirs)
 {
     refreshList(filebrowser, parental_level, flatlist, group_type);
-
-    typedef map<QString, MythGenericTree *> string_to_tree;
-    string_to_tree prefix_tree_map;
 
     video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                                               kRootNode, false));
@@ -943,9 +940,6 @@ void VideoListImp::buildTVList(void)
 
     metadata_path_sort mps(true);
     sort(mlist.begin(), mlist.end(), mps);
-
-    typedef map<QString, meta_dir_node *> group_to_node_map;
-    group_to_node_map gtnm;
 
     meta_dir_node *video_root = &m_metadata_tree;
 

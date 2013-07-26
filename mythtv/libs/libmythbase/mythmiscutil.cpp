@@ -541,18 +541,6 @@ QString getSymlinkTarget(const QString &start_file,
     return (!fi.isSymLink()) ? cur_file : QString::null;
 }
 
-void sendPlaybackStart(void)
-{
-    MythEvent me(QString("PLAYBACK_START %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
-}
-
-void sendPlaybackEnd(void)
-{
-    MythEvent me(QString("PLAYBACK_END %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
-}
-
 bool IsMACAddress(QString MAC)
 {
     QStringList tokens = MAC.split(':');
@@ -954,6 +942,10 @@ void setHttpProxy(void)
 void wrapList(QStringList &list, int width)
 {
     int i;
+
+    // if this is triggered, something has gone seriously wrong
+    // the result won't really be usable, but at least it won't crash
+    width = max(width, 5);
 
     for(i = 0; i < list.size(); i++)
     {

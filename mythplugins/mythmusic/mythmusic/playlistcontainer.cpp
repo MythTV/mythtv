@@ -269,7 +269,7 @@ QString PlaylistContainer::getPlaylistName(int index, bool &reference)
         "getPlaylistName() called with unknown index number");
 
     reference = true;
-    return QObject::tr("Something is Wrong");
+    return tr("Something is Wrong");
 }
 
 bool PlaylistContainer::nameIsUnique(QString a_name, int which_id)

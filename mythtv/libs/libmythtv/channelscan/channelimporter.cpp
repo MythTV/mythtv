@@ -35,13 +35,19 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     {
         if (use_gui)
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + (ChannelUtil::GetChannelCount() ?
-                                             "No new channels to process" :
+            int channels = ChannelUtil::GetChannelCount();
+
+            LOG(VB_GENERAL, LOG_INFO, LOC + (channels ?
+                                             (m_success ?
+                                              QString("Found %1 channels").arg(channels) :
+                                              "No new channels to process") :
                                              "No channels to process.."));
+
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), QObject::tr("Channel Importer"),
-                ChannelUtil::GetChannelCount()
-                ? QObject::tr("Failed to find any new channels!")
+                channels ? 
+                (m_success ? QObject::tr("Found %1 channels").arg(channels) :
+                             QObject::tr("Failed to find any new channels!"))
                 : QObject::tr("Failed to find any channels."));
         }
         else
@@ -1303,12 +1309,11 @@ ChannelImporter::QueryUserDelete(const QString &msg)
             cin >> ret;
             bool ok;
             uint val = QString(ret.c_str()).toUInt(&ok);
-            if (ok && (1 <= val) && (val <= 3))
+            if (ok && (val == 1 || val == 2 || val == 4))
             {
                 action = (1 == val) ? kDeleteAll       : action;
                 action = (2 == val) ? kDeleteInvisibleAll : action;
                 //action = (3 == val) ? kDeleteManual    : action;
-                action = (3 == val) ? kDeleteIgnoreAll : action;
                 action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }

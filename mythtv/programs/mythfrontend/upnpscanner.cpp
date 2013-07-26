@@ -684,11 +684,11 @@ void UPNPScanner::customEvent(QEvent *event)
         MythInfoMapEvent *info = (MythInfoMapEvent*)event;
         if (!info)
             return;
-        if (!info->InfoMap())
+        if (!info->GetInfoMap())
             return;
 
-        QString usn = info->InfoMap()->value("usn");
-        QString id  = info->InfoMap()->value("SystemUpdateID");
+        QString usn = info->GetInfoMap()->value("usn");
+        QString id  = info->GetInfoMap()->value("SystemUpdateID");
         if (usn.isEmpty() || id.isEmpty())
             return;
 

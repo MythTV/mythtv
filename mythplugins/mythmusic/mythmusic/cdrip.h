@@ -4,6 +4,7 @@
 // qt
 #include <QEvent>
 #include <QVector>
+#include <QCoreApplication>
 
 // mythtv
 #include <musicmetadata.h>
@@ -56,6 +57,8 @@ class RipStatus;
 
 class CDRipperThread: public MThread
 {
+    Q_DECLARE_TR_FUNCTIONS(CDRipperThread)
+
     public:
         CDRipperThread(RipStatus *parent,  QString device,
                        QVector<RipTrack*> *tracks, int quality);

@@ -5,22 +5,23 @@
 #include <QPair>
 #include <QString>
 
+#include "mythtypes.h"
 #include "mythimage.h"
 #include "mythmetaexp.h"
 #include "bluray.h"
 
 typedef QList< QPair < uint,QString > > BlurayTitles;
 
-typedef QHash<QString,QString> MetadataMap;
-
 struct meta_dl;
 class META_PUBLIC BlurayMetadata : public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(BlurayMetadata)
+
   public:
     BlurayMetadata(const QString path);
     ~BlurayMetadata();
 
-    void toMap(MetadataMap &metadataMap);
+    void toMap(InfoMap &metadataMap);
 
     bool OpenDisc(void);
     bool IsOpen() { return m_bdnav; };

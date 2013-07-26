@@ -59,6 +59,18 @@ static HostCheckBox *DecodeExtraAudio()
     return gc;
 }
 
+#if CONFIG_DEBUGTYPE
+static HostCheckBox *FFmpegDemuxer()
+{
+    HostCheckBox *gc = new HostCheckBox("FFMPEGTS");
+    gc->setLabel(QObject::tr("Use FFmpeg's original MPEG-TS demuxer"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Experimental: Enable this setting to use FFmpeg's native demuxer. "
+                                "Things will be broken."));
+    return gc;
+}
+#endif
+
 static HostComboBox *PIPLocationComboBox()
 {
     HostComboBox *gc = new HostComboBox("PIPLocation");
@@ -2133,6 +2145,7 @@ static HostComboBox *MythTimeFormat()
     return gc;
 }
 
+#if ! CONFIG_DARWIN
 static HostComboBox *ThemePainter()
 {
     HostComboBox *gc = new HostComboBox("ThemePainter");
@@ -2151,6 +2164,7 @@ static HostComboBox *ThemePainter()
                     "drivers or windowing systems) where only Qt works."));
     return gc;
 }
+#endif
 
 static HostComboBox *ChannelFormat()
 {
@@ -2523,9 +2537,9 @@ static HorizontalConfigurationGroup *AirPlayPasswordSettings()
 static HostCheckBox *AirPlayFullScreen()
 {
     HostCheckBox *gc = new HostCheckBox("AirPlayFullScreen");
-    gc->setLabel(QObject::tr("Full screen"));
+    gc->setLabel(QObject::tr("AirPlay full screen playback"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("During audio playback, displays album cover "
+    gc->setHelpText(QObject::tr("During music playback, displays album cover "
                                 "and various media information in full screen mode"));
     return gc;
 }
@@ -3173,6 +3187,9 @@ PlaybackSettings::PlaybackSettings()
     column1->addChild(RealtimePriority());
     column1->addChild(DecodeExtraAudio());
     column1->addChild(JumpToProgramOSD());
+#if CONFIG_DEBUGTYPE
+    column1->addChild(FFmpegDemuxer());
+#endif
     columns->addChild(column1);
 
     VerticalConfigurationGroup *column2 =
@@ -3437,6 +3454,9 @@ AppearanceSettings::AppearanceSettings()
     column2->addChild(HideMouseCursor());
     column2->addChild(RunInWindow());
     column2->addChild(UseFixedWindowSize());
+#ifdef USING_AIRPLAY
+    column2->addChild(AirPlayFullScreen());
+#endif
 
     HorizontalConfigurationGroup *columns =
         new HorizontalConfigurationGroup(false, false, false, false);

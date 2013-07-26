@@ -16,6 +16,8 @@ namespace MythTV
 
 class MTV_PUBLIC AudioPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioPlayer)
+
   public:
     AudioPlayer(MythPlayer *parent, bool muted);
    ~AudioPlayer();

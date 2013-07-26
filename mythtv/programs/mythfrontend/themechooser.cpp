@@ -376,7 +376,7 @@ void ThemeChooser::Init(void)
 
             item->DisplayState(m_themeStatuses[themeinfo->GetName()],
                                "themestatus");
-            QHash<QString, QString> infomap;
+            InfoMap infomap;
             themeinfo->ToMap(infomap);
             item->SetTextFromMap(infomap);
             item->SetData(qVariantFromValue(themeinfo));
@@ -665,7 +665,7 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
         return;
 
     QFileInfo preview(info->GetPreviewPath());
-    QHash<QString, QString> infomap;
+    InfoMap infomap;
     info->ToMap(infomap);
     SetTextFromMap(infomap);
     if (m_preview)

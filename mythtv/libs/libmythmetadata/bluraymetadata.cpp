@@ -1,4 +1,6 @@
+// Qt headers
 #include <QHash>
+#include <QCoreApplication>
 
 #include "bdnav/meta_data.h"
 #include "bluraymetadata.h"
@@ -92,7 +94,7 @@ bool BlurayMetadata::ParseDisc(void)
     return true;
 }
 
-void BlurayMetadata::toMap(MetadataMap &metadataMap)
+void BlurayMetadata::toMap(InfoMap &metadataMap)
 {
     metadataMap["title"] = m_title;
     metadataMap["alttitle"] = m_alttitle;
@@ -100,9 +102,12 @@ void BlurayMetadata::toMap(MetadataMap &metadataMap)
 
     metadataMap["discnumber"] = QString::number(m_discnumber);
     metadataMap["disctotal"] = QString::number(m_disctotal);
-    metadataMap["discseries"] = QObject::tr("%1 of %2")
-                                    .arg(m_discnumber)
-                                    .arg(m_disctotal);
+
+    //: %1 and %2 are both numbers, %1 is the current position, %2 the maximum 
+    metadataMap["discseries"] = QCoreApplication::translate("(Common)", 
+                                                            "%1 of %2")
+                                                            .arg(m_discnumber)
+                                                            .arg(m_disctotal);
 
     metadataMap["numtitles"] = m_titles.count();
     metadataMap["numthumbs"] = m_images.count();

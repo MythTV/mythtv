@@ -125,6 +125,22 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                           int   udpPort,
                                                           int   Timeout ) = 0;
 
+        virtual bool                SendNotification    ( bool  Error,
+                                                          const QString &Type,
+                                                          const QString &Message,
+                                                          const QString &Origin,
+                                                          const QString &Description,
+                                                          const QString &Image,
+                                                          const QString &Extra,
+                                                          const QString &ProgressText,
+                                                          float Progress,
+                                                          int   Timeout,
+                                                          bool  Fullscreen,
+                                                          uint  Visibility,
+                                                          uint  Priority,
+                                                          const QString &Address,
+                                                          int   udpPort ) = 0;
+
         virtual bool                BackupDatabase      ( void ) = 0;
 
         virtual bool                CheckDatabase       ( bool Repair ) = 0;

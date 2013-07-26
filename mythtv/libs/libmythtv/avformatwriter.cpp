@@ -60,8 +60,8 @@ AVFormatWriter::~AVFormatWriter()
 
     if (m_ctx)
     {
-        av_write_trailer(m_ctx);
-        avio_close(m_ctx->pb);
+        (void)av_write_trailer(m_ctx);
+        avio_closep(&m_ctx->pb);
         for(unsigned int i = 0; i < m_ctx->nb_streams; i++) {
             av_freep(&m_ctx->streams[i]);
         }
@@ -76,6 +76,8 @@ AVFormatWriter::~AVFormatWriter()
 
     if (m_audPicture)
         avcodec_free_frame(&m_audPicture);
+
+    Cleanup();
 }
 
 bool AVFormatWriter::Init(void)
@@ -169,10 +171,12 @@ bool AVFormatWriter::OpenFile(void)
 
     m_ringBuffer = RingBuffer::Create(m_filename, true);
 
-    if (!m_ringBuffer)
+    if (!m_ringBuffer || !m_ringBuffer->GetLastError().isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
-            "OpenFile(): RingBuffer::Create() failed");
+            QString("OpenFile(): RingBuffer::Create() failed: '%1'")
+            .arg(m_ringBuffer ? m_ringBuffer->GetLastError() : ""));
+        Cleanup();
         return false;
     }
 
@@ -181,23 +185,38 @@ bool AVFormatWriter::OpenFile(void)
     uc->prot            = AVFRingBuffer::GetRingBufferURLProtocol();
     uc->priv_data       = (void *)m_avfRingBuffer;
 
-    avformat_write_header(m_ctx, NULL);
+    if (avformat_write_header(m_ctx, NULL) < 0)
+    {
+        Cleanup();
+        return false;
+    }
 
     return true;
+}
+
+void AVFormatWriter::Cleanup(void)
+{
+    if (m_ctx && m_ctx->pb)
+    {
+        avio_closep(&m_ctx->pb);
+    }
+    delete m_avfRingBuffer;
+    m_avfRingBuffer = NULL;
+    delete m_ringBuffer;
+    m_ringBuffer = NULL;
 }
 
 bool AVFormatWriter::CloseFile(void)
 {
     if (m_ctx)
     {
-        av_write_trailer(m_ctx);
+        (void)av_write_trailer(m_ctx);
         avio_close(m_ctx->pb);
         for(unsigned int i = 0; i < m_ctx->nb_streams; i++) {
             av_freep(&m_ctx->streams[i]);
         }
 
-        av_free(m_ctx);
-        m_ctx = NULL;
+        av_freep(&m_ctx);
     }
 
     return true;

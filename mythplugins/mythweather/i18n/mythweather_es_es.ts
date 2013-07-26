@@ -1226,12 +1226,12 @@ Cuando termine los cambios, pulse &quot;Finalizar&quot; para continuar.</transla
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="98"/>
+        <location filename="../mythweather/weather.cpp" line="99"/>
         <source>Paused</source>
         <translation>En Pausa</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="210"/>
+        <location filename="../mythweather/weather.cpp" line="211"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Ninguna de las pantallas configuradas están completas en este tema (falta información del copyright).</translation>
     </message>

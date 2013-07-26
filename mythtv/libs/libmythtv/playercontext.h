@@ -19,6 +19,7 @@ using namespace std;
 #include "mythtvexp.h"
 #include "mythdeque.h"
 #include "mythdate.h"
+#include "mythtypes.h"
 #include "tv.h"
 
 class TV;
@@ -32,8 +33,8 @@ class QPainter;
 
 struct osdInfo
 {
-    QHash<QString,QString> text;
-    QHash<QString,int>     values;
+    InfoMap             text;
+    QHash<QString,int>  values;
 };
 
 typedef enum
@@ -44,7 +45,6 @@ typedef enum
 } PseudoState;
 
 typedef deque<QString>         StringDeque;
-typedef QHash<QString,QString> InfoMap;
 
 class MTV_PUBLIC PlayerContext
 {

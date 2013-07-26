@@ -21,7 +21,7 @@
 #include "asirecorder.h"
 #include "asistreamhandler.h"
 
-#define LOC QString("ASISM[%1](%2): ") \
+#define LOC QString("ASISigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 /**

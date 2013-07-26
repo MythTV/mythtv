@@ -372,6 +372,14 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         : PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false)
         { ; }
   public:
+    /// Constructor for viewing a section, does not create it's own data
+    PSIPTable(const unsigned char *pesdata)
+        : PESPacket(pesdata, false)
+    {
+        // fixup wrong assumption about length for sections without CRC
+        _pesdataSize = SectionLength();
+    }
+  public:
     PSIPTable(const PSIPTable& table) : PESPacket(table)
     {
         // section_syntax_ind   1       1.0       8   should always be 1

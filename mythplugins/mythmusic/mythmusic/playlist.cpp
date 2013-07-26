@@ -173,7 +173,7 @@ void Playlist::moveTrackUpDown(bool flag, MusicMetadata* mdata)
 
 Playlist::Playlist(void) :
     m_playlistid(0),
-    m_name(QObject::tr("oops")),
+    m_name(tr("oops")),
     m_parent(NULL),
     m_changed(false),
     m_doSave(true),
@@ -632,7 +632,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     }
 
     if (m_name == "default_playlist_storage")
-        m_name = QObject::tr("Default Playlist");
+        m_name = tr("Default Playlist");
 
     fillSongsFromSonglist(rawSonglist);
 }
@@ -1316,7 +1316,7 @@ int Playlist::CreateCDMP3(void)
 
     reclistfile.close();
 
-    m_progress = new MythProgressDialog(QObject::tr("Creating CD File System"),
+    m_progress = new MythProgressDialog(tr("Creating CD File System"),
                                       100);
     m_progress->setProgress(1);
 
@@ -1365,7 +1365,7 @@ int Playlist::CreateCDMP3(void)
     }
     else
     {
-        m_progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
+        m_progress = new MythProgressDialog(tr("Burning CD"), 100);
         m_progress->setProgress(2);
 
         command = "cdrecord";

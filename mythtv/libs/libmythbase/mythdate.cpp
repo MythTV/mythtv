@@ -1,4 +1,5 @@
 #include <QtGlobal>
+#include <QCoreApplication>
 
 #include "mythcorecontext.h"
 #include "mythdate.h"
@@ -142,11 +143,11 @@ QString toString(const QDate &date, uint format)
         {
             QDate now = current().toLocalTime().date();
             if ((format & kSimplify) && (now == date))
-                result = QObject::tr("Today");
+                result = QCoreApplication::translate("(Common)", "Today");
             else if ((format & kSimplify) && (now.addDays(-1) == date))
-                result = QObject::tr("Yesterday");
+                result = QCoreApplication::translate("(Common)", "Yesterday");
             else if ((format & kSimplify) && (now.addDays(1) == date))
-                result = QObject::tr("Tomorrow");
+                result = QCoreApplication::translate("(Common)", "Tomorrow");
         }
 
         if (result.isEmpty())

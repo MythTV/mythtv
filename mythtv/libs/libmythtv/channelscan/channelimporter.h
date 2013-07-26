@@ -78,10 +78,12 @@ class MTV_PUBLIC ChannelImporter
   public:
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
-                    bool fta_only, ServiceRequirements service_requirements) :
+                    bool fta_only, ServiceRequirements service_requirements,
+                    bool success = false) :
         use_gui(gui), is_interactive(interactive),
         do_delete(_delete),
         do_insert(insert), do_save(save), m_fta_only(fta_only),
+        m_success(success),
         m_service_requirements(service_requirements) { }
 
     void Process(const ScanDTVTransportList&);
@@ -228,6 +230,8 @@ class MTV_PUBLIC ChannelImporter
     bool do_save;
     /// Only FreeToAir (non-encrypted) channels desired post scan?
     bool m_fta_only;
+    /// To pass information IPTV channel scan succeeded
+    bool m_success;
     /// Services desired post scan
     ServiceRequirements m_service_requirements;
 };

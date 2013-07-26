@@ -751,6 +751,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
         return true;
     }
 
+    AdjustFillMode oldadjustfillmode = window.GetAdjustFill();
+
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
@@ -759,6 +761,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
         if (wasembedding)
             EmbedInWidget(oldrect);
         BestDeint();
+        window.ToggleAdjustFill(oldadjustfillmode);
         return true;
     }
 

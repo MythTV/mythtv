@@ -1628,7 +1628,7 @@ void LCDProcClient::scrollMenuText()
 
     // Back up one if were at the end so the last item shows up at the bottom
     // of the display
-    if ((int)counter == m_lcdMenuItems->size())
+    if (counter > 1 && (int)counter == m_lcdMenuItems->size())
         --it;
 
     bool stopTimer = true;
@@ -1990,6 +1990,9 @@ void LCDProcClient::outputRecStatus(void)
         listTime = LCD_RECSTATUS_TIME;
         m_isTimeVisible = false;
         m_activeScreen = "RecStatus";
+
+        if (m_lcdTunerNo > (int) m_tunerList.size() - 1)
+            m_lcdTunerNo = 0;
     }
     else if ( m_lcdTunerNo > (int) m_tunerList.size() - 1)
     {

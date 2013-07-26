@@ -16,8 +16,7 @@ using namespace std;
 #include <sys/types.h>
 
 #include "mythexp.h"
-
-typedef QHash<QString,QString> MetadataMap;
+#include "mythtypes.h"
 
 typedef enum ArticleTypes {
     VIDEO_FILE = 0,
@@ -129,7 +128,7 @@ class MPUBLIC ResultItem
     ResultItem();
     ~ResultItem();
 
-    void toMap(QHash<QString, QString> &infoMap);
+    void toMap(InfoMap &infoMap);
 
     const QString& GetTitle() const { return m_title; }
     const QString& GetSubtitle() const { return m_subtitle; }

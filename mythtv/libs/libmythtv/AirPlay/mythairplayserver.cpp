@@ -18,7 +18,7 @@
 #include "mythuistatetracker.h"
 #include "plist.h"
 #include "tv_play.h"
-#include "mythuinotificationcenter.h"
+#include "mythmainwindow.h"
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
@@ -401,7 +401,7 @@ MythAirplayServer::~MythAirplayServer()
     m_lock = NULL;
     if (m_id > 0)
     {
-        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        GetNotificationCenter()->UnRegister(this, m_id);
         m_id = -1;
     }
 }
@@ -434,7 +434,7 @@ void MythAirplayServer::Teardown(void)
 
     if (m_id > 0)
     {
-        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
+        GetNotificationCenter()->UnRegister(this, m_id);
         m_id = -1;
     }
 }
@@ -558,13 +558,17 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
             .arg(remove.data()));
         m_connections.remove(remove);
 
-        // close any photos that could be displayed
-        MythUINotificationCenter::GetInstance()->UnRegister(this, m_id);
-        m_id = -1;
-
+        if (m_id > 0)
+        {
+            // close any photos that could be displayed
+            GetNotificationCenter()->UnRegister(this, m_id);
+            m_id = -1;
+        }
         MythNotification n(tr("Client disconnected"), tr("AirPlay"),
                            tr("from %1").arg(socket->peerAddress().toString()));
-        MythUINotificationCenter::GetInstance()->Queue(n);
+        // Don't show it during playback
+        n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
+        GetNotificationCenter()->Queue(n);
     }
 
     socket->deleteLater();
@@ -704,10 +708,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
         MythNotification n(tr("New Connection"), tr("AirPlay"),
                            tr("from %1").arg(socket->peerAddress().toString()));
-        MythUINotificationCenter::GetInstance()->Queue(n);
-
-        m_id = MythUINotificationCenter::GetInstance()->Register(this);
-
+        // Don't show it during playback
+        n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
+        GetNotificationCenter()->Queue(n);
     }
 
     double position    = 0.0f;
@@ -829,12 +832,16 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Received %1 photo").arg(png ? "jpeg" : "png"));
 
+            if (m_id < 0)
+            {
+                m_id = GetNotificationCenter()->Register(this);
+            }
             // send full screen display notification
             MythImageNotification n(MythNotification::New, image);
             n.SetId(m_id);
             n.SetParent(this);
             n.SetFullScreen(true);
-            MythUINotificationCenter::GetInstance()->Queue(n);
+            GetNotificationCenter()->Queue(n);
         }
     }
     else if (req->GetURI() == "/slideshow-features")
@@ -1147,6 +1154,12 @@ void MythAirplayServer::StartPlayback(const QString &pathname)
     gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStarted()),
                                    SIGNAL(TVPlaybackAborted()),
                                    NULL);
+    if (TV::IsTVRunning() && m_id > 0)
+    {
+        // playback has started, dismiss the photo is we were showing one
+        GetNotificationCenter()->UnRegister(this, m_id);
+        m_id = -1;
+    }
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("ACTION_HANDLEMEDIA completed"));
 }

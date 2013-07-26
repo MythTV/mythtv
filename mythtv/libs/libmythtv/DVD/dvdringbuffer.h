@@ -5,11 +5,14 @@
 #define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
+// Qt headers
 #include <QMap>
 #include <QString>
 #include <QMutex>
 #include <QRect>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "ringbuffer.h"
 #include "mythdate.h"
 #include "referencecounter.h"
@@ -43,6 +46,10 @@ class MTV_PUBLIC MythDVDContext : public ReferenceCounter
     int      GetFPS()               const { return (m_pci.pci_gi.e_eltm.frame_u & 0x80) ? 30 : 25; }
 
   protected:
+    MythDVDContext(const dsi_t& dsi, const pci_t& pci);
+
+  private:
+    // Default constructor should not be called
     MythDVDContext();
 
   protected:
@@ -60,6 +67,8 @@ class MythDVDPlayer;
 
 class MTV_PUBLIC DVDInfo
 {
+    Q_DECLARE_TR_FUNCTIONS(DVDInfo)
+
   public:
     DVDInfo(const QString &filename);
    ~DVDInfo(void);
@@ -76,6 +85,8 @@ class MTV_PUBLIC DVDInfo
 
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
+    Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
+
   public:
     DVDRingBuffer(const QString &lfilename);
     virtual ~DVDRingBuffer();

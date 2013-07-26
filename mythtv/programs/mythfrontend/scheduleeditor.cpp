@@ -33,6 +33,7 @@
 #include "mythuiimageresults.h"
 #include "videoutils.h"
 #include "mythuiutils.h"
+#include "mythtypes.h"
 
 #include "metadataimagehelper.h"
 
@@ -1585,7 +1586,7 @@ void MetadataOptions::QueryComplete(MetadataLookup *lookup)
     // Episode
     m_episodeSpin->SetValue(m_lookup->GetEpisode());
 
-    MetadataMap metadataMap;
+    InfoMap metadataMap;
     lookup->toMap(metadataMap);
     SetTextFromMap(metadataMap);
 }

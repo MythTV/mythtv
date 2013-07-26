@@ -158,8 +158,8 @@ class ZMServer
 
   private:
     string getZMSetting(const string &setting);
-    bool send(const string s) const;
-    bool send(const string s, const unsigned char *buffer, int dataLen) const;
+    bool send(const string &s) const;
+    bool send(const string &s, const unsigned char *buffer, int dataLen) const;
     void sendError(string error);
     void getMonitorList(void);
     void initMonitor(MONITOR *monitor);

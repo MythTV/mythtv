@@ -152,11 +152,7 @@ class VideoPlayMythSystem : public VideoPlayProc
 
     bool Play() const
     {
-        sendPlaybackStart();
-        GetMythMainWindow()->PauseIdleTimer(true);
         myth_system(m_play_command);
-        sendPlaybackEnd();
-        GetMythMainWindow()->PauseIdleTimer(false);
 
         return true;
     }
@@ -416,7 +412,11 @@ void VideoPlayerCommand::Play() const
         lcd->setFunctionLEDs(FUNC_TV, false);
         lcd->setFunctionLEDs(FUNC_MOVIE, true);
     }
+    gCoreContext->WantingPlayback(NULL);
+    GetMythMainWindow()->PauseIdleTimer(true);
     m_d->Play();
+    gCoreContext->emitTVPlaybackStopped();
+    GetMythMainWindow()->PauseIdleTimer(false);
     GetMythMainWindow()->raise();
     GetMythMainWindow()->activateWindow();
     if (GetMythMainWindow()->currentWidget())

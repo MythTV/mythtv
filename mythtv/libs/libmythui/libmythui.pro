@@ -41,8 +41,8 @@ HEADERS += mythrender_base.h mythfontmanager.h mythuieditbar.h
 HEADERS += mythdisplay.h mythuivideo.h mythudplistener.h
 HEADERS += mythuiexp.h mythuisimpletext.h mythuistatetracker.h
 HEADERS += mythuianimation.h mythuiscrollbar.h
-HEADERS += mythuinotificationcenter.h mythuinotificationcenter_private.h
-HEADERS += mythnotification.h
+HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
+HEADERS += mythuicomposite.h mythnotification.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp  mythpainter_qimage.cpp mythpainter_yuva.cpp
@@ -62,7 +62,8 @@ SOURCES += mythfontmanager.cpp mythuieditbar.cpp
 SOURCES += mythdisplay.cpp mythuivideo.cpp mythudplistener.cpp
 SOURCES += mythuisimpletext.cpp mythuistatetracker.cpp
 SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
-SOURCES += mythuinotificationcenter.cpp mythnotification.cpp
+SOURCES += mythnotificationcenter.cpp mythnotification.cpp
+SOURCES += mythuicomposite.cpp
 
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 SOURCES += mythuiwebbrowser.cpp
@@ -84,7 +85,7 @@ inc.files += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
 inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
 inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
-inc.files += mythuinotificationcenter.h mythnotification.h
+inc.files += mythnotificationcenter.h mythnotification.h mythuicomposite.h
 
 INSTALLS += inc
 

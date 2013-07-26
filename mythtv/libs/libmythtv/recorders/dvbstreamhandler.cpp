@@ -331,8 +331,7 @@ void DVBStreamHandler::RunSR(void)
 
             readSomething = true;
 
-            const PESPacket pes = PESPacket::ViewData(buffer);
-            const PSIPTable psip(pes);
+            const PSIPTable psip(buffer);
 
             if (psip.SectionSyntaxIndicator())
             {

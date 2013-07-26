@@ -822,7 +822,7 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
     if (tvchain)
     {
         tvchain->DestroyChain();
-        delete tvchain;
+        tvchain->DecrRef();
         tvchain = NULL;
     }
 

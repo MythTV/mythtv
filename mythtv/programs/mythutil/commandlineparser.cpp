@@ -176,6 +176,12 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("notification");
     add("--fullscreen", "fullscreen", false, "(optional) display notification in full screen mode", "")
         ->SetChildOf("notification");
+    add("--error", "error", false, "(optional) set notification to be displayed as an error", "")
+    ->SetChildOf("notification");
+    add("--visibility", "visibility", 0, "(optional) bitmask indicating where to show the notification", "")
+    ->SetChildOf("notification");
+    add("--type", "type", "type", "(optional) type of notification (normal, error, warning, check", "")
+    ->SetChildOf("notification");
 
     // Generic Options used by more than one utility
     addRecording();

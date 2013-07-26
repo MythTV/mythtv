@@ -41,7 +41,7 @@ class ProgramRecPriorityInfo : public RecordingInfo
 
     virtual void clear(void);
 
-    virtual void ToMap(QHash<QString, QString> &progMap,
+    virtual void ToMap(InfoMap &progMap,
                        bool showrerecord = false,
                        uint star_range = 10) const;
 

@@ -21,6 +21,20 @@ class SERVICE_PUBLIC FrontendServices : public Service
     virtual DTC::FrontendStatus* GetStatus(void) = 0;
     virtual bool                 SendMessage(const QString &Message,
                                              uint Timeout) = 0;
+
+    virtual bool                 SendNotification(bool  Error,
+                                                  const QString &Type,
+                                                  const QString &Message,
+                                                  const QString &Origin,
+                                                  const QString &Description,
+                                                  const QString &Image,
+                                                  const QString &Extra,
+                                                  const QString &ProgressText,
+                                                  float Progress,
+                                                  int   Timeout,
+                                                  bool  Fullscreen,
+                                                  uint  Visibility,
+                                                  uint  Priority ) = 0;
     virtual bool                 SendAction(const QString &Action,
                                             const QString &Value,
                                             uint Width, uint Height) = 0;

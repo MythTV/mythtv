@@ -1,7 +1,13 @@
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "ringbuffer.h"
 
 class MTV_PUBLIC FileRingBuffer : public RingBuffer
 {
+    Q_DECLARE_TR_FUNCTIONS(FileRingBuffer)
+
     friend class RingBuffer;
   public:
     ~FileRingBuffer();

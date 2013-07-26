@@ -36,9 +36,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
                                       QStringList   *intermediaries = NULL,
                                       unsigned       maxLinks       = 255);
 
-MBASE_PUBLIC void sendPlaybackStart();
-MBASE_PUBLIC void sendPlaybackEnd();
-
 MBASE_PUBLIC void wrapList(QStringList &list, int width);
 
 inline float clamp(float val, float minimum, float maximum)

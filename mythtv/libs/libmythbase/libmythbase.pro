@@ -28,7 +28,7 @@ HEADERS += mythscheduler.h filesysteminfo.h hardwareprofile.h serverpool.h
 HEADERS += plist.h bswap.h signalhandling.h mythtimezone.h mythdate.h
 HEADERS += mythplugin.h mythpluginapi.h housekeeper.h
 HEADERS += ffmpeg-mmx.h
-HEADERS += mythsystemlegacy.h
+HEADERS += mythsystemlegacy.h mythtypes.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -45,7 +45,7 @@ SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
 SOURCES += mythplugin.cpp housekeeper.cpp
-SOURCES += mythsystemlegacy.cpp
+SOURCES += mythsystemlegacy.cpp mythtypes.cpp
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
@@ -78,7 +78,7 @@ inc.files += referencecounter.h mythcommandlineparser.h mthread.h mthreadpool.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h
-inc.files += remotefile.h mythsystemlegacy.h
+inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase

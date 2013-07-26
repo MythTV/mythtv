@@ -288,7 +288,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
             return NULL;
         else
         {
-            QString msg = QObject::tr("Invalid or unuseable audio device");
+            QString msg = tr("Invalid or unuseable audio device");
             return new AudioOutput::AudioDeviceConfig(name, msg);
         }
     }
@@ -299,13 +299,13 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     {
         if (aosettings.getELD().isValid())
         {
-            capabilities += QObject::tr(" (%1 connected to %2)")
+            capabilities += tr(" (%1 connected to %2)")
                 .arg(aosettings.getELD().product_name().simplified())
                 .arg(aosettings.getELD().connection_name());
         }
         else
         {
-            capabilities += QObject::tr(" (No connection detected)");
+            capabilities += tr(" (No connection detected)");
         }
     }
 
@@ -323,7 +323,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
             break;
     }
 
-    capabilities += QObject::tr("\nDevice supports up to %1")
+    capabilities += tr("\nDevice supports up to %1")
         .arg(speakers);
     if (aosettings.canPassthrough() >= 0)
     {
@@ -378,7 +378,7 @@ static void fillSelectionsFromDir(const QDir &dir,
     {
         QFileInfo &fi = *it;
         QString name = fi.absoluteFilePath();
-        QString desc = QObject::tr("OSS device");
+        QString desc = AudioOutput::tr("OSS device");
         AudioOutput::AudioDeviceConfig *adc =
             AudioOutput::GetAudioDeviceConfig(name, desc);
         if (!adc)
@@ -439,7 +439,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #ifdef USING_JACK
     {
         QString name = "JACK:";
-        QString desc = QObject::tr("Use JACK default sound server.");
+        QString desc = tr("Use JACK default sound server.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
@@ -470,7 +470,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
         delete devs;
         QString name = "CoreAudio:Default Output Device";
-        QString desc = QObject::tr("CoreAudio default output");
+        QString desc = tr("CoreAudio default output");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {
@@ -519,7 +519,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #ifdef USING_PULSEOUTPUT
     {
         QString name = "PulseAudio:default";
-        QString desc =  QObject::tr("PulseAudio default sound server.");
+        QString desc =  tr("PulseAudio default sound server.");
         adc = GetAudioDeviceConfig(name, desc);
         if (adc)
         {

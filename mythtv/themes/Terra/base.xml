@@ -172,8 +172,16 @@
             <filename>controls/cursor.png</filename>
         </imagetype>
         <textarea name="text">
-            <area>8,10,421,35</area>
+            <area>8,10,100%-16,100%-20</area>
             <font>basemediumbrown</font>
+        </textarea>
+    </textedit>
+
+    <!-- Base definition of a multi-line textedit -->
+    <textedit name="basemultilinetextedit" from="basetextedit">
+        <area>0,0,318,90</area>
+        <textarea name="text">
+            <multiline>true</multiline>
         </textarea>
     </textedit>
 

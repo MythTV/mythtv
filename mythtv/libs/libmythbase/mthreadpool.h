@@ -11,6 +11,9 @@ class MThreadPoolPrivate;
 class MPoolThread;
 class QRunnable;
 
+/**
+  * \ingroup mthreadpool
+  */
 class MBASE_PUBLIC MThreadPool
 {
     friend class MPoolThread;
@@ -38,9 +41,6 @@ class MBASE_PUBLIC MThreadPool
     void setMaxThreadCount(int maxThreadCount);
 
     int activeThreadCount(void) const;
-
-    //void reserveThread(void) MDEPRECATED;
-    //void releaseThread(void) MDEPRECATED;
 
     void waitForDone(void);
 

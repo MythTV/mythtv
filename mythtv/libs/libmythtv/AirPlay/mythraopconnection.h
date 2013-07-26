@@ -190,6 +190,7 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     // Notification Center registration Id
     int             m_id;
     bool            m_firstsend;
+    bool            m_playbackStarted;
 
   private slots:
     void ProcessAudio(void);

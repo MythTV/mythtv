@@ -583,7 +583,7 @@ class ItemDetailPopup : public MythScreenType
         if (m_playButton || m_doneButton)
             SetFocusWidget(m_playButton ? m_playButton : m_doneButton);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         m_metadata->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -1238,7 +1238,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     if (metadata)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         metadata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
     }
@@ -2288,13 +2288,13 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     if (metadata)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         metadata->toMap(metadataMap);
         SetTextFromMap(metadataMap);
     }
     else
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         ClearMap(metadataMap);
         SetTextFromMap(metadataMap);
     }

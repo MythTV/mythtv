@@ -41,6 +41,7 @@
 #include "commandlineparser.h"
 #include "profilegroup.h"
 #include "signalhandling.h"
+#include "mythmiscutil.h"
 
 using namespace std;
 
@@ -367,6 +368,8 @@ int main(int argc, char *argv[])
         if (!InitializeMythSchema())
             return GENERIC_EXIT_DB_ERROR;
     }
+
+    setHttpProxy();
 
     if (use_display)
     {

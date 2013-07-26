@@ -1,4 +1,6 @@
+// Qt headers
 #include <QLocale>
+#include <QCoreApplication>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -394,7 +396,7 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
     return ret;
 }
 
-void MetadataLookup::toMap(MetadataMap &metadataMap)
+void MetadataLookup::toMap(InfoMap &metadataMap)
 {
     metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
@@ -437,8 +439,17 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
         m_releasedate, MythDate::kDateFull);
     metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
 
-    metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
-    metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
+    metadataMap["runtime"] = QCoreApplication::translate("(Common)",
+                                                         "%n minute(s)",
+                                                         "",
+                                                         QCoreApplication::UnicodeUTF8,
+                                                         m_runtime);
+
+    metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
+                                                             "%n second(s)",
+                                                             "",
+                                                             QCoreApplication::UnicodeUTF8,
+                                                             m_runtimesecs);
     metadataMap["inetref"] = m_inetref;
     metadataMap["collectionref"] = m_collectionref;
     metadataMap["tmsref"] = m_tmsref;
@@ -1515,7 +1526,7 @@ MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
                              type, typestring, description, version);
 }
 
-void MetaGrabberScript::toMap(MetadataMap &metadataMap)
+void MetaGrabberScript::toMap(InfoMap &metadataMap)
 {
     metadataMap["name"] = m_name;
     metadataMap["author"] = m_author;

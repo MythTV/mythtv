@@ -2362,7 +2362,7 @@ NULL
 "INSERT INTO `housekeeping` (`tag`, `hostname`, `lastrun`)"
 "   SELECT SUBSTRING_INDEX(`tag`, '-', 1) AS `tag`,"
 "          IF(LOCATE('-', `tag`) > 0,"
-"             SUBSTRING_INDEX(`tag`, '-', -1),"
+"             SUBSTRING(`tag` FROM LENGTH(SUBSTRING_INDEX(`tag`, '-', 1)) +2),"
 "             NULL) AS `hostname`,"
 "          `lastrun`"
 "     FROM `oldhousekeeping`;",

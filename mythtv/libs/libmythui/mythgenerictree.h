@@ -67,18 +67,18 @@ class MUI_PUBLIC MythGenericTree
 
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
-    void SetTextFromMap(InfoMap &infoMap, const QString &state="");
+    void SetTextFromMap(const InfoMap &infoMap, const QString &state="");
     QString GetText(const QString &name="") const;
 
     QString GetSortText() const { return m_sortText; }
     void SetSortText(const QString &text) { m_sortText = text; }
 
     void SetImage(const QString &filename, const QString &name="");
-    void SetImageFromMap(InfoMap &infoMap);
+    void SetImageFromMap(const InfoMap &infoMap);
     QString GetImage(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name="");
-    void DisplayStateFromMap(InfoMap &infoMap);
+    void DisplayStateFromMap(const InfoMap &infoMap);
     QString GetState(const QString &name="") const;
 
     void SetData(QVariant data) { m_data = data; }

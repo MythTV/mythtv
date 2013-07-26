@@ -104,18 +104,21 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
 
 MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, QPaintDevice* device,
                                    RenderType type)
-  : QGLContext(format, device), MythRender(type)
+  : QGLContext(format, device), MythRender(type), m_lock(QMutex::Recursive)
 {
+    ResetVars();
+    ResetProcs();
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const QGLFormat& format, RenderType type)
-  : QGLContext(format), MythRender(type)
+  : QGLContext(format), MythRender(type), m_lock(QMutex::Recursive)
 {
+    ResetVars();
+    ResetProcs();
 }
 
 MythRenderOpenGL::~MythRenderOpenGL()
 {
-    delete m_lock;
 }
 
 void MythRenderOpenGL::Init(void)
@@ -157,7 +160,7 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
 
 void MythRenderOpenGL::makeCurrent()
 {
-    m_lock->lock();
+    m_lock.lock();
     if (this != MythRenderOpenGL::currentContext())
         QGLContext::makeCurrent();
     m_lock_level++;
@@ -170,7 +173,7 @@ void MythRenderOpenGL::doneCurrent()
         QGLContext::doneCurrent();
     if (m_lock_level < 0)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mis-matched calls to makeCurrent()");
-    m_lock->unlock();
+    m_lock.unlock();
 }
 
 void MythRenderOpenGL::Release(void)
@@ -962,7 +965,6 @@ void MythRenderOpenGL::ResetVars(void)
 {
     m_fence           = 0;
 
-    m_lock            = new QMutex(QMutex::Recursive);
     m_lock_level      = 0;
 
     m_extensions      = QString();

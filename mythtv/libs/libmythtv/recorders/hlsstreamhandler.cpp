@@ -125,6 +125,9 @@ void HLSStreamHandler::run(void)
         m_hls->OpenFile(m_tuning.GetURL(0).toString());
     }
 
+    uint64_t startup    = MythDate::current().toMSecsSinceEpoch();
+    uint64_t expected   = 0;
+
     while (m_hls->IsOpen() && _running_desired)
     {
         int size = m_hls->Read((void*)m_buffer, BUFFER_SIZE);
@@ -150,13 +153,31 @@ void HLSStreamHandler::run(void)
                 remainder = sit.key()->ProcessData(m_buffer, size);
             }
         }
-
+        
         if (remainder != 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("data_length = %1 remainder = %2")
                 .arg(size).arg(remainder));
         }
+
+        expected        += m_hls->DurationForBytes(size);
+        uint64_t actual  = MythDate::current().toMSecsSinceEpoch() - startup;
+        uint64_t waiting = 0;
+        if (expected > actual)
+        {
+            waiting = expected-actual;
+        }
+        // The HLS Stream Handler feeds data to the MPEGStreamData, however it feeds
+        // data as fast as the MPEGStream can accept it, which quickly exhausts the HLS buffer.
+        // The data fed however is lost by the time the recorder starts,
+        // forcing the HLS ringbuffer to wait for new data to arrive.
+        // The frontend will usually timeout by then.
+        // So we simulate a live mechanism by pausing before feeding new data
+        // to the MPEGStreamData
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("waiting %1ms (actual:%2, expected:%3)")
+            .arg(waiting).arg(actual).arg(expected));
+        usleep(waiting * 1000);
     }
 
     SetRunning(false, false, false);

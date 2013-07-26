@@ -78,14 +78,18 @@ void ChannelGroupStorage::Save(QString destination)
 
 class ChannelCheckBox : public CheckBoxSetting, public ChannelGroupStorage
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelCheckBox)
+
   public:
     ChannelCheckBox(const ChannelGroupConfig& _parent, const uint chanid, const QString channum,
                const QString channame, const QString grpname):
         CheckBoxSetting(this),
         ChannelGroupStorage(this, chanid, grpname)
     {
-        setLabel(QString("%1 %2").arg(channum).arg(channame));
-        setHelpText(QObject::tr("Select/Unselect channels for this channel group"));
+        //: %1 is the channel number, %2 is the channel name
+        setLabel(tr("%1 %2", "Channel number with channel name")
+                 .arg(channum).arg(channame));
+        setHelpText(tr("Select/Unselect channels for this channel group"));
     };
 };
 
@@ -106,9 +110,10 @@ ChannelGroupConfig::ChannelGroupConfig(QString _name)
     do
     {
         columns = new HorizontalConfigurationGroup(false,false,false,false);
-        columns->setLabel(getName() + " " +
-                          QObject::tr("Channel Group - Page ") + QString("%1").arg(p) +
-                          QObject::tr("of") + QString("%1").arg(pages));
+        columns->setLabel(tr("%1 Channel Group - Page %2 of %3")
+                          .arg(getName())
+                          .arg(p)
+                          .arg(pages));
 
         for (j = 0; ((j < 3) && (it < chanlist.end())); ++j)
         {

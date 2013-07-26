@@ -39,6 +39,8 @@ QEvent::Type ScannerEvent::ScanComplete =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ScannerEvent::ScanShutdown =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::ScanErrored =
+    (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ScannerEvent::AppendTextToLog =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type ScannerEvent::SetStatusText =
@@ -122,6 +124,11 @@ void ScanMonitor::ScanUpdateStatusText(const QString &str)
 void ScanMonitor::ScanUpdateStatusTitleText(const QString &str)
 {
     post_event(this, ScannerEvent::SetStatusTitleText, str);
+}
+
+void ScanMonitor::ScanErrored(const QString &error)
+{
+    post_event(this, ScannerEvent::ScanErrored, error);
 }
 
 void ScanMonitor::StatusRotorPosition(const SignalMonitorValue &val)

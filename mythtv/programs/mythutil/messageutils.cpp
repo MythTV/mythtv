@@ -24,14 +24,17 @@ const QString kMessage =
 const QString kNotification =
 "<mythnotification version=\"1\">\n"
 "  <text>%message_text%</text>\n"
-"  <timeout>%timeout%</timeout>\n"
-"  <image>%image%</image>\n"
 "  <origin>%origin%</origin>\n"
 "  <description>%description%</description>\n"
+"  <error>%error%</error>\n"
+"  <timeout>%timeout%</timeout>\n"
+"  <image>%image%</image>\n"
 "  <extra>%extra%</extra>\n"
 "  <progress_text>%progress_text%</progress_text>\n"
 "  <progress>%progress%</progress>\n"
 "  <fullscreen>%fullscreen%</fullscreen>\n"
+"  <visibility>%visibility%</visibility>\n"
+"  <type>%type%</type>\n"
 "</mythnotification>";
 
 static int PrintMTemplate(const MythUtilCommandLineParser &cmdline)
@@ -61,6 +64,9 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     QString progress_text = "";
     QString progress = "-1";
     QString fullscreen = "false";
+    QString error = "false";
+    QString visibility = "0";
+    QString type = "normal";
 
     QString message = notification ? kNotification : kMessage;
 
@@ -97,6 +103,15 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
         if (cmdline.toBool("fullscreen"))
             fullscreen = cmdline.toString("fullscreen");
         message.replace("%fullscreen%", fullscreen);
+        if (cmdline.toBool("error"))
+            error = cmdline.toString("error");
+        message.replace("%error%", error);
+        if (cmdline.toBool("visibility"))
+            visibility = cmdline.toString("visibility");
+        message.replace("%visibility%", visibility);
+        if (cmdline.toBool("type"))
+            type = cmdline.toString("type");
+        message.replace("%type%", type);
     }
 
     // extra optional argument

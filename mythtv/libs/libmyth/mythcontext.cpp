@@ -39,7 +39,6 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsystemlegacy.h"
 #include "mythmiscutil.h"
-#include "mythuinotificationcenter.h"
 
 #include "mythplugin.h"
 
@@ -1017,10 +1016,10 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 {
     QDateTime now = MythDate::current();
 
-    if (m_lastCheck.isValid() && now < m_lastCheck)
+    if (!GetNotificationCenter() || !m_ui || !m_ui->IsScreenSetup())
         return;
 
-    if (!GetNotificationCenter())
+    if (m_lastCheck.isValid() && now < m_lastCheck)
         return;
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
@@ -1050,7 +1049,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     if (!m_lastCheck.isValid())
         return;
 
-    MythNotification n(QObject::tr("Backend is online"), _Location);
+    MythCheckNotification n(QObject::tr("Backend is online"), _Location);
     n.SetId(m_registration);
     n.SetParent(this);
     n.SetDuration(5);

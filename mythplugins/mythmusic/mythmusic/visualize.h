@@ -16,6 +16,9 @@
 #include <QVector>
 #include <vector>
 
+// Qt headers
+#include <QCoreApplication>
+
 // MythTV headers
 #include <visual.h>
 #include <musicmetadata.h>
@@ -273,6 +276,8 @@ typedef struct piano_key_data {
 
 class AlbumArt : public VisualBase
 {
+    Q_DECLARE_TR_FUNCTIONS(AlbumArt)
+
   public:
     AlbumArt(void);
     virtual ~AlbumArt();

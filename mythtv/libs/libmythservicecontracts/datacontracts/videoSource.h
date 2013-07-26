@@ -46,7 +46,9 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
         VideoSource(QObject *parent = 0)
             : QObject         ( parent ),
-              m_Id            ( 0      )
+              m_Id            ( 0      ),
+              m_UseEIT        ( false  ),
+              m_NITId         ( 0      )
         {
         }
 

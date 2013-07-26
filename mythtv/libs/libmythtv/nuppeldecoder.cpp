@@ -1385,6 +1385,8 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
             .arg((doFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
 
+    QMutexLocker locker(avcodeclock);
+
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 
     if (mpa_vidcodec && doFlush)

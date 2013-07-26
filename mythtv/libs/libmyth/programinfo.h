@@ -9,7 +9,6 @@
 
 #include <QStringList>
 #include <QDateTime>
-#include <QHash>
 
 // MythTV headers
 #include "autodeletedeque.h"
@@ -18,6 +17,7 @@
 #include "mythdbcon.h"
 #include "mythexp.h"
 #include "mythdate.h"
+#include "mythtypes.h"
 
 /* If NUMPROGRAMLINES gets updated following files need
    updates and code changes:
@@ -285,7 +285,7 @@ class MPUBLIC ProgramInfo
 
     // Serializers
     void ToStringList(QStringList &list) const;
-    virtual void ToMap(QHash<QString, QString> &progMap,
+    virtual void ToMap(InfoMap &progMap,
                        bool showrerecord = false,
                        uint star_range = 10) const;
     virtual void SubstituteMatches(QString &str);

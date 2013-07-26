@@ -695,6 +695,8 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
+    QMutexLocker locker(avcodeclock);
+
     if (doflush)
     {
         lastapts = 0;
@@ -871,8 +873,8 @@ extern "C" void HandleStreamChange(void *data)
         QString("streams_changed 0x%1 -- stream count %2")
             .arg((uint64_t)data,0,16).arg(cnt));
 
-    QMutexLocker locker(avcodeclock);
     decoder->SeekReset(0, 0, true, true);
+    QMutexLocker locker(avcodeclock);
     decoder->ScanStreams(false);
 }
 
@@ -887,8 +889,8 @@ extern "C" void HandleDVDStreamChange(void *data)
         QString("streams_changed 0x%1 -- stream count %2")
             .arg((uint64_t)data,0,16).arg(cnt));
 
-    QMutexLocker locker(avcodeclock);
     //decoder->SeekReset(0, 0, true, true);
+    QMutexLocker locker(avcodeclock);
     decoder->ScanStreams(true);
 }
 
@@ -969,20 +971,49 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         return -1;
     }
 
-#if 0
-    fmt->flags |= AVFMT_NOFILE;
-#endif
-
-    ic = avformat_alloc_context();
-    if (!ic)
+    if (!strcmp(fmt->name, "mpegts") &&
+        gCoreContext->GetNumSetting("FFMPEGTS", false))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
-        return -1;
+        AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
+        if (fmt2)
+        {
+            fmt = fmt2;
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using FFmpeg MPEG-TS demuxer (forced)");
+        }
     }
 
-    InitByteContext();
+    int err;
+    while (true)
+    {
+        ic = avformat_alloc_context();
+        if (!ic)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
+            return -1;
+        }
 
-    int err = avformat_open_input(&ic, filename, fmt, NULL);
+        InitByteContext();
+
+        err = avformat_open_input(&ic, filename, fmt, NULL);
+        if (err < 0)
+        {
+            if (!strcmp(fmt->name, "mpegts"))
+            {
+                fmt = av_find_input_format("mpegts-ffmpeg");
+                if (fmt)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("avformat_open_input failed with '%1' error.").arg(err));
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        QString("Attempting using original FFmpeg MPEG-TS demuxer."));
+                    // ic would have been freed due to the earlier failure
+                    continue;
+                }
+                break;
+            }
+        }
+        break;
+    }
     if (err < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1528,9 +1559,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         return;
     }
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     uint i;
     for (i = 0; i < pmt.StreamCount(); i++)
@@ -1655,9 +1684,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     if (!ic->cur_pmt_sect || tracks[kTrackTypeTeletextCaptions].size())
         return;
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1732,9 +1759,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     if (!itv && ! (itv = m_parent->GetInteractiveTV()))
         return;
 
-    const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-    const PSIPTable psip(pes);
-    const ProgramMapTable pmt(psip);
+    const ProgramMapTable pmt(ic->cur_pmt_sect);
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -2432,9 +2457,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
 
     if (ic->cur_pmt_sect) // mpeg-ts
     {
-        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-        const PSIPTable psip(pes);
-        const ProgramMapTable pmt(psip);
+        const ProgramMapTable pmt(ic->cur_pmt_sect);
         switch (pmt.GetAudioType(stream_index))
         {
             case 0x01 :
@@ -4640,7 +4663,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
 
             int retval = 0;
-            if (!ic || ((retval = ReadPacket(ic, pkt)) < 0))
+            avcodeclock->lock();
+            if (!ic || ((retval = ReadPacket(ic, pkt, storevideoframes)) < 0))
             {
                 if (retval == -EAGAIN)
                     continue;
@@ -4649,8 +4673,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 delete pkt;
                 errno = -retval;
                 LOG(VB_GENERAL, LOG_ERR, QString("decoding error") + ENO);
+                avcodeclock->unlock();
                 return false;
             }
+            avcodeclock->unlock();
 
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
@@ -4815,7 +4841,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     return true;
 }
 
-int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt)
+int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
     return av_read_frame(ctx, pkt);
 }
@@ -4824,9 +4850,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 {
     if (ic && ic->cur_pmt_sect)
     {
-        const PESPacket pes = PESPacket::ViewData(ic->cur_pmt_sect);
-        const PSIPTable psip(pes);
-        const ProgramMapTable pmt(psip);
+        const ProgramMapTable pmt(ic->cur_pmt_sect);
 
         for (uint i = 0; i < pmt.StreamCount(); i++)
         {

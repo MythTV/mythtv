@@ -13,7 +13,7 @@
 #include "cetonrecorder.h"
 #include "cetonchannel.h"
 
-#define LOC QString("CetonSM[%1](%2): ") \
+#define LOC QString("CetonSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 /**

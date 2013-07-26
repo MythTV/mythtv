@@ -133,38 +133,38 @@ void GalleryFilterDialog::fillWidgets()
     m_dirFilter->SetText(m_settingsTemp->getDirFilter(), false);
 
     // Type Filter
-    new MythUIButtonListItem(m_typeFilter, QObject::tr("All"),
+    new MythUIButtonListItem(m_typeFilter, tr("All"),
                              kTypeFilterAll);
-    new MythUIButtonListItem(m_typeFilter, QObject::tr("Images only"),
+    new MythUIButtonListItem(m_typeFilter, tr("Images only"),
                              kTypeFilterImagesOnly);
-    new MythUIButtonListItem(m_typeFilter, QObject::tr("Movies only"),
+    new MythUIButtonListItem(m_typeFilter, tr("Movies only"),
                              kTypeFilterMoviesOnly);
     m_typeFilter->SetValueByData(m_settingsTemp->getTypeFilter());
     m_numImagesText->SetText(tr("Filter result : (unknown)"));
 
     // Sort order
-    new MythUIButtonListItem(m_sortList, QObject::tr("Unsorted"),
+    new MythUIButtonListItem(m_sortList, tr("Unsorted"),
                              kSortOrderUnsorted);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Name (A-Z alpha)"),
+    new MythUIButtonListItem(m_sortList, tr("Name (A-Z alpha)"),
                              kSortOrderNameAsc);
     new MythUIButtonListItem(m_sortList,
-                             QObject::tr("Reverse Name (Z-A alpha)"),
+                             tr("Reverse Name (Z-A alpha)"),
                              kSortOrderNameDesc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Mod Time (oldest first)"),
+    new MythUIButtonListItem(m_sortList, tr("Mod Time (oldest first)"),
                              kSortOrderModTimeAsc);
     new MythUIButtonListItem(m_sortList,
-                             QObject::tr("Reverse Mod Time (newest first)"),
+                             tr("Reverse Mod Time (newest first)"),
                              kSortOrderModTimeDesc);
-    new MythUIButtonListItem(m_sortList, QObject::tr("Extension (A-Z alpha)"),
+    new MythUIButtonListItem(m_sortList, tr("Extension (A-Z alpha)"),
                              kSortOrderExtAsc);
     new MythUIButtonListItem(m_sortList,
-                             QObject::tr("Reverse Extension (Z-A alpha)"),
+                             tr("Reverse Extension (Z-A alpha)"),
                              kSortOrderExtDesc);
     new MythUIButtonListItem(m_sortList,
-                             QObject::tr("Filesize (smallest first)"),
+                             tr("Filesize (smallest first)"),
                              kSortOrderSizeAsc);
     new MythUIButtonListItem(m_sortList,
-                             QObject::tr("Reverse Filesize (largest first)"),
+                             tr("Reverse Filesize (largest first)"),
                              kSortOrderSizeDesc);
     m_sortList->SetValueByData(m_settingsTemp->getSort());
 }

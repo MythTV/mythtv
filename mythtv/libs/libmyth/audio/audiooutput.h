@@ -1,9 +1,12 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
+// Qt headers
 #include <QString>
 #include <QVector>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "compat.h"
 #include "audiosettings.h"
 #include "audiooutputsettings.h"
@@ -17,6 +20,8 @@ struct AVPacket;
 
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioOutput)
+
  public:
     class AudioDeviceConfig
     {

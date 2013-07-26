@@ -8,6 +8,7 @@ MessageHandler::MessageHandler(void) : SocketRequestHandler()
     if (!gCoreContext)
     {
         LOG(VB_GENERAL, LOG_ERR, "MessageHandler started with no CoreContext!");
+        return;
     }
     gCoreContext->addListener(this);
 }

@@ -115,11 +115,14 @@ bool CardUtil::IsCableCardPresent(uint cardid,
         if (oob > 0 && (strncmp(status.channel, "none", 4) != 0))
         {
             LOG(VB_GENERAL, LOG_INFO, "Cardutil: HDHomeRun Cablecard Present.");
+            hdhomerun_device_destroy(hdhr);
             return true;
         }
-        else
+
+        hdhomerun_device_destroy(hdhr);
+
 #endif
-            return false;
+        return false;
     }
     else if (cardType == "CETON")
     {
@@ -2354,7 +2357,13 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 
     const char *model = hdhomerun_device_get_model_str(hdhr);
     if (model && strstr(model, "dvb"))
+    {
+        hdhomerun_device_destroy(hdhr);
         return true;
+    }
+
+    hdhomerun_device_destroy(hdhr);
+
 #endif
 
     return false;
@@ -2394,7 +2403,10 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
     const char *model = hdhomerun_device_get_model_str(hdhr);
     if (!model)
+    {
+        hdhomerun_device_destroy(hdhr);
         return connectErr;
+    }
 
 
     QString   description = model;
@@ -2403,6 +2415,8 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
     if (hdhomerun_device_get_version(hdhr, &sVersion, &iVersion))
         description += QObject::tr(", firmware: %2").arg(sVersion);
+
+    hdhomerun_device_destroy(hdhr);
 
     return description;
 #else

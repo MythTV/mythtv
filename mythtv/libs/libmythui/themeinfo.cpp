@@ -239,7 +239,7 @@ bool ThemeInfo::IsWide() const
     return false;
 }
 
-void ThemeInfo::ToMap(QHash<QString, QString> &infoMap) const
+void ThemeInfo::ToMap(InfoMap &infoMap) const
 {
     infoMap["description"] = m_description;
     infoMap["name"] = m_name;

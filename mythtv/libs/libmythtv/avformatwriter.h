@@ -37,6 +37,7 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVStream *AddAudioStream(void);
     bool OpenAudio(void);
     AVFrame *AllocPicture(enum PixelFormat pix_fmt);
+    void Cleanup(void);
 
     AVRational GetCodecTimeBase(void);
     bool FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFormat format);

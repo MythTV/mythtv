@@ -532,10 +532,10 @@ void MythGenericTree::SetText(const QString &text, const QString &name,
     }
 }
 
-void MythGenericTree::SetTextFromMap(InfoMap &infoMap,
+void MythGenericTree::SetTextFromMap(const InfoMap &infoMap,
                                      const QString &state)
 {
-    InfoMap::iterator map_it = infoMap.begin();
+    InfoMap::const_iterator map_it = infoMap.begin();
     while (map_it != infoMap.end())
     {
         TextProperties textprop;
@@ -562,7 +562,7 @@ void MythGenericTree::SetImage(const QString &filename, const QString &name)
         m_imageFilenames.insert(name, filename);
 }
 
-void MythGenericTree::SetImageFromMap(InfoMap &infoMap)
+void MythGenericTree::SetImageFromMap(const InfoMap &infoMap)
 {
     m_imageFilenames.clear();
     m_imageFilenames = infoMap;
@@ -580,7 +580,7 @@ QString MythGenericTree::GetImage(const QString &name) const
     return QString();
 }
 
-void MythGenericTree::DisplayStateFromMap(QHash<QString,QString> &infoMap)
+void MythGenericTree::DisplayStateFromMap(const InfoMap &infoMap)
 {
     m_states.clear();
     m_states = infoMap;

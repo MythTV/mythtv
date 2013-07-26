@@ -47,7 +47,6 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_XYSpeed = QPoint(0, 0);
     m_deferload = false;
     m_IsDependDefault = false;
-    m_ReverseDepend = false;
 
     m_Parent = NULL;
 
@@ -1037,11 +1036,50 @@ void MythUIType::Refresh(void)
     SetRedraw();
 }
 
-void MythUIType::UpdateDependState(bool isDefault)
+void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 {
-    m_IsDependDefault = m_ReverseDepend ? !isDefault : isDefault;
+    bool visible;
+
+    if (dependee)
+    {
+        bool reverse = m_ReverseDepend[dependee];
+        visible = reverse ? !isDefault : isDefault;
+        for (int i = 0; i < m_dependsValue.size(); i++)
+        {
+            if (m_dependsValue[i].first != dependee)
+                continue;
+            m_dependsValue[i].second = visible;
+            break;
+        }
+    }
+
+    visible = m_dependsValue[0].second;
+    for (int i = 1; i <  m_dependsValue.size(); i++)
+    {
+        bool v = m_dependsValue[i].second;
+
+        if (m_dependOperator[i-1] == 1)
+        {
+            // OR operator
+            visible = visible && v;
+        }
+        else
+        {
+            // AND operator
+            visible = visible || v;
+        }
+    }
+
+    m_IsDependDefault = visible;
 
     SetVisible(!m_IsDependDefault);
+}
+
+void MythUIType::UpdateDependState(bool isDefault)
+{
+    MythUIType *dependee = static_cast<MythUIType*>(sender());
+
+    UpdateDependState(dependee, isDefault);
 }
 
 void MythUIType::SetVisible(bool visible)
@@ -1159,7 +1197,6 @@ void MythUIType::CopyFrom(MythUIType *base)
     }
 
     m_dependsMap = base->m_dependsMap;
-    m_ReverseDepend = base->m_ReverseDepend;
 
     SetMinArea(base->m_MinArea);
 }
@@ -1372,34 +1409,64 @@ void MythUIType::SetDependsMap(QMap<QString, QString> dependsMap)
     m_dependsMap = dependsMap;
 }
 
-void MythUIType::SetReverseDependence(bool reverse)
+void MythUIType::SetReverseDependence(MythUIType *dependee, bool reverse)
 {
-    m_ReverseDepend = reverse;
+    m_ReverseDepend.insert(dependee, reverse);
 }
 
 void MythUIType::ConnectDependants(bool recurse)
 {
-
-    QMapIterator<QString, QString> i(m_dependsMap);
-    while(i.hasNext())
+    QMapIterator<QString, QString> it(m_dependsMap);
+    while(it.hasNext())
     {
-        i.next();
-        QString dependeeName = i.value();
-        bool reverse = false;
-        if (dependeeName.startsWith('!'))
-        {
-            reverse = true;
-            dependeeName.remove(0,1);
-        }
-        MythUIType *dependee = GetChild(dependeeName);
-        MythUIType *dependant = GetChild(i.key());
+        it.next();
 
-        if (dependee && dependant)
+        // build list of operators and dependeees.
+        QStringList dependees;
+        QList<int> operators;
+        QString name = it.value();
+        QStringList tmp1 = name.split("&");
+        for (int i = 0; i < tmp1.size(); i++)
         {
-            QObject::connect(dependee, SIGNAL(DependChanged(bool)),
-                             dependant, SLOT(UpdateDependState(bool)));
-            dependant->SetReverseDependence(reverse);
-            dependant->UpdateDependState(true);
+            QStringList tmp2 = tmp1[i].split("|");
+
+            dependees.append(tmp2[0]);
+            for (int j = 1; j < tmp2.size(); j++)
+            {
+                dependees.append(tmp2[j]);
+                operators.append(1); // 1 is OR
+            }
+            operators.append(2);     // 2 is AND
+        }
+
+        MythUIType *dependant = GetChild(it.key());
+        if (dependant)
+        {
+            dependant->m_dependOperator = operators;
+            foreach (QString dependeeName, dependees)
+            {
+                bool reverse = false;
+                if (dependeeName.startsWith('!'))
+                {
+                    reverse = true;
+                    dependeeName.remove(0,1);
+                }
+                MythUIType *dependee = GetChild(dependeeName);
+
+                if (dependee)
+                {
+                    QObject::connect(dependee, SIGNAL(DependChanged(bool)),
+                                     dependant, SLOT(UpdateDependState(bool)));
+                    dependant->SetReverseDependence(dependee, reverse);
+                    dependant->m_dependsValue.append(QPair<MythUIType *, bool>(dependee, false));
+                    dependant->UpdateDependState(dependee, true);
+                }
+                else
+                {
+                    dependant->m_dependsValue.append(QPair<MythUIType *, bool>(dependee, !reverse));
+                    dependant->UpdateDependState(dependee, reverse);
+                }
+            }
         }
     }
 

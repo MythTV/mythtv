@@ -130,10 +130,10 @@ void GeneralSetupWizard::slotNext(void)
 
 void GeneralSetupWizard::slotSubmit(void)
 {
-    QString message = QObject::tr("Would you like to share your "
-                          "hardware profile with the MythTV developers? "
-                          "Profiles are anonymous and are a great way to "
-                          "help with future development.");
+    QString message = tr("Would you like to share your "
+                         "hardware profile with the MythTV developers? "
+                         "Profiles are anonymous and are a great way to "
+                         "help with future development.");
     MythConfirmationDialog *confirmdialog =
             new MythConfirmationDialog(m_popupStack,message);
 
@@ -231,11 +231,11 @@ void GeneralSetupWizard::slotDelete(void)
         return;
     }
 
-    QString message = QObject::tr("Are you sure you want to delete "
-                                  "your online profile?  Your information "
-                                  "is anonymous and helps the developers "
-                                  "to know what hardware the majority of users "
-                                  "prefer.");
+    QString message = tr("Are you sure you want to delete "
+                         "your online profile?  Your information "
+                         "is anonymous and helps the developers "
+                         "to know what hardware the majority of users "
+                         "prefer.");
     MythConfirmationDialog *confirmdialog =
             new MythConfirmationDialog(m_popupStack,message);
 

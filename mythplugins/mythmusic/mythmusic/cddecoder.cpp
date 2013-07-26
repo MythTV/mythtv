@@ -762,7 +762,7 @@ MusicMetadata *CdDecoder::getMetadata()
     }
 
     if (compilation_artist.toLower().left(7) == "various")
-        compilation_artist = QObject::tr("Various Artists");
+        compilation_artist = tr("Various Artists");
 
     if (artist.isEmpty())
     {
@@ -771,7 +771,7 @@ MusicMetadata *CdDecoder::getMetadata()
     }
 
     if (title.isEmpty())
-        title = QObject::tr("Track %1").arg(tracknum);
+        title = tr("Track %1").arg(tracknum);
 
     MusicMetadata *m = new MusicMetadata(getFilename(), artist, compilation_artist,
         album, title, genre, year, tracknum, length);
@@ -797,7 +797,7 @@ const QString &CdDecoderFactory::extension() const
 // pure virtual
 const QString &CdDecoderFactory::description() const
 {
-    static QString desc(QObject::tr("Audio CD parser"));
+    static QString desc(tr("Audio CD parser"));
     return desc;
 }
 

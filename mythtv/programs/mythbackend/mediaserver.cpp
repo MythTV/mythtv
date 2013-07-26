@@ -92,7 +92,6 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
                                                 m_sSharePath );
-    QString sDeviceType;
 
     if ( bIsMaster )
         sFileName  += "devicemaster.xml";

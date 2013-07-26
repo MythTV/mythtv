@@ -17,6 +17,7 @@ AvFormatDecoderDVD::AvFormatDecoderDVD(
   , m_lbaLastVideoPkt(INVALID_LBA)
   , m_framesReq(0)
   , m_returnContext(NULL)
+  , m_oldLowBuffers(lowbuffers)
 {
 }
 
@@ -57,6 +58,14 @@ void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool rese
     SyncPositionMap();
 }
 
+void AvFormatDecoderDVD::SetLowBuffers(bool low)
+{
+    if (lowbuffers == m_oldLowBuffers)
+        DecoderBase::SetLowBuffers(low);
+
+    m_oldLowBuffers = low;
+}
+
 void AvFormatDecoderDVD::UpdateFramesPlayed(void)
 {
     if (!ringBuffer->IsDVD())
@@ -73,7 +82,7 @@ bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
     return AvFormatDecoder::GetFrame( kDecodeAV );
 }
 
-int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
+int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
 {
     int result = 0;
 
@@ -106,33 +115,75 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt)
         {
             gotPacket = true;
 
-            result = av_read_frame(ctx, pkt);
-
-            while (result == AVERROR_EOF && errno == EAGAIN)
+            do
             {
                 if (ringBuffer->DVD()->IsReadingBlocked())
                 {
-                    if (ringBuffer->DVD()->GetLastEvent() == DVDNAV_HOP_CHANNEL)
+                    int32_t lastEvent = ringBuffer->DVD()->GetLastEvent();
+                    switch(lastEvent)
                     {
-                        // Non-seamless jump - clear all buffers
-                        m_framesReq = 0;
-                        ReleaseContext(m_curContext);
+                        case DVDNAV_HOP_CHANNEL:
+                            // Non-seamless jump - clear all buffers
+                            m_framesReq = 0;
+                            ReleaseContext(m_curContext);
 
-                        while (m_contextList.size() > 0)
-                            m_contextList.takeFirst()->DecrRef();
+                            while (m_contextList.size() > 0)
+                                m_contextList.takeFirst()->DecrRef();
 
-                        Reset(true, false, false);
-                        m_audio->Reset();
-                        m_parent->DiscardVideoFrames(false);
+                            Reset(true, false, false);
+                            m_audio->Reset();
+                            m_parent->DiscardVideoFrames(false);
+                            break;
+
+                        case DVDNAV_WAIT:
+                        case DVDNAV_STILL_FRAME:
+                            if (storedPackets.count() > 0)
+                            {
+                                // Ringbuffer is waiting for the player
+                                // to empty its buffers but we have one or
+                                // more frames in our buffer that have not
+                                // yet been sent to the player.
+                                // Make sure no more frames will be buffered
+                                // for the time being and start emptying our
+                                // buffer.
+                                m_oldLowBuffers = lowbuffers;
+                                lowbuffers = false;
+
+                                // Force AvFormatDecoder to stop buffering frames
+                                storePacket = false;
+
+                                // Return the first buffered packet
+                                AVPacket *storedPkt = storedPackets.takeFirst();
+                                av_copy_packet(pkt, storedPkt);
+                                delete storedPkt;
+
+                                return 0;
+                            }
+                            else
+                            {
+                                // Our buffers are empty, frames may be
+                                // buffered again if necessary.
+                                lowbuffers = m_oldLowBuffers;
+                            }
+                            break;
+
+                        case DVDNAV_NAV_PACKET:
+                            // Don't need to do anything here.  There was a timecode discontinuity
+                            // and the ringbuffer returned to make sure that any packets still in
+                            // ffmpeg's buffers were flushed.
+                            break;
+
+                        default:
+                            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unexpected DVD event - %1")
+                                .arg(lastEvent));
+                            break;
                     }
+
                     ringBuffer->DVD()->UnblockReading();
-                    result = av_read_frame(ctx, pkt);
                 }
-                else
-                {
-                    break;
-                }
-            }
+
+                result = av_read_frame(ctx, pkt);
+            }while (ringBuffer->DVD()->IsReadingBlocked());
 
             if (result >= 0)
             {
@@ -330,7 +381,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
         if (context)
             m_contextList.append(context);
 
-        if (m_curContext == NULL)
+        if ((m_curContext == NULL) && (m_contextList.size() > 0))
         {
             // If we don't have a current context, use
             // the first in the list

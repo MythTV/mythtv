@@ -303,7 +303,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetText(video->GetTitle());
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         video->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 
@@ -1004,7 +1004,7 @@ void NetTree::slotItemChanged()
 
     if (item)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         item->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -1048,7 +1048,7 @@ void NetTree::slotItemChanged()
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -1091,7 +1091,7 @@ void NetTree::slotItemChanged()
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 

@@ -561,7 +561,7 @@ void MythWebView::doDownload(const QString &saveFilename)
     if (saveFilename.isEmpty())
         return;
 
-    openBusyPopup(QObject::tr("Downloading file. Please wait..."));
+    openBusyPopup(tr("Downloading file. Please wait..."));
 
     // No need to make sure the path to saveFilename exists because
     // MythDownloadManage takes care of that

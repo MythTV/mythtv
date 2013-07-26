@@ -6,6 +6,7 @@
 #include "mythuiactions.h"
 #include "mythuitype.h"
 #include "mythscreenstack.h"
+#include "mythnotificationcenter.h"
 
 class QEvent;
 
@@ -27,7 +28,6 @@ class MythPainterWindowQt;
 class MythPainterWindowVDPAU;
 class MythPainterWindowD3D9;
 class MythRender;
-class MythUINotificationCenter;
 
 class MUI_PUBLIC MythMainWindow : public QWidget
 {
@@ -95,7 +95,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythPainter *GetCurrentPainter();
     QWidget     *GetPaintWindow();
     MythRender  *GetRenderDevice();
-    MythUINotificationCenter *GetCurrentNotificationCenter();
+    MythNotificationCenter *GetCurrentNotificationCenter();
     void         ShowPainterWindow();
     void         HidePainterWindow();
     void         ResizePainterWindow(const QSize &size);
@@ -182,6 +182,6 @@ MUI_PUBLIC void DestroyMythMainWindow();
 
 MUI_PUBLIC MythPainter *GetMythPainter();
 
-MUI_PUBLIC MythUINotificationCenter *GetNotificationCenter();
+MUI_PUBLIC MythNotificationCenter *GetNotificationCenter();
 
 #endif

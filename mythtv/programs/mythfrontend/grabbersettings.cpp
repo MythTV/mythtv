@@ -183,7 +183,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Movie/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_movieGrabberButtonList, (*it)->GetName());
@@ -198,7 +198,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Television/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_tvGrabberButtonList, (*it)->GetName());
@@ -214,7 +214,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Game/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_gameGrabberButtonList, (*it)->GetName());

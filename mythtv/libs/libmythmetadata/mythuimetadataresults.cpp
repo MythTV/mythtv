@@ -49,7 +49,7 @@ bool MetadataResultsDialog::Create()
         MythUIButtonListItem *button =
             new MythUIButtonListItem(m_resultsList,
                 m_results[i]->GetTitle());
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         m_results[i]->toMap(metadataMap);
 
         QString coverartfile;

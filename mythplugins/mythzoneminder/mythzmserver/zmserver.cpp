@@ -363,7 +363,7 @@ bool ZMServer::processRequest(char* buf, int nbytes)
     return false;
 }
 
-bool ZMServer::send(const string s) const
+bool ZMServer::send(const string &s) const
 {
     // send length
     uint32_t len = s.size();
@@ -381,7 +381,7 @@ bool ZMServer::send(const string s) const
         return true;
 }
 
-bool ZMServer::send(const string s, const unsigned char *buffer, int dataLen) const
+bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) const
 {
     // send length
     uint32_t len = s.size();

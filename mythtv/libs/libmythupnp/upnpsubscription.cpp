@@ -12,6 +12,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#include "mythtypes.h"
 #include "upnpsubscription.h"
 
 // default requested time for subscription (actual is dictated by server)
@@ -235,7 +236,7 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
     LOG(VB_UPNP, LOG_DEBUG, LOC + "/n/n" + body.toString(4) + "/n/n");
 
     QDomNodeList properties = body.elementsByTagName("property");
-    QHash<QString,QString> results;
+    InfoMap results;
 
     // this deals with both one argument per property (compliant) and mutliple
     // arguments per property as sent by mediatomb

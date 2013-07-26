@@ -143,7 +143,7 @@ class MusicPlayer : public QObject, public MythObservable
     void         sendAlbumArtChangedEvent(int trackID);
     void         sendCDChangedEvent(void);
 
-    void         toMap(QHash<QString, QString> &infoMap);
+    void         toMap(InfoMap &infoMap);
 
     void         showMiniPlayer(void);
     enum RepeatMode
@@ -179,6 +179,10 @@ class MusicPlayer : public QObject, public MythObservable
     ResumeMode  getResumeMode(void) { return m_resumeMode; }
 
     void getBufferStatus(int *bufferAvailable, int *bufferSize);
+
+  public slots:
+    void StartPlayback(void);
+    void StopPlayback(void);
 
   protected:
     void customEvent(QEvent *event);

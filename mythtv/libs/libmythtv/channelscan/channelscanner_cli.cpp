@@ -50,7 +50,8 @@ ChannelScannerCLI::~ChannelScannerCLI()
 void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 {
     if ((scanEvent->type() == ScannerEvent::ScanComplete) ||
-        (scanEvent->type() == ScannerEvent::ScanShutdown))
+        (scanEvent->type() == ScannerEvent::ScanShutdown) ||
+        (scanEvent->type() == ScannerEvent::ScanErrored))
     {
         cout<<endl;
 
@@ -68,7 +69,12 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 
         Teardown();
 
-        if (sigmonScanner && !transports.empty())
+        if (scanEvent->type() == ScannerEvent::ScanErrored)
+        {
+            QString error = scanEvent->strValue();
+            InformUser(error);
+        }
+        else if (sigmonScanner && !transports.empty())
             Process(transports);
 
         done = true;
