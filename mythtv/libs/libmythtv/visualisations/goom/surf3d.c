@@ -14,11 +14,11 @@ void grid3d_free(grid3d **grid)
 grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	int x = defx;
 	int y = defz;
-	grid3d *g = malloc (sizeof(grid3d));
+	grid3d *g = (grid3d*)malloc (sizeof(grid3d));
 	surf3d *s = &(g->surf);
 	s->nbvertex = x*y;
-	s->vertex = malloc (x*y*sizeof(v3d));
-	s->svertex = malloc (x*y*sizeof(v3d));
+	s->vertex = (v3d*)malloc (x*y*sizeof(v3d));
+	s->svertex = (v3d*)malloc(x*y*sizeof(v3d));
 	s->center = center;
 	
 	g->defx=defx;

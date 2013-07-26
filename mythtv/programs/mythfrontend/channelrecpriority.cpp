@@ -191,7 +191,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
+    ChannelInfo *chanInfo = item->GetData().value<ChannelInfo *>();
 
     // inc/dec recording priority
     int tempRecPriority = chanInfo->recpriority + howMuch;
@@ -343,7 +343,7 @@ void ChannelRecPriority::SortList()
 
     if (item)
     {
-        ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+        ChannelInfo *channelItem = item->GetData().value<ChannelInfo *>();
         m_currentItem = channelItem;
     }
 
@@ -397,7 +397,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+    ChannelInfo *channelItem = item->GetData().value<ChannelInfo *>();
     if (!m_channelData.isEmpty() && channelItem)
     {
         QString rectype;
@@ -429,7 +429,7 @@ void ChannelRecPriority::upcoming()
     if (!item)
         return;
 
-    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
+    ChannelInfo *chanInfo = item->GetData().value<ChannelInfo *>();
 
     if (!chanInfo || chanInfo->chanid < 1)
         return;

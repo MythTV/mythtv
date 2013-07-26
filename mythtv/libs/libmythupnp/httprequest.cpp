@@ -20,7 +20,7 @@
 #include <QDateTime>
 
 #include "mythconfig.h"
-#if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW))
+#if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(_WIN32))
 #define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
@@ -30,7 +30,7 @@
 #include <fcntl.h>
 #include <cerrno>
 
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <netinet/tcp.h>
 #endif
 

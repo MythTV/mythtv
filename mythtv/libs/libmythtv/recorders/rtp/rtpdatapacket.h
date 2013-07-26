@@ -11,6 +11,10 @@
 #include "udppacket.h"
 #include "mythlogging.h"
 
+#ifdef _MSC_VER
+#  include <WinSock2.h>
+#endif
+
 /** \brief RTP Data Packet
  *
  *  The RTP Header exists for all RTP packets, it contains a payload

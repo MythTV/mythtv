@@ -97,7 +97,7 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
     virtual bool closeDevice();
     virtual bool isSameDevice(const QString &path);
     virtual void setSpeed(int speed);
-    virtual void setDeviceSpeed(const char */*devicePath*/, int /*speed*/) { }
+    virtual void setDeviceSpeed(const char * /*devicePath*/, int /*speed*/) { }
     virtual MythMediaStatus checkMedia() = 0;// Derived classes MUST implement this.
     virtual MythMediaError eject(bool open_close = true);
     virtual MythMediaError lock();

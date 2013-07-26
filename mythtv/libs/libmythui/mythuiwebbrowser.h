@@ -37,7 +37,11 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     QString GetTitle(void) { return QString(); }
     QVariant evaluateJavaScript(const QString&) { return QVariant(); }
 };
-#warning MythUIWebBrowser has not yet been ported to Qt5
+#ifndef _MSC_VER
+#  warning MythUIWebBrowser has not yet been ported to Qt5
+#else
+#  pragma message ( "MythUIWebBrowser has not yet been ported to Qt5" )
+#endif
 #else
 
 #include <QString>

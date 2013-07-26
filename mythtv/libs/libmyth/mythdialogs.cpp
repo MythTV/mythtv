@@ -31,7 +31,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #undef LoadImage
 #endif
 
@@ -326,7 +326,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 {
     // -=>TODO: Temp fix... should re-evalutate/re-code.
 
-    QList<QWidget *> objList = qFindChildren<QWidget *>(this);
+    QList<QWidget *> objList = this->findChildren<QWidget *>();
 
     QWidget *pCurr    = focusWidget();
     QWidget *pNew     = NULL;
@@ -1194,7 +1194,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
         rect_to_update = this->geometry();
     }
 
-    redrawRect = redrawRect.unite(r);
+    redrawRect = redrawRect.united(r);
 
     update(redrawRect);
 }
@@ -1246,7 +1246,7 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
         //  needed to be repainted
         //
 
-        const QRect intersect = inv_rect.intersect(container_area);
+        const QRect intersect = inv_rect.intersected(container_area);
         int looper_context = looper->GetContext();
         if (container_area.isValid() &&
             (looper_context == context || looper_context == -1) &&

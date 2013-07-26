@@ -19,7 +19,7 @@
  */
 
 // POSIX
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/select.h>
 #endif
 #include <sys/types.h>

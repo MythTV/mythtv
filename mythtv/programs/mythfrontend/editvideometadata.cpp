@@ -650,7 +650,7 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
         m_busyPopup = NULL;
     }
 
-    VideoArtworkType type = qVariantValue<VideoArtworkType>(lookup->GetData());
+    VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
     ArtworkList list = lookup->GetArtwork(type);
 
     if (list.count() == 0)
@@ -711,7 +711,7 @@ void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
         m_busyPopup = NULL;
     }
 
-    VideoArtworkType type = qVariantValue<VideoArtworkType>(lookup->GetData());
+    VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
     ArtworkMap map = lookup->GetDownloads();
 
     if (map.count() >= 1)

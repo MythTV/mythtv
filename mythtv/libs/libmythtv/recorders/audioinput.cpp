@@ -39,11 +39,15 @@ AudioInput *AudioInput::CreateDevice(const QByteArray &device)
     AudioInput *audio = NULL;
     if (CONFIG_AUDIO_OSS && device.startsWith("/"))
     {
+#if defined( CONFIG_AUDIO_OSS ) && (CONFIG_AUDIO_OSS==1)
         audio = new AudioInputOSS(device);
+#endif
     }
     else if (CONFIG_AUDIO_ALSA && device.startsWith("ALSA:"))
     {
+#if defined( CONFIG_AUDIO_ALSA ) && (CONFIG_AUDIO_ALSA==1)
         audio = new AudioInputALSA(device);
+#endif
     }
     else if (device == "NULL")
     {

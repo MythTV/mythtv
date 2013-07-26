@@ -168,7 +168,7 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
-             aspect, m_hWnd, disp, av_codec_id))
+             aspect, (WId)m_hWnd, disp, av_codec_id))
     {
         BestDeint();
         return true;
@@ -210,7 +210,7 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
         painter->FreeResources();
 
     QMutexLocker locker(&m_lock);
-    m_hWnd      = winid;
+    m_hWnd      = (HWND)winid;
     window.SetAllowPreviewEPG(true);
 
     VideoOutput::Init(video_dim_buf, video_dim_disp,

@@ -60,12 +60,16 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
             if (!temp.isEmpty())
             {
                 if (temp.contains("%n"))
+#if QT_VERSION < 0x050000
                     text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
                                            QCoreApplication::UnicodeUTF8,
                                            qAbs(value));
+#else
+					text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
+					qAbs(value));
+#endif
                 else
-                    text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
-                                           QCoreApplication::UnicodeUTF8);
+                    text = qApp->translate("ThemeUI", temp.toUtf8());
             }
         }
 

@@ -824,7 +824,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
         else if (resultid == "deleterule")
         {
             RecordingRule *record =
-                qVariantValue<RecordingRule *>(dce->GetData());
+                dce->GetData().value<RecordingRule *>();
             if (record)
             {
                 if (buttonnum > 0)
@@ -856,7 +856,7 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (!pgRecInfo)
         return;
@@ -922,7 +922,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
     ProgramRecPriorityInfo *pgRecInfo = NULL;
     if (item)
-        pgRecInfo = qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+        pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
 
     // If the recording id doesn't match, the user created a new
     // template.
@@ -999,7 +999,7 @@ void ProgramRecPriority::customEdit(void)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     EditCustom(pgRecInfo);
 }
@@ -1011,7 +1011,7 @@ void ProgramRecPriority::remove(void)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (!pgRecInfo || 
         (pgRecInfo->recType == kTemplateRecord &&
@@ -1053,7 +1053,7 @@ void ProgramRecPriority::deactivate(void)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (pgRecInfo)
     {
@@ -1108,7 +1108,7 @@ void ProgramRecPriority::upcoming(void)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (!pgRecInfo)
         return;
@@ -1146,8 +1146,8 @@ void ProgramRecPriority::details(void)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo = qVariantValue<ProgramRecPriorityInfo *>
-                                                            (item->GetData());
+    ProgramRecPriorityInfo *pgRecInfo = item->GetData().value<ProgramRecPriorityInfo *>
+                                                            ();
 
     ShowDetails(pgRecInfo);
 }
@@ -1159,7 +1159,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
         return;
 
     ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        item->GetData().value<ProgramRecPriorityInfo*>();
 
     if (!pgRecInfo)
         return;
@@ -1339,7 +1339,7 @@ void ProgramRecPriority::SortList(ProgramRecPriorityInfo *newCurrentItem)
         MythUIButtonListItem *item = m_programList->GetItemCurrent();
         if (item)
             m_currentItem = 
-                qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                item->GetData().value<ProgramRecPriorityInfo*>();
     }
 
     QMap<int, ProgramRecPriorityInfo>::Iterator pit;
@@ -1392,8 +1392,8 @@ void ProgramRecPriority::SortList(ProgramRecPriorityInfo *newCurrentItem)
 void ProgramRecPriority::UpdateList()
 {
     if (!m_currentItem && !m_programList->IsEmpty())
-        m_currentItem = qVariantValue<ProgramRecPriorityInfo*>
-                                (m_programList->GetItemCurrent()->GetData());
+        m_currentItem = m_programList->GetItemCurrent()->GetData()
+		                    .value<ProgramRecPriorityInfo*>();
 
     m_programList->Reset();
 
@@ -1529,8 +1529,8 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo = qVariantValue<ProgramRecPriorityInfo *>
-                                                            (item->GetData());
+    ProgramRecPriorityInfo *pgRecInfo = item->GetData()
+		                .value<ProgramRecPriorityInfo *>();
 
     if (!pgRecInfo)
         return;
@@ -1649,8 +1649,8 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramRecPriorityInfo *pgRecInfo = qVariantValue<ProgramRecPriorityInfo *>
-                                                            (item->GetData());
+	ProgramRecPriorityInfo *pgRecInfo = item->GetData()
+		                  .value<ProgramRecPriorityInfo *>();
 
     if (!pgRecInfo)
         return;

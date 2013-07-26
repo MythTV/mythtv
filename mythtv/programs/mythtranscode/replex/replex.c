@@ -49,7 +49,7 @@
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 # define S_IRGRP 0
 # define S_IWGRP 0
 # define S_IROTH 0

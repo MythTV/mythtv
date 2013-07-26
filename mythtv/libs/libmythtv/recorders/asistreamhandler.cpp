@@ -3,7 +3,7 @@
 // POSIX headers
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/select.h>
 #include <sys/ioctl.h>
 #endif

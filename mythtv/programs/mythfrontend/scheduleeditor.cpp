@@ -1109,7 +1109,7 @@ void SchedFilterEditor::Load()
     for (idx = 0; idx < end; ++idx)
     {
         button = m_filtersList->GetItemAt(idx);
-        int filterid = qVariantValue<int>(button->GetData());
+        int filterid = button->GetData().value<int>();
         button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
                            MythUIButtonListItem::FullChecked :
                            MythUIButtonListItem::NotChecked);
@@ -1139,7 +1139,7 @@ void SchedFilterEditor::Save()
     {
         if ((button = m_filtersList->GetItemAt(idx)) &&
             button->state() == MythUIButtonListItem::FullChecked)
-            filter_mask |= (1 << qVariantValue<uint32_t>(button->GetData()));
+            filter_mask |= (1 << button->GetData().value<uint32_t>());
     }
     m_recordingRule->m_filter = filter_mask;
 }
@@ -1686,7 +1686,7 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
         m_busyPopup = NULL;
     }
 
-    VideoArtworkType type = qVariantValue<VideoArtworkType>(lookup->GetData());
+    VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
     ArtworkList list = lookup->GetArtwork(type);
 
     if (list.count() == 0)

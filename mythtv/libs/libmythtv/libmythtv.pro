@@ -48,8 +48,10 @@ INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += $$POSTINC
 
-QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
-QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
+!win32-msvc* {
+    QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
+    QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
+}
 
 macx {
     # Mac OS X Frameworks
@@ -78,18 +80,20 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
 #using_v4l2 {
-!mingw {
-    HEADERS += recorders/vbitext/cc.h
-    HEADERS += recorders/vbitext/dllist.h
-    HEADERS += recorders/vbitext/hamm.h
-    HEADERS += recorders/vbitext/lang.h
-    HEADERS += recorders/vbitext/vbi.h
-    HEADERS += recorders/vbitext/vt.h
-    SOURCES += recorders/vbitext/cc.cpp
-    SOURCES += recorders/vbitext/vbi.c
-    SOURCES += recorders/vbitext/hamm.c
-    SOURCES += recorders/vbitext/lang.c
-}
+
+    !mingw:!win32-msvc* {
+        HEADERS += recorders/vbitext/cc.h
+        HEADERS += recorders/vbitext/dllist.h
+        HEADERS += recorders/vbitext/hamm.h
+        HEADERS += recorders/vbitext/lang.h
+        HEADERS += recorders/vbitext/vbi.h
+        HEADERS += recorders/vbitext/vt.h
+        SOURCES += recorders/vbitext/cc.cpp
+        SOURCES += recorders/vbitext/vbi.c
+        SOURCES += recorders/vbitext/hamm.c
+        SOURCES += recorders/vbitext/lang.c
+    }
+#}
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
@@ -249,7 +253,9 @@ INSTALLS += inc
 #DVD stuff
 DEPENDPATH  += ../libmythdvdnav/
 INCLUDEPATH += ../libmythdvdnav
-POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+
+!win32-msvc*:POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+
 HEADERS += DVD/dvdringbuffer.h
 SOURCES += DVD/dvdringbuffer.cpp
 using_frontend {
@@ -264,7 +270,7 @@ LIBS += -lmythdvdnav-$$LIBVERSION
 #Bluray stuff
 DEPENDPATH   += ../../external/libmythbluray/
 INCLUDEPATH  += ../../external/libmythbluray/
-POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+!win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 HEADERS += Bluray/bdringbuffer.h
 SOURCES += Bluray/bdringbuffer.cpp
 using_frontend {
@@ -362,7 +368,7 @@ using_frontend {
     SOURCES += videocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
 
-   using_opengl | using_vdpau {
+   using_opengl | using_vdpau : !win32-msvc* {
         # Goom
         HEADERS += visualisations/goom/filters.h
         HEADERS += visualisations/goom/goomconfig.h
@@ -560,12 +566,12 @@ using_backend {
 
     # Simple NuppelVideo Recorder
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
-    !mingw:HEADERS += recorders/NuppelVideoRecorder.h
+    !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
     HEADERS += recorders/RTjpegN.h
     HEADERS += recorders/audioinput.h
     HEADERS += recorders/go7007_myth.h
 
-    !mingw:SOURCES += recorders/NuppelVideoRecorder.cpp
+    !mingw:!win32-msvc*:SOURCES += recorders/NuppelVideoRecorder.cpp
     SOURCES += recorders/RTjpegN.cpp
     SOURCES += recorders/audioinput.cpp
     using_alsa {
@@ -580,10 +586,12 @@ using_backend {
     }
 
     # Support for Video4Linux devices
-    !mingw {
+
+    !mingw:!win32-msvc* {
         HEADERS += recorders/v4lrecorder.h
         SOURCES += recorders/v4lrecorder.cpp
     }
+
     using_v4l2 {
         HEADERS += recorders/v4lchannel.h
         HEADERS += recorders/analogsignalmonitor.h
@@ -763,8 +771,9 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-mingw {
-    DEFINES += USING_MINGW
+mingw:DEFINES += USING_MINGW
+
+mingw | win32-msvc* {
 
     HEADERS += videoout_d3d.h
     SOURCES += videoout_d3d.cpp
@@ -775,6 +784,12 @@ mingw {
 
     LIBS += -lws2_32
 }
+
+win32-msvc* {
+  LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+  QMAKE_CXXFLAGS += "/FI compat.h"
+}
+
 
 # Dependencies and required libraries
 # Have them at the end in order to properly resolve on mingw platform
@@ -801,11 +816,13 @@ using_hdhomerun: LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERS
 using_backend: LIBS += -lmp3lame
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
-POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+!win32-msvc* {
+    POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+    POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+}
 using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}

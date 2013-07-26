@@ -261,7 +261,7 @@ int mythfile_close(int fileID)
     return result;
 }
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #   undef  lseek
 #   define lseek  _lseeki64
 #   undef  off_t
@@ -303,7 +303,7 @@ off_t mythfile_tell(int fileID)
 
     return result;
 }
-#ifdef USING_MINGW
+#ifdef _WIN32
 #   undef  lseek
 #   undef  off_t
 #endif

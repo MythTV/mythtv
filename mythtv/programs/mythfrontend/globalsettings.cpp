@@ -2142,7 +2142,7 @@ static HostComboBox *ThemePainter()
 #ifdef USING_OPENGL
     gc->addSelection(QObject::tr("OpenGL"), OPENGL_PAINTER);
 #endif
-#ifdef USING_MINGW
+#ifdef _WIN32
     gc->addSelection(QObject::tr("Direct3D"), D3D9_PAINTER);
 #endif
     gc->setHelpText(QObject::tr("This selects what MythTV uses to draw. "

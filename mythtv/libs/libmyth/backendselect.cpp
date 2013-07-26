@@ -90,7 +90,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    DeviceLocation *dev = qVariantValue<DeviceLocation *>(item->GetData());
+    DeviceLocation *dev = item->GetData().value<DeviceLocation *>();
 
     if (!dev)
     {

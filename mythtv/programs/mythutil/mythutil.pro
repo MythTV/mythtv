@@ -26,4 +26,4 @@ SOURCES += main.cpp mythutil.cpp commandlineparser.cpp
 SOURCES += backendutils.cpp fileutils.cpp jobutils.cpp markuputils.cpp
 SOURCES += messageutils.cpp mpegutils.cpp
 
-mingw: LIBS += -lwinmm -lws2_32
+mingw|win32-msvc*: LIBS += -lwinmm -lws2_32

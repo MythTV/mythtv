@@ -64,7 +64,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     ret.res     = QSize(width, height);
 
 #elif defined(Q_OS_WIN)
-    HDC hdc = GetDC(GetWindowID());
+    HDC hdc = GetDC((HWND)GetWindowID());
     int rate = 0;
     if (hdc)
     {

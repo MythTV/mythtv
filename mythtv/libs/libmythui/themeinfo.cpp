@@ -200,14 +200,12 @@ bool ThemeInfo::parseThemeInfo()
                         else if (ce.tagName() == "description")
                         {
                             m_description = qApp->translate("ThemeUI",
-                                                 parseText(ce).toUtf8(), NULL,
-                                                 QCoreApplication::UnicodeUTF8);
+                                                 parseText(ce).toUtf8());
                         }
                         else if (ce.tagName() == "errata")
                         {
                             m_errata = qApp->translate("ThemeUI",
-                                                parseText(ce).toUtf8(), NULL,
-                                                QCoreApplication::UnicodeUTF8);
+                                                parseText(ce).toUtf8());
                         }
                     }
                 }

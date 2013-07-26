@@ -12,7 +12,7 @@
 // MythTV
 #include "mythlogging.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 static inline void setup_pipe(int[2], long[2]) {}
 #else
 static inline void setup_pipe(int mypipe[2], long myflags[2])

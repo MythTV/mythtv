@@ -9,9 +9,9 @@ using namespace std;
 #  include <sys/vfs.h>
 #else // if !__linux__
 #  include <sys/param.h>
-#  ifndef USING_MINGW
+#  ifndef _WIN32
 #    include <sys/mount.h>
-#  endif // USING_MINGW
+#  endif // _WIN32
 #endif // !__linux__
 
 #include <sys/stat.h>

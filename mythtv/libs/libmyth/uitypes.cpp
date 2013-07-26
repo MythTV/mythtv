@@ -24,7 +24,7 @@ using namespace std;
 
 #include "mythlogging.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #undef LoadImage
 #endif
 

@@ -285,6 +285,8 @@ namespace
       public:
         FanartLoader() : itemsPast(0), m_fanart(NULL)
         {
+            //TODO: This causes a runtime error on windows since FanartLoader is
+            //      Initialized with a static variable.  Must fix.
             connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
         }
 
@@ -3263,7 +3265,7 @@ void VideoDialog::customEvent(QEvent *levent)
         }
 
         VideoMetadata *metadata =
-            qVariantValue<VideoMetadata *>(lookup->GetData());
+            lookup->GetData().value<VideoMetadata *>();
         if (metadata)
         {
             metadata->SetProcessed(true);
@@ -3625,7 +3627,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
+    VideoMetadata *metadata = lookup->GetData().value<VideoMetadata *>();
 
     if (!metadata)
         return;

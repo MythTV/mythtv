@@ -21,7 +21,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythfontproperties.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #undef LoadImage
 #endif
 

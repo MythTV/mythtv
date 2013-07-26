@@ -592,7 +592,7 @@ void ChannelEditor::customEvent(QEvent *event)
         else if (resultid == "delsingle" && buttonnum == 1)
         {
             MythUIButtonListItem *item =
-                    qVariantValue<MythUIButtonListItem *>(dce->GetData());
+                    dce->GetData().value<MythUIButtonListItem *>();
             if (!item)
                 return;
             uint chanid = item->GetData().toUInt();

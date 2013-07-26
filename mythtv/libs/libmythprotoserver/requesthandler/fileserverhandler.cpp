@@ -159,8 +159,8 @@ void FileServerHandler::RunDeleteThread(void)
 {
     if (deletethread != NULL)
     {
-        if (deletethread->isRunning())
-            return
+		if (deletethread->isRunning())
+			return;
 
         delete deletethread;
         deletethread = NULL;
@@ -607,7 +607,7 @@ bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
                 << QString::number(fileinfo.st_gid)
                 << QString::number(fileinfo.st_rdev)
                 << QString::number(fileinfo.st_size)
-#ifdef USING_MINGW
+#ifdef _WIN32
                 << "0"
                 << "0"
 #else

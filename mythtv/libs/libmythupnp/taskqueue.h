@@ -15,11 +15,11 @@
 
 // POSIX headers
 #include <sys/types.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif // USING_MINGW
+#endif // _WIN32
 
 // C++ headers
 #include <map>

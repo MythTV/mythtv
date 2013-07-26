@@ -2051,7 +2051,7 @@ bool DVDRingBuffer::GetDVDStateSnapshot(QString& state)
  */
 bool DVDRingBuffer::RestoreDVDStateSnapshot(QString& state)
 {
-    QByteArray ba_state = state.toAscii();
+    QByteArray ba_state = state.toUtf8();
 
     return (dvdnav_set_state(m_dvdnav, ba_state.constData()) == DVDNAV_STATUS_OK);
 }

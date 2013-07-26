@@ -54,7 +54,7 @@ public:
      * Populate *pNextFrame with the next frame number desired by this
      * analyzer.
      */
-    static const long long ANYFRAME = LONG_LONG_MAX;
+    static const long long ANYFRAME = LLONG_MAX;
     static const long long NEXTFRAME = -1;
     virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
             long long frameno, long long *pNextFrame /* [out] */) = 0;

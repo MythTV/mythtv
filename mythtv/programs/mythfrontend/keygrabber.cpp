@@ -90,7 +90,7 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         m_waitingForKeyRelease = false;
         m_keyReleaseSeen       = true;
 
-        QString key_name = QString(QKeySequence(event->key()));
+        QString key_name = QKeySequence(event->key()).toString();
         if (!key_name.isEmpty())
         {
             QString modifiers;

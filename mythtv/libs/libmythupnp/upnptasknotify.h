@@ -15,7 +15,7 @@
 
 // POSIX headers
 #include <sys/types.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif

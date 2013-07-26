@@ -54,7 +54,7 @@
 #  include <windows.h>
 #  include <winsock.h>
 #else
-#  if defined (Q_CC_BOR) || defined (Q_CC_GNU)
+#  if defined (Q_CC_BOR) || defined (Q_CC_GNU) || ( _MSC_VER )
 #    include <winsock2.h>
 #  elif defined (Q_CC_INTEL)
 #    include <winsock.h>

@@ -19,7 +19,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #undef LoadImage
 #endif
 

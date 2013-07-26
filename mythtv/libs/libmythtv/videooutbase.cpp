@@ -20,7 +20,7 @@
 #include "videoout_xv.h"
 #endif
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #include "videoout_d3d.h"
 #endif
 
@@ -75,7 +75,7 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 
     VideoOutputNull::GetRenderOptions(opts, cpudeints);
 
-#ifdef USING_MINGW
+#ifdef _WIN32
     VideoOutputD3D::GetRenderOptions(opts, cpudeints);
 #endif
 
@@ -143,7 +143,7 @@ VideoOutput *VideoOutput::Create(
     }
     else
     {
-#ifdef USING_MINGW
+#ifdef _WIN32
         renderers += VideoOutputD3D::
             GetAllowedRenderers(codec_id, video_dim_disp);
 #endif
@@ -217,10 +217,10 @@ VideoOutput *VideoOutput::Create(
         if (renderer == "null")
             vo = new VideoOutputNull();
 
-#ifdef USING_MINGW
+#ifdef _WIN32
         else if (renderer == "direct3d")
             vo = new VideoOutputD3D();
-#endif // USING_MINGW
+#endif // _WIN32
 
 #ifdef USING_QUARTZ_VIDEO
         else if (osxlist.contains(renderer))

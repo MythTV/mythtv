@@ -129,7 +129,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
         ThumbnailData *data = tde->thumb;
 
         QString file = data->url;
-        uint pos = qVariantValue<uint>(data->data);
+        uint pos = data->data.value<uint>();
 
         if (file.isEmpty())
             return;
@@ -151,7 +151,7 @@ void MetadataResultsDialog::customEvent(QEvent *event)
 
 void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    MetadataLookup *lookup = m_results.takeAt(qVariantValue<uint>(item->GetData()));
+    MetadataLookup *lookup = m_results.takeAt(item->GetData().value<uint>());
     qDeleteAll(m_results);
     emit haveResult(lookup);
     Close();

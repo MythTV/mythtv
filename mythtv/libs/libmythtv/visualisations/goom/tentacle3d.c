@@ -32,7 +32,7 @@ void tentacle_new (void) {
 	int tmp;
 
 	v3d center = {0,-17.0,0};
-	vals = malloc ((definitionx+20)*sizeof(float));
+	vals = (float*)malloc ((definitionx+20)*sizeof(float));
 	
 	for (tmp=0;tmp<nbgrid;tmp++) {
 		int x,z;

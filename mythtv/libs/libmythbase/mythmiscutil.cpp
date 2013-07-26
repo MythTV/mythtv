@@ -87,7 +87,7 @@ bool getUptime(time_t &uptime)
     }
     else
         uptime = time(NULL) - bootTime.tv_sec;
-#elif defined(USING_MINGW)
+#elif defined(_WIN32)
     uptime = ::GetTickCount() / 1000;
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
@@ -219,7 +219,7 @@ bool hasUtf8(const char *str)
  */
 bool ping(const QString &host, int timeout)
 {
-#ifdef USING_MINGW
+#ifdef _WIN32
     QString cmd = QString("%systemroot%\\system32\\ping.exe -i %1 -n 1 %2>NUL")
                   .arg(timeout).arg(host);
 
@@ -353,7 +353,7 @@ QString createTempFile(QString name_template, bool dir)
 {
     int ret = -1;
 
-#ifdef USING_MINGW
+#ifdef _WIN32
     char temppath[MAX_PATH] = ".";
     char tempfilename[MAX_PATH] = "";
     // if GetTempPath fails, use current dir
@@ -683,7 +683,7 @@ bool WakeOnLAN(QString MAC)
 
 bool IsPulseAudioRunning(void)
 {
-#ifdef USING_MINGW
+#ifdef _WIN32
     return false;
 #else
 
@@ -696,7 +696,7 @@ bool IsPulseAudioRunning(void)
     uint res = myth_system(command, kMSDontBlockInputDevs |
                                     kMSDontDisableDrawing);
     return (res == GENERIC_EXIT_OK);
-#endif // USING_MINGW
+#endif // _WIN32
 }
 
 bool myth_nice(int val)

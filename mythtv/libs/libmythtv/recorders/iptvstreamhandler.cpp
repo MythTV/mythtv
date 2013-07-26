@@ -2,9 +2,7 @@
 
 // System headers
 #ifdef _WIN32
-# ifndef _MSC_VER
 #  include <ws2tcpip.h>
-# endif
 #else
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -225,7 +223,7 @@ void IPTVStreamHandler::run(void)
                 dest_addr.toString().toLatin1().constData());
             imr.imr_interface.s_addr = htonl(INADDR_ANY);
             if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                           &imr, sizeof(imr)) < 0)
+				(const char *)&imr, sizeof(imr)) < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "setsockopt - IP_ADD_MEMBERSHIP " + ENO);

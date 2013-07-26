@@ -21,7 +21,7 @@
 
 using namespace std;
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #   define O_NONBLOCK 0
 #endif
 

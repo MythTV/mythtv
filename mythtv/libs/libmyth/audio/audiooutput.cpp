@@ -14,7 +14,7 @@ using namespace std;
 #include "compat.h"
 
 #include "audiooutputnull.h"
-#ifdef USING_MINGW
+#ifdef _WIN32
 #include "audiooutputdx.h"
 #include "audiooutputwin.h"
 #endif
@@ -168,7 +168,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("DirectX:"))
     {
-#ifdef USING_MINGW
+#ifdef _WIN32
         ret = new AudioOutputDX(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to DirectX device "
@@ -177,7 +177,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
     }
     else if (main_device.startsWith("Windows:"))
     {
-#ifdef USING_MINGW
+#ifdef _WIN32
         ret = new AudioOutputWin(settings);
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to a Windows "
@@ -479,7 +479,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
-#ifdef USING_MINGW
+#ifdef _WIN32
     {
         QString name = "Windows:";
         QString desc = "Windows default output";

@@ -241,7 +241,7 @@ void CustomPriority::ruleChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    RuleInfo rule = qVariantValue<RuleInfo>(item->GetData());
+    RuleInfo rule = item->GetData().value<RuleInfo>();
 
     m_titleEdit->SetText(rule.title);
 

@@ -109,12 +109,14 @@ LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 
-POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
-POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
-POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
-POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
+!win32-msvc* {
+    POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
+    POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+    POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
+    POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
+}
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
@@ -184,8 +186,10 @@ cygwin {
     #SOURCES += mediamonitor-windows.cpp
 }
 
-mingw {
-    DEFINES += USING_MINGW
+mingw:DEFINES += USING_MINGW
+
+mingw | win32-msvc* {
+    
     SOURCES += mediamonitor-windows.cpp audio/audiooutputwin.cpp
     SOURCES += audio/audiooutputdx.cpp
     HEADERS += mediamonitor-windows.h   audio/audiooutputwin.h

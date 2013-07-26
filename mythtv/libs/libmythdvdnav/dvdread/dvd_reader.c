@@ -631,6 +631,8 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
  *     or -1 on file not found.
  *     or -2 on path not found.
  */
+#ifndef _MSC_VER
+
 static int findDirFile( const char *path, const char *file, char *filename )
 {
   DIR *dir;
@@ -659,6 +661,43 @@ static int findDirFile( const char *path, const char *file, char *filename )
   closedir(dir);
   return -1;
 }
+#else
+static int findDirFile( const char *path, const char *file, char *filename )
+{
+	HANDLE           dir;
+	WIN32_FIND_DATAA ent;
+
+	if (!strncmp(path, "myth://", 7) && mythfile_exists(path, file))
+	{
+		sprintf(filename, "%s%s%s", path,
+			((path[strlen(path) - 1] == '/') ? "" : "/"),
+			file);
+		return 0;
+	}
+
+	dir = FindFirstFileA(path, &ent);
+
+	if (dir == INVALID_HANDLE_VALUE)
+		return -2;
+
+	while (dir != INVALID_HANDLE_VALUE)
+	{
+		if (!strcasecmp(ent.cFileName, file)) {
+			sprintf(filename, "%s%s%s", path,
+				((path[strlen(path) - 1] == '/') ? "" : "/"),
+				ent.cFileName);
+			FindClose(dir);
+			return 0;
+		}
+		if (FindNextFileA(dir, &ent) == FALSE)
+		{
+			FindClose(dir);
+			dir = INVALID_HANDLE_VALUE;
+		}
+	}
+	return -1;
+}
+#endif
 
 static int findDVDFile( dvd_reader_t *dvd, const char *file, char *filename )
 {

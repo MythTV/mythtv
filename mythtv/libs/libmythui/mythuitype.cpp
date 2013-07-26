@@ -314,7 +314,7 @@ void MythUIType::SetRedraw(void)
     if (m_DirtyRegion.isEmpty())
         m_DirtyRegion = QRegion(m_Area.toQRect());
     else
-        m_DirtyRegion = m_DirtyRegion.unite(QRegion(m_Area.toQRect()));
+        m_DirtyRegion = m_DirtyRegion.united(QRegion(m_Area.toQRect()));
 
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);
@@ -329,14 +329,14 @@ void MythUIType::SetChildNeedsRedraw(MythUIType *child)
 
     childRegion.translate(m_Area.x(), m_Area.y());
 
-    childRegion = childRegion.intersect(m_Area.toQRect());
+    childRegion = childRegion.intersected(m_Area.toQRect());
 
     m_NeedsRedraw = true;
 
     if (m_DirtyRegion.isEmpty())
         m_DirtyRegion = childRegion;
     else
-        m_DirtyRegion = m_DirtyRegion.unite(childRegion);
+        m_DirtyRegion = m_DirtyRegion.united(childRegion);
 
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);

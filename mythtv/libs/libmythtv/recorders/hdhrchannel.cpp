@@ -7,7 +7,7 @@
 // C includes
 #include <unistd.h>
 #include <sys/types.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

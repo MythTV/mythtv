@@ -588,7 +588,7 @@ void CustomEdit::ruleChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
+    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
 
     m_titleEdit->SetText(rule.title);
     m_descriptionEdit->SetText(rule.description);
@@ -613,7 +613,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
+    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
 
     QString msg = (m_evaluate) ? evaluate(rule.description) : rule.description;
     msg.replace('\n', ' ');
@@ -633,7 +633,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
+    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
 
     QString clause;
     QString desc = m_descriptionEdit->GetText();
@@ -675,7 +675,7 @@ void CustomEdit::recordClicked(void)
     RecordingRule *record = new RecordingRule();
 
     MythUIButtonListItem* item = m_ruleList->GetItemCurrent();
-    CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
+    CustomRuleInfo rule = item->GetData().value<CustomRuleInfo>();
 
     int cur_recid = rule.recordid.toInt();
     if (cur_recid > 0)

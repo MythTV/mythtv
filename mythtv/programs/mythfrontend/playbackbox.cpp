@@ -811,7 +811,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -917,7 +917,7 @@ void PlaybackBox::UpdateUIListItem(MythUIButtonListItem *item,
 
 void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
     if (item->GetText("is_item_initialized").isNull())
     {
         QMap<AudioProps, QString> audioFlags;
@@ -992,7 +992,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
 
 void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
 
     ItemLoaded(item);
     // Job status (recording, transcoding, flagging)
@@ -1013,7 +1013,7 @@ void PlaybackBox::ItemVisible(MythUIButtonListItem *item)
         m_preview_tokens.insert(token);
         // now make sure selected item is still at the top of the queue
         ProgramInfo *sel_pginfo =
-            qVariantValue<ProgramInfo*>(sel_item->GetData());
+            sel_item->GetData().value<ProgramInfo*>();
         if (sel_pginfo && sel_item->GetImageFilename("preview").isEmpty() &&
             (asAvailable == sel_pginfo->GetAvailableStatus()))
         {
@@ -1471,14 +1471,14 @@ static bool save_position(
     for (int i = curPos; (i >= 0) && (i < recordingList->GetCount()); i++)
     {
         MythUIButtonListItem *item = recordingList->GetItemAt(i);
-        ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+        ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
         itemSelPref.push_back(groupSelPref.front());
         itemSelPref.push_back(pginfo->MakeUniqueKey());
     }
     for (int i = curPos; (i >= 0) && (i < recordingList->GetCount()); i--)
     {
         MythUIButtonListItem *item = recordingList->GetItemAt(i);
-        ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+        ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
         itemSelPref.push_back(groupSelPref.front());
         itemSelPref.push_back(pginfo->MakeUniqueKey());
     }
@@ -1489,7 +1489,7 @@ static bool save_position(
         if (i >= 0 && i < recordingList->GetCount())
         {
             MythUIButtonListItem *item = recordingList->GetItemAt(i);
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
             if (i == topPos)
             {
                 itemTopPref.push_front(pginfo->MakeUniqueKey());
@@ -1535,7 +1535,7 @@ static void restore_position(
         for (uint j = 0; j < (uint)recordingList->GetCount(); j++)
         {
             MythUIButtonListItem *item = recordingList->GetItemAt(j);
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
             if (pginfo && (pginfo->MakeUniqueKey() == key))
             {
                 sel = j;
@@ -1556,7 +1556,7 @@ static void restore_position(
         for (uint j = 0; j < (uint)recordingList->GetCount(); j++)
         {
             MythUIButtonListItem *item = recordingList->GetItemAt(j);
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            ProgramInfo *pginfo = item->GetData().value<ProgramInfo*>();
             if (pginfo && (pginfo->MakeUniqueKey() == key))
             {
                 top = j;
@@ -2203,7 +2203,7 @@ void PlaybackBox::PlayFromBookmark(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (pginfo)
         PlayX(*pginfo, false, false);
@@ -2217,7 +2217,7 @@ void PlaybackBox::PlayFromBeginning(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (pginfo)
         PlayX(*pginfo, true, false);
@@ -2256,7 +2256,7 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -2330,7 +2330,7 @@ ProgramInfo *PlaybackBox::CurrentItem(void)
     if (!item)
         return NULL;
 
-    pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return NULL;
@@ -3555,7 +3555,7 @@ void PlaybackBox::toggleWatched(void)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -3581,7 +3581,7 @@ void PlaybackBox::toggleAutoExpire()
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -3603,7 +3603,7 @@ void PlaybackBox::togglePreserveEpisode()
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -3647,7 +3647,7 @@ void PlaybackBox::togglePlayListItem(void)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;
@@ -4771,7 +4771,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo *>();
 
     if (!pginfo)
         return;

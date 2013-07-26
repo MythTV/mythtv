@@ -1749,7 +1749,11 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString filename)
         QUrl url = filename;
         isHLS =
         url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive) ||
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         QString(url.encodedQuery()).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
+#else
+        QString(url.query( QUrl::ComponentFormattingOption::FullyEncoded )).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
+#endif
     }
     return isHLS;
 }
@@ -2009,6 +2013,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString line)
 #endif
     else
     {
+#ifndef _MSC_VER  
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "invalid encryption type, only NONE "
 #ifdef USING_LIBCRYPTO
@@ -2017,6 +2022,10 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString line)
             "is supported."
 #endif
             );
+#else
+// msvc doesn't like #ifdef in the middle of the LOG macro.
+// Errors with '#':invalid character: possibly the result of a macro expansion
+#endif
         err = RET_ERROR;
     }
     return err;

@@ -697,13 +697,9 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     SetCommand( cmd );
 
-    QByteArray cmdUTF8 = GetCommand().toUtf8();
-    TCHAR *command = TEXT((char *)cmdUTF8.constData());
-
-    const char *directory = NULL;
+	QString  sCmd = GetCommand();
+    
     QString dir = GetDirectory();
-    if (GetSetting("SetDirectory") && !dir.isEmpty())
-        directory = strdup(dir.toUtf8().constData());
 
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
@@ -713,13 +709,13 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
         m_timeout += time(NULL);
 
     bool success = CreateProcess(NULL, 
-                    command,       // command line 
+                    (LPWSTR)sCmd.utf16(),       // command line 
                     NULL,          // process security attributes 
                     NULL,          // primary thread security attributes 
                     TRUE,          // handles are inherited 
                     0,             // creation flags 
                     NULL,          // use parent's environment 
-                    directory,     // use parent's current directory 
+                    (LPCWSTR)dir.utf16(),   // use parent's current directory 
                    &si,            // STARTUPINFO pointer 
                    &pi);           // receives PROCESS_INFORMATION 
 
@@ -752,9 +748,6 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
         m_stdpipe[1] = p_stdout[0];
         m_stdpipe[2] = p_stderr[0];
 
-        // clean up the memory use
-        if( directory )
-            free((void *)directory);
     }
 
     /* Parent */

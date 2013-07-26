@@ -9,7 +9,7 @@ using namespace std;
 #include "mthread.h"
 #include "compat.h"
 
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/poll.h>
 #endif
 
@@ -50,7 +50,7 @@ DeviceReadBuffer::DeviceReadBuffer(
         wake_pipe_flags[i] = 0;
     }
 
-#if defined( USING_MINGW ) && !defined( _MSC_VER )
+#ifdef USING_MINGW 
 #warning mingw DeviceReadBuffer::Poll
     if (using_poll)
     {
@@ -436,7 +436,7 @@ bool DeviceReadBuffer::HandlePausing(void)
 
 bool DeviceReadBuffer::Poll(void) const
 {
-#ifdef USING_MINGW
+#ifdef _WIN32
 # ifdef _MSC_VER
 #  pragma message( "mingw DeviceReadBuffer::Poll" )
 # else
@@ -556,7 +556,7 @@ bool DeviceReadBuffer::Poll(void) const
     }
 
     return retval;
-#endif //!USING_MINGW
+#endif //!_WIN32
 }
 
 bool DeviceReadBuffer::CheckForErrors(
@@ -575,7 +575,7 @@ bool DeviceReadBuffer::CheckForErrors(
         return false;
     }
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 # ifdef _MSC_VER
 #  pragma message( "mingw DeviceReadBuffer::CheckForErrors" )
 # else

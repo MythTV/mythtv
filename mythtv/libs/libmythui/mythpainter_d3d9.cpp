@@ -37,7 +37,7 @@ bool MythD3D9Painter::InitD3D9(QPaintDevice *parent)
     if (!m_render)
         return false;
 
-    if (m_render->Create(real_parent->size(), real_parent->winId()))
+    if (m_render->Create(real_parent->size(), (HWND)real_parent->winId()))
         return true;
 
     Teardown();

@@ -272,7 +272,7 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
     if (m_previewImage)
         m_previewImage->Reset();
 
-    MFileInfo finfo = qVariantValue<MFileInfo>(item->GetData());
+    MFileInfo finfo = item->GetData().value<MFileInfo>();
 
     if (finfo.isParentDir())
     {
@@ -309,7 +309,7 @@ void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    MFileInfo finfo = qVariantValue<MFileInfo>(item->GetData());
+	MFileInfo finfo = item->GetData().value<MFileInfo>();
 
     if (finfo.isFile())
     {
@@ -422,7 +422,7 @@ void MythUIFileBrowser::homePressed()
 void MythUIFileBrowser::OKPressed()
 {
     MythUIButtonListItem *item = m_fileList->GetItemCurrent();
-    MFileInfo finfo = qVariantValue<MFileInfo>(item->GetData());
+	MFileInfo finfo = item->GetData().value<MFileInfo>();
 
     if (m_retObject)
     {

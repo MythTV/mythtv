@@ -123,7 +123,7 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
         ThumbnailData *data = tde->thumb;
 
         QString file = data->url;
-        uint pos = qVariantValue<uint>(data->data);
+        uint pos = data->data.value<uint>();
 
         if (file.isEmpty())
             return;
@@ -145,7 +145,7 @@ void ImageSearchResultsDialog::customEvent(QEvent *event)
 
 void ImageSearchResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    emit haveResult(qVariantValue<ArtworkInfo>(item->GetData()),
+    emit haveResult(item->GetData().value<ArtworkInfo>(),
                     m_type);
     Close();
 }

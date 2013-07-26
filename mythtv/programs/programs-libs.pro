@@ -44,18 +44,21 @@ mingw {
     CONFIG += console
 }
 
-POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
-POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
-POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
-POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
-POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
-POST_TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}
-POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
+!win32-msvc* {
+    POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
+    POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
+    POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+    POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
+    POST_TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}
+    POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
+}
+
 using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 

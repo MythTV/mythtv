@@ -56,7 +56,7 @@ static int64_t file_read_mythiowrapper(BD_FILE_H *file, uint8_t *buf, int64_t si
 
 static int64_t file_write_mythiowrapper(BD_FILE_H *file, const uint8_t *buf, int64_t size)
 {
-    return mythfile_write((int)file->internal, buf, size);
+    return mythfile_write((int)file->internal, (void *)buf, size);
 }
 
 BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *mode)

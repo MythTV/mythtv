@@ -48,7 +48,6 @@ inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
 
 INSTALLS += inc_dvdnav inc_dvdread
 
-
 mingw:DEFINES += STDC_HEADERS
 
 include ( ../libs-targetfix.pro )

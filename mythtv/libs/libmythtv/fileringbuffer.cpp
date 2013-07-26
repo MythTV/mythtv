@@ -248,6 +248,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 {
                     if (0 == lseek(fd2, 0, SEEK_SET))
                     {
+#ifndef _MSC_VER
                         if (posix_fadvise(fd2, 0, 0,
                                           POSIX_FADV_SEQUENTIAL) < 0)
                         {
@@ -262,6 +263,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                                 QString("OpenFile(): fadvise willneed "
                                         "failed: ") + ENO);
                         }
+#endif
                         lasterror = 0;
                         break;
                     }
@@ -645,6 +647,7 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                 else
                 {
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
+#ifndef _MSC_VER
                     if (posix_fadvise(fd2, internalreadpos,
                                   128*1024, POSIX_FADV_WILLNEED) < 0)
                     {
@@ -652,6 +655,7 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                             QString("Seek(): fadvise willneed "
                             "failed: ") + ENO);
                     }
+#endif
                 }
                 LOG(VB_FILE, LOG_INFO, LOC +
                     QString("Seek to %1 from ignore pos %2 returned %3")

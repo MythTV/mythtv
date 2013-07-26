@@ -716,7 +716,7 @@ static void playDisc()
 #ifdef Q_OS_MAC
             // Convert a BSD 'leaf' name into a raw device path
             QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
-#elif USING_MINGW
+#elif _WIN32
             QString filename = "dvd:";          // e.g. 'dvd:E\\'
 #else
             QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'

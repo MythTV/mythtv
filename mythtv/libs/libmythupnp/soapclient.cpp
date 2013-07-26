@@ -202,7 +202,7 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
 
     headers.insert("Content-Type", "text/xml; charset=\"utf-8\"");
     QString soapHeader = QString("\"%1#%2\"").arg(m_sNamespace).arg(sMethod);
-    headers.insert("SOAPACTION", soapHeader.toAscii());
+	headers.insert("SOAPACTION", soapHeader.toUtf8());
     headers.insert("User-Agent", "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                                  "Gecko/25250101 Netscape/5.432b1");
     // --------------------------------------------------------------

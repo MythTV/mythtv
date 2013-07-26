@@ -40,7 +40,7 @@
  */
 Action::Action(const QString &description, const QString &keys)
     : m_description(description),
-      m_keys(QString(QKeySequence(keys)).split(", "))
+      m_keys(QKeySequence(keys).toString().split(", "))
 {
     m_description.detach();
     m_keys.detach();

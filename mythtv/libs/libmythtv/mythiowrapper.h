@@ -20,7 +20,7 @@ void    mythfile_open_register_callback(const char *pathname, void* object,
 int     mythfile_check(int fileID);
 MTV_PUBLIC int     mythfile_open(const char *pathname, int flags);
 MTV_PUBLIC int     mythfile_close(int fileID);
-#ifdef USING_MINGW
+#ifdef _WIN32
 MTV_PUBLIC off64_t mythfile_seek(int fileID, off64_t offset, int whence);
 MTV_PUBLIC off64_t mythfile_tell(int fileID);
 #else

@@ -28,6 +28,7 @@
 #define NZMQT_H
 
 #include <zmq.hpp>
+#include "nzmqtexp.h"
 
 #include <QDebug>
 #include <QObject>
@@ -125,7 +126,7 @@ namespace nzmqt
     // This class cannot be instantiated. Its purpose is to serve as an
     // intermediate base class that provides Qt-based convenience methods
     // to subclasses.
-    class ZMQSocket : public QObject, private zmq::socket_t
+    class NZMQT_PUBLIC ZMQSocket : public QObject, private zmq::socket_t
     {
         Q_OBJECT
         Q_ENUMS(Type Event SendFlag ReceiveFlag Option)
@@ -427,7 +428,7 @@ namespace nzmqt
 
 
     // This class is an abstract base class for concrete implementations.
-    class ZMQContext : public QObject, private zmq::context_t
+    class NZMQT_PUBLIC ZMQContext : public QObject, private zmq::context_t
     {
         Q_OBJECT
 
@@ -498,7 +499,7 @@ namespace nzmqt
     }
 
 
-    class ZMQDevice : public QObject, public QRunnable
+    class NZMQT_PUBLIC ZMQDevice : public QObject, public QRunnable
     {
         Q_OBJECT
         Q_ENUMS(Type)
@@ -530,7 +531,7 @@ namespace nzmqt
 
     // An instance of this class cannot directly be created. Use one
     // of the 'PollingZMQContext::createSocket()' factory methods instead.
-    class PollingZMQSocket : public ZMQSocket
+    class NZMQT_PUBLIC PollingZMQSocket : public ZMQSocket
     {
         Q_OBJECT
 
@@ -553,7 +554,7 @@ namespace nzmqt
         void messageReceived(const QList<QByteArray>&);
     };
 
-    class PollingZMQContext : public ZMQContext, public QRunnable
+    class NZMQT_PUBLIC PollingZMQContext : public ZMQContext, public QRunnable
     {
         Q_OBJECT
 
@@ -724,7 +725,7 @@ namespace nzmqt
 
     // An instance of this class cannot directly be created. Use one
     // of the 'SocketNotifierZMQContext::createSocket()' factory methods instead.
-    class SocketNotifierZMQSocket : public ZMQSocket
+    class NZMQT_PUBLIC SocketNotifierZMQSocket : public ZMQSocket
     {
         Q_OBJECT
 
@@ -791,7 +792,7 @@ namespace nzmqt
 //        QSocketNotifier *socketNotifyWrite_;
     };
 
-    class SocketNotifierZMQContext : public ZMQContext
+    class NZMQT_PUBLIC SocketNotifierZMQContext : public ZMQContext
     {
         Q_OBJECT
 

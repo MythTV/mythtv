@@ -81,11 +81,17 @@ class AudioOutputDXPrivate
         void DestroyDSBuffer(void);
         void FillBuffer(unsigned char *buffer, int size);
         bool StartPlayback(void);
-        static int CALLBACK DSEnumCallback(LPGUID lpGuid,
-                                           LPCSTR lpcstrDesc,
-                                           LPCSTR lpcstrModule,
-                                           LPVOID lpContext);
-
+#ifdef UNICODE
+        static int CALLBACK DSEnumCallback(LPGUID  lpGuid,
+                                           LPCWSTR lpcstrDesc,
+                                           LPCWSTR lpcstrModule,
+                                           LPVOID  lpContext);
+#else
+		static int CALLBACK DSEnumCallback(LPGUID lpGuid,
+			LPCSTR lpcstrDesc,
+			LPCSTR lpcstrModule,
+			LPVOID lpContext);
+#endif
     public:
         AudioOutputDX       *parent;
         HINSTANCE           dsound_dll;
@@ -129,12 +135,22 @@ AudioOutputDX::~AudioOutputDX()
 typedef HRESULT (WINAPI *LPFNDSC) (LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
 typedef HRESULT (WINAPI *LPFNDSE) (LPDSENUMCALLBACK, LPVOID);
 
-int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
-                                                  LPCSTR lpcstrDesc,
-                                                  LPCSTR lpcstrModule,
-                                                  LPVOID lpContext)
+#ifdef UNICODE
+int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID  lpGuid,
+                                                  LPCWSTR lpcstrDesc,
+                                                  LPCWSTR lpcstrModule,
+                                                  LPVOID  lpContext)
 {
-    const QString enum_desc = lpcstrDesc;
+	QString enum_desc = QString::fromWCharArray( lpcstrDesc );
+#else
+int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
+												  LPCSTR lpcstrDesc,
+												  LPCSTR lpcstrModule,
+												  LPVOID lpContext)
+{
+	QString enum_desc = QString::fromLocal8Bit( lpcstrDesc );
+
+#endif
     AudioOutputDXPrivate *context = static_cast<AudioOutputDXPrivate*>(lpContext);
     const QString cfg_desc  = context->device_name;
     const int device_num    = context->device_num;
@@ -188,7 +204,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     ResetDirectSound();
 
-    dsound_dll = LoadLibrary("DSOUND.DLL");
+    dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
     if (dsound_dll == NULL)
     {
         VBERROR("Cannot open DSOUND.DLL");
@@ -208,7 +224,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
         (LPFNDSE)GetProcAddress(dsound_dll, "DirectSoundEnumerateA");
 
     if(OurDirectSoundEnumerate)
-        if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this)))
+        if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this) != DS_OK))
             VBERROR("DirectSoundEnumerate FAILED");
 
     if (!chosenGUID)

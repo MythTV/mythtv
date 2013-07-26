@@ -79,7 +79,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #include "mythpainter_d3d9.h"
 #endif
 
@@ -395,12 +395,12 @@ MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 {
-    d->repaintRegion = d->repaintRegion.unite(pe->region());
+    d->repaintRegion = d->repaintRegion.united(pe->region());
     parent->drawScreen();
 }
 #endif
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
                                              MythMainWindowPrivate *priv)
                    : QGLWidget(win),
@@ -411,7 +411,7 @@ MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
 
 void MythPainterWindowD3D9::paintEvent(QPaintEvent *pe)
 {
-    d->repaintRegion = d->repaintRegion.unite(pe->region());
+    d->repaintRegion = d->repaintRegion.united(pe->region());
     parent->drawScreen();
 }
 #endif
@@ -425,7 +425,7 @@ MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *win,
 
 void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
 {
-    d->repaintRegion = d->repaintRegion.unite(pe->region());
+    d->repaintRegion = d->repaintRegion.united(pe->region());
     parent->drawScreen();
 }
 
@@ -724,7 +724,7 @@ void MythMainWindow::animate(void)
             {
                 QRegion topDirty = (*screenit)->GetDirtyArea();
                 (*screenit)->ResetNeedsRedraw();
-                d->repaintRegion = d->repaintRegion.unite(topDirty);
+                d->repaintRegion = d->repaintRegion.united(topDirty);
                 redraw = true;
             }
         }
@@ -746,12 +746,12 @@ void MythMainWindow::drawScreen(void)
         return;
 
     if (!d->painter->SupportsClipping())
-        d->repaintRegion = d->repaintRegion.unite(d->uiScreenRect);
+        d->repaintRegion = d->repaintRegion.united(d->uiScreenRect);
     else
     {
         // Ensure that the region is not larger than the screen which
         // can happen with bad themes
-        d->repaintRegion = d->repaintRegion.intersect(d->uiScreenRect);
+        d->repaintRegion = d->repaintRegion.intersected(d->uiScreenRect);
 
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
@@ -1026,7 +1026,7 @@ void MythMainWindow::Init(QString forcedpainter)
 
     QString painter = forcedpainter.isEmpty() ?
         GetMythDB()->GetSetting("ThemePainter", QT_PAINTER) : forcedpainter;
-#ifdef USING_MINGW
+#ifdef _WIN32
     if (painter == AUTO_PAINTER || painter == D3D9_PAINTER)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Using the %1 painter").arg(D3D9_PAINTER));
@@ -1303,7 +1303,7 @@ void MythMainWindow::Show(void)
 /* FIXME compatibility only */
 void MythMainWindow::attach(QWidget *child)
 {
-#ifdef USING_MINGW
+#ifdef _WIN32
 # ifdef _MSC_VER
 #  pragma message( "TODO FIXME MythMainWindow::attach() does not always work on MS Windows!")
 # else
@@ -2466,7 +2466,7 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     float floatSize = pointSize;
     float desired = 100.0;
 
-#ifdef USING_MINGW
+#ifdef _WIN32
     // logicalDpiY not supported in QT3/win.
     int logicalDpiY = 100;
     HDC hdc = GetDC(NULL);

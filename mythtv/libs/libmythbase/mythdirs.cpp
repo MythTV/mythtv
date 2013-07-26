@@ -19,7 +19,11 @@ static QString filtersdir = QString::null;
 
 void InitializeMythDirs(void)
 {
+#ifdef __MSC_VER
+    installprefix = QString( #RUNPREFIX );
+#else
     installprefix = QString(RUNPREFIX);
+#endif
 
     char *tmp_installprefix = std::getenv("MYTHTVDIR");
     if (tmp_installprefix)
@@ -89,7 +93,7 @@ QString GetFiltersDir(void) { return filtersdir; }
 #if CONFIG_DARWIN
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
-#elif USING_MINGW
+#elif _WIN32
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dll";
 #else

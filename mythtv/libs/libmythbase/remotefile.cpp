@@ -333,7 +333,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
             fileinfo->st_gid       = strlist[7].toLongLong();
             fileinfo->st_rdev      = strlist[8].toLongLong();
             fileinfo->st_size      = strlist[9].toLongLong();
-#ifndef USING_MINGW
+#ifndef _WIN32
             fileinfo->st_blksize   = strlist[10].toLongLong();
             fileinfo->st_blocks    = strlist[11].toLongLong();
 #endif

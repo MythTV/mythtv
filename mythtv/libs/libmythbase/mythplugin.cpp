@@ -1,5 +1,5 @@
 // C includes
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <dlfcn.h>
 #else
 #include "compat.h"

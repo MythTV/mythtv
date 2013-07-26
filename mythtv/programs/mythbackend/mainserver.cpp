@@ -11,7 +11,7 @@ using namespace std;
 #include <fcntl.h>
 #include "mythconfig.h"
 
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/ioctl.h>
 #endif
 
@@ -20,9 +20,9 @@ using namespace std;
 #  include <sys/vfs.h>
 #else // if !__linux__
 #  include <sys/param.h>
-#  ifndef USING_MINGW
+#  ifndef _WIN32
 #    include <sys/mount.h>
-#  endif // USING_MINGW
+#  endif // _WIN32
 #endif // !__linux__
 
 #include <QCoreApplication>
@@ -3157,7 +3157,7 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
             retlist << QString::number(fileinfo.st_gid);
             retlist << QString::number(fileinfo.st_rdev);
             retlist << QString::number(fileinfo.st_size);
-#ifdef USING_MINGW
+#ifdef _WIN32
             retlist << "0"; // st_blksize
             retlist << "0"; // st_blocks
 #else

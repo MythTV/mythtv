@@ -3,11 +3,14 @@
 
 #include <QWidget>
 
+#if defined( USE_OPENGL_PAINTER ) || defined( _WIN32 )
+#  include <QGLWidget>
+#endif
+
 class MythMainWindow;
 class MythMainWindowPrivate;
 
 #ifdef USE_OPENGL_PAINTER
-#include <QGLWidget>
 #include "mythrender_opengl.h"
 
 class MythPainterWindowGL : public QGLWidget
@@ -26,7 +29,7 @@ class MythPainterWindowGL : public QGLWidget
 };
 #endif
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 // FIXME - this only really needs a QWidget but the background overpaints the
 //         main window (setAutoFillBackground(false) does not seem to help)
 class MythPainterWindowD3D9 : public QGLWidget

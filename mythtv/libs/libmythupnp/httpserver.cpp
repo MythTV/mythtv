@@ -16,7 +16,7 @@
 
 // POSIX headers
 #include <compat.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/utsname.h> 
 #endif
 
@@ -59,7 +59,7 @@ HttpServer::HttpServer(const QString sApplicationPrefix) :
     // ----------------------------------------------------------------------
     {
         QMutexLocker locker(&s_platformLock);
-#ifdef USING_MINGW
+#ifdef _WIN32
         s_platform = QString("Windows %1.%2")
             .arg(LOBYTE(LOWORD(GetVersion())))
             .arg(HIBYTE(LOWORD(GetVersion())));

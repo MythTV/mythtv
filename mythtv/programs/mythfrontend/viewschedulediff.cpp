@@ -331,7 +331,7 @@ void ViewScheduleDiff::updateInfo(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*> (item->GetData());
+    ProgramInfo *pginfo = item->GetData().value<ProgramInfo*> ();
     if (pginfo)
     {
         InfoMap infoMap;

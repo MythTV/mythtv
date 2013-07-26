@@ -26,10 +26,10 @@
 #include "mythlogging.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <net/if.h>
 #include <sys/ioctl.h>
-#endif // USING_MINGW
+#endif // _WIN32
 #if HAVE_GETIFADDRS
 #include <ifaddrs.h>
 #endif
@@ -130,7 +130,7 @@ long GetIPAddressList(QStringList &sStrList)
 
 long GetIPAddressList( QStringList &sStrList )
 {
-#ifdef USING_MINGW
+#ifdef _WIN32
     LOG(VB_UPNP, LOG_NOTICE, "GetIPAddressList() not implemented in MinGW");
     return 0;
 #else
@@ -196,7 +196,7 @@ long GetIPAddressList( QStringList &sStrList )
     }
 
     return( sStrList.count() );
-#endif // !USING_MINGW
+#endif // !_WIN32
 }
 
 #endif // HAVE_GETIFADDRS

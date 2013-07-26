@@ -8,7 +8,9 @@ CONFIG -= qt
 INCLUDEPATH += ../../libs/libavcodec ../..
 
 # Like libavcodec, debug mode on x86 runs out of registers on some GCCs.
-!profile:QMAKE_CXXFLAGS_DEBUG += -O
+!win32-msvc* { 
+  !profile:QMAKE_CXXFLAGS_DEBUG += -O
+}
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -26,11 +28,19 @@ SOURCES += FIFOSampleBuffer.cpp
 SOURCES += RateTransposer.cpp
 SOURCES += SoundTouch.cpp
 SOURCES += TDStretch.cpp
-SOURCES += cpu_detect_x86_gcc.cpp
 
-contains(ARCH_X86, yes) {
+win32-msvc* {
+
+  SOURCES += cpu_detect_x86_win.cpp
+
+} else {
+
+  SOURCES += cpu_detect_x86_gcc.cpp
+
+  contains(ARCH_X86, yes) {
         DEFINES += ALLOW_SSE2 ALLOW_SSE3
         SOURCES += sse_gcc.cpp
+  }
 }
 
 include ( ../libs-targetfix.pro )

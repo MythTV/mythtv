@@ -19,7 +19,7 @@
 #include <algorithm>
 using namespace std;
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #include <winsock2.h>
 #include <unistd.h>
 #else
@@ -619,7 +619,7 @@ bool MythCoreContext::BackendIsRunning(void)
 {
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
-#elif defined USING_MINGW
+#elif defined _WIN32
     const char *command = "%systemroot%\\system32\\tasklist.exe "
        " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
 #else

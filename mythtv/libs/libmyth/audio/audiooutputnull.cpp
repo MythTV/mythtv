@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
-#ifndef USING_MINGW
+#ifndef _WIN32
 #include <sys/ioctl.h>
 #else
 #include "compat.h"

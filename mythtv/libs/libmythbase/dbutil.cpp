@@ -205,7 +205,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
 {
     filename = QString();
 
-#ifdef USING_MINGW
+#ifdef _WIN32
     LOG(VB_GENERAL, LOG_CRIT, "Database backups disabled on Windows.");
     return kDB_Backup_Disabled;
 #else
@@ -275,7 +275,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
         return kDB_Backup_Completed;
 
     return kDB_Backup_Failed;
-#endif // USING_MINGW
+#endif // _WIN32
 }
 
 /** \fn DBUtil::CheckTables(const bool repair, const QString options)

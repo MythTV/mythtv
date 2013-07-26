@@ -720,10 +720,9 @@ AVRational AVFormatWriter::GetCodecTimeBase(void)
 
     if (m_avVideoCodec && m_avVideoCodec->supported_framerates) {
         const AVRational *p= m_avVideoCodec->supported_framerates;
-        AVRational req =
-            (AVRational){result.den, result.num};
+        AVRational req = {result.den, result.num};
         const AVRational *best = NULL;
-        AVRational best_error= (AVRational){INT_MAX, 1};
+        AVRational best_error= {INT_MAX, 1};
         for(; p->den!=0; p++) {
             AVRational error = av_sub_q(req, *p);
             if (error.num <0)

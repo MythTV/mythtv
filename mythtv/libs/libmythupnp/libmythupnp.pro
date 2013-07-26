@@ -35,7 +35,7 @@ HEADERS += serializers/xmlplistSerializer.h
 SOURCES += mmulticastsocketdevice.cpp
 SOURCES += msocketdevice.cpp
 unix:SOURCES += msocketdevice_unix.cpp
-mingw:SOURCES += msocketdevice_win.cpp
+mingw | win32-msvc*:SOURCES += msocketdevice_win.cpp
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
@@ -58,10 +58,13 @@ LIBS      += -L../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 
-mingw {
+mingw | win32-msvc* {
 
     LIBS += -lws2_32
 }
+
+win32-msvc*:LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
 

@@ -70,9 +70,13 @@ LIBS += $${CONFIG_TAGLIB_LIBS}
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
 
-mingw {
+mingw:LIBS += -lws2_32
+
+win32-msvc* {
 
     LIBS += -lws2_32
+    LIBS += -ltag
+    INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/external/taglib/include/taglib
 }
 
 inc.path = $${PREFIX}/include/mythtv/metadata/

@@ -9200,7 +9200,7 @@ void TV::customEvent(QEvent *e)
             reinterpret_cast<DialogCompletionEvent*>(e);
         if (dce->GetData().userType() == qMetaTypeId<MenuNodeTuple>())
         {
-            MenuNodeTuple data = qVariantValue<MenuNodeTuple>(dce->GetData());
+            MenuNodeTuple data = dce->GetData().value<MenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
                 PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),
                                  data.m_node);
@@ -11051,8 +11051,7 @@ QDomElement MenuBase::GetRoot(void) const
 
 QString MenuBase::Translate(const QString &text) const
 {
-    return qApp->translate(m_translationContext, text.toUtf8(), NULL,
-                           QCoreApplication::UnicodeUTF8);
+    return qApp->translate(m_translationContext, text.toUtf8(), NULL);
 }
 
 bool MenuBase::Show(const QDomNode &node,

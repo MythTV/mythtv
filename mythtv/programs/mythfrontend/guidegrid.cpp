@@ -1393,7 +1393,7 @@ void GuideGrid::customEvent(QEvent *event)
         if (resultid == "deleterule")
         {
             RecordingRule *record =
-                qVariantValue<RecordingRule *>(dce->GetData());
+                dce->GetData().value<RecordingRule *>();
             if (record)
             {
                 if ((buttonnum > 0) && !record->Delete())

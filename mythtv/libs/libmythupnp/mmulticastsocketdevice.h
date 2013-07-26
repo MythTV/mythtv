@@ -14,9 +14,7 @@
 #define _MULTICAST_SOCKET_DEVICE_H_
 
 #ifdef _WIN32
-# ifndef _MSC_VER
-#  include <ws2tcpip.h>
-# endif
+# include <ws2tcpip.h>
 #else
 # include <sys/socket.h>
 # include <netinet/in.h>

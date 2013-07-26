@@ -249,7 +249,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
 
     if (m_currentMenu)
     {
-        MythMenuItem *menuItem = qVariantValue<MythMenuItem *>(item->GetData());
+		MythMenuItem *menuItem = item->GetData().value< MythMenuItem * >();
 
         if (menuItem->SubMenu)
         {
@@ -259,7 +259,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
             return;
         }
 
-        const char *slot = qVariantValue<const char *>(menuItem->Data);
+		const char *slot = menuItem->Data.value < const char * >();
         if (menuItem->UseSlot && slot)
         {
             connect(this, SIGNAL(Selected()), m_currentMenu->m_retObject, slot,
@@ -271,7 +271,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     }
     else
     {
-        const char *slot = qVariantValue<const char *>(item->GetData());
+        const char *slot = item->GetData().value<const char *>();
         if (m_useSlots && slot)
         {
             connect(this, SIGNAL(Selected()), m_retObject, slot,

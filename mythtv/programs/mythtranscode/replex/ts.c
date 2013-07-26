@@ -31,7 +31,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #include <winsock2.h>
 #else
 #include <netinet/in.h>

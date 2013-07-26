@@ -245,7 +245,7 @@ void StatusBox::setHelpText(MythUIButtonListItem *item)
     if (!item || GetFocusWidget() != m_logList)
         return;
 
-    LogLine logline = qVariantValue<LogLine>(item->GetData());
+    LogLine logline = item->GetData().value<LogLine>();
     if (m_helpText)
         m_helpText->SetText(logline.helpdetail);
     if (m_justHelpText)
@@ -259,7 +259,7 @@ void StatusBox::updateLogList(MythUIButtonListItem *item)
 
     disconnect(this, SIGNAL(updateLog()),0,0);
 
-    const char *slot = (const char *)qVariantValue<void*>(item->GetData());
+    const char *slot = (const char *)item->GetData().value<void*>();
 
     connect(this, SIGNAL(updateLog()), slot);
     emit updateLog();
@@ -270,7 +270,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    LogLine logline = qVariantValue<LogLine>(item->GetData());
+    LogLine logline = item->GetData().value<LogLine>();
 
     MythUIButtonListItem *currentButton = m_categoryList->GetItemCurrent();
     QString currentItem;
@@ -458,7 +458,7 @@ void StatusBox::customEvent(QEvent *event)
         }
         else if (resultid == "AutoExpireManage")
         {
-            ProgramInfo* rec = qVariantValue<ProgramInfo*>(dce->GetData());
+            ProgramInfo* rec = dce->GetData().value<ProgramInfo*>();
 
             // button 2 is "No Change"
             if (!rec || buttonnum == 2)

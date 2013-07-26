@@ -124,7 +124,7 @@ bool ThreadedFileWriter::Open(void)
     {
         LOG(VB_FILE, LOG_INFO, LOC + "Open() successful");
 
-#ifdef USING_MINGW
+#ifdef _WIN32
         _setmode(fd, _O_BINARY);
 #endif
         if (!writeThread)
@@ -377,7 +377,7 @@ void ThreadedFileWriter::SyncLoop(void)
  */
 void ThreadedFileWriter::DiskLoop(void)
 {
-#ifndef USING_MINGW
+#ifndef _WIN32
     // don't exit program if file gets larger than quota limit..
     signal(SIGXFSZ, SIG_IGN);
 #endif

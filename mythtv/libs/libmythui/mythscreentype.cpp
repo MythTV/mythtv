@@ -279,7 +279,7 @@ void MythScreenType::aboutToShow(void)
             // shown in front of this screen
             QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
             m_SavedMask = region;
-            region = region.unite(QRegion(m_Area));
+            region = region.united(QRegion(m_Area));
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
     }

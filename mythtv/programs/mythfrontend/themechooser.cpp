@@ -479,7 +479,7 @@ void ThemeChooser::showPopupMenu(void)
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
     {
-        ThemeInfo *info = qVariantValue<ThemeInfo *>(current->GetData());
+        ThemeInfo *info = current->GetData().value<ThemeInfo *>();
 
         if (info)
         {
@@ -559,7 +559,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
         else
         {
             MythUIButtonListItem *item = m_themes->GetItemCurrent();
-            ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
+            ThemeInfo *info = item->GetData().value<ThemeInfo*>();
             if (info)
             {
                 if (m_fullScreenPreview)
@@ -603,7 +603,7 @@ void ThemeChooser::saveAndReload(void)
 
 void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = qVariantValue<ThemeInfo *>(item->GetData());
+    ThemeInfo *info = item->GetData().value<ThemeInfo *>();
 
     if (!info)
         return;
@@ -659,7 +659,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
 void ThemeChooser::itemChanged(MythUIButtonListItem *item)
 {
-    ThemeInfo *info = qVariantValue<ThemeInfo*>(item->GetData());
+    ThemeInfo *info = item->GetData().value<ThemeInfo*>();
 
     if (!info)
         return;
@@ -856,7 +856,7 @@ void ThemeChooser::removeTheme(void)
         return;
     }
 
-    ThemeInfo *info = qVariantValue<ThemeInfo *>(current->GetData());
+    ThemeInfo *info = current->GetData().value<ThemeInfo *>();
     if (!info)
     {
         ShowOkPopup(tr("Error, unable to find current theme."));

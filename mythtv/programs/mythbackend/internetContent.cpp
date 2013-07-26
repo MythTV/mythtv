@@ -166,7 +166,11 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
 
     pRequest->FormatRawResponse( ret.toString() );
 #else
-#warning InternetContent::GetInternetSearch() not yet ported to Qt5
+# ifndef _MSC_VER
+#  warning InternetContent::GetInternetSearch() not yet ported to Qt5
+# else
+#  pragma message ( "InternetContent::GetInternetSearch() not yet ported to Qt5" )
+# endif
 #endif
 }
 

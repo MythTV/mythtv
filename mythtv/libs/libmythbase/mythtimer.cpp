@@ -95,7 +95,7 @@ int MythTimer::elapsed(void) const
         return 0;
     }
 
-    int64_t e = m_timer.elapsed();
+    qint64 e = m_timer.elapsed();
     if (!m_timer.isMonotonic() && (e > 86300000))
     {
         const_cast<MythTimer*>(this)->start();

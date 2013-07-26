@@ -60,9 +60,16 @@ extern "C" {
 // nzmqt
 #include "nzmqt.hpp"
 // QJson
-#include "QJson/QObjectHelper"
-#include "QJson/Serializer"
-#include "QJson/Parser"
+#ifdef _MSC_VER    
+    // This is needed to avoid creating a reparse point which git on windows doesn't like
+    #include "QJson/src/QObjectHelper"
+    #include "QJson/src/Serializer"
+    #include "QJson/src/Parser"
+#else
+    #include "QJson/QObjectHelper"
+    #include "QJson/Serializer"
+    #include "QJson/Parser"
+#endif
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
@@ -749,6 +756,11 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
         free(formatcopy);
 
     QMutexLocker qLock(&logQueueMutex);
+
+#if defined( _MSC_VER ) && defined( _DEBUG )
+	OutputDebugStringA( item->m_message );
+	OutputDebugStringA( "\n" );
+#endif
 
     logQueue.enqueue(item);
 

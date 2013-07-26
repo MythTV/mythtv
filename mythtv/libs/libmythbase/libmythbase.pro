@@ -58,7 +58,7 @@ unix {
     HEADERS += mythsystemunix.h
 }
 
-mingw {
+mingw | win32-msvc* {
     SOURCES += mythsystemwindows.cpp
     HEADERS += mythsystemwindows.h
 }
@@ -130,6 +130,12 @@ using_libudf {
 using_x11:DEFINES += USING_X11
 
 mingw:LIBS += -lws2_32
+
+win32-msvc* {
+
+    LIBS += -lws2_32
+    EXTRA_LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+}
 
 QT += xml sql network
 

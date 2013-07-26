@@ -418,11 +418,10 @@ void ScheduleCommon::customEvent(QEvent *event)
 
         if (resultid == "editrecording")
         {
-            if (!qVariantCanConvert<RecordingInfo>(dce->GetData()))
+            if (!dce->GetData().canConvert<RecordingInfo>())
                 return;
 
-            RecordingInfo recInfo = qVariantValue<RecordingInfo>
-                (dce->GetData());
+            RecordingInfo recInfo = dce->GetData().value<RecordingInfo>();
 
             if (resulttext == tr("Record this showing"))
             {

@@ -71,7 +71,7 @@ static bool compare_zone_files(QFileInfo first_file_info,
     return false;
 }
 
-#ifndef USING_MINGW
+#ifndef _WIN32
 /* Helper function for getSystemTimeZoneID() that compares the
    zoneinfo_file_path (regular) file with files in the zoneinfo_dir_path until
    it finds a match.  The matching file's name is used to determine the time
@@ -182,7 +182,7 @@ static bool read_time_zone_id(QString filename, QString& zone_id)
 static QString getSystemTimeZoneID(void)
 {
     QString zone_id("UNDEF");
-#ifdef USING_MINGW
+#ifdef _WIN32
     // typedef struct _TIME_ZONE_INFORMATION { ...
     // GetTimeZoneInformation();
     // ...
@@ -272,7 +272,7 @@ static QString getSystemTimeZoneID(void)
 QString getTimeZoneID(void)
 {
     QString zone_id("UNDEF");
-#ifndef USING_MINGW
+#ifndef _WIN32
     // First, try the TZ environment variable to check for environment-specific
     // overrides
     QString tz = getenv("TZ");

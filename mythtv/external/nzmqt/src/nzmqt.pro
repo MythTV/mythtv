@@ -1,7 +1,6 @@
 include ( ../../../settings.pro )
 
 QT       += core
-
 QT       -= gui
 
 TARGET = mythnzmqt
@@ -10,6 +9,7 @@ target.path = $${LIBDIR}
 #CONFIG   -= app_bundle
 CONFIG += thread dll
 INSTALLS = target
+DEFINES += NZMQT_API
 
 TEMPLATE = lib
 
@@ -20,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     ../include/nzmqt/nzmqt.hpp \
+    ../include/nzmqt/nzmqtexp.h \
     pubsub/PubSubServer.h \
     pubsub/PubSubClient.h \
     reqrep/ReqRepServer.h \
@@ -30,17 +31,22 @@ HEADERS += \
     NzmqtApp.h \
     common/Tools.h
 
-LIBS += -lmythzmq
+win32-msvc* {
+  LIBS += -llibzmq
+} else {
+  LIBS += -lmythzmq
+}
 LIBS += $${LATE_LIBS}
 
 INCLUDEPATH += \
     ../include \
     ../../zeromq/include
 
-QMAKE_LIBDIR += \
-    ../../zeromq/src/.libs
+!win32-msvc* {
+  QMAKE_LIBDIR += ../../zeromq/src/.libs
+}
 
 inc.files += ../include/nzmqt/nzmqt.hpp
-inc.path  = $${PREFIX}/include/mythtv/nzmqt/
+inc.path  = $${PREFIX}/include/
 
 INSTALLS += inc

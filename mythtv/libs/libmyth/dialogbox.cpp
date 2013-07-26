@@ -4,7 +4,7 @@ using namespace std;
 #include "dialogbox.h"
 #include "mythwidgets.h"
 
-#ifdef USING_MINGW
+#ifdef _WIN32
 #undef DialogBox
 #endif
 

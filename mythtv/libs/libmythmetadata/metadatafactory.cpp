@@ -354,7 +354,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     if (!lookup)
        return;
 
-    VideoMetadata *metadata = qVariantValue<VideoMetadata *>(lookup->GetData());
+    VideoMetadata *metadata = lookup->GetData().value<VideoMetadata *>();
 
     if (!metadata)
         return;

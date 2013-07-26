@@ -186,7 +186,7 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    SearchEntry entry = qVariantValue<SearchEntry>(item->GetData());
+    SearchEntry entry = item->GetData().value<SearchEntry>();
 
     LOG(VB_GENERAL, LOG_INFO, QString("Menu Selection: %1 %2 %3")
             .arg(entry.strID) .arg(entry.strName) .arg(entry.strLogo));

@@ -110,7 +110,7 @@ void MythQtPainter::SetClipRect(const QRect &clipRect)
         if (clipRegion.isEmpty())
             clipRegion = QRegion(clipRect);
         else
-            clipRegion = clipRegion.unite(clipRect);
+            clipRegion = clipRegion.united(clipRect);
     }
     else
         painter->setClipping(false);

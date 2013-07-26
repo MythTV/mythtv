@@ -7,8 +7,10 @@ TEMPLATE = lib
 QT      -= gui
 TARGET   = mythqjson
 target.path = $${LIBDIR}
-DESTDIR  = $$QJSON_BASE/lib
-#CONFIG += create_prl
+
+!win32-msvc*:DESTDIR  = $$QJSON_BASE/lib
+
+CONFIG += create_prl
 INSTALLS = target
 
 !mingw {
@@ -17,6 +19,7 @@ INSTALLS = target
 
 windows: {
   DEFINES += QJSON_MAKEDLL
+  VERSION = 
 }
 
 # MythTV OS X build fix. We want a dynamic library (like all our other libs),
@@ -83,7 +86,7 @@ symbian: {
 }
 
 inc.files += $${PUBLIC_HEADERS}
-inc.path  = $${PREFIX}/include/mythtv/QJson/
+inc.path  = $${PREFIX}/include/QJson/
 
 INSTALLS += inc
 
@@ -93,7 +96,7 @@ PUBLIC_CPPHEADERS += \
   Parser
 
 cppinc.files += $${PUBLIC_CPPHEADERS}
-cppinc.path  += $${PREFIX}/include/mythtv/QJson/
+cppinc.path  += $${PREFIX}/include/QJson/
 
 INSTALLS += cppinc
 

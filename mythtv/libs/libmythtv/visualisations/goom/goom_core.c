@@ -430,7 +430,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 				guint32 newvit;
 
 				lockvar = 50;
-				newvit = STOP_SPEED + 1 - ((float)4.0f * log10(speedvar+1));
+				newvit = STOP_SPEED + 1 - ((float)4.0f * log10((double)speedvar+1));
 				// retablir le zoom avant..
 				if ((zfd.reverse) && (!(cycle % 13)) && (rand () % 5 == 0)) {
 					zfd.reverse = 0;
