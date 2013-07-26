@@ -259,6 +259,9 @@ bool MythDVDPlayer::Rewind(float seconds)
 
 bool MythDVDPlayer::JumpToFrame(uint64_t frame)
 {
+    if (frame == ~0x00u)
+        return false;
+
     if (decoder)
         decoder->UpdateFramesPlayed();
     return MythPlayer::JumpToFrame(frame);
@@ -409,6 +412,7 @@ uint64_t MythDVDPlayer::GetBookmark(void)
             if (dvdbookmark.count() == 1)
             {
                 m_initial_dvdstate = *it;
+                frames = ~0x00LL;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Get Bookmark: bookmark found");
             }
             else
