@@ -183,7 +183,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                 }
 
                 result = av_read_frame(ctx, pkt);
-            }while (result == AVERROR_EOF && errno == EAGAIN);
+            }while (ringBuffer->DVD()->IsReadingBlocked());
 
             if (result >= 0)
             {
