@@ -87,10 +87,9 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     emit topScreenChanged(m_topScreen);
 }
 
-void MythScreenStack::PopScreen(bool allowFade,
-                                bool deleteScreen)
+void MythScreenStack::PopScreen(void)
 {
-    PopScreen(m_topScreen, allowFade, deleteScreen);
+    PopScreen(m_topScreen, true, true);
 }
 
 void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
