@@ -147,8 +147,13 @@ QString GetDisplayLength(int length)
 {
     // The disambiguation string must be an empty string and not a 
     // NULL to get extracted by the Qt tools.
+#if QT_VERSION < 0x050000
     return QCoreApplication::translate("(Common)", "%n minute(s)", "", 
                QCoreApplication::UnicodeUTF8, length);
+#else
+    return QCoreApplication::translate("(Common)", "%n minute(s)", "", 
+               length);
+#endif
 }
 
 QString GetDisplayBrowse(bool browse)

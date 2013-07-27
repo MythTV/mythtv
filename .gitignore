@@ -7,8 +7,6 @@ moc_*.cpp
 *.orig
 *.rej
 *kdev*
-*.exe
-*.dll
 *.def
 *.dylib
 object_script.*
@@ -18,3 +16,15 @@ object_script.*
 *.pc
 patches
 *.core
+debug
+release
+*.exe
+*.dll
+*.obj
+*.suo
+*.sln
+*.sdf
+*.exp
+*.pdb
+*.user
+bin

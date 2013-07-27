@@ -43,6 +43,8 @@ INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray
 # for TagLib
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
+win32-msvc*:INCLUDEPATH += ../../platform/win32/msvc/external/taglib/taglib/Headers
+
 DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
@@ -66,6 +68,8 @@ LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 
 # for TagLib
 LIBS += $${CONFIG_TAGLIB_LIBS}
+
+win32-msvc*:LIBS += -ltag
 
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}

@@ -142,9 +142,7 @@ void MythUIText::ResetMap(const InfoMap &map)
         int pos = 0;
 
         QString translatedTemplate = qApp->translate("ThemeUI",
-                                                     newText.toUtf8(),
-                                                     NULL,
-                                                     QCoreApplication::UnicodeUTF8);
+                                                     newText.toUtf8());
 
         while ((pos = regexp.indexIn(translatedTemplate, pos)) != -1)
         {

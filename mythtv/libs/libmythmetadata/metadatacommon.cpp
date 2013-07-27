@@ -439,17 +439,31 @@ void MetadataLookup::toMap(InfoMap &metadataMap)
         m_releasedate, MythDate::kDateFull);
     metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
 
+#if QT_VERSION < 0x050000
     metadataMap["runtime"] = QCoreApplication::translate("(Common)",
                                                          "%n minute(s)",
                                                          "",
                                                          QCoreApplication::UnicodeUTF8,
                                                          m_runtime);
 
+
     metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
                                                              "%n second(s)",
                                                              "",
                                                              QCoreApplication::UnicodeUTF8,
                                                              m_runtimesecs);
+#else
+    metadataMap["runtime"] = QCoreApplication::translate("(Common)",
+                                                         "%n minute(s)",
+                                                         "",
+                                                         m_runtime);
+
+
+    metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
+                                                             "%n second(s)",
+                                                             "",
+                                                             m_runtimesecs);
+#endif
     metadataMap["inetref"] = m_inetref;
     metadataMap["collectionref"] = m_collectionref;
     metadataMap["tmsref"] = m_tmsref;

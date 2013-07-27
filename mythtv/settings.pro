@@ -1,5 +1,3 @@
-message("Processing: " $${_PRO_FILE_PWD}$${_PRO_FILE_} )
-
 !win32-msvc* {
   include ( config.mak )
 } else {
@@ -92,6 +90,7 @@ win32 {
     win32-msvc* {
                                                              
         DEFINES += WIN32 WIN32_LEAN_AND_MEAN NOMINMAX _USE_MATH_DEFINES
+        DEFINES += _CRT_SECURE_NO_WARNINGS
     
         Debug  :DEFINES += _DEBUG
         Release:DEFINES += NDEBUG
@@ -117,14 +116,14 @@ win32 {
         Release:LIBS           += -L$$SRC_PATH_BARE/bin/release
         Release:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/release
         Release:MOC_DIR         = release/moc
-        Release:QMAKE_CXXFLAGS  = /MD /MP
+        Release:QMAKE_CXXFLAGS  = /MD /MP /wd4100
 
 
         Debug:DESTDIR         = $$SRC_PATH_BARE/bin/debug
         Debug:LIBS           += -L$$SRC_PATH_BARE/bin/debug
         Debug:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/debug
         Debug:MOC_DIR         = debug/moc
-        Debug:QMAKE_CXXFLAGS  = /MDd /MP
+        Debug:QMAKE_CXXFLAGS  = /MDd /MP /wd4100
 
         EXTRA_LIBS += -llibzmq
         EXTRA_LIBS += -lmythnzmqt

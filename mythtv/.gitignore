@@ -1,4 +1,8 @@
 Makefile
+Makefile.debug
+Makefile.release
+Makefile.*.release
+Makefile.*.debug
 config.*
 version.cpp
 TMPMAK

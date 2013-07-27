@@ -1,3 +1,10 @@
+Param(
+    [Parameter( Mandatory=$true, ValueFromPipeline=$true )] 
+    [ValidateSet( "debug", "release")] 
+    [String] 
+    $BuildType
+)
+
 # helper Functions
 
 Function Which( [string] $path )
@@ -38,12 +45,18 @@ Function Run-Exe( [string] $path, [string] $exe, $params )
 #
 # ###########################################################################
 
-$BuildType = "debug"
 $DestDir   = "bin\$BuildType"
 
 Write-Host "--------------------------------------------------------------------------"  -foregroundcolor green
 Write-Host "Performing Environmental Checks" -foregroundcolor green
 Write-Host "--------------------------------------------------------------------------"  -foregroundcolor green
+
+if (-not (Test-Path $DestDir ))
+{
+    New-Item $DestDir -itemType directory
+}
+
+#
 
 if (-not (Test-Path Env:\VCINSTALLDIR) )
 {
@@ -142,13 +155,18 @@ if ($tools.Get_Item( "mp3lame.lib") -eq "Build")
     if (!(Test-Path platform\win32\msvc\external\lame\output\libmp3lame-static.lib))
     {
 
+        Copy-Item platform\win32\msvc\external\lame\configMS.h platform\win32\msvc\external\lame\config.h 
+
         Run-Exe "platform\win32\msvc\external\lame\" `
                 "nmake.exe"                          `
-                @( "-f Makefile.MSVC", 
-                   "CPU=P3", 
-                   "ASM=YES", 
-                   "MMX=YES", 
+                @( "-f Makefile.MSVC",
+                   "comp=msvc",
+                   "asm=no",
                    "libmp3lame-static.lib" )
+                    
+                #   "CPU=P3", 
+                #   "ASM=YES", 
+                #   "MMX=YES", 
     }
 
     # -- Copy lib to shared folder 
@@ -206,7 +224,7 @@ if ($tools.Get_Item( 'tag.lib') -eq "Build")
                 @("-G ""NMake Makefiles""";
                   "-DZLIB_INCLUDE_DIR=..\zlib";
                   "-DZLIB_LIBRARY=..\zlib\zlib.lib";
-                  "-DENABLE_STATIC=1";
+                  "-DENABLE_STATIC=0";
                   "-DWITH_MP4=1";
                   "-DCMAKE_BUILD_TYPE=$BuildType" )
 
@@ -217,6 +235,7 @@ if ($tools.Get_Item( 'tag.lib') -eq "Build")
 
     # -- Copy lib to shared folder 
     Copy-Item platform\win32\msvc\external\taglib\taglib\*.lib   $DestDir
+    Copy-Item platform\win32\msvc\external\taglib\taglib\*.dll   $DestDir
 }
 
 Write-Host "--------------------------------------------------------------------------"  -ForegroundColor green
@@ -228,7 +247,7 @@ if ($tools.Get_Item( 'libzmq.lib') -eq "Build")
 {
     Write-Host "Building: zeromq" -foregroundcolor cyan
 
-    if (!(Test-Path external\zeromq\builds\msvc\debug\*.lib ))
+    if (!(Test-Path external\zeromq\builds\msvc\$BuildType\*.lib ))
     {
         # -- Upgrade solution to verion of visual studios being used
 
@@ -246,12 +265,19 @@ if ($tools.Get_Item( 'libzmq.lib') -eq "Build")
     }
 
     # -- Copy dll & lib to shared folder 
-    Copy-Item external\zeromq\builds\msvc\debug\*.lib bin\debug
-    Copy-Item external\zeromq\lib\*.dll               bin\debug
+    Copy-Item external\zeromq\builds\msvc\$BuildType\*.lib $DestDir
+    Copy-Item external\zeromq\lib\*.dll                    $DestDir
 
 }
 
 # ###########################################################################
+
+# --------------------------------------------------------------------------
+# delete external\Makefile since version in Git is for Linux.
+# it will be re-created by qmake using external.pro
+# --------------------------------------------------------------------------
+
+Remove-Item external\Makefile -ErrorAction SilentlyContinue
 
 # --------------------------------------------------------------------------
 Write-Host "Running qmake on mythtv..." -foregroundcolor green

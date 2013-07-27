@@ -51,13 +51,22 @@
 #else // !defined(_IMPLEMENT_VERBOSE)
 
 // This is used to define the enumerated type (used by all files)
-#define VERBOSE_PREAMBLE \
-    enum VerboseMask {
-#define VERBOSE_POSTAMBLE \
-        VB_LAST_ITEM \
-    };
-#define VERBOSE_MAP(name,mask,additive,help) \
-    name = (uint64_t)(mask),
+
+#ifndef _MSC_VER
+    #define VERBOSE_PREAMBLE \
+        enum VerboseMask {
+    #define VERBOSE_POSTAMBLE \
+            VB_LAST_ITEM \
+        };
+    #define VERBOSE_MAP(name,mask,additive,help) \
+        name = (uint64_t)(mask),
+#else
+    // msvc can't have 64bit enums
+    #define VERBOSE_PREAMBLE
+    #define VERBOSE_POSTAMBLE
+    #define VERBOSE_MAP(name,mask,additive,help) \
+    const uint64_t name = (uint64_t)(mask);
+#endif
 
 #define LOGLEVEL_PREAMBLE \
     typedef enum {
