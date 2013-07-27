@@ -95,6 +95,10 @@ void MythScreenStack::PopScreen(void)
 void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
                                 bool deleteScreen)
 {
+    if (!screen)
+    {
+        screen = m_topScreen;
+    }
     if (!screen || screen->IsDeleting())
         return;
 
