@@ -31,7 +31,7 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
     // TODO init isLocked
-    bool isLocked = true;
+    // bool isLocked = true;
 
     QMutexLocker locker(&statusLock);
     signalLock.SetValue(1 /*(isLocked) ? 1 : 0*/);
