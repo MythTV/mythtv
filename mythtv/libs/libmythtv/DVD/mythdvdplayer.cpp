@@ -348,7 +348,8 @@ void MythDVDPlayer::SetBookmark(bool clear)
     QString serialid;
     QString dvdstate;
 
-    if (player_ctx->buffer->IsBookmarkAllowed() || clear)
+    if (!player_ctx->buffer->IsInMenu() &&
+        (player_ctx->buffer->IsBookmarkAllowed() || clear))
     {
         if (!player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
