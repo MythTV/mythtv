@@ -872,6 +872,12 @@ class DatabaseConfig( object ):
     def __hash__(self):
         return hash(self.ident)
 
+    def __eq__(self, other):
+        try:
+            return self.ident == other.ident
+        except:
+            return False
+
     def copy(self):
         cls = self.__class__
         obj = cls(())
