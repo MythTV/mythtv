@@ -6,6 +6,7 @@
 #include <QDate>
 #include <QTime>
 #include <QStringList>
+#include <QCoreApplication>
 
 // libmythbase
 #include "mythtvexp.h"
@@ -29,6 +30,7 @@
 
 class MTV_PUBLIC RecordingRule
 {
+    Q_DECLARE_TR_FUNCTIONS(RecordingRule)
 
   public:
     static const int kNumFilters = 12;
