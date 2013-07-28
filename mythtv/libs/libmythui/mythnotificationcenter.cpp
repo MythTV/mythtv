@@ -6,12 +6,14 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
+// Qt headers
 #include <QCoreApplication>
 #include <QEvent>
 #include <QObject>
 #include <QThread>
 #include <QTimer>
 
+// MythTV headers
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
 
@@ -1494,7 +1496,8 @@ void ShowNotification(MythNotification::Type type,
     DMAP data;
 
     data["minm"] = msg;
-    data["asar"] = origin.isNull() ? QObject::tr("MythTV") : origin;
+    data["asar"] = origin.isNull() ? QCoreApplication::translate("(Common)",
+                                                                 "MythTV") : origin;
     data["asal"] = detail;
     data["asfm"] = extra;
 
