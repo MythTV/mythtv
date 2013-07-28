@@ -10,8 +10,8 @@
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="199"/>
-        <source>MythMusic hasn&apos;t been built with libcdio support so ripping CD&apos;s is not possible</source>
-        <translation>Το MythMusic δεν έχει ενσωματώσει υποστήριξη για libcdio, οπότε δε θα είναι δυνατή η εξαγωγή από CD</translation>
+        <source>MythMusic hasn&apos;t been built with libcdio support so ripping CDs is not possible</source>
+        <translation>Το παρόν MythMusic δεν έχει δημιουργηθεί με υποστήριξη libcdio οπότε δεν είναι εφικτή η αντιγραφή CD</translation>
     </message>
     <message>
         <location filename="../mythmusic/main.cpp" line="210"/>
@@ -1010,13 +1010,13 @@ Do you want to continue playing in the background?</source>
 <context>
     <name>MusicPlayer</name>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1298"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1297"/>
         <source>%1% (Muted)</source>
         <comment>Zero Audio Volume</comment>
         <translation>%1% (Σε Σίγαση)</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1302"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1301"/>
         <source>Muted</source>
         <translation>Σε Σίγαση</translation>
     </message>
@@ -1502,12 +1502,12 @@ Name: %1</source>
 <context>
     <name>RipStatus</name>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1469"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1467"/>
         <source>Cancel ripping the CD?</source>
         <translation>Ακύρωση της αντιγραφής CD;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1556"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1554"/>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
         <translation>Ο μετατροπέας απέτυχε να δημιουργήσει το αρχείο.
@@ -1542,54 +1542,54 @@ Do you have write permissions for the music directory?</source>
         <translation>Ανίχνευση CD. Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1027"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1026"/>
         <source>There are no tracks to rip?</source>
         <translation>Δεν υπάρχουν τραγούδια για αντιγραφή;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1055"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1054"/>
         <source>Rip completed successfully.</source>
         <translation>Η αντιγραφή ολοκληρώθηκε επιτυχώς.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1070"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1069"/>
         <source>Ejecting CD. Please Wait ...</source>
         <translation>Εξάγω το CD. Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1174"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1172"/>
         <source>Select an Artist</source>
         <translation>Επιλέξτε Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1198"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1196"/>
         <source>Select an Album</source>
         <translation>Επιλέξτε Δίσκο</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1222"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1220"/>
         <source>Select a Genre</source>
         <translation>Επιλέξτε Είδος</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1325"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1323"/>
         <source>This track has been disabled because it is already present in the database.
 Do you want to permanently delete the existing file(s)?</source>
         <translation>Το τραγούδι έχει αποεπιλεγεί επειδή ήδη υπάρχει στη συλλογή σας.
 Θέλετε να διαγράψετε μόνιμα το(α) υπάρχον(τα) αρχείο(α);</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1341"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1339"/>
         <source>No, Cancel</source>
         <translation>Όχι, Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1342"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1340"/>
         <source>Yes, Delete</source>
         <translation>Ναι, Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1343"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1341"/>
         <source>Yes, Delete All</source>
         <translation>Ναι, Διαγραφή Όλων</translation>
     </message>
