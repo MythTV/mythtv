@@ -21,11 +21,12 @@ void SignalMonitorValue::Init()
     if (run_static_init)
     {
         run_static_init = false;
-        ERROR_NO_CHANNEL<<"error"<<QObject::tr("Could not open tuner device");
-        ERROR_NO_LINK<<"error"<<QObject::tr("Bad connection to backend");
+        ERROR_NO_CHANNEL<<"error"<<tr("Could not open tuner device");
+        ERROR_NO_LINK<<"error"<<tr("Bad connection to backend");
 
         SignalMonitorValue slock(
-            QObject::tr("Signal Lock"), "slock", 0, true, 0, 1, 0);
+            QCoreApplication::translate("(Common)", "Signal Lock"),
+                "slock", 0, true, 0, 1, 0);
         slock.SetValue(1);
         SIGNAL_LOCK<<slock.GetName()<<slock.GetStatus();
     }
