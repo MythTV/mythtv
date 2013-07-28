@@ -259,6 +259,9 @@ bool MythDVDPlayer::Rewind(float seconds)
 
 bool MythDVDPlayer::JumpToFrame(uint64_t frame)
 {
+    if (frame == ~0x0ULL)
+        return false;
+
     if (decoder)
         decoder->UpdateFramesPlayed();
     return MythPlayer::JumpToFrame(frame);
@@ -345,7 +348,8 @@ void MythDVDPlayer::SetBookmark(bool clear)
     QString serialid;
     QString dvdstate;
 
-    if (player_ctx->buffer->IsBookmarkAllowed() || clear)
+    if (!player_ctx->buffer->IsInMenu() &&
+        (player_ctx->buffer->IsBookmarkAllowed() || clear))
     {
         if (!player_ctx->buffer->DVD()->GetNameAndSerialNum(name, serialid))
         {
@@ -390,7 +394,7 @@ uint64_t MythDVDPlayer::GetBookmark(void)
     QStringList dvdbookmark = QStringList();
     QString name;
     QString serialid;
-    long long frames = 0;
+    uint64_t frames = 0;
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (player_ctx->playingInfo)
     {
@@ -409,13 +413,14 @@ uint64_t MythDVDPlayer::GetBookmark(void)
             if (dvdbookmark.count() == 1)
             {
                 m_initial_dvdstate = *it;
+                frames = ~0x0ULL;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + "Get Bookmark: bookmark found");
             }
             else
             {
                 // Legacy bookmarks
                 m_initial_title = (*it).toInt();
-                frames = (long long)((*++it).toLongLong() & 0xffffffffLL);
+                frames = (uint64_t)((*++it).toLongLong() & 0xffffffffLL);
                 m_initial_audio_track    = (*++it).toInt();
                 m_initial_subtitle_track = (*++it).toInt();
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +

@@ -109,10 +109,6 @@ QString AudioPlayer::ReinitAudio(void)
     QString errMsg = QString::null;
     QMutexLocker lock(&m_lock);
 
-    bool firstinit = (m_format == FORMAT_NONE &&
-                      m_channels < 0 &&
-                      m_samplerate == 44100);
-
     if ((m_format == FORMAT_NONE) ||
         (m_channels <= 0) ||
         (m_samplerate <= 0))

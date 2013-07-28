@@ -87,15 +87,13 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     emit topScreenChanged(m_topScreen);
 }
 
-void MythScreenStack::PopScreen(bool allowFade,
-                                bool deleteScreen)
-{
-    PopScreen(m_topScreen, allowFade, deleteScreen);
-}
-
 void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
                                 bool deleteScreen)
 {
+    if (!screen)
+    {
+        screen = m_topScreen;
+    }
     if (!screen || screen->IsDeleting())
         return;
 

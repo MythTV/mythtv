@@ -191,8 +191,6 @@ protected:
     {
     }
 
-    MythNotification &operator=(const MythNotification&);
-
 protected:
     int         m_id;
     void       *m_parent;
@@ -250,8 +248,6 @@ protected:
     {
     }
 
-    MythImageNotification &operator=(const MythImageNotification&);
-
 protected:
     QImage      m_image;
     QString     m_imagePath;
@@ -307,8 +303,6 @@ protected:
     {
     }
 
-    MythPlaybackNotification &operator=(const MythPlaybackNotification&);
-
 protected:
     float       m_progress;
     QString     m_progressText;
@@ -353,8 +347,6 @@ protected:
         : MythNotification(o), MythImageNotification(o), MythPlaybackNotification(o)
     {
     }
-
-    MythMediaNotification &operator=(const MythMediaNotification&);
 };
 
 class MUI_PUBLIC MythErrorNotification : public MythNotification

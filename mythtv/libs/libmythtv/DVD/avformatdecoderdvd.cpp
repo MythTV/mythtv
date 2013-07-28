@@ -119,7 +119,8 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
             {
                 if (ringBuffer->DVD()->IsReadingBlocked())
                 {
-                    switch(ringBuffer->DVD()->GetLastEvent())
+                    int32_t lastEvent = ringBuffer->DVD()->GetLastEvent();
+                    switch(lastEvent)
                     {
                         case DVDNAV_HOP_CHANNEL:
                             // Non-seamless jump - clear all buffers
@@ -166,7 +167,15 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                             }
                             break;
 
+                        case DVDNAV_NAV_PACKET:
+                            // Don't need to do anything here.  There was a timecode discontinuity
+                            // and the ringbuffer returned to make sure that any packets still in
+                            // ffmpeg's buffers were flushed.
+                            break;
+
                         default:
+                            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unexpected DVD event - %1")
+                                .arg(lastEvent));
                             break;
                     }
 
@@ -174,7 +183,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                 }
 
                 result = av_read_frame(ctx, pkt);
-            }while (result == AVERROR_EOF && errno == EAGAIN);
+            }while (ringBuffer->DVD()->IsReadingBlocked());
 
             if (result >= 0)
             {
