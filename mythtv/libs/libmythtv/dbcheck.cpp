@@ -2068,9 +2068,9 @@ NULL
                 updates_ba.push_back(
                          QString("UPDATE %1 "
                                  "SET starttime = "
-                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
+                                 "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
                                  "    endtime   = "
-                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                                 "    CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                                  "ORDER BY %4")
                          .arg(with_endtime[i])
                          .arg(order).toLocal8Bit());
@@ -2081,7 +2081,7 @@ NULL
                 updates_ba.push_back(
                           QString("UPDATE %1 "
                                   "SET starttime = "
-                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                                  "    CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                                   "ORDER BY %3")
                           .arg(without_endtime[i]).arg(order)
                           .toLocal8Bit());
@@ -2090,7 +2090,7 @@ NULL
             updates_ba.push_back(
                          QString("UPDATE oldprogram "
                                  "SET airdate = "
-                                 "    CONVERT_TZ(airdate, 'SYSTEM', 'UTC') "
+                                 "    CONVERT_TZ(airdate, 'SYSTEM', 'Etc/UTC') "
                                  "ORDER BY %3")
                          .arg((utc_offset > 0) ? "-airdate" :
                               "airdate").toLocal8Bit());
@@ -2098,9 +2098,9 @@ NULL
             updates_ba.push_back(
                          QString("UPDATE recorded "
                                  "set progstart = "
-                                 "    CONVERT_TZ(progstart, 'SYSTEM', 'UTC'), "
+                                 "    CONVERT_TZ(progstart, 'SYSTEM', 'Etc/UTC'), "
                                  "    progend   = "
-                                 "    CONVERT_TZ(progend, 'SYSTEM', 'UTC') ")
+                                 "    CONVERT_TZ(progend, 'SYSTEM', 'Etc/UTC') ")
                          .toLocal8Bit());
         }
 
@@ -2155,8 +2155,8 @@ NULL
             {
                 updates_ba.push_back(
                      QString("UPDATE %1 "
-                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC'), "
-                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'UTC') "
+                     "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC'), "
+                     "    endtime   = CONVERT_TZ(endtime, 'SYSTEM', 'Etc/UTC') "
                      "ORDER BY %4")
                      .arg(with_endtime[i]).arg(order).toLocal8Bit());
             }
@@ -2165,7 +2165,7 @@ NULL
             {
                 updates_ba.push_back(
                       QString("UPDATE %1 "
-                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'UTC') "
+                      "SET starttime = CONVERT_TZ(starttime, 'SYSTEM', 'Etc/UTC') "
                       "ORDER BY %3")
                       .arg(without_endtime[i]).arg(order).toLocal8Bit());
             }
@@ -2189,20 +2189,20 @@ NULL
 
         updates_ba.push_back(
 "UPDATE recordfilter SET clause="
-"'HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) >= 19 AND "
-"HOUR(CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM'')) < 22' "
+"'HOUR(CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM'')) >= 19 AND "
+"HOUR(CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM'')) < 22' "
 "WHERE filterid=3");
 
         updates_ba.push_back(QString(
 "UPDATE record SET findday = "
 "    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
-"                         'SYSTEM', 'UTC') + INTERVAL findday DAY) "
+"                         'SYSTEM', 'Etc/UTC') + INTERVAL findday DAY) "
 "WHERE findday > 0").toLocal8Bit());
 
         updates_ba.push_back(QString(
 "UPDATE record SET findtime = "
 "    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
-"                    'SYSTEM', 'UTC')) ")
+"                    'SYSTEM', 'Etc/UTC')) ")
                              .toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
@@ -2226,13 +2226,13 @@ NULL
         updates_ba.push_back(QString(
 "UPDATE record SET findday = "
 "    DAYOFWEEK(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
-"                         'UTC', 'SYSTEM') + INTERVAL findday DAY) "
+"                         'Etc/UTC', 'SYSTEM') + INTERVAL findday DAY) "
 "WHERE findday > 0").toLocal8Bit());
 
         updates_ba.push_back(QString(
 "UPDATE record SET findtime = "
 "    TIME(CONVERT_TZ(ADDTIME('2012-06-02 00:00:00', findtime), "
-"                    'UTC', 'SYSTEM')) ").toLocal8Bit());
+"                    'Etc/UTC', 'SYSTEM')) ").toLocal8Bit());
 
         // Convert update ByteArrays to NULL terminated char**
         QList<QByteArray>::const_iterator it = updates_ba.begin();
@@ -2299,13 +2299,13 @@ NULL
 // Add this time filter
 "REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
 "  VALUES (8, 'This time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
-"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
-"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 1440 <= 10', 0)",
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 1440 <= 10', 0)",
 // Add this day and time filter
 "REPLACE INTO recordfilter (filterid, description, clause, newruledefault) "
 "  VALUES (9, 'This day and time', 'ABS(TIMESTAMPDIFF(MINUTE, CONVERT_TZ("
-"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''UTC'', ''SYSTEM''), "
-"  CONVERT_TZ(program.starttime, ''UTC'', ''SYSTEM''))) MOD 10080 <= 10', 0)",
+"  ADDTIME(RECTABLE.startdate, RECTABLE.starttime), ''Etc/UTC'', ''SYSTEM''), "
+"  CONVERT_TZ(program.starttime, ''Etc/UTC'', ''SYSTEM''))) MOD 10080 <= 10', 0)",
 // Convert old, normal Timeslot rules to Channel with time filter
 "UPDATE record SET type = 3, filter = filter|256 "
 "  WHERE type = 2 AND search = 0",
@@ -3676,7 +3676,7 @@ bool InitializeMythSchema(void)
 "INSERT INTO recordfilter VALUES (0,'New episode','program.previouslyshown = 0',0);",
 "INSERT INTO recordfilter VALUES (1,'Identifiable episode','program.generic = 0',0);",
 "INSERT INTO recordfilter VALUES (2,'First showing','program.first > 0',0);",
-"INSERT INTO recordfilter VALUES (3,'Prime time','HOUR(CONVERT_TZ(program.starttime, \\'UTC\\', \\'SYSTEM\\')) >= 19 AND HOUR(CONVERT_TZ(program.starttime, \\'UTC\\', \\'SYSTEM\\')) < 22',0);",
+"INSERT INTO recordfilter VALUES (3,'Prime time','HOUR(CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\')) >= 19 AND HOUR(CONVERT_TZ(program.starttime, \\'Etc/UTC\\', \\'SYSTEM\\')) < 22',0);",
 "INSERT INTO recordfilter VALUES (4,'Commercial free','channel.commmethod = -2',0);",
 "INSERT INTO recordfilter VALUES (5,'High definition','program.hdtv > 0',0);",
 "INSERT INTO recordfilter VALUES (6,'This episode','(RECTABLE.programid <> \\'\\' AND program.programid = RECTABLE.programid) OR (RECTABLE.programid = \\'\\' AND program.subtitle = RECTABLE.subtitle AND program.description = RECTABLE.description)',0);",

@@ -879,7 +879,7 @@ void DBUtil::UnlockSchema(MSqlQuery &query)
 bool DBUtil::CheckTimeZoneSupport(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONVERT_TZ(NOW(), 'SYSTEM', 'UTC')");
+    query.prepare("SELECT CONVERT_TZ(NOW(), 'SYSTEM', 'Etc/UTC')");
     if (!query.exec() || !query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support check failed");

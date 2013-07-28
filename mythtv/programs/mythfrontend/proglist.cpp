@@ -1204,7 +1204,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         {
             where += "  AND ( ";
             where += "    ( program.originalairdate = DATE(";
-            where += "        CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM'))";
+            where += "        CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM'))";
             where += "      AND (program.category = 'Special' ";
             where += "        OR program.programid LIKE 'EP%0001')) ";
             where += "    OR (program.category_type='movie' ";

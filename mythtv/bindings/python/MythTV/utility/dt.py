@@ -272,7 +272,10 @@ class datetime( _pydatetime ):
 
     @classmethod
     def UTCTZ(cls):
-        return offsettzinfo()
+        try:
+            return posixtzinfo('Etc/UTC')
+        except:
+            return offsettzinfo()
 
     @classmethod
     def fromDatetime(cls, dt, tzinfo=None):
@@ -319,7 +322,7 @@ class datetime( _pydatetime ):
 
     @classmethod
     def frommythtime(cls, mtime, tz=None):
-        if tz == 'UTC':
+        if tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()
@@ -343,15 +346,12 @@ class datetime( _pydatetime ):
 
         if match.group('tz'):
             if match.group('tz') == 'Z':
-                try:
-                    tz = posixtzinfo('UTC')
-                except:
-                    tz = offsettzinfo()
+                tz = cls.UTCTZ()
             elif match.group('tzmin'):
                 tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
                 tz = offsettzinfo(*match.group('tzdirec','tzhour'))
-        elif tz == 'UTC':
+        elif tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()
@@ -390,10 +390,7 @@ class datetime( _pydatetime ):
 
         if match.group('tz'):
             if match.group('tz') in ('UT', 'GMT'):
-                try:
-                    tz = posixtzinfo('UTC')
-                except:
-                    tz = offsettzinfo()
+                tz = cls.UTCTZ()
             elif match.group('tz') == 'EDT':
                 tz = offsettzinfo(hr=-4)
             elif match.group('tz') in ('EST', 'CDT'):
@@ -408,7 +405,7 @@ class datetime( _pydatetime ):
                 tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
                 tz = offsettzinfo(*match.group('tzdirec','tzhour'))
-        elif tz == 'UTC':
+        elif tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()
