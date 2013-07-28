@@ -401,6 +401,16 @@ bool DVDRingBuffer::IsBookmarkAllowed(void)
     return GetTotalTimeOfTitle() >= 120;
 }
 
+bool DVDRingBuffer::IsSeekingAllowed(void)
+{
+    // Don't allow seeking when the ringbuffer is
+    // waiting for the player to flush its buffers
+    // or waiting for the decoder.
+    return ((m_dvdEvent != DVDNAV_WAIT) &&
+            (m_dvdEvent != DVDNAV_HOP_CHANNEL) &&
+            (m_processState != PROCESS_WAIT));
+}
+
 void DVDRingBuffer::GetDescForPos(QString &desc)
 {
     if (m_inMenu)
