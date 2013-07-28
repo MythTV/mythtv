@@ -3,8 +3,11 @@
 #ifndef DVBSIGNALMONITOR_H
 #define DVBSIGNALMONITOR_H
 
+// Qt headers
 #include <QStringList>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "dtvsignalmonitor.h"
 
 class DVBChannel;
@@ -13,6 +16,8 @@ class DVBSignalMonitorListener;
 
 class DVBSignalMonitor: public DTVSignalMonitor
 {
+    Q_DECLARE_TR_FUNCTIONS(DVBSignalMonitor)
+
   public:
     DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                      uint64_t _flags =
