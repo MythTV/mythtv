@@ -802,7 +802,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
 
     QRegExp tmp24ep = m_uk24ep;
-    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
+    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:") &&
+        !event.title.startsWith("Mission: Impossible"))
     {
         if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&
             ((position2=event.description.indexOf(m_ukDoubleDotStart)) != -1))
