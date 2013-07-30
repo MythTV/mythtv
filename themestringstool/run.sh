@@ -75,7 +75,7 @@ done
 #####################################################################
 
 # Select the themes that should be translatable (theme name = directory name after extraction)
-TRANSLATABLE_THEMES="Arclight Childish Graphite Mythbuntu MythCenter MythCenter-wide Steppes Steppes-narrow Terra"
+TRANSLATABLE_THEMES="Arclight Childish Graphite Mythbuntu MythCenter MythCenter-wide Steppes Steppes-narrow Terra A-Forest blue-abstract-wide"
 #TRANSLATABLE_THEMES=$(ls ${DOWNLOAD_DIR}/themes/ --file-type |grep "/$"|tr '/' ' ') #All themes
 
 #Remove the extracted themes which shouldn't be translatable

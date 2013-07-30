@@ -81,8 +81,17 @@ void strings_null() {
     ThemeUI::tr("Select the recordings and videos you wish to save.");
     ThemeUI::tr("0:00:00.00");
     ThemeUI::tr("Up Level");
-    ThemeUI::tr("description goes here.");
     ThemeUI::tr("0.00 GB");
+    ThemeUI::tr("Filesize: %1");
+    ThemeUI::tr("Recorded Time: %1");
+    ThemeUI::tr("%\"|SUBTITLE|\" %%(|ORIGINALAIRDATE|) %%(|STARS|) %%DESCRIPTION%");
+    ThemeUI::tr("Ok");
+    ThemeUI::tr("Parental Level: %1");
+    ThemeUI::tr("Archive Items");
+    ThemeUI::tr("Profile:");
+    ThemeUI::tr("Old Size:");
+    ThemeUI::tr("New Size:");
+    ThemeUI::tr("description goes here.");
     ThemeUI::tr("Video Category:");
     ThemeUI::tr("title goes here");
     ThemeUI::tr("1");
