@@ -34,7 +34,7 @@ EITFixUp::EITFixUp()
       m_dishPPVCode("\\s*\\(([A-Z]|[0-9]){5}\\)\\s*$"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
-      m_ukNewTitle("^Brand New\\s*",Qt::CaseInsensitive),
+      m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
