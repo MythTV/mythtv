@@ -15,6 +15,7 @@
 #include <QLocale>
 #include <QPair>
 #include <QDateTime>
+#include <QRunnable>
 
 #include <cmath>
 #include <cstdarg>
