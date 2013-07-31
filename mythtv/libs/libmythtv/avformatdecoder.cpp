@@ -587,8 +587,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
             break;
         }
     }
-    if (!st)
-        return false;
 
     int seekDelta = desiredFrame - framesPlayed;
 
@@ -622,7 +620,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int normalframes = 0;
 
-    if (st->cur_dts != (int64_t)AV_NOPTS_VALUE)
+    if (st && st->cur_dts != (int64_t)AV_NOPTS_VALUE)
     {
 
         int64_t adj_cur_dts = st->cur_dts;
