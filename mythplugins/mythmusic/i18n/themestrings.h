@@ -2,6 +2,11 @@
 // Do not edit
 
 void strings_null() {
+    ThemeUI::tr("Now Playing: %TITLE% by %ARTIST% on %ALBUM%");
+    ThemeUI::tr("%TITLE%");
+    ThemeUI::tr("%ALBUM%");
+    ThemeUI::tr("%ARTIST%");
+    ThemeUI::tr("%GENRE%");
     ThemeUI::tr("%1 -");
     ThemeUI::tr("Played %1 times");
     ThemeUI::tr("Repeat Mode: Off");
@@ -14,7 +19,6 @@ void strings_null() {
     ThemeUI::tr("Shuffle Mode: Artist");
     ThemeUI::tr("%VOLUMEPERCENT% %|(MUTE|)%");
     ThemeUI::tr("Next: %NEXTTITLE% by %NEXTARTIST%");
-    ThemeUI::tr("Now Playing: %TITLE% by %ARTIST% on %ALBUM%");
     ThemeUI::tr("You haven't selected any tracks to play");
     ThemeUI::tr("%TITLE% by %ARTIST% on %ALBUM%");
     ThemeUI::tr("Album Art");
@@ -140,12 +144,28 @@ void strings_null() {
     ThemeUI::tr("Shuffle: Intelligent");
     ThemeUI::tr("Shuffle: Album");
     ThemeUI::tr("Shuffle: Artist");
+    ThemeUI::tr("Internet Stream View");
+    ThemeUI::tr("Press MENU to add some radio streams to play.");
+    ThemeUI::tr("%STATION% - %CHANNEL%");
+    ThemeUI::tr("Last played: %1");
+    ThemeUI::tr("Add/Edit Music Stream");
+    ThemeUI::tr("Station:");
+    ThemeUI::tr("Channel:");
+    ThemeUI::tr("URL:");
+    ThemeUI::tr("Logo URL:");
+    ThemeUI::tr("Genres:");
+    ThemeUI::tr("Metadata Format:");
+    ThemeUI::tr("Search for Music Stream");
+    ThemeUI::tr("%STATION% - %Channel%");
     ThemeUI::tr("Playing:");
     ThemeUI::tr("None");
     ThemeUI::tr("%TITLE%  by  %ARTIST%");
     ThemeUI::tr("Tag Encoding:");
     ThemeUI::tr("Clears the entire database:");
     ThemeUI::tr("Visualizer Settings");
+    ThemeUI::tr("Radio Stream");
+    ThemeUI::tr("%channel% (%station%)");
+    ThemeUI::tr("%CHANNEL% (%STATION%)");
     ThemeUI::tr("Please Wait...");
     ThemeUI::tr("Track Information");
     ThemeUI::tr("Play Count:");
@@ -177,9 +197,7 @@ void strings_null() {
     ThemeUI::tr("-");
     ThemeUI::tr("+");
     ThemeUI::tr("Playlist View");
-    ThemeUI::tr("%TITLE%");
     ThemeUI::tr("From the album %ALBUM% by the artist %ARTIST%");
-    ThemeUI::tr("Last played: %1");
     ThemeUI::tr("Playlist Tree View");
     ThemeUI::tr("Playlist Gallery View");
     ThemeUI::tr("Search View");
@@ -198,9 +216,6 @@ void strings_null() {
     ThemeUI::tr("Status:");
     ThemeUI::tr("Search Term");
     ThemeUI::tr("Ok");
-    ThemeUI::tr("%ALBUM%");
-    ThemeUI::tr("%ARTIST%");
-    ThemeUI::tr("%GENRE%");
     ThemeUI::tr("Convert stereo to 5.1 sound");
     ThemeUI::tr("Ignore ID3 Tags");
     ThemeUI::tr("Allow metadata to be written to tags");
@@ -232,18 +247,7 @@ void strings_null() {
     ThemeUI::tr("Ripping CD");
     ThemeUI::tr("Importing CD:");
     ThemeUI::tr("Matches");
-    ThemeUI::tr("Press MENU to add some radio streams to play.");
-    ThemeUI::tr("%STATION% - %CHANNEL%");
-    ThemeUI::tr("Add/Edit Music Stream");
     ThemeUI::tr("Search For Stream");
-    ThemeUI::tr("Station:");
-    ThemeUI::tr("Channel:");
-    ThemeUI::tr("URL:");
-    ThemeUI::tr("Logo URL:");
-    ThemeUI::tr("Genres:");
-    ThemeUI::tr("Metadata Format:");
-    ThemeUI::tr("Search for Music Stream");
-    ThemeUI::tr("%STATION% - %Channel%");
     ThemeUI::tr("Search for Stream");
     ThemeUI::tr("Music folders and general options");
     ThemeUI::tr("Music playback options");

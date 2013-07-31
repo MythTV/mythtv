@@ -22,7 +22,9 @@ MYTHTHEMES_DL="http://themes.mythtv.org/themes/repository/trunk/themes.zip"
 REAL_XMLPLUGINS="browser-ui.xml gallery-ui.xml game-ui.xml music-ui.xml \
     mytharchive-ui.xml mythburn-ui.xml netvision-ui.xml \
     news-ui.xml zoneminder-ui.xml weather-ui.xml \
-    mythnative-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml"
+    mythnative-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml \
+    base_archive.xml image-ui.xml base_music.xml stream-ui.xml \
+    base_netvision.xml"
 
 BOGUS_XMLPLUGINS="dvd-ui.xml gallery2-ui.xml" # dvd-ui.xml (DVD ripper) needs
     # to be in this list to be excluded from mythtv. It isn't used anymore,
@@ -174,12 +176,12 @@ function updateplugin {
     popd > /dev/null
 }
 
-updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml
+updateplugin mytharchive mytharchive-ui.xml mythburn-ui.xml mythnative-ui.xml base_archive.xml
 updateplugin mythbrowser browser-ui.xml
-updateplugin mythgallery gallery-ui.xml
+updateplugin mythgallery gallery-ui.xml image-ui.xml
 updateplugin mythgame game-ui.xml
-updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml
-updateplugin mythnetvision netvision-ui.xml
+updateplugin mythmusic music-ui.xml musicsettings-ui.xml steppes-music.xml music-base.xml base_music.xml stream-ui.xml
+updateplugin mythnetvision netvision-ui.xml base_netvision.xml
 updateplugin mythnews news-ui.xml
 updateplugin mythweather weather-ui.xml
 updateplugin mythzoneminder zoneminder-ui.xml
