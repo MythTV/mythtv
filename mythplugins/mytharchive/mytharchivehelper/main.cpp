@@ -146,7 +146,7 @@ NativeArchive::~NativeArchive(void)
 
 bool NativeArchive::copyFile(const QString &source, const QString &destination)
 {
-    QString command = QString("mythutil --copyfile --infile %1 --outfile %2")
+    QString command = QString("mythutil --copyfile --infile '%1' --outfile '%2'")
                               .arg(source).arg(destination);
     uint res = myth_system(command);
     if (res != GENERIC_EXIT_OK)
