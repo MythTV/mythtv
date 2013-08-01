@@ -1514,11 +1514,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
     if (!!(cacheMode & kCacheIgnoreDisk) || fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        if (!(cacheMode & kCacheIgnoreDisk))
-            FindThemeFile(srcfile);
-
         QDateTime srcLastModified;
-        QFileInfo original(srcfile);
 
         if ((srcfile.startsWith("http://")) ||
             (srcfile.startsWith("https://")) ||
@@ -1529,8 +1525,19 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         }
         else if (srcfile.startsWith("myth://"))
             srcLastModified = RemoteFile::LastModified(srcfile);
-        else if (original.exists())
-            srcLastModified = original.lastModified();
+        else
+        {
+            if (!(cacheMode & kCacheIgnoreDisk))
+            {
+                if (!FindThemeFile(srcfile))
+                    return NULL;
+            }
+
+            QFileInfo original(srcfile);
+
+            if (original.exists())
+                srcLastModified = original.lastModified();
+        }
 
         if (!!(cacheMode & kCacheIgnoreDisk) ||
             (fi.lastModified() >= srcLastModified))
