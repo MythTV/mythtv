@@ -405,13 +405,14 @@ static GlobalSpinBox *DeletedMaxAge()
 };
 
 #if 0
+// If this is ever reactivated, re-add the translations...
 class DeletedExpireOptions : public TriggeredConfigurationGroup
 {
     public:
      DeletedExpireOptions() :
          TriggeredConfigurationGroup(false, false, false, false)
          {
-             setLabel(tr("DeletedExpireOptions"));
+             setLabel("DeletedExpireOptions");
              Setting* enabled = AutoExpireInsteadOfDelete();
              addChild(enabled);
              setTrigger(enabled);
