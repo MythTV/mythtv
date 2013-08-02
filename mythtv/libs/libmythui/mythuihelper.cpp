@@ -156,7 +156,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_cacheSize(0), m_maxCacheSize(20 * 1024 * 1024),
+      m_cacheSize(0), m_maxCacheSize(30 * 1024 * 1024),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
@@ -404,7 +404,7 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
     d->callbacks = cbs;
 
     d->m_maxCacheSize.fetchAndStoreRelease(
-        GetMythDB()->GetNumSetting("UIImageCacheSize", 20) * 1024 * 1024);
+        GetMythDB()->GetNumSetting("UIImageCacheSize", 30) * 1024 * 1024);
 
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("MythUI Image Cache size set to %1 bytes")
