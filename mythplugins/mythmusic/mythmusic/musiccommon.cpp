@@ -2007,7 +2007,12 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
-        map["playlistname"] = gPlayer->getPlaylist()->getName();
+        QString playlistName = gPlayer->getPlaylist()->getName();
+        if (playlistName == "default_playlist_storage")
+            playlistName = tr("Default Playlist");
+        else if (playlistName ==  "stream_playlist")
+            playlistName = tr("Stream Playlist");
+        map["playlistname"] = playlistName;
     }
     else
     {
