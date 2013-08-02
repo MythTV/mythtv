@@ -143,7 +143,14 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
 
         LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));
-        if (myth_system(MountCommand, kMSDontBlockInputDevs) == GENERIC_EXIT_OK)
+        int ret = myth_system(MountCommand, kMSDontBlockInputDevs);
+        if (ret !=  GENERIC_EXIT_OK)
+        {
+            usleep(300000);
+            LOG(VB_MEDIA, LOG_INFO, QString("Retrying '%1'").arg(MountCommand));
+            ret = myth_system(MountCommand, kMSDontBlockInputDevs);
+        }
+        if (ret == GENERIC_EXIT_OK)
         {
             if (DoMount)
             {
@@ -153,6 +160,13 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 // in /etc/fstab then pmount delegates to mount which
                 // performs the mount asynchronously so we must wait a bit
                 usleep(1000000);
+                for (int tries = 2; !findMountPath() && tries > 0; --tries)
+                {
+                    LOG(VB_MEDIA, LOG_INFO,
+                        QString("Repeating '%1'").arg(MountCommand));
+                    myth_system(MountCommand, kMSDontBlockInputDevs);
+                    usleep(500000);
+                }
                 if (!findMountPath())
                 {
                     LOG(VB_MEDIA, LOG_ERR, "performMountCmd() attempted to"
@@ -169,8 +183,8 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             return true;
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, QString("Failed to mount %1.")
-                                       .arg(m_DevicePath));
+            LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
+                    .arg(DoMount ? "mount" : "unmount").arg(m_DevicePath));
     }
     else
     {
