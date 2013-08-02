@@ -1493,7 +1493,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         // This code relaxes the original-file check so that the check
         // isn't repeated if it was already done within kImageCacheTimeout
         // seconds.
-        const uint kImageCacheTimeout = 5;
+        const uint kImageCacheTimeout = 20;
         uint now = MythDate::current().toTime_t();
 
         QMutexLocker locker(d->m_cacheLock);
