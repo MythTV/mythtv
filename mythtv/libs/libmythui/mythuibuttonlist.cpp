@@ -3383,14 +3383,11 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     else
         state = m_parent->m_active ? "active" : "inactive";
 
-    if (!button->DisplayState(state) && state == "inactive")
-    {
+    if (state == "inactive" && !button->GetState(state))
         state = "active";
-        button->DisplayState(state);
-    }
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
-                               (button->GetCurrentState());
+                               (button->GetState(state));
 
     if (!buttonstate)
     {
@@ -3398,8 +3395,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
             .arg(state));
         return;
     }
-
-    buttonstate->SetVisible(true);
 
     // We want to reset everything in the button EXCEPT for the widgets which
     // are about to be assigned new values. This is more efficient than
@@ -3571,6 +3566,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
         ++state_it;
     }
+
+    // There is no need to check the return value here, since we already
+    // checked that the state exists with GetState() earlier
+    button->DisplayState(state);
 }
 
 //---------------------------------------------------------
