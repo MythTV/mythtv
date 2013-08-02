@@ -625,7 +625,7 @@ void MythUIImage::Reset(void)
             m_HighNum = 0;
             m_animatedImage = false;
         }
-	    emit DependChanged(true);
+        emit DependChanged(true);
 
         d->m_UpdateLock.unlock();
         Load();
@@ -739,8 +739,6 @@ void MythUIImage::SetImage(MythImage *img)
     }
 
     m_imageProperties.filename = img->GetFileName();
-    Clear();
-    m_Delay = -1;
 
     img->IncrRef();
 
@@ -761,6 +759,9 @@ void MythUIImage::SetImage(MythImage *img)
 
     if (m_imageProperties.isGreyscale && !img->isGrayscale())
         img->ToGreyscale();
+
+    Clear();
+    m_Delay = -1;
 
     if (m_imageProperties.forceSize.isNull())
         SetSize(img->size());
@@ -953,8 +954,6 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         return false;
     }
 
-    Clear();
-
     bool bPreferLoadInBackground =
         ((filename.startsWith("myth://")) ||
          (filename.startsWith("http://")) ||
@@ -963,6 +962,14 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
     if (getenv("DISABLETHREADEDMYTHUIIMAGE"))
         allowLoadInBackground = false;
+
+    // Don't clear the widget before we need to, otherwise it causes
+    // unsightly flashing. We exclude animations for now since that requires a
+    // deeper fix
+    bool isAnimation = (m_HighNum != m_LowNum) || m_animatedImage;
+
+    if (isAnimation)
+        Clear();
 
     QString imagelabel;
 
@@ -1008,6 +1015,9 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     do_background_load = true;
             }
         }
+
+        if (!isAnimation && !GetMythUI()->IsImageInCache(imagelabel))
+            Clear();
 
         if (do_background_load)
         {
@@ -1574,6 +1584,12 @@ void MythUIImage::customEvent(QEvent *event)
 
         if (image)
         {
+            // We don't clear until we have the new image ready to display to
+            // avoid unsightly flashing. This isn't currently supported for
+            // animations.
+            if ((m_HighNum == m_LowNum) && !m_animatedImage);
+                Clear();
+
             d->m_UpdateLock.lockForWrite();
 
             if (m_imageProperties.forceSize.isNull())
