@@ -954,12 +954,6 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         return false;
     }
 
-    bool bPreferLoadInBackground =
-        ((filename.startsWith("myth://")) ||
-         (filename.startsWith("http://")) ||
-         (filename.startsWith("https://")) ||
-         (filename.startsWith("ftp://")));
-
     if (getenv("DISABLETHREADEDMYTHUIIMAGE"))
         allowLoadInBackground = false;
 
@@ -1000,20 +994,13 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         bool do_background_load = false;
         if (allowLoadInBackground)
         {
-            if (bPreferLoadInBackground)
-            {
-                do_background_load = true;
-            }
+            MythImage *img = GetMythUI()->LoadCacheImage(
+                filename, imagelabel, GetPainter(),
+                static_cast<ImageCacheMode>(cacheMode));
+            if (img)
+                img->DecrRef();
             else
-            {
-                MythImage *img = GetMythUI()->LoadCacheImage(
-                    filename, imagelabel, GetPainter(),
-                    static_cast<ImageCacheMode>(cacheMode));
-                if (img)
-                    img->DecrRef();
-                else
-                    do_background_load = true;
-            }
+                do_background_load = true;
         }
 
         if (!isAnimation && !GetMythUI()->IsImageInCache(imagelabel))
