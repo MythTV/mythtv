@@ -229,12 +229,17 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
-        <translation>Ειδήσεις</translation>
+        <translation>Τροφοδοσίες Ειδήσεων</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
         <translation>Ρυθμίσεις Ειδήσεων</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Ειδήσεις</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>

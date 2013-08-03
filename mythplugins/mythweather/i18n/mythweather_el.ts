@@ -1161,6 +1161,11 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Η οθόνη ελέγχει τη συμπεριφορά των ρυθμίσεων του καιρού. Μπορείτε να ενεργοποιήσετε μια παρασκηνιακή ενημέρωση του καιρού που θα τρέχει και όταν δεν εμφανίζεται στην οθόνη, και να ρυθμίσετε πόσο χρόνο θα εμφανίζεται η κάθε οθόνη. Όταν ολοκληρώσετε τις ρυθμίσεις του Καιρού, πατήστε &quot;Τέλος&quot; για συνέχεια.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Ρυθμίσεις Καιρού</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Ρύθμιση Οθόνης Καιρού</translation>

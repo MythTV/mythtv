@@ -753,6 +753,11 @@ Remove it from the database?</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>Από %1</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="33"/>
         <source>System: %1</source>
         <translation>Σύστημα: %1</translation>

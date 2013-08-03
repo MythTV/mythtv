@@ -389,6 +389,44 @@ Removing stale lock file.</source>
     </message>
 </context>
 <context>
+    <name>BurnMenu</name>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
+        <source>Cannot burn a DVD.
+The last run failed to create a DVD.</source>
+        <translation>Δεν μπορώ να γράψω DVD.
+Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
+        <source>Burn DVD</source>
+        <translation>Εγγραφή DVD</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
+        <source>
+Place a blank DVD in the drive and select an option below.</source>
+        <translation>
+Τοποθετήστε ένα κενό DVD στη συσκευή και διαλέξτε μια από τις παρακάτω επιλογές.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
+        <source>Burn DVD Rewritable</source>
+        <translation>Εγγραφή Επανεγγράψιμου DVD</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
+        <source>Burn DVD Rewritable (Force Erase)</source>
+        <translation>Εγγραφή Επανεγγράψιμου DVD (Αναγκαστική Διαγραφή)</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
+        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
+        <translation>Δεν ήταν δυνατή η εκτέλεση του mytharchivehelper για εγγραφή του DVD.</translation>
+    </message>
+</context>
+<context>
     <name>BurnThemeUI</name>
     <message>
         <location filename="../mythburn/themes/burnthemestrings.h" line="5"/>
@@ -654,6 +692,11 @@ This may take a few minutes.</source>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Αδύνατη η δημιουργία του DVD. Προκλήθηκε σφάλμα κατά την εκτέλεση των scripts</translation>
     </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
+        <source>You don&apos;t have any videos!</source>
+        <translation>Δεν έχετε ταινίες!</translation>
+    </message>
 </context>
 <context>
     <name>MythControls</name>
@@ -691,49 +734,6 @@ This may take a few minutes.</source>
         <location filename="../mytharchive/main.cpp" line="315"/>
         <source>Burn DVD</source>
         <translation>Εγγραφή του DVD</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1008"/>
-        <source>You don&apos;t have any videos!</source>
-        <translation>Δεν έχετε ταινίες!</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1155"/>
-        <source>Cannot burn a DVD.
-The last run failed to create a DVD.</source>
-        <translation>Δεν μπορώ να γράψω DVD.
-Η τελευταία εκτέλεση απέτυχε να δημιουργήσει DVD.</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1161"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1173"/>
-        <source>Burn DVD</source>
-        <translation>Εγγραφή DVD</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1162"/>
-        <source>
-Place a blank DVD in the drive and select an option below.</source>
-        <translation>
-Τοποθετήστε ένα κενό DVD στη συσκευή και διαλέξτε μια από τις παρακάτω επιλογές.</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1174"/>
-        <source>Burn DVD Rewritable</source>
-        <translation>Εγγραφή Επανεγγράψιμου DVD</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1175"/>
-        <source>Burn DVD Rewritable (Force Erase)</source>
-        <translation>Εγγραφή Επανεγγράψιμου DVD (Αναγκαστική Διαγραφή)</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
-        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
-        <translation>Δεν ήταν δυνατή η εκτέλεση του mytharchivehelper για εγγραφή του DVD.</translation>
     </message>
 </context>
 <context>
