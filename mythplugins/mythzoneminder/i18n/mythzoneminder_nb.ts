@@ -152,44 +152,109 @@
         <translation>ZoneMinder direkte</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="48"/>
+        <source>See what your system is doing</source>
+        <translation>Se hva systemet ditt gjør</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>CCTV Console</source>
+        <translation>CCTV konsoll</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Monitors</source>
+        <translation>Skjermer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>CCTV Status:</source>
+        <translation>CCTV Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>System Load:</source>
+        <translation>Systemlast:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Disk Usage:</source>
+        <translation>Diskbruk:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>CCTV Time:</source>
+        <translation>CCTV Tid:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>CCTV Date:</source>
+        <translation>CCTV Dato:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Source:</source>
+        <translation>Kilde:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Function:</source>
+        <translation>Funksjon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Events:</source>
+        <translation>Hendelser:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>[R] = Running, [S] = Stopped</source>
+        <translation>[R] = Kjører, [S] = Stoppet</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="69"/>
+        <source>CCTV Event Player</source>
+        <translation>CCTV Hendelsesavspiller</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="71"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Kjører 
 [S] = Stoppet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Select Camera:</source>
         <translation>Velg kamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Select Date:</source>
         <translation>Velg dato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Record</source>
         <translation>Ta opp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Store</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="76"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -319,16 +384,19 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
         <source>Configure Zoneminder console</source>
-        <translation type="obsolete">Konfigurer ZoneMinder konsoll</translation>
+        <translation>Konfigurer ZoneMinder konsoll</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="46"/>
         <source>Monitor Function</source>
-        <translation type="obsolete">Monitor funksjon</translation>
+        <translation>Monitor funksjon</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="47"/>
         <source>Save</source>
-        <translation type="obsolete">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message numerus="yes">
         <source>%name%  -  Source: %zmastatus%, function: %zmcstatus%</source>
@@ -366,49 +434,57 @@
         <translation type="obsolete">CCTV Dato</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="59"/>
         <source>0.12</source>
-        <translation type="obsolete">0.12</translation>
+        <translation>0.12</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="60"/>
         <source>100%</source>
-        <translation type="obsolete">100%</translation>
+        <translation>100%</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="62"/>
         <source>Look at the Zoneminder events list</source>
-        <translation type="obsolete">Se på Zoneminder hendelsesliste</translation>
+        <translation>Se på Zoneminder hendelsesliste</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="65"/>
         <source>Event No:</source>
-        <translation type="obsolete">Hendelse nr:</translation>
+        <translation>Hendelse nr:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="66"/>
         <source>%camera%:  %time% (%length%)</source>
-        <translation type="obsolete">%camera%:  %time% (%length%)</translation>
+        <translation>%camera%:  %time% (%length%)</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="67"/>
         <source>Delete</source>
-        <translation type="obsolete">Slett</translation>
+        <translation>Slett</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="68"/>
         <source>Play</source>
-        <translation type="obsolete">Spill</translation>
+        <translation>Spill</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="70"/>
         <source>CCTV Live Player</source>
-        <translation type="obsolete">CCTV Live-avspiller</translation>
+        <translation>CCTV Live-avspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Show Console</source>
         <translation>Vis konsoll</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Show Live View</source>
         <translation>Vis live-visning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Show Events</source>
         <translation>Vis hendelser</translation>
     </message>

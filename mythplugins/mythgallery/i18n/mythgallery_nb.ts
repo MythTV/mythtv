@@ -1067,12 +1067,12 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="20"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="21"/>
         <source>No images are present in the pictures folder.</source>
         <translation>Ingen bilder er tilgjengelig i billedmappen.</translation>
     </message>
@@ -1087,99 +1087,163 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>Ingen bilder funnet i konfigurert katalog.  Er du sikker på at tillegget er satt opp riktig?</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="7"/>
+        <source>Syncing image %1</source>
+        <translation>Synkroniserer bilde %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Creating thumbnail %1</source>
+        <translation>Lager miniatyrbilde %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Gallery Settings</source>
+        <translation>Galleri-innstillinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Name of the storage group for the images:</source>
+        <translation>Lagringsgruppe for bildene:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Sorting order of the shown images:</source>
+        <translation>Sorteringsrekkefølge for bildene:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Time to display each image during a slideshow (ms):</source>
+        <translation>Tid for å vise hvert bilde under billedfremvisning (ms):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Type of transition between two images:</source>
+        <translation>Overgangstype mellom to bilder:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Duration of an image transition (ms):</source>
+        <translation>Varighet for billedovergang (ms):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Show files that are marked as hidden:</source>
+        <translation>Vis filer markert som skjult:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Clear database contents (Resync required):</source>
+        <translation>Tøm databaseinnhold (resynk krevet):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Image Loading...</source>
+        <translation>Bilde lastes...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>SELECT: View</source>
         <translation>VELG: Vis</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="29"/>
         <source>MENU: Activate Menu</source>
         <translation>MENY: Aktiver meny</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="30"/>
         <source>PICTURE GALLERY</source>
-        <translation type="obsolete">BILLEDGALLERI</translation>
+        <translation>BILLEDGALLERI</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>Path</source>
+        <translation>Sti</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
         <source>Adjust view for your picture library</source>
-        <translation type="obsolete">Juster visningen for ditt billedgalleri</translation>
+        <translation>Juster visningen for ditt billedgalleri</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="33"/>
         <source>Filter and sort images</source>
-        <translation type="obsolete">Filtrer og sorter bilder</translation>
+        <translation>Filtrer og sorter bilder</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="34"/>
         <source>Folder filter:</source>
-        <translation type="obsolete">Mappefilter:</translation>
+        <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Video Gallery</source>
         <translation>Videogalleri</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Filter/sort images</source>
         <translation>Filtrer/sorter bilder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Directory filter:</source>
         <translation>Katalogfilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Type filter:</source>
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Check Filter</source>
         <translation>Sjekk filter</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Sort by:</source>
         <translation>Sorter etter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
         <translation>Legg til din plassering, nærmeste sted eller by. I noen land kan du også bruk postnr.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Done</source>
         <translation>Ferdig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Save as default</source>
         <translation>Lagre som standard</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Type filter :</source>
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Sort by :</source>
         <translation>Sorter etter:</translation>
     </message>

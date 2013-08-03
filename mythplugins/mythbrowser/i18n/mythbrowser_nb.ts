@@ -249,32 +249,42 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
         <translation>Tekststørrelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="19"/>
+        <source>WEB BROWSER</source>
+        <translation>WEBLESER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>BOOKMARK MANAGER</source>
+        <translation>BOKMERKEBEHANDLER</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Web Page</source>
         <translation>Webside</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Web Bookmarks</source>
         <translation>Web bokmerker</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Browse your favorite web sites.</source>
         <translation>Utforsk favorittwebsidene dine.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Browser:</source>
         <translation>Webleser:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Slå på tillegg for webleser (Flash, etc):</translation>
     </message>
@@ -284,17 +294,17 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Rating Settings</source>
         <translation>Innstillinger for rangering</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Configure Web Browser</source>
         <translation>Konfigurer webleseren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="36"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -303,90 +313,94 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for å fortsette.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Genre:</source>
         <translation>Sjanger:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Click to choose from existing categories...</source>
         <translation>Klikk for å velge mellom eksisterende kategorier...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Find</source>
         <translation>Finn</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Url</source>
         <translation>Url</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Homepage</source>
         <translation>Hjemmeside</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Edit Bookmark</source>
         <translation>Rediger bokmerke</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Homepage:</source>
         <translation>Hjemmeside:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Browser Settings</source>
         <translation>Webleserinnnstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Slå på tillegg for webleser (Flash, etc)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Webbrowser</source>
         <oldsource>WEB BROWSER</oldsource>
         <translation>Webleser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Bookmarks</source>
         <oldsource>BOOKMARK MANAGER</oldsource>
         <translation>Bokmerkebehandler</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="21"/>
         <source>Choose a bookmark to show in the web browser</source>
-        <translation type="obsolete">Velg et bokmerke for å vise websiden</translation>
+        <translation>Velg et bokmerke for å vise websiden</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="22"/>
         <source>Browse the web</source>
-        <translation type="obsolete">Utforsk internett</translation>
+        <translation>Utforsk internett</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="23"/>
         <source>URL Name:</source>
-        <translation type="obsolete">URL Navn:</translation>
+        <translation>URL Navn:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="24"/>
         <source>Search</source>
-        <translation type="obsolete">Søk</translation>
+        <translation>Søk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Enable plugins</source>
         <translation>Slå på tillegg</translation>
     </message>

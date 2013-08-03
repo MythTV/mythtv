@@ -210,6 +210,11 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Kanal:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Nyheter</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
         <translation>Du har ikke spesifisert noen nyhetssteder.</translation>
@@ -246,12 +251,19 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Nyhetsmatinger</translation>
     </message>
     <message>
-        <source>Choose which news channels interest you</source>
-        <translation type="obsolete">Velg hvilke nyhetskanaler som interesserer deg</translation>
+        <location filename="themestrings.h" line="34"/>
+        <source>NEWS</source>
+        <translation>NYHETER</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Choose which news channels interest you</source>
+        <translation>Velg hvilke nyhetskanaler som interesserer deg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
         <source>Name site:</source>
-        <translation type="obsolete">Navn for nettsted:</translation>
+        <translation>Navn for nettsted:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
@@ -260,16 +272,24 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Nettsted</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Site icon:</source>
+        <translation>Stedsikon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
         <source>URL site:</source>
-        <translation type="obsolete">URL for nettsted:</translation>
+        <translation>URL for nettsted:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="39"/>
         <source>Save</source>
-        <translation type="obsolete">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="40"/>
         <source>News settings</source>
-        <translation type="obsolete">Innstillinger for nyhetssted</translation>
+        <translation>Innstillinger for nyhetssted</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>

@@ -578,47 +578,47 @@ Fjerne den fra databasen?</translation>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Edit Game Information</source>
         <translation>Rediger spillinformasjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Game Name:</source>
         <translation>Spillnavn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Country:</source>
         <translation>Land:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Publisher:</source>
         <translation>Utgiver:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Plot:</source>
         <translation>Handling:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Screenshot:</source>
         <translation>Skjermbilde:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Fanart:</source>
         <translation>Fan-kunst:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Boxart:</source>
         <translation>Bokskunst:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="52"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/sti/til/tingen.jpg</translation>
     </message>
@@ -628,57 +628,57 @@ Fjerne den fra databasen?</translation>
         <translation>Emulator:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Released %1</source>
         <translation>Utgitt %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="24"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Edit Metadata</source>
         <translation>Rediger metadata</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Modify your game&apos;s metadata.</source>
         <translation>Endre ditt spills metadata.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Title:</source>
         <translation>Tittel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Cover Art:</source>
         <translation>Omslagkunst:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game is a Favorite</source>
         <translation>Spillet er en favoritt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Click here to search existing coverart...</source>
         <translation>Klikk her for å lete etter eksisterende omslagskunst...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Klikk her for å lete etter eksisterende skjermbilder...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Click here to search existing fanart...</source>
         <translation>Klikk her for å lete etter eksisterende fan-kunst...</translation>
     </message>
@@ -693,132 +693,202 @@ Fjerne den fra databasen?</translation>
         <translation>Spill spill</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="51"/>
         <source>ROM Name:</source>
         <translation>ROM navn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="47"/>
         <source>ROM Path:</source>
         <translation>ROM sti:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Game:</source>
         <translation>Spill:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Type:</source>
         <translation>Type:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Filename:</source>
         <translation>Filnavn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="44"/>
         <source>System(s):</source>
         <translation>System(er):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="46"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Description:</source>
         <translation>Beskrivelse:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="59"/>
         <source>Gaming system</source>
-        <translation type="obsolete">Sppillsystem</translation>
+        <translation>Spillsystem</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="72"/>
         <source>Unknown</source>
-        <translation type="obsolete">Ukjent</translation>
+        <translation>Ukjent</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="60"/>
         <source>Customize meta data of your games</source>
-        <translation type="obsolete">Tilpass metadata for dine spill</translation>
+        <translation>Tilpass metadata for dine spill</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Settings</source>
+        <translation>Innstillinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Game folders and general</source>
+        <translation>Spillmapper og generelle valg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Players</source>
+        <translation>Spillere</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>Configure your game</source>
+        <translation>Konfigurer spillet ditt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Library</source>
+        <translation>Bibliotek</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Add games to your</source>
+        <translation>Legg til spill i ditt</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Data</source>
+        <translation>Data</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Clear your game</source>
+        <translation>Tøm dine spill</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>From %1</source>
+        <translation>Fra %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>GAMES</source>
+        <translation>SPILL</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
         <source>Game details</source>
-        <translation type="obsolete">Spilldetaljer</translation>
+        <translation>Spilldetaljer</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="62"/>
         <source>Add game to Favorites:</source>
-        <translation type="obsolete">Legg spill til favoritter:</translation>
+        <translation>Legg spill til favoritter:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="63"/>
         <source>Coverart:</source>
-        <translation type="obsolete">Omslagkunst:</translation>
+        <translation>Omslagkunst:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="64"/>
         <source>Search</source>
-        <translation type="obsolete">Søk</translation>
+        <translation>Søk</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="65"/>
         <source>Screenshot</source>
-        <translation type="obsolete">Skjermbilde</translation>
+        <translation>Skjermbilde</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="66"/>
         <source>Fanart</source>
-        <translation type="obsolete">Fan-kunst</translation>
+        <translation>Fan-kunst</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="67"/>
         <source>Coverart</source>
-        <translation type="obsolete">Omslagkunst</translation>
+        <translation>Omslagkunst</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="68"/>
         <source>Navigation</source>
-        <translation type="obsolete">Navigasjon</translation>
+        <translation>Navigasjon</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="69"/>
         <source>Save</source>
-        <translation type="obsolete">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="70"/>
         <source>%TITLE% %SUBTITLE%</source>
-        <translation type="obsolete">%TITLE% %SUBTITLE%</translation>
+        <translation>%TITLE% %SUBTITLE%</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="71"/>
         <source>Game Details</source>
-        <translation type="obsolete">Spilldetaljer</translation>
+        <translation>Spilldetaljer</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="73"/>
         <source>N/A</source>
-        <translation type="obsolete">N/A</translation>
+        <translation>N/A</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="74"/>
         <source>ROM</source>
-        <translation type="obsolete">ROM</translation>
+        <translation>ROM</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="75"/>
         <source>%romname% %|(rompath)%</source>
-        <translation type="obsolete">%romname% %|(rompath)%</translation>
+        <translation>%romname% %|(rompath)%</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="76"/>
         <source>Publisher</source>
-        <translation type="obsolete">Utgiver</translation>
+        <translation>Utgiver</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="77"/>
         <source>System(s)</source>
-        <translation type="obsolete">System(er)</translation>
+        <translation>System(er)</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="78"/>
         <source>CRC</source>
-        <translation type="obsolete">CRC</translation>
+        <translation>CRC</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="80"/>
         <source>No Plot.</source>
         <translation>Ingen handling.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Empty your game library</source>
         <translation>Tøm spillbiblioteket ditt</translation>
     </message>
@@ -828,72 +898,72 @@ Fjerne den fra databasen?</translation>
         <translation>Spill</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Game Information</source>
         <translation>Spillinformasjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Games</source>
         <translation>Spill</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="41"/>
         <source>System: %1</source>
         <translation>System: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Genre: %1</source>
         <translation>Sjanger: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Back</source>
         <translation>Tilbake</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="55"/>
         <source>ROM path:</source>
         <translation>ROM sti:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Favorite</source>
         <translation>Favoritt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="81"/>
         <source>General Settings</source>
         <translation>Generelle innstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Game folders and general options</source>
         <translation>Spillmapper og generelle valg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Game Players</source>
         <translation>Spillere</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Configure an emulator</source>
         <translation>Konfigurer en emulator</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="85"/>
         <source>Scan for Games</source>
         <translation>Søk etter spill</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="86"/>
         <source>Add games to your library</source>
         <translation>Legg spill til biblioteket ditt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Clear Game Data</source>
         <translation>Slett spilldata</translation>
     </message>

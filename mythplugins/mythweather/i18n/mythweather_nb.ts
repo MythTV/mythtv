@@ -1120,6 +1120,11 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Dette skjermbildet styrer hvordan værskjermbildene oppfører seg.  Du kan slå på oppdatering av værinformasjon i bakgrunnen, som vil kjøre automatisk uavhengig om du viser skjermbilder, samt konfigurere hvor mange sekunder hvert skjermbilde skal vises. Når du er ferdig med å konfigurere værtillegget må du klikke «Ferdig» for å fortsette.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Værinnstillinger</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Oppsett for værskjermbilder</translation>
@@ -1174,29 +1179,38 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Føles som:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="56"/>
         <source>WEATHER</source>
-        <translation type="obsolete">WÆR</translation>
+        <translation>WÆR</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="57"/>
         <source>Running</source>
-        <translation type="obsolete">Kjører</translation>
-    </message>
-    <message>
-        <source>Updating</source>
-        <translation type="obsolete">Oppdaterer</translation>
-    </message>
-    <message>
-        <source>Temperature</source>
-        <translation type="obsolete">Temperatur</translation>
+        <translation>Kjører</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
+        <source>Updating</source>
+        <translation>Oppdaterer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="59"/>
+        <source>Temperature</source>
+        <translation>Temperatur</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="60"/>
+        <source>General Mythweather options</source>
+        <translation>Generelle innstillinger for værtillegg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="67"/>
         <source>Global Weather Settings</source>
         <oldsource>General Mythweather options</oldsource>
         <translation>Generelle innstillinger for MythWeather</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="65"/>
         <source>: %1</source>
         <translation>: %1</translation>
     </message>
@@ -1206,43 +1220,43 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Vind(i kastene):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="66"/>
         <source>100%</source>
         <translation>100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Seconds to display each page</source>
         <translation>Sekunder hver side skal vises</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Retrieve data in the background</source>
         <translation>Last ned data i bakgrunnen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="70"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Generelle innstillinger for værtillegg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Screen Settings</source>
         <translation>Skjermbildeinnstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Velg hvilke værvarsler som skal vises</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Source Settings</source>
         <translation>Kildeinnstillinger</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Konfigurer oppsett for værskript</translation>
     </message>
