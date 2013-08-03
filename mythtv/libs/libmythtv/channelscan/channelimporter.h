@@ -15,6 +15,7 @@
 // Qt headers
 #include <QMap>
 #include <QString>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "mythtvexp.h"
@@ -75,6 +76,8 @@ class ChannelImporterUniquenessStats
 
 class MTV_PUBLIC ChannelImporter
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelImporter)
+
   public:
     ChannelImporter(bool gui, bool interactive,
                     bool _delete, bool insert, bool save,
