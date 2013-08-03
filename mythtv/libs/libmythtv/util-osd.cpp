@@ -16,29 +16,41 @@
 void yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                     int left, int top, int right, int bottom)
 {
-    bool c_aligned  = !(left % ALIGN_C || right % ALIGN_C);
-    bool misaligned = (top % ALIGN_C || bottom % ALIGN_C) || !c_aligned;
-    bool mmx_aligned = false;
-#ifdef MMX
-    mmx_aligned = !(left % ALIGN_X_MMX || right % ALIGN_X_MMX);
-#endif
+    static bool s_bReported;
+    bool c_aligned  = !(left % ALIGN_C || top % ALIGN_C);
 
-    if (misaligned)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("OSD image size is odd. This shouldn't happen."));
-    }
-    else if (mmx_aligned)
+#ifdef MMX
+    if (c_aligned &&
+        !(left % ALIGN_X_MMX || right % ALIGN_X_MMX || bottom % ALIGN_C) )
     {
         mmx_yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
+        return;
     }
-    else if (c_aligned)
+
+    // This can happen with a non fullscreen window
+    if (c_aligned && !s_bReported)
     {
-#ifdef MMX
-        LOG(VB_GENERAL, LOG_WARNING, "MMX available but image not MMX aligned. "
-                                     "This shouldn't happen.");
+        s_bReported = true;
+        LOG(VB_GENERAL, LOG_WARNING, QString(
+            "OSD image size is odd; performance will suffer.\n"
+            "\t\t\tVideo window position and size must be a multiple of %1x%2.")
+                .arg(ALIGN_X_MMX).arg(ALIGN_C));
+    }
 #endif
+
+    if (c_aligned)
+    {
         c_yuv888_to_yv12(frame, osd_image, left, top, right, bottom);
+        return;
+    }
+
+    if (!s_bReported)
+    {
+        s_bReported = true;
+        LOG(VB_GENERAL, LOG_WARNING, QString(
+            "Unable to display the OSD.\n"
+            "\t\t\tVideo window position and size must be a multiple of %1x%2.")
+                .arg(ALIGN_C).arg(ALIGN_C));
     }
 }
 
