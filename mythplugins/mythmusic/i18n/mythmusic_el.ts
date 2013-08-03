@@ -1823,1158 +1823,1328 @@ Station: %1 - Channel: %2</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="147"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Please Wait...</source>
         <oldsource>Please Wait ...</oldsource>
         <translation>Παρακαλώ Περιμένετε...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="148"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Track Information</source>
         <translation>Πληροφορίες Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Compilation:</source>
         <translation>Σύνθεση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Comp. Artist:</source>
         <translation>Καλλιτέχνης Σύνθ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Artist:</source>
         <translation>Καλλιτέχνης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Album:</source>
         <translation>Δίσκος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Title:</source>
         <translation>Τίτλος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Track No.:</source>
         <translation>Αρ. Τραγ.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Genre:</source>
         <translation>Είδος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Year:</source>
         <translation>Έτος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Rating:</source>
         <translation>Αξιολόγηση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="149"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Play Count:</source>
         <translation>Παίχθηκε φορές:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="150"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Last Play:</source>
         <translation>Παίχτηκε τελευταία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Filename:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Album Art</source>
         <translation>Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="25"/>
         <source>No Album Art Found</source>
         <translation>Δεν Βρέθηκε Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Type:</source>
         <translation>Τύπος:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="151"/>
+        <location filename="themestrings.h" line="173"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Import Coverart</source>
         <translation>Εισαγωγή Εξωφύλλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Browse cover images on your system.</source>
         <translation>Ψάχνει εικόνες εξωφύλλων στον Η/Υ.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="60"/>
         <source>File:</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Destination:</source>
         <translation>Προορισμός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Image Type:</source>
         <translation>Τύπος Εικόνας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Previous</source>
         <translation>Προηγούμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Copy</source>
         <translation>Αντιγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Done</source>
         <translation>Εντάξει</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Already in database</source>
         <translation>Ήδη στη συλλογή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Import Music</source>
         <translation>Εισαγωγή Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="178"/>
         <source>Import local music files.</source>
         <translation>Εισαγωγή τοπικών αρχείων μουσικής.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Location:</source>
         <translation>Θέση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Track is part of a compilation</source>
         <translation>Το τραγούδι είναι μέρος σύνθεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="180"/>
         <source>Click to browse directories...</source>
         <translation>Πατήστε για περιήγηση στους φακέλους...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Search</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="181"/>
         <source>Choose Coverart</source>
         <translation>Επιλέξτε Εξώφυλλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Add</source>
         <translation>Προσθήκη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Play</source>
         <translation>Παίξε</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Next New</source>
         <translation>Επόμενη Νέα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Add All New</source>
         <translation>Προσθήκη Όλων Νέων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Rip A CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Input metadata for the CD you have inserted.</source>
         <translation>Εισαγωγή στοιχείων για το CD που εισάγατε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Quality:</source>
         <translation>Ποιότητα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Album Name:</source>
         <translation>Όνομα Δίσκου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Album Year:</source>
         <translation>Έτος Δίσκου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Album is a compilation</source>
         <translation>Ο δίσκος αποτελεί Σύνθεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Click here to search existing artists...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντες καλλιτέχνες...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Click here to search existing albums...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντες δίσκους...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="189"/>
         <source>Click here to search existing genres...</source>
         <translation>Πατήστε για αναζήτηση σε υπάρχοντα είδη...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Switch Titles</source>
         <translation>Εναλλαγή Τίτλων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Scan CD</source>
         <translation>Ανίχνευση CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Rip CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Metadata</source>
         <translation>Στοιχεία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="190"/>
+        <location filename="themestrings.h" line="232"/>
         <source>Scan</source>
         <translation>Ανίχνευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Cover Art</source>
         <translation>Εξώφυλλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="192"/>
+        <location filename="themestrings.h" line="210"/>
         <source>Album</source>
         <translation>Άλμπουμ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="193"/>
+        <location filename="themestrings.h" line="211"/>
         <source>Genre</source>
         <translation>Είδος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Multi-Artist:</source>
         <translation>Πολλαπλοί-Καλλιτέχνες:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Track</source>
         <translation>Τραγούδι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Title</source>
         <translation>Τίτλος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="195"/>
+        <location filename="themestrings.h" line="235"/>
         <source>Play List</source>
         <translation>Λίστα Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Played %1 times</source>
         <translation>Παίχθηκε %1 φορές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="196"/>
+        <location filename="themestrings.h" line="236"/>
         <source>Play List Editor (tree)</source>
         <translation>Επεξεργασία Λίστας (δένδρο)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="197"/>
+        <location filename="themestrings.h" line="237"/>
         <source>Play List Editor (gallery)</source>
         <translation>Επεξεργασία Λίστας (συλλογή)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="198"/>
+        <location filename="themestrings.h" line="238"/>
         <source>Play List Editor (search)</source>
         <translation>Επεξεργασία Λίστας (αναζήτηση)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="23"/>
         <source>%TITLE% by %ARTIST% on %ALBUM%</source>
         <translation>%TITLE% από %ARTIST% στο %ALBUM%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Next: %NEXTTITLE% by %NEXTARTIST%</source>
         <translation>Επόμενοt: %NEXTTITLE% από %NEXTARTIST%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Smart Playlist Editor</source>
         <translation>Επεξεργασία Έξυπνης Λίστας Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Category:</source>
         <translation>Κατηγορία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="199"/>
+        <location filename="themestrings.h" line="239"/>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="200"/>
+        <location filename="themestrings.h" line="240"/>
         <source>Match:</source>
         <translation>Ταίριασμα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="201"/>
+        <location filename="themestrings.h" line="241"/>
         <source>of the following conditions:</source>
         <translation>από τις παρακάτω συνθήκες:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Order By:</source>
         <translation>Σειρά Κατά:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Limit:</source>
         <translation>Όριο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Show Results</source>
         <translation>Εμφάνιση Αποτελεσμάτων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Edit Criteria</source>
         <translation>Επεξεργασία Κριτηρίων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Edit Date</source>
         <translation>Επεξεργασία Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Use Current Date</source>
         <translation>Χρήση Τρέχουσας Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Fixed Date</source>
         <translation>Σταθερή Ημερομηνία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="6"/>
+        <source>%TITLE%</source>
+        <translation>%TITLE%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>%ALBUM%</source>
+        <translation>%ALBUM%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>%ARTIST%</source>
+        <translation>%ARTIST%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>%GENRE%</source>
+        <translation>%GENRE%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="81"/>
         <source>Day</source>
         <translation>Ημέρα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Month</source>
         <translation>Μήνας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Year</source>
         <translation>Έτος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="85"/>
         <source>+/- Days</source>
         <translation>+/- Ημέρες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Order By Fields</source>
         <translation>Σειρά κατά Πεδία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Move Up</source>
         <translation>Προς Τα Πάνω</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Move Down</source>
         <translation>Προς τα Κάτω</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Ascending</source>
         <translation>Αύξουσα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Descending</source>
         <translation>Φθίνουσα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Smart Playlist Result Viewer</source>
         <translation>Εμφάνιση Αποτελέσματος Έξυπνης Λίστας Αναπαραγωγής</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="147"/>
+        <source>Internet Stream View</source>
+        <translation>Προβολή Ροής Διαδικτύου</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
+        <source>Clears the entire database:</source>
+        <translation>Αδειάζει όλη τη βάση δεδομένων:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>Visualizer Settings</source>
+        <translation>Ρυθμίσεις Οπτικοποίησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="166"/>
+        <source>Radio Stream</source>
+        <translation>Ροή Ραδιοφώνου</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="167"/>
+        <source>%channel% (%station%)</source>
+        <translation>%channel% (%station%)</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="168"/>
+        <source>%CHANNEL% (%STATION%)</source>
+        <translation>%CHANNEL% (%STATION%)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="190"/>
         <source>Track Title:</source>
         <translation>Τίτλος Τραγουδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="191"/>
         <source>Track Artist:</source>
         <translation>Καλλιτέχνης Τραγουδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="192"/>
         <source>Track:</source>
         <translation>Τραγούδι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="193"/>
         <source>Click Here to Select Artist</source>
         <translation>Πατήστε για Επιλογή Καλλιτέχνη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="194"/>
         <source>Click Here to Select Compilation</source>
         <translation>Πατήστε για Επιλογή Σύνθεσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="195"/>
         <source>Click Here to Select Album</source>
         <translation>Πατήστε για Επιλογή Δίσκου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="196"/>
         <source>Click Here to Select Genre</source>
         <translation>Πατήστε για Επιλογή Είδους</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="197"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="198"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="194"/>
+        <location filename="themestrings.h" line="199"/>
+        <source>Playlist View</source>
+        <translation>Προβολή Λίστας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="200"/>
+        <source>From the album %ALBUM% by the artist %ARTIST%</source>
+        <translation>Από το δίσκο %ALBUM% του καλλιτέχνη %ARTIST%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="201"/>
+        <source>Playlist Tree View</source>
+        <translation>Προβολή Δένδρου Λίστας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="202"/>
+        <source>Playlist Gallery View</source>
+        <translation>Προβολή Έκθεσης Λίστας</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="203"/>
+        <source>Search View</source>
+        <translation>Προβολή Αναζήτησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="204"/>
+        <source>Track Details</source>
+        <translation>Λεπτομέρειες Κομματιού</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="205"/>
+        <source>Compilation Artist:</source>
+        <translation>Καλλιτέχνης Σύνθεσης:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="206"/>
+        <source>Length: %1</source>
+        <translation>Μήκος: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="207"/>
+        <source>Year: %1</source>
+        <translation>Έτος: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="208"/>
+        <source>Track Count:</source>
+        <translation>Πλήθος Τραγουδιών:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="209"/>
+        <source>Date added:</source>
+        <translation>Ημερομηνία Προσθήκης:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="212"/>
+        <source>: %VOLUMEPERCENT%</source>
+        <translation>: %VOLUMEPERCENT%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="213"/>
+        <source>Position:</source>
+        <translation>Θέση:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="214"/>
+        <source>CD Ripping</source>
+        <translation>Αντιγραφή CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="216"/>
+        <source>Status:</source>
+        <translation>Κατάσταση:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="217"/>
+        <source>Search Term</source>
+        <translation>Όρος Αναζήτησης</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="218"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="234"/>
         <source>Listen to Music</source>
         <translation>Ακούστε Μουσική</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="202"/>
+        <location filename="themestrings.h" line="242"/>
         <source>Compilation</source>
         <translation>Σύνθεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="203"/>
+        <location filename="themestrings.h" line="243"/>
         <source>Album Artwork</source>
         <translation>Εξώφυλλο Δίσκου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Date Added:</source>
         <translation>Προστέθηκε στις:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="204"/>
+        <location filename="themestrings.h" line="244"/>
         <source>Look Up</source>
         <translation>Εύρεση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="205"/>
+        <location filename="themestrings.h" line="245"/>
         <source>Rip a CD</source>
         <translation>Αντιγραφή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="206"/>
+        <location filename="themestrings.h" line="246"/>
         <source>Multi-Artist</source>
         <translation>Πολλαπλοί Καλλιτέχνες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="208"/>
+        <location filename="themestrings.h" line="248"/>
         <source>Importing CD:</source>
         <translation>Εισάγω το CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="209"/>
+        <location filename="themestrings.h" line="215"/>
         <source>Encoding Track:</source>
         <translation>Κωδικοποίηση Τραγουδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="65"/>
         <source>%VOLUMEPERCENT%</source>
         <translation>%VOLUMEPERCENT%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Artist</source>
         <translation>Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="144"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Playing:</source>
         <translation>Παίζει:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="145"/>
+        <location filename="themestrings.h" line="161"/>
         <source>None</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="146"/>
+        <location filename="themestrings.h" line="162"/>
         <source>%TITLE%  by  %ARTIST%</source>
         <translation>%TITLE%  από  %ARTIST%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Length</source>
         <translation>Διάρκεια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Encoding Track</source>
         <translation>Κωδικοποίηση Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="229"/>
+        <location filename="themestrings.h" line="258"/>
         <source>Play Music</source>
         <translation>Αναπαραγωγή Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="207"/>
+        <location filename="themestrings.h" line="247"/>
         <source>Ripping CD</source>
         <translation>Αντιγράφω CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Importing CD</source>
         <translation>Εισάγω CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Import Cover Art</source>
         <translation>Εισαγωγή Εξωφύλλου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="100"/>
         <source>General Settings</source>
         <translation>Γενικές Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="223"/>
+        <location filename="themestrings.h" line="252"/>
         <source>Music folders and general options</source>
         <translation>Φάκελοι Μουσικής και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Player Settings</source>
         <translation>Ρυθμίσεις Αναπαραγωγής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="224"/>
+        <location filename="themestrings.h" line="253"/>
         <source>Music playback options</source>
         <translation>Επιλογές Αναπαραγωγής Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="115"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Ripper Settings</source>
         <translation>Ρυθμίσεις Αντιγραφής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="225"/>
+        <location filename="themestrings.h" line="254"/>
         <source>CD copying options</source>
         <translation>Επιλογές Αντιγραφής CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="231"/>
+        <location filename="themestrings.h" line="262"/>
         <source>Select Music</source>
         <translation>Επιλογή Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="191"/>
+        <location filename="themestrings.h" line="233"/>
         <source>Import CD</source>
         <translation>Εισαγωγή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="189"/>
+        <location filename="themestrings.h" line="231"/>
         <source>Import Files</source>
         <translation>Εισαγωγή Αρχείων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Edit Track Information</source>
         <translation>Επεξεργασία Πληροφοριών Τραγουδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="68"/>
         <source>N/A</source>
         <translation>Δ/Υ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Volume</source>
         <translation>Ένταση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Length:</source>
         <translation>Διάρκεια:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Last Played:</source>
         <translation>Παίχθηκε τελευταία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Last Value</source>
         <translation>Τελευταία Τιμή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Directory to hold music:</source>
         <translation>Φάκελος για αποθήκευση μουσικής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="102"/>
         <source>CD device:</source>
         <translation>Συσκευή CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Audio device:</source>
         <translation>Συσκευή Ήχου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Filename Format:</source>
         <translation>Μορφή αρχείων:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Tag Encoding:</source>
         <translation>Κωδικοποίηση Ετικέτας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="219"/>
         <source>Convert stereo to 5.1 sound</source>
         <translation>Μετατροπή στερεοφωνικού ήχου σε 5.1 πολυκάναλο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="220"/>
         <source>Ignore ID3 Tags</source>
         <translation>Αγνόηση Ετικετών ID3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="221"/>
         <source>Allow metadata to be written to tags</source>
         <translation>Να γράφονται πληροφορίες στις ετικέττες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Save</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Resume mode:</source>
         <translation>Είδος Συνέχειας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Action on exit:</source>
         <translation>Ενέργεια κατά την έξοδο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="222"/>
         <source>Automatically lookup CDs</source>
         <translation>Αυτόματη αναζήτηση στοιχείων των CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="223"/>
         <source>Automatically Play CDs</source>
         <translation>Αυτόματη Αναπαραγωγή CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Rating Settings</source>
         <translation>Ρυθμίσεις Αξιολόγησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Rating Weight:</source>
         <translation>Βαρύτητα Αξιολόγησης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Play Count Weight:</source>
         <translation>Βαρύτητα Επαναλήψεων Αναπαραγωγής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="116"/>
         <source>Last Play Weight:</source>
         <translation>Βαρύτητα Παλαιότητας Αναπαραγωγής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="114"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Random Weight:</source>
         <translation>Βαρύτητα Τυχαιότητας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="116"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Paranoia Level:</source>
         <translation>Επίπεδο Παράνοιας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="119"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Encoding Type:</source>
         <translation>Τύπος Κωδικοποίησης:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="120"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Default Rip Quality:</source>
         <translation>Προεπιλεγμένη Ποιότητα Αντιγραφής:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="117"/>
+        <location filename="themestrings.h" line="120"/>
         <source>File storage location:</source>
         <translation>Θέση αποθήκευσης αρχείου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="224"/>
         <source>Replace space with underscore</source>
         <translation>Αντικατάστση κενού με &apos;_&apos;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="225"/>
         <source>Use variable bitrates</source>
         <translation>Χρήση μεταβλητής δειγματοληψίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="226"/>
         <source>Automatically eject CDs after ripping</source>
         <translation>Αυτόματη εξαγωγή CD μετά την αντιγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="123"/>
+        <location filename="themestrings.h" line="126"/>
         <source>Script Path:</source>
         <translation>Φάκελος με σκριπτάκι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="124"/>
+        <location filename="themestrings.h" line="127"/>
         <source>Burn Settings</source>
         <translation>Ρυθμίσεις Εγγραφής CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="227"/>
         <source>Enable CD Writing</source>
         <translation>Ενεργοποίηση Εγγραφής CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="126"/>
+        <location filename="themestrings.h" line="129"/>
         <source>CD-Writer Device:</source>
         <translation>Συσκευή Εγγραφέα CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
+        <location filename="themestrings.h" line="130"/>
         <source>Disk Size:</source>
         <translation>Μέγεθος Δίσκου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="128"/>
+        <location filename="themestrings.h" line="131"/>
         <source>CD Write Speed:</source>
         <translation>Ταχύτητα Εγγραφής CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="129"/>
+        <location filename="themestrings.h" line="132"/>
         <source>CD Blanking Type:</source>
         <translation>Τρόπος Διαγραφής CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="228"/>
         <source>Enable directories on MP3 Creation</source>
         <translation>Επιτρέπονται οι φάκελοι κατά την δημιουργία MP3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="131"/>
+        <location filename="themestrings.h" line="134"/>
         <source>Visualiser Settings</source>
         <translation>Ρυθμίσεις Οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="134"/>
+        <location filename="themestrings.h" line="137"/>
         <source>Width for Visual Scaling:</source>
         <translation>Πλάτος για Οπτική Κλιμάκωση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="135"/>
+        <location filename="themestrings.h" line="138"/>
         <source>Height for Visual Scaling:</source>
         <translation>Ύψος για Οπτική Κλιμάκωση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="229"/>
         <source>Change Visualizer on each song</source>
         <translation>Αλλαγή Οπτικοποίησης ανά τραγούδι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="230"/>
         <source>Randomize Visualizer order</source>
         <translation>Τυχαία σειρά Οπτικοποιήσεων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="136"/>
+        <location filename="themestrings.h" line="139"/>
         <source>Repeat: Off</source>
         <translation>Επανάληψη.: Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="137"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Repeat: Track</source>
         <translation>Επανάληψη: Τραγούδι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="138"/>
+        <location filename="themestrings.h" line="141"/>
         <source>Repeat: All</source>
         <translation>Επανάληψη: Όλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="139"/>
+        <location filename="themestrings.h" line="142"/>
         <source>Shuffle: Off</source>
         <translation>Ανάμιξη: Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="140"/>
+        <location filename="themestrings.h" line="143"/>
         <source>Shuffle: Random</source>
         <translation>Ανάμιξη: Τυχαία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="141"/>
+        <location filename="themestrings.h" line="144"/>
         <source>Shuffle: Intelligent</source>
         <translation>Ανάμιξη: Έξυπνη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="142"/>
+        <location filename="themestrings.h" line="145"/>
         <source>Shuffle: Album</source>
         <translation>Ανάμιξη: Δίσκος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="143"/>
+        <location filename="themestrings.h" line="146"/>
         <source>Shuffle: Artist</source>
         <translation>Ανάμιξη: Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
         <translation>Τώρα παίζει: %TITLE% από %ARTIST% στο %ALBUM%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="22"/>
         <source>You haven&apos;t selected any tracks to play</source>
         <translation>Δεν έχετε επιλέξει τραγούδια για αναπαραγωγή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="10"/>
         <source>%1 -</source>
         <translation>%1 -</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Played:</source>
         <translation>Παίχθηκε:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="99"/>
         <source>%playcount% times</source>
         <translation>%playcount% φορές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Repeat Mode: Off</source>
         <translation>Επανάληψη: Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Repeat Mode: Track</source>
         <translation>Επανάληψη: Τραγούδι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Repeat Mode: All</source>
         <translation>Επανάληψη: Όλα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Shuffle Mode: Off</source>
         <translation>Ανάμιξη: Όχι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Shuffle Mode: Random</source>
         <translation>Ανάμιξη: Τυχαία</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Shuffle Mode: Intelligent</source>
         <translation>Ανάμιξη: Έξυπνη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Shuffle Mode: Album</source>
         <translation>Ανάμιξη: Δίσκος</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Shuffle Mode: Artist</source>
         <translation>Ανάμιξη: Καλλιτέχνης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="20"/>
         <source>%VOLUMEPERCENT% %|(MUTE|)%</source>
         <translation>%VOLUMEPERCENT% %|(MUTE|)%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="210"/>
+        <location filename="themestrings.h" line="249"/>
         <source>Matches</source>
         <translation>Αποτελέσματα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Match</source>
         <translation>Αποτέλεσμα</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Of The Following Conditions</source>
         <translation>Από Τις Ακόλουθες Συνθήκες</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Matches:</source>
         <translation>Αποτελέσματα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="86"/>
         <source>OK</source>
         <translation>ΟΚ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Convert stereo to 5.1 sound:</source>
         <translation>Μετατροπή στερεοφωνικού ήχου σε 5.1 πολυκάναλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Ignore ID3 Tags:</source>
         <translation>Αγνόηση Ετικετών ID3:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Allow metadata to be written to tags:</source>
         <translation>Να γράφονται πληροφορίες στις ετικέττες:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Automatically lookup CDs:</source>
         <translation>Αυτόματη εύρεση στοιχείων των CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Automatically Play CDs:</source>
         <translation>Αυτόματη αναπαραγωγή CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="118"/>
+        <location filename="themestrings.h" line="121"/>
         <source>Replace space with underscore:</source>
         <translation>Αντικατάστση κενού με &apos;_&apos;:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="121"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Use variable bitrates:</source>
         <translation>Χρήση μεταβλητής δειγματοληψίας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="122"/>
+        <location filename="themestrings.h" line="125"/>
         <source>Automatically eject CDs after ripping:</source>
         <translation>Αυτόματη εξαγωγή CD μετά την αντιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="132"/>
+        <location filename="themestrings.h" line="135"/>
         <source>Change Visualizer on each song:</source>
         <translation>Αλλαγή Οπτικοποίησης ανά τραγούδι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="133"/>
+        <location filename="themestrings.h" line="136"/>
         <source>Randomize Visualizer order:</source>
         <translation>Τυχαία σειρά Οπτικοποιήσεων:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="125"/>
+        <location filename="themestrings.h" line="128"/>
         <source>Enable CD Writing:</source>
         <translation>Ενεργοποίηση Εγγραφής CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="130"/>
+        <location filename="themestrings.h" line="133"/>
         <source>Enable directories on MP3 Creation:</source>
         <translation>Επιτρέπονται οι φάκελοι κατά την δημιουργία MP3:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="211"/>
+        <location filename="themestrings.h" line="148"/>
         <source>Press MENU to add some radio streams to play.</source>
         <translation>Πατήστε ΕΠΙΛΟΓΕΣ για να προσθέσετε ροές ραδιοφώνου που θέλετε ν΄ακούσετε.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="212"/>
+        <location filename="themestrings.h" line="149"/>
         <source>%STATION% - %CHANNEL%</source>
         <translation>%STATION% - %CHANNEL%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="213"/>
+        <location filename="themestrings.h" line="151"/>
         <source>Add/Edit Music Stream</source>
         <translation>Προσθήκη/Επεξεργασία Ροής Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="214"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Station:</source>
         <translation>Σταθμός:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="215"/>
+        <location filename="themestrings.h" line="251"/>
         <source>Search for Stream</source>
         <translation>Αναζήτηση για Ροή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="216"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Channel:</source>
         <translation>Κανάλι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="217"/>
+        <location filename="themestrings.h" line="154"/>
         <source>URL:</source>
         <translation>Διεύθυνση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="218"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Logo URL:</source>
         <translation>Διεύθυνση Λογότυπου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="219"/>
+        <location filename="themestrings.h" line="156"/>
         <source>Genres:</source>
         <translation>Είδη:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="220"/>
+        <location filename="themestrings.h" line="157"/>
         <source>Metadata Format:</source>
         <translation>Μορφή Πληροφοριών:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="221"/>
+        <location filename="themestrings.h" line="158"/>
         <source>Search for Music Stream</source>
         <translation>Αναζήτηση για Ροή Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="222"/>
+        <location filename="themestrings.h" line="159"/>
         <source>%STATION% - %Channel%</source>
         <translation>%STATION% - %Channel%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="226"/>
+        <location filename="themestrings.h" line="250"/>
+        <source>Search For Stream</source>
+        <translation>Αναζήτηση για Ροή</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="255"/>
         <source>Music rating options</source>
         <translation>Επιλογές αξιολόγησης μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="227"/>
+        <location filename="themestrings.h" line="256"/>
         <source>Visualization Settings</source>
         <translation>Ρυθμίσεις Οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="228"/>
+        <location filename="themestrings.h" line="257"/>
         <source>Music visualization options</source>
         <translation>Επιλογές οπτικοποίησης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="230"/>
+        <location filename="themestrings.h" line="259"/>
+        <source>Play music files</source>
+        <translation>Αναπαραγωγή αρχείων μουσικής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="260"/>
         <source>Play Radio Streams</source>
         <translation>Αναπαραγωγή Ροών Ραδιοφώνου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="232"/>
+        <location filename="themestrings.h" line="261"/>
+        <source>Play an internet radio stream</source>
+        <translation>Αναπαραγωγή ροής ραδιοφώνου στο διαδίκτυο</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="263"/>
+        <source>Choose which tracks to play</source>
+        <translation>Επιλέξτε ποιά κομμάτια θα παίξετε</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="264"/>
+        <source>Import new tracks</source>
+        <translation>Εισαγωγή νέων κομματιών</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="265"/>
         <source>Scan for New Music</source>
         <translation>Ανίχνευση για Νέα Μουσική</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="233"/>
+        <location filename="themestrings.h" line="266"/>
+        <source>Look for new music files</source>
+        <translation>Αναζήτηση για νέα αρχεία μουσικής</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="267"/>
         <source>Eject media</source>
         <translation>Εξαγωγή Μέσου</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="234"/>
+        <location filename="themestrings.h" line="268"/>
+        <source>Eject a CD</source>
+        <translation>Εξαγωγή CD</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="269"/>
         <source>Music Settings</source>
         <translation>Ρυθμίσεις Μουσικής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="235"/>
+        <location filename="themestrings.h" line="270"/>
         <source>Configure playback and CD ripping</source>
         <translation>Ρυθμίζει την αναπαραγωγή και αντιγραφή CD</translation>
     </message>
