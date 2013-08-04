@@ -1324,8 +1324,8 @@ bool MythDownloadManager::saveFile(const QString &outFile,
 QDateTime MythDownloadManager::GetLastModified(const QString &url)
 {
     // If the header has not expired and
-    // the last modification date is less than 30 minutes old or if
-    // the cache object is less than 5 minutes old,
+    // the last modification date is less than 1 hours old or if
+    // the cache object is less than 20 minutes old,
     // then use the cached header otherwise redownload the header
 
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
@@ -1360,7 +1360,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         ((!urlData.expirationDate().isValid()) ||
          (urlData.expirationDate().secsTo(now) < 0)))
     {
-        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 1800)
+        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 3600) // 1 Hour
         {
             result = urlData.lastModified().toUTC();
         }
@@ -1372,7 +1372,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
                 QDateTime loadDate =
                     MythDate::fromString(date, dateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
-                if (loadDate.secsTo(now) <= 720)
+                if (loadDate.secsTo(now) <= 1200) // 20 Minutes
                 {
                     result = urlData.lastModified().toUTC();
                 }
