@@ -1357,17 +1357,17 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         tmpimage.load(filename);
     }
 
+    if (tmpimage.isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("LoadScaleImage(%1) failed to load image")
+            .arg(filename));
+
+        return NULL;
+    }
+
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
-        if (tmpimage.isNull())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("LoadScaleImage(%1) failed to load image")
-                .arg(filename));
-
-            return NULL;
-        }
-
         QImage tmp2 = tmpimage.scaled(
                           (int)(tmpimage.width() * wmult),
                           (int)(tmpimage.height() * hmult),
