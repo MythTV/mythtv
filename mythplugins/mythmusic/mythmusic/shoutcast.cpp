@@ -878,9 +878,7 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
         QString("DecoderIOFactoryShoutCast: metadata changed - %1")
             .arg(metadata));
     ShoutCastMetaParser parser;
-    // FIXME: 
-    //parser.setMetaFormat(getMetadata().MetadataFormat());
-    parser.setMetaFormat("%a - %t");
+    parser.setMetaFormat(getMetadata().MetadataFormat());
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 
