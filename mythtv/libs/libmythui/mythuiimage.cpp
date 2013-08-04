@@ -981,7 +981,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
 
         // Only load in the background if allowed and the image is
         // not already in our mem cache
-        int cacheMode = kCacheCheckMemoryOnly;
+        int cacheMode = kCacheIgnoreDisk;
 
         if (forceStat)
             cacheMode |= (int)kCacheForceStat;

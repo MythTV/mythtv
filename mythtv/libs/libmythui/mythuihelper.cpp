@@ -1508,16 +1508,25 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         }
     }
 
-    QString cachefilepath = GetThemeCacheDir() + '/' + label;
-    QFileInfo fi(cachefilepath);
-
     MythImage *ret = NULL;
 
-    if (!!(cacheMode & kCacheIgnoreDisk) || fi.exists())
+    // Check Memory Cache
+    ret = GetImageFromCache(label);
+
+    // If the image is in the memory or we are not ignoring the disk cache
+    // then proceed to check whether the source file is newer than our cached
+    // copy
+    if (ret || !(cacheMode & kCacheIgnoreDisk))
     {
+        // Create url to image in disk cache
+        QString cachefilepath = GetThemeCacheDir() + '/' + label;
+        QFileInfo cacheFileInfo(cachefilepath);
+
         // Now compare the time on the source versus our cached copy
         QDateTime srcLastModified;
 
+        // For internet images this involves querying the headers of the remote
+        // image. This is slow even without redownloading the whole image
         if ((srcfile.startsWith("http://")) ||
             (srcfile.startsWith("https://")) ||
             (srcfile.startsWith("ftp://")))
@@ -1529,11 +1538,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             srcLastModified = RemoteFile::LastModified(srcfile);
         else
         {
-            if (!(cacheMode & kCacheIgnoreDisk))
-            {
-                if (!FindThemeFile(srcfile))
-                    return NULL;
-            }
+            if (!FindThemeFile(srcfile))
+                return NULL;
 
             QFileInfo original(srcfile);
 
@@ -1541,18 +1547,28 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                 srcLastModified = original.lastModified();
         }
 
-        if (!!(cacheMode & kCacheIgnoreDisk) ||
-            (fi.lastModified() >= srcLastModified))
+        // Now compare the timestamps, if the cached image is newer than the
+        // source image we can use it, otherwise we want to remove it from the
+        // cache
+        if (cacheFileInfo.lastModified() >= srcLastModified)
         {
-            // Check Memory Cache
-            ret = GetImageFromCache(label);
-
-            if (!ret && (cacheMode == kCacheNormal) && painter)
+            // If we haven't already loaded the image from the memory cache
+            // and we're not ignoring the disk cache, then it's time to load
+            // it from there instead
+            if (!ret && (cacheMode == kCacheNormal))
             {
-                // Load file from disk cache to memory cache
-                ret = painter->GetFormatImage();
 
-                if (!ret->Load(cachefilepath, false))
+                if (painter)
+                    ret = painter->GetFormatImage();
+
+                // Load file from disk cache to memory cache
+                if (ret && ret->Load(cachefilepath, false))
+                {
+                    // Add to ram cache, and skip saving to disk since that is
+                    // where we found this in the first place.
+                    CacheImage(label, ret, true);
+                }
+                else
                 {
                     LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
                         QString("LoadCacheImage: Could not load :%1")
@@ -1562,16 +1578,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                     ret->DecrRef();
                     ret = NULL;
                 }
-                else
-                {
-                    // Add to ram cache, and skip saving to disk since that is
-                    // where we found this in the first place.
-                    CacheImage(label, ret, true);
-                }
             }
         }
         else
         {
+            ret = NULL;
             // If file has changed on disk, then remove it from the memory
             // and disk cache
             RemoveFromCacheByURL(label);
