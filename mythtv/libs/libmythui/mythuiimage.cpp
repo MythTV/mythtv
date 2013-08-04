@@ -289,6 +289,16 @@ class ImageLoader
             }
         }
 
+        if (image && image->isNull())
+        {
+            LOG(VB_GUI | VB_FILE, LOG_INFO,
+                QString("ImageLoader::LoadImage(%1) Image is NULL")
+                                                    .arg(filename));
+
+            image->DecrRef();
+            image = NULL;
+        }
+
         if (image && !bFoundInCache)
         {
             if (bForceResize)
@@ -326,16 +336,6 @@ class ImageLoader
 
             if (!imageReader)
                 GetMythUI()->CacheImage(cacheKey, image);
-        }
-
-        if (image && image->isNull())
-        {
-            LOG(VB_GUI | VB_FILE, LOG_INFO,
-                QString("ImageLoader::LoadImage(%1) Image is NULL")
-                                                    .arg(filename));
-
-            image->DecrRef();
-            image = NULL;
         }
 
         if (image)
