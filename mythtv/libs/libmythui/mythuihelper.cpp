@@ -1531,8 +1531,17 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
             (srcfile.startsWith("https://")) ||
             (srcfile.startsWith("ftp://")))
         {
-            srcLastModified =
-                GetMythDownloadManager()->GetLastModified(srcfile);
+            // If the image is in the memory cache then skip the last modified
+            // check, since memory cached images are loaded in the foreground
+            // this can cause an intolerable delay. The images won't stay in
+            // the cache forever and so eventually they will be checked.
+            if (ret)
+                srcLastModified = cacheFileInfo.lastModified();
+            else
+            {
+                srcLastModified =
+                    GetMythDownloadManager()->GetLastModified(srcfile);
+            }
         }
         else if (srcfile.startsWith("myth://"))
             srcLastModified = RemoteFile::LastModified(srcfile);
