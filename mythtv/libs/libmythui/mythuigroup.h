@@ -16,7 +16,6 @@ class MUI_PUBLIC MythUIGroup : public MythUIComposite
    ~MythUIGroup();
 
     void Reset(void);
-    void Reset(const QStringList &exceptions);
 
   protected:
     virtual void CopyFrom(MythUIType *base);

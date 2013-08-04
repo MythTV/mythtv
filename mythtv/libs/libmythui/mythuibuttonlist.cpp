@@ -3396,15 +3396,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         return;
     }
 
-    // We want to reset everything in the button EXCEPT for the widgets which
-    // are about to be assigned new values. This is more efficient than
-    // resetting everything and more importantly it prevent flashing of images
-    // while browsing the list
-    QStringList exceptionList;
-    exceptionList << "buttontext" << "buttonimage" << "buttonarrow" << "buttoncheck";
-    exceptionList << m_strings.keys() << m_images.keys();
-    exceptionList << m_imageFilenames.keys() << m_states.keys();
-    buttonstate->Reset(exceptionList);
+    buttonstate->Reset();
 
     MythUIText *buttontext = dynamic_cast<MythUIText *>
                              (buttonstate->GetChild("buttontext"));
