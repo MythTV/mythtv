@@ -1301,11 +1301,11 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     if (filename.isEmpty())
         return NULL;
 
-    if ((!FindThemeFile(filename)) &&
-        (!filename.startsWith("http://")) &&
+    if ((!filename.startsWith("http://")) &&
         (!filename.startsWith("https://")) &&
         (!filename.startsWith("ftp://")) &&
-        (!filename.startsWith("myth://")))
+        (!filename.startsWith("myth://")) &&
+        (!FindThemeFile(filename)))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1) ")
             .arg(filename) + "Unable to find image file");
