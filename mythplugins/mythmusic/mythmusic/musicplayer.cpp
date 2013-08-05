@@ -1372,6 +1372,13 @@ void MusicPlayer::decoderHandlerReady(void)
         cddecoder->setDevice(gCDdevice);
 #endif
 
+    // Decoder thread can't be running while being initialized
+    if (getDecoder()->isRunning())
+    {
+        getDecoder()->stop();
+        getDecoder()->wait();
+    }
+
     getDecoder()->setOutput(m_output);
     //getDecoder()-> setBlockSize(2 * 1024);
     getDecoder()->addListener(this);
