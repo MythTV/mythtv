@@ -35,7 +35,6 @@
 #include "uitypes.h"
 #include "cardutil.h"
 #include "themeinfo.h"
-#include "mythconfig.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #ifdef USING_AIRPLAY
@@ -3576,7 +3575,7 @@ static HostCheckBox *MacMainEnabled()
                                         "in the main GUI window. Disable this "
                                         "when you only want video on the "
                                         "desktop or in a floating window. Only "
-                                        "valid when "\"Use GUI size for TV "
+                                        "valid when \"Use GUI size for TV "
                                         "playback\" and \"Run the frontend in "
                                         "a window\" are checked."));
     return gc;

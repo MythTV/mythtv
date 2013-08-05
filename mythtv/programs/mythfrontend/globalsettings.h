@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QCoreApplication>
 
+#include "mythconfig.h"
 #include "settings.h"
 #include "mythcontext.h"
 #include "videodisplayprofile.h"
