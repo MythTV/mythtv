@@ -909,7 +909,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1324"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2154"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2159"/>
         <source>Save To New Playlist</source>
         <translation>In neuer Playlist speichern</translation>
     </message>
@@ -920,7 +920,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1340"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2155"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2160"/>
         <source>Save To Existing Playlist</source>
         <translation>In vorhandener Playlist speichern</translation>
     </message>
@@ -931,73 +931,73 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1407"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2196"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2201"/>
         <source>Change Volume</source>
         <translation>Lautstärke ändern</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1409"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2197"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2202"/>
         <source>Mute</source>
         <translation>Stumm</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1411"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2198"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2203"/>
         <source>Previous Track</source>
         <translation>Vorheriges Lied</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1413"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2199"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2204"/>
         <source>Next Track</source>
         <translation>Nächstes Lied</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1415"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2203"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2208"/>
         <source>Jump Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1417"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2204"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2209"/>
         <source>Jump Forward</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1419"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2207"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2212"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1421"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2208"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2213"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1423"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2211"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2216"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1428"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2250"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2255"/>
         <source>All Tracks</source>
         <translation>Alle Titel</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1430"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2253"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2258"/>
         <source>From CD</source>
         <translation>Von CD</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1438"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2260"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2265"/>
         <source>Tracks From Current Year</source>
         <translation>Alle Titel dieses Jahres</translation>
     </message>
@@ -1007,12 +1007,22 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
         <translation>%1 von %2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2131"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2012"/>
+        <source>Default Playlist</source>
+        <translation>Standard Playlist</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2014"/>
+        <source>Stream Playlist</source>
+        <translation>Stream Playlist</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/musiccommon.cpp" line="2136"/>
         <source>Play Radio Stream</source>
         <translation>Radiostream abspielen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2395"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2400"/>
         <source>More Options</source>
         <translation>Mehr Optionen</translation>
     </message>
@@ -1053,72 +1063,72 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
         <translation type="obsolete">Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2088"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2093"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2096"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2118"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2101"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2123"/>
         <source>Switch View</source>
         <translation>Ansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2100"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2140"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2105"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2145"/>
         <source>Playlist Options</source>
         <translation>Playlistoptionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2101"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2231"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2106"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2236"/>
         <source>Set Shuffle Mode</source>
         <translation>Shuffle Mode wählen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2102"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2218"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2107"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2223"/>
         <source>Set Repeat Mode</source>
         <translation>Wiederholungsmodus wählen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2105"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2110"/>
         <source>Player Options</source>
         <translation>Wiedergabeoptionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2108"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2246"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2113"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2251"/>
         <source>Quick Playlists</source>
         <translation>Schnelle Playlisten</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2111"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2116"/>
         <source>Change Visualizer</source>
         <translation>Visualisierungsmodus ändern</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2123"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2128"/>
         <source>Current Playlist</source>
         <translation>Aktuelle Playlist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2125"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2130"/>
         <source>Playlist Editor - Tree</source>
         <translation>Playlisteneditor - Baumansicht</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2127"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2132"/>
         <source>Playlist Editor - Gallery</source>
         <translation>Playlisteneditor - Galerieansicht</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2129"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2134"/>
         <source>Search for Music</source>
         <translation>Nach Musik suchen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2133"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2138"/>
         <source>Fullscreen Visualizer</source>
         <translation>Vollbild Visualisierung</translation>
     </message>
@@ -1131,7 +1141,7 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</translation>
         <translation type="obsolete">Information über Interpret</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2168"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2173"/>
         <source>Exiting Music Player.
 
 Do you want to continue playing in the background?</source>
@@ -1140,53 +1150,53 @@ Do you want to continue playing in the background?</source>
 Soll im Hintergrund weiterhin abgespielt werden?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2192"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2197"/>
         <source>Player Actions</source>
         <translation>Playeraktionen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2222"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2235"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2227"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2240"/>
         <source>None</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2223"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2228"/>
         <source>Track</source>
         <translation>Lied</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2224"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2229"/>
         <source>All</source>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2236"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2241"/>
         <source>Random</source>
         <translation>Zufall</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2237"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2242"/>
         <source>Smart</source>
         <translation>Intelligent</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2238"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2243"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2239"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2244"/>
         <source>Artist</source>
         <translation>Interpret</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2269"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2274"/>
         <source>Choose Visualizer</source>
         <translation>Visualisierungsmodus wählen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2281"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2286"/>
         <source>Add to Playlist Options</source>
         <translation>Zu Playlistoptionen hinzufügen</translation>
     </message>
@@ -1201,25 +1211,25 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1298"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2094"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2099"/>
         <source>Search List...</source>
         <translation>Suche Liste...</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1305"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2146"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2151"/>
         <source>Sync List With Current Track</source>
         <translation>Synchronisiere Liste mit aktuellem Stück</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1309"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2147"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2152"/>
         <source>Remove Selected Track</source>
         <translation>Entferne aktuelles Stück</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1319"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2150"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2155"/>
         <source>Remove All Tracks</source>
         <translation>Entferne alle Stücke</translation>
     </message>
@@ -1229,31 +1239,31 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1355"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2160"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2165"/>
         <source>Switch To Move Mode</source>
         <translation>In den Verschiebemodus wechseln</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1363"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2158"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2163"/>
         <source>Switch To Select Mode</source>
         <translation>In den Auswahlmodus wechseln</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1432"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2257"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2262"/>
         <source>Tracks By Current Artist</source>
         <translation>Alle Titel dieses Interpreten</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1434"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2259"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2264"/>
         <source>Tracks From Current Genre</source>
         <translation>Alle Titel dieses Genres</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1436"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2258"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2263"/>
         <source>Tracks From Current Album</source>
         <translation>Alle Titel dieses Albums</translation>
     </message>
@@ -1263,36 +1273,36 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1440"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2261"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2266"/>
         <source>Tracks With Same Title</source>
         <translation>Lieder mit gleichem Titel</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1445"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2285"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2290"/>
         <source>Replace Tracks</source>
         <translation>Ersetze Lieder</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1450"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2286"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2291"/>
         <source>Add Tracks</source>
         <translation>Lieder hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musiccommon.cpp" line="2185"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2190"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1394"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2183"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2188"/>
         <source>No - Exit, Stop Playing</source>
         <translation>Nein, Wiedergabe beenden</translation>
     </message>
     <message>
         <location filename="../mythmusic/musiccommon.cpp" line="1400"/>
-        <location filename="../mythmusic/musiccommon.cpp" line="2184"/>
+        <location filename="../mythmusic/musiccommon.cpp" line="2189"/>
         <source>Yes - Exit, Continue Playing</source>
         <translation>Ja, Wiedergabe fortsetzen</translation>
     </message>
@@ -3385,197 +3395,197 @@ Station: %1 - Sender: %2</translation>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="147"/>
+        <location filename="themestrings.h" line="169"/>
         <source>Please Wait...</source>
         <translation>Bitte warten...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="148"/>
+        <location filename="themestrings.h" line="170"/>
         <source>Track Information</source>
         <translation>Titelinformation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Artist:</source>
         <translation>Interpret:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Album:</source>
         <translation>Album:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Title:</source>
         <translation>Titel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Year:</source>
         <translation>Jahr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Track No.:</source>
         <translation>Lied Nr.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Rating:</source>
         <translation>Bewertung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="149"/>
+        <location filename="themestrings.h" line="171"/>
         <source>Play Count:</source>
         <translation>Wie oft gehört:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="150"/>
+        <location filename="themestrings.h" line="172"/>
         <source>Last Play:</source>
         <translation>Zuletzt gehört:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Compilation:</source>
         <translation>Zusammenstellung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Filename:</source>
         <translation>Dateiname:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Metadata</source>
         <translation>Metadaten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Already in database</source>
         <translation>Bereits in der Datenbank</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Search</source>
         <translation>Suche</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Cover Art</source>
         <translation>Coverbild</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Next New</source>
         <translation>Nächstes Neue</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Add All New</source>
         <translation>Alle neuen hinzu</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Comp. Artist:</source>
         <translation>Komp. Interpret:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Album Art</source>
         <translation>Albumcover</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="25"/>
         <source>No Album Art Found</source>
         <translation>Kein Albumcover gefunden</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Type:</source>
         <translation>Typ:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Quality:</source>
         <translation>Qualität:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Multi-Artist:</source>
         <translation>Mehrere Interpreten:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Switch Titles</source>
         <translation>Titel wechseln</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Track</source>
         <translation>Lied</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="40"/>
         <source>Artist</source>
         <translation>Interpret</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Length</source>
         <translation>Länge</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Scan CD</source>
         <translation>CD durchsuchen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Rip CD</source>
         <translation>CD importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Importing CD</source>
         <translation>Importiere CD</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Encoding Track</source>
         <translation>Kodiere Lied</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Import Music</source>
         <translation>Musik importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Location:</source>
         <translation>Verzeichnis:</translation>
     </message>
@@ -3592,12 +3602,12 @@ Station: %1 - Sender: %2</translation>
         <translation type="obsolete">/some/file/goes/here/test.mp3</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="192"/>
+        <location filename="themestrings.h" line="210"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="193"/>
+        <location filename="themestrings.h" line="211"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
@@ -3606,427 +3616,562 @@ Station: %1 - Sender: %2</translation>
         <translation type="obsolete">Verzeichnissuche</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Import Cover Art</source>
         <translation>Coverbild importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="144"/>
+        <location filename="themestrings.h" line="160"/>
         <source>Playing:</source>
         <translation>Spiele:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="145"/>
+        <location filename="themestrings.h" line="161"/>
         <source>None</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="146"/>
+        <location filename="themestrings.h" line="162"/>
         <source>%TITLE%  by  %ARTIST%</source>
         <translation>%TITLE%  by  %ARTIST%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="97"/>
+        <location filename="themestrings.h" line="101"/>
         <source>Directory to hold music:</source>
         <translation>Verzeichnis für Musik:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="98"/>
+        <location filename="themestrings.h" line="102"/>
         <source>CD device:</source>
         <translation>CD Gerät:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="99"/>
+        <location filename="themestrings.h" line="103"/>
         <source>Audio device:</source>
         <translation>Audiogerät:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="101"/>
+        <location filename="themestrings.h" line="105"/>
         <source>Filename Format:</source>
         <translation>Format der Dateinamen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="103"/>
+        <location filename="themestrings.h" line="163"/>
         <source>Tag Encoding:</source>
         <translation>Zeichenkodierung der Tags:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="177"/>
+        <location filename="themestrings.h" line="219"/>
         <source>Convert stereo to 5.1 sound</source>
         <translation>Stereo in 5.1 konvertieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="178"/>
+        <location filename="themestrings.h" line="220"/>
         <source>Ignore ID3 Tags</source>
         <translation>ID3-Tags ignorieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="179"/>
+        <location filename="themestrings.h" line="221"/>
         <source>Allow metadata to be written to tags</source>
         <translation>Erlaube das Schreiben von Metadaten zu Tags</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="106"/>
+        <location filename="themestrings.h" line="109"/>
         <source>Resume mode:</source>
         <translation>Wiederaufnahmemodus:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="107"/>
+        <location filename="themestrings.h" line="110"/>
         <source>Action on exit:</source>
         <translation>Aktion beim Beenden:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="180"/>
+        <location filename="themestrings.h" line="222"/>
         <source>Automatically lookup CDs</source>
         <translation>CDs autom. nachschlagen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="181"/>
+        <location filename="themestrings.h" line="223"/>
         <source>Automatically Play CDs</source>
         <translation>CDs autom. abspielen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="110"/>
+        <location filename="themestrings.h" line="113"/>
         <source>Rating Settings</source>
         <translation>Bewertungseinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="111"/>
+        <location filename="themestrings.h" line="114"/>
         <source>Rating Weight:</source>
         <translation>Gewichtung der Bewertung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="112"/>
+        <location filename="themestrings.h" line="115"/>
         <source>Play Count Weight:</source>
         <translation>Gewichtung des Wiedergabezählers:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="113"/>
+        <location filename="themestrings.h" line="116"/>
         <source>Last Play Weight:</source>
         <translation>Gewichtung der letzten Wiedergaben:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="114"/>
+        <location filename="themestrings.h" line="117"/>
         <source>Random Weight:</source>
         <translation>Zufallsgewichtung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="116"/>
+        <location filename="themestrings.h" line="119"/>
         <source>Paranoia Level:</source>
         <translation>Paranoia Level:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="119"/>
+        <location filename="themestrings.h" line="122"/>
         <source>Encoding Type:</source>
         <translation>Zeichenkodierung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="120"/>
+        <location filename="themestrings.h" line="123"/>
         <source>Default Rip Quality:</source>
         <translation>Standardmäßige Qualitätsstufe für den CD-Import:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="117"/>
+        <location filename="themestrings.h" line="120"/>
         <source>File storage location:</source>
         <translation>Speicherort für Dateien:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="182"/>
+        <location filename="themestrings.h" line="224"/>
         <source>Replace space with underscore</source>
         <translation>Leerzeichen durch Unterstrich ersetzen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="183"/>
+        <location filename="themestrings.h" line="225"/>
         <source>Use variable bitrates</source>
         <translation>Nutze variable Bitraten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="184"/>
+        <location filename="themestrings.h" line="226"/>
         <source>Automatically eject CDs after ripping</source>
         <translation>CDs nach dem Import auswerfen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="123"/>
+        <location filename="themestrings.h" line="126"/>
         <source>Script Path:</source>
         <translation>Skriptpfad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="124"/>
+        <location filename="themestrings.h" line="127"/>
         <source>Burn Settings</source>
         <translation>Brenneinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="185"/>
+        <location filename="themestrings.h" line="227"/>
         <source>Enable CD Writing</source>
         <translation>CD-Beschreiben aktivieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="126"/>
+        <location filename="themestrings.h" line="129"/>
         <source>CD-Writer Device:</source>
         <translation>CD-Brenner Gerät:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="127"/>
+        <location filename="themestrings.h" line="130"/>
         <source>Disk Size:</source>
         <translation>Diskgröße:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="128"/>
+        <location filename="themestrings.h" line="131"/>
         <source>CD Write Speed:</source>
         <translation>CD-Brenngeschwindigkeit:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="129"/>
+        <location filename="themestrings.h" line="132"/>
         <source>CD Blanking Type:</source>
         <translation>CD Austastwert:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="186"/>
+        <location filename="themestrings.h" line="228"/>
         <source>Enable directories on MP3 Creation</source>
         <translation>Erlaube Verzeichnisse für MP3-CDs</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="131"/>
+        <location filename="themestrings.h" line="134"/>
         <source>Visualiser Settings</source>
         <translation>Visualisierungseinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="134"/>
+        <location filename="themestrings.h" line="137"/>
         <source>Width for Visual Scaling:</source>
         <translation>Breite für Visualiserungs Skalierung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="135"/>
+        <location filename="themestrings.h" line="138"/>
         <source>Height for Visual Scaling:</source>
         <translation>Höhe für Visualiserungs Skalierung:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="187"/>
+        <location filename="themestrings.h" line="229"/>
         <source>Change Visualizer on each song</source>
         <translation>Visualisierung für jedes Lied ändern</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="188"/>
+        <location filename="themestrings.h" line="230"/>
         <source>Randomize Visualizer order</source>
         <translation>Zufällige Sortierung der Visualisierungsplugins</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="136"/>
+        <location filename="themestrings.h" line="139"/>
         <source>Repeat: Off</source>
         <translation>Wiederholung: Aus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="137"/>
+        <location filename="themestrings.h" line="140"/>
         <source>Repeat: Track</source>
         <translation>Wiederholung: Lied</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="138"/>
+        <location filename="themestrings.h" line="141"/>
         <source>Repeat: All</source>
         <translation>Wiederholung: Alle</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="139"/>
+        <location filename="themestrings.h" line="142"/>
         <source>Shuffle: Off</source>
         <translation>Shuffle: Aus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="140"/>
+        <location filename="themestrings.h" line="143"/>
         <source>Shuffle: Random</source>
         <translation>Shuffle: Zufällig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="141"/>
+        <location filename="themestrings.h" line="144"/>
         <source>Shuffle: Intelligent</source>
         <translation>Shuffle: Intelligent</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="142"/>
+        <location filename="themestrings.h" line="145"/>
         <source>Shuffle: Album</source>
         <translation>Shuffle: Album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="143"/>
+        <location filename="themestrings.h" line="146"/>
         <source>Shuffle: Artist</source>
         <translation>Shuffle: Artist</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
         <translation>Aktuell: %TITLE% von %ARTIST% aus %ALBUM%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="22"/>
         <source>You haven&apos;t selected any tracks to play</source>
         <translation>Sie haben keine Lieder zum Abspielen ausgewählt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="10"/>
         <source>%1 -</source>
         <translation>%1 -</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="151"/>
+        <location filename="themestrings.h" line="173"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="152"/>
+        <location filename="themestrings.h" line="174"/>
         <source>Import Coverart</source>
         <translation>Coverart importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="153"/>
+        <location filename="themestrings.h" line="175"/>
         <source>Browse cover images on your system.</source>
         <translation>Coverbilder auf dem System durchsuchen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="60"/>
         <source>File:</source>
         <translation>Datei:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="61"/>
         <source>Destination:</source>
         <translation>Ziel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Image Type:</source>
         <translation>Bildtyp:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="154"/>
+        <location filename="themestrings.h" line="176"/>
         <source>Previous</source>
         <translation>Vorherige</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="155"/>
+        <location filename="themestrings.h" line="177"/>
         <source>Next</source>
         <translation>Nächste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Copy</source>
         <translation>Kopieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="156"/>
+        <location filename="themestrings.h" line="6"/>
+        <source>%TITLE%</source>
+        <translation>%TITLE%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>%ALBUM%</source>
+        <translation>%ALBUM%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>%ARTIST%</source>
+        <translation>%ARTIST%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>%GENRE%</source>
+        <translation>%GENRE%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="147"/>
+        <source>Internet Stream View</source>
+        <translation>Internet Streams</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="164"/>
+        <source>Clears the entire database:</source>
+        <translation>Löscht die gesamte Datenbank:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="165"/>
+        <source>Visualizer Settings</source>
+        <translation>Visualisierungseinstellungen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="166"/>
+        <source>Radio Stream</source>
+        <translation>Radiostream</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="167"/>
+        <source>%channel% (%station%)</source>
+        <translation>%channel% (%station%)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="168"/>
+        <source>%CHANNEL% (%STATION%)</source>
+        <translation>%CHANNEL% (%STATION%)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="178"/>
         <source>Import local music files.</source>
         <translation>Lokale Musikdateien importieren.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="157"/>
+        <location filename="themestrings.h" line="179"/>
         <source>Track is part of a compilation</source>
         <translation>Lied ist Teil einer Kompilation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="158"/>
+        <location filename="themestrings.h" line="180"/>
         <source>Click to browse directories...</source>
         <translation>Verzeichnisse durchsuchen...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="159"/>
+        <location filename="themestrings.h" line="181"/>
         <source>Choose Coverart</source>
         <translation>Coverart wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="160"/>
+        <location filename="themestrings.h" line="182"/>
         <source>Rip A CD</source>
         <translation>Eine CD rippen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="161"/>
+        <location filename="themestrings.h" line="183"/>
         <source>Input metadata for the CD you have inserted.</source>
         <translation>Metadaten für die eingelegte CD eingeben.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="162"/>
+        <location filename="themestrings.h" line="184"/>
         <source>Album Name:</source>
         <translation>Albumname:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="163"/>
+        <location filename="themestrings.h" line="185"/>
         <source>Album Year:</source>
         <translation>Album Jahr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="164"/>
+        <location filename="themestrings.h" line="186"/>
         <source>Album is a compilation</source>
         <translation>Album ist eine Kompilation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="165"/>
+        <location filename="themestrings.h" line="187"/>
         <source>Click here to search existing artists...</source>
         <translation>Vorhandene Künstler durchsuchen...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="166"/>
+        <location filename="themestrings.h" line="188"/>
         <source>Click here to search existing albums...</source>
         <translation>Vorhandene Alben durchsuchen...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="167"/>
+        <location filename="themestrings.h" line="189"/>
         <source>Click here to search existing genres...</source>
         <translation>Vorhandene Genres durchsuchen...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="168"/>
+        <location filename="themestrings.h" line="190"/>
         <source>Track Title:</source>
         <translation>Titel:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="169"/>
+        <location filename="themestrings.h" line="191"/>
         <source>Track Artist:</source>
         <translation>Künstler:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="170"/>
+        <location filename="themestrings.h" line="192"/>
         <source>Track:</source>
         <translation>Lied:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="171"/>
+        <location filename="themestrings.h" line="193"/>
         <source>Click Here to Select Artist</source>
         <translation>Hier klicken um den Künstler zu wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="172"/>
+        <location filename="themestrings.h" line="194"/>
         <source>Click Here to Select Compilation</source>
         <translation>Hier klicken um die Compilation zu wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="173"/>
+        <location filename="themestrings.h" line="195"/>
         <source>Click Here to Select Album</source>
         <translation>Hier klicken um das Album zu wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="174"/>
+        <location filename="themestrings.h" line="196"/>
         <source>Click Here to Select Genre</source>
         <translation>Hier klicken um das Genre zu wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="175"/>
+        <location filename="themestrings.h" line="197"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="176"/>
+        <location filename="themestrings.h" line="198"/>
         <source>+</source>
         <translation>+</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="190"/>
+        <location filename="themestrings.h" line="199"/>
+        <source>Playlist View</source>
+        <translation>Playlisten Ansicht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="200"/>
+        <source>From the album %ALBUM% by the artist %ARTIST%</source>
+        <translation>Aus dem Album %ALBUM% von %ARTIST%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="201"/>
+        <source>Playlist Tree View</source>
+        <translation>Playlisten Baumansicht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="202"/>
+        <source>Playlist Gallery View</source>
+        <translation>Playlisten Galerieansicht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="203"/>
+        <source>Search View</source>
+        <translation>Suchansicht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="204"/>
+        <source>Track Details</source>
+        <translation>Lied Details</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="205"/>
+        <source>Compilation Artist:</source>
+        <translation>Kompilations-Interpret:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="206"/>
+        <source>Length: %1</source>
+        <translation>Länge: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="207"/>
+        <source>Year: %1</source>
+        <translation>Jahr: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="208"/>
+        <source>Track Count:</source>
+        <translation>Anzahl Lieder:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="209"/>
+        <source>Date added:</source>
+        <translation>Datum hinzugefügt:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="212"/>
+        <source>: %VOLUMEPERCENT%</source>
+        <translation>: %VOLUMEPERCENT%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="213"/>
+        <source>Position:</source>
+        <translation>Position:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="214"/>
+        <source>CD Ripping</source>
+        <translation>CD Ripping</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="216"/>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="217"/>
+        <source>Search Term</source>
+        <translation>Suchbegriff</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="218"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="232"/>
         <source>Scan</source>
         <translation>Scannen</translation>
     </message>
@@ -4043,22 +4188,22 @@ Station: %1 - Sender: %2</translation>
         <translation type="obsolete">Albumcover bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="207"/>
+        <location filename="themestrings.h" line="247"/>
         <source>Ripping CD</source>
         <translation>CD wird geripped</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Edit Track Information</source>
         <translation>Liedinformationen bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="68"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Volume</source>
         <translation>Lautstärke</translation>
     </message>
@@ -4067,507 +4212,542 @@ Station: %1 - Sender: %2</translation>
         <translation type="obsolete">0%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="90"/>
+        <location filename="themestrings.h" line="94"/>
         <source>Length:</source>
         <translation>Länge:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="93"/>
+        <location filename="themestrings.h" line="97"/>
         <source>Last Played:</source>
         <translation>Zuletzt gehört:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="92"/>
+        <location filename="themestrings.h" line="96"/>
         <source>Last Value</source>
         <translation>Letzte Lautstärke</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="94"/>
+        <location filename="themestrings.h" line="98"/>
         <source>Played:</source>
         <translation>Gehört:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="95"/>
+        <location filename="themestrings.h" line="99"/>
         <source>%playcount% times</source>
         <translation>%playcount% times</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="96"/>
+        <location filename="themestrings.h" line="100"/>
         <source>General Settings</source>
         <translation>Grundeinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="223"/>
+        <location filename="themestrings.h" line="252"/>
         <source>Music folders and general options</source>
         <translation>Musikverzeichnisse und allgemeine Optionen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="105"/>
+        <location filename="themestrings.h" line="108"/>
         <source>Player Settings</source>
         <translation>Wiedergabe</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="224"/>
+        <location filename="themestrings.h" line="253"/>
         <source>Music playback options</source>
         <translation>Wiedergabe-Einstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="115"/>
+        <location filename="themestrings.h" line="118"/>
         <source>Ripper Settings</source>
         <translation>CD-Import</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="229"/>
+        <location filename="themestrings.h" line="258"/>
         <source>Play Music</source>
         <translation>Musik hören</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="231"/>
+        <location filename="themestrings.h" line="262"/>
         <source>Select Music</source>
         <translation>Musik wählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="191"/>
+        <location filename="themestrings.h" line="233"/>
         <source>Import CD</source>
         <translation>CD importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="189"/>
+        <location filename="themestrings.h" line="231"/>
         <source>Import Files</source>
         <translation>Dateien importieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="195"/>
+        <location filename="themestrings.h" line="235"/>
         <source>Play List</source>
         <translation>Playlist</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Played %1 times</source>
         <translation>%1 Mal abgespielt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="196"/>
+        <location filename="themestrings.h" line="236"/>
         <source>Play List Editor (tree)</source>
         <translation>Playlisteneditor (Baumansicht)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="197"/>
+        <location filename="themestrings.h" line="237"/>
         <source>Play List Editor (gallery)</source>
         <translation>Playlisteneditor (Galerieansicht)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="198"/>
+        <location filename="themestrings.h" line="238"/>
         <source>Play List Editor (search)</source>
         <translation>Playlisteneditor (Suche)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="23"/>
         <source>%TITLE% by %ARTIST% on %ALBUM%</source>
         <translation>%TITLE% von %ARTIST% aus %ALBUM%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Next: %NEXTTITLE% by %NEXTARTIST%</source>
         <translation>Als Nächstes: %NEXTTITLE% von %NEXTARTIST%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Smart Playlist Editor</source>
         <translation>Intelligente Playlists - Editor</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Category:</source>
         <translation>Kategorie:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="199"/>
+        <location filename="themestrings.h" line="239"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="200"/>
+        <location filename="themestrings.h" line="240"/>
         <source>Match:</source>
         <translation>Treffer:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="201"/>
+        <location filename="themestrings.h" line="241"/>
         <source>of the following conditions:</source>
         <translation>der folgenden Bedingungen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Order By:</source>
         <translation>Sortierung nach:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Limit:</source>
         <translation>Limit:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="76"/>
         <source>Show Results</source>
         <translation>Treffer zeigen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Edit Criteria</source>
         <translation>Kriterium bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Edit Date</source>
         <translation>Datum bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="80"/>
+        <location filename="themestrings.h" line="84"/>
         <source>Use Current Date</source>
         <translation>Aktuelles Datum verwenden</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
+        <location filename="themestrings.h" line="80"/>
         <source>Fixed Date</source>
         <translation>Fixes Datum</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
+        <location filename="themestrings.h" line="81"/>
         <source>Day</source>
         <translation>Tag</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
+        <location filename="themestrings.h" line="82"/>
         <source>Month</source>
         <translation>Monat</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="79"/>
+        <location filename="themestrings.h" line="83"/>
         <source>Year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="81"/>
+        <location filename="themestrings.h" line="85"/>
         <source>+/- Days</source>
         <translation>+/- Tage</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="83"/>
+        <location filename="themestrings.h" line="87"/>
         <source>Order By Fields</source>
         <translation>Nach Feldern sortieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="84"/>
+        <location filename="themestrings.h" line="88"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="85"/>
+        <location filename="themestrings.h" line="89"/>
         <source>Move Up</source>
         <translation>Nach oben verschieben</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="86"/>
+        <location filename="themestrings.h" line="90"/>
         <source>Move Down</source>
         <translation>Nach unten verschieben</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="87"/>
+        <location filename="themestrings.h" line="91"/>
         <source>Ascending</source>
         <translation>Aufsteigend</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="88"/>
+        <location filename="themestrings.h" line="92"/>
         <source>Descending</source>
         <translation>Absteigend</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="89"/>
+        <location filename="themestrings.h" line="93"/>
         <source>Smart Playlist Result Viewer</source>
         <translation>Intelligente Playlists - Treffer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="194"/>
+        <location filename="themestrings.h" line="234"/>
         <source>Listen to Music</source>
         <translation>Musik hören</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="202"/>
+        <location filename="themestrings.h" line="242"/>
         <source>Compilation</source>
         <translation>Kompilation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="203"/>
+        <location filename="themestrings.h" line="243"/>
         <source>Album Artwork</source>
         <translation>Albumcover</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="91"/>
+        <location filename="themestrings.h" line="95"/>
         <source>Date Added:</source>
         <translation>Datum hinzugefügt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="204"/>
+        <location filename="themestrings.h" line="244"/>
         <source>Look Up</source>
         <translation>Suchen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="205"/>
+        <location filename="themestrings.h" line="245"/>
         <source>Rip a CD</source>
         <translation>Eine CD rippen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="206"/>
+        <location filename="themestrings.h" line="246"/>
         <source>Multi-Artist</source>
         <translation>Mehrere Interpreten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="208"/>
+        <location filename="themestrings.h" line="248"/>
         <source>Importing CD:</source>
         <translation>Importiere CD:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="209"/>
+        <location filename="themestrings.h" line="215"/>
         <source>Encoding Track:</source>
         <translation>Kodiere Lied.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="65"/>
         <source>%VOLUMEPERCENT%</source>
         <translation>%VOLUMEPERCENT%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Repeat Mode: Off</source>
         <translation>Wiederholung: Aus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Repeat Mode: Track</source>
         <translation>Wiederholung: Lied</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Repeat Mode: All</source>
         <translation>Wiederholung: Alle</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Shuffle Mode: Off</source>
         <translation>Shuffle: Aus</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Shuffle Mode: Random</source>
         <translation>Shuffle: Zufällig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Shuffle Mode: Intelligent</source>
         <translation>Shuffle: Intelligent</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Shuffle Mode: Album</source>
         <translation>Shuffle: Album</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Shuffle Mode: Artist</source>
         <translation>Shuffle: Interpret</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="20"/>
         <source>%VOLUMEPERCENT% %|(MUTE|)%</source>
         <translation>%VOLUMEPERCENT% %|(MUTE|)%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="210"/>
+        <location filename="themestrings.h" line="249"/>
         <source>Matches</source>
         <translation>Stimmt überein</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Match</source>
         <translation>Übereinstimmung</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Of The Following Conditions</source>
         <translation>Der folgenden Bedingungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Matches:</source>
         <translation>Übereinstimmungen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="82"/>
+        <location filename="themestrings.h" line="86"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="100"/>
+        <location filename="themestrings.h" line="104"/>
         <source>Convert stereo to 5.1 sound:</source>
         <translation>Stereo in 5.1 konvertieren:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="102"/>
+        <location filename="themestrings.h" line="106"/>
         <source>Ignore ID3 Tags:</source>
         <translation>ID3-Tags ignorieren:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="104"/>
+        <location filename="themestrings.h" line="107"/>
         <source>Allow metadata to be written to tags:</source>
         <translation>Erlaube das Schreiben von Metadaten zu Tags:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="108"/>
+        <location filename="themestrings.h" line="111"/>
         <source>Automatically lookup CDs:</source>
         <translation>CDs autom. nachschlagen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="109"/>
+        <location filename="themestrings.h" line="112"/>
         <source>Automatically Play CDs:</source>
         <translation>CDs autom. abspielen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="118"/>
+        <location filename="themestrings.h" line="121"/>
         <source>Replace space with underscore:</source>
         <translation>Leerzeichen durch Unterstrich ersetzen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="121"/>
+        <location filename="themestrings.h" line="124"/>
         <source>Use variable bitrates:</source>
         <translation>Nutze variable Bitraten:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="122"/>
+        <location filename="themestrings.h" line="125"/>
         <source>Automatically eject CDs after ripping:</source>
         <translation>CDs nach dem Import auswerfen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="132"/>
+        <location filename="themestrings.h" line="135"/>
         <source>Change Visualizer on each song:</source>
         <translation>Visualisierung für jedes Lied ändern:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="133"/>
+        <location filename="themestrings.h" line="136"/>
         <source>Randomize Visualizer order:</source>
         <translation>Zufällige Sortierung der Visualisierungsplugins:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="125"/>
+        <location filename="themestrings.h" line="128"/>
         <source>Enable CD Writing:</source>
         <translation>CD-Beschreiben aktivieren:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="130"/>
+        <location filename="themestrings.h" line="133"/>
         <source>Enable directories on MP3 Creation:</source>
         <translation>Erlaube Verzeichnisse für MP3-CDs:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="211"/>
+        <location filename="themestrings.h" line="148"/>
         <source>Press MENU to add some radio streams to play.</source>
         <translation>Drücken Sie MENÜ um Radiostreams abzuspielen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="212"/>
+        <location filename="themestrings.h" line="149"/>
         <source>%STATION% - %CHANNEL%</source>
         <translation>%STATION% - %CHANNEL%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="213"/>
+        <location filename="themestrings.h" line="151"/>
         <source>Add/Edit Music Stream</source>
         <translation>Musikstream hinzufügen/bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="214"/>
+        <location filename="themestrings.h" line="152"/>
         <source>Station:</source>
         <translation>Sender:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="215"/>
+        <location filename="themestrings.h" line="251"/>
         <source>Search for Stream</source>
         <translation>Stream suchen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="216"/>
+        <location filename="themestrings.h" line="153"/>
         <source>Channel:</source>
         <translation>Sender:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="217"/>
+        <location filename="themestrings.h" line="154"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="218"/>
+        <location filename="themestrings.h" line="155"/>
         <source>Logo URL:</source>
         <translation>Logo URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="219"/>
+        <location filename="themestrings.h" line="156"/>
         <source>Genres:</source>
         <translation>Genres:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="220"/>
+        <location filename="themestrings.h" line="157"/>
         <source>Metadata Format:</source>
         <translation>Metadatenformat:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="221"/>
+        <location filename="themestrings.h" line="158"/>
         <source>Search for Music Stream</source>
         <translation>Suche nach Musikstream</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="222"/>
+        <location filename="themestrings.h" line="159"/>
         <source>%STATION% - %Channel%</source>
         <translation>%STATION% - %Channel%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="225"/>
+        <location filename="themestrings.h" line="250"/>
+        <source>Search For Stream</source>
+        <translation>Stream suchen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="254"/>
         <source>CD copying options</source>
         <translation>CD-Kopiereinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="226"/>
+        <location filename="themestrings.h" line="255"/>
         <source>Music rating options</source>
         <translation>Musik Bewertungsoptionen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="227"/>
+        <location filename="themestrings.h" line="256"/>
         <source>Visualization Settings</source>
         <translation>Visualisierungseinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="228"/>
+        <location filename="themestrings.h" line="257"/>
         <source>Music visualization options</source>
         <translation>Musik Visualiserungsoptionen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="230"/>
+        <location filename="themestrings.h" line="259"/>
+        <source>Play music files</source>
+        <translation>Musik hören</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="260"/>
         <source>Play Radio Streams</source>
         <translation>Radiostreams abspielen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="232"/>
+        <location filename="themestrings.h" line="261"/>
+        <source>Play an internet radio stream</source>
+        <translation>Radiostream abspielen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="263"/>
+        <source>Choose which tracks to play</source>
+        <translation>Wählen Sie welche Lieder abgespielt werden sollen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="264"/>
+        <source>Import new tracks</source>
+        <translation>Neue Lieder importieren</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="265"/>
         <source>Scan for New Music</source>
         <translation>Nach neuer Musik suchen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="233"/>
+        <location filename="themestrings.h" line="266"/>
+        <source>Look for new music files</source>
+        <translation>Nach neuen Musikdateien suchen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="267"/>
         <source>Eject media</source>
         <translation>Medium auswerfen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="234"/>
+        <location filename="themestrings.h" line="268"/>
+        <source>Eject a CD</source>
+        <translation>CD auswerfen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="269"/>
         <source>Music Settings</source>
         <translation>Musikeinstellungen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="235"/>
+        <location filename="themestrings.h" line="270"/>
         <source>Configure playback and CD ripping</source>
         <translation>Einstellungen fürs Abspielen und CD rippen</translation>
     </message>

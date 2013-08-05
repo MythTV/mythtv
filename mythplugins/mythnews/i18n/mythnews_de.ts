@@ -261,7 +261,7 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
         <translation>Wählen Sie die Nachrichtenseite die Sie lesen wollen.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>Newsfeed</translation>
     </message>
@@ -272,31 +272,56 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation>Sie haben noch keine Nachrichten-Feeds definiert.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Nachrichten bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>Nachrichten konfigurieren</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Verfügbare Kategorien</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Verfügbare Seiten</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Kategorie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Webseite</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Newsfeed bearbeiten</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Kontexte</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
@@ -318,8 +343,9 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
         <translation>Abbrechen</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="23"/>
         <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>
