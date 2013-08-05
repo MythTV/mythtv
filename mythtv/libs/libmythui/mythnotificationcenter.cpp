@@ -411,7 +411,7 @@ void MythNotificationScreen::Init(void)
         else if (!m_image.isNull())
         {
             // We don't have a path to the image, but the image itself
-            MythImage *img = new MythImage(m_artworkImage->GetPainter());
+            MythImage *img = m_artworkImage->GetPainter()->GetFormatImage();
             img->Assign(m_image);
             m_artworkImage->SetImage(img);
             img->DecrRef();
