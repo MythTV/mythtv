@@ -288,6 +288,8 @@ void MusicPlayer::stop(bool stopAll)
     OutputEvent oe(OutputEvent::Stopped);
     dispatch(oe);
 
+    gCoreContext->emitTVPlaybackStopped();
+
     GetMythMainWindow()->PauseIdleTimer(false);
 }
 
@@ -317,6 +319,8 @@ void MusicPlayer::play(void)
 
     stopDecoder();
 
+    // Notify others that we are about to play
+    gCoreContext->WantingPlayback(this);
 
     if (!m_output)
     {
