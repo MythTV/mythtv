@@ -1353,7 +1353,7 @@ static HostComboBox *PlayBoxOrdering()
     {
         PlaybackSettings::tr("Sort all sub-titles/multi-titles Ascending"),
         PlaybackSettings::tr("Sort all sub-titles/multi-titles Descending"),
-        PlaybackSettings::tr("Sort sub-titles Descending, multi-titles"
+        PlaybackSettings::tr("Sort sub-titles Descending, multi-titles "
                              "Ascending"),
         PlaybackSettings::tr("Sort sub-titles Ascending, multi-titles Descending"),
     };
