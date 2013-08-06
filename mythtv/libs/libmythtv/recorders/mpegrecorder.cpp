@@ -1113,6 +1113,8 @@ void MpegRecorder::run(void)
                     good_data = true;
             }
         }
+        else if (readfd < 0)
+            continue;
         else
         {
             if (has_select)
