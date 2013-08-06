@@ -355,7 +355,8 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
              recinfo.GetRecordingStatus() == rsOtherShowing))
         {
             if (recinfo.GetRecordingStatus() == rsWillRecord ||
-                recinfo.GetRecordingStatus() == rsOtherShowing)
+                recinfo.GetRecordingStatus() == rsOtherShowing ||
+                recinfo.GetRecordingStatus() == rsConflict)
                 menuPopup->AddButton(tr("Don't record this showing"),
                                      qVariantFromValue(recinfo));
 
