@@ -454,17 +454,8 @@ QString getResponse(const QString &query, const QString &def)
         return def;
     }
 
-    char response[80];
-    cin.clear();
-    cin.getline(response, 80);
-    if (!cin.good())
-    {
-        cout << endl;
-        LOG(VB_GENERAL, LOG_ERR, "Read from stdin failed");
-        return NULL;
-    }
-
-    QString qresponse = response;
+    QTextStream stream(stdin);
+    QString     qresponse = stream.readLine();
 
     if (qresponse.isEmpty())
         qresponse = def;
@@ -942,10 +933,6 @@ void setHttpProxy(void)
 void wrapList(QStringList &list, int width)
 {
     int i;
-
-    // if this is triggered, something has gone seriously wrong
-    // the result won't really be usable, but at least it won't crash
-    width = max(width, 5);
 
     for(i = 0; i < list.size(); i++)
     {
