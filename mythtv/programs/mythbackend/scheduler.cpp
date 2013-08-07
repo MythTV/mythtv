@@ -3185,10 +3185,10 @@ void Scheduler::UpdateManuals(uint recordid)
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;
     QDateTime lstartdt = QDateTime(query.value(3).toDate(),
-                               query.value(4).toTime(), Qt::UTC);
+                               query.value(4).toTime(), Qt::UTC).toLocalTime();
     int duration = lstartdt.secsTo(
         QDateTime(query.value(5).toDate(),
-                  query.value(6).toTime(), Qt::UTC));
+                  query.value(6).toTime(), Qt::UTC).toLocalTime());
 
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
