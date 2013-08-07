@@ -200,7 +200,7 @@ void SelectSetting::setValue(int which)
     if ((which >= ((int) values.size())) || (which < 0))
     {
         LOG(VB_GENERAL, LOG_ERR,
-                 QString("SelectSetting::setValue(): invalid index: %1 size: ")
+                 QString("SelectSetting::setValue(): invalid index: %1 size: %2")
                      .arg(which).arg(values.size()));
     }
     else
