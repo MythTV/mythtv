@@ -1,80 +1,38 @@
+// Qt headers
 #include <QFile>
 #include <QDir>
+#include <QObject>
 
+// MythTV headers
 #include "dbsettings.h"
+#include "dbsettings_private.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythdbparams.h"
 
-class MythDbSettings1: public VerticalConfigurationGroup {
-public:
-    MythDbSettings1(const QString &DBhostOverride = QString::null);
-
-    void Load(void);
-    void Save(void);
-    void Save(QString /*destination*/) { Save(); }
-
-protected:
-    TransLabelSetting    *info;
-    TransLineEditSetting *dbHostName;
-    TransCheckBoxSetting *dbHostPing;
-    TransLineEditSetting *dbPort;
-    TransLineEditSetting *dbName;
-    TransLineEditSetting *dbUserName;
-    TransLineEditSetting *dbPassword;
-//    TransComboBoxSetting *dbType;
-
-    QString              m_DBhostOverride;
-}; 
-
-class MythDbSettings2: public VerticalConfigurationGroup {
-public:
-    MythDbSettings2();
-
-    void Load(void);
-    void Save(void);
-    void Save(QString /*destination*/) { Save(); }
-
-protected:
-    TransCheckBoxSetting *localEnabled;
-    TransLineEditSetting *localHostName;
-    TransCheckBoxSetting *wolEnabled;
-    TransSpinBoxSetting  *wolReconnect;
-    TransSpinBoxSetting  *wolRetry;
-    TransLineEditSetting *wolCommand;
-}; 
-
-
-
-class LocalHostNameSettings : public TriggeredConfigurationGroup
+LocalHostNameSettings::LocalHostNameSettings(Setting *checkbox,
+    ConfigurationGroup *group) :
+    TriggeredConfigurationGroup(false, false, false, false)
 {
-  public:
-    LocalHostNameSettings(Setting *checkbox, ConfigurationGroup *group) :
-        TriggeredConfigurationGroup(false, false, false, false)
-    {
-        setLabel(QObject::tr("Use custom identifier for frontend preferences"));
+        setLabel(DatabaseSettings::tr("Use custom identifier for frontend "
+                                      "preferences"));
         addChild(checkbox);
         setTrigger(checkbox);
 
         addTarget("1", group);
         addTarget("0", new VerticalConfigurationGroup(true));
-    }
 };
 
-class WOLsqlSettings : public TriggeredConfigurationGroup
+WOLsqlSettings::WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group) :
+    TriggeredConfigurationGroup(false, false, false, false)
 {
-  public:
-    WOLsqlSettings(Setting *checkbox, ConfigurationGroup *group) :
-        TriggeredConfigurationGroup(false, false, false, false)
-    {
-        setLabel(QObject::tr("Backend Server Wakeup settings"));
+        setLabel(DatabaseSettings::tr("Backend Server Wakeup settings"));
 
         addChild(checkbox);
         setTrigger(checkbox);
 
         addTarget("1", group);
         addTarget("0", new VerticalConfigurationGroup(true));
-    }
 };
 
 MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
@@ -82,38 +40,46 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
 {
     m_DBhostOverride = DbHostOverride;
 
-    setLabel(QObject::tr("Database Configuration") + " 1/2");
+    // %1 is the current page, %2 is the total number of pages
+    setLabel(DatabaseSettings::tr("Database Configuration %1/%2")
+             .arg("1").arg("2"));
 
     info = new TransLabelSetting();
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
-        info->setValue(QObject::tr("All database settings take effect when "
-                                   "you restart this program."));
+        info->setValue(DatabaseSettings::tr("All database settings take effect "
+                                            "when you restart this program."));
     else
-        info->setValue(QObject::tr("MythTV could not connect to the database. "
-                                   "Please verify your database settings "
-                                   "below."));
+        info->setValue(DatabaseSettings::tr("MythTV could not connect to the "
+                                            "database. Please verify your "
+                                            "database settings below."));
     addChild(info);
 
     VerticalConfigurationGroup* dbServer = new VerticalConfigurationGroup();
-    dbServer->setLabel(QObject::tr("Database Server Settings"));
+
+    dbServer->setLabel(DatabaseSettings::tr("Database Server Settings"));
+
     dbHostName = new TransLineEditSetting(true);
-    dbHostName->setLabel(QObject::tr("Hostname"));
-    dbHostName->setHelpText(QObject::tr("The host name or IP address of "
-                                        "the machine hosting the database. "
-                                        "This information is required."));
+
+    dbHostName->setLabel(QCoreApplication::translate("(Common)", "Hostname"));
+
+    dbHostName->setHelpText(DatabaseSettings::tr("The host name or IP address "
+                                                 "of the machine hosting the "
+                                                 "database. This information "
+                                                 "is required."));
     dbServer->addChild(dbHostName);
 
     HorizontalConfigurationGroup* g =
         new HorizontalConfigurationGroup(false, false);
 
     dbHostPing = new TransCheckBoxSetting();
-    dbHostPing->setLabel(QObject::tr("Ping test server?"));
-    dbHostPing->setHelpText(QObject::tr("Test basic host connectivity using "
-                                        "the ping command. Turn off if your "
-                                        "host or network don't support ping "
-                                        "(ICMP ECHO) packets"));
+    dbHostPing->setLabel(DatabaseSettings::tr("Ping test server?"));
+    dbHostPing->setHelpText(DatabaseSettings::tr("Test basic host connectivity "
+                                                 "using the ping command. Turn "
+                                                 "off if your host or network "
+                                                 "don't support ping "
+                                                 "(ICMP ECHO) packets"));
     g->addChild(dbHostPing);
 
     // Some extra horizontal space:
@@ -124,37 +90,47 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
     dbServer->addChild(g);
 
     dbPort = new TransLineEditSetting(true);
-    dbPort->setLabel(QObject::tr("Port"));
-    dbPort->setHelpText(QObject::tr("The port number the database is running "
-                                    "on.  Leave blank if using the default "
-                                    "port (3306)."));
+
+    dbPort->setLabel(QCoreApplication::translate("(Common)", "Port", "TCP/IP port"));
+
+    dbPort->setHelpText(DatabaseSettings::tr("The port number the database is "
+                                             "running on.  Leave blank if "
+                                             "using the default port (3306)."));
     g->addChild(dbPort);
 
     dbName = new TransLineEditSetting(true);
-    dbName->setLabel(QObject::tr("Database name"));
-    dbName->setHelpText(QObject::tr("The name of the database. "
-                                    "This information is required."));
+
+    dbName->setLabel(DatabaseSettings::tr("Database name"));
+
+    dbName->setHelpText(DatabaseSettings::tr("The name of the database. "
+                                             "This information is required."));
     dbServer->addChild(dbName);
 
     dbUserName = new TransLineEditSetting(true);
-    dbUserName->setLabel(QObject::tr("User"));
-    dbUserName->setHelpText(QObject::tr("The user name to use while "
-                                        "connecting to the database. "
-                                        "This information is required."));
+
+    dbUserName->setLabel(QCoreApplication::translate("(Common)", "User"));
+
+    dbUserName->setHelpText(DatabaseSettings::tr("The user name to use while "
+                                                 "connecting to the database. "
+                                                 "This information is "
+                                                 "required."));
     dbServer->addChild(dbUserName);
 
     dbPassword = new TransLineEditSetting(true);
-    dbPassword->setLabel(QObject::tr("Password"));
-    dbPassword->setHelpText(QObject::tr("The password to use while "
-                                        "connecting to the database. "
-                                        "This information is required."));
+
+    dbPassword->setLabel(QCoreApplication::translate("(Common)", "Password"));
+
+    dbPassword->setHelpText(DatabaseSettings::tr("The password to use while "
+                                                 "connecting to the database. "
+                                                 "This information is "
+                                                 "required."));
     dbServer->addChild(dbPassword);
 
 //     dbType = new TransComboBoxSetting(false);
-//     dbType->setLabel(QObject::tr("Database type"));
-//     dbType->addSelection(QObject::tr("MySQL"), "QMYSQL");
+//     dbType->setLabel(DatabaseSettings::tr("Database type"));
+//     dbType->addSelection(DatabaseSettings::tr("MySQL"), "QMYSQL");
 //     dbType->setValue(0);
-//     dbType->setHelpText(QObject::tr("The database implementation used "
+//     dbType->setHelpText(DatabaseSettings::tr("The database implementation used "
 //                                     "for your server."));
 //     dbType->setEnabled(false);
     //dbServer->addChild(dbType);
@@ -166,25 +142,31 @@ MythDbSettings1::MythDbSettings1(const QString &DbHostOverride) :
 MythDbSettings2::MythDbSettings2(void) :
     VerticalConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Database Configuration") + " 2/2");
+    setLabel(DatabaseSettings::tr("Database Configuration %1/%2")
+             .arg("2").arg("2"));
 
     localEnabled = new TransCheckBoxSetting();
-    localEnabled->setLabel(QObject::tr("Use custom identifier for frontend "
-                                       "preferences"));
-    localEnabled->setHelpText(QObject::tr("If this frontend's host name "
-                                          "changes often, check this box "
-                                          "and provide a network-unique "
-                                          "name to identify it. "
-                                          "If unchecked, the frontend "
-                                          "machine's local host name will "
-                                          "be used to save preferences in "
-                                          "the database."));
+
+    localEnabled->setLabel(DatabaseSettings::tr("Use custom identifier for "
+                                                "frontend preferences"));
+
+    localEnabled->setHelpText(DatabaseSettings::tr("If this frontend's host "
+                                                   "name changes often, check "
+                                                   "this box and provide a "
+                                                   "network-unique name to "
+                                                   "identify it. If unchecked, "
+                                                   "the frontend machine's "
+                                                   "local host name will be "
+                                                   "used to save preferences "
+                                                   "in the database."));
 
     localHostName = new TransLineEditSetting(true);
-    localHostName->setLabel(QObject::tr("Custom identifier"));
-    localHostName->setHelpText(QObject::tr("An identifier to use while "
-                                           "saving the settings for this "
-                                           "frontend."));
+
+    localHostName->setLabel(DatabaseSettings::tr("Custom identifier"));
+
+    localHostName->setHelpText(DatabaseSettings::tr("An identifier to use "
+                                                    "while saving the settings "
+                                                    "for this frontend."));
 
     VerticalConfigurationGroup *group1 =
         new VerticalConfigurationGroup(false);
@@ -195,28 +177,39 @@ MythDbSettings2::MythDbSettings2(void) :
     addChild(sub3);
 
     wolEnabled = new TransCheckBoxSetting();
-    wolEnabled->setLabel(QObject::tr("Enable database server wakeup"));
-    wolEnabled->setHelpText(QObject::tr("If enabled, the frontend will use "
-                                        "database wakeup parameters to "
-                                        "reconnect to the database server."));
+
+    wolEnabled->setLabel(DatabaseSettings::tr("Enable database server wakeup"));
+
+    wolEnabled->setHelpText(DatabaseSettings::tr("If enabled, the frontend "
+                                                 "will use database wakeup "
+                                                 "parameters to reconnect "
+                                                 "to the database server."));
 
     wolReconnect = new TransSpinBoxSetting(0, 60, 1, true);
-    wolReconnect->setLabel(QObject::tr("Reconnect time"));
-    wolReconnect->setHelpText(QObject::tr("The time in seconds to wait for "
-                                          "the server to wake up."));
+
+    wolReconnect->setLabel(DatabaseSettings::tr("Reconnect time"));
+
+    wolReconnect->setHelpText(DatabaseSettings::tr("The time in seconds to "
+                                                    "wait for the server to "
+                                                    "wake up."));
 
     wolRetry = new TransSpinBoxSetting(1, 10, 1, true);
-    wolRetry->setLabel(QObject::tr("Retry attempts"));
-    wolRetry->setHelpText(QObject::tr("The number of retries to wake the "
-                                      "server before the frontend gives "
-                                      "up."));
+
+    wolRetry->setLabel(DatabaseSettings::tr("Retry attempts"));
+
+    wolRetry->setHelpText(DatabaseSettings::tr("The number of retries to wake "
+                                               "the server before the frontend "
+                                               "gives up."));
 
     wolCommand = new TransLineEditSetting(true);
-    wolCommand->setLabel(QObject::tr("Wake command"));
-    wolCommand->setHelpText(QObject::tr("The command executed on this "
-                                        "frontend to wake up the database "
-                                        "server (eg. sudo /etc/init.d/mysql "
-                                        "restart)."));
+
+    wolCommand->setLabel(DatabaseSettings::tr("Wake command"));
+
+    wolCommand->setHelpText(DatabaseSettings::tr("The command executed on this "
+                                                 "frontend to wake up the "
+                                                 "database server (eg. sudo "
+                                                 "/etc/init.d/mysql "
+                                                 "restart)."));
 
     HorizontalConfigurationGroup *group2 =
         new HorizontalConfigurationGroup(false, false);
@@ -242,12 +235,14 @@ void MythDbSettings1::Load(void)
         params.dbPassword.isEmpty() ||
         params.dbName.isEmpty())
         info->setValue(info->getValue() + "\n" +
-                       QObject::tr("Required fields are"
-                                   " marked with an asterisk (*)."));
+            DatabaseSettings::tr("Required fields are marked with an "
+                                 "asterisk (*)."));
 
     if (params.dbHostName.isEmpty())
     {
-        dbHostName->setLabel("* " + dbHostName->getLabel());
+        //: %1 is the required field name 
+        dbHostName->setLabel(DatabaseSettings::tr("* %1", "Required field")
+                             .arg(dbHostName->getLabel()));
         dbHostName->setValue(m_DBhostOverride);
     }
     else
@@ -260,13 +255,16 @@ void MythDbSettings1::Load(void)
 
     dbUserName->setValue(params.dbUserName);
     if (params.dbUserName.isEmpty())
-        dbUserName->setLabel("* " + dbUserName->getLabel());
+        dbUserName->setLabel(DatabaseSettings::tr("* %1", "Required field")
+                             .arg(dbUserName->getLabel()));
     dbPassword->setValue(params.dbPassword);
     if (params.dbPassword.isEmpty())
-        dbPassword->setLabel("* " + dbPassword->getLabel());
+        dbPassword->setLabel(DatabaseSettings::tr("* %1", "Required field")
+                             .arg(dbPassword->getLabel()));
     dbName->setValue(params.dbName);
     if (params.dbName.isEmpty())
-        dbName->setLabel("* " + dbName->getLabel());
+        dbName->setLabel(DatabaseSettings::tr("* %1", "Required field")
+                         .arg(dbName->getLabel()));
 
 //     if (params.dbType == "QMYSQL")
 //         dbType->setValue(0);
