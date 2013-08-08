@@ -481,24 +481,28 @@ QNetworkReply *MythDownloadManager::download(const QString &url,
                                              const bool reload)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
+    QNetworkReply *reply = NULL;
 
     dlInfo->m_url          = url;
     dlInfo->m_reload       = reload;
     dlInfo->m_syncMode     = true;
     dlInfo->m_processReply = false;
 
-    bool ok = downloadNow(dlInfo, false);
+    if (downloadNow(dlInfo, false))
+    {
+        if (dlInfo->m_reply)
+        {
+            reply = dlInfo->m_reply;
+            // prevent dlInfo dtor from deleting the reply
+            dlInfo->m_reply = NULL;
 
-    QNetworkReply *reply = dlInfo->m_reply;
+            delete dlInfo;
 
-    if (reply)
-        dlInfo->m_reply = NULL;
+            return reply;
+        }
 
-    delete dlInfo;
-    dlInfo = NULL;
-
-    if (ok && reply)
-        return reply;
+        delete dlInfo;
+    }
 
     return NULL;
 }
@@ -1394,15 +1398,21 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         // Head request, we only want to inspect the headers
         dlInfo->m_requestType = kRequestHead;
 
-        if (downloadNow(dlInfo, false) && dlInfo->m_reply)
+        if (downloadNow(dlInfo, false))
         {
-            QVariant lastMod =
-                dlInfo->m_reply->header(QNetworkRequest::LastModifiedHeader);
-            if (lastMod.isValid())
-                result = lastMod.toDateTime().toUTC();
-        }
+            if (dlInfo->m_reply)
+            {
+                QVariant lastMod =
+                    dlInfo->m_reply->header(
+                        QNetworkRequest::LastModifiedHeader);
+                if (lastMod.isValid())
+                    result = lastMod.toDateTime().toUTC();
+            }
 
-        delete dlInfo;
+            // downloadNow() will set a flag to trigger downloadFinished()
+            // to delete the dlInfo if the download times out
+            delete dlInfo;
+        }
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1'): Result %2")
