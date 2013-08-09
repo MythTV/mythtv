@@ -385,9 +385,9 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
         shift = 0;
 
 #if ARCH_X86
-    if (false && sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
+    if (sse_check() && len >= 16 && ISALIGN(in) && ISALIGN(out))
     {
-        float o = 1, mo = -1;
+        float o = 0.99999995, mo = -1;
         int loops = len >> 4;
         i = loops << 4;
 
@@ -447,16 +447,15 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
 
         if (valf >= 1.0f)
         {
-            *out++ = (range - 1) << shift;
+            *out++ = (range - 128) << shift;
+            continue;
         }
-        else if (valf <= -1.0f)
+        if (valf <= -1.0f)
         {
             *out++ = (-range) << shift;
+            continue;
         }
-        else
-        {
-            *out++ = lrintf(valf * f) << shift;
-        }
+        *out++ = lrintf(valf * f) << shift;
     }
     return len << 2;
 }

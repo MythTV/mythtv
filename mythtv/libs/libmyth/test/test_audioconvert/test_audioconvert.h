@@ -462,10 +462,10 @@ class TestAudioConvert: public QObject
         arrays2[1] = -2147483648;
         arrays2[2] = -2147483648;
         arrays2[3] = -2147483648;
-        arrays2[4] = 2147483647;
-        arrays2[5] = 2147483647;
-        arrays2[6] = 2147483647;
-        arrays2[7] = 2147483647;
+        arrays2[4] = 2147483520;   // (1<<31)-128
+        arrays2[5] = 2147483520;
+        arrays2[6] = 2147483520;
+        arrays2[7] = 2147483520;
         AudioConvert::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
         for (int i = 0; i < 8; i++)
         {
