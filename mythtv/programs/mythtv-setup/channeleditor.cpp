@@ -26,7 +26,7 @@
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
     : ConfigurationWizard()
 {
-    setLabel(QObject::tr("Channel Options"));
+    setLabel(tr("Channel Options"));
 
     // Must be first.
     addChild(cid = new ChannelID());
@@ -60,7 +60,7 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
 ChannelEditor::ChannelEditor(MythScreenStack *parent)
               : MythScreenType(parent, "channeleditor"),
     m_sourceFilter(FILTER_ALL),
-    m_currentSortMode(QObject::tr("Channel Name")),
+    m_currentSortMode(QCoreApplication::translate("(Common)", "Channel Name")),
     m_currentHideMode(false),
     m_channelList(NULL), m_sourceList(NULL), m_preview(NULL),
     m_channame(NULL), m_channum(NULL), m_callsign(NULL),
