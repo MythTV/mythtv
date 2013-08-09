@@ -97,7 +97,7 @@ class ShoutCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
@@ -151,7 +151,7 @@ class IceCastRequest
             QString authstring = url.userName() + ":" + url.password();
             QString auth = QCodecs::base64Encode(authstring.toLocal8Bit());
 
-            hdr += "Authorization: Basic " + auth;
+            hdr += "Authorization: Basic " + auth + "\r\n";
         }
 
         hdr += QString("TE: trailers\r\n"
@@ -270,7 +270,7 @@ class ShoutCastMetaParser
     ~ShoutCastMetaParser(void) { }
 
     void setMetaFormat(const QString &metaformat);
-    ShoutCastMetaMap parseMeta(QString meta);
+    ShoutCastMetaMap parseMeta(const QString &meta);
 
   private:
     QString m_meta_format;
@@ -335,25 +335,23 @@ void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)
     m_meta_format.replace("%%", "%");
 }
 
-ShoutCastMetaMap ShoutCastMetaParser::parseMeta(QString meta)
+ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
 {
-    QByteArray metastring(meta.toLocal8Bit());
     ShoutCastMetaMap result;
-    int title_begin_pos = metastring.indexOf("StreamTitle='");
+    int title_begin_pos = mdata.indexOf("StreamTitle='");
     int title_end_pos;
 
     if (title_begin_pos >= 0) 
     {
         title_begin_pos += 13;
-        title_end_pos = metastring.indexOf("';", title_begin_pos);
-        QByteArray title = metastring.mid(title_begin_pos, 
-                                          title_end_pos - title_begin_pos);
+        title_end_pos = mdata.indexOf("';", title_begin_pos);
+        QString title = mdata.mid(title_begin_pos, title_end_pos - title_begin_pos);
         QRegExp rx;
         rx.setPattern(m_meta_format);
         if (rx.indexIn(title) != -1)
         {
             LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
-                    .arg(meta));
+                    .arg(mdata));
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("ShoutCast: Parsed as: '%1' by '%2'")
                     .arg(rx.cap(m_meta_title_pos))
@@ -432,9 +430,6 @@ qint64 ShoutCastIODevice::readData(char *data, qint64 maxlen)
 {
     // the decoder wants more data from the stream
     // but first we must filter out any headers and metadata
-
-    // first fill our buffer with as much data as is available
-    socketReadyRead();
 
     if (m_buffer->readBufAvail() == 0)
     {
@@ -742,14 +737,14 @@ bool ShoutCastIODevice::parseMeta(void)
         return false;
     }
 
-    QString metadata_string = QString::fromUtf8(data.constData());
+    QString metadataString = QString::fromUtf8(data.constData());
 
     // avoid sending signals if the data hasn't changed
-    if (m_last_metadata == metadata_string)
+    if (m_last_metadata == metadataString)
         return true;
 
-    m_last_metadata = metadata_string;
-    emit meta(metadata_string);
+    m_last_metadata = metadataString;
+    emit meta(metadataString);
 
     return true;
 }
@@ -757,7 +752,7 @@ bool ShoutCastIODevice::parseMeta(void)
 /****************************************************************************/
 
 DecoderIOFactoryShoutCast::DecoderIOFactoryShoutCast(DecoderHandler *parent)
-    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL)
+    : DecoderIOFactory(parent), m_timer(NULL), m_input(NULL), m_prebuffer(160000)
 {
     m_timer = new QTimer(this);
 }
@@ -867,8 +862,8 @@ void DecoderIOFactoryShoutCast::periodicallyCheckBuffered(void)
         doConnectDecoder("create-aac-decoder.aac");
     else
     {
-        doFailed(QObject::tr("Unsupported content type for ShoutCast stream: %1")
-                             .arg (response.getContent()));
+        doFailed(tr("Unsupported content type for ShoutCast stream: %1")
+                    .arg (response.getContent()));
     }
 
     m_timer->disconnect();
@@ -883,9 +878,7 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
         QString("DecoderIOFactoryShoutCast: metadata changed - %1")
             .arg(metadata));
     ShoutCastMetaParser parser;
-    // FIXME: 
-    //parser.setMetaFormat(getMetadata().MetadataFormat());
-    parser.setMetaFormat("%a - %t");
+    parser.setMetaFormat(getMetadata().MetadataFormat());
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 

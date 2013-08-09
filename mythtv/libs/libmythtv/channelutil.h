@@ -12,12 +12,14 @@ using namespace std;
 
 // Qt headers
 #include <QString>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "mythtvexp.h"
 #include "dtvmultiplex.h"
 #include "channelinfo.h"
 #include "iptvtuningdata.h"
+#include "tv.h" // for CHANNEL_DIRECTION
 
 class NetworkInformationTable;
 
@@ -47,6 +49,8 @@ typedef vector<pid_cache_item_t> pid_cache_t;
  */
 class MTV_PUBLIC ChannelUtil
 {
+    Q_DECLARE_TR_FUNCTIONS(ChannelUtil)
+
   public:
     // Multiplex Stuff
 
@@ -214,7 +218,7 @@ class MTV_PUBLIC ChannelUtil
     static uint    GetNextChannel(const ChannelInfoList &sorted,
                                   uint old_chanid,
                                   uint mplexid_restriction,
-                                  int  direction,
+                                  ChannelChangeDirection direction,
                                   bool skip_non_visible = true,
                                   bool skip_same_channum_and_callsign = false);
 

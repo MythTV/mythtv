@@ -23,11 +23,12 @@
 #define AVCODEC_SNOW_H
 
 #include "dsputil.h"
-#include "dwt.h"
+#include "snow_dwt.h"
 
 #include "rangecoder.h"
 #include "mathops.h"
 #include "mpegvideo.h"
+#include "h264qpel.h"
 
 #define MID_STATE 128
 
@@ -109,7 +110,8 @@ typedef struct SnowContext{
     RangeCoder c;
     DSPContext dsp;
     VideoDSPContext vdsp;
-    DWTContext dwt;
+    H264QpelContext h264qpel;
+    SnowDWTContext dwt;
     AVFrame new_picture;
     AVFrame input_picture;              ///< new_picture with the internal linesizes
     AVFrame current_picture;

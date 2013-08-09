@@ -54,6 +54,8 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
             : QObject( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),
+              m_CurrentPage   ( 0      ),
+              m_TotalPages    ( 0      ),
               m_TotalAvailable( 0      )
         {
         }

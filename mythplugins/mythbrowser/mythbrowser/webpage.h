@@ -31,6 +31,7 @@ class WebPage : public QObject
   signals:
     void loadProgress(int progress);
     void statusBarMessage(const QString &text);
+    void loadFinished(bool OK);
 
   protected slots:
     void slotLoadStarted(void);

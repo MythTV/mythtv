@@ -64,22 +64,13 @@
             <position>650,380</position>
         </checkbox>
 
-        <textarea name="tagencoding_label" from="basetextarea">
-            <area>140,420,500,40</area>
-            <align>right,vcenter</align>
-            <value>Tag Encoding:</value>
-        </textarea>
-        <buttonlist name="tagencoding" from="baseselector">
-            <position>650,420</position>
-        </buttonlist>
-
         <textarea name="allowtagwriting_label" from="basetextarea">
-            <area>140,470,500,40</area>
+            <area>140,420,500,40</area>
             <align>right,vcenter</align>
             <value>Allow metadata to be written to tags:</value>
         </textarea>
         <checkbox name="allowtagwriting" from="basecheckbox">
-            <position>650,475</position>
+            <position>650,425</position>
         </checkbox>
 
         <textarea name="helptext" from="basetextarea">

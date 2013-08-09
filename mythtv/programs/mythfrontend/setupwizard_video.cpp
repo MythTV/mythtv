@@ -31,9 +31,9 @@ VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
     : MythScreenType(parent, name),      m_downloadFile(QString()),
       m_testType(ttNone),
       m_generalScreen(general),          m_audioScreen(audio),
-      m_playbackProfileButtonList(NULL), m_testSDButton(NULL),
-      m_testHDButton(NULL),              m_nextButton(NULL),
-      m_prevButton(NULL)
+      m_playbackProfileButtonList(NULL), m_progressDialog(NULL),
+	  m_testSDButton(NULL),              m_testHDButton(NULL),
+	  m_nextButton(NULL),                m_prevButton(NULL)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_vdp = new VideoDisplayProfile();

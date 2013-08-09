@@ -549,20 +549,26 @@ int ff_interleave_add_packet(AVFormatContext *s, AVPacket *pkt,
         next_point = &s->packet_buffer;
     }
 
-    if (*next_point) {
-        if (chunked) {
-            uint64_t max= av_rescale_q(s->max_chunk_duration, AV_TIME_BASE_Q, st->time_base);
-            if (   st->interleaver_chunk_size     + pkt->size     <= s->max_chunk_size-1U
-                && st->interleaver_chunk_duration + pkt->duration <= max-1U) {
-                st->interleaver_chunk_size     += pkt->size;
-                st->interleaver_chunk_duration += pkt->duration;
-                goto next_non_null;
-            } else {
-                st->interleaver_chunk_size     =
+    if (chunked) {
+        uint64_t max= av_rescale_q_rnd(s->max_chunk_duration, AV_TIME_BASE_Q, st->time_base, AV_ROUND_UP);
+        st->interleaver_chunk_size     += pkt->size;
+        st->interleaver_chunk_duration += pkt->duration;
+        if (   (s->max_chunk_size && st->interleaver_chunk_size > s->max_chunk_size)
+            || (max && st->interleaver_chunk_duration           > max)) {
+            st->interleaver_chunk_size      = 0;
+            this_pktl->pkt.flags |= CHUNK_START;
+            if (max && st->interleaver_chunk_duration > max) {
+                int64_t syncoffset = (st->codec->codec_type == AVMEDIA_TYPE_VIDEO)*max/2;
+                int64_t syncto = av_rescale(pkt->dts + syncoffset, 1, max)*max - syncoffset;
+
+                st->interleaver_chunk_duration += (pkt->dts - syncto)/8 - max;
+            } else
                 st->interleaver_chunk_duration = 0;
-                this_pktl->pkt.flags |= CHUNK_START;
-            }
         }
+    }
+    if (*next_point) {
+        if (chunked && !(this_pktl->pkt.flags & CHUNK_START))
+            goto next_non_null;
 
         if (compare(s, &s->packet_buffer_end->pkt, pkt)) {
             while (   *next_point

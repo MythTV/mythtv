@@ -21,7 +21,7 @@
 #include "mythversion.h"
 #include "mythdate.h"
 #include "dbutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythdownloadmanager.h"
 #include "mythtvexp.h"
@@ -1186,7 +1186,13 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
     }
 
     QFile file(inputfile);
-    file.open(QIODevice::ReadOnly);
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open file: %1").arg(inputfile));
+        return false;
+    }
+
     QByteArray data = file.readAll();
     file.close();
 
@@ -1581,7 +1587,11 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
     LOG(VB_GENERAL, LOG_INFO, LOC + "SaveLineupToCache("+lineupid+
         ") -- success");
 
-    makeFileAccessible(fna.constData()); // Let anybody update it
+    bool ret = makeFileAccessible(fna.constData()); // Let anybody update it
+    if (!ret)
+    {
+        // Nothing, makeFileAccessible will print an error
+    }
 
     return true;
 }

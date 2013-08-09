@@ -16,7 +16,7 @@ MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
       m_layout(LayoutHorizontal), m_effect(EffectReveal),
       m_total(0),                 m_start(0),
-      m_current(0)
+      m_current(0),               m_firstdepend(true)
 {
 }
 
@@ -24,6 +24,7 @@ void MythUIProgressBar::Reset()
 {
     m_total = m_start = m_current = 0;
     CalculatePosition();
+    emit DependChanged(false);
     MythUIType::Reset();
 }
 
@@ -187,4 +188,14 @@ void MythUIProgressBar::CreateCopy(MythUIType *parent)
 {
     MythUIProgressBar *progressbar = new MythUIProgressBar(parent, objectName());
     progressbar->CopyFrom(this);
+}
+
+void MythUIProgressBar::SetVisible(bool visible)
+{
+    if (m_firstdepend || visible != m_Visible)
+    {
+        emit DependChanged(!visible);
+        m_firstdepend = false;
+    }
+    MythUIType::SetVisible(visible);
 }

@@ -4,8 +4,6 @@
 #include <QString>
 #include <QMap>
 
-#include "unzip.h"
-
 class RomData
 {
   public:

@@ -9,7 +9,6 @@
 
 #include <QStringList>
 #include <QDateTime>
-#include <QHash>
 
 // MythTV headers
 #include "autodeletedeque.h"
@@ -18,6 +17,7 @@
 #include "mythdbcon.h"
 #include "mythexp.h"
 #include "mythdate.h"
+#include "mythtypes.h"
 
 /* If NUMPROGRAMLINES gets updated following files need
    updates and code changes:
@@ -285,7 +285,7 @@ class MPUBLIC ProgramInfo
 
     // Serializers
     void ToStringList(QStringList &list) const;
-    virtual void ToMap(QHash<QString, QString> &progMap,
+    virtual void ToMap(InfoMap &progMap,
                        bool showrerecord = false,
                        uint star_range = 10) const;
     virtual void SubstituteMatches(QString &str);
@@ -320,12 +320,12 @@ class MPUBLIC ProgramInfo
         { return GetProgramInfoType() == kProgramInfoTypeVideoDVD; }
     bool IsVideoBD(void) const
         { return GetProgramInfoType() == kProgramInfoTypeVideoBD; }
-    bool IsLocal(void) const { return pathname.left(1) == "/"
+    bool IsLocal(void) const { return pathname.startsWith("/")
 #ifdef _WIN32
         || pathname.at(1) == ':'
 #endif
             ; }
-    bool IsMythStream(void) const { return pathname.left(7) == "myth://"; }
+    bool IsMythStream(void) const { return pathname.startsWith("myth://"); }
     bool IsPathSet(void) const { return GetBasename() != pathname; }
     bool HasPathname(void) const { return !GetPathname().isEmpty(); }
     bool IsFileReadable(void) const;

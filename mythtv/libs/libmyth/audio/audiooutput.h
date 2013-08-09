@@ -1,9 +1,12 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
+// Qt headers
 #include <QString>
 #include <QVector>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "compat.h"
 #include "audiosettings.h"
 #include "audiooutputsettings.h"
@@ -11,8 +14,14 @@
 #include "volumebase.h"
 #include "output.h"
 
+// forward declaration
+struct AVCodecContext;
+struct AVPacket;
+
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioOutput)
+
  public:
     class AudioDeviceConfig
     {
@@ -51,7 +60,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        lastError(QString::null), lastWarn(QString::null) {}
+        lastError(QString::null), lastWarn(QString::null), pulsewassuspended(false) {}
 
     virtual ~AudioOutput();
 
@@ -79,12 +88,12 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         /**
          * AddData:
          * Add data to the audiobuffer for playback
-         * 
+         *
          * in:
          *     buffer  : pointer to audio data
          *     len     : length of audio data added
          *     timecode: timecode of the first sample added
-         *     frames  : number of frames added. 
+         *     frames  : number of frames added.
          * out:
          *     return false if there wasn't enough space in audio buffer to
          *     process all the data
@@ -132,10 +141,37 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual int readOutputData(unsigned char *read_buffer,
                                int max_length) = 0;
 
-    virtual bool IsUpmixing(void) = 0;
-    virtual bool ToggleUpmix(void) = 0;
-    virtual bool CanUpmix(void) = 0;
+    virtual bool IsUpmixing(void)   { return false; }
+    virtual bool ToggleUpmix(void)  { return false; }
+    virtual bool CanUpmix(void)     { return false; }
     bool PulseStatus(void) { return pulsewassuspended; }
+    /**
+     * CanProcess
+     * argument: AudioFormat
+     * return true if class can handle AudioFormat
+     * All AudioOutput derivative must be able to handle S16
+     */
+    virtual bool CanProcess(AudioFormat fmt) { return fmt == FORMAT_S16; }
+    /**
+     * CanProcess
+     * return bitmask of all AudioFormat handled
+     * All AudioOutput derivative must be able to handle S16
+     */
+    virtual uint32_t CanProcess(void) { return 1 << FORMAT_S16; }
+
+    /**
+     * DecodeAudio
+     * Utility routine.
+     * Decode an audio packet, and compact it if data is planar
+     * Return negative error code if an error occurred during decoding
+     * or the number of bytes consumed from the input AVPacket
+     * data_size contains the size of decoded data copied into buffer
+     * data decoded will be S16 samples if class instance can't handle HD audio
+     * or S16 and above otherwise. No U8 PCM format can be returned
+     */
+    int DecodeAudio(AVCodecContext *ctx,
+                    uint8_t *buffer, int &data_size,
+                    const AVPacket *pkt);
 
   protected:
     void Error(const QString &msg);

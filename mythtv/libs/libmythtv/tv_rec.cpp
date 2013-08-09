@@ -186,11 +186,7 @@ TVRec::~TVRec()
 {
     QMutexLocker locker(&cardsLock);
     cards.remove(cardid);
-    TeardownAll();
-}
 
-void TVRec::TeardownAll(void)
-{
     if (HasFlags(kFlagRunMainLoop))
     {
         ClearFlags(kFlagRunMainLoop);
@@ -199,18 +195,21 @@ void TVRec::TeardownAll(void)
         eventThread = NULL;
     }
 
+    if (channel)
+    {
+        delete channel;
+        channel = NULL;
+    }
+}
+
+void TVRec::TeardownAll(void)
+{
     TeardownSignalMonitor();
 
     if (scanner)
     {
         delete scanner;
         scanner = NULL;
-    }
-
-    if (channel)
-    {
-        delete channel;
-        channel = NULL;
     }
 
     TeardownRecorder(kFlagKillRec);
@@ -589,6 +588,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
             QString message = QString("LIVETV_EXITED");
             MythEvent me(message, tvchain->GetID());
             gCoreContext->dispatch(me);
+            tvchain->DecrRef();
             tvchain = NULL;
         }
 
@@ -1283,6 +1283,7 @@ void TVRec::run(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "RunTV encountered fatal error, exiting event thread.");
             ClearFlags(kFlagRunMainLoop);
+            TeardownAll();
             return;
         }
 
@@ -1456,6 +1457,8 @@ void TVRec::run(void)
         ChangeState(kState_None);
         HandleStateChange();
     }
+
+    TeardownAll();
 }
 
 /** \fn TVRec::WaitForEventThreadSleep(bool wake, ulong time)
@@ -2603,6 +2606,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     QMutexLocker lock(&stateChangeLock);
 
     tvchain = newchain;
+    tvchain->IncrRef(); // mark it for TVRec use
     tvchain->ReloadAll();
 
     QString hostprefix = gCoreContext->GenMythURL(
@@ -2860,6 +2864,10 @@ void TVRec::StopLiveTV(void)
     WaitForEventThreadSleep();
 
     // We are done with the tvchain...
+    if (tvchain)
+    {
+        tvchain->DecrRef();
+    }
     tvchain = NULL;
 }
 
@@ -3431,8 +3439,9 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
 
     if (channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
+        // FIXME This is just horrible
         int dir     = channum.right(channum.length() - 12).toInt();
-        uint chanid = channel->GetNextChannel(0, dir);
+        uint chanid = channel->GetNextChannel(0, static_cast<ChannelChangeDirection>(dir));
         channum     = ChannelUtil::GetChanNum(chanid);
     }
 
@@ -3850,7 +3859,25 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             SetFlags(kFlagSignalMonitorRunning);
             ClearFlags(kFlagWaitingForSignal);
             if (!antadj)
+            {
                 SetFlags(kFlagWaitingForSignal);
+
+                QDateTime expire;
+                if (curRecording)
+                {
+                    expire = curRecording->GetScheduledStartTime() >
+                             MythDate::current() ?
+                             curRecording->GetScheduledStartTime() :
+                             MythDate::current();
+                }
+                else
+                {
+                    expire = MythDate::current();
+                }
+
+                signalMonitorDeadline =
+                    expire.addMSecs(genOpt.channel_timeout * 2);
+            }
         }
 
         if (has_dummy && ringBuffer)
@@ -3890,13 +3917,15 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     RecStatusType newRecStatus = rsRecording;
     if (signalMonitor->IsAllGood())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + "Got good signal");
+        LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Have a good signal");
     }
-    else if (signalMonitor->IsErrored())
+    else if (signalMonitor->IsErrored() ||
+             MythDate::current() > signalMonitorDeadline)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "SignalMonitor failed");
-        ClearFlags(kFlagNeedToStartRecorder);
+        LOG(VB_RECORD, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
+            (signalMonitor->IsErrored() ? "failed" : "timed out"));
 
+        ClearFlags(kFlagNeedToStartRecorder);
         newRecStatus = rsFailed;
 
         if (scanner && HasFlags(kFlagEITScannerRunning))
@@ -3907,6 +3936,9 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     }
     else
     {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("TuningSignalCheck: Still waiting.  Will timeout @ %1")
+            .arg(signalMonitorDeadline.toLocalTime().toString("hh:mm:ss.zzz")));
         return NULL;
     }
 
@@ -4224,6 +4256,7 @@ void TVRec::TuningRestartRecorder(void)
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
         RecordingInfo recinfo(*progInfo);
         delete progInfo;
+        recinfo.SetCardID(cardid);
         recorder->SetRecording(&recinfo);
     }
     recorder->Reset();

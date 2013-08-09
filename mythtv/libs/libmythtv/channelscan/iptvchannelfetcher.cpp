@@ -15,10 +15,7 @@
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "mythlogging.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include "httpcomms.h"
-#endif
+#include "mythdownloadmanager.h"
 
 #define LOC QString("IPTVChanFetch: ")
 
@@ -108,6 +105,12 @@ void IPTVChannelFetcher::run(void)
 
     if (_stop_now || playlist.isEmpty())
     {
+        if (playlist.isNull() && _scan_monitor)
+        {
+            _scan_monitor->ScanAppendTextToLog(QObject::tr("Error"));
+            _scan_monitor->ScanPercentComplete(100);
+            _scan_monitor->ScanErrored(QObject::tr("Downloading Playlist Failed"));
+        }
         _thread_running = false;
         _stop_now = true;
         return;
@@ -210,7 +213,7 @@ void IPTVChannelFetcher::SetMessage(const QString &status)
 QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                                              bool inQtThread)
 {
-    if (url.left(4).toLower() == "file")
+    if (url.startsWith("file", Qt::CaseInsensitive))
     {
         QString ret = "";
         QUrl qurl(url);
@@ -230,27 +233,20 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
         return ret;
     }
 
-    // Use Myth HttpComms for http URLs
-    QString redirected_url = url;
+    // Use MythDownloadManager for http URLs
+    QByteArray data;
+    QString tmp;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QString tmp = HttpComms::getHttp(
-        redirected_url,
-        10000 /* ms        */, 3     /* retries      */,
-        3     /* redirects */, true  /* allow gzip   */,
-        NULL  /* login     */, inQtThread);
-#else
-#warning IPTVChannelFetcher::DownloadPlaylist not yet ported to Qt5.
-    QString tmp("");
-#endif
-
-    if (redirected_url != url)
+    if (!GetMythDownloadManager()->download(url, &data))
     {
-        LOG(VB_CHANNEL, LOG_INFO, QString("Channel URL redirected to %1")
-                .arg(redirected_url));
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("IPTVChannelFetcher::DownloadPlaylist failed to "
+                    "download from %1").arg(url));
     }
+    else
+        tmp = QString(data);
 
-    return QString::fromUtf8(tmp.toLatin1().constData());
+    return tmp.isNull() ? tmp : QString::fromUtf8(tmp.toLatin1().constData());
 }
 
 static uint estimate_number_of_channels(const QString &rawdata)
@@ -373,7 +369,7 @@ static bool parse_chan_info(const QString   &rawdata,
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
-                QString data = line.mid(line.indexOf(':'));
+                QString data = line.mid(line.indexOf(':')+1);
                 QString key = data.left(data.indexOf('='));
                 if (!key.isEmpty())
                     values[key] = data.mid(data.indexOf('=')+1);

@@ -27,7 +27,12 @@
 #include "viewschedulediff.h"
 
 CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
-              : MythScreenType(parent, "CustomPriority")
+              : MythScreenType(parent, "CustomPriority"),
+                m_ruleList(NULL),      m_clauseList(NULL),
+                m_titleEdit(NULL),     m_descriptionEdit(NULL),
+                m_prioritySpin(NULL),  m_addButton(NULL),
+                m_testButton(NULL),    m_installButton(NULL),
+                m_deleteButton(NULL),  m_cancelButton(NULL)
 {
     if (proginfo)
         m_pginfo = new ProgramInfo(*proginfo);

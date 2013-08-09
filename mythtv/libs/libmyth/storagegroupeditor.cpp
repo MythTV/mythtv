@@ -1,9 +1,12 @@
+// Qt headers
 #include <QDir>
 #include <QFile>
 #include <QRegExp>
 #include <QUrl>
 #include <QVector>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "storagegroupeditor.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
@@ -35,8 +38,10 @@ SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
     textEdit->setText(text);
     popup->addWidget(textEdit);
 
-    popup->addButton(QObject::tr("OK"),     popup, SLOT(accept()));
-    popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
+    popup->addButton(QCoreApplication::translate("(Common)", "OK"),
+        popup, SLOT(accept()));
+    popup->addButton(QCoreApplication::translate("(Common)", "Cancel"),
+        popup, SLOT(reject()));
 
     textEdit->setFocus();
 
@@ -61,9 +66,10 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
     QString dispGroup = group;
 
     if (group == "Default")
-        dispGroup = QObject::tr("Default");
+        dispGroup = tr("Default", "Default storage group");
     else if (StorageGroup::kSpecialGroups.contains(group))
-        dispGroup = QObject::tr(group.toLatin1().constData());
+        dispGroup = QCoreApplication::translate("(StorageGroups)",
+                                                group.toLatin1().constData());
 
     if (gCoreContext->IsMasterHost())
     {
@@ -96,7 +102,7 @@ void StorageGroupEditor::open(QString name)
         if (name.isEmpty())
             return;
 
-        if (name.right(1) != "/")
+        if (!name.endsWith("/"))
             name.append("/");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -118,7 +124,7 @@ void StorageGroupEditor::open(QString name)
         if (result == SGPopup_CANCEL)
             return;
 
-        if (name.right(1) != "/")
+        if (!name.endsWith("/"))
             name.append("/");
 
         MSqlQuery query(MSqlQuery::InitCon());
@@ -257,7 +263,7 @@ void StorageGroupListEditor::open(QString name)
 {
     lastValue = name;
 
-    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
+    if (name.startsWith("__CREATE_NEW_STORAGE_GROUP__"))
     {
         if (name.length() > 28)
         {
@@ -286,16 +292,17 @@ void StorageGroupListEditor::open(QString name)
 void StorageGroupListEditor::doDelete(void) 
 {
     QString name = listbox->getValue();
-    if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
+    if (name.startsWith("__CREATE_NEW_STORAGE_GROUP__"))
         return;
 
     bool is_master_host = gCoreContext->IsMasterHost();
 
     QString dispGroup = name;
     if (name == "Default")
-        dispGroup = QObject::tr("Default");
+        dispGroup = tr("Default", "Default storage group");
     else if (StorageGroup::kSpecialGroups.contains(name))
-        dispGroup = QObject::tr(name.toLatin1().constData());
+        dispGroup = QCoreApplication::translate("(StorageGroups)",
+                                                name.toLatin1().constData());
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
     if (is_master_host)
@@ -391,7 +398,8 @@ void StorageGroupListEditor::Load(void)
 
     if (isMaster || names.contains("Default"))
     {
-        listbox->addSelection(QObject::tr("Default"), "Default");
+        listbox->addSelection(tr("Default", "Default storage group"),
+                              "Default");
         lastValue = "Default";
     }
     else
@@ -405,7 +413,9 @@ void StorageGroupListEditor::Load(void)
         if (names.contains(groupName))
         {
             listbox->addSelection(
-                QObject::tr(groupName.toLatin1().constData()), groupName);
+                QCoreApplication::translate("(StorageGroups)",
+                                            groupName.toLatin1().constData()),
+                groupName);
             createAddSpecialGroupButton[curGroup] = false;
         }
         else
@@ -424,8 +434,9 @@ void StorageGroupListEditor::Load(void)
 
     if (createAddDefaultButton)
     {
-        listbox->addSelection(tr("(Create %1 group)").arg("Default"),
-                              "Default");
+        listbox->addSelection(tr("(Create %1 group)")
+            .arg(tr("Default", "Default storage group")),
+            "Default");
         lastValue = "Default";
     }
 
@@ -434,13 +445,16 @@ void StorageGroupListEditor::Load(void)
     {
         groupName = StorageGroup::kSpecialGroups[curGroup];
         if (createAddSpecialGroupButton[curGroup])
-            listbox->addSelection(tr("(Create %1 group)").arg(groupName),
+            listbox->addSelection(tr("(Create %1 group)")
+                .arg(QCoreApplication::translate("(StorageGroups)",
+                     groupName.toLatin1().constData())),
                 QString("__CREATE_NEW_STORAGE_GROUP__%1").arg(groupName));
         curGroup++;
     }
 
     if (isMaster)
-        listbox->addSelection(tr("(Create %1 group)").arg("new"),
+        listbox->addSelection(tr("(Create %1 group)")
+            .arg(tr("new", "New storage group")),
             "__CREATE_NEW_STORAGE_GROUP__");
     else
     {

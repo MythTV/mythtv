@@ -505,6 +505,7 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                 default:
                     LOG(VB_GENERAL, LOG_ERR, "Music Scanner - APIC tag found "
                                              "with unsupported type");
+                    delete art;
                     continue;
             }
 

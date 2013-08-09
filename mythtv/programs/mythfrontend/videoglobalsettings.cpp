@@ -15,130 +15,182 @@ namespace
 HostComboBox *VideoDefaultParentalLevel()
 {
     HostComboBox *gc = new HostComboBox("VideoDefaultParentalLevel");
-    gc->setLabel(QObject::tr("Starting Parental Level"));
-    gc->addSelection(QObject::tr("4 - Highest"),
+
+    gc->setLabel(VideoGeneralSettings::tr("Starting Parental Level"));
+
+    gc->addSelection(VideoGeneralSettings::tr("4 - Highest"),
                      QString::number(ParentalLevel::plHigh));
-    gc->addSelection(QObject::tr("1 - Lowest"),
+    gc->addSelection(VideoGeneralSettings::tr("1 - Lowest"),
                      QString::number(ParentalLevel::plLowest));
     gc->addSelection(QString::number(ParentalLevel::plLow));
     gc->addSelection(QString::number(ParentalLevel::plMedium));
-    gc->setHelpText(QObject::tr("This is the 'level' that Video starts at. "
-                    "Any videos with a level at or below this will be shown in "
-                    "the list or while browsing by default. The Parental PIN "
-                    "should be set to limit changing of the default level."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This is the 'level' that Video "
+                                             "starts at. Any videos with a "
+                                             "level at or below this will be "
+                                             "shown in the list or while "
+                                             "browsing by default. The "
+                                             "Parental PIN should be set to "
+                                             "limit changing of the default "
+                                             "level."));
     return gc;
 }
 
 const char *password_clue =
-    QT_TRANSLATE_NOOP("QObject", "Setting this value to all numbers will make your life "
-                "much easier.");
+    QT_TRANSLATE_NOOP("VideoGeneralSettings", "Setting this value to all "
+                                              "numbers will make your life "
+                                              "much easier.");
 
 HostLineEdit *VideoAdminPassword()
 {
     HostLineEdit *gc = new HostLineEdit("VideoAdminPassword");
-    gc->setLabel(QObject::tr("Parental Level 4 PIN"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Parental Level 4 PIN"));
+
     gc->setHelpText(QString("%1 %2")
-        .arg(QObject::tr("This PIN is used to enter Parental Control "
-                         "Level 4 as well as the Video Manager."))
-        .arg(QObject::tr(password_clue)));
+        .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
+                                      "Control Level 4 as well as the Video "
+                                      "Manager."))
+        .arg(VideoGeneralSettings::tr(password_clue)));
+
     return gc;
 }
 
 HostLineEdit *VideoAdminPasswordThree()
 {
     HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordThree");
-    gc->setLabel(QObject::tr("Parental Level 3 PIN"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Parental Level 3 PIN"));
+
     gc->setHelpText(QString("%1 %2")
-        .arg(QObject::tr("This PIN is used to enter Parental Control Level 3."))
-        .arg(QObject::tr(password_clue)));
+        .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
+                                      "Control Level 3."))
+        .arg(VideoGeneralSettings::tr(password_clue)));
+
     return gc;
 }
 
 HostLineEdit *VideoAdminPasswordTwo()
 {
     HostLineEdit *gc = new HostLineEdit("VideoAdminPasswordTwo");
-    gc->setLabel(QObject::tr("Parental Level 2 PIN"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Parental Level 2 PIN"));
+
     gc->setHelpText(QString("%1 %2")
-        .arg(QObject::tr("This PIN is used to enter Parental Control Level 2."))
-        .arg(QObject::tr(password_clue)));
+        .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
+                                      "Control Level 2."))
+        .arg(VideoGeneralSettings::tr(password_clue)));
+
     return gc;
 }
 
 HostCheckBox *VideoAggressivePC()
 {
     HostCheckBox *gc = new HostCheckBox("VideoAggressivePC");
-    gc->setLabel(QObject::tr("Aggressive Parental Control"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Aggressive Parental Control"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, you will not be able to return "
-                    "to this screen and reset the Parental "
-                    "PIN without first entering the current PIN. You have "
-                    "been warned."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("If set, you will not be able to "
+                                             "return to this screen and reset "
+                                             "the Parental PIN without first "
+                                             "entering the current PIN. You "
+                                             "have been warned."));
     return gc;
 }
 
 HostLineEdit *VideoStartupDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
-    gc->setLabel(QObject::tr("Directories that hold videos"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directories that hold videos"));
+
     gc->setValue(DEFAULT_VIDEOSTARTUP_DIR);
-    gc->setHelpText(QObject::tr("Multiple directories can be separated by ':'. "
-                    "Each directory must exist and be readable by the user "
-                    "running the frontend."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("Multiple directories can be "
+                                             "separated by ':'. Each "
+                                             "directory must exist and be "
+                                             "readable by the user running "
+                                             "the frontend."));
     return gc;
 }
 
 HostLineEdit *VideoArtworkDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
-    gc->setLabel(QObject::tr("Directory that holds movie posters"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
+                                          "posters"));
+
     gc->setValue(GetConfDir() + "/Video/Artwork");
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running the frontend needs to have read/write permission "
-                    "to the directory."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This directory must exist, and "
+                                             "the user running the frontend "
+                                             "needs to have read/write "
+                                             "permission to the directory."));
     return gc;
 }
 
 HostLineEdit *VideoScreenshotDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.screenshotDir");
-    gc->setLabel(QObject::tr("Directory that holds movie screenshots"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
+                                          "screenshots"));
+
     gc->setValue(GetConfDir() + "/Video/Screenshots");
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running the frontend needs to have read/write permission "
-                    "to the directory."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This directory must exist, and "
+                                             "the user running the frontend "
+                                             "needs to have read/write "
+                                             "permission to the directory."));
     return gc;
 }
 
 HostLineEdit *VideoBannerDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.bannerDir");
-    gc->setLabel(QObject::tr("Directory that holds movie/TV Banners"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie/TV "
+                                          "Banners"));
+
     gc->setValue(GetConfDir() + "/Video/Banners");
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running the frontend needs to have read/write permission "
-                    "to the directory."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This directory must exist, and "
+                                             "the user running the frontend "
+                                             "needs to have read/write "
+                                             "permission to the directory."));
     return gc;
 }
 
 HostLineEdit *VideoFanartDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.fanartDir");
-    gc->setLabel(QObject::tr("Directory that holds movie fanart"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie fanart"));
+
     gc->setValue(GetConfDir() + "/Video/Fanart");
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running the frontend needs to have read/write permission "
-                    "to the directory."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This directory must exist, and "
+                                             "the user running the frontend "
+                                             "needs to have read/write "
+                                             "permission to the directory."));
     return gc;
 }
 
 HostLineEdit *TrailerDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TrailersDir");
-    gc->setLabel(QObject::tr("Directory that holds movie trailers"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Directory that holds movie "
+                                          "trailers"));
+
     gc->setValue(GetConfDir() + "/Video/Trailers");
-    gc->setHelpText(QObject::tr("This directory must exist, and the user "
-                    "running the frontend needs to have read/write permission "
-                    "to the directory."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("This directory must exist, and "
+                                             "the user running the frontend "
+                                             "needs to have read/write "
+                                             "permission to the directory."));
     return gc;
 }
 
@@ -151,22 +203,31 @@ HostLineEdit *TrailerDirectory()
 HostComboBox *SetOnInsertDVD()
 {
     HostComboBox *gc = new HostComboBox("DVDOnInsertDVD");
-    gc->setLabel(QObject::tr("On DVD insertion"));
-    gc->addSelection(QObject::tr("Display mythdvd menu"),"1");
-    gc->addSelection(QObject::tr("Do nothing"),"0");
-    gc->addSelection(QObject::tr("Play DVD"),"2");
-    gc->setHelpText(QObject::tr("Media Monitoring should be turned on to "
-                   "allow this feature (Setup -> General -> CD/DVD Monitor)."));
+
+    gc->setLabel(VideoGeneralSettings::tr("On DVD insertion"));
+
+    gc->addSelection(VideoGeneralSettings::tr("Display mythdvd menu"),"1");
+    gc->addSelection(VideoGeneralSettings::tr("Do nothing"),"0");
+    gc->addSelection(VideoGeneralSettings::tr("Play DVD"),"2");
+
+    gc->setHelpText(VideoGeneralSettings::tr("Media Monitoring should be "
+                                             "turned on to allow this feature "
+                                             "(Setup -> General -> CD/DVD "
+                                             "Monitor)."));
     return gc;
 }
 
 HostCheckBox *VideoTreeRemember()
 {
     HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
-    gc->setLabel(QObject::tr("Video Tree remembers last selected position"));
+
+    gc->setLabel(VideoGeneralSettings::tr("Video Tree remembers last selected "
+                                          "position"));
+
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, the current position in the Video "
-                                "Tree is persistent."));
+
+    gc->setHelpText(VideoGeneralSettings::tr("If set, the current position in "
+                                             "the Video Tree is persistent."));
     return gc;
 }
 
@@ -219,25 +280,33 @@ class RatingsToPL : public TriggeredConfigurationGroup
     {
         HostCheckBox *r2pl =
                 new HostCheckBox("mythvideo.ParentalLevelFromRating");
-        r2pl->setLabel(QObject::tr("Enable automatic Parental Level from "
-                                   "rating"));
+
+        r2pl->setLabel(VideoGeneralSettings::tr("Enable automatic Parental "
+                                                "Level from rating"));
         r2pl->setValue(false);
-        r2pl->setHelpText(QObject::tr("If enabled, searches will automatically "
-                                      "set the Parental Level to the one "
-                                      "matching the rating below."));
+
+        r2pl->setHelpText(VideoGeneralSettings::tr("If enabled, searches will "
+                                                   "automatically set the "
+                                                   "Parental Level to the one "
+                                                   "matching the rating "
+                                                   "below."));
         addChild(r2pl);
         setTrigger(r2pl);
 
         typedef std::map<ParentalLevel::Level, QString> r2pl_map;
+
         r2pl_map r2pl_defaults;
+
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLowest,
-                QObject::tr("G", "PL 1 default search string.")));
+                VideoGeneralSettings::tr("G", "PL 1 default search string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plLow,
-                QObject::tr("PG", "PL 2 default search string.")));
+                VideoGeneralSettings::tr("PG", "PL 2 default search string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plMedium,
-                QObject::tr("PG-13", "PL3 default search string.")));
+                VideoGeneralSettings::tr("PG-13", "PL3 default search "
+                                                  "string.")));
         r2pl_defaults.insert(r2pl_map::value_type(ParentalLevel::plHigh,
-                QObject::tr("R:NC-17", "PL4 default search string.")));
+                VideoGeneralSettings::tr("R:NC-17", "PL4 default search "
+                                                    "string.")));
 
         VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
 
@@ -246,14 +315,20 @@ class RatingsToPL : public TriggeredConfigurationGroup
         {
             HostLineEdit *hle = new HostLineEdit(QString("mythvideo.AutoR2PL%1")
                                                  .arg(pl.GetLevel()));
-            hle->setLabel(QObject::tr("Level %1").arg(pl.GetLevel()));
-            hle->setHelpText(QObject::tr("Ratings containing these strings "
-                                         "(separated by :) will be assigned "
-                                         "to Parental Level %1.")
-                             .arg(pl.GetLevel()));
+
+            hle->setLabel(VideoGeneralSettings::tr("Level %1")
+                                                   .arg(pl.GetLevel()));
+
+            hle->setHelpText(VideoGeneralSettings::tr("Ratings containing "
+                                                      "these strings "
+                                                      "(separated by :) will "
+                                                      "be assigned to Parental "
+                                                      "Level %1.")
+                                                      .arg(pl.GetLevel()));
 
             r2pl_map::const_iterator def_setting =
                     r2pl_defaults.find(pl.GetLevel());
+
             if (def_setting != r2pl_defaults.end())
             {
                 hle->setValue(def_setting->second);
@@ -288,7 +363,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     // page 3
     VerticalConfigurationGroup *pctrl =
             new VerticalConfigurationGroup(true, false);
-    pctrl->setLabel(QObject::tr("Parental Control Settings"));
+    pctrl->setLabel(tr("Parental Control Settings"));
     pctrl->addChild(VideoDefaultParentalLevel());
     pctrl->addChild(VideoAdminPassword());
     pctrl->addChild(VideoAdminPasswordThree());
@@ -304,7 +379,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     for (ConfigPage::PageList::const_iterator p = pages.begin();
          p != pages.end(); ++p, ++page_num)
     {
-        (*p)->setLabel(QObject::tr("General Settings (%1/%2)").arg(page_num)
+        (*p)->setLabel(tr("General Settings (%1/%2)").arg(page_num)
                        .arg(pages.size()));
         addChild(*p);
     }

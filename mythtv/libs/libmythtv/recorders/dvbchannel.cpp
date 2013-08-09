@@ -64,23 +64,25 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
  */
 DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     : DTVChannel(parent),
-      // Helper classes
-      diseqc_tree(NULL),            dvbcam(NULL),
-      // Device info
-      frontend_name(QString::null),
-      // Tuning
-      tune_lock(),                  hw_lock(QMutex::Recursive),
-      last_lnb_dev_id(~0x0),
-      tuning_delay(0),              sigmon_delay(25),
-      first_tune(true),
-      // Misc
-      fd_frontend(-1),              device(aDevice),
-      has_crc_bug(false)
+    // Helper classes
+    diseqc_tree(NULL),              dvbcam(NULL),
+    // Device info
+    capabilities(0),                ext_modulations(0),
+    frequency_minimum(0),           frequency_maximum(0),
+    symbol_rate_minimum(0),         symbol_rate_maximum(0),
+    // Tuning
+    tune_lock(),                    hw_lock(QMutex::Recursive),
+    last_lnb_dev_id(~0x0),
+    tuning_delay(0),                sigmon_delay(25),
+    first_tune(true),
+    // Misc
+    fd_frontend(-1),                device(aDevice),
+    has_crc_bug(false)
 {
     master_map_lock.lockForWrite();
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     master_map[devname].push_back(this); // == RegisterForMaster
-    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
     if (master == this)
     {
         dvbcam = new DVBCam(device);
@@ -102,7 +104,7 @@ DVBChannel::~DVBChannel()
     // whether we are the master or not remove us from the map..
     master_map_lock.lockForWrite();
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    DVBChannel *master = dynamic_cast<DVBChannel*>(master_map[devname].front());
+    DVBChannel *master = static_cast<DVBChannel*>(master_map[devname].front());
     if (master == this)
     {
         master_map[devname].pop_front();

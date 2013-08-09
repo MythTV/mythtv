@@ -67,7 +67,6 @@ private:
         int32_t phasemode;              // phase shifting mode
         int32_t steering;               // steering mode (0=simple, 1=linear)
         int32_t front_sep, rear_sep;    // front/rear stereo separation
-        float gain;                     // total gain
         // (default) constructor
         fsurround_params(int32_t center_width=100, int32_t dimension=0);
     } params;
@@ -76,10 +75,7 @@ private:
     uint srate;
 
     // info about the current setup
-    bool open_;                         // whether a stream is currently open
-    bool initialized_;                  // whether the thing is intialized	
     struct buffers *bufs;               // our buffers
-    struct int16buffers *int16bufs;     // our buffers
     class fsurround_decoder *decoder;   // the surround decoder
     int in_count;                       // amount in lt,rt
     int out_count;                      // amount in output bufs

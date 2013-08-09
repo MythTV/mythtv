@@ -230,7 +230,6 @@ class MPUBLIC UIKeyType : public UIType
     bool    m_bDown;
     bool    m_bToggle;
 
-    bool    m_bPushed;
     QTimer  m_pushTimer;
 };
 

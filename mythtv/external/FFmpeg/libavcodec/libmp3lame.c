@@ -218,7 +218,7 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         }
     } else {
         lame_result = lame_encode_flush(s->gfp, s->buffer + s->buffer_index,
-                                        s->buffer_size - s->buffer_index);
+                                        BUFFER_SIZE - s->buffer_index);
     }
     if (lame_result < 0) {
         if (lame_result == -1) {
@@ -254,7 +254,7 @@ static int mp3lame_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     av_dlog(avctx, "in:%d packet-len:%d index:%d\n", avctx->frame_size, len,
             s->buffer_index);
     if (len <= s->buffer_index) {
-        if ((ret = ff_alloc_packet2(avctx, avpkt, len)))
+        if ((ret = ff_alloc_packet2(avctx, avpkt, len)) < 0)
             return ret;
         memcpy(avpkt->data, s->buffer, len);
         s->buffer_index -= len;

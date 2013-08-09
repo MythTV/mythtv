@@ -15,37 +15,36 @@
 static HostLineEdit *ZMServerIP()
 {
     HostLineEdit *gc = new HostLineEdit("ZoneMinderServerIP");
-    gc->setLabel(QObject::tr("IP address of the MythZoneMinder server"));
+    gc->setLabel(ZMSettings::tr("IP address of the MythZoneMinder server"));
     gc->setValue("127.0.0.1");
-    gc->setHelpText(QObject::tr("Enter the IP address of the MythZoneMinder server "
-            "that this frontend should connect to."));
+    gc->setHelpText(ZMSettings::tr("Enter the IP address of the MythZoneMinder "
+                                   "server that this frontend should connect "
+                                   "to."));
     return gc;
 };
 
 static HostLineEdit *ZMServerPort()
 {
     HostLineEdit *gc = new HostLineEdit("ZoneMinderServerPort");
-    gc->setLabel(QObject::tr("Port the server runs on"));
+    gc->setLabel(ZMSettings::tr("Port the server runs on"));
     gc->setValue("6548");
-    gc->setHelpText(QObject::tr("Unless you've got good reason to, don't "
-            "change this."));
+    gc->setHelpText(ZMSettings::tr("Unless you've got good reason to, don't "
+                                   "change this."));
     return gc;
 };
 
 static HostComboBox *ZMDateFormat()
 {
     HostComboBox *gc = new HostComboBox("ZoneMinderDateFormat");
-    gc->setLabel(QObject::tr("Date format"));
+    gc->setLabel(ZMSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
-    QString sampleStr =
-            QObject::tr("Samples are shown using today's date.");
+    QString sampleStr = ZMSettings::tr("Samples are shown using today's date.");
 
     if (sampdate.month() == sampdate.day())
     {
         sampdate = sampdate.addDays(1);
-        sampleStr =
-                QObject::tr("Samples are shown using tomorrow's date.");
+        sampleStr = ZMSettings::tr("Samples are shown using tomorrow's date.");
     }
 
     gc->addSelection(sampdate.toString("ddd - dd/MM"), "ddd - dd/MM");
@@ -61,15 +60,18 @@ static HostComboBox *ZMDateFormat()
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy"); 
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
     gc->addSelection(sampdate.toString("ddd dd MMM yyyy"), "ddd dd MMM yyyy");
-    gc->setHelpText(QObject::tr("Your preferred date format to use on the events screens.") 
-            + " " +  sampleStr);
+
+    //: %1 gives additional info on the date used
+    gc->setHelpText(ZMSettings::tr("Your preferred date format to use on the "
+                                   "events screens. %1") 
+                                   .arg(sampleStr));
     return gc;
 }
 
 static HostComboBox *ZMTimeFormat()
 {
     HostComboBox *gc = new HostComboBox("ZoneMinderTimeFormat");
-    gc->setLabel(QObject::tr("Time format"));
+    gc->setLabel(ZMSettings::tr("Time format"));
 
     QTime samptime = QTime::currentTime();
 
@@ -77,15 +79,15 @@ static HostComboBox *ZMTimeFormat()
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
     gc->addSelection(samptime.toString("hh:mm:ss"), "hh:mm:ss");
 
-    gc->setHelpText(QObject::tr("Your preferred time format to display "
-                                "on the events screens."));
+    gc->setHelpText(ZMSettings::tr("Your preferred time format to display "
+                                   "on the events screens."));
     return gc;
 }
 
 ZMSettings::ZMSettings()
 {
     VerticalConfigurationGroup* vcg1 = new VerticalConfigurationGroup(false);
-    vcg1->setLabel(QObject::tr("MythZoneMinder Settings"));
+    vcg1->setLabel(tr("MythZoneMinder Settings"));
     vcg1->addChild(ZMServerIP());
     vcg1->addChild(ZMServerPort());
     vcg1->addChild(ZMDateFormat());

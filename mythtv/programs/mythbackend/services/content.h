@@ -79,7 +79,7 @@ class Content : public ContentServices
         QFileInfo           GetMusic            ( int Id );
         QFileInfo           GetVideo            ( int Id );
 
-        QString             GetHash             ( const QString   &storageGroup,
+        QString             GetHash             ( const QString   &StorageGroup,
                                                   const QString   &FileName );
 
         bool                DownloadFile        ( const QString   &URL,
@@ -114,8 +114,7 @@ class Content : public ContentServices
                                                           int              SampleRate );
 
         DTC::LiveStreamInfo     *GetLiveStream            ( int Id );
-        DTC::LiveStreamInfoList *GetLiveStreamList        ( void );
-        DTC::LiveStreamInfoList *GetFilteredLiveStreamList( const QString &FileName );
+        DTC::LiveStreamInfoList *GetLiveStreamList        ( const QString &FileName );
 
         DTC::LiveStreamInfo     *StopLiveStream         ( int Id );
         bool                     RemoveLiveStream       ( int Id );
@@ -149,24 +148,36 @@ class ScriptableContent : public QObject
         Q_INVOKABLE ScriptableContent( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
+        QObject* GetRecordingArtworkList(       int        ChanId,
+                                          const QDateTime &StartTime  )
+        {
+            return m_obj.GetRecordingArtworkList( ChanId, StartTime );
+        }
+
+        QObject* GetProgramArtworkList( const QString &Inetref,
+                                              int      Season  )
+        {
+            return m_obj.GetProgramArtworkList( Inetref, Season );
+        }
+
+        QString GetHash ( const QString   &StorageGroup,
+                          const QString   &FileName )
+        {
+            return m_obj.GetHash( StorageGroup, FileName );
+        }
 
         QObject* GetLiveStream(      int              Id )
         {
             return m_obj.GetLiveStream( Id );
         }
 
-        QObject* GetLiveStreamList(  void )
+        QObject* GetLiveStreamList(  const QString &FileName )
         {
-            return m_obj.GetLiveStreamList();
-        }
-
-        QObject* GetFilteredLiveStreamList(  const QString &FileName )
-        {
-            return m_obj.GetFilteredLiveStreamList( FileName );
+            return m_obj.GetLiveStreamList( FileName );
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT( Content, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableContent, QObject*);
 
 #endif
 

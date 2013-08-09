@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QMutex>
+#include <QDateTime>
 
 #include <cmath>
 #include <iostream>
@@ -36,7 +37,7 @@ using namespace std;
 #include "mythxmlclient.h"
 #include "upnp.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythmiscutil.h"
 
 #include "mythplugin.h"
@@ -49,6 +50,8 @@ using namespace std;
 #define LOC      QString("MythContext: ")
 
 MythContext *gContext = NULL;
+
+static const QString _Location = "MythContext";
 
 class MythContextPrivate : public QObject
 {
@@ -106,8 +109,9 @@ class MythContextPrivate : public QObject
     MythContextSlotHandler *m_sh;
 
   private:
-    MythConfirmationDialog *MBEconnectPopup;
     MythConfirmationDialog *MBEversionPopup;
+    int m_registration;
+    QDateTime m_lastCheck;
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -177,18 +181,28 @@ static void exec_program_tv_cb(const QString &cmd)
 static void configplugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gCoreContext->GetPluginManager();
-    if (pmanager)
-        if (pmanager->config_plugin(cmd.trimmed()))
-            ShowOkPopup(QObject::tr("Failed to configure plugin %1").arg(cmd));
+    if (!pmanager)
+        return;
+
+    if (GetNotificationCenter() && pmanager->config_plugin(cmd.trimmed()))
+    {
+        ShowNotificationError(cmd, _Location,
+                              QObject::tr("Failed to configure plugin"));
+    }
 }
 
 static void plugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gCoreContext->GetPluginManager();
-    if (pmanager)
-        if (pmanager->run_plugin(cmd.trimmed()))
-            ShowOkPopup(QObject::tr("The plugin %1 has failed "
-                                    "to run for some reason...").arg(cmd));
+    if (!pmanager)
+        return;
+
+    if (GetNotificationCenter() && pmanager->run_plugin(cmd.trimmed()))
+    {
+        ShowNotificationError(QObject::tr("Plugin failure"),
+                              _Location,
+                              QObject::tr("%1 failed to run for some reason").arg(cmd));
+    }
 }
 
 static void eject_cb(void)
@@ -199,12 +213,12 @@ static void eject_cb(void)
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_gui(false),
-      m_pConfig(NULL), 
+      m_pConfig(NULL),
       disableeventpopup(false),
       m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
-      MBEconnectPopup(NULL),
-      MBEversionPopup(NULL)
+      MBEversionPopup(NULL),
+      m_registration(-1)
 {
     InitializeMythDirs();
 }
@@ -213,6 +227,10 @@ MythContextPrivate::~MythContextPrivate()
 {
     if (m_pConfig)
         delete m_pConfig;
+    if (GetNotificationCenter() && m_registration > 0)
+    {
+        GetNotificationCenter()->UnRegister(this, m_registration, true);
+    }
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -974,6 +992,11 @@ bool MythContextPrivate::event(QEvent *e)
         if (disableeventpopup)
             return true;
 
+        if (GetNotificationCenter() && m_registration < 0)
+        {
+            m_registration = GetNotificationCenter()->Register(this);
+        }
+
         MythEvent *me = (MythEvent*)e;
         if (me->Message() == "VERSION_MISMATCH" && (1 == me->ExtraDataCount()))
             ShowVersionMismatchPopup(me->ExtraData(0).toUInt());
@@ -991,10 +1014,17 @@ bool MythContextPrivate::event(QEvent *e)
 
 void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
 {
-    if (MBEconnectPopup)
+    QDateTime now = MythDate::current();
+
+    if (!GetNotificationCenter() || !m_ui || !m_ui->IsScreenSetup())
         return;
 
-    QString message = (persistent) ?
+    if (m_lastCheck.isValid() && now < m_lastCheck)
+        return;
+
+    m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
+
+    QString description = (persistent) ?
         QObject::tr(
             "The connection to the master backend "
             "server has gone away for some reason. "
@@ -1004,19 +1034,27 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
             "it running?  Is the IP address set for it in "
             "mythtv-setup correct?");
 
-    if (HasMythMainWindow() && m_ui && m_ui->IsScreenSetup())
-    {
-        MBEconnectPopup = ShowOkPopup(
-            message, m_sh, SLOT(ConnectFailurePopupClosed()));
-    }
+    QString message = QObject::tr("Could not connect to master backend");
+    MythErrorNotification n(message, _Location, description);
+    n.SetId(m_registration);
+    n.SetParent(this);
+    GetNotificationCenter()->Queue(n);
 }
 
 void MythContextPrivate::HideConnectionFailurePopup(void)
 {
-    MythConfirmationDialog *dlg = this->MBEconnectPopup;
-    this->MBEconnectPopup = NULL;
-    if (dlg)
-        dlg->Close();
+    if (!GetNotificationCenter())
+        return;
+
+    if (!m_lastCheck.isValid())
+        return;
+
+    MythCheckNotification n(QObject::tr("Backend is online"), _Location);
+    n.SetId(m_registration);
+    n.SetParent(this);
+    n.SetDuration(5);
+    GetNotificationCenter()->Queue(n);
+    m_lastCheck = QDateTime();
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
@@ -1044,11 +1082,6 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     }
 }
 
-void MythContextSlotHandler::ConnectFailurePopupClosed(void)
-{
-    d->MBEconnectPopup = NULL;
-}
-
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
     d->MBEversionPopup = NULL;
@@ -1063,7 +1096,7 @@ MythContext::MythContext(const QString &binversion)
     if (!WSAStarted) {
         WSADATA wsadata;
         int res = WSAStartup(MAKEWORD(2, 0), &wsadata);
-        LOG(VB_SOCKET, LOG_INFO, 
+        LOG(VB_SOCKET, LOG_INFO,
                  QString("WSAStartup returned %1").arg(res));
     }
 #endif
@@ -1092,7 +1125,7 @@ bool MythContext::Init(const bool gui,
 
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        LOG(VB_GENERAL, LOG_EMERG, 
+        LOG(VB_GENERAL, LOG_EMERG,
                  QString("Application binary version (%1) does not "
                          "match libraries (%2)")
                      .arg(app_binary_version) .arg(MYTH_BINARY_VERSION));

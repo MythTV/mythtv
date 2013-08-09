@@ -140,11 +140,15 @@ bool AudioOutputOSS::OpenDevice()
 
     if (audiofd == -1)
     {
+        Error(QObject::tr("Error opening audio device (%1)").arg(main_device));
         VBERRENO(QString("Error opening audio device (%1)").arg(main_device));
         return false;
     }
 
-    fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
+    if (fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK) == -1)
+    {
+        VBERRENO(QString("Error removing the O_NONBLOCK flag from audio device FD (%1)").arg(main_device));
+    }
 
     bool err = false;
     int  format;
@@ -202,7 +206,8 @@ bool AudioOutputOSS::OpenDevice()
     }
 
     audio_buf_info info;
-    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+    if (ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info) < 0)
+        VBERRENO("Error retrieving card buffer size");
     // align by frame size
     fragment_size = info.fragsize - (info.fragsize % output_bytes_per_frame);
 
@@ -269,7 +274,8 @@ int AudioOutputOSS::GetBufferedOnSoundcard(void) const
     int soundcard_buffer=0;
 //GREG This is needs to be fixed for sure!
 #ifdef SNDCTL_DSP_GETODELAY
-    ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer); // bytes
+    if(ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer) < 0) // bytes
+        VBERRNOCONST("Error retrieving buffering delay");
 #endif
     return soundcard_buffer;
 }

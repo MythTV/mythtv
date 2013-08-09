@@ -19,6 +19,8 @@ class MusicMetadata;
 
 class CdDecoder : public Decoder
 {
+     Q_DECLARE_TR_FUNCTIONS(CdDecoder)
+
   public:
     CdDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~CdDecoder();
@@ -28,15 +30,12 @@ class CdDecoder : public Decoder
     virtual void seek(double);
     virtual void stop();
 
-    // Decoder overrides
-    virtual MusicMetadata *getMetadata(void);
-    virtual void commitMetadata(MusicMetadata *mdata);
+    MusicMetadata *getMetadata(void);
 
     // The following need to allocate a new MusicMetadata object each time,
     // because their callers free the returned value
     // TODO check this is still true
     MusicMetadata *getMetadata(int track);
-    MusicMetadata *getLastMetadata();
 
 #if CONFIG_DARWIN
     double lengthInSeconds();
@@ -44,8 +43,8 @@ class CdDecoder : public Decoder
     int getNumTracks();
     int getNumCDAudioTracks();
 
-    void      setDevice(const QString &dev);
-    void      setCDSpeed(int speed);
+    void setDevice(const QString &dev);
+    void setCDSpeed(int speed);
 
   private:
     void run();

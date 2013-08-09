@@ -21,15 +21,15 @@ class AudioOutputDigitalEncoder
     ~AudioOutputDigitalEncoder();
 
     bool   Init(CodecID codec_id, int bitrate, int samplerate, int channels);
-    void   Dispose(void);
     size_t Encode(void *buf, int len, AudioFormat format);
     size_t GetFrames(void *ptr, int maxlen);
     int    Buffered(void) const
     { return inlen / sizeof(inbuf_t) / av_context->channels; }
-    void clear();
+    void    clear();
 
   private:
-    void *realloc(void *ptr, size_t old_size, size_t new_size);
+    void   Reset(void);
+    void  *realloc(void *ptr, size_t old_size, size_t new_size);
 
     AVCodecContext *av_context;
     outbuf_t       *out;
@@ -39,7 +39,6 @@ class AudioOutputDigitalEncoder
     int             outlen;
     int             inlen;
     size_t          samples_per_frame;
-    int16_t         m_encodebuffer[FF_MIN_BUFFER_SIZE];
     SPDIFEncoder   *m_spdifenc;
 };
 

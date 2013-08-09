@@ -67,7 +67,7 @@ class ChannelScannerGUI :
 
     virtual void InformUser(const QString &error);
 
-    virtual void Process(const ScanDTVTransportList&);
+    virtual void Process(const ScanDTVTransportList&, bool success = false);
 
     virtual void MonitorProgress(bool lock, bool strength,
                                  bool snr, bool rotor);

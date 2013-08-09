@@ -2,20 +2,18 @@
 #define MYTHNEWS_H
 
 // MythTV headers
-#include <httpcomms.h>
 #include <mythscreentype.h>
 
 // MythNews headers
 #include "newssite.h"
 
 class QTimer;
-class HtppComms;
+class HttpComms;
 class MythUIText;
 class MythUIImage;
 class MythDialogBox;
 class MythUIButtonList;
 class MythUIButtonListItem;
-class MythUIProgressDialog;
 
 /** \class MythNews
  *  \brief Plugin for browsing RSS news feeds.
@@ -38,8 +36,6 @@ class MythNews : public MythScreenType
     void cancelRetrieve(void);
     void processAndShowNews(NewsSite *site);
 
-    bool getHttpFile(const QString &sFilename, const QString &cmdURL);
-    void createProgress(const QString &title);
     QString formatSize(long long bytes, int prec);
     void playVideo(const NewsArticle &article);
 
@@ -59,10 +55,6 @@ class MythNews : public MythScreenType
     QString        m_zoom;
     QString        m_browser;
     MythDialogBox *m_menuPopup;
-
-    MythUIProgressDialog *m_progressPopup;
-    HttpComms            *m_httpGrabber;
-    bool                  m_abortHttp;
 
     MythUIButtonList *m_sitesList;
     MythUIButtonList *m_articlesList;
@@ -85,8 +77,6 @@ class MythNews : public MythScreenType
     void slotRetrieveNews(void);
     void slotNewsRetrieved(NewsSite*);
     void slotSiteSelected(MythUIButtonListItem*);
-
-    void slotProgressCancelled();
 };
 
 #endif /* MYTHNEWS_H */

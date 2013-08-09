@@ -30,59 +30,48 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
         <source>IP address of the MythZoneMinder server</source>
-        <translation>IP-adressen til MythZoneMinder tjeneren</translation>
+        <translation type="obsolete">IP-adressen til MythZoneMinder tjeneren</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
         <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation>Legg inn IP-adressen til MythZoneMinder-tjeneren som denne grenseflaten skal koble til.</translation>
+        <translation type="obsolete">Legg inn IP-adressen til MythZoneMinder-tjeneren som denne grenseflaten skal koble til.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="28"/>
         <source>Port the server runs on</source>
-        <translation>Port som serveren kjører på</translation>
+        <translation type="obsolete">Port som serveren kjører på</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="30"/>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation>Ikke endre dette uten en god grunn.</translation>
+        <translation type="obsolete">Ikke endre dette uten en god grunn.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="38"/>
         <source>Date format</source>
-        <translation>Datoformat</translation>
+        <translation type="obsolete">Datoformat</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation>Eksempler vises med dagens dato.</translation>
+        <translation type="obsolete">Eksempler vises med dagens dato.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="48"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation>Eksempler vises med morgendagens dato.</translation>
+        <translation type="obsolete">Eksempler vises med morgendagens dato.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="64"/>
         <source>Your preferred date format to use on the events screens.</source>
-        <translation>Det datoformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
+        <translation type="obsolete">Det datoformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="72"/>
         <source>Time format</source>
-        <translation>Tidsformat</translation>
+        <translation type="obsolete">Tidsformat</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="80"/>
         <source>Your preferred time format to display on the events screens.</source>
-        <translation>Det tidsformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
+        <translation type="obsolete">Det tidsformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="88"/>
         <source>MythZoneMinder Settings</source>
-        <translation>MythZoneMinderinnstillinger</translation>
+        <translation type="obsolete">MythZoneMinderinnstillinger</translation>
     </message>
 </context>
 <context>
@@ -143,44 +132,129 @@
         <translation>ZoneMinder Live-avspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="41"/>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Name:</source>
+        <translation>Navn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Duration:</source>
+        <translation>Varighet:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>ZoneMinder Live</source>
+        <translation>ZoneMinder direkte</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="48"/>
+        <source>See what your system is doing</source>
+        <translation>Se hva systemet ditt gjør</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>CCTV Console</source>
+        <translation>CCTV konsoll</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>Monitors</source>
+        <translation>Skjermer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>CCTV Status:</source>
+        <translation>CCTV Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>System Load:</source>
+        <translation>Systemlast:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
+        <source>Disk Usage:</source>
+        <translation>Diskbruk:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="54"/>
+        <source>CCTV Time:</source>
+        <translation>CCTV Tid:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="55"/>
+        <source>CCTV Date:</source>
+        <translation>CCTV Dato:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="56"/>
+        <source>Source:</source>
+        <translation>Kilde:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="57"/>
+        <source>Function:</source>
+        <translation>Funksjon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="58"/>
+        <source>Events:</source>
+        <translation>Hendelser:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
+        <source>[R] = Running, [S] = Stopped</source>
+        <translation>[R] = Kjører, [S] = Stoppet</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="69"/>
+        <source>CCTV Event Player</source>
+        <translation>CCTV Hendelsesavspiller</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="71"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Kjører 
 [S] = Stoppet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Select Camera:</source>
         <translation>Velg kamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Select Date:</source>
         <translation>Velg dato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Record</source>
         <translation>Ta opp</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="75"/>
         <source>Store</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="76"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -310,115 +384,107 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Configure Zoneminder console</source>
         <translation>Konfigurer ZoneMinder konsoll</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Monitor Function</source>
         <translation>Monitor funksjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message numerus="yes">
-        <location filename="themestrings.h" line="44"/>
         <source>%name%  -  Source: %zmastatus%, function: %zmcstatus%</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%name%  -  Kilde: %zmastatus%, function: %zmcstatus%</numerusform>
             <numerusform>%name%  -  Kilder: %zmastatus%, function: %zmcstatus%</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
         <source>(%eventcount%)</source>
-        <translation>(%eventcount%)</translation>
+        <translation type="obsolete">(%eventcount%)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
         <source>%eventcount% Events:  %zmastatus% - %zmcstatus% function</source>
-        <translation>%eventcount% Hendelser:  %zmastatus% - %zmcstatus% funksjon</translation>
+        <translation type="obsolete">%eventcount% Hendelser:  %zmastatus% - %zmcstatus% funksjon</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
         <source>CCTV Status</source>
-        <translation>CCTV Status</translation>
+        <translation type="obsolete">CCTV Status</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
         <source>System Load</source>
-        <translation>Systemlast</translation>
+        <translation type="obsolete">Systemlast</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
         <source>Disk Usage</source>
-        <translation>Diskbruk</translation>
+        <translation type="obsolete">Diskbruk</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
         <source>CCTV Time</source>
-        <translation>CCTV Tid</translation>
+        <translation type="obsolete">CCTV Tid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
         <source>CCTV Date</source>
-        <translation>CCTV Dato</translation>
+        <translation type="obsolete">CCTV Dato</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="59"/>
         <source>0.12</source>
         <translation>0.12</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="60"/>
         <source>100%</source>
         <translation>100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Look at the Zoneminder events list</source>
         <translation>Se på Zoneminder hendelsesliste</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Event No:</source>
         <translation>Hendelse nr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="66"/>
         <source>%camera%:  %time% (%length%)</source>
         <translation>%camera%:  %time% (%length%)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="68"/>
         <source>Play</source>
         <translation>Spill</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="70"/>
         <source>CCTV Live Player</source>
         <translation>CCTV Live-avspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="77"/>
         <source>Show Console</source>
         <translation>Vis konsoll</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="78"/>
         <source>Show Live View</source>
         <translation>Vis live-visning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="79"/>
         <source>Show Events</source>
         <translation>Vis hendelser</translation>
     </message>
@@ -431,7 +497,7 @@
         <translation>Kan ikke koble til mythzmserveren - kjører den? Har du satt riktig IP-adresse og port i innstillingene?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="194"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>Mythzmserveren svarte ikke på vår forespørsel etter protokollversjon!!</translation>
     </message>
@@ -439,12 +505,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Kjører</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="217"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Stoppet</translation>
     </message>
@@ -503,12 +569,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>Kan ikke vise live-visning.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Du har ikke definert noen monitorer!</translation>
     </message>
@@ -516,31 +582,90 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="291"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Previous</source>
         <translation>Forrige</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Next</source>
         <translation>Neste</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="298"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="377"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Spill</translation>
+    </message>
+</context>
+<context>
+    <name>ZMSettings</name>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>IP-adressen til MythZoneMinder tjeneren</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Legg inn IP-adressen til MythZoneMinder-tjeneren som denne grenseflaten skal koble til.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
+        <source>Port the server runs on</source>
+        <translation>Port som serveren kjører på</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="31"/>
+        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
+        <translation>Ikke endre dette uten en god grunn.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="39"/>
+        <source>Date format</source>
+        <translation>Datoformat</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Eksempler vises med dagens dato.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Eksempler vises med morgendagens dato.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="65"/>
+        <source>Your preferred date format to use on the events screens. %1</source>
+        <extracomment>%1 gives additional info on the date used</extracomment>
+        <translation>Det datoformatet som du foretrekker å bruke på hendelsesskjermene. %1</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="74"/>
+        <source>Time format</source>
+        <translation>Tidsformat</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="82"/>
+        <source>Your preferred time format to display on the events screens.</source>
+        <translation>Det tidsformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
+        <source>MythZoneMinder Settings</source>
+        <translation>MythZoneMinderinnstillinger</translation>
     </message>
 </context>
 </TS>

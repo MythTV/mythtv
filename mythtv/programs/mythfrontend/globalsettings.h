@@ -3,7 +3,9 @@
 
 #include <QStringList>
 #include <QObject>
+#include <QCoreApplication>
 
+#include "mythconfig.h"
 #include "settings.h"
 #include "mythcontext.h"
 #include "videodisplayprofile.h"
@@ -14,42 +16,125 @@ class QFileInfo;
 
 class PlaybackSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(PlaybackSettings)
+
   public:
     PlaybackSettings();
 };
 
-class OSDSettings: virtual public ConfigurationWizard
+class VideoModeSettings : public TriggeredConfigurationGroup
 {
+    Q_OBJECT
+
+  public:
+    VideoModeSettings();
+};
+
+class LcdSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    LcdSettings();
+};
+
+
+class WatchListSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    WatchListSettings();
+};
+
+class ChannelGroupSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    ChannelGroupSettings();
+};
+
+#if CONFIG_DARWIN
+class MacMainSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    MacMainSettings();
+};
+
+class MacFloatSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    MacFloatSettings();
+};
+
+
+class MacDockSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    MacDockSettings();
+};
+
+
+class MacDesktopSettings : public TriggeredConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    MacDesktopSettings();
+};
+#endif
+
+class OSDSettings : virtual public ConfigurationWizard
+{
+    Q_DECLARE_TR_FUNCTIONS(OSDSettings)
+        
   public:
     OSDSettings();
 };
 
 class GeneralSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(GeneralSettings)
+        
   public:
     GeneralSettings();
 };
 
 class EPGSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(EPGSettings)
+
   public:
     EPGSettings();
 };
 
 class AppearanceSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(AppearanceSettings)
+
   public:
     AppearanceSettings();
 };
 
 class MainGeneralSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(MainGeneralSettings)
+
   public:
     MainGeneralSettings();
 };
 
 class GeneralRecPrioritiesSettings : public ConfigurationWizard
 {
+    Q_DECLARE_TR_FUNCTIONS(GeneralRecPrioritiesSettings)
+
   public:
     GeneralRecPrioritiesSettings();
 };

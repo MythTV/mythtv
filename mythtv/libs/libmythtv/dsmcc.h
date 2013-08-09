@@ -114,4 +114,10 @@ class Dsmcc
     unsigned short m_startTag;
 };
 
+#define COMBINE32(data, idx) \
+    ((((unsigned)((data)[(idx) + 0])) << 24) |  \
+     (((unsigned)((data)[(idx) + 1])) << 16) |  \
+     (((unsigned)((data)[(idx) + 2])) << 8) |   \
+     (((unsigned)((data)[(idx) + 3]))))
+
 #endif

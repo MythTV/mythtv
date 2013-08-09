@@ -70,15 +70,17 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying %1 (allow seeks: %2")
         .arg(filename).arg(m_allowSeeks));
 
-    rwlock.unlock();
-
     if (res < 0 || !m_context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to open stream (error %1)") .arg(res));
+        lastError = QObject::tr("Failed to open stream (%1)").arg(res);
+        rwlock.unlock();
         return false;
     }
 
+    rwlock.unlock();
+    
     return true;
 }
 
@@ -101,9 +103,28 @@ long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
 
 int StreamingRingBuffer::safe_read(void *data, uint sz)
 {
+    uint len = 0;
+
     if (m_context)
-        return ffurl_read_complete(m_context, (unsigned char*)data, sz);
-    return 0;
+    {
+        while (len < sz)
+        {
+            int ret = ffurl_read(m_context, (unsigned char*)data + len, sz - len);
+            if (ret < 0)
+            {
+                if (ret == AVERROR_EOF)
+                {
+                    ateof = true;
+                }
+                errno = ret;
+                break;
+            }
+            if (ret == 0) // nothing read, exit early
+                break;    // should EOF be set ??
+            len += ret;
+        }
+    }
+    return len;
 }
 
 long long StreamingRingBuffer::GetRealFileSize(void) const

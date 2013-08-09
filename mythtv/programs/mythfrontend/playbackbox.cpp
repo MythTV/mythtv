@@ -47,6 +47,8 @@
 #define LOC_WARN QString("PlaybackBox Warning: ")
 #define LOC_ERR  QString("PlaybackBox Error: ")
 
+static const QString _Location = "Playback Box";
+
 static int comp_programid(const ProgramInfo *a, const ProgramInfo *b)
 {
     if (a->GetProgramID() == b->GetProgramID())
@@ -378,9 +380,18 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
     : ScheduleCommon(parent, name),
       m_prefixes(QObject::tr("^(The |A |An )")),
       m_titleChaff(" \\(.*\\)$"),
+      // UI variables
+      m_recgroupList(NULL),
+      m_groupList(NULL),
+      m_recordingList(NULL),
+      m_noRecordingsText(NULL),
+      m_previewImage(NULL),
       // Artwork Variables
       m_artHostOverride(),
       // Settings
+      m_titleView(false),
+      m_useCategories(false),
+      m_useRecGroups(false),
       m_watchListAutoExpire(false),
       m_watchListMaxAge(60),              m_watchListBlackOut(2),
       m_listOrder(1),
@@ -397,11 +408,13 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
       m_doToggleMenu(true),
       // Main Recording List support
       m_progsInDB(0),
+      m_isFilling(false),
       // Other state
       m_op_on_playlist(false),
       m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
+      m_haveGroupInfoSet(false),
       // Other
       m_player(NULL),
       m_helper(this),
@@ -2286,6 +2299,13 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     }
 }
 
+void PlaybackBox::previous()
+{
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo)
+        ShowPrevious(pginfo);
+}
+
 void PlaybackBox::upcoming()
 {
     ProgramInfo *pginfo = CurrentItem();
@@ -2399,7 +2419,7 @@ void PlaybackBox::ShowGroupPopup()
 
     if (m_playList.size())
     {
-        m_popupMenu->AddItem(tr("Playlist options"), NULL, createPlaylistMenu());
+        m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
     }
     else if (!m_player)
     {
@@ -2645,41 +2665,48 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
         case asAvailable:
             if (pginfo.QueryIsInUse(byWho))
             {
-                ShowOkPopup(tr("Recording Available\n") + msg +
-                            tr("This recording is currently in "
-                               "use by:") + "\n" + byWho);
+                ShowNotification(tr("Recording Available\n"),
+                                      _Location, msg +
+                                 tr("This recording is currently in "
+                                    "use by:") + "\n" + byWho);
             }
             else
             {
-                ShowOkPopup(tr("Recording Available\n") + msg +
-                            tr("This recording is currently "
-                               "Available"));
+                ShowNotification(tr("Recording Available\n"),
+                                      _Location, msg +
+                                 tr("This recording is currently "
+                                    "Available"));
             }
             break;
         case asPendingDelete:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording is currently being "
-                           "deleted and is unavailable"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording is currently being "
+                                     "deleted and is unavailable"));
             break;
         case asDeleted:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording has been "
-                           "deleted and is unavailable"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording has been "
+                                     "deleted and is unavailable"));
             break;
         case asFileNotFound:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("The file for this recording can "
-                           "not be found"));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("The file for this recording can "
+                                     "not be found"));
             break;
         case asZeroByte:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("The file for this recording is "
-                           "empty."));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("The file for this recording is "
+                                     "empty."));
             break;
         case asNotYetAvailable:
-            ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                        tr("This recording is not yet "
-                           "available."));
+            ShowNotificationError(tr("Recording Unavailable\n"),
+                                  _Location, msg +
+                                  tr("This recording is not yet "
+                                     "available."));
     }
 }
 
@@ -3121,17 +3148,17 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if ((asFileNotFound  == pginfo.GetAvailableStatus()) ||
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
-        m_popupMenu->AddItem(tr("Show Recording Details"), SLOT(showProgramDetails()));
-        m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
-
         if (m_playList.filter(pginfo.MakeUniqueKey()).size())
-        {
             m_popupMenu->AddItem(tr("Remove from Playlist"), SLOT(togglePlayListItem()));
-        }
         else
-        {
             m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
-        }
+
+        if (m_playList.size())
+            m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
+
+        m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
+
+        m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
 
         DisplayPopupMenu();
 
@@ -3163,7 +3190,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
                                  SLOT(togglePlayListItem()));
         if (m_playList.size())
         {
-            m_popupMenu->AddItem(tr("Playlist options"), NULL, createPlaylistMenu());
+            m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
         }
     }
 
@@ -3731,7 +3758,8 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 
                 pginfo.SetPathname(pginfo.GetPlaybackURL());
 
-                PlayX(pginfo, true, true);
+                bool ignoreBookmark = (tokens[1] == "PLAY");
+                PlayX(pginfo, ignoreBookmark, true);
             }
             else
             {
@@ -3852,6 +3880,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 upcoming();
             else if (action == ACTION_VIEWSCHEDULED)
                 upcomingScheduled();
+            else if (action == ACTION_PREVRECORDED)
+                previous();
             else
                 handled = false;
         }
@@ -3884,7 +3914,7 @@ void PlaybackBox::customEvent(QEvent *event)
         MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
-        if (message.left(21) == "RECORDING_LIST_CHANGE")
+        if (message.startsWith("RECORDING_LIST_CHANGE"))
         {
             QStringList tokens = message.simplified().split(" ");
             uint chanid = 0;
@@ -3920,7 +3950,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_programInfoCache.ScheduleLoad();
             }
         }
-        else if (message.left(15) == "NETWORK_CONTROL")
+        else if (message.startsWith("NETWORK_CONTROL"))
         {
             QStringList tokens = message.simplified().split(" ");
             if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
@@ -3948,7 +3978,7 @@ void PlaybackBox::customEvent(QEvent *event)
                                             keyevent);
             }
         }
-        else if (message.left(16) == "UPDATE_FILE_SIZE")
+        else if (message.startsWith("UPDATE_FILE_SIZE"))
         {
             QStringList tokens = message.simplified().split(" ");
             bool ok = false;

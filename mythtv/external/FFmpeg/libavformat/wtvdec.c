@@ -200,6 +200,9 @@ static AVIOContext * wtvfile_open_sector(int first_sector, uint64_t length, int 
         return NULL;
     }
 
+    if ((int64_t)wf->sectors[wf->nb_sectors - 1] << WTV_SECTOR_BITS > avio_tell(s->pb))
+        av_log(s, AV_LOG_WARNING, "truncated file\n");
+
     /* check length */
     length &= 0xFFFFFFFFFFFF;
     if (length > ((int64_t)wf->nb_sectors << wf->sector_bits)) {
@@ -445,8 +448,16 @@ done:
 
 static void get_tag(AVFormatContext *s, AVIOContext *pb, const char *key, int type, int length)
 {
-    int buf_size = FFMAX(2*length, LEN_PRETTY_GUID) + 1;
-    char *buf = av_malloc(buf_size);
+    int buf_size;
+    char *buf;
+
+    if (!strcmp(key, "WM/MediaThumbType")) {
+        avio_skip(pb, length);
+        return;
+    }
+
+    buf_size = FFMAX(2*length, LEN_PRETTY_GUID) + 1;
+    buf = av_malloc(buf_size);
     if (!buf)
         return;
 

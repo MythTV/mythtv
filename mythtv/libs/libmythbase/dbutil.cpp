@@ -20,7 +20,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #define LOC QString("DBUtil: ")
@@ -544,7 +544,11 @@ bool DBUtil::CreateTemporaryDBConf(
     }
     else
     {
-        chmod(tmpfile.constData(), S_IRUSR);
+        if (chmod(tmpfile.constData(), S_IRUSR))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error changing permissions '%1'")
+                    .arg(tmpfile.constData()) + ENO);
+        }
 
         QByteArray outarr = privateinfo.toLocal8Bit();
         fprintf(fp, "%s", outarr.constData());
@@ -863,7 +867,10 @@ bool DBUtil::TryLockSchema(MSqlQuery &query, uint timeout_secs)
 void DBUtil::UnlockSchema(MSqlQuery &query)
 {
     query.prepare("SELECT RELEASE_LOCK('schemaLock')");
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("DBUtil UnlockSchema", query);
+    }
 }
 
 /** \fn CheckTimeZoneSupport(void)
@@ -872,7 +879,7 @@ void DBUtil::UnlockSchema(MSqlQuery &query)
 bool DBUtil::CheckTimeZoneSupport(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONVERT_TZ(NOW(), 'SYSTEM', 'UTC')");
+    query.prepare("SELECT CONVERT_TZ(NOW(), 'SYSTEM', 'Etc/UTC')");
     if (!query.exec() || !query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, "MySQL time zone support check failed");

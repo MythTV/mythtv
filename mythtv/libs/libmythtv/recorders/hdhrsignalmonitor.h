@@ -29,7 +29,6 @@ class HDHRSignalMonitor: public DTVSignalMonitor
   protected:
     bool               streamHandlerStarted;
     HDHRStreamHandler *streamHandler;
-    int                lock_timeout;
 };
 
 #endif // HDHRSIGNALMONITOR_H

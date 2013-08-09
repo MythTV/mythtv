@@ -7,7 +7,7 @@
 
 // myth
 #include "mythcorecontext.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
 
@@ -99,7 +99,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(MovieScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();
@@ -126,7 +126,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(TVScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();
@@ -154,7 +154,7 @@ void GrabberSettings::Load(void)
         {
             QString commandline = QString("%1/%2")
                                       .arg(GameScriptPath.path()).arg(*i);
-            MythSystem grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut | kMSBuffered);
+            MythSystemLegacy grabber(commandline, QStringList() << "-v", kMSRunShell | kMSStdOut);
             grabber.Run();
             grabber.Wait();
             QByteArray result = grabber.ReadAll();
@@ -183,7 +183,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Movie/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_movieGrabberButtonList, (*it)->GetName());
@@ -198,7 +198,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Television/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_tvGrabberButtonList, (*it)->GetName());
@@ -214,7 +214,7 @@ void GrabberSettings::Init(void)
     {
         QString commandline = QString("metadata/Game/%1")
                     .arg((*it)->GetCommand());
-        MetadataMap map;
+        InfoMap map;
         (*it)->toMap(map);
         MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_gameGrabberButtonList, (*it)->GetName());
@@ -227,7 +227,7 @@ void GrabberSettings::Init(void)
     QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
                                          "metadata/Television/ttvdb.py");
     QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",
-                                         "metadata/Movie/tmdb.py");
+                                         "metadata/Movie/tmdb3.py");
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",
                                          "metadata/Game/giantbomb.py");
 

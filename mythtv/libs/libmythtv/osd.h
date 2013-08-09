@@ -1,9 +1,17 @@
 #ifndef OSD_H
 #define OSD_H
 
+// Qt headers
+
+#include <QCoreApplication>
+#include <QHash>
+
+// MythTV headers
+
 #include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"
+#include "mythtypes.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows
@@ -80,8 +88,8 @@ class ChannelEditor : public MythScreenType
     virtual bool Create(void);
     virtual bool keyPressEvent(QKeyEvent *event);
 
-    void SetText(QHash<QString,QString>&map);
-    void GetText(QHash<QString,QString>&map);
+    void SetText(const InfoMap &map);
+    void GetText(InfoMap &map);
 
   protected:
     MythUITextEdit *m_callsignEdit;
@@ -122,6 +130,8 @@ class MythOSDWindow : public MythScreenType
 
 class OSD
 {
+    Q_DECLARE_TR_FUNCTIONS(OSD)
+
   public:
     OSD(MythPlayer *player, QObject *parent, MythPainter *painter);
    ~OSD();
@@ -130,7 +140,7 @@ class OSD
     void    SetPainter(MythPainter *painter);
     QRect   Bounds(void) const { return m_Rect; }
     int     GetFontStretch(void) const { return m_fontStretch; }
-    void    OverrideUIScale(void);
+    void    OverrideUIScale(bool log = true);
     void    RevertUIScale(void);
     bool    Reinit(const QRect &rect, float font_aspect);
     void    DisableFade(void) { m_Effects = false; }
@@ -139,7 +149,8 @@ class OSD
     void    SetTimeouts(int _short, int _medium, int _long);
 
     bool    IsVisible(void);
-    void    HideAll(bool keepsubs = true, MythScreenType *except = NULL);
+    void    HideAll(bool keepsubs = true, MythScreenType *except = NULL,
+                    bool dropnotification = false);
 
     MythScreenType *GetWindow(const QString &window);
     void    SetExpiry(const QString &window, enum OSDTimeout timeout,
@@ -154,11 +165,11 @@ class OSD
     QRegion Draw(MythPainter* painter, QPaintDevice *device, QSize size,
                  QRegion &changed, int alignx = 0, int aligny = 0);
 
-    void SetValues(const QString &window, QHash<QString,int> &map,
+    void SetValues(const QString &window, const QHash<QString,int> &map,
                    OSDTimeout timeout);
-    void SetValues(const QString &window, QHash<QString,float> &map,
+    void SetValues(const QString &window, const QHash<QString,float> &map,
                    OSDTimeout timeout);
-    void SetText(const QString &window, QHash<QString,QString> &map,
+    void SetText(const QString &window, const InfoMap &map,
                  OSDTimeout timeout);
     void SetRegions(const QString &window, frm_dir_map_t &map,
                  long long total);
@@ -173,7 +184,7 @@ class OSD
     void DialogBack(QString text = "", QVariant data = 0, bool exit = false);
     void DialogAddButton(QString text, QVariant data,
                          bool menu = false, bool current = false);
-    void DialogGetText(QHash<QString,QString> &map);
+    void DialogGetText(InfoMap &map);
 
     TeletextScreen* InitTeletext(void);
     void EnableTeletext(bool enable, int page);

@@ -10,6 +10,7 @@ class MythUIButton;using namespace std;
 #include <QDateTime>
 #include <QVariant>
 #include <QKeyEvent>
+#include <QCoreApplication>
 
 // mythtv
 #include <mythscreentype.h>
@@ -41,6 +42,8 @@ QString formattedFieldValue(const QVariant &value);
 
 class SmartPLCriteriaRow
 {
+    Q_DECLARE_TR_FUNCTIONS(SmartPLCriteriaRow)
+
   public:
 
     SmartPLCriteriaRow(const QString &_Field, const QString &_Operator,

@@ -96,7 +96,7 @@ class VideoSync
   protected:
     int64_t GetTime(void);
     int CalcDelay(void);
-    void KeepPhase(void);
+    void KeepPhase(void) MDEPRECATED;
 
     VideoOutput *m_video_output;
     int m_frame_interval; // of video

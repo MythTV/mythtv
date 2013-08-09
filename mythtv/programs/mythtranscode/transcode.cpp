@@ -45,6 +45,7 @@ using namespace std;
 
 Transcode::Transcode(ProgramInfo *pginfo) :
     m_proginfo(pginfo),
+    m_recProfile(new RecordingProfile("Transcoders")),
     keyframedist(30),
     nvr(NULL),
     ctx(NULL),
@@ -75,6 +76,8 @@ Transcode::~Transcode()
         delete fifow;
     if (kfa_table)
         delete kfa_table;
+    if (m_recProfile)
+        delete m_recProfile;
 }
 void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 {
@@ -106,16 +109,16 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("Transcode: Looking for autodetect profile: %1")
                 .arg(autoProfileName));
-        result = profile.loadByGroup(autoProfileName, "Transcoders");
+        result = m_recProfile->loadByGroup(autoProfileName, "Transcoders");
 
         if (!result && encodingType == "MPEG-2")
         {
-            result = profile.loadByGroup("MPEG2", "Transcoders");
+            result = m_recProfile->loadByGroup("MPEG2", "Transcoders");
             autoProfileName = "MPEG2";
         }
         if (!result && (encodingType == "MPEG-4" || encodingType == "RTjpeg"))
         {
-            result = profile.loadByGroup("RTjpeg/MPEG4",
+            result = m_recProfile->loadByGroup("RTjpeg/MPEG4",
                                          "Transcoders");
             autoProfileName = "RTjpeg/MPEG4";
         }
@@ -139,8 +142,8 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
         profileID = profileName.toInt(&isNum);
         // If a bad profile is specified, there will be trouble
         if (isNum && profileID > 0)
-            profile.loadByID(profileID);
-        else if (!profile.loadByGroup(profileName, "Transcoders"))
+            m_recProfile->loadByID(profileID);
+        else if (!m_recProfile->loadByGroup(profileName, "Transcoders"))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find profile #: %1")
                     .arg(profileName));
@@ -159,9 +162,9 @@ void Transcode::SetPlayerContext(PlayerContext *player_ctx)
     ctx = player_ctx;
 }
 
-static QString get_str_option(RecordingProfile &profile, const QString &name)
+static QString get_str_option(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile.byName(name);
+    const Setting *setting = profile->byName(name);
     if (setting)
         return setting->getValue();
 
@@ -171,7 +174,7 @@ static QString get_str_option(RecordingProfile &profile, const QString &name)
     return QString::null;
 }
 
-static int get_int_option(RecordingProfile &profile, const QString &name)
+static int get_int_option(RecordingProfile *profile, const QString &name)
 {
     QString ret_str = get_str_option(profile, name);
     if (ret_str.isEmpty())
@@ -250,9 +253,20 @@ int Transcode::TranscodeFile(const QString &inputname,
     // Input setup
     PlayerContext *player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
-    player_ctx->SetRingBuffer((hls && (hlsStreamID != -1)) ?
+    RingBuffer *rb = (hls && (hlsStreamID != -1)) ?
         RingBuffer::Create(hls->GetSourceFile(), false, false) :
-        RingBuffer::Create(inputname, false, false));
+        RingBuffer::Create(inputname, false, false);
+    if (!rb || !rb->GetLastError().isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Transcoding aborted, error: '%1'")
+            .arg(rb? rb->GetLastError() : ""));
+        delete player_ctx;
+        if (hls)
+            delete hls;
+        return REENCODE_ERROR;
+    }
+    player_ctx->SetRingBuffer(rb);
     player_ctx->SetPlayer(new MythPlayer(kVideoIsNull));
     SetPlayerContext(player_ctx);
     GetPlayer()->SetPlayerInfo(NULL, NULL, GetPlayerContext());
@@ -277,6 +291,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
         SetPlayerContext(NULL);
+        if (hls)
+            delete hls;
         return REENCODE_ERROR;
     }
 
@@ -335,6 +351,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
             return REENCODE_CUTLIST_CHANGE;
         }
         m_proginfo->ClearMarkupFlag(MARK_UPDATED_CUT);
@@ -403,6 +421,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_ERR,
                 "Transcoding aborted, error creating AVFormatWriter.");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
             return REENCODE_ERROR;
         }
 
@@ -412,9 +432,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         avfw->SetAspect(video_aspect);
         avfw->SetAudioBitrate(cmdAudioBitrate);
         avfw->SetAudioChannels(arb->m_channels);
-        avfw->SetAudioBits(16);
-        avfw->SetAudioSampleRate(arb->m_eff_audiorate);
-        avfw->SetAudioSampleBytes(2);
+        avfw->SetAudioFrameRate(arb->m_eff_audiorate);
+        avfw->SetAudioFormat(FORMAT_S16);
 
         if (hlsMode)
         {
@@ -426,13 +445,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 audioOnlyBitrate = 48000;
 
                 avfw2 = new AVFormatWriter();
-                if (!avfw2)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error "
-                        "creating low-bitrate AVFormatWriter.");
-                    SetPlayerContext(NULL);
-                    return REENCODE_ERROR;
-                }
 
                 avfw2->SetContainer("mpegts");
 
@@ -451,9 +463,8 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
-                avfw2->SetAudioBits(16);
-                avfw2->SetAudioSampleRate(arb->m_eff_audiorate);
-                avfw2->SetAudioSampleBytes(2);
+                avfw2->SetAudioFrameRate(arb->m_eff_audiorate);
+                avfw2->SetAudioFormat(FORMAT_S16);
             }
 
             avfw->SetContainer("mpegts");
@@ -484,6 +495,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
                     SetPlayerContext(NULL);
+                    delete avfw;
+                    if (avfw2)
+                        delete avfw2;
                     return REENCODE_ERROR;
                 }
             }
@@ -496,6 +510,10 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
                 SetPlayerContext(NULL);
+                delete hls;
+                delete avfw;
+                if (avfw2)
+                    delete avfw2;
                 return REENCODE_ERROR;
             }
 
@@ -548,6 +566,11 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
+            delete avfw;
+            if (avfw2)
+                delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -555,6 +578,11 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
+            delete avfw;
+            if (avfw2)
+                delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -562,6 +590,10 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
+            delete avfw;
+            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -569,6 +601,10 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
             SetPlayerContext(NULL);
+            if (hls)
+                delete hls;
+            delete avfw;
+            delete avfw2;
             return REENCODE_ERROR;
         }
 
@@ -602,12 +638,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
         }
 
-        vidsetting = get_str_option(profile, "videocodec");
-        audsetting = get_str_option(profile, "audiocodec");
-        vidfilters = get_str_option(profile, "transcodefilters");
+        vidsetting = get_str_option(m_recProfile, "videocodec");
+        audsetting = get_str_option(m_recProfile, "audiocodec");
+        vidfilters = get_str_option(m_recProfile, "transcodefilters");
 
         if (encodingType == "MPEG-2" &&
-            get_int_option(profile, "transcodelossless"))
+            get_int_option(m_recProfile, "transcodelossless"))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "Switching to MPEG-2 transcoder.");
             SetPlayerContext(NULL);
@@ -615,18 +651,18 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         // Recorder setup
-        if (get_int_option(profile, "transcodelossless"))
+        if (get_int_option(m_recProfile, "transcodelossless"))
         {
             vidsetting = encodingType;
             audsetting = "MP3";
         }
-        else if (get_int_option(profile, "transcoderesize"))
+        else if (get_int_option(m_recProfile, "transcoderesize"))
         {
             int actualHeight = (video_height == 1088 ? 1080 : video_height);
 
             GetPlayer()->SetVideoFilters(vidfilters);
-            newWidth = get_int_option(profile, "width");
-            newHeight = get_int_option(profile, "height");
+            newWidth = get_int_option(m_recProfile, "width");
+            newHeight = get_int_option(m_recProfile, "height");
 
             // If height or width are 0, then we need to calculate them
             if (newHeight == 0 && newWidth > 0)
@@ -644,7 +680,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
             }
 
-            if (encodingType.left(4).toLower() == "mpeg")
+            if (encodingType.startsWith("mpeg", Qt::CaseInsensitive))
             {
                 // make sure dimensions are valid for MPEG codecs
                 newHeight = (newHeight + 15) & ~0xF;
@@ -676,15 +712,15 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             nvr->SetOption("videocodec", "mpeg4");
 
-            nvr->SetIntOption(&profile, "mpeg4bitrate");
-            nvr->SetIntOption(&profile, "scalebitrate");
-            nvr->SetIntOption(&profile, "mpeg4maxquality");
-            nvr->SetIntOption(&profile, "mpeg4minquality");
-            nvr->SetIntOption(&profile, "mpeg4qualdiff");
-            nvr->SetIntOption(&profile, "mpeg4optionvhq");
-            nvr->SetIntOption(&profile, "mpeg4option4mv");
+            nvr->SetIntOption(m_recProfile, "mpeg4bitrate");
+            nvr->SetIntOption(m_recProfile, "scalebitrate");
+            nvr->SetIntOption(m_recProfile, "mpeg4maxquality");
+            nvr->SetIntOption(m_recProfile, "mpeg4minquality");
+            nvr->SetIntOption(m_recProfile, "mpeg4qualdiff");
+            nvr->SetIntOption(m_recProfile, "mpeg4optionvhq");
+            nvr->SetIntOption(m_recProfile, "mpeg4option4mv");
 #ifdef USING_FFMPEG_THREADS
-            nvr->SetIntOption(profile, "encodingthreadcount");
+            nvr->SetIntOption(m_recProfile, "encodingthreadcount");
 #endif
         }
         else if ((vidsetting == "MPEG-2") ||
@@ -692,19 +728,19 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             nvr->SetOption("videocodec", "mpeg2video");
 
-            nvr->SetIntOption(&profile, "mpeg2bitrate");
-            nvr->SetIntOption(&profile, "scalebitrate");
+            nvr->SetIntOption(m_recProfile, "mpeg2bitrate");
+            nvr->SetIntOption(m_recProfile, "scalebitrate");
 #ifdef USING_FFMPEG_THREADS
-            nvr->SetIntOption(&profile, "encodingthreadcount");
+            nvr->SetIntOption(m_recProfile, "encodingthreadcount");
 #endif
         }
         else if ((vidsetting == "RTjpeg") ||
                  (recorderOptionsMap["videocodec"] == "rtjpeg"))
         {
             nvr->SetOption("videocodec", "rtjpeg");
-            nvr->SetIntOption(&profile, "rtjpegquality");
-            nvr->SetIntOption(&profile, "rtjpegchromafilter");
-            nvr->SetIntOption(&profile, "rtjpeglumafilter");
+            nvr->SetIntOption(m_recProfile, "rtjpegquality");
+            nvr->SetIntOption(m_recProfile, "rtjpegchromafilter");
+            nvr->SetIntOption(m_recProfile, "rtjpeglumafilter");
         }
         else if (vidsetting.isEmpty())
         {
@@ -726,7 +762,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (audsetting == "MP3")
         {
             nvr->SetOption("audiocompression", 1);
-            nvr->SetIntOption(&profile, "mp3quality");
+            nvr->SetIntOption(m_recProfile, "mp3quality");
             copyaudio = true;
         }
         else if (audsetting == "Uncompressed")
@@ -821,6 +857,12 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_ERR,
             "Unable to initialize MythPlayer for Transcode");
         SetPlayerContext(NULL);
+        if (hls)
+            delete hls;
+        if (avfw)
+            delete avfw;
+        if (avfw2)
+            delete avfw2;
         return REENCODE_ERROR;
     }
 

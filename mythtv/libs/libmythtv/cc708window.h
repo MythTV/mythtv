@@ -69,8 +69,6 @@ extern const uint k708AttrOpacityTransparent;
 class CC708CharacterAttribute
 {
   public:
-    // Note this is intenionally not initialized in the constructor.
-
     uint pen_size;
     uint offset;
     uint text_tag;
@@ -86,11 +84,12 @@ class CC708CharacterAttribute
     uint bg_opacity;
     uint edge_color;
 
-    bool override_fg_color; // for a color not in the 6-bit palette
-    QColor actual_fg_color;
+    QColor actual_fg_color; // if !isValid(), then convert fg_color
 
-    CC708CharacterAttribute(bool isItalic, bool isBold, bool isUnderline,
-                            QColor fgColor) :
+    CC708CharacterAttribute(bool isItalic = false,
+                            bool isBold = false,
+                            bool isUnderline = false,
+                            QColor fgColor = QColor()) :
         pen_size(k708AttrSizeStandard),
         offset(k708AttrOffsetNormal),
         text_tag(0), // "dialog", ignored
@@ -104,22 +103,14 @@ class CC708CharacterAttribute
         bg_color(k708AttrColorBlack),
         bg_opacity(k708AttrOpacitySolid),
         edge_color(k708AttrColorBlack),
-        override_fg_color(true),
         actual_fg_color(fgColor)
     {
     }
-    CC708CharacterAttribute(void) : override_fg_color(false) {}
 
-    // remove this
-    uint FontIndex(void) const
-    {
-        return (((font_tag & 0x7) * 6) + ((italics) ? 3 : 0) +
-                (pen_size & 0x3));
-    }
     static QColor ConvertToQColor(uint eia708color);
     QColor GetFGColor(void) const
     {
-        QColor fg = (override_fg_color ?
+        QColor fg = (actual_fg_color.isValid() ?
                      actual_fg_color : ConvertToQColor(fg_color));
         fg.setAlpha(GetFGAlpha());
         return fg;

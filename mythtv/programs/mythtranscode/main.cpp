@@ -60,11 +60,8 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, QStr
         fprintf (mapfh, "Type: %d\n", keyType);
         for (it = posMap.begin(); it != posMap.end(); ++it)
         {
-            if (it.key() == keyType)
-            {
-                QString str = QString("%1 %2\n").arg(it.key()).arg(*it);
-                fprintf(mapfh, "%s", qPrintable(str));
-            }
+            QString str = QString("%1 %2\n").arg(it.key()).arg(*it);
+            fprintf(mapfh, "%s", qPrintable(str));
         }
         fclose(mapfh);
     }
@@ -160,7 +157,7 @@ namespace
 
 int main(int argc, char *argv[])
 {
-    uint chanid;
+    uint chanid = 0;
     QDateTime starttime;
     QString infile, outfile;
     QString profilename = QString("autodetect");
@@ -541,7 +538,7 @@ int main(int argc, char *argv[])
         return QueueTranscodeJob(pginfo, profilename, hostname, useCutlist);
     }
 
-    if (infile.left(7) == "myth://" && (outfile.isEmpty() || outfile != "-") &&
+    if (infile.startsWith("myth://") && (outfile.isEmpty() || outfile != "-") &&
         fifodir.isEmpty() && !cmdline.toBool("hls") && !cmdline.toBool("avf"))
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -922,7 +919,6 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
                 err = transUnlink(alink.constData(), pginfo);
-
                 if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
@@ -944,7 +940,8 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             }
             else
             {
-                if ((err = transUnlink(aoldfile.constData(), pginfo)))
+                err = transUnlink(aoldfile.constData(), pginfo);
+                if (err)
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1': ")
                             .arg(oldfile) + ENO);
@@ -1007,7 +1004,15 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                 QFile checkFile(oldfileprev);
 
                 if ((oldfileprev != newfileprev) && (checkFile.exists()))
-                    rename(aoldfileprev.constData(), anewfileprev.constData());
+                {
+                    if(rename(aoldfileprev.constData(), 
+                              anewfileprev.constData()) == -1)
+                    {
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("mythtranscode: Error renaming %1 to %2")
+                                    .arg(oldfileprev).arg(newfileprev) + ENO);
+                    }
+                }
             }
         }
 

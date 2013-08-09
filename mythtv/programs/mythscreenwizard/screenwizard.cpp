@@ -35,7 +35,9 @@ ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
     m_xsize(GetMythMainWindow()->GetUIScreenRect().width()),
     m_ysize(GetMythMainWindow()->GetUIScreenRect().height()),
     m_xoffset(0),            m_yoffset(0),
-    m_menuPopup(NULL)
+    m_blackout(NULL),        m_preview(NULL),
+    m_size(NULL),            m_offsets(NULL),
+    m_changeamount(NULL),    m_menuPopup(NULL)
 {
 }
 

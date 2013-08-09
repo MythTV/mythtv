@@ -74,7 +74,6 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
     static QMap<void*,uint> pat_keys;
     static QMutex           pat_keys_lock;
-    int                lock_timeout;
 };
 
 #endif // _FIREWIRESIGNALMONITOR_H_

@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg zeromq nzmqt qjson libmythbluray
+SUBDIRS = FFmpeg zeromq nzmqt qjson libmythbluray libsamplerate
 
 ifdef CONFIG_HDHOMERUN
     SUBDIRS += libhdhomerun
@@ -25,6 +25,9 @@ FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
 
 zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
+ifeq ($(CONFIG_DARWIN),yes)
+	install_name_tool -id "@rpath/$(LIBPREF)zmq.1$(SLIBSUF)" zeromq/src/.libs/$(LIBPREF)zmq.1$(SLIBSUF)
+endif
 
 zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
 	${MAKE} -C zeromq ${@:zeromq-%=%} DESTDIR=${INSTALL_ROOT}
@@ -51,4 +54,7 @@ libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install 
 
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}
+
+libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-install libsamplerate-uninstall:
+	${MAKE} -C libsamplerate ${@:libsamplerate-%=%}
 

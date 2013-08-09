@@ -751,6 +751,8 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
         return true;
     }
 
+    AdjustFillMode oldadjustfillmode = window.GetAdjustFill();
+
     TearDown();
     QRect disp = window.GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
@@ -759,6 +761,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &video_dim_buf,
         if (wasembedding)
             EmbedInWidget(oldrect);
         BestDeint();
+        window.ToggleAdjustFill(oldadjustfillmode);
         return true;
     }
 
@@ -1190,7 +1193,7 @@ void VideoOutputVDPAU::RemovePIP(MythPlayer *pipplayer)
     if (m_pips[pipplayer].videoSurface && m_render)
         m_render->DestroyVideoSurface(m_pips[pipplayer].videoSurface);
 
-    if (m_pips[pipplayer].videoMixer)
+    if (m_pips[pipplayer].videoMixer && m_render)
         m_render->DestroyVideoMixer(m_pips[pipplayer].videoMixer);
 
     m_pips.remove(pipplayer);

@@ -23,6 +23,7 @@
 #include "avcodec.h"
 #include "internal.h"
 #include "mathops.h"
+#include "libavutil/avstring.h"
 
 static av_cold int xbm_decode_init(AVCodecContext *avctx)
 {
@@ -58,7 +59,7 @@ static int xbm_decode_frame(AVCodecContext *avctx, void *data,
         int number, len;
 
         ptr += strcspn(ptr, "#");
-        if (sscanf(ptr, "#define %256s %u", name, &number) != 2) {
+        if (sscanf(ptr, "#define %255s %u", name, &number) != 2) {
             av_log(avctx, AV_LOG_ERROR, "Unexpected preprocessor directive\n");
             return AVERROR_INVALIDDATA;
         }
@@ -94,10 +95,10 @@ static int xbm_decode_frame(AVCodecContext *avctx, void *data,
             uint8_t val;
 
             ptr += strcspn(ptr, "x") + 1;
-            if (ptr < end && isxdigit(*ptr)) {
+            if (ptr < end && av_isxdigit(*ptr)) {
                 val = convert(*ptr);
                 ptr++;
-                if (isxdigit(*ptr))
+                if (av_isxdigit(*ptr))
                     val = (val << 4) + convert(*ptr);
                 *dst++ = ff_reverse[val];
             } else {

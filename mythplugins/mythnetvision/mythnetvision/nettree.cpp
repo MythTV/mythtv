@@ -8,7 +8,7 @@
 #include <mythdb.h>
 #include <mythcontext.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <remoteutil.h>
 #include <remotefile.h>
 #include <mythprogressdialog.h>
@@ -39,13 +39,15 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return 0;
+        return NULL;
     }
 }
 
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_siteMap(NULL),               m_siteButtonList(NULL),
+      m_siteGeneric(NULL),           m_rssGeneric(NULL),
+      m_searchGeneric(NULL),         m_currentNode(NULL),
       m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
@@ -301,7 +303,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetText(video->GetTitle());
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         video->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 
@@ -360,6 +362,9 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
 void NetTree::handleSelect(MythUIButtonListItem *item)
 {
     MythGenericTree *node = GetNodePtrFromButton(item);
+    if (!node)
+        return;
+
     int nodeInt = node->getInt();
 
     switch (nodeInt)
@@ -999,7 +1004,7 @@ void NetTree::slotItemChanged()
 
     if (item)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         item->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -1038,13 +1043,13 @@ void NetTree::slotItemChanged()
     }
     else if (site)
     {
-        ResultItem *res = new ResultItem(site->GetTitle(), QString(), site->GetDescription(),
+        ResultItem res = ResultItem(site->GetTitle(), QString(), site->GetDescription(),
               site->GetURL(), site->GetImage(), QString(), site->GetAuthor(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        InfoMap metadataMap;
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (!site->GetImage().isEmpty() && m_thumbImage)
@@ -1081,13 +1086,13 @@ void NetTree::slotItemChanged()
                 thumb = node->GetData().toString();
         }
 
-        ResultItem *res = new ResultItem(title, QString(), QString(),
+        ResultItem res = ResultItem(title, QString(), QString(),
               QString(), thumb, QString(), QString(), QDateTime(),
               0, 0, -1, QString(), QStringList(), QString(), QStringList(), 0, 0, QString(),
               0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
-        res->toMap(metadataMap);
+        InfoMap metadataMap;
+        res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
         if (m_thumbImage)

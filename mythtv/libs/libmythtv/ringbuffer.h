@@ -66,6 +66,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QString   GetSafeFilename(void) { return safefilename; }
     QString   GetFilename(void)      const;
     QString   GetSubtitleFilename(void) const;
+    QString   GetLastError(void)     const;
+
     /// Returns value of stopreads
     /// \sa StartReads(void), StopReads(void)
     bool      GetStopReads(void)     const { return stopreads; }
@@ -152,7 +154,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
 
     long long SetAdjustFilesize(void);
 
-    /// Calls SetOldFile(), do not use
+    /// \deprecated Calls SetOldFile(), do not use
     void SetTimeout(bool is_old) MDEPRECATED { SetOldFile(is_old); }
 
     static const int kDefaultOpenTimeout;
@@ -204,6 +206,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QString safefilename;         // unprotected (for debugging)
     QString filename;             // protected by rwlock
     QString subtitlefilename;     // protected by rwlock
+    QString lastError;            // protected by rwlock
 
     ThreadedFileWriter *tfw;      // protected by rwlock
     int fd2;                      // protected by rwlock

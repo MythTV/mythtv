@@ -16,7 +16,7 @@
 #include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 using namespace std;
@@ -294,14 +294,9 @@ MythMediaError MythMediaDevice::eject(bool open_close)
     (void) open_close;
 
 #if CONFIG_DARWIN
-    // Backgrounding this is a bit naughty, but it can take up to five
-    // seconds to execute, and freezing the frontend for that long is bad
+    QString  command = "diskutil eject " + m_DevicePath;
 
-    QString  command = "disktool -e " + m_DevicePath + " &";
-
-    if (myth_system(command, kMSRunBackground) != GENERIC_EXIT_OK)
-        return MEDIAERR_FAILED;
-
+    int ret = myth_system(command, kMSRunBackground);
     return MEDIAERR_OK;
 #endif
 

@@ -24,7 +24,7 @@ using namespace std;
 #include <compat.h>
 #include <mythmediamonitor.h>
 #include <mythmiscutil.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 
 const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
@@ -51,7 +51,8 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
     SongList::const_iterator it = m_songs.begin();
     for (; it != m_songs.end(); ++it)
     {
-        to_ptr->addTrack(*it, update_display);
+        if ((*it)->isDBTrack())
+            to_ptr->addTrack(*it, update_display);
     }
 
     enableSaves();
@@ -94,6 +95,27 @@ void Playlist::removeAllTracks(void)
     m_songs.clear();
     m_songMap.clear();
     m_shuffledSongs.clear();
+
+    changed();
+}
+
+void Playlist::removeAllCDTracks(void)
+{
+    // find the cd tracks
+    SongList cdTracks;
+    for (int x = 0; x < m_songs.count(); x++)
+    {
+        if (m_songs.at(x)->isCDTrack())
+            cdTracks.append(m_songs.at(x));
+    }
+
+    // remove the tracks from our lists
+    for (int x = 0; x < cdTracks.count(); x++)
+    {
+        m_songs.removeAll(cdTracks.at(x));
+        m_songMap.remove(cdTracks.at(x)->ID());
+        m_shuffledSongs.removeAll(cdTracks.at(x));;
+    }
 
     changed();
 }
@@ -151,7 +173,7 @@ void Playlist::moveTrackUpDown(bool flag, MusicMetadata* mdata)
 
 Playlist::Playlist(void) :
     m_playlistid(0),
-    m_name(QObject::tr("oops")),
+    m_name(tr("oops")),
     m_parent(NULL),
     m_changed(false),
     m_doSave(true),
@@ -610,7 +632,7 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     }
 
     if (m_name == "default_playlist_storage")
-        m_name = QObject::tr("Default Playlist");
+        m_name = tr("Default Playlist");
 
     fillSongsFromSonglist(rawSonglist);
 }
@@ -836,7 +858,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
     changed();
 }
 
-QString Playlist::toRawSonglist(bool shuffled)
+QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
 {
     QString rawList;
 
@@ -845,7 +867,13 @@ QString Playlist::toRawSonglist(bool shuffled)
         SongList::const_iterator it = m_shuffledSongs.begin();
         for (; it != m_shuffledSongs.end(); ++it)
         {
-            rawList += QString(",%1").arg((*it)->ID());
+            if (tracksOnly)
+            {
+                if (ID_TO_REPO((*it)->ID()) == RT_Database)
+                    rawList += QString(",%1").arg((*it)->ID());
+            }
+            else
+                rawList += QString(",%1").arg((*it)->ID());
         }
     }
     else
@@ -853,7 +881,13 @@ QString Playlist::toRawSonglist(bool shuffled)
         SongList::const_iterator it = m_songs.begin();
         for (; it != m_songs.end(); ++it)
         {
-            rawList += QString(",%1").arg((*it)->ID());
+            if (tracksOnly)
+            {
+                if (ID_TO_REPO((*it)->ID()) == RT_Database)
+                    rawList += QString(",%1").arg((*it)->ID());
+            }
+            else
+                rawList += QString(",%1").arg((*it)->ID());
         }
     }
 
@@ -979,7 +1013,8 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
         return;
     }
 
-    QString rawSonglist = toRawSonglist(true);
+    // get the shuffled list of tracks excluding any cd tracks and radio streams
+    QString rawSonglist = toRawSonglist(true, true);
 
     MSqlQuery query(MSqlQuery::InitCon());
     uint songcount = 0, playtime = 0;
@@ -1281,7 +1316,7 @@ int Playlist::CreateCDMP3(void)
 
     reclistfile.close();
 
-    m_progress = new MythProgressDialog(QObject::tr("Creating CD File System"),
+    m_progress = new MythProgressDialog(tr("Creating CD File System"),
                                       100);
     m_progress->setProgress(1);
 
@@ -1297,11 +1332,11 @@ int Playlist::CreateCDMP3(void)
     args << "-J";
     args << "-R";
 
-    uint flags = kMSRunShell | kMSStdErr | kMSBuffered |
+    uint flags = kMSRunShell | kMSStdErr |
                  kMSDontDisableDrawing | kMSDontBlockInputDevs |
                  kMSRunBackground;
 
-    m_proc = new MythSystem(command, args, flags);
+    m_proc = new MythSystemLegacy(command, args, flags);
 
     connect(m_proc, SIGNAL(readDataReady(int)), this, SLOT(mkisofsData(int)),
             Qt::DirectConnection);
@@ -1330,7 +1365,7 @@ int Playlist::CreateCDMP3(void)
     }
     else
     {
-        m_progress = new MythProgressDialog(QObject::tr("Burning CD"), 100);
+        m_progress = new MythProgressDialog(tr("Burning CD"), 100);
         m_progress->setProgress(2);
 
         command = "cdrecord";
@@ -1348,11 +1383,11 @@ int Playlist::CreateCDMP3(void)
         args << "-data";
         args << tmprecordisofs;
 
-        flags = kMSRunShell | kMSStdErr | kMSStdOut | kMSBuffered |
+        flags = kMSRunShell | kMSStdErr | kMSStdOut |
                 kMSDontDisableDrawing | kMSDontBlockInputDevs |
                 kMSRunBackground;
 
-        m_proc = new MythSystem(command, args, flags);
+        m_proc = new MythSystemLegacy(command, args, flags);
         connect(m_proc, SIGNAL(readDataReady(int)),
                 this, SLOT(cdrecordData(int)), Qt::DirectConnection);
         connect(m_proc, SIGNAL(finished()),

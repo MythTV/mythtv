@@ -45,6 +45,7 @@
 #include "decoder.h"
 #include "remap.h"
 #include "vm.h"
+#include "vm_serialize.h"
 #include "dvdnav_internal.h"
 
 #ifdef _MSC_VER
@@ -351,6 +352,8 @@ int vm_reset(vm_t *vm, const char *dvdroot) {
 
   (vm->state).vtsN               = -1;
 
+  vm->hop_channel                = 0;
+
   if (vm->dvd && dvdroot) {
     /* a new dvd device has been requested */
     vm_stop(vm);
@@ -472,6 +475,8 @@ void vm_position_get(vm_t *vm, vm_position_t *position) {
   /* still already determined */
   if (position->still)
     return;
+#if 0   /* MythTV - Disable this workaround as it is invalid. VOBUs consisting
+           of just a NAV packet are valid */
   /* This is a rough fix for some strange still situations on some strange DVDs.
    * There are discs (like the German "Back to the Future" RC2) where the only
    * indication of a still is a cell playback time higher than the time the frames
@@ -499,6 +504,7 @@ void vm_position_get(vm_t *vm, vm_position_t *position) {
     if (time > 0xff) time = 0xff;
     position->still = time;
   }
+#endif
 }
 
 void vm_get_next_cell(vm_t *vm) {
@@ -729,35 +735,22 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result) {
  */
 int vm_get_audio_stream(vm_t *vm, int audioN) {
   int streamN = -1;
-  const uint AC3_OFFSET  = 0x80;
-  const uint DTS_OFFSET  = 0x88;
-  const uint LPCM_OFFSET = 0xA0;
-  const uint MP2_OFFSET  = 0xC0;
-
-  int stream_id = audioN;
-  if (stream_id >= MP2_OFFSET) {
-    stream_id -= MP2_OFFSET;
-  } else if (stream_id >= LPCM_OFFSET) {
-    stream_id -= LPCM_OFFSET;
-  } else if (stream_id >= DTS_OFFSET) {
-    stream_id -= DTS_OFFSET;
-  } else if (stream_id >= AC3_OFFSET) {
-    stream_id -= AC3_OFFSET;
-  }
    
   if((vm->state).domain != VTS_DOMAIN)
-    stream_id = 0;
+    audioN = 0;
 
-  if(stream_id < 8) {
+  if(audioN < 8) {
     /* Is there any control info for this logical stream */
-    if((vm->state).pgc->audio_control[stream_id] & (1<<15)) {
-      streamN = ((vm->state).pgc->audio_control[stream_id] >> 8) & 0x07;
+    if((vm->state).pgc->audio_control[audioN] & (1<<15)) {
+      streamN = ((vm->state).pgc->audio_control[audioN] >> 8) & 0x07;
     }
   }
 
   if((vm->state).domain != VTS_DOMAIN && streamN == -1)
     streamN = 0;
 
+  /* FIXME: Should also check in vtsi/vmgi status what kind of stream
+   * it is (ac3/lpcm/dts/sdds...) to find the right (sub)stream id */
   return streamN;
 }
 
@@ -1151,7 +1144,7 @@ static link_t play_Cell(vm_t *vm) {
   /* Multi angle/Interleaved */
   switch((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_mode) {
   case 0: /*  Normal */
-    assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type == 0);
+    /*assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type == 0);*/
     break;
   case 1: /*  The first cell in the block */
     switch((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type) {
@@ -1252,7 +1245,7 @@ static link_t play_Cell_post(vm_t *vm) {
   /* Multi angle/Interleaved */
   switch((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_mode) {
   case 0: /*  Normal */
-    assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type == 0);
+    /* assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type == 0); */
     (vm->state).cellN++;
     break;
   case 1: /*  The first cell in the block */
@@ -2012,6 +2005,62 @@ ifo_handle_t *vm_get_title_ifo(vm_t *vm, uint32_t title)
 void vm_ifo_close(ifo_handle_t *ifo)
 {
   ifoClose(ifo);
+}
+
+char *vm_get_state_str(vm_t *vm) {
+  char *str_state = NULL;
+
+  if(vm)
+    str_state = vm_serialize_dvd_state(&vm->state);
+
+  return str_state;
+}
+
+int vm_set_state(vm_t *vm, const char *state_str) {
+  /* restore state from save_state as taken from ogle */
+
+  dvd_state_t save_state;
+
+  if(state_str == NULL) {
+    return 0;
+  }
+
+  if(!vm_deserialize_dvd_state(state_str, &save_state)) {
+#ifdef TRACE
+    fprintf( MSG_OUT, "state_str invalid\n");
+#endif
+    return 0;
+  }
+
+  /* open the needed vts */
+  if( !ifoOpenNewVTSI(vm, vm->dvd, save_state.vtsN) ) return 0;
+  // sets state.vtsN
+
+  vm->state = save_state;
+  /* set state.domain before calling */
+  //calls get_pgcit()
+  //      needs state.domain and sprm[0] set
+  //      sets pgcit depending on state.domain
+  //writes: state.pgc
+  //        state.pgN
+  //        state.TT_PGCN_REG
+
+  if( !set_PGCN(vm, save_state.pgcN) ) return 0;
+  save_state.pgc = vm->state.pgc;
+
+  /* set the rest of state after the call */
+  vm->state = save_state;
+
+  /* if we are not in standard playback, we must get all data */
+  /* otherwise we risk loosing stillframes, and overlays */
+  if(vm->state.domain != VTS_DOMAIN)
+    vm->state.blockN = 0;
+
+  /* force a flush of data here */
+  /* we don't need a hop seek here as it's a complete state*/
+  vm->hop_channel++;
+
+  return 1;
 }
 
 /* Debug functions */

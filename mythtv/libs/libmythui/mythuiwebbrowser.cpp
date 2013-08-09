@@ -107,6 +107,7 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
 
     networkManager = new MythNetworkAccessManager();
     LOG(VB_GENERAL, LOG_DEBUG, "Copying DLManager's Cookie Jar");
+    GetMythDownloadManager()->loadCookieJar(GetConfDir() + "/MythBrowser/cookiejar.txt");
     networkManager->setCookieJar(GetMythDownloadManager()->copyCookieJar());
 
     atexit(DestroyNetworkAccessManager);
@@ -119,7 +120,9 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
  * @brief Adds a JavaScript object
  * \note allows the browser to control the music player
  */
-BrowserApi::BrowserApi(QObject *parent) : QObject(parent)
+BrowserApi::BrowserApi(QObject *parent)
+           : QObject(parent),
+            m_frame(NULL), m_gotAnswer(false)
 {
     gCoreContext->addListener(this);
 }
@@ -243,7 +246,7 @@ void BrowserApi::customEvent(QEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(13) != "MUSIC_CONTROL")
+        if (!message.startsWith("MUSIC_CONTROL"))
             return;
 
         QStringList tokens = message.simplified().split(" ");
@@ -271,6 +274,7 @@ MythWebPage::~MythWebPage()
 {
     LOG(VB_GENERAL, LOG_DEBUG, "Refreshing DLManager's Cookie Jar");
     GetMythDownloadManager()->refreshCookieJar(networkManager->cookieJar());
+    GetMythDownloadManager()->saveCookieJar(GetConfDir() + "/MythBrowser/cookiejar.txt");
 }
 
 bool MythWebPage::supportsExtension(Extension extension) const
@@ -449,12 +453,6 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void MythWebView::wheelEvent(QWheelEvent *event)
-{
-    event->accept();
-    QCoreApplication::postEvent(GetMythMainWindow(), new QWheelEvent(*event));
-}
-
 void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError)
@@ -563,7 +561,7 @@ void MythWebView::doDownload(const QString &saveFilename)
     if (saveFilename.isEmpty())
         return;
 
-    openBusyPopup(QObject::tr("Downloading file. Please wait..."));
+    openBusyPopup(tr("Downloading file. Please wait..."));
 
     // No need to make sure the path to saveFilename exists because
     // MythDownloadManage takes care of that
@@ -1006,6 +1004,9 @@ void MythUIWebBrowser::Init(void)
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);
+
+    m_zoom = gCoreContext->GetFloatSetting("WebBrowserZoomLevel", 1.0);
+
     SetZoom(m_zoom);
 
     if (!m_widgetUrl.isEmpty() && m_widgetUrl.isValid())
@@ -1513,6 +1514,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         if (action == "TOGGLEINPUT")
         {
             m_inputToggled = !m_inputToggled;
+
+            if (m_inputToggled)
+                slotStatusBarMessage(tr("Sending key presses to web page"));
+            else
+                slotStatusBarMessage(tr("Sending key presses to MythTV"));
+
             return true;
         }
 
@@ -1520,6 +1527,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         if (m_inputToggled)
         {
             m_browser->keyPressEvent(event);
+
             return true;
         }
 

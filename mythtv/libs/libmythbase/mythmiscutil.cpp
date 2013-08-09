@@ -49,7 +49,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythsocket.h"
 #include "mythcoreutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
@@ -421,10 +421,16 @@ QString createTempFile(QString name_template, bool dir)
  *
  *  \param filename   Path of file to make accessible
  */
-void makeFileAccessible(QString filename)
+bool makeFileAccessible(QString filename)
 {
     QByteArray fname = filename.toLatin1();
-    chmod(fname.constData(), 0666);
+    int ret = chmod(fname.constData(), 0666);
+    if (ret == -1)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Unable to change permissions on file. (%1)").arg(filename));
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -448,17 +454,8 @@ QString getResponse(const QString &query, const QString &def)
         return def;
     }
 
-    char response[80];
-    cin.clear();
-    cin.getline(response, 80);
-    if (!cin.good())
-    {
-        cout << endl;
-        LOG(VB_GENERAL, LOG_ERR, "Read from stdin failed");
-        return NULL;
-    }
-
-    QString qresponse = response;
+    QTextStream stream(stdin);
+    QString     qresponse = stream.readLine();
 
     if (qresponse.isEmpty())
         qresponse = def;
@@ -533,18 +530,6 @@ QString getSymlinkTarget(const QString &start_file,
 #endif
 
     return (!fi.isSymLink()) ? cur_file : QString::null;
-}
-
-void sendPlaybackStart(void)
-{
-    MythEvent me(QString("PLAYBACK_START %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
-}
-
-void sendPlaybackEnd(void)
-{
-    MythEvent me(QString("PLAYBACK_END %1").arg(gCoreContext->GetHostName()));
-    gCoreContext->dispatchNow(me);
 }
 
 bool IsMACAddress(QString MAC)
@@ -949,6 +934,10 @@ void wrapList(QStringList &list, int width)
 {
     int i;
 
+    // if this is triggered, something has gone seriously wrong
+    // the result won't really be usable, but at least it won't crash
+    width = max(width, 5);
+
     for(i = 0; i < list.size(); i++)
     {
         QString string = list.at(i);
@@ -959,7 +948,7 @@ void wrapList(QStringList &list, int width)
         QString left   = string.left(width);
         bool inserted  = false;
 
-        while( !inserted && left.right(1) != " " )
+        while( !inserted && !left.endsWith(" " ))
         {
             if( string.mid(left.size(), 1) == " " )
             {

@@ -8,6 +8,7 @@
 #include <QObject> // for moc
 #include <QStringList>
 #include <QEvent>
+#include <QCoreApplication>
 
 #include "mythmetaexp.h"
 #include "mthread.h"
@@ -58,6 +59,8 @@ class META_PUBLIC VideoScanChanges : public QEvent
 
 class META_PUBLIC VideoScannerThread : public MThread
 {
+    Q_DECLARE_TR_FUNCTIONS(VideoScannerThread)
+
   public:
     VideoScannerThread(QObject *parent);
     ~VideoScannerThread();

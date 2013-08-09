@@ -28,31 +28,22 @@ AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     samples_per_frame(0),
     m_spdifenc(NULL)
 {
-    out = (outbuf_t *)av_malloc(OUTBUFSIZE);
+    out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
     if (out)
     {
         out_size = OUTBUFSIZE;
     }
-    in = (inbuf_t *)av_malloc(INBUFSIZE);
+    in = (inbuf_t *)av_mallocz(INBUFSIZE);
     if (in)
     {
         in_size = INBUFSIZE;
     }
-    inp = (inbuf_t *)av_malloc(INBUFSIZE);
+    inp = (inbuf_t *)av_mallocz(INBUFSIZE);
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
 {
-    Dispose();
-}
-
-void AudioOutputDigitalEncoder::Dispose()
-{
-    if (av_context)
-    {
-        avcodec_close(av_context);
-        av_freep(&av_context);
-    }
+    Reset();
     if (out)
     {
         av_freep(&out);
@@ -67,11 +58,19 @@ void AudioOutputDigitalEncoder::Dispose()
     {
         av_freep(&inp);
     }
-    if (m_spdifenc)
+}
+
+void AudioOutputDigitalEncoder::Reset(void)
+{
+    if (av_context)
     {
-        delete m_spdifenc;
-        m_spdifenc = NULL;
+        avcodec_close(av_context);
+        av_freep(&av_context);
     }
+    delete m_spdifenc;
+    m_spdifenc = NULL;
+
+    clear();
 }
 
 void *AudioOutputDigitalEncoder::realloc(void *ptr,
@@ -98,10 +97,19 @@ bool AudioOutputDigitalEncoder::Init(
     AVCodec *codec;
     int ret;
 
-    LOG(VB_AUDIO, LOG_INFO, LOC + 
+    LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
+
+    if (!(in || inp || out))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Memory allocation failed");
+        return false;
+    }
+
+    // Clear digital encoder from all existing content
+    Reset();
 
     // We need to do this when called from mythmusic
     avcodeclock->lock();
@@ -120,49 +128,22 @@ bool AudioOutputDigitalEncoder::Init(
     av_context->bit_rate       = bitrate;
     av_context->sample_rate    = samplerate;
     av_context->channels       = channels;
-    switch (channels)
-    {
-        case 1:
-            av_context->channel_layout = AV_CH_LAYOUT_MONO;
-            break;
-        case 2:
-            av_context->channel_layout = AV_CH_LAYOUT_STEREO;
-            break;
-        case 3:
-            av_context->channel_layout = AV_CH_LAYOUT_SURROUND;
-            break;
-        case 4:
-            av_context->channel_layout = AV_CH_LAYOUT_4POINT0;
-            break;
-        case 5:
-            av_context->channel_layout = AV_CH_LAYOUT_5POINT0;
-            break;
-        default:
-            av_context->channel_layout = AV_CH_LAYOUT_5POINT1;
-            break;
-    }
+    av_context->channel_layout = av_get_default_channel_layout(channels);
     av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
 
-// open it
+    // open it
     ret = avcodec_open2(av_context, codec, NULL);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Could not open codec, invalid bitrate or samplerate");
 
-        Dispose();
         return false;
-    }
-
-    if (m_spdifenc)
-    {
-        delete m_spdifenc;
     }
 
     m_spdifenc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
     if (!m_spdifenc->Succeeded())
     {
-        Dispose();
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not create spdif muxer");
         return false;
     }
@@ -177,9 +158,17 @@ bool AudioOutputDigitalEncoder::Init(
 
 size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
+    int sampleSize = AudioOutputSettings::SampleSize(format);
+    if (sampleSize <= 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error, sample size is zero");
+        return 0;
+    }
+
     // Check if there is enough space in incoming buffer
-    int required_len = inlen + len / AudioOutputSettings::SampleSize(format) *
-        AudioOutputSettings::SampleSize(FORMAT_S16);
+    int required_len = inlen +
+        len * AudioOutputSettings::SampleSize(FORMAT_S16) / sampleSize;
+
     if (required_len > (int)in_size)
     {
         required_len = ((required_len / INBUFSIZE) + 1) * INBUFSIZE;
@@ -219,18 +208,22 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     frame->extended_data = frame->data;
     frame->nb_samples    = av_context->frame_size;
     frame->pts           = AV_NOPTS_VALUE;
-        // init AVFrame for planar data (input is interleaved)
-    for (int j = 0, jj = 0; j < channels; j++, jj += samples_per_frame)
+
+    if (frames > 0)
     {
-        frame->data[j] = (uint8_t*)(inp + jj);
+            // init AVFrame for planar data (input is interleaved)
+        for (int j = 0, jj = 0; j < channels; j++, jj += av_context->frame_size)
+        {
+            frame->data[j] = (uint8_t*)(inp + jj);
+        }
     }
 
     while (i < frames)
     {
         AVPacket pkt;
         av_init_packet(&pkt);
-        pkt.data          = (uint8_t *)m_encodebuffer;
-        pkt.size          = sizeof(m_encodebuffer);
+        pkt.data          = NULL;
+        pkt.size          = 0;
         int got_packet    = 0;
 
         AudioOutputUtil::DeinterleaveSamples(
@@ -241,14 +234,13 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
         int ret           = avcodec_encode_audio2(av_context, &pkt, frame,
                                                   &got_packet);
-        int outsize       = pkt.size;
 
         if (ret < 0)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
+            avcodec_free_frame(&frame);
             return ret;
         }
-        av_free_packet(&pkt);
         i++;
         if (!got_packet)
             continue;
@@ -257,7 +249,10 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         {
             m_spdifenc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
         }
-        m_spdifenc->WriteFrame((uint8_t *)m_encodebuffer, outsize);
+
+        m_spdifenc->WriteFrame((uint8_t *)pkt.data, pkt.size);
+        av_free_packet(&pkt);
+
         // Check if output buffer is big enough
         required_len = outlen + m_spdifenc->GetProcessedSize();
         if (required_len > (int)out_size)
@@ -270,6 +265,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                 (realloc(out, out_size, required_len));
             if (!tmp)
             {
+                avcodec_free_frame(&frame);
                 out = NULL;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
@@ -284,7 +280,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         outlen += data_size;
         inlen  -= samples_per_frame * sizeof(inbuf_t);
     }
-    av_free(frame);
+    avcodec_free_frame(&frame);
 
     memmove(in, in + i * samples_per_frame, inlen);
     return outlen;

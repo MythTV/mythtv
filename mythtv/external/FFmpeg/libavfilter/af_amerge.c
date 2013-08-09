@@ -63,8 +63,10 @@ static av_cold void uninit(AVFilterContext *ctx)
     int i;
 
     for (i = 0; i < am->nb_inputs; i++) {
-        ff_bufqueue_discard_all(&am->in[i].queue);
-        av_freep(&ctx->input_pads[i].name);
+        if (am->in)
+            ff_bufqueue_discard_all(&am->in[i].queue);
+        if (ctx->input_pads)
+            av_freep(&ctx->input_pads[i].name);
     }
     av_freep(&am->in);
 }
@@ -231,6 +233,11 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
         if (inlink == ctx->inputs[input_number])
             break;
     av_assert1(input_number < am->nb_inputs);
+    if (ff_bufqueue_is_full(&am->in[input_number].queue)) {
+        av_log(ctx, AV_LOG_ERROR, "Buffer queue overflow\n");
+        avfilter_unref_buffer(insamples);
+        return AVERROR(ENOMEM);
+    }
     ff_bufqueue_add(ctx, &am->in[input_number].queue, insamples);
     am->in[input_number].nb_samples += insamples->audio->nb_samples;
     nb_samples = am->in[0].nb_samples;
@@ -255,6 +262,7 @@ static int filter_frame(AVFilterLink *inlink, AVFilterBufferRef *insamples)
 
     outbuf->audio->nb_samples     = nb_samples;
     outbuf->audio->channel_layout = outlink->channel_layout;
+    outbuf->audio->channels       = outlink->channels;
 
     while (nb_samples) {
         ns = nb_samples;
@@ -335,7 +343,7 @@ static const AVFilterPad amerge_outputs[] = {
 
 AVFilter avfilter_af_amerge = {
     .name          = "amerge",
-    .description   = NULL_IF_CONFIG_SMALL("Merge two audio streams into "
+    .description   = NULL_IF_CONFIG_SMALL("Merge two or more audio streams into "
                                           "a single multi-channel stream."),
     .priv_size     = sizeof(AMergeContext),
     .init          = init,

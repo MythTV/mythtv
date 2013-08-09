@@ -12,8 +12,8 @@ GeneralSettings::GeneralSettings(MythScreenStack *parent, const char *name)
         m_musicLocation(NULL), m_musicAudioDevice(NULL),
         m_musicDefaultUpmix(NULL), m_musicCDDevice(NULL),
         m_nonID3FileNameFormat(NULL), m_ignoreID3Tags(NULL),
-        m_tagEncoding(NULL), m_allowTagWriting(NULL),
-        m_saveButton(NULL), m_cancelButton(NULL)
+        m_allowTagWriting(NULL), m_saveButton(NULL),
+        m_cancelButton(NULL)
 {
 }
 
@@ -36,7 +36,6 @@ bool GeneralSettings::Create()
     UIUtilE::Assign(this, m_musicCDDevice, "musiccddevice", &err);
     UIUtilE::Assign(this, m_nonID3FileNameFormat, "nonid3filenameformat", &err);
     UIUtilE::Assign(this, m_ignoreID3Tags, "ignoreid3tags", &err);
-    UIUtilE::Assign(this, m_tagEncoding, "tagencoding", &err);
     UIUtilE::Assign(this, m_allowTagWriting, "allowtagwriting", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
@@ -61,11 +60,6 @@ bool GeneralSettings::Create()
     int loadIgnoreTags = gCoreContext->GetNumSetting("Ignore_ID3", 0);
     if (loadIgnoreTags == 1)
         m_ignoreID3Tags->SetCheckState(MythUIStateType::Full);
-
-    new MythUIButtonListItem(m_tagEncoding, tr("UTF-16"), qVariantFromValue(QString("utf16")));
-    new MythUIButtonListItem(m_tagEncoding, tr("UTF-8"), qVariantFromValue(QString("utf8")));
-    new MythUIButtonListItem(m_tagEncoding, tr("ASCII"), qVariantFromValue(QString("ascii")));
-    m_tagEncoding->SetValueByData(gCoreContext->GetSetting("MusicTagEncoding"));
 
     int allowTagWriting = gCoreContext->GetNumSetting("AllowTagWriting", 1);
     if (allowTagWriting == 1)
@@ -92,9 +86,6 @@ bool GeneralSettings::Create()
                  "in files and just try to determine Genre, Artist, "
                  "Album, and Track number and title from the "
                  "filename."));
-    m_tagEncoding->SetHelpText(tr("Some MP3 players don't understand tags encoded in UTF-8 "
-                 "or UTF-16, this setting allows you to change the encoding "
-                 "format used. Currently applies only to ID3 tags."));
     m_allowTagWriting->SetHelpText(tr("If set, MythMusic will be allowed to update the "
                  "metadata in the file (e.g. ID3) to match the "
                  "database. This means allowing MythTV to write "
@@ -128,7 +119,6 @@ void GeneralSettings::slotSave(void)
     gCoreContext->SaveSetting("CDDevice", m_musicCDDevice->GetText());
     gCoreContext->SaveSetting("MusicAudioDevice", m_musicAudioDevice->GetText());
     gCoreContext->SaveSetting("NonID3FileNameFormat", m_nonID3FileNameFormat->GetText());
-    gCoreContext->SaveSetting("MusicTagEncoding", m_tagEncoding->GetValue());
 
     int saveMusicDefaultUpmix = (m_musicDefaultUpmix->GetCheckState() == MythUIStateType::Full) ? 1 : 0;
     gCoreContext->SaveSetting("MusicDefaultUpmix", saveMusicDefaultUpmix);

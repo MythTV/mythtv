@@ -66,10 +66,10 @@ class TransportWizard : public ConfigurationWizard
 
 static QString pp_modulation(QString mod)
 {
-    if (mod.right(3) == "vsb")
+    if (mod.endsWith("vsb"))
         return mod.left(mod.length() - 3) + "-VSB";
 
-    if (mod.left(4) == "qam_")
+    if (mod.startsWith("qam_"))
         return "QAM-" + mod.mid(4, mod.length());
 
     if (mod == "analog")

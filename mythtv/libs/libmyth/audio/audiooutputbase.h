@@ -15,7 +15,9 @@ using namespace std;
 
 // MythTV headers
 #include "audiooutput.h"
+// external/libsamplerate
 #include "samplerate.h"
+
 #include "mythlogging.h"
 #include "mthread.h"
 
@@ -25,6 +27,7 @@ using namespace std;
 #define VBERROR(str)   LOG(VB_GENERAL, LOG_ERR, LOC + str)
 #define VBWARN(str)    LOG(VB_GENERAL, LOG_WARNING, LOC + str)
 #define VBERRENO(str)  Error(LOC + str + ": " + ENO)
+#define VBERRNOCONST(str)   LOG(VB_GENERAL, LOG_ERR, LOC + str + ": " + ENO)
 
 namespace soundtouch {
 class SoundTouch;
@@ -77,6 +80,12 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool IsUpmixing(void);
     virtual bool ToggleUpmix(void);
     virtual bool CanUpmix(void);
+    virtual bool CanProcess(AudioFormat fmt) { return true; }
+    virtual uint32_t CanProcess(void)
+    {
+        // we support all codec
+        return ~(((~0ULL) >> FORMAT_FLT) << FORMAT_FLT);
+    }
 
     virtual void Reset(void);
 

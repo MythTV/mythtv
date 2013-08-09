@@ -140,7 +140,7 @@ void ChannelScanner::Scan(
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
-        if ((mod.left(3).toLower() == "qam") &&
+        if ((mod.startsWith("qam", Qt::CaseInsensitive)) &&
             (sigmonScanner->GetSignalTimeout() < 1000))
         {
             sigmonScanner->SetSignalTimeout(1000);

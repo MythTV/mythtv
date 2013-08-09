@@ -111,6 +111,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
+        memset(&m_aeskey, 0, sizeof(m_aeskey));
 #endif
         m_downloading   = false;
     }
@@ -289,7 +290,7 @@ public:
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;
         unsigned char iv[AES_BLOCK_SIZE];
-        char *decrypted_data = new char[aeslen];
+        char *decrypted_data = new char[m_data.size()];
         if (IV == NULL)
         {
             /*
@@ -393,6 +394,7 @@ public:
         m_url           = uri;
 #ifdef USING_LIBCRYPTO
         m_ivloaded      = false;
+        memset(m_AESIV, 0, sizeof(m_AESIV));
 #endif
     }
 
@@ -438,6 +440,7 @@ public:
 #ifdef USING_LIBCRYPTO
         m_keypath       = rhs.m_keypath;
         m_ivloaded      = rhs.m_ivloaded;
+        memcpy(m_AESIV, rhs.m_AESIV, sizeof(m_AESIV));
 #endif
         return *this;
     }
@@ -1880,10 +1883,13 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString line, const QStri
     attr = ParseAttributes(line, "PROGRAM-ID");
     if (attr.isNull())
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>");
-        return NULL;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "#EXT-X-STREAM-INF: expected PROGRAM-ID=<value>, using -1");
+        id = -1;
     }
-    id = attr.toInt();
+    else
+    {
+        id = attr.toInt();
+    }
 
     attr = ParseAttributes(line, "BANDWIDTH");
     if (attr.isNull())
@@ -2732,6 +2738,34 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
     return used;
 }
 
+/**
+ * returns an estimated duration in ms for size amount of data
+ * returns 0 if we can't estimate the duration
+ */
+int HLSRingBuffer::DurationForBytes(uint size)
+{
+    int segnum = m_playback->Segment();
+    int stream = m_streamworker->StreamForSegment(segnum);
+    if (stream < 0)
+    {
+        return 0;
+    }
+    HLSStream *hls = GetStream(stream);
+    if (hls == NULL)
+    {
+        return 0;
+    }
+    HLSSegment *segment = hls->GetSegment(segnum);
+    if (segment == NULL)
+    {
+        return 0;
+    }
+    uint64_t byterate = (uint64_t)(((double)segment->Size()) /
+                                   ((double)segment->Duration()));
+
+    return (int)((size * 1000.0) / byterate);
+}
+
 long long HLSRingBuffer::GetRealFileSize(void) const
 {
     QReadLocker lock(&rwlock);
@@ -2882,6 +2916,12 @@ long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
     }
     else
     {
+        if (segment == NULL) // can never happen, make coverity happy
+        {
+            // stream doesn't contain segment error can't continue,
+            // unknown error
+            return -1;
+        }
         int32_t skip = ((postime - starttime) * segment->Size()) / segment->Duration();
         segment->Read(NULL, skip);
     }

@@ -33,6 +33,7 @@ class basetzinfo( _pytzinfo ):
             self._get_transition = self._get_transition_single
         else:
             self.__last = 0
+            self._compute_ranges()
             self._get_transition = self._get_transition_search
         return self._get_transition(dt)
 
@@ -41,25 +42,30 @@ class basetzinfo( _pytzinfo ):
             dt = _pydatetime.now()
         dt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        direction = 0
         index = self.__last
+        direction = 0
         while True:
-            if dt < self._transitions[index].local[0:5]:
+            if dt < self._ranges[index][0]:
                 if direction == 1:
+                    # gap found, use later transition
+                    break
+                else:
                     index -= 1
-                    break
-                else:
                     direction = -1
-            else:
+            elif dt >= self._ranges[index][1]:
                 if direction == -1:
+                    # gap found, use later transition
+                    index += 1
                     break
                 else:
+                    index += 1
                     direction = 1
+            else:
+                break
 
-            index += direction
-            if index >= len(self._transitions):
+            if index >= len(self._ranges):
                 # out of bounds future, use final transition
-                index = len(self._transitions) - 1
+                index = len(self._ranges) - 1
                 break
             elif index < 0:
                 # out of bounds past, undefined time frame
@@ -67,12 +73,30 @@ class basetzinfo( _pytzinfo ):
                                   self.tzname(), dt)
 
         self.__last = index
-        return self._transitions[index]
+        return self._transitions[self._ranges[index][2]]
 
     def _get_transition_empty(self, dt=None):
         return self._Transition(0, None, None, 0, 'UTC', False)
     def _get_transition_single(self, dt=None):
         return self._transitions[0]
+
+    def _compute_ranges(self):
+        self._ranges = []
+        for i in range(0, len(self._transitions)-1):
+            p,n = self._transitions[i:i+2]
+            rstart = p.local[0:5]
+
+            offset = p.offset - n.offset
+            rend = list(n.local[0:5])
+            rend[4] += offset/60
+            if (0 > rend[4]) or (rend[4] > 59):
+                rend[3] += rend[4]/60
+                rend[4] = rend[4]%60
+            if (0 > rend[3]) or (rend[3] > 23):
+                rend[2] += rend[3]/24
+                rend[3] = rend[3]%24
+
+            self._ranges.append((rstart, tuple(rend), i))
 
     def utcoffset(self, dt=None):
         return timedelta(0, self._get_transition(dt).offset)
@@ -248,7 +272,10 @@ class datetime( _pydatetime ):
 
     @classmethod
     def UTCTZ(cls):
-        return offsettzinfo()
+        try:
+            return posixtzinfo('Etc/UTC')
+        except:
+            return offsettzinfo()
 
     @classmethod
     def fromDatetime(cls, dt, tzinfo=None):
@@ -295,7 +322,7 @@ class datetime( _pydatetime ):
 
     @classmethod
     def frommythtime(cls, mtime, tz=None):
-        if tz == 'UTC':
+        if tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()
@@ -319,15 +346,12 @@ class datetime( _pydatetime ):
 
         if match.group('tz'):
             if match.group('tz') == 'Z':
-                try:
-                    tz = posixtzinfo('UTC')
-                except:
-                    tz = offsettzinfo()
+                tz = cls.UTCTZ()
             elif match.group('tzmin'):
                 tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
                 tz = offsettzinfo(*match.group('tzdirec','tzhour'))
-        elif tz == 'UTC':
+        elif tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()
@@ -366,10 +390,7 @@ class datetime( _pydatetime ):
 
         if match.group('tz'):
             if match.group('tz') in ('UT', 'GMT'):
-                try:
-                    tz = posixtzinfo('UTC')
-                except:
-                    tz = offsettzinfo()
+                tz = cls.UTCTZ()
             elif match.group('tz') == 'EDT':
                 tz = offsettzinfo(hr=-4)
             elif match.group('tz') in ('EST', 'CDT'):
@@ -384,7 +405,7 @@ class datetime( _pydatetime ):
                 tz = offsettzinfo(*match.group('tzdirec','tzhour','tzmin'))
             else:
                 tz = offsettzinfo(*match.group('tzdirec','tzhour'))
-        elif tz == 'UTC':
+        elif tz in ('UTC', 'Etc/UTC'):
             tz = cls.UTCTZ()
         elif tz is None:
             tz = cls.localTZ()

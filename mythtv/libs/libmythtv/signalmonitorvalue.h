@@ -5,12 +5,16 @@
 #include <vector>
 using namespace std;
 
+// Qt headers
 #include <QStringList>
+#include <QCoreApplication>
 
 #include "mythcontext.h"
 
 class SignalMonitorValue
 {
+    Q_DECLARE_TR_FUNCTIONS(SignalMonitorValue)
+
     typedef vector<SignalMonitorValue> SignalMonitorList;
   public:
     SignalMonitorValue(const QString& _name, const QString& _noSpaceName,

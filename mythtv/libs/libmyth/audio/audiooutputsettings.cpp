@@ -202,6 +202,48 @@ int AudioOutputSettings::SampleSize(AudioFormat format)
     }
 }
 
+/**
+ * Return AVSampleFormat closest equivalent to AudioFormat
+ */
+AudioFormat AudioOutputSettings::AVSampleFormatToFormat(AVSampleFormat format, int bits)
+{
+    switch (av_get_packed_sample_fmt(format))
+    {
+        case AV_SAMPLE_FMT_U8:      return FORMAT_U8;
+        case AV_SAMPLE_FMT_S16:     return FORMAT_S16;
+        case AV_SAMPLE_FMT_FLT:     return FORMAT_FLT;
+        case AV_SAMPLE_FMT_DBL:     return FORMAT_NONE;
+        case AV_SAMPLE_FMT_S32:
+            switch (bits)
+            {
+                case  0:            return FORMAT_S32;
+                case 24:            return FORMAT_S24;
+                case 32:            return FORMAT_S32;
+                default:            return FORMAT_NONE;
+            }
+        default:                    return FORMAT_NONE;
+    }
+}
+
+/**
+ * Return AudioFormat closest equivalent to AVSampleFormat
+ * Note that FORMAT_S24LSB and FORMAT_S24 have no direct equivalent
+ * use S32 instead
+ */
+AVSampleFormat AudioOutputSettings::FormatToAVSampleFormat(AudioFormat format)
+{
+    switch (format)
+    {
+        case FORMAT_U8:             return AV_SAMPLE_FMT_U8;
+        case FORMAT_S16:            return AV_SAMPLE_FMT_S16;
+        case FORMAT_FLT:            return AV_SAMPLE_FMT_FLT;
+        case FORMAT_S32:
+        case FORMAT_S24:
+        case FORMAT_S24LSB:         return AV_SAMPLE_FMT_S32;
+        default:                    return AV_SAMPLE_FMT_NONE;
+    }
+}
+
 void AudioOutputSettings::AddSupportedChannels(int channels)
 {
     m_channels.push_back(channels);

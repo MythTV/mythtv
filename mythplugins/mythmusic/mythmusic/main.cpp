@@ -28,6 +28,7 @@
 // MythMusic headers
 #include "musicdata.h"
 #include "decoder.h"
+#include "cddecoder.h"
 #include "playlisteditorview.h"
 #include "playlistview.h"
 #include "streamview.h"
@@ -47,10 +48,6 @@
 #ifdef HAVE_CDIO
 #include "cdrip.h"
 #endif
-
-
-// This stores the last MythMediaDevice that was detected:
-QString gCDdevice;
 
 /**
  * \brief Work out the best CD drive to use at this time
@@ -98,7 +95,8 @@ static void loadMusic()
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = QObject::tr("Loading Music. Please wait ...");
+    QString message = qApp->translate("(MythMusicMain)", 
+                                      "Loading Music. Please wait ...");
 
     MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
                                                   "musicscanbusydialog");
@@ -180,9 +178,9 @@ static void startDatabaseTree(void)
 
 static void startRipper(void)
 {
+#if defined HAVE_CDIO
     loadMusic();
 
-#if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Ripper *rip = new Ripper(mainStack, chooseCD());
@@ -196,6 +194,11 @@ static void startRipper(void)
     }
     else
         delete rip;
+
+#else
+    ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                "MythMusic hasn't been built with libcdio "
+                                "support so ripping CDs is not possible"));
 #endif
 }
 
@@ -204,15 +207,20 @@ static void runScan(void)
     // if we don't have a valid start dir warn the user and give up
     if (getMusicDirectory().isEmpty())
     {
-        ShowOkPopup(QObject::tr("You need to tell me where to find your music on the "
-                                "'General Settings' page of MythMusic's settings pages."));
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "You need to tell me where to find your "
+                                    "music on the 'General Settings' page of "
+                                    "MythMusic's settings pages."));
        return;
     }
 
     if (!QFile::exists(getMusicDirectory()))
     {
-        ShowOkPopup(QObject::tr("Can't find your music directory. Have you set it correctly on the "
-                                "'General Settings' page of MythMusic's settings pages?"));
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "Can't find your music directory. Have "
+                                    "you set it correctly on the 'General "
+                                    "Settings' page of MythMusic's settings "
+                                    "pages?"));
        return;
     }
 
@@ -398,7 +406,10 @@ static void runRipCD(void)
     if (rip->Create())
         mainStack->AddScreen(rip);
     else
+    {
         delete rip;
+        return;
+    }
 
     QObject::connect(rip, SIGNAL(ripFinished()),
                      gMusicData, SLOT(reloadMusic()),
@@ -416,72 +427,157 @@ static void showMiniPlayer(void)
         gPlayer->showMiniPlayer();
 }
 
-#ifdef FIXME  // the only call is likewise commented out and needs fixing
 static void handleMedia(MythMediaDevice *cd)
 {
-    // if the music player is already playing ignore the event
-    if (gPlayer->isPlaying())
-    {
-        LOG(VB_GENERAL, LOG_NOTICE, "Got a media changed event but ignoring since "
-                                      "the music player is already playing");
+    if (!cd)
         return;
-    }
-    else
-         LOG(VB_GENERAL, LOG_NOTICE, "Got a media changed event");
 
     // Note that we should deal with other disks that may contain music.
     // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
+    LOG(VB_MEDIA, LOG_NOTICE, QString("Ignoring changed media event of type: %1")
+        .arg(MythMediaDevice::MediaTypeString(cd->getMediaType())));
+}
+
+static void handleCDMedia(MythMediaDevice *cd)
+{
+#ifdef HAVE_CDIO
 
     if (!cd)
         return;
 
+    LOG(VB_MEDIA, LOG_NOTICE, "Got a media changed event");
+
+    QString newDevice;
+
+    // save the device if valid
     if (cd->isUsable())
     {
-        QString newDevice;
-
 #ifdef Q_OS_MAC
         newDevice = cd->getMountPath();
 #else
         newDevice = cd->getDevicePath();
 #endif
 
-        if (gCDdevice.length() && gCDdevice != newDevice)
-        {
-            // In the case of multiple audio CDs, clear the old stored device
-            // so the user has to choose (via MediaMonitor::defaultCDdevice())
-
-            gCDdevice = QString::null;
-            LOG(VB_MEDIA, LOG_INFO, "MythMusic: Forgetting existing CD");
-        }
-        else
-        {
-            gCDdevice = newDevice;
-            LOG(VB_MEDIA, LOG_INFO,
-                "MythMusic: Storing CD device " + gCDdevice);
-        }
+        gCDdevice = newDevice;
+        LOG(VB_MEDIA, LOG_INFO, "MythMusic: Storing CD device " + gCDdevice);
     }
     else
     {
-        gCDdevice = QString::null;
+        LOG(VB_MEDIA, LOG_INFO, "Device is not usable clearing cd data");
+
+        // device is not usable so remove any existing CD tracks
+        if (gMusicData->all_music)
+        {
+            gMusicData->all_music->clearCDData();
+            gMusicData->all_playlists->getActive()->removeAllCDTracks();
+        }
+
+        gPlayer->activePlaylistChanged(-1, true);
+        gPlayer->sendCDChangedEvent();
+
         return;
     }
 
-    GetMythMainWindow()->JumpTo("Main Menu");
+    if (!gMusicData->initialized)
+        loadMusic();
 
+    // remove any existing CD tracks
+    if (gMusicData->all_music)
+    {
+        gMusicData->all_music->clearCDData();
+        gMusicData->all_playlists->getActive()->removeAllCDTracks();
+    }
+
+    // find any new cd tracks
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
+    decoder->setDevice(newDevice);
+
+    int tracks = decoder->getNumTracks();
+    bool setTitle = false;
+
+    for (int trackNo = 1; trackNo <= tracks; trackNo++)
+    {
+        MusicMetadata *track = decoder->getMetadata(trackNo);
+        if (track)
+        {
+            gMusicData->all_music->addCDTrack(*track);
+
+            if (!setTitle)
+            {
+
+                QString parenttitle = " ";
+                if (track->FormatArtist().length() > 0)
+                {
+                    parenttitle += track->FormatArtist();
+                    parenttitle += " ~ ";
+                }
+
+                if (track->Album().length() > 0)
+                    parenttitle += track->Album();
+                else
+                {
+                    parenttitle = " " + qApp->translate("(MythMusicMain)", 
+                                                        "Unknown");
+                    LOG(VB_GENERAL, LOG_INFO, "Couldn't find your "
+                    " CD. It may not be in the freedb database.\n"
+                    "    More likely, however, is that you need to delete\n"
+                    "    ~/.cddb and ~/.cdserverrc and restart MythMusic.");
+                }
+
+                gMusicData->all_music->setCDTitle(parenttitle);
+                setTitle = true;
+            }
+
+            delete track;
+        }
+    }
+
+    gPlayer->sendCDChangedEvent();
+
+    delete decoder;
+
+    // if the AutoPlayCD setting is set we remove all the existing tracks
+    // from the playlist and replace them with the new CD tracks found
     if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
     {
-        // Empty the playlist to ensure CD is played first
-        if (gMusicData->all_music)
-            gMusicData->all_music->clearCDData();
-        if (gMusicData->all_playlists)
-            gMusicData->all_playlists->clearCDList();
+        gMusicData->all_playlists->getActive()->removeAllTracks();
+
+        QList<int> songList;
+
+        for (int x = 1; x <= gMusicData->all_music->getCDTrackCount(); x++)
+        {
+            MusicMetadata *mdata = gMusicData->all_music->getCDMetadata(x);
+            if (mdata)
+                songList.append((mdata)->ID());
+        }
+
+        if (songList.count())
+        {
+            gMusicData->all_playlists->getActive()->fillSonglistFromList(
+                    songList, true, PL_REPLACE, 0);
+            gPlayer->setCurrentTrackPos(0);
+        }
+    }
+    else
+    {
+        // don't show the music screen if AutoPlayCD is off
+        return;
+    }
+
+    // if there is no music screen showing show the Playlist view
+    if (!gPlayer->hasClient())
+    {
+        // make sure we start playing from the first track
+        gCoreContext->SaveSetting("MusicBookmark", 0);
+        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
 
         runMusicPlayback();
     }
-    else
-        mythplugin_run();
-}
+#else
+    LOG(VB_GENERAL, LOG_NOTICE, "MythMusic got a media changed event"
+                                "but cdio support is not compiled in");
 #endif
+}
 
 static void setupKeys(void)
 {
@@ -555,18 +651,14 @@ static void setupKeys(void)
     REG_KEY("Music", "SWITCHTORADIO",                 QT_TRANSLATE_NOOP("MythControls",
         "Switch to the radio stream view"), "");
 
-#ifdef FIXME
-// FIXME need to find a way to stop the media monitor jumping to the main menu before
-// calling the handler
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 1/2"), "", "", handleMedia,
+        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythMusic Media Handler 2/2"), "", "", handleMedia,
         MEDIATYPE_MMUSIC, "mp3,mp2,ogg,oga,flac,wma,wav,ac3,"
                           "oma,omg,atp,ra,dts,aac,m4a,aa3,tta,"
                           "mka,aiff,swa,wv");
-#endif
 }
 
 int mythplugin_init(const char *libversion)
@@ -588,7 +680,7 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    gPlayer = new MusicPlayer(NULL, chooseCD());
+    gPlayer = new MusicPlayer(NULL);
     gMusicData = new MusicData();
 
     return 0;

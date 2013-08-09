@@ -147,6 +147,7 @@ VideoOutputXv::VideoOutputXv()
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),     xv_set_defaults(false),
+      xv_need_bobdeint_repaint(false),
       xv_use_picture_controls(true),
 
       chroma_osd(NULL)
@@ -845,7 +846,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     }
 
     // Create video buffers
-    bool use_xv     = (renderer.left(2) == "xv");
+    bool use_xv     = (renderer.startsWith("xv"));
     bool use_shm    = (renderer == "xshm");
     bool ok = InitVideoBuffers(use_xv, use_shm);
 

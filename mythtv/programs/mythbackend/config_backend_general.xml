@@ -791,6 +791,12 @@
          help_text="EventCmdRecStarted"
          data_type="string" />
       <setting
+         value="EventCmdRecStartedWriting" label="Recording started writing"
+         setting_type="host" default_data=""
+         placeholder_text="Enter a command to run when this occurs"
+         help_text="EventCmdRecStartedWriting"
+         data_type="string" />
+      <setting
          value="EventCmdRecFinished" label="Recording finished"
          setting_type="host" default_data=""
          placeholder_text="Enter a command to run when this occurs"

@@ -47,61 +47,6 @@ static const float m7db = 0.44721359549996;              // 7dB  = SQRT(5)
 
 unsigned int block_size = default_block_size;
 
-// stupidity countermeasure...
-template<class T> T pop_back(std::list<T> &l)
-{
-    T result(l.back());
-    l.pop_back();
-    return result;
-}
-
-// a pool, where the DSP can throw its objects at after it got deleted and
-// get them back when it is recreated...
-class object_pool
-{
-public:
-    typedef void* (*callback)();
-    // initialize
-    object_pool(callback cbf):construct(cbf) { }
-    ~object_pool()
-    {
-        for (std::map<void*,void*>::iterator i=pool.begin(),e=pool.end();
-             i != e; i++)
-            delete i->second;
-        for (std::list<void*>::iterator i=freelist.begin(),e=freelist.end();
-             i != e; i++)
-            delete *i;
-    }
-    // (re)acquire an object
-    void *acquire(void *who)
-    {
-        std::map<void*,void*>::iterator i(pool.find(who));
-        if (i != pool.end())
-            return i->second;
-        else
-            if (!freelist.empty())
-                return pool.insert(std::make_pair(who,pop_back(freelist)))
-                                  .first->second;
-            else
-                return pool.insert(std::make_pair(who,construct()))
-                                  .first->second;
-    }
-    // release an object into the wild
-    void release(void *who)
-    {
-        std::map<void*,void*>::iterator i(pool.find(who));
-        if (i != pool.end()) {
-            freelist.push_back(i->second);
-            pool.erase(i);
-        }
-    }
-public:
-    callback construct;            // object constructor callback
-    std::list<void*> freelist;     // list of available objects
-    std::map<void*,void*> pool;    // pool of used objects, by class
-};
-
-// buffers which we usually need (and want to share between plugin lifespans)
 struct buffers
 {
     buffers(unsigned int s):
@@ -122,13 +67,6 @@ struct buffers
                        rls, rrs;       // for demultiplexing
 };
 
-// construction methods
-void *new_decoder() { return new fsurround_decoder(block_size); }
-void *new_buffers() { return new buffers(block_size/2); }
-
-object_pool dp(&new_decoder);
-object_pool bp(&new_buffers);
-
 //#define SPEAKERTEST
 #ifdef SPEAKERTEST
 int channel_select = -1;
@@ -136,8 +74,6 @@ int channel_select = -1;
 
 FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     srate(srate),
-    open_(false),
-    initialized_(false),
     bufs(NULL),
     decoder(0),
     in_count(0),
@@ -145,7 +81,8 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     processed(true),
     processed_size(0),
     surround_mode(smode),
-    latency_frames(0)
+    latency_frames(0),
+    channels(0)
 {
     LOG(VB_AUDIO, LOG_DEBUG,
         QString("FreeSurround::FreeSurround rate %1 moviemode %2")
@@ -175,7 +112,7 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
             break;
     }
 
-    bufs = (buffers*)bp.acquire((void*)1);
+    bufs = new buffers(block_size/2);
     open();
 #ifdef SPEAKERTEST
     channel_select++;
@@ -215,11 +152,8 @@ FreeSurround::~FreeSurround()
 {
     LOG(VB_AUDIO, LOG_DEBUG, QString("FreeSurround::~FreeSurround"));
     close();
-    if (bufs)
-    {
-        bp.release((void*)1);
-        bufs = NULL;
-    }
+    delete bufs;
+    bufs = NULL;
     LOG(VB_AUDIO, LOG_DEBUG, QString("FreeSurround::~FreeSurround done"));
 }
 
@@ -493,7 +427,7 @@ long long FreeSurround::getLatency()
     // returns in usec
     if (latency_frames == 0)
         return 0;
-    return decoder ? ((latency_frames + in_count)*1000000)/(2*srate) : 0;
+    return decoder ? ((long long)(latency_frames + in_count)*1000000)/(2*srate) : 0;
 }
 
 void FreeSurround::flush()
@@ -508,7 +442,7 @@ void FreeSurround::open()
 {
     if (!decoder)
     {
-        decoder = (fsurround_decoder*)dp.acquire((void*)1);
+        decoder = new fsurround_decoder(block_size);
         decoder->flush();
         if (bufs)
             bufs->clear();
@@ -519,11 +453,8 @@ void FreeSurround::open()
 
 void FreeSurround::close()
 {
-    if (decoder)
-    {
-        dp.release(this);
-        decoder = 0;
-    }
+    delete decoder;
+    decoder = NULL;
 }
 
 uint FreeSurround::numUnprocessedFrames()

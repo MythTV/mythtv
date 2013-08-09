@@ -53,7 +53,7 @@ MHOctetString::MHOctetString(const char *str, int nLen)
     }
     else
     {
-        m_pChars = (unsigned char *)malloc(nLen);
+        m_pChars = (unsigned char *)malloc(nLen + 1);
 
         if (! m_pChars)
         {
@@ -74,7 +74,7 @@ MHOctetString::MHOctetString(const unsigned char *str, int nLen)
     }
     else
     {
-        m_pChars = (unsigned char *)malloc(nLen);
+        m_pChars = (unsigned char *)malloc(nLen + 1);
 
         if (! m_pChars)
         {
@@ -111,7 +111,7 @@ MHOctetString::MHOctetString(const MHOctetString &str, int nOffset, int nLen)
     }
     else
     {
-        m_pChars = (unsigned char *)malloc(nLen);
+        m_pChars = (unsigned char *)malloc(nLen + 1);
 
         if (! m_pChars)
         {

@@ -23,6 +23,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
+#include "mythmiscutil.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -196,7 +197,11 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
-    setuid(getuid());
+    if (setuid(getuid()) != 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Failed to setuid(), exiting.");
+        return GENERIC_EXIT_NOT_OK;
+    }
 
     QString themename = gCoreContext->GetSetting("Theme");
     QString themedir = GetMythUI()->FindThemeDir(themename);
@@ -254,6 +259,7 @@ int main(int argc, char *argv[])
     else
     {
         TV::InitKeys();
+        setHttpProxy();
 
         if (!UpgradeTVDatabaseSchema(false))
         {

@@ -17,7 +17,7 @@
 #include "mythdb.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mthread.h"
 #include "mythdate.h"

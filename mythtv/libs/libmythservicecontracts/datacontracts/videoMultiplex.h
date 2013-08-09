@@ -75,7 +75,14 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
 
         VideoMultiplex(QObject *parent = 0)
             : QObject         ( parent ),
-              m_MplexId       ( 0      )
+              m_MplexId       ( 0      ),
+              m_SourceId      ( 0      ),
+              m_TransportId   ( 0      ),
+              m_NetworkId     ( 0      ),
+              m_Frequency     ( 0      ),
+              m_SymbolRate    ( 0      ),
+              m_Visible       ( false  ),
+              m_ServiceVersion( 0      )
         {
         }
 

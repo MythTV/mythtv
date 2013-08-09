@@ -42,7 +42,7 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
                           .arg(alsa_device.constData()));
         return false;
     }
-    AlsaBad(snd_config_update_free_global(), "failed to update snd config");
+    (void)AlsaBad(snd_config_update_free_global(), "failed to update snd config");
     m_audio_sample_rate = sample_rate;
     m_audio_channels = channels;
     m_audio_sample_bits = sample_bits;
@@ -55,7 +55,7 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
     }
     if (!(PrepHwParams() && PrepSwParams()))
     {
-        snd_pcm_close(pcm_handle);
+        (void)snd_pcm_close(pcm_handle);
         pcm_handle = NULL;
         return false;
     }
@@ -68,7 +68,7 @@ void AudioInputALSA::Close(void)
     if (pcm_handle != NULL)
     {
         Stop();
-        AlsaBad(snd_pcm_close(pcm_handle), "Close close failed");
+        (void)AlsaBad(snd_pcm_close(pcm_handle), "Close close failed");
     }
     pcm_handle = NULL;
 }

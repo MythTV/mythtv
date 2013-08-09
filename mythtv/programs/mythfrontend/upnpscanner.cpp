@@ -684,11 +684,11 @@ void UPNPScanner::customEvent(QEvent *event)
         MythInfoMapEvent *info = (MythInfoMapEvent*)event;
         if (!info)
             return;
-        if (!info->InfoMap())
+        if (!info->GetInfoMap())
             return;
 
-        QString usn = info->InfoMap()->value("usn");
-        QString id  = info->InfoMap()->value("SystemUpdateID");
+        QString usn = info->GetInfoMap()->value("usn");
+        QString id  = info->GetInfoMap()->value("SystemUpdateID");
         if (usn.isEmpty() || id.isEmpty())
             return;
 
@@ -1275,15 +1275,15 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
                                QUrl::RemoveQuery);
 
     // strip leading slashes off the controlURL
-    while (!controlURL.isEmpty() && controlURL.left(1) == "/")
+    while (!controlURL.isEmpty() && controlURL.startsWith("/"))
         controlURL = controlURL.mid(1);
 
     // strip leading slashes off the eventURL
-    //while (!eventURL.isEmpty() && eventURL.left(1) == "/")
+    //while (!eventURL.isEmpty() && eventURL.startsWith("/"))
     //    eventURL = eventURL.mid(1);
 
     // strip trailing slashes off URLBase
-    while (!URLBase.isEmpty() && URLBase.right(1) == "/")
+    while (!URLBase.isEmpty() && URLBase.endsWith("/"))
         URLBase = URLBase.mid(0, URLBase.size() - 1);
 
     controlURL = URLBase + "/" + controlURL;

@@ -343,11 +343,18 @@ int main(int argc, char **argv)
                     else
                     {
                         ZMServer *server = serverList[i];
-                        server->processRequest(buf, nbytes);
+                        quit = server->processRequest(buf, nbytes);
                     }
                 }
             }
         }
+    }
+
+    // cleanly remove all the ZMServer's
+    for (std::map<int, ZMServer*>::iterator it = serverList.begin();
+         it != serverList.end(); ++it)
+    {
+        delete it->second;
     }
 
     mysql_close(&g_dbConn);

@@ -34,6 +34,7 @@ EITFixUp::EITFixUp()
       m_dishPPVCode("\\s*\\(([A-Z]|[0-9]){5}\\)\\s*$"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
+      m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
@@ -717,6 +718,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     // BBC three case (could add another record here ?)
     event.description = event.description.remove(m_ukThen);
     event.description = event.description.remove(m_ukNew);
+    event.title = event.title.remove(m_ukNewTitle);
 
     // Removal of Class TV, CBBC and CBeebies etc..
     event.title = event.title.remove(m_ukTitleRemove);
@@ -802,7 +804,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
 
     QRegExp tmp24ep = m_uk24ep;
-    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
+    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:") &&
+        !event.title.startsWith("Mission: Impossible"))
     {
         if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&
             ((position2=event.description.indexOf(m_ukDoubleDotStart)) != -1))
@@ -1550,11 +1553,10 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     /* if we do not have an episode title by now try some guessing as last resort */
     if (event.subtitle.length() == 0)
     {
-        int position;
         const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
         const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
-        if ((position = tmpExp1.indexIn(event.description)) != -1)
+        if (tmpExp1.indexIn(event.description) != -1)
         {
             uint tmpExp1Len = tmpExp1.cap(1).length();
             uint evDescLen = max(event.description.length(), 1);
@@ -1729,38 +1731,37 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Film - categories are usually not Films
     if (event.category.startsWith("Film -"))
     {
-        event.categoryType = ProgramInfo::                                                                      kCategorySeries;
+        event.categoryType = ProgramInfo::kCategorySeries;
     }
 
     // Get stereo info
-    int position;
-    if ((position = fullinfo.indexOf(m_Stereo)) != -1)
+    if (fullinfo.indexOf(m_Stereo) != -1)
     {
         event.audioProps |= AUD_STEREO;
         fullinfo = fullinfo.replace(m_Stereo, ".");
     }
 
     //Get widescreen info
-    if ((position = fullinfo.indexOf(m_nlWide)) != -1)
+    if (fullinfo.indexOf(m_nlWide) != -1)
     {
         fullinfo = fullinfo.replace("breedbeeld", ".");
     }
 
     // Get repeat info
-    if ((position = fullinfo.indexOf(m_nlRepeat)) != -1)
+    if (fullinfo.indexOf(m_nlRepeat) != -1)
     {
         fullinfo = fullinfo.replace("herh.", ".");
     }
 
     // Get teletext subtitle info
-    if ((position = fullinfo.indexOf(m_nlTxt)) != -1)
+    if (fullinfo.indexOf(m_nlTxt) != -1)
     {
         event.subtitleType |= SUB_NORMAL;
         fullinfo = fullinfo.replace("txt", ".");
     }
 
     // Get HDTV information
-    if ((position = event.title.indexOf(m_nlHD)) != -1)
+    if (event.title.indexOf(m_nlHD) != -1)
     {
         event.videoProps |= VID_HDTV;
         event.title = event.title.replace(m_nlHD, "");
@@ -1791,6 +1792,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
+    int position;
     if (((position = event.title.indexOf(":")) != -1) &&
         (event.title[position + 1].toUpper() == event.title[position + 1]) &&
         (event.subtitle.isEmpty()))
@@ -1833,7 +1835,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Try to find year
     QRegExp tmpYear1 = m_nlYear1;
     QRegExp tmpYear2 = m_nlYear2;
-    if ((position = tmpYear1.indexIn(fullinfo)) != -1)
+    if (tmpYear1.indexIn(fullinfo) != -1)
     {
         bool ok;
         uint y = tmpYear1.cap(0).toUInt(&ok);
@@ -1841,7 +1843,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
             event.originalairdate = QDate(y, 1, 1);
     }
 
-    if ((position = tmpYear2.indexIn(fullinfo)) != -1)
+    if (tmpYear2.indexIn(fullinfo) != -1)
     {
         bool ok;
         uint y = tmpYear2.cap(2).toUInt(&ok);
@@ -1852,26 +1854,26 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Try to find director
     QRegExp tmpDirector = m_nlDirector;
     QString tmpDirectorString;
-    if ((position = fullinfo.indexOf(m_nlDirector)) != -1)
+    if (fullinfo.indexOf(m_nlDirector) != -1)
     {
         tmpDirectorString = tmpDirector.cap(0);
         event.AddPerson(DBPerson::kDirector, tmpDirectorString);
     }
 
     // Strip leftovers
-    if ((position = fullinfo.indexOf(m_nlRub)) != -1)
+    if (fullinfo.indexOf(m_nlRub) != -1)
     {
         fullinfo = fullinfo.replace(m_nlRub, "");
     }
 
     // Strip category info from description
-    if ((position = fullinfo.indexOf(m_nlCat)) != -1)
+    if (fullinfo.indexOf(m_nlCat) != -1)
     {
         fullinfo = fullinfo.replace(m_nlCat, "");
     }
 
     // Remove omroep from title
-    if ((position = event.title.indexOf(m_nlOmroep)) != -1)
+    if (event.title.indexOf(m_nlOmroep) != -1)
     {
         event.title = event.title.replace(m_nlOmroep, "");
     }
@@ -1929,25 +1931,22 @@ void EITFixUp::FixNO(DBEventEIT &event) const
  */
 void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
 {
-    int        position;
     QRegExp    tmpExp1;
     // Check for "title (R)" in the title
-    position = event.title.indexOf(m_noRerun);
-    if (position != -1)
+    if (event.title.indexOf(m_noRerun) != -1)
     {
       event.previouslyshown = true;
       event.title = event.title.replace(m_noRerun, "");
     }
     // Check for "(R)" in the description
-    position = event.description.indexOf(m_noRerun);
-    if (position != -1)
+    if (event.description.indexOf(m_noRerun) != -1)
     {
       event.previouslyshown = true;
     }
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
     tmpExp1 =  m_noNRKCategories;
-    while (((position = tmpExp1.indexIn(event.title)) != -1) &&
+    while ((tmpExp1.indexIn(event.title) != -1) &&
            (tmpExp1.cap(2).length() > 1))
     {
         event.title  = tmpExp1.cap(2);
@@ -1955,7 +1954,7 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
     }
     // Remove season premiere markings
     tmpExp1 = m_noPremiere;
-    if ((position = tmpExp1.indexIn(event.title)) >=3)
+    if (tmpExp1.indexIn(event.title) >= 3)
     {
         event.title.remove(m_noPremiere);
     }
@@ -1965,7 +1964,7 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
         !event.title.startsWith("CD:") &&
         !event.title.startsWith("Distriktsnyheter: fra"))
     {
-        if ((position = tmpExp1.indexIn(event.title)) != -1)
+        if (tmpExp1.indexIn(event.title) != -1)
         {
 
             if (event.subtitle.length() <= 0)

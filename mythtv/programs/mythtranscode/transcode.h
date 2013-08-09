@@ -48,7 +48,7 @@ class Transcode : public QObject
 
   private:
     ProgramInfo            *m_proginfo;
-    RecordingProfile        profile;
+    RecordingProfile       *m_recProfile;
     int                     keyframedist;
     NuppelVideoRecorder    *nvr;
     PlayerContext          *ctx;

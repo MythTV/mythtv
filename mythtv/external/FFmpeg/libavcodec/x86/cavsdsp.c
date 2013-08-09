@@ -22,11 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
-#include "libavcodec/dsputil.h"
 #include "libavcodec/cavsdsp.h"
 #include "dsputil_mmx.h"
 #include "config.h"
@@ -446,7 +446,8 @@ CAVS_MC(put_, 16, mmxext)
 CAVS_MC(avg_,  8, mmxext)
 CAVS_MC(avg_, 16, mmxext)
 
-static void ff_cavsdsp_init_mmxext(CAVSDSPContext *c, AVCodecContext *avctx)
+static av_cold void ff_cavsdsp_init_mmxext(CAVSDSPContext *c,
+                                           AVCodecContext *avctx)
 {
 #define dspfunc(PFX, IDX, NUM) \
     c->PFX ## _pixels_tab[IDX][ 0] = ff_ ## PFX ## NUM ## _mc00_mmxext; \
@@ -474,7 +475,9 @@ CAVS_MC(put_, 16,3dnow)
 CAVS_MC(avg_, 8, 3dnow)
 CAVS_MC(avg_, 16,3dnow)
 
-static void ff_cavsdsp_init_3dnow(CAVSDSPContext* c, AVCodecContext *avctx) {
+static av_cold void ff_cavsdsp_init_3dnow(CAVSDSPContext *c,
+                                          AVCodecContext *avctx)
+{
 #define dspfunc(PFX, IDX, NUM) \
     c->PFX ## _pixels_tab[IDX][ 0] = ff_ ## PFX ## NUM ## _mc00_mmxext; \
     c->PFX ## _pixels_tab[IDX][ 2] = ff_ ## PFX ## NUM ## _mc20_3dnow; \

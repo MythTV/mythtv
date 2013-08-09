@@ -24,11 +24,13 @@
 #include "libavutil/time.h"
 #include "libavcodec/get_bits.h"
 #include "avformat.h"
-#include "mpegts-mythtv.h"
 #include "network.h"
+#include "srtp.h"
 #include "url.h"
 #include "rtpdec.h"
 #include "rtpdec_formats.h"
+
+#define MIN_FEEDBACK_INTERVAL 200000 /* 200 ms in us */
 
 static RTPDynamicProtocolHandler realmedia_mp3_dynamic_handler = {
     .enc_name   = "X-MP3-draft-00",
@@ -48,7 +50,6 @@ static RTPDynamicProtocolHandler opus_dynamic_handler = {
     .codec_id   = AV_CODEC_ID_OPUS,
 };
 
-/* statistics functions */
 static RTPDynamicProtocolHandler *rtp_first_dynamic_payload_handler = NULL;
 
 void ff_register_dynamic_payload_handler(RTPDynamicProtocolHandler *handler)
@@ -59,39 +60,39 @@ void ff_register_dynamic_payload_handler(RTPDynamicProtocolHandler *handler)
 
 void av_register_rtp_dynamic_payload_handlers(void)
 {
-    ff_register_dynamic_payload_handler(&ff_mp4v_es_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_mpeg4_generic_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_amr_nb_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_amr_wb_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_g726_16_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_g726_24_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_g726_32_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_g726_40_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_h263_1998_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_h263_2000_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_h263_rfc2190_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_h264_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_ilbc_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_jpeg_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_vorbis_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_theora_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_qdm2_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_svq3_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_mp4a_latm_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_vp8_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_qcelp_dynamic_handler);
-    ff_register_dynamic_payload_handler(&realmedia_mp3_dynamic_handler);
-    ff_register_dynamic_payload_handler(&speex_dynamic_handler);
-    ff_register_dynamic_payload_handler(&opus_dynamic_handler);
-
+    ff_register_dynamic_payload_handler(&ff_mp4v_es_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_mpeg_audio_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_mpeg_video_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_mpeg4_generic_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_mpegts_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_ms_rtp_asf_pfv_handler);
     ff_register_dynamic_payload_handler(&ff_ms_rtp_asf_pfa_handler);
-
+    ff_register_dynamic_payload_handler(&ff_qcelp_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_qdm2_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_qt_rtp_aud_handler);
     ff_register_dynamic_payload_handler(&ff_qt_rtp_vid_handler);
     ff_register_dynamic_payload_handler(&ff_quicktime_rtp_aud_handler);
     ff_register_dynamic_payload_handler(&ff_quicktime_rtp_vid_handler);
-
-    ff_register_dynamic_payload_handler(&ff_g726_16_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_24_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_32_dynamic_handler);
-    ff_register_dynamic_payload_handler(&ff_g726_40_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_svq3_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_theora_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_vorbis_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_vp8_dynamic_handler);
+    ff_register_dynamic_payload_handler(&opus_dynamic_handler);
+    ff_register_dynamic_payload_handler(&realmedia_mp3_dynamic_handler);
+    ff_register_dynamic_payload_handler(&speex_dynamic_handler);
 }
 
 RTPDynamicProtocolHandler *ff_rtp_handler_find_by_name(const char *name,
@@ -133,6 +134,7 @@ static int rtcp_parse_packet(RTPDemuxContext *s, const unsigned char *buf,
                 return AVERROR_INVALIDDATA;
             }
 
+            s->last_rtcp_reception_time = av_gettime();
             s->last_rtcp_ntp_time  = AV_RB64(buf + 8);
             s->last_rtcp_timestamp = AV_RB32(buf + 16);
             if (s->first_rtcp_ntp_time == AV_NOPTS_VALUE) {
@@ -226,6 +228,24 @@ static int rtp_valid_packet_in_sequence(RTPStatistics *s, uint16_t seq)
     return 1;
 }
 
+static void rtcp_update_jitter(RTPStatistics *s, uint32_t sent_timestamp,
+                               uint32_t arrival_timestamp)
+{
+    // Most of this is pretty straight from RFC 3550 appendix A.8
+    uint32_t transit = arrival_timestamp - sent_timestamp;
+    uint32_t prev_transit = s->transit;
+    int32_t d = transit - prev_transit;
+    // Doing the FFABS() call directly on the "transit - prev_transit"
+    // expression doesn't work, since it's an unsigned expression. Doing the
+    // transit calculation in unsigned is desired though, since it most
+    // probably will need to wrap around.
+    d = FFABS(d);
+    s->transit = transit;
+    if (!prev_transit)
+        return;
+    s->jitter += d - (int32_t) ((s->jitter + 8) >> 4);
+}
+
 int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
                                   AVIOContext *avio, int count)
 {
@@ -238,10 +258,9 @@ int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
     uint32_t extended_max;
     uint32_t expected_interval;
     uint32_t received_interval;
-    uint32_t lost_interval;
+    int32_t  lost_interval;
     uint32_t expected;
     uint32_t fraction;
-    uint64_t ntp_time = s->last_rtcp_ntp_time; // TODO: Get local ntp time?
 
     if ((!fd && !avio) || (count < 1))
         return -1;
@@ -271,7 +290,7 @@ int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
     // some placeholders we should really fill...
     // RFC 1889/p64
     extended_max          = stats->cycles + stats->max_seq;
-    expected              = extended_max - stats->base_seq + 1;
+    expected              = extended_max - stats->base_seq;
     lost                  = expected - stats->received;
     lost                  = FFMIN(lost, 0xffffff); // clamp it since it's only 24 bits...
     expected_interval     = expected - stats->expected_prior;
@@ -295,7 +314,8 @@ int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
         avio_wb32(pb, 0); /* delay since last SR */
     } else {
         uint32_t middle_32_bits   = s->last_rtcp_ntp_time >> 16; // this is valid, right? do we need to handle 64 bit values special?
-        uint32_t delay_since_last = ntp_time - s->last_rtcp_ntp_time;
+        uint32_t delay_since_last = av_rescale(av_gettime() - s->last_rtcp_reception_time,
+                                               65536, AV_TIME_BASE);
 
         avio_wb32(pb, middle_32_bits); /* last SR timestamp */
         avio_wb32(pb, delay_since_last); /* delay since last SR */
@@ -305,13 +325,14 @@ int ff_rtp_check_and_send_back_rr(RTPDemuxContext *s, URLContext *fd,
     avio_w8(pb, (RTP_VERSION << 6) + 1); /* 1 report block */
     avio_w8(pb, RTCP_SDES);
     len = strlen(s->hostname);
-    avio_wb16(pb, (6 + len + 3) / 4); /* length in words - 1 */
+    avio_wb16(pb, (7 + len + 3) / 4); /* length in words - 1 */
     avio_wb32(pb, s->ssrc + 1);
     avio_w8(pb, 0x01);
     avio_w8(pb, len);
     avio_write(pb, s->hostname, len);
+    avio_w8(pb, 0); /* END */
     // padding
-    for (len = (6 + len) % 4; len % 4; len++)
+    for (len = (7 + len) % 4; len % 4; len++)
         avio_w8(pb, 0);
 
     avio_flush(pb);
@@ -366,10 +387,103 @@ void ff_rtp_send_punch_packets(URLContext *rtp_handle)
     av_free(buf);
 }
 
+static int find_missing_packets(RTPDemuxContext *s, uint16_t *first_missing,
+                                uint16_t *missing_mask)
+{
+    int i;
+    uint16_t next_seq = s->seq + 1;
+    RTPPacket *pkt = s->queue;
+
+    if (!pkt || pkt->seq == next_seq)
+        return 0;
+
+    *missing_mask = 0;
+    for (i = 1; i <= 16; i++) {
+        uint16_t missing_seq = next_seq + i;
+        while (pkt) {
+            int16_t diff = pkt->seq - missing_seq;
+            if (diff >= 0)
+                break;
+            pkt = pkt->next;
+        }
+        if (!pkt)
+            break;
+        if (pkt->seq == missing_seq)
+            continue;
+        *missing_mask |= 1 << (i - 1);
+    }
+
+    *first_missing = next_seq;
+    return 1;
+}
+
+int ff_rtp_send_rtcp_feedback(RTPDemuxContext *s, URLContext *fd,
+                              AVIOContext *avio)
+{
+    int len, need_keyframe, missing_packets;
+    AVIOContext *pb;
+    uint8_t *buf;
+    int64_t now;
+    uint16_t first_missing = 0, missing_mask = 0;
+
+    if (!fd && !avio)
+        return -1;
+
+    need_keyframe = s->handler && s->handler->need_keyframe &&
+                    s->handler->need_keyframe(s->dynamic_protocol_context);
+    missing_packets = find_missing_packets(s, &first_missing, &missing_mask);
+
+    if (!need_keyframe && !missing_packets)
+        return 0;
+
+    /* Send new feedback if enough time has elapsed since the last
+     * feedback packet. */
+
+    now = av_gettime();
+    if (s->last_feedback_time &&
+        (now - s->last_feedback_time) < MIN_FEEDBACK_INTERVAL)
+        return 0;
+    s->last_feedback_time = now;
+
+    if (!fd)
+        pb = avio;
+    else if (avio_open_dyn_buf(&pb) < 0)
+        return -1;
+
+    if (need_keyframe) {
+        avio_w8(pb, (RTP_VERSION << 6) | 1); /* PLI */
+        avio_w8(pb, RTCP_PSFB);
+        avio_wb16(pb, 2); /* length in words - 1 */
+        // our own SSRC: we use the server's SSRC + 1 to avoid conflicts
+        avio_wb32(pb, s->ssrc + 1);
+        avio_wb32(pb, s->ssrc); // server SSRC
+    }
+
+    if (missing_packets) {
+        avio_w8(pb, (RTP_VERSION << 6) | 1); /* NACK */
+        avio_w8(pb, RTCP_RTPFB);
+        avio_wb16(pb, 3); /* length in words - 1 */
+        avio_wb32(pb, s->ssrc + 1);
+        avio_wb32(pb, s->ssrc); // server SSRC
+
+        avio_wb16(pb, first_missing);
+        avio_wb16(pb, missing_mask);
+    }
+
+    avio_flush(pb);
+    if (!fd)
+        return 0;
+    len = avio_close_dyn_buf(pb, &buf);
+    if (len > 0 && buf) {
+        ffurl_write(fd, buf, len);
+        av_free(buf);
+    }
+    return 0;
+}
+
 /**
  * open a new RTP parse context for stream 'st'. 'st' can be NULL for
- * MPEG2-TS streams to indicate that they should be demuxed inside the
- * rtp demux (otherwise AV_CODEC_ID_MPEG2TS packets are returned)
+ * MPEG2-TS streams.
  */
 RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
                                    int payload_type, int queue_size)
@@ -385,27 +499,9 @@ RTPDemuxContext *ff_rtp_parse_open(AVFormatContext *s1, AVStream *st,
     s->ic                  = s1;
     s->st                  = st;
     s->queue_size          = queue_size;
-    rtp_init_statistics(&s->statistics, 0); // do we know the initial sequence from sdp?
-    if (!strcmp(ff_rtp_enc_name(payload_type), "MP2T")) {
-        s->ts = ff_mpegts_parse_open(s->ic);
-        if (s->ts == NULL) {
-            av_free(s);
-            return NULL;
-        }
-    } else if (st) {
+    rtp_init_statistics(&s->statistics, 0);
+    if (st) {
         switch (st->codec->codec_id) {
-        case AV_CODEC_ID_MPEG1VIDEO:
-        case AV_CODEC_ID_MPEG2VIDEO:
-        case AV_CODEC_ID_MP2:
-        case AV_CODEC_ID_MP3:
-        case AV_CODEC_ID_MPEG4:
-        case AV_CODEC_ID_H263:
-        case AV_CODEC_ID_H264:
-            st->need_parsing = AVSTREAM_PARSE_FULL;
-            break;
-        case AV_CODEC_ID_VORBIS:
-            st->need_parsing = AVSTREAM_PARSE_HEADERS;
-            break;
         case AV_CODEC_ID_ADPCM_G722:
             /* According to RFC 3551, the stream clock rate is 8000
              * even if the sample rate is 16000. */
@@ -425,7 +521,14 @@ void ff_rtp_parse_set_dynamic_protocol(RTPDemuxContext *s, PayloadContext *ctx,
                                        RTPDynamicProtocolHandler *handler)
 {
     s->dynamic_protocol_context = ctx;
-    s->parse_packet             = handler->parse_packet;
+    s->handler                  = handler;
+}
+
+void ff_rtp_parse_set_crypto(RTPDemuxContext *s, const char *suite,
+                             const char *params)
+{
+    if (!ff_srtp_set_crypto(&s->srtp, suite, params))
+        s->srtp_enabled = 1;
 }
 
 /**
@@ -470,13 +573,14 @@ static void finalize_packet(RTPDemuxContext *s, AVPacket *pkt, uint32_t timestam
 static int rtp_parse_packet_internal(RTPDemuxContext *s, AVPacket *pkt,
                                      const uint8_t *buf, int len)
 {
-    unsigned int ssrc, h;
-    int payload_type, seq, ret, flags = 0;
-    int ext;
+    unsigned int ssrc;
+    int payload_type, seq, flags = 0;
+    int ext, csrc;
     AVStream *st;
     uint32_t timestamp;
     int rv = 0;
 
+    csrc         = buf[0] & 0x0f;
     ext          = buf[0] & 0x10;
     payload_type = buf[1] & 0x7f;
     if (buf[1] & 0x80)
@@ -510,6 +614,11 @@ static int rtp_parse_packet_internal(RTPDemuxContext *s, AVPacket *pkt,
     len   -= 12;
     buf   += 12;
 
+    len   -= 4 * csrc;
+    buf   += 4 * csrc;
+    if (len < 0)
+        return AVERROR_INVALIDDATA;
+
     /* RFC 3550 Section 5.3.1 RTP Header Extension handling */
     if (ext) {
         if (len < 4)
@@ -525,67 +634,17 @@ static int rtp_parse_packet_internal(RTPDemuxContext *s, AVPacket *pkt,
         buf += ext;
     }
 
-    if (!st) {
-        /* specific MPEG2-TS demux support */
-        ret = ff_mpegts_parse_packet(s->ts, pkt, buf, len);
-        /* The only error that can be returned from ff_mpegts_parse_packet
-         * is "no more data to return from the provided buffer", so return
-         * AVERROR(EAGAIN) for all errors */
-        if (ret < 0)
-            return AVERROR(EAGAIN);
-        if (ret < len) {
-            s->read_buf_size = FFMIN(len - ret, sizeof(s->buf));
-            memcpy(s->buf, buf + ret, s->read_buf_size);
-            s->read_buf_index = 0;
-            return 1;
-        }
-        return 0;
-    } else if (s->parse_packet) {
-        rv = s->parse_packet(s->ic, s->dynamic_protocol_context,
-                             s->st, pkt, &timestamp, buf, len, seq, flags);
-    } else {
-        /* At this point, the RTP header has been stripped;
-         * This is ASSUMING that there is only 1 CSRC, which isn't wise. */
-        switch (st->codec->codec_id) {
-        case AV_CODEC_ID_MP2:
-        case AV_CODEC_ID_MP3:
-            /* better than nothing: skip MPEG audio RTP header */
-            if (len <= 4)
-                return -1;
-            h    = AV_RB32(buf);
-            len -= 4;
-            buf += 4;
-            if (av_new_packet(pkt, len) < 0)
-                return AVERROR(ENOMEM);
-            memcpy(pkt->data, buf, len);
-            break;
-        case AV_CODEC_ID_MPEG1VIDEO:
-        case AV_CODEC_ID_MPEG2VIDEO:
-            /* better than nothing: skip MPEG video RTP header */
-            if (len <= 4)
-                return -1;
-            h    = AV_RB32(buf);
-            buf += 4;
-            len -= 4;
-            if (h & (1 << 26)) {
-                /* MPEG-2 */
-                if (len <= 4)
-                    return -1;
-                buf += 4;
-                len -= 4;
-            }
-            if (av_new_packet(pkt, len) < 0)
-                return AVERROR(ENOMEM);
-            memcpy(pkt->data, buf, len);
-            break;
-        default:
-            if (av_new_packet(pkt, len) < 0)
-                return AVERROR(ENOMEM);
-            memcpy(pkt->data, buf, len);
-            break;
-        }
-
+    if (s->handler && s->handler->parse_packet) {
+        rv = s->handler->parse_packet(s->ic, s->dynamic_protocol_context,
+                                      s->st, pkt, &timestamp, buf, len, seq,
+                                      flags);
+    } else if (st) {
+        if ((rv = av_new_packet(pkt, len)) < 0)
+            return rv;
+        memcpy(pkt->data, buf, len);
         pkt->stream_index = st->index;
+    } else {
+        return AVERROR(EINVAL);
     }
 
     // now perform timestamp things....
@@ -610,15 +669,14 @@ void ff_rtp_reset_packet_queue(RTPDemuxContext *s)
 static void enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
 {
     uint16_t seq   = AV_RB16(buf + 2);
-    RTPPacket *cur = s->queue, *prev = NULL, *packet;
+    RTPPacket **cur = &s->queue, *packet;
 
     /* Find the correct place in the queue to insert the packet */
-    while (cur) {
-        int16_t diff = seq - cur->seq;
+    while (*cur) {
+        int16_t diff = seq - (*cur)->seq;
         if (diff < 0)
             break;
-        prev = cur;
-        cur  = cur->next;
+        cur = &(*cur)->next;
     }
 
     packet = av_mallocz(sizeof(*packet));
@@ -628,11 +686,8 @@ static void enqueue_packet(RTPDemuxContext *s, uint8_t *buf, int len)
     packet->seq      = seq;
     packet->len      = len;
     packet->buf      = buf;
-    packet->next     = cur;
-    if (prev)
-        prev->next = packet;
-    else
-        s->queue = packet;
+    packet->next     = *cur;
+    *cur = packet;
     s->queue_len++;
 }
 
@@ -672,7 +727,7 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
                                 uint8_t **bufptr, int len)
 {
     uint8_t *buf = bufptr ? *bufptr : NULL;
-    int ret, flags = 0;
+    int flags = 0;
     uint32_t timestamp;
     int rv = 0;
 
@@ -683,28 +738,15 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
         if (s->prev_ret <= 0)
             return rtp_parse_queued_packet(s, pkt);
         /* return the next packets, if any */
-        if (s->st && s->parse_packet) {
+        if (s->handler && s->handler->parse_packet) {
             /* timestamp should be overwritten by parse_packet, if not,
              * the packet is left with pts == AV_NOPTS_VALUE */
             timestamp = RTP_NOTS_VALUE;
-            rv        = s->parse_packet(s->ic, s->dynamic_protocol_context,
-                                        s->st, pkt, &timestamp, NULL, 0, 0,
-                                        flags);
+            rv        = s->handler->parse_packet(s->ic, s->dynamic_protocol_context,
+                                                 s->st, pkt, &timestamp, NULL, 0, 0,
+                                                 flags);
             finalize_packet(s, pkt, timestamp);
             return rv;
-        } else {
-            // TODO: Move to a dynamic packet handler (like above)
-            if (s->read_buf_index >= s->read_buf_size)
-                return AVERROR(EAGAIN);
-            ret = ff_mpegts_parse_packet(s->ts, pkt, s->buf + s->read_buf_index,
-                                         s->read_buf_size - s->read_buf_index);
-            if (ret < 0)
-                return AVERROR(EAGAIN);
-            s->read_buf_index += ret;
-            if (s->read_buf_index < s->read_buf_size)
-                return 1;
-            else
-                return 0;
         }
     }
 
@@ -715,6 +757,16 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
         return -1;
     if (RTP_PT_IS_RTCP(buf[1])) {
         return rtcp_parse_packet(s, buf, len);
+    }
+
+    if (s->st) {
+        int64_t received = av_gettime();
+        uint32_t arrival_ts = av_rescale_q(received, AV_TIME_BASE_Q,
+                                           s->st->time_base);
+        timestamp = AV_RB32(buf + 4);
+        // Calculate the jitter immediately, before queueing the packet
+        // into the reordering queue.
+        rtcp_update_jitter(&s->statistics, timestamp, arrival_ts);
     }
 
     if ((s->seq == 0 && !s->queue) || s->queue_size <= 1) {
@@ -757,7 +809,10 @@ static int rtp_parse_one_packet(RTPDemuxContext *s, AVPacket *pkt,
 int ff_rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
                         uint8_t **bufptr, int len)
 {
-    int rv = rtp_parse_one_packet(s, pkt, bufptr, len);
+    int rv;
+    if (s->srtp_enabled && bufptr && ff_srtp_decrypt(&s->srtp, *bufptr, &len) < 0)
+        return -1;
+    rv = rtp_parse_one_packet(s, pkt, bufptr, len);
     s->prev_ret = rv;
     while (rv == AVERROR(EAGAIN) && has_next_packet(s))
         rv = rtp_parse_queued_packet(s, pkt);
@@ -767,9 +822,7 @@ int ff_rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
 void ff_rtp_parse_close(RTPDemuxContext *s)
 {
     ff_rtp_reset_packet_queue(s);
-    if (!strcmp(ff_rtp_enc_name(s->payload_type), "MP2T")) {
-        ff_mpegts_parse_close(s->ts);
-    }
+    ff_srtp_free(&s->srtp);
     av_free(s);
 }
 

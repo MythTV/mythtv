@@ -26,7 +26,9 @@
  */
 
 #include "libavutil/avassert.h"
+#include "dsputil.h"
 #include "h264pred.h"
+#include "avcodec.h" // for AV_CODEC_ID_*
 
 #define BIT_DEPTH 8
 #include "h264pred_template.c"
@@ -408,8 +410,6 @@ static void pred8x8_tm_vp8_c(uint8_t *src, ptrdiff_t stride)
 void ff_h264_pred_init(H264PredContext *h, int codec_id, const int bit_depth,
                        int chroma_format_idc)
 {
-//    MpegEncContext * const s = &h->s;
-
 #undef FUNC
 #undef FUNCC
 #define FUNC(a, depth) a ## _ ## depth

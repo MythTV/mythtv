@@ -72,6 +72,8 @@ class ThemeExtractThread : public QRunnable
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString name) :
     MythScreenType(parent, name),
+    m_themes(NULL),
+    m_preview(NULL),
     m_fullPreviewShowing(false),
     m_fullPreviewStateType(NULL),
     m_fullScreenName(NULL),
@@ -151,6 +153,10 @@ void ThemeChooser::Load(void)
     QDir themes(m_userThemeDir);
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
+
+    // Treat devel branches as master
+    if (MythVersion.startsWith("devel/"))
+        MythVersion = "master";
 
     // FIXME: For now, treat git master the same as svn trunk
     if (MythVersion == "master")
@@ -370,7 +376,7 @@ void ThemeChooser::Init(void)
 
             item->DisplayState(m_themeStatuses[themeinfo->GetName()],
                                "themestatus");
-            QHash<QString, QString> infomap;
+            InfoMap infomap;
             themeinfo->ToMap(infomap);
             item->SetTextFromMap(infomap);
             item->SetData(qVariantFromValue(themeinfo));
@@ -385,8 +391,6 @@ void ThemeChooser::Init(void)
             if (curTheme == themeinfo->GetDirectoryName())
                 curThemeInfo = themeinfo;
         }
-        else
-            delete item;
     }
 
     SetFocusWidget(m_themes);
@@ -397,6 +401,16 @@ void ThemeChooser::Init(void)
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
         itemChanged(current);
+
+    QString testFile = m_userThemeDir + "/.test";
+    QFile test(testFile);
+    if (test.open(QIODevice::WriteOnly))
+        test.remove();
+    else
+    {
+        ShowOkPopup(tr("Error creating test file, %1 themes directory is "
+                       "not writable.").arg(m_userThemeDir));
+    }
 }
 
 ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
@@ -596,6 +610,17 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 
     if (!info->GetDownloadURL().isEmpty())
     {
+        QString testFile = m_userThemeDir + "/.test";
+        QFile test(testFile);
+        if (test.open(QIODevice::WriteOnly))
+            test.remove();
+        else
+        {
+            ShowOkPopup(tr("Unable to install theme, %1 themes directory is "
+                           "not writable.").arg(m_userThemeDir));
+            return;
+        }
+
         QString downloadURL = info->GetDownloadURL();
         QFileInfo qfile(downloadURL);
         QString baseName = qfile.fileName();
@@ -640,7 +665,7 @@ void ThemeChooser::itemChanged(MythUIButtonListItem *item)
         return;
 
     QFileInfo preview(info->GetPreviewPath());
-    QHash<QString, QString> infomap;
+    InfoMap infomap;
     info->ToMap(infomap);
     SetTextFromMap(infomap);
     if (m_preview)
@@ -809,6 +834,14 @@ void ThemeChooser::customEvent(QEvent *e)
             gCoreContext->SendSystemEvent(event);
 
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
+
+            // Send a message to ourself so we trigger a reload our next chance
+            MythEvent *me = new MythEvent("THEME_RELOAD");
+            qApp->postEvent(this, me);
+        }
+        else if ((me->Message() == "THEME_RELOAD") &&
+                 (m_downloadState == dsIdle))
+        {
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
@@ -880,6 +913,10 @@ ThemeUpdateChecker::ThemeUpdateChecker() :
     m_updateTimer(new QTimer(this))
 {
     m_mythVersion = MYTH_SOURCE_PATH;
+
+    // Treat devel branches as master
+    if (m_mythVersion.startsWith("devel/"))
+        m_mythVersion = "master";
 
     // FIXME: For now, treat git master the same as svn trunk
     if (m_mythVersion == "master")

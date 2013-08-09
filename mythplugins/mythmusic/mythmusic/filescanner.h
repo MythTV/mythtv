@@ -1,10 +1,15 @@
 #ifndef _FILESCANNER_H_
 #define _FILESCANNER_H_
 
+// Qt headers
+#include <QCoreApplication>
+
 typedef QMap<QString, int> IdCache;
 
 class FileScanner
 {
+    Q_DECLARE_TR_FUNCTIONS(FileScanner)
+
     enum MusicFileLocation
     {
         kFileSystem,

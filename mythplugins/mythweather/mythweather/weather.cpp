@@ -21,15 +21,20 @@
 
 Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan)
     : MythScreenType(parent, name),
-      m_cur_screen(0)
+      m_weatherStack(new MythScreenStack(GetMythMainWindow(), "weather stack")),
+      m_firstRun(true),
+      m_nextpageInterval(gCoreContext->GetNumSetting("weatherTimeout", 10)),
+      m_nextpage_Timer(new QTimer(this)),
+      m_firstSetup(true),
+      m_createdSrcMan(false),
+      m_srcMan(NULL),
+      m_cur_screen(0),
+      m_currScreen(NULL),
+      m_paused(false),
+      m_pauseText(NULL),
+      m_headerText(NULL),
+      m_updatedText(NULL)
 {
-    m_weatherStack = new MythScreenStack(GetMythMainWindow(), "weather stack");
-
-    m_paused = false;
-
-    m_firstRun = true;
-    m_firstSetup = true;
-
     if (!srcMan)
     {
         m_srcMan = new SourceManager();
@@ -47,12 +52,8 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
         m_createdSrcMan = false;
     }
 
-    m_pauseText = m_headerText = m_updatedText = NULL;
-
-    m_nextpageInterval = gCoreContext->GetNumSetting("weatherTimeout", 10);
-
-    m_nextpage_Timer = new QTimer(this);
     connect(m_nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
+
     m_allScreens = loadScreens();
 }
 
@@ -310,7 +311,7 @@ void Weather::hideScreen()
     if (!m_currScreen)
         return;
 
-    m_weatherStack->PopScreen(false,false);
+    m_weatherStack->PopScreen(NULL, false,false);
 }
 
 void Weather::holdPage()

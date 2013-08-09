@@ -18,13 +18,13 @@
 
 using namespace std;
 
-MythBrowser::MythBrowser(MythScreenStack *parent,
-                         QStringList &urlList, float zoom)
+MythBrowser::MythBrowser(MythScreenStack *parent, QStringList &urlList)
     : MythScreenType (parent, "mythbrowser"),
-      m_urlList(urlList),  m_pageList(NULL),
-      m_progressBar(NULL), m_titleText(NULL),
-      m_statusText(NULL),  m_currentBrowser(-1),
-      m_zoom(zoom),        m_menuPopup(NULL),
+      m_urlList(urlList),   m_pageList(NULL),
+      m_progressBar(NULL),  m_titleText(NULL),
+      m_statusText(NULL),   m_backButton(NULL),
+      m_forwardButton(NULL),  m_exitButton(NULL),
+      m_currentBrowser(-1),   m_menuPopup(NULL),
       m_defaultFavIcon(NULL)
 {
     GetMythMainWindow()->PauseIdleTimer(true);
@@ -44,23 +44,25 @@ MythBrowser::~MythBrowser()
 
 bool MythBrowser::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("browser-ui.xml", "browser", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("browser-ui.xml", "browser", this))
         return false;
 
-    MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *> (GetChild("webbrowser"));
-    m_progressBar = dynamic_cast<MythUIProgressBar *>(GetChild("progressbar"));
-    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
-    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
-    m_pageList = dynamic_cast<MythUIButtonList *>(GetChild("pagelist"));
+    bool err = false;
+    MythUIWebBrowser *browser = NULL;
 
-    if (!browser || !m_pageList)
+    UIUtilE::Assign(this, browser,         "webbrowser", &err);
+    UIUtilE::Assign(this, m_pageList,      "pagelist", &err);
+    UIUtilW::Assign(this, m_progressBar,   "progressbar");
+    UIUtilW::Assign(this, m_statusText,    "status");
+    UIUtilW::Assign(this, m_titleText,     "title");
+    UIUtilW::Assign(this, m_backButton,    "back");
+    UIUtilW::Assign(this, m_forwardButton, "forward");
+    UIUtilW::Assign(this, m_exitButton,    "exit");
+
+    if (err)
     {
-        LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'browser'");
         return false;
     }
 
@@ -69,19 +71,20 @@ bool MythBrowser::Create(void)
 
     // create the default favicon
     QString favIcon = "mb_default_favicon.png";
-    GetMythUI()->FindThemeFile(favIcon);
-    if (QFile::exists(favIcon))
+    if (GetMythUI()->FindThemeFile(favIcon))
     {
-        QImage image(favIcon);
-        m_defaultFavIcon = GetMythPainter()->GetFormatImage();
-        m_defaultFavIcon->Assign(image);
+        if (QFile::exists(favIcon))
+        {
+            QImage image(favIcon);
+            m_defaultFavIcon = GetMythPainter()->GetFormatImage();
+            m_defaultFavIcon->Assign(image);
+        }
     }
 
     // this is the template for all other browser tabs
     WebPage *page = new WebPage(this, browser);
 
     m_browserList.append(page);
-    page->getBrowser()->SetZoom(m_zoom);
     page->getBrowser()->SetDefaultSaveDirectory(m_defaultSaveDir);
     page->getBrowser()->SetDefaultSaveFilename(m_defaultSaveFilename);
 
@@ -91,9 +94,30 @@ bool MythBrowser::Create(void)
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(page, SIGNAL(loadFinished(bool)),
+            this, SLOT(slotLoadFinished(bool)));
 
     if (m_progressBar)
         m_progressBar->SetTotal(100);
+
+    if (m_exitButton)
+    {
+        m_exitButton->SetEnabled(false);
+        m_exitButton->SetEnabled(true);
+        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+    }
+
+    if (m_backButton)
+    {
+        m_backButton->SetEnabled(false);
+        connect(m_backButton, SIGNAL(Clicked()), this, SLOT(slotBack()));
+    }
+
+    if (m_forwardButton)
+    {
+        m_forwardButton->SetEnabled(false);
+        connect(m_forwardButton, SIGNAL(Clicked()), this, SLOT(slotForward()));
+    }
 
     BuildFocusList();
 
@@ -138,8 +162,6 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
     WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
                                 name.toAscii().constData());
-    page->getBrowser()->SetZoom(m_zoom);
-
     m_browserList.append(page);
 
     QString newUrl = url;
@@ -158,6 +180,8 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(page, SIGNAL(loadFinished(bool)),
+            this, SLOT(slotLoadFinished(bool)));
 
     if (doSwitch)
         m_pageList->SetItemCurrent(m_browserList.size() -1);
@@ -262,6 +286,12 @@ void MythBrowser::slotLoadFinished(bool OK)
 
     if (m_progressBar)
         m_progressBar->SetUsed(0);
+
+    if (m_backButton)
+        m_backButton->SetEnabled(activeBrowser()->CanGoBack());
+
+    if (m_forwardButton)
+        m_forwardButton->SetEnabled(activeBrowser()->CanGoForward());
 }
 
 void MythBrowser::slotLoadProgress(int progress)
@@ -354,7 +384,7 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "ESCAPE")
         {
-            GetScreenStack()->PopScreen(true, true);
+            GetScreenStack()->PopScreen();
         }
         else if (action == "PREVTAB")
         {

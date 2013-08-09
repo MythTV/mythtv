@@ -1114,8 +1114,8 @@ class ImageSize : public VerticalConfigurationGroup
         setLabel(labelName);
 
         QSize defaultsize(768, 576), maxsize(768, 576);
-        bool transcoding = profName.left(11) == "Transcoders";
-        bool ivtv = profName.left(20) == "IVTV MPEG-2 Encoders";
+        bool transcoding = profName.startsWith("Transcoders");
+        bool ivtv = profName.startsWith("IVTV MPEG-2 Encoders");
 
         if (transcoding)
         {
@@ -1125,7 +1125,7 @@ class ImageSize : public VerticalConfigurationGroup
             else
                 defaultsize = QSize(480, 576);
         }
-        else if (tvFormat.toLower().left(4) == "ntsc")
+        else if (tvFormat.toLower().startsWith("ntsc"))
         {
             maxsize     = QSize(720, 480);
             defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
@@ -1211,7 +1211,7 @@ RecordingProfile::RecordingProfile(QString profName)
 
     if (!profName.isEmpty())
     {
-        if (profName.left(11) == "Transcoders")
+        if (profName.startsWith("Transcoders"))
         {
             tr_filters = new TranscodeFilters(*this);
             tr_lossless = new TranscodeLossless(*this);
@@ -1401,7 +1401,7 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
         audioSettings = new AudioCompressionSettings(*this, profileName);
         addChild(audioSettings);
 
-        if (!profileName.isEmpty() && profileName.left(11) == "Transcoders")
+        if (!profileName.isEmpty() && profileName.startsWith("Transcoders"))
         {
             connect(tr_resize,   SIGNAL(valueChanged   (bool)),
                     this,        SLOT(  ResizeTranscode(bool)));

@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QEvent>
+#include <QCoreApplication>
 
 #include "playercontext.h"
 #include "volumebase.h"
@@ -182,8 +183,14 @@ class MTV_PUBLIC MythPlayer
     uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return framesPlayed; }
-    virtual  int64_t GetSecondsPlayed(bool honorCutList);
-    virtual  int64_t GetTotalSeconds(void) const;
+    // GetSecondsPlayed() and GetTotalSeconds() internally calculate
+    // in terms of milliseconds and divide the result by 1000.  This
+    // divisor can be passed in as an argument, e.g. pass divisor=1 to
+    // return the time in milliseconds.
+    virtual  int64_t GetSecondsPlayed(bool honorCutList,
+                                      int divisor = 1000) const;
+    virtual  int64_t GetTotalSeconds(bool honorCutList,
+                                     int divisor = 1000) const;
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
@@ -321,6 +328,7 @@ class MTV_PUBLIC MythPlayer
     // DVD public stuff
     virtual bool GoToMenu(QString str)          { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
+    virtual bool IsInStillFrame() const         { return false;     }
 
     // Position Map Stuff
     bool PosMapFromEnc(uint64_t start,
@@ -475,7 +483,7 @@ class MTV_PUBLIC MythPlayer
 
     // Edit mode stuff
     bool EnableEdit(void);
-    bool HandleProgramEditorActions(QStringList &actions, long long frame = -1);
+    bool HandleProgramEditorActions(QStringList &actions);
     bool GetEditMode(void) const { return deleteMap.IsEditing(); }
     void DisableEdit(int howToSave);
     bool IsInDelete(uint64_t frame);
@@ -544,7 +552,8 @@ class MTV_PUBLIC MythPlayer
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPlaying(bool is_playing);
-    void SetErrored(const QString &reason) const;
+    void SetErrored(const QString &reason);
+    void ResetErrored(void);
 
     // Private Gets
     int  GetStatusbarPos(void) const;
@@ -652,8 +661,8 @@ class MTV_PUBLIC MythPlayer
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;
     mutable QMutex   errorLock;
-    mutable QString  errorMsg;   ///< Reason why NVP exited with a error
-    mutable int errorType;
+    QString  errorMsg;   ///< Reason why NVP exited with a error
+    int errorType;
 
     // Chapter stuff
     int jumpchapter;

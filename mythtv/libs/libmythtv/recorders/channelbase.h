@@ -11,7 +11,7 @@
 // MythTV headers
 #include "channelinfo.h"
 #include "inputinfo.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "tv.h"
 
 class FireWireDBOptions;
@@ -59,8 +59,8 @@ class ChannelBase
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
     // Gets
-    virtual uint GetNextChannel(uint chanid, int direction) const;
-    virtual uint GetNextChannel(const QString &channum, int direction) const;
+    virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
+    virtual uint GetNextChannel(const QString &channum, ChannelChangeDirection direction) const;
     virtual int GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
@@ -163,7 +163,7 @@ class ChannelBase
     ChannelInfoList m_allchannels; ///< channels across all inputs
 
     QMutex         m_system_lock;
-    MythSystem    *m_system;
+    MythSystemLegacy    *m_system;
     /// These get mapped from the GENERIC_EXIT_* to these values for use
     /// with the signalmonitor code.
     /// 0 == unknown, 1 == pending, 2 == failed, 3 == success

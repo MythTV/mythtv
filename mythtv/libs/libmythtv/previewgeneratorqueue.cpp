@@ -273,7 +273,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     if (!is_special)
     {
         QDateTime previewLastModified;
-        bool streaming = filename.left(1) != "/";
+        bool streaming = !filename.startsWith("/");
         bool locally_accessible = false;
         bool bookmark_updated = false;
 

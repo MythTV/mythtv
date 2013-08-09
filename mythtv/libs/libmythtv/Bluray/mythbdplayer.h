@@ -1,10 +1,16 @@
 #ifndef MYTHBDPLAYER_H
 #define MYTHBDPLAYER_H
 
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "mythplayer.h"
 
 class MythBDPlayer : public MythPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
+
   public:
     MythBDPlayer(PlayerFlags flags = kNoFlags);
     virtual bool    HasReachedEof(void) const;

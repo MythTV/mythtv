@@ -6,7 +6,7 @@
 #include "iptvchannel.h"
 #include "mythlogging.h"
 
-#define LOC QString("IPTVSM[%1](%2): ") \
+#define LOC QString("IPTVSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 /** \brief Initializes signal lock and signal values.
@@ -26,16 +26,16 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    m_lock_timeout(1000 * 60 /* 1 minute */)
+    m_streamHandlerStarted(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
     // TODO init isLocked
-    bool isLocked = true;
+    // bool isLocked = true;
 
     QMutexLocker locker(&statusLock);
-    signalLock.SetValue((isLocked) ? 1 : 0);
-    signalStrength.SetValue((isLocked) ? 100 : 0);
+    signalLock.SetValue(1 /*(isLocked) ? 1 : 0*/);
+    signalStrength.SetValue(100 /*(isLocked) ? 100 : 0*/);
 }
 
 /** \fn IPTVSignalMonitor::~IPTVSignalMonitor()
@@ -85,9 +85,6 @@ void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
  */
 void IPTVSignalMonitor::UpdateValues(void)
 {
-    if (lock_timer.elapsed() > m_lock_timeout)
-        error = "Timed out.";
-
     if (!running || exit)
         return;
 

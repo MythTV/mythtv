@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__="v0.6.16"
+__version__="v0.6.17"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -59,6 +59,8 @@ __version__="v0.6.16"
 # 0.6.14 Add support for Lists
 # 0.6.15 Add ability to search Collections
 # 0.6.16 Make absent primary images return None (previously u'')
+# 0.6.17 Add userrating/votes to Image, add overview to Collection, remove 
+#           releasedate sorting from Collection Movies
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -77,7 +79,7 @@ DEBUG = False
 def process_date(datestr):
     try:
         return datetime.date(*[int(x) for x in datestr.split('-')])
-    except TypeError:
+    except ValueError:
         import sys
         import warnings
         import traceback
@@ -197,6 +199,8 @@ class Image( Element ):
     height          = Datapoint('height')
     width           = Datapoint('width')
     language        = Datapoint('iso_639_1')
+    userrating      = Datapoint('vote_average')                                                                                                                                                                                         
+    votes           = Datapoint('vote_count') 
 
     def sizes(self):
         return ['original']
@@ -653,7 +657,8 @@ class Collection( NameRepr, Element ):
                             raw=False, default=None)
     poster   = Datapoint('poster_path', handler=Poster, \
                             raw=False, default=None)
-    members  = Datalist('parts', handler=Movie, sort='releasedate')
+    members  = Datalist('parts', handler=Movie)
+    overview = Datapoint('overview')
 
     def _populate(self):
         return Request('collection/{0}'.format(self.id), \

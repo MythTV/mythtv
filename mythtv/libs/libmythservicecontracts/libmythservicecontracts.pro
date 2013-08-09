@@ -40,6 +40,7 @@ HEADERS += datacontracts/recRuleList.h           datacontracts/artworkInfo.h
 HEADERS += datacontracts/artworkInfoList.h       datacontracts/frontendStatus.h
 HEADERS += datacontracts/frontendActionList.h
 HEADERS += datacontracts/liveStreamInfo.h        datacontracts/liveStreamInfoList.h
+HEADERS += datacontracts/titleInfo.h             datacontracts/titleInfoList.h
 HEADERS += datacontracts/labelValue.h
 HEADERS += datacontracts/logMessage.h            datacontracts/logMessageList.h
 
@@ -80,6 +81,7 @@ incDatacontracts.files += datacontracts/recRule.h             datacontracts/recR
 incDatacontracts.files += datacontracts/artworkInfo.h         datacontracts/artworkInfoList.h
 incDatacontracts.files += datacontracts/frontendStatus.h      datacontracts/frontendActionList.h
 incDatacontracts.files += datacontracts/liveStreamInfo.h      datacontracts/liveStreamInfoList.h
+incDatacontracts.files += datacontracts/titleInfo.h           datacontracts/titleInfoList.h
 incDatacontracts.files += datacontracts/labelValue.h
 incDatacontracts.files += datacontracts/logMessage.h          datacontracts/logMessageList.h
 

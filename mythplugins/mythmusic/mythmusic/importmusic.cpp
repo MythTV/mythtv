@@ -138,7 +138,9 @@ void ImportMusicDialog::fillWidgets()
     if (!m_tracks->empty())
     {
         // update current
-        m_currentText->SetText(QString("%1 of %2")
+        //: %1 is the current track,
+        //: %2 is the number of tracks
+        m_currentText->SetText(tr("%1 of %2", "Current track position")
                 .arg(m_currentTrack + 1).arg(m_tracks->size()));
 
         MusicMetadata *meta = m_tracks->at(m_currentTrack)->metadata;
@@ -508,7 +510,7 @@ void ImportMusicDialog::startScan()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythUIBusyDialog *busy = 
-            new MythUIBusyDialog(QObject::tr("Searching for music files"),
+            new MythUIBusyDialog(tr("Searching for music files"),
                                      popupStack,
                                      "scanbusydialog");
 

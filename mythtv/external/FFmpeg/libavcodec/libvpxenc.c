@@ -48,6 +48,9 @@ struct FrameListData {
     unsigned long duration;          /**< duration to show frame
                                           (in timebase units) */
     uint32_t flags;                  /**< flags for this frame */
+    uint64_t sse[4];
+    int have_sse;                    /**< true if we have pending sse[] */
+    uint64_t frame_number;
     struct FrameListData *next;
 };
 
@@ -57,6 +60,9 @@ typedef struct VP8EncoderContext {
     struct vpx_image rawimg;
     struct vpx_fixed_buf twopass_stats;
     int deadline; //i.e., RT/GOOD/BEST
+    uint64_t sse[4];
+    int have_sse; /**< true if we have pending sse[] */
+    uint64_t frame_number;
     struct FrameListData *coded_frame_list;
 
     int cpu_used;
@@ -227,11 +233,12 @@ static av_cold int vp8_free(AVCodecContext *avctx)
     return 0;
 }
 
-static av_cold int vp8_init(AVCodecContext *avctx)
+static av_cold int vpx_init(AVCodecContext *avctx,
+                            const struct vpx_codec_iface *iface)
 {
     VP8Context *ctx = avctx->priv_data;
-    const struct vpx_codec_iface *iface = &vpx_codec_vp8_cx_algo;
     struct vpx_codec_enc_cfg enccfg;
+    vpx_codec_flags_t flags = (avctx->flags & CODEC_FLAG_PSNR) ? VPX_CODEC_USE_PSNR : 0;
     int res;
 
     av_log(avctx, AV_LOG_INFO, "%s\n", vpx_codec_version_str());
@@ -285,10 +292,20 @@ static av_cold int vp8_init(AVCodecContext *avctx)
         }
     }
 
-    if (avctx->qmin > 0)
+    if (avctx->qmin >= 0)
         enccfg.rc_min_quantizer = avctx->qmin;
     if (avctx->qmax > 0)
         enccfg.rc_max_quantizer = avctx->qmax;
+
+    if (enccfg.rc_end_usage == VPX_CQ) {
+        if (ctx->crf < enccfg.rc_min_quantizer || ctx->crf > enccfg.rc_max_quantizer) {
+                av_log(avctx, AV_LOG_ERROR,
+                       "CQ level must be between minimum and maximum quantizer value (%d-%d)\n",
+                       enccfg.rc_min_quantizer, enccfg.rc_max_quantizer);
+                return AVERROR(EINVAL);
+        }
+    }
+
     enccfg.rc_dropframe_thresh = avctx->frame_skip_threshold;
 
     //0-100 (0 => CBR, 100 => VBR)
@@ -354,7 +371,7 @@ static av_cold int vp8_init(AVCodecContext *avctx)
 
     dump_enc_cfg(avctx, &enccfg);
     /* Construct Encoder Context */
-    res = vpx_codec_enc_init(&ctx->encoder, iface, &enccfg, 0);
+    res = vpx_codec_enc_init(&ctx->encoder, iface, &enccfg, flags);
     if (res != VPX_CODEC_OK) {
         log_encoder_error(avctx, "Failed to initialize encoder");
         return AVERROR(EINVAL);
@@ -397,13 +414,30 @@ static av_cold int vp8_init(AVCodecContext *avctx)
 }
 
 static inline void cx_pktcpy(struct FrameListData *dst,
-                             const struct vpx_codec_cx_pkt *src)
+                             const struct vpx_codec_cx_pkt *src,
+                             VP8Context *ctx)
 {
     dst->pts      = src->data.frame.pts;
     dst->duration = src->data.frame.duration;
     dst->flags    = src->data.frame.flags;
     dst->sz       = src->data.frame.sz;
     dst->buf      = src->data.frame.buf;
+    dst->have_sse = 0;
+    /* For alt-ref frame, don't store PSNR or increment frame_number */
+    if (!(dst->flags & VPX_FRAME_IS_INVISIBLE)) {
+        dst->frame_number = ++ctx->frame_number;
+        dst->have_sse = ctx->have_sse;
+        if (ctx->have_sse) {
+            /* associate last-seen SSE to the frame. */
+            /* Transfers ownership from ctx to dst. */
+            /* WARNING! This makes the assumption that PSNR_PKT comes
+               just before the frame it refers to! */
+            memcpy(dst->sse, ctx->sse, sizeof(dst->sse));
+            ctx->have_sse = 0;
+        }
+    } else {
+        dst->frame_number = -1;   /* sanity marker */
+    }
 }
 
 /**
@@ -428,6 +462,19 @@ static int storeframe(AVCodecContext *avctx, struct FrameListData *cx_frame,
             pkt->flags            |= AV_PKT_FLAG_KEY;
         } else
             coded_frame->pict_type = AV_PICTURE_TYPE_P;
+
+        if (cx_frame->have_sse) {
+            int i;
+            /* Beware of the Y/U/V/all order! */
+            coded_frame->error[0] = cx_frame->sse[1];
+            coded_frame->error[1] = cx_frame->sse[2];
+            coded_frame->error[2] = cx_frame->sse[3];
+            coded_frame->error[3] = 0;    // alpha
+            for (i = 0; i < 4; ++i) {
+                avctx->error[i] += coded_frame->error[i];
+            }
+            cx_frame->have_sse = 0;
+        }
     } else {
         return ret;
     }
@@ -471,7 +518,7 @@ static int queue_frames(AVCodecContext *avctx, AVPacket *pkt_out,
                 /* avoid storing the frame when the list is empty and we haven't yet
                    provided a frame for output */
                 av_assert0(!ctx->coded_frame_list);
-                cx_pktcpy(&cx_frame, pkt);
+                cx_pktcpy(&cx_frame, pkt, ctx);
                 size = storeframe(avctx, &cx_frame, pkt_out, coded_frame);
                 if (size < 0)
                     return size;
@@ -484,7 +531,7 @@ static int queue_frames(AVCodecContext *avctx, AVPacket *pkt_out,
                            "Frame queue element alloc failed\n");
                     return AVERROR(ENOMEM);
                 }
-                cx_pktcpy(cx_frame, pkt);
+                cx_pktcpy(cx_frame, pkt, ctx);
                 cx_frame->buf = av_malloc(cx_frame->sz);
 
                 if (!cx_frame->buf) {
@@ -511,7 +558,14 @@ static int queue_frames(AVCodecContext *avctx, AVPacket *pkt_out,
             stats->sz += pkt->data.twopass_stats.sz;
             break;
         }
-        case VPX_CODEC_PSNR_PKT: //FIXME add support for CODEC_FLAG_PSNR
+        case VPX_CODEC_PSNR_PKT:
+            av_assert0(!ctx->have_sse);
+            ctx->sse[0] = pkt->data.psnr.sse[0];
+            ctx->sse[1] = pkt->data.psnr.sse[1];
+            ctx->sse[2] = pkt->data.psnr.sse[2];
+            ctx->sse[3] = pkt->data.psnr.sse[3];
+            ctx->have_sse = 1;
+            break;
         case VPX_CODEC_CUSTOM_PKT:
             //ignore unsupported/unrecognized packet types
             break;
@@ -608,13 +662,6 @@ static const AVOption options[] = {
     { NULL }
 };
 
-static const AVClass class = {
-    .class_name = "libvpx encoder",
-    .item_name  = av_default_item_name,
-    .option     = options,
-    .version    = LIBAVUTIL_VERSION_INT,
-};
-
 static const AVCodecDefault defaults[] = {
     { "qmin",             "-1" },
     { "qmax",             "-1" },
@@ -623,7 +670,20 @@ static const AVCodecDefault defaults[] = {
     { NULL },
 };
 
-AVCodec ff_libvpx_encoder = {
+#if CONFIG_LIBVPX_VP8_ENCODER
+static av_cold int vp8_init(AVCodecContext *avctx)
+{
+    return vpx_init(avctx, &vpx_codec_vp8_cx_algo);
+}
+
+static const AVClass class_vp8 = {
+    .class_name = "libvpx encoder",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+AVCodec ff_libvpx_vp8_encoder = {
     .name           = "libvpx",
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VP8,
@@ -634,6 +694,36 @@ AVCodec ff_libvpx_encoder = {
     .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS,
     .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
     .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP8"),
-    .priv_class     = &class,
+    .priv_class     = &class_vp8,
     .defaults       = defaults,
 };
+#endif /* CONFIG_LIBVPX_VP8_ENCODER */
+
+#if CONFIG_LIBVPX_VP9_ENCODER
+static av_cold int vp9_init(AVCodecContext *avctx)
+{
+    return vpx_init(avctx, &vpx_codec_vp9_cx_algo);
+}
+
+static const AVClass class_vp9 = {
+    .class_name = "libvpx encoder",
+    .item_name  = av_default_item_name,
+    .option     = options,
+    .version    = LIBAVUTIL_VERSION_INT,
+};
+
+AVCodec ff_libvpx_vp9_encoder = {
+    .name           = "libvpx-vp9",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_VP9,
+    .priv_data_size = sizeof(VP8Context),
+    .init           = vp9_init,
+    .encode2        = vp8_encode,
+    .close          = vp8_free,
+    .capabilities   = CODEC_CAP_DELAY | CODEC_CAP_AUTO_THREADS | CODEC_CAP_EXPERIMENTAL,
+    .pix_fmts       = (const enum AVPixelFormat[]){ AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
+    .long_name      = NULL_IF_CONFIG_SMALL("libvpx VP9"),
+    .priv_class     = &class_vp9,
+    .defaults       = defaults,
+};
+#endif /* CONFIG_LIBVPX_VP9_ENCODER */

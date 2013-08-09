@@ -48,7 +48,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
       directrendering(false),
-      lastct('1'), strm(0), buf(0), buf2(0),
+      lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
     // initialize structures
@@ -1273,12 +1273,12 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
                 QMutexLocker locker(avcodeclock);
 
-                while (pkt.size > 0)
+                while (pkt.size > 0 && m_audio->HasAudioOut())
                 {
                     int data_size = 0;
 
-                    ret = AudioOutputUtil::DecodeAudio(mpa_audctx, m_audioSamples,
-                                                       data_size, &pkt);
+                    ret = m_audio->DecodeAudio(mpa_audctx, m_audioSamples,
+                                               data_size, &pkt);
                     if (ret < 0)
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown audio decoding error");
@@ -1384,6 +1384,8 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
             .arg(newKey).arg(skipFrames)
             .arg((doFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
+
+    QMutexLocker locker(avcodeclock);
 
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 

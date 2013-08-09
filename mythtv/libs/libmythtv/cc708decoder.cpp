@@ -611,7 +611,6 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     int service_number = 0;
     int block_data_offset = 0;
     int len     = ((((int)pkt_buf[0]) & 0x3f)<<1) - 1;
-    int seq_num = (((int)pkt_buf[0])>>6)&0x3;
 
     if (len < 0)
         return;
@@ -626,6 +625,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     {
         int j;
         int srv = (pkt_buf[off]>>5) & 0x7;
+        int seq_num = (((int)pkt_buf[0])>>6)&0x3;
         QString msg = QString("CC708 len %1 srv0 %2 seq %3 ").arg(len, 2)
                           .arg(srv) .arg(seq_num);
         for (j = 0; j < pkt_size; j++)

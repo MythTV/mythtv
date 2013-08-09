@@ -36,7 +36,7 @@
 // DiSEqC sleep intervals per eutelsat spec
 #define DISEQC_SHORT_WAIT     (15 * 1000)
 #define DISEQC_LONG_WAIT      (100 * 1000)
-#define DISEQC_POWER_OFF_WAIT (1000 * 1000)
+#define DISEQC_POWER_OFF_WAIT ((1000 * 1000) - 1)
 #define DISEQC_POWER_ON_WAIT  (500 * 1000)
 
 // Number of times to retry ioctls after receiving ETIMEDOUT before giving up

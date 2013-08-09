@@ -1,0 +1,5 @@
+test_audioutils
+*.gcda
+*.gcno
+*.gcov
+

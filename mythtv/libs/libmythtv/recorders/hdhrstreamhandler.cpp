@@ -96,7 +96,7 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
     StreamHandler(device),
     _hdhomerun_device(NULL),
     _tuner(-1),
-
+    _tune_mode(hdhrTuneModeNone),
     _hdhr_lock(QMutex::Recursive)
 {
     setObjectName("HDHRStreamHandler");
@@ -120,11 +120,6 @@ void HDHRStreamHandler::run(void)
     hdhomerun_device_stream_flush(_hdhomerun_device);
 
     SetRunning(true, false, false);
-
-    /* Calculate buffer size */
-    uint buffersize = 40000 * TSPacket::kSize;
-    buffersize /= VIDEO_DATA_PACKET_SIZE;
-    buffersize *= VIDEO_DATA_PACKET_SIZE;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): begin");
 

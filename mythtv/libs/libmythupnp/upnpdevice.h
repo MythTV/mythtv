@@ -14,12 +14,12 @@
 #define __UPNPDEVICE_H__
 
 #include <QDomDocument>
-#include <QHash>
 #include <QUrl>
 
 #include "compat.h"
 #include "upnpexp.h"
 #include "upnputil.h"
+#include "mythtypes.h"
 #include "referencecounter.h"
 
 class UPnpDeviceDesc;
@@ -124,7 +124,7 @@ class UPNP_PUBLIC UPnpDevice
 
         QString GetUDN(void) const;
 
-        void toMap(QHash<QString, QString> &map);
+        void toMap(InfoMap &map);
 
         UPnpService GetService(const QString &urn, bool *found = NULL) const;
 
@@ -187,7 +187,7 @@ class UPNP_PUBLIC UPnpDeviceDesc
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
         static UPnpDeviceDesc *Retrieve  ( QString &sURL );
 
-        void toMap(QHash<QString, QString> &map)
+        void toMap(InfoMap &map)
         {
             map["hostname"] = m_sHostName;
             m_rootDevice.toMap(map);
@@ -297,7 +297,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
                    + pDevice->m_rootDevice.m_sUDN;
         }
 
-        void GetDeviceDetail(QHash<QString, QString> &map)
+        void GetDeviceDetail(InfoMap &map)
         {
             map["location"] = m_sLocation;
 

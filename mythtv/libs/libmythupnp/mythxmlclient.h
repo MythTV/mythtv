@@ -31,13 +31,9 @@
 
 class UPNP_PUBLIC MythXMLClient : public SOAPClient
 {
-    protected:
-
-        bool    m_bInQtThread;
-
     public:
 
-        explicit MythXMLClient( const QUrl &url, bool bInQtThread = true );
+        explicit MythXMLClient( const QUrl &url );
         virtual ~MythXMLClient( );
 
         UPnPResultCode GetConnectionInfo( const QString &sPin, DatabaseParams *pParams, QString &sMsg );

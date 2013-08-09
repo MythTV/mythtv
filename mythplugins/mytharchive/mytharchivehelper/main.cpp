@@ -62,7 +62,7 @@ using namespace std;
 #include <programinfo.h>
 #include <mythdirs.h>
 #include <mythconfig.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythdate.h>
 #include <mythlogging.h>
 
@@ -146,7 +146,7 @@ NativeArchive::~NativeArchive(void)
 
 bool NativeArchive::copyFile(const QString &source, const QString &destination)
 {
-    QString command = QString("mythutil --copyfile --infile %1 --outfile %2")
+    QString command = QString("mythutil --copyfile --infile '%1' --outfile '%2'")
                               .arg(source).arg(destination);
     uint res = myth_system(command);
     if (res != GENERIC_EXIT_OK)
@@ -1066,7 +1066,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         {
             // delete any records for this recordings
             query.prepare("DELETE FROM recordedmarkup "
-                          "WHERE chanid = CHANID AND starttime = STARTTIME;");
+                          "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
                 query.bindValue(":CHANID", chanID);
                 query.bindValue(":STARTTIME", startTime);
             query.exec();
@@ -1119,7 +1119,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
         {
             // delete any records for this recordings
             query.prepare("DELETE FROM recordedseek "
-                          "WHERE chanid = CHANID AND starttime = STARTTIME;");
+                          "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
                 query.bindValue(":CHANID", chanID);
                 query.bindValue(":STARTTIME", startTime);
             query.exec();
@@ -1948,15 +1948,10 @@ static int64_t getFrameCount(const QString &filename, float fps)
 
 static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
-    const char *type = NULL;
-
     av_register_all();
 
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
-
-    if (type)
-        fmt = av_find_input_format(type);
 
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("getFileInfo(): Opening '%1'")

@@ -186,6 +186,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     filename = lfilename;
     safefilename = lfilename;
+    subtitlefilename.clear();
 
     if (remotefile)
     {
@@ -200,8 +201,8 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     bool is_local = 
-        (filename.left(4) != "/dev") &&
-        ((filename.left(1) == "/") || QFile::exists(filename));
+        (!filename.startsWith("/dev")) &&
+        ((filename.startsWith("/")) || QFile::exists(filename));
 
     if (is_local)
     {
@@ -247,8 +248,20 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
                 {
                     if (0 == lseek(fd2, 0, SEEK_SET))
                     {
-                        posix_fadvise(fd2, 0, 0,        POSIX_FADV_SEQUENTIAL);
-                        posix_fadvise(fd2, 0, 128*1024, POSIX_FADV_WILLNEED);
+                        if (posix_fadvise(fd2, 0, 0,
+                                          POSIX_FADV_SEQUENTIAL) < 0)
+                        {
+                            LOG(VB_FILE, LOG_DEBUG, LOC +
+                                QString("OpenFile(): fadvise sequential "
+                                        "failed: ") + ENO);
+                        }
+                        if (posix_fadvise(fd2, 0, 128*1024,
+                                          POSIX_FADV_WILLNEED) < 0)
+                        {
+                            LOG(VB_FILE, LOG_DEBUG, LOC +
+                                QString("OpenFile(): fadvise willneed "
+                                        "failed: ") + ENO);
+                        }
                         lasterror = 0;
                         break;
                     }
@@ -275,19 +288,30 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             case 1:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("OpenFile(): Could not open."));
+
+                //: %1 is the filename
+                lastError = tr("Could not open %1").arg(filename);
                 break;
             case 2:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         QString("OpenFile(): File too small (%1B).")
                         .arg(QFileInfo(filename).size()));
+
+                //: %1 is the file size
+                lastError = tr("File too small (%1B)")
+                            .arg(QFileInfo(filename).size());
                 break;
             case 3:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         "OpenFile(): Improper permissions.");
+
+                lastError = tr("Improper permissions");
                 break;
             case 4:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                         "OpenFile(): Cannot seek in file.");
+
+                lastError = tr("Cannot seek in file");
                 break;
             default:
                 break;
@@ -334,6 +358,9 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("RingBuffer::RingBuffer(): Failed to open remote "
                             "file (%1)").arg(filename));
+
+            //: %1 is the filename
+            lastError = tr("Failed to open remote file %1").arg(filename);
             delete remotefile;
             remotefile = NULL;
         }
@@ -626,8 +653,13 @@ long long FileRingBuffer::Seek(long long pos, int whence, bool has_lock)
                 else
                 {
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
-                    posix_fadvise(fd2, internalreadpos,
-                                  128*1024, POSIX_FADV_WILLNEED);
+                    if (posix_fadvise(fd2, internalreadpos,
+                                  128*1024, POSIX_FADV_WILLNEED) < 0)
+                    {
+                        LOG(VB_FILE, LOG_DEBUG, LOC +
+                            QString("Seek(): fadvise willneed "
+                            "failed: ") + ENO);
+                    }
                 }
                 LOG(VB_FILE, LOG_INFO, LOC +
                     QString("Seek to %1 from ignore pos %2 returned %3")

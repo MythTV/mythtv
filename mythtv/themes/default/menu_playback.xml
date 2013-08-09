@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+
+<!-- All "text" attribute values need translations.  The "XXXtext"
+     attributes illustrate the default value if the "text" attribute
+     is omitted. -->
+
+<menu text="Playback Menu">
+  <menu text="Audio">
+    <menu text="Select Audio Track">
+      <itemlist actiongroup="SELECTAUDIO_" current="active" />
+    </menu>
+    <item action="TOGGLEAUDIOSYNC" XXXtext="Adjust Audio Sync" />
+    <menu text="Visualisation">
+      <item action="DISABLEVISUALISATION" XXXtext="None" />
+      <itemlist actiongroup="VISUALISER_" current="active" />
+    </menu>
+    <item action="DISABLEUPMIX" XXXtext="Disable Audio Upmixer"
+          show="inactive" />
+    <item action="ENABLEUPMIX" XXXtext="Enable Audio Upmixer"
+          show="inactive" />
+  </menu>
+  <menu text="Video">
+    <menu text="Change Aspect Ratio">
+      <itemlist actiongroup="TOGGLEASPECT" current="active" />
+      <!-- Alternatively:
+      <item action="TOGGLEASPECT0" XXXtext="Off" current="active" />
+      <item action="TOGGLEASPECT1" XXXtext="4:3" current="active" />
+      <item action="TOGGLEASPECT3" XXXtext="14:9" current="active" />
+      <item action="TOGGLEASPECT2" XXXtext="16:9" current="active" />
+      <item action="TOGGLEASPECT4" XXXtext="2.35:1" current="active" />
+      -->
+    </menu>
+    <menu text="Adjust Fill">
+      <item action="AUTODETECT_FILL" XXXtext="Auto Detect" current="active" />
+      <!-- Alternatively:
+      <item action="TOGGLEFILL0" XXXtext="Off" current="active" />
+      <item action="TOGGLEFILL1" XXXtext="Half" current="active" />
+      <item action="TOGGLEFILL2" XXXtext="Full" current="active" />
+      <item action="TOGGLEFILL3" XXXtext="H.Stretch" current="active" />
+      <item action="TOGGLEFILL4" XXXtext="V.Stretch" current="active" />
+      <item action="TOGGLEFILL5" XXXtext="H.Fill" current="active" />
+      <item action="TOGGLEFILL6" XXXtext="V.Fill" current="active" />
+      -->
+      <itemlist actiongroup="TOGGLEFILL" current="active" />
+    </menu>
+    <item action="TOGGLEMANUALZOOM" XXXtext="Manual Zoom Mode" />
+    <menu text="Adjust Picture">
+      <itemlist actiongroup="TOGGLEPICCONTROLS" />
+      <!-- Alternatively:
+      <item action="TOGGLEPICCONTROLS0" XXXtext="None" />
+      <item action="TOGGLEPICCONTROLS1" XXXtext="Brightness" />
+      <item action="TOGGLEPICCONTROLS2" XXXtext="Contrast" />
+      <item action="TOGGLEPICCONTROLS3" XXXtext="Color" />
+      <item action="TOGGLEPICCONTROLS4" XXXtext="Hue" />
+      <item action="TOGGLESTUDIOLEVELS"
+            XXXtext="Disable Studio Levels" show="active" />
+      <item action="TOGGLESTUDIOLEVELS"
+            XXXtext="Enable Studio Levels" show="active" />
+      <item action="TOGGLEPICCONTROLS6" XXXtext="Volume" />
+      -->
+      <item action="TOGGLENIGHTMODE"
+            XXXtext="Disable Night Mode" show="active" />
+      <item action="TOGGLENIGHTMODE"
+            XXXtext="Enable Night Mode" show="inactive" />
+    </menu>
+    <menu text="3D">
+      <itemlist actiongroup="3D" current="active" />
+      <!-- Alternatively:
+      <item action="3DNONE" XXXtext="None" current="active" />
+      <item action="3DSIDEBYSIDE" XXXtext="Side by Side" current="active" />
+      <item action="3DSIDEBYSIDEDISCARD" XXXtext="Discard Side by Side"
+            current="active" />
+      <item action="3DTOPANDBOTTOM" XXXtext="Top and Bottom"
+            current="active" />
+      <item action="3DTOPANDBOTTOMDISCARD" XXXtext="Discard Top and Bottom"
+            current="active" />
+      -->
+    </menu>
+    <menu text="Advanced">
+      <menu text="Video Scan">
+        <itemlist actiongroup="SELECTSCAN_" current="active" />
+        <!-- Alternatively:
+        <item action="SELECTSCAN_0"
+              XXXtext="Detect" current="active" />
+        <item action="SELECTSCAN_3"
+              XXXtext="Progressive" current="active" />
+        <item action="SELECTSCAN_1"
+              XXXtext="Interlaced (Normal)" current="active" />
+        <item action="SELECTSCAN_2"
+              XXXtext="Interlaced (Reversed)" current="active" />
+        -->
+      </menu>
+      <menu text="Deinterlacer">
+        <itemlist actiongroup="DEINTERLACER_" current="active" />
+      </menu>
+    </menu>
+  </menu>
+  <menu text="Subtitles">
+    <item action="DISABLESUBS" XXXtext="Disable Subtitles" show="inactive" />
+    <item action="ENABLESUBS" XXXtext="Enable Subtitles" show="inactive" />
+    <item action="DISABLEFORCEDSUBS" XXXtext="Disable Forced Subtitles"
+          show="inactive" />
+    <item action="ENABLEFORCEDSUBS" XXXtext="Enable Forced Subtitles"
+          show="inactive" />
+    <menu text="Select Subtitle">
+      <itemlist actiongroup="SELECTSUBTITLE_" current="active" />
+    </menu>
+    <menu text="Text Subtitles">
+      <item action="DISABLEEXTTEXT" XXXtext="Disable External Subtitles"
+            show="inactive" />
+      <item action="ENABLEEXTTEXT" XXXtext="Enable External Subtitles"
+            show="inactive" />
+      <itemlist actiongroup="SELECTRAWTEXT_" current="active" />
+    </menu>
+    <menu text="Select ATSC CC">
+      <itemlist actiongroup="SELECTCC708_" current="active" />
+    </menu>
+    <menu text="Select VBI CC">
+      <itemlist actiongroup="SELECTCC608_" current="active" />
+    </menu>
+    <menu text="Select Teletext CC">
+      <itemlist actiongroup="SELECTTTC_" current="active" />
+    </menu>
+    <item action="TOGGLETTM" XXXtext="Toggle Teletext Menu" />
+    <item action="TOGGLESUBZOOM" XXXtext="Adjust Subtitle Zoom" />
+    <item action="TOGGLESUBDELAY" XXXtext="Adjust Subtitle Delay" />
+  </menu>
+  <menu text="Playback">
+    <item action="PAUSE" XXXtext="Play" show="active" />
+    <item action="PAUSE" XXXtext="Pause" show="inactive" />
+    <menu text="Adjust Time Stretch">
+      <item action="TOGGLESTRETCH" XXXtext="Toggle" />
+      <itemlist actiongroup="ADJUSTSTRETCH" current="active" />
+      <!-- Alternatively:
+      <item action="ADJUSTSTRETCH"    XXXtext="Adjust" />
+      <item action="ADJUSTSTRETCH0.5" XXXtext="0.5X" current="active" />
+      <item action="ADJUSTSTRETCH0.9" XXXtext="0.9X" current="active" />
+      <item action="ADJUSTSTRETCH1.0" XXXtext="1.0X" current="active" />
+      <item action="ADJUSTSTRETCH1.1" XXXtext="1.1X" current="active" />
+      <item action="ADJUSTSTRETCH1.2" XXXtext="1.2X" current="active" />
+      <item action="ADJUSTSTRETCH1.3" XXXtext="1.3X" current="active" />
+      <item action="ADJUSTSTRETCH1.4" XXXtext="1.4X" current="active" />
+      <item action="ADJUSTSTRETCH1.5" XXXtext="1.5X" current="active" />
+      -->
+    </menu>
+    <menu text="Picture-in-Picture">
+      <item action="JUMPRECPIP" XXXtext="Open Recording PIP" />
+      <item action="JUMPRECPBP" XXXtext="Open Recording PBP" />
+      <item action="CREATEPIPVIEW" XXXtext="Open Live TV PIP" />
+      <item action="CREATEPBPVIEW" XXXtext="Open Live TV PBP" />
+      <item action="NEXTPIPWINDOW" XXXtext="Change Active Window" />
+      <item action="TOGGLEPIPMODE" XXXtext="Close PIP(s)" />
+      <item action="TOGGLEPBPMODE" XXXtext="Close PBP(s)" />
+      <item action="SWAPPIP" XXXtext="Swap Windows" />
+      <item action="TOGGLEPIPSTATE" XXXtext="Switch to PBP" show="active" />
+      <item action="TOGGLEPIPSTATE" XXXtext="Switch to PIP" show="inactive" />
+    </menu>
+    <menu text="Sleep">
+      <itemlist actiongroup="TOGGLESLEEP" />
+      <!-- Alternatively:
+      <item action="TOGGLESLEEPON" XXXtext="Sleep Off" />
+      <item action="TOGGLESLEEP30" XXXtext="Sleep 30 minutes" />
+      <item action="TOGGLESLEEP60" XXXtext="Sleep 60 minutes" />
+      <item action="TOGGLESLEEP90" XXXtext="Sleep 90 minutes" />
+      <item action="TOGGLESLEEP120" XXXtext="Sleep 120 minutes" />
+      -->
+    </menu>
+    <menu text="Channel Groups">
+      <itemlist actiongroup="CHANGROUP_" current="active" />
+    </menu>
+    <item action="TOGGLEBROWSE" XXXtext="Toggle Browse Mode" />
+    <item action="CANCELPLAYLIST" XXXtext="Cancel Playlist" />
+    <item action="DEBUGOSD" XXXtext="Playback Data" />
+  </menu>
+  <menu text="Navigate">
+    <item action="JUMPFFWD" XXXtext="Jump Ahead" />
+    <item action="JUMPRWND" XXXtext="Jump Back" />
+    <menu text="Commercial Auto-Skip">
+      <itemlist actiongroup="TOGGLECOMMSKIP" current="active" />
+      <!-- Alternatively:
+      <item action="TOGGLECOMMSKIP0" XXXtext="Auto-Skip OFF"
+            current="active" />
+      <item action="TOGGLECOMMSKIP2" XXXtext="Auto-Skip Notify"
+            current="active" />
+      <item action="TOGGLECOMMSKIP1" XXXtext="Auto-Skip ON"
+            current="active" />
+      -->
+    </menu>
+    <!-- JUMPTODVDROOTMENU has different text/meanings for BD & DVD -->
+    <item action="JUMPTODVDROOTMENU" XXXtext="DVD Root Menu" show="active" />
+    <item action="JUMPTODVDROOTMENU" XXXtext="Top menu" show="inactive" />
+    <item action="JUMPTOPOPUPMENU" XXXtext="Popup menu" />
+    <item action="JUMPTODVDTITLEMENU" XXXtext="DVD Title Menu" />
+    <item action="JUMPTODVDCHAPTERMENU" XXXtext="DVD Chapter Menu" />
+    <item action="PREVCHAN" XXXtext="Previous Channel" />
+    <menu text="Chapter">
+      <itemlist actiongroup="JUMPTOCHAPTER" current="active" />
+    </menu>
+    <menu text="Angle">
+      <itemlist actiongroup="SWITCHTOANGLE" current="active" />
+    </menu>
+    <menu text="Title">
+      <itemlist actiongroup="JUMPTOTITLE" current="active" />
+    </menu>
+  </menu>
+  <menu text="Schedule">
+    <item action="GUIDE" XXXtext="Program Guide" />
+    <item action="FINDER" XXXtext="Program Finder" />
+    <item action="VIEWSCHEDULED" XXXtext="Upcoming Recordings" />
+    <item action="SCHEDULE" XXXtext="Edit Recording Schedule" />
+  </menu>
+  <menu text="Source">
+    <menu text="Jump to Program">
+      <item action="DIALOG_JUMPREC_X_0" XXXtext="Recorded Program" />
+      <item action="JUMPPREV" />
+    </menu>
+    <menu text="Switch Input">
+      <itemlist actiongroup="SWITCHTOINPUT_" show="inactive" />
+    </menu>
+    <menu text="Switch Source">
+      <itemlist actiongroup="SWITCHTOSOURCE_" />
+    </menu>
+  </menu>
+  <menu text="Jobs">
+    <item action="EDIT" XXXtext="Edit Channel" show="active" />
+    <item action="EDIT" XXXtext="Edit Recording" show="inactive" />
+    <item action="TOGGLEAUTOEXPIRE" XXXtext="Turn Auto-Expire OFF" show="active" />
+    <item action="TOGGLEAUTOEXPIRE" XXXtext="Turn Auto-Expire ON" show="inactive" />
+    <item action="QUEUETRANSCODE" XXXtext="Stop Transcoding" show="active" />
+    <menu text="Begin Transcoding">
+      <item action="QUEUETRANSCODE" XXXtext="Default"
+            show="inactive" />
+      <item action="QUEUETRANSCODE_AUTO" XXXtext="Autodetect"
+            show="inactive" />
+      <item action="QUEUETRANSCODE_HIGH" XXXtext="High Quality"
+            show="inactive" />
+      <item action="QUEUETRANSCODE_MEDIUM" XXXtext="Medium Quality"
+            show="inactive" />
+      <item action="QUEUETRANSCODE_LOW" XXXtext="Low Quality"
+            show="inactive" />
+    </menu>
+  </menu>
+</menu>

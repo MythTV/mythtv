@@ -73,6 +73,7 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_albumArt(NULL),
             m_id(lid),
             m_filename(lurl),
+            m_fileSize(0),
             m_changed(false),
             m_station(lstation),
             m_channel(lchannel),
@@ -203,18 +204,50 @@ int MusicMetadata::compare(const MusicMetadata *other) const
     }
 }
 
-bool MusicMetadata::isInDatabase()
+// static
+MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
 {
-    bool retval = false;
-
-    QString sqldir = m_filename.section('/', 0, -2);
+    // find the trackid for this filename
+    QString sqldir = filename.section('/', 0, -2);
 
     // Filename is the absolute path, we want the relative path
     if (sqldir.startsWith(getMusicDirectory()))
         sqldir.remove(0, getMusicDirectory().length());
 
-    QString sqlfilename = m_filename.section('/', -1);
+    QString sqlfilename = filename.section('/', -1);
 
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT song_id FROM music_songs "
+        "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
+        "WHERE music_songs.filename = :FILENAME "
+        "AND music_directories.path = :DIRECTORY ;");
+    query.bindValue(":FILENAME", sqlfilename);
+    query.bindValue(":DIRECTORY", sqldir);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MusicMetadata::createFromFilename", query);
+        return NULL;
+    }
+
+    if (query.numRowsAffected() == 0)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("MusicMetadata::createFromFilename: Could not find '%1'")
+                .arg(filename));
+        return NULL;
+
+    }
+
+    int songID = query.value(0).toInt();
+
+    return MusicMetadata::createFromID(songID);
+}
+
+// static
+MusicMetadata *MusicMetadata::createFromID(int trackid)
+{
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT music_artists.artist_name, "
     "music_comp_artists.artist_name AS compilation_artist, "
@@ -222,44 +255,66 @@ bool MusicMetadata::isInDatabase()
     "music_songs.year, music_songs.track, music_songs.length, "
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
     "music_songs.lastplay, music_albums.compilation, music_songs.format, "
-    "music_songs.track_count, music_songs.size "
+    "music_songs.track_count, music_songs.size, music_songs.date_entered, "
+    "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename "
     "FROM music_songs "
-    "LEFT JOIN music_directories "
-    "ON music_songs.directory_id=music_directories.directory_id "
+    "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
     "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
     "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
-    "LEFT JOIN music_artists AS music_comp_artists "
-    "ON music_albums.artist_id=music_comp_artists.artist_id "
+    "LEFT JOIN music_artists AS music_comp_artists ON music_albums.artist_id=music_comp_artists.artist_id "
     "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
-    "WHERE music_songs.filename = :FILENAME "
-    "AND music_directories.path = :DIRECTORY ;");
-    query.bindValue(":FILENAME", sqlfilename);
-    query.bindValue(":DIRECTORY", sqldir);
+    "WHERE music_songs.song_id = :SONGID; ");
+    query.bindValue(":SONGID", trackid);
 
     if (query.exec() && query.next())
     {
+        MusicMetadata *mdata = new MusicMetadata();
+        mdata->m_artist = query.value(0).toString();
+        mdata->m_compilation_artist = query.value(1).toString();
+        mdata->m_album = query.value(2).toString();
+        mdata->m_title = query.value(3).toString();
+        mdata->m_genre = query.value(4).toString();
+        mdata->m_year = query.value(5).toInt();
+        mdata->m_tracknum = query.value(6).toInt();
+        mdata->m_length = query.value(7).toInt();
+        mdata->m_id = query.value(8).toUInt();
+        mdata->m_rating = query.value(9).toInt();
+        mdata->m_playcount = query.value(10).toInt();
+        mdata->m_lastplay = query.value(11).toDateTime();
+        mdata->m_compilation = (query.value(12).toInt() > 0);
+        mdata->m_format = query.value(13).toString();
+        mdata->m_trackCount = query.value(14).toInt();
+        mdata->m_fileSize = (quint64)query.value(15).toULongLong();
+        mdata->m_dateadded = query.value(16).toDateTime();
+        mdata->m_filename = query.value(17).toString();
 
-        m_artist = query.value(0).toString();
-        m_compilation_artist = query.value(1).toString();
-        m_album = query.value(2).toString();
-        m_title = query.value(3).toString();
-        m_genre = query.value(4).toString();
-        m_year = query.value(5).toInt();
-        m_tracknum = query.value(6).toInt();
-        m_length = query.value(7).toInt();
-        m_id = query.value(8).toUInt();
-        m_rating = query.value(9).toInt();
-        m_playcount = query.value(10).toInt();
-        m_lastplay = query.value(11).toDateTime();
-        m_compilation = (query.value(12).toInt() > 0);
-        m_format = query.value(13).toString();
-        m_trackCount = query.value(14).toInt();
-        m_fileSize = (quint64)query.value(15).toULongLong();
-
-        retval = true;
+        return mdata;
     }
 
-    return retval;
+    return NULL;
+}
+
+void MusicMetadata::reloadMetadata(void)
+{
+    MusicMetadata *mdata = MusicMetadata::createFromID(m_id);
+
+    if (!mdata)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MusicMetadata: Asked to reload metadata "
+                                         "for trackID: %1 but not found!").arg(m_id));
+
+        return;
+    }
+
+    *this = *mdata;
+
+    delete mdata;
+
+    m_directoryid = -1;
+    m_artistid = -1;
+    m_compartistid = -1;
+    m_albumid = -1;
+    m_genreid = -1;
 }
 
 void MusicMetadata::dumpToDatabase()
@@ -588,16 +643,16 @@ inline QString MusicMetadata::formatReplaceSymbols(const QString &format)
 void MusicMetadata::checkEmptyFields()
 {
     if (m_artist.isEmpty())
-        m_artist = QObject::tr("Unknown Artist");
+        m_artist = tr("Unknown Artist", "Default artist if no artist");
     // This should be the same as Artist if it's a compilation track or blank
     if (!m_compilation || m_compilation_artist.isEmpty())
         m_compilation_artist = m_artist;
     if (m_album.isEmpty())
-        m_album = QObject::tr("Unknown Album");
+        m_album = tr("Unknown Album", "Default album if no album");
     if (m_title.isEmpty())
         m_title = m_filename;
     if (m_genre.isEmpty())
-        m_genre = QObject::tr("Unknown Genre");
+        m_genre = tr("Unknown Genre", "Default genre if no genre");
 
 }
 
@@ -743,7 +798,7 @@ void MusicMetadata::getField(const QString &field, QString *data)
     }
 }
 
-void MusicMetadata::toMap(MetadataMap &metadataMap, const QString &prefix)
+void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
 {
     using namespace MythDate;
     metadataMap[prefix + "artist"] = m_artist;
@@ -775,7 +830,7 @@ void MusicMetadata::toMap(MetadataMap &metadataMap, const QString &prefix)
         metadataMap[prefix + "lastplayed"] =
             MythDate::toString(m_lastplay, kDateFull | kSimplify | kAddYear);
     else
-        metadataMap[prefix + "lastplayed"] = QObject::tr("Never Played");
+        metadataMap[prefix + "lastplayed"] = tr("Never Played");
 
     metadataMap[prefix + "dateadded"] = MythDate::toString(
         m_dateadded, kDateFull | kSimplify | kAddYear);
@@ -793,7 +848,15 @@ void MusicMetadata::toMap(MetadataMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "station"] = m_station;
     metadataMap[prefix + "channel"] = m_channel;
     metadataMap[prefix + "genre"] = m_genre;
-    metadataMap[prefix + "url"] = m_filename;
+
+    if (isRadio())
+    {
+        QUrl url(m_filename);
+        metadataMap[prefix + "url"] = url.toString(QUrl::RemoveUserInfo);
+    }
+    else
+        metadataMap[prefix + "url"] = m_filename;
+
     metadataMap[prefix + "logourl"] = m_logoUrl;
     metadataMap[prefix + "metadataformat"] = m_metaFormat;
 }
@@ -813,6 +876,12 @@ void MusicMetadata::incRating()
     {
         m_rating++;
     }
+    m_changed = true;
+}
+
+void MusicMetadata::setLastPlay(QDateTime lastPlay)
+{
+    m_templastplay = MythDate::as_utc(lastPlay);
     m_changed = true;
 }
 
@@ -905,7 +974,7 @@ QString MusicMetadata::getAlbumArtFile(void)
         res = albumart_image->filename;
 
     // check file exists
-    if (!res.isEmpty())
+    if (!res.isEmpty() && albumart_image)
     {
         int repo = ID_TO_REPO(m_id);
         if (repo == RT_Radio)
@@ -1258,11 +1327,15 @@ void AllMusic::clearCDData(void)
 {
     while (!m_cdData.empty())
     {
+        MusicMetadata *mdata = m_cdData.back();
+        if (music_map.contains(mdata->ID()))
+            music_map.remove(mdata->ID());
+
         delete m_cdData.back();
         m_cdData.pop_back();
     }
 
-    m_cdTitle = QObject::tr("CD -- none");
+    m_cdTitle = tr("CD -- none");
 }
 
 void AllMusic::addCDTrack(const MusicMetadata &the_track)
@@ -1661,19 +1734,19 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
     ImageType type = IT_FRONTCOVER;
 
     if (filename.contains("front", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("front"), Qt::CaseInsensitive))
+             filename.contains(tr("front"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
     else if (filename.contains("back", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("back"),  Qt::CaseInsensitive))
+             filename.contains(tr("back"),  Qt::CaseInsensitive))
         type = IT_BACKCOVER;
     else if (filename.contains("inlay", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("inlay"), Qt::CaseInsensitive))
+             filename.contains(tr("inlay"), Qt::CaseInsensitive))
         type = IT_INLAY;
     else if (filename.contains("cd", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("cd"), Qt::CaseInsensitive))
+             filename.contains(tr("cd"), Qt::CaseInsensitive))
         type = IT_CD;
     else if (filename.contains("cover", Qt::CaseInsensitive) ||
-             filename.contains(QObject::tr("cover"), Qt::CaseInsensitive))
+             filename.contains(tr("cover"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
 
     return type;

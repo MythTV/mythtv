@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Michael Niedermayer (michaelni@gmx.at)
+ * Copyright (C) 2011-2013 Michael Niedermayer (michaelni@gmx.at)
  *
  * This file is part of libswresample
  *
@@ -27,6 +27,8 @@
 
 #define SQRT3_2      1.22474487139158904909  /* sqrt(3/2) */
 
+#define NS_TAPS 20
+
 #if ARCH_X86_64
 typedef int64_t integer;
 #else
@@ -48,6 +50,22 @@ typedef struct AudioData{
     enum AVSampleFormat fmt;    ///< sample format
 } AudioData;
 
+struct DitherContext {
+    enum SwrDitherType method;
+    int noise_pos;
+    float scale;
+    float noise_scale;                              ///< Noise scale
+    int ns_taps;                                    ///< Noise shaping dither taps
+    float ns_scale;                                 ///< Noise shaping dither scale
+    float ns_scale_1;                               ///< Noise shaping dither scale^-1
+    int ns_pos;                                     ///< Noise shaping dither position
+    float ns_coeffs[NS_TAPS];                       ///< Noise shaping filter coefficients
+    float ns_errors[SWR_CH_MAX][2*NS_TAPS];
+    AudioData noise;                                ///< noise used for dithering
+    AudioData temp;                                 ///< temporary storage when writing into the input buffer isnt possible
+    int output_sample_bits;                         ///< the number of used output bits, needed to scale dither correctly
+};
+
 struct SwrContext {
     const AVClass *av_class;                        ///< AVClass used for AVOption and av_log()
     int log_level_offset;                           ///< logging level offset
@@ -68,9 +86,9 @@ struct SwrContext {
     const int *channel_map;                         ///< channel index (or -1 if muted channel) map
     int used_ch_count;                              ///< number of used input channels (mapped channel count if channel_map, otherwise in.ch_count)
     enum SwrEngine engine;
-    enum SwrDitherType dither_method;
-    int dither_pos;
-    float dither_scale;
+
+    struct DitherContext dither;
+
     int filter_size;                                /**< length of each FIR filter in the resampling filterbank relative to the cutoff frequency */
     int phase_shift;                                /**< log2 of the number of entries in the resampling polyphase filterbank */
     int linear_interp;                              /**< if 1 then the resampling FIR filter will be linearly interpolated */
@@ -85,6 +103,7 @@ struct SwrContext {
     float soft_compensation_duration;               ///< swr duration over which soft compensation is applied
     float max_soft_compensation;                    ///< swr maximum soft compensation in seconds over soft_compensation_duration
     float async;                                    ///< swr simple 1 parameter async, similar to ffmpegs -async
+    int64_t firstpts_in_samples;                    ///< swr first pts in samples
 
     int resample_first;                             ///< 1 if resampling must come first, 0 if rematrixing
     int rematrix;                                   ///< flag to indicate if rematrixing is needed (basically if input and output layouts mismatch)
@@ -96,12 +115,14 @@ struct SwrContext {
     AudioData preout;                               ///< pre-output audio data: used for rematrix/resample
     AudioData out;                                  ///< converted output audio data
     AudioData in_buffer;                            ///< cached audio data (convert and resample purpose)
-    AudioData dither;                               ///< noise used for dithering
+    AudioData silence;                              ///< temporary with silence
+    AudioData drop_temp;                            ///< temporary used to discard output
     int in_buffer_index;                            ///< cached buffer position
     int in_buffer_count;                            ///< cached buffer length
     int resample_in_constraint;                     ///< 1 if the input end was reach before the output end, 0 otherwise
     int flushed;                                    ///< 1 if data is to be flushed and no further input is expected
     int64_t outpts;                                 ///< output PTS
+    int64_t firstpts;                               ///< first PTS
     int drop_output;                                ///< number of output samples to drop
 
     struct AudioConvert *in_convert;                ///< input conversion context
@@ -152,12 +173,18 @@ int swri_resample_int32(struct ResampleContext *c, int32_t *dst, const int32_t *
 int swri_resample_float(struct ResampleContext *c, float   *dst, const float   *src, int *consumed, int src_size, int dst_size, int update_ctx);
 int swri_resample_double(struct ResampleContext *c,double  *dst, const double  *src, int *consumed, int src_size, int dst_size, int update_ctx);
 
+void swri_noise_shaping_int16 (SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
+void swri_noise_shaping_int32 (SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
+void swri_noise_shaping_float (SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
+void swri_noise_shaping_double(SwrContext *s, AudioData *dsts, const AudioData *srcs, const AudioData *noises, int count);
+
 int swri_rematrix_init(SwrContext *s);
 void swri_rematrix_free(SwrContext *s);
 int swri_rematrix(SwrContext *s, AudioData *out, AudioData *in, int len, int mustcopy);
 void swri_rematrix_init_x86(struct SwrContext *s);
 
-void swri_get_dither(SwrContext *s, void *dst, int len, unsigned seed, enum AVSampleFormat out_fmt, enum AVSampleFormat in_fmt);
+void swri_get_dither(SwrContext *s, void *dst, int len, unsigned seed, enum AVSampleFormat noise_fmt);
+int swri_dither_init(SwrContext *s, enum AVSampleFormat out_fmt, enum AVSampleFormat in_fmt);
 
 void swri_audio_convert_init_arm(struct AudioConvert *ac,
                                  enum AVSampleFormat out_fmt,

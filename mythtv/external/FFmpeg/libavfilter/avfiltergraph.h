@@ -31,7 +31,7 @@ typedef struct AVFilterGraph {
     AVFilterContext **filters;
 
     char *scale_sws_opts; ///< sws options to use for the auto-inserted scale filters
-
+    char *resample_lavr_opts;   ///< libavresample options to use for the auto-inserted resample filters
     char *aresample_swr_opts; ///< swr options to use for the auto-inserted aresample filters, Access ONLY through AVOptions
 
     /**

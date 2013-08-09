@@ -1224,3 +1224,61 @@ user_ops_t dvdnav_get_restrictions(dvdnav_t* this) {
 
   return ops.ops_struct;
 }
+
+char* dvdnav_get_state(dvdnav_t *this)
+{
+  char *state = NULL;
+
+  if(this && this->vm) {
+    pthread_mutex_lock(&this->vm_lock);
+
+    if( !(state = vm_get_state_str(this->vm)) )
+      printerr("Failed to get vm state.");
+
+    pthread_mutex_unlock(&this->vm_lock);
+  }
+
+  return state;
+}
+
+dvdnav_status_t dvdnav_set_state(dvdnav_t *this, const char *state_str)
+{
+  if(!this || !this->vm)
+  {
+    printerr("Passed a NULL pointer.");
+    return DVDNAV_STATUS_ERR;
+  }
+
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return DVDNAV_STATUS_ERR;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+
+  /* reset the dvdnav state */
+  memset(&this->pci,0,sizeof(this->pci));
+  memset(&this->dsi,0,sizeof(this->dsi));
+  this->last_cmd_nav_lbn = SRI_END_OF_CELL;
+
+  /* Set initial values of flags */
+  this->position_current.still = 0;
+  this->skip_still = 0;
+  this->sync_wait = 0;
+  this->sync_wait_skip = 0;
+  this->spu_clut_changed = 0;
+
+
+  /* set the state. this will also start the vm on that state */
+  /* means the next read block should be comming from that new */
+  /* state */
+  if( !vm_set_state(this->vm, state_str) )
+  {
+    printerr("Failed to set vm state.");
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
+  pthread_mutex_unlock(&this->vm_lock);
+  return DVDNAV_STATUS_OK;
+}

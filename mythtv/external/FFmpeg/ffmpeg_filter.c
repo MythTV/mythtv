@@ -24,6 +24,8 @@
 #include "libavfilter/avfiltergraph.h"
 #include "libavfilter/buffersink.h"
 
+#include "libavresample/avresample.h"
+
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
@@ -139,7 +141,7 @@ static char *choose_ ## var ## s(OutputStream *ost)                            \
     if (ost->st->codec->var != none) {                                         \
         get_name(ost->st->codec->var);                                         \
         return av_strdup(name);                                                \
-    } else if (ost->enc->supported_list) {                                     \
+    } else if (ost->enc && ost->enc->supported_list) {                         \
         const type *p;                                                         \
         AVIOContext *s = NULL;                                                 \
         uint8_t *ret;                                                          \
@@ -367,12 +369,16 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
     char *sample_fmts, *sample_rates, *channel_layouts;
     char name[255];
     int ret;
+    AVABufferSinkParams *params = av_abuffersink_params_alloc();
 
-
+    if (!params)
+        return AVERROR(ENOMEM);
+    params->all_channel_counts = 1;
     snprintf(name, sizeof(name), "output stream %d:%d", ost->file_index, ost->index);
     ret = avfilter_graph_create_filter(&ofilter->filter,
                                        avfilter_get_by_name("ffabuffersink"),
-                                       name, NULL, NULL, fg->graph);
+                                       name, NULL, params, fg->graph);
+    av_freep(&params);
     if (ret < 0)
         return ret;
 
@@ -522,7 +528,7 @@ static int sub2video_prepare(InputStream *ist)
 
     /* rectangles are AV_PIX_FMT_PAL8, but we have no guarantee that the
        palettes for all rectangles are identical or compatible */
-    ist->st->codec->pix_fmt = AV_PIX_FMT_RGB32;
+    ist->resample_pix_fmt = ist->st->codec->pix_fmt = AV_PIX_FMT_RGB32;
 
     ret = av_image_alloc(image, linesize, w, h, AV_PIX_FMT_RGB32, 32);
     if (ret < 0)
@@ -620,20 +626,25 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
     AVFilter *filter = avfilter_get_by_name("abuffer");
     InputStream *ist = ifilter->ist;
     int pad_idx = in->pad_idx;
-    char args[255], name[255];
+    AVBPrint args;
+    char name[255];
     int ret;
 
-    snprintf(args, sizeof(args), "time_base=%d/%d:sample_rate=%d:sample_fmt=%s"
-             ":channel_layout=0x%"PRIx64,
+    av_bprint_init(&args, 0, AV_BPRINT_SIZE_AUTOMATIC);
+    av_bprintf(&args, "time_base=%d/%d:sample_rate=%d:sample_fmt=%s",
              1, ist->st->codec->sample_rate,
              ist->st->codec->sample_rate,
-             av_get_sample_fmt_name(ist->st->codec->sample_fmt),
-             ist->st->codec->channel_layout);
+             av_get_sample_fmt_name(ist->st->codec->sample_fmt));
+    if (ist->st->codec->channel_layout)
+        av_bprintf(&args, ":channel_layout=0x%"PRIx64,
+                   ist->st->codec->channel_layout);
+    else
+        av_bprintf(&args, ":channels=%d", ist->st->codec->channels);
     snprintf(name, sizeof(name), "graph %d input from stream %d:%d", fg->index,
              ist->file_index, ist->st->index);
 
     if ((ret = avfilter_graph_create_filter(&ifilter->filter, filter,
-                                            name, args, NULL,
+                                            name, args.str, NULL,
                                             fg->graph)) < 0)
         return ret;
 
@@ -664,6 +675,8 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
         av_strlcatf(args, sizeof(args), "async=%d", audio_sync_method);
         if (audio_drift_threshold != 0.1)
             av_strlcatf(args, sizeof(args), ":min_hard_comp=%f", audio_drift_threshold);
+        if (!fg->reconfiguration)
+            av_strlcatf(args, sizeof(args), ":first_pts=0");
         AUTO_INSERT_FILTER_INPUT("-async", "aresample", args);
     }
 
@@ -721,20 +734,29 @@ int configure_filtergraph(FilterGraph *fg)
 
     if (simple) {
         OutputStream *ost = fg->outputs[0]->ost;
-        char args[255];
+        char args[512];
+        AVDictionaryEntry *e = NULL;
+
         snprintf(args, sizeof(args), "flags=0x%X", (unsigned)ost->sws_flags);
         fg->graph->scale_sws_opts = av_strdup(args);
 
         args[0] = 0;
-        if (ost->swr_filter_type != SWR_FILTER_TYPE_KAISER)
-            av_strlcatf(args, sizeof(args), "filter_type=%d:", (int)ost->swr_filter_type);
-        if (ost->swr_dither_method)
-            av_strlcatf(args, sizeof(args), "dither_method=%d:", (int)ost->swr_dither_method);
-        if (ost->swr_dither_scale != 1.0)
-            av_strlcatf(args, sizeof(args), "dither_scale=%f:", ost->swr_dither_scale);
+        while ((e = av_dict_get(ost->swr_opts, "", e,
+                                AV_DICT_IGNORE_SUFFIX))) {
+            av_strlcatf(args, sizeof(args), "%s=%s:", e->key, e->value);
+        }
         if (strlen(args))
             args[strlen(args)-1] = 0;
         av_opt_set(fg->graph, "aresample_swr_opts", args, 0);
+
+        args[0] = '\0';
+        while ((e = av_dict_get(fg->outputs[0]->ost->resample_opts, "", e,
+                                AV_DICT_IGNORE_SUFFIX))) {
+            av_strlcatf(args, sizeof(args), "%s=%s:", e->key, e->value);
+        }
+        if (strlen(args))
+            args[strlen(args) - 1] = '\0';
+        fg->graph->resample_lavr_opts = av_strdup(args);
     }
 
     if ((ret = avfilter_graph_parse2(fg->graph, graph_desc, &inputs, &outputs)) < 0)
@@ -776,6 +798,7 @@ int configure_filtergraph(FilterGraph *fg)
         }
     }
 
+    fg->reconfiguration = 1;
     return 0;
 }
 

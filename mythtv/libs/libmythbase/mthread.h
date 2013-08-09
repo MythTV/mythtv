@@ -19,6 +19,8 @@ bool MBASE_PUBLIC is_current_thread(MThread &thread);
 
 /** This is a wrapper around QThread that does several additional things.
  *
+ *  \ingroup mthreadpool
+ *
  *  First it requires that you set the thread's name which is used for
  *  debugging.
  *

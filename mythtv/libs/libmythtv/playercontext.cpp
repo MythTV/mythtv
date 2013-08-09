@@ -408,26 +408,28 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
 
     player->SetVideoFilters((useNullVideo) ? "onefield" : "");
 
+    bool isWatchingRecording = (desiredState == kState_WatchingRecording);
+    player->SetWatchingRecording(isWatchingRecording);
+
     if (!IsAudioNeeded())
         audio->SetNoAudio();
     else
     {
         QString subfn = buffer->GetSubtitleFilename();
+        bool isInProgress =
+            desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
         if (!subfn.isEmpty() && player->GetSubReader())
-            player->GetSubReader()->LoadExternalSubtitles(subfn);
+            player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
     }
 
     if (embed && !embedbounds.isNull())
         player->EmbedInWidget(embedbounds);
 
-    bool isWatchingRecording = (desiredState == kState_WatchingRecording);
-    player->SetWatchingRecording(isWatchingRecording);
-
     SetPlayer(player);
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
-        if (audio->HasAudioOut())
+        if (IsAudioNeeded())
         {
             QString errMsg = audio->ReinitAudio();
         }
@@ -448,8 +450,13 @@ bool PlayerContext::StartPlaying(int maxWait)
     if (!player)
         return false;
 
-    player->StartPlaying();
-
+    if (!player->StartPlaying())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
+        // no need to call StopPlaying here as the player context will be deleted
+        // later following the error
+        return false;
+    }
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
 #ifdef USING_VALGRIND
     maxWait = (1<<30);
@@ -481,12 +488,12 @@ void PlayerContext::StopPlaying(void)
         player->StopPlaying();
 }
 
-void PlayerContext::UpdateTVChain(void)
+void PlayerContext::UpdateTVChain(const QStringList &data)
 {
     QMutexLocker locker(&deletePlayerLock);
     if (tvchain && player)
     {
-        tvchain->ReloadAll();
+        tvchain->ReloadAll(data);
         player->CheckTVChain();
     }
 }
@@ -747,7 +754,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
         }
         else
         {
-            if (!filters.isEmpty() && (filters.right(1) != ","))
+            if (!filters.isEmpty() && (!filters.endsWith(",")))
                 filters += ",";
 
             filters += chanFilters.mid(1);
@@ -815,7 +822,7 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
     if (tvchain)
     {
         tvchain->DestroyChain();
-        delete tvchain;
+        tvchain->DecrRef();
         tvchain = NULL;
     }
 

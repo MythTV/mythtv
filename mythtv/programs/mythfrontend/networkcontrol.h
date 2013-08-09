@@ -113,6 +113,7 @@ class NetworkControl : public ServerPool, public QRunnable
     QString processQuery(NetworkCommand *nc);
     QString processSet(NetworkCommand *nc);
     QString processMessage(NetworkCommand *nc);
+    QString processNotification(NetworkCommand *nc);
     QString processHelp(NetworkCommand *nc);
 
     void notifyDataAvailable(void);

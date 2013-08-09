@@ -17,6 +17,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythtvexp.h"
+#include "mythtypes.h"
 #include "programtypes.h"
 
 class MTV_PUBLIC ChannelInfo

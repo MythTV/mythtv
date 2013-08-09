@@ -400,7 +400,7 @@ bool ClassicCommDetector::go()
 
 
     float flagFPS;
-    long long  currentFrameNumber;
+    long long  currentFrameNumber = 0LL;
     float aspect = player->GetVideoAspect();
     float newAspect = aspect;
     int prevpercent = -1;
@@ -862,7 +862,7 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
         }
     }
 
-    if (commDetectMethod & COMM_DETECT_BLANKS)
+    if ((commDetectMethod & COMM_DETECT_BLANKS) && blankPixelsChecked)
     {
         for(int y = commDetectBorder; y < (height - commDetectBorder);
                 y += vertSpacing)

@@ -13,7 +13,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
         // fileutils.cpp
         << add("--copyfile", "copyfile", false,
-                "Copy a MythTV Storage Group file", "")
+                "Copy a MythTV Storage Group file using RingBuffers", "")
+                ->SetGroup("File")
+                ->SetRequiredChild(QStringList("infile") << "outfile")
+        << add("--download", "download", false,
+                "Download a file using MythDownloadManager", "")
                 ->SetGroup("File")
                 ->SetRequiredChild(QStringList("infile") << "outfile")
 
@@ -61,6 +65,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 ->SetRequiredChild(QStringList("chanid") << "starttime")
         << add("--clearskiplist", "clearskiplist", false,
                 "Clear the commercial skip list.", "")
+                ->SetGroup("Recording Markup")
+                ->SetRequiredChild(QStringList("chanid") << "starttime")
+        << add("--clearseektable", "clearseektable", false,
+                "Clear the seek table.", "")
                 ->SetGroup("Recording Markup")
                 ->SetRequiredChild(QStringList("chanid") << "starttime")
 
@@ -116,7 +124,13 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--message", "message", false,
                 "Display a message on a frontend", "")
                 ->SetGroup("Messaging")
-        << add("--print-template", "printtemplate", false,
+        << add("--print-message-template", "printmtemplate", false,
+                "Print the template to be sent to the frontend", "")
+                ->SetGroup("Messaging")
+        << add("--notification", "notification", false,
+                "Display a notification on a frontend", "")
+                ->SetGroup("Messaging")
+        << add("--print-notification-template", "printntemplate", false,
                 "Print the template to be sent to the frontend", "")
                 ->SetGroup("Messaging")
         );
@@ -136,10 +150,38 @@ void MythUtilCommandLineParser::LoadArguments(void)
         ->SetChildOf("pidprinter");
 
     // messageutils.cpp
+    add("--message_text", "message_text", "message", "(optional) message to send", "")
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
+    add("--timeout", "timeout", 0, "(optional) notification duration", "")
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
     add("--udpport", "udpport", 6948, "(optional) UDP Port to send to", "")
-        ->SetChildOf("message");
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
     add("--bcastaddr", "bcastaddr", "127.0.0.1", "(optional) IP address to send to", "")
-        ->SetChildOf("message");
+        ->SetChildOf("message")
+        ->SetChildOf("notification");
+    add("--image", "image", "image_path", "(optional) Path to image to send to (http://, myth://)", "")
+        ->SetChildOf("notification");
+    add("--origin", "origin", "text", "(optional) notification origin text", "")
+        ->SetChildOf("notification");
+    add("--description", "description", "text", "(optional) notification description text", "")
+        ->SetChildOf("notification");
+    add("--extra", "extra", "text", "(optional) notification extra text", "")
+        ->SetChildOf("notification");
+    add("--progress_text", "progress_text", "text", "(optional) notification progress text", "")
+        ->SetChildOf("notification");
+    add("--progress", "progress", -1.0, "(optional) progress value (must be between 0 and 1)", "")
+        ->SetChildOf("notification");
+    add("--fullscreen", "fullscreen", false, "(optional) display notification in full screen mode", "")
+        ->SetChildOf("notification");
+    add("--error", "error", false, "(optional) set notification to be displayed as an error", "")
+    ->SetChildOf("notification");
+    add("--visibility", "visibility", 0, "(optional) bitmask indicating where to show the notification", "")
+    ->SetChildOf("notification");
+    add("--type", "type", "type", "(optional) type of notification (normal, error, warning, check", "")
+    ->SetChildOf("notification");
 
     // Generic Options used by more than one utility
     addRecording();

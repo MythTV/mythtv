@@ -754,10 +754,12 @@ typedef struct AVStream {
         int64_t last_dts;
         int64_t duration_gcd;
         int duration_count;
-        double duration_error[2][2][MAX_STD_TIMEBASES];
+        double (*duration_error)[2][MAX_STD_TIMEBASES];
         int64_t codec_info_duration;
         int64_t codec_info_duration_fields;
         int found_decoder;
+
+        int64_t last_duration;
 
         /**
          * Those are used for average framerate estimation.
@@ -850,7 +852,7 @@ typedef struct AVStream {
 
     /**
      * Number of internally decoded frames, used internally in libavformat, do not access
-     * its lifetime differs from info which is why its not in that structure.
+     * its lifetime differs from info which is why it is not in that structure.
      */
     int nb_decoded_frames;
 
@@ -1218,6 +1220,13 @@ typedef struct AVFormatContext {
      * - decoding: Set by user via AVOPtions (NO direct access)
      */
     unsigned int correct_ts_overflow;
+
+    /**
+     * Force seeking to any (also non key) frames.
+     * - encoding: unused
+     * - decoding: Set by user via AVOPtions (NO direct access)
+     */
+    int seek2any;
 
     /*****************************************************************
      * All fields below this line are not part of the public API. They
@@ -1945,6 +1954,18 @@ enum AVCodecID av_codec_get_id(const struct AVCodecTag * const *tags, unsigned i
  * in AVInputFormat.codec_tag and AVOutputFormat.codec_tag
  */
 unsigned int av_codec_get_tag(const struct AVCodecTag * const *tags, enum AVCodecID id);
+
+/**
+ * Get the codec tag for the given codec id.
+ *
+ * @param tags list of supported codec_id - codec_tag pairs, as stored
+ * in AVInputFormat.codec_tag and AVOutputFormat.codec_tag
+ * @param id codec id that should be searched for in the list
+ * @param tag A pointer to the found tag
+ * @return 0 if id was not found in tags, > 0 if it was found
+ */
+int av_codec_get_tag2(const struct AVCodecTag * const *tags, enum AVCodecID id,
+                      unsigned int *tag);
 
 int av_find_default_stream_index(AVFormatContext *s);
 

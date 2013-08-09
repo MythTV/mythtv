@@ -133,6 +133,7 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
                              m_eContentType   ( ContentType_Unknown),
                              m_nMajor         (   0 ),
                              m_nMinor         (   0 ),
+                             m_bProtected     ( false ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
@@ -248,7 +249,13 @@ long HTTPRequest::SendResponse( void )
 
 #ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+                   &g_on, sizeof( g_on )) < 0)
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponse(xml/html) "
+                    "setsockopt error setting TCP_CORK on ") + ENO);
+    }
 #endif
 
     // ----------------------------------------------------------------------
@@ -319,7 +326,13 @@ long HTTPRequest::SendResponse( void )
     // ----------------------------------------------------------------------
 
 #ifdef USE_SETSOCKOPT
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+                   &g_off, sizeof( g_off )) < 0)
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponse(xml/html) "
+                    "setsockopt error setting TCP_CORK off ") + ENO);
+    }
 #endif
 
     return( nBytes );
@@ -357,7 +370,14 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
 #ifdef USE_SETSOCKOPT
     // Never send out partially complete segments
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK, 
+                   &g_on, sizeof( g_on )) < 0)
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponseFile(%1) "
+                    "setsockopt error setting TCP_CORK on " ).arg(sFileName) +
+            ENO);
+    }
 #endif
 
     QFile tmpFile( sFileName );
@@ -469,7 +489,14 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // ----------------------------------------------------------------------
 
 #ifdef USE_SETSOCKOPT
-    setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
+    if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
+                   &g_off, sizeof( g_off )) < 0)
+    {
+        LOG(VB_UPNP, LOG_INFO,
+            QString("HTTPRequest::SendResponseFile(%1) "
+                    "setsockopt error setting TCP_CORK off ").arg(sFileName) +
+            ENO);
+    }
 #endif
 
     // -=>TODO: Only returns header length...

@@ -24,7 +24,7 @@
 #include "mythuimetadataresults.h"
 #include "mythdialogbox.h"
 #include "mythgenerictree.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "remotefile.h"
 #include "remoteutil.h"
 #include "storagegroup.h"
@@ -581,7 +581,7 @@ class ItemDetailPopup : public MythScreenType
         if (m_playButton || m_doneButton)
             SetFocusWidget(m_playButton ? m_playButton : m_doneButton);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         m_metadata->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -835,27 +835,38 @@ VideoDialog::VideoListDeathDelayPtr &VideoDialog::GetSavedVideoList()
 }
 
 VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
-        VideoListPtr video_list, DialogType type, BrowseType browse) :
-    MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
-    m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
-    m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
-    m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0),
-    m_parentalLevelState(0), m_watchedState(0), m_studioState(0)
+        VideoListPtr video_list, DialogType type, BrowseType browse)
+  : MythScreenType(lparent, lname),
+    m_menuPopup(NULL),
+    m_busyPopup(NULL),
+    m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
+    m_mainStack(GetMythMainWindow()->GetMainStack()),
+    m_videoButtonList(NULL),
+    m_videoButtonTree(NULL),
+    m_titleText(NULL),
+    m_novideoText(NULL),
+    m_positionText(NULL),
+    m_crumbText(NULL),
+    m_coverImage(NULL),
+    m_screenshot(NULL),
+    m_banner(NULL),
+    m_fanart(NULL),
+    m_trailerState(NULL),
+    m_parentalLevelState(NULL),
+    m_videoLevelState(NULL),
+    m_userRatingState(NULL),
+    m_watchedState(NULL),
+    m_studioState(NULL),
+    m_metadataFactory(new MetadataFactory(this)),
+    m_d(new VideoDialogPrivate(video_list, type, browse))
 {
-    m_metadataFactory = new MetadataFactory(this);
-
-    m_d = new VideoDialogPrivate(video_list, type, browse);
-
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_mainStack = GetMythMainWindow()->GetMainStack();
-
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
 
     m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
                     GetNumSetting("VideoDefaultParentalLevel",
                             ParentalLevel::plLowest)));
-    
+
     StorageGroup::ClearGroupToUseCache();
 }
 
@@ -1225,7 +1236,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     if (metadata)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         metadata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
     }
@@ -2275,13 +2286,13 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     if (metadata)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         metadata->toMap(metadataMap);
         SetTextFromMap(metadataMap);
     }
     else
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         ClearMap(metadataMap);
         SetTextFromMap(metadataMap);
     }

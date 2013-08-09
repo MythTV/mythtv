@@ -37,8 +37,10 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVStream *AddAudioStream(void);
     bool OpenAudio(void);
     AVFrame *AllocPicture(enum PixelFormat pix_fmt);
+    void Cleanup(void);
 
     AVRational GetCodecTimeBase(void);
+    bool FindAudioFormat(AVCodecContext *ctx, AVCodec *c, AVSampleFormat format);
 
     AVFRingBuffer         *m_avfRingBuffer;
     RingBuffer            *m_ringBuffer;
@@ -51,13 +53,9 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVCodec               *m_avAudioCodec;
     AVFrame               *m_picture;
     AVFrame               *m_tmpPicture;
-    AVPacket              *m_pkt;
     AVFrame               *m_audPicture;
-    AVPacket              *m_audPkt;
-    unsigned char         *m_videoOutBuf;
-    unsigned char         *m_audioOutBuf;
-    int                    m_audioOutBufSize;
-    float                 *m_audioFltBuf;
+    unsigned char         *m_audioInBuf;
+    unsigned char         *m_audioInPBuf;
 
     QList<long long>       m_bufferedVideoFrameTimes;
     QList<int>             m_bufferedVideoFrameTypes;

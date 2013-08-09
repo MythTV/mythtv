@@ -35,7 +35,7 @@
 #include "scheduler.h"
 #include "mainserver.h"
 #include "cardutil.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "upnp.h"
@@ -572,8 +572,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QDomElement misc = pDoc->createElement("Miscellaneous");
         root.appendChild(misc);
 
-        uint flags = kMSRunShell | kMSStdOut | kMSBuffered;
-        MythSystem ms(info_script, flags);
+        uint flags = kMSRunShell | kMSStdOut;
+        MythSystemLegacy ms(info_script, flags);
         ms.Run(10);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {

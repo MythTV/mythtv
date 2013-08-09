@@ -225,6 +225,10 @@ enum
     FREESAT_SI_PID     = 0x0f01,
     FREESAT_EIT_PID    = 0x0f02,
     FREESAT_ST_EIT_PID = 0x0f03,
+
+    /// The all-ones PID value 0x1FFF indicates a Null TS Packet
+    /// introduced to maintain a constant bit rate of a TS Multiplex.
+    MPEG_NULL_PID      = 0x1fff,
 };
 
 /** \class TableID
@@ -311,6 +315,7 @@ class MTV_PUBLIC TableID
         SITscte  = 0xFC, // SCTE 35 Splice Info Table (Cueing messages)
 
         // ATSC Conditional Access (A/70)
+        // DVB Conditional Access (TS 100 289)
         ECM0     = 0x80,
         ECM1     = 0x81,
         ECMbeg   = 0x82, // ECM begin private data
@@ -366,6 +371,14 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     PSIPTable(const PESPacket& pkt, bool)
         : PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false)
         { ; }
+  public:
+    /// Constructor for viewing a section, does not create it's own data
+    PSIPTable(const unsigned char *pesdata)
+        : PESPacket(pesdata, false)
+    {
+        // fixup wrong assumption about length for sections without CRC
+        _pesdataSize = SectionLength();
+    }
   public:
     PSIPTable(const PSIPTable& table) : PESPacket(table)
     {

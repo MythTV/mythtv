@@ -4,10 +4,10 @@
 #include <QString>
 #include <QSize>
 #include <QMetaType>
-#include <QHash>
 #include <QFileInfo>
 
 #include "mythuiexp.h"
+#include "mythtypes.h"
 
 #include "xmlparsebase.h" // for VERBOSE_XML && Xml Parsing helpers
 
@@ -41,7 +41,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
     QString GetLocalURL() const { return m_themeurl; }
     QString GetDirectoryName() const { return m_theme.fileName(); }
 
-    void ToMap(QHash<QString, QString> &infoMap) const;
+    void ToMap(InfoMap &infoMap) const;
 
   private:
     bool parseThemeInfo();

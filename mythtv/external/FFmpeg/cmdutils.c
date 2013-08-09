@@ -62,8 +62,8 @@
 static int init_report(const char *env);
 
 struct SwsContext *sws_opts;
-SwrContext *swr_opts;
-AVDictionary *format_opts, *codec_opts;
+AVDictionary *swr_opts;
+AVDictionary *format_opts, *codec_opts, *resample_opts;
 
 const int this_year = 2013;
 
@@ -75,9 +75,6 @@ void init_opts(void)
     if(CONFIG_SWSCALE)
         sws_opts = sws_getContext(16, 16, 0, 16, 16, 0, SWS_BICUBIC,
                               NULL, NULL, NULL);
-
-    if(CONFIG_SWRESAMPLE)
-        swr_opts = swr_alloc();
 }
 
 void uninit_opts(void)
@@ -87,11 +84,10 @@ void uninit_opts(void)
     sws_opts = NULL;
 #endif
 
-    if(CONFIG_SWRESAMPLE)
-        swr_free(&swr_opts);
-
+    av_dict_free(&swr_opts);
     av_dict_free(&format_opts);
     av_dict_free(&codec_opts);
+    av_dict_free(&resample_opts);
 }
 
 void log_callback_help(void *ptr, int level, const char *fmt, va_list vl)
@@ -478,6 +474,9 @@ int opt_default(void *optctx, const char *opt, const char *arg)
     char opt_stripped[128];
     const char *p;
     const AVClass *cc = avcodec_get_class(), *fc = avformat_get_class();
+#if CONFIG_AVRESAMPLE
+    const AVClass *rc = avresample_get_class();
+#endif
     const AVClass *sc, *swr_class;
 
     if (!strcmp(opt, "debug") || !strcmp(opt, "fdebug"))
@@ -516,13 +515,23 @@ int opt_default(void *optctx, const char *opt, const char *arg)
 #endif
 #if CONFIG_SWRESAMPLE
     swr_class = swr_get_class();
-    if (!consumed && av_opt_find(&swr_class, opt, NULL, 0,
-                               AV_OPT_SEARCH_CHILDREN | AV_OPT_SEARCH_FAKE_OBJ)) {
-        int ret = av_opt_set(swr_opts, opt, arg, 0);
+    if (!consumed && (o=av_opt_find(&swr_class, opt, NULL, 0,
+                                    AV_OPT_SEARCH_CHILDREN | AV_OPT_SEARCH_FAKE_OBJ))) {
+        struct SwrContext *swr = swr_alloc();
+        int ret = av_opt_set(swr, opt, arg, 0);
+        swr_free(&swr);
         if (ret < 0) {
             av_log(NULL, AV_LOG_ERROR, "Error setting option %s.\n", opt);
             return ret;
         }
+        av_dict_set(&swr_opts, opt, arg, FLAGS);
+        consumed = 1;
+    }
+#endif
+#if CONFIG_AVRESAMPLE
+    if ((o=av_opt_find(&rc, opt, NULL, 0,
+                       AV_OPT_SEARCH_CHILDREN | AV_OPT_SEARCH_FAKE_OBJ))) {
+        av_dict_set(&resample_opts, opt, arg, FLAGS);
         consumed = 1;
     }
 #endif
@@ -575,9 +584,11 @@ static void finish_group(OptionParseContext *octx, int group_idx,
     g->swr_opts    = swr_opts;
     g->codec_opts  = codec_opts;
     g->format_opts = format_opts;
+    g->resample_opts = resample_opts;
 
     codec_opts  = NULL;
     format_opts = NULL;
+    resample_opts = NULL;
 #if CONFIG_SWSCALE
     sws_opts    = NULL;
 #endif
@@ -635,11 +646,11 @@ void uninit_parse_context(OptionParseContext *octx)
             av_freep(&l->groups[j].opts);
             av_dict_free(&l->groups[j].codec_opts);
             av_dict_free(&l->groups[j].format_opts);
+            av_dict_free(&l->groups[j].resample_opts);
 #if CONFIG_SWSCALE
             sws_freeContext(l->groups[j].sws_opts);
 #endif
-            if(CONFIG_SWRESAMPLE)
-                swr_free(&l->groups[j].swr_opts);
+            av_dict_free(&l->groups[j].swr_opts);
         }
         av_freep(&l->groups);
     }
@@ -656,6 +667,7 @@ int split_commandline(OptionParseContext *octx, int argc, char *argv[],
                       const OptionGroupDef *groups, int nb_groups)
 {
     int optindex = 1;
+    int dashdash = -2;
 
     /* perform system-dependent conversions for arguments list */
     prepare_app_arguments(&argc, &argv);
@@ -670,8 +682,12 @@ int split_commandline(OptionParseContext *octx, int argc, char *argv[],
 
         av_log(NULL, AV_LOG_DEBUG, "Reading option '%s' ...", opt);
 
+        if (opt[0] == '-' && opt[1] == '-' && !opt[2]) {
+            dashdash = optindex;
+            continue;
+        }
         /* unnamed group separators, e.g. output filename */
-        if (opt[0] != '-' || !opt[1]) {
+        if (opt[0] != '-' || !opt[1] || dashdash+1 == optindex) {
             finish_group(octx, 0, opt);
             av_log(NULL, AV_LOG_DEBUG, " matched as %s.\n", groups[0].name);
             continue;
@@ -743,7 +759,7 @@ do {                                                                           \
         return AVERROR_OPTION_NOT_FOUND;
     }
 
-    if (octx->cur_group.nb_opts || codec_opts || format_opts)
+    if (octx->cur_group.nb_opts || codec_opts || format_opts || resample_opts)
         av_log(NULL, AV_LOG_WARNING, "Trailing options were found on the "
                "commandline.\n");
 
@@ -1612,7 +1628,7 @@ int show_help(void *optctx, const char *opt, const char *arg)
 int read_yesno(void)
 {
     int c = getchar();
-    int yesno = (toupper(c) == 'Y');
+    int yesno = (av_toupper(c) == 'Y');
 
     while (c != '\n' && c != EOF)
         c = getchar();
@@ -1733,10 +1749,8 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
     if (!codec)
         codec            = s->oformat ? avcodec_find_encoder(codec_id)
                                       : avcodec_find_decoder(codec_id);
-    if (!codec)
-        return NULL;
 
-    switch (codec->type) {
+    switch (st->codec->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         prefix  = 'v';
         flags  |= AV_OPT_FLAG_VIDEO_PARAM;
@@ -1848,12 +1862,6 @@ static int alloc_buffer(FrameBuffer **pool, AVCodecContext *s, FrameBuffer **pbu
         av_log(s, AV_LOG_ERROR, "alloc_buffer: av_image_alloc() failed\n");
         return ret;
     }
-    /* XXX this shouldn't be needed, but some tests break without this line
-     * those decoders are buggy and need to be fixed.
-     * the following tests fail:
-     * cdgraphics, ansi
-     */
-    memset(buf->base[0], 128, ret);
 
     avcodec_get_chroma_sub_sample(s->pix_fmt, &h_chroma_shift, &v_chroma_shift);
     for (i = 0; i < FF_ARRAY_ELEMS(buf->data); i++) {

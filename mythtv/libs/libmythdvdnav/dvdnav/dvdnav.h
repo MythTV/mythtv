@@ -726,6 +726,21 @@ int8_t dvdnav_is_domain_vtsm(dvdnav_t *self);
  */
 int8_t dvdnav_is_domain_vts(dvdnav_t *self);
 
+/*********************************************************************
+ * Save/restore playback state                                       *
+ *********************************************************************/
+
+/*
+ * Get a text string representing a snapshot of the current internal state
+ * The calling application is responsible for freeing the returned buffer.
+ */
+char* dvdnav_get_state(dvdnav_t *self);
+
+/*
+ * Set the current internal state to an earlier snapshot
+ */
+dvdnav_status_t dvdnav_set_state(dvdnav_t *self, const char *state_str);
+
 
 #ifdef __cplusplus
 }

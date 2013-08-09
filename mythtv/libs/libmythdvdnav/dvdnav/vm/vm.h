@@ -171,6 +171,8 @@ audio_attr_t vm_get_audio_attr(vm_t *vm, int streamN);
 subp_attr_t  vm_get_subp_attr(vm_t *vm, int streamN);
 ifo_handle_t *vm_get_title_ifo(vm_t *vm, uint32_t title);
 void vm_ifo_close(ifo_handle_t *ifo);
+char *vm_get_state_str(vm_t *vm);
+int vm_set_state(vm_t *vm, const char *state_str);
 
 /* Uncomment for VM command tracing */
 /* #define TRACE */

@@ -13,7 +13,7 @@
 #include "cetonrecorder.h"
 #include "cetonchannel.h"
 
-#define LOC QString("CetonSM[%1](%2): ") \
+#define LOC QString("CetonSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 /**
@@ -33,8 +33,7 @@
 CetonSignalMonitor::CetonSignalMonitor(
     int db_cardnum, CetonChannel* _channel, uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    streamHandlerStarted(false), streamHandler(NULL),
-    lock_timeout(1000 * 30 /* 30 seconds */)
+    streamHandlerStarted(false), streamHandler(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
@@ -82,9 +81,6 @@ CetonChannel *CetonSignalMonitor::GetCetonChannel(void)
  */
 void CetonSignalMonitor::UpdateValues(void)
 {
-    if (lock_timer.elapsed() > lock_timeout)
-        error = "Timed out.";
-
     if (!running || exit)
         return;
 

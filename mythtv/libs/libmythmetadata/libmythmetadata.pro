@@ -43,13 +43,13 @@ INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray
 # for TagLib
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
-DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
+DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp ../libmythtv ../libmyth
 DEPENDPATH += ../../external/libmythbluray
 
-LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
+LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}

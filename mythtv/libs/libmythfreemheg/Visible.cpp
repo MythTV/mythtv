@@ -625,6 +625,8 @@ MHSlider::MHSlider(): MHInteractible(this)
     orig_min_value = initial_value = orig_step_size = 1;
     initial_portion = 0;
     m_style = SliderNormal;
+    max_value = min_value = step_size = 0;
+    slider_value = portion = 0;
 }
 
 MHSlider::~MHSlider()

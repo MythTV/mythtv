@@ -21,38 +21,35 @@ class MBASE_PUBLIC LCDMenuItem
   public:
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
                 QString item_name, unsigned int item_indent  = 0,
-                bool item_scroll = false)
+                bool item_scroll = false) :
+            m_selected(item_selected),  m_checked(item_checked),
+            m_name(item_name),          m_scroll(item_scroll),
+            m_indent(item_indent),      m_scrollPosition(item_indent)
     {
-        selected = item_selected;
-        checked = item_checked;
-        name = item_name;
-        scroll = item_scroll;
-        indent = item_indent;
-        scrollPosition = indent;
     }
 
-    CHECKED_STATE isChecked() const { return checked; }
-    bool isSelected() const { return selected; }
-    QString ItemName() const { return name; }
-    bool Scroll() const { return scroll; }
-    unsigned int getIndent() const { return indent; }
-    unsigned int getScrollPos() const { return scrollPosition; }
+    CHECKED_STATE isChecked() const { return m_checked; }
+    bool isSelected() const { return m_selected; }
+    QString ItemName() const { return m_name; }
+    bool Scroll() const { return m_scroll; }
+    unsigned int getIndent() const { return m_indent; }
+    unsigned int getScrollPos() const { return m_scrollPosition; }
 
-    void setChecked(CHECKED_STATE value) { checked = value; }
-    void setSelected(bool value) { selected = value; }
-    void setItemName(QString value) { name = value; }
-    void setScroll(bool value) { scroll = value; }
-    void setIndent(unsigned int value) { indent = value; }
-    void setScrollPos(unsigned int value) { scrollPosition = value; }
-    void incrementScrollPos() { ++scrollPosition; }
+    void setChecked(CHECKED_STATE value) { m_checked = value; }
+    void setSelected(bool value) { m_selected = value; }
+    void setItemName(QString value) { m_name = value; }
+    void setScroll(bool value) { m_scroll = value; }
+    void setIndent(unsigned int value) { m_indent = value; }
+    void setScrollPos(unsigned int value) { m_scrollPosition = value; }
+    void incrementScrollPos() { ++m_scrollPosition; }
 
   private:
-    bool selected;
-    CHECKED_STATE checked;
-    QString name;
-    bool scroll;
-    unsigned int indent;
-    unsigned int scrollPosition;
+    bool m_selected;
+    CHECKED_STATE m_checked;
+    QString m_name;
+    bool m_scroll;
+    unsigned int m_indent;
+    unsigned int m_scrollPosition;
 };
 
 enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
@@ -60,39 +57,36 @@ enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
 class MBASE_PUBLIC LCDTextItem
 {
   public:
-    LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, QString text,
-                QString screen = "Generic", bool scroll = false,
-                QString widget = "textWidget")
+    LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, const QString &text,
+                const QString &screen = "Generic", bool scroll = false,
+                const QString &widget = "textWidget") :
+                m_itemRow(row),     m_itemAlignment(align),
+                m_itemText(text),   m_itemScreen(screen),
+                m_itemWidget(widget),   m_itemScrollable(scroll)
     {
-        itemRow = row;
-        itemAlignment = align;
-        itemText = text;
-        itemScreen = screen;
-        itemWidget = widget;
-        itemScrollable = scroll;
     }
 
-    unsigned int getRow() const { return itemRow; }
-    TEXT_ALIGNMENT getAlignment() const { return itemAlignment; }
-    QString getText() const { return itemText; }
-    QString getScreen() const { return itemScreen; }
-    QString getWidget() const { return itemWidget; }
-    int getScroll() const { return itemScrollable; }
+    unsigned int getRow() const { return m_itemRow; }
+    TEXT_ALIGNMENT getAlignment() const { return m_itemAlignment; }
+    QString getText() const { return m_itemText; }
+    QString getScreen() const { return m_itemScreen; }
+    QString getWidget() const { return m_itemWidget; }
+    int getScroll() const { return m_itemScrollable; }
 
-    void setRow(unsigned int value) { itemRow = value; }
-    void setAlignment(TEXT_ALIGNMENT value) { itemAlignment = value; }
-    void setText(QString value) { itemText = value; }
-    void setScreen(QString value) { itemScreen = value; }
-    void setWidget(QString value) { itemWidget = value; }
-    void setScrollable(bool value) { itemScrollable = value; }
+    void setRow(unsigned int value) { m_itemRow = value; }
+    void setAlignment(TEXT_ALIGNMENT value) { m_itemAlignment = value; }
+    void setText(const QString &value) { m_itemText = value; }
+    void setScreen(const QString &value) { m_itemScreen = value; }
+    void setWidget(const QString &value) { m_itemWidget = value; }
+    void setScrollable(bool value) { m_itemScrollable = value; }
 
   private:
-    unsigned int itemRow;
-    TEXT_ALIGNMENT itemAlignment;
-    QString itemText;
-    QString itemScreen;
-    QString itemWidget;
-    bool itemScrollable;
+    unsigned int m_itemRow;
+    TEXT_ALIGNMENT m_itemAlignment;
+    QString m_itemText;
+    QString m_itemScreen;
+    QString m_itemWidget;
+    bool m_itemScrollable;
 };
 
 //only one active at a time
@@ -177,7 +171,7 @@ class MBASE_PUBLIC LCD : public QObject
   protected:
     LCD();
 
-    static bool m_server_unavailable;
+    static bool m_serverUnavailable;
     static LCD *m_lcd;
     static bool m_enabled;
 
@@ -229,8 +223,8 @@ class MBASE_PUBLIC LCD : public QObject
     // Note that the "channel" screen can be used for any kind of progress meter
     // just put whatever you want in the strings, and update the progress as
     // appropriate;
-    void switchToChannel(QString channum = "", QString title = "",
-                         QString subtitle = "");
+    void switchToChannel(const QString &channum = "", const QString &title = "",
+                         const QString &subtitle = "");
 
     // While watching Live/Recording/Pause Buffer, occasionaly describe how
     // much of the program has been seen (between 0.0 and 1.0)
@@ -240,7 +234,8 @@ class MBASE_PUBLIC LCD : public QObject
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items
     // See mythmusic/databasebox.cpp for an example
-    void switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name = "",
+    void switchToMenu(QList<LCDMenuItem> &menuItems,
+                      const QString &app_name = "",
                       bool popMenu = true);
 
     // Show the Generic Progress
@@ -260,7 +255,7 @@ class MBASE_PUBLIC LCD : public QObject
     void setGenericBusy();
 
     // Do a music progress bar with the generic level between 0 and 1.0
-    void setMusicProgress(QString time, float generic_progress);
+    void setMusicProgress(const QString &time, float generic_progress);
 
     /** \brief Set music player's repeat properties
         \param repeat the state of repeat
@@ -273,7 +268,7 @@ class MBASE_PUBLIC LCD : public QObject
     void setMusicShuffle(int shuffle);
 
     // Show the Volume Level top_text scrolls
-    void switchToVolume(QString app_name);
+    void switchToVolume(const QString &app_name);
 
     // Do a progress bar with the volume level between 0 and 1.0
     void setVolumeLevel(float volume_level);
@@ -291,8 +286,8 @@ class MBASE_PUBLIC LCD : public QObject
 
     void stopAll(void);
 
-    uint getLCDHeight(void) { return lcd_height; }
-    uint getLCDWidth(void) { return lcd_width; }
+    uint getLCDHeight(void) { return m_lcdHeight; }
+    uint getLCDWidth(void) { return m_lcdWidth; }
 
     void resetServer(void); // tell the mythlcdserver to reload its settings
 
@@ -305,8 +300,8 @@ class MBASE_PUBLIC LCD : public QObject
     bool startLCDServer(void);
     void sendToServer(const QString &someText);
     void init();
-    void handleKeyPress(QString key);
-    QString quotedString(const QString &s);
+    void handleKeyPress(const QString &keyPressed);
+    QString quotedString(const QString &string);
     void describeServer();
 
   private slots:
@@ -314,37 +309,37 @@ class MBASE_PUBLIC LCD : public QObject
     void Disconnected(void);
 
   private:
-    QTcpSocket *socket;
-    QMutex   socketLock;
-    QString  hostname;
-    uint     port;
-    bool     bConnected;
+    QTcpSocket *m_socket;
+    QMutex   m_socketLock;
+    QString  m_hostname;
+    uint     m_port;
+    bool     m_connected;
 
-    QTimer *retryTimer;
-    QTimer *LEDTimer;
+    QTimer *m_retryTimer;
+    QTimer *m_LEDTimer;
 
-    QString send_buffer;
-    QString last_command;
+    QString m_sendBuffer;
+    QString m_lastCommand;
 
-    int  lcd_width;
-    int  lcd_height;
+    int  m_lcdWidth;
+    int  m_lcdHeight;
 
-    bool lcd_ready;
+    bool m_lcdReady;
 
-    bool lcd_showtime;
-    bool lcd_showmenu;
-    bool lcd_showgeneric;
-    bool lcd_showmusic;
-    bool lcd_showchannel;
-    bool lcd_showvolume;
-    bool lcd_showrecstatus;
-    bool lcd_backlighton;
-    bool lcd_heartbeaton;
-    int  lcd_popuptime;
-    QString lcd_showmusic_items;
-    QString lcd_keystring;
+    bool m_lcdShowTime;
+    bool m_lcdShowMenu;
+    bool m_lcdShowGeneric;
+    bool m_lcdShowMusic;
+    bool m_lcdShowChannel;
+    bool m_lcdShowVolume;
+    bool m_lcdShowRecStatus;
+    bool m_lcdBacklightOn;
+    bool m_lcdHeartbeatOn;
+    int  m_lcdPopupTime;
+    QString m_lcdShowMusicItems;
+    QString m_lcdKeyString;
 
-    int lcd_ledmask;
+    int m_lcdLedMask;
 
     int (*GetLEDMask)(void);
 };

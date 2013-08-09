@@ -14,14 +14,14 @@
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
 
-#define LOC QString("AnalogSM[%1](%2): ") \
+#define LOC QString("AnalogSigMon[%1](%2): ") \
             .arg(capturecardnum).arg(channel->GetDevice())
 
 AnalogSignalMonitor::AnalogSignalMonitor(
     int db_cardnum, V4LChannel *_channel, uint64_t _flags) :
     SignalMonitor(db_cardnum, _channel, _flags),
-    m_usingv4l2(false), m_width(0), m_stable_time(2000), m_lock_cnt(0),
-    m_lock_timeout(1000 * 30 /* 30 seconds */)
+    m_usingv4l2(false), m_version(0), m_width(0), m_stable_time(2000),
+    m_lock_cnt(0)
 {
     int videofd = channel->GetFd();
     if (videofd >= 0)
@@ -166,9 +166,6 @@ void AnalogSignalMonitor::UpdateValues(void)
         if (!scriptStatus.IsGood())
             return;
     }
-
-    if (lock_timer.elapsed() > m_lock_timeout)
-        error = "Timed out.";
 
     if (!running || exit)
         return;

@@ -245,7 +245,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sFilePath    = query.value( 3).toString();
     QString        sDirector    = query.value( 4).toString();
     QString        sPlot        = query.value( 5).toString();
-    QString        sRating      = query.value( 6).toString();
+    // QString        sRating      = query.value( 6).toString();
     // int             nYear        = query.value( 7).toInt();
     // int             nUserRating  = query.value( 8).toInt();
     int            nLength      = query.value( 9).toInt();

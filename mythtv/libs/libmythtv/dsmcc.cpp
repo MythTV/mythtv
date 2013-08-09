@@ -124,8 +124,7 @@ bool Dsmcc::ProcessSectionHeader(DsmccSectionHeader *header,
 
     /* skip to end, read last 4 bytes and store in crc */
 
-    header->crc = ((data[crc_offset]   << 24) | (data[crc_offset+1] << 16) |
-                   (data[crc_offset+2] <<  8) | (data[crc_offset+3]));
+    header->crc = COMBINE32(data, crc_offset);
 
     return true;
 }
@@ -255,8 +254,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     DsmccDii dii;
     int off = 0;
 
-    dii.download_id = ((data[0] << 24) | (data[1] << 16) |
-                       (data[2] << 8)  | (data[3]));
+    dii.download_id = COMBINE32(data, 0);
 
     ObjCarousel *car = GetCarouselById(dii.download_id);
 
@@ -274,8 +272,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     off += 2;
 
     off += 6; /* not used fields */
-    dii.tc_download_scenario = ((data[off + 0] << 24) | (data[off + 1] << 16) |
-                                (data[off + 2] <<  8) | (data[off + 3]));
+    dii.tc_download_scenario = COMBINE32(data, off);
     off += 4;
 
     /* skip unused compatibility descriptor len */
@@ -288,9 +285,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
     {
         dii.modules[i].module_id = (data[off] << 8) | data[off + 1];
         off += 2;
-        dii.modules[i].module_size =
-            (data[off + 0] << 24) | (data[off + 1] << 16) |
-            (data[off + 2] <<  8) | (data[off + 3]);
+        dii.modules[i].module_size = COMBINE32(data, off);
         off += 4;
         dii.modules[i].module_version  = data[off++];
         dii.modules[i].module_info_len = data[off++];
@@ -424,8 +419,7 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
         return;
     }
 
-    unsigned long download_id = ((hdrData[4] << 24) | (hdrData[5] << 16) |
-                                 (hdrData[6] <<  8) | (hdrData[7]));
+    unsigned long download_id = COMBINE32(hdrData, 4);
     /* skip reserved byte */
 //    char adaptation_len = hdrData[9];
     unsigned message_len = (hdrData[10] << 8) | hdrData[11];

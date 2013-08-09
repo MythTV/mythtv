@@ -2,6 +2,12 @@
 // Do not edit
 
 void strings_null() {
+    ThemeUI::tr("Author: %1");
+    ThemeUI::tr("Posted: %1");
+    ThemeUI::tr("Length: %1");
+    ThemeUI::tr("Runtime: %1");
+    ThemeUI::tr("Rating: %1");
+    ThemeUI::tr("Size: %1");
     ThemeUI::tr("Internet Video Browser");
     ThemeUI::tr("No sites configured!");
     ThemeUI::tr("Videos - Gallery");
@@ -10,7 +16,6 @@ void strings_null() {
     ThemeUI::tr("No search scripts found!  This usually indicates missing prerequisites.");
     ThemeUI::tr("Page %1");
     ThemeUI::tr("Search:");
-    ThemeUI::tr("Author: %1");
     ThemeUI::tr("Edit/Add a New RSS Feed");
     ThemeUI::tr("Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press \"Save\" to save/subscribe.\n\nFor new subscriptions, you can simply enter the URL and click \"Save.\"");
     ThemeUI::tr("Title:");
@@ -27,24 +32,32 @@ void strings_null() {
     ThemeUI::tr("New Site");
     ThemeUI::tr("Edit Site");
     ThemeUI::tr("Unsubscribe");
-    ThemeUI::tr("Search Net Videos");
+    ThemeUI::tr("Search Videos");
+    ThemeUI::tr("Can't find any search scripts!\nThis usually indicates missing search script prerequisities.\nTry running a script from the command line.");
     ThemeUI::tr("Search Term:");
-    ThemeUI::tr("Size: %1");
-    ThemeUI::tr("Description: %1");
-    ThemeUI::tr("Can't find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.");
-    ThemeUI::tr("Manage Site Subscriptions");
+    ThemeUI::tr("Manage RSS Subscriptions");
     ThemeUI::tr("Edit");
     ThemeUI::tr("New");
-    ThemeUI::tr("Remove");
-    ThemeUI::tr("Manage RSS Subscriptions");
+    ThemeUI::tr("Delete");
     ThemeUI::tr("Feed Name:");
     ThemeUI::tr("Feed URL:");
     ThemeUI::tr("Site Description:");
     ThemeUI::tr("Feed Author:");
+    ThemeUI::tr("Download this feed automatically:");
+    ThemeUI::tr("Choose Image:");
+    ThemeUI::tr("NetVision Tree");
+    ThemeUI::tr("You haven't added any Sites/RSS Feeds yet! To add a site, press MENU, then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
+    ThemeUI::tr("NetVision Browser");
+    ThemeUI::tr("You haven't added any Sites/RSS Feeds yet!\nTo add a site, press MENU, then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
+    ThemeUI::tr("NetVision Gallery");
+    ThemeUI::tr("Search Net Videos");
+    ThemeUI::tr("Description: %1");
+    ThemeUI::tr("Can't find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.");
+    ThemeUI::tr("Manage Site Subscriptions");
+    ThemeUI::tr("Remove");
     ThemeUI::tr("Download this feed automatically");
     ThemeUI::tr("Choose Image");
     ThemeUI::tr("Browse Net Videos");
-    ThemeUI::tr("Posted: %1");
     ThemeUI::tr("Runtime");
     ThemeUI::tr("Author");
     ThemeUI::tr("Rating");

@@ -24,6 +24,8 @@ extern "C" {
 SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
 {
+    memset(&m_buffer, 0 , sizeof(m_buffer));
+
     QByteArray dev_ba     = muxer.toLatin1();
     AVOutputFormat *fmt;
 

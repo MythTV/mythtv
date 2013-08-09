@@ -100,7 +100,7 @@ ProgramInfo::CategoryType string_to_myth_category_type(const QString &category_t
     static const char *cattype[] =
         { "", "movie", "series", "sports", "tvshow", };
 
-    for (uint i = 1; i < NUM_CAT_TYPES; i++)
+    for (int i = 1; i < NUM_CAT_TYPES; i++)
         if (category_type == cattype[i])
             return (ProgramInfo::CategoryType) i;
     return ProgramInfo::kCategoryNone;
@@ -866,8 +866,8 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 
     QString pn = _pathname;
     if ((!_pathname.startsWith("myth://")) &&
-        (_pathname.right(4).toLower() == ".iso" ||
-         _pathname.right(4).toLower() == ".img" ||
+        (_pathname.endsWith(".iso", Qt::CaseInsensitive) ||
+         _pathname.endsWith(".img", Qt::CaseInsensitive) ||
          QDir(_pathname + "/VIDEO_TS").exists()))
     {
         pn = QString("dvd:%1").arg(_pathname);
@@ -1130,6 +1130,7 @@ void ProgramInfo::clear(void)
     lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
     recstatus = rsUnknown;
+    oldrecstatus = rsUnknown;
 
     prefinput = 0;
     recpriority2 = 0;
@@ -1676,7 +1677,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["yearstars"] = "";
 
     if (!originalAirDate.isValid() ||
-        (!programid.isEmpty() && (programid.left(2) == "MV")))
+        (!programid.isEmpty() && programid.startsWith("MV")))
     {
         progMap["originalairdate"] = "";
         progMap["shortoriginalairdate"] = "";
@@ -2176,13 +2177,13 @@ static ProgramInfoType discover_program_info_type(
         if (fn_lower.startsWith("dvd:") ||
             fn_lower.endsWith(".iso") ||
             fn_lower.endsWith(".img") ||
-            ((pathname.left(1) == "/") &&
+            ((pathname.startsWith("/")) &&
              QDir(pathname + "/VIDEO_TS").exists()))
         {
             pit = kProgramInfoTypeVideoDVD;
         }
         else if (fn_lower.startsWith("bd:") ||
-                 ((pathname.left(1) == "/") &&
+                 ((pathname.startsWith("/")) &&
                   QDir(pathname + "/BDMV").exists()))
         {
             pit = kProgramInfoTypeVideoBD;
@@ -2578,15 +2579,25 @@ QStringList ProgramInfo::QueryDVDBookmark(
 
     if (!(programflags & FL_IGNOREBOOKMARK))
     {
-        query.prepare(" SELECT title, framenum, audionum, subtitlenum "
+        query.prepare(" SELECT dvdstate, title, framenum, audionum, subtitlenum "
                         " FROM dvdbookmark "
                         " WHERE serialid = :SERIALID ");
         query.bindValue(":SERIALID", serialid);
 
         if (query.exec() && query.next())
         {
-            for(int i = 0; i < 4; i++)
-                fields.append(query.value(i).toString());
+            QString dvdstate = query.value(0).toString();
+
+            if (!dvdstate.isEmpty())
+            {
+                fields.append(dvdstate);
+            }
+            else
+            {
+                // Legacy bookmark
+                for(int i = 1; i < 5; i++)
+                    fields.append(query.value(i).toString());
+            }
         }
     }
 
@@ -2600,32 +2611,35 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
 
     QString serialid    = *(it);
     QString name        = *(++it);
-    QString title       = *(++it);
-    QString audionum    = *(++it);
-    QString subtitlenum = *(++it);
-    QString frame       = *(++it);
 
-    query.prepare("INSERT IGNORE INTO dvdbookmark "
-                    " (serialid, name)"
-                    " VALUES ( :SERIALID, :NAME );");
-    query.bindValue(":SERIALID", serialid);
-    query.bindValue(":NAME", name);
+    if( fields.count() == 3 )
+    {
+        // We have a state field, so update/create the bookmark
+        QString state = *(++it);
 
-    if (!query.exec())
-        MythDB::DBError("SetDVDBookmark inserting", query);
+        query.prepare("INSERT IGNORE INTO dvdbookmark "
+                        " (serialid, name)"
+                        " VALUES ( :SERIALID, :NAME );");
+        query.bindValue(":SERIALID", serialid);
+        query.bindValue(":NAME", name);
 
-    query.prepare(" UPDATE dvdbookmark "
-                    " SET title       = :TITLE , "
-                    "     audionum    = :AUDIONUM , "
-                    "     subtitlenum = :SUBTITLENUM , "
-                    "     framenum    = :FRAMENUM , "
-                    "     timestamp   = NOW() "
-                    " WHERE serialid = :SERIALID");
-    query.bindValue(":TITLE",title);
-    query.bindValue(":AUDIONUM",audionum);
-    query.bindValue(":SUBTITLENUM",subtitlenum);
-    query.bindValue(":FRAMENUM",frame);
-    query.bindValue(":SERIALID",serialid);
+        if (!query.exec())
+            MythDB::DBError("SetDVDBookmark inserting", query);
+
+        query.prepare(" UPDATE dvdbookmark "
+                        " SET dvdstate    = :STATE , "
+                        "     timestamp   = NOW() "
+                        " WHERE serialid = :SERIALID");
+        query.bindValue(":STATE",state);
+        query.bindValue(":SERIALID",serialid);
+    }
+    else
+    {
+        // No state field, delete the bookmark
+        query.prepare("DELETE FROM dvdbookmark "
+                        "WHERE serialid = :SERIALID");
+        query.bindValue(":SERIALID",serialid);
+    }
 
     if (!query.exec())
         MythDB::DBError("SetDVDBookmark updating", query);
@@ -2638,7 +2652,7 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields) const
  */
 ProgramInfo::CategoryType ProgramInfo::QueryCategoryType(void) const
 {
-    CategoryType ret;
+    CategoryType ret = kCategoryNone;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -3889,13 +3903,11 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
 
-    if (!query.exec())
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("QueryAverageAspectRatio", query);
         return MARK_UNSET;
     }
-
-    query.next();
 
     return static_cast<MarkTypes>(query.value(0).toInt());
 }
@@ -3937,7 +3949,11 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint vid_flags)
     query.bindValue(":FLAGS",      vid_flags);
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  startts);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveVideoProperties", query);
+        return;
+    }
 
     uint videoproperties = GetVideoProperties();
     videoproperties &= ~mask;
@@ -3999,7 +4015,11 @@ void ProgramInfo::SaveSeasonEpisode(uint seas, uint ep)
     query.bindValue(":CHANID",     chanid);
     query.bindValue(":STARTTIME",  recstartts);
     query.bindValue(":RECORDID",   recordid);
-    query.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("SaveSeasonEpisode", query);
+        return;
+    }
 
     SendUpdateEvent();
 }
@@ -4107,7 +4127,7 @@ QString ProgramInfo::DiscoverRecordingDirectory(void) const
             return "";
 
         QString path = GetPlaybackURL(false, true);
-        if (path.left(1) == "/")
+        if (path.startsWith("/"))
         {
             QFileInfo testFile(path);
             return testFile.path();
@@ -4508,7 +4528,7 @@ QString ProgramInfo::i18n(const QString &msg)
 void ProgramInfo::SubstituteMatches(QString &str)
 {
     QString pburl = GetPlaybackURL(false, true);
-    if (pburl.left(7) == "myth://")
+    if (pburl.startsWith("myth://"))
     {
         str.replace(QString("%DIR%"), pburl);
     }

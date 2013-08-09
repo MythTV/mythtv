@@ -31,6 +31,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
       xds_net_call(QString::null),  xds_net_name(QString::null),
       xds_tsid(0)
 {
+    memset(last_seen, 0, sizeof(last_seen));
     for (uint i = 0; i < 2; i++)
     {
         badvbi[i]      =  0;
@@ -376,7 +377,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                 len = NewRowCC(mode, len);
 
                             if (len == 0 ||
-                                ccbuf[mode].left(1) == "\b")
+                                ccbuf[mode].startsWith("\b"))
                             {
                                 ccbuf[mode] += (char)'\b';
                                 len++;
@@ -1122,16 +1123,16 @@ QString CC608Decoder::GetXDS(const QString &key) const
 
     if (key == "ratings")
         return QString::number(GetRatingSystems(false));
-    else if (key.left(11) == "has_rating_")
+    else if (key.startsWith("has_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(false))?"1":"0";
-    else if (key.left(7) == "rating_")
+    else if (key.startsWith("rating_"))
         return GetRatingString(key.right(1).toUInt(), false);
 
     else if (key == "future_ratings")
         return QString::number(GetRatingSystems(true));
-    else if (key.left(11) == "has_future_rating_")
+    else if (key.startsWith("has_future_rating_"))
         return ((1<<key.right(1).toUInt()) & GetRatingSystems(true))?"1":"0";
-    else if (key.left(14) == "future_rating_")
+    else if (key.startsWith("future_rating_"))
         return GetRatingString(key.right(1).toUInt(), true);
 
     else if (key == "programname")

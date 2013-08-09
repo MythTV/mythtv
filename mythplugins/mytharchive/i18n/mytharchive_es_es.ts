@@ -163,27 +163,39 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="365"/>
+        <location filename="../mytharchive/logviewer.cpp" line="367"/>
         <source>Show Progress Log</source>
         <translation>Mostrar registro de progreso</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="366"/>
+        <location filename="../mytharchive/logviewer.cpp" line="368"/>
         <source>Show Full Log</source>
         <translation>Mostrar registro completo</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="361"/>
+        <location filename="../mytharchive/logviewer.cpp" line="363"/>
         <source>Don&apos;t Auto Update</source>
         <translation>No actualizar automáticamente</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="363"/>
+        <location filename="../mytharchive/logviewer.cpp" line="77"/>
+        <source>Cannot find any logs to show!</source>
+        <translation>¡No pudo encontrarse ningún registro para mostrar!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/logviewer.cpp" line="216"/>
+        <source>Background creation has been asked to stop.
+This may take a few minutes.</source>
+        <translation>Se ha solicitado detener la creación en segundo plano.
+Esto puede tardar unos minutos.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/logviewer.cpp" line="365"/>
         <source>Auto Update</source>
         <translation>Actualizar automáticamente</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="353"/>
+        <location filename="../mytharchive/logviewer.cpp" line="355"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>
@@ -415,13 +427,6 @@
         <translation>Órdenes externas de MythArchive (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="214"/>
-        <source>Background creation has been asked to stop.
-This may take a few minutes.</source>
-        <translation>Se ha solicitado detener la creación en segundo plano.
-Esto puede tardar unos minutos.</translation>
-    </message>
-    <message>
         <location filename="../mytharchive/archivesettings.cpp" line="88"/>
         <source>Copy remote files</source>
         <translation>Copiar archivos remotos</translation>
@@ -617,11 +622,6 @@ Have you set the correct path in the settings?</source>
         <location filename="../mytharchive/exportnative.cpp" line="495"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>No fue posible crear el DVD. Ocurrió un error al ejecutar los guiones</translation>
-    </message>
-    <message>
-        <location filename="../mytharchive/logviewer.cpp" line="76"/>
-        <source>Cannot find any logs to show!</source>
-        <translation>¡No pudo encontrarse ningún registro para mostrar!</translation>
     </message>
     <message>
         <location filename="../mytharchive/main.cpp" line="93"/>
@@ -1313,17 +1313,17 @@ Por favor, espere...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="925"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Salir y guardar miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="926"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Salir y no guardar miniaturas</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="918"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>
@@ -1331,28 +1331,28 @@ Por favor, espere...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="158"/>
+        <location filename="../mytharchive/videoselector.cpp" line="160"/>
         <source>Clear All</source>
         <translation>Desmarcar todos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="159"/>
+        <location filename="../mytharchive/videoselector.cpp" line="161"/>
         <source>Select All</source>
         <translation>Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="544"/>
+        <location filename="../mytharchive/videoselector.cpp" line="546"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Debe introducir una contraseña válida para este nivel parental</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="357"/>
-        <location filename="../mytharchive/videoselector.cpp" line="487"/>
+        <location filename="../mytharchive/videoselector.cpp" line="359"/>
+        <location filename="../mytharchive/videoselector.cpp" line="489"/>
         <source>All Videos</source>
         <translation>Todos los vídeos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="151"/>
+        <location filename="../mytharchive/videoselector.cpp" line="153"/>
         <source>Menu</source>
         <translation>Menú</translation>
     </message>

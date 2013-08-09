@@ -18,6 +18,7 @@
 #include "datacontracts/programList.h"
 #include "datacontracts/encoderList.h"
 #include "datacontracts/recRuleList.h"
+#include "datacontracts/titleInfoList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.7" );
+    Q_CLASSINFO( "version"    , "1.9" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -56,6 +57,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::ProgramList::InitializeCustomTypes();
             DTC::EncoderList::InitializeCustomTypes();
             DTC::RecRuleList::InitializeCustomTypes();
+            DTC::TitleInfoList::InitializeCustomTypes();
         }
 
     public slots:
@@ -65,14 +67,10 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
                                                            int              StartIndex,
-                                                           int              Count      ) = 0;
-
-        virtual DTC::ProgramList*  GetFilteredRecordedList ( bool             Descending,
-                                                             int              StartIndex,
-                                                             int              Count,
-                                                             const QString   &TitleRegEx,
-                                                             const QString   &RecGroup,
-                                                             const QString   &StorageGroup ) = 0;
+                                                           int              Count,
+                                                           const QString   &TitleRegEx,
+                                                           const QString   &RecGroup,
+                                                           const QString   &StorageGroup ) = 0;
 
         virtual DTC::Program*      GetRecorded           ( int              ChanId,
                                                             const QDateTime &StartTime  ) = 0;
@@ -93,9 +91,11 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual QStringList        GetTitleList          ( ) = 0;
 
+        virtual DTC::TitleInfoList* GetTitleInfoList     ( ) = 0;
+
         // Recording Rules
 
-        virtual int                AddRecordSchedule     ( QString   Title,
+        virtual uint               AddRecordSchedule     ( QString   Title,
                                                            QString   Subtitle,
                                                            QString   Description,
                                                            QString   Category,
@@ -137,7 +137,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            bool      AutoUserJob4,
                                                            int       Transcoder        ) = 0;
 
-        virtual bool               UpdateRecordSchedule  ( int       RecordId,
+        virtual bool               UpdateRecordSchedule  ( uint      RecordId,
                                                            QString   Title,
                                                            QString   Subtitle,
                                                            QString   Description,

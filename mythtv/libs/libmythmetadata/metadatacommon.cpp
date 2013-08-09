@@ -1,4 +1,6 @@
+// Qt headers
 #include <QLocale>
+#include <QCoreApplication>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -267,8 +269,11 @@ MetadataLookup::MetadataLookup(
     m_title(title),
     m_categories(categories),
     m_userrating(userrating),
+    m_ratingcount(0),
     m_subtitle(subtitle),
     m_description(description),
+    m_season(0),
+    m_episode(0),
     m_chanid(chanid),
     m_channum(channum),
     m_chansign(chansign),
@@ -345,12 +350,22 @@ MetadataLookup::MetadataLookup(
     m_title(title),
     m_categories(categories),
     m_userrating(userrating),
+    m_ratingcount(0),
     m_subtitle(subtitle),
     m_tagline(tagline),
     m_description(description),
     m_season(season),
     m_episode(episode),
+    m_chanid(0),
+    m_programflags(0),
+    m_audioproperties(0),
+    m_videoproperties(0),
+    m_subtitletype(0),
     m_certification(certification),
+    m_popularity(0),
+    m_budget(0),
+    m_revenue(0),
+    m_tracknum(0),
     m_year(year),
     m_releasedate(releasedate),
     m_runtime(runtime),
@@ -381,7 +396,7 @@ ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
     return ret;
 }
 
-void MetadataLookup::toMap(MetadataMap &metadataMap)
+void MetadataLookup::toMap(InfoMap &metadataMap)
 {
     metadataMap["filename"] = m_filename;
     metadataMap["title"] = m_title;
@@ -424,8 +439,17 @@ void MetadataLookup::toMap(MetadataMap &metadataMap)
         m_releasedate, MythDate::kDateFull);
     metadataMap["lastupdated"] = MythDate::toString(m_lastupdated, MythDate::kDateFull);
 
-    metadataMap["runtime"] = QObject::tr("%n minute(s)", "", m_runtime);
-    metadataMap["runtimesecs"] = QObject::tr("%n second(s)", "", m_runtimesecs);
+    metadataMap["runtime"] = QCoreApplication::translate("(Common)",
+                                                         "%n minute(s)",
+                                                         "",
+                                                         QCoreApplication::UnicodeUTF8,
+                                                         m_runtime);
+
+    metadataMap["runtimesecs"] = QCoreApplication::translate("(Common)",
+                                                             "%n second(s)",
+                                                             "",
+                                                             QCoreApplication::UnicodeUTF8,
+                                                             m_runtimesecs);
     metadataMap["inetref"] = m_inetref;
     metadataMap["collectionref"] = m_collectionref;
     metadataMap["tmsref"] = m_tmsref;
@@ -1502,7 +1526,7 @@ MetaGrabberScript* ParseGrabberVersion(const QDomElement& item)
                              type, typestring, description, version);
 }
 
-void MetaGrabberScript::toMap(MetadataMap &metadataMap)
+void MetaGrabberScript::toMap(InfoMap &metadataMap)
 {
     metadataMap["name"] = m_name;
     metadataMap["author"] = m_author;

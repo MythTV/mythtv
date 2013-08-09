@@ -2,6 +2,26 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="it_IT">
 <context>
+    <name>(MythArchiveMain)</name>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="93"/>
+        <source>Found a lock file but the owning process isn&apos;t running!
+Removing stale lock file.</source>
+        <translation>Trovato un file bloccato ma il processo proprietario non è in esecuzione!
+Rimuove lo stato di blocco del file.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="212"/>
+        <source>Last run did not create a playable DVD.</source>
+        <translation>L&apos;ultima esecuzione non ha creato un DVD riproducibile.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="219"/>
+        <source>Last run failed to create a DVD.</source>
+        <translation>L&apos;ultima esecuzione ha fallito la creazione di un DVD.</translation>
+    </message>
+</context>
+<context>
     <name>ArchiveFileSelector</name>
     <message>
         <location filename="../mytharchive/importnative.cpp" line="212"/>
@@ -164,27 +184,39 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="353"/>
+        <location filename="../mytharchive/logviewer.cpp" line="77"/>
+        <source>Cannot find any logs to show!</source>
+        <translation>Impossibile trovare ogni log da visualizzare!</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/logviewer.cpp" line="216"/>
+        <source>Background creation has been asked to stop.
+This may take a few minutes.</source>
+        <translation>La creazione sullo sfondo è stato richiesto di fermarsi.
+Questo può richiedere alcuni minuti.</translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/logviewer.cpp" line="355"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="361"/>
+        <location filename="../mytharchive/logviewer.cpp" line="363"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Nessun aggiornamento automatico</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="363"/>
+        <location filename="../mytharchive/logviewer.cpp" line="365"/>
         <source>Auto Update</source>
         <translation>Aggiornamento automatico</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="365"/>
+        <location filename="../mytharchive/logviewer.cpp" line="367"/>
         <source>Show Progress Log</source>
         <translation>Mostrare log di progresso</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="366"/>
+        <location filename="../mytharchive/logviewer.cpp" line="368"/>
         <source>Show Full Log</source>
         <translation>Mostrare log completo</translation>
     </message>
@@ -268,37 +300,37 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="299"/>
+        <location filename="../mytharchive/main.cpp" line="302"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Attivare/Disattivare stato dell&apos;elenco lista tagli per il programma selezionato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="302"/>
+        <location filename="../mytharchive/main.cpp" line="305"/>
         <source>Create DVD</source>
         <translation>Creare DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="304"/>
+        <location filename="../mytharchive/main.cpp" line="307"/>
         <source>Create Archive</source>
         <translation>Creare archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="306"/>
+        <location filename="../mytharchive/main.cpp" line="309"/>
         <source>Import Archive</source>
         <translation>Importare archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="308"/>
+        <location filename="../mytharchive/main.cpp" line="311"/>
         <source>View Archive Log</source>
         <translation>Mostrare log archivio</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="310"/>
+        <location filename="../mytharchive/main.cpp" line="313"/>
         <source>Play Created DVD</source>
         <translation>Riproduzione DVD creato</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="312"/>
+        <location filename="../mytharchive/main.cpp" line="315"/>
         <source>Burn DVD</source>
         <translation>Masterizzare DVD</translation>
     </message>
@@ -613,33 +645,28 @@ Avere impostato il percorso corretto nelle impostazioni?</translation>
         <translation>Non è stato possibile creare il DVD, Un errore è occorso quando gli script sono stati in esecuzione</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="76"/>
         <source>Cannot find any logs to show!</source>
-        <translation>Impossibile trovare ogni log da visualizzare!</translation>
+        <translation type="obsolete">Impossibile trovare ogni log da visualizzare!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="214"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
-        <translation>La creazione dello sfondo è stato richiesto di fermarsi.
+        <translation type="obsolete">La creazione dello sfondo è stato richiesto di fermarsi.
 Questo può richiedere alcuni minuti.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="93"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
-        <translation>Trovato un file bloccato ma il processo proprietario non è in esecuzione!
+        <translation type="obsolete">Trovato un file bloccato ma il processo proprietario non è in esecuzione!
 Rimuove lo stato di blocco del file.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="211"/>
         <source>Last run did not create a playable DVD.</source>
-        <translation>L&apos;ultima esecuzione non ha creato un DVD riproducibile.</translation>
+        <translation type="obsolete">L&apos;ultima esecuzione non ha creato un DVD riproducibile.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="217"/>
         <source>Last run failed to create a DVD.</source>
-        <translation>L&apos;ultima esecuzione ha fallito la creazione di un DVD.</translation>
+        <translation type="obsolete">L&apos;ultima esecuzione ha fallito la creazione di un DVD.</translation>
     </message>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="1008"/>
@@ -1318,17 +1345,17 @@ Attendere...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="918"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="925"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Uscire, salvare le anteprime</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="926"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Uscire, non salvare le anteprime</translation>
     </message>
@@ -1336,28 +1363,28 @@ Attendere...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="151"/>
+        <location filename="../mytharchive/videoselector.cpp" line="153"/>
         <source>Menu</source>
         <translation>Menù</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="158"/>
+        <location filename="../mytharchive/videoselector.cpp" line="160"/>
         <source>Clear All</source>
         <translation>Pulisci tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="159"/>
+        <location filename="../mytharchive/videoselector.cpp" line="161"/>
         <source>Select All</source>
         <translation>Selezionare tutto</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="357"/>
-        <location filename="../mytharchive/videoselector.cpp" line="487"/>
+        <location filename="../mytharchive/videoselector.cpp" line="359"/>
+        <location filename="../mytharchive/videoselector.cpp" line="489"/>
         <source>All Videos</source>
         <translation>Tutti i video</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="544"/>
+        <location filename="../mytharchive/videoselector.cpp" line="546"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>È richiesto l&apos;inserimento di una password valida per questo controllo genitori</translation>
     </message>

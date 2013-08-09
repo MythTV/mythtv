@@ -52,18 +52,11 @@ class Weather : public MythScreenType
     void hideScreen(void);
 
     MythScreenStack *m_weatherStack;
-    int m_timeoutCounter;
-    int m_wantAnimated;
-    bool m_stopProcessing;
 
-    units_t m_units;
     bool m_firstRun;
-    int m_updateInterval;
     int m_nextpageInterval;
-    int m_nextpageIntArrow;
-    QTimer *m_nextpage_Timer;
 
-    bool m_gotDataHook;
+    QTimer *m_nextpage_Timer;
 
     bool m_firstSetup;
 

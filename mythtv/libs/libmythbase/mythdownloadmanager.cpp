@@ -276,11 +276,14 @@ void MythDownloadManager::run(void)
         }
         m_infoLock->lock();
         downloading = !m_downloadInfos.isEmpty();
-        itemsInQueue = !m_downloadQueue.isEmpty();
         m_infoLock->unlock();
 
         if (downloading)
             QCoreApplication::processEvents();
+
+        m_infoLock->lock();
+        itemsInQueue = !m_downloadQueue.isEmpty();
+        m_infoLock->unlock();
 
         if (!itemsInQueue || waitAnyway)
         {
@@ -807,7 +810,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     m_queueWaitCond.wakeAll();
 
     // timeout myth:// RemoteFile transfers 20 seconds from now
-    // timeout non-myth:// QNetworkAccessManager transfers 10 seconds after
+    // timeout non-myth:// QNetworkAccessManager transfers 60 seconds after
     //    their last progress update
     QDateTime startedAt = MythDate::current();
     m_infoLock->lock();
@@ -835,7 +838,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
         if ((dlInfo->m_reply) &&
             (dlInfo->m_errorCode == QNetworkReply::NoError))
         {
-            LOG(VB_FILE, LOG_DEBUG, 
+            LOG(VB_FILE, LOG_DEBUG,
                 LOC + QString("Aborting download - lack of data transfer"));
             dlInfo->m_reply->abort();
         }
@@ -866,32 +869,49 @@ void MythDownloadManager::cancelDownload(const QString &url)
         dlInfo = lit.value();
         if (dlInfo->m_url == url)
         {
-            // this shouldn't happen
-            if (dlInfo->m_reply)
-            {
-                LOG(VB_FILE, LOG_DEBUG, 
-                    LOC + QString("Aborting download - user request"));
-                dlInfo->m_reply->abort();
-            }
+            if (!m_cancellationQueue.contains(dlInfo))
+                m_cancellationQueue.append(dlInfo);
             lit.remove();
-            dlInfo->m_lock.lock();
-            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
-            dlInfo->m_done = true;
-            dlInfo->m_lock.unlock();
         }
     }
 
     if (m_downloadInfos.contains(url))
     {
         dlInfo = m_downloadInfos[url];
+
+        if (!m_cancellationQueue.contains(dlInfo))
+            m_cancellationQueue.append(dlInfo);
+
+        if (dlInfo->m_reply)
+            m_downloadReplies.remove(dlInfo->m_reply);
+
+        m_downloadInfos.remove(url);
+    }
+
+    QMetaObject::invokeMethod(this, "downloadCanceled",
+                              Qt::QueuedConnection);
+}
+
+void MythDownloadManager::downloadCanceled()
+{
+    QMutexLocker locker(m_infoLock);
+    MythDownloadInfo *dlInfo;
+
+    QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
+    while (lit.hasNext())
+    {
+        lit.next();
+        dlInfo = lit.value();
+        
         if (dlInfo->m_reply)
         {
-            LOG(VB_FILE, LOG_DEBUG, 
+            LOG(VB_FILE, LOG_DEBUG,
                 LOC + QString("Aborting download - user request"));
-            m_downloadReplies.remove(dlInfo->m_reply);
             dlInfo->m_reply->abort();
         }
-        m_downloadInfos.remove(url);
+        lit.remove();
+        if (dlInfo->IsDone())
+            continue;
         dlInfo->m_lock.lock();
         dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
         dlInfo->m_done = true;
@@ -1025,6 +1045,12 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
                 .arg((long long)dlInfo)
                 .arg(reply->url().toString())
                 .arg(dlInfo->m_redirectedTo.toString()));
+
+        if (dlInfo->m_data)
+            dlInfo->m_data->clear();
+
+        dlInfo->m_bytesReceived = 0;
+        dlInfo->m_bytesTotal    = 0;
 
         QNetworkRequest request(dlInfo->m_redirectedTo);
         if (dlInfo->m_preferCache)
@@ -1304,8 +1330,8 @@ bool MythDownloadManager::saveFile(const QString &outFile,
 QDateTime MythDownloadManager::GetLastModified(const QString &url)
 {
     // If the header has not expired and
-    // the last modification date is less than 30 minutes old or if
-    // the cache object is less than 5 minutes old,
+    // the last modification date is less than 1 hours old or if
+    // the cache object is less than 20 minutes old,
     // then use the cached header otherwise redownload the header
 
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
@@ -1340,7 +1366,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         ((!urlData.expirationDate().isValid()) ||
          (urlData.expirationDate().secsTo(now) < 0)))
     {
-        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 1800)
+        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 3600) // 1 Hour
         {
             result = urlData.lastModified().toUTC();
         }
@@ -1352,7 +1378,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
                 QDateTime loadDate =
                     MythDate::fromString(date, dateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
-                if (loadDate.secsTo(now) <= 720)
+                if (loadDate.secsTo(now) <= 1200) // 20 Minutes
                 {
                     result = urlData.lastModified().toUTC();
                 }
@@ -1521,8 +1547,17 @@ MythCookieJar::MythCookieJar()
  */
 void MythCookieJar::load(const QString &filename)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("MythCookieJar: loading cookies from: %1").arg(filename));
+
+    QFile f(filename);
+    if (!f.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("MythCookieJar::load() failed to open file for reading: %1").arg(filename));
+        return;
+    }
+
     QList<QNetworkCookie> cookieList;
-    QTextStream stream((QString *)&filename, QIODevice::ReadOnly);
+    QTextStream stream(&f);
     while (!stream.atEnd())
     {
         QString cookie = stream.readLine();
@@ -1537,8 +1572,17 @@ void MythCookieJar::load(const QString &filename)
  */
 void MythCookieJar::save(const QString &filename)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("MythCookieJar: saving cookies to: %1").arg(filename));
+
+    QFile f(filename);
+    if (!f.open(QIODevice::WriteOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("MythCookieJar::save() failed to open file for writing: %1").arg(filename));
+        return;
+    }
+
     QList<QNetworkCookie> cookieList = allCookies();
-    QTextStream stream((QString *)&filename, QIODevice::WriteOnly);
+    QTextStream stream(&f);
 
     for (QList<QNetworkCookie>::iterator it = cookieList.begin();
          it != cookieList.end(); ++it)

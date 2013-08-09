@@ -90,14 +90,14 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
         lpath = lpath.section('/', -1);
 
         QString fpath = lpath;
-        if (fpath.right(4) == ".png")
+        if (fpath.endsWith(".png"))
             fpath = fpath.left(fpath.length() - 4);
 
         ProgramInfo pginfo(fpath);
         if (pginfo.GetChanID())
         {
             QString pburl = GetPlaybackURL(&pginfo);
-            if (pburl.left(1) == "/")
+            if (pburl.startsWith("/"))
             {
                 lpath = pburl.section('/', 0, -2) + "/" + lpath;
                 LOG(VB_FILE, LOG_INFO,
@@ -517,7 +517,7 @@ QList<FileSystemInfo> FileServerHandler::QueryFileSystems(void)
                                            .toByteArray().constData());
             disk.setPath(currentDir);
 
-            if (currentDir.right(1) == "/")
+            if (currentDir.endsWith("/"))
                 currentDir.remove(currentDir.length() - 1, 1);
 
             checkDir.setPath(currentDir);

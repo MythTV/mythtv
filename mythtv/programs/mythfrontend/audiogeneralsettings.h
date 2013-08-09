@@ -85,6 +85,8 @@ class AudioDeviceComboBox : public HostComboBox
 
 class AudioMixerSettings : public TriggeredConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     AudioMixerSettings();
   private:
@@ -104,6 +106,8 @@ class AudioGeneralSettings : public ConfigurationWizard
 
 class AudioAdvancedSettings : public VerticalConfigurationGroup
 {
+    Q_OBJECT
+
   public:
     AudioAdvancedSettings(bool mpcm);
 
@@ -116,8 +120,6 @@ class AudioAdvancedSettings : public VerticalConfigurationGroup
     HostCheckBox       *SPDIFRateOverride();
     HostCheckBox       *HBRPassthrough();
 
-    CheckBoxSetting    *m_triggerMPCM;
-    HostCheckBox       *m_MPCM;
     HostCheckBox       *m_PassThroughOverride;
 };
 
@@ -131,7 +133,7 @@ class AudioTestGroup : public ConfigurationWizard
 {
   public:
     AudioTestGroup(QString main, QString passthrough,
-                   int channels, AudioOutputSettings settings);
+                   int channels, AudioOutputSettings &settings);
 };
 
 class ChannelChangedEvent : public QEvent
@@ -149,10 +151,12 @@ class ChannelChangedEvent : public QEvent
 
 class AudioTestThread : public MThread
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioTestThread)
+
   public:
 
     AudioTestThread(QObject *parent, QString main, QString passthrough,
-                    int channels, AudioOutputSettings settings, bool hd);
+                    int channels, AudioOutputSettings &settings, bool hd);
     ~AudioTestThread();
 
     void cancel();
@@ -180,7 +184,7 @@ class AudioTest : public VerticalConfigurationGroup
     Q_OBJECT
   public:
     AudioTest(QString main, QString passthrough,
-              int channels, AudioOutputSettings settings);
+              int channels, AudioOutputSettings &settings);
     ~AudioTest();
     bool event(QEvent *event);
 

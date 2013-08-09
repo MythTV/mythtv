@@ -79,6 +79,7 @@ MythSocket::MythSocket(
     m_tcpSocket(new QTcpSocket()),
     m_thread(NULL),
     m_socketDescriptor(-1),
+    m_peerPort(-1),
     m_callback(cb),
     m_useSharedThread(use_shared_thread),
     m_disableReadyReadCallback(false),

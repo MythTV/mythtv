@@ -29,7 +29,6 @@ DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ./mpeg ./channelscan ./visualisations
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
-DEPENDPATH  += ./recorders/HLS
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
@@ -365,22 +364,38 @@ using_frontend {
 
    using_opengl | using_vdpau {
         # Goom
-        HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
-        HEADERS += goom/ifs.h goom/lines.h goom/drawmethods.h
-        HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
-        HEADERS += videovisualgoom.h
-        SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
-        SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
-        SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c
-        SOURCES += videovisualgoom.cpp
+        HEADERS += visualisations/goom/filters.h
+        HEADERS += visualisations/goom/goomconfig.h
+        HEADERS += visualisations/goom/goom_core.h
+        HEADERS += visualisations/goom/graphic.h
+        HEADERS += visualisations/goom/ifs.h
+        HEADERS += visualisations/goom/lines.h
+        HEADERS += visualisations/goom/drawmethods.h
+        HEADERS += visualisations/goom/mmx.h
+        HEADERS += visualisations/goom/mathtools.h
+        HEADERS += visualisations/goom/tentacle3d.h
+        HEADERS += visualisations/goom/v3d.h
+        HEADERS += visualisations/videovisualgoom.h
+
+        SOURCES += visualisations/goom/filters.c
+        SOURCES += visualisations/goom/goom_core.c
+        SOURCES += visualisations/goom/graphic.c
+        SOURCES += visualisations/goom/tentacle3d.c
+        SOURCES += visualisations/goom/ifs.c
+        SOURCES += visualisations/goom/ifs_display.c
+        SOURCES += visualisations/goom/lines.c
+        SOURCES += visualisations/goom/surf3d.c
+        SOURCES += visualisations/goom/zoom_filter_mmx.c
+        SOURCES += visualisations/goom/zoom_filter_xmmx.c
+        SOURCES += visualisations/videovisualgoom.cpp
     }
 
     using_libfftw3 {
         DEFINES += FFTW3_SUPPORT
         HEADERS += visualisations/videovisualspectrum.h
         SOURCES += visualisations/videovisualspectrum.cpp
-        using_opengl: HEADERS += videovisualcircles.h
-        using_opengl: SOURCES += videovisualcircles.cpp
+        using_opengl: HEADERS += visualisations/videovisualcircles.h
+        using_opengl: SOURCES += visualisations/videovisualcircles.cpp
     }
 
     using_quartz_video: DEFINES += USING_QUARTZ_VIDEO
@@ -634,6 +649,10 @@ using_backend {
 
     SOURCES += recorders/rtp/packetbuffer.cpp
     SOURCES += recorders/rtp/rtppacketbuffer.cpp
+
+    # Suppport for HLS recorder
+    HEADERS += recorders/hlsstreamhandler.h
+    SOURCES += recorders/hlsstreamhandler.cpp
 
     DEFINES += USING_IPTV
 

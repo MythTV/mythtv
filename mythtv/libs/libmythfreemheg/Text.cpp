@@ -455,7 +455,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
 
             if (lineSpace == 0)
             {
-                size = 0x18;
+                lineSpace = 0x18;
             }
 
             p = q + 1;

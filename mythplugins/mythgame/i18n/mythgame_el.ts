@@ -134,7 +134,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="232"/>
-        <location filename="../mythgame/gamehandler.cpp" line="618"/>
+        <location filename="../mythgame/gamehandler.cpp" line="613"/>
         <source>No</source>
         <translation>Όχι</translation>
     </message>
@@ -145,7 +145,7 @@ Remove it from the database?</source>
     </message>
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="234"/>
-        <location filename="../mythgame/gamehandler.cpp" line="619"/>
+        <location filename="../mythgame/gamehandler.cpp" line="614"/>
         <source>Yes</source>
         <translation>Ναι</translation>
     </message>
@@ -167,13 +167,13 @@ Remove it from the database?</source>
         <translation>Επιβεβαίωση %1 αρχείων...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="612"/>
+        <location filename="../mythgame/gamehandler.cpp" line="607"/>
         <source>This will clear all game metadata from the database. Are you sure you want to do this?</source>
         <translation>Αυτό θα διαγράψει όλες τις πληροφορίες παιχνιδιών από τη βάση δεδομένων. Σίγουρα θέλετε να το κάνετε;</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="717"/>
-        <location filename="../mythgame/gamehandler.cpp" line="745"/>
+        <location filename="../mythgame/gamehandler.cpp" line="707"/>
+        <location filename="../mythgame/gamehandler.cpp" line="735"/>
         <source>Scanning for %1 games...</source>
         <extracomment>%1 is the system name</extracomment>
         <translation>Ανίχνευση για παιχνίδια %1...</translation>
@@ -200,37 +200,37 @@ Remove it from the database?</source>
 <context>
     <name>GameUI</name>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="139"/>
+        <location filename="../mythgame/gameui.cpp" line="146"/>
         <source>Favorites</source>
         <translation>Αγαπημένα</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="153"/>
+        <location filename="../mythgame/gameui.cpp" line="160"/>
         <source>All Games</source>
         <translation>Όλα τα Παιχνίδια</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="158"/>
+        <location filename="../mythgame/gameui.cpp" line="165"/>
         <source>-   By Genre</source>
         <translation>-   Κατά Είδος</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="163"/>
+        <location filename="../mythgame/gameui.cpp" line="170"/>
         <source>-   By Year</source>
         <translation>-   Κατά Έτος</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="168"/>
+        <location filename="../mythgame/gameui.cpp" line="175"/>
         <source>-   By Name</source>
         <translation>-   Κατά Όνομα</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="173"/>
+        <location filename="../mythgame/gameui.cpp" line="180"/>
         <source>-   By Publisher</source>
         <translation>-   Κατά Εταιρία</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="272"/>
+        <location filename="../mythgame/gameui.cpp" line="279"/>
         <source>Choose System for:
 %1</source>
         <extracomment>%1 is the game name</extracomment>
@@ -238,53 +238,53 @@ Remove it from the database?</source>
 %1</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="540"/>
+        <location filename="../mythgame/gameui.cpp" line="547"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="440"/>
-        <location filename="../mythgame/gameui.cpp" line="520"/>
+        <location filename="../mythgame/gameui.cpp" line="447"/>
+        <location filename="../mythgame/gameui.cpp" line="527"/>
         <source>Scan For Changes</source>
         <translation>Ανίχνευση για Αλλαγές</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="446"/>
-        <location filename="../mythgame/gameui.cpp" line="524"/>
+        <location filename="../mythgame/gameui.cpp" line="453"/>
+        <location filename="../mythgame/gameui.cpp" line="531"/>
         <source>Show Information</source>
         <translation>Προβολή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="448"/>
-        <location filename="../mythgame/gameui.cpp" line="529"/>
+        <location filename="../mythgame/gameui.cpp" line="455"/>
+        <location filename="../mythgame/gameui.cpp" line="536"/>
         <source>Remove Favorite</source>
         <translation>Αφαίρεση Αγαπημένου</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="450"/>
-        <location filename="../mythgame/gameui.cpp" line="528"/>
+        <location filename="../mythgame/gameui.cpp" line="457"/>
+        <location filename="../mythgame/gameui.cpp" line="535"/>
         <source>Make Favorite</source>
         <translation>Προσθήκη Αγαπημένου</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="451"/>
-        <location filename="../mythgame/gameui.cpp" line="533"/>
+        <location filename="../mythgame/gameui.cpp" line="458"/>
+        <location filename="../mythgame/gameui.cpp" line="540"/>
         <source>Retrieve Details</source>
         <translation>Ανάκτηση Λεπτομερειών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="452"/>
-        <location filename="../mythgame/gameui.cpp" line="516"/>
+        <location filename="../mythgame/gameui.cpp" line="459"/>
+        <location filename="../mythgame/gameui.cpp" line="523"/>
         <source>Edit Details</source>
         <translation>Επεξεργασία Λεπτομερειών</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="480"/>
+        <location filename="../mythgame/gameui.cpp" line="487"/>
         <source>Game Search</source>
         <translation>Αναζήτηση Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="../mythgame/gameui.cpp" line="924"/>
+        <location filename="../mythgame/gameui.cpp" line="931"/>
         <source>Fetching details for %1</source>
         <extracomment>%1 is the game name</extracomment>
         <translation>Κατεβάζω στοιχεία για %1</translation>
@@ -535,12 +535,12 @@ Remove it from the database?</source>
         <translation>%1 (%2)</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="108"/>
+        <location filename="../mythgame/gamesettings.h" line="110"/>
         <source>Player Name</source>
         <translation>Όνομα Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.h" line="109"/>
+        <location filename="../mythgame/gamesettings.h" line="111"/>
         <source>Name of this Game and or Emulator</source>
         <translation>Όνομα του παιχνιδιού και/ή του Προσομοιωτή</translation>
     </message>
@@ -548,7 +548,7 @@ Remove it from the database?</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Games</source>
         <translation>Παιχνίδια</translation>
     </message>
@@ -683,32 +683,32 @@ Remove it from the database?</source>
         <translation>Ναι</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="43"/>
         <source>ROM Name:</source>
         <translation>Όνομα ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="39"/>
         <source>ROM Path:</source>
         <translation>Διαδρομή ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="44"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/διαδρομή/προς/την/εικόνα.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game Information</source>
         <translation>Πληροφορίες Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Game:</source>
         <translation>Παιχνίδι:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Type:</source>
         <translation>Τύπος:</translation>
     </message>
@@ -718,87 +718,107 @@ Remove it from the database?</source>
         <translation>Αρχείο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="47"/>
         <source>ROM path:</source>
         <translation>Διαδρομή ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="36"/>
         <source>System(s):</source>
         <translation>Σύστημα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Edit Game Information</source>
         <translation>Επεξεργασία Πληροφοριών Παιχνιδιού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Game Name:</source>
         <translation>Όνομα Παιχνιδιού:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Description:</source>
         <translation>Περιγραφή:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Boxart:</source>
         <translation>Εξώφυλλο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>Από %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>System: %1</source>
+        <translation>Σύστημα: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Genre: %1</source>
+        <translation>Είδος: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Back</source>
+        <translation>Πίσω</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
         <source>Favorite</source>
         <translation>Αγαπημένο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>No Plot.</source>
         <translation>Χωρίς πλοκή.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>General Settings</source>
         <translation>Γενικές Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Game folders and general options</source>
         <translation>Φάκελοι παιχνιδιών και γενικές επιλογές</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Game Players</source>
         <translation>Συστήματα Παιχνιδιών</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Configure an emulator</source>
         <translation>Ρύθμιση Προσομοιωτή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Scan for Games</source>
         <translation>Ανίχνευση για Παιχνίδια</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Add games to your library</source>
         <translation>Προσθέστε παιχνίδια στη συλλογή σας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Clear Game Data</source>
         <translation>Εκκαθάριση Συλλογής</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Empty your game library</source>
         <translation>Σβήνει τη συλλογή παιχνιδιών σας</translation>
     </message>

@@ -7,7 +7,7 @@
 
 // myth
 #include "mythlogging.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
 
 // mythbrowser
 #include "mythbrowser.h"
@@ -47,6 +47,8 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
     m_listItem = new MythUIButtonListItem(parent->m_pageList, "");
 
     m_browser = browser;
+
+    m_active = false;
 
     connect(m_browser, SIGNAL(loadStarted()),
             this, SLOT(slotLoadStarted()));
@@ -133,15 +135,13 @@ void WebPage::slotLoadStarted(void)
 
 void WebPage::slotLoadFinished(bool OK)
 {
-    (void) OK;
-
     m_listItem->DisplayState("off", "loadingstate");
-
-    slotLoadProgress(0);
 
     slotIconChanged();
 
     m_listItem->SetText(m_browser->GetTitle());
+
+    emit loadFinished(OK);
 }
 
 void WebPage::slotLoadProgress(int progress)

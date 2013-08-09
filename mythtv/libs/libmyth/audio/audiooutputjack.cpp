@@ -1,3 +1,22 @@
+/*
+ *  JACK AudioOutput module
+ *  Written by Ed Wildgoose in 2010 with improvements from various authors
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
@@ -46,8 +65,8 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
     client = _jack_client_open();
     if (!client)
     {
-        JERROR("Cannot start/connect to jack server "
-               "(to check supported rate/channels)");
+        JERROR(tr("Cannot start/connect to jack server "
+               "(to check supported rate/channels)"));
         delete settings;
         return NULL;
     }
@@ -57,7 +76,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     if (!rate)
     {
-        JERROR("Unable to retrieve jack server sample rate");
+        JERROR(tr("Unable to retrieve jack server sample rate"));
         goto err_out;
     }
     else
@@ -71,7 +90,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 
     if (!matching_ports || !matching_ports[0])
     {
-        JERROR("No ports available to connect to");
+        JERROR(tr("No ports available to connect to"));
         goto err_out;
     }
     // Count matching ports from 2nd port upwards
@@ -111,7 +130,7 @@ bool AudioOutputJACK::OpenDevice()
     // We have a hard coded channel limit - check we haven't exceeded it
     if (channels > JACK_CHANNELS_MAX)
     {
-        JERROR(QString("Requested more channels: (%1), than the maximum: %2")
+        JERROR(tr("Requested more channels: (%1), than the maximum: %2")
                    .arg(channels).arg(JACK_CHANNELS_MAX));
         return false;
     }
@@ -127,7 +146,7 @@ bool AudioOutputJACK::OpenDevice()
     client = _jack_client_open();
     if (!client)
     {
-        JERROR("Cannot start/connect to jack server");
+        JERROR(tr("Cannot start/connect to jack server"));
         goto err_out;
     }
 
@@ -135,7 +154,7 @@ bool AudioOutputJACK::OpenDevice()
     matching_ports = _jack_get_ports();
     if (!matching_ports || !matching_ports[0])
     {
-        JERROR("No ports available to connect to");
+        JERROR(tr("No ports available to connect to"));
         goto err_out;
     }
 
@@ -146,7 +165,7 @@ bool AudioOutputJACK::OpenDevice()
     // ensure enough ports to satisfy request
     if (channels > i)
     {
-        JERROR("Not enough ports available to connect to");
+        JERROR(tr("Not enough ports available to connect to"));
         goto err_out;
     }
 
@@ -159,7 +178,7 @@ bool AudioOutputJACK::OpenDevice()
                                       JackPortIsOutput, 0);
         if (!ports[i])
         {
-            JERROR(QString("Error while registering new jack port: %1").arg(i));
+            JERROR(tr("Error while registering new jack port: %1").arg(i));
             goto err_out;
         }
     }
@@ -180,16 +199,16 @@ bool AudioOutputJACK::OpenDevice()
     // These will actually get called after jack_activate()!
     // ...Possibly even before this OpenDevice sub returns...
     if (jack_set_process_callback(client, _JackCallback, this))
-        JERROR("Error. Unable to set process callback?!");
+        JERROR(tr("Error. Unable to set process callback?!"));
     if (jack_set_xrun_callback(client, _JackXRunCallback, this))
-        JERROR("Error. Unable to set xrun callback?!");
+        JERROR(tr("Error. Unable to set xrun callback?!"));
     if (jack_set_graph_order_callback(client, _JackGraphOrderCallback, this))
-        JERROR("Error. Unable to set graph order change callback?!");
+        JERROR(tr("Error. Unable to set graph order change callback?!"));
 
     // Activate! Everything comes into life after here. Beware races
     if (jack_activate(client))
     {
-        JERROR("Calling jack_activate failed");
+        JERROR(tr("Calling jack_activate failed"));
         goto err_out;
     }
 
@@ -596,7 +615,7 @@ bool AudioOutputJACK::_jack_connect_ports(const char** matching_ports)
     {
         if (jack_connect(client, jack_port_name(ports[i]), matching_ports[i]))
         {
-            JERROR(QString("Calling jack_connect failed on port: %1\n").arg(i));
+            JERROR(tr("Calling jack_connect failed on port: %1\n").arg(i));
             return false;
         }
     }
@@ -610,7 +629,7 @@ void AudioOutputJACK::_jack_client_close(jack_client_t **client)
     {
         int err = jack_client_close(*client);
         if (err != 0)
-            JERROR(QString("Error closing Jack output device. Error: %1")
+            JERROR(tr("Error closing Jack output device. Error: %1")
                        .arg(err));
         *client = NULL;
     }

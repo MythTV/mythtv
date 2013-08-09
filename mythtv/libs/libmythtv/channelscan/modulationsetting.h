@@ -30,24 +30,36 @@
 #ifndef _MODULATION_SETTING_H_
 #define _MODULATION_SETTING_H_
 
+// Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "settings.h"
 
 class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
 {
+
   public:
     ScanATSCModulation() : ComboBoxSetting(this)
     {
-        addSelection(QObject::tr("Terrestrial")+" (8-VSB)","vsb8",  true);
-        addSelection(QObject::tr("Cable") + " (QAM-256)", "qam256", false);
-        addSelection(QObject::tr("Cable") + " (QAM-128)", "qam128", false);
-        addSelection(QObject::tr("Cable") + " (QAM-64)",  "qam64",  false);
+        //: %1 is the modulation (QAM-64, QAM-128. etc...)
+        addSelection(QCoreApplication::translate("(ModulationSettings)",
+            "Terrestrial %1").arg("(8-VSB)"), "vsb8", true);
+        //: %1 is the modulation (QAM-64, QAM-128. etc...)
+        addSelection(QCoreApplication::translate("(ModulationSettings)",
+            "Cable %1").arg("(QAM-256)"), "qam256", false);
+        addSelection(QCoreApplication::translate("(ModulationSettings)",
+            "Cable %1").arg("(QAM-128)"), "qam128", false);
+        addSelection(QCoreApplication::translate("(ModulationSettings)",
+            "Cable %1").arg("(QAM-64)"), "qam64", false);
 
-        setLabel(QObject::tr("Modulation"));
-        setHelpText(
-            QObject::tr("Modulation, 8-VSB, QAM-256, etc.") + " " +
-            QObject::tr("Most cable systems in the United States use "
-                        "QAM-256 or QAM-64, but some mixed systems "
-                        "may use 8-VSB for over-the-air channels."));
+        setLabel(QCoreApplication::translate("(ModulationSettings)",
+                                             "Modulation"));
+
+        setHelpText(QCoreApplication::translate("(ModulationSettings)", 
+            "Modulation, 8-VSB, QAM-256, etc. Most cable systems in the "
+            "United States use QAM-256 or QAM-64, but some mixed systems "
+            "may use 8-VSB for over-the-air channels."));
     }
 };
 
@@ -56,7 +68,10 @@ class ScanModulationSetting: public ComboBoxSetting
   public:
     ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
-        addSelection(QObject::tr("Auto"),"auto",true);
+        addSelection(QCoreApplication::translate("(Common)",
+                                                 "Auto",
+                                                 "Automatic"), 
+                                                 "auto", true);
         addSelection("QPSK","qpsk");
         addSelection("QAM 16","qam_16");
         addSelection("QAM 32","qam_32");
@@ -71,8 +86,11 @@ class ScanModulation: public ScanModulationSetting, public TransientStorage
   public:
     ScanModulation() : ScanModulationSetting(this)
     {
-        setLabel(QObject::tr("Modulation"));
-        setHelpText(QObject::tr("Modulation (Default: Auto)"));
+        setLabel(QCoreApplication::translate("(ModulationSettings)",
+                                             "Modulation"));
+
+        setHelpText(QCoreApplication::translate("(ModulationSettings)",
+            "Modulation (Default: Auto)"));
     };
 };
 
@@ -82,8 +100,11 @@ class ScanConstellation: public ScanModulationSetting,
   public:
     ScanConstellation() : ScanModulationSetting(this)
     {
-        setLabel(QObject::tr("Constellation"));
-        setHelpText(QObject::tr("Constellation (Default: Auto)"));
+        setLabel(QCoreApplication::translate("(ModulationSettings)",
+                                             "Constellation"));
+
+        setHelpText(QCoreApplication::translate("(ModulationSettings)",
+            "Constellation (Default: Auto)"));
     };
 };
 
@@ -97,12 +118,13 @@ class ScanDVBSModulation: public ComboBoxSetting, public TransientStorage
         addSelection("8PSK",  "8psk");
         addSelection("QAM 16","qam_16");
 
-        setLabel(QObject::tr("Modulation"));
-        setHelpText(
-            QObject::tr("Modulation, QPSK, 8PSK, QAM-16") + " " +
-            QObject::tr("Most DVB-S transponders use QPSK, while "
-                        "DVB-S2 use 8PSK. QAM-16 is not available "
-                        "for DVB-S2 transports."));
+        setLabel(QCoreApplication::translate("(ModulationSettings)",
+                                             "Modulation"));
+
+        setHelpText(QCoreApplication::translate("(ModulationSettings)", 
+            "Modulation, QPSK, 8PSK, QAM-16. Most DVB-S transponders use QPSK, "
+            "while DVB-S2 use 8PSK. QAM-16 is not available for DVB-S2 "
+            "transports."));
     }
 };
 

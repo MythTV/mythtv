@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<mythuitheme>
+
+    <window name="browser">
+
+        <button name="back" from="basebutton">
+            <area>20,10,44,44</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/left_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/left_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/left_arrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state name="pushed">
+                    <imagetype name="icon">
+                        <area>7,7,32,32</area>
+                        <filename>ui/left_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="forward" from="basebutton">
+            <area>70,10,44,44</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/right_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/right_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/right_arrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state name="pushed">
+                    <imagetype name="icon">
+                        <area>7,7,32,32</area>
+                        <filename>ui/right_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <buttonlist name="pagelist" from="baseselector">
+            <area>120,10,1090,44</area>
+            <buttonarea>0,0,1065,44</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,44</area>
+                    <imagetype name="favicon">
+                        <area>6,6,32,32</area>
+                    </imagetype>
+                    <statetype name="loadingstate">
+                        <position>9,9</position>
+                        <state name="loading">
+                            <imagetype name="animation">
+                                <position>0,0</position>
+                                <filepattern low="1" high="8">mb_loading_%1.png</filepattern>
+                                <delay>160</delay>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext">
+                        <area>40,2,100%-10,40</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="background" from="baseinactivewidgetshape" />
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>100%-20,2</position>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>100%-20,22</position>
+            </statetype>
+        </buttonlist>
+
+        <button name="exit" from="basebutton">
+            <area>1215,10,44,44</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/up_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/up_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled">
+                    <imagetype name="icon">
+                        <area>6,6,32,32</area>
+                        <filename>ui/up_arrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state name="pushed">
+                    <imagetype name="icon">
+                        <area>7,7,32,32</area>
+                        <filename>ui/up_arrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <webbrowser name="webbrowser">
+            <area>20,55,1240,600</area>
+            <zoom>1.4</zoom>
+        </webbrowser>
+
+        <!-- these are optional -->
+        <progressbar name="progressbar" from="baseprogressbar">
+            <area>260,670,760,40</area>
+            <imagetype name="background">
+                <area>0,0,100%,100%</area>
+                <filename>mb_progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,100%</area>
+                <filename>mb_progressbar_fill.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="status" from="basetextarea">
+            <area>270,670,740,38</area>
+            <align>left,vcenter</align>
+        </textarea>
+    </window>
+
+    <window name="bookmarkmanager">
+        <textarea name="title" from="basetextarea">
+            <area>0,10,1280,38</area>
+            <align>allcenter</align>
+            <value>Bookmark Manager</value>
+            <font>baselarge</font>
+        </textarea>
+
+        <shape name="topbackground">
+            <area>25,75,1230,110</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <textarea name="categorylabel">
+            <area>90,90,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Category</value>
+        </textarea>
+
+        <buttonlist name="grouplist">
+            <area>70,130,1250,30</area>
+            <layout>horizontal</layout>
+            <spacing>6</spacing>
+            <buttonarea>15,0,1220,40</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,180,40</area>
+                <state name="active">
+                    <area>0,0,180,40</area>
+                    <shape name="background" from="basewidgetshape" />
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,180,40</area>
+                        <font>basesmall</font>
+                        <font state="error">basesmallred</font>
+                        <font state="warning">basesmallyellow</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="background" from="baseinactivewidgetshape" />
+                   <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1130,10</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-rtarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-rtarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,10</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-ltarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-ltarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="label">
+            <area>40,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>[x]</value>
+        </textarea>
+
+        <textarea name="namelabel" from="label">
+            <area>80,200,130,30</area>
+            <value>Name</value>
+        </textarea>
+
+        <textarea name="urllabel" from="label">
+            <area>435,200,130,30</area>
+            <value>URL</value>
+        </textarea>
+
+        <shape name="bottombackground">
+            <area>25,240,1230,450</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+
+        <buttonlist name="bookmarklist" from="basebuttonlist2">
+            <area>40,260,1200,420</area>
+            <spacing>4</spacing>
+            <layout>vertical</layout>
+            <showarrow>no</showarrow>
+            <buttonarea>0,0,1180,420</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <statetype name="buttoncheck">
+                        <position>5,5</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="name">
+                        <area>40,0,350,30</area>
+                        <font>basesmall</font>
+                        <align>left,top</align>
+                    </textarea>
+                    <textarea name="url">
+                        <area>395,0,515,30</area>
+                        <align>left,top</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="selectbar">
+                        <area>30,0,1130,30</area>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>30,0,1130,30</area>
+                    </shape>
+                    <textarea name="name">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                    <textarea name="url">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1170,5</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1170,390</position>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="messagetext" from="basetextarea">
+            <font>basemedium</font>
+            <area>40,230,720,290</area>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
+    <window name="bookmarkeditor">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,1280,50</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="categorylabel" from="basetextarea">
+            <area>180,150,200,30</area>
+            <align>right,vcenter</align>
+            <value>Category:</value>
+        </textarea>
+
+        <textedit name="category" from="basetextedit">
+            <position>395,140</position>
+        </textedit>
+
+        <button name="findcategory" from="basebutton">
+            <position>790,145</position>
+            <value>Find...</value>
+        </button>
+
+        <textarea name="namelabel" from="basetextarea">
+            <area>180,250,200,30</area>
+            <align>right,vcenter</align>
+            <value>Name:</value>
+        </textarea>
+
+        <textedit name="name" from="basetextedit">
+            <position>395,240</position>
+        </textedit>
+
+        <textarea name="urllabel" from="basetextarea">
+            <area>180,350,200,30</area>
+            <align>right,vcenter</align>
+            <value>URL:</value>
+        </textarea>
+
+        <textedit name="url" from="basetextedit">
+            <position>395,340</position>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <position>395,480</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>620,480</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
+    <window name="browserconfig">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,1280,50</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="commandlabel" from="basetextarea">
+            <area>130,150,300,30</area>
+            <align>right,vcenter</align>
+            <value>Browser Command:</value>
+        </textarea>
+
+        <textedit name="command" from="basetextedit">
+            <position>445,140</position>
+        </textedit>
+
+        <textarea name="zoomlabel" from="commandlabel">
+            <position>130,250</position>
+            <align>right,vcenter</align>
+            <value>Text Size:</value>
+        </textarea>
+
+        <textedit name="zoom" from="basetextedit">
+            <position>445,240</position>
+        </textedit>
+
+        <textarea name="pluginlabel" from="commandlabel">
+           <position>130,350</position>
+            <value>Enable plugins:</value>
+        </textarea>
+
+        <checkbox name="enablepluginscheck" from="basecheckbox">
+            <position>445,350</position>
+        </checkbox>
+
+        <shape name="background">
+            <area>200,420,800,140</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="70" />
+            <cornerradius>8</cornerradius>
+        </shape>
+
+        <textarea name="description" from="basetextarea">
+            <area>210,430,780,120</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>260,610</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>790,610</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
+</mythuitheme>

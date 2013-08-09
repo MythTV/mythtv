@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.32" );
+    Q_CLASSINFO( "version"    , "1.33" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
 
     public:
@@ -130,8 +130,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                                   int              SampleRate ) = 0;
 
         virtual DTC::LiveStreamInfo     *GetLiveStream            ( int Id ) = 0;
-        virtual DTC::LiveStreamInfoList *GetLiveStreamList        ( void ) = 0;
-        virtual DTC::LiveStreamInfoList *GetFilteredLiveStreamList( const QString &FileName ) = 0;
+        virtual DTC::LiveStreamInfoList *GetLiveStreamList        ( const QString &FileName ) = 0;
 
         virtual DTC::LiveStreamInfo     *StopLiveStream         ( int Id ) = 0;
         virtual bool                     RemoveLiveStream       ( int Id ) = 0;

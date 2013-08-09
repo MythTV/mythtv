@@ -441,7 +441,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         if (inpixfmt == FMT_NONE)
             inpixfmt = FmtList.front()->in;
         if (outpixfmt == FMT_NONE)
-            inpixfmt = FmtList.back()->out;
+            outpixfmt = FmtList.back()->out;
         width = postfilt_width;
         height = postfilt_height;
     }

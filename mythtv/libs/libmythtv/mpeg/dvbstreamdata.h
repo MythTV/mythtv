@@ -30,6 +30,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
                   int desired_program, int cardnum, bool cacheTables = false);
     virtual ~DVBStreamData();
 
+    using MPEGStreamData::Reset;
     void Reset(void) { Reset(0, 0, -1); }
     void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
 

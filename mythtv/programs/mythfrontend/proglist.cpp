@@ -260,6 +260,8 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             ShowDeleteItemMenu();
         else if (action == "UPCOMING")
             ShowUpcoming();
+        else if (action == "PREVRECORDED")
+            ShowPrevious();
         else if (action == "DETAILS" || action == "INFO")
             ShowDetails();
         else if (action == "GUIDE")
@@ -331,7 +333,10 @@ void ProgLister::ShowMenu(void)
     menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
     menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
     menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
-    menu->AddItem(tr("Upcoming"),        SLOT(ShowUpcoming()));
+    if (m_type != plTitle)
+        menu->AddItem(tr("Upcoming"),        SLOT(ShowUpcoming()));
+    if (m_type != plPreviouslyRecorded)
+        menu->AddItem(tr("Previously Recorded"),SLOT(ShowPrevious()));
     menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
 
     ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
@@ -792,8 +797,7 @@ void ProgLister::ShowGuide(void)
     if (pi)
     {
         GuideGrid::RunProgramGuide(pi->GetChanID(), pi->GetChanNum(),
-                                   pi->GetScheduledStartTime(),
-                                   NULL, this, -2);
+                                   pi->GetScheduledStartTime());
     }
 }
 
@@ -802,6 +806,13 @@ void ProgLister::ShowUpcoming(void)
     ProgramInfo *pi = GetCurrent();
     if (pi && m_type != plTitle)
         ScheduleCommon::ShowUpcoming(pi);
+}
+
+void ProgLister::ShowPrevious(void)
+{
+    ProgramInfo *pi = GetCurrent();
+    if (pi && m_type != plPreviouslyRecorded)
+        ScheduleCommon::ShowPrevious(pi);
 }
 
 void ProgLister::FillViewList(const QString &view)
@@ -1193,7 +1204,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         {
             where += "  AND ( ";
             where += "    ( program.originalairdate = DATE(";
-            where += "        CONVERT_TZ(program.starttime, 'UTC', 'SYSTEM'))";
+            where += "        CONVERT_TZ(program.starttime, 'Etc/UTC', 'SYSTEM'))";
             where += "      AND (program.category = 'Special' ";
             where += "        OR program.programid LIKE 'EP%0001')) ";
             where += "    OR (program.category_type='movie' ";

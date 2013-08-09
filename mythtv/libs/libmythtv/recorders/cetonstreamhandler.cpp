@@ -108,8 +108,13 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref)
 CetonStreamHandler::CetonStreamHandler(const QString &device) :
     IPTVStreamHandler(IPTVTuningData(
                           "", 0, IPTVTuningData::kNone, "", 0, "", 0)),
+    _card(0),
+    _tuner(0),
+    _using_cablecard(false),
     _connected(false),
-    _valid(false)
+    _valid(false),
+    _last_frequency(0),
+    _last_program(0)
 {
     setObjectName("CetonStreamHandler");
 

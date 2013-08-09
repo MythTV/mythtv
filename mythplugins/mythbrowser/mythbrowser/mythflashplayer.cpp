@@ -28,6 +28,7 @@ MythFlashPlayer::MythFlashPlayer(MythScreenStack *parent,
     m_jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
     GetMythMainWindow()->PauseIdleTimer(true);
+    GetMythUI()->DisableScreensaver();
 }
 
 
@@ -42,11 +43,13 @@ MythFlashPlayer::~MythFlashPlayer()
         m_browser = NULL;
     }
     GetMythMainWindow()->PauseIdleTimer(false);
+    GetMythUI()->RestoreScreensaver();
 }
 
 bool MythFlashPlayer::Create(void)
 {
-    m_browser = new MythUIWebBrowser(this, "mythflashplayer");
+    if (!m_browser)
+        m_browser = new MythUIWebBrowser(this, "mythflashplayer");
     m_browser->SetArea(GetMythMainWindow()->GetUIScreenRect());
     m_browser->Init();
     m_browser->SetActive(true);
@@ -65,7 +68,7 @@ bool MythFlashPlayer::Create(void)
 
 QVariant MythFlashPlayer::evaluateJavaScript(const QString& source)
 {
-    return m_browser->evaluateJavaScript(source);
+    return (m_browser ? m_browser->evaluateJavaScript(source) : QVariant());
 }
 
 bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
@@ -101,7 +104,8 @@ bool MythFlashPlayer::keyPressEvent(QKeyEvent *event)
             return true;
     }
 
-    handled = m_browser->keyPressEvent(event);
+    if (m_browser)
+        handled = m_browser->keyPressEvent(event);
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;

@@ -27,60 +27,57 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Oppdatert</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Ukjent</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Laster ned media...</translation>
+        <translation type="obsolete">Laster ned media...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
         <translation>Administrer matinger</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
         <translation>Legg til mating</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
         <translation>Rediger mating</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
         <translation>Slett mating</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="674"/>
         <source>Options</source>
         <translation>Innstillinger</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Du har ikke konfigurert MythNews for noen nyhetssteder.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Ingen nettleser er satt! MythBrowser må være installert for at MythNews skal virke.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 av %2 (%3 prosent)</translation>
+        <translation type="obsolete">%1 av %2 (%3 prosent)</translation>
     </message>
 </context>
 <context>
@@ -213,37 +210,84 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Kanal:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Nyheter</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation>Du har ikke spesifisert noen nyhetssteder.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Rediger nyheter</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>Nyhetsinnstillinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Tilgjengelige kategorier</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Tilgjengelige steder</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="27"/>
+        <source>News Feeds</source>
+        <oldsource>NEWS</oldsource>
+        <translation>Nyhetsmatinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
         <source>NEWS</source>
         <translation>NYHETER</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Choose which news channels interest you</source>
         <translation>Velg hvilke nyhetskanaler som interesserer deg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Name site:</source>
         <translation>Navn for nettsted:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
-        <source>Site icon:</source>
-        <translation>Ikon for nettsted:</translation>
+        <source>Web Site</source>
+        <oldsource>Site icon:</oldsource>
+        <translation>Nettsted</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="37"/>
+        <source>Site icon:</source>
+        <translation>Stedsikon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
         <source>URL site:</source>
         <translation>URL for nettsted:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Save</source>
         <translation>Lagre</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="40"/>
         <source>News settings</source>
         <translation>Innstillinger for nyhetssted</translation>
     </message>
@@ -268,24 +312,19 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Velg hvilke nyhetssiter du vil lese.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Rediger RSS nyhetsmating</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Kontekster</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Aksjoner</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="20"/>
-        <source>News Feeds</source>
-        <translation>Nyhetsmatinger</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -298,19 +337,14 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
         <translation>Innstillinger for nyhetssted</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Kategori</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="23"/>
-        <source>Web Site</source>
-        <translation>Nettsted</translation>
     </message>
 </context>
 </TS>

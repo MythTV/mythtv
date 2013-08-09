@@ -132,6 +132,8 @@ UIType::UIType(const QString &name)
     screen_area = QRect(0,0,0,0);
     drawFontShadow = true;
     hidden = false;
+    m_wmult = 0.0;
+    m_hmult = 0.0;
 }
 
 void UIType::SetOrder(int order)

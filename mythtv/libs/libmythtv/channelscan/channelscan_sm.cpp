@@ -910,7 +910,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         QString msg_tr  = "";
         QString msg     = "";
 
-        if (currentInfo && !currentInfo->IsEmpty())
+        if (!currentInfo->IsEmpty())
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Adding %1, offset %2 to channelList.")

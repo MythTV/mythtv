@@ -110,13 +110,13 @@ ImageView::ImageView(const ThumbList &itemList,
     if (slideShow > 1)
     {
         m_slideshow_sequence = new SequenceShuffle(m_itemList.size());
-        m_slideshow_mode = "Random Slideshow";
+        m_slideshow_mode = QT_TR_NOOP("Random Slideshow");
         m_pos = 0;
     }
     else
     {
         m_slideshow_sequence = new SequenceInc(m_itemList.size());
-        m_slideshow_mode = "Slideshow";
+        m_slideshow_mode = QT_TR_NOOP("Slideshow");
     }
 
     m_pos = m_slideshow_sequence->index(m_pos);
@@ -175,7 +175,7 @@ void ImageView::UpdateLCD(const ThumbItem *item)
 QString ImageView::GetDescriptionStatus(void) const
 {
     if (m_slideshow_running)
-        return " [" + QObject::tr(m_slideshow_mode) + "]";
+        return " [" + tr(m_slideshow_mode) + "]";
 
     return "";
 }

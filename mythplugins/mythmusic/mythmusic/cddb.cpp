@@ -12,12 +12,7 @@
 #include <mythversion.h>
 #include <mythlogging.h>
 #include <mythcontext.h>
-#ifdef USING_HTTPCOMMS
-#error httpcomms is no longer supported
-#include <httpcomms.h>
-#else
 #include "mythdownloadmanager.h"
-#endif
 
 /*
  * CDDB protocol docs:
@@ -30,8 +25,8 @@ const int CDROM_LEADOUT_TRACK = 0xaa;
 const int CD_FRAMES_PER_SEC = 75;
 const int SECS_PER_MIN = 60;
 
-static const char URL[] = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
-//static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
+//static const char URL[] = "http://freedb.freedb.org/~cddb/cddb.cgi?cmd=";
+static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
 static const QString& helloID();
 
 namespace {
@@ -119,24 +114,22 @@ bool Cddb::Query(Matches& res, const Toc& toc)
 
     // Construct query
     // cddb query discid ntrks off1 off2 ... nsecs
-    QString URL2 = URL +
-        QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
+    QString URL2 = URL + QString("cddb+query+%1+%2+").arg(discID,0,16).arg(totalTracks);
+
     for (unsigned t = 0; t < totalTracks; ++t)
         URL2 += QString("%1+").arg(msf2lsn(toc[t]));
+
     URL2 += QString::number(secs);
 
     // Send the request
     URL2 += "&hello=" + helloID() + "&proto=5";
     LOG(VB_MEDIA, LOG_INFO, "CDDB lookup: " + URL2);
-#ifdef USING_HTTPCOMMS
-    QString cddb = HttpComms::getHttp(URL2);
-#else
+
     QString cddb;
-    { QByteArray data;
+    QByteArray data;
     if (!GetMythDownloadManager()->download(URL2, &data))
         return false;
-    cddb = data; }
-#endif
+    cddb = data;
 
     // Check returned status
     const uint stat = cddb.left(3).toUInt(); // Extract 3 digit status:
@@ -204,23 +197,20 @@ bool Cddb::Query(Matches& res, const Toc& toc)
 // static
 bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
 {
-     // Is it cached?
+    // Is it cached?
     if (Dbase::Search(album, genre.toLower(), discID))
         return true;
 
-   // Lookup the details...
+    // Lookup the details...
     QString URL2 = URL + QString("cddb+read+") + genre.toLower() +
         QString("+%1").arg(discID,0,16) + "&hello=" + helloID() + "&proto=5";
     LOG(VB_MEDIA, LOG_INFO, "CDDB read: " + URL2);
-#ifdef USING_HTTPCOMMS
-    QString cddb = HttpComms::getHttp(URL2);
-#else
+
     QString cddb;
-    { QByteArray data;
+    QByteArray data;
     if (!GetMythDownloadManager()->download(URL2, &data))
         return false;
-    cddb = data; }
-#endif
+    cddb = data;
 
     // Check returned status
     const uint stat = cddb.left(3).toUInt(); // Get 3 digit status:
@@ -238,7 +228,7 @@ bool Cddb::Read(Album& album, const QString& genre, discid_t discID)
     }
 
     album = cddb;
-    album.genre = cddb.section(' ', 0, 0);
+    album.discGenre = genre;
     album.discID = discID;
 
     // Success - add to cache
@@ -302,10 +292,11 @@ void Cddb::Alias(const Album& album, discid_t discID)
  */
 Cddb::Album& Cddb::Album::operator =(const QString& rhs)
 {
-    genre.clear();
+    discGenre.clear();
     discID = 0;
     artist.clear();
     title.clear();
+    genre.clear();
     year = 0;
     submitter = "MythTV " MYTH_BINARY_VERSION;
     rev = 1;
@@ -317,7 +308,7 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
 
     enum { kNorm, kToc } eState = kNorm;
 
-    QString cddb = rhs;
+    QString cddb = QString::fromUtf8(rhs.toAscii().constData());
     while (!cddb.isEmpty())
     {
         // Lines should be of the form "FIELD=value\r\n"
@@ -375,9 +366,9 @@ Cddb::Album& Cddb::Album::operator =(const QString& rhs)
             if (line.startsWith("DISCID="))
             {
                 bool isValid = false;
-                ulong discID = value.toULong(&isValid,16);
+                ulong discID2 = value.toULong(&isValid,16);
                 if (isValid)
-                    discID = discID;
+                    discID = discID2;
             }
             else if (line.startsWith("DTITLE="))
             {
@@ -462,7 +453,7 @@ Cddb::Album::operator QString() const
     ret += "DISCID=" + QString::number(discID,16) + '\n';
     ret += "DTITLE=" + artist.toUtf8() + " / " + title + '\n';
     ret += "DYEAR=" + (year ? QString::number(year) : "")+ '\n';
-    ret += "DGENRE=" + genre.toLower().toUtf8() + '\n';
+    ret += "DGENRE=" + genre.toUtf8() + '\n';
     for (int t = 0; t < tracks.size(); ++t)
         ret += "TTITLE" + QString::number(t) + "=" +
             tracks[t].title.toUtf8() + '\n';
@@ -501,7 +492,7 @@ bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text))
                 {
                     Cddb::Album a = QTextStream(&file).readAll();
-                    a.genre = genre;
+                    a.discGenre = genre;
                     a.discID = discID;
                     LOG(VB_MEDIA, LOG_INFO, QString("LocalCDDB found %1 in ").
                         arg(discID,0,16) + genre + " : " +
@@ -522,12 +513,12 @@ bool Dbase::Search(Cddb::Album& a, const QString& genre, const Cddb::discid_t di
 {
     if (CacheGet(a, genre, discID))
         return true;
-    
+
     QFile file(GetDB() + '/' + genre.toLower() + '/' + QString::number(discID,16));
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         a = QTextStream(&file).readAll();
-        a.genre = genre.toLower();
+        a.discGenre = genre.toLower();
         a.discID = discID;
         LOG(VB_MEDIA, LOG_INFO, QString("LocalCDDB matched %1 ").arg(discID,0,16) +
             genre + " to " + a.artist + " / " + a.title);
@@ -544,8 +535,8 @@ bool Dbase::Write(const Cddb::Album& album)
 {
     CachePut(album);
 
-    const QString genre = !album.genre.isEmpty() ?
-        album.genre.toLower().toUtf8() : "misc";
+    const QString genre = !album.discGenre.isEmpty() ?
+        album.discGenre.toLower().toUtf8() : "misc";
 
     LOG(VB_MEDIA, LOG_INFO, "WriteDB " + genre +
         QString(" %1 ").arg(album.discID,0,16) +
@@ -600,10 +591,10 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
             ret = true;
             res.discID = discID;
             LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CacheGet found %1 ").
-                arg(discID,0,16) + it->genre + " " + it->artist + " / " + it->title);
+                arg(discID,0,16) + it->discGenre + " " + it->artist + " / " + it->title);
 
             // If it's marker for 'no match' then genre is empty
-            if (!it->genre.isEmpty())
+            if (!it->discGenre.isEmpty())
                 res.matches.push_back(Cddb::Match(*it));
         }
     }
@@ -614,7 +605,7 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
 bool Dbase::CacheGet(Cddb::Album& album, const QString& genre, const Cddb::discid_t discID)
 {
     const Cddb::Album& a = s_cache[ discID];
-    if (a.discID && a.genre == genre)
+    if (a.discID && a.discGenre == genre)
     {
         album = a;
         return true;

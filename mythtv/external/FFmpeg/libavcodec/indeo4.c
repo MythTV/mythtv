@@ -30,7 +30,6 @@
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
-#include "dsputil.h"
 #include "ivi_dsp.h"
 #include "ivi_common.h"
 #include "indeo4data.h"
@@ -385,6 +384,10 @@ static int decode_band_hdr(IVI45DecContext *ctx, IVIBandDesc *band,
         }
         if (band->scan_size != band->blk_size) {
             av_log(avctx, AV_LOG_ERROR, "mismatching scan table!\n");
+            return AVERROR_INVALIDDATA;
+        }
+        if (band->transform_size == 8 && band->blk_size < 8) {
+            av_log(avctx, AV_LOG_ERROR, "mismatching transform_size!\n");
             return AVERROR_INVALIDDATA;
         }
 

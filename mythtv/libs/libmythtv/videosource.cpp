@@ -41,7 +41,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythlogging.h"
 #include "libmythupnp/httprequest.h"    // for TestMimeType()
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #ifdef USING_DVB
@@ -135,7 +135,7 @@ class InstanceCount : public TransSpinBoxSetting
                 "programs on a multiplex, if this is set to a value greater "
                 "than one MythTV can sometimes take advantage of this."));
         uint cnt = parent.GetInstanceCount();
-        cnt = (!cnt) ? kDefaultMultirecCount : ((cnt < 1) ? 1 : cnt);
+        cnt = (!cnt) ? kDefaultMultirecCount : cnt;
         setValue(cnt);
     };
 };
@@ -567,8 +567,8 @@ void XMLTVConfig::Load(void)
     QStringList args;
     args += "baseline";
 
-    MythSystem find_grabber_proc("tv_find_grabbers", args, 
-                                 kMSStdOut | kMSBuffered | kMSRunShell);
+    MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
+                                 kMSStdOut | kMSRunShell);
     find_grabber_proc.Run(25);
     LOG(VB_GENERAL, LOG_INFO,
         loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
@@ -942,8 +942,8 @@ class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
         setValue(value);
         setHelpText(QObject::tr(
                         "Maximum time (in milliseconds) MythTV waits for "
-                        "a channel lock when scanning for channels during setup, or for "
-                        "issuing a warning in Live TV mode."));
+                        "a channel lock.  For recordings, this value will "
+                        "be doubled."));
     };
 };
 
@@ -1464,9 +1464,9 @@ void HDHomeRunDeviceIDList::fillSelections(const QString &cur)
     QString sel = man_addr;
     devs.push_back(sel);
 
-    if (3 == devs.size() && current.left(8).toUpper() == "FFFFFFFF")
+    if (3 == devs.size() && current.startsWith("FFFFFFFF", Qt::CaseInsensitive))
     {
-        current = sel = (current.right(1) == "0") ?
+        current = sel = (current.endsWith("0")) ?
             *(devs.begin()) : *(++devs.begin());
     }
     else
@@ -1564,7 +1564,7 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
     {
         setUseLabel(false);
         addChild(new IPTVHost(parent));
-        addChild(new ChannelTimeout(parent, 3000, 1750));
+        addChild(new ChannelTimeout(parent, 30000, 1750));
         addChild(new EmptyAudioDevice(parent));
         addChild(new EmptyVBIDevice(parent));
     };
@@ -2216,7 +2216,7 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     addChild(new EmptyVBIDevice(parent));
     addChild(cardinfo);
     addChild(audioinput);
-    addChild(new ChannelTimeout(parent, 12000, 2000));
+    addChild(new ChannelTimeout(parent, 15000, 2000));
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
@@ -2252,7 +2252,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
-    
+
 #ifdef USING_DVB
     addTarget("DVB",       new DVBConfigurationGroup(parent));
 #endif // USING_DVB
@@ -2278,14 +2278,14 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
-    
+
 #ifdef USING_V4L2
     addTarget("V4L",       new V4LConfigurationGroup(parent));
 # ifdef USING_IVTV
     addTarget("MPEG",      new MPEGConfigurationGroup(parent));
 # endif // USING_IVTV
 #endif // USING_V4L2
-    
+
 #ifdef USING_ASI
     addTarget("ASI",       new ASIConfigurationGroup(parent));
 #endif // USING_ASI
@@ -2470,7 +2470,7 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("HDHomeRun networked tuner"), "HDHOMERUN");
 #endif // USING_HDHOMERUN
-    
+
 #ifdef USING_FIREWIRE
     setting->addSelection(
         QObject::tr("FireWire cable box"), "FIREWIRE");
@@ -3066,7 +3066,7 @@ void CardInput::channelScanner(void)
     QString cardtype = CardUtil::GetRawCardType(crdid);
     if (CardUtil::IsUnscanable(cardtype))
     {
-        LOG(VB_GENERAL, LOG_ERR, 
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Sorry, %1 cards do not yet support scanning.")
                 .arg(cardtype));
         return;
@@ -3538,19 +3538,19 @@ static QString remove_chaff(const QString &name)
 {
     // Trim off some of the chaff.
     QString short_name = name;
-    if (short_name.left(14) == "LG Electronics")
+    if (short_name.startsWith("LG Electronics"))
         short_name = short_name.right(short_name.length() - 15);
-    if (short_name.left(4) == "Oren")
+    if (short_name.startsWith("Oren"))
         short_name = short_name.right(short_name.length() - 5);
-    if (short_name.left(8) == "Nextwave")
+    if (short_name.startsWith("Nextwave"))
         short_name = short_name.right(short_name.length() - 9);
-    if (short_name.right(8).toLower() == "frontend")
+    if (short_name.startsWith("frontend", Qt::CaseInsensitive))
         short_name = short_name.left(short_name.length() - 9);
-    if (short_name.right(7) == "VSB/QAM")
+    if (short_name.endsWith("VSB/QAM"))
         short_name = short_name.left(short_name.length() - 8);
-    if (short_name.right(3) == "VSB")
+    if (short_name.endsWith("VSB"))
         short_name = short_name.left(short_name.length() - 4);
-    if (short_name.right(5) == "DVB-T")
+    if (short_name.endsWith("DVB-T"))
         short_name = short_name.left(short_name.length() - 6);
 
     // It would be infinitely better if DVB allowed us to query
@@ -3558,19 +3558,19 @@ static QString remove_chaff(const QString &name)
     // demodulator name. This means cards like the Air2PC HD5000
     // and DViCO Fusion HDTV cards are not identified correctly.
     short_name = short_name.simplified();
-    if (short_name.left(7).toLower() == "or51211")
+    if (short_name.startsWith("or51211", Qt::CaseInsensitive))
         short_name = "pcHDTV HD-2000";
-    else if (short_name.left(7).toLower() == "or51132")
+    else if (short_name.startsWith("or51132", Qt::CaseInsensitive))
         short_name = "pcHDTV HD-3000";
-    else if (short_name.left(7).toLower() == "bcm3510")
+    else if (short_name.startsWith("bcm3510", Qt::CaseInsensitive))
         short_name = "Air2PC v1";
-    else if (short_name.left(7).toLower() == "nxt2002")
+    else if (short_name.startsWith("nxt2002", Qt::CaseInsensitive))
         short_name = "Air2PC v2";
-    else if (short_name.left(7).toLower() == "nxt200x")
+    else if (short_name.startsWith("nxt200x", Qt::CaseInsensitive))
         short_name = "Air2PC v2";
-    else if (short_name.left(8).toLower() == "lgdt3302")
+    else if (short_name.startsWith("lgdt3302", Qt::CaseInsensitive))
         short_name = "DViCO HDTV3";
-    else if (short_name.left(8).toLower() == "lgdt3303")
+    else if (short_name.startsWith("lgdt3303", Qt::CaseInsensitive))
         short_name = "DViCO v2 or Air2PC v3 or pcHDTV HD-5500";
 
     return short_name;
@@ -3655,9 +3655,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 #if 0 // frontends on hybrid DVB-T/Analog cards
             QString short_name = remove_chaff(frontend_name);
             buttonAnalog->setVisible(
-                short_name.left(15).toLower() == "zarlink zl10353" ||
-                short_name.toLower() == "wintv hvr 900 m/r: 65008/a1c0" ||
-                short_name.left(17).toLower() == "philips tda10046h");
+                short_name.startsWith("zarlink zl10353",
+                                      Qt::CaseInsensitive) ||
+                short_name.startsWith("wintv hvr 900 m/r: 65008/a1c0",
+                                      Qt::CaseInsensitive) ||
+                short_name.startsWith("philips tda10046h",
+                                      Qt::CaseInsensitive));
 #endif
         }
         break;
@@ -3681,9 +3684,9 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             if (frontend_name.toLower().indexOf("usb") < 0)
             {
                 buttonAnalog->setVisible(
-                    short_name.left(6).toLower() == "pchdtv" ||
-                    short_name.left(5).toLower() == "dvico" ||
-                    short_name.left(8).toLower() == "nextwave");
+                    short_name.startsWith("pchdtv", Qt::CaseInsensitive) ||
+                    short_name.startsWith("dvico", Qt::CaseInsensitive) ||
+                    short_name.startsWith("nextwave", Qt::CaseInsensitive));
             }
 #endif
         }

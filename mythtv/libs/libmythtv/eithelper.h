@@ -24,7 +24,7 @@ class ATSCEvent
     /// not intended to be used to initialize an ATSC Event.
     /// Since we immediately initialize the value inserted into the
     /// QMap this is safe in that use.
-    ATSCEvent() {}
+    ATSCEvent() : start_time(0), length(0), etm(0), desc_length(0), desc(NULL) {}
     /// This is the only valid constructor for ATSCEvent.
     ATSCEvent(uint a, uint b, uint c, QString d,
               const unsigned char *e, uint f)

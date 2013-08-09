@@ -13,6 +13,7 @@ using namespace std;
 // qt
 #include <QDomDocument>
 #include <QDir>
+#include <QCoreApplication>
 
 // myth
 #include <mythcontext.h>
@@ -20,7 +21,7 @@ using namespace std;
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythdate.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <exitcodes.h>
 #include <mythlogging.h>
 
@@ -76,9 +77,10 @@ QString getTempDirectory(bool showError)
     QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
 
     if (tempDir == "" && showError)
-        ShowOkPopup(QObject::tr("Cannot find the MythArchive work directory.\n"
-                                "Have you set the correct path in the settings?"),
-                                NULL, NULL);
+        ShowOkPopup(QCoreApplication::translate("(ArchiveUtils)", 
+            "Cannot find the MythArchive work directory.\n"
+            "Have you set the correct path in the settings?"),
+            NULL, NULL);
 
     if (tempDir == "")
         return "";

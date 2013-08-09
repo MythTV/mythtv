@@ -127,6 +127,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void customEdit();
     void deleteRule();
     void upcoming();
+    void previous();
     void details();
 
     void Close();
@@ -193,7 +194,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void updateDateText(void);
 
   private:
-    bool  m_selectChangesChannel;
     int   m_selectRecThreshold;
 
     bool m_allowFinder;

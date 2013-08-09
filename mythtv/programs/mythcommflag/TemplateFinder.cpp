@@ -15,7 +15,7 @@
 #include "mythcorecontext.h"    /* gContext */
 #include "frame.h"          /* VideoFrame */
 #include "mythdate.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 // Commercial Flagging headers
@@ -744,12 +744,6 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     sampleTime = min(proglen / 2, 20 * 60);
 
     const float fps = player->GetFrameRate();
-
-    if (samplesNeeded > UINT_MAX)
-    {
-        /* Max value of "scores" data type */
-        samplesNeeded = UINT_MAX;
-    }
 
     frameInterval = (int)roundf(sampleTime * fps / samplesNeeded);
     endFrame = 0 + frameInterval * samplesNeeded - 1;

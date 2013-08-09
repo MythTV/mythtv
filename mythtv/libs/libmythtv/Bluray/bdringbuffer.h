@@ -3,9 +3,11 @@
 
 #define BD_BLOCK_SIZE 6144LL
 
+//Qt headers
 #include <QString>
 #include <QRect>
 #include <QHash>
+#include <QCoreApplication>
 
 // external/libmythbluray
 #include "bluray.h"
@@ -49,6 +51,8 @@ class BDOverlay
 
 class MTV_PUBLIC BDRingBuffer : public RingBuffer
 {
+    Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
+
   public:
     BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();

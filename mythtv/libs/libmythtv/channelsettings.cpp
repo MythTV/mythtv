@@ -1,6 +1,9 @@
+// Qt headers
 #include <QWidget>
 #include <QFile>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "channelsettings.h"
 #include "channelutil.h"
 #include "programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
@@ -42,7 +45,7 @@ class Name : public LineEditSetting, public ChannelDBStorage
     Name(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "name")
     {
-        setLabel(QObject::tr("Channel Name"));
+        setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
     }
 };
 
@@ -52,7 +55,7 @@ class Channum : public LineEditSetting, public ChannelDBStorage
     Channum(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "channum")
     {
-        setLabel(QObject::tr("Channel Number"));
+        setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
     }
 };
 
@@ -63,7 +66,7 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
         ComboBoxSetting(this), ChannelDBStorage(this, id, "sourceid"),
         default_sourceid(_default_sourceid)
     {
-        setLabel(QObject::tr("Video Source"));
+        setLabel(QCoreApplication::translate("(Common)", "Video Source"));
     }
 
     void Load(void)
@@ -81,7 +84,8 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
 
     void fillSelections(void)
     {
-        addSelection(QObject::tr("[Not Selected]"), "0");
+        addSelection(QCoreApplication::translate("(ChannelSettings)",
+                                                 "[Not Selected]"), "0");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT name, sourceid "
@@ -116,20 +120,19 @@ class Callsign : public LineEditSetting, public ChannelDBStorage
     Callsign(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "callsign")
     {
-        setLabel(QObject::tr("Callsign"));
+        setLabel(QCoreApplication::translate("(Common)", "Callsign"));
     }
 };
 
 ChannelTVFormat::ChannelTVFormat(const ChannelID &id) :
     ComboBoxSetting(this), ChannelDBStorage(this, id, "tvformat")
 {
-    setLabel(QObject::tr("TV Format"));
-    setHelpText(
-        QObject::tr(
-            "If this channel uses a format other than TV "
-            "Format in the General Backend Setup screen, set it here."));
+    setLabel(QCoreApplication::translate("(ChannelSettings)", "TV Format"));
+    setHelpText(QCoreApplication::translate("(ChannelSettings)",
+        "If this channel uses a format other than TV Format in the General "
+        "Backend Setup screen, set it here."));
 
-    addSelection(QObject::tr("Default"), "Default");
+    addSelection(QCoreApplication::translate("(Common)", "Default"), "Default");
 
     QStringList list = GetFormats();
     for (int i = 0; i < list.size(); i++)
@@ -165,12 +168,14 @@ class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
         SpinBoxSetting(this, -1440, 1440, 1),
         ChannelDBStorage(this, id, "tmoffset")
     {
-        setLabel(QObject::tr("DataDirect") + " " + QObject::tr("Time Offset"));
-        setHelpText(QObject::tr("Offset (in minutes) to apply to the program "
-                    "guide data during import.  This can be used when the "
-                    "listings for a particular channel are in a different "
-                    "time zone.") + " " +
-                    QObject::tr("(Works for DataDirect listings only.)"));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+                                             "DataDirect Time Offset"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Offset (in minutes) to apply to the program guide data during "
+            "import.  This can be used when the listings for a particular "
+            "channel are in a different time zone. (Works for DataDirect "
+            "listings only.)"));
     }
 };
 
@@ -181,13 +186,13 @@ class Priority : public SpinBoxSetting, public ChannelDBStorage
         SpinBoxSetting(this, -99, 99, 1),
         ChannelDBStorage(this, id, "recpriority")
     {
-        setLabel(QObject::tr("Priority"));
-        setHelpText(
-            QObject::tr("Number of priority points to be added to any "
-                        "recording on this channel during scheduling.")+" "+
-            QObject::tr("Use a positive number as the priority if you "
-                        "want this to be a preferred channel, a "
-                        "negative one to deprecate this channel."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", "Priority"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Number of priority points to be added to any recording on this "
+            "channel during scheduling. Use a positive number as the priority "
+            "if you want this to be a preferred channel, a negative one to "
+            "deprecate this channel."));
     }
 };
 
@@ -197,9 +202,11 @@ class Icon : public LineEditSetting, public ChannelDBStorage
     Icon(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "icon")
     {
-        setLabel(QObject::tr("Icon"));
-        setHelpText(QObject::tr("Image file to use as the icon for this "
-                                "channel on various MythTV displays."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", "Icon"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Image file to use as the icon for this channel on various MythTV "
+            "displays."));
     }
 };
 
@@ -209,10 +216,12 @@ class VideoFilters : public LineEditSetting, public ChannelDBStorage
     VideoFilters(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "videofilters")
     {
-        setLabel(QObject::tr("Video filters"));
-        setHelpText(QObject::tr("Filters to be used when recording "
-                                "from this channel.  Not used with "
-                                "hardware encoding cards."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+                                             "Video filters"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Filters to be used when recording from this channel.  Not used "
+            "with hardware encoding cards."));
 
     }
 };
@@ -224,11 +233,12 @@ class OutputFilters : public LineEditSetting, public ChannelDBStorage
     OutputFilters(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "outputfilters")
     {
-        setLabel(QObject::tr("Playback filters"));
-        setHelpText(QObject::tr("Filters to be used when recordings "
-                                "from this channel are viewed.  "
-                                "Start with a plus to append to the "
-                                "global playback filters."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
+                    "Playback filters"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Filters to be used when recordings from this channel are viewed. "
+            "Start with a plus to append to the global playback filters."));
     }
 };
 
@@ -239,12 +249,13 @@ class XmltvID : public ComboBoxSetting, public ChannelDBStorage
         ComboBoxSetting(this, true), ChannelDBStorage(this, id, "xmltvid"),
         sourceName(_sourceName)
     {
-        setLabel(QObject::tr("XMLTV ID"));
-        setHelpText(QObject::tr(
-                        "ID used by listing services to get an exact "
-                        "correspondance between a channel in your line-up "
-                        "and a channel in their database. Normally this is "
-                        "set automatically when 'mythfilldatabase' is run."));
+        setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+            "ID used by listing services to get an exact correspondance "
+            "between a channel in your line-up and a channel in their "
+            "database. Normally this is set automatically when "
+            "'mythfilldatabase' is run."));
     }
 
     void Load(void)
@@ -295,10 +306,13 @@ class CommMethod : public ComboBoxSetting, public ChannelDBStorage
     CommMethod(const ChannelID &id) :
        ComboBoxSetting(this), ChannelDBStorage(this, id, "commmethod")
     {
-        setLabel(QObject::tr("Commercial Detection Method"));
-        setHelpText(QObject::tr("Changes the method of "
-               "commercial detection used for recordings on this channel or "
-               "skips detection by marking the channel as Commercial Free."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                             "Commercial Detection Method"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Changes the method of commercial detection used for recordings on "
+            "this channel or skips detection by marking the channel as "
+            "Commercial Free."));
 
         deque<int> tmp = GetPreferredSkipTypeCombinations();
         tmp.push_front(COMM_DETECT_UNINIT);
@@ -316,9 +330,11 @@ class Visible : public CheckBoxSetting, public ChannelDBStorage
         CheckBoxSetting(this), ChannelDBStorage(this, id, "visible")
     {
         setValue(true);
-        setLabel(QObject::tr("Visible"));
-        setHelpText(QObject::tr("If enabled, the channel will be visible in the "
-                    "EPG."));
+
+        setLabel(QCoreApplication::translate("(ChannelSettings)", "Visible"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+            "If enabled, the channel will be visible in the EPG."));
     }
 };
 
@@ -328,10 +344,12 @@ class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
     OnAirGuide(const ChannelID &id) :
         CheckBoxSetting(this), ChannelDBStorage(this, id, "useonairguide")
     {
-        setLabel(QObject::tr("Use on air guide"));
-        setHelpText(QObject::tr("If enabled, guide information for this "
-                    "channel will be updated using 'Over-the-Air' "
-                    "program listings."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                             "Use on air guide"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+            "If enabled, guide information for this channel will be updated "
+            "using 'Over-the-Air' program listings."));
     }
 };
 
@@ -345,11 +363,11 @@ class Freqid : public LineEditSetting, public ChannelDBStorage
     Freqid(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "freqid")
     {
-        setLabel(QObject::tr("Frequency")+" "+QObject::tr("or")+" "+
-                 QObject::tr("Channel"));
-        setHelpText(QObject::tr(
-                        "Specify either the exact frequency (in kHz) or "
-                        "a valid channel for your 'TV Format'."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                             "Frequency or Channel"));
+        setHelpText(QCoreApplication::translate("(ChannelSettings)",
+            "Specify either the exact frequency (in kHz) or a valid channel "
+            "for your 'TV Format'."));
     }
 };
 
@@ -360,9 +378,12 @@ class Finetune : public SliderSetting, public ChannelDBStorage
         : SliderSetting(this, -300, 300, 1),
         ChannelDBStorage(this, id, "finetune")
     {
-        setLabel(QObject::tr("Finetune")+" (kHz)");
-        setHelpText(QObject::tr("Value to be added to your desired frequency "
-                                "(in kHz) for 'fine tuning'."));
+        setLabel(QCoreApplication::translate("(ChannelSettings)", 
+                                             "Finetune (kHz)"));
+
+        setHelpText(QCoreApplication::translate("(ChannelSettings)", 
+            "Value to be added to your desired frequency (in kHz) for "
+            "'fine tuning'."));
     }
 };
 
@@ -373,7 +394,7 @@ class Contrast : public SliderSetting, public ChannelDBStorage
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "contrast")
     {
-        setLabel(QObject::tr("Contrast"));
+        setLabel(QCoreApplication::translate("(Common)", "Contrast"));
     }
 };
 
@@ -384,7 +405,7 @@ class Brightness : public SliderSetting, public ChannelDBStorage
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "brightness")
     {
-        setLabel(QObject::tr("Brightness"));
+        setLabel(QCoreApplication::translate("(Common)", "Brightness"));
     }
 };
 
@@ -395,7 +416,7 @@ class Colour : public SliderSetting, public ChannelDBStorage
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "colour")
     {
-        setLabel(QObject::tr("Color"));
+        setLabel(QCoreApplication::translate("(Common)", "Color"));
     }
 };
 
@@ -405,7 +426,7 @@ class Hue : public SliderSetting, public ChannelDBStorage
     Hue(const ChannelID &id) :
         SliderSetting(this, 0, 65535, 655), ChannelDBStorage(this, id, "hue")
     {
-        setLabel(QObject::tr("Hue"));
+        setLabel(QCoreApplication::translate("(Common)", "Hue"));
     }
 };
 
@@ -413,7 +434,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
                                            uint default_sourceid) :
     VerticalConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Channel Options - Common"));
+    setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                         "Channel Options - Common"));
     setUseLabel(false);
 
     addChild(new Name(id));
@@ -516,7 +538,8 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :
     VerticalConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Channel Options - Filters"));
+    setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                         "Channel Options - Filters"));
     setUseLabel(false);
 
     addChild(new VideoFilters(id));
@@ -526,7 +549,8 @@ ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
     VerticalConfigurationGroup(false, true, false, false)
 {
-    setLabel(QObject::tr("Channel Options - Video4Linux"));
+    setLabel(QCoreApplication::translate("(ChannelSettings)",
+                                         "Channel Options - Video4Linux"));
     setUseLabel(false);
 
     addChild(new Freqid(id));
@@ -544,7 +568,9 @@ ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id) :
 ChannelOptionsRawTS::ChannelOptionsRawTS(const ChannelID &id) :
     VerticalConfigurationGroup(false, true, false, false), cid(id)
 {
-    setLabel(QObject::tr("Channel Options - Raw Transport Stream"));
+    setLabel(QCoreApplication::translate("(ChannelSettings)",
+        "Channel Options - Raw Transport Stream"));
+
     setUseLabel(false);
 
     const uint mx = kMaxPIDs;

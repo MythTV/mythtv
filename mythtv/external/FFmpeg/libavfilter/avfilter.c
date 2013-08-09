@@ -222,11 +222,11 @@ int avfilter_config_links(AVFilterContext *filter)
 
     for (i = 0; i < filter->nb_inputs; i ++) {
         AVFilterLink *link = filter->inputs[i];
-        AVFilterLink *inlink = link->src->nb_inputs ?
-            link->src->inputs[0] : NULL;
+        AVFilterLink *inlink;
 
         if (!link) continue;
 
+        inlink = link->src->nb_inputs ? link->src->inputs[0] : NULL;
         link->current_pts = AV_NOPTS_VALUE;
 
         switch (link->init_state) {
@@ -391,7 +391,7 @@ int avfilter_process_command(AVFilterContext *filter, const char *cmd, const cha
     return AVERROR(ENOSYS);
 }
 
-#define MAX_REGISTERED_AVFILTERS_NB 128
+#define MAX_REGISTERED_AVFILTERS_NB 256
 
 static AVFilter *registered_avfilters[MAX_REGISTERED_AVFILTERS_NB + 1];
 
@@ -690,7 +690,7 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFilterBufferRef *frame)
 
         switch (link->type) {
         case AVMEDIA_TYPE_VIDEO:
-            av_image_copy(out->data, out->linesize, frame->data, frame->linesize,
+            av_image_copy(out->data, out->linesize, (const uint8_t **)frame->data, frame->linesize,
                           frame->format, frame->video->w, frame->video->h);
             break;
         case AVMEDIA_TYPE_AUDIO:
@@ -706,7 +706,7 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFilterBufferRef *frame)
     } else
         out = frame;
 
-    while(cmd && cmd->time <= frame->pts * av_q2d(link->time_base)){
+    while(cmd && cmd->time <= out->pts * av_q2d(link->time_base)){
         av_log(link->dst, AV_LOG_DEBUG,
                "Processing command time:%f command:%s arg:%s\n",
                cmd->time, cmd->command, cmd->arg);

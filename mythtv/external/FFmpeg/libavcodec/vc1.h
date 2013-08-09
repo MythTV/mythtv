@@ -24,6 +24,7 @@
 #define AVCODEC_VC1_H
 
 #include "avcodec.h"
+#include "h264chroma.h"
 #include "mpegvideo.h"
 #include "intrax8.h"
 #include "vc1dsp.h"
@@ -181,6 +182,7 @@ enum FrameCodingMode {
 typedef struct VC1Context{
     MpegEncContext s;
     IntraX8Context x8;
+    H264ChromaContext h264chroma;
     VC1DSPContext vc1dsp;
 
     int bits;
@@ -384,7 +386,7 @@ typedef struct VC1Context{
     int bi_type;
     int x8_type;
 
-    DCTELEM (*block)[6][64];
+    int16_t (*block)[6][64];
     int n_allocated_blks, cur_blk_idx, left_blk_idx, topleft_blk_idx, top_blk_idx;
     uint32_t *cbp_base, *cbp;
     uint8_t *is_intra_base, *is_intra;
@@ -452,9 +454,9 @@ int ff_vc1_parse_frame_header    (VC1Context *v, GetBitContext *gb);
 int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext *gb);
 int ff_vc1_init_common(VC1Context *v);
 
-av_cold int  ff_vc1_decode_init_alloc_tables(VC1Context *v);
-av_cold void ff_vc1_init_transposed_scantables(VC1Context *v);
-av_cold int  ff_vc1_decode_end(AVCodecContext *avctx);
+int  ff_vc1_decode_init_alloc_tables(VC1Context *v);
+void ff_vc1_init_transposed_scantables(VC1Context *v);
+int  ff_vc1_decode_end(AVCodecContext *avctx);
 void ff_vc1_decode_blocks(VC1Context *v);
 
 #endif /* AVCODEC_VC1_H */

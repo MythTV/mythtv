@@ -13,7 +13,7 @@
 
 class PlaylistContainer;
 class Playlist;
-class MythSystem;
+class MythSystemLegacy;
 
 enum InsertPLOption
 {
@@ -70,7 +70,7 @@ class Playlist : public QObject
                               bool removeDuplicates,
                               InsertPLOption insertOption,
                               int currentTrackID);
-    QString toRawSonglist(bool shuffled = false);
+    QString toRawSonglist(bool shuffled = false, bool tracksOnly = false);
 
     const SongList &getSongs(void) { return m_shuffledSongs; }
     MusicMetadata* getSongAt(int pos);
@@ -87,6 +87,7 @@ class Playlist : public QObject
 
     void removeTrack(int the_track_id);
     void removeAllTracks(void);
+    void removeAllCDTracks(void);
 
     void copyTracks(Playlist *to_ptr, bool update_display);
 
@@ -128,7 +129,7 @@ class Playlist : public QObject
     bool                  m_changed;
     bool                  m_doSave;
     MythProgressDialog   *m_progress;
-    MythSystem           *m_proc;
+    MythSystemLegacy           *m_proc;
     uint                  m_procExitVal;
 };
 

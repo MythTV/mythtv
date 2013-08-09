@@ -10,7 +10,7 @@ GREP=`which grep`
 TEST_FAILED=0
 
 
-TESTS=`find -name "test_*.pro"`
+TESTS=`find . -name "test_*.pro"`
 
 for TEST in $TESTS
 do

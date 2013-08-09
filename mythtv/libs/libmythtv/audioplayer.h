@@ -4,8 +4,10 @@
 #include <stdint.h>
 #include "audiooutputsettings.h"
 
-class MythPlayer;
-class AudioOutput;
+class  MythPlayer;
+class  AudioOutput;
+struct AVCodecContext;
+struct AVPacket;
 
 namespace MythTV
 {
@@ -14,6 +16,8 @@ namespace MythTV
 
 class MTV_PUBLIC AudioPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(AudioPlayer)
+
   public:
     AudioPlayer(MythPlayer *parent, bool muted);
    ~AudioPlayer();
@@ -65,6 +69,12 @@ class MTV_PUBLIC AudioPlayer
     uint  GetMaxChannels(void);
     int   GetMaxHDRate(void);
     int64_t GetAudioTime(void);
+    AudioFormat GetFormat(void) const { return m_format; }
+    bool CanProcess(AudioFormat fmt);
+    uint32_t CanProcess(void);
+    int   DecodeAudio(AVCodecContext *ctx,
+                      uint8_t *buffer, int &data_size,
+                      const AVPacket *pkt);
 
     bool      IsMuted(void) { return GetMuteState() == kMuteAll; }
     bool      SetMuted(bool mute);
@@ -77,6 +87,11 @@ class MTV_PUBLIC AudioPlayer
     int64_t LengthLastData(void);
     bool GetBufferStatus(uint &fill, uint &total);
     bool IsBufferAlmostFull(void);
+    
+    /**
+     * Return internal AudioOutput object
+     */
+    AudioOutput *GetAudioOutput(void) const { return m_audioOutput; }
 
   private:
     void AddVisuals(void);

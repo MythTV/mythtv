@@ -27,7 +27,7 @@ class RTPDataPacket : public UDPPacket
 {
   public:
     RTPDataPacket(const RTPDataPacket &o) : UDPPacket(o), m_off(o.m_off) { }
-    RTPDataPacket(const UDPPacket &o) : UDPPacket(o) { }
+    RTPDataPacket(const UDPPacket &o) : UDPPacket(o), m_off(0) { }
     RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
     RTPDataPacket(void) : UDPPacket(0ULL), m_off(0) { }
 

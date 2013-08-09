@@ -21,10 +21,12 @@ DEFINES += HAVE_AV_CONFIG_H
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # dvdnav
-HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h dvdnav/remap.h
+HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h dvdnav/remap.h \
+    dvdnav/vm/vm_serialize.h
 HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h
 
-SOURCES += dvdnav/dvdnav.c dvdnav/read_cache.c dvdnav/navigation.c
+SOURCES += dvdnav/dvdnav.c dvdnav/read_cache.c dvdnav/navigation.c \
+    dvdnav/vm/vm_serialize.c
 SOURCES += dvdnav/highlight.c dvdnav/searching.c dvdnav/settings.c
 SOURCES += dvdnav/remap.c dvdnav/vm/decoder.c dvdnav/vm/vm.c
 SOURCES += dvdnav/vm/vmcmd.c
@@ -44,7 +46,7 @@ inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
 inc_dvdread.files = dvdread/dvd_reader.h dvdread/nav_types.h dvdread/ifo_types.h
 inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
 
-INSTALLS += target inc_dvdnav inc_dvdread
+INSTALLS += inc_dvdnav inc_dvdread
 
 
 mingw:DEFINES += STDC_HEADERS

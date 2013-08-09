@@ -231,9 +231,15 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
     skipTime.sprintf("%d:%02d", skipped_seconds / 60,
                      abs(skipped_seconds) % 60);
     if (kCommSkipOn == autocommercialskip)
-        comm_msg = QObject::tr("Skip %1").arg(skipTime);
+    {        
+        //: %1 is the skip time
+        comm_msg = tr("Skip %1").arg(skipTime);
+    }
     else
-        comm_msg = QObject::tr("Commercial: %1").arg(skipTime);
+    {
+        //: %1 is the skip time
+        comm_msg = tr("Commercial: %1").arg(skipTime);
+    }
 
     if (kCommSkipOn == autocommercialskip)
     {
@@ -263,7 +269,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     if ((skipcommercials == (0 - lastCommSkipDirection)) &&
         ((time(NULL) - lastCommSkipTime) <= 5))
     {
-        comm_msg = QObject::tr("Skipping Back.");
+        comm_msg = tr("Skipping Back.");
 
         if (lastCommSkipStart > (2.0 * video_frame_rate))
             lastCommSkipStart -= (long long) (2.0 * video_frame_rate);
@@ -281,7 +287,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     if ((commBreakIter == commBreakMap.begin()) &&
         (skipcommercials < 0))
     {
-        comm_msg = QObject::tr("Start of program.");
+        comm_msg = tr("Start of program.");
         jumpToFrame = 0;
         return true;
     }
@@ -291,7 +297,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
          ((totalFrames) &&
           ((commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
     {
-        comm_msg = QObject::tr("At End, cannot Skip.");
+        comm_msg = tr("At End, cannot Skip.");
         return false;
     }
 
@@ -307,7 +313,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
         {
             if (commBreakIter == commBreakMap.begin())
             {
-                comm_msg = QObject::tr("Start of program.");
+                comm_msg = tr("Start of program.");
                 jumpToFrame = 0;
                 return true;
             }
@@ -335,7 +341,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
                  ((commBreakIter.key() + (10 * video_frame_rate)) >
                                                                 totalFrames)))
             {
-                comm_msg = QObject::tr("At End, cannot Skip.");
+                comm_msg = tr("At End, cannot Skip.");
                 return false;
             }
         }
@@ -352,11 +358,14 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     if ((lastIgnoredManualSkip.secsTo(MythDate::current()) > 3) &&
         (abs(skipped_seconds) >= maxskip))
     {
-        comm_msg = QObject::tr("Too Far %1").arg(skipTime);
+        //: %1 is the skip time
+        comm_msg = tr("Too Far %1").arg(skipTime);
         lastIgnoredManualSkip = MythDate::current();
         return false;
     }
-    comm_msg = QObject::tr("Skip %1").arg(skipTime);
+
+    //: %1 is the skip time
+    comm_msg = tr("Skip %1").arg(skipTime);
 
     uint64_t jumpto = (skipcommercials > 0) ?
         commBreakIter.key() - (long long)(commrewindamount * video_frame_rate):

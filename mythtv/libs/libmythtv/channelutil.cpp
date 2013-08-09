@@ -15,7 +15,6 @@ using namespace std;
 #include "channelutil.h"
 #include "mythdb.h"
 #include "dvbtables.h"
-#include "tv.h" // for CHANNEL_DIRECTION
 
 #define LOC QString("ChanUtil: ")
 
@@ -1361,7 +1360,7 @@ QString ChannelUtil::GetIcon(uint chanid)
 
 QString ChannelUtil::GetUnknownCallsign(void)
 {
-    QString tmp = QObject::tr("UNKNOWN", "Synthesized callsign");
+    QString tmp = tr("UNKNOWN", "Synthesized callsign");
     tmp.detach();
     return tmp;
 }
@@ -2359,7 +2358,7 @@ uint ChannelUtil::GetNextChannel(
     const ChannelInfoList &sorted,
     uint              old_chanid,
     uint              mplexid_restriction,
-    int               direction,
+    ChannelChangeDirection direction,
     bool              skip_non_visible,
     bool              skip_same_channum_and_callsign)
 {
@@ -2379,8 +2378,14 @@ uint ChannelUtil::GetNextChannel(
         do
         {
             if (it == sorted.begin())
+            {
                 it = find(sorted.begin(), sorted.end(),
                           sorted.rbegin()->chanid);
+                if (it == sorted.end())
+                {
+                    --it;
+                }
+            }
             else
                 --it;
         }

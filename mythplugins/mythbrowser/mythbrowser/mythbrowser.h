@@ -5,6 +5,7 @@
 
 #include <mythuiwebbrowser.h>
 #include <mythuibuttonlist.h>
+#include <mythuibutton.h>
 #include <mythscreentype.h>
 #include <mythdialogbox.h>
 #include <mythuiprogressbar.h>
@@ -18,8 +19,7 @@ class MythBrowser : public MythScreenType
   Q_OBJECT
 
   public:
-    MythBrowser(MythScreenStack *parent,
-           QStringList &urlList, float zoom);
+    MythBrowser(MythScreenStack *parent, QStringList &urlList);
     ~MythBrowser();
 
     bool Create(void);
@@ -72,10 +72,12 @@ class MythBrowser : public MythScreenType
     MythUIProgressBar        *m_progressBar;
     MythUIText               *m_titleText;
     MythUIText               *m_statusText;
+    MythUIButton             *m_backButton;
+    MythUIButton             *m_forwardButton;
+    MythUIButton             *m_exitButton;
 
     int       m_currentBrowser;
     QUrl      m_url;
-    float     m_zoom;
     QString   m_defaultSaveDir;
     QString   m_defaultSaveFilename;
 

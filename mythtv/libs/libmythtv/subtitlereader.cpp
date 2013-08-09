@@ -60,10 +60,10 @@ bool SubtitleReader::AddAVSubtitle(const AVSubtitle &subtitle,
     m_AVSubtitles.buffers.push_back(subtitle);
     // in case forced subtitles aren't displayed, avoid leaking by
     // manually clearing the subtitles
-    if (m_AVSubtitles.buffers.size() > 20)
+    if (m_AVSubtitles.buffers.size() > 40)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "SubtitleReader: >20 AVSubtitles queued - clearing.");
+            "SubtitleReader: >40 AVSubtitles queued - clearing.");
         clearsubs = true;
     }
     m_AVSubtitles.lock.unlock();
@@ -97,15 +97,18 @@ void SubtitleReader::FreeAVSubtitle(const AVSubtitle &subtitle)
         av_free(subtitle.rects);
 }
 
-bool SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName)
+void SubtitleReader::LoadExternalSubtitles(const QString &subtitleFileName,
+                                           bool isInProgress)
 {
     m_TextSubtitles.Clear();
-    return TextSubtitleParser::LoadSubtitles(subtitleFileName, m_TextSubtitles);
+    m_TextSubtitles.SetInProgress(isInProgress);
+    TextSubtitleParser::LoadSubtitles(subtitleFileName, m_TextSubtitles,
+                                      false);
 }
 
 bool SubtitleReader::HasTextSubtitles(void)
 {
-    return m_TextSubtitles.GetSubtitleCount() > 0;
+    return m_TextSubtitles.GetSubtitleCount() >= 0;
 }
 
 QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)

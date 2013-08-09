@@ -39,7 +39,7 @@ using namespace std;
 #include <mythuibutton.h>
 #include <mythuiprogressbar.h>
 #include <mythuibuttonlist.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>
@@ -247,7 +247,7 @@ void CDRipperThread::run(void)
 
     if (LCD *lcd = LCD::Get())
     {
-        QString lcd_tots = QObject::tr("Importing ") + tots;
+        QString lcd_tots = tr("Importing %1").arg(tots);
         QList<LCDTextItem> textItems;
         textItems.append(LCDTextItem(1, ALIGN_CENTERED,
                                          lcd_tots, "Generic", false));
@@ -654,7 +654,7 @@ void Ripper::startScanCD(void)
     if (m_scanThread)
         return;
 
-    QString message = QObject::tr("Scanning CD. Please Wait ...");
+    QString message = tr("Scanning CD. Please Wait ...");
     OpenBusyPopup(message);
 
     m_scanThread = new CDScannerThread(this);
@@ -672,7 +672,6 @@ void Ripper::ScanFinished()
     bool isCompilation = false;
     if (m_decoder)
     {
-        QString label;
         MusicMetadata *metadata;
 
         m_artistName.clear();
@@ -1116,7 +1115,6 @@ void Ripper::updateTrackList(void)
     if (m_tracks->isEmpty())
         return;
 
-    QString tmptitle;
     if (m_trackList)
     {
         m_trackList->Reset();
@@ -1294,7 +1292,13 @@ void Ripper::toggleTrackActive(MythUIButtonListItem *item)
     if (m_tracks->isEmpty() || !item)
         return;
 
-    RipTrack *track = m_tracks->at(m_trackList->GetItemPos(item));
+    int pos = m_trackList->GetItemPos(item);
+
+    // sanity check item position
+    if (pos < 0 || pos > m_tracks->count() - 1)
+        return;
+
+    RipTrack *track = m_tracks->at(pos);
 
     if (!track->active && !track->isNew)
     {
@@ -1401,17 +1405,14 @@ void Ripper::customEvent(QEvent* event)
 
 RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
                      QVector<RipTrack*> *tracks, int quality)
-    : MythScreenType(parent, "ripstatus")
+    : MythScreenType(parent, "ripstatus"),
+    m_tracks(tracks),           m_quality(quality),
+    m_CDdevice(device),         m_overallText(NULL),
+    m_trackText(NULL),          m_statusText(NULL),
+    m_overallPctText(NULL),     m_trackPctText(NULL),
+    m_overallProgress(NULL),    m_trackProgress(NULL),
+    m_ripperThread(NULL)
 {
-    m_CDdevice = device;
-    m_tracks = tracks;
-    m_quality = quality;
-    m_ripperThread = NULL;
-
-    m_overallText = m_trackText = m_statusText = m_trackPctText =
-    m_overallPctText = NULL;
-
-    m_overallProgress = m_trackProgress = NULL;
 }
 
 RipStatus::~RipStatus(void)

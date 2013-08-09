@@ -303,8 +303,8 @@ static void return_4096_block(unsigned char* ptr)
             if (ts->PID() == 0x1ffb)
             {
                 LOG(VB_GENERAL, LOG_DEBUG, QString(" tid(0x%1) ext(0x%2)")
-                    .arg(PSIPTable::View(*ts).TableID(),0,16)
-                    .arg(PSIPTable::View(*ts).TableIDExtension(),0,16));
+                    .arg(PSIPTable(*ts).TableID(),0,16)
+                    .arg(PSIPTable(*ts).TableIDExtension(),0,16));
             }
         }
 #endif

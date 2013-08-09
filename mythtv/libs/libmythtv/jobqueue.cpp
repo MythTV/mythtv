@@ -29,7 +29,7 @@ using namespace std;
 
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 
@@ -91,7 +91,7 @@ void JobQueue::customEvent(QEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(9) == "LOCAL_JOB")
+        if (message.startsWith("LOCAL_JOB"))
         {
             // LOCAL_JOB action ID jobID
             // LOCAL_JOB action type chanid recstartts hostname

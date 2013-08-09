@@ -19,7 +19,7 @@
 #include "darwinfirewiredevice.h"
 #endif
 #include "mythlogging.h"
-#include "pespacket.h"
+#include "mpegtables.h"
 
 #define LOC      QString("FireDev(%1): ").arg(guid_to_string(m_guid))
 
@@ -230,12 +230,12 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     // the PACE is obviously not a Motorola channel changer, but the
     // same commands work for it as the Motorola.
-    bool is_mot = ((panel_model.toUpper().left(4) == "DCT-") ||
-                   (panel_model.toUpper().left(4) == "DCH-") ||
-                   (panel_model.toUpper().left(4) == "DCX-") ||
-                   (panel_model.toUpper().left(4) == "QIP-") ||
-                   (panel_model.toUpper().left(4) == "MOTO") ||
-                   (panel_model.toUpper().left(5) == "PACE-"));
+    bool is_mot = ((panel_model.toUpper().startsWith("DCT-")) ||
+                   (panel_model.toUpper().startsWith("DCH-")) ||
+                   (panel_model.toUpper().startsWith("DCX-")) ||
+                   (panel_model.toUpper().startsWith("QIP-")) ||
+                   (panel_model.toUpper().startsWith("MOTO")) ||
+                   (panel_model.toUpper().startsWith("PACE-")));
 
     if (is_mot && !alt_method)
     {
@@ -337,9 +337,9 @@ void FirewireDevice::SetLastChannel(const uint channel)
 void FirewireDevice::ProcessPATPacket(const TSPacket &tspacket)
 {
     if (!tspacket.TransportError() && !tspacket.Scrambled() &&
-        tspacket.HasPayload() && tspacket.PayloadStart() && !tspacket.PID())
+        tspacket.HasPayload() && tspacket.PayloadStart() && (tspacket.PID() == 0))
     {
-        PESPacket pes = PESPacket::View(tspacket);
+        PSIPTable pes(tspacket);
         uint crc = pes.CalcCRC();
         m_buffer_cleared |= (crc != m_last_crc);
         m_last_crc = crc;

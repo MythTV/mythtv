@@ -2,11 +2,14 @@
 #define _LIVETVCHAIN_H_
 
 #include <QString>
+#include <QStringList>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
 
 #include "mythtvexp.h"
+#include "referencecounter.h"
+
 
 class ProgramInfo;
 class MythSocket;
@@ -23,7 +26,7 @@ struct MTV_PUBLIC LiveTVChainEntry
     QString inputname;
 };
 
-class MTV_PUBLIC LiveTVChain
+class MTV_PUBLIC LiveTVChain : public ReferenceCounter
 {
   public:
     LiveTVChain();
@@ -42,7 +45,7 @@ class MTV_PUBLIC LiveTVChain
     void FinishedRecording(ProgramInfo *pginfo);
     void DeleteProgram(ProgramInfo *pginfo);
 
-    void ReloadAll();
+    void ReloadAll(const QStringList &data = QStringList());
 
     // const gets
     QString GetID(void)  const { return m_id; }
@@ -83,6 +86,11 @@ class MTV_PUBLIC LiveTVChain
     void DelHostSocket(MythSocket *sock);
  
     QString toString() const;
+
+    // serialize m_maxpos and m_chain to a stringlist
+    QStringList entriesToStringList() const;
+    // deserialize m_maxpos and m_chain from a stringlist
+    bool entriesFromStringList(const QStringList &items);
 
   private:
     void BroadcastUpdate();

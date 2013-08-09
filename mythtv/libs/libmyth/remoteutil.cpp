@@ -549,8 +549,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
     if (!RemoteGetRecordingList(*info, strlist))
     {
-        if (info)
-            delete info;
+        delete info;
         return reclist;
     }
 
@@ -574,8 +573,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
         delete info->back();
         info->pop_back();
     }
-    if (info)
-        delete info;
+    delete info;
 
     return reclist; 
 }

@@ -51,8 +51,8 @@ extern const int this_year;
 extern AVCodecContext *avcodec_opts[AVMEDIA_TYPE_NB];
 extern AVFormatContext *avformat_opts;
 extern struct SwsContext *sws_opts;
-extern struct SwrContext *swr_opts;
-extern AVDictionary *format_opts, *codec_opts;
+extern AVDictionary *swr_opts;
+extern AVDictionary *format_opts, *codec_opts, *resample_opts;
 
 /**
  * Initialize the cmdutils option system, in particular
@@ -123,7 +123,7 @@ double parse_number_or_die(const char *context, const char *numstr, int type,
  * not zero timestr is interpreted as a duration, otherwise as a
  * date
  *
- * @see parse_date()
+ * @see av_parse_time()
  */
 int64_t parse_time_or_die(const char *context, const char *timestr,
                           int is_duration);
@@ -190,13 +190,13 @@ void show_help_options(const OptionDef *options, const char *msg, int req_flags,
 void show_help_children(const AVClass *class, int flags);
 
 /**
- * Per-avtool specific help handler. Implemented in each
- * avtool, called by show_help().
+ * Per-fftool specific help handler. Implemented in each
+ * fftool, called by show_help().
  */
 void show_help_default(const char *opt, const char *arg);
 
 /**
- * Generic -h handler common to all avtools.
+ * Generic -h handler common to all fftools.
  */
 int show_help(void *optctx, const char *opt, const char *arg);
 
@@ -253,8 +253,9 @@ typedef struct OptionGroup {
 
     AVDictionary *codec_opts;
     AVDictionary *format_opts;
+    AVDictionary *resample_opts;
     struct SwsContext *sws_opts;
-    struct SwrContext *swr_opts;
+    AVDictionary *swr_opts;
 } OptionGroup;
 
 /**

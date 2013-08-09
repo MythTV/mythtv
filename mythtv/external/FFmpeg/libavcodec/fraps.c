@@ -43,7 +43,7 @@
 /**
  * local variable storage
  */
-typedef struct FrapsContext{
+typedef struct FrapsContext {
     AVCodecContext *avctx;
     AVFrame frame;
     uint8_t *tmpbuf;
@@ -64,7 +64,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     avcodec_get_frame_defaults(&s->frame);
     avctx->coded_frame = &s->frame;
 
-    s->avctx = avctx;
+    s->avctx  = avctx;
     s->tmpbuf = NULL;
 
     ff_dsputil_init(&s->dsp, avctx);
@@ -76,7 +76,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
  * Comparator - our nodes should ascend by count
  * but with preserved symbol order
  */
-static int huff_cmp(const void *va, const void *vb){
+static int huff_cmp(const void *va, const void *vb)
+{
     const Node *a = va, *b = vb;
     return (a->count - b->count)*256 + a->sym - b->sym;
 }
@@ -88,31 +89,33 @@ static int fraps2_decode_plane(FrapsContext *s, uint8_t *dst, int stride, int w,
                                int h, const uint8_t *src, int size, int Uoff,
                                const int step)
 {
-    int i, j;
+    int i, j, ret;
     GetBitContext gb;
     VLC vlc;
     Node nodes[512];
 
-    for(i = 0; i < 256; i++)
+    for (i = 0; i < 256; i++)
         nodes[i].count = bytestream_get_le32(&src);
     size -= 1024;
-    if (ff_huff_build_tree(s->avctx, &vlc, 256, nodes, huff_cmp,
-                           FF_HUFFMAN_FLAG_ZERO_COUNT) < 0)
-        return -1;
+    if ((ret = ff_huff_build_tree(s->avctx, &vlc, 256, nodes, huff_cmp,
+                                  FF_HUFFMAN_FLAG_ZERO_COUNT)) < 0)
+        return ret;
     /* we have built Huffman table and are ready to decode plane */
 
     /* convert bits so they may be used by standard bitreader */
     s->dsp.bswap_buf((uint32_t *)s->tmpbuf, (const uint32_t *)src, size >> 2);
 
     init_get_bits(&gb, s->tmpbuf, size * 8);
-    for(j = 0; j < h; j++){
-        for(i = 0; i < w*step; i += step){
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w*step; i += step) {
             dst[i] = get_vlc2(&gb, vlc.table, 9, 3);
             /* lines are stored as deltas between previous lines
              * and we need to add 0x80 to the first lines of chroma planes
              */
-            if(j) dst[i] += dst[i - stride];
-            else if(Uoff) dst[i] += 0x80;
+            if (j)
+                dst[i] += dst[i - stride];
+            else if (Uoff)
+                dst[i] += 0x80;
             if (get_bits_left(&gb) < 0) {
                 ff_free_vlc(&vlc);
                 return AVERROR_INVALIDDATA;
@@ -128,25 +131,24 @@ static int decode_frame(AVCodecContext *avctx,
                         void *data, int *got_frame,
                         AVPacket *avpkt)
 {
-    const uint8_t *buf = avpkt->data;
-    int buf_size = avpkt->size;
     FrapsContext * const s = avctx->priv_data;
-    AVFrame *frame = data;
-    AVFrame * const f = &s->frame;
+    const uint8_t *buf     = avpkt->data;
+    int buf_size           = avpkt->size;
+    AVFrame *frame         = data;
+    AVFrame * const f      = &s->frame;
     uint32_t header;
     unsigned int version,header_size;
     unsigned int x, y;
     const uint32_t *buf32;
     uint32_t *luma1,*luma2,*cb,*cr;
     uint32_t offs[4];
-    int i, j, is_chroma;
+    int i, j, ret, is_chroma;
     const int planes = 3;
     uint8_t *out;
     enum AVPixelFormat pix_fmt;
-    int ret;
 
-    header = AV_RL32(buf);
-    version = header & 0xff;
+    header      = AV_RL32(buf);
+    version     = header & 0xff;
     header_size = (header & (1<<30))? 8 : 4; /* bit 30 means pad to 8 bytes */
 
     if (version > 5) {
@@ -159,7 +161,7 @@ static int decode_frame(AVCodecContext *avctx,
     buf += header_size;
 
     if (version < 2) {
-        unsigned needed_size = avctx->width*avctx->height*3;
+        unsigned needed_size = avctx->width * avctx->height * 3;
         if (version == 0) needed_size /= 2;
         needed_size += header_size;
         /* bit 31 means same as previous pic */
@@ -183,15 +185,15 @@ static int decode_frame(AVCodecContext *avctx,
             av_log(avctx, AV_LOG_ERROR, "Fraps: error in data stream\n");
             return AVERROR_INVALIDDATA;
         }
-        for(i = 0; i < planes; i++) {
+        for (i = 0; i < planes; i++) {
             offs[i] = AV_RL32(buf + 4 + i * 4);
-            if(offs[i] >= buf_size - header_size || (i && offs[i] <= offs[i - 1] + 1024)) {
+            if (offs[i] >= buf_size - header_size || (i && offs[i] <= offs[i - 1] + 1024)) {
                 av_log(avctx, AV_LOG_ERROR, "Fraps: plane %i offset is out of bounds\n", i);
                 return AVERROR_INVALIDDATA;
             }
         }
         offs[planes] = buf_size - header_size;
-        for(i = 0; i < planes; i++) {
+        for (i = 0; i < planes; i++) {
             av_fast_padded_malloc(&s->tmpbuf, &s->tmpbuf_size, offs[i + 1] - offs[i] - 1024);
             if (!s->tmpbuf)
                 return AVERROR(ENOMEM);
@@ -216,23 +218,23 @@ static int decode_frame(AVCodecContext *avctx,
         return ret;
     }
 
-    switch(version) {
+    switch (version) {
     case 0:
     default:
         /* Fraps v0 is a reordered YUV420 */
-        if ( (avctx->width % 8) != 0 || (avctx->height % 2) != 0 ) {
+        if (((avctx->width % 8) != 0) || ((avctx->height % 2) != 0)) {
             av_log(avctx, AV_LOG_ERROR, "Invalid frame size %dx%d\n",
                    avctx->width, avctx->height);
             return AVERROR_INVALIDDATA;
         }
 
-        buf32=(const uint32_t*)buf;
-        for(y=0; y<avctx->height/2; y++){
-            luma1=(uint32_t*)&f->data[0][ y*2*f->linesize[0] ];
-            luma2=(uint32_t*)&f->data[0][ (y*2+1)*f->linesize[0] ];
-            cr=(uint32_t*)&f->data[1][ y*f->linesize[1] ];
-            cb=(uint32_t*)&f->data[2][ y*f->linesize[2] ];
-            for(x=0; x<avctx->width; x+=8){
+        buf32 = (const uint32_t*)buf;
+        for (y = 0; y < avctx->height / 2; y++) {
+            luma1 = (uint32_t*)&f->data[0][  y * 2      * f->linesize[0] ];
+            luma2 = (uint32_t*)&f->data[0][ (y * 2 + 1) * f->linesize[0] ];
+            cr    = (uint32_t*)&f->data[1][  y          * f->linesize[1] ];
+            cb    = (uint32_t*)&f->data[2][  y          * f->linesize[2] ];
+            for (x = 0; x < avctx->width; x += 8) {
                 *luma1++ = *buf32++;
                 *luma1++ = *buf32++;
                 *luma2++ = *buf32++;
@@ -245,10 +247,10 @@ static int decode_frame(AVCodecContext *avctx,
 
     case 1:
         /* Fraps v1 is an upside-down BGR24 */
-            for(y=0; y<avctx->height; y++)
-                memcpy(&f->data[0][ (avctx->height - y -1) * f->linesize[0]],
-                       &buf[y*avctx->width*3],
-                       3*avctx->width);
+            for (y = 0; y<avctx->height; y++)
+                memcpy(&f->data[0][(avctx->height - y - 1) * f->linesize[0]],
+                       &buf[y * avctx->width * 3],
+                       3 * avctx->width);
         break;
 
     case 2:
@@ -257,28 +259,32 @@ static int decode_frame(AVCodecContext *avctx,
          * Fraps v2 is Huffman-coded YUV420 planes
          * Fraps v4 is virtually the same
          */
-        for(i = 0; i < planes; i++){
+        for (i = 0; i < planes; i++) {
             is_chroma = !!i;
-            if(fraps2_decode_plane(s, f->data[i], f->linesize[i], avctx->width >> is_chroma,
-                    avctx->height >> is_chroma, buf + offs[i], offs[i + 1] - offs[i], is_chroma, 1) < 0) {
+            if ((ret = fraps2_decode_plane(s, f->data[i], f->linesize[i],
+                                           avctx->width  >> is_chroma,
+                                           avctx->height >> is_chroma,
+                                           buf + offs[i], offs[i + 1] - offs[i],
+                                           is_chroma, 1)) < 0) {
                 av_log(avctx, AV_LOG_ERROR, "Error decoding plane %i\n", i);
-                return AVERROR_INVALIDDATA;
+                return ret;
             }
         }
         break;
     case 3:
     case 5:
         /* Virtually the same as version 4, but is for RGB24 */
-        for(i = 0; i < planes; i++){
-            if(fraps2_decode_plane(s, f->data[0] + i + (f->linesize[0] * (avctx->height - 1)), -f->linesize[0],
-                    avctx->width, avctx->height, buf + offs[i], offs[i + 1] - offs[i], 0, 3) < 0) {
+        for (i = 0; i < planes; i++) {
+            if ((ret = fraps2_decode_plane(s, f->data[0] + i + (f->linesize[0] * (avctx->height - 1)),
+                                           -f->linesize[0], avctx->width, avctx->height,
+                                           buf + offs[i], offs[i + 1] - offs[i], 0, 3)) < 0) {
                 av_log(avctx, AV_LOG_ERROR, "Error decoding plane %i\n", i);
-                return AVERROR_INVALIDDATA;
+                return ret;
             }
         }
         out = f->data[0];
         // convert pseudo-YUV into real RGB
-        for(j = 0; j < avctx->height; j++){
+        for (j = 0; j < avctx->height; j++) {
             uint8_t *line_end = out + 3*avctx->width;
             while (out < line_end) {
                 out[0]  += out[1];

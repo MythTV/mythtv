@@ -57,7 +57,7 @@
     <button>
         <type>WEATHER</type>
         <text>Weather</text>
-        <description>View the weather forcast</description>
+        <description>View the weather forecast</description>
         <action>PLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>

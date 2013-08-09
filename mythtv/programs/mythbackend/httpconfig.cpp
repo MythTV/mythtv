@@ -72,7 +72,8 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
         }
 
         // FIXME, this is always false, what's it for
-        if (request->m_sBaseUrl.right(7) == "config" &&
+        // JMS "fixed" by using endsWith()
+        if (request->m_sBaseUrl.endsWith("config") &&
             !database_settings.empty())
         {
             QString checkResult;

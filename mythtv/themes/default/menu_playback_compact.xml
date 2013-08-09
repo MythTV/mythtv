@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<menu text="Playback Compact Menu">
+  <!-- Insert desired actions here.  End by including the main menu
+       so that all actions are ultimately available.  The actions
+       may need more descriptive text outside the context of the
+       original menu; if so, it's best to find a string from tv_play.cpp
+       that is already being translated. -->
+  <include file="menu_playback.xml" />
+</menu>

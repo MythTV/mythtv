@@ -220,6 +220,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 gCoreContext->GetSetting("VideoAdminPasswordTwo"));
 
         m_passwordOK = false;
+        m_fromLevel = ParentalLevel::plNone;
+        m_toLevel = ParentalLevel::plNone;
     }
 
     void Check(ParentalLevel::Level fromLevel, ParentalLevel::Level toLevel)
@@ -305,7 +307,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
 
         MythTextInputDialog *pwd =
                 new MythTextInputDialog(popupStack,
-                        QObject::tr("Parental PIN:"), FilterNone, true);
+                        tr("Parental PIN:"), FilterNone, true);
 
         connect(pwd, SIGNAL(haveResult(QString)),
                 SLOT(OnPasswordEntered(QString)));

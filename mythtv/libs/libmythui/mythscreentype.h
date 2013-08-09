@@ -1,12 +1,11 @@
 #ifndef MYTHSCREEN_TYPE_H_
 #define MYTHSCREEN_TYPE_H_
 
-#include "mythuitype.h"
+#include "mythuicomposite.h"
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
 #include <QSemaphore>
-#include <QHash>
 
 class ScreenLoadTask;
 class MythScreenStack;
@@ -38,7 +37,7 @@ class MUI_PUBLIC ScreenLoadCompletionEvent : public QEvent
  *
  * \ingroup MythUI_Widgets
  */
-class MUI_PUBLIC MythScreenType : public MythUIType
+class MUI_PUBLIC MythScreenType : public MythUIComposite
 {
     Q_OBJECT
 
@@ -77,9 +76,6 @@ class MUI_PUBLIC MythScreenType : public MythUIType
 
     bool IsLoading(void) { return m_IsLoading; }
     bool IsLoaded(void) { return m_IsLoaded; }
-
-    void SetTextFromMap(InfoMap &infoMap);
-    void ResetMap(InfoMap &infoMap);
 
     virtual MythPainter *GetPainter(void);
 

@@ -196,10 +196,10 @@ static VideoFilter *NewIvtcFilter(VideoFrameType inpixfmt,
                                   int threads)
 {
     (void) threads;
+    (void) options;
 
     ThisFilter *filter;
 
-    options = NULL;
     if (inpixfmt != FMT_YV12)
         return NULL;
     if (outpixfmt != FMT_YV12)

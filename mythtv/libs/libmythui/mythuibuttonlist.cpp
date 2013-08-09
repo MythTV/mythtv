@@ -3066,10 +3066,10 @@ void MythUIButtonListItem::SetText(const QString &text, const QString &name,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetTextFromMap(InfoMap &infoMap,
+void MythUIButtonListItem::SetTextFromMap(const InfoMap &infoMap,
                                           const QString &state)
 {
-    QHash<QString, QString>::iterator map_it = infoMap.begin();
+    InfoMap::const_iterator map_it = infoMap.begin();
 
     while (map_it != infoMap.end())
     {
@@ -3084,7 +3084,7 @@ void MythUIButtonListItem::SetTextFromMap(InfoMap &infoMap,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetTextFromMap(QMap<QString, TextProperties> &stringMap)
+void MythUIButtonListItem::SetTextFromMap(const QMap<QString, TextProperties> &stringMap)
 {
     m_strings.clear();
     m_strings = stringMap;
@@ -3383,14 +3383,11 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     else
         state = m_parent->m_active ? "active" : "inactive";
 
-    if (!button->DisplayState(state) && state == "inactive")
-    {
+    if (state == "inactive" && !button->GetState(state))
         state = "active";
-        button->DisplayState(state);
-    }
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
-                               (button->GetCurrentState());
+                               (button->GetState(state));
 
     if (!buttonstate)
     {
@@ -3399,7 +3396,6 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         return;
     }
 
-    buttonstate->SetVisible(true);
     buttonstate->Reset();
 
     MythUIText *buttontext = dynamic_cast<MythUIText *>
@@ -3562,6 +3558,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
         ++state_it;
     }
+
+    // There is no need to check the return value here, since we already
+    // checked that the state exists with GetState() earlier
+    button->DisplayState(state);
 }
 
 //---------------------------------------------------------

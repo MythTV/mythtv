@@ -7,6 +7,8 @@
 
 class MythDVDPlayer : public MythPlayer
 {
+    Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer)
+
   public:
     MythDVDPlayer(PlayerFlags flags = kNoFlags);
 
@@ -20,12 +22,15 @@ class MythDVDPlayer : public MythPlayer
 
     // Gets
     virtual uint64_t GetBookmark(void);
-    virtual  int64_t GetSecondsPlayed(bool honorCutList);
-    virtual  int64_t GetTotalSeconds(void) const;
+    virtual  int64_t GetSecondsPlayed(bool honorCutList,
+                                      int divisor = 1000) const;
+    virtual  int64_t GetTotalSeconds(bool honorCutList,
+                                     int divisor = 1000) const;
 
     // DVD public stuff
     virtual bool GoToMenu(QString str);
     virtual void GoToDVDProgram(bool direction);
+    virtual bool IsInStillFrame() const;
 
     // DVD ringbuffer methods
     void ResetStillFrameTimer(void);
@@ -63,6 +68,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
     virtual void DisplayPauseFrame(void);
     virtual void PreProcessNormalFrame(void);
+    virtual void VideoStart(void);
     virtual bool VideoLoop(void);
     virtual void EventStart(void);
     virtual void EventEnd(void);
@@ -98,7 +104,6 @@ class MythDVDPlayer : public MythPlayer
 
   private:
     void DoChangeDVDTrack(void);
-    void SetDVDBookmark(uint64_t frame);
     void DisplayDVDButton(void);
 
     void DisplayLastFrame(void);
@@ -110,6 +115,7 @@ class MythDVDPlayer : public MythPlayer
     int m_initial_title;
     int m_initial_audio_track;
     int m_initial_subtitle_track;
+    QString m_initial_dvdstate;
 
     // still frame timing
     MythTimer m_stillFrameTimer;

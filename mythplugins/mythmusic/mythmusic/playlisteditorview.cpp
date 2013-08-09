@@ -205,6 +205,11 @@ void PlaylistEditorView::customEvent(QEvent *event)
         //TODO should just update the relevent playlist here
         reloadTree();
     }
+    else if (event->type() == MusicPlayerEvent::CDChangedEvent)
+    {
+        //TODO should just update the cd node
+        reloadTree();
+    }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
         DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
@@ -501,7 +506,7 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
         node->getAction() == "smartplaylistcategory")
     {
     }
-    else if (node->getAction() == "trackid")
+    else if (node->getAction() == "trackid" || node->getAction() == "cdtrack")
     {
         m_songList.append(node->getInt());
     }
@@ -752,6 +757,13 @@ void PlaylistEditorView::createRootNode(void )
     }
     node->SetData(qVariantFromValue(compTracks));
 
+    if (gMusicData->all_music->getCDTrackCount())
+    {
+        node = new MusicGenericTree(m_rootNode, tr("CD - %1").arg(gMusicData->all_music->getCDTitle()), "cd");
+        node->setDrawArrow(true);
+        node->SetData(qVariantFromValue(gMusicData->all_music->getAllCDMetadata()));
+    }
+
     node = new MusicGenericTree(m_rootNode, tr("Directory"), "directory");
     node->setDrawArrow(true);
     node->SetData(qVariantFromValue(gMusicData->all_music->getAllMetadata()));
@@ -875,6 +887,11 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
             state = "compilations";
             artFile="blank.png";
         }
+        else if (mnode->getAction() == "cd")
+        {
+            state = "cd";
+            artFile="blank.png";
+        }
         else if (mnode->getAction() == "directory")
         {
             state = "directory";
@@ -941,6 +958,10 @@ void PlaylistEditorView::treeNodeChanged(MythGenericTree *node)
     else if (mnode->getAction() == "playlist")
     {
         getPlaylistTracks(mnode, mnode->getInt());
+    }
+    else if (mnode->getAction() == "cd")
+    {
+        getCDTracks(mnode);
     }
     else
         filterTracks(mnode);
@@ -1546,6 +1567,22 @@ void PlaylistEditorView::getPlaylists(MusicGenericTree *node)
         MusicGenericTree *newnode =
                 new MusicGenericTree(node, playlist->getName(), "playlist");
         newnode->setInt(playlist->getID());
+    }
+}
+
+void PlaylistEditorView::getCDTracks(MusicGenericTree *node)
+{
+    MetadataPtrList *tracks = gMusicData->all_music->getAllCDMetadata();
+
+    for (int x = 0; x < tracks->count(); x++)
+    {
+        MusicMetadata *mdata = tracks->at(x);
+        QString title = QString("%1 - %2").arg(mdata->Track()).arg(mdata->FormatTitle());
+        MusicGenericTree *newnode = new MusicGenericTree(node, title, "trackid");
+        newnode->setInt(mdata->ID());
+        newnode->setDrawArrow(false);
+        bool hasTrack = gPlayer->getPlaylist()->checkTrack(mdata->ID());
+        newnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
     }
 }
 

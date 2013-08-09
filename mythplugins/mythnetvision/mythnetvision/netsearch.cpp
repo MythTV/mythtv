@@ -1,7 +1,3 @@
-#include <iostream>
-#include <set>
-#include <map>
-
 // qt
 #include <QString>
 #include <QMetaType>
@@ -14,7 +10,7 @@
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythdirs.h>
-#include <mythsystem.h>
+#include <mythsystemlegacy.h>
 #include <mythprogressdialog.h>
 #include <storagegroup.h>
 #include <remotefile.h>
@@ -37,30 +33,27 @@ using namespace std;
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_searchResultList(NULL),      m_siteList(NULL),
-      m_search(NULL),                m_thumbImage(NULL),
+      m_search(NULL),                m_pageText(NULL),
+      m_noSites(NULL),               m_thumbImage(NULL),
       m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
-      m_popupStack(),                m_progressDialog(NULL),
-      m_netSearch(NULL),             m_reply(NULL),
-      m_currentSearch(QString()),    m_currentGrabber(0),
-      m_currentCmd(QString()),       m_downloadFile(QString()),
-      m_pagenum(0)
+      m_menuPopup(NULL),
+      m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
+      m_progressDialog(NULL),        m_netSearch(NULL),
+      m_reply(NULL),                 m_download(new MythDownloadManager()),
+      m_imageDownload(new MetadataImageDownload(this)),
+      m_file(NULL),                  m_currentSearch(QString()),
+      m_currentGrabber(0),           m_currentCmd(QString()),
+      m_downloadFile(QString()),     m_pagenum(0),
+      m_maxpage(0),                  m_playing(false),
+      m_redirects(0),                m_mythXML(GetMythXMLURL())
 {
-    m_mythXML = GetMythXMLURL();
-    m_playing = false;
-    m_download = new MythDownloadManager();
-    m_imageDownload = new MetadataImageDownload(this);
-    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_menuPopup = NULL;
     gCoreContext->addListener(this);
 }
 
 bool NetSearch::Create()
 {
     bool foundtheme = false;
-
-    m_type = static_cast<DialogType>(gCoreContext->GetNumSetting(
-                       "mythnetvision.ViewMode", DLG_SEARCH));
 
     // Load the theme for this screen
     foundtheme = LoadWindowFromXML("netvision-ui.xml", "netsearch", this);
@@ -87,13 +80,14 @@ bool NetSearch::Create()
         m_noSites->SetVisible(false);
 
     m_search = dynamic_cast<MythUITextEdit *> (GetChild("search"));
-    m_search->SetMaxLength(255);
 
     if (!m_siteList || !m_searchResultList || !m_search)
     {
         LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
         return false;
     }
+
+    m_search->SetMaxLength(255);
 
     // UI Hookups
     connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem *)),
@@ -290,14 +284,12 @@ void NetSearch::fillGrabberButtonList()
                     new MythUIButtonListItem(m_siteList, (*i)->GetTitle());
         if (item)
         {
-        item->SetText((*i)->GetTitle(), "title");
-        item->SetData((*i)->GetCommandline());
-        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*i)->GetImage());
-        item->SetImage(thumb);
+            item->SetText((*i)->GetTitle(), "title");
+            item->SetData((*i)->GetCommandline());
+            QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
+                                .arg((*i)->GetImage());
+            item->SetImage(thumb);
         }
-        else
-            delete item;
     }
 }
 
@@ -477,7 +469,7 @@ void NetSearch::populateResultList(ResultItem::resultList list)
                     m_searchResultList, title);
         if (item)
         {
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             (*i)->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
 
@@ -502,8 +494,6 @@ void NetSearch::populateResultList(ResultItem::resultList list)
                 }
             }
         }
-        else
-            delete item;
     }
 }
 
@@ -737,7 +727,7 @@ void NetSearch::slotItemChanged()
 
     if (item && GetFocusWidget() == m_searchResultList)
     {
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         item->toMap(metadataMap);
         SetTextFromMap(metadataMap);
 
@@ -774,7 +764,7 @@ void NetSearch::slotItemChanged()
                        QString(), QStringList(), 0, 0, QString(),
                        0, QStringList(), 0, 0, 0);
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         res.toMap(metadataMap);
         SetTextFromMap(metadataMap);
 

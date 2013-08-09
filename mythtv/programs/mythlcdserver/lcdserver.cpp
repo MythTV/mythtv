@@ -76,16 +76,17 @@ int debug_level = 0;
 #define LOC_ERR  QString("LCDServer, Error: ")
 
 LCDServer::LCDServer(int port, QString message, int messageTime)
-    :QObject()
+    :QObject(),
+     m_lcd(new LCDProcClient(this)),
+     m_serverPool(new ServerPool()),
+     m_lastSocket(NULL)
 {
-    m_lcd = new LCDProcClient(this);
     if (!m_lcd->SetupLCD())
     {
         delete m_lcd;
         m_lcd = NULL;
     }
 
-    m_serverPool = new ServerPool();
     connect(m_serverPool, SIGNAL(newConnection(QTcpSocket*)),
             this,         SLOT(newConnection(QTcpSocket*)));
 
@@ -97,7 +98,6 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
         delete m_serverPool;
         return;
     }
-    m_lastSocket = NULL;
 
     if (m_lcd)
         m_lcd->setStartupMessage(message, messageTime);
@@ -135,16 +135,20 @@ void LCDServer::endConnection(void)
 void LCDServer::readSocket()
 {
     QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
-    m_lastSocket = socket;
 
-    while(socket->canReadLine())
+    if (socket)
     {
-        QString incoming_data = socket->readLine();
-        incoming_data = incoming_data.replace( QRegExp("\n"), "" );
-        incoming_data = incoming_data.replace( QRegExp("\r"), "" );
-        incoming_data.simplified();
-        QStringList tokens = parseCommand(incoming_data);
-        parseTokens(tokens, socket);
+        m_lastSocket = socket;
+
+        while(socket->canReadLine())
+        {
+            QString incoming_data = socket->readLine();
+            incoming_data = incoming_data.replace( QRegExp("\n"), "" );
+            incoming_data = incoming_data.replace( QRegExp("\r"), "" );
+            incoming_data.simplified();
+            QStringList tokens = parseCommand(incoming_data);
+            parseTokens(tokens, socket);
+        }
     }
 }
 

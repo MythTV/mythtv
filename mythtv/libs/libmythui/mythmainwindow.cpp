@@ -191,7 +191,8 @@ class MythMainWindowPrivate
 
         idleTimer(NULL),
         standby(false),
-        enteringStandby(false)
+        enteringStandby(false),
+        NC(NULL)
     {
     }
 
@@ -233,6 +234,7 @@ class MythMainWindowPrivate
     QMap<int, JumpData*> jumpMap;
     QMap<QString, JumpData> destinationMap;
     QMap<QString, MPData> mediaPluginMap;
+    QHash<QString, QHash<QString, QString> > actionText;
 
     void (*exitmenucallback)(void);
 
@@ -283,6 +285,7 @@ class MythMainWindowPrivate
     QTimer *idleTimer;
     bool standby;
     bool enteringStandby;
+    MythNotificationCenter *NC;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -368,6 +371,14 @@ void DestroyMythMainWindow(void)
 MythPainter *GetMythPainter(void)
 {
     return MythMainWindow::getMainWindow()->GetCurrentPainter();
+}
+
+MythNotificationCenter *GetNotificationCenter(void)
+{
+    if (!mainWin ||
+        !mainWin->GetCurrentNotificationCenter())
+        return NULL;
+    return mainWin->GetCurrentNotificationCenter();
 }
 
 #ifdef USE_OPENGL_PAINTER
@@ -582,12 +593,20 @@ MythMainWindow::~MythMainWindow()
         delete d->cecAdapter;
 #endif
 
+    delete d->NC;
+
     delete d;
+
 }
 
 MythPainter *MythMainWindow::GetCurrentPainter(void)
 {
     return d->painter;
+}
+
+MythNotificationCenter *MythMainWindow::GetCurrentNotificationCenter(void)
+{
+    return d->NC;
 }
 
 QWidget *MythMainWindow::GetPaintWindow(void)
@@ -1085,6 +1104,11 @@ void MythMainWindow::Init(QString forcedpainter)
         d->m_themeBase->Reload();
     else
         d->m_themeBase = new MythThemeBase();
+
+    if (!d->NC)
+    {
+        d->NC = new MythNotificationCenter();
+    }
 }
 
 void MythMainWindow::InitKeys()
@@ -1300,13 +1324,12 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
-#ifndef Q_OS_MAC
     child->winId();
-#endif
     child->raise();
     child->setFocus();
     child->setMouseTracking(true);
 }
+
 
 void MythMainWindow::detach(QWidget *child)
 {
@@ -1321,13 +1344,12 @@ void MythMainWindow::detach(QWidget *child)
 
     d->widgetList.erase(it);
     QWidget *current = currentWidget();
+    if (!current)
+        current = this;
 
-    if (current)
-    {
-        current->setEnabled(true);
-        current->setFocus();
-        current->setMouseTracking(true);
-    }
+    current->setEnabled(true);
+    current->setFocus();
+    current->setMouseTracking(true);
 
     if (d->exitingtomain)
     {
@@ -1701,6 +1723,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     }
 
     BindKey(context, action, keybind);
+    d->actionText[context][action] = description;
 }
 
 QString MythMainWindow::GetKey(const QString &context,
@@ -1723,6 +1746,18 @@ QString MythMainWindow::GetKey(const QString &context,
         return "?";
 
     return query.value(0).toString();
+}
+
+QString MythMainWindow::GetActionText(const QString &context,
+                                      const QString &action) const
+{
+    if (d->actionText.contains(context))
+    {
+        QHash<QString, QString> entry = d->actionText.value(context);
+        if (entry.contains(action))
+            return entry.value(action);
+    }
+    return "";
 }
 
 void MythMainWindow::ClearJump(const QString &destination)
@@ -2389,6 +2424,10 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (!message.isEmpty())
             ShowOkPopup(message);
+    }
+    else if ((MythEvent::Type)(ce->type()) == MythNotificationCenterEvent::kEventType)
+    {
+        GetNotificationCenter()->ProcessQueue();
     }
 }
 

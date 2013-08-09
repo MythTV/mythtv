@@ -703,7 +703,7 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
 
             cb++;
             cr++;
-            p += 4;
+            p += 4; // we dereference p in the next iteration, so its not really unused
             lum += -wrap + 2;
             alpha += -wrap + 2;
        }

@@ -20,7 +20,7 @@
 #include "spdifencoder.h"
 #include "mythlogging.h"
 
-#define LOC QString("AO: ")
+#define LOC QString("AOBase: ")
 
 #define WPOS audiobuffer + org_waud
 #define RPOS audiobuffer + raud
@@ -104,7 +104,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test2(0xdeadbeef),
     memory_corruption_test3(0xdeadbeef),
     m_configure_succeeded(false),m_length_last_data(0),
-    m_spdifenc(NULL),           m_forcedprocessing(false)
+    m_spdifenc(NULL),           m_forcedprocessing(false),
+    m_previousbpf(0)
 {
     src_in = (float *)AOALIGN(src_in_buf);
     memset(&src_data,          0, sizeof(SRC_DATA));
@@ -649,8 +650,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (needs_downmix && source_channels > 8)
     {
-        Error("Aborting Audio Reconfigure. "
-              "Can't handle audio with more than 8 channels.");
+        Error(QObject::tr("Aborting Audio Reconfigure. "
+              "Can't handle audio with more than 8 channels."));
         return;
     }
 
@@ -701,7 +702,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         src_ctx = src_new(2-src_quality, chans, &error);
         if (error)
         {
-            Error(QString("Error creating resampler: %1")
+            Error(QObject::tr("Error creating resampler: %1")
                   .arg(src_strerror(error)));
             src_ctx = NULL;
             return;
@@ -737,7 +738,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (!encoder->Init(AV_CODEC_ID_AC3, 448000, samplerate,
                            configured_channels))
         {
-            Error("AC-3 encoder initialization failed");
+            Error(QObject::tr("AC-3 encoder initialization failed"));
             delete encoder;
             encoder = NULL;
             enc = false;
@@ -798,7 +799,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (!OpenDevice())
     {
         if (GetError().isEmpty())
-            Error("Aborting reconfigure");
+            Error(QObject::tr("Aborting reconfigure"));
         else
             VBGENERAL("Aborting reconfigure");
         m_configure_succeeded = false;
@@ -820,19 +821,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VolumeBase::SyncVolume();
     VolumeBase::UpdateVolume();
 
-    if (needs_upmix && IS_VALID_UPMIX_CHANNEL(source_channels) &&
-        configured_channels > 2)
+    if (needs_upmix && configured_channels > 2)
     {
         surround_mode = gCoreContext->GetNumSetting("AudioUpmixType", QUALITY_HIGH);
-        if ((upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
-                                    (FreeSurround::SurroundMode)surround_mode)))
-            VBAUDIO(QString("Create %1 quality upmixer done")
-                    .arg(quality_string(surround_mode)));
-        else
-        {
-            VBERROR("Failed to create upmixer");
-            needs_upmix = false;
-        }
+        upmixer = new FreeSurround(samplerate, source == AUDIOOUTPUT_VIDEO,
+                                   (FreeSurround::SurroundMode)surround_mode);
+        VBAUDIO(QString("Create %1 quality upmixer done")
+                .arg(quality_string(surround_mode)));
     }
 
     VBAUDIO(QString("Audio Stretch Factor: %1").arg(stretchfactor));
@@ -1243,8 +1238,10 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
     }
 
     // Convert mono to stereo as most devices can't accept mono
-    if (configured_channels == 2 && source_channels == 1)
+    if (!upmixer)
     {
+        // we're always in the case
+        // configured_channels == 2 && source_channels == 1
         int bdFrames = bdiff / bpf;
         if (bdFrames <= frames)
         {
@@ -1399,9 +1396,16 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     // Calculate amount of free space required in ringbuffer
     if (processing)
     {
+        int sampleSize = AudioOutputSettings::SampleSize(format);
+        if (sampleSize <= 0)
+        {
+            // Would lead to division by zero (or unexpected results if negative)
+            VBERROR("Sample size is <= 0, AddData returning false");
+            return false;
+        }
+
         // Final float conversion space requirement
-        len = sizeof(*src_in_buf) /
-            AudioOutputSettings::SampleSize(format) * len;
+        len = sizeof(*src_in_buf) / sampleSize * len;
 
         // Account for changes in number of channels
         if (needs_downmix)
@@ -1642,7 +1646,7 @@ void AudioOutputBase::OutputAudioLoop(void)
     int zero_fragment_size = 8 * samplerate * output_bytes_per_frame / 1000;
     if (zero_fragment_size > fragment_size)
         zero_fragment_size = fragment_size;
-           
+
     while (!killaudio)
     {
         if (pauseaudio)
@@ -1753,6 +1757,10 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
     int bdiff = kAudioRingBufferSize - raud;
 
     int obytes = output_settings->SampleSize(output_format);
+
+    if (obytes <= 0)
+        return 0;
+
     bool fromFloats = processing && !enc && output_format != FORMAT_FLT;
 
     // Scale if necessary

@@ -425,12 +425,12 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (m_expertMode)
     {
         resp = getResponse("Would you like to use the existing schema?", "yes");
-        if (resp.isEmpty() || resp.left(1).toLower() == "y")
+        if (resp.isEmpty() || resp.startsWith("y", Qt::CaseInsensitive))
             return MYTH_SCHEMA_USE_EXISTING;
     }
 
     resp = getResponse("\nShall I upgrade this database?", "yes");
-    if (!resp.isEmpty() && resp.left(1).toLower() != "y")
+    if (!resp.isEmpty() && !resp.startsWith("y", Qt::CaseInsensitive))
         return MYTH_SCHEMA_EXIT;
 
     if (connections)
@@ -441,7 +441,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     {
         resp = getResponse("\nA database backup might be a good idea"
                            "\nAre you sure you want to upgrade?", "no");
-        if (resp.isEmpty() || resp.left(1).toLower() == "n")
+        if (resp.isEmpty() || resp.startsWith("n", Qt::CaseInsensitive))
             return MYTH_SCHEMA_EXIT;
     }
 

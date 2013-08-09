@@ -29,6 +29,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     void            AddKeyword(QString keyword)     { m_keywords << keyword; }
 
     QString         GetName(void) const             { return m_name; }
+    QString         GetUsedKeyword(void) const      { return m_usedKeyword; }
     int             GetKeywordLength(void) const;
     QString         GetHelpString(int off, QString group = "",
                                   bool force = false) const;
@@ -243,6 +244,7 @@ class MBASE_PUBLIC MythCommandLineParser
     QString                 GetLogFilePath(void);
     int                     GetSyslogFacility(void);
     LogLevel_t              GetLogLevel(void);
+    QString                 GetAppName(void) const { return m_appname; }
 
     bool                    toBool(QString key) const;
     int                     toInt(QString key) const;

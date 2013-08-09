@@ -8,7 +8,7 @@
 #include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "storagegroup.h"
 #include "metadatadownload.h"
 #include "mythmiscutil.h"
@@ -249,7 +249,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
                                                 MetadataLookup* lookup,
                                                 bool passseas)
 {
-    MythSystem grabber(cmd, args, kMSNoRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(cmd, args, kMSStdOut);
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
@@ -278,7 +278,7 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
 
 QString MetadataDownload::GetMovieGrabber()
 {
-    QString def_cmd = "metadata/Movie/tmdb.py";
+    QString def_cmd = "metadata/Movie/tmdb3.py";
     QString db_cmd = gCoreContext->GetSetting("MovieGrabber", def_cmd);
 
     return QDir::cleanPath(QString("%1/%2")
@@ -311,7 +311,7 @@ bool MetadataDownload::runGrabberTest(const QString &grabberpath)
     QStringList args;
     args.append("-t");
 
-    MythSystem grabber(grabberpath, args, kMSNoRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy grabber(grabberpath, args, kMSStdOut);
 
     grabber.Run();
     uint exitcode = grabber.Wait();
@@ -363,7 +363,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
         if (MXMLpath.startsWith("myth://"))
         {
             RemoteFile *rf = new RemoteFile(MXMLpath);
-            if (rf && rf->Open())
+            if (rf && rf->isOpen())
             {
                 bool loaded = rf->SaveAs(mxmlraw);
                 if (loaded)
@@ -379,7 +379,6 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Corrupt or invalid MXML file."));
                 }
-                rf->Close();
             }
 
             delete rf;
@@ -428,7 +427,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
         if (NFOpath.startsWith("myth://"))
         {
             RemoteFile *rf = new RemoteFile(NFOpath);
-            if (rf && rf->Open())
+            if (rf && rf->isOpen())
             {
                 bool loaded = rf->SaveAs(nforaw);
                 if (loaded)
@@ -443,7 +442,6 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("PIRATE ERROR: Invalid NFO file found."));
                 }
-                rf->Close();
             }
 
             delete rf;

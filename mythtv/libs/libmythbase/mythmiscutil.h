@@ -27,7 +27,7 @@ MBASE_PUBLIC bool telnet(const QString &host, int port);
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
 MBASE_PUBLIC QString createTempFile(
     QString name_template = "/tmp/mythtv_XXXXXX", bool dir = false);
-MBASE_PUBLIC void makeFileAccessible(QString filename);
+MBASE_PUBLIC bool makeFileAccessible(QString filename);
 
 MBASE_PUBLIC QString getResponse(const QString &query, const QString &def);
 MBASE_PUBLIC int     intResponse(const QString &query, int def);
@@ -35,9 +35,6 @@ MBASE_PUBLIC int     intResponse(const QString &query, int def);
 MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
                                       QStringList   *intermediaries = NULL,
                                       unsigned       maxLinks       = 255);
-
-MBASE_PUBLIC void sendPlaybackStart();
-MBASE_PUBLIC void sendPlaybackEnd();
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width);
 

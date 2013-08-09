@@ -185,15 +185,15 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_YUV444P12LE] = { 1, 1 },
     [AV_PIX_FMT_YUV444P14BE] = { 1, 1 },
     [AV_PIX_FMT_YUV444P14LE] = { 1, 1 },
-    [AV_PIX_FMT_GBRP]        = { 1, 0 },
-    [AV_PIX_FMT_GBRP9LE]     = { 1, 0 },
-    [AV_PIX_FMT_GBRP9BE]     = { 1, 0 },
-    [AV_PIX_FMT_GBRP10LE]    = { 1, 0 },
-    [AV_PIX_FMT_GBRP10BE]    = { 1, 0 },
-    [AV_PIX_FMT_GBRP12LE]    = { 1, 0 },
-    [AV_PIX_FMT_GBRP12BE]    = { 1, 0 },
-    [AV_PIX_FMT_GBRP14LE]    = { 1, 0 },
-    [AV_PIX_FMT_GBRP14BE]    = { 1, 0 },
+    [AV_PIX_FMT_GBRP]        = { 1, 1 },
+    [AV_PIX_FMT_GBRP9LE]     = { 1, 1 },
+    [AV_PIX_FMT_GBRP9BE]     = { 1, 1 },
+    [AV_PIX_FMT_GBRP10LE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRP10BE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRP12LE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRP12BE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRP14LE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRP14BE]    = { 1, 1 },
     [AV_PIX_FMT_GBRP16LE]    = { 1, 0 },
     [AV_PIX_FMT_GBRP16BE]    = { 1, 0 },
 };
@@ -991,7 +991,6 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
     getSubSampleFactors(&c->chrSrcHSubSample, &c->chrSrcVSubSample, srcFormat);
     getSubSampleFactors(&c->chrDstHSubSample, &c->chrDstVSubSample, dstFormat);
 
-
     if (isAnyRGB(dstFormat) && !(flags&SWS_FULL_CHR_H_INT)) {
         if (dstW&1) {
             av_log(c, AV_LOG_DEBUG, "Forcing full internal H chroma due to odd output size\n");
@@ -999,16 +998,52 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
             c->flags = flags;
         }
     }
+
+    if(dstFormat == AV_PIX_FMT_BGR4_BYTE ||
+       dstFormat == AV_PIX_FMT_RGB4_BYTE ||
+       dstFormat == AV_PIX_FMT_BGR8 ||
+       dstFormat == AV_PIX_FMT_RGB8) {
+        if (flags & SWS_ERROR_DIFFUSION && !(flags & SWS_FULL_CHR_H_INT)) {
+            av_log(c, AV_LOG_DEBUG,
+                "Error diffusion dither is only supported in full chroma interpolation for destination format '%s'\n",
+                av_get_pix_fmt_name(dstFormat));
+            flags   |= SWS_FULL_CHR_H_INT;
+            c->flags = flags;
+        }
+        if (!(flags & SWS_ERROR_DIFFUSION) && (flags & SWS_FULL_CHR_H_INT)) {
+            av_log(c, AV_LOG_DEBUG,
+                "Ordered dither is not supported in full chroma interpolation for destination format '%s'\n",
+                av_get_pix_fmt_name(dstFormat));
+            flags   |= SWS_ERROR_DIFFUSION;
+            c->flags = flags;
+        }
+    }
+    if (isPlanarRGB(dstFormat)) {
+        if (!(flags & SWS_FULL_CHR_H_INT)) {
+            av_log(c, AV_LOG_DEBUG,
+                   "%s output is not supported with half chroma resolution, switching to full\n",
+                   av_get_pix_fmt_name(dstFormat));
+            flags   |= SWS_FULL_CHR_H_INT;
+            c->flags = flags;
+        }
+    }
+
     /* reuse chroma for 2 pixels RGB/BGR unless user wants full
      * chroma interpolation */
     if (flags & SWS_FULL_CHR_H_INT &&
         isAnyRGB(dstFormat)        &&
+        !isPlanarRGB(dstFormat)    &&
         dstFormat != AV_PIX_FMT_RGBA  &&
         dstFormat != AV_PIX_FMT_ARGB  &&
         dstFormat != AV_PIX_FMT_BGRA  &&
         dstFormat != AV_PIX_FMT_ABGR  &&
         dstFormat != AV_PIX_FMT_RGB24 &&
-        dstFormat != AV_PIX_FMT_BGR24) {
+        dstFormat != AV_PIX_FMT_BGR24 &&
+        dstFormat != AV_PIX_FMT_BGR4_BYTE &&
+        dstFormat != AV_PIX_FMT_RGB4_BYTE &&
+        dstFormat != AV_PIX_FMT_BGR8 &&
+        dstFormat != AV_PIX_FMT_RGB8
+    ) {
         av_log(c, AV_LOG_WARNING,
                "full chroma interpolation for destination format '%s' not yet implemented\n",
                av_get_pix_fmt_name(dstFormat));
@@ -1029,6 +1064,11 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
         srcFormat != AV_PIX_FMT_RGB8 && srcFormat != AV_PIX_FMT_BGR8 &&
         srcFormat != AV_PIX_FMT_RGB4 && srcFormat != AV_PIX_FMT_BGR4 &&
         srcFormat != AV_PIX_FMT_RGB4_BYTE && srcFormat != AV_PIX_FMT_BGR4_BYTE &&
+        srcFormat != AV_PIX_FMT_GBRP9BE   && srcFormat != AV_PIX_FMT_GBRP9LE  &&
+        srcFormat != AV_PIX_FMT_GBRP10BE  && srcFormat != AV_PIX_FMT_GBRP10LE &&
+        srcFormat != AV_PIX_FMT_GBRP12BE  && srcFormat != AV_PIX_FMT_GBRP12LE &&
+        srcFormat != AV_PIX_FMT_GBRP14BE  && srcFormat != AV_PIX_FMT_GBRP14LE &&
+        srcFormat != AV_PIX_FMT_GBRP16BE  && srcFormat != AV_PIX_FMT_GBRP16LE &&
         ((dstW >> c->chrDstHSubSample) <= (srcW >> 1) ||
          (flags & SWS_FAST_BILINEAR)))
         c->chrSrcHSubSample = 1;
@@ -1246,6 +1286,9 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
             c->vChrBufSize = (nextSlice >> c->chrSrcVSubSample) -
                              c->vChrFilterPos[chrI];
     }
+
+    for (i = 0; i < 4; i++)
+        FF_ALLOCZ_OR_GOTO(c, c->dither_error[i], (c->dstW+2) * sizeof(int), fail);
 
     /* Allocate pixbufs (we use dynamic allocation because otherwise we would
      * need to allocate several megabytes to handle all possible cases) */
@@ -1739,6 +1782,9 @@ void sws_freeContext(SwsContext *c)
             av_freep(&c->alpPixBuf[i]);
         av_freep(&c->alpPixBuf);
     }
+
+    for (i = 0; i < 4; i++)
+        av_freep(&c->dither_error[i]);
 
     av_freep(&c->vLumFilter);
     av_freep(&c->vChrFilter);

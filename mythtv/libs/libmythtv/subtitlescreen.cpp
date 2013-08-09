@@ -527,6 +527,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_player(player),  m_subreader(NULL),   m_608reader(NULL),
     m_708reader(NULL), m_safeArea(QRect()),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
+    m_fontSize(0),
     m_textFontZoom(100), m_textFontZoomPrev(100),
     m_textFontDelayMs(0), m_textFontDelayMsPrev(0),
     m_refreshModified(false), m_refreshDeleted(false),
@@ -1111,7 +1112,11 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //    playPos = (uint64_t)
         //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
         //else
-        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
+        //playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
+        //
+        // Change of plans.  Just ask the player how many milliseconds
+        // have been played so far.
+        playPos = m_player->GetSecondsPlayed(false, 1);
     }
     playPos -= playPosAdj;
     if (playPos != 0)
@@ -1446,7 +1451,8 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 }
 
-MythFontProperties* SubtitleScreen::GetFont(CC708CharacterAttribute attr) const
+MythFontProperties *
+SubtitleScreen::GetFont(const CC708CharacterAttribute &attr) const
 {
     return m_format->GetFont(m_family, attr, m_fontSize,
                              m_textFontZoom, m_fontStretch);

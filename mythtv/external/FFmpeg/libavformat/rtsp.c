@@ -181,7 +181,8 @@ static void init_rtp_handler(RTPDynamicProtocolHandler *handler,
 {
     if (!handler)
         return;
-    codec->codec_id          = handler->codec_id;
+    if (codec)
+        codec->codec_id          = handler->codec_id;
     rtsp_st->dynamic_handler = handler;
     if (handler->alloc) {
         rtsp_st->dynamic_protocol_context = handler->alloc();
@@ -201,8 +202,7 @@ static int sdp_parse_rtpmap(AVFormatContext *s,
     AVCodec *c;
     const char *c_name;
 
-    /* Loop into AVRtpDynamicPayloadTypes[] and AVRtpPayloadTypes[] and
-     * see if we can handle this kind of payload.
+    /* See if we can handle this kind of payload.
      * The space should normally not be there but some Real streams or
      * particular servers ("RealServer Version 6.1.3.970", see issue 1658)
      * have a trailing space. */
@@ -210,7 +210,6 @@ static int sdp_parse_rtpmap(AVFormatContext *s,
     if (payload_type < RTP_PT_PRIVATE) {
         /* We are in a standard case
          * (from http://www.iana.org/assignments/rtp-parameters). */
-        /* search into AVRtpPayloadTypes[] */
         codec->codec_id = ff_rtp_codec_id(buf, codec->codec_type);
     }
 
@@ -246,10 +245,6 @@ static int sdp_parse_rtpmap(AVFormatContext *s,
             i = atoi(buf);
             if (i > 0)
                 codec->channels = i;
-            // TODO: there is a bug here; if it is a mono stream, and
-            // less than 22000Hz, faad upconverts to stereo and twice
-            // the frequency.  No problem, but the sample rate is being
-            // set here by the sdp line. Patch on its way. (rdm)
         }
         av_log(s, AV_LOG_DEBUG, "audio samplerate set to: %i\n",
                codec->sample_rate);
@@ -380,6 +375,8 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
         get_word(buf1, sizeof(buf1), &p); /* protocol */
         if (!strcmp(buf1, "udp"))
             rt->transport = RTSP_TRANSPORT_RAW;
+        else if (strstr(buf1, "/AVPF") || strstr(buf1, "/SAVPF"))
+            rtsp_st->feedback = 1;
 
         /* XXX: handle list of formats */
         get_word(buf1, sizeof(buf1), &p); /* format list */
@@ -387,8 +384,17 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
 
         if (!strcmp(ff_rtp_enc_name(rtsp_st->sdp_payload_type), "MP2T")) {
             /* no corresponding stream */
-            if (rt->transport == RTSP_TRANSPORT_RAW && !rt->ts && CONFIG_RTPDEC)
-                rt->ts = ff_mpegts_parse_open(s);
+            if (rt->transport == RTSP_TRANSPORT_RAW) {
+                if (!rt->ts && CONFIG_RTPDEC)
+                    rt->ts = ff_mpegts_parse_open(s);
+            } else {
+                RTPDynamicProtocolHandler *handler;
+                handler = ff_rtp_handler_find_by_id(
+                              rtsp_st->sdp_payload_type, AVMEDIA_TYPE_DATA);
+                init_rtp_handler(handler, rtsp_st, NULL);
+                if (handler && handler->init)
+                    handler->init(s, -1, rtsp_st->dynamic_protocol_context);
+            }
         } else if (rt->server_type == RTSP_SERVER_WMS &&
                    codec_type == AVMEDIA_TYPE_DATA) {
             /* RTX stream, a stream that carries all the other actual
@@ -484,6 +490,14 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
                    s->nb_streams > 0) {
             st = s->streams[s->nb_streams - 1];
             st->codec->sample_rate = atoi(p);
+        } else if (av_strstart(p, "crypto:", &p) && s->nb_streams > 0) {
+            // RFC 4568
+            rtsp_st = rt->rtsp_streams[rt->nb_rtsp_streams - 1];
+            get_word(buf1, sizeof(buf1), &p); // ignore tag
+            get_word(rtsp_st->crypto_suite, sizeof(rtsp_st->crypto_suite), &p);
+            p += strspn(p, SPACE_CHARS);
+            if (av_strstart(p, "inline:", &p))
+                get_word(rtsp_st->crypto_params, sizeof(rtsp_st->crypto_params), &p);
         } else {
             if (rt->server_type == RTSP_SERVER_WMS)
                 ff_wms_parse_sdp_a_line(s, p);
@@ -657,6 +671,10 @@ int ff_rtsp_open_transport_ctx(AVFormatContext *s, RTSPStream *rtsp_st)
                                               rtsp_st->dynamic_protocol_context,
                                               rtsp_st->dynamic_handler);
         }
+        if (rtsp_st->crypto_suite[0])
+            ff_rtp_parse_set_crypto(rtsp_st->transport_priv,
+                                    rtsp_st->crypto_suite,
+                                    rtsp_st->crypto_params);
     }
 
     return 0;
@@ -1863,6 +1881,7 @@ int ff_rtsp_fetch_packet(AVFormatContext *s, AVPacket *pkt)
             rt->cur_transport_priv = NULL;
     }
 
+redo:
     if (rt->transport == RTSP_TRANSPORT_RTP) {
         int i;
         int64_t first_queue_time = 0;
@@ -1878,12 +1897,15 @@ int ff_rtsp_fetch_packet(AVFormatContext *s, AVPacket *pkt)
                 first_queue_st   = rt->rtsp_streams[i];
             }
         }
-        if (first_queue_time)
+        if (first_queue_time) {
             wait_end = first_queue_time + s->max_delay;
+        } else {
+            wait_end = 0;
+            first_queue_st = NULL;
+        }
     }
 
     /* read next RTP packet */
- redo:
     if (!rt->recvbuf) {
         rt->recvbuf = av_malloc(RECVBUF_SIZE);
         if (!rt->recvbuf)
@@ -1904,7 +1926,11 @@ int ff_rtsp_fetch_packet(AVFormatContext *s, AVPacket *pkt)
             ff_rtp_check_and_send_back_rr(rtsp_st->transport_priv, rtsp_st->rtp_handle, NULL, len);
         break;
     case RTSP_LOWER_TRANSPORT_CUSTOM:
-        len = ffio_read_partial(s->pb, rt->recvbuf, RECVBUF_SIZE);
+        if (first_queue_st && rt->transport == RTSP_TRANSPORT_RTP &&
+            wait_end && wait_end < av_gettime())
+            len = AVERROR(EAGAIN);
+        else
+            len = ffio_read_partial(s->pb, rt->recvbuf, RECVBUF_SIZE);
         len = pick_stream(s, &rtsp_st, rt->recvbuf, len);
         if (len > 0 && rtsp_st->transport_priv && rt->transport == RTSP_TRANSPORT_RTP)
             ff_rtp_check_and_send_back_rr(rtsp_st->transport_priv, NULL, s->pb, len);
@@ -1924,6 +1950,12 @@ int ff_rtsp_fetch_packet(AVFormatContext *s, AVPacket *pkt)
         ret = ff_rdt_parse_packet(rtsp_st->transport_priv, pkt, &rt->recvbuf, len);
     } else if (rt->transport == RTSP_TRANSPORT_RTP) {
         ret = ff_rtp_parse_packet(rtsp_st->transport_priv, pkt, &rt->recvbuf, len);
+        if (rtsp_st->feedback) {
+            AVIOContext *pb = NULL;
+            if (rt->lower_transport == RTSP_LOWER_TRANSPORT_CUSTOM)
+                pb = s->pb;
+            ff_rtp_send_rtcp_feedback(rtsp_st->transport_priv, rtsp_st->rtp_handle, pb);
+        }
         if (ret < 0) {
             /* Either bad packet, or a RTCP packet. Check if the
              * first_rtcp_ntp_time field was initialized. */

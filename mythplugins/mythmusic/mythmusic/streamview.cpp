@@ -123,7 +123,7 @@ void StreamView::customEvent(QEvent *event)
             MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_playedTracksList, "", qVariantFromValue(mdata), 0);
 
-            MetadataMap metadataMap;
+            InfoMap metadataMap;
             mdata->toMap(metadataMap);
             item->SetTextFromMap(metadataMap);
             item->SetFontState("normal");
@@ -386,10 +386,11 @@ void StreamView::removeStream(void)
     {
         MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
 
-        ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
-                       "Station: %1 - Channel: %2")
-                       .arg(mdata->Station()).arg(mdata->Channel()),
-                    this, SLOT(doRemoveStream(bool)), true);
+        if (mdata)
+            ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
+                           "Station: %1 - Channel: %2")
+                           .arg(mdata->Station()).arg(mdata->Channel()),
+                        this, SLOT(doRemoveStream(bool)), true);
     }
 }
 
@@ -402,7 +403,9 @@ void StreamView::doRemoveStream(bool ok)
     if (item)
     {
         MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
-        deleteStream(mdata);
+
+        if (mdata)
+            deleteStream(mdata);
     }
 }
 
@@ -416,7 +419,7 @@ void StreamView::updateStreamList(void)
     {
         MusicMetadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         if (mdata)
             mdata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
@@ -425,7 +428,8 @@ void StreamView::updateStreamList(void)
         item->DisplayState("default", "playstate");
 
         // if this is the current radio stream update its play state to match the player
-        if (gPlayer->getCurrentMetadata() && mdata->ID() == gPlayer->getCurrentMetadata()->ID())
+        if (gPlayer->getCurrentMetadata() && mdata &&
+            mdata->ID() == gPlayer->getCurrentMetadata()->ID())
         {
             if (gPlayer->isPlaying())
             {
@@ -574,7 +578,7 @@ void StreamView::updateStream(MusicMetadata *mdata)
                 playedmdata->setStation(mdata->Station());
                 playedmdata->setChannel(mdata->Channel());
 
-                MetadataMap metadataMap;
+                InfoMap metadataMap;
                 playedmdata->toMap(metadataMap);
                 item->SetTextFromMap(metadataMap);
             }
@@ -923,7 +927,7 @@ void SearchStream::updateStreams(void)
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, 
                 "", qVariantFromValue(mdata));
 
-        MetadataMap metadataMap;
+        InfoMap metadataMap;
         mdata->toMap(metadataMap);
         item->SetTextFromMap(metadataMap);
 

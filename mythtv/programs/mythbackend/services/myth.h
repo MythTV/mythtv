@@ -35,7 +35,7 @@ class Myth : public MythServices
     Q_OBJECT
 
     public:
-    
+
         Q_INVOKABLE Myth( QObject *parent = 0 ) : MythServices( parent ) {}
 
     public:
@@ -73,12 +73,12 @@ class Myth : public MythServices
                                                   const QString   &MsgContains
                                                 );
 
-        DTC::SettingList*   GetSetting          ( const QString   &HostName, 
-                                                  const QString   &Key, 
+        DTC::SettingList*   GetSetting          ( const QString   &HostName,
+                                                  const QString   &Key,
                                                   const QString   &Default );
 
-        bool                PutSetting          ( const QString   &HostName, 
-                                                  const QString   &Key, 
+        bool                PutSetting          ( const QString   &HostName,
+                                                  const QString   &Key,
                                                   const QString   &Value   );
 
         bool                ChangePassword      ( const QString   &UserName,
@@ -95,6 +95,22 @@ class Myth : public MythServices
                                                   const QString &Address,
                                                   int   udpPort,
                                                   int   Timeout);
+
+        bool                SendNotification    ( bool  Error,
+                                                  const QString &Type,
+                                                  const QString &Message,
+                                                  const QString &Origin,
+                                                  const QString &Description,
+                                                  const QString &Image,
+                                                  const QString &Extra,
+                                                  const QString &ProgressText,
+                                                  float Progress,
+                                                  int   Duration,
+                                                  bool  Fullscreen,
+                                                  uint  Visibility,
+                                                  uint  Priority,
+                                                  const QString &Address,
+                                                  int   udpPort );
 
         bool                BackupDatabase      ( void );
 
@@ -117,10 +133,10 @@ class Myth : public MythServices
 // QObject actually return QObject* (not the user class *).  If the user class pointer
 // is returned, the script engine treats it as a QVariant and doesn't create a
 // javascript prototype wrapper for it.
-// 
+//
 // This class allows us to keep the rich return types in the main API class while
 // offering the script engine a class it can work with.
-// 
+//
 // Only API Classes that return custom classes needs to implement these wrappers.
 //
 // We should continue to look for a cleaning solution to this problem.
@@ -135,7 +151,7 @@ class ScriptableMyth : public QObject
         Myth    m_obj;
 
     public:
-    
+
         Q_INVOKABLE ScriptableMyth( QObject *parent = 0 ) : QObject( parent ) {}
 
     public slots:
@@ -189,15 +205,15 @@ class ScriptableMyth : public QObject
                                   Level, MsgContains );
         }
 
-        QObject* GetSetting ( const QString   &HostName, 
-                              const QString   &Key, 
+        QObject* GetSetting ( const QString   &HostName,
+                              const QString   &Key,
                               const QString   &Default )
         {
             return m_obj.GetSetting( HostName, Key, Default );
         }
 
-        bool PutSetting( const QString   &HostName, 
-                         const QString   &Key, 
+        bool PutSetting( const QString   &HostName,
+                         const QString   &Key,
                          const QString   &Value   )
         {
             return m_obj.PutSetting( HostName, Key, Value );
@@ -262,4 +278,4 @@ Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableMyth, QObject*);
 
 
 
-#endif 
+#endif

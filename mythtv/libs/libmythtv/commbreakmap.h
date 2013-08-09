@@ -1,12 +1,16 @@
 #ifndef BREAKMAP_H
 #define BREAKMAP_H
 
+// MythTV headers
 #include "tv.h"
 #include "programtypes.h"
 #include "playercontext.h"
 
+// Qt headers
 #include <QMutex>
 #include <QMap>
+#include <QCoreApplication>
+
 
 #include <compat.h>
 #include <stdint.h>
@@ -15,6 +19,8 @@ class NuppelVideoPlayer;
 
 class CommBreakMap
 {
+    Q_DECLARE_TR_FUNCTIONS(CommBreakMap)
+
   public:
     CommBreakMap(void);
 

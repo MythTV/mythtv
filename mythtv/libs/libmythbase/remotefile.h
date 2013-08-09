@@ -21,9 +21,7 @@ class MBASE_PUBLIC RemoteFile
                const QStringList *possibleAuxiliaryFiles = NULL);
    ~RemoteFile();
 
-    bool Open();
     bool ReOpen(QString newFilename);
-    void Close(void);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
@@ -39,7 +37,6 @@ class MBASE_PUBLIC RemoteFile
 
     bool SaveAs(QByteArray &data);
 
-    void SetURL(const QString &url) { path = url; }
     void SetTimeout(bool fast);
 
     bool isOpen(void) const
@@ -51,6 +48,9 @@ class MBASE_PUBLIC RemoteFile
         { return auxfiles; }
 
   private:
+    bool Open();
+    void Close(void);
+
     MythSocket     *openSocket(bool control);
 
     QString         path;

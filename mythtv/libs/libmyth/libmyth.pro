@@ -28,6 +28,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 # Input
 HEADERS += audio/audiooutput.h audio/audiooutputbase.h audio/audiooutputnull.h
 HEADERS += audio/audiooutpututil.h audio/audiooutputdownmix.h
+HEADERS += audio/audioconvert.h
 HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
@@ -55,6 +56,7 @@ SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
 SOURCES += audio/audiooutputnull.cpp
 SOURCES += audio/audiooutpututil.cpp audio/audiooutputdownmix.cpp
+SOURCES += audio/audioconvert.cpp
 SOURCES += audio/audiosettings.cpp audio/audiooutputsettings.cpp audio/pink.c
 SOURCES += audio/volumebase.cpp audio/eldutils.cpp
 
@@ -85,17 +87,17 @@ SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 }
 
-INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
+INCLUDEPATH += ../../external/libsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../../external/FFmpeg
-DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
+DEPENDPATH += ../../external/libsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 
-LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
+LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
@@ -107,7 +109,7 @@ LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 
-POST_TARGETDEPS += ../libmythsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
+POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
@@ -121,6 +123,7 @@ inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
+inc.files += audio/audioconvert.h
 inc.files += audio/volumebase.h audio/eldutils.h
 inc.files += inetcomms.h mythwizard.h schemawizard.h
 inc.files += mythmediamonitor.h
@@ -230,7 +233,7 @@ using_jack {
 }
 
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../external/FFmpeg/libavcodec/x86/mmx.h ../../external/FFmpeg/libavcodec/dsputil.h
+    HEADERS += ../../external/FFmpeg/libavcodec/dsputil.h
 }
 
 use_hidesyms {

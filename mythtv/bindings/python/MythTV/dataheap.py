@@ -919,6 +919,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
                     id = cursor.fetchone()[0]
                     self._evalwheredat([id])
                     self._pull()
+                    self._postinit()
                     return self
 
         # create new entry
@@ -1169,7 +1170,7 @@ class VideoGrabber( Grabber ):
     def __init__(self, mode, lang='en', db=None):
         dbvalue = {'tv':'TelevisionGrabber', 'movie':'MovieGrabber'}
         path = {'tv':'metadata/Television/ttvdb.py',
-                'movie':'metadata/Movie/tmdb.py'}
+                'movie':'metadata/Movie/tmdb3.py'}
         self.mode = mode.lower()
         try:
             Grabber.__init__(self, setting=dbvalue[self.mode], db=db,

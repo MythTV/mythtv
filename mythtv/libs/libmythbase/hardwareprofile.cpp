@@ -9,7 +9,7 @@
 #include "mythcorecontext.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythdate.h"
 
@@ -19,17 +19,42 @@ const QString SMOLT_TOKEN =
                   QString("smolt_token-smolt.mythtv.org");
 
 HardwareProfile::HardwareProfile() :
+    m_enabled(false),
     m_uuid(QString()),               m_publicuuid(QString()),
     m_lastUpdate(QDateTime()),       m_hardwareProfile(QString())
 {
+    m_enabled = (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 1);
     m_uuid = gCoreContext->GetSetting("HardwareProfileUUID");
     m_publicuuid = gCoreContext->GetSetting("HardwareProfilePublicUUID");
-    QString lastupdate = gCoreContext->GetSetting("HardwareProfileLastUpdated");
-    m_lastUpdate = MythDate::fromString(lastupdate);
+
+    if (m_enabled)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT lastrun FROM housekeeping"
+                      " WHERE      tag = 'HardwareProfiler'"
+                      "   AND hostname = :HOST");
+        query.bindValue(":HOST", gCoreContext->GetHostName());
+        if (query.exec() && query.next())
+            m_lastUpdate = MythDate::as_utc(query.value(0).toDateTime());
+    }
 }
 
 HardwareProfile::~HardwareProfile()
 {
+}
+
+void HardwareProfile::Enable(void)
+{
+    if (m_uuid.isEmpty())
+        return;
+
+    gCoreContext->SaveSettingOnHost("HardwareProfileEnabled", "1", "");
+}
+
+void HardwareProfile::Disable(void)
+{
+    gCoreContext->SaveSettingOnHost("HardwareProfileEnabled", "0", "");
 }
 
 void HardwareProfile::GenerateUUIDs(void)
@@ -51,7 +76,7 @@ void HardwareProfile::GenerateUUIDs(void)
         QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
         QStringList args;
         args << "-p";
-        MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+        MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
         system.Run();
         system.Wait();
@@ -169,10 +194,13 @@ bool HardwareProfile::NeedsUpdate(void) const
     return false;
 }
 
-bool HardwareProfile::SubmitProfile(void)
+bool HardwareProfile::SubmitProfile(bool updateTime)
 {
     if (m_uuid.isEmpty())
         return false;
+
+    if (!m_enabled)
+        Enable();
 
     if (!m_hardwareProfile.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,
@@ -183,7 +211,7 @@ bool HardwareProfile::SubmitProfile(void)
     QStringList args;
     args << "--submitOnly";
     args << "-a";
-    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
@@ -191,8 +219,13 @@ bool HardwareProfile::SubmitProfile(void)
         GenerateUUIDs();
         gCoreContext->SaveSetting("HardwareProfileUUID", GetPrivateUUID());
         gCoreContext->SaveSetting("HardwareProfilePublicUUID", GetPublicUUID());
-        gCoreContext->SaveSetting("HardwareProfileLastUpdated",
-                                  MythDate::current_iso_string());
+
+        if (updateTime)
+        {
+            HardwareProfileTask task;
+            task.UpdateLastRun(MythDate::current());
+        }
+
         return true;
     }
     else
@@ -212,15 +245,14 @@ bool HardwareProfile::DeleteProfile(void)
 
     QString cmd = GetShareDir() + "hardwareprofile/deleteProfile.py";
     QStringList args;
-    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     if (system.Wait() == GENERIC_EXIT_OK)
     {
         gCoreContext->SaveSetting("HardwareProfileUUID", "");
         gCoreContext->SaveSetting("HardwareProfilePublicUUID", "");
-        gCoreContext->SaveSetting("HardwareProfileLastUpdated",
-                                  MythDate::current_iso_string());
+        Disable();
         return true;
     }
     else
@@ -246,9 +278,25 @@ QString HardwareProfile::GetHardwareProfile() const
     QString cmd = GetShareDir() + "hardwareprofile/sendProfile.py";
     QStringList args;
     args << "-p";
-    MythSystem system(cmd, args, kMSRunShell | kMSStdOut | kMSBuffered);
+    MythSystemLegacy system(cmd, args, kMSRunShell | kMSStdOut);
 
     system.Run();
     system.Wait();
     return system.ReadAll();
+}
+
+bool HardwareProfileTask::DoCheckRun(QDateTime now)
+{
+    if (gCoreContext->GetNumSetting("HardwareProfileEnabled", 0) == 0)
+        // global disable, we don't want to run
+        return false;
+
+    // leave it up to the standard periodic calculation, 30 +-1 days
+    return PeriodicHouseKeeperTask::DoCheckRun(now);
+}
+
+bool HardwareProfileTask::DoRun(void)
+{
+    HardwareProfile hp;
+    return hp.SubmitProfile(false);
 }

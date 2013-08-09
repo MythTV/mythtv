@@ -45,6 +45,35 @@ bool Frontend::SendMessage(const QString &Message, uint Timeout)
     return true;
 }
 
+bool  Frontend::SendNotification(bool  Error,
+                                 const QString &Type,
+                                 const QString &Message,
+                                 const QString &Origin,
+                                 const QString &Description,
+                                 const QString &Image,
+                                 const QString &Extra,
+                                 const QString &ProgressText,
+                                 float Progress,
+                                 int   Timeout,
+                                 bool  Fullscreen,
+                                 uint  Visibility,
+                                 uint  Priority)
+{
+    if (Message.isEmpty())
+        return false;
+    if (!GetNotificationCenter())
+        return false;
+
+    ShowNotification(Error ? MythNotification::Error :
+                             MythNotification::TypeFromString(Type),
+                     Message,
+                     Origin.isNull() ? tr("FrontendServices") : Origin,
+                     Description, Image, Extra,
+                     ProgressText, Progress, Timeout,
+                     Fullscreen, Visibility, (MythNotification::Priority)Priority);
+    return true;
+}
+
 bool Frontend::SendAction(const QString &Action, const QString &Value,
                           uint Width, uint Height)
 {

@@ -90,11 +90,9 @@ MusicMetadata* MetaIO::readMetadata(const QString &filename)
 MusicMetadata* MetaIO::getMetadata(const QString &filename)
 {
 
-    MusicMetadata *mdata = new MusicMetadata(filename);
-    if (mdata->isInDatabase())
+    MusicMetadata *mdata = MusicMetadata::createFromFilename(filename);
+    if (mdata)
         return mdata;
-
-    delete mdata;
 
     return readMetadata(filename);
 }
@@ -159,7 +157,7 @@ void MetaIO::readFromFilename(const QString &filename,
                 if (title.isEmpty())
                     title = part_str;
                 if (artist.isEmpty())
-                    title = part_str;
+                    artist = part_str;
             }
         }
     }

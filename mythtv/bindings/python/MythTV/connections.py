@@ -477,11 +477,13 @@ class FEConnection( object ):
     def testList(cls, felist):
         felist = [cls(addr, port, test=False) for addr,port in felist]
         for fe in felist:
+            if not fe.isConnected:
+                continue
             try:
                 t = time()
                 fe._test(t + 2.0)
             except MythError, e:
-                pass
+                continue
             yield fe
 
     def __del__(self):
@@ -498,14 +500,16 @@ class FEConnection( object ):
 
     def connect(self, test=True):
         if self.isConnected:
-            return True
+            return
         self.socket = deadlinesocket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setdeadline(self._deadline)
         self.socket.log = self.log
         try:
             self.socket.connect((self.host, self.port))
         except:
-            raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
+            if test:
+                raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
+            return
         self.isConnected = True
         if test: self._test()
 

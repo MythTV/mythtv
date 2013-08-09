@@ -9,7 +9,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythlogging.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
 {
@@ -80,7 +80,7 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         {
             const QString channum = query.value(0).toString();
             const int where = channum.indexOf(sepExpr);
-            if (channum.right(2).left(1) == "0")
+            if (channum.right(2).startsWith("0"))
                 counts["0"]++;
             else
                 counts[(where < 0) ? "" : QString(channum.at(where))]++;
@@ -190,7 +190,7 @@ static QStringList get_cardtypes(uint sourceid)
 /// BEGIN HACK HACK HACK -- return correct card type for child cards
             QString cardtype = query.value(0).toString().toUpper();
             QString inputname = query.value(1).toString().toUpper();
-            cardtype = ((cardtype == "DVB") && (inputname.left(3) != "DVB")) ?
+            cardtype = ((cardtype == "DVB") && (!inputname.startsWith("DVB"))) ?
                 "V4L" : cardtype;
 /// END  HACK HACK HACK
             list += cardtype;
@@ -380,7 +380,7 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
             args.append(cardtype);
         }
 
-        MythSystem getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
+        MythSystemLegacy getchan(cmd, args, kMSRunShell | kMSAutoCleanup );
         getchan.Run();
         getchan.Wait();
     }

@@ -11,7 +11,7 @@ use strict;
 use POSIX;
 use XML::Simple;
 
-our $VERSION = 0.5;
+our $VERSION = 0.6;
 
 my %results;
 my %directions = (  N  => "North",      NNE => "North Northeast",
@@ -22,6 +22,15 @@ my %directions = (  N  => "North",      NNE => "North Northeast",
                     NW => "Northwest",  WSW => "West Southwest",
                     SE => "Southeast",  WNW => "West Northwest",
                     SW => "Southwest",  NNW => "North Northwest");
+
+my %degrees = (     N  => 0,   NNE => 22.5,
+                    S  => 180, ENE => 67.5,
+                    E  => 90,  ESE => 112.5,
+                    W  => 270, SSE => 157.5,
+                    NE => 45,  SSW => 202.5,
+                    NW => 315, WSW => 247.5,
+                    SE => 135, WNW => 292.5,
+                    SW => 225, NNW => 337.5);
 
 sub getIcon {
     my $condition = shift;
@@ -35,6 +44,10 @@ sub getIcon {
     elsif ($condition =~ /fog/i) {
         $icon = 'fog.png';
     }
+    elsif ($condition =~ /precip/i) {
+        $icon = 'lshowers.png';
+        $icon = 'rainsnow.png'  if ($condition =~ /freezing/i);
+    }
     elsif ($condition =~ /drizzle/i) {
         $icon = 'lshowers.png';
         $icon = 'rainsnow.png'  if ($condition =~ /freezing/i);
@@ -47,6 +60,9 @@ sub getIcon {
                                      ($condition =~ /flurries/i));
         $icon = 'thunshowers.png' if ($condition =~ /thunder/i);
     }
+    elsif ($condition =~ /overcast/i) {
+        $icon = 'cloudy.png';
+    }
     elsif ($condition =~ /cloud/i) {
         $icon = 'cloudy.png';
         $icon = 'mcloudy.png' if ($condition =~ /mostly/i);
@@ -57,6 +73,7 @@ sub getIcon {
     }
     elsif ($condition =~ /clear/i) {
         $icon = 'fair.png';
+        $icon = 'pcloudy.png' if ($condition =~ /clearing/i);
     }
     elsif ($condition =~ /sun/i) {
         $icon = 'sunny.png';
@@ -75,42 +92,43 @@ sub doParse {
     # Initialize results hash
     foreach my $type (@types) { $results{$type} = ""; }
 
-    my $xml = XMLin($data);
+    my $xml = XMLin($data, ForceArray => [ 'id' ] );
     die if (!$xml);
 
-    $results{'copyright'}  = $xml->{channel}->{copyright};
-    if ($xml->{channel}->{title} =~ /^(.*) - Weather/) {
+    $results{'copyright'}  = $xml->{rights};
+    if ($xml->{title} =~ /^(.*) - Weather/) {
         $results{'cclocation'} = ucfirst($1); 
         $results{'3dlocation'} = ucfirst($1); 
         $results{'6dlocation'} = ucfirst($1); 
     }
    
     my $i = 0; 
-    foreach my $item (@{$xml->{channel}->{item}}) {
+
+    foreach my $item (@{$xml->{entry}}) {
         if ($item->{title} =~ /Current Conditions/) {
-            if ($item->{description} =~ /Condition:\<\/b\>\s*([\w ]*)\s*\<br\/\>/s) {
+            if ($item->{summary}->{content} =~ /Condition:\<\/b\>\s*([\w ]*)\s*\<br\/\>/s) {
                 $results{'weather'} = $1;
                 $results{'weather_icon'} = getIcon($1);
             }
             $results{'temp'}     = sprintf("%.0f", $1) 
-                if ($item->{description} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
+                if ($item->{summary}->{content} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
             $results{'pressure'} = sprintf("%d", $1 * 10)
-                if ($item->{description} =~ /Pressure \/ Tendency:\<\/b\>\s*(\d*\.?\d*) kPa\s*.*\<br\/\>/s);
+                if ($item->{summary}->{content} =~ /Pressure.*:\<\/b\>\s*(\d*\.?\d*) kPa\s*.*\<br\/\>/s);
             $results{'visibility'} = sprintf("%.1f", $1)
-                if ($item->{description} =~ /Visibility:\<\/b\>\s*(\d*\.?\d*) km\s*.*\<br\/\>/s);
+                if ($item->{summary}->{content} =~ /Visibility:\<\/b\>\s*(\d*\.?\d*) km\s*.*\<br\/\>/s);
             $results{'relative_humidity'} = $1
-                if ($item->{description} =~ /Humidity:\<\/b\>\s*(\d*) \%\<br\/\>/s);
-            if ($item->{description} =~ /Wind Chill:\<\/b\>\s*(-?\d*\.?\d*)\s*\<br\/\>/s) {
+                if ($item->{summary}->{content} =~ /Humidity:\<\/b\>\s*(\d*) \%\<br\/\>/s);
+            if ($item->{summary}->{content} =~ /Wind Chill:\<\/b\>\s*(-?\d*\.?\d*)\s*\<br\/\>/s) {
                 $results{'appt'} = $1; 
                 $results{'windchill'} = $1; 
             }
             $results{'dewpoint'} = sprintf("%.0f", $1)
-                if ($item->{description} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
-            if ($item->{description} =~ /(\d*\:\d*[\w ]*\d*[\w *]\d*)\s*\<br\/\>/s) {
+                if ($item->{summary}->{content} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
+            if ($item->{summary}->{content} =~ /(\d*\:\d*[\w ]*\d*[\w *]\d*)\s*\<br\/\>/s) {
                 $results{'observation_time'} = "Last updated at ". $1;
                 $results{'updatetime'} = "Last updated at ". $1;
             }
-            if ($item->{description} =~ /Wind:\<\/b\>(.*)\<br\/\>/s) {
+            if ($item->{summary}->{content} =~ /Wind:\<\/b\>(.*)\<br\/\>/s) {
                 my $wind = $1;
                 if ($wind =~ /\s*(\d*)\s*km\/h\s*/i) {
                     $results{'wind_dir'} = 'Calm';
@@ -118,7 +136,8 @@ sub doParse {
                     $results{'wind_gust'} = 0;
                 }
                 if ($wind =~ /\s*(\w*)\s*(\d*)\s*km\/h\s*/i) {
-                    $results{'wind_dir'}   = $directions{$1};
+                    $results{'wind_dir'}     = $directions{$1};
+                    $results{'wind_degrees'} = $degrees{$1};
                     $results{'wind_speed'} = $2;
                 }
                 if ($wind =~ /\s*(\w*)\s*(\d*)\s*km\/h\s*gust\s*(\d*)\s*km\/h/i) {

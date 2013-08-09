@@ -77,13 +77,20 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
     }
 
     QDomElement docElem = doc.documentElement();
+    bool notification = false;
     if (!docElem.isNull())
     {
-        if (docElem.tagName() != "mythmessage")
+        if (docElem.tagName() != "mythmessage" &&
+            docElem.tagName() != "mythnotification")
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unknown UDP packet (not <mythmessage> XML)");
             return;
+        }
+
+        if (docElem.tagName() == "mythnotification")
+        {
+            notification = true;
         }
 
         QString version = docElem.attribute("version", "");
@@ -97,6 +104,16 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
 
     QString msg  = QString("");
     uint timeout = 0;
+    QString image;
+    QString origin;
+    QString description = "";
+    QString extra = "";
+    QString progress_text = "";
+    float progress = -1.0f;
+    bool fullscreen = false;
+    bool error = false;
+    int visibility = 0;
+    QString type = "normal";
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -108,11 +125,35 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
                 msg = e.text();
             else if (e.tagName() == "timeout")
                 timeout = e.text().toUInt();
+            else if (notification && e.tagName() == "image")
+                image = e.text();
+            else if (notification && e.tagName() == "origin")
+                origin = e.text();
+            else if (notification && e.tagName() == "description")
+                description = e.text();
+            else if (notification && e.tagName() == "extra")
+                extra = e.text();
+            else if (notification && e.tagName() == "progress_text")
+                progress_text = e.text();
+            else if (notification && e.tagName() == "fullscreen")
+                fullscreen = e.text().toLower() == "true";
+            else if (notification && e.tagName() == "error")
+                error = e.text().toLower() == "true";
+            else if (e.tagName() == "visibility")
+                visibility = e.text().toUInt();
+            else if (e.tagName() == "type")
+                type = e.text();
+            else if (notification && e.tagName() == "progress")
+            {
+                bool ok;
+                progress = e.text().toFloat(&ok);
+                if (!ok)
+                    progress = -1.0f;
+            }
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
                     .arg(e.tagName()));
-                return;
             }
         }
         n = n.nextSibling();
@@ -120,14 +161,26 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
 
     if (!msg.isEmpty())
     {
+        LOG(VB_GENERAL, LOG_INFO, QString("Received %1 '%2', timeout %3")
+            .arg(notification ? "notification" : "message").arg(msg).arg(timeout));
         if (timeout > 1000)
-            timeout = 0;
-        LOG(VB_GENERAL, LOG_INFO, QString("Received message '%1', timeout %2")
-            .arg(msg).arg(timeout));
-        QStringList args;
-        args << QString::number(timeout);
-        MythMainWindow *window = GetMythMainWindow();
-        MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
-        qApp->postEvent(window, me);
+            timeout = notification ? 5 : 0;
+        if (notification)
+        {
+            origin = origin.isNull() ? tr("UDP Listener") : origin;
+            ShowNotification(error ? MythNotification::Error :
+                                     MythNotification::TypeFromString(type),
+                             msg, origin, description, image, extra,
+                             progress_text, progress, timeout, fullscreen,
+                             visibility);
+        }
+        else
+        {
+            QStringList args;
+            args << QString::number(timeout);
+            MythMainWindow *window = GetMythMainWindow();
+            MythEvent* me = new MythEvent(MythEvent::MythUserMessage, msg, args);
+            qApp->postEvent(window, me);
+        }
     }
 }

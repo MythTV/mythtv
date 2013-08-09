@@ -62,6 +62,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "icringbuffer.h"
+#include "audiooutput.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -237,7 +238,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
 
     defaultDisplayAspect =
         gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
-                                            gCoreContext->GetHostName(), 1.3333);
+                                            gCoreContext->GetHostName(), 1.7777);
     captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
     decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
     itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
@@ -574,7 +575,7 @@ void MythPlayer::ReinitVideo(void)
     if (!videoOutput->IsPreferredRenderer(video_disp_dim))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Need to switch video renderer.");
-        SetErrored(tr("Need to switch video renderer."));
+        SetErrored(tr("Need to switch video renderer"));
         errorType |= kError_Switch_Renderer;
         return;
     }
@@ -809,16 +810,19 @@ void MythPlayer::SetScanType(FrameScanType scan)
 void MythPlayer::SetVideoParams(int width, int height, double fps,
                                 FrameScanType scan)
 {
-    if (width < 1 || height < 1 || qIsNaN(fps))
-        return;
+    bool paramsChanged = false;
 
-    video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
-    video_disp_dim = QSize(width, height);
-    if (height)
-        video_aspect = (float)width / height;
-
-    if (fps > 0.0f && fps < 121.0f)
+    if (width >= 1 && height >= 1)
     {
+        paramsChanged  = true;
+        video_dim      = QSize((width + 15) & ~0xf, (height + 15) & ~0xf);
+        video_disp_dim = QSize(width, height);
+        video_aspect   = (float)width / height;
+    }
+
+    if (!qIsNaN(fps) && fps > 0.0f && fps < 121.0f)
+    {
+        paramsChanged    = true;
         video_frame_rate = fps;
         if (ffrew_skip != 0 && ffrew_skip != 1)
         {
@@ -833,6 +837,9 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
                              1.0 / (video_frame_rate * temp_speed));
         }
     }
+
+    if (!paramsChanged)
+        return;
 
     if (videoOutput)
         ReinitVideo();
@@ -889,7 +896,7 @@ void MythPlayer::CreateDecoder(char *testbuf, int testreadsize)
 int MythPlayer::OpenFile(uint retries)
 {
     // Disable hardware acceleration for second PBP
-    if ((player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP()) &&
+    if (player_ctx && (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP()) &&
         FlagIsSet(kDecodeAllowGPU))
     {
         playerFlags = (PlayerFlags)(playerFlags - kDecodeAllowGPU);
@@ -933,6 +940,7 @@ int MythPlayer::OpenFile(uint retries)
                         .arg(testreadsize)
                         .arg(player_ctx->buffer->GetFilename()));
                 delete[] testbuf;
+                SetErrored(tr("Could not read first %1 bytes").arg(testreadsize));
                 return -1;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenFile() waiting on data");
@@ -952,6 +960,7 @@ int MythPlayer::OpenFile(uint retries)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Couldn't find an A/V decoder for: '%1'")
                 .arg(player_ctx->buffer->GetFilename()));
+        SetErrored(tr("Could not find an A/V decoder"));
 
         delete[] testbuf;
         return -1;
@@ -960,6 +969,7 @@ int MythPlayer::OpenFile(uint retries)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
         SetDecoder(NULL);
+        SetErrored(tr("Could not initialize A/V decoder"));
 
         delete[] testbuf;
         return -1;
@@ -984,6 +994,7 @@ int MythPlayer::OpenFile(uint retries)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Couldn't open decoder for: %1")
                 .arg(player_ctx->buffer->GetFilename()));
+        SetErrored(tr("Could not open decoder"));
         return -1;
     }
 
@@ -1046,7 +1057,7 @@ void MythPlayer::InitFilters(void)
         }
         else
         {
-            if ((filters.length() > 1) && (filters.right(1) != ","))
+            if ((filters.length() > 1) && (!filters.endsWith(",")))
                 filters += ",";
             filters += videoFiltersForProgram.mid(1);
         }
@@ -2388,6 +2399,8 @@ bool MythPlayer::VideoLoop(void)
 
     if (FlagIsSet(kVideoIsNull) && decoder)
         decoder->UpdateFramesPlayed();
+    else if (decoder && decoder->GetEof() != kEofStateNone)
+        ++framesPlayed;
     else
         framesPlayed = videoOutput->GetFramesPlayed();
     return !IsErrored();
@@ -2522,7 +2535,8 @@ void MythPlayer::SwitchToProgram(void)
     {
         // Restore original ringbuffer
         ICRingBuffer *ic = dynamic_cast< ICRingBuffer* >(player_ctx->buffer);
-        player_ctx->buffer = ic->Take();
+        if (ic) // should always be true
+            player_ctx->buffer = ic->Take();
         delete ic;
     }
 
@@ -2664,12 +2678,20 @@ void MythPlayer::JumpToProgram(void)
     {
         // Restore original ringbuffer
         ICRingBuffer *ic = dynamic_cast< ICRingBuffer* >(player_ctx->buffer);
-        player_ctx->buffer = ic->Take();
+        if (ic) // should always be true
+            player_ctx->buffer = ic->Take();
         delete ic;
     }
 
     player_ctx->buffer->OpenFile(
         pginfo->GetPlaybackURL(), RingBuffer::kLiveTVOpenTimeout);
+    QString subfn = player_ctx->buffer->GetSubtitleFilename();
+    TVState desiredState = player_ctx->GetState();
+    bool isInProgress =
+        desiredState == kState_WatchingRecording || kState_WatchingLiveTV;
+    if (GetSubReader())
+        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress &&
+                                              !subfn.isEmpty());
 
     if (!player_ctx->buffer->IsOpen())
     {
@@ -2931,8 +2953,12 @@ void MythPlayer::EventLoop(void)
             return;
         }
 
-        if (eof != kEofStateDelayed ||
-            (videoOutput && videoOutput->ValidVideoFrames() < 1))
+        bool videoDrained =
+            videoOutput && videoOutput->ValidVideoFrames() < 1;
+        bool audioDrained =
+            !audio.GetAudioOutput() ||
+            audio.GetAudioOutput()->GetAudioBufferedTime() < 100;
+        if (eof != kEofStateDelayed || (videoDrained && audioDrained))
         {
             if (eof == kEofStateDelayed)
                 LOG(VB_PLAYBACK, LOG_INFO,
@@ -2980,8 +3006,8 @@ void MythPlayer::EventLoop(void)
             SetOSDStatus(tr("Not Flagged"), kOSDTimeout_Med);
             QString message = "COMMFLAG_REQUEST ";
             player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            message += player_ctx->playingInfo->GetChanID() + " " +
-                   player_ctx->playingInfo->MakeUniqueKey();
+            message += QString("%1").arg(player_ctx->playingInfo->GetChanID()) +
+                " " + player_ctx->playingInfo->MakeUniqueKey();
             player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
             gCoreContext->SendMessage(message);
         }
@@ -3079,15 +3105,18 @@ void MythPlayer::UnpauseDecoder(void)
         return;
     }
 
-    int tries = 0;
-    unpauseDecoder = true;
-    while (decoderThread && !killdecoder && (tries++ < 100) &&
-          !decoderThreadUnpause.wait(&decoderPauseLock, 100))
+    if (!IsInStillFrame())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Waited 100ms for decoder to unpause");
+        int tries = 0;
+        unpauseDecoder = true;
+        while (decoderThread && !killdecoder && (tries++ < 100) &&
+              !decoderThreadUnpause.wait(&decoderPauseLock, 100))
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Waited 100ms for decoder to unpause");
+        }
+        unpauseDecoder = false;
     }
-    unpauseDecoder = false;
     decoderPauseLock.unlock();
 }
 
@@ -3234,6 +3263,9 @@ void MythPlayer::DecoderLoop(bool pause)
 
 bool MythPlayer::DecoderGetFrameFFREW(void)
 {
+    if (!decoder)
+        return false;
+
     if (ffrew_skip > 0)
     {
         long long delta = decoder->GetFramesRead() - framesPlayed;
@@ -3965,11 +3997,11 @@ void MythPlayer::DisableEdit(int howToSave)
         SetOSDStatus(tr("Paused"), kOSDTimeout_None);
 }
 
-bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
-                                             long long frame)
+bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
 {
     bool handled = false;
     bool refresh = true;
+    long long frame = GetFramesPlayed();
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -4075,7 +4107,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions,
         {
             QString undoMessage = deleteMap.GetUndoMessage();
             QString redoMessage = deleteMap.GetRedoMessage();
-            handled = deleteMap.HandleAction(action, frame, framesPlayed);
+            handled = deleteMap.HandleAction(action, frame);
             if (handled && (action == "CUTTOBEGINNING" ||
                 action == "CUTTOEND" || action == "NEWCUT"))
             {
@@ -4682,14 +4714,23 @@ int MythPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-int64_t MythPlayer::GetSecondsPlayed(bool honorCutList)
+int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor) const
 {
-    return TranslatePositionFrameToMs(framesPlayed, honorCutList) / 1000;
+    int64_t pos = TranslatePositionFrameToMs(framesPlayed, honorCutList);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("GetSecondsPlayed: framesPlayed %1, honorCutList %2, divisor %3, pos %4")
+        .arg(framesPlayed).arg(honorCutList).arg(divisor).arg(pos));
+    return TranslatePositionFrameToMs(framesPlayed, honorCutList) / divisor;
 }
 
-int64_t MythPlayer::GetTotalSeconds(void) const
+int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
 {
-    return totalDuration;
+    uint64_t pos = totalFrames;
+
+    if (IsWatchingInprogress())
+        pos = (uint64_t)-1;
+
+    return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
 }
 
 // Returns the total frame count, as totalFrames for a completed
@@ -4740,7 +4781,6 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     info.values.insert("progbefore", 0);
     info.values.insert("progafter",  0);
 
-    uint64_t total_frames = totalFrames;
     int playbackLen = 0;
     bool fixed_playbacklen = false;
 
@@ -4760,7 +4800,6 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     }
     else if (IsWatchingInprogress())
     {
-        total_frames = -1;
         islive = true;
     }
     else
@@ -4794,18 +4833,24 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
     for (int i = 0; i < 2 ; ++i)
     {
         bool honorCutList = (i > 0);
+        bool stillFrame = false;
+        int  pos = 0;
+
         QString relPrefix = (honorCutList ? "rel" : "");
         if (!fixed_playbacklen)
-            playbackLen =
-                TranslatePositionFrameToMs(total_frames, honorCutList)
-            / 1000;
-        playbackLen = max(playbackLen, 1);
-        float secsplayed = GetSecondsPlayed(honorCutList);
-        secsplayed = min((float)playbackLen, max(secsplayed, 0.0f));
+            playbackLen = GetTotalSeconds(honorCutList);
+        int secsplayed = GetSecondsPlayed(honorCutList);
 
-        info.values.insert(relPrefix + "secondsplayed", (int)secsplayed);
+        stillFrame = (secsplayed < 0);
+        playbackLen = max(playbackLen, 0);
+        secsplayed = min(playbackLen, max(secsplayed, 0));
+
+        if (playbackLen > 0)
+            pos = (int)(1000.0f * (secsplayed / (float)playbackLen));
+
+        info.values.insert(relPrefix + "secondsplayed", secsplayed);
         info.values.insert(relPrefix + "totalseconds", playbackLen);
-        info.values[relPrefix + "position"] = (int)(1000.0f * (secsplayed / (float)playbackLen));
+        info.values[relPrefix + "position"] = pos;
 
         int phours = (int)secsplayed / 3600;
         int pmins = ((int)secsplayed - phours * 3600) / 60;
@@ -4854,7 +4899,10 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
             }
         }
 
-        info.text[relPrefix + "description"] = tr("%1 of %2").arg(text1).arg(text2);
+        QString desc = stillFrame ? tr("Still Frame") :
+                                    tr("%1 of %2").arg(text1).arg(text2);
+
+        info.text[relPrefix + "description"] = desc;
         info.text[relPrefix + "playedtime"] = text1;
         info.text[relPrefix + "totaltime"] = text2;
         info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
@@ -4869,7 +4917,8 @@ uint64_t MythPlayer::TranslatePositionFrameToMs(uint64_t position,
                                                 bool use_cutlist) const
 {
     float frameRate = GetFrameRate();
-    if (position == (uint64_t)-1)
+    if (position == (uint64_t)-1 &&
+        player_ctx->recorder && player_ctx->recorder->IsValidRecorder())
     {
         float recorderFrameRate = player_ctx->recorder->GetFrameRate();
         if (recorderFrameRate > 0)
@@ -5072,7 +5121,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream buffer OpenFile failed");
         SetEof(kEofStateImmediate);
-        SetErrored(QObject::tr("Error opening remote stream buffer"));
+        SetErrored(tr("Error opening remote stream buffer"));
         return;
     }
 
@@ -5085,7 +5134,7 @@ void MythPlayer::JumpToStream(const QString &stream)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream OpenFile failed.");
         SetEof(kEofStateImmediate);
-        SetErrored(QObject::tr("Error opening remote stream"));
+        SetErrored(tr("Error opening remote stream"));
         return;
     }
 
@@ -5194,7 +5243,7 @@ bool MythPlayer::PosMapFromEnc(uint64_t start,
     return true;
 }
 
-void MythPlayer::SetErrored(const QString &reason) const
+void MythPlayer::SetErrored(const QString &reason)
 {
     QMutexLocker locker(&errorLock);
 
@@ -5210,6 +5259,13 @@ void MythPlayer::SetErrored(const QString &reason) const
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("%1").arg(reason));
     }
+}
+
+void MythPlayer::ResetErrored(void)
+{
+    QMutexLocker locker(&errorLock);
+
+    errorMsg = QString();
 }
 
 bool MythPlayer::IsErrored(void) const
@@ -5326,7 +5382,7 @@ void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
     if (!osd)
         return;
 
-    QHash<QString,QString> info;
+    InfoMap info;
     info.insert("message_text", msg);
     osd->SetText("osd_message", info, timeout);
 }

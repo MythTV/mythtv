@@ -223,7 +223,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
         return "";
 
     QString pburl = pginfo.GetPlaybackURL(true);
-    if (pburl.left(1) != "/")
+    if (!pburl.startsWith("/"))
         return "";
 
     QString basename(query.value(0).toString());
@@ -598,9 +598,11 @@ bool CommDetector2::go(void)
             struct timeval start, end, elapsedtv;
 
             (void)gettimeofday(&start, NULL);
-            VideoFrame *currentFrame = player->GetRawVideoFrame(nextFrame);
+            bool fetchNext = (nextFrame == currentFrameNumber + 1);
+            VideoFrame *currentFrame =
+                player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = currentFrameNumber;
-            currentFrameNumber = currentFrame->frameNumber;
+            currentFrameNumber = currentFrame->frameNumber + 1;
             (void)gettimeofday(&end, NULL);
             timersub(&end, &start, &elapsedtv);
             timeradd(&getframetime, &elapsedtv, &getframetime);
@@ -645,7 +647,7 @@ bool CommDetector2::go(void)
                 *currentPass, finishedAnalyzers,
                 deadAnalyzers, currentFrame, currentFrameNumber);
 
-            if (((currentFrameNumber >= 1) &&
+            if (((currentFrameNumber >= 1) && (nframes > 0) &&
                  (((nextFrame * 10) / nframes) !=
                   ((currentFrameNumber * 10) / nframes))) ||
                 (nextFrame >= nframes))
