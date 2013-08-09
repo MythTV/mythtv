@@ -3153,6 +3153,7 @@ void MythPlayer::DecoderEnd(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to stop decoder loop.");
     else
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Exited decoder loop.");
+    SetDecoder(NULL);
 }
 
 void MythPlayer::DecoderPauseCheck(void)
