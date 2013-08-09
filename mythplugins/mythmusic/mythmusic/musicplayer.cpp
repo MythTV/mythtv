@@ -1411,7 +1411,7 @@ void MusicPlayer::decoderHandlerReady(void)
 
         getDecoder()->start();
 
-        if (m_resumeMode == RESUME_EXACT &&
+        if (!m_oneshotMetadata && m_resumeMode == RESUME_EXACT &&
             gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
         {
             seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
