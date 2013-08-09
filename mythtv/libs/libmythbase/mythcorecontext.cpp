@@ -957,7 +957,7 @@ bool MythCoreContext::SendReceiveStringList(
         for (uint i=0; i<(uint)strlist.size() && i<2; i++)
             msg += (i?",":"") + strlist[i];
         msg += (strlist.size() > 2) ? "...)" : ")";
-        LOG(VB_GENERAL, LOG_WARNING, msg + " called from UI thread");
+        LOG(VB_GENERAL, LOG_DEBUG, msg + " called from UI thread");
     }
 
     QString query_type = "UNKNOWN";
