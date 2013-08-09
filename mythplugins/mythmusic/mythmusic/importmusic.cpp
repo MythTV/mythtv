@@ -121,7 +121,7 @@ ImportMusicDialog::~ImportMusicDialog()
     if (gPlayer->getCurrentMetadata() && m_playingMetaData)
     {
         if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata()->Filename() == m_playingMetaData->Filename())
-            gPlayer->next();
+            gPlayer->stop();
     }
 
     if (m_locationEdit)
