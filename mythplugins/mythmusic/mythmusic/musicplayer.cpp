@@ -73,7 +73,7 @@ MusicPlayer::MusicPlayer(QObject *parent)
     m_isPlaying = false;
     m_playMode = PLAYMODE_TRACKS;
     m_canShowPlayer = true;
-    m_wasPlaying = true;
+    m_wasPlaying = false;
     m_updatedLastplay = false;
     m_allowRestorePos = true;
 
