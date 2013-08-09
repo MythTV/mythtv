@@ -18,9 +18,7 @@ LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
 LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
-LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
-LIBS += -L../.. -lmythtv-$$LIBVERSION
 LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
 LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
@@ -29,7 +27,9 @@ LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/zeromq/src/.libs -lmythzmq
 LIBS += -L../../../../external/nzmqt/src -lmythnzmqt
 LIBS += -L../../../../external/qjson/lib -lmythqjson
-LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+using_hdhomerun:LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
+LIBS += -L../.. -lmythtv-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
