@@ -675,7 +675,7 @@ void VideoFilterDialog::fillWidgets()
     }
 
     // Category
-    new MythUIButtonListItem(m_categoryList, QObject::tr("All"),
+    new MythUIButtonListItem(m_categoryList, tr("All", "Category"),
                            kCategoryFilterAll);
 
     const VideoCategory::entry_list &vcl =
@@ -691,7 +691,7 @@ void VideoFilterDialog::fillWidgets()
     m_categoryList->SetValueByData(m_settings.GetCategory());
 
     // Genre
-    new MythUIButtonListItem(m_genreList, QObject::tr("All"), kGenreFilterAll);
+    new MythUIButtonListItem(m_genreList, tr("All", "Genre"), kGenreFilterAll);
 
     const VideoGenre::entry_list &gl = VideoGenre::getGenre().getList();
     for (VideoGenre::entry_list::const_iterator p = gl.begin();
@@ -704,7 +704,7 @@ void VideoFilterDialog::fillWidgets()
     m_genreList->SetValueByData(m_settings.getGenre());
 
     // Cast
-    new MythUIButtonListItem(m_castList, QObject::tr("All"), kCastFilterAll);
+    new MythUIButtonListItem(m_castList, tr("All", "Cast"), kCastFilterAll);
 
     const VideoCast::entry_list &cl = VideoCast::GetCast().getList();
     for (VideoCast::entry_list::const_iterator p = cl.begin();
@@ -717,7 +717,7 @@ void VideoFilterDialog::fillWidgets()
     m_castList->SetValueByData(m_settings.GetCast());
 
     // Country
-    new MythUIButtonListItem(m_countryList, QObject::tr("All"), kCountryFilterAll);
+    new MythUIButtonListItem(m_countryList, tr("All", "Country"), kCountryFilterAll);
 
     const VideoCountry::entry_list &cnl = VideoCountry::getCountry().getList();
     for (VideoCountry::entry_list::const_iterator p = cnl.begin();
@@ -731,7 +731,7 @@ void VideoFilterDialog::fillWidgets()
     m_countryList->SetValueByData(m_settings.getCountry());
 
     // Year
-    new MythUIButtonListItem(m_yearList, QObject::tr("All"), kYearFilterAll);
+    new MythUIButtonListItem(m_yearList, tr("All", "Year"), kYearFilterAll);
 
     for (int_list::const_reverse_iterator p = years.rbegin();
             p != years.rend(); ++p)
@@ -746,7 +746,7 @@ void VideoFilterDialog::fillWidgets()
     m_yearList->SetValueByData(m_settings.getYear());
 
     // Runtime
-    new MythUIButtonListItem(m_runtimeList, QObject::tr("All"), kRuntimeFilterAll);
+    new MythUIButtonListItem(m_runtimeList, tr("All", "Runtime"), kRuntimeFilterAll);
 
     if (have_unknown_runtime)
         new MythUIButtonListItem(m_runtimeList, VIDEO_RUNTIME_UNKNOWN,
@@ -763,7 +763,7 @@ void VideoFilterDialog::fillWidgets()
     m_runtimeList->SetValueByData(m_settings.getRuntime());
 
     // User Rating
-    new MythUIButtonListItem(m_userratingList, QObject::tr("All"),
+    new MythUIButtonListItem(m_userratingList, tr("All", "User rating"),
                            kUserRatingFilterAll);
 
     for (int_list::const_reverse_iterator p = user_ratings.rbegin();
@@ -777,52 +777,60 @@ void VideoFilterDialog::fillWidgets()
     m_userratingList->SetValueByData(m_settings.GetUserRating());
 
     // Browsable
-    new MythUIButtonListItem(m_browseList, QObject::tr("All"), kBrowseFilterAll);
-    new MythUIButtonListItem(m_browseList, QObject::tr("Yes"),
-                                qVariantFromValue(1));
-    new MythUIButtonListItem(m_browseList, QObject::tr("No"),
-                                qVariantFromValue(0));
+    new MythUIButtonListItem(m_browseList, tr("All", "Browsable"),
+                             kBrowseFilterAll);
+    new MythUIButtonListItem(m_browseList,
+        QCoreApplication::translate("(Common)", "Yes"), qVariantFromValue(1));
+    new MythUIButtonListItem(m_browseList,
+        QCoreApplication::translate("(Common)", "No"),  qVariantFromValue(0));
     m_browseList->SetValueByData(m_settings.GetBrowse());
 
     // Watched
-    new MythUIButtonListItem(m_watchedList, QObject::tr("All"), kWatchedFilterAll);
-    new MythUIButtonListItem(m_watchedList, QObject::tr("Yes"),
-                                qVariantFromValue(1));
-    new MythUIButtonListItem(m_watchedList, QObject::tr("No"),
-                                qVariantFromValue(0));
+    new MythUIButtonListItem(m_watchedList, tr("All", "Watched"),
+                             kWatchedFilterAll);
+    new MythUIButtonListItem(m_watchedList,
+        QCoreApplication::translate("(Common)", "Yes"), qVariantFromValue(1));
+    new MythUIButtonListItem(m_watchedList,
+        QCoreApplication::translate("(Common)", "No"), qVariantFromValue(0));
     m_watchedList->SetValueByData(m_settings.GetWatched());
 
     // Inet Reference
-    new MythUIButtonListItem(m_inetrefList, QObject::tr("All"),
+    new MythUIButtonListItem(m_inetrefList, tr("All", "Inet reference"),
                            kInetRefFilterAll);
-    new MythUIButtonListItem(m_inetrefList, QObject::tr("Unknown"),
+    new MythUIButtonListItem(m_inetrefList, tr("Unknown", "Inet reference"),
                            kInetRefFilterUnknown);
     m_inetrefList->SetValueByData(m_settings.getInteRef());
 
     // Coverfile
-    new MythUIButtonListItem(m_coverfileList, QObject::tr("All"),
+    new MythUIButtonListItem(m_coverfileList, tr("All", "Cover file"),
                            kCoverFileFilterAll);
-    new MythUIButtonListItem(m_coverfileList, QObject::tr("None"),
+    new MythUIButtonListItem(m_coverfileList, tr("None", "Cover file"),
                            kCoverFileFilterNone);
     m_coverfileList->SetValueByData(m_settings.GetCoverFile());
 
     // Order by
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Title"),
-                           VideoFilterSettings::kOrderByTitle);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Season/Episode"),
-                           VideoFilterSettings::kOrderBySeasonEp);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Year"),
-                           VideoFilterSettings::kOrderByYearDescending);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("User Rating"),
-                           VideoFilterSettings::kOrderByUserRatingDescending);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Runtime"),
-                           VideoFilterSettings::kOrderByLength);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Filename"),
-                           VideoFilterSettings::kOrderByFilename);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Video ID"),
-                           VideoFilterSettings::kOrderByID);
-    new MythUIButtonListItem(m_orderbyList, QObject::tr("Date Added"),
-                           VideoFilterSettings::kOrderByDateAddedDescending);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "Title"),
+        VideoFilterSettings::kOrderByTitle);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "Season/Episode"),
+        VideoFilterSettings::kOrderBySeasonEp);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "Year"),
+        VideoFilterSettings::kOrderByYearDescending);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "User Rating"),
+        VideoFilterSettings::kOrderByUserRatingDescending);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "Runtime"),
+        VideoFilterSettings::kOrderByLength);
+    new MythUIButtonListItem(m_orderbyList,
+        QCoreApplication::translate("(Common)", "Filename"),
+        VideoFilterSettings::kOrderByFilename);
+    new MythUIButtonListItem(m_orderbyList, tr("Video ID"),
+        VideoFilterSettings::kOrderByID);
+    new MythUIButtonListItem(m_orderbyList, tr("Date Added"),
+        VideoFilterSettings::kOrderByDateAddedDescending);
     m_orderbyList->SetValueByData(m_settings.getOrderby());
 
     // Text Filter

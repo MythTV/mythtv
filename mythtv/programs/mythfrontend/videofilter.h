@@ -1,8 +1,12 @@
 #ifndef VIDEOFILTER_H_
 #define VIDEOFILTER_H_
 
+// MythTV headers
 #include "mythscreentype.h"
 #include "parentalcontrols.h"
+
+// Qt headers
+#include <QCoreApplication>
 
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -14,6 +18,8 @@ class VideoList;
 
 class VideoFilterSettings
 {
+     Q_DECLARE_TR_FUNCTIONS(VideoFilterSettings)
+
   public:
     static const unsigned int FILTER_MASK = 0xFFFE;
     static const unsigned int SORT_MASK = 0x1;
