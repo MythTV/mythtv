@@ -25,7 +25,7 @@
 
 #ifdef Q_OS_MAC
 #include "util-osx.h"
-#import <agl.h>
+#import <AGL/agl.h>
 #endif
 
 #include "mythuiexp.h"
