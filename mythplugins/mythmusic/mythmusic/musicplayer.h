@@ -232,6 +232,8 @@ class MusicPlayer : public QObject, public MythObservable
     int               m_lastTrackStart;
     int               m_bufferAvailable;
     int               m_bufferSize;
+
+    int               m_errorCount;
 };
 
 Q_DECLARE_METATYPE(MusicPlayer::RepeatMode);

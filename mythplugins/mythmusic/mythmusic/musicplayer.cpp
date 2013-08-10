@@ -79,6 +79,8 @@ MusicPlayer::MusicPlayer(QObject *parent)
 
     m_playSpeed = 1.0;
 
+    m_errorCount = 0;
+
     QString playmode = gCoreContext->GetSetting("PlayMode", "none");
     if (playmode.toLower() == "random")
         setShuffleMode(SHUFFLE_RANDOM);
@@ -539,6 +541,7 @@ void MusicPlayer::customEvent(QEvent *event)
     // handle decoderHandler events
     if (event->type() == DecoderHandlerEvent::Ready)
     {
+        m_errorCount = 0;
         decoderHandlerReady();
     }
     else if (event->type() == DecoderHandlerEvent::Meta)
@@ -710,54 +713,76 @@ void MusicPlayer::customEvent(QEvent *event)
         }
     }
 
-    if (m_isAutoplay)
+    if (event->type() == OutputEvent::Error)
     {
-        if (event->type() == OutputEvent::Error)
+        OutputEvent *aoe = dynamic_cast<OutputEvent *>(event);
+
+        if (!aoe)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(*aoe->errorMessage()));
+
+        MythNotification n(tr("Audio Output Error"), tr("MythMusic"), *aoe->errorMessage());
+        n.SetDuration(10);
+        GetNotificationCenter()->Queue(n);
+
+        m_errorCount++;
+
+        if (m_errorCount <= 5)
+            nextAuto();
+        else
         {
-            OutputEvent *aoe = dynamic_cast<OutputEvent*>(event);
-
-            if (!aoe)
-                return;
-
-            LOG(VB_GENERAL, LOG_ERR, QString("Output Error - %1")
-                    .arg(*aoe->errorMessage()));
-
-            ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
-                    .arg(*aoe->errorMessage()));
-            stop(true);
-        }
-        else if (event->type() == DecoderEvent::Error)
-        {
-            stop(true);
-
-            QApplication::sendPostedEvents();
-
-            DecoderEvent *dxe = dynamic_cast<DecoderEvent*>(event);
-
-            if (!dxe)
-                return;
-
-            LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error - %1")
-                    .arg(*dxe->errorMessage()));
-            ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
-                    .arg(*dxe->errorMessage()));
-        }
-        else if (event->type() == DecoderHandlerEvent::Error)
-        {
-            DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
-            if (!dhe)
-                return;
-
-            LOG(VB_GENERAL, LOG_ERR, QString("Output Error - %1")
-                    .arg(*dhe->getMessage()));
-
-            ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
-                    .arg(*dhe->getMessage()));
+            m_errorCount = 0;
             stop(true);
         }
     }
+    else if (event->type() == DecoderEvent::Error)
+    {
+        DecoderEvent *dxe = dynamic_cast<DecoderEvent *>(event);
 
-    if (event->type() == OutputEvent::Info)
+        if (!dxe)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error: %2").arg(*dxe->errorMessage()));
+
+        MythNotification n(tr("Decoder Error"), tr("MythMusic"), *dxe->errorMessage());
+        n.SetDuration(10);
+        GetNotificationCenter()->Queue(n);
+
+        m_errorCount++;
+
+        if (m_errorCount <= 5)
+            nextAuto();
+        else
+        {
+            m_errorCount = 0;
+            stop(true);
+        }
+    }
+    else if (event->type() == DecoderHandlerEvent::Error)
+    {
+        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
+
+        if (!dhe)
+            return;
+
+        LOG(VB_GENERAL, LOG_ERR, QString("Decoder Handler Error - %1").arg(*dhe->getMessage()));
+
+        MythNotification n(tr("Decoder Handler Error"), tr("MythMusic"), *dhe->getMessage());
+        n.SetDuration(10);
+        GetNotificationCenter()->Queue(n);
+
+        m_errorCount++;
+
+        if (m_errorCount <= 5)
+            nextAuto();
+        else
+        {
+            m_errorCount = 0;
+            stop(true);
+        }
+    }
+    else if (event->type() == OutputEvent::Info)
     {
         OutputEvent *oe = dynamic_cast<OutputEvent*>(event);
 
