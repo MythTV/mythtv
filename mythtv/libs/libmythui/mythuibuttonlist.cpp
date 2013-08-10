@@ -2522,7 +2522,7 @@ void MythUIButtonList::customEvent(QEvent *event)
         {
             const int loginterval = (cur < 1000 ? 100 : 500);
             if (cur > 200 && cur % loginterval == 0)
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GUI, LOG_INFO,
                     QString("Build background buttonlist item %1").arg(cur));
             emit itemLoaded(GetItemAt(cur));
         }
