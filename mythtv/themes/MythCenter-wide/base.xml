@@ -60,7 +60,7 @@
         <color>#9999cc</color>
     </fontdef>
     <fontdef name="basesmall_normal_inactive" from="basesmall">
-        <color>#666666</color>
+        <color>#888888</color>
     </fontdef>
     <fontdef name="basesmall_warning_selected" from="basesmallbold">
         <color>#dddd44</color>
@@ -222,14 +222,14 @@
             <state name="selectedactive" from="active">
                 <shape name="background">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                        <gradient start="#58f833" end="#4d6b30" alpha="200" />
                     </fill>
                 </shape>
             </state>
             <state name="selectedinactive" from="active">
                 <shape name="background">
                     <fill style="gradient">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                        <gradient start="#58f833" end="#4d6b30" alpha="130" />
                     </fill>
                 </shape>
                 <textarea name="buttontext">
