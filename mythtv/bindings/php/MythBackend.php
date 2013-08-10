@@ -111,7 +111,7 @@ class MythBackend {
     }
 
     private function announce() {
-        $response = $this->sendCommand('ANN Monitor '.hostname.' 2' );
+        $response = $this->sendCommand('ANN Monitor '.hostname.' 0' );
         if ($response == 'OK')
             return true;
         return false;
