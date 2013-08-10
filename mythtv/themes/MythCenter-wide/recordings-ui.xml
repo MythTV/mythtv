@@ -450,9 +450,9 @@
 
     <window name="groupselector">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>12,4,470,90</area>
