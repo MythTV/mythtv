@@ -327,8 +327,8 @@ class TestAudioUtils: public QObject
     void S16ToFloatCvsSSESpeed_data(void)
     {
         QTest::addColumn<bool>("useSSE");
-        QTest::newRow("Use SSE accelerated code") << true;
-        QTest::newRow("Use C code") << false;
+        QTest::newRow("Aligned memory") << true;
+        QTest::newRow("Unaligned memory") << false;
     }
 
     void S16ToFloatCvsSSESpeed(void)
@@ -336,7 +336,7 @@ class TestAudioUtils: public QObject
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
-        int offsetfloat     = 0;
+        int offsetfloat     = 1;
 
         short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
         // has to be 16 short for 16 bytes boundary * 2
@@ -809,8 +809,8 @@ class TestAudioUtils: public QObject
     void FloatToS32CvsSSESpeed_data(void)
     {
         QTest::addColumn<bool>("useSSE");
-        QTest::newRow("Use SSE accelerated code") << true;
-        QTest::newRow("Use C code") << false;
+        QTest::newRow("Aligned memory") << true;
+        QTest::newRow("Unaligned memory") << false;
     }
 
     void FloatToS32CvsSSESpeed(void)
@@ -818,7 +818,7 @@ class TestAudioUtils: public QObject
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
-        int offsetfloat     = 0;
+        int offsetfloat     = 1;
 
         int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(int32_t));
         // has to be 16 short for 16 bytes boundary * 2
@@ -855,7 +855,7 @@ class TestAudioUtils: public QObject
                 {
                     // Done by C
                     AudioOutputUtil::toFloat(FORMAT_S32, arrayf1+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(int32_t));
-                    AudioOutputUtil::fromFloat(FORMAT_S32, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(int32_t));
+                    AudioOutputUtil::fromFloat(FORMAT_S32, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(float));
                 }
             }
         }

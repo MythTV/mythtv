@@ -458,6 +458,7 @@ class TestAudioConvert: public QObject
         arrayf1[5+offsetfloat1] = 1.0;
         arrayf1[6+offsetfloat1] = 1.1;
         arrayf1[7+offsetfloat1] = 1.2;
+        arrayf1[8+offsetfloat1] = 0;
         arrays2[0] = -2147483648;
         arrays2[1] = -2147483648;
         arrays2[2] = -2147483648;
@@ -466,8 +467,16 @@ class TestAudioConvert: public QObject
         arrays2[5] = 2147483520;
         arrays2[6] = 2147483520;
         arrays2[7] = 2147483520;
+        arrays2[8] = 0;
         AudioConvert::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 9; i++)
+        {
+            QCOMPARE(arrays2[i], arrays1[i]);
+        }
+
+        // Force C code (< 16)
+        AudioConvert::fromFloat(FORMAT_S32, arrays1, arrayf1+offsetfloat1, 9 * ISIZEOF(float));
+        for (int i = 0; i < 9; i++)
         {
             QCOMPARE(arrays2[i], arrays1[i]);
         }
@@ -505,6 +514,7 @@ class TestAudioConvert: public QObject
         arrayf1[5+offsetfloat1] = 1.0;
         arrayf1[6+offsetfloat1] = 1.1;
         arrayf1[7+offsetfloat1] = 1.2;
+        arrayf1[8+offsetfloat1] = 0.0;
         arrays2[0] = -32768;
         arrays2[1] = -32768;
         arrays2[2] = -32768;
@@ -513,8 +523,72 @@ class TestAudioConvert: public QObject
         arrays2[5] = 32767;
         arrays2[6] = 32767;
         arrays2[7] = 32767;
+        arrays2[8] = 0;
         AudioConvert::fromFloat(FORMAT_S16, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 9; i++)
+        {
+            QCOMPARE(arrays2[i], arrays1[i]);
+        }
+
+        // Force C code (< 16)
+        AudioConvert::fromFloat(FORMAT_S16, arrays1, arrayf1+offsetfloat1, 9 * ISIZEOF(float));
+        for (int i = 0; i < 9; i++)
+        {
+            QCOMPARE(arrays2[i], arrays1[i]);
+        }
+
+        av_free(arrays1);
+        av_free(arrays2);
+        av_free(arrayf1);
+    }
+
+    void FloatU8ClipTest3_data(void)
+    {
+        QTest::addColumn<int>("OFFSET");
+        QTest::newRow("Use SSE accelerated code") << 0;
+        QTest::newRow("Use C code") << 1;
+    }
+
+    void FloatU8ClipTest3(void)
+    {
+        int SIZEARRAY       = 256;
+        QFETCH(int, OFFSET);
+        // +1 will never be 16-bytes aligned, forcing C-code
+        int offsetint32_t   = 0;
+        int offsetfloat1    = OFFSET;
+
+        uchar *arrays1      = (uchar*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uchar));
+        // has to be 16 int32_t for 16 bytes boundary * 2
+        uchar *arrays2      = (uchar*)av_malloc((SIZEARRAY+offsetint32_t+4) * ISIZEOF(uchar));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat1+4) * ISIZEOF(float));
+
+        arrayf1[0+offsetfloat1] = -1.2;
+        arrayf1[1+offsetfloat1] = -1.1;
+        arrayf1[2+offsetfloat1] = -1.0;
+        arrayf1[3+offsetfloat1] = -1.3;
+        arrayf1[4+offsetfloat1] = 1.3;
+        arrayf1[5+offsetfloat1] = 1.0;
+        arrayf1[6+offsetfloat1] = 1.1;
+        arrayf1[7+offsetfloat1] = 1.2;
+        arrayf1[8+offsetfloat1] = 0.0;
+        arrays2[0] = 0;
+        arrays2[1] = 0;
+        arrays2[2] = 0;
+        arrays2[3] = 0;
+        arrays2[4] = 255;
+        arrays2[5] = 255;
+        arrays2[6] = 255;
+        arrays2[7] = 255;
+        arrays2[8] = 128;
+        AudioConvert::fromFloat(FORMAT_U8, arrays1, arrayf1+offsetfloat1, SIZEARRAY * ISIZEOF(float));
+        for (int i = 0; i < 9; i++)
+        {
+            QCOMPARE(arrays2[i], arrays1[i]);
+        }
+
+        // Force C code (< 16)
+        AudioConvert::fromFloat(FORMAT_U8, arrays1, arrayf1+offsetfloat1, 9 * ISIZEOF(float));
+        for (int i = 0; i < 9; i++)
         {
             QCOMPARE(arrays2[i], arrays1[i]);
         }
