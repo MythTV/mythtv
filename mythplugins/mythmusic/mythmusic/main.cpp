@@ -480,7 +480,7 @@ static void handleCDMedia(MythMediaDevice *cd)
             gMusicData->all_playlists->getActive()->removeAllCDTracks();
         }
 
-        gPlayer->activePlaylistChanged(-1, true);
+        gPlayer->activePlaylistChanged(-1, false);
         gPlayer->sendCDChangedEvent();
 
         return;
