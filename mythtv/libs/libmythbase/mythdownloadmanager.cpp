@@ -873,7 +873,8 @@ void MythDownloadManager::cancelDownload(const QString &url)
         dlInfo = lit.value();
         if (dlInfo->m_url == url)
         {
-            m_cancellationQueue.append(dlInfo);
+            if (!m_cancellationQueue.contains(dlInfo))
+                m_cancellationQueue.append(dlInfo);
             lit.remove();
         }
     }
@@ -881,10 +882,13 @@ void MythDownloadManager::cancelDownload(const QString &url)
     if (m_downloadInfos.contains(url))
     {
         dlInfo = m_downloadInfos[url];
+
+        if (!m_cancellationQueue.contains(dlInfo))
+            m_cancellationQueue.append(dlInfo);
+
         if (dlInfo->m_reply)
             m_downloadReplies.remove(dlInfo->m_reply);
 
-        m_cancellationQueue.append(dlInfo);
         m_downloadInfos.remove(url);
     }
 
@@ -902,7 +906,7 @@ void MythDownloadManager::downloadCanceled()
     {
         lit.next();
         dlInfo = lit.value();
-        // this shouldn't happen
+        
         if (dlInfo->m_reply)
         {
             LOG(VB_FILE, LOG_DEBUG,
