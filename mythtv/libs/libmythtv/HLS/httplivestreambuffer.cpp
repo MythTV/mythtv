@@ -959,8 +959,9 @@ public:
     }
     void Seek(int val)
     {
-        QMutexLocker lock(&m_lock);
+        m_lock.lock();
         m_segment = val;
+        m_lock.unlock();
         Wakeup();
     }
     bool IsAtEnd(bool lock = false)
@@ -1011,7 +1012,6 @@ public:
     }
     int CurrentLiveBuffer(void)
     {
-        QMutexLocker lock(&m_lock);
         return m_parent->NumSegments() - m_segment;
     }
     void SetBuffer(int val)
@@ -1021,6 +1021,8 @@ public:
     }
     void AddSegmentToStream(int segnum, int stream)
     {
+        if (m_interrupted)
+            return;
         QMutexLocker lock(&m_lock);
         m_segmap.insert(segnum, stream);
     }
@@ -1133,11 +1135,15 @@ protected:
             {
                 uint64_t bw = m_bandwidth;
                 int err = hls->DownloadSegmentData(dnldsegment, bw, m_stream);
+                if (m_interrupted)
+                {
+                    // interrupt only
+                    Wakeup();
+                    break;
+                }
                 bw = AverageNewBandwidth(bw);
                 if (err != RET_OK)
                 {
-                    if (m_interrupted)
-                        break;
                     retries++;
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("download failed, retry #%1").arg(retries));
@@ -1269,8 +1275,9 @@ public:
 
     void Wakeup(void)
     {
-        QMutexLocker lock(&m_lock);
+        m_lock.lock();
         m_wokenup = true;
+        m_lock.unlock();
         // send a wake signal
         m_waitcond.wakeAll();
     }
