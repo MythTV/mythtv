@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 # mythburn.py
 # The ported MythBurn scripts which feature:
 
@@ -44,7 +46,7 @@
 
 
 # version of script - change after each update
-VERSION="0.1.20120304-1"
+VERSION="0.1.20130811-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -78,6 +80,7 @@ encodetoac3 = True
 import os
 import sys
 import string
+import codecs
 import getopt
 import traceback
 import signal
@@ -161,7 +164,7 @@ jobfile="mydata.xml"
 
 #progress log filename and file object
 progresslog = ""
-progressfile = open("/dev/null", 'w')
+progressfile = codecs.open("/dev/null", 'w', 'utf-8')
 
 #default location of DVD drive
 dvddrivepath = "/dev/dvd"
@@ -194,6 +197,14 @@ MVID = MythTV.MythVideo(db=DB)
 configHostname = DB.gethostname()
 
 #############################################################
+
+# mytharchivehelper needes this locale to work correctly
+try:
+   oldlocale = os.environ["LC_ALL"]
+except:
+   oldlocale = ""
+os.putenv("LC_ALL", "en_US.UTF-8")
+
 
 # fix rtl text where pyfribidi is not available
 # should write a simple algorithm, meanwhile just return the original string
@@ -264,8 +275,7 @@ class FontDef(object):
 def write(text, progress=True):
     """Simple place to channel all text output through"""
 
-    text = text.encode("utf-8", "replace")
-    sys.stdout.write(text + "\n")
+    sys.stdout.write((text + "\n").encode("utf-8", "replace"))
     sys.stdout.flush()
 
     if progress == True and progresslog != "":
@@ -315,7 +325,8 @@ def getTempPath():
 
 def getCPUCount():
     """return the number of CPUs"""
-    cpustat = open("/proc/cpuinfo")
+    # /proc/cpuinfo
+    cpustat = codecs.open("/proc/cpuinfo", 'r', 'utf-8')
     cpudata = cpustat.readlines()
     cpustat.close()
 
@@ -456,14 +467,7 @@ def checkCancelFlag():
 def runCommand(command):
     checkCancelFlag()
 
-    # mytharchivehelper needes this locale to work correctly
-    try:
-       oldlocale = os.environ["LC_ALL"]
-    except:
-       oldlocale = ""
-    os.putenv("LC_ALL", "en_US.UTF-8")
     result = os.system(command.encode('utf-8'))
-    os.putenv("LC_ALL", oldlocale)
 
     if os.WIFEXITED(result):
         result = os.WEXITSTATUS(result)
@@ -554,7 +558,14 @@ def findEncodingProfile(profile):
             write("Encoding profile (%s) found" % profile)
             return node
 
-    fatalError("Encoding profile (%s) not found" % profile)
+    write('WARNING: Encoding profile "' + profile + '" not found.')
+    write('Using default profile "' + defaultEncodingProfile + '".')
+    for node in profiles:
+        if getText(node.getElementsByTagName("name")[0]) == defaultEncodingProfile:
+            write("Encoding profile (%s) found" % defaultEncodingProfile)
+            return node
+
+    fatalError('Neither encoding profile "' + profile + '" nor default enocding profile "' + defaultEncodingProfile + '" found. Giving up.')
     return None
 
 #############################################################
@@ -1423,7 +1434,7 @@ def getFileInformation(file, folder):
         data.title = vid.title
 
         if vid.year != 1895:
-            data.recordingdate = str(vid.year)
+            data.recordingdate = unicode(vid.year)
 
         data.subtitle = vid.subtitle
 
@@ -1432,7 +1443,7 @@ def getFileInformation(file, folder):
 
         data.rating = str(vid.userrating)
 
-        if doesFileExist(vid.coverfile):
+        if doesFileExist(unicode(vid.coverfile)):
             data.coverfile = vid.coverfile
 
     elif file.attributes["type"].value=="file":
@@ -1737,7 +1748,7 @@ def generateProjectXCutlist(chanid, starttime, folder):
     cutlist = rec.markup.getcutlist()
 
     if len(cutlist):
-        with open(os.path.join(folder, "cutlist_x.txt"), 'w') as cutlist_f:
+        with codecs.open(os.path.join(folder, "cutlist_x.txt"), 'w', 'utf-8') as cutlist_f:
             cutlist_f.write("CollectionPanel.CutMode=2\n")
             i = 0
             for cut in cutlist:
@@ -2231,6 +2242,7 @@ def CreateDVDISO(title):
 #############################################################
 # Burns the contents of a directory to create a DVD 
 
+
 def BurnDVDISO(title):
     write( "Burning ISO image to %s" % dvddrivepath)
 
@@ -2248,31 +2260,57 @@ def BurnDVDISO(title):
           write("Please insert an empty double-layer disc (DVD+R DL or DVD-R DL).")
         if mediatype == DVD_RW:
           write("Please insert a rewritable disc (DVD+RW or DVD-RW).")
-    def tray(action):
-        runCommand("pumount " + quoteCmdArg(dvddrivepath));
+    def drive(action, value=0):
         waitForDrive()
-        try:
-            f = os.open(drivepath, os.O_RDONLY | os.O_NONBLOCK)
-            r = ioctl(f,action, 0)
-            os.close(f)
-            return True
-        except:
-            write("Failed to eject the disc!")
-            return False
-        finally:
-            os.close(f)
+        # workaround as some distros have problems to eject the DVD
+        # 'sudo sysctl -w dev.cdrom.autoclose=0' should help, but we don't have the privliges to do this
+        if action == CDROM.CDROMEJECT:
+          counter = 0
+          while drivestatus() != CDROM.CDS_TRAY_OPEN and counter < 15:
+            counter = counter + 1
+            drive(CDROM.CDROM_LOCKDOOR, 0)
+            if counter % 2:   # if counter is 1,3,5,7,... use ioctl
+                f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+                try:
+                  ioctl(f,action, value)
+                except:
+                  write("Sending command ", action, " to drive failed", False)
+                os.close(f)
+            else:   # try eject-command
+                if runCommand("eject " + quoteCmdArg(dvddrivepath)) == 32512:
+                    write('"eject" is probably not installed.', False)
+            waitForDrive()
+            time.sleep(3)
+          if drivestatus() == CDROM.CDS_TRAY_OPEN:
+            res = True
+          else:
+            res = False
+            write("Failed to eject the disc! Probably drive is blocked by another program.")
+        # normal
+        else:
+            f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+              ioctl(f,action, value)
+              res = True
+            except:
+              write("Sending command ", action, " to drive failed", False)
+              res = False
+            os.close(f) 
+        return res 
     def waitForDrive():
         tries = 0
         while drivestatus() == CDROM.CDS_DRIVE_NOT_READY:
-	    checkCancelFlag()
+            checkCancelFlag()
             write("Waiting for drive")
             time.sleep(5)
+            runCommand("pumount " + quoteCmdArg(dvddrivepath))
             tries += 1
             if tries > 10:
                 # Try a hard reset if the device is still not ready
                 write("Try a hard-reset of the device")
-                tray(CDROM.CDROMRESET)
+                drive(CDROM.CDROMRESET)
                 tries = 0
+
 
 
     ####################
@@ -2294,7 +2332,7 @@ def BurnDVDISO(title):
             runCommand("pumount " + quoteCmdArg(dvddrivepath));
 
 
-            command = quoteCmdArg(path_growisofs[0]) + " -dvd-compat"
+            command = quoteCmdArg(path_growisofs[0]) + " -input-charset=UTF-8 -dvd-compat"
             if drivespeed != 0:
                 command += " -speed=%d" % drivespeed
             if mediatype == DVD_RW and erasedvdrw == True:
@@ -2306,6 +2344,21 @@ def BurnDVDISO(title):
             result = runCommand(command)
             if result == 0:
                 finished = True
+                
+                # Wait till the drive is not busy any longer
+                f = os.open(dvddrivepath, os.O_RDONLY | os.O_NONBLOCK)
+                busy = True
+                tries = 0
+                while busy and tries < 10:
+                  tries += 1
+                  try:
+                    ioctl(f, CDROM.CDROM_LOCKDOOR, 0)
+                    busy = False
+                  except:
+                    write("Drive is still busy")
+                    time.sleep(5)
+                    waitForDrive()
+                os.close(f)
             else:
                 if result == 252:
                     write("-"*60)
@@ -2329,7 +2382,7 @@ def BurnDVDISO(title):
                 displayneededdisktype()
 
             # eject the disc
-            tray(CDROM.CDROMEJECT)
+            drive(CDROM.CDROMEJECT)
 
 
         elif drivestatus() == CDROM.CDS_TRAY_OPEN:
@@ -2340,7 +2393,7 @@ def BurnDVDISO(title):
                 checkCancelFlag()
                 time.sleep(5)
         elif drivestatus() == CDROM.CDS_NO_DISC:
-            tray(CDROM.CDROMEJECT)
+            drive(CDROM.CDROMEJECT)
             displayneededdisktype()
 
     write("Finished burning ISO image")
@@ -5061,7 +5114,7 @@ def main():
     if progresslog != "":
         if os.path.exists(progresslog):
             os.remove(progresslog)
-        progressfile = open(progresslog, 'w')
+        progressfile = codecs.open(progresslog, 'w', 'utf-8')
         write( "mythburn.py (%s) starting up..." % VERSION)
 
     #Get mysql database parameters
@@ -5206,3 +5259,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+os.putenv("LC_ALL", oldlocale)
