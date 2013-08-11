@@ -863,28 +863,14 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
  */
 void MythDownloadManager::cancelDownload(const QString &url)
 {
-    m_infoLock->lock();
-    bool downloading = !m_downloadInfos.isEmpty();
-    m_infoLock->unlock();
-
-    if (!downloading || QThread::currentThread() == this->thread())
-    {
-        downloadCanceled(url);
-    }
-    else
-    {
-        QMetaObject::invokeMethod(this, "downloadCanceled",
-                                  Qt::BlockingQueuedConnection,
-                                  Q_ARG(const QString&, url));
-    }
+    QMetaObject::invokeMethod(this, "downloadCanceled",
+                              Qt::QueuedConnection, Q_ARG(const QString&, url));
 }
 
 void MythDownloadManager::downloadCanceled(const QString  &url)
 {
     QMutexLocker locker(m_infoLock);
     MythDownloadInfo *dlInfo;
-    MythDownloadInfo *dlaborted = NULL;
-    bool abort = QThread::currentThread() == this->thread();
 
     QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
     while (lit.hasNext())
@@ -894,12 +880,11 @@ void MythDownloadManager::downloadCanceled(const QString  &url)
         if (dlInfo->m_url == url)
         {
             // this shouldn't happen
-            if (abort && dlInfo->m_reply)
+            if (dlInfo->m_reply)
             {
                 LOG(VB_FILE, LOG_DEBUG,
                     LOC + QString("Aborting download - user request"));
                 dlInfo->m_reply->abort();
-                dlaborted = dlInfo;
             }
             lit.remove();
             if (dlInfo->IsDone())
@@ -919,10 +904,7 @@ void MythDownloadManager::downloadCanceled(const QString  &url)
             LOG(VB_FILE, LOG_DEBUG,
                 LOC + QString("Aborting download - user request"));
             m_downloadReplies.remove(dlInfo->m_reply);
-            if (abort && dlaborted != dlInfo)
-            {
-                dlInfo->m_reply->abort();
-            }
+            dlInfo->m_reply->abort();
         }
         m_downloadInfos.remove(url);
         if (!dlInfo->IsDone())
