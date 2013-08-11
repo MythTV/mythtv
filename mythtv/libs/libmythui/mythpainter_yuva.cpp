@@ -56,7 +56,29 @@ void MythYUVAPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
                                const QPen &linePen, int alpha)
 {
     QBrush brush(fillBrush);
-    brush.setColor(rgb_to_yuv(brush.color()));
+
+    switch (fillBrush.style())
+    {
+    case Qt::LinearGradientPattern:
+    case Qt::RadialGradientPattern:
+    case Qt::ConicalGradientPattern:
+        {
+        QGradient gradient = *fillBrush.gradient();
+        QGradientStops stops = gradient.stops();
+        for (QGradientStops::iterator it = stops.begin(); it != stops.end(); ++it)
+        {
+            it->second = rgb_to_yuv(it->second);
+            it->second.setAlpha(alpha);
+        }
+        gradient.setStops(stops);
+        brush = gradient;
+        }
+        break;
+    default:
+        brush.setColor(rgb_to_yuv(brush.color()));
+        break;
+    }
+
     QPen pen(linePen);
     pen.setColor(rgb_to_yuv(pen.color()));
 
