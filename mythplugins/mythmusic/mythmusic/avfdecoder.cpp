@@ -412,8 +412,7 @@ void avfDecoder::deinit()
 
     if (m_byteIOContext)
     {
-        delete m_byteIOContext;
-        m_byteIOContext = NULL;
+        av_freep(&m_byteIOContext);
     }
 }
 
