@@ -1727,9 +1727,12 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         return true;
     }
 
+    if (!m_tvList->contains(rcinfo->GetCardID()))
+        return true;
+
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetCardID()];
     // first check the card we will be recording on...
-    if (!rctv || rctv->IsBusyRecording())
+    if (rctv->IsBusyRecording())
         return true;
 
     // now check other cards in the same input group as the recording.
@@ -1739,8 +1742,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         inputid, rcinfo->GetCardID());
     for (uint i = 0; i < cardids.size(); i++)
     {
-        rctv = (*m_tvList)[cardids[i]];
-        if (!rctv)
+        if (!m_tvList->contains(cardids[i]))
         {
 #if 0
             LOG(VB_SCHEDULE, LOG_ERR, LOC +
@@ -1750,6 +1752,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
             return true;
         }
 
+        rctv = (*m_tvList)[cardids[i]];
         if (rctv->IsBusy(&busy_input, -1) &&
             igrp.GetSharedInputGroup(busy_input.inputid, inputid))
         {
@@ -4468,10 +4471,10 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
 {
     QMutexLocker lockit(&schedLock);
 
-    EncoderLink *tv = (*m_tvList)[cardid];
-
-    if (!tv)
+    if (!m_tvList->contains(cardid))
         return;
+
+    EncoderLink *tv = (*m_tvList)[cardid];
 
     QDateTime cur = MythDate::current(true);
     QString recording_dir;
