@@ -765,7 +765,7 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Image Gallery</source>
-        <translation>Bildergallerie</translation>
+        <translation>Bildergalerie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
