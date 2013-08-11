@@ -863,6 +863,12 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
  */
 void MythDownloadManager::cancelDownload(const QString &url)
 {
+    QMetaObject::invokeMethod(this, "downloadCanceled",
+                              Qt::QueuedConnection, Q_ARG(const QString&, url));
+}
+
+void MythDownloadManager::downloadCanceled(const QString  &url)
+{
     QMutexLocker locker(m_infoLock);
     MythDownloadInfo *dlInfo;
 
@@ -873,8 +879,20 @@ void MythDownloadManager::cancelDownload(const QString &url)
         dlInfo = lit.value();
         if (dlInfo->m_url == url)
         {
-            m_cancellationQueue.append(dlInfo);
+            // this shouldn't happen
+            if (dlInfo->m_reply)
+            {
+                LOG(VB_FILE, LOG_DEBUG,
+                    LOC + QString("Aborting download - user request"));
+                dlInfo->m_reply->abort();
+            }
             lit.remove();
+            if (dlInfo->IsDone())
+                continue;
+            dlInfo->m_lock.lock();
+            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
+            dlInfo->m_done = true;
+            dlInfo->m_lock.unlock();
         }
     }
 
@@ -882,40 +900,20 @@ void MythDownloadManager::cancelDownload(const QString &url)
     {
         dlInfo = m_downloadInfos[url];
         if (dlInfo->m_reply)
-            m_downloadReplies.remove(dlInfo->m_reply);
-
-        m_cancellationQueue.append(dlInfo);
-        m_downloadInfos.remove(url);
-    }
-
-    QMetaObject::invokeMethod(this, "downloadCanceled",
-                              Qt::QueuedConnection);
-}
-
-void MythDownloadManager::downloadCanceled()
-{
-    QMutexLocker locker(m_infoLock);
-    MythDownloadInfo *dlInfo;
-
-    QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
-    while (lit.hasNext())
-    {
-        lit.next();
-        dlInfo = lit.value();
-        // this shouldn't happen
-        if (dlInfo->m_reply)
         {
             LOG(VB_FILE, LOG_DEBUG,
                 LOC + QString("Aborting download - user request"));
+            m_downloadReplies.remove(dlInfo->m_reply);
             dlInfo->m_reply->abort();
         }
-        lit.remove();
-        if (dlInfo->IsDone())
-            continue;
-        dlInfo->m_lock.lock();
-        dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
-        dlInfo->m_done = true;
-        dlInfo->m_lock.unlock();
+        m_downloadInfos.remove(url);
+        if (!dlInfo->IsDone())
+        {
+            dlInfo->m_lock.lock();
+            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
+            dlInfo->m_done = true;
+            dlInfo->m_lock.unlock();
+        }
     }
 }
 
