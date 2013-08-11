@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QPointer>
 #include <QMutex>
+#include <QWaitCondition>
 #include <QList>
 
 #include "mthread.h"
@@ -116,7 +117,8 @@ class MPUBLIC MediaMonitor : public QObject
     // List of devices/mountpoints that the user doesn't want to monitor:
     QStringList                  m_IgnoreList;
 
-    bool                         m_Active;      ///< Was MonitorThread started?
+    bool volatile                m_Active;      ///< Was MonitorThread started?
+    QWaitCondition               m_wait;
     MonitorThread                *m_Thread;
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;

@@ -51,11 +51,14 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
 void MonitorThread::run(void)
 {
     RunProlog();
+    QMutex mtx;
+    mtx.lock();
     while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
-        msleep(m_Interval);
+        m_Monitor->m_wait.wait(&mtx, m_Interval);
     }
+    mtx.unlock();
     RunEpilog();
 }
 
@@ -445,7 +448,9 @@ void MediaMonitor::StopMonitoring(void)
 
     LOG(VB_MEDIA, LOG_NOTICE, "Stopping MediaMonitor");
     m_Active = false;
+    m_wait.wakeAll();
     m_Thread->wait();
+    LOG(VB_MEDIA, LOG_NOTICE, "Stopped MediaMonitor");
 }
 
 /** \fn MediaMonitor::ValidateAndLock(MythMediaDevice *pMedia)
