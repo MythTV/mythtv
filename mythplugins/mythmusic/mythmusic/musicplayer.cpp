@@ -722,8 +722,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("Audio Output Error: %1").arg(*aoe->errorMessage()));
 
-        MythNotification n(tr("Audio Output Error"), tr("MythMusic"), *aoe->errorMessage());
-        n.SetDuration(10);
+        MythErrorNotification n(tr("Audio Output Error"), tr("MythMusic"), *aoe->errorMessage());
         GetNotificationCenter()->Queue(n);
 
         m_errorCount++;
@@ -745,8 +744,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("Decoder Error: %2").arg(*dxe->errorMessage()));
 
-        MythNotification n(tr("Decoder Error"), tr("MythMusic"), *dxe->errorMessage());
-        n.SetDuration(10);
+        MythErrorNotification n(tr("Decoder Error"), tr("MythMusic"), *dxe->errorMessage());
         GetNotificationCenter()->Queue(n);
 
         m_errorCount++;
@@ -768,8 +766,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
         LOG(VB_GENERAL, LOG_ERR, QString("Decoder Handler Error - %1").arg(*dhe->getMessage()));
 
-        MythNotification n(tr("Decoder Handler Error"), tr("MythMusic"), *dhe->getMessage());
-        n.SetDuration(10);
+        MythErrorNotification n(tr("Decoder Handler Error"), tr("MythMusic"), *dhe->getMessage());
         GetNotificationCenter()->Queue(n);
 
         m_errorCount++;
