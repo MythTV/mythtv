@@ -988,7 +988,7 @@ Bitte warten...</translation>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="47"/>
         <source>Any file accessable from your filesystem.</source>
-        <translation>Jede verfügbare Datei</translation>
+        <translation>Jede verfügbare Datei von Ihrem Dateisystem.</translation>
     </message>
     <message>
         <location filename="../mytharchive/selectdestination.cpp" line="294"/>

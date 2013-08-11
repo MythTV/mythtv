@@ -267,12 +267,12 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1029"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation>Lösche 1 Verzeichnis, einschliesslich Unterverzeichnissen und Dateien</translation>
+        <translation>Lösche 1 Verzeichnis, einschliesslich Unterverzeichnissen und Dateien.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1030"/>
         <source>Deleting 1 image.</source>
-        <translation>Lösche 1 Bild</translation>
+        <translation>Lösche 1 Bild.</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1097"/>
@@ -777,7 +777,7 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Image Gallery</source>
-        <translation>Bildergallerie</translation>
+        <translation>Bildergalerie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>

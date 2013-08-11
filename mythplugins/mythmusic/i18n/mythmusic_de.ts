@@ -4,62 +4,62 @@
 <context>
     <name>AlbumArtImages</name>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1373"/>
+        <location filename="../mythmusic/metadata.cpp" line="1379"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1374"/>
+        <location filename="../mythmusic/metadata.cpp" line="1380"/>
         <source>Front Cover</source>
         <translation>Vorderseitencover</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1375"/>
+        <location filename="../mythmusic/metadata.cpp" line="1381"/>
         <source>Back Cover</source>
         <translation>Rückseitencover</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1376"/>
+        <location filename="../mythmusic/metadata.cpp" line="1382"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1377"/>
+        <location filename="../mythmusic/metadata.cpp" line="1383"/>
         <source>Inlay</source>
         <translation>Inlay</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1378"/>
+        <location filename="../mythmusic/metadata.cpp" line="1384"/>
         <source>Artist</source>
         <translation>Interpret</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1390"/>
+        <location filename="../mythmusic/metadata.cpp" line="1396"/>
         <source>unknown</source>
         <translation>unbekannt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1391"/>
+        <location filename="../mythmusic/metadata.cpp" line="1397"/>
         <source>front</source>
         <translation>Vorderseite</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1392"/>
+        <location filename="../mythmusic/metadata.cpp" line="1398"/>
         <source>back</source>
         <translation>Rückseite</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1393"/>
+        <location filename="../mythmusic/metadata.cpp" line="1399"/>
         <source>cd</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1394"/>
+        <location filename="../mythmusic/metadata.cpp" line="1400"/>
         <source>inlay</source>
         <translation>Inlay</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1395"/>
+        <location filename="../mythmusic/metadata.cpp" line="1401"/>
         <source>artist</source>
         <translation>Interpret</translation>
     </message>
@@ -1143,8 +1143,8 @@ Soll im Hintergrund weiterhin abgespielt werden?</translation>
         <translation type="obsolete">Playlist-Start</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1238"/>
-        <location filename="../mythmusic/musicplayer.cpp" line="1241"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1245"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1248"/>
         <source>Muted</source>
         <translation>Stumm geschalten</translation>
     </message>
@@ -1729,7 +1729,7 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">Ogg Vorbis Audio</translation>
     </message>
     <message>
-        <location filename="../mythmusic/musicplayer.cpp" line="1467"/>
+        <location filename="../mythmusic/musicplayer.cpp" line="1474"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
@@ -1986,17 +1986,17 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">CD-Import 1/2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="547"/>
+        <location filename="../mythmusic/metadata.cpp" line="553"/>
         <source>Unknown Artist</source>
         <translation>Unbekannter Interpret</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="552"/>
+        <location filename="../mythmusic/metadata.cpp" line="558"/>
         <source>Unknown Album</source>
         <translation>Unbekanntes Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="556"/>
+        <location filename="../mythmusic/metadata.cpp" line="562"/>
         <source>Unknown Genre</source>
         <translation>Unbekanntes Genre</translation>
     </message>
@@ -2006,7 +2006,7 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">%1  von  %2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1193"/>
+        <location filename="../mythmusic/metadata.cpp" line="1199"/>
         <source>CD -- none</source>
         <translation>CD -- leer</translation>
     </message>
@@ -2019,32 +2019,32 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">%1 - %2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="723"/>
+        <location filename="../mythmusic/metadata.cpp" line="729"/>
         <source>Never Played</source>
         <translation>Nie gespielt</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1408"/>
+        <location filename="../mythmusic/metadata.cpp" line="1414"/>
         <source>front</source>
         <translation>Vorderseite</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1411"/>
+        <location filename="../mythmusic/metadata.cpp" line="1417"/>
         <source>back</source>
         <translation>Rückseite</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1414"/>
+        <location filename="../mythmusic/metadata.cpp" line="1420"/>
         <source>inlay</source>
         <translation>Inlay</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1417"/>
+        <location filename="../mythmusic/metadata.cpp" line="1423"/>
         <source>cd</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1420"/>
+        <location filename="../mythmusic/metadata.cpp" line="1426"/>
         <source>cover</source>
         <translation>Cover</translation>
     </message>
@@ -2191,18 +2191,18 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">CDs Brennen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="549"/>
-        <location filename="../mythmusic/playlist.cpp" line="590"/>
+        <location filename="../mythmusic/playlist.cpp" line="561"/>
+        <location filename="../mythmusic/playlist.cpp" line="602"/>
         <source>Default Playlist</source>
         <translation>Standard Playlist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1228"/>
+        <location filename="../mythmusic/playlist.cpp" line="1240"/>
         <source>Creating CD File System</source>
         <translation>Erzeuge CD-Dateisystem</translation>
     </message>
     <message>
-        <location filename="../mythmusic/playlist.cpp" line="1277"/>
+        <location filename="../mythmusic/playlist.cpp" line="1289"/>
         <source>Burning CD</source>
         <translation>Brenne die CD</translation>
     </message>
@@ -2241,7 +2241,7 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">SCSI- oder IDE-Brenner auswählen.</translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1577"/>
+        <location filename="../mythmusic/metadata.cpp" line="1583"/>
         <source>Rebuilding music tree</source>
         <translation>Erneuere die Musiksammlung</translation>
     </message>
@@ -2462,7 +2462,7 @@ Soll die Wiedergabe im Hintergrund fortgesetzt werden?</translation>
         <translation type="obsolete">Interpreten</translation>
     </message>
     <message>
-        <location filename="../mythmusic/avfdecoder.cpp" line="545"/>
+        <location filename="../mythmusic/avfdecoder.cpp" line="547"/>
         <source>Internal Decoder</source>
         <translation>Interner Dekoder</translation>
     </message>
@@ -3602,7 +3602,7 @@ Wollen Sie die vorhandene Datei dauerhaft löschen?</translation>
     <message>
         <location filename="themestrings.h" line="165"/>
         <source>Browse cover images on your system.</source>
-        <translation>Coverbilder auf dem System durchsuchen</translation>
+        <translation>Coverbilder auf dem System durchsuchen.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
