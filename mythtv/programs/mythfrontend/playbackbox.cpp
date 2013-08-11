@@ -2754,8 +2754,8 @@ MythMenu* PlaybackBox::createPlaylistStorageMenu()
     menu->AddItem(tr("Change Playback Group"), SLOT(ShowPlayGroupChangerUsePlaylist()));
     menu->AddItem(tr("Disable Auto Expire"), SLOT(doPlaylistExpireSetOff()));
     menu->AddItem(tr("Enable Auto Expire"), SLOT(doPlaylistExpireSetOn()));
-    menu->AddItem(tr("Mark As Watched"), SLOT(doPlaylistWatchedSetOn()));
-    menu->AddItem(tr("Mark As Unwatched"), SLOT(doPlaylistWatchedSetOff()));
+    menu->AddItem(tr("Mark as Watched"), SLOT(doPlaylistWatchedSetOn()));
+    menu->AddItem(tr("Mark as Unwatched"), SLOT(doPlaylistWatchedSetOff()));
 
     return menu;
 }
