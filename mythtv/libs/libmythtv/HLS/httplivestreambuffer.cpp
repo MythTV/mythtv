@@ -1137,7 +1137,7 @@ protected:
                 int err = hls->DownloadSegmentData(dnldsegment, bw, m_stream);
                 if (m_interrupted)
                 {
-                    // interrupt only
+                    // interrupt early
                     Wakeup();
                     break;
                 }
