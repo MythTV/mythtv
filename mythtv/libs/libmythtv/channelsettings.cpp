@@ -192,7 +192,7 @@ class Priority : public SpinBoxSetting, public ChannelDBStorage
             "Number of priority points to be added to any recording on this "
             "channel during scheduling. Use a positive number as the priority "
             "if you want this to be a preferred channel, a negative one to "
-            "deprecate this channel."));
+            "depreciate this channel."));
     }
 };
 
@@ -252,7 +252,7 @@ class XmltvID : public ComboBoxSetting, public ChannelDBStorage
         setLabel(QCoreApplication::translate("(Common)", "XMLTV ID"));
 
         setHelpText(QCoreApplication::translate("(ChannelSettings)", 
-            "ID used by listing services to get an exact correspondance "
+            "ID used by listing services to get an exact correspondence "
             "between a channel in your line-up and a channel in their "
             "database. Normally this is set automatically when "
             "'mythfilldatabase' is run."));
