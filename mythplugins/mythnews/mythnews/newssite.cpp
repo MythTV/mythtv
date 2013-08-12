@@ -36,7 +36,7 @@ void NewsSite::deleteLater()
 {
     QMutexLocker locker(&m_lock);
     GetMythDownloadManager()->removeListener(this);
-    GetMythDownloadManager()->cancelDownload(m_url);
+    GetMythDownloadManager()->cancelDownload(m_url, false);
     m_articleList.clear();
     QObject::deleteLater();
 }
@@ -45,7 +45,7 @@ NewsSite::~NewsSite()
 {
     QMutexLocker locker(&m_lock);
     GetMythDownloadManager()->removeListener(this);
-    GetMythDownloadManager()->cancelDownload(m_url);
+    GetMythDownloadManager()->cancelDownload(m_url, false);
 }
 
 void NewsSite::insertNewsArticle(const NewsArticle &item)
