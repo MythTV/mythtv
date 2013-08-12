@@ -82,16 +82,22 @@ static uint64_t mdate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
-static bool downloadURL(const QString url, QByteArray *buffer)
+static bool downloadURL(const QString &url, QByteArray *buffer)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     return mdm->download(url, buffer);
 }
 
-static void cancelURL(const QString url)
+static void cancelURL(const QString &url)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     mdm->cancelDownload(url);
+}
+
+static void cancelURL(const QStringList &urls)
+{
+    MythDownloadManager *mdm = GetMythDownloadManager();
+    mdm->cancelDownload(urls);
 }
 
 /* segment container */
@@ -1261,15 +1267,17 @@ public:
         m_lock.lock();
         // Interrupt on-going downloads of all stream playlists
         int streams = m_parent->NumStreams();
+        QStringList listurls;
         for (int i = 0; i < streams; i++)
         {
             HLSStream *hls = m_parent->GetStream(i);
             if (hls)
             {
-                cancelURL(hls->Url());
+                listurls.append(hls->Url());
             }
         }
         m_lock.unlock();
+        cancelURL(listurls);
         wait();
     }
 
