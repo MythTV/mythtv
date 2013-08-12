@@ -1502,7 +1502,7 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="191"/>
         <source>Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished">Number of priority points to be added to any recording on this channel during scheduling. A positive value will increase the scheduler&apos;s preference for this channel; a negative value will reduce it.</translation>
+        <translation>Number of priority points to be added to any recording on this channel during scheduling. A positive value will increase the scheduler&apos;s preference for this channel; a negative value will reduce it.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="205"/>
@@ -1537,7 +1537,7 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="254"/>
         <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="unfinished">ID used by listing services to get an exact correspondence between a channel in your lineup and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</translation>
+        <translation>ID used by listing services to get an exact correspondence between a channel in your lineup and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="309"/>
@@ -3239,12 +3239,12 @@ Device supports up to %1</translation>
     <message>
         <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="384"/>
         <source>Can&apos;t find any Bluray-compatible title</source>
-        <translation type="unfinished">Can&apos;t find any Blu-ray compatible titles</translation>
+        <translation>Can&apos;t find any Blu-ray compatible titles</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="484"/>
         <source>Can&apos;t find any usable Bluray title</source>
-        <translation type="unfinished">Can&apos;t find any useable Blu-ray titles</translation>
+        <translation>Can&apos;t find any useable Blu-ray titles</translation>
     </message>
 </context>
 <context>
@@ -5574,7 +5574,7 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2706"/>
         <source>Selects the situations where thescheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished">Selects the situations where the scheduler will avoid assigning consecutive shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</translation>
+        <translation>Selects the situations where the scheduler will avoid assigning consecutive shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2713"/>
@@ -5817,7 +5817,7 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="535"/>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished">This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
+        <translation>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="550"/>
@@ -5827,7 +5827,7 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="554"/>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished">This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
+        <translation>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="567"/>
@@ -5847,7 +5847,7 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="602"/>
         <source>For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time in-between.</source>
-        <translation type="unfinished">For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
+        <translation>For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time inbetween.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="616"/>
@@ -11528,12 +11528,12 @@ Are you sure you want to delete:</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="952"/>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished">&amp;</translation>
+        <translation>&amp;</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="955"/>
         <source>if rez</source>
-        <translation type="unfinished">if rez</translation>
+        <translation>if res</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1031"/>
@@ -25687,7 +25687,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="638"/>
         <source>Stati</source>
-        <translation type="unfinished">Stati</translation>
+        <translation>States</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="639"/>
@@ -25772,7 +25772,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="656"/>
         <source>PCM-BluRay</source>
-        <translation type="unfinished">PCM-Blu-ray</translation>
+        <translation>PCM-Blu-ray</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="657"/>
@@ -25807,7 +25807,7 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="663"/>
         <source>MPEG2</source>
-        <translation type="unfinished">MPEG-2</translation>
+        <translation>MPEG-2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="664"/>
@@ -26087,9 +26087,9 @@ Do you wish to continue watching?</translation>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="734"/>
         <source>%name%% (v.|version%)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%name%% (v.|version%)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%name%% (v.|version%)</numerusform>
         </translation>
     </message>
     <message>
@@ -26210,12 +26210,12 @@ Do you wish to continue watching?</translation>
     <message>
         <location filename="../themes/themestrings.h" line="772"/>
         <source>BluRay Player:</source>
-        <translation type="unfinished">Blu-ray Player:</translation>
+        <translation>Blu-ray Player:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="773"/>
         <source>BluRay Region:</source>
-        <translation type="unfinished">Blu-ray Region:</translation>
+        <translation>Blu-ray Region:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="774"/>
@@ -27419,7 +27419,7 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
     <message>
         <location filename="../themes/themestrings.h" line="1149"/>
         <source>Bluray</source>
-        <translation type="unfinished">Blu-ray</translation>
+        <translation>Blu-ray</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1150"/>
