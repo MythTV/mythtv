@@ -537,7 +537,7 @@ static GlobalSpinBox *RecordPreRoll()
                                         "scheduled start time. It does not "
                                         "affect the scheduler. It is ignored "
                                         "when two shows have been scheduled "
-                                        "without enough time in between."));
+                                        "without enough time inbetween."));
     bs->setValue(0);
 
     return bs;
@@ -556,7 +556,7 @@ static GlobalSpinBox *RecordOverTime()
                                         "scheduled end time. It does not "
                                         "affect the scheduler. It is ignored "
                                         "when two shows have been scheduled "
-                                        "without enough time in between."));
+                                        "without enough time inbetween."));
     return bs;
 }
 
@@ -604,7 +604,7 @@ static GlobalSpinBox *CategoryOverTime()
                                         "the recording by the specified "
                                         "number of minutes. It is ignored "
                                         "when two shows have been scheduled "
-                                        "without enough time in-between."));
+                                        "without enough time inbetween."));
     return bs;
 }
 
