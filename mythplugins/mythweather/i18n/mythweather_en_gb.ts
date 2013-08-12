@@ -1073,6 +1073,11 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
         <translation>This screen governs the behaviour of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation type="unfinished">Weather settings</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="49"/>
         <source>Weather Location Search</source>
         <translation>Weather Location Search</translation>

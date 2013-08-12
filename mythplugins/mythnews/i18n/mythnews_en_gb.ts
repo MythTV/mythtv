@@ -240,6 +240,11 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>News Settings</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>News</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
         <translation>You Haven&apos;t Specified Any News Feeds.</translation>

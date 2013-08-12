@@ -1672,12 +1672,17 @@
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="159"/>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="173"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="783"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="792"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="162"/>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="176"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="205"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="785"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="794"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -1699,6 +1704,7 @@
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="48"/>
+        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="63"/>
         <source>Channel Name</source>
         <translation>Channel Name</translation>
     </message>
@@ -1835,6 +1841,7 @@
         <translation>Delete</translation>
     </message>
     <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="111"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1315"/>
         <source>Error</source>
         <translation>Error</translation>
@@ -1868,6 +1875,57 @@
         <location filename="../programs/mythfrontend/main.cpp" line="586"/>
         <source>There are no configured tuners.</source>
         <translation>There are no configured tuners.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="65"/>
+        <source>Hostname</source>
+        <translation>Hostname</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="94"/>
+        <source>Port</source>
+        <comment>TCP/IP port</comment>
+        <translation>Port</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="111"/>
+        <source>User</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="121"/>
+        <source>Password</source>
+        <translation>Password</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="813"/>
+        <source>Title</source>
+        <translation>Title</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="816"/>
+        <source>Season/Episode</source>
+        <translation>Series/Episode</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="819"/>
+        <source>Year</source>
+        <translation>Year</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="822"/>
+        <source>User Rating</source>
+        <translation>User Rating</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="825"/>
+        <source>Runtime</source>
+        <translation>Runtime</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="828"/>
+        <source>Filename</source>
+        <translation>Filename</translation>
     </message>
 </context>
 <context>
@@ -3964,6 +4022,14 @@ Device supports up to %1</translation>
     </message>
 </context>
 <context>
+    <name>ChannelWizard</name>
+    <message>
+        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="29"/>
+        <source>Channel Options</source>
+        <translation>Channel Options</translation>
+    </message>
+</context>
+<context>
     <name>CommBreakMap</name>
     <message>
         <location filename="../libs/libmythtv/commbreakmap.cpp" line="236"/>
@@ -4534,6 +4600,151 @@ Device supports up to %1</translation>
         <location filename="../libs/libmythtv/videosource.cpp" line="347"/>
         <source>Fetching lineups from %1...</source>
         <translation>Fetching lineups from %1...</translation>
+    </message>
+</context>
+<context>
+    <name>DatabaseSettings</name>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="17"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="150"/>
+        <source>Use custom identifier for frontend preferences</source>
+        <translation>Use custom identifier for frontend preferences</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="29"/>
+        <source>Backend Server Wakeup settings</source>
+        <translation>Backend Server Wakeup settings</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="44"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="145"/>
+        <source>Database Configuration %1/%2</source>
+        <translation>Database Configuration %1/%2</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="51"/>
+        <source>All database settings take effect when you restart this program.</source>
+        <translation>All database settings take effect when you restart this program.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="54"/>
+        <source>MythTV could not connect to the database. Please verify your database settings below.</source>
+        <translation>MythTV could not connect to the database. Please verify your database settings below.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="61"/>
+        <source>Database Server Settings</source>
+        <translation>Database Server Settings</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="67"/>
+        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
+        <translation>The hostname or IP address of the machine hosting the database. This information is required.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="77"/>
+        <source>Ping test server?</source>
+        <translation>Ping test server?</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="78"/>
+        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
+        <translation>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="96"/>
+        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
+        <translation>The port number the database is running on.  Leave blank if using the default port (3306).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="103"/>
+        <source>Database name</source>
+        <translation>Database name</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="105"/>
+        <source>The name of the database. This information is required.</source>
+        <translation>The name of the database. This information is required.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="113"/>
+        <source>The user name to use while connecting to the database. This information is required.</source>
+        <translation>The user name to use while connecting to the database. This information is required.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="123"/>
+        <source>The password to use while connecting to the database. This information is required.</source>
+        <translation>The password to use while connecting to the database. This information is required.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="153"/>
+        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
+        <translation>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="165"/>
+        <source>Custom identifier</source>
+        <translation>Custom identifier</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="167"/>
+        <source>An identifier to use while saving the settings for this frontend.</source>
+        <translation>An identifier to use while saving the settings for this frontend.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="181"/>
+        <source>Enable database server wakeup</source>
+        <translation>Enable database server wakeup</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="183"/>
+        <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
+        <translation>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="190"/>
+        <source>Reconnect time</source>
+        <translation>Reconnect time</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="192"/>
+        <source>The time in seconds to wait for the server to wake up.</source>
+        <translation>The time in seconds to wait for the server to wake up.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="198"/>
+        <source>Retry attempts</source>
+        <translation>Retry attempts</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="200"/>
+        <source>The number of retries to wake the server before the frontend gives up.</source>
+        <translation>The number of retries to wake the server before the frontend gives up.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="206"/>
+        <source>Wake command</source>
+        <translation>Wake command</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="208"/>
+        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
+        <translation>The command executed on this frontend to wake up the database server (e.g. &apos;sudo /etc/init.d/mysql restart&apos;).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="238"/>
+        <source>Required fields are marked with an asterisk (*).</source>
+        <translation>Required fields are marked with an asterisk (*).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="244"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="258"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="262"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="266"/>
+        <source>* %1</source>
+        <comment>Required field</comment>
+        <extracomment>%1 is the required field name</extracomment>
+        <translation>* %1</translation>
     </message>
 </context>
 <context>
@@ -5216,9 +5427,23 @@ Delete the current cut or preserved region</extracomment>
         <translation>Do you really want to exit MythTV?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="205"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="207"/>
+        <source>Yes, Exit now</source>
+        <translation>Yes, Exit now</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="209"/>
+        <source>Yes, Exit and Reboot</source>
+        <translation>Yes, Exit and Reboot</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="211"/>
+        <source>Yes, Exit and Shutdown</source>
+        <translation>Yes, Exit and Shutdown</translation>
+    </message>
+    <message>
         <source>No</source>
-        <translation>No</translation>
+        <translation type="obsolete">No</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="39"/>
@@ -6725,6 +6950,60 @@ Delete the current cut or preserved region</extracomment>
     </message>
 </context>
 <context>
+    <name>IPTVChannelFetcher</name>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="101"/>
+        <source>Downloading Playlist</source>
+        <translation>Downloading Playlist</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="113"/>
+        <source>Downloading Playlist Failed</source>
+        <translation>Downloading Playlist Failed</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="124"/>
+        <source>Processing Playlist</source>
+        <translation>Processing Playlist</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="131"/>
+        <source>Adding Channels</source>
+        <translation>Adding Channels</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="144"/>
+        <source>Channel #%1 : %2</source>
+        <extracomment>%1 is the channel number, %2 is the channel name</extracomment>
+        <translation>Channel #%1 : %2</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="155"/>
+        <source>Adding %1</source>
+        <translation>Adding %1</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="169"/>
+        <source>Updating %1</source>
+        <translation>Updating %1</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="183"/>
+        <source>Done</source>
+        <translation>Done</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="288"/>
+        <source>ERROR: M3U channel list is malformed</source>
+        <translation>ERROR: M3U channel list is malformed</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="315"/>
+        <source>Encountered malformed channel</source>
+        <translation>Encountered malformed channel</translation>
+    </message>
+</context>
+<context>
     <name>IdleScreen</name>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/idlescreen.cpp" line="121"/>
@@ -7858,6 +8137,12 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../libs/libmythtv/channelscan/multiplexsetting.h" line="17"/>
         <source>Transport</source>
         <translation>Transport</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/multiplexsetting.cpp" line="73"/>
+        <source>ATSC Channel %1</source>
+        <extracomment>%1 is the channel number</extracomment>
+        <translation>ATSC Channel %1</translation>
     </message>
 </context>
 <context>
@@ -9484,7 +9769,7 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MythCoreContext</name>
     <message>
-        <location filename="../libs/libmythbase/mythcorecontext.cpp" line="213"/>
+        <location filename="../libs/libmythbase/mythcorecontext.cpp" line="216"/>
         <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
         <translation>This application is not compatible with the installed MythTV libraries. Please recompile after a &apos;make distclean&apos;</translation>
     </message>
@@ -10394,7 +10679,7 @@ Returning to the previous menu.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1572"/>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; duringplayback.</source>
-        <translation type="unfinished">If enabled, subtitles will be displayed when playing back recordings or watching Live TV. Subtitles can be turned on/off by pressing &quot;T&quot; during playback.</translation>
+        <translation>If enabled, subtitles will be displayed when playing back recordings or watching Live TV. Subtitles can be turned on/off by pressing &quot;T&quot; during playback.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1584"/>
@@ -10451,6 +10736,24 @@ Returning to the previous menu.</translation>
         <location filename="../libs/libmythtv/channelscan/panedvbutilsimport.h" line="50"/>
         <source>Location of the channels.conf file.</source>
         <translation>Location of the channels.conf file.</translation>
+    </message>
+</context>
+<context>
+    <name>PaneExistingScanImport</name>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="50"/>
+        <source>Scan to Import</source>
+        <translation>Scan to Import</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="69"/>
+        <source>processed</source>
+        <translation>processed</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="69"/>
+        <source>unprocessed</source>
+        <translation>unprocessed</translation>
     </message>
 </context>
 <context>
@@ -10930,11 +11233,13 @@ Returning to the previous menu.</translation>
         <translation>There are no recordings available</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2758"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3206"/>
         <source>Mark as Unwatched</source>
         <translation>Mark as Unwatched</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3208"/>
         <source>Mark as Watched</source>
         <translation>Mark as Watched</translation>
@@ -11123,14 +11428,12 @@ Are you sure you want to delete:</translation>
         <translation>Toggle playlist for this Group</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
         <source>Mark As Watched</source>
-        <translation>Mark As Watched</translation>
+        <translation type="obsolete">Mark As Watched</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2758"/>
         <source>Mark As Unwatched</source>
-        <translation>Mark As Unwatched</translation>
+        <translation type="obsolete">Mark As Unwatched</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2827"/>
@@ -12959,100 +13262,79 @@ name cannot be blank.</translation>
         <translation type="obsolete">The plugin %1 has failed to run for some reason...</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="55"/>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="172"/>
         <source>Use custom identifier for frontend preferences</source>
-        <translation>Use custom identifier for frontend preferences</translation>
+        <translation type="obsolete">Use custom identifier for frontend preferences</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="85"/>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="169"/>
         <source>Database Configuration</source>
-        <translation>Database Configuration</translation>
+        <translation type="obsolete">Database Configuration</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="91"/>
         <source>All database settings take effect when you restart this program.</source>
-        <translation>All database settings will take effect when you restart this program.</translation>
+        <translation type="obsolete">All database settings will take effect when you restart this program.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="103"/>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation>The hostname or IP address of the machine hosting the database. This information is required.</translation>
+        <translation type="obsolete">The hostname or IP address of the machine hosting the database. This information is required.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="135"/>
         <source>The name of the database. This information is required.</source>
-        <translation>The name of the database. This information is required.</translation>
+        <translation type="obsolete">The name of the database. This information is required.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="140"/>
         <source>User</source>
-        <translation>User</translation>
+        <translation type="obsolete">User</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="141"/>
         <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation>The user name to use while connecting to the database. This information is required.</translation>
+        <translation type="obsolete">The user name to use while connecting to the database. This information is required.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="147"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="330"/>
         <source>Password</source>
         <translation>Password</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="148"/>
         <source>The password to use while connecting to the database. This information is required.</source>
-        <translation>The password to use while connecting to the database. This information is required.</translation>
+        <translation type="obsolete">The password to use while connecting to the database. This information is required.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="174"/>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</translation>
+        <translation type="obsolete">If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="184"/>
         <source>Custom identifier</source>
-        <translation>Custom identifier</translation>
+        <translation type="obsolete">Custom identifier</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="185"/>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation>An identifier to use while saving the settings for this frontend.</translation>
+        <translation type="obsolete">An identifier to use while saving the settings for this frontend.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="198"/>
         <source>Enable database server wakeup</source>
-        <translation>Enable database server wakeup</translation>
+        <translation type="obsolete">Enable database server wakeup</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="199"/>
         <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</translation>
+        <translation type="obsolete">If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="204"/>
         <source>Reconnect time</source>
-        <translation>Reconnect time</translation>
+        <translation type="obsolete">Reconnect time</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="205"/>
         <source>The time in seconds to wait for the server to wake up.</source>
-        <translation>The time in seconds to wait for the server to wake up.</translation>
+        <translation type="obsolete">The time in seconds to wait for the server to wake up.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="209"/>
         <source>Retry attempts</source>
-        <translation>Retry attempts</translation>
+        <translation type="obsolete">Retry attempts</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="210"/>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation>The number of retries to wake the server before the frontend gives up.</translation>
+        <translation type="obsolete">The number of retries to wake the server before the frontend gives up.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="215"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="341"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="362"/>
         <source>Wake command</source>
@@ -13069,9 +13351,8 @@ name cannot be blank.</translation>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="63"/>
         <source>Channel Name</source>
-        <translation>Channel Name</translation>
+        <translation type="obsolete">Channel Name</translation>
     </message>
     <message>
         <source>Channel Number</source>
@@ -13494,16 +13775,12 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
     <message>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="220"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1025"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="781"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="789"/>
         <source>Yes</source>
         <translation>Yes</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="220"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1026"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="783"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="791"/>
         <source>No</source>
         <translation>No</translation>
     </message>
@@ -13530,49 +13807,40 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
         <location filename="../libs/libmythtv/transporteditor.cpp" line="670"/>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="704"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="297"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="805"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="810"/>
         <source>Title</source>
-        <translation>Title</translation>
+        <translation type="obsolete">Title</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="812"/>
         <source>Season/Episode</source>
-        <translation>Series/Episode</translation>
+        <translation type="obsolete">Series/Episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="814"/>
         <source>Year</source>
-        <translation>Year</translation>
+        <translation type="obsolete">Year</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="816"/>
         <source>User Rating</source>
-        <translation>User Rating</translation>
+        <translation type="obsolete">User Rating</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="818"/>
         <source>Runtime</source>
-        <translation>Runtime</translation>
+        <translation type="obsolete">Runtime</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="820"/>
         <source>Filename</source>
-        <translation>Filename</translation>
+        <translation type="obsolete">Filename</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="822"/>
         <source>Video ID</source>
-        <translation>Video ID</translation>
+        <translation type="obsolete">Video ID</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="824"/>
         <source>Date Added</source>
-        <translation>Date Added</translation>
+        <translation type="obsolete">Date Added</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="269"/>
@@ -13723,7 +13991,6 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
         <translation>Profile Group Name</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="102"/>
         <location filename="../libs/libmythtv/profilegroup.h" line="74"/>
         <source>Hostname</source>
         <translation>Hostname</translation>
@@ -13755,7 +14022,6 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="41"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="42"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1059"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="798"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
@@ -14609,7 +14875,6 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</tran
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1957"/>
-        <location filename="../libs/libmythtv/channelscan/multiplexsetting.cpp" line="71"/>
         <source>ATSC Channel %1</source>
         <translation>ATSC Channel %1</translation>
     </message>
@@ -15442,17 +15707,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="92"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="678"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="694"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="707"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="720"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="734"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="749"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="766"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="780"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="788"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="796"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="803"/>
         <source>All</source>
         <translation>All</translation>
     </message>
@@ -17966,56 +18220,46 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
         <translation type="obsolete">Channel Options - Filters</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="70"/>
         <source>Backend Server Wakeup settings</source>
-        <translation>Backend Server Wakeup settings</translation>
+        <translation type="obsolete">Backend Server Wakeup settings</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="94"/>
         <source>MythTV could not connect to the database. Please verify your database settings below.</source>
-        <translation>MythTV could not connect to the database. Please verify your database settings below.</translation>
+        <translation type="obsolete">MythTV could not connect to the database. Please verify your database settings below.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="100"/>
         <source>Database Server Settings</source>
-        <translation>Database Server Settings</translation>
+        <translation type="obsolete">Database Server Settings</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="112"/>
         <source>Ping test server?</source>
-        <translation>Ping test server?</translation>
+        <translation type="obsolete">Ping test server?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="113"/>
         <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</translation>
+        <translation type="obsolete">Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="127"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="83"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="117"/>
         <source>Port</source>
         <translation>Port</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="128"/>
         <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation>The port number the database is running on.  Leave blank if using the default port (3306).</translation>
+        <translation type="obsolete">The port number the database is running on.  Leave blank if using the default port (3306).</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="134"/>
         <source>Database name</source>
-        <translation>Database name</translation>
+        <translation type="obsolete">Database name</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="216"/>
         <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation>The command executed on this frontend to wake up the database server (e.g. &apos;sudo /etc/init.d/mysql restart&apos;).</translation>
+        <translation type="obsolete">The command executed on this frontend to wake up the database server (e.g. &apos;sudo /etc/init.d/mysql restart&apos;).</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="245"/>
         <source>Required fields are marked with an asterisk (*).</source>
-        <translation>Required fields are marked with an asterisk (*).</translation>
+        <translation type="obsolete">Required fields are marked with an asterisk (*).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="162"/>
@@ -18170,9 +18414,8 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
         <translation>, firmware: %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="29"/>
         <source>Channel Options</source>
-        <translation>Channel Options</translation>
+        <translation type="obsolete">Channel Options</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="357"/>
@@ -18714,14 +18957,14 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="221"/>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="420"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="331"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="340"/>
         <source>currently running.</source>
         <translation>currently running.</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="440"/>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="988"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="374"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="383"/>
         <source>Successful.</source>
         <translation>Successful.</translation>
     </message>
@@ -18808,9 +19051,8 @@ Most DVB-S transponders transmit at 27.5 million symbols per second.</translatio
 &apos;%1&apos; is already being used.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="110"/>
         <source>Error</source>
-        <translation>Error</translation>
+        <translation type="obsolete">Error</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
@@ -20261,7 +20503,7 @@ You may have to use the eject button under its tray.</translation>
         <translation type="obsolete">Running</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="370"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="379"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
         <translation>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</translation>
     </message>
@@ -20486,19 +20728,16 @@ Check if the video exists</translation>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="207"/>
         <source>Yes, Exit now</source>
-        <translation>Yes, Exit now</translation>
+        <translation type="obsolete">Yes, Exit now</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="209"/>
         <source>Yes, Exit and Reboot</source>
-        <translation>Yes, Exit and Reboot</translation>
+        <translation type="obsolete">Yes, Exit and Reboot</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="211"/>
         <source>Yes, Exit and Shutdown</source>
-        <translation>Yes, Exit and Shutdown</translation>
+        <translation type="obsolete">Yes, Exit and Shutdown</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1488"/>
@@ -20519,59 +20758,48 @@ Check if the video exists</translation>
         <translation type="obsolete">of</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="101"/>
         <source>Downloading Playlist</source>
-        <translation>Downloading Playlist</translation>
+        <translation type="obsolete">Downloading Playlist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="112"/>
         <source>Downloading Playlist Failed</source>
-        <translation>Downloading Playlist Failed</translation>
+        <translation type="obsolete">Downloading Playlist Failed</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="123"/>
         <source>Processing Playlist</source>
-        <translation>Processing Playlist</translation>
+        <translation type="obsolete">Processing Playlist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="130"/>
         <source>Adding Channels</source>
-        <translation>Adding Channels</translation>
+        <translation type="obsolete">Adding Channels</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="142"/>
         <source>Channel #%1 : %2</source>
-        <translation>Channel #%1 : %2</translation>
+        <translation type="obsolete">Channel #%1 : %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="153"/>
         <source>Adding %1</source>
-        <translation>Adding %1</translation>
+        <translation type="obsolete">Adding %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="167"/>
         <source>Updating %1</source>
-        <translation>Updating %1</translation>
+        <translation type="obsolete">Updating %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="181"/>
         <source>Done</source>
-        <translation>Done</translation>
+        <translation type="obsolete">Done</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="286"/>
         <source>ERROR: M3U channel list is malformed</source>
-        <translation>ERROR: M3U channel list is malformed</translation>
+        <translation type="obsolete">ERROR: M3U channel list is malformed</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="313"/>
         <source>Encountered malformed channel</source>
-        <translation>Encountered malformed channel</translation>
+        <translation type="obsolete">Encountered malformed channel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="318"/>
         <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation>Parsing Channel #%1 : %2 : %3</translation>
+        <translation type="obsolete">Parsing Channel #%1 : %2 : %3</translation>
     </message>
     <message>
         <source>Performing Logo Identification</source>
@@ -20619,19 +20847,16 @@ Check if the video exists</translation>
         <translation>Backlinks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="48"/>
         <source>Scan to Import</source>
-        <translation>Scan to Import</translation>
+        <translation type="obsolete">Scan to Import</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="67"/>
         <source>processed</source>
-        <translation>processed</translation>
+        <translation type="obsolete">processed</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="67"/>
         <source>unprocessed</source>
-        <translation>unprocessed</translation>
+        <translation type="obsolete">unprocessed</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.h" line="93"/>
@@ -21125,9 +21350,8 @@ Check if the video exists</translation>
         <translation type="obsolete">Error opening remote stream</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videooutwindow.cpp" line="946"/>
         <source>Zoom %1x%2 @ (%3,%4)</source>
-        <translation>Zoom %1x%2 @ (%3,%4)</translation>
+        <translation type="obsolete">Zoom %1x%2 @ (%3,%4)</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/channeldata.cpp" line="87"/>
@@ -22884,7 +23108,6 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="302"/>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="401"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="438"/>
         <source>Default</source>
         <comment>Default storage group</comment>
         <translation>Default</translation>
@@ -22920,17 +23143,24 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="437"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="448"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="456"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="467"/>
+        <source>(Create default group)</source>
+        <translation>(Create default group)</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="446"/>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="464"/>
         <source>(Create %1 group)</source>
         <translation>(Create %1 group)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="457"/>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="454"/>
+        <source>(Create new group)</source>
+        <translation>(Create new group)</translation>
+    </message>
+    <message>
         <source>new</source>
         <comment>New storage group</comment>
-        <translation>new</translation>
+        <translation type="obsolete">new</translation>
     </message>
 </context>
 <context>
@@ -31239,10 +31469,98 @@ dd MMM yyyy</translation>
         <translation>Result of this filter : No Videos</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="678"/>
+        <source>All</source>
+        <comment>Category</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="694"/>
+        <source>All</source>
+        <comment>Genre</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="707"/>
+        <source>All</source>
+        <comment>Cast</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="720"/>
+        <source>All</source>
+        <comment>Country</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="734"/>
+        <source>All</source>
+        <comment>Year</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="749"/>
+        <source>All</source>
+        <comment>Runtime</comment>
+        <translation>All</translation>
+    </message>
+    <message>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="758"/>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="759"/>
         <source>minutes</source>
         <translation>minutes</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="766"/>
+        <source>All</source>
+        <comment>User rating</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="780"/>
+        <source>All</source>
+        <comment>Browsable</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="789"/>
+        <source>All</source>
+        <comment>Watched</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="798"/>
+        <source>All</source>
+        <comment>Inet reference</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="800"/>
+        <source>Unknown</source>
+        <comment>Inet reference</comment>
+        <translation>Unknown</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="805"/>
+        <source>All</source>
+        <comment>Cover file</comment>
+        <translation>All</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="807"/>
+        <source>None</source>
+        <comment>Cover file</comment>
+        <translation>None</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="830"/>
+        <source>Video ID</source>
+        <translation>Video ID</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="832"/>
+        <source>Date Added</source>
+        <translation>Date Added</translation>
     </message>
 </context>
 <context>
@@ -31577,6 +31895,14 @@ dd MMM yyyy</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2348"/>
         <source>Overrides for specific video sizes</source>
         <translation>Overrides for specific video sizes</translation>
+    </message>
+</context>
+<context>
+    <name>VideoOutWindow</name>
+    <message>
+        <location filename="../libs/libmythtv/videooutwindow.cpp" line="946"/>
+        <source>Zoom %1x%2 @ (%3,%4)</source>
+        <translation>Zoom %1x%2 @ (%3,%4)</translation>
     </message>
 </context>
 <context>

@@ -753,6 +753,11 @@ Remove it from the database?</translation>
         <translation>Boxart:</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>From %1</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="33"/>
         <source>System: %1</source>
         <translation>System: %1</translation>

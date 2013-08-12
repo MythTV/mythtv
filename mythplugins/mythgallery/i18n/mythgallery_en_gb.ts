@@ -2,6 +2,18 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en_GB">
 <context>
+    <name>(MythGalleryMain)</name>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="54"/>
+        <source>MythGallery cannot find its start directory.
+%1
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation>MythGallery cannot find its start directory.
+%1
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</translation>
+    </message>
+</context>
+<context>
     <name>GLSingleView</name>
     <message>
         <location filename="../mythgallery/glsingleview.cpp" line="243"/>
@@ -761,113 +773,113 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="88"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
         <source>Image viewer / slideshow</source>
         <translation>Image viewer / slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Start/Stop Slideshow</source>
         <translation>Start/Stop Slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>Go to the first image in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>Go to the last image in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Start Slideshow in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="90"/>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="102"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Start Random Slideshow in thumbnail view</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="104"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Rotate image right 90 degrees</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="106"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Rotate image left 90 degrees</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="108"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Zoom image out</source>
         <translation>Zoom image out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="110"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Zoom image in</source>
         <translation>Zoom image in</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="112"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>Scroll image up</source>
         <translation>Scroll image up</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="114"/>
+        <location filename="../mythgallery/main.cpp" line="115"/>
         <source>Scroll image left</source>
         <translation>Scroll image left</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="116"/>
+        <location filename="../mythgallery/main.cpp" line="117"/>
         <source>Scroll image right</source>
         <translation>Scroll image right</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="118"/>
+        <location filename="../mythgallery/main.cpp" line="119"/>
         <source>Scroll image down</source>
         <translation>Scroll image down</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="120"/>
+        <location filename="../mythgallery/main.cpp" line="121"/>
         <source>Recenter image</source>
         <translation>Recenter image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="122"/>
+        <location filename="../mythgallery/main.cpp" line="123"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Full-size (un-zoom) image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="124"/>
+        <location filename="../mythgallery/main.cpp" line="125"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Go to the upper-left corner of the image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="126"/>
+        <location filename="../mythgallery/main.cpp" line="127"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Go to the lower-right corner of the image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="128"/>
+        <location filename="../mythgallery/main.cpp" line="129"/>
         <source>Mark image</source>
         <translation>Mark image</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="130"/>
+        <location filename="../mythgallery/main.cpp" line="131"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Toggle scale to fullscreen/scale to fit</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="132"/>
+        <location filename="../mythgallery/main.cpp" line="133"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery Media Handler (1/2)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="143"/>
+        <location filename="../mythgallery/main.cpp" line="144"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery Media Handler (2/2)</translation>
     </message>
@@ -999,11 +1011,10 @@
         <translation type="obsolete">MythGallery Settings (General)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="53"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation>MythGallery cannot find its start directory.
+        <translation type="obsolete">MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</translation>
     </message>
