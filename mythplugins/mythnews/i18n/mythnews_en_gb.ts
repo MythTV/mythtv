@@ -27,58 +27,55 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>You haven&apos;t configured MythNews to use any sites.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Updated</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 of %2 (%3 percent)</translation>
+        <translation type="obsolete">%1 of %2 (%3 percent)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Downloading media...</translation>
+        <translation type="obsolete">Downloading media...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>No browser command set! MythNews needs MythBrowser to be installed.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="674"/>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
         <translation>Manage Feeds</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
         <translation>Add Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
         <translation>Edit Feed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
         <translation>Delete Feed</translation>
     </message>
@@ -243,37 +240,72 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>News Settings</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>News</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation>You Haven&apos;t Specified Any News Feeds.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Edit News</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>News Config</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Available Categories</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Available Sites</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Category</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Web Site</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Edit RSS News Feed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Contexts</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Actions</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>News Feeds</translation>
     </message>
