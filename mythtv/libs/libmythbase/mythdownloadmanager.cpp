@@ -240,6 +240,7 @@ void MythDownloadManager::run(void)
 
     bool downloading = false;
     bool itemsInQueue = false;
+    bool itemsInCancellationQueue = false;
     bool waitAnyway = false;
 
     m_queueThread = QThread::currentThread();
@@ -276,8 +277,13 @@ void MythDownloadManager::run(void)
         }
         m_infoLock->lock();
         downloading = !m_downloadInfos.isEmpty();
+        itemsInCancellationQueue = !m_cancellationQueue.isEmpty();
         m_infoLock->unlock();
 
+        if (itemsInCancellationQueue)
+        {
+            downloadCanceled();
+        }
         if (downloading)
             QCoreApplication::processEvents();
 
@@ -861,39 +867,65 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 /** \brief Cancel a queued or current download.
  *  \param url for download to cancel
  */
-void MythDownloadManager::cancelDownload(const QString &url)
+void MythDownloadManager::cancelDownload(const QString &url, bool block)
 {
-    QMutexLocker locker(m_infoLock);
+    cancelDownload(QStringList(url), block);
+}
+
+/** \brief Cancel a queued or current download.
+ *  \param list of urls for download to cancel
+ */
+void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
+{
     MythDownloadInfo *dlInfo;
 
-    QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
-    while (lit.hasNext())
+    m_infoLock->lock();
+    foreach (QString url, urls)
     {
-        lit.next();
-        dlInfo = lit.value();
-        if (dlInfo->m_url == url)
+        QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
+        while (lit.hasNext())
         {
+            lit.next();
+            dlInfo = lit.value();
+            if (dlInfo->m_url == url)
+            {
+                if (!m_cancellationQueue.contains(dlInfo))
+                    m_cancellationQueue.append(dlInfo);
+                lit.remove();
+            }
+        }
+
+        if (m_downloadInfos.contains(url))
+        {
+            dlInfo = m_downloadInfos[url];
+
             if (!m_cancellationQueue.contains(dlInfo))
                 m_cancellationQueue.append(dlInfo);
-            lit.remove();
+
+            if (dlInfo->m_reply)
+                m_downloadReplies.remove(dlInfo->m_reply);
+
+            m_downloadInfos.remove(url);
         }
     }
+    m_infoLock->unlock();
 
-    if (m_downloadInfos.contains(url))
+    if (QThread::currentThread() == this->thread())
     {
-        dlInfo = m_downloadInfos[url];
-
-        if (!m_cancellationQueue.contains(dlInfo))
-            m_cancellationQueue.append(dlInfo);
-
-        if (dlInfo->m_reply)
-            m_downloadReplies.remove(dlInfo->m_reply);
-
-        m_downloadInfos.remove(url);
+        downloadCanceled();
+        return;
     }
 
-    QMetaObject::invokeMethod(this, "downloadCanceled",
-                              Qt::QueuedConnection);
+    // wake-up running thread
+    m_queueWaitCond.wakeAll();
+
+    if (!block)
+        return;
+
+    while (!m_cancellationQueue.isEmpty())
+    {
+        usleep(50000); // re-test in another 50ms
+    }
 }
 
 void MythDownloadManager::downloadCanceled()
@@ -906,7 +938,8 @@ void MythDownloadManager::downloadCanceled()
     {
         lit.next();
         dlInfo = lit.value();
-        
+        dlInfo->m_lock.lock();
+
         if (dlInfo->m_reply)
         {
             LOG(VB_FILE, LOG_DEBUG,
@@ -914,9 +947,11 @@ void MythDownloadManager::downloadCanceled()
             dlInfo->m_reply->abort();
         }
         lit.remove();
-        if (dlInfo->IsDone())
+        if (dlInfo->m_done)
+        {
+            dlInfo->m_lock.unlock();
             continue;
-        dlInfo->m_lock.lock();
+        }
         dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
         dlInfo->m_done = true;
         dlInfo->m_lock.unlock();

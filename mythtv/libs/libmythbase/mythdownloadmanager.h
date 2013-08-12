@@ -71,7 +71,8 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                   const QHash<QByteArray, QByteArray> *headers = NULL);
 
     // Cancel a download
-    void cancelDownload(const QString &url);
+    void cancelDownload(const QString &url, bool block = true);
+    void cancelDownload(const QStringList &urls, bool block = true);
 
     // Generic helpers
     void removeListener(QObject *caller);
@@ -97,8 +98,6 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void downloadError(QNetworkReply::NetworkError errorCode);
     void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
-    void downloadCanceled();
-
   private:
     // Notification from RemoteFile downloads
     void downloadFinished(MythDownloadInfo *dlInfo);
@@ -120,6 +119,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);
     bool downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo = true);
+    void downloadCanceled(void);
 
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
