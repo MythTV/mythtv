@@ -381,7 +381,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         // no title, no point trying any longer
         bd_close(bdnav);
         bdnav = NULL;
-        lastError = tr("Can't find any Bluray-compatible title");
+        lastError = tr("Can't find any Blu-ray compatible titles");
         rwlock.unlock();
         mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
         return false;
@@ -481,7 +481,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             // no title, no point trying any longer
             bd_close(bdnav);
             bdnav = NULL;
-            lastError = tr("Can't find any usable Bluray title");
+            lastError = tr("Can't find any usable Blu-ray titles");
             rwlock.unlock();
             mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
             return false;
