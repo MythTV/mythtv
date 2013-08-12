@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QtPlugin>
 #include <QImageReader>
+#include <QCoreApplication>
 
 // myth
 #include <mythcontext.h>
@@ -50,12 +51,12 @@ static int run(MythMediaDevice *dev = NULL, bool startRandomShow = false)
     }
     else
     {
-        ShowOkPopup(QObject::tr("MythGallery cannot find its start directory."
-                                "\n%1\n"
-                                "Check the directory exists, is readable and "
-                                "the setting is correct on MythGallery's "
-                                "settings page.")
-                    .arg(startdir.absolutePath()));
+        ShowOkPopup(QCoreApplication::translate("(MythGalleryMain)",
+            "MythGallery cannot find its start directory.\n"
+            "%1\n"
+            "Check the directory exists, is readable and the setting is "
+            "correct on MythGallery's settings page.")
+            .arg(startdir.absolutePath()));
     }
 
     return -1;

@@ -1641,10 +1641,9 @@
     <window name="criteriaroweditor">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="box">
-            <position>0,0</position>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>5,5,460,40</area>
@@ -1716,10 +1715,9 @@
     <window name="dateeditordialog">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="box">
-            <position>0,0</position>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>5,5,460,40</area>
@@ -1817,10 +1815,9 @@
     <window name="orderbydialog">
         <area>-1,-1,470,500</area>
 
-        <imagetype name="box">
-            <area>0,0,470,500</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>5,5,460,40</area>

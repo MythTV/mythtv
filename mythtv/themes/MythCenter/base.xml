@@ -150,6 +150,17 @@
         <cornerradius>12</cornerradius>
     </shape>
 
+        <!-- Base definition of a shape used as a background on many popups -->
+    <shape name="basepopupbackground" from="basebackground">
+        <fill style="gradient">
+            <gradient direction="vertical" alpha="255">
+                <stop position="0" color="#111111" />
+                <stop position="50" color="#888888" />
+                <stop position="100" color="#111111" />
+            </gradient>
+        </fill>
+    </shape>
+
     <!-- Base definition of a shape used as a background to many widgets -->
     <shape name="basewidgetshape">
         <area>0,0,100%,100%</area>
@@ -1120,15 +1131,65 @@
     </window>
 
     <window name="MythMetadataResults">
-        <area>-1,-1,413,426</area>
+        <area>-1,-1,750,550</area>
 
-        <imagetype name="box">
-            <filename>mv_results_popup.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <buttonlist name="results" from="basebuttonlist">
-            <area>20,22,357,378</area>
-            <showarrow>no</showarrow>
+            <area>20,20,710,510</area>
+            <arrange>stack</arrange>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,95</area>
+                    <shape name="background">
+                        <area>0,0,100%,95</area>
+                    </shape>
+                    <imagetype name="buttonimage">
+                        <area>45,0,50,95</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>0,0,0,0</area>
+                    </textarea>
+                    <textarea name="title">
+                        <area>140,10,550,75</area>
+                        <align>left,vcenter</align>
+                        <font>baselarge</font>
+                        <template>%TITLE%% - |SUBTITLE%% (|YEAR|)%</template>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selectedactive">
+                    <area>0,0,100%,180</area>
+
+                    <shape name="background">
+                        <area>0,0,100%,180</area>
+                    </shape>
+                    <imagetype name="buttonimage">
+                        <area>10,0,120,180</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>0,0,0,0</area>
+                    </textarea>
+                    <textarea name="title">
+                        <area>140,0,550,30</area>
+                        <align>left</align>
+                        <font>basemedium</font>
+                        <template>%TITLE%% - |SUBTITLE%% (|YEAR|)%</template>
+                        <multiline>yes</multiline>
+                    </textarea>
+                    <textarea name="description">
+                        <area>140,37,550,140</area>
+                        <align>justify</align>
+                        <font>basesmall</font>
+                        <template>%DESCRIPTION%</template>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+            </statetype>
         </buttonlist>
     </window>
 

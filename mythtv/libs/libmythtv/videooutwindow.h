@@ -8,10 +8,13 @@
 #ifndef VIDEOOUTWINDOW_H_
 #define VIDEOOUTWINDOW_H_
 
+// Qt headers
 #include <QSize>
 #include <QRect>
 #include <QPoint>
+#include <QCoreApplication>
 
+// MythTV headers
 #include "mythcodecid.h"
 #include "videoouttypes.h"
 
@@ -19,6 +22,8 @@ class MythPlayer;
 
 class VideoOutWindow
 {
+    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow)
+
   public:
     VideoOutWindow();
 

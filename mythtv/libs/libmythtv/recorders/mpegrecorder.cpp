@@ -1295,6 +1295,12 @@ bool MpegRecorder::StartEncoding(void)
             m_h264_parser.Reset();
             _wait_for_keyframe_option = true;
             _seen_sps = false;
+
+            // (at least) with the 3.10 kernel, the V4L2_ENC_CMD_START
+            // does not reliably start the data flow.  A read() seems
+            // to consistently work, though.
+            uint8_t dummy;
+            read(readfd, &dummy, 0);
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");

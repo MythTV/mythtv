@@ -202,7 +202,6 @@ class MusicPlayer : public QObject, public MythObservable
     int          m_currentTrack;
     int          m_currentTime;
 
-    MusicMetadata  *m_currentMetadata;
     MusicMetadata  *m_oneshotMetadata;
 
     AudioOutput    *m_output;
@@ -232,6 +231,8 @@ class MusicPlayer : public QObject, public MythObservable
     int               m_lastTrackStart;
     int               m_bufferAvailable;
     int               m_bufferSize;
+
+    int               m_errorCount;
 };
 
 Q_DECLARE_METATYPE(MusicPlayer::RepeatMode);

@@ -93,6 +93,8 @@ class MythCoreContextPrivate : public QObject
     bool m_inwanting;
     bool m_intvwanting;
 
+    bool m_announcedProtocol;
+
     MythPluginManager *m_pluginmanager;
 };
 
@@ -115,6 +117,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_blockingClient(false),
       m_inwanting(false),
       m_intvwanting(false),
+      m_announcedProtocol(false),
       m_pluginmanager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
@@ -957,7 +960,7 @@ bool MythCoreContext::SendReceiveStringList(
         for (uint i=0; i<(uint)strlist.size() && i<2; i++)
             msg += (i?",":"") + strlist[i];
         msg += (strlist.size() > 2) ? "...)" : ")";
-        LOG(VB_GENERAL, LOG_WARNING, msg + " called from UI thread");
+        LOG(VB_GENERAL, LOG_DEBUG, msg + " called from UI thread");
     }
 
     QString query_type = "UNKNOWN";
@@ -1212,8 +1215,13 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
     }
     else if (strlist[0] == "ACCEPT")
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Using protocol version %1")
-                                      .arg(MYTH_PROTO_VERSION));
+        if (!d->m_announcedProtocol)
+        {
+            d->m_announcedProtocol = true;
+            LOG(VB_GENERAL, LOG_INFO, QString("Using protocol version %1")
+                                              .arg(MYTH_PROTO_VERSION));
+        }
+
         return true;
     }
 

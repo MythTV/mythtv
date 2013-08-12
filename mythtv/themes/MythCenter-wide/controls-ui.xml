@@ -4,9 +4,9 @@
 
     <window name="keygrabpopup">
         <area>390,150,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="message" from="basetextarea">
             <area>18,18,460,400</area>

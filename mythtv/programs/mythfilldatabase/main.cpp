@@ -326,6 +326,15 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
+    if (gCoreContext->SafeConnectToMasterServer(true, false))
+        LOG(VB_GENERAL, LOG_INFO,
+            "Opening blocking connection to master backend");
+    else
+        LOG(VB_GENERAL, LOG_WARNING,
+            "Failed to connect to master backend. MythFillDatabase will "
+            "continue running but will be unable to prevent backend from "
+            "shutting down, or triggering a reschedule when complete.");
+
     if (from_file)
     {
         QString status = QObject::tr("currently running.");

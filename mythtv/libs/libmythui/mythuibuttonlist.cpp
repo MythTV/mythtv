@@ -1330,7 +1330,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     if (it < m_itemList.begin())
         it = m_itemList.begin();
 
-    int curItem = GetItemPos(*it);
+    int curItem = it < m_itemList.end() ? GetItemPos(*it) : 0;
 
     while (it < m_itemList.end() && button < (int)m_itemsVisible)
     {
@@ -2522,7 +2522,7 @@ void MythUIButtonList::customEvent(QEvent *event)
         {
             const int loginterval = (cur < 1000 ? 100 : 500);
             if (cur > 200 && cur % loginterval == 0)
-                LOG(VB_GENERAL, LOG_INFO,
+                LOG(VB_GUI, LOG_INFO,
                     QString("Build background buttonlist item %1").arg(cur));
             emit itemLoaded(GetItemAt(cur));
         }

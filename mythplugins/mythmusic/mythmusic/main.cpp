@@ -465,6 +465,14 @@ static void handleCDMedia(MythMediaDevice *cd)
     {
         LOG(VB_MEDIA, LOG_INFO, "Device is not usable clearing cd data");
 
+        if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata()
+            && gPlayer->getCurrentMetadata()->isCDTrack())
+        {
+            // we was playing a cd track which is no longer available so stop playback
+            // TODO should check the playing track is from the ejected drive if more than one is available
+            gPlayer->stop(true);
+        }
+
         // device is not usable so remove any existing CD tracks
         if (gMusicData->all_music)
         {
@@ -472,7 +480,7 @@ static void handleCDMedia(MythMediaDevice *cd)
             gMusicData->all_playlists->getActive()->removeAllCDTracks();
         }
 
-        gPlayer->activePlaylistChanged(-1, true);
+        gPlayer->activePlaylistChanged(-1, false);
         gPlayer->sendCDChangedEvent();
 
         return;

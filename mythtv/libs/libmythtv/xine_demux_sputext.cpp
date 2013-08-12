@@ -107,14 +107,14 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
     nread = len - demuxstr->buflen;
     if (nread > demuxstr->rbuffer_len - demuxstr->rbuffer_cur)
         nread = demuxstr->rbuffer_len - demuxstr->rbuffer_cur;
-    memcpy(&demuxstr->buf[demuxstr->buflen],
-           &demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
-           nread);
-    demuxstr->rbuffer_cur += nread;
     if (nread < 0) {
       printf("read failed.\n");
       return NULL;
     }
+    memcpy(&demuxstr->buf[demuxstr->buflen],
+           &demuxstr->rbuffer_text[demuxstr->rbuffer_cur],
+           nread);
+    demuxstr->rbuffer_cur += nread;
   }
 
   if (!nread)

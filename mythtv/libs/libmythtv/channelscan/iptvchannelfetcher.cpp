@@ -98,7 +98,7 @@ void IPTVChannelFetcher::run(void)
     if (_scan_monitor)
     {
         _scan_monitor->ScanPercentComplete(5);
-        _scan_monitor->ScanAppendTextToLog(QObject::tr("Downloading Playlist"));
+        _scan_monitor->ScanAppendTextToLog(tr("Downloading Playlist"));
     }
 
     QString playlist = DownloadPlaylist(url, true);
@@ -107,9 +107,10 @@ void IPTVChannelFetcher::run(void)
     {
         if (playlist.isNull() && _scan_monitor)
         {
-            _scan_monitor->ScanAppendTextToLog(QObject::tr("Error"));
+            _scan_monitor->ScanAppendTextToLog(
+                QCoreApplication::translate("(Common)", "Error"));
             _scan_monitor->ScanPercentComplete(100);
-            _scan_monitor->ScanErrored(QObject::tr("Downloading Playlist Failed"));
+            _scan_monitor->ScanErrored(tr("Downloading Playlist Failed"));
         }
         _thread_running = false;
         _stop_now = true;
@@ -120,14 +121,14 @@ void IPTVChannelFetcher::run(void)
     if (_scan_monitor)
     {
         _scan_monitor->ScanPercentComplete(35);
-        _scan_monitor->ScanAppendTextToLog(QObject::tr("Processing Playlist"));
+        _scan_monitor->ScanAppendTextToLog(tr("Processing Playlist"));
     }
 
     const fbox_chan_map_t channels = ParsePlaylist(playlist, this);
 
     // Step 4/4 : Finish up
     if (_scan_monitor)
-        _scan_monitor->ScanAppendTextToLog(QObject::tr("Adding Channels"));
+        _scan_monitor->ScanAppendTextToLog(tr("Adding Channels"));
     SetTotalNumChannels(channels.size());
 
     LOG(VB_CHANNEL, LOG_INFO, QString("Found %1 channels")
@@ -139,7 +140,8 @@ void IPTVChannelFetcher::run(void)
         QString channum = it.key();
         QString name    = (*it).m_name;
         QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
-        QString msg = QObject::tr("Channel #%1 : %2").arg(channum).arg(name);
+        //: %1 is the channel number, %2 is the channel name
+        QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
 
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
             .arg(channum).arg(name));
@@ -150,7 +152,7 @@ void IPTVChannelFetcher::run(void)
             if (_scan_monitor)
             {
                 _scan_monitor->ScanAppendTextToLog(
-                    QObject::tr("Adding %1").arg(msg));
+                    tr("Adding %1").arg(msg));
             }
             chanid = ChannelUtil::CreateChanID(_sourceid, channum);
             ChannelUtil::CreateChannel(
@@ -164,7 +166,7 @@ void IPTVChannelFetcher::run(void)
             if (_scan_monitor)
             {
                 _scan_monitor->ScanAppendTextToLog(
-                    QObject::tr("Updating %1").arg(msg));
+                    tr("Updating %1").arg(msg));
             }
             ChannelUtil::UpdateChannel(
                 0, _sourceid, chanid, name, name, channum,
@@ -178,7 +180,7 @@ void IPTVChannelFetcher::run(void)
 
     if (_scan_monitor)
     {
-        _scan_monitor->ScanAppendTextToLog(QObject::tr("Done"));
+        _scan_monitor->ScanAppendTextToLog(tr("Done"));
         _scan_monitor->ScanAppendTextToLog("");
         _scan_monitor->ScanPercentComplete(100);
         _scan_monitor->ScanComplete();
@@ -283,7 +285,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         if (fetcher)
         {
             fetcher->SetMessage(
-                QObject::tr("ERROR: M3U channel list is malformed"));
+                tr("ERROR: M3U channel list is malformed"));
         }
 
         return chanmap;
@@ -310,12 +312,12 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         if (!parse_chan_info(rawdata, info, channum, lineNum))
             break;
 
-        QString msg = QObject::tr("Encountered malformed channel");
+        QString msg = tr("Encountered malformed channel");
         if (!channum.isEmpty())
         {
             chanmap[channum] = info;
 
-            msg = QObject::tr("Parsing Channel #%1 : %2 : %3")
+            msg = QString("Parsing Channel #%1 : %2 : %3")
                 .arg(channum).arg(info.m_name)
                 .arg(info.m_tuning.GetDataURL().toString());
             LOG(VB_CHANNEL, LOG_INFO, msg);

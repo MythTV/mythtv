@@ -434,9 +434,7 @@ void StorageGroupListEditor::Load(void)
 
     if (createAddDefaultButton)
     {
-        listbox->addSelection(tr("(Create %1 group)")
-            .arg(tr("Default", "Default storage group")),
-            "Default");
+        listbox->addSelection(tr("(Create default group)"), "Default");
         lastValue = "Default";
     }
 
@@ -453,8 +451,7 @@ void StorageGroupListEditor::Load(void)
     }
 
     if (isMaster)
-        listbox->addSelection(tr("(Create %1 group)")
-            .arg(tr("new", "New storage group")),
+        listbox->addSelection(tr("(Create new group)"),
             "__CREATE_NEW_STORAGE_GROUP__");
     else
     {

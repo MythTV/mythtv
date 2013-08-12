@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.xsd">
+
+<mythuitheme>
+
+    <baseres>1920x1080</baseres>
+
+    <window name="notification">
+        <area>-1,20,600,180</area>
+        <!--
+        <animation trigger="AboutToShow">
+            <section duration="500" centre="middle">
+                <position start="100%,20" end="-1,-1" easingcurve="OutBack" />
+            </section>
+        </animation>
+        <animation trigger="AboutToHide">
+            <section duration="500" centre="middle">
+                <position start="-1,-1" end="100%,20" easingcurve="InBack" />
+            </section>
+        </animation>-->
+
+        <shape name="background" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>18,10,-18,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="origin" from="basetextarea">
+            <area>18,45,-18,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="description" from="basetextarea" depends="progress">
+            <area>18,75,-18,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="extra" from="basetextarea" depends="progress">
+            <area>18,105,350,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="progress_text" from="basetextarea" depends="progress">
+            <area>370,105,-18,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+        </textarea>
+
+        <progressbar name="progress">
+            <area>18,140,100%-18,28</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_fill2.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>18,75,-18,115</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
+    </window>
+
+    <window name="notification-image">
+        <area>-1,20,600,180</area>
+        <!--
+         <animation trigger="AboutToShow">
+         <section duration="500" centre="middle">
+         <position start="100%,20" end="-1,-1" easingcurve="OutBack" />
+         </section>
+         </animation>
+         <animation trigger="AboutToHide">
+         <section duration="500" centre="middle">
+         <position start="-1,-1" end="100%,20" easingcurve="InBack" />
+         </section>
+         </animation>-->
+
+        <shape name="background" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
+
+        <statetype name="mediastate">
+            <area>0,0,100%,100%</area>
+            <state name="ok"/>
+            <state name="noartwork">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageartwork">
+                    <!-- Artist: Vargas21 http://www.iconarchive.com/show/aquave-metal-icons-by-vargas21/Music-icon.html -->
+                    <filename>noartwork.png</filename>
+                    <area>10,10,160,160</area>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <statetype name="errorstate">
+            <area>0,0,100%,100%</area>
+            <state name="ok"/>
+            <state name="error">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Error-icon.html -->
+                    <filename>error.png</filename>
+                    <area>10,10,160,160</area>
+                </imagetype>
+            </state>
+            <state name="check">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Select-icon.html -->
+                    <filename>check.png</filename>
+                    <area>10,10,160,160</area>
+                </imagetype>
+            </state>
+            <state name="warning">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Alert-icon.html -->
+                    <filename>warning.png</filename>
+                    <area>10,10,160,160</area>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <imagetype name="image" depends="!mediastate&amp;!errorstate">
+            <filename>damaged.png</filename>
+            <area>10,10,160,160</area>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>175,10,-10,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="origin" from="basetextarea">
+            <area>175,45,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="description" from="basetextarea" depends="progress">
+            <area>175,75,-10,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="extra" from="basetextarea" depends="progress">
+            <area>175,105,200,30</area>
+            <font>basesmall</font>
+        </textarea>
+
+        <textarea name="progress_text" from="basetextarea" depends="progress">
+            <area>375,105,-10,30</area>
+            <font>basesmall</font>
+            <align>right</align>
+        </textarea>
+
+        <progressbar name="progress">
+            <area>175,140,100%-10,28</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_fill2.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>175,75,-10,115</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
+    </window>
+
+    <window name="notification-full">
+        <area>0,0,100%,100%</area>
+
+        <imagetype name="background">
+            <area>0,0,100%,100%</area>
+            <filename>ui/background.png</filename>
+        </imagetype>
+
+        <statetype name="mediastate">
+            <area>0,0,100%,100%</area>
+            <state name="ok"/>
+            <state name="noartwork">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageartwork">
+                    <!-- Artist: Vargas21 http://www.iconarchive.com/show/aquave-metal-icons-by-vargas21/Music-icon.html -->
+                    <filename>noartwork512.png</filename>
+                    <area>0,0,100%,100%</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <statetype name="errorstate">
+            <area>0,0,100%,100%</area>
+            <state name="ok"/>
+            <state name="error">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Error-icon.html -->
+                    <filename>error.png</filename>
+                    <area>704,189,512,512</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="check">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Select-icon.html -->
+                    <filename>check.png</filename>
+                    <area>704,189,512,512</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="warning">
+                <area>0,0,100%,100%</area>
+                <imagetype name="imageerror">
+                    <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Alert-icon.html -->
+                    <filename>warning.png</filename>
+                    <area>704,189,512,512</area>
+                    <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <imagetype name="image" depends="!mediastate&amp;!errorstate">
+            <filename>damaged.png</filename>
+            <area>0,0,100%,100%</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <shape name="textbackground">
+            <area>85,100%-260,-85,-55</area>
+            <fill color="#000000" alpha="100" />
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>100,100%-245,-100,35</area>
+            <font>baseextralarge</font>
+        </textarea>
+
+        <textarea name="origin" from="basetextarea">
+            <area>100,100%-200,-100,30</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="description" from="basetextarea" depends="progress">
+            <area>100,100%-165,-100,30</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="extra" from="basetextarea" depends="progress">
+            <area>100,100%-135,310,30</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="progress_text" from="basetextarea" depends="progress">
+            <area>410,100%-135,-100,30</area>
+            <font>basemedium</font>
+            <align>right</align>
+        </textarea>
+
+        <progressbar name="progress">
+            <area>100,100%-100,-100,28</area>
+            <layout>horizontal</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,28</area>
+                <filename>progressbar_fill2.png</filename>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="description_noprogress" from="basetextarea" depends="!progress">
+            <area>100,100%-165,-100,115</area>
+            <font>basemedium</font>
+            <multiline>yes</multiline>
+            <align>left,top</align>
+            <template>%DESCRIPTION%</template>
+        </textarea>
+    </window>
+
+</mythuitheme>

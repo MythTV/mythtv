@@ -1574,7 +1574,7 @@ void MythUIImage::customEvent(QEvent *event)
             // We don't clear until we have the new image ready to display to
             // avoid unsightly flashing. This isn't currently supported for
             // animations.
-            if ((m_HighNum == m_LowNum) && !m_animatedImage);
+            if ((m_HighNum == m_LowNum) && !m_animatedImage)
                 Clear();
 
             d->m_UpdateLock.lockForWrite();

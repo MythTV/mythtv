@@ -327,8 +327,8 @@ class TestAudioUtils: public QObject
     void S16ToFloatCvsSSESpeed_data(void)
     {
         QTest::addColumn<bool>("useSSE");
-        QTest::newRow("Use SSE accelerated code") << true;
-        QTest::newRow("Use C code") << false;
+        QTest::newRow("Aligned memory") << true;
+        QTest::newRow("Unaligned memory") << false;
     }
 
     void S16ToFloatCvsSSESpeed(void)
@@ -336,7 +336,7 @@ class TestAudioUtils: public QObject
         int SIZEARRAY       = (INT16_MAX - INT16_MIN);
         // +1 will never be 16-bytes aligned, forcing C-code
         int offsetshort     = 1;
-        int offsetfloat     = 0;
+        int offsetfloat     = 1;
 
         short *arrays1      = (short*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(short));
         // has to be 16 short for 16 bytes boundary * 2
@@ -797,9 +797,68 @@ class TestAudioUtils: public QObject
             // sanity check
             QCOMPARE(arrayf1[i+offsetfloat1], arrayf2[i+offsetfloat2]);
 
-            QCOMPARE(arrays1[i], arrays2[i]);
+            QCOMPARE(arrays2[i], arrays1[i]);
         }
 
+        av_free(arrays1);
+        av_free(arrays2);
+        av_free(arrayf1);
+        av_free(arrayf2);
+    }
+
+    void FloatToS32CvsSSESpeed_data(void)
+    {
+        QTest::addColumn<bool>("useSSE");
+        QTest::newRow("Aligned memory") << true;
+        QTest::newRow("Unaligned memory") << false;
+    }
+
+    void FloatToS32CvsSSESpeed(void)
+    {
+        int SIZEARRAY       = (INT16_MAX - INT16_MIN);
+        // +1 will never be 16-bytes aligned, forcing C-code
+        int offsetshort     = 1;
+        int offsetfloat     = 1;
+
+        int32_t *arrays1    = (int32_t*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(int32_t));
+        // has to be 16 short for 16 bytes boundary * 2
+        int32_t *arrays2    = (int32_t*)av_malloc((SIZEARRAY+offsetshort+4) * ISIZEOF(int32_t));
+        float *arrayf1      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+        float *arrayf2      = (float*)av_malloc((SIZEARRAY+offsetfloat+4) * ISIZEOF(float));
+
+        short j = INT16_MIN;
+        for (int i = 0; i < SIZEARRAY; i++, j++)
+        {
+            arrays1[i+offsetshort] = j;
+            arrays2[i] = j;
+        }
+
+        QFETCH(bool, useSSE);
+
+        if (useSSE)
+        {
+            QBENCHMARK
+            {
+                for (int i = 0; i < 128; i++)
+                {
+                    // Done by SSE
+                    AudioOutputUtil::toFloat(FORMAT_S32, arrayf2, arrays2, SIZEARRAY * ISIZEOF(int32_t));
+                    AudioOutputUtil::fromFloat(FORMAT_S32, arrays2, arrayf2, SIZEARRAY * ISIZEOF(float));
+                }
+            }
+        }
+        else
+        {
+            QBENCHMARK
+            {
+                for (int i = 0; i < 128; i++)
+                {
+                    // Done by C
+                    AudioOutputUtil::toFloat(FORMAT_S32, arrayf1+offsetfloat, arrays1+offsetshort, SIZEARRAY * ISIZEOF(int32_t));
+                    AudioOutputUtil::fromFloat(FORMAT_S32, arrays1+offsetshort, arrayf1+offsetfloat, SIZEARRAY * ISIZEOF(float));
+                }
+            }
+        }
         av_free(arrays1);
         av_free(arrays2);
         av_free(arrayf1);
