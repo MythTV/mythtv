@@ -926,7 +926,7 @@ void MythSocket::ReadReal(char *data, int size, int max_wait_ms, int *ret)
 
     if (t.elapsed() > 50)
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_NETWORK, LOG_INFO,
             QString("ReadReal(?, %1, %2) -> %3 took %4 ms")
             .arg(size).arg(max_wait_ms).arg(*ret)
             .arg(t.elapsed()));
