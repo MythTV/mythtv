@@ -29,6 +29,7 @@ public:
     static Type Error;
     static Type Warning;
     static Type Check;
+    static Type Busy;
 
     MythNotification(Type t, void *parent = NULL)
         : MythEvent(t), m_id(-1), m_parent(parent), m_fullScreen(false),
@@ -380,6 +381,14 @@ public:
     {
         SetDuration(5);
     }
+};
+
+class MUI_PUBLIC MythBusyNotification : public MythNotification
+{
+public:
+    MythBusyNotification(const QString &title, const QString &author,
+                         const QString &details = QString())
+    : MythNotification(Busy, title, author, details) { }
 };
 
 #endif /* defined(__MythTV__mythnotification__) */

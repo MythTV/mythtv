@@ -22,6 +22,8 @@ QEvent::Type MythNotification::Warning =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MythNotification::Check =
     (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MythNotification::Busy =
+    (QEvent::Type) QEvent::registerEventType();
 
 void MythNotification::SetId(int id)
 {
@@ -77,6 +79,10 @@ MythNotification::Type MythNotification::TypeFromString(const QString &type)
     else if (type == "check")
     {
         return MythNotification::Check;
+    }
+    else if (type == "busy")
+    {
+        return MythNotification::Busy;
     }
     else
     {

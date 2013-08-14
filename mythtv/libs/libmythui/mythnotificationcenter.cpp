@@ -232,7 +232,8 @@ void MythNotificationScreen::SetNotification(MythNotification &notification)
 
     if (m_type == MythNotification::Error   ||
         m_type == MythNotification::Warning ||
-        m_type == MythNotification::Check)
+        m_type == MythNotification::Check ||
+        m_type == MythNotification::Busy)
     {
         m_update |= kImage;
         update = false;
@@ -532,6 +533,10 @@ void MythNotificationScreen::SetErrorState(void)
     else if (m_type == MythNotification::Check)
     {
         state = "check";
+    }
+    else if (m_type == MythNotification::Busy)
+    {
+        state = "busy";
     }
     else
     {
@@ -1503,10 +1508,13 @@ void ShowNotification(MythNotification::Type type,
 
     if (type == MythNotification::Error   ||
         type == MythNotification::Warning ||
-        type == MythNotification::Check)
+        type == MythNotification::Check ||
+        type == MythNotification::Busy)
     {
         n = new MythNotification(type, data);
-        if (!duration && type != MythNotification::Check)
+        if (!duration &&
+            type != MythNotification::Check &&
+            type != MythNotification::Busy)
         {
             // default duration for those type of notifications is 10s
             duration = 10;
