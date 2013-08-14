@@ -130,6 +130,14 @@
                     <area>10,10,160,160</area>
                 </imagetype>
             </state>
+            <state name="busy">
+                <area>0,0,100%,100%</area>
+                <imagetype name="animation">
+                    <area>40,40,105,105</area>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>250</delay>
+                </imagetype>
+            </state>
         </statetype>
 
         <imagetype name="image" depends="!mediastate&amp;!errorstate">
@@ -238,6 +246,15 @@
                     <preserveaspect>true</preserveaspect>
                 </imagetype>
             </state>
+            <state name="busy">
+                <area>0,0,100%,100%</area>
+                <imagetype name="animation">
+                    <area>704,189,512,512</area>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>250</delay>
+                </imagetype>
+            </state>
+        </statetype>
         </statetype>
 
         <imagetype name="image" depends="!mediastate&amp;!errorstate">
