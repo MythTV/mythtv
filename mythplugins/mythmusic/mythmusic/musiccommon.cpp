@@ -2231,7 +2231,7 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "visualizermenu");
 
-    for (uint x = 0; x < m_visualModes.count(); x++)
+    for (uint x = 0; x < static_cast<uint>(m_visualModes.count()); x++)
         menu->AddItem(m_visualModes.at(x), qVariantFromValue(x));
 
     menu->SetSelectedByData(m_currentVisual);
