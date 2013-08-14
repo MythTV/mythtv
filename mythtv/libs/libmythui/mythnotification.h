@@ -376,7 +376,10 @@ class MUI_PUBLIC MythCheckNotification : public MythNotification
 public:
     MythCheckNotification(const QString &title, const QString &author,
                           const QString &details = QString())
-    : MythNotification(Check, title, author, details) { }
+    : MythNotification(Check, title, author, details)
+    {
+        SetDuration(5);
+    }
 };
 
 #endif /* defined(__MythTV__mythnotification__) */
