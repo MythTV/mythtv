@@ -783,6 +783,7 @@ class VideoDialogPrivate
     VideoScanner *m_scanner;
 
     QString m_lastTreeNodePath;
+    QMap<QString, int> m_notifications;
 
   private:
     parental_level_map m_rating_to_pl;
@@ -2102,7 +2103,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
  *  \brief Create a busy dialog, used during metadata search, etc.
  *  \return void.
  */
-void VideoDialog::createBusyDialog(QString title)
+void VideoDialog::createBusyDialog(const QString &title)
 {
     if (m_busyPopup)
         return;
@@ -2114,6 +2115,72 @@ void VideoDialog::createBusyDialog(QString title)
 
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
+}
+
+/** \fn VideoDialog::createFetchDialog(VideoMetadata *metadata)
+ *  \brief Create a fetch notification, used during metadata search.
+ *  \return void.
+ */
+void VideoDialog::createFetchDialog(VideoMetadata *metadata)
+{
+    if (m_d->m_notifications.contains(metadata->GetHash()))
+        return;
+
+    int id = GetNotificationCenter()->Register(this);
+    m_d->m_notifications[metadata->GetHash()] = id;
+
+    QString msg = tr("Fetching details for %1")
+                    .arg(metadata->GetTitle());
+    QString desc;
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+    {
+        desc = tr("Season %1, Episode %2")
+                .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
+    }
+    MythBusyNotification n(msg, tr("MythVideo"), desc);
+    n.SetId(id);
+    n.SetParent(this);
+    GetNotificationCenter()->Queue(n);
+}
+
+void VideoDialog::dismissFetchDialog(VideoMetadata *metadata, bool ok)
+{
+    if (!metadata || !m_d->m_notifications.contains(metadata->GetHash()))
+        return;
+
+    int id = m_d->m_notifications[metadata->GetHash()];
+    m_d->m_notifications.remove(metadata->GetHash());
+
+    QString msg;
+    if (ok)
+    {
+        msg = tr("Retrieved details for %1").arg(metadata->GetTitle());
+    }
+    else
+    {
+        msg = tr("Failed to retrieve details for %1").arg(metadata->GetTitle());
+    }
+    QString desc;
+    if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
+    {
+        desc = tr("Season %1, Episode %2")
+                .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
+    }
+    if (ok)
+    {
+        MythCheckNotification n(msg, tr("MythVideo"), desc);
+        n.SetId(id);
+        n.SetParent(this);
+        GetNotificationCenter()->Queue(n);
+    }
+    else
+    {
+        MythErrorNotification n(msg, tr("MythVideo"), desc);
+        n.SetId(id);
+        n.SetParent(this);
+        GetNotificationCenter()->Queue(n);
+    }
+    GetNotificationCenter()->UnRegister(this, id);
 }
 
 /** \fn VideoDialog::createOkDialog(QString title)
@@ -2367,7 +2434,10 @@ void VideoDialog::VideoMenu()
         else
             menu->AddItem(tr("Mark as Watched"), SLOT(ToggleWatched()));
         menu->AddItem(tr("Video Info"), NULL, CreateInfoMenu());
-        menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
+        if (!m_d->m_notifications.contains(metadata->GetHash()))
+        {
+            menu->AddItem(tr("Change Video Details"), NULL, CreateManageMenu());
+        }
         menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
     }
     else if (node && node->getInt() != kUpFolder)
@@ -3211,14 +3281,11 @@ void VideoDialog::customEvent(QEvent *levent)
 
         MetadataLookupList list = mfmr->results;
 
-        if (m_busyPopup)
-        {
-            m_busyPopup->Close();
-            m_busyPopup = NULL;
-        }
-
         if (list.count() > 1)
         {
+            VideoMetadata *metadata =
+                qVariantValue<VideoMetadata *>(list[0]->GetData());
+            dismissFetchDialog(metadata, true);
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);
 
@@ -3256,16 +3323,11 @@ void VideoDialog::customEvent(QEvent *levent)
         if (!lookup)
             return;
 
-        if (m_busyPopup)
-        {
-            m_busyPopup->Close();
-            m_busyPopup = NULL;
-        }
-
         VideoMetadata *metadata =
             qVariantValue<VideoMetadata *>(lookup->GetData());
         if (metadata)
         {
+            dismissFetchDialog(metadata, false);
             metadata->SetProcessed(true);
             metadata->UpdateDatabase();
         }
@@ -3292,11 +3354,7 @@ void VideoDialog::customEvent(QEvent *levent)
 void VideoDialog::OnVideoImageSetDone(VideoMetadata *metadata)
 {
     // The metadata has some cover file set
-     if (m_busyPopup)
-     {
-         m_busyPopup->Close();
-         m_busyPopup = NULL;
-     }
+    dismissFetchDialog(metadata, true);
 
     metadata->SetProcessed(true);
     metadata->UpdateDatabase();
@@ -3367,14 +3425,7 @@ void VideoDialog::VideoSearch(MythGenericTree *node,
 
     if (!automode)
     {
-        QString msg = tr("Fetching details for %1")
-                           .arg(metadata->GetTitle());
-        if (!metadata->GetSubtitle().isEmpty())
-            msg += QString(": %1").arg(metadata->GetSubtitle());
-        if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
-            msg += tr(" %1x%2").arg(metadata->GetSeason())
-                   .arg(metadata->GetEpisode());
-        createBusyDialog(msg);
+        createFetchDialog(metadata);
     }
 }
 
@@ -3616,12 +3667,6 @@ void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
 
 void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
 {
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
     if (!lookup)
        return;
 
@@ -3630,6 +3675,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (!metadata)
         return;
 
+    dismissFetchDialog(metadata, true);
     metadata->SetTitle(lookup->GetTitle());
     metadata->SetSubtitle(lookup->GetSubtitle());
 

@@ -165,7 +165,9 @@ class VideoDialog : public MythScreenType
     void setParentalLevel(const ParentalLevel::Level &level);
     void shiftParental(int amount);
     bool createPopup();
-    void createBusyDialog(QString title);
+    void createBusyDialog(const QString &title);
+    void createFetchDialog(VideoMetadata *metadata);
+    void dismissFetchDialog(VideoMetadata *metadata, bool ok);
     void createOkDialog(QString title);
 
     void SwitchLayout(DialogType type, BrowseType browse);
