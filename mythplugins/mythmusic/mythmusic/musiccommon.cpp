@@ -2180,6 +2180,8 @@ MythMenu* MusicCommon::createRepeatMenu(void)
     menu->AddItem(tr("Track"), qVariantFromValue((int)MusicPlayer::REPEAT_TRACK));
     menu->AddItem(tr("All"),   qVariantFromValue((int)MusicPlayer::REPEAT_ALL));
 
+    menu->SetSelectedByData(static_cast<int>(gPlayer->getRepeatMode()));
+
     return menu;
 }
 
@@ -2194,6 +2196,8 @@ MythMenu* MusicCommon::createShuffleMenu(void)
     menu->AddItem(tr("Smart"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
     menu->AddItem(tr("Album"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_ALBUM));
     menu->AddItem(tr("Artist"), qVariantFromValue((int)MusicPlayer::SHUFFLE_ARTIST));
+
+    menu->SetSelectedByData(static_cast<int>(gPlayer->getShuffleMode()));
 
     return menu;
 }
@@ -2227,8 +2231,10 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "visualizermenu");
 
-    for (int x = 0; x < m_visualModes.count(); x++)
+    for (uint x = 0; x < m_visualModes.count(); x++)
         menu->AddItem(m_visualModes.at(x), qVariantFromValue(x));
+
+    menu->SetSelectedByData(m_currentVisual);
 
     return menu;
 }

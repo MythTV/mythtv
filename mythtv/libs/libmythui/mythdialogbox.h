@@ -83,6 +83,8 @@ class MUI_PUBLIC MythMenu
                  bool selected = false, bool checked = false);
     void AddItem(const QString &title, const char *slot, MythMenu *subMenu = NULL,
                  bool selected = false, bool checked = false);
+    void SetSelectedByTitle(const QString &title);
+    void SetSelectedByData(QVariant data);
 
     void SetParent(MythMenu *parent) { m_parentMenu = parent; }
 
