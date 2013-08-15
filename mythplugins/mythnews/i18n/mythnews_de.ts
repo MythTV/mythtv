@@ -271,6 +271,11 @@ Wenn Sie mit dem Bearbeiten fertig sind, wählen Sie &quot;OK&quot; oder &quot;A
         <translation>Nachrichten Einstellungen</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Nachrichten</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="21"/>
         <source>You Haven&apos;t Specified Any News Feeds.</source>
         <translation>Sie haben noch keine Nachrichten-Feeds definiert.</translation>

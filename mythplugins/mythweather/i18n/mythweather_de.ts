@@ -1183,6 +1183,11 @@ Wenn Sie fertig sind klicken Sie &quot;Beenden&quot;.</translation>
         <translation>Hier können Sie die Einstellungen der Wetteranzeige ändern.  Sie können die Aktualisierung der Wetterdaten im Hintergrund aktivieren, dann werden die Daten aktualisiert egal ob Sie sich in der Wetteranzeige befinden oder nicht. Sie können ebenfalls die Anzeigespanne der Wetterseiten bestimmen. Wenn Sie mit der Konfiguration fertig sind klicken Sie auf &quot;Beenden&quot;.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Wettereinstellungen</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="50"/>
         <source>Humidity:</source>
         <translation>Luftfeuchtigkeit:</translation>

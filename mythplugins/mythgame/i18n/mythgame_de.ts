@@ -1091,6 +1091,11 @@ dass sie dies tun möchten?</translation>
         <translation>Spiele</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>Von %1</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="33"/>
         <source>System: %1</source>
         <translation>System: %1</translation>
