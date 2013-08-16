@@ -14,6 +14,7 @@
 #include "mythtypes.h"
 #include "mythmetaexp.h"
 #include "metadataimagehelper.h"
+#include "referencecounterlist.h"
 
 class ProgramInfo;
 
@@ -78,7 +79,7 @@ typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
 
 typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 
-class META_PUBLIC MetadataLookup : public QObject
+class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 {
   public:
     MetadataLookup(void);
@@ -442,7 +443,7 @@ class META_PUBLIC MetadataLookup : public QObject
     DownloadMap m_downloads;
 };
 
-typedef QList<MetadataLookup*> MetadataLookupList;
+typedef RefCountedList<MetadataLookup*> MetadataLookupList;
 
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookup *lookup);
