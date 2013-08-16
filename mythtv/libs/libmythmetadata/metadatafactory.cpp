@@ -36,7 +36,7 @@ QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactory::MetadataFactory(QObject *parent) :
-    m_parent(parent), m_scanning(false),
+    QObject(parent), m_scanning(false),
     m_returnList(), m_sync(false)
 {
     m_lookupthread = new MetadataDownload(this);
@@ -64,6 +64,9 @@ MetadataFactory::~MetadataFactory()
 
     if (m_videoscanner && m_videoscanner->wait())
         delete m_videoscanner;
+
+    delete m_mlm;
+    m_mlm = NULL;
 }
 
 void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
@@ -264,8 +267,8 @@ void MetadataFactory::OnMultiResult(MetadataLookupList list)
     if (list.isEmpty())
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactoryMultiResult(list));
 }
 
@@ -325,8 +328,8 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
     {
         if (m_scanning)
             OnVideoResult(lookup);
-        else if (m_parent)
-            QCoreApplication::postEvent(m_parent,
+        else if (parent())
+            QCoreApplication::postEvent(parent(),
                 new MetadataFactorySingleResult(lookup));
     }
 }
@@ -336,8 +339,8 @@ void MetadataFactory::OnNoResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactoryNoResult(lookup));
 }
 
@@ -346,8 +349,8 @@ void MetadataFactory::OnImageResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
 }
 
@@ -491,9 +494,9 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     metadata->SetProcessed(true);
     metadata->UpdateDatabase();
 
-    if (gCoreContext->HasGUI() && m_parent)
+    if (gCoreContext->HasGUI() && parent())
     {
-        QCoreApplication::postEvent(m_parent,
+        QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
     }
     else
@@ -577,8 +580,8 @@ void MetadataFactory::customEvent(QEvent *levent)
                 .arg(additions.count()).arg(moves.count())
                 .arg(deletions.count()));
 
-            if (m_parent)
-                QCoreApplication::postEvent(m_parent,
+            if (parent())
+                QCoreApplication::postEvent(parent(),
                     new MetadataFactoryVideoChanges(additions, moves,
                                                     deletions));
         }

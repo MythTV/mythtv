@@ -112,7 +112,6 @@ class META_PUBLIC MetadataFactory : public QObject
 
     void OnVideoResult(MetadataLookup *lookup);
 
-    QObject *m_parent;
     MetadataDownload *m_lookupthread;
     MetadataImageDownload *m_imagedownload;
 
