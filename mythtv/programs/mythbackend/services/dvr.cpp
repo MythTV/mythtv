@@ -557,6 +557,11 @@ uint Dvr::AddRecordSchedule   (
     rule.m_subtitle = sSubtitle;
     rule.m_description = sDescription;
 
+    rule.m_startdate = recstartts.date();
+    rule.m_starttime = recstartts.time();
+    rule.m_enddate = recendts.date();
+    rule.m_endtime = recendts.time();
+
     rule.m_type = recTypeFromString(sType);
     rule.m_searchType = searchTypeFromString(sSearchType);
     rule.m_dupMethod = dupMethodFromString(sDupMethod);
