@@ -4665,7 +4665,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             if (!ic || ((retval = ReadPacket(ic, pkt, storevideoframes)) < 0))
             {
                 if (retval == -EAGAIN)
+                {
+                    avcodeclock->unlock();
                     continue;
+                }
 
                 SetEof(true);
                 delete pkt;
