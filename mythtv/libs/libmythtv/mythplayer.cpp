@@ -3234,7 +3234,7 @@ void MythPlayer::DecoderLoop(bool pause)
                 if (((uint64_t)decoderSeek < framesPlayed) && decoder)
                     decoder->DoRewind(decoderSeek);
                 else if (decoder)
-                    decoder->DoFastForward(decoderSeek);
+                    decoder->DoFastForward(decoderSeek, !transcoding);
                 decoderSeek = -1;
                 decoderSeekLock.unlock();
             }
