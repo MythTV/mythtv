@@ -2279,7 +2279,7 @@ NULL
 // removed "UNIQUE KEY path (`storagegroup`, `hostname`, `filename`)" from
 // scannerpath as a quick fix for key length constraints
 
-        if (!performActualUpdate(&updates[0], "1307", dbver))
+        if (!performActualUpdate(updates, "1307", dbver))
             return false;
     }
 
@@ -2290,7 +2290,7 @@ NULL
 "UPDATE channel SET icon='' WHERE icon='none';",
 NULL
 };
-        if (!performActualUpdate(&updates[0], "1308", dbver))
+        if (!performActualUpdate(updates, "1308", dbver))
             return false;
     }
 
@@ -2329,7 +2329,7 @@ NULL
 "UPDATE record SET type = 5 WHERE type = 10",
 NULL
 };
-        if (!performActualUpdate(&updates[0], "1309", dbver))
+        if (!performActualUpdate(updates, "1309", dbver))
             return false;
     }
 
@@ -2343,7 +2343,7 @@ NULL
 "UPDATE record SET type = 4, filter = filter|1024 WHERE type = 3",
 NULL
 };
-        if (!performActualUpdate(&updates[0], "1310", dbver))
+        if (!performActualUpdate(updates, "1310", dbver))
             return false;
     }
 
@@ -2372,7 +2372,7 @@ NULL
 NULL
 };
 
-        if (!performActualUpdate(&updates[0], "1311", dbver))
+        if (!performActualUpdate(updates, "1311", dbver))
             return false;
     }
 
@@ -2399,7 +2399,7 @@ NULL
 "DELETE FROM `settings` WHERE `value` = 'HardwareProfileLastUpdated';",
 NULL
 };
-        if (!performActualUpdate(&updates[0], "1312", dbver))
+        if (!performActualUpdate(updates, "1312", dbver))
             return false;
     }
 
@@ -2411,7 +2411,7 @@ NULL
 "ALTER TABLE dvdbookmark ADD COLUMN dvdstate varchar(1024) NOT NULL DEFAULT '';",
 NULL
 };
-        if (!performActualUpdate(&updates[0], "1313", dbver))
+        if (!performActualUpdate(updates, "1313", dbver))
             return false;
     }
 
@@ -2434,7 +2434,7 @@ NULL
             "cardtype = \"MPEG\" AND channel_timeout < 12000;",
             NULL
         };
-        if (!performActualUpdate(&updates[0], "1314", dbver))
+        if (!performActualUpdate(updates, "1314", dbver))
             return false;
     }
 
@@ -2447,7 +2447,7 @@ NULL
              "WHERE value='MovieGrabber'",
             NULL
         };
-        if (!performActualUpdate(&updates[0], "1315", dbver))
+        if (!performActualUpdate(updates, "1315", dbver))
             return false;
     }
 
