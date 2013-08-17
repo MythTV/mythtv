@@ -30,59 +30,48 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
         <source>IP address of the MythZoneMinder server</source>
-        <translation>Indirizzo IP del server MythZoneMinder</translation>
+        <translation type="obsolete">Indirizzo IP del server MythZoneMinder</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
         <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation>Inserire l&apos;indirizzo IP del server MythZoneMinder la quale questo frontend dovrebbe connettersi.</translation>
+        <translation type="obsolete">Inserire l&apos;indirizzo IP del server MythZoneMinder la quale questo frontend dovrebbe connettersi.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="28"/>
         <source>Port the server runs on</source>
-        <translation>Porta del server in eseguzione su</translation>
+        <translation type="obsolete">Porta del server in eseguzione su</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="30"/>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation>Almeno che non si abbia una buona ragione, non cambiarlo.</translation>
+        <translation type="obsolete">Almeno che non si abbia una buona ragione, non cambiarlo.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="38"/>
         <source>Date format</source>
-        <translation>Formato data</translation>
+        <translation type="obsolete">Formato data</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation>I campioni sono visualizzati usando la data di oggi.</translation>
+        <translation type="obsolete">I campioni sono visualizzati usando la data di oggi.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="48"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation>I campioni sono visualizzati usando la data di domani.</translation>
+        <translation type="obsolete">I campioni sono visualizzati usando la data di domani.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="64"/>
         <source>Your preferred date format to use on the events screens.</source>
-        <translation>Formata di data preferito da usare sulle schermate degli eventi.</translation>
+        <translation type="obsolete">Formata di data preferito da usare sulle schermate degli eventi.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="72"/>
         <source>Time format</source>
-        <translation>Formato ora</translation>
+        <translation type="obsolete">Formato ora</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="80"/>
         <source>Your preferred time format to display on the events screens.</source>
-        <translation>Formata di ora preferito da visualizzare sulle schermate degli eventi.</translation>
+        <translation type="obsolete">Formata di ora preferito da visualizzare sulle schermate degli eventi.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="88"/>
         <source>MythZoneMinder Settings</source>
-        <translation>Impostazioni MythZoneMinder</translation>
+        <translation type="obsolete">Impostazioni MythZoneMinder</translation>
     </message>
 </context>
 <context>
@@ -143,7 +132,7 @@
         <translation>Riproduttore in diretta ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -274,53 +263,73 @@
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
+        <source>Status:</source>
+        <translation>Stato:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Name:</source>
+        <translation>Nome:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Duration:</source>
+        <translation>Durata:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>ZoneMinder Live</source>
+        <translation>ZoneMinder Live</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[E] = Esecuzione
 [F] = Fermato</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Select Camera:</source>
         <translation>Selezionare telecamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Select Date:</source>
         <translation>Selezionare data:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Test</source>
         <translation>Verificare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Record</source>
         <translation>Registrare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Cancel</source>
         <translation>Annulare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Store</source>
         <translation>Archiviare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Show Console</source>
         <translation>Mostrare Console</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Show Live View</source>
         <translation>Mostrare la visualizzazione in diretta</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Show Events</source>
         <translation>Mostrare gli eventi</translation>
     </message>
@@ -341,12 +350,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Esecuzione</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="217"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Fermato</translation>
     </message>
@@ -405,12 +414,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>mossibile mostrare la visualizzazione in diretta.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Non ci sono alcuni schermi definiti!</translation>
     </message>
@@ -418,31 +427,90 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="292"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Pausa</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
         <source>Delete</source>
         <translation>Cancellare</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Previous</source>
         <translation>Precedente</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Next</source>
         <translation>Successivo</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="299"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="378"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Riproduzione</translation>
+    </message>
+</context>
+<context>
+    <name>ZMSettings</name>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>Indirizzo IP del server MythZoneMinder</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Inserire l&apos;indirizzo IP del server MythZoneMinder la quale questo frontend dovrebbe connettersi.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
+        <source>Port the server runs on</source>
+        <translation>Porta del server in eseguzione su</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="31"/>
+        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
+        <translation>Almeno che non si abbia una buona ragione, non cambiarlo.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="39"/>
+        <source>Date format</source>
+        <translation>Formato data</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>I campioni sono visualizzati usando la data di oggi.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>I campioni sono visualizzati usando la data di domani.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="65"/>
+        <source>Your preferred date format to use on the events screens. %1</source>
+        <extracomment>%1 gives additional info on the date used</extracomment>
+        <translation>Formata di data preferito da usare sulle schermate degli eventi. %1</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="74"/>
+        <source>Time format</source>
+        <translation>Formato ora</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="82"/>
+        <source>Your preferred time format to display on the events screens.</source>
+        <translation>Formata di ora preferito da visualizzare sulle schermate degli eventi.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
+        <source>MythZoneMinder Settings</source>
+        <translation>Impostazioni MythZoneMinder</translation>
     </message>
 </context>
 </TS>
