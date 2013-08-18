@@ -1109,7 +1109,7 @@ QString CardUtil::GetStartInput(uint nCardID)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT inputname "
                   "FROM cardinput "
-                  "WHERE cardinput.cardid = :CARDID " 
+                  "WHERE cardinput.cardid = :CARDID "
                   "ORDER BY livetvorder = 0, livetvorder, cardinputid "
                   "LIMIT 1");
     query.bindValue(":CARDID", nCardID);
@@ -2072,7 +2072,6 @@ void CardUtil::GetCardInputs(
     vector<CardInput*> &cardInputs)
 {
     QStringList inputs;
-    bool is_dtv = !IsEncoder(cardtype) && !IsUnscanable(cardtype);
 
     if (IsSingleInputCard(cardtype))
         inputs += "MPEG2TS";
@@ -2084,7 +2083,7 @@ void CardUtil::GetCardInputs(
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        CardInput *cardinput = new CardInput(is_dtv, false, false, cardid);
+        CardInput *cardinput = new CardInput(cardtype, false, cardid);
         cardinput->loadByInput(cardid, (*it));
         inputLabels.push_back(
             dev_label + QString(" (%1) -> %2")
@@ -2103,7 +2102,7 @@ void CardUtil::GetCardInputs(
         InputNames::const_iterator it;
         for (it = list.begin(); it != list.end(); ++it)
         {
-            CardInput *cardinput = new CardInput(is_dtv, true, false, cardid);
+            CardInput *cardinput = new CardInput(cardtype, false, cardid);
             cardinput->loadByInput(cardid, *it);
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
@@ -2114,7 +2113,7 @@ void CardUtil::GetCardInputs(
         // plus add one "new" input
         if (needs_conf)
         {
-            CardInput *newcard = new CardInput(is_dtv, true, true, cardid);
+            CardInput *newcard = new CardInput(cardtype, true, cardid);
             QString newname = QString("DVBInput #%1").arg(list.size() + 1);
             newcard->loadByInput(cardid, newname);
             inputLabels.push_back(dev_label + " " + QObject::tr("New Input"));
