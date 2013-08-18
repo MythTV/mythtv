@@ -372,8 +372,6 @@ class MetadataOptions : public SchedEditChild
     MetadataDownload *m_imageLookup;
     MetadataImageDownload *m_imageDownload;
 
-    MetadataLookup  *m_lookup;
-
     MythScreenStack  *m_popupStack;
     MythUIBusyDialog *m_busyPopup;
 

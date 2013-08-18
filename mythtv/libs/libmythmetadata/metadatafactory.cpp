@@ -76,6 +76,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(recrule));
@@ -103,6 +104,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(pginfo));
@@ -130,6 +132,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
     if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
@@ -182,6 +185,7 @@ META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
                                                       bool allowgeneric)
 {
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetAutomatic(false);
