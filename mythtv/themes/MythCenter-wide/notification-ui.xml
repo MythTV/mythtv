@@ -255,7 +255,6 @@
                 </imagetype>
             </state>
         </statetype>
-        </statetype>
 
         <imagetype name="image" depends="!mediastate&amp;!errorstate">
             <filename>damaged.png</filename>
