@@ -1500,11 +1500,6 @@
         <translation>Προτεραιότητα</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelsettings.cpp" line="191"/>
-        <source>Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation>Ο βαθμός των βαθμών προτεραιότητας που θα προστεθεί σε κάθε εγγραφή από αυτό το κανάλι κατά το χρονοπρογραμματισμό. Θετικός αριθμός για αύξηση προτεραιότητας, αρνητικός για μείωση.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="205"/>
         <source>Icon</source>
         <translation>Εικονίδιο</translation>
@@ -1535,9 +1530,14 @@
         <translation>Τα φίλτρα που θα χρησιμοποιηθούν κατά την παρακολούθηση εγγραφών από αυτό το κανάλι. Ξεκινήστε με + για να τα προσθέσετε στα γενικά φίλτρα προβολής.</translation>
     </message>
     <message>
+        <location filename="../libs/libmythtv/channelsettings.cpp" line="191"/>
+        <source>Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to depreciate this channel.</source>
+        <translation>Οι βαθμοί προτεραιότητας που θα προστίθενται σε κάθε εγγραφή που προγραμματίζεται σ΄αυτό το κανάλι. Δώστε θετικό αριθμό για αύξηση της προτίμησης και αρνητικό για μείωση.</translation>
+    </message>
+    <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="254"/>
-        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation>Αναγνωριστικό για χρήση από παροχείς τηλεοπτ. προγραμμάτων για σωστή αντιστοίχηση των καναλιών που έχετε με αυτά που παρέχουν. Κανονικά ορίζεται αυτόματα όταν τρέχει το &apos;mythfilldatabase&apos;.</translation>
+        <source>ID used by listing services to get an exact correspondence between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
+        <translation>Το αναγνωριστικό που χρησιμοποιείται από τις υπηρεσίες παροχής προγράμματος TV για ακριβή αντιστοίχιση των καναλιών που έχετε με αυτά που διαθέτουν. Κανονικά τιεται αυτόματα όταν εκτελείτε το &apos;mythfilldatabase&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="309"/>
@@ -1630,12 +1630,17 @@
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="159"/>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="173"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="783"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="792"/>
         <source>Yes</source>
         <translation>Ναι</translation>
     </message>
     <message>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="162"/>
         <location filename="../libs/libmythmetadata/videoutils.cpp" line="176"/>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="205"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="785"/>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="794"/>
         <source>No</source>
         <translation>Όχι</translation>
     </message>
@@ -1683,14 +1688,15 @@
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="71"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2558"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2574"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2557"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2573"/>
         <source>Auto</source>
         <comment>Automatic</comment>
         <translation>Αυτόματα</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="48"/>
+        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="63"/>
         <source>Channel Name</source>
         <translation>Όνομα Καναλιού</translation>
     </message>
@@ -1712,7 +1718,7 @@
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="135"/>
         <location filename="../programs/mythfrontend/audiogeneralsettings.cpp" line="1226"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="106"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="105"/>
         <source>Default</source>
         <translation>Προεπιλογή</translation>
     </message>
@@ -1742,7 +1748,7 @@
         <translation>Απόχρωση</translation>
     </message>
     <message>
-        <location filename="../libs/libmythui/mythnotificationcenter.cpp" line="1499"/>
+        <location filename="../libs/libmythui/mythnotificationcenter.cpp" line="1504"/>
         <source>MythTV</source>
         <translation>MythTV</translation>
     </message>
@@ -1834,40 +1840,92 @@
         <translation>%1 %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="239"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="238"/>
         <source>Off</source>
         <translation>Όχι</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1009"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1008"/>
         <source>Edit</source>
         <translation>Επεξεργασία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1010"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1262"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1009"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1261"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1316"/>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="111"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1315"/>
         <source>Error</source>
         <translation>Σφάλμα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2557"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2556"/>
         <source>Qt</source>
         <translation>Qt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2561"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2560"/>
         <source>OpenGL</source>
         <translation>OpenGL</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2565"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2564"/>
         <source>Direct3D</source>
         <translation>Direct3D</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="65"/>
+        <source>Hostname</source>
+        <translation>Όνομα Η/Υ</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="94"/>
+        <source>Port</source>
+        <comment>TCP/IP port</comment>
+        <translation>Θύρα</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="111"/>
+        <source>User</source>
+        <translation>Χρήστης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="121"/>
+        <source>Password</source>
+        <translation>Κωδικός</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="813"/>
+        <source>Title</source>
+        <translation>Τίτλος</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="816"/>
+        <source>Season/Episode</source>
+        <translation>Κύκλος/Επεισόδιο</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="819"/>
+        <source>Year</source>
+        <translation>Έτος</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="822"/>
+        <source>User Rating</source>
+        <translation>Αξιολόγηση Χρήστη</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="825"/>
+        <source>Runtime</source>
+        <translation>Διάρκεια</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="828"/>
+        <source>Filename</source>
+        <translation>Αρχείο</translation>
     </message>
 </context>
 <context>
@@ -2285,231 +2343,231 @@ Check if the video exists</source>
 <context>
     <name>AppearanceSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1441"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1440"/>
         <source>Menu theme</source>
         <translation>Θέμα Επιλογών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1958"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1957"/>
         <source>All</source>
         <translation>Όλα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1960"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1959"/>
         <source>Display on screen</source>
         <translation>Εμφάνιση στην οθόνη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1964"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1963"/>
         <source>Run on the specified screen or spanning all screens.</source>
         <translation>Εκτέλεση στην συγκεκριμένη οθόνη ή άπλωμα σε όλες τις οθόνες.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1974"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1973"/>
         <source>Monitor aspect ratio</source>
         <translation>Λόγος Πλευρών Οθόνης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1976"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1975"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1977"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1976"/>
         <source>16:10</source>
         <translation>16:10</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1978"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1977"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1980"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1979"/>
         <source>The aspect ratio of a Xinerama display cannot be queried from the display, so it must be specified.</source>
         <translation>Ο λόγος των πλευρών μιας οθόνης Xinerama δεν δηλώνεται από την ίδια την οθόνη, συνεπώς πρέπει να οριστεί.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2045"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2044"/>
         <source>GUI width (pixels)</source>
         <translation>Πλάτος Προγράμματος (px)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2049"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2048"/>
         <source>The width of the GUI. Do not make the GUI wider than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Το πλάτος του προγράμματος. Μην το θέσετε μεγαλύτερο από την πραγματική ανάλυση της οθόνης σας. Βάλτε 0 για αυτόματη επέκταση σε όλη την οθόνη.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2061"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2060"/>
         <source>GUI height (pixels)</source>
         <translation>Ύψος Προγράμματος (px)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2065"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2064"/>
         <source>The height of the GUI. Do not make the GUI taller than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Το ύψος του προγράμματος. Μην το θέσετε μεγαλύτερο από την πραγματική ανάλυση της οθόνης σας. Βάλτε 0 για αυτόματη επέκταση σε όλη την οθόνη.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2077"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2076"/>
         <source>GUI X offset</source>
         <translation>Οριζόντια απόκλιση Προγράμματος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2081"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2080"/>
         <source>The horizontal offset where the GUI will be displayed. May only work if run in a window.</source>
         <translation>Η οριζόντια απόκλιση στην εμφάνιση του προγράμματος. Χρησιμοποιείται μόνο όταν τρέχει σε παράθυρο.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2091"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2090"/>
         <source>GUI Y offset</source>
         <translation>Κάθετη απόκλιση Προγράμματος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2095"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2094"/>
         <source>The vertical offset where the GUI will be displayed.</source>
         <translation>Η κάθετη απόκλιση εμφάνισης του προγράμματος.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2105"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2104"/>
         <source>Display size - width</source>
         <translation>Μέγεθος Οθόνης - πλάτος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2109"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2108"/>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Το οριζόντιο μέγεθος της οθόνης ή της TV. Χρησιμοποιείται για τον υπολογισμό του πραγματικού λόγου διαστάσεων της οθόνης. Παρακάμπτει τη μεταβλητή DisplaySize του συστήματος.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2120"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2119"/>
         <source>Display size - height</source>
         <translation>Μέγεθος Οθόνης - ύψος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2124"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2123"/>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Το κάθετο μέγεθος της οθόνης ή της TV. Χρησιμοποιείται για τον υπολογισμό του πραγματικού λόγου διαστάσεων της οθόνης. Παρακάμπτει τη μεταβλητή DisplaySize του συστήματος.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2136"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2135"/>
         <source>Use GUI size for TV playback</source>
         <translation>Χρήση μεγέθους προγράμματος για προβολή TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2140"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2139"/>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
         <translation>Εάν επιλεγεί, θα χρησιμοποιεί το εν λόγω μέγεθος για προβολή TV, αλλιώς θα χρησιμοποιεί όλη την οθόνη.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2380"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2379"/>
         <source>Hide mouse cursor in MythTV</source>
         <translation>Απόκρυψη δείκτη ποντικιού στο MythTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2384"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2383"/>
         <source>Toggles mouse cursor visibility for touchscreens. By default MythTV will auto-hide the cursor if the mouse doesn&apos;t move for a period, this setting disables the cursor entirely.</source>
         <translation>Εναλλάσει την εμφάνιση του ποντικιού για οθόνες αφής. Εξ΄ορισμού ο δείκτης κρύβεται αυτόματα αν δεν χρησιμοποιηθεί το ποντίκι για ορισμένο χρόνο. Αυτή η ρύθμιση το απενεργοποιεί εντελώς.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2398"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2397"/>
         <source>Use window border</source>
         <translation>Εμφάνιση πλαισίου παραθύρου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2402"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2401"/>
         <source>Toggles between windowed and borderless operation.</source>
         <translation>Εμφανίζει ή κρύβει ένα πλαίσιοι γύρω από το παράθυρο απεικόνισης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2412"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2411"/>
         <source>Use fixed window size</source>
         <translation>Χρήση σταθερού μεγέθους παραθύρου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2416"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2415"/>
         <source>If disabled, the video playback window can be resized</source>
         <translation>Όταν είναι απενεργοποιημένο, μπορείτε να αλλάζετε το μέγεθος του παραθύρου προβολής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2425"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2424"/>
         <source>Date format</source>
         <translation>Μορφή Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2428"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2483"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2427"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2482"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Βλέπετε δείγματα βασισμένα στη σημερινή ημερομηνία.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2434"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2489"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2433"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2488"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Βλέπετε δείγματα βασισμένα στην αυριανή ημερομηνία.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2470"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2469"/>
         <source>Your preferred date format. %1</source>
         <extracomment>%1 gives additional information regarding the date format</extracomment>
         <translation>Η μορφή ημερομηνίας που προτιμάτε. %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2479"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2478"/>
         <source>Short date format</source>
         <translation>Μορφή Σύντομης Ημερομηνίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2518"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2517"/>
         <source>Your preferred short date format. %1</source>
         <extracomment>%1 gives additional information regarding the date format</extracomment>
         <translation>Η μορφή σύντομης ημερομηνίας που προτιμάτε. %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2527"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2526"/>
         <source>Time format</source>
         <translation>Μορφή ώρας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2542"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2541"/>
         <source>Your preferred time format. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>Η μορφή ώρας που προτιμάτε. Πρέπει να επιλέξετε κάποιο με &quot;AM&quot; ή &quot;PM&quot;, αλλιώς η ώρα θα εμφανίζεται &quot;στρατιωτική&quot; δηλ. σε 24ωρη βάση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2555"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2554"/>
         <source>Paint engine</source>
         <translation>Μηχανή γραφικών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2569"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2568"/>
         <source>This selects what MythTV uses to draw. Choosing &apos;%1&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
         <translation>Επιλέγει τι σύστημα θα χρησιμοποιεί το πρόγραμμα για να απεικονίζει στην οθόνη. Συνιστάται η επιλογή &apos;%1&apos;, εκτός και αν χρησιμοποιείτε κάποιον Η/Υ με προβληματικές εκδόσεις OpenGL (είτε λόγω υλικού, οδηγών ή παραθυρικού συστήματος) όπου μόνο η επιλογή Qt λειτουργεί κανονικά.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2897"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2896"/>
         <source>Language</source>
         <translation>Γλώσσα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2916"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2915"/>
         <source>Your preferred language for the user interface.</source>
         <translation>Η γλώσσα που προτιμάτε για το πρόγραμμα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2952"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2951"/>
         <source>Guide language #%1</source>
         <translation>Γλώσσα Προγράμματος #%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2958"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2957"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
         <translation>Η #%1 προτιμώμενη γλώσσα για το Πρόγραμμα Τηλεόρασης και τίτλους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4161"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4160"/>
         <source>Theme / Screen Settings</source>
         <translation>Επιλογές Θεμάτων / Οθόνης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4213"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4212"/>
         <source>Localization</source>
         <translation>Τοπικές Ρυθμίσεις</translation>
     </message>
@@ -3169,18 +3227,18 @@ Device supports up to %1</source>
     </message>
     <message>
         <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="315"/>
-        <source>Couldn&apos;t open Blu-ray device: %1</source>
-        <translation>Αδυναμία ανοίγματος συσκευής Blu-ray: %1</translation>
+        <source>Could not open Blu-ray device: %1</source>
+        <translation>Αποτυχία ανοίγματος συσκευής Blu-ray: %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="384"/>
-        <source>Can&apos;t find any Bluray-compatible title</source>
-        <translation>Δε βρίσκω κάποιο τίτλο συμβατό με Blu-ray</translation>
+        <source>Unable to find any Blu-ray compatible titles</source>
+        <translation>Αδυναμία εύρεσης τίτλων Blu-ray</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="484"/>
-        <source>Can&apos;t find any usable Bluray title</source>
-        <translation>Δε βρίσκω χρησιμοποιήσιμο τίτλο Bluray</translation>
+        <source>Unable to find any usable Blu-ray titles</source>
+        <translation>Δεν μπορούν να χρησιμοποιηθούν τα έργα Blu-ray που βρέθηκαν</translation>
     </message>
 </context>
 <context>
@@ -3547,28 +3605,28 @@ Device supports up to %1</source>
 <context>
     <name>ChannelGroupSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2622"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2682"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2621"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2681"/>
         <source>Remember last channel group</source>
         <translation>Χρήση προηγούμενης ομάδας καναλιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2624"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2623"/>
         <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
         <translation>Εάν επιλεγεί, το Πρόγραμμα Τηλεόρασης θα ξεκινήσει δείχνοντας μόνο τα κανάλια από την τελευταία ομάδα καναλιών. Με το &quot;4&quot; εναλλάζει η ομάδα καναλιών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2639"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2638"/>
         <source>Default channel group</source>
         <translation>Προεπιλεγμένη ομάδα καναλιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2645"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2644"/>
         <source>All Channels</source>
         <translation>Όλα τα Κανάλια</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2652"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2651"/>
         <source>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</source>
         <translation>Η προεπιλεγμένη ομάδα καναλιών που θα εμφανίζεται στο Τηλεοπτικό Πρόγραμμα. Πατώντας το κουμπί ΠΡΟΓΡΑΜΜΑ εναλλάσσει τις ομάδες καναλιών.</translation>
     </message>
@@ -3951,6 +4009,14 @@ Device supports up to %1</source>
         <source>UNKNOWN</source>
         <comment>Synthesized callsign</comment>
         <translation>ΑΓΝΩΣΤΟ</translation>
+    </message>
+</context>
+<context>
+    <name>ChannelWizard</name>
+    <message>
+        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="29"/>
+        <source>Channel Options</source>
+        <translation>Επιλογές Καναλιών</translation>
     </message>
 </context>
 <context>
@@ -4520,6 +4586,151 @@ Device supports up to %1</source>
     </message>
 </context>
 <context>
+    <name>DatabaseSettings</name>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="17"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="150"/>
+        <source>Use custom identifier for frontend preferences</source>
+        <translation>Χρήση προσαρμοσμένου αναγνωριστικού για τις ρυθμίσεις του frontend</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="29"/>
+        <source>Backend Server Wakeup settings</source>
+        <translation>Ρυθμίσεις αφύπνισης Υπολογιστή</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="44"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="145"/>
+        <source>Database Configuration %1/%2</source>
+        <translation>Ρύθμιση Βάσης Δεδομένων %1/%2</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="51"/>
+        <source>All database settings take effect when you restart this program.</source>
+        <translation>Όλες οι αλλαγές στη βάση δεδομένων θα ισχύσουν μετά την επανεκκίνηση του προγράμματος.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="54"/>
+        <source>MythTV could not connect to the database. Please verify your database settings below.</source>
+        <translation>Το MythTV δεν μπόρεσε να συνδεθεί στη βάση. Παρακαλώ ελέγξτε τις πιο κάτω ρυθμίσεις σας.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="61"/>
+        <source>Database Server Settings</source>
+        <translation>Ρυθμίσεις Διακομιστή Βάσης Δεδομένων</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="67"/>
+        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
+        <translation>Το όνομα ή η διεύθυνση IP του Η/Υ που διατηρεί τη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="77"/>
+        <source>Ping test server?</source>
+        <translation>Να κάνω ping στο διακομιστή;</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="78"/>
+        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
+        <translation>Ελέγχει τη βασική συνδεσιμότητα με το διακομιστή χρησιμοποιώντας την εντολή ping. Απενεργοποιήστε το αν ο διακομιστής ή το δίκτυό σας δεν υποστηρίζουν πακέτα ICMP ECHO</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="96"/>
+        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
+        <translation>Η Θύρα στην οποία τρέχει η βάση δεδομένων. Αφήστε τη κενή αν χρησιμοποιείτε την προεπιλεγμένη (3306).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="103"/>
+        <source>Database name</source>
+        <translation>Όνομα Βάσης Δεδομένων</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="105"/>
+        <source>The name of the database. This information is required.</source>
+        <translation>Το όνομα της βάσης δεδομένων. Απαραίτητη πληροφορία.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="113"/>
+        <source>The user name to use while connecting to the database. This information is required.</source>
+        <translation>Το όνομα χρήστη για σύνδεση στη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="123"/>
+        <source>The password to use while connecting to the database. This information is required.</source>
+        <translation>Ο κωδικός για τη σύνδεση στη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="153"/>
+        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
+        <translation>Αν το όνομα αυτού του Η/Υ αλλάζει συχνά, επιλέξτε αυτό το πλαίσιο και δώστε ένα μοναδικό στο δίκτυο όνομα για αναγνώρισή του. Εάν δεν το επιλέξετε, θα χρησιμοποιηθεί το τοπικό όνομα του Η/Υ κατά την αποθήκευση των ρυθμίσεων στη βάση δεδομένων.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="165"/>
+        <source>Custom identifier</source>
+        <translation>Προσαρμοσμένο αναγνωριστικό</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="167"/>
+        <source>An identifier to use while saving the settings for this frontend.</source>
+        <translation>Ένα αναγνωριστικό για τις ρυθμίσεις που αφορούν αυτό τον Η/Υ.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="181"/>
+        <source>Enable database server wakeup</source>
+        <translation>Ενεργοποίηση αφύπνισης διακομιστή Βάσης Δεδομένων</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="183"/>
+        <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
+        <translation>Εάν επιλεγεί, ο frontend θα χρησιμοποιήσει τις παραμέτρους αφύπνισης της βάσης για να επανασυνδεθεί στον διακομιστή που την τρέχει.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="190"/>
+        <source>Reconnect time</source>
+        <translation>Χρόνος επανασύνδεσης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="192"/>
+        <source>The time in seconds to wait for the server to wake up.</source>
+        <translation>Ο χρόνος αναμονής σε δευτερόλεπτα ως την αφύπνιση του διακομιστή.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="198"/>
+        <source>Retry attempts</source>
+        <translation>Προσπάθειες επανάληψης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="200"/>
+        <source>The number of retries to wake the server before the frontend gives up.</source>
+        <translation>Το πλήθος των προσπαθειών επανάληψης αφύπνισης του διακομιστή πριν τα παρατήσει ο frontend.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="206"/>
+        <source>Wake command</source>
+        <translation>Εντολή Αφύπνισης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="208"/>
+        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
+        <translation>Η εντολή που θα εκτελεστεί στο frontend για την αφύπνιση του διακομιστή της βάσης δεδομένων (πχ. sudo /etc/init.d/mysql restart).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="238"/>
+        <source>Required fields are marked with an asterisk (*).</source>
+        <translation>Τα απαιτούμενα πεδία σημειώνονται με αστερίσκο (*).</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="244"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="258"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="262"/>
+        <location filename="../libs/libmyth/dbsettings.cpp" line="266"/>
+        <source>* %1</source>
+        <comment>Required field</comment>
+        <extracomment>%1 is the required field name</extracomment>
+        <translation>* %1</translation>
+    </message>
+</context>
+<context>
     <name>DeleteMap</name>
     <message>
         <location filename="../libs/libmythtv/deletemap.cpp" line="76"/>
@@ -4645,12 +4856,12 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>DeletedExpireOptions</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="374"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="373"/>
         <source>Auto-Expire instead of delete recording</source>
         <translation>Αυτόματη λήξη αντί διαγραφής της εγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="378"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="377"/>
         <source>If enabled, move deleted recordings to the &apos;Deleted&apos; recgroup and turn on autoexpire instead of deleting immediately.</source>
         <translation>Εάν επιλεγεί, μεταφέρει τις ληγμένες εγγραφές στην ομάδα εγγραφών &apos;Διεγραμμένα&apos; και ενεργοποιεί την αυτόματη λήξη αντί να τις διαγράψει άμεσα.</translation>
     </message>
@@ -5090,37 +5301,37 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>EPGSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2868"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2867"/>
         <source>Guide starts at channel</source>
         <translation>Το Πρόγραμμα TV ξεκινάει από το κανάλι</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2871"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode.</source>
         <translation>Ξεκινάει το πρόγραμμα τηλεόρασης στο κανάλι αυτό αν κληθεί έξω από τη λειτουργία Ζωντανής Τηλεόρασης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2883"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2882"/>
         <source>Record threshold</source>
         <translation>Χρόνος πριν την εγγραφή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2887"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2886"/>
         <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
         <translation>Πατώντας ΕΠΙΛΟΓΗ σε μια εκπομπή που βρίσκεται τόσα λεπτά στο μέλλον θα προγραμματίσει εγγραφή.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3792"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3791"/>
         <source>Show the program guide when starting Live TV</source>
         <translation>Εμφάνιση προγράμματος τηλεόρασης όταν αρχίζει η Ζωντανή Τηλεόραση</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3795"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3794"/>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>Θα δείχνει το πρόγραμμα τηλεόρασης αμέσως μόλις αρχίσει η Ζωντανή TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4123"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4122"/>
         <source>Program Guide %1/%2</source>
         <translation>Πρόγραμμα TV %1/%2</translation>
     </message>
@@ -5199,9 +5410,19 @@ Delete the current cut or preserved region</extracomment>
         <translation>Σίγουρα θέλετε να κλείσετε το MythTV;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="205"/>
-        <source>No</source>
-        <translation>Όχι</translation>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="207"/>
+        <source>Yes, Exit now</source>
+        <translation>Ναι, κλείστο</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="209"/>
+        <source>Yes, Exit and Reboot</source>
+        <translation>Ναι, κλείστο και κάνε επανεκκίνηση του Η/Υ</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="211"/>
+        <source>Yes, Exit and Shutdown</source>
+        <translation>Ναι, κλείστο και σβήσε τον Η/Υ</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="39"/>
@@ -5325,117 +5546,117 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>GeneralRecPrioritiesSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2703"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2702"/>
         <source>Avoid back to back recordings</source>
         <translation>Αποφυγή διαδοχικών εγγραφών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2707"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2706"/>
         <source>Selects the situations where thescheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
         <translation>Επιλέγει πότε ο ρυθμιστής εγγραφών θα αποφεύγει να αναθέτει την εγγραφή εκπομπών στην ίδια κάρτα όταν οι χρόνοι τέλους και εκκίνησής τους εφάπτονται. Αυτό θα επιτρέπεται όπου είναι απαραίτητο προκειμένου να επιλυθούν συγκρούσεις εγγραφών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2714"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2713"/>
         <source>Never</source>
         <translation>Ποτέ</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2715"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2714"/>
         <source>Different Channels</source>
         <translation>Διαφορετικά Κανάλια</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2717"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2716"/>
         <source>Always</source>
         <translation>Πάντα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2728"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2727"/>
         <source>Preferred input priority</source>
         <translation>Προτιμούμενη προτεραιότητα εισόδου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2730"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2729"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation>Προστιθέμενη προτεραιότητα όταν μια εκπομπή ταιριάζει με την προτιμούμενη είσοδο που επιλέχθηκε στις &apos;Επιλογές Χρονοπρογραμματισμού&apos; του κανόνα εγγραφής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2745"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2744"/>
         <source>HDTV recording priority</source>
         <translation>Προτεραιότητα Εγγραφής για HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2747"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2746"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
         <translation>Επιπλέον προτεραιότητα όταν μια εκπομπή σημειώνεται ως HDTV στο πρόγραμμα TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2761"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2760"/>
         <source>Widescreen recording priority</source>
         <translation>Προτεραιότητα Ευρείας Οθόνης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2764"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2763"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
         <translation>Προστιθέμενη προτεραιότητα όταν μια εκπομπή είναι Ευρείας Οθόνης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2779"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2778"/>
         <source>Sign language recording priority</source>
         <translation>Προτεραιότητα Νοηματικής Γλώσσας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2782"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2781"/>
         <source>Additional priority when a showing is marked as having in-vision sign language.</source>
         <translation>Προστιθέμενη προτεραιότητα όταν μια εκπομπή σημειώνεται πως περιλαμβάνει νοηματική γλώσσα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2798"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2797"/>
         <source>In-vision Subtitles Recording Priority</source>
         <translation>Προτεραιότητα Εγγραφής για Υπότιτλους</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2801"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2800"/>
         <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
         <translation>Επιπλέον προτεραιότητα όταν μια εκπομπή έχει υποτίτλους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2816"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2815"/>
         <source>Subtitles/CC recording priority</source>
         <translation>Προτεραιότητα Εγγραφής υποτίτλων/CC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2819"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2818"/>
         <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
         <translation>Επιπλέον προτεραιότητα όταν μια εκπομπή έχει κανονικούς ή κρυφούς (CC) υπότιτλους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2835"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2834"/>
         <source>Hard of hearing priority</source>
         <translation>Προτεραιότητα νοηματικής γλώσσας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2837"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2836"/>
         <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
         <translation>Επιπλέον προτεραιότητα όταν μια εκπομπή έχει υποστήριξη για θεατές με προβλήματα ακοής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2853"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2852"/>
         <source>Audio described priority</source>
         <translation>Προτεραιότητα περιγραφής Ήχου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2855"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2854"/>
         <source>Additional priority when a showing is marked as being Audio Described.</source>
         <translation>Επιπλέον προτεραιότητα όταν μια εκπομπή έχει Περιγραφή Ήχων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4136"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4135"/>
         <source>Scheduler Options</source>
         <translation>Επιλογές Προγραμματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4147"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4146"/>
         <source>Accessibility Options</source>
         <translation>Επιλογές Προσβασιμότητας</translation>
     </message>
@@ -5443,268 +5664,268 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>GeneralSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="205"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="204"/>
         <source>Commercial detection method</source>
         <translation>Μέθοδος ανίχνευσης διαφημίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="207"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="206"/>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
         <translation>Ορίζει την μέθοδο που θα χρησιμοποιείται από το MythTV για εντοπισμό των διαφημιστικών διαλειμάτων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="223"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="222"/>
         <source>Enable experimental speedup of commercial detection</source>
         <translation>Χρήση πειραματικής επιτάχυνσης της ανίχνευσης διαφημίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="228"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="227"/>
         <source>If enabled, experimental commercial detection speedups will be enabled.</source>
         <translation>Εάν επιλεγεί, ενεργοποιούνται κάποιες πειραματικές επιταχύνσεις της ανίχνευσης διαφημίσεων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="258"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="257"/>
         <source>Deferral days for auto transcode jobs</source>
         <translation>Μέρες καθυστέρησης για εργασίες αυτόματης μετατροπής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="260"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="259"/>
         <source>If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
         <translation>Εάν δεν είναι μηδέν, οι εργασίες αυτόματης μετατροπής θα προγραμματιστούν να εκτελούνται τόσες ημέρες από την ολοκλήρωση της εγγραφής αντί για αμέσως μετά.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="274"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="273"/>
         <source>Strict commercial detection</source>
         <translation>Αυστηρός εντοπισμός διαφημίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="278"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="277"/>
         <source>Enable stricter commercial detection code. Disable if some commercials are not being detected.</source>
         <translation>Ενεργοποιεί αλγόριθμο αυστηρότερου εντοπισμού διαφημίσεων. Απενεργοποιείστε το αν δεν εντοπίζονται κάποιες διαφημίσεις.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="357"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="356"/>
         <source>Extra disk space (GB)</source>
         <translation>Επιπλέον χώρος δίσκου (GB)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="359"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="358"/>
         <source>Extra disk space (in gigabytes) beyond what MythTV requires that you want to keep free on the recording file systems.</source>
         <translation>Ο ελάχιστος ελεύθερος χώρος που θέλετε να αφήσετε στο δίσκο που κάνει το MythTV τις εγγραφές του.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="389"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="388"/>
         <source>Time to retain deleted recordings (days)</source>
         <translation>Χρόνος που θα διατηρούνται οι διαγραμμένες εγγραφές (σε ημέρες)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="392"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="391"/>
         <source>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</source>
         <translation>Καθορίζει το μέγιστο αριθμό ημερών πριν να είναι αδύνατη η επαναφορά κάποιας διαγραμμένης εγγραφής. Το μηδέν σημαίνει πως η εγγραφή θα διαγραφεί μόνιμα μεταξύ 5 και 20 λεπτών αργότερα. Αν δώσετε -1 σημαίνει πως οι εγγραφές θα διατηρούνται μέχρι να χρειαστεί ο χώρος. Οι εγγραφές θα αφαιρούνται πριν τη λήξη του χρόνου αυτού αν υπάρχει έλειψη χώρου για νέα εγγραφή.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="435"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="434"/>
         <source>Auto-Expire method</source>
         <translation>Μέθοδος Αυτόματης Λήξης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="437"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="436"/>
         <source>Oldest show first</source>
         <translation>Πρώτα η παλαιότερη εκπομπή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="438"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="437"/>
         <source>Lowest priority first</source>
         <translation>Πρώτα η χαμηλότερη προτεραιότητα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="439"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="438"/>
         <source>Weighted time/priority combination</source>
         <translation>Συνδυασμός Βάρους χρόνου/προτεραιότητας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="442"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="441"/>
         <source>Method used to determine which recorded shows to delete first. Live TV recordings will always expire before normal recordings.</source>
         <translation>Η μέθοδος που αποφασίζει ποιές εκπομπές να διαγραφούν πρώτες. Οι εγγραφές της Ζωντανής TV πάντα θα λήγουν πριν από τις κανονικές εγγραφές.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="455"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="454"/>
         <source>Watched before unwatched</source>
         <translation>Όσα έχω δει πριν από όσα δεν έχω δει</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="459"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="458"/>
         <source>If enabled, programs that have been marked as watched will be expired before programs that have not been watched.</source>
         <translation>Αν επιλεγεί, τα προγράμματα που έχουν σημειωθεί ως &apos;το έχω δει&apos; θα λήξουν πριν από τα προγράμματα που &apos;δεν έχω δει&apos;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="470"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="469"/>
         <source>Priority weight</source>
         <translation>Βάρος προτεραιότητας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="472"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="471"/>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</source>
         <translation>Ο αριθμός των ημερών &apos;δώρου&apos; που λαβαίνει κάποια εκπομπή για κάθε βαθμό προτεραιότητας. Χρησιμοποιείται μόνο όταν επιλέγεται η μέθοδος Συνδυασμένη βαρύτητα Χρόνου/Προτεραιότητας.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="486"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="485"/>
         <source>Live TV max age (days)</source>
         <translation>Μέγιστη ηλικία Ζωντανής TV (ημέρες)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="488"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="487"/>
         <source>Auto-Expire will force expiration of Live TV recordings when they are this many days old. Live TV recordings may also be expired early if necessary to free up disk space.</source>
         <translation>Η Αυτόματη Λήξη θα επιβάλει Λήξη των εγγραφών από Ζωντανή TV όταν συμπληρώσουν τόσες ημέρες. Επιπλέον, οι εγγραφές από Ζωντανή TV μπορούν να λήξουν νωρίτρεα για να ελευθερωθεί χώρος στο δίσκο.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="518"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="517"/>
         <source>Re-record watched</source>
         <translation>Επανεγγραφή όσων &apos;τα έχω δει&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="522"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="521"/>
         <source>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</source>
         <translation>Αν επιλεγεί, οι εκπομπές που έχουν σημειωθεί ως &apos;το έχω δει&apos; και έχουν Αυτόματη Λήξη θα επανεγγραφούν αν ξαναπροβληθούν.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="533"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="532"/>
         <source>Time to record before start of show (secs)</source>
         <translation>Πρόωρη έναρξη εγγραφής πριν την αρχή της εκπομπής (secs)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="536"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="535"/>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>Αυτή η γενική ρύθμιση επιτρέπει στον εγγραφέα να ξεκινήσει πριν την προγραμματισμένη ώρα εκκίνησης. Δεν επηρεάζει τον προγραμματιστή. Αγνοείται όταν δύο εκπομπές έχουν προγραμματιστεί χωρίς αρκετό χρονικό κενό μεταξύ τους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="551"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="550"/>
         <source>Time to record past end of show (secs)</source>
         <translation>Χρόνος προς εγγραφή μετά το τέλος της εκπομπής (secs)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="555"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="554"/>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation>Αυτή η γενική ρύθμιση επιτρέπει στον εγγραφέα να γράψει μετά το προγραμματισμένο χρόνο τέλους. Δεν επηρεάζει τον προγραμματιστή. Αγνοείται όταν δύο εκπομπές έχουν προγραμματιστεί χωρίς αρκετό χρονικό κενό μεταξύ τους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="568"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="567"/>
         <source>Category of shows to be extended</source>
         <translation>Η κατηγορία των εκπομπών που θα επιμηκύνονται</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="570"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="569"/>
         <source>For a special category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
         <translation>Για κάποια ειδική κατηγορία (π.χ. &quot;Αθλητικό γεγονός&quot;), να ζητείται η αυτόματη επιμήκυνση των εκπομπών. Επιδρά μόνο αν μπορεί να καθοριστεί η κατηγορία της εκπομπής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="599"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="598"/>
         <source>Record past end of show (mins)</source>
         <translation>Εγγραφή μετά το τέλος της εκπομπής (mins)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="603"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="602"/>
         <source>For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time in-between.</source>
         <translation>Για τη συγκεκριμένη κατηγορία, θα γίνει προσπάθεια να παραταθεί η εγγραφή κατά τον συγκεκριμένο αριθμό λεπτών. Αγνοείται όταν δύο εκπομπές έχουν προγραμματιστεί χωρίς αρκετό χρόνο μεταξύ τους.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="617"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="616"/>
         <source>Category record over-time</source>
         <translation>Κατηγορία με επέκταση εγγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1500"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1499"/>
         <source>Channel ordering</source>
         <translation>Ταξινόμηση Καναλιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1502"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1501"/>
         <source>channel number</source>
         <translation>αριθμός καναλιού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1503"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2589"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2608"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1502"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2588"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2607"/>
         <source>callsign</source>
         <translation>όνομα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2584"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2583"/>
         <source>Channel format</source>
         <translation>Μορφή καναλιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2586"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2605"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2585"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2604"/>
         <source>number</source>
         <translation>αριθμός</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2587"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2606"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2586"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2605"/>
         <source>number callsign</source>
         <translation>αριθμός όνομα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2588"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2607"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2587"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2606"/>
         <source>number name</source>
         <translation>αριθμός ονομασία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2590"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2609"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2608"/>
         <source>name</source>
         <translation>όνομα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2592"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2591"/>
         <source>Your preferred channel format.</source>
         <translation>Προτίμηση εμφάνισης καναλιών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2603"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2602"/>
         <source>Long channel format</source>
         <translation>Μορφή πλήρους ονομασίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2611"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2610"/>
         <source>Your preferred long channel format.</source>
         <translation>Πώς προτιμάτε την πλήρη εμφάνιση των καναλιών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2665"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2664"/>
         <source>Browse/change channels from Channel Group</source>
         <translation>Περιήγηση/αλλαγή καναλιών από την Ομάδα Καναλιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2668"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2667"/>
         <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
         <translation>Εάν επιλεγεί, στην Ζωντανή TV θα εμφανίζονται μόνο κανάλια από την επιλεγμένη ομάδα καναλιών. Για περιήγηση σε όλα τα κανάλια, επιλέξτε την ομάδα &quot;Όλα τα Κανάλια&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4050"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4049"/>
         <source>General (Basic)</source>
         <translation>Γενικά (Βασικά)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4059"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4058"/>
         <source>General (Auto-Expire)</source>
         <translation>Γενικά (Αυτόματη Λήξη)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4090"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4089"/>
         <source>General (Jobs)</source>
         <translation>Γενικά (Εργασίες)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4101"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4100"/>
         <source>General (Advanced)</source>
         <translation>Γενικά (Προχωρημένα)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4110"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4109"/>
         <source>General (Channel Groups)</source>
         <translation>Γενικά (Ομάδες Καναλιών)</translation>
     </message>
@@ -6708,6 +6929,60 @@ Delete the current cut or preserved region</extracomment>
     </message>
 </context>
 <context>
+    <name>IPTVChannelFetcher</name>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="101"/>
+        <source>Downloading Playlist</source>
+        <translation>Κατεβάζω το Πρόγρ. Τηλεόρασης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="113"/>
+        <source>Downloading Playlist Failed</source>
+        <translation>Αποτυχία κατεβάσματος Λίστας Προβολής</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="124"/>
+        <source>Processing Playlist</source>
+        <translation>Επεξεργάζομαι το Πρόγραμμα Τηλεόρασης</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="131"/>
+        <source>Adding Channels</source>
+        <translation>Προσθέτω Κανάλια</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="144"/>
+        <source>Channel #%1 : %2</source>
+        <extracomment>%1 is the channel number, %2 is the channel name</extracomment>
+        <translation>Κανάλι #%1 : %2</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="155"/>
+        <source>Adding %1</source>
+        <translation>Προσθέτω %1</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="169"/>
+        <source>Updating %1</source>
+        <translation>Ενημερώνω %1</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="183"/>
+        <source>Done</source>
+        <translation>Ολοκληρώθηκε</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="288"/>
+        <source>ERROR: M3U channel list is malformed</source>
+        <translation>ΣΦΑΛΜΑ: Η Λίστα καναλιών M3U είναι κακογραμμένη</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="315"/>
+        <source>Encountered malformed channel</source>
+        <translation>Αντιμετώπισα κακογραμμένο κανάλι</translation>
+    </message>
+</context>
+<context>
     <name>IdleScreen</name>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/idlescreen.cpp" line="121"/>
@@ -7156,157 +7431,157 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>LcdSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3281"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3280"/>
         <source>Display time</source>
         <translation>Εμφάνιση Ώρας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3283"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3282"/>
         <source>Display current time on idle LCD display.</source>
         <translation>Εμφανίζει την τρέχουσα ώρα στην LCD οθόνη όταν δε χρησιμοποιείται.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3295"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3294"/>
         <source>Display recording status</source>
         <translation>Εμφάνιση κατάστασης εγγραφών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3297"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3296"/>
         <source>Display current recordings information on LCD display.</source>
         <translation>Εμφάνιση των τρεχόντων πληροφοριών εγγραφών σε οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3309"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3308"/>
         <source>Display menus</source>
         <translation>Εμφάνιση Επιλογών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3311"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3310"/>
         <source>Display selected menu on LCD display. </source>
         <translation>Εμφάνιση των επιλεγμένων Επιλογών σε οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3322"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3321"/>
         <source>Menu pop-up time</source>
         <translation>Χρόνος εμφάνισης Επιλογών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3324"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3323"/>
         <source>How many seconds the menu will remain visible after navigation.</source>
         <translation>Ο χρόνος (σε δευτερόλεπτα) που θα μένουν ορατές οι επιλογές.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3336"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3335"/>
         <source>Display music artist and title</source>
         <translation>Εμφάνιση καλλιτέχνη και τίτλου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3338"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3337"/>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
         <translation>Εμφάνιση του καλλιτέχνη και τίτλου τραγουδιού της Μουσικής στην οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3350"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3349"/>
         <source>Items</source>
         <translation>Στοιχεία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3352"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3351"/>
         <source>Artist - Title</source>
         <translation>Καλλιτέχνης - Τίτλος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3353"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3352"/>
         <source>Artist [Album] Title</source>
         <translation>Καλλιτέχνης [Δίσκος] Τίτλος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3356"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3355"/>
         <source>Which items to show when playing music.</source>
         <translation>Ποιά στοιχεία θα εμφανίζονται κατά το άκουσμα της μουσικής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3365"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3364"/>
         <source>Display channel information</source>
         <translation>Εμφάνιση Πληροφοριών Καναλιού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3367"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3366"/>
         <source>Display tuned channel information on LCD display.</source>
         <translation>Εμφάνιση πληροφοριών για το τρέχον κανάλι στην οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3379"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3378"/>
         <source>Display volume information</source>
         <translation>Εμφάνιση Έντασης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3381"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3380"/>
         <source>Display volume level information on LCD display.</source>
         <translation>Εμφάνιση του επιπέδου έντασης στην οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3393"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3392"/>
         <source>Display generic information</source>
         <translation>Εμφάνιση Γενικών Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3395"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3394"/>
         <source>Display generic information on LCD display.</source>
         <translation>Εμφανίζει γενικές πληροφορίες στην οθόνη LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3406"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3405"/>
         <source>Backlight always on</source>
         <translation>Οπίσθιος Φωτισμός πάντα Ενεργός</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3408"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3407"/>
         <source>Turn on the backlight permanently on the LCD display.</source>
         <translation>Ανάβει μόνιμα τον οπίσθιο φωτισμό της οθόνης LCD.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3419"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3418"/>
         <source>Heartbeat always on</source>
         <translation>Πάντα ενεργοποιημένο το heartbeat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3421"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3420"/>
         <source>Turn on the LCD heartbeat.</source>
         <translation>Ενεργοποιεί το Heartbeat της LCD οθόνης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3432"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3431"/>
         <source>Display large clock</source>
         <translation>Εμφάνιση μεγάλου ρολογιού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3434"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3433"/>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation>Σε οθόνες πολλών γραμμών προσπαθεί να εμφανίσει την ώρα όσο μεγαλύτερη γίνεται.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3446"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3445"/>
         <source>LCD key order</source>
         <translation>Σειρά κουμπιών LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3451"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3450"/>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
         <translation>Εισάγετε τους 6 κωδικούς επιστροφής του πληκτρολογίου του LCD σας στη σειρά με την οποία θέλετε τις λειτουργίες πάνω/κάτω/αριστερά/δεξιά/ναι/όχι να λειτουργούν. (Δείτε και lcdproc/server/drivers/hd44780.c/keyMapMatrix ή το αντίστοιχο της οθόνης σας)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3463"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3462"/>
         <source>Enable LCD device</source>
         <translation>Ενεργοποίηση συσκευής LCD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3465"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3464"/>
         <source>Use an LCD display to view MythTV status information.</source>
         <translation>Χρήση οθόνης LCD για εμφάνιση πληροφοριών κατάστασης του MythTV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3478"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3477"/>
         <source>LCD device display</source>
         <translation>Συσκευή οθόνης LCD</translation>
     </message>
@@ -7332,23 +7607,23 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MacDesktopSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3745"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3776"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3744"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3775"/>
         <source>Video on the desktop</source>
         <translation>Εικόνα στην επιφάνεια εργασίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3749"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3748"/>
         <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Εάν επιλεγεί, η ταινία θα εμφανίζεται στο φόντο της επιφάνειας εργασίας. Έγκυρο μόνο όταν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3763"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3762"/>
         <source>Frames to skip</source>
         <translation>Καρέ για παράλειψη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3767"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3766"/>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Η εικόνα που εμφανίζεται στο φόντο της επιφάνειας εργασίαςθα παραλείπει τόσα καρέ για κάθε ένα που εμφανίζεται. Δώστε 0 για να δείχνει κάθε καρέ.</translation>
     </message>
@@ -7356,23 +7631,23 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MacDockSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3701"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3729"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3700"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3728"/>
         <source>Video in the dock</source>
         <translation>Εικόνα στη γραμμή εργασιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3704"/>
         <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Εάν επιλεγεί, η ταινία θα εμφανίζεται στο εικονίδιο της εφαρμογής στη γραμμή εργασιών. Έγκυρο μόνο όταν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3717"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3716"/>
         <source>Frames to skip</source>
         <translation>Καρέ για παράλειψη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3721"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3720"/>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Η εικόνα που εμφανίζεται στο εικονίδιο της μπάρας εργασιών θα παραλείπει τόσα καρέ για κάθε ένα που εμφανίζεται. Δώστε 0 για να δείχνει κάθε καρέ.</translation>
     </message>
@@ -7380,33 +7655,33 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MacFloatSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3636"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3680"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3635"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3679"/>
         <source>Video in floating window</source>
         <translation>Εικόνα σε παράθυρο που επιπλέει</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3640"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3639"/>
         <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Εάν επιλεγεί, η ταινία θα εμφανίζεται σε παράθυρο. Έγκυρο μόνο όταν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3652"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3651"/>
         <source>Frames to skip</source>
         <translation>Καρέ για παράλειψη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3656"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3655"/>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Η εικόνα που εμφανίζεται σε παραθυρική κατάσταση θα παραλείπει τόσα καρέ για κάθε ένα που εμφανίζεται. Δώστε 0 για να δείχνει κάθε καρέ.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3667"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3666"/>
         <source>Opacity</source>
         <translation>Αδιαφάνεια</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3671"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3670"/>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Η αδιαφάνεια του επιπλέοντος παραθύρου. Δώστε 100 για πλήρη αδιαφάνεια, δώστε 100 για πλήρη διαφάνεια.</translation>
     </message>
@@ -7414,33 +7689,33 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MacMainSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3571"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3616"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3570"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3615"/>
         <source>Video in main window</source>
         <translation>Εικόνα στο κύριο παράθυρο</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3575"/>
-        <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Αν επιλεγεί, η ταινία θα εμφανίζεται στο κύριο παράθυρο του συστήματος. Αποεπιλέξτε το αν θέλετε τις ταινίες να παίζονται στην επιφάνεια εργασίας ή σε παράθυρο που επιπλέει. Έγκυρο μόνο όταν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;.</translation>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3574"/>
+        <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation>Αν επιλεγεί, η ταινίες θα προβάλλονται στο κύριο παράθυρο του προγράμματος. Απενεργοποιήστε το αν θέλετε να παίζονται στο φόντο της επιφάνειας εργασίας ή σε παράθυρο που επιπλέει. Έγκυρο μόνο όταν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;. </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3588"/>
         <source>Frames to skip</source>
         <translation>Καρέ για παράλειψη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3593"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3592"/>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Η εικόνα που εμφανίζεται σε στο κύριο παράθυρο θα παραλείπει τόσα καρέ για κάθε ένα που εμφανίζεται. Δώστε 0 για να δείχνει κάθε καρέ.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3604"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3603"/>
         <source>Opacity</source>
         <translation>Αδιαφάνεια</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3608"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3607"/>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Η αδιαφάνεια του κυρίως παραθύρου. Δώστε 100 για πλήρη αδιαφάνεια, δώστε 100 για πλήρη διαφάνεια.</translation>
     </message>
@@ -7448,247 +7723,247 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MainGeneralSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1801"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1800"/>
         <source>Use line edit virtual keyboards</source>
         <translation>Χρήση εικονικών πληκτρολογίων για επεξεργασία κειμένου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1805"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1804"/>
         <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
         <translation>Επιτρέπει να χρησιμοποιήσετε εικονικό πληκτρολόγιο όταν γράφετε κείμενο. Για να εμφανιστεί, πατήστε ΕΠΙΛΟΓΗ (Έντερ ή κενό) όταν βρίσκεστε σε πεδίο κειμένου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1817"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1816"/>
         <source>Idle time before entering standby mode (minutes)</source>
         <translation>Ο χρόνος αδράνειας πριν την εισαγωγή σε κατάσταση αναμονής (σε λεπτά)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1822"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1821"/>
         <source>Number of minutes to wait when the frontend is idle before entering standby mode. Standby mode allows the backend to power down if configured to do so. Any remote or mouse input will cause the countdown to start again and/or exit idle mode. Video playback suspends the countdown. A value of zero prevents the frontend automatically entering standby.</source>
         <translation>Τα λεπτά που θα περιμένει το frontend πριν να μπει σε κατάσταση αναμονής. Η κατάσταση αυτή επιτρέπει στον υπολογιστή να διακόψει τη λειτουργία του αν έχει ρυθμιστεί έτσι. Το πάτημα κάποιου πλήκτρου ή κούνημα του ποντικιού μηδενίζει το χρονοδιακόπτη και/ή φεύγει από την κατάσταση αδράνειας. Η προβολή ταινιών αδρανοποιεί το χρονοδιακόπτη. Δώστε μηδέν για να μην μπαίνει σε αδράνεια το πρόγραμμα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1841"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1840"/>
         <source>Customize exit menu options</source>
         <translation>Προσαρμογή επιλογών εξόδου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1843"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1842"/>
         <source>Default</source>
         <translation>Προεπιλογή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1844"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1843"/>
         <source>Show quit</source>
         <translation>Εμφάνιση εξόδου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1845"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1844"/>
         <source>Show quit and shutdown</source>
         <translation>Εμφάνιση εξόδου και τερματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1846"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1845"/>
         <source>Show quit, reboot and shutdown</source>
         <translation>Εμφάνιση εξόδου, επανεκκίνησης και τερματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1848"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1847"/>
         <source>Show shutdown</source>
         <translation>Εμφάνιση τερματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1849"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1848"/>
         <source>Show reboot</source>
         <translation>Εμφάνιση επανεκκίνησης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1850"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1849"/>
         <source>Show reboot and shutdown</source>
         <translation>Εμφάνιση επανεκκίνησης και τερματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1853"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1852"/>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
         <translation>Από προεπιλογή, μόνο οι απομακρυσμένοι frontends εμφανίζουν την επιλογή Τερματισμός στις επιλογές εξόδου. Εδώ μπορείτε να επιβάλετε την προβολή συγκεκριμένων επιλογών τερματισμού και επανεκκίνησης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1864"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1863"/>
         <source>Reboot command</source>
         <translation>Εντολή επανεκκίνησης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1868"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1867"/>
         <source>Optional. Script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Προαιρετικό. Το σκριπτάκι προς εκτέλεση αν επιλέξετε την Επανεκκίνηση στις επιλογές εξόδου, εάν εμφανίζεται η επιλογή. Πρέπει να ορίσετε ένα πλήκτρο εξόδου για να εμφανιστούν οι επιλογές εξόδου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1881"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1880"/>
         <source>Halt command</source>
         <translation>Εντολή τερματισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1885"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1884"/>
         <source>Optional. Script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Προαιρετικό. Το σκριπτάκι προς εκτέλεση αν επιλέξετε τον Τερματισμό στις επιλογές εξόδου, εάν εμφανίζεται η επιλογή. Πρέπει να ορίσετε ένα πλήκτρο εξόδου για να εμφανιστούν οι επιλογές εξόδου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1898"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1897"/>
         <source>LIRC daemon socket</source>
         <translation>Η θύρα του Δαίμονα LIRC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1908"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1907"/>
         <source>UNIX socket or IP address[:port] to connect in order to communicate with the LIRC Daemon.</source>
         <translation>Θύρα του Unix ή συνδυασμός διεύθυνσης IP[:θύρα] για σύνδεση για επικοινωνία με το Δαίμονα LIRC.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1920"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1919"/>
         <source>Screen shot path</source>
         <translation>Φάκελος Στιγμιοτύπων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1924"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1923"/>
         <source>Path to screenshot storage location. Should be writable by the frontend</source>
         <translation>Η τοποθεσία που θα αποθηκεύονται τα στιγμιότυπα. Το frontend θα πρέπει να έχει δικαιώματα εγγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1935"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1934"/>
         <source>Setup PIN code</source>
         <translation>Κωδικός PIN για Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1937"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1936"/>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable. If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>Το PIN αυτό θα ελέγχει την πρόσβαση στις επιλογές ρυθμίσεων. Αν θέλετε να χρησιμοποιήσετε αυτό το χαρακτηριστικό, συνιστάται να χρησιμοποιήσετε νούμερα. Άδειο το απενεργοποιεί. Αν το ορίσετε, δεν θα μπορείτε να μπείτε σ΄αυτή την οθόνη και να το βγάλετε χωρίς πρώτα να εισάγετε το ενεργό PIN.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2968"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2967"/>
         <source>Enable Network Remote Control interface</source>
         <translation>Ενεργοποίηση Δικτυακού Τηλεχειρισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2971"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2970"/>
         <source>This enables support for controlling MythFrontend over the network.</source>
         <translation>Ενεργοποιεί την δυνατότητα ελέγχου του MythFrontend μέσω δικτύου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2984"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2983"/>
         <source>Network Remote Control port</source>
         <translation>Θύρα Δικτυακού Τηλεχειρισμού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2988"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2987"/>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation>Ορίζει τη θύρα που θα δεσμεύσει ο Δικτυακός Τηλεχειρισμός ώστε να δεχθεί νέες συνδέσεις.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2999"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2998"/>
         <source>UDP notify port</source>
         <translation>Θύρα ειδοποίησης UDP</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3003"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3002"/>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
         <translation>Το MythTV θα περιμένει συνδέσεις από το &quot;mythutil&quot; πρόγραμμα σε αυτή την θύρα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3016"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3015"/>
         <source>Enable AirPlay</source>
         <translation>Ενεργοποίηση AirPlay</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3018"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3017"/>
         <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
         <translation>Το AirPlay σας επιτρέπει να βλέπετε ασύρματα στην τηλεόραση ή τον Η/Υ σας περιεχόμενο από το iPhone, iPad, iPod Touch ή iTunes.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3032"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3031"/>
         <source>Only support AirTunes (no video)</source>
         <translation>Υποστήριξη μόνο AirTunes (χωρίς εικόνα)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3034"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3033"/>
         <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
         <translation>Μόνο ροή ήχου από το iPhone, iPad, iPod Touch ή iTunes στον Η/Υ σας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3047"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3046"/>
         <source>Require password</source>
         <translation>Απαίτηση κωδικού</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3051"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3050"/>
         <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
         <translation>Απαιτείται κωδικός για χρήση AirPlay. Το iPhone, iPad, iPod Touch ή iTunes στον Η/Υ σας θα σας ρωτήσει όταν χρειαστεί</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3064"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3063"/>
         <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
         <translation>Το  iPhone, iPad, iPod Touch ή iTunes στον Η/Υ σας θα σας ζητήσει αυτό τον κωδικό όταν χρειαστεί</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3086"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3085"/>
         <source>AirPlay full screen playback</source>
         <translation>Προβολή AirPlay σε πλήρη οθόνη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3090"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3089"/>
         <source>During music playback, displays album cover and various media information in full screen mode</source>
         <translation>Κατά την αναπαραγωγή τραγουδιών, εμφανίζει εξώφυλλα και πληροφορίες για το τραγούδι σε πλήρη οθόνη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3100"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3099"/>
         <source>All AirPlay settings take effect when you restart MythFrontend.</source>
         <translation>Όλες οι ρυθμίσεις του AirPlay θα ενεργοποιηθούν όταν επανεκκινήσετε το MythFrontend.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3111"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3110"/>
         <source>AirTunes RSA key couldn&apos;t be loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. Last Error: %1</source>
         <translation>Το κλειδί RSA του AirTunes δεν μπόρεσε να φορτωθεί. Ελέγξτε το http://www.mythtv.org/wiki/AirTunes/AirPlay. Το τελευταίο Σφάλμα ήταν: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3118"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3117"/>
         <source>AirTunes RSA key successfully loaded.</source>
         <translation>Επιτυχής φόρτωση κλειδιού RSA του AirTunes.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3146"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3145"/>
         <source>Ignore devices</source>
         <translation>Αγνόηση Συσκευών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3150"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3149"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
         <translation>Εάν υπάρχουν κάποιες συσκευές που δεν θέλετε να παρακολουθούνται, δώστε τις εδώ χωρισμένες με κόμμα. Τα πρόσθετα θα τις αγνοούν. Απαιτεί επανεκκίνηση του προγράμματος.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3809"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3808"/>
         <source>Settings Access</source>
         <translation>Πρόσβαση Ρυθμίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3815"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3814"/>
         <source>General</source>
         <translation>Γενικά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3822"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3821"/>
         <source>Media Monitor</source>
         <translation>Παρακολούθηση Μέσων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3828"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3827"/>
         <source>Remote Control</source>
         <translation>Απομακρυσμένος Έλεγχος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3838"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3837"/>
         <source>AirPlay Settings</source>
         <translation>Ρυθμίσεις AirPlay</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3850"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3849"/>
         <source>Shutdown/Reboot Settings</source>
         <translation>Επιλογές Τερματισμού/Επανεκκίνησης</translation>
     </message>
@@ -7841,6 +8116,12 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../libs/libmythtv/channelscan/multiplexsetting.h" line="17"/>
         <source>Transport</source>
         <translation>Συχνότητα</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/multiplexsetting.cpp" line="73"/>
+        <source>ATSC Channel %1</source>
+        <extracomment>%1 is the channel number</extracomment>
+        <translation>Κανάλι ATSC %1</translation>
     </message>
 </context>
 <context>
@@ -9451,7 +9732,7 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MythCoreContext</name>
     <message>
-        <location filename="../libs/libmythbase/mythcorecontext.cpp" line="213"/>
+        <location filename="../libs/libmythbase/mythcorecontext.cpp" line="216"/>
         <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
         <translation>Το πρόγραμμα δειν είναι συμβατό με τις εγκατεστημένες βιβλιοθήκες του MythTV. Παρακαλώ επαναμεταγλωττιίστε τις αφού δώσετε make distclean</translation>
     </message>
@@ -9595,61 +9876,61 @@ Delete the current cut or preserved region</extracomment>
         <translation>Μη ανακτήσιμο σφάλμα εγγραφέα</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3006"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3007"/>
         <source>Not Flagged</source>
         <extracomment>The commercials/adverts have not been flagged</extracomment>
         <translation>Δεν Σημειώθηκαν</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3865"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3866"/>
         <source>Searching</source>
         <translation>Ψάχνω</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3932"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3933"/>
         <source>No Seektable</source>
         <translation>Δεν υπάρχει πίνακας αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3953"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3954"/>
         <source>Using previously auto-saved cuts</source>
         <translation>Με χρήση αυτόματα αποθηκευμένων κοψιμάτων</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3997"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3998"/>
         <source>Paused</source>
         <translation>Σε Παύση</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4078"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4114"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4079"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4115"/>
         <source>New cut added.</source>
         <translation>Προστέθηκε νέο κόψιμο.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4083"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4084"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4088"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4089"/>
         <source>Undo Changes</source>
         <translation>Ακύρωση Αλλαγών</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4119"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4120"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation>Ακύρωση - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4125"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4126"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation>Επανάληψη - %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4898"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4899"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n δευτερόλεπτο</numerusform>
@@ -9657,42 +9938,42 @@ Delete the current cut or preserved region</extracomment>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4902"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4903"/>
         <source>Still Frame</source>
         <translation>Ακίνητο Καρέ</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4903"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4904"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5124"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5125"/>
         <source>Error opening remote stream buffer</source>
         <translation>Σφάλμα κατά το άνοιγμα προσωρινής μνήμης της απομακρυσμένης ροής</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5137"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5138"/>
         <source>Error opening remote stream</source>
         <translation>Σφάλμα κατά το άνοιγμα της απομακρυσμένης ροής</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5297"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5298"/>
         <source>Enabled Studio Levels</source>
         <translation>Ενεργοποιήθηκαν Χρωματισμοί Στούντιο</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5298"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5299"/>
         <source>Disabled Studio Levels</source>
         <translation>Απενεργοποιήθηκαν Χρωματισμοί Στούντιο</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5322"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5323"/>
         <source>Enabled Night Mode</source>
         <translation>Ενεργή η Νυχτερινή Κατάσταση</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5328"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5329"/>
         <source>Disabled Night Mode</source>
         <translation>Ανενεργή η Νυχτερινή Κατάσταση</translation>
     </message>
@@ -10133,8 +10414,8 @@ Returning to the previous menu.</source>
 <context>
     <name>MythUISearchDialog</name>
     <message numerus="yes">
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="763"/>
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="824"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="799"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="860"/>
         <source>%n match(es)</source>
         <translation>
             <numerusform>%n ταίριασμα</numerusform>
@@ -10321,77 +10602,77 @@ Returning to the previous menu.</source>
 <context>
     <name>OSDSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1463"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1462"/>
         <source>Decode VBI format</source>
         <translation>Μορφή αποκωδικοποίησης VBI</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1465"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1464"/>
         <source>None</source>
         <translation>Καμία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1467"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1466"/>
         <source>PAL teletext</source>
         <translation>PAL teletext</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1469"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1468"/>
         <source>NTSC closed caption</source>
         <translation>Κρυφοί υπότιτλοι NTSC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1473"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1472"/>
         <source>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
         <translation>Αν επιλεγεί, παρακάμπτει τη ρύθμιση του mythtv-setup που χρησιμοποιείται κατά την εγγραφή όταν αποκωδικοποιούνται οι υπότιτλοι.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1483"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1482"/>
         <source>Subtitle Codec</source>
         <translation>Αποκωδικοποιητής Υποτίτλων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1568"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1567"/>
         <source>Always display closed captioning or subtitles</source>
         <translation>Πάντα να εμφανίζονται οι κρυφοί ή οι απλοί υπότιτλοι</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1573"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1572"/>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; duringplayback.</source>
         <translation>Αν επιλεγεί, θα εμφανίζονται υπότιτλοι κατά την προβολή εγγραφών ή ζωντανής TV. Μπορεί να απενεργοποιηθεί με το πλήκτρο &quot;T&quot; κατά την προβολή.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1585"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1584"/>
         <source>Enable interactive TV</source>
         <translation>Ενεργοποίηση Διαδραστικής TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1588"/>
         <source>If enabled, interactive TV applications (MHEG) will be activated. This is used for teletext and logos for radio and channels that are currently off-air.</source>
         <translation>Εάν ενεργοποιηθεί, θα χρησιμοποιούνται διαδραστικές εφαρμογές στην τηλεόραση (MHEG). Χρησιμοποιείται για teletext και κανάλια που δεν εκπέμπουν.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1600"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1599"/>
         <source>Always use browse mode in Live TV</source>
         <translation>Πάντα να χρησιμοποιείται Περιήγηση στη ζωντανή TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1604"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1603"/>
         <source>If enabled, browse mode will automatically be activated whenever you use channel up/down while watching Live TV.</source>
         <translation>Εάν ενεργοποιηθεί, θα χρησιμοποιείται αυτόματα η κατάσταση περιήγησης όποτε πατάτε τα κουμπιά ΠΑΝΩ/ΚΑΤΩ όταν βλέπετε ζωντανή TV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1615"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1614"/>
         <source>Browse all channels</source>
         <translation>Περιήγηση σε όλα τα κανάλια</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1619"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1618"/>
         <source>If enabled, browse mode will show channels on all available recording devices, instead of showing channels on just the current recorder.</source>
         <translation>Εάν ενεργοποιηθεί, η περιήγηση θα δείχνει κανάλια από όλες τις διαθέσιμες συσκευές εγγραφής αντί να δείχνει μόνο αυτά που είναι διαθέσιμα στην τρέχουσα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4026"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4025"/>
         <source>On-screen Display</source>
         <translation>Πληροφορίες στην Οθόνη (OSD)</translation>
     </message>
@@ -10415,6 +10696,24 @@ Returning to the previous menu.</source>
         <location filename="../libs/libmythtv/channelscan/panedvbutilsimport.h" line="50"/>
         <source>Location of the channels.conf file.</source>
         <translation>Η θέση του αρχείου channels.conf.</translation>
+    </message>
+</context>
+<context>
+    <name>PaneExistingScanImport</name>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="50"/>
+        <source>Scan to Import</source>
+        <translation>Ανίχνευση για Εισαγωγή</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="69"/>
+        <source>processed</source>
+        <translation>επεξεργάστηκαν</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="69"/>
+        <source>unprocessed</source>
+        <translation>χωρίς επεξεργασία</translation>
     </message>
 </context>
 <context>
@@ -10890,16 +11189,6 @@ Are you sure you want to delete:</source>
         <translation>Ενεργοποίηση Αυτόματης Λήξης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
-        <source>Mark As Watched</source>
-        <translation>Σημείωση ως Προβληθείσα</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2758"/>
-        <source>Mark As Unwatched</source>
-        <translation>Σημείωση ως Μη Προβληθείσα</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2822"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3033"/>
         <source>Begin Transcoding</source>
@@ -11084,11 +11373,13 @@ Are you sure you want to delete:</source>
         <translation>Τερματισμός Εγγραφής</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2758"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3206"/>
         <source>Mark as Unwatched</source>
         <translation>Σημείωση ως μη Προβλημένο</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3208"/>
         <source>Mark as Watched</source>
         <translation>Σημείωση ως Προβλημένο</translation>
@@ -11182,18 +11473,18 @@ Are you sure you want to delete:</source>
 <context>
     <name>PlaybackProfileConfig</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="953"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="952"/>
         <source>&amp;</source>
         <comment>and</comment>
         <translation>&amp;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="956"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="955"/>
         <source>if rez</source>
         <translation>Αν ανάλ</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1032"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1031"/>
         <source>Add New Entry</source>
         <translation>Προσθήκη Νέας Επιλογής</translation>
     </message>
@@ -11201,34 +11492,34 @@ Are you sure you want to delete:</source>
 <context>
     <name>PlaybackProfileConfigs</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1180"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1179"/>
         <source>Playback Profiles %1</source>
         <translation>Πρότυπα Προβολής %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1250"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1249"/>
         <source>Current Video Playback Profile</source>
         <translation>Τρέχον Πρότυπο Προβολής Ταινιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1261"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1260"/>
         <source>Add New</source>
         <translation>Προσθήκη Νέου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1300"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1299"/>
         <source>Enter Playback Group Name</source>
         <translation>Δώστε Όνομα Ομάδας Προβολής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1311"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1310"/>
         <source>Sorry, playback group
 name cannot be blank.</source>
         <translation>Λυπάμαι, το όνομα δεν 
 μπορεί να είναι κενό.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1312"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1311"/>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
         <translation>Λυπάμαι, το όνομα %1 ήδη
@@ -11238,114 +11529,114 @@ name cannot be blank.</source>
 <context>
     <name>PlaybackProfileItemConfig</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="650"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="649"/>
         <source>Profile Item</source>
         <translation>Αντικείμενο Προτύπου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="678"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="677"/>
         <source>Match criteria</source>
         <translation>Κριτήρια ομοιότητας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="680"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="679"/>
         <source>W</source>
         <comment>Width</comment>
         <translation>Π</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="682"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="681"/>
         <source>H</source>
         <comment>Height</comment>
         <translation>Υ</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="694"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="693"/>
         <source>Decoder</source>
         <translation>Αποκωδικοποιητής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="695"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="694"/>
         <source>Max CPUs</source>
         <translation>Πλήθος Επεξεργαστών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="696"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="695"/>
         <source>Deblocking filter</source>
         <translation>Φίλτρο Deblocking</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="697"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="696"/>
         <source>Video renderer</source>
         <translation>Απόδοση εικόνας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="698"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="697"/>
         <source>OSD renderer</source>
         <translation>Απόδοση OSD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="699"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="698"/>
         <source>OSD fade</source>
         <translation>Ξεθώριασμα OSD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="700"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="699"/>
         <source>Primary deinterlacer</source>
         <translation>Κύριος αποπλέκτης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="701"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="700"/>
         <source>Fallback deinterlacer</source>
         <translation>Εφεδρικός Αποπλέκτης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="702"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="701"/>
         <source>Custom filters</source>
         <translation>Προσαρμοσμένα Φίλτρα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="704"/>
         <source>Maximum number of CPU cores used for video decoding and filtering.</source>
         <translation>Μέγιστο πλήθος πυρήνων CPU για χρήση σε αποκωδικοποίηση και φιλτράρισμα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="707"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="706"/>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
         <translation>Είναι απενεργοποιημένη η πολυνηματική αποκωδικοποίηση - μόνο ένας πυρήνας θα χρησιμοποιηθεί, παρακαλώ recompile με την επιλογή --enable-ffmpeg-pthreads για ενεργοποίηση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="712"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="711"/>
         <source>Example custom filter list: &apos;ivtc,denoise3d&apos;</source>
         <translation>Παράδειγμα λίστας προσαρμοσμένων φίλτρων: &apos;ivtc,denoise3d&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="715"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="714"/>
         <source>When unchecked the deblocking loopfilter will be disabled </source>
         <translation>Μη επιλεγμένο απενεργοποιεί το φίλτρο deblocking</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="716"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="715"/>
         <source>Disabling will significantly reduce the load on the CPU when watching HD H.264 but may significantly reduce video quality.</source>
         <translation>Η απενεργοποίησή του θα ελαττώσει σημαντικά το φόρτο της CPU κατά την προβολή HD H.264 υλικού, αλλά μπορεί να ελαττώσει σημαντικά την ποιότητα της εικόνας.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="720"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="719"/>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
         <translation>Όταν είναι αποεπιλεγμένο, οι Πληροφορίες Οθόνης δεν θα σβήνουν αργά αλλά θα χαθούν απότομα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="722"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="721"/>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
         <translation>Αποεπιλέξτε αυτό εάν η εικόνα χαλάει ενόσω σβήνουν οι Πληροφ. Οθόνης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="920"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="919"/>
         <source>Main deinterlacing method. %1</source>
         <translation>Κύρια μέθοδος απόπλεξης: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="927"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="926"/>
         <source>Fallback deinterlacing method. %1</source>
         <translation>Εφεδρική μέθοδος απόπλεξης: %1</translation>
     </message>
@@ -11353,477 +11644,477 @@ name cannot be blank.</source>
 <context>
     <name>PlaybackSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="52"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="51"/>
         <source>Extra audio buffering</source>
         <translation>Επιπλέον αποθήκευση ήχου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="56"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="55"/>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio. This setting affects digital tuners (QAM/DVB/ATSC) and hardware encoders. It will have no effect on framegrabbers (MPEG-4/RTJPEG). MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
         <translation>Επιλέξτε το εάν το MythTV παίζει ήχο με &quot;σπασίματα&quot;. Η ρύθμιση αφορά ψηφιακούς δέκτες (QAM/DVB/ATSC) και κωδικοποιητές hardware. Δεν έχει επίδραση σε περίπτωση αναλογικών δεκτών (MPEG-4/RTJPEG). Το MythTV θα διατηρεί περαιτέρω δεδομένα ήχου στην εσωτερική μνήμη του για παράκαμψη αυτού του σφάλματος.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="73"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="72"/>
         <source>Use FFmpeg&apos;s original MPEG-TS demuxer</source>
         <translation>Use FFmpeg&apos;s original MPEG-TS demuxer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="77"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="76"/>
         <source>Experimental: Enable this setting to use FFmpeg&apos;s native demuxer. Things will be broken.</source>
         <translation>Πειραματικό: Επιλέξτε το για χρήση του ενσωματωμένου αποπλέκτη του FFmpeg. Να αναμένετε προβλήματα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="88"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="87"/>
         <source>PIP video location</source>
         <translation>Θέση εικόνας PIP</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="93"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="92"/>
         <source>Location of PIP Video window.</source>
         <translation>Θέση παραθύρου Εικόνας εντός Εικόνας.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="102"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="101"/>
         <source>Default group filter to apply</source>
         <translation>Προεπιλεγμένο φίλτρο ομάδας για εφαρμογή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="105"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="104"/>
         <source>All Programs</source>
         <translation>Όλα τα Προγράμματα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="135"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="134"/>
         <source>Default group filter to apply on the View Recordings screen.</source>
         <translation>Το προεπιλεγμένο φίλτρο ομάδας που θα εφαρμόζεται στην οθόνη Προβολής Εγγραφών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="144"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="143"/>
         <source>Always prompt for initial group filter</source>
         <translation>Πάντα ερώτηση για αρχικό φίλτρο ομάδας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="149"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="148"/>
         <source>If enabled, always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
         <translation>Εάν επιλεγεί, πάντα θα ρωτάει το χρήστη για το αρχικό φίλτρο που θα εφαρμόζεται κατά την είσοδο στην οθόνη Προβολή Εγγραφών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="160"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="159"/>
         <source>Save current group filter when changed</source>
         <translation>Αποθήκευση του τρέχοντος φίλτρου ομάδας όταν αλλάζει</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="165"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="164"/>
         <source>If enabled, remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
         <translation>Εάν επιλεγεί, θα θυμάται το τελευταία επιλεγμένο φίλτρο αντί να εμφανίζει το αρχικό φίλτρο κατά την είσοδο στην οθόνη προβολής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="177"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="176"/>
         <source>Start in group list</source>
         <translation>Να ξεκινάει στην λίστα ομάδων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="181"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="180"/>
         <source>If enabled, the focus will start on the group list, otherwise the focus will default to the recordings.</source>
         <translation>Εάν επιλεγεί, κατά την είσοδο θα είναι επιλεγμένη η λίστα ομάδων, αλλιώς θα είναι οι εγγραφές.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="191"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="190"/>
         <source>Smart fast forwarding</source>
         <translation>Έξυπνη κίνηση μπροστά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="195"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="194"/>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
         <translation>Εάν επιλεγεί, τότε αμέσως μετά την κίνηση προς τα πίσω, να πηγαίνει μπροστά τόσο όσο και όταν πήγε πίσω.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="237"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="236"/>
         <source>Automatically skip commercials</source>
         <translation>Αυτόματη παράλειψη διαφημίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="240"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="239"/>
         <source>Notify, but do not skip</source>
         <comment>Skip commercials</comment>
         <translation>Ειδοποίηση αλλά να μην παραλείπονται</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="242"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="241"/>
         <source>Automatically Skip</source>
         <comment>Skip commercials</comment>
         <translation>Αυτόματη Παράλειψη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="245"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="244"/>
         <source>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</source>
         <translation>Αυτόματα παραλείπει τα διαφημιστικά διαλλείματα που έχουν σημειωθεί κατά τον αυτόματο εντοπισμό διαφημίσεων ή από το πρόγραμμα mythcommflag, ή απλά ενημερώνει πως εντοπίστηκε διαφήμιση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="288"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="287"/>
         <source>Commercial skip automatic rewind amount (secs)</source>
         <translation>Χρόνος κίνησης προς τα πίσω (secs) κατά την παράλειψη διαφημίσεων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="291"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="290"/>
         <source>MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
         <translation>Το MythTV αυτόματα θα γυρίσει προς τα πίσω τόσα δευτερόλεπτα αφού κάνει παράλειψη μιας διαφήμησης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="304"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="303"/>
         <source>Commercial skip notify amount (secs)</source>
         <translation>Τιμή ανακοίνωσης σε δευτερόλεπτα της παράλειψης διαφήμισης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="306"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="305"/>
         <source>MythTV will act like a commercial begins this many seconds early. This can be useful when commercial notification is used in place of automatic skipping.</source>
         <translation>Το MythTV θα ενεργήσει σαν να εντοπίστηκε διαφήμιση τόσα δευτερόλεπτα πριν. Μπορεί να φανεί χρήσιμο όταν αντί για παράλειψη, χρησιμοποείται ανακοίνωση των διαφημίσεων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="321"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="320"/>
         <source>Maximum commercial skip (secs)</source>
         <translation>Μέγιστη παράλειψη διαφημίσεων (secs)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="323"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="322"/>
         <source>MythTV will discourage long manual commercial skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic commercial skipping is not affected by this limit.</source>
         <translation>Το MythTV θα αποθαρρύνει τις μακρόχρονες χειροποίητες παραλείψεις διαφημίσεων. Τα κενά που είναι μεγαλύτερα από αυτό θα απαιτούν από το χρήστη το διπλό πάτημα του κουμπιού ΠΑΡΑΛΕΙΨΗ. Δεν επηρεάζει την αυτόματη παράλειψη διαφημίσεων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="339"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="338"/>
         <source>Merge short commercial breaks (secs)</source>
         <translation>Ένωση μικρών διαφημιστικών κενών (secs)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="341"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="340"/>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
         <translation>Να ενώνει τα διαδοχικά διαφημιστικά κενά μικρότερα από αυτό σαν ένα κενό όταν παραλείπει προς τα εμπρός. Χρήσιμο αν θέλετε να παραλείψετε αρκετές φορές μέσα στις διαφημίσεις. Εφαρμόζεται και στην αυτόματη παράλειψη. Βάλτε 0 για απενεργοποίηση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1354"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1353"/>
         <source>Sort all sub-titles/multi-titles Ascending</source>
         <translation>Ταξινόμηση όλων των υπο-τίτλων / πολυ-τίτλων σε Αύξουσα σειρά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1355"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1354"/>
         <source>Sort all sub-titles/multi-titles Descending</source>
         <translation>Ταξινόμηση όλων των υπο-τίτλων / πολυ-τίτλων σε Φθίνουσα σειρά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1356"/>
-        <source>Sort sub-titles Descending, multi-titlesAscending</source>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1355"/>
+        <source>Sort sub-titles Descending, multi-titles Ascending</source>
         <translation>Ταξινόμηση όλων των υπο-τίτλων σε Φθίνουσα και των πολυ-τίτλων σε Αύξουσα σειρά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1358"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1357"/>
         <source>Sort sub-titles Ascending, multi-titles Descending</source>
         <translation>Ταξινόμηση όλων των υπο-τίτλων σε Αύξουσα και των πολυ-τίτλων σε Φθίνουσα σειρά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1361"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1360"/>
         <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
         <translation>Επιλέγει πώς θα ταξινομούνται τα επεισόδια. Οι υπο-τίτλοι αναφέρονται στα επεισόδια που ανήκουν σε συγκεκριμένη σειρά. Οι πολυ-τίτλοι αναφέρονται σε τμήματα (π.χ. &quot;Όλες οι Εκπομπές&quot;) που εμφανίζουν πολλαπλούς τίτλους. Τα τμήματα σε παρενθέσεις δεν επηρεάζονται.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1371"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1370"/>
         <source>Episode sort orderings</source>
         <translation>Σειρές ταξινόμησης επεισοδίων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1386"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1385"/>
         <source>Sort episodes</source>
         <translation>Ταξινόμηση επεισοδίων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1388"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1387"/>
         <source>Record date</source>
         <translation>Ημερομηνία Εγγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1389"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1388"/>
         <source>Season/Episode</source>
         <translation>Κύκλος/Επεισόδιο</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1390"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1389"/>
         <source>Original air date</source>
         <translation>Αρχική ημερομηνία Προβολής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1391"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1390"/>
         <source>Program ID</source>
         <translation>Αναγν/κό Προγράμματος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1393"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1392"/>
         <source>Selects how to sort a show&apos;s episodes</source>
         <translation>Επιλέγει πώς θα ταξινομούνται τα επεισόδια μιας σειράς</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1403"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1402"/>
         <source>Fast forward/rewind reposition amount</source>
         <translation>Ποσο μετατόπισης κατά τη γρήγορη κίνηση μπροστά - πίσω</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1407"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1406"/>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>Όταν βγαίνετε από την κατάσταση γρήγορης κίνησης μπροστά/πίσω των κολλημένων πλήκτρων, να μετακινούνται τόσα 1/100 του δευτερολέπτου πριν την επαναφορά της κανονικής προβολής. Αυτό αντισταθμίζει το χρόνο αντίδρασης από την ώρα που θα θελήσετε να βγείτε μέχρι την πραγματική έξοδο.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1422"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1421"/>
         <source>Reverse direction in fast forward/rewind</source>
         <translation>Αντιστροφή κατεύθυνσης στη γρήγορη κίνηση εμπρός/πίσω</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1427"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1426"/>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
         <translation>Εάν επιλεγεί, πατώντας το κολλημένο πλήκτρο προς τα πίσω κατά τη γρήγορη κίνηση προς τα εμπρός γυρίζει σε γρήγορη κίνηση προς τα πίσω, και αντίστροφα. Αν απενεργοποιηθεί, θα μειώσει την τρέχουσα ταχύτητα ή θα γυρίσει σε κανονική προβολή αν δεν μπορεί να μειωθεί η ταχύτητα περαιτέρω.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1512"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1511"/>
         <source>Vertical scaling</source>
         <translation>Κάθετη κλίμακα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1516"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1515"/>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
         <translation>Ρυθμίστε το αν η εικόνα δεν γεμίζει την οθόνη σας κάθετα. Κλίμακα -100% ως 100%</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1526"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1525"/>
         <source>Horizontal scaling</source>
         <translation>Οριζόντια κλίμακα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1530"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1529"/>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
         <translation>Ρυθμίστε το αν η εικόνα δεν γεμίζει την οθόνη σας οριζόντια. Κλίμακα -100% ως 100%</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1540"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1539"/>
         <source>Scan displacement (X)</source>
         <translation>Μετακίνηση θέσης (Χ)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1544"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1543"/>
         <source>Adjust this to move the image horizontally.</source>
         <translation>Ρυθμίστε το για να μετακινήσετε την εικόνα οριζόντια.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1554"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1553"/>
         <source>Scan displacement (Y)</source>
         <translation>Μετακίνηση θέσης (Υ)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1558"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1557"/>
         <source>Adjust this to move the image vertically.</source>
         <translation>Ρυθμίστε το για να μετακινήσετε την εικόνα κάθετα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1630"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1629"/>
         <source>Clear bookmark on playback</source>
         <translation>Καθαρισμός αποθηκευμένης θέσης κατά την προβολή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1634"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1633"/>
         <source>If enabled, automatically clear the bookmark on a recording when the recording is played back. If disabled, you can mark the beginning with rewind then save position.</source>
         <translation>Αυτόματα διαγράφει τη θέση της εγγραφής όταν ξεκινάει η προβολή της. Αν απενεργοποιηθεί, μπορείτε να σημαδέψετε την αρχή με πίσω κίνηση και μετά να αποθηκεύσετε τη θέση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1647"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1646"/>
         <source>Alternate clear and save bookmark</source>
         <translation>Εναλλαγή καθαρισμού και αποθήκευσης θέσης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1651"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1650"/>
         <source>During playback the SELECT key (Enter or Space) will alternate between &quot;Bookmark Saved&quot; and &quot;Bookmark Cleared&quot;. If disabled, the SELECT key will save the current position for each keypress.</source>
         <translation>Κατά την προβολή, το πάτημα του ΕΠΙΛΟΓΗ (Enter ή Space) θα εναλλάσει μεταξύ του &quot;Η θέση αποθηκεύτηκε &quot; και &quot;Η θέση διαγράφηκε&quot;. Αν απενεργοποιηθεί, το κουμπί ΕΠΙΛΟΓΗ θα αποθηκεύει την κάθε τρέχουσα θέση με κάθε πάτημα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1664"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1663"/>
         <source>Action on playback exit</source>
         <translation>Ενέργεια κατά την έξοδο από την προβολή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1666"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1665"/>
         <source>Just exit</source>
         <translation>Απλά βγες</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1667"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1666"/>
         <source>Save position and exit</source>
         <translation>Αποθήκευση θέσης και έξοδος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1668"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1667"/>
         <source>Always prompt (excluding Live TV)</source>
         <translation>Πάντα να ρωτάει (εξαιρείται η Ζωντανή TV)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1670"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1669"/>
         <source>Always prompt (including Live TV)</source>
         <translation>Πάντα να ρωτάει (περιλαμβάνεται η Ζωντανή TV)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1672"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1671"/>
         <source>Prompt for Live TV only</source>
         <translation>Ερώτηση μόνο για Ζωντανή TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1674"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1673"/>
         <source>If set to prompt, a menu will be displayed when you exit playback mode. The options available will allow you to save your position, delete the recording, or continue watching.</source>
         <translation>Αν ρυθμιστεί να ρωτάει, θα εμφανίζονται επιλογές κατά την έξοδο από την προβολή. Θα σας επιτρέπουν να αποθηκεύσετε τη θέση σας, να διαγράψετε την εγγραφή ή να συνεχίσετε την προβολή.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1687"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1686"/>
         <source>Prompt at end of recording</source>
         <translation>Ερώτηση στο τέλος της εγγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1691"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1690"/>
         <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
         <translation>Εάν τεθεί, θα εμφανίζονται επιλογές που θα σας επιτρέπουν να διαγράψετε την εγγραφή μόλις τελειώσει η προβολή της.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1701"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1700"/>
         <source>Jump to program OSD</source>
         <translation>Πήγαινε στο Πρόγραμμα OSD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1704"/>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
         <translation>Θέτει την επιλογή μεταξύ της εμφάνισης της τρέχουσας ομάδας εγγραφών στο OSD ή της εμφάνισης της οθόνης &apos;Εμφάνιση Εγγραφών&apos; όταν ενεργοποιείται η επιλογή &apos;Πήγαινε στο Πρόγραμμα&apos;. Αν επιλεγεί, εμφανίζονται οι εγγραφές στο OSD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1718"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1717"/>
         <source>Continue playback when embedded</source>
         <translation>Συνέχεια Προβολής κατά την Ενσωμάτωση</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1722"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1721"/>
         <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
         <translation>Συνεχίζει την προβολή TV όταν το παράθυρό της είναι ενσωματωμένο στην λίστα των επερχόμενων ή των προηγούμενων εγγραφών. Η προεπιλογή είναι να μπει σε παύση η γραφόμενη εκπομπή κατά την ενσωμάτωση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1735"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1734"/>
         <source>Automatically mark a recording as watched</source>
         <translation>Αυτόματη σημείωση εγγραφής ως προβληθείσας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1740"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1739"/>
         <source>If enabled, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
         <translation>Εάν επιλεγεί, όταν φτάνετε στο τέλος μιας εγγραφής θα σημειωθεί ως προβλημένη. Ο αυτόματος εντοπισμός δεν είναι αλάνθαστος, οπότε μην ενεργοποιείτε αυτή τη ρύθμιση αν δεν θέλετε μια μη προβλημένη εγγραφή να φαίνετε πως την έχετε δει.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1754"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1753"/>
         <source>Live TV idle timeout (mins)</source>
         <translation>Όριο αδράνειας Ζωντανής TV (mins)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1758"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1757"/>
         <source>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
         <translation>Έξοδος από την Ζωντανή TV αυτόματα μόλις συμπληρωθούν τόσα λεπτά αδράνειας. Βάλτε 0 για να μη βγαίνει αυτόματα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1991"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1990"/>
         <source>Letterboxing color</source>
         <translation>Χρώμα πλαισίου γραμμάτων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1996"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1995"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in. Currently only works with XVideo video renderer.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2009"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2008"/>
         <source>Video aspect override</source>
         <translation>Παράκαμψη Λόγου πλευρών Εικόνας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2014"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2013"/>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
         <translation>Όταν ενεργοποιηθεί, θα υπερισχύει του λόγου πλευρών που ορίζεται από τους σταθμούς για όλες τις εκπομπές εικόνας.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2024"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2023"/>
         <source>Zoom</source>
         <translation>Μεγένθυση</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2033"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2032"/>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
         <translation>Όταν ενεργοποιηθούν, θα εφαρμόσουν μια προεπιλεγμένη μεγένθυση σε όλες τις προβολές εικόνας στο MythTV.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3130"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3129"/>
         <source>Enable realtime priority threads</source>
         <translation>Ενεργοποίηση νημάτων προτεραιότητας πραγματικού χρόνου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3132"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3131"/>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if MythFrontend freezes during video playback.</source>
         <translation>Όταν τρέχετε το mythfrontend με δικαιώματα root, μερικά νήματα μπορούν να λάβουν αυξημένη προτεραιότητα. Απενεργοποιήστε το αν το MythFrontend παγώνει κατά την προβολή ταινιών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3162"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3161"/>
         <source>Sort titles</source>
         <translation>Ταξινόμηση Τίτλων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3164"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3163"/>
         <source>Alphabetically</source>
         <translation>Αλφαβητικά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3166"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3165"/>
         <source>By recording priority</source>
         <translation>Κατά προτεραιότητα εγγραφής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3169"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3168"/>
         <source>Sets the title sorting order when the view is set to Titles only.</source>
         <translation>Θέτει τη σειρά ταξινόμισης των τίτλων όταν εμφανίζονται μόνο οι Τίτλοι.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3523"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3522"/>
         <source>Enable gamma correction for video</source>
         <translation>Χρήση διόρθωσης gamma της εικόνας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3527"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3526"/>
         <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
         <translation>Εάν επιλεγεί, το QuickTime θα διορθώσει το gamma της εικόνας ώστε να ταιριάσει με την οθόνη σας. Αν δεν το επιλέξετε γλιτώνετε λίγη χρήση CPU.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3538"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3537"/>
         <source>Scale video as necessary</source>
         <translation>Κλιμάκωση εικόνας όσο χρειάζεται</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3542"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3541"/>
         <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
         <translation>Εάν επιλεγεί, η εικόνα θα πάρει το σχήμα του παραθύρου ή της οθόνης σας. Αν δεν επιλεγεί, η εικόνα θα έχει το πραγματικό μέγεθος των pixel της.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3553"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3552"/>
         <source>Frames to skip in fullscreen mode</source>
         <translation>Καρέ προς παράλειψη σε κατάσταση πλήρους οθόνης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3557"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3556"/>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
         <translation>Η εικόνα που εμφανίζεται σε πλήρη οθόνη ή μη παραθυρική κατάσταση θα παραλείπει τόσα καρέ για κάθε ένα που εμφανίζεται. Δώστε 0 για να δείχνει κάθε καρέ. Έγκυρο μόνο όταν δεν είναι επιλεγμένα τα &quot;Χρήση μεγέθους οθόνης για προβολή TV&quot; και &quot;Εκτέλεση του frontend σε παράθυρο&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3870"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3902"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3869"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3901"/>
         <source>General Playback (%1/%2)</source>
         <extracomment>%2 is the position, %2 is the total</extracomment>
         <translation>Γενική Προβολή (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3937"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3961"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3936"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3960"/>
         <source>View Recordings (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total
 ----------
@@ -11831,31 +12122,31 @@ name cannot be blank.</source>
         <translation>Προβολή Εγγραφών (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3950"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3949"/>
         <source>Recording Groups (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Ομάδες Εγγραφής (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3971"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3970"/>
         <source>Seeking (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Αναζήτηση (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3982"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3981"/>
         <source>Commercial Skip (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Παράλειψη Διαφημίσεων (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3996"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3995"/>
         <source>Mac OS X Video Setting (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Επιλογή του Mac OS X (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4007"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4006"/>
         <source>Mac OS X Video Settings (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Επιλογές του Mac OS X (%1/%2)</translation>
@@ -12964,7 +13255,6 @@ name cannot be blank.</source>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="41"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="42"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1059"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="798"/>
         <source>Unknown</source>
         <translation>Άγνωστο</translation>
     </message>
@@ -13894,162 +14184,26 @@ name cannot be blank.</source>
         <translation>Ναι</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="55"/>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="172"/>
-        <source>Use custom identifier for frontend preferences</source>
-        <translation>Χρήση προσαρμοσμένου αναγνωριστικού για τις ρυθμίσεις του frontend</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="70"/>
-        <source>Backend Server Wakeup settings</source>
-        <translation>Ρυθμίσεις αφύπνισης Υπολογιστή</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="85"/>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="169"/>
-        <source>Database Configuration</source>
-        <translation>Ρύθμιση Βάσης Δεδομένων</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="91"/>
-        <source>All database settings take effect when you restart this program.</source>
-        <translation>Όλες οι αλλαγές στη βάση δεδομένων θα ισχύσουν μετά την επανεκκίνηση του προγράμματος.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="94"/>
-        <source>MythTV could not connect to the database. Please verify your database settings below.</source>
-        <translation>Το MythTV δεν μπόρεσε να συνδεθεί στη βάση. Παρακαλώ ελέγξτε τις ρυθμίσεις σας παρακάτω.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="100"/>
-        <source>Database Server Settings</source>
-        <translation>Ρυθμίσεις Διακομιστή Βάσης Δεδομένων</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="102"/>
         <location filename="../libs/libmythtv/profilegroup.h" line="74"/>
         <source>Hostname</source>
         <translation>Όνομα Η/Υ</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="103"/>
-        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation>Το όνομα ή η διεύθυνση IP του Η/Υ που διατηρεί τη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="112"/>
-        <source>Ping test server?</source>
-        <translation>Να κάνω ping στο διακομιστή;</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="113"/>
-        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation>Ελέγχει τη βασική συνδεσιμότητα με το διακομιστή χρησιμοποιώντας την εντολή ping. Απενεργοποιήστε το αν ο διακομιστής ή το δίκτυό σας δεν υποστηρίζουν πακέτα ICMP ECHO</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="127"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="83"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="117"/>
         <source>Port</source>
         <translation>Θύρα</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="128"/>
-        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation>Η Θύρα στην οποία τρέχει η βάση δεδομένων. Αφήστε τη κενή αν χρησιμοποιείτε την αρχική (3306).</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="134"/>
-        <source>Database name</source>
-        <translation>Όνομα Βάσης Δεδομένων</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="135"/>
-        <source>The name of the database. This information is required.</source>
-        <translation>Το όνομα της βάσης δεδομένων. Απαραίτητη πληροφορία.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="140"/>
-        <source>User</source>
-        <translation>Χρήστης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="141"/>
-        <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation>Το όνομα χρήστη για σύνδεση στη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="147"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="330"/>
         <source>Password</source>
         <translation>Κωδικός</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="148"/>
-        <source>The password to use while connecting to the database. This information is required.</source>
-        <translation>Ο κωδικός για τη σύνδεση στη βάση δεδομένων. Απαραίτητη πληροφορία.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="174"/>
-        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation>Αν το όνομα αυτού του Η/Υ αλλάζει συχνά, επιλέξτε αυτό το πλαίσιο και δώστε ένα μοναδικό στο δίκτυο όνομα για αναγνώρισή του. Εάν δεν το επιλέξετε, θα χρησιμοποιηθεί το τοπικό όνομα του Η/Υ κατά την αποθήκευση των ρυθμίσεων στη βάση δεδομένων.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="184"/>
-        <source>Custom identifier</source>
-        <translation>Προσαρμοσμένο αναγνωριστικό</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="185"/>
-        <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation>Ένα αναγνωριστικό για τις ρυθμίσεις που αφορούν αυτό τον Η/Υ.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="198"/>
-        <source>Enable database server wakeup</source>
-        <translation>Ενεργοποίηση αφύπνισης διακομιστή Βάσης Δεδομένων</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="199"/>
-        <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation>Εάν επιλεγεί, ο frontend θα χρησιμοποιήσει τις παραμέτρους αφύπνισης της βάσης για να επανασυνδεθεί στον διακομιστή που την τρέχει.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="204"/>
-        <source>Reconnect time</source>
-        <translation>Χρόνος επανασύνδεσης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="205"/>
-        <source>The time in seconds to wait for the server to wake up.</source>
-        <translation>Ο χρόνος αναμονής σε δευτερόλεπτα ως την αφύπνιση του διακομιστή.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="209"/>
-        <source>Retry attempts</source>
-        <translation>Προσπάθειες επανάληψης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="210"/>
-        <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation>Το πλήθος των προσπαθειών επανάληψης αφύπνισης του διακομιστή πριν τα παρατήσει ο frontend.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="215"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="341"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="362"/>
         <source>Wake command</source>
         <translation>Εντολή Αφύπνισης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="216"/>
-        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation>Η εντολή που θα εκτελεστεί στο frontend για την αφύπνιση του διακομιστή της βάσης δεδομένων (πχ. sudo /etc/init.d/mysql restart).</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmyth/dbsettings.cpp" line="245"/>
-        <source>Required fields are marked with an asterisk (*).</source>
-        <translation>Τα απαιτούμενα πεδία σημειώνονται με αστερίσκο (*).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="162"/>
@@ -14320,7 +14474,6 @@ name cannot be blank.</source>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1957"/>
-        <location filename="../libs/libmythtv/channelscan/multiplexsetting.cpp" line="71"/>
         <source>ATSC Channel %1</source>
         <translation>Κανάλι ATSC %1</translation>
     </message>
@@ -14460,11 +14613,6 @@ name cannot be blank.</source>
         <translation>Γαλλία</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="63"/>
-        <source>Channel Name</source>
-        <translation>Όνομα Καναλιού</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="143"/>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="154"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="452"/>
@@ -14490,61 +14638,6 @@ name cannot be blank.</source>
         <location filename="../libs/libmythtv/videoouttypes.h" line="308"/>
         <source>Hue</source>
         <translation>Απόχρωση</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="101"/>
-        <source>Downloading Playlist</source>
-        <translation>Κατεβάζω το Πρόγρ. Τηλεόρασης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="112"/>
-        <source>Downloading Playlist Failed</source>
-        <translation>Αποτυχία κατεβάσματος Λίστας Προβολής</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="123"/>
-        <source>Processing Playlist</source>
-        <translation>Επεξεργάζομαι το Πρόγραμμα Τηλεόρασης</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="130"/>
-        <source>Adding Channels</source>
-        <translation>Προσθέτω Κανάλια</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="142"/>
-        <source>Channel #%1 : %2</source>
-        <translation>Κανάλι #%1 : %2</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="153"/>
-        <source>Adding %1</source>
-        <translation>Προσθέτω %1</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="167"/>
-        <source>Updating %1</source>
-        <translation>Ενημερώνω %1</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="181"/>
-        <source>Done</source>
-        <translation>Ολοκληρώθηκε</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="286"/>
-        <source>ERROR: M3U channel list is malformed</source>
-        <translation>ΣΦΑΛΜΑ: Η Λίστα καναλιών M3U είναι κακογραμμένη</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="313"/>
-        <source>Encountered malformed channel</source>
-        <translation>Αντιμετώπισα κακογραμμένο κανάλι</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="318"/>
-        <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation>Λεκτική Ανάλυση Καναλιού #%1 : %2 : %3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="76"/>
@@ -15340,7 +15433,6 @@ Most DVB-C transports transmit at 6.9 or 6.875 million symbols per second.</sour
         <location filename="../libs/libmythtv/transporteditor.cpp" line="670"/>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="704"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="297"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="805"/>
         <source>None</source>
         <translation>Κανένα</translation>
     </message>
@@ -16519,14 +16611,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="221"/>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="420"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="331"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="340"/>
         <source>currently running.</source>
         <translation>είναι σε εκτέλεση.</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="440"/>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="988"/>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="374"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="383"/>
         <source>Successful.</source>
         <translation>Επιτυχής.</translation>
     </message>
@@ -16546,24 +16638,9 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Το mythfilldatabase εκτελέστηκε, αλλά δεν εισήγαγε νέα δεδομένα στον Οδηγό για %1 από %2 πηγές. Αυτό μπορεί να οφείλεται σε πιθανή αποτυχία της λήψης στοιχείων.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfilldatabase/main.cpp" line="370"/>
+        <location filename="../programs/mythfilldatabase/main.cpp" line="379"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
         <translation>Το mythfilldatabase εκτελέστηκε, αλλά δεν εισήγαγε νέα δεδομένα στον Οδηγό. Αυτό μπορεί να οφείλεται σε πιθανό σφάλμα στο αρχείο XML που χρησιμοποιείται για την ενημέρωση.</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="207"/>
-        <source>Yes, Exit now</source>
-        <translation>Ναι, κλείστο</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="209"/>
-        <source>Yes, Exit and Reboot</source>
-        <translation>Ναι, κλείστο και κάνε επανεκκίνηση του Η/Υ</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/exitprompt.cpp" line="211"/>
-        <source>Yes, Exit and Shutdown</source>
-        <translation>Ναι, κλείστο και σβήσε τον Η/Υ</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/setupwizard_audio.cpp" line="295"/>
@@ -16581,33 +16658,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Προειδοποίηση</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="812"/>
-        <source>Season/Episode</source>
-        <translation>Κύκλος/Επεισόδιο</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2843"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="110"/>
-        <source>Error</source>
-        <translation>Σφάλμα</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="92"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="678"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="694"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="707"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="720"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="734"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="749"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="766"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="780"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="788"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="796"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="803"/>
         <source>All</source>
         <translation>Όλα</translation>
     </message>
@@ -17368,11 +17424,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Ρυθμίσεις Διακομιστή UPnP</translation>
     </message>
     <message>
-        <location filename="../programs/mythtv-setup/channeleditor.cpp" line="29"/>
-        <source>Channel Options</source>
-        <translation>Επιλογές Καναλιών</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtv-setup/checksetup.cpp" line="23"/>
         <source>Path &quot;%1&quot; doesn&apos;t exist.</source>
         <translation>Η Διαδρομή &quot;%1&quot; δεν υπάρχει.</translation>
@@ -17440,21 +17491,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../libs/libmyth/rssparse.cpp" line="529"/>
         <source>Backlinks</source>
         <translation>Συνδέσεις παρασκηνίου</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="48"/>
-        <source>Scan to Import</source>
-        <translation>Ανίχνευση για Εισαγωγή</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="67"/>
-        <source>processed</source>
-        <translation>επεξεργάστηκαν</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/paneexistingscanimport.h" line="67"/>
-        <source>unprocessed</source>
-        <translation>χωρίς επεξεργασία</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="190"/>
@@ -17660,16 +17696,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="220"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1025"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="781"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="789"/>
         <source>Yes</source>
         <translation>Ναι</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="220"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1026"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="783"/>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="791"/>
         <source>No</source>
         <translation>Όχι</translation>
     </message>
@@ -17717,41 +17749,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../libs/libmythtv/videodbcheck.cpp" line="140"/>
         <source>Error: failed to hash file &apos;%1&apos;</source>
         <translation>Σφάλμα: αποτυχία δημιουργίας hash για το αρχείο &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="810"/>
-        <source>Title</source>
-        <translation>Τίτλος</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="814"/>
-        <source>Year</source>
-        <translation>Έτος</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="816"/>
-        <source>User Rating</source>
-        <translation>Βαθμολογία</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="818"/>
-        <source>Runtime</source>
-        <translation>Διάρκεια</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="820"/>
-        <source>Filename</source>
-        <translation>Αρχείο</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="822"/>
-        <source>Video ID</source>
-        <translation>Αναγνωριστικό Ταινίας</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videofilter.cpp" line="824"/>
-        <source>Date Added</source>
-        <translation>Ημερομηνία Προσθήκης</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videolist.cpp" line="640"/>
@@ -17941,11 +17938,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <location filename="../programs/mythfrontend/setupwizard_audio.cpp" line="311"/>
         <source>7.1 Channel Audio</source>
         <translation>7.1 Κανάλια Ήχου</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videooutwindow.cpp" line="946"/>
-        <source>Zoom %1x%2 @ (%3,%4)</source>
-        <translation>Μεγέθυνση %1x%2 @ (%3,%4)</translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/channeldata.cpp" line="87"/>
@@ -18611,98 +18603,98 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="282"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="335"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="427"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="428"/>
         <source>Record this showing</source>
         <translation>Μόνο αυτή την προβολή</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="284"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="438"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="439"/>
         <source>Record all showings</source>
         <translation>Όλες τις προβολές</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="289"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="441"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="442"/>
         <source>Record one showing</source>
         <translation>Μόνο μία προβολή</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="292"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="440"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="441"/>
         <source>Record one showing (this episode)</source>
         <translation>Μόνο μία προβολή (αυτή)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="296"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="447"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="448"/>
         <source>Record all showings (this channel)</source>
         <translation>Όλες τις προβολές (σε αυτό το κανάλι)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="298"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="400"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="483"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="401"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="484"/>
         <source>Edit recording rule</source>
         <translation>Επεξεργασία κανόνα εγγραφής</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="306"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="453"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="454"/>
         <source>Stop this recording</source>
         <translation>Διακοπή της εγγραφής</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="308"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="460"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="461"/>
         <source>Modify recording options</source>
         <translation>Αλλαγή επιλογών εγγραφής</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="318"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="470"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="471"/>
         <source>Restart this recording</source>
         <translation>Επανεκκίνηση της εγγραφής</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="341"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="472"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="473"/>
         <source>Forget previous recording</source>
         <translation>Ξέχνα τις προηγούμενες εγγραφές</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="359"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="474"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="360"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="475"/>
         <source>Don&apos;t record this showing</source>
         <translation>Μη γράψεις αυτή την προβολή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="381"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="476"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="382"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="477"/>
         <source>Never record this episode</source>
         <translation>Να μην γραφτεί ποτέ το επεισόδιο</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="389"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="484"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="390"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="485"/>
         <source>Edit override rule</source>
         <translation>Επεξεργασία κανόνα παράκαμψης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="391"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="487"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="392"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="488"/>
         <source>Delete override rule</source>
         <translation>Διαγραφή κανόνα παράκαμψης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="398"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="461"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="399"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="462"/>
         <source>Add override rule</source>
         <translation>Προσθήκη κανόνα παράκαμψης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="402"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="486"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="403"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="487"/>
         <source>Delete recording rule</source>
         <translation>Διαγραφή κανόνα εγγραφής</translation>
     </message>
@@ -19610,7 +19602,6 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="302"/>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="401"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="438"/>
         <source>Default</source>
         <comment>Default storage group</comment>
         <translation>Προεπιλογή</translation>
@@ -19646,17 +19637,19 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="437"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="448"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="456"/>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="467"/>
+        <source>(Create default group)</source>
+        <translation>(Δημιουργία προεπιλεγμένης ομάδας)</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="446"/>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="464"/>
         <source>(Create %1 group)</source>
         <translation>(Δημιουργία ομάδας %1)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="457"/>
-        <source>new</source>
-        <comment>New storage group</comment>
-        <translation>νέο</translation>
+        <location filename="../libs/libmyth/storagegroupeditor.cpp" line="454"/>
+        <source>(Create new group)</source>
+        <translation>(Δημιουργία νέας ομάδας)</translation>
     </message>
 </context>
 <context>
@@ -27439,28 +27432,51 @@ dd MMM yyyy</translation>
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="1099"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="1100"/>
         <source>The video scan found no files, have you configured a video storage group?</source>
         <translation>Η αναζήτηση ταινιών δεν βρήκε αρχεία, σίγουρα έχετε ορίσει ομάδα αποθήκευσης;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="1251"/>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="1266"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="1252"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="1267"/>
         <source>Season</source>
         <translation>Κύκλος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2200"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2137"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2166"/>
+        <source>Season %1, Episode %2</source>
+        <translation>Κύκλος %1, Επεισόδιο %2</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2140"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2171"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2178"/>
+        <source>MythVideo</source>
+        <translation>MythVideo</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2157"/>
+        <source>Retrieved details for %1</source>
+        <translation>Βρέθηκαν πληροφορίες για %1</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2161"/>
+        <source>Failed to retrieve details for %1</source>
+        <translation>Αποτυχία εύρεσης πληροφοριών για %1</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2267"/>
         <source>Video Search</source>
         <translation>Αναζήτηση Ταινίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2261"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2328"/>
         <source>%1 of %2</source>
         <translation>%1 από %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2345"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2412"/>
         <source>Video Options
 %1
 %2</source>
@@ -27469,316 +27485,311 @@ dd MMM yyyy</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2348"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2415"/>
         <source>Video Options
 %1</source>
         <translation>Επιλογές Ταινιών
 %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2351"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2418"/>
         <source>Video Options</source>
         <translation>Επιλογές Ταινιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2362"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2429"/>
         <source>Play...</source>
         <translation>Προβολή...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2364"/>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2404"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2431"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2474"/>
         <source>Play</source>
         <translation>Προβολή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2366"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2433"/>
         <source>Mark as Unwatched</source>
         <translation>Σημείωση ως Δεν-Το-Έχω-Δει</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2368"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2435"/>
         <source>Mark as Watched</source>
         <translation>Σημείωση ως Το-Έχω-Δει</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2369"/>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2595"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2436"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2665"/>
         <source>Video Info</source>
         <translation>Πληροφορίες Ταινίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2370"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2439"/>
         <source>Change Video Details</source>
         <translation>Αλλαγή Πληροφοριών Ταινίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2371"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2441"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2375"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2445"/>
         <source>Play Folder</source>
         <translation>Προβολή Ταινιών Φακέλου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2398"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2468"/>
         <source>Playback Options
 %1</source>
         <translation>Επιλογές Προβολής
 %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2408"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2478"/>
         <source>Play in Alternate Player</source>
         <translation>Προβολή με Εναλλακτικό Πρόγραμμα</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2413"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2483"/>
         <source>Play With Trailers</source>
         <translation>Προβολή με Trailers</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2420"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2490"/>
         <source>Play Trailer</source>
         <translation>Προβολή Trailer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2432"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2502"/>
         <source>Video Display Menu</source>
         <translation>Επιλογές Εμφάνισης Ταινιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2436"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2506"/>
         <source>Scan For Changes</source>
         <translation>Έλεγχος για Αλλαγές</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2437"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2507"/>
         <source>Retrieve All Details</source>
         <translation>Κατέβασμα όλων των Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2438"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2508"/>
         <source>Filter Display</source>
         <translation>Κριτήρια Εμφάνισης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2439"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2509"/>
         <source>Browse By...</source>
         <translation>Εμφάνιση κατά...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2440"/>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2457"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2510"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2527"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2441"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2511"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2462"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2532"/>
         <source>Switch to Browse View</source>
         <translation>Αλλαγή σε Προβολή Περιήγησης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2465"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2535"/>
         <source>Switch to Gallery View</source>
         <translation>Αλλαγή σε Προβολή Γκαλερί</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2468"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2538"/>
         <source>Switch to List View</source>
         <translation>Αλλαγή στην Προβολή Λίστας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2471"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2541"/>
         <source>Switch to Manage View</source>
         <translation>Αλλαγή σε Προβολή Διαχείρισης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2474"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2544"/>
         <source>Show Directory Structure</source>
         <translation>Εμφάνιση Διάταξης Φακέλων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2476"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2546"/>
         <source>Hide Directory Structure</source>
         <translation>Απόκρυψη Διάταξης Φακέλων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2479"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2549"/>
         <source>Browse Library (recommended)</source>
         <translation>Περιήγηση στην Ταινιοθήκη (συνιστάται)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2481"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2551"/>
         <source>Browse Filesystem (slow)</source>
         <translation>Περιήγηση στο Σύστημα Αρχείων (αργό)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2493"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2563"/>
         <source>Video Settings</source>
         <translation>Ρυθμίσεις Ταινιών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2497"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2567"/>
         <source>Player Settings</source>
         <translation>Ρυθμίσεις Προβολής</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2498"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2568"/>
         <source>Metadata Settings</source>
         <translation>Ρυθμίσεις Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2499"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2569"/>
         <source>File Type Settings</source>
         <translation>Ρυθμίσεις Τύπων Αρχείων</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2552"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2622"/>
         <source>Browse By</source>
         <translation>Περιήγηση κατά</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2557"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2627"/>
         <source>Cast</source>
         <translation>Πρωταγωνιστές</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2560"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2630"/>
         <source>Category</source>
         <translation>Κατηγορία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2563"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2633"/>
         <source>Date Added</source>
         <translation>Ημερομηνία Προσθήκης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2566"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2636"/>
         <source>Director</source>
         <translation>Σκηνοθέτη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2569"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2639"/>
         <source>Studio</source>
         <translation>Στούντιο</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2572"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2642"/>
         <source>Folder</source>
         <translation>Φάκελο</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2575"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2645"/>
         <source>Genre</source>
         <translation>Είδος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2578"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2648"/>
         <source>TV/Movies</source>
         <translation>TV/Ταινίες</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2581"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2651"/>
         <source>User Rating</source>
         <translation>Αξιολόγηση Χρήστη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2584"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2654"/>
         <source>Year</source>
         <translation>Έτος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2600"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2670"/>
         <source>View Details</source>
         <translation>Προβολή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2602"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2672"/>
         <source>View Full Plot</source>
         <translation>Προβολή Υπόθεσης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2608"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2678"/>
         <source>View Cast</source>
         <translation>Προβολή Πρωταγωνιστών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="3478"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="3529"/>
         <source>Are you sure you want to permanently delete:
 %1</source>
         <translation>Σίγουρα θέλετε να διαγράψετε μόνιμα:
 %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="3765"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="3811"/>
         <source>There are no videos in the database, would you like to scan your video directories now?</source>
         <translation>Δεν υπάρχουν ταινίες στην ταινιοθήκη, θα θέλατε να ψάξω στους φακέλους ταινιών σας;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2610"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2680"/>
         <source>View Homepage</source>
         <translation>Προβολή Αρχικής Σελίδας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2622"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2692"/>
         <source>Manage Video Details</source>
         <translation>Διαχείριση Πληροφοριών Ταινίας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2628"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2698"/>
         <source>Edit Details</source>
         <translation>Επεξεργασία Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2629"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2699"/>
         <source>Retrieve Details</source>
         <translation>Κατέβασμα Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2631"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2701"/>
         <source>Allow Updates</source>
         <translation>Επιτρέπονται Ενημερώσεις</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2633"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2703"/>
         <source>Disable Updates</source>
         <translation>Απαγορεύονται Ενημερώσεις</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2634"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2704"/>
         <source>Reset Details</source>
         <translation>Διαγραφή Πληροφοριών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2886"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2956"/>
         <source>An error occurred when switching views.</source>
         <translation>Προέκυψε σφάλμα κατά την αλλαγή προβολής.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="2959"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="3029"/>
         <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
         <translation>Δεν έχει δοθεί πρόγραμμα περιήγησης! Χρειάζεται το MythBrowser για να δείξει την αρχική σελίδα.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="3370"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="2132"/>
         <source>Fetching details for %1</source>
         <translation>Κατεβάζω πληροφορίες για %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="3375"/>
-        <source> %1x%2</source>
-        <translation> %1x%2</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/videodlg.cpp" line="3516"/>
+        <location filename="../programs/mythfrontend/videodlg.cpp" line="3567"/>
         <source>Failed to delete file</source>
         <translation>Αποτυχία διαγραφής αρχείου</translation>
     </message>
@@ -27799,10 +27810,98 @@ dd MMM yyyy</translation>
         <translation>Αποτέλεσμα φίλτρου : Καμία ταινία</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="678"/>
+        <source>All</source>
+        <comment>Category</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="694"/>
+        <source>All</source>
+        <comment>Genre</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="707"/>
+        <source>All</source>
+        <comment>Cast</comment>
+        <translation>Όλοι</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="720"/>
+        <source>All</source>
+        <comment>Country</comment>
+        <translation>Όλες</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="734"/>
+        <source>All</source>
+        <comment>Year</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="749"/>
+        <source>All</source>
+        <comment>Runtime</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="758"/>
         <location filename="../programs/mythfrontend/videofilter.cpp" line="759"/>
         <source>minutes</source>
         <translation>λεπτά</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="766"/>
+        <source>All</source>
+        <comment>User rating</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="780"/>
+        <source>All</source>
+        <comment>Browsable</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="789"/>
+        <source>All</source>
+        <comment>Watched</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="798"/>
+        <source>All</source>
+        <comment>Inet reference</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="800"/>
+        <source>Unknown</source>
+        <comment>Inet reference</comment>
+        <translation>Άγνωστο</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="805"/>
+        <source>All</source>
+        <comment>Cover file</comment>
+        <translation>Όλα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="807"/>
+        <source>None</source>
+        <comment>Cover file</comment>
+        <translation>Κανένα</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="830"/>
+        <source>Video ID</source>
+        <translation>Αναγνωριστικό Ταινίας</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/videofilter.cpp" line="832"/>
+        <source>Date Added</source>
+        <translation>Ημερομηνία Προσθήκης</translation>
     </message>
 </context>
 <context>
@@ -28031,112 +28130,120 @@ dd MMM yyyy</translation>
 <context>
     <name>VideoModeSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2150"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2149"/>
         <source>Separate video modes for GUI and TV playback</source>
         <translation>Ξεχωριστές ρυθμίσεις οθόνης για Πρόγραμμα και Προβολή TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2155"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2154"/>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
         <translation>Αλλάζει την ανάλυση της οθόνης για την TV. Απαιτεί υποστήριξη για &quot;xrandr&quot;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2165"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2164"/>
         <source>In X</source>
         <comment>Video mode width</comment>
         <translation>Σε Χ</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2172"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2171"/>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
         <translation>Οριζόντια ανάλυση της εικόνας που χρειάζεται ειδική ανάλυση εξόδου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2183"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2182"/>
         <source>In Y</source>
         <comment>Video mode height</comment>
         <translation>Σε Υ</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2190"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2189"/>
         <source>Vertical resolution of video which needs a special output resolution.</source>
         <translation>Κάθετη ανάλυση της εικόνας που χρειάζεται ειδική ανάλυση εξόδου.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2200"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2199"/>
         <source>GUI</source>
         <translation>Εμφάνιση</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2204"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2203"/>
         <source>Resolution of screen when not watching a video.</source>
         <translation>Η ανάλυση της οθόνης όταν δεν βλέπετε ταινία.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2233"/>
         <source>Default screen resolution when watching a video.</source>
         <translation>Η προεπιλεγμένη ανάλυση οθόνης όταν βλέπετε ταινία.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2236"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2235"/>
         <source>Screen resolution when watching a video at a specific resolution.</source>
         <translation>Η ανάλυση της οθόνης όταν βλέπετε ταινία με ορισμένη ανάλυση.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2242"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2241"/>
         <source>Video output</source>
         <translation>Έξοδος εικόνας</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2243"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2242"/>
         <source>Output</source>
         <translation>Έξοδος</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2264"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2263"/>
         <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
         <translation>Ο Προεπιλεγμένος ρυθμός ανανέωσης κατά την προβολή ταινίας. Αφήστε το στο &quot;Αυτόματα&quot; για επιλογή του καλύτερου διαθέσιμου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2268"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2267"/>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
         <translation>Ο Προεπιλεγμένος ρυθμός ανανέωσης κατά την προβολή ταινίας σε συγκεκριμένη ανάλυση. Αφήστε το στο &quot;Αυτόματα&quot; για επιλογή του καλύτερου διαθέσιμου</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2276"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2275"/>
         <source>Rate</source>
         <translation>Ρυθμός</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2288"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2287"/>
         <source>Aspect ratio when watching a video. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Λόγος πλευρών όταν βλέπετε ταινία. Αφήστε το ως &quot;%1&quot; για να χρησιμοποιήσετε το δηλωμένο από την οθόνη σας. Ορίστε το σε 16:8 ή 4:3 για να επιβάλετε συγκεκριμένο λόγο πλευρών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2296"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2295"/>
         <source>Aspect ratio when watching a video at a specific resolution. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Λόγος πλευρών όταν βλέπετε ταινία σε συγκεκριμένη ανάλυση. Αφήστε το ως &quot;%1&quot; για να χρησιμοποιήσετε το δηλωμένο από την οθόνη σας. Ορίστε το σε 16:8 ή 4:3 για να επιβάλετε συγκεκριμένο λόγο πλευρών.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2308"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2307"/>
         <source>Aspect</source>
         <translation>Λόγος πλευρών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2314"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2316"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2313"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2315"/>
         <source>Default</source>
         <translation>Προεπιλογή</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2326"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2325"/>
         <source>Video Mode Settings</source>
         <translation>Ρυθμίσεις Κατάστασης Οθόνης</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2349"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2348"/>
         <source>Overrides for specific video sizes</source>
         <translation>Επιβολές ορισμένων μεγεθών εικόνας</translation>
+    </message>
+</context>
+<context>
+    <name>VideoOutWindow</name>
+    <message>
+        <location filename="../libs/libmythtv/videooutwindow.cpp" line="946"/>
+        <source>Zoom %1x%2 @ (%3,%4)</source>
+        <translation>Μεγέθυνση %1x%2 @ (%3,%4)</translation>
     </message>
 </context>
 <context>
@@ -28408,52 +28515,52 @@ If they no longer exist please remove them</source>
 <context>
     <name>WatchListSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3178"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3177"/>
         <source>Include the &apos;Watch List&apos; group</source>
         <translation>Να περιλαμβάνεται η ομάδα &apos;Να Δω&apos;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3182"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3181"/>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
         <translation>Η ομάδα &apos;Να Δω&apos; είναι μια λίστα εγγραφών ταξινομημένα ώστε να εμφανίζουν σειρές και εκπομπές που πρέπει να δείτε για να μείνετε ενημερωμένοι.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3194"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3193"/>
         <source>Start from the Watch List view</source>
         <translation>Εκκίνηση από την προβολή Να Δω</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3198"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3197"/>
         <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
         <translation>Εάν επιλεγεί, επιλέγονται τα &apos;Να Δω&apos; ως αρχική προβολή κατά την είσοδο στην Προβολή Εγγραφών</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3208"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3207"/>
         <source>Exclude recordings not set for Auto-Expire</source>
         <translation>Εξαίρεση των εγγραφών που δεν έχουν Αυτόματη Λήξη</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3213"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3212"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
         <translation>Θέστε το αν απενεργοποιήσετε την αυτόματη λήξη μόνο για εγγραφές που έχετε δει και θέλετε να κρατήσετε. Αυτή η επιλογή θα τις εξαιρέσει από τα &apos;Να Δω&apos;.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3226"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3225"/>
         <source>Maximum days counted in the score</source>
         <translation>Μέγιστες ημέρες προς μέτρηση στη βαθμολογία</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3230"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3229"/>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
         <translation>Οι βαθμολογίες της ομάδας &apos;Να Δω&apos; εξηγούνται ως 1 βαθμός για κάθε μία μέρα από την εγγραφή. Αυτή η επιλογή περιορίζει τη μέγιστη βαθμολογία λόγω ηλικίας και επηρεάζει άλλους παράγοντες στάθμισης.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3242"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3241"/>
         <source>Days to exclude weekly episodes after delete</source>
         <translation>Ημέρες εξαίρεσης εβδομαδιαίων επεισοδίων μετά τη διαγραφή τους</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3247"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3246"/>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
         <translation>Όταν ένα επεισόδιο διαγράφεται ή σημειώνεται ως προβλημένο, τα άλλα επεισόδια της σειράς εξαιρούνται από τα &apos;Να Δω&apos; γι΄αυτό το χρονικό διάστημα. Οι καθημερινές εκπομπές έχουν επίσης ένα μικρότερο διάστημα βασισμένο σε αυτή τη ρύθμιση.</translation>
     </message>
