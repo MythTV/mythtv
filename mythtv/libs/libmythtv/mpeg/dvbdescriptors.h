@@ -2012,7 +2012,16 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
     QString ContentId(void) const
     {
-        return QString::fromLatin1((const char *)_data+4, _data[3]);
+        int length = _data[3];
+        int positionOfHash = length-1;
+        while (positionOfHash >= 0) {
+            if (_data[4 + positionOfHash] == '#') {
+                length = positionOfHash; /* remove the hash and the following IMI */
+                break;
+            }
+            positionOfHash--;
+        }
+        return QString::fromLatin1((const char *)&_data[4], length);
     }
 };
 
