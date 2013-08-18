@@ -1782,9 +1782,8 @@ void MetadataOptions::customEvent(QEvent *levent)
                 if (!m_recordingRule->m_seriesid.isEmpty() &&
                     m_recordingRule->m_seriesid == (list[p])->GetTMSref())
                 {
-                    MetadataLookup *lookup = list.takeAt(p);
+                    MetadataLookup *lookup = list[p];
                     QueryComplete(lookup);
-                    qDeleteAll(list);
                     return;
                 }
                 else if (m_recInfo &&
@@ -1808,9 +1807,8 @@ void MetadataOptions::customEvent(QEvent *levent)
 
             if (yearindex > -1)
             {
-                MetadataLookup *lookup = list.takeAt(yearindex);
+                MetadataLookup *lookup = list[yearindex];
                 QueryComplete(lookup);
-                qDeleteAll(list);
                 return;
             }
 
@@ -1859,11 +1857,6 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfnr->result;
-
-        delete lookup;
-        lookup = NULL;
-
         QString title = tr("No match found for this recording. You can "
                            "try entering a TVDB/TMDB number, season, and "
                            "episode manually.");
@@ -1891,7 +1884,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (lul.count() >= 1)
         {
-            OnArtworkSearchDone(lul.takeFirst());
+            OnArtworkSearchDone(lul[0]);
         }
     }
     else if (levent->type() == MetadataLookupFailure::kEventType)
@@ -1908,8 +1901,6 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (lul.size())
         {
-            MetadataLookup *lookup = lul.takeFirst();
-
             QString title = tr("This number, season, and episode combination "
                                "does not appear to be valid (or the site may "
                                "be down). Check your information and try "
@@ -1920,9 +1911,6 @@ void MetadataOptions::customEvent(QEvent *levent)
 
             if (okPopup->Create())
                 m_popupStack->AddScreen(okPopup);
-
-            delete lookup;
-            lookup = NULL;
         }
     }
     else if (levent->type() == ImageDLEvent::kEventType)
@@ -1949,16 +1937,6 @@ void MetadataOptions::customEvent(QEvent *levent)
             m_busyPopup->Close();
             m_busyPopup = NULL;
         }
-
-        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
-
-        MetadataLookup *lookup = ide->item;
-
-        if (!lookup)
-            return;
-
-        delete lookup;
-        lookup = NULL;
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {

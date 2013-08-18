@@ -76,7 +76,6 @@ class META_PUBLIC MetadataDownload : public MThread
                                  MetadataLookup* lookup,
                                  bool passseas = true);
     MetadataLookupList  readNFO(QString NFOpath, MetadataLookup* lookup);
-    MetadataLookup*     moreWork();
 
     QObject            *m_parent;
     MetadataLookupList  m_lookupList;

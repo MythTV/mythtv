@@ -223,8 +223,6 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
 
     m_sync = false;
 
-    delete lookup;
-
     return m_returnList;
 }
 
@@ -322,6 +320,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             }
         }
         lookup->SetDownloads(map);
+        lookup->IncrRef();
         m_imagedownload->addDownloads(lookup);
     }
     else
@@ -499,10 +498,6 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
     }
-    else
-    {
-        lookup->deleteLater();
-    }
 }
 
 void MetadataFactory::customEvent(QEvent *levent)
@@ -522,7 +517,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         else if (lul.count() == 1)
         {
-            OnSingleResult(lul.takeFirst());
+            OnSingleResult(lul[0]);
         }
         else
         {
@@ -545,7 +540,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         if (lul.size())
         {
-            OnNoResult(lul.takeFirst());
+            OnNoResult(lul[0]);
         }
     }
     else if (levent->type() == ImageDLEvent::kEventType)

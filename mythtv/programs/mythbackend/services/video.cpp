@@ -175,6 +175,8 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
     if ( !list.size() )
         return pVideoLookups;
 
+    //MetadataLookupList is a reference counted list.
+    //it will delete all its content at its end of life
     for( int n = 0; n < list.size(); n++ )
     {
         DTC::VideoLookup *pVideoLookup = pVideoLookups->AddNewVideoLookup();
@@ -251,8 +253,6 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                 art->setWidth((*s).width);
                 art->setHeight((*s).height);
             }
-
-            delete lookup;
         }
     }
 

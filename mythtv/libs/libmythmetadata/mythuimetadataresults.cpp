@@ -149,9 +149,10 @@ void MetadataResultsDialog::customEvent(QEvent *event)
 
 void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
 {
+    // lookup object is owned by m_results. So we have to increase its reference counter
+    // so it won't be deleted when m_results is cleared
     MetadataLookup *lookup = m_results.takeAt(qVariantValue<uint>(item->GetData()));
-    qDeleteAll(m_results);
+    m_results.clear();
     emit haveResult(lookup);
     Close();
 }
-

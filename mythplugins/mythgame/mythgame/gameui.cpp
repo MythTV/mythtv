@@ -587,7 +587,7 @@ void GameUI::customEvent(QEvent *event)
 
         if (lul.count() == 1)
         {
-            OnGameSearchDone(lul.takeFirst());
+            OnGameSearchDone(lul[0]);
         }
         else
         {
@@ -616,7 +616,7 @@ void GameUI::customEvent(QEvent *event)
 
         if (lul.size())
         {
-            MetadataLookup *lookup = lul.takeFirst();
+            MetadataLookup *lookup = lul[0];
             MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
             if (node)
             {

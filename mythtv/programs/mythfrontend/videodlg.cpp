@@ -3792,9 +3792,6 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     if (item != NULL)
         UpdateItem(item);
 
-    delete lookup;
-    lookup = NULL;
-
     StartVideoImageSet(metadata);
 }
 

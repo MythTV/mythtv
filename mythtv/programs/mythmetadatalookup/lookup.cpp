@@ -251,12 +251,11 @@ void LookerUpper::customEvent(QEvent *levent)
                 if (pginfo && !pginfo->GetSeriesID().isEmpty() &&
                     pginfo->GetSeriesID() == (list[p])->GetTMSref())
                 {
-                    MetadataLookup *lookup = list.takeAt(p);
+                    MetadataLookup *lookup = list[p];
                     if (!lookup->GetSubtype() == kProbableGenericTelevision)
                         pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                     pginfo->SaveInetRef(lookup->GetInetref());
                     m_busyRecList.removeAll(pginfo);
-                    qDeleteAll(list);
                     return;
                 }
                 else if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
@@ -268,7 +267,6 @@ void LookerUpper::customEvent(QEvent *levent)
                         LOG(VB_GENERAL, LOG_INFO, "Multiple results matched on year. No definite "
                                       "match could be found.");
                         m_busyRecList.removeAll(pginfo);
-                        qDeleteAll(list);
                         return;
                     }
                     else
@@ -281,13 +279,12 @@ void LookerUpper::customEvent(QEvent *levent)
 
             if (yearindex > -1)
             {
-                MetadataLookup *lookup = list.takeAt(yearindex);
+                MetadataLookup *lookup = list[yearindex];
                 ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(lookup->GetData());
                 if (!lookup->GetSubtype() == kProbableGenericTelevision)
                     pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                 pginfo->SaveInetRef(lookup->GetInetref());
                 m_busyRecList.removeAll(pginfo);
-                qDeleteAll(list);
                 return;
             }
 
@@ -296,8 +293,6 @@ void LookerUpper::customEvent(QEvent *levent)
                                       "inetref in the 'Watch Recordings' screen.");
 
             ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(list.takeFirst()->GetData());
-
-            qDeleteAll(list);
 
             if (pginfo)
             {
