@@ -187,9 +187,19 @@ class TestMPEGTables: public QObject
             0x55, 0x00, 0x54, 0x02, 0x23, 0x00, 0x3b, 0xf9,  0x94, 0xa5                                       /* U.T.#.;...       */
         };
 
-    /* pick just the ContentIdentifierDescriptor from the event_information_section */
-    DVBContentIdentifierDescriptor descriptor(&eit_data[407]);
+        /* pick just the ContentIdentifierDescriptor from the event_information_section */
+        DVBContentIdentifierDescriptor descriptor(&eit_data[407]);
 
-    QCOMPARE (descriptor.ContentId(), QString("eventis.nl/00000000-0000-1000-0604-0000000E0711"));
+        QCOMPARE (descriptor.ContentId(),  QString("eventis.nl/00000000-0000-1000-0604-0000000E0711"));
+
+        /* FIXME hack to test the case of no hash in the CRID until we support more then one CRID per descriptor */
+        const unsigned char cid_data[] = {
+            0x76, 0x73, 0x04, 0x2f, 0x65, 0x76, 0x65, 0x6e,  0x74, 0x69, 0x73, 0x2e, 0x6e, 0x6c, 0x2f, 0x30,  /* vs.@eventis.nl/0 */
+            0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2d,  0x30, 0x30, 0x30, 0x30, 0x2d, 0x31, 0x30, 0x30,  /* 0000000-0000-100 */
+            0x30, 0x2d, 0x30, 0x36, 0x30, 0x38, 0x2d, 0x30,  0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x33,  /* 0-0608-000000003 */
+            0x46, 0x39, 0x43                                                                                  /* F9C              */
+        };
+        DVBContentIdentifierDescriptor descriptor2(cid_data);
+        QCOMPARE (descriptor2.ContentId(), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
     }
 };
