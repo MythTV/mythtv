@@ -144,8 +144,6 @@ void MetadataResultsDialog::customEvent(QEvent *event)
         {
             item->SetImage(file);
         }
-        delete data;
-        data = NULL;
     }
 }
 

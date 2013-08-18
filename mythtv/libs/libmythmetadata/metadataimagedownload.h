@@ -46,7 +46,11 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
     ThumbnailDLEvent(ThumbnailData *data) :
                  QEvent(kEventType),
                  thumb(data) {}
-    ~ThumbnailDLEvent() {}
+    ~ThumbnailDLEvent()
+    {
+        delete thumb;
+        thumb = NULL;
+    }
 
     ThumbnailData *thumb;
 

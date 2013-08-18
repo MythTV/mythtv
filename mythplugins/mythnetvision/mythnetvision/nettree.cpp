@@ -1276,7 +1276,6 @@ void NetTree::customEvent(QEvent *event)
         {
             if (!((uint)m_siteButtonList->GetCount() >= pos))
             {
-                delete data;
                 return;
             }
 
@@ -1288,8 +1287,6 @@ void NetTree::customEvent(QEvent *event)
                 item->SetImage(file);
             }
         }
-
-        delete data;
     }
     else if (event->type() == kGrabberUpdateEventType)
     {
