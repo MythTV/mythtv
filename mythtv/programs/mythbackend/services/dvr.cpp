@@ -583,6 +583,7 @@ uint Dvr::AddRecordSchedule   (
     rule.m_seriesid = sSeriesId;
     rule.m_programid = sProgramId;
 
+    rule.m_channelid = nChanId;
     rule.m_station = sStation;
 
     rule.m_findday = nFindDay;
@@ -727,7 +728,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
         pRule.m_description = sDescription;
 
     if (!sCategory.isEmpty())
-            pRule.m_category = sCategory;
+        pRule.m_category = sCategory;
 
     if (!sSeriesId.isEmpty())
         pRule.m_seriesid = sSeriesId;
@@ -735,12 +736,13 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
     if (!sProgramId.isEmpty())
         pRule.m_programid = sProgramId;
 
+    if (nChanId)
+        pRule.m_channelid = nChanId;
     if (!sStation.isEmpty())
         pRule.m_station = sStation;
 
     pRule.m_startdate = recstartts.date();
     pRule.m_starttime = recstartts.time();
-
     pRule.m_enddate = recendts.date();
     pRule.m_endtime = recendts.time();
 
