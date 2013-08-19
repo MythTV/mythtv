@@ -802,8 +802,8 @@ void logPropagateCalc(void)
 
     if (!logPropagateOpts.dblog)
     {
-        logPropagateArgs += " --nodblog";
-        logPropagateArgList << "--nodblog";
+        logPropagateArgs += " --enable-dblog";
+        logPropagateArgList << "--enable-dblog";
     }
 
 #ifndef _WIN32
