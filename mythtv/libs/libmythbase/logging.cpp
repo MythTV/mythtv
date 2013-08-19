@@ -791,7 +791,7 @@ void logPropagateCalc(void)
         logPropagateArgs += " --quiet";
 
     if (!logPropagateOpts.dblog)
-        logPropagateArgs += " --nodblog";
+        logPropagateArgs += " --enable-dblog";
 
 #ifndef _WIN32
     if (logPropagateOpts.facility >= 0)
