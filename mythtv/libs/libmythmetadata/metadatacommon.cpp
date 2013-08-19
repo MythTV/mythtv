@@ -1,6 +1,7 @@
 // Qt headers
 #include <QLocale>
 #include <QCoreApplication>
+#include <QMetaType>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -9,6 +10,8 @@
 #include "mythlogging.h"
 #include "mythlocale.h"
 #include "mythmiscutil.h"
+
+static int x0 = qRegisterMetaType< RefCountHandler<MetadataLookup> >();
 
 // null constructor
 MetadataLookup::MetadataLookup(void) :

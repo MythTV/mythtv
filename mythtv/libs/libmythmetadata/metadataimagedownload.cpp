@@ -124,7 +124,7 @@ void MetadataImageDownload::run()
         }
         // Ref owns the MetadataLookup object for the duration of the loop
         // and it will be deleted automatically when the loop completes
-        RefCountHandler<MetadataLookup*> ref = m_downloadList.takeFirstAndDecr();
+        RefCountHandler<MetadataLookup> ref = m_downloadList.takeFirstAndDecr();
         m_mutex.unlock();
         MetadataLookup *lookup = ref;
         DownloadMap downloads = lookup->GetDownloads();

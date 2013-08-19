@@ -594,8 +594,8 @@ void GameUI::customEvent(QEvent *event)
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, lul);
 
-            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
-                    SLOT(OnGameSearchListSelection(MetadataLookup*)),
+            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
+                    SLOT(OnGameSearchListSelection(RefCountHandler<MetadataLookup>)),
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())
@@ -948,12 +948,13 @@ void GameUI::createBusyDialog(QString title)
         m_popupStack->AddScreen(m_busyPopup);
 }
 
-void GameUI::OnGameSearchListSelection(MetadataLookup *lookup)
+void GameUI::OnGameSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     if (!lookup)
         return;
 
     lookup->SetStep(kLookupData);
+    lookup->IncrRef();
     m_query->prependLookup(lookup);
 }
 

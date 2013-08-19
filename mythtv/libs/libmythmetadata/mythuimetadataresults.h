@@ -22,7 +22,7 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
     bool Create();
 
   signals:
-    void haveResult(MetadataLookup*);
+    void haveResult(RefCountHandler<MetadataLookup>);
 
   private:
     MetadataLookupList m_results;

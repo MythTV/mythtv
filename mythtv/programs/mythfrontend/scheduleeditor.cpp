@@ -1476,7 +1476,7 @@ void MetadataOptions::PerformQuery()
     m_metadataFactory->Lookup(lookup);
 }
 
-void MetadataOptions::OnSearchListSelection(MetadataLookup *lookup)
+void MetadataOptions::OnSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     QueryComplete(lookup);
 }
@@ -1814,8 +1814,8 @@ void MetadataOptions::customEvent(QEvent *levent)
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);
 
-            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
-                    SLOT(OnSearchListSelection(MetadataLookup*)),
+            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
+                    SLOT(OnSearchListSelection(RefCountHandler<MetadataLookup>)),
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())

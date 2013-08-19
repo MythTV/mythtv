@@ -443,7 +443,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     DownloadMap m_downloads;
 };
 
-typedef RefCountedList<MetadataLookup*> MetadataLookupList;
+typedef RefCountedList<MetadataLookup> MetadataLookupList;
 
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookup *lookup);
@@ -531,5 +531,6 @@ META_PUBLIC MetaGrabberScript *ParseGrabberVersion(const QDomElement &item);
 
 Q_DECLARE_METATYPE(MetaGrabberScript*)
 Q_DECLARE_METATYPE(MetadataLookup*)
+Q_DECLARE_METATYPE(RefCountHandler<MetadataLookup>)
 
 #endif // METADATACOMMON_H_

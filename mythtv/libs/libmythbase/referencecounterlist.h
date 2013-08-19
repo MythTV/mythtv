@@ -17,7 +17,8 @@ template <class T>
 class RefCountHandler
 {
 public:
-    RefCountHandler(T r) : r(r) { r->IncrRef(); }
+    RefCountHandler() : r(new T()) { }
+    RefCountHandler(T *r) : r(r) { r->IncrRef(); }
     RefCountHandler(const RefCountHandler &other) : r(other.r) { r->IncrRef(); }
     RefCountHandler &operator= (const RefCountHandler &other)
     {
@@ -27,18 +28,18 @@ public:
         return *this;
     }
     ~RefCountHandler() { r->DecrRef(); }
-    operator T() const { return r; } // Convert to T automatically.
-    T operator*() { return r; }
-    const T operator*() const { return r; }
-    T operator->() { return r; }
-    const T operator->() const { return r; }
+    operator T *() const { return r; } // Convert to T* automatically.
+    T *operator*() { return r; }
+    const T* operator*() const { return r; }
+    T *operator->() { return r; }
+    const T *operator->() const { return r; }
 
 private:
-    T r;
+    T *r;
 };
 
 /** \brief General purpose reference counted list.
- * T typename must be a pointer to a ReferenceCounter inheriting object
+ * T typename must be a ReferenceCounter inheriting object
  * provide the same access methods as a QList
  */
 template <class T>
@@ -51,7 +52,7 @@ public:
      * takeAt takes ownership of the object from the list.
      * (e.g if the object only exists in the list, it won't be deleted)
      */
-    T takeAt(int i)
+    T *takeAt(int i)
     {
         RefCountHandler<T> rch = QList<RefCountHandler<T> >::takeAt(i);
         rch->IncrRef();
@@ -65,7 +66,7 @@ public:
      * takeFirst takes ownership of the object from the list.
      * (e.g if the object only exists in the list, it won't be deleted)
      */
-    T takeFirst(void)
+    T *takeFirst(void)
     {
         RefCountHandler<T> rch = QList<RefCountHandler<T> >::takeFirst();
         rch->IncrRef();
@@ -79,7 +80,7 @@ public:
      * takeFirst takes ownership of the object from the list.
      * (e.g if the object only exists in the list, it won't be deleted)
      */
-    T takeLast(void)
+    T *takeLast(void)
     {
         RefCountHandler<T> rch = QList<RefCountHandler<T> >::takeLast();
         rch->IncrRef();
@@ -145,7 +146,7 @@ public:
         QList<RefCountHandler<T> >::operator+=(other);
         return *this;
     }
-    RefCountedList<T> &operator+=(const T &value)
+    RefCountedList<T> &operator+=(const RefCountHandler<T> &value)
     {
         QList<RefCountHandler<T> >::operator+=(value);
         return *this;
@@ -155,7 +156,7 @@ public:
         QList<RefCountHandler<T> >::operator<<(other);
         return *this;
     }
-    RefCountedList<T> &operator<<(const T &value)
+    RefCountedList<T> &operator<<(const RefCountHandler<T> &value)
     {
         QList<RefCountHandler<T> >::operator<<(value);
         return *this;
@@ -165,8 +166,8 @@ public:
         QList<RefCountHandler<T> >::operator=(other);
         return *this;
     }
-    };
+};
 
-    typedef RefCountedList<ReferenceCounter*> ReferenceCounterList;
+typedef RefCountedList<ReferenceCounter> ReferenceCounterList;
 
 #endif /* defined(__MythTV__referencecounterlist__) */
