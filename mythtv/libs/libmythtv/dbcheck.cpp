@@ -2462,6 +2462,24 @@ NULL
             return false;
     }
 
+    if (dbver == "1316")
+    {
+        const char *updates[] = {
+// adjust programid type in various tables to match the program table
+"ALTER TABLE oldrecorded CHANGE COLUMN programid programid varchar(64);",
+"ALTER TABLE oldrecorded CHANGE COLUMN seriesid seriesid varchar(64);",
+"ALTER TABLE record CHANGE COLUMN programid programid varchar(64);",
+"ALTER TABLE record CHANGE COLUMN seriesid seriesid varchar(64);",
+"ALTER TABLE recorded CHANGE COLUMN programid programid varchar(64);",
+"ALTER TABLE recorded CHANGE COLUMN seriesid seriesid varchar(64);",
+"ALTER TABLE recordedprogram CHANGE COLUMN programid programid varchar(64);",
+"ALTER TABLE recordedprogram CHANGE COLUMN seriesid seriesid varchar(64);",
+NULL
+};
+        if (!performActualUpdate(updates, "1317", dbver))
+            return false;
+    }
+
 
     return true;
 }
