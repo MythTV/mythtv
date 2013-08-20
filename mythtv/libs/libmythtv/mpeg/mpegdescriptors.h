@@ -297,7 +297,7 @@ class ConditionalAccessDescriptor : public MPEGDescriptor
     uint SystemID(void) const { return  _data[2] << 8 | _data[3]; }
     uint PID(void) const      { return (_data[4] & 0x1F) << 8 | _data[5]; }
     uint DataSize(void) const { return DescriptorLength() - 4; }
-    const unsigned char *Data(void) const { return _data+6; }
+    const unsigned char *Data(void) const { return &_data[6]; }
     QString toString() const;
 };
 
