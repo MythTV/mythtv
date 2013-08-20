@@ -10,6 +10,8 @@
 #include "mythbaseexp.h"
 
 class MythSocket;
+class QFile;
+class ThreadedFileWriter;
 
 class MBASE_PUBLIC RemoteFile
 {
@@ -39,10 +41,10 @@ class MBASE_PUBLIC RemoteFile
 
     void SetTimeout(bool fast);
 
-    bool isOpen(void) const
-        { return sock && controlSock; }
-    long long GetFileSize(void) const
-        { return filesize; }
+    bool isOpen(void) const;
+    static bool isLocal(const QString &path);
+    bool isLocal(void) const;
+    long long GetFileSize(void) const;
 
     QStringList GetAuxiliaryFiles(void) const
         { return auxfiles; }
@@ -70,6 +72,8 @@ class MBASE_PUBLIC RemoteFile
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;
+    QFile          *localFile;
+    ThreadedFileWriter *fileWriter;
 };
 
 #endif
