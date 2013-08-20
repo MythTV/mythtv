@@ -3363,12 +3363,14 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
         return false;
 
     // Wait for frames to be available for decoding onto
-    if (!videoOutput->EnoughFreeFrames() && !unsafe && !killdecoder)
+    int tries = 0;
+    while (!unsafe &&
+        (!videoOutput->EnoughFreeFrames() || GetAudio()->IsBufferAlmostFull()) )
     {
-        int tries = 0;
-        while (!videoOutput->EnoughFreeFrames() && (tries++ < 10))
-            usleep(1000);
-        if (!videoOutput->EnoughFreeFrames())
+        if (killdecoder)
+            return false;
+
+        if (++tries > 10)
         {
             if (++videobuf_retries >= 2000)
             {
@@ -3380,6 +3382,8 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             }
             return false;
         }
+
+        usleep(1000);
     }
     videobuf_retries = 0;
 
