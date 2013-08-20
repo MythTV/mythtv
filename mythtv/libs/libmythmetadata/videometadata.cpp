@@ -350,6 +350,8 @@ class VideoMetadataImp
 
     bool IsHostSet() const;
 
+    void GetImageMap(InfoMap &imageMap) const;
+
   private:
     void fillCountries();
     void updateCountries();
@@ -622,13 +624,21 @@ void VideoMetadataImp::saveToDatabase()
         m_plot = VIDEO_PLOT_DEFAULT;
     if (m_rating.isEmpty())
         m_rating = VIDEO_RATING_DEFAULT;
-    if (m_coverfile.isEmpty())
+
+    InfoMap metadataMap;
+    GetImageMap(metadataMap);
+    QString coverfile   = metadataMap["coverfile"];
+    QString screenshot  = metadataMap["screenshotfile"];
+    QString bannerfile  = metadataMap["bannerfile"];
+    QString fanartfile  = metadataMap["fanartfile"];
+
+    if (coverfile.isEmpty() || !RemoteFile::Exists(coverfile))
         m_coverfile = VIDEO_COVERFILE_DEFAULT;
-    if (m_screenshot.isEmpty())
+    if (screenshot.isEmpty() || !RemoteFile::Exists(screenshot))
         m_screenshot = VIDEO_SCREENSHOT_DEFAULT;
-    if (m_banner.isEmpty())
+    if (bannerfile.isEmpty() || !RemoteFile::Exists(bannerfile))
         m_banner = VIDEO_BANNER_DEFAULT;
-    if (m_fanart.isEmpty())
+    if (fanartfile.isEmpty() || !RemoteFile::Exists(fanartfile))
         m_fanart = VIDEO_FANART_DEFAULT;
     if (m_trailer.isEmpty())
         m_trailer = VIDEO_TRAILER_DEFAULT;
@@ -873,6 +883,76 @@ void VideoMetadataImp::updateCast()
             cast = m_cast.erase(cast);
         }
     }
+}
+
+void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
+{
+    QString coverfile;
+    if (IsHostSet()
+        && !GetCoverFile().startsWith("/")
+        && !GetCoverFile().isEmpty()
+        && !IsDefaultCoverFile(GetCoverFile()))
+    {
+        coverfile = generate_file_url("Coverart", GetHost(),
+                                      GetCoverFile());
+    }
+    else
+    {
+        coverfile = GetCoverFile();
+    }
+
+    imageMap["coverfile"] = coverfile;
+    imageMap["coverart"] = coverfile;
+
+    QString screenshotfile;
+    if (IsHostSet() && !GetScreenshot().startsWith("/")
+        && !GetScreenshot().isEmpty())
+    {
+        screenshotfile = generate_file_url("Screenshots",
+                                           GetHost(), GetScreenshot());
+    }
+    else
+    {
+        screenshotfile = GetScreenshot();
+    }
+
+    imageMap["screenshotfile"] = screenshotfile;
+    imageMap["screenshot"] = screenshotfile;
+
+    QString bannerfile;
+    if (IsHostSet() && !GetBanner().startsWith("/")
+        && !GetBanner().isEmpty())
+    {
+        bannerfile = generate_file_url("Banners", GetHost(),
+                                       GetBanner());
+    }
+    else
+    {
+        bannerfile = GetBanner();
+    }
+
+    imageMap["bannerfile"] = bannerfile;
+    imageMap["banner"] = bannerfile;
+
+    QString fanartfile;
+    if (IsHostSet() && !GetFanart().startsWith("/")
+        && !GetFanart().isEmpty())
+    {
+        fanartfile = generate_file_url("Fanart", GetHost(),
+                                       GetFanart());
+    }
+    else
+    {
+        fanartfile = GetFanart();
+    }
+
+    imageMap["fanartfile"] = fanartfile;
+    imageMap["fanart"] = fanartfile;
+
+    QString smartimage = coverfile;
+    if (!screenshotfile.isEmpty () && (GetSeason() > 0 || GetEpisode() > 0))
+        smartimage = screenshotfile;
+    imageMap["smartimage"] = smartimage;
 }
 
 ////////////////////////////////////////
@@ -1226,72 +1306,7 @@ void VideoMetadata::GetStateMap(InfoMap &stateMap)
 
 void VideoMetadata::GetImageMap(InfoMap &imageMap)
 {
-    QString coverfile;
-    if (IsHostSet()
-        && !GetCoverFile().startsWith("/")
-        && !GetCoverFile().isEmpty()
-        && !IsDefaultCoverFile(GetCoverFile()))
-    {
-        coverfile = generate_file_url("Coverart", GetHost(),
-                GetCoverFile());
-    }
-    else
-    {
-        coverfile = GetCoverFile();
-    }
-
-    imageMap["coverfile"] = coverfile;
-    imageMap["coverart"] = coverfile;
-
-    QString screenshotfile;
-    if (IsHostSet() && !GetScreenshot().startsWith("/")
-        && !GetScreenshot().isEmpty())
-    {
-        screenshotfile = generate_file_url("Screenshots",
-                GetHost(), GetScreenshot());
-    }
-    else
-    {
-        screenshotfile = GetScreenshot();
-    }
-
-    imageMap["screenshotfile"] = screenshotfile;
-    imageMap["screenshot"] = screenshotfile;
-
-    QString bannerfile;
-    if (IsHostSet() && !GetBanner().startsWith("/")
-        && !GetBanner().isEmpty())
-    {
-        bannerfile = generate_file_url("Banners", GetHost(),
-                GetBanner());
-    }
-    else
-    {
-        bannerfile = GetBanner();
-    }
-
-    imageMap["bannerfile"] = bannerfile;
-    imageMap["banner"] = bannerfile;
-
-    QString fanartfile;
-    if (IsHostSet() && !GetFanart().startsWith("/")
-        && !GetFanart().isEmpty())
-    {
-        fanartfile = generate_file_url("Fanart", GetHost(),
-                GetFanart());
-    }
-    else
-    {
-        fanartfile = GetFanart();
-    }
-
-    imageMap["fanartfile"] = fanartfile;
-    imageMap["fanart"] = fanartfile;
-
-    QString smartimage = coverfile;
-    if (!screenshotfile.isEmpty () && (GetSeason() > 0 || GetEpisode() > 0))
-        smartimage = screenshotfile;
-    imageMap["smartimage"] = smartimage;
+    m_imp->GetImageMap(imageMap);
 }
 
 void ClearMap(InfoMap &metadataMap)
