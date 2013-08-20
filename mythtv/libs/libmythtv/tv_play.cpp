@@ -438,6 +438,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
             mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
         tv->ReturnPlayerLock(mctx);
+        quitAll |= !playerError.isEmpty();
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV -- process events 2 begin");
