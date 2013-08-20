@@ -292,7 +292,7 @@ void LookerUpper::customEvent(QEvent *levent)
                                       "You may wish to manually set the season, episode, and "
                                       "inetref in the 'Watch Recordings' screen.");
 
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(list.takeFirst()->GetData());
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(list[0]->GetData());
 
             if (pginfo)
             {
