@@ -418,6 +418,8 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
         QString("Matching NFO file found. Parsing %1 for metadata...")
                .arg(NFOpath));
 
+    bool error = false;
+
     if (lookup->GetType() == kMetadataVideo)
     {
         QByteArray nforaw;
@@ -439,6 +441,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Invalid NFO file found."));
+                    error = true;
                 }
             }
         }
@@ -446,10 +449,13 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
         delete rf;
         rf = NULL;
 
-        MetadataLookup *tmp = ParseMetadataMovieNFO(item, lookup);
-        list.append(tmp);
-        // MetadataLookup is owned by the MetadataLookupList returned
-        tmp->DecrRef();
+        if (!error)
+        {
+            MetadataLookup *tmp = ParseMetadataMovieNFO(item, lookup);
+            list.append(tmp);
+            // MetadataLookup is owned by the MetadataLookupList returned
+            tmp->DecrRef();
+        }
     }
 
     return list;
@@ -503,7 +509,12 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
         nfo = getNFOPath(lookup->GetFilename());
     }
 
-    if (mxml.isEmpty() && nfo.isEmpty())
+    if (!mxml.isEmpty())
+        list = readMXML(mxml, lookup);
+    else if (!nfo.isEmpty())
+        list = readNFO(nfo, lookup);
+
+    if (list.isEmpty())
     {
         QString cmd = GetMovieGrabber();
 
@@ -534,10 +545,6 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
         }
         list = runGrabber(cmd, args, lookup);
     }
-    else if (!mxml.isEmpty())
-        list = readMXML(mxml, lookup);
-    else if (!nfo.isEmpty())
-        list = readNFO(nfo, lookup);
 
     return list;
 }
