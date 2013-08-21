@@ -248,6 +248,7 @@ class PlaybackBox : public ScheduleCommon
     void doPlaylistWatchedSetting(bool turnOn);
     void doPlaylistWatchedSetOn()      { doPlaylistWatchedSetting(true);  }
     void doPlaylistWatchedSetOff()     { doPlaylistWatchedSetting(false); }
+    void doPlaylistAllowRerecord();
     void togglePlayListTitle(void);
     void togglePlayListItem(void);
     void playSelectedPlaylist(bool random);

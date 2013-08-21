@@ -2756,6 +2756,7 @@ MythMenu* PlaybackBox::createPlaylistStorageMenu()
     menu->AddItem(tr("Enable Auto Expire"), SLOT(doPlaylistExpireSetOn()));
     menu->AddItem(tr("Mark as Watched"), SLOT(doPlaylistWatchedSetOn()));
     menu->AddItem(tr("Mark as Unwatched"), SLOT(doPlaylistWatchedSetOff()));
+    menu->AddItem(tr("Allow this episode to re-record"), SLOT(doPlaylistAllowRerecord()));
 
     return menu;
 }
@@ -3323,6 +3324,25 @@ void PlaybackBox::doAllowRerecord()
     RecordingInfo ri(*pginfo);
     ri.ForgetHistory();
     *pginfo = ri;
+}
+
+void PlaybackBox::doPlaylistAllowRerecord()
+{
+    ProgramInfo *pginfo;
+    QStringList::Iterator it;
+
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
+    {
+        if ((pginfo = FindProgramInUILists(*it)))
+        {
+            RecordingInfo ri(*pginfo);
+            ri.ForgetHistory();
+            *pginfo = ri;
+        }
+    }
+
+    doClearPlaylist();
+    UpdateUILists();
 }
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
