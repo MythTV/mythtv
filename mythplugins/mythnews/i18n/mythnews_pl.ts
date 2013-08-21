@@ -27,37 +27,36 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Zaktualizowany</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Nieznany</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Pobieram zawartość...</translation>
+        <translation type="obsolete">Pobieram zawartość...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
         <translation>Zarządzaj Kanałami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
         <translation>Dodaj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
         <translation>Edytuj Kanał</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
         <translation>Usuń Kanał</translation>
     </message>
@@ -78,25 +77,23 @@
         <translation type="obsolete">Usuń stronę wiadomości</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="674"/>
         <source>Options</source>
         <translation>Opcje</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>W MythNews nie skonfigurowano żadnej kanału RSS.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Nie podano polecenia przeglądarki! Należy zainstalować MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 z %2 (%3 procent)</translation>
+        <translation type="obsolete">%1 z %2 (%3 procent)</translation>
     </message>
 </context>
 <context>
@@ -263,7 +260,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation>Wybierz strony z wiadomościami które chcesz czytać.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>Kanały z wiadomościami</translation>
     </message>
@@ -274,31 +271,56 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Ketegoria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[v]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Strona</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Edytuj źródła RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Kontekst</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Akcje</translation>
     </message>
@@ -311,8 +333,9 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
         <translation type="obsolete">Minut</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="23"/>
         <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 </TS>
