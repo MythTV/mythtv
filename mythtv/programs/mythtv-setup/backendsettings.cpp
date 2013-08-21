@@ -53,10 +53,15 @@ static HostComboBox *LocalServerIP6()
         gc->setEnabled(false);
         gc->setValue("");
     }
-    else if (list.contains(QHostAddress("::1")))
-        gc->setValue("::1");
+    else
+    {
+        // Allow ability to have no value set, this disable IPv6
+        gc->addSelection("");
+        if (list.contains(QHostAddress("::1")))
+            gc->setValue("::1");
+    }
 #endif
-        
+
     gc->setHelpText(QObject::tr("Enter the IPv6 address of this machine. "
                     "Use an externally accessible address (ie, not "
                     "::1) if you are going to be running a frontend "
