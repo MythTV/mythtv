@@ -288,7 +288,6 @@ void MHIContext::QueueDSMCCPacket(
                                              componentTag, carouselId,
                                              dataBroadcastId));
     }
-    QMutexLocker locker(&m_runLock);
     m_engine_wait.wakeAll();
 }
 
