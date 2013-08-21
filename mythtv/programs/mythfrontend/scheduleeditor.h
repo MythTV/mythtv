@@ -340,7 +340,7 @@ class MetadataOptions : public SchedEditChild
     void SelectOnlineCoverart();
     void SelectOnlineBanner();
     void QueryComplete(MetadataLookup *lookup);
-    void OnSearchListSelection(MetadataLookup *lookup);
+    void OnSearchListSelection(RefCountHandler<MetadataLookup> lookup);
     void OnImageSearchListSelection(ArtworkInfo info,
                                VideoArtworkType type);
     void OnArtworkSearchDone(MetadataLookup *lookup);
@@ -371,8 +371,6 @@ class MetadataOptions : public SchedEditChild
     // For image picking
     MetadataDownload *m_imageLookup;
     MetadataImageDownload *m_imageDownload;
-
-    MetadataLookup  *m_lookup;
 
     MythScreenStack  *m_popupStack;
     MythUIBusyDialog *m_busyPopup;

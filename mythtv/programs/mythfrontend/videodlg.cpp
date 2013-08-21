@@ -3289,8 +3289,8 @@ void VideoDialog::customEvent(QEvent *levent)
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);
 
-            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
-                    SLOT(OnVideoSearchListSelection(MetadataLookup*)),
+            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
+                    SLOT(OnVideoSearchListSelection(RefCountHandler<MetadataLookup>)),
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())
@@ -3474,12 +3474,13 @@ void VideoDialog::ToggleWatched()
     }
 }
 
-void VideoDialog::OnVideoSearchListSelection(MetadataLookup *lookup)
+void VideoDialog::OnVideoSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     if (!lookup)
         return;
 
     lookup->SetStep(kLookupData);
+    lookup->IncrRef();
     m_metadataFactory->Lookup(lookup);
 }
 
@@ -3791,9 +3792,6 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
     MythUIButtonListItem *item = GetItemByMetadata(metadata);
     if (item != NULL)
         UpdateItem(item);
-
-    delete lookup;
-    lookup = NULL;
 
     StartVideoImageSet(metadata);
 }

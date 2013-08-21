@@ -40,7 +40,8 @@ MetadataImageDownload::~MetadataImageDownload()
 void MetadataImageDownload::addThumb(QString title,
                                      QString url, QVariant data)
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     ThumbnailData *id = new ThumbnailData();
     id->title = title;
     id->data = data;
@@ -48,26 +49,30 @@ void MetadataImageDownload::addThumb(QString title,
     m_thumbnailList.append(id);
     if (!isRunning())
         start();
-    m_mutex.unlock();
 }
 
+/**
+ * addLookup: Add lookup to bottom of the queue
+ * MetadataDownload::m_downloadList takes ownership of the given lookup
+ */
 void MetadataImageDownload::addDownloads(MetadataLookup *lookup)
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     m_downloadList.append(lookup);
+    lookup->DecrRef();
     if (!isRunning())
         start();
-    m_mutex.unlock();
 }
 
 void MetadataImageDownload::cancel()
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     qDeleteAll(m_thumbnailList);
     m_thumbnailList.clear();
-    qDeleteAll(m_downloadList);
+    // clearing m_downloadList automatically delete all its content
     m_downloadList.clear();
-    m_mutex.unlock();
 }
 
 void MetadataImageDownload::run()
@@ -108,9 +113,20 @@ void MetadataImageDownload::run()
             delete thumb;
     }
 
-    MetadataLookup *lookup;
-    while ((lookup = moreDownloads()) != NULL)
+    while (true)
     {
+        m_mutex.lock();
+        if (m_downloadList.isEmpty())
+        {
+            // no more to process, we're done
+            m_mutex.unlock();
+            break;
+        }
+        // Ref owns the MetadataLookup object for the duration of the loop
+        // and it will be deleted automatically when the loop completes
+        RefCountHandler<MetadataLookup> ref = m_downloadList.takeFirstAndDecr();
+        m_mutex.unlock();
+        MetadataLookup *lookup = ref;
         DownloadMap downloads = lookup->GetDownloads();
         DownloadMap downloaded;
 
@@ -317,21 +333,11 @@ void MetadataImageDownload::run()
 
 ThumbnailData* MetadataImageDownload::moreThumbs()
 {
+    QMutexLocker lock(&m_mutex);
     ThumbnailData *ret = NULL;
-    m_mutex.lock();
+
     if (!m_thumbnailList.isEmpty())
         ret = m_thumbnailList.takeFirst();
-    m_mutex.unlock();
-    return ret;
-}
-
-MetadataLookup* MetadataImageDownload::moreDownloads()
-{
-    MetadataLookup *ret = NULL;
-    m_mutex.lock();
-    if (!m_downloadList.isEmpty())
-        ret = m_downloadList.takeFirst();
-    m_mutex.unlock();
     return ret;
 }
 

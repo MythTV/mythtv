@@ -76,6 +76,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(recrule));
@@ -103,6 +104,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(pginfo));
@@ -130,6 +132,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
     if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
@@ -182,6 +185,7 @@ META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
                                                       bool allowgeneric)
 {
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetAutomatic(false);
@@ -222,8 +226,6 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
     }
 
     m_sync = false;
-
-    delete lookup;
 
     return m_returnList;
 }
@@ -322,6 +324,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             }
         }
         lookup->SetDownloads(map);
+        lookup->IncrRef();
         m_imagedownload->addDownloads(lookup);
     }
     else
@@ -499,10 +502,6 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
     }
-    else
-    {
-        lookup->deleteLater();
-    }
 }
 
 void MetadataFactory::customEvent(QEvent *levent)
@@ -522,7 +521,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         else if (lul.count() == 1)
         {
-            OnSingleResult(lul.takeFirst());
+            OnSingleResult(lul[0]);
         }
         else
         {
@@ -545,7 +544,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         if (lul.size())
         {
-            OnNoResult(lul.takeFirst());
+            OnNoResult(lul[0]);
         }
     }
     else if (levent->type() == ImageDLEvent::kEventType)

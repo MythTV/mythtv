@@ -10,7 +10,7 @@
 #include <QFileInfo>
 #include <QDir>
 
-#include "ThreadedFileWriter.h"
+#include "threadedfilewriter.h"
 #include "fileringbuffer.h"
 #include "mythcontext.h"
 #include "remotefile.h"

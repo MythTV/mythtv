@@ -40,7 +40,7 @@ class GameUI : public MythScreenType
     void searchComplete(QString);
     void gameSearch(MythGenericTree *node = NULL,
                      bool automode = false);
-    void OnGameSearchListSelection(MetadataLookup *lookup);
+    void OnGameSearchListSelection(RefCountHandler<MetadataLookup> lookup);
     void OnGameSearchDone(MetadataLookup *lookup);
     void StartGameImageSet(MythGenericTree *node, QStringList coverart,
                            QStringList fanart, QStringList screenshot);

@@ -1,6 +1,7 @@
 // Qt headers
 #include <QLocale>
 #include <QCoreApplication>
+#include <QMetaType>
 
 #include "rssparse.h"
 #include "programinfo.h"
@@ -10,8 +11,12 @@
 #include "mythlocale.h"
 #include "mythmiscutil.h"
 
+static int x0 = qRegisterMetaType< RefCountHandler<MetadataLookup> >();
+
 // null constructor
 MetadataLookup::MetadataLookup(void) :
+    ReferenceCounter("MetadataLookup"),
+
     m_type(kMetadataVideo),
     m_subtype(kUnknownVideo),
     m_data(),
@@ -145,6 +150,7 @@ MetadataLookup::MetadataLookup(
     const QString &trailerURL,
     const ArtworkMap artwork,
     DownloadMap downloads) :
+    ReferenceCounter("MetadataLookup"),
 
     m_type(type),
     m_subtype(subtype),
@@ -254,6 +260,7 @@ MetadataLookup::MetadataLookup(
     const QDateTime lastupdated,
     const uint runtime,
     const uint runtimesecs) :
+    ReferenceCounter("MetadataLookup"),
 
     m_type(type),
     m_subtype(subtype),
@@ -335,6 +342,7 @@ MetadataLookup::MetadataLookup(
     const QString &trailerURL,
     const ArtworkMap artwork,
     DownloadMap downloads) :
+    ReferenceCounter("MetadataLookup"),
 
     m_type(type),
     m_subtype(subtype),
@@ -524,7 +532,7 @@ QDomDocument CreateMetadataXML(ProgramInfo *pginfo)
     if (lookup)
         doc = CreateMetadataXML(lookup);
 
-    delete lookup;
+    lookup->DecrRef();
     lookup = NULL;
 
     return doc;

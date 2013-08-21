@@ -13,6 +13,7 @@ using namespace std;
 
 // MythTV
 #include "iso639.h"
+#include "mythtvexp.h"
 
 typedef vector<const unsigned char*> desc_list_t;
 
@@ -197,7 +198,7 @@ class PrivateDescriptorID
     };
 };
 
-class MPEGDescriptor
+class MTV_PUBLIC MPEGDescriptor
 {
   public:
     operator const unsigned char*() const { return _data; }

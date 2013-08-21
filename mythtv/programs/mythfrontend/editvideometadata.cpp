@@ -1011,7 +1011,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         // If not, USER ERROR!
         if (lul.count() == 1)
         {
-            OnArtworkSearchDone(lul.takeFirst());
+            OnArtworkSearchDone(lul[0]);
         }
         else
         {
@@ -1036,7 +1036,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
 
         if (lul.size())
         {
-            MetadataLookup *lookup = lul.takeFirst();
+            MetadataLookup *lookup = lul[0];
             LOG(VB_GENERAL, LOG_INFO,
                 QString("No results found for %1 %2 %3").arg(lookup->GetTitle())
                     .arg(lookup->GetSeason()).arg(lookup->GetEpisode()));

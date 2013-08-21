@@ -144,16 +144,13 @@ void MetadataResultsDialog::customEvent(QEvent *event)
         {
             item->SetImage(file);
         }
-        delete data;
-        data = NULL;
     }
 }
 
 void MetadataResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    MetadataLookup *lookup = m_results.takeAt(qVariantValue<uint>(item->GetData()));
-    qDeleteAll(m_results);
+    RefCountHandler<MetadataLookup> lookup = m_results.takeAtAndDecr(qVariantValue<uint>(item->GetData()));
+    m_results.clear();
     emit haveResult(lookup);
     Close();
 }
-

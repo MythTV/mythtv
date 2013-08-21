@@ -194,7 +194,7 @@ bool ScheduleEditor::Create()
         connect(m_maxepSpin, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(MaxEpisodesChanged(MythUIButtonListItem *)));
     if (m_recgroupList)
-        connect(m_recgroupList, SIGNAL(LosingFocus()), 
+        connect(m_recgroupList, SIGNAL(LosingFocus()),
                 SLOT(PromptForRecGroup()));
     if (m_transcodeCheck)
         connect(m_transcodeCheck, SIGNAL(toggled(bool)),
@@ -279,7 +279,7 @@ void ScheduleEditor::Load()
             bool hasChannel = !m_recordingRule->m_station.isEmpty();
             bool isManual = (m_recordingRule->m_searchType == kManualSearch);
 
-            new MythUIButtonListItem(m_rulesList, 
+            new MythUIButtonListItem(m_rulesList,
                                      tr("Do not record this program"),
                                      ENUM_TO_QVARIANT(kNotRecording));
             if (hasChannel)
@@ -335,7 +335,7 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
     m_recordingRule->m_type = static_cast<RecordingType>
         (item->GetData().toInt());
 
-    bool isScheduled = (m_recordingRule->m_type != kNotRecording && 
+    bool isScheduled = (m_recordingRule->m_type != kNotRecording &&
                         m_recordingRule->m_type != kDontRecord);
 
     if (m_schedOptButton)
@@ -516,7 +516,7 @@ bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
         TranslateKeyPress("TV Frontend", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
-    {   
+    {
         QString action = actions[i];
         handled = true;
 
@@ -633,7 +633,7 @@ void ScheduleEditor::showUpcomingByTitle(void)
         return;
 
     // Existing rule and search?  Search by rule
-    if (m_recordingRule->m_recordID > 0 && 
+    if (m_recordingRule->m_recordID > 0 &&
         m_recordingRule->m_searchType != kNoSearch)
         showUpcomingByRule();
 
@@ -788,7 +788,7 @@ void ScheduleEditor::showMenu(void)
 {
     QString label = tr("Options");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = 
+    MythDialogBox *menuPopup =
         new MythDialogBox(label, popupStack, "menuPopup");
 
     MythUIButtonListItem *item = m_rulesList->GetItemCurrent();
@@ -825,7 +825,7 @@ void ScheduleEditor::showMenu(void)
 }
 
 void ScheduleEditor::showTemplateMenu(void)
-{   
+{
     QStringList templates = RecordingRule::GetTemplateNames();
     if (templates.empty())
     {
@@ -835,11 +835,11 @@ void ScheduleEditor::showTemplateMenu(void)
 
     QString label = tr("Template Options");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = 
-        new MythDialogBox(label, popupStack, "menuPopup");   
+    MythDialogBox *menuPopup =
+        new MythDialogBox(label, popupStack, "menuPopup");
 
     if (menuPopup->Create())
-    {   
+    {
         menuPopup->SetReturnEvent(this, "templatemenu");
         while (!templates.empty())
         {
@@ -1189,7 +1189,7 @@ bool StoreOptEditor::Create()
         connect(m_maxepSpin, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(MaxEpisodesChanged(MythUIButtonListItem *)));
     if (m_recgroupList)
-        connect(m_recgroupList, SIGNAL(LosingFocus()), 
+        connect(m_recgroupList, SIGNAL(LosingFocus()),
                 SLOT(PromptForRecGroup()));
 
     BuildFocusList();
@@ -1311,7 +1311,6 @@ MetadataOptions::MetadataOptions(MythScreenStack *parent,
                                  RecordingRule &rule,
                                  RecordingInfo *recInfo)
     : SchedEditChild(parent, "MetadataOptions", editor, rule, recInfo),
-      m_lookup(NULL),
       m_busyPopup(NULL), m_fanart(NULL), m_coverart(NULL),
       m_banner(NULL), m_inetrefEdit(NULL), m_seasonSpin(NULL),
       m_episodeSpin(NULL), m_queryButton(NULL), m_localFanartButton(NULL),
@@ -1451,33 +1450,33 @@ void MetadataOptions::CreateBusyDialog(QString title)
 
 void MetadataOptions::PerformQuery()
 {
-    m_lookup = new MetadataLookup();
+    MetadataLookup *lookup = new MetadataLookup();
 
     CreateBusyDialog(tr("Trying to manually find this "
                         "recording online..."));
 
-    m_lookup->SetStep(kLookupSearch);
-    m_lookup->SetType(kMetadataRecording);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataRecording);
     if (m_seasonSpin->GetIntValue() > 0 ||
            m_episodeSpin->GetIntValue() > 0)
-        m_lookup->SetSubtype(kProbableTelevision);
+        lookup->SetSubtype(kProbableTelevision);
     else
-        m_lookup->SetSubtype(kProbableMovie);
-    m_lookup->SetAllowGeneric(true);
-    m_lookup->SetAutomatic(false);
-    m_lookup->SetHandleImages(false);
-    m_lookup->SetHost(gCoreContext->GetMasterHostName());
-    m_lookup->SetTitle(m_recordingRule->m_title);
-    m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
-    m_lookup->SetInetref(m_inetrefEdit->GetText());
-    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
-    m_lookup->SetSeason(m_seasonSpin->GetIntValue());
-    m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
+        lookup->SetSubtype(kProbableMovie);
+    lookup->SetAllowGeneric(true);
+    lookup->SetAutomatic(false);
+    lookup->SetHandleImages(false);
+    lookup->SetHost(gCoreContext->GetMasterHostName());
+    lookup->SetTitle(m_recordingRule->m_title);
+    lookup->SetSubtitle(m_recordingRule->m_subtitle);
+    lookup->SetInetref(m_inetrefEdit->GetText());
+    lookup->SetCollectionref(m_inetrefEdit->GetText());
+    lookup->SetSeason(m_seasonSpin->GetIntValue());
+    lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
-    m_metadataFactory->Lookup(m_lookup);
+    m_metadataFactory->Lookup(lookup);
 }
 
-void MetadataOptions::OnSearchListSelection(MetadataLookup *lookup)
+void MetadataOptions::OnSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     QueryComplete(lookup);
 }
@@ -1488,23 +1487,24 @@ void MetadataOptions::OnImageSearchListSelection(ArtworkInfo info,
     QString msg = tr("Downloading selected artwork...");
     CreateBusyDialog(msg);
 
-    m_lookup = new MetadataLookup();
-    m_lookup->SetType(kMetadataVideo);
-    m_lookup->SetHost(gCoreContext->GetMasterHostName());
-    m_lookup->SetAutomatic(true);
-    m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    MetadataLookup *lookup = new MetadataLookup();
+
+    lookup->SetType(kMetadataVideo);
+    lookup->SetHost(gCoreContext->GetMasterHostName());
+    lookup->SetAutomatic(true);
+    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
 
     ArtworkMap downloads;
     downloads.insert(type, info);
-    m_lookup->SetDownloads(downloads);
-    m_lookup->SetAllowOverwrites(true);
-    m_lookup->SetTitle(m_recordingRule->m_title);
-    m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
-    m_lookup->SetInetref(m_inetrefEdit->GetText());
-    m_lookup->SetSeason(m_seasonSpin->GetIntValue());
-    m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
+    lookup->SetDownloads(downloads);
+    lookup->SetAllowOverwrites(true);
+    lookup->SetTitle(m_recordingRule->m_title);
+    lookup->SetSubtitle(m_recordingRule->m_subtitle);
+    lookup->SetInetref(m_inetrefEdit->GetText());
+    lookup->SetSeason(m_seasonSpin->GetIntValue());
+    lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
-    m_imageDownload->addDownloads(m_lookup);
+    m_imageDownload->addDownloads(lookup);
 }
 
 void MetadataOptions::SelectLocalFanart()
@@ -1575,16 +1575,14 @@ void MetadataOptions::QueryComplete(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    m_lookup = lookup;
-
     // InetRef
-    m_inetrefEdit->SetText(m_lookup->GetInetref());
+    m_inetrefEdit->SetText(lookup->GetInetref());
 
     // Season
-    m_seasonSpin->SetValue(m_lookup->GetSeason());
+    m_seasonSpin->SetValue(lookup->GetSeason());
 
     // Episode
-    m_episodeSpin->SetValue(m_lookup->GetEpisode());
+    m_episodeSpin->SetValue(lookup->GetEpisode());
 
     InfoMap metadataMap;
     lookup->toMap(metadataMap);
@@ -1649,31 +1647,31 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     if (!CanSetArtwork())
         return;
 
-    m_lookup = new MetadataLookup();
+    MetadataLookup *lookup = new MetadataLookup();
 
     QString msg = tr("Searching for available artwork...");
     CreateBusyDialog(msg);
 
-    m_lookup->SetStep(kLookupSearch);
-    m_lookup->SetType(kMetadataVideo);
-    m_lookup->SetAutomatic(true);
-    m_lookup->SetHandleImages(false);
+    lookup->SetStep(kLookupSearch);
+    lookup->SetType(kMetadataVideo);
+    lookup->SetAutomatic(true);
+    lookup->SetHandleImages(false);
     if (m_seasonSpin->GetIntValue() > 0 ||
            m_episodeSpin->GetIntValue() > 0)
-        m_lookup->SetSubtype(kProbableTelevision);
+        lookup->SetSubtype(kProbableTelevision);
     else
-        m_lookup->SetSubtype(kProbableMovie);
-    m_lookup->SetAllowGeneric(true);
-    m_lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
-    m_lookup->SetHost(gCoreContext->GetMasterHostName());
-    m_lookup->SetTitle(m_recordingRule->m_title);
-    m_lookup->SetSubtitle(m_recordingRule->m_subtitle);
-    m_lookup->SetInetref(m_inetrefEdit->GetText());
-    m_lookup->SetCollectionref(m_inetrefEdit->GetText());
-    m_lookup->SetSeason(m_seasonSpin->GetIntValue());
-    m_lookup->SetEpisode(m_episodeSpin->GetIntValue());
+        lookup->SetSubtype(kProbableMovie);
+    lookup->SetAllowGeneric(true);
+    lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
+    lookup->SetHost(gCoreContext->GetMasterHostName());
+    lookup->SetTitle(m_recordingRule->m_title);
+    lookup->SetSubtitle(m_recordingRule->m_subtitle);
+    lookup->SetInetref(m_inetrefEdit->GetText());
+    lookup->SetCollectionref(m_inetrefEdit->GetText());
+    lookup->SetSeason(m_seasonSpin->GetIntValue());
+    lookup->SetEpisode(m_episodeSpin->GetIntValue());
 
-    m_imageLookup->addLookup(m_lookup);
+    m_imageLookup->addLookup(lookup);
 }
 
 void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
@@ -1782,9 +1780,8 @@ void MetadataOptions::customEvent(QEvent *levent)
                 if (!m_recordingRule->m_seriesid.isEmpty() &&
                     m_recordingRule->m_seriesid == (list[p])->GetTMSref())
                 {
-                    MetadataLookup *lookup = list.takeAt(p);
+                    MetadataLookup *lookup = list[p];
                     QueryComplete(lookup);
-                    qDeleteAll(list);
                     return;
                 }
                 else if (m_recInfo &&
@@ -1808,9 +1805,8 @@ void MetadataOptions::customEvent(QEvent *levent)
 
             if (yearindex > -1)
             {
-                MetadataLookup *lookup = list.takeAt(yearindex);
+                MetadataLookup *lookup = list[yearindex];
                 QueryComplete(lookup);
-                qDeleteAll(list);
                 return;
             }
 
@@ -1818,8 +1814,8 @@ void MetadataOptions::customEvent(QEvent *levent)
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);
 
-            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
-                    SLOT(OnSearchListSelection(MetadataLookup*)),
+            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
+                    SLOT(OnSearchListSelection(RefCountHandler<MetadataLookup>)),
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())
@@ -1859,11 +1855,6 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (!mfnr)
             return;
 
-        MetadataLookup *lookup = mfnr->result;
-
-        delete lookup;
-        lookup = NULL;
-
         QString title = tr("No match found for this recording. You can "
                            "try entering a TVDB/TMDB number, season, and "
                            "episode manually.");
@@ -1891,7 +1882,7 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (lul.count() >= 1)
         {
-            OnArtworkSearchDone(lul.takeFirst());
+            OnArtworkSearchDone(lul[0]);
         }
     }
     else if (levent->type() == MetadataLookupFailure::kEventType)
@@ -1908,8 +1899,6 @@ void MetadataOptions::customEvent(QEvent *levent)
 
         if (lul.size())
         {
-            MetadataLookup *lookup = lul.takeFirst();
-
             QString title = tr("This number, season, and episode combination "
                                "does not appear to be valid (or the site may "
                                "be down). Check your information and try "
@@ -1920,9 +1909,6 @@ void MetadataOptions::customEvent(QEvent *levent)
 
             if (okPopup->Create())
                 m_popupStack->AddScreen(okPopup);
-
-            delete lookup;
-            lookup = NULL;
         }
     }
     else if (levent->type() == ImageDLEvent::kEventType)
@@ -1949,16 +1935,6 @@ void MetadataOptions::customEvent(QEvent *levent)
             m_busyPopup->Close();
             m_busyPopup = NULL;
         }
-
-        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
-
-        MetadataLookup *lookup = ide->item;
-
-        if (!lookup)
-            return;
-
-        delete lookup;
-        lookup = NULL;
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
@@ -1998,8 +1974,8 @@ void MetadataOptions::customEvent(QEvent *levent)
 
 SchedOptMixin::SchedOptMixin(MythScreenType &screen, RecordingRule *rule,
                              SchedOptMixin *other)
-    : m_prioritySpin(NULL), m_startoffsetSpin(NULL), m_endoffsetSpin(NULL), 
-      m_dupmethodList(NULL), m_dupscopeList(NULL), m_inputList(NULL), 
+    : m_prioritySpin(NULL), m_startoffsetSpin(NULL), m_endoffsetSpin(NULL),
+      m_dupmethodList(NULL), m_dupscopeList(NULL), m_inputList(NULL),
       m_ruleactiveCheck(NULL), m_newrepeatList(NULL),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false),
       m_haveRepeats(gCoreContext->GetNumSetting("HaveRepeats", 0))
@@ -2120,7 +2096,7 @@ void SchedOptMixin::Load(void)
             new MythUIButtonListItem(m_dupscopeList,
                 QObject::tr("Look for duplicates in previous recordings only"),
                                      ENUM_TO_QVARIANT(kDupsInOldRecorded));
-            if (m_haveRepeats && !m_newrepeatList && 
+            if (m_haveRepeats && !m_newrepeatList &&
                 (!m_other || !m_other->m_newrepeatList))
             {
                 new MythUIButtonListItem(m_dupscopeList,
@@ -2136,14 +2112,14 @@ void SchedOptMixin::Load(void)
     {
         if (!m_loaded)
         {
-            new MythUIButtonListItem(m_inputList, 
+            new MythUIButtonListItem(m_inputList,
                                      QObject::tr("Use any available input"),
                                      qVariantFromValue(0));
 
             vector<uint> inputids = CardUtil::GetAllInputIDs();
             for (uint i = 0; i < inputids.size(); ++i)
             {
-                new MythUIButtonListItem(m_inputList, 
+                new MythUIButtonListItem(m_inputList,
                     QObject::tr("Prefer input %1")
                     .arg(CardUtil::GetDisplayName(inputids[i])), inputids[i]);
             }
@@ -2231,12 +2207,12 @@ void SchedOptMixin::RuleChanged(void)
     if (m_dupmethodList)
         m_dupmethodList->SetEnabled(isScheduled && !isSingle);
     if (m_dupscopeList)
-        m_dupscopeList->SetEnabled(isScheduled && !isSingle && 
+        m_dupscopeList->SetEnabled(isScheduled && !isSingle &&
                                    m_rule->m_dupMethod != kDupCheckNone);
     if (m_inputList)
         m_inputList->SetEnabled(isScheduled);
     if (m_ruleactiveCheck)
-        m_ruleactiveCheck->SetEnabled(isScheduled); 
+        m_ruleactiveCheck->SetEnabled(isScheduled);
     if (m_newrepeatList)
         m_newrepeatList->SetEnabled(isScheduled && !isSingle && m_haveRepeats);
 }
@@ -2262,8 +2238,8 @@ void SchedOptMixin::DupMethodChanged(MythUIButtonListItem *item)
 
 StoreOptMixin::StoreOptMixin(MythScreenType &screen, RecordingRule *rule,
                              StoreOptMixin *other)
-    : m_recprofileList(NULL), m_recgroupList(NULL), m_storagegroupList(NULL), 
-      m_playgroupList(NULL), m_maxepSpin(NULL), m_maxbehaviourList(NULL), 
+    : m_recprofileList(NULL), m_recgroupList(NULL), m_storagegroupList(NULL),
+      m_playgroupList(NULL), m_maxepSpin(NULL), m_maxbehaviourList(NULL),
       m_autoexpireCheck(NULL),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
 {
@@ -2330,7 +2306,7 @@ void StoreOptMixin::Load(void)
             QMap<int, QString>::iterator pit;
             for (pit = profiles.begin(); pit != profiles.end(); ++pit)
             {
-                new MythUIButtonListItem(m_recprofileList, 
+                new MythUIButtonListItem(m_recprofileList,
                                          label.arg(pit.value()),
                                          qVariantFromValue(pit.value()));
             }
@@ -2347,7 +2323,7 @@ void StoreOptMixin::Load(void)
             new MythUIButtonListItem(m_recgroupList,
                                   QObject::tr("Create a new recording group"),
                                   qVariantFromValue(QString("__NEW_GROUP__")));
-            new MythUIButtonListItem(m_recgroupList, 
+            new MythUIButtonListItem(m_recgroupList,
                                      label.arg(QObject::tr("Default")),
                                      qVariantFromValue(QString("Default")));
 
@@ -2388,7 +2364,7 @@ void StoreOptMixin::Load(void)
         if (!m_loaded)
         {
             label = QObject::tr("Store in the \"%1\" storage group");
-            new MythUIButtonListItem(m_storagegroupList, 
+            new MythUIButtonListItem(m_storagegroupList,
                                      label.arg(QObject::tr("Default")),
                                      qVariantFromValue(QString("Default")));
 
@@ -2396,7 +2372,7 @@ void StoreOptMixin::Load(void)
             for (it = groups.begin(); it != groups.end(); ++it)
             {
                 if ((*it).compare("Default", Qt::CaseInsensitive) != 0)
-                    new MythUIButtonListItem(m_storagegroupList, 
+                    new MythUIButtonListItem(m_storagegroupList,
                                        label.arg(*it), qVariantFromValue(*it));
             }
         }
@@ -2409,7 +2385,7 @@ void StoreOptMixin::Load(void)
         if (!m_loaded)
         {
             label = QObject::tr("Use \"%1\" playback group settings");
-            new MythUIButtonListItem(m_playgroupList, 
+            new MythUIButtonListItem(m_playgroupList,
                                      label.arg(QObject::tr("Default")),
                                      qVariantFromValue(QString("Default")));
 
@@ -2542,10 +2518,10 @@ void StoreOptMixin::PromptForRecGroup(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QString label = 
+    QString label =
         QObject::tr("Create New Recording Group. Enter group name: ");
 
-    MythTextInputDialog *textDialog = 
+    MythTextInputDialog *textDialog =
         new MythTextInputDialog(popupStack, label,
                 static_cast<InputFilter>(FilterSymbols | FilterPunct));
 
@@ -2590,9 +2566,9 @@ void StoreOptMixin::SetRecGroup(QString recgroup)
 
 PostProcMixin::PostProcMixin(MythScreenType &screen, RecordingRule *rule,
                              PostProcMixin *other)
-    : m_commflagCheck(NULL), m_transcodeCheck(NULL), 
-      m_transcodeprofileList(NULL), m_userjob1Check(NULL), 
-      m_userjob2Check(NULL), m_userjob3Check(NULL), m_userjob4Check(NULL), 
+    : m_commflagCheck(NULL), m_transcodeCheck(NULL),
+      m_transcodeprofileList(NULL), m_userjob1Check(NULL),
+      m_userjob2Check(NULL), m_userjob3Check(NULL), m_userjob4Check(NULL),
       m_metadataLookupCheck(NULL),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
 {
@@ -2663,7 +2639,7 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        QMap<int, QString> profiles = 
+        QMap<int, QString> profiles =
             RecordingProfile::listProfiles(RecordingProfile::TranscoderGroup);
         QMap<int, QString>::iterator it;
         for (it = profiles.begin(); it != profiles.end(); ++it)
@@ -2779,7 +2755,7 @@ void PostProcMixin::RuleChanged(void)
     if (m_transcodeCheck)
         m_transcodeCheck->SetEnabled(isScheduled);
     if (m_transcodeprofileList)
-        m_transcodeprofileList->SetEnabled(isScheduled && 
+        m_transcodeprofileList->SetEnabled(isScheduled &&
                                            m_rule->m_autoTranscode);
     if (m_userjob1Check)
         m_userjob1Check->SetEnabled(isScheduled);

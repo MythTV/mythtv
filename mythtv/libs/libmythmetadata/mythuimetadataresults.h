@@ -16,13 +16,13 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
 
   public:
     MetadataResultsDialog(MythScreenStack *lparent,
-                            const MetadataLookupList results);
+                          const MetadataLookupList results);
     ~MetadataResultsDialog();
 
     bool Create();
 
   signals:
-    void haveResult(MetadataLookup*);
+    void haveResult(RefCountHandler<MetadataLookup>);
 
   private:
     MetadataLookupList m_results;

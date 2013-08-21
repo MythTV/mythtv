@@ -2860,7 +2860,7 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
     };
 };
 
-CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
+CardInput::CardInput(const QString & cardtype,
                      bool isNewInput, int _cardid) :
     id(new ID()),
     cardid(new CardID(*this)),
@@ -2891,17 +2891,18 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     basic->addChild(new InputDisplayName(*this));
     basic->addChild(sourceid);
 
-    if (!isDTVcard)
+    if (CardUtil::IsEncoder(cardtype) || CardUtil::IsUnscanable(cardtype))
     {
         basic->addChild(new ExternalChannelCommand(*this));
-        basic->addChild(new PresetTuner(*this));
+        if (!CardUtil::IsEncoder(cardtype))
+            basic->addChild(new PresetTuner(*this));
     }
     else
     {
         ConfigurationGroup *chgroup =
             new HorizontalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new QuickTune(*this));
-        if (isDVBcard)
+        if ("DVB" == cardtype)
             chgroup->addChild(new DishNetEIT(*this));
         basic->addChild(chgroup);
     }

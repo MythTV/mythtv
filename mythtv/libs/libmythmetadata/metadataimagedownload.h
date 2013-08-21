@@ -19,8 +19,21 @@ class META_PUBLIC ImageDLEvent : public QEvent
   public:
     ImageDLEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
-                 item(lookup) {}
-    ~ImageDLEvent() {}
+                 item(lookup)
+    {
+        if (item)
+        {
+            item->IncrRef();
+        }
+    }
+    ~ImageDLEvent()
+    {
+        if (item)
+        {
+            item->DecrRef();
+            item = NULL;
+        }
+    }
 
     MetadataLookup *item;
 
@@ -32,8 +45,21 @@ class META_PUBLIC ImageDLFailureEvent : public QEvent
   public:
     ImageDLFailureEvent(MetadataLookup *lookup) :
                  QEvent(kEventType),
-                 item(lookup) {}
-    ~ImageDLFailureEvent() {}
+                 item(lookup)
+    {
+        if (item)
+        {
+            item->IncrRef();
+        }
+    }
+    ~ImageDLFailureEvent()
+    {
+        if (item)
+        {
+            item->DecrRef();
+            item = NULL;
+        }
+    }
 
     MetadataLookup *item;
 
@@ -46,7 +72,11 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
     ThumbnailDLEvent(ThumbnailData *data) :
                  QEvent(kEventType),
                  thumb(data) {}
-    ~ThumbnailDLEvent() {}
+    ~ThumbnailDLEvent()
+    {
+        delete thumb;
+        thumb = NULL;
+    }
 
     ThumbnailData *thumb;
 
@@ -71,10 +101,9 @@ class META_PUBLIC MetadataImageDownload : public MThread
   private:
 
     ThumbnailData*             moreThumbs();
-    MetadataLookup*            moreDownloads();
 
     QObject                   *m_parent;
-    QList<MetadataLookup*>     m_downloadList;
+    MetadataLookupList         m_downloadList;
     QList<ThumbnailData*>      m_thumbnailList;
     QMutex                     m_mutex;
 };

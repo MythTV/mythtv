@@ -823,7 +823,6 @@ void NetSearch::customEvent(QEvent *event)
 
         if (file.isEmpty() || !((uint)m_searchResultList->GetCount() >= pos))
         {
-            delete data;
             return;
         }
 
@@ -834,8 +833,6 @@ void NetSearch::customEvent(QEvent *event)
         {
             item->SetImage(file);
         }
-
-        delete data;
     }
     else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {

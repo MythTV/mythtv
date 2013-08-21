@@ -785,8 +785,7 @@ class CardInput : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
   public:
-    CardInput(bool is_dtv_card, bool is_dvb_card,
-              bool is_new_input, int cardid);
+    CardInput(const QString & cardtype, bool is_new_input, int cardid);
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
