@@ -125,6 +125,8 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data)
     {
         LOG(VB_MHEG, LOG_DEBUG, LOC + QString("GetFile cache read %1").arg(csPath) );
 
+        locker.unlock();
+
         NetStream req(csPath, NetStream::kAlwaysCache);
         if (req.WaitTillFinished(3000) && req.GetError() == QNetworkReply::NoError)
         {
@@ -137,6 +139,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data)
         LOG(VB_MHEG, LOG_WARNING, LOC + QString("GetFile cache read failed %1").arg(csPath) );
         //return kError;
         // Retry
+        locker.relock();
     }
 
     // Queue a download
