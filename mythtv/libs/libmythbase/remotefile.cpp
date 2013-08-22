@@ -189,7 +189,7 @@ MythSocket *RemoteFile::openSocket(bool control)
             for (; it != strlist.end(); ++it)
                 auxfiles << *it;
         }
-        else if (0 < strlist.size() && strlist.size() < 3 &&
+        else if (!strlist.isEmpty() && strlist.size() < 3 &&
                  strlist[0] != "ERROR")
         {
             LOG(VB_GENERAL, LOG_ERR, loc +
@@ -201,11 +201,11 @@ MythSocket *RemoteFile::openSocket(bool control)
         }
     }
 
-    if (strlist.empty() || strlist[0] == "ERROR")
+    if (strlist.isEmpty() || strlist[0] == "ERROR")
     {
         lsock->DecrRef();
         lsock = NULL;
-        if (strlist.empty())
+        if (strlist.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, loc + "Failed to open socket, timeout");
         }
@@ -319,7 +319,7 @@ bool RemoteFile::ReOpen(QString newFilename)
     lock.unlock();
 
     bool retval = false;
-    if (!strlist.empty())
+    if (!strlist.isEmpty())
         retval = strlist[0].toInt();
 
     return retval;
@@ -390,7 +390,7 @@ bool RemoteFile::DeleteFile(const QString &url)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (strlist[0] == "1")
+    if (!strlist.isEmpty() && strlist[0] == "1")
         result = true;
 
     return result;
@@ -430,7 +430,7 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
     gCoreContext->SendReceiveStringList(strlist);
 
     bool result = false;
-    if ((strlist.size() >= 1) && strlist[0] == "1")
+    if (!strlist.isEmpty() && strlist[0] == "1")
     {
         if ((strlist.size() >= 15) && fileinfo)
         {
@@ -487,7 +487,10 @@ QString RemoteFile::GetFileHash(const QString &url)
     strlist << hostname;
 
     gCoreContext->SendReceiveStringList(strlist);
-    result = strlist[0];
+    if (!strlist.isEmpty())
+    {
+        result = strlist[0];
+    }
 
     return result;
 }
@@ -566,7 +569,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     bool ok = controlSock->SendReceiveStringList(strlist);
 
-    if (ok && !strlist.empty())
+    if (ok && !strlist.isEmpty())
     {
         readposition = strlist[0].toLongLong();
         sock->Reset();
@@ -641,7 +644,7 @@ int RemoteFile::Write(const void *data, int size)
 
         if (controlSock->IsDataAvailable() &&
             controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
-            !strlist.empty())
+            !strlist.isEmpty())
         {
             recv = strlist[0].toInt(); // -1 on backend error
             response = true;
@@ -651,7 +654,7 @@ int RemoteFile::Write(const void *data, int size)
     if (!error && !response)
     {
         if (controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
-            !strlist.empty())
+            !strlist.isEmpty())
         {
             recv = strlist[0].toInt(); // -1 on backend error
         }
@@ -752,7 +755,7 @@ int RemoteFile::Read(void *data, int size)
 
         if (controlSock->IsDataAvailable() &&
             controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
-            !strlist.empty())
+            !strlist.isEmpty())
         {
             sent = strlist[0].toInt(); // -1 on backend error
             response = true;
@@ -762,7 +765,7 @@ int RemoteFile::Read(void *data, int size)
     if (!error && !response)
     {
         if (controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
-            !strlist.empty())
+            !strlist.isEmpty())
         {
             sent = strlist[0].toInt(); // -1 on backend error
         }
