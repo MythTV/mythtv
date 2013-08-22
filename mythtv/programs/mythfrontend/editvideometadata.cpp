@@ -26,6 +26,8 @@
 
 #include "editvideometadata.h"
 
+static const QString _Location = QObject::tr("Metadata Editor");
+
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, VideoMetadata *source_metadata,
         const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
@@ -653,9 +655,12 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
     VideoArtworkType type = qVariantValue<VideoArtworkType>(lookup->GetData());
     ArtworkList list = lookup->GetArtwork(type);
 
-    if (list.count() == 0)
+    if (list.isEmpty())
+    {
+        MythWarningNotification n(tr("No image found"), _Location);
+        GetNotificationCenter()->Queue(n);
         return;
-
+    }
     MythScreenStack *m_popupStack =
                      GetMythMainWindow()->GetStack("popup stack");
 
@@ -1052,5 +1057,12 @@ void EditMetadataDialog::customEvent(QEvent *levent)
             return;
 
         handleDownloadedImages(lookup);
+    }
+    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    {
+        MythErrorNotification n(tr("Failed to retrieve image"),
+                                _Location,
+                                tr("Check logs"));
+        GetNotificationCenter()->Queue(n);
     }
 }

@@ -46,6 +46,10 @@
 #include "videofileassoc.h"
 #include "videoplayersettings.h"
 #include "videometadatasettings.h"
+// for ImageDLFailureEvent
+#include "metadataimagedownload.h"
+
+static const QString _Location = "MythVideo";
 
 namespace
 {
@@ -2137,7 +2141,7 @@ void VideoDialog::createFetchDialog(VideoMetadata *metadata)
         desc = tr("Season %1, Episode %2")
                 .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
     }
-    MythBusyNotification n(msg, tr("MythVideo"), desc);
+    MythBusyNotification n(msg, _Location, desc);
     n.SetId(id);
     n.SetParent(this);
     GetNotificationCenter()->Queue(n);
@@ -2168,14 +2172,14 @@ void VideoDialog::dismissFetchDialog(VideoMetadata *metadata, bool ok)
     }
     if (ok)
     {
-        MythCheckNotification n(msg, tr("MythVideo"), desc);
+        MythCheckNotification n(msg, _Location, desc);
         n.SetId(id);
         n.SetParent(this);
         GetNotificationCenter()->Queue(n);
     }
     else
     {
-        MythErrorNotification n(msg, tr("MythVideo"), desc);
+        MythErrorNotification n(msg, _Location, desc);
         n.SetId(id);
         n.SetParent(this);
         GetNotificationCenter()->Queue(n);
@@ -3348,6 +3352,13 @@ void VideoDialog::customEvent(QEvent *levent)
         }
         else
             m_menuPopup = NULL;
+    }
+    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    {
+        MythErrorNotification n(tr("Failed to retrieve image(s)"),
+                                _Location,
+                                tr("Check logs"));
+        GetNotificationCenter()->Queue(n);
     }
 }
 

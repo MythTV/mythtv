@@ -561,6 +561,20 @@ void MetadataFactory::customEvent(QEvent *levent)
         else
             OnImageResult(lookup);
     }
+    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    {
+        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
+
+        MetadataLookup *lookup = ide->item;
+
+        if (!lookup)
+            return;
+
+        // propagate event on image download failure
+        if (parent())
+            QCoreApplication::postEvent(parent(),
+                            new ImageDLFailureEvent(lookup));
+    }
     else if (levent->type() == VideoScanChanges::kEventType)
     {
         VideoScanChanges *vsc = (VideoScanChanges *)levent;

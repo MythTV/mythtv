@@ -43,6 +43,8 @@
 
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
+static const QString _Location = QObject::tr("Schedule Editor");
+
 // Define the strings inserted into the recordfilter table in the
 // database.  This should make them available to the translators.
 static QString fs0(QT_TRANSLATE_NOOP("SchedFilterEditor", "New episode"));
@@ -1688,8 +1690,12 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
     VideoArtworkType type = qVariantValue<VideoArtworkType>(lookup->GetData());
     ArtworkList list = lookup->GetArtwork(type);
 
-    if (list.count() == 0)
+    if (list.isEmpty())
+    {
+        MythWarningNotification n(tr("No image found"), _Location);
+        GetNotificationCenter()->Queue(n);
         return;
+    }
 
     ImageSearchResultsDialog *resultsdialog =
           new ImageSearchResultsDialog(m_popupStack, list, type);
@@ -1935,6 +1941,10 @@ void MetadataOptions::customEvent(QEvent *levent)
             m_busyPopup->Close();
             m_busyPopup = NULL;
         }
+        MythErrorNotification n(tr("Failed to retrieve image(s)"),
+                                _Location,
+                                tr("Check logs"));
+        GetNotificationCenter()->Queue(n);
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
