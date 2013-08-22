@@ -1,2 +1,3 @@
 Makefile
 nzmqt
+src/Makefile.nzmqt

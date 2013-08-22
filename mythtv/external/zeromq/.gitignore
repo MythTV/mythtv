@@ -61,3 +61,5 @@ zeromq-*.tar.gz
 zeromq-*.zip
 builds/redhat/zeromq.spec
 src/libzmq.pc
+builds/msvc/_UpgradeReport_files
+builds/msvc/UpgradeLog.XML
