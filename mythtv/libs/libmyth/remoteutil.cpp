@@ -40,7 +40,7 @@ bool RemoteGetLoad(float load[3])
 {
     QStringList strlist(QString("QUERY_LOAD"));
 
-    if (gCoreContext->SendReceiveStringList(strlist))
+    if (gCoreContext->SendReceiveStringList(strlist) && strlist.size() >= 3)
     {
         load[0] = strlist[0].toFloat();
         load[1] = strlist[1].toFloat();
@@ -55,10 +55,10 @@ bool RemoteGetUptime(time_t &uptime)
 {
     QStringList strlist(QString("QUERY_UPTIME"));
 
-    if (!gCoreContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
         return false;
 
-    if (!strlist[0].at(0).isNumber())
+    if (strlist[0].isEmpty() || !strlist[0].at(0).isNumber())
         return false;
 
     if (sizeof(time_t) == sizeof(int))
@@ -75,7 +75,7 @@ bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
     QStringList strlist(QString("QUERY_MEMSTATS"));
 
-    if (gCoreContext->SendReceiveStringList(strlist))
+    if (gCoreContext->SendReceiveStringList(strlist) && strlist.size() >= 4)
     {
         totalMB = strlist[0].toInt();
         freeMB  = strlist[1].toInt();
@@ -93,8 +93,8 @@ bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
     strlist << QString::number((int)checkSlaves);
     pginfo->ToStringList(strlist);
 
-    if ((!gCoreContext->SendReceiveStringList(strlist)) ||
-        (!strlist[0].toInt()))
+    if (!gCoreContext->SendReceiveStringList(strlist) ||
+        (strlist.size() < 2) || !strlist[0].toInt())
         return false;
 
     // Only modify the pathname if the recording file is available locally on
@@ -120,7 +120,7 @@ bool RemoteDeleteRecording(
         .arg(forgetHistory ? "FORGET" : "NO_FORGET");
     QStringList strlist(cmd);
 
-    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
         result = false;
     else if (strlist[0].toInt() == -2)
         result = false;
@@ -150,7 +150,7 @@ bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (strlist[0].toInt() == 0)
+    if (!strlist.isEmpty() && strlist[0].toInt() == 0)
         result = true;
 
     return result;
@@ -171,7 +171,7 @@ void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist)
 uint RemoteGetRecordingList(
     vector<ProgramInfo *> &reclist, QStringList &strList)
 {
-    if (!gCoreContext->SendReceiveStringList(strList))
+    if (!gCoreContext->SendReceiveStringList(strList) || strList.isEmpty())
         return 0;
 
     int numrecordings = strList[0].toInt();
@@ -216,7 +216,7 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
     if (!gCoreContext->SendReceiveStringList(strlist))
         return QDateTime();
 
-    if (!strlist.empty() && strlist[0] != "BAD")
+    if (!strlist.isEmpty() && strlist[0] != "BAD")
     {
         uint timet = strlist[0].toUInt();
         return MythDate::fromTime_t(timet);
@@ -243,7 +243,7 @@ QDateTime RemoteGetPreviewIfModified(
     pginfo.ToStringList(strlist);
 
     if (!gCoreContext->SendReceiveStringList(strlist) ||
-        strlist.empty() || strlist[0] == "ERROR")
+        strlist.isEmpty() || strlist[0] == "ERROR")
     {
         LOG(VB_GENERAL, LOG_ERR, loc + "Remote error" +
             ((strlist.size() >= 2) ? (":\n\t\t\t" + strlist[1]) : ""));
@@ -383,11 +383,8 @@ int RemoteGetRecordingMask(void)
 
     QStringList strlist( cmd );
 
-    if (!gCoreContext->SendReceiveStringList(strlist))
+    if (!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty())
         return mask;
-
-    if (strlist.empty())
-        return 0;
 
     int recCount = strlist[0].toInt();
 
@@ -398,7 +395,7 @@ int RemoteGetRecordingMask(void)
         strlist = QStringList( cmd );
         strlist << "IS_RECORDING";
 
-        if (gCoreContext->SendReceiveStringList(strlist) && !strlist.empty())
+        if (gCoreContext->SendReceiveStringList(strlist) && !strlist.isEmpty())
         {
             if (strlist[0].toInt())
             {
@@ -419,10 +416,7 @@ int RemoteGetFreeRecorderCount(void)
 {
     QStringList strlist( "GET_FREE_RECORDER_COUNT" );
 
-    if (!gCoreContext->SendReceiveStringList(strlist, true))
-        return 0;
-
-    if (strlist.empty())
+    if (!gCoreContext->SendReceiveStringList(strlist, true) || strlist.isEmpty())
         return 0;
 
     if (strlist[0] == "UNKNOWN_COMMAND")
@@ -495,7 +489,7 @@ int RemoteCheckForRecording(const ProgramInfo *pginfo)
     QStringList strlist( QString("CHECK_RECORDING") );
     pginfo->ToStringList(strlist);
 
-    if (gCoreContext->SendReceiveStringList(strlist) && !strlist.empty())
+    if (gCoreContext->SendReceiveStringList(strlist) && !strlist.isEmpty())
         return strlist[0].toInt();
 
     return 0;
