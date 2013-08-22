@@ -642,7 +642,7 @@ void GameUI::customEvent(QEvent *event)
 
         handleDownloadedImages(lookup);
     }
-    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    else if (event->type() == ImageDLFailureEvent::kEventType)
     {
         MythErrorNotification n(tr("Failed to retrieve image(s)"),
                                 _Location,
