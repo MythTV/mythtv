@@ -82,16 +82,22 @@ static uint64_t mdate(void)
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
-static bool downloadURL(const QString url, QByteArray *buffer)
+static bool downloadURL(const QString &url, QByteArray *buffer)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     return mdm->download(url, buffer);
 }
 
-static void cancelURL(const QString url)
+static void cancelURL(const QString &url)
 {
     MythDownloadManager *mdm = GetMythDownloadManager();
     mdm->cancelDownload(url);
+}
+
+static void cancelURL(const QStringList &urls)
+{
+    MythDownloadManager *mdm = GetMythDownloadManager();
+    mdm->cancelDownload(urls);
 }
 
 /* segment container */
@@ -959,8 +965,9 @@ public:
     }
     void Seek(int val)
     {
-        QMutexLocker lock(&m_lock);
+        m_lock.lock();
         m_segment = val;
+        m_lock.unlock();
         Wakeup();
     }
     bool IsAtEnd(bool lock = false)
@@ -1011,7 +1018,6 @@ public:
     }
     int CurrentLiveBuffer(void)
     {
-        QMutexLocker lock(&m_lock);
         return m_parent->NumSegments() - m_segment;
     }
     void SetBuffer(int val)
@@ -1021,6 +1027,8 @@ public:
     }
     void AddSegmentToStream(int segnum, int stream)
     {
+        if (m_interrupted)
+            return;
         QMutexLocker lock(&m_lock);
         m_segmap.insert(segnum, stream);
     }
@@ -1133,11 +1141,15 @@ protected:
             {
                 uint64_t bw = m_bandwidth;
                 int err = hls->DownloadSegmentData(dnldsegment, bw, m_stream);
+                if (m_interrupted)
+                {
+                    // interrupt early
+                    Wakeup();
+                    break;
+                }
                 bw = AverageNewBandwidth(bw);
                 if (err != RET_OK)
                 {
-                    if (m_interrupted)
-                        break;
                     retries++;
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("download failed, retry #%1").arg(retries));
@@ -1255,22 +1267,25 @@ public:
         m_lock.lock();
         // Interrupt on-going downloads of all stream playlists
         int streams = m_parent->NumStreams();
+        QStringList listurls;
         for (int i = 0; i < streams; i++)
         {
             HLSStream *hls = m_parent->GetStream(i);
             if (hls)
             {
-                cancelURL(hls->Url());
+                listurls.append(hls->Url());
             }
         }
         m_lock.unlock();
+        cancelURL(listurls);
         wait();
     }
 
     void Wakeup(void)
     {
-        QMutexLocker lock(&m_lock);
+        m_lock.lock();
         m_wokenup = true;
+        m_lock.unlock();
         // send a wake signal
         m_waitcond.wakeAll();
     }

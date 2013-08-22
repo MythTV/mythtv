@@ -44,11 +44,11 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
                                              "No channels to process.."));
 
             MythPopupBox::showOkPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 channels ? 
-                (m_success ? QObject::tr("Found %1 channels").arg(channels) :
-                             QObject::tr("Failed to find any new channels!"))
-                : QObject::tr("Failed to find any channels."));
+                (m_success ? tr("Found %n channel(s)", "", channels) :
+                             tr("Failed to find any new channels!"))
+                           : tr("Failed to find any channels."));
         }
         else
         {
@@ -169,9 +169,9 @@ uint ChannelImporter::DeleteChannels(
     }
 
     // ask user whether to delete all or some of these stale channels
-    //   if some is selected ask about each individually
-    QString msg = QObject::tr(
-        "Found %n off-air channel(s).", "", off_air_list.size());
+    // if some is selected ask about each individually
+    //: %n is the number of channels
+    QString msg = tr("Found %n off-air channel(s).", "", off_air_list.size());
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
         return 0;
@@ -247,7 +247,7 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
         return 0;
     }
 
-    QString msg = QObject::tr("Found %n unused transport(s).", "", query.size());
+    QString msg = tr("Found %n unused transport(s).", "", query.size());
 
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
@@ -304,17 +304,18 @@ void ChannelImporter::InsertChannels(
 
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %n old %1 channel(s).", "", old_chan)
-                                    .arg(toString(type));
+            //: %n is the number of channels, %1 is the type of channel
+            QString msg = tr("Found %n old %1 channel(s).", "", old_chan)
+                              .arg(toString(type));
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
         }
         if (new_chan)
         {
-            QString msg = QObject::tr(
-                    "Found %n new non-conflicting %1 channel(s).", "", new_chan)
-                        .arg(toString(type));
+            //: %n is the number of channels, %1 is the type of channel
+            QString msg = tr("Found %n new non-conflicting %1 channel(s).", 
+                              "", new_chan).arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
@@ -347,17 +348,18 @@ void ChannelImporter::InsertChannels(
         CountChannels(list, info, type, new_chan, old_chan);
         if (new_chan)
         {
-            QString msg = QObject::tr(
-                        "Found %n new conflicting %1 channel(s).", "", new_chan)
-                            .arg(toString(type));
+            //: %n is the number of channels, %1 is the type of channel
+            QString msg = tr("Found %n new conflicting %1 channel(s).",
+                             "", new_chan).arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
         }
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %n conflicting old %1 channel(s).",
-                                      "", old_chan).arg(toString(type));
+            //: %n is the number of channels, %1 is the type of channel
+            QString msg = tr("Found %n conflicting old %1 channel(s).",
+                             "", old_chan).arg(toString(type));
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
@@ -1122,9 +1124,9 @@ QString ChannelImporter::GetSummary(
     const ChannelImporterBasicStats      &info,
     const ChannelImporterUniquenessStats &stats)
 {
-
-    QString msg = QObject::tr("Found %n transport(s):\n", "", transport_count);
-    msg += QObject::tr("Channels: FTA Enc Dec\n") +
+    //: %n is the number of transports
+    QString msg = tr("Found %n transport(s):\n", "", transport_count);
+    msg += tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
         .arg(info.atsc_channels[0],3).arg(info.atsc_channels[1],3)
         .arg(info.atsc_channels[2],3) +
@@ -1138,10 +1140,10 @@ QString ChannelImporter::GetSummary(
         .arg(info.mpeg_channels[0],3).arg(info.mpeg_channels[1],3)
         .arg(info.mpeg_channels[2],3) +
         QString("NTSC      %1\n").arg(info.ntsc_channels[0],3) +
-        QObject::tr("Unique: prog %1 atsc %2 atsc minor %3 channum %4\n")
+        tr("Unique: prog %1 atsc %2 atsc minor %3 channum %4\n")
         .arg(stats.unique_prognum).arg(stats.unique_atscnum)
         .arg(stats.unique_atscmin).arg(stats.unique_channum) +
-        QObject::tr("Max atsc major count: %1")
+        tr("Max atsc major count: %1")
         .arg(stats.max_atscmajcnt);
 
     return msg;
@@ -1273,16 +1275,16 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     if (use_gui)
     {
         QStringList buttons;
-        buttons.push_back(QObject::tr("Delete all"));
-        buttons.push_back(QObject::tr("Set all invisible"));
-//        buttons.push_back(QObject::tr("Handle manually"));
-        buttons.push_back(QObject::tr("Ignore all"));
+        buttons.push_back(tr("Delete all"));
+        buttons.push_back(tr("Set all invisible"));
+//        buttons.push_back(tr("Handle manually"));
+        buttons.push_back(tr("Ignore all"));
 
         DialogCode ret;
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1297,12 +1299,17 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toLatin1().constData()          << endl;
-        cout << "Do you want to:"    << endl;
-        cout << "1. Delete all"      << endl;
-        cout << "2. Set all invisible" << endl;
+        cout << msg.toLatin1().constData()
+             << endl
+             << tr("Do you want to:").toLatin1().constData()
+             << endl
+             << tr("1. Delete all").toLatin1().constData()
+             << endl
+             << tr("2. Set all invisible").toLatin1().constData()
+             << endl
 //        cout << "3. Handle manually" << endl;
-        cout << "4. Ignore all"      << endl;
+             << tr("4. Ignore all").toLatin1().constData()
+             << endl;
         while (true)
         {
             string ret;
@@ -1320,7 +1327,8 @@ ChannelImporter::QueryUserDelete(const QString &msg)
             else
             {
                 //cout << "Please enter either 1, 2, 3 or 4:" << endl;
-                cout << "Please enter either 1, 2 or 4:" << endl;//
+                cout << tr("Please enter either 1, 2 or 4:")
+                    .toLatin1().constData() << endl;//
             }
         }
     }
@@ -1335,15 +1343,15 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     if (use_gui)
     {
         QStringList buttons;
-        buttons.push_back(QObject::tr("Insert all"));
-        buttons.push_back(QObject::tr("Insert manually"));
-        buttons.push_back(QObject::tr("Ignore all"));
+        buttons.push_back(tr("Insert all"));
+        buttons.push_back(tr("Insert manually"));
+        buttons.push_back(tr("Ignore all"));
 
         DialogCode ret;
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1356,11 +1364,16 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toLatin1().constData()          << endl;
-        cout << "Do you want to:"    << endl;
-        cout << "1. Insert all"      << endl;
-        cout << "2. Insert manually" << endl;
-        cout << "3. Ignore all"      << endl;
+        cout << msg.toLatin1().constData()          
+             << endl
+             << tr("Do you want to:").toLatin1().constData()
+             << endl
+             << tr("1. Insert all").toLatin1().constData()
+             << endl
+             << tr("2. Insert manually").toLatin1().constData()
+             << endl
+             << tr("3. Ignore all").toLatin1().constData()
+             << endl;
         while (true)
         {
             string ret;
@@ -1376,7 +1389,8 @@ ChannelImporter::QueryUserInsert(const QString &msg)
             }
             else
             {
-                cout << "Please enter either 1, 2, or 3:" << endl;
+                cout << tr("Please enter either 1, 2, or 3:")
+                    .toLatin1().constData() << endl;
             }
         }
     }
@@ -1392,15 +1406,15 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
     if (use_gui)
     {
         QStringList buttons;
-        buttons.push_back(QObject::tr("Update all"));
-        buttons.push_back(QObject::tr("Update manually"));
-        buttons.push_back(QObject::tr("Ignore all"));
+        buttons.push_back(tr("Update all"));
+        buttons.push_back(tr("Update manually"));
+        buttons.push_back(tr("Ignore all"));
 
         DialogCode ret;
         do
         {
             ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 msg, buttons, kDialogCodeButton0);
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
@@ -1415,13 +1429,13 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
     {
         cout << msg.toLatin1().constData()
              << endl
-             << QObject::tr("Do you want to:").toLatin1().constData()
+             << tr("Do you want to:").toLatin1().constData()
              << endl
-             << "1. " << QObject::tr("Update all").toLatin1().constData()
+             << tr("1. Update all").toLatin1().constData()
              << endl
-             << "2. " << QObject::tr("Update manually").toLatin1().constData()
+             << tr("2. Update manually").toLatin1().constData()
              << endl
-             << "3. " << QObject::tr("Ignore all").toLatin1().constData()
+             << tr("3. Ignore all").toLatin1().constData()
              << endl;
         while (true)
         {
@@ -1438,8 +1452,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
             }
             else
             {
-                cout << QObject::tr(
-                    "Please enter either 1, 2, or 3:")
+                cout << tr("Please enter either 1, 2, or 3:")
                     .toLatin1().constData() << endl;
             }
         }
@@ -1463,10 +1476,12 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     textEdit->setText(text);
     popup->addWidget(textEdit);
 
-    popup->addButton(QObject::tr("OK"),     popup, SLOT(accept()));
-    popup->addButton(QObject::tr("Suggest"));
-    popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
-    popup->addButton(QObject::tr("Cancel All"));
+    popup->addButton(QCoreApplication::translate("(Common)", "OK"),
+                     popup, SLOT(accept()));
+    popup->addButton(tr("Suggest"));
+    popup->addButton(QCoreApplication::translate("(Common)", "Cancel"),
+                     popup, SLOT(reject()));
+    popup->addButton(QCoreApplication::translate("(Common)", "Cancel All"));
 
     textEdit->setFocus();
 
@@ -1485,9 +1500,11 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         textEdit->setText(text);
         popup->addWidget(textEdit);
 
-        popup->addButton(QObject::tr("OK"), popup, SLOT(accept()))->setFocus();
-        popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
-        popup->addButton(QObject::tr("Cancel All"));
+        popup->addButton(QCoreApplication::translate("(Common)", "OK"),
+                         popup, SLOT(accept()))->setFocus();
+        popup->addButton(QCoreApplication::translate("(Common)", "Cancel"),
+                         popup, SLOT(reject()));
+        popup->addButton(QCoreApplication::translate("(Common)", "Cancel All"));
 
         dc = popup->ExecPopup();
     }
@@ -1508,9 +1525,8 @@ OkCancelType ChannelImporter::QueryUserResolve(
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
 {
-    QString msg = QObject::tr(
-        "Channel %1 was found to be in conflict with other channels. ")
-        .arg(SimpleFormatChannel(transport, chan));
+    QString msg = tr("Channel %1 was found to be in conflict with other "
+                     "channels.").arg(SimpleFormatChannel(transport, chan));
 
     OkCancelType ret = kOCTCancel;
 
@@ -1519,11 +1535,12 @@ OkCancelType ChannelImporter::QueryUserResolve(
         while (true)
         {
             QString msg2 = msg;
-            msg2 += QObject::tr("Please enter a unique channel number. ");
+            msg2 += " ";
+            msg2 += tr("Please enter a unique channel number.");
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
             ret = ShowManualChannelPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret)
@@ -1543,11 +1560,12 @@ OkCancelType ChannelImporter::QueryUserResolve(
     {
         cout << msg.toLatin1().constData() << endl;
 
-        QString cancelStr = QObject::tr("Cancel").toLower();
-        QString cancelAllStr = QObject::tr("Cancel All").toLower();
-        QString msg2 = QObject::tr(
-            "Please enter a non-conflicting channel number "
-            "(or type %1 to skip, %2 to skip all): ")
+        QString cancelStr = QCoreApplication::translate("(Common)",
+                                                        "Cancel").toLower();
+        QString cancelAllStr = QCoreApplication::translate("(Common)",
+                                   "Cancel All").toLower();
+        QString msg2 = tr("Please enter a non-conflicting channel number "
+                          "(or type '%1' to skip, '%2' to skip all):")
             .arg(cancelStr).arg(cancelAllStr);
 
         while (true)
@@ -1589,8 +1607,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
 {
-    QString msg = QObject::tr(
-        "You chose to manually insert channel %1.")
+    QString msg = tr("You chose to manually insert channel %1.")
         .arg(SimpleFormatChannel(transport, chan));
 
     OkCancelType ret = kOCTCancel;
@@ -1600,11 +1617,12 @@ OkCancelType ChannelImporter::QueryUserInsert(
         while (true)
         {
             QString msg2 = msg;
-            msg2 += QObject::tr("Please enter a unique channel number. ");
+            msg2 += " ";
+            msg2 += tr("Please enter a unique channel number.");
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
             ret = ShowManualChannelPopup(
-                GetMythMainWindow(), QObject::tr("Channel Importer"),
+                GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);
 
             if (kOCTOk != ret)
@@ -1627,12 +1645,15 @@ OkCancelType ChannelImporter::QueryUserInsert(
     {
         cout << msg.toLatin1().constData() << endl;
 
-        QString cancelStr    = QObject::tr("Cancel").toLower();
-        QString cancelAllStr = QObject::tr("Cancel All").toLower();
-        QString msg2 = QObject::tr(
-            "Please enter a non-conflicting channel number "
-            "(or type %1 to skip, %2 to skip all): ")
-            .arg(cancelStr).arg(cancelAllStr);
+        QString cancelStr    = QCoreApplication::translate("(Common)",
+                                                           "Cancel").toLower();
+        QString cancelAllStr = QCoreApplication::translate("(Common)",
+                                   "Cancel All").toLower();
+
+        //: %1 is the translation of "cancel", %2 of "cancel all"
+        QString msg2 = tr("Please enter a non-conflicting channel number "
+                          "(or type '%1' to skip, '%2' to skip all): ")
+                          .arg(cancelStr).arg(cancelAllStr);
 
         while (true)
         {

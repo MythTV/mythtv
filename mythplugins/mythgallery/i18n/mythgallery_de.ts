@@ -2,11 +2,23 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
 <context>
+    <name>(MythGalleryMain)</name>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="54"/>
+        <source>MythGallery cannot find its start directory.
+%1
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation>MythGallery kann das Startverzeichnis nicht finden.
+%1
+Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstellungen korrekt sind.</translation>
+    </message>
+</context>
+<context>
     <name>GLSingleView</name>
     <message>
         <location filename="../mythgallery/glsingleview.cpp" line="243"/>
         <source>Press SELECT to play again</source>
-        <translation>Mit &apos;SELECT&apos; wiederholen</translation>
+        <translation>Mit &apos;SELECT&apos; nochmals abspielen</translation>
     </message>
 </context>
 <context>
@@ -813,113 +825,113 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="88"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
         <source>Image viewer / slideshow</source>
         <translation>Bildbetrachter / Diaschau</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Start/Stop Slideshow</source>
         <translation>Diaschau Start/Stopp</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>zum ersten Bild der Vorschauansicht springen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>zum letzten Bild der Vorschauansicht springen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Diaschau in der Vorschauansicht starten</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="90"/>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="102"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Diaschau (zufällige Reihenfolge) in der Vorschauansicht starten</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="104"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Bild um 90° nach rechts drehen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="106"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Bild um 90° nach links drehen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="108"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Zoom image out</source>
         <translation>Bild verkleinern</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="110"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Zoom image in</source>
         <translation>Bild vergrößern</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="112"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>Scroll image up</source>
         <translation>Bild nach oben schieben</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="114"/>
+        <location filename="../mythgallery/main.cpp" line="115"/>
         <source>Scroll image left</source>
         <translation>Bild nach links schieben</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="116"/>
+        <location filename="../mythgallery/main.cpp" line="117"/>
         <source>Scroll image right</source>
         <translation>Bild nach rechts schieben</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="118"/>
+        <location filename="../mythgallery/main.cpp" line="119"/>
         <source>Scroll image down</source>
         <translation>Bild nach unten schieben</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="120"/>
+        <location filename="../mythgallery/main.cpp" line="121"/>
         <source>Recenter image</source>
         <translation>Bild zentrieren</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="122"/>
+        <location filename="../mythgallery/main.cpp" line="123"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Bild in Originalgröße anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="124"/>
+        <location filename="../mythgallery/main.cpp" line="125"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>Springe zur linken oberen Ecke des Bildes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="126"/>
+        <location filename="../mythgallery/main.cpp" line="127"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>Springe zur rechten unteren Ecke des Bildes</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="128"/>
+        <location filename="../mythgallery/main.cpp" line="129"/>
         <source>Mark image</source>
         <translation>Bild markieren</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="130"/>
+        <location filename="../mythgallery/main.cpp" line="131"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Umschalten zwischen Vollbild und Einpassen</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="132"/>
+        <location filename="../mythgallery/main.cpp" line="133"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery Medienhandler 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="143"/>
+        <location filename="../mythgallery/main.cpp" line="144"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery Medienhandler 2/2</translation>
     </message>
@@ -1063,11 +1075,10 @@
         <translation type="obsolete">MythGallery Einstellungen (Allgemein)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="53"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation>MythGallery kann das Startverzeichnis nicht finden.
+        <translation type="obsolete">MythGallery kann das Startverzeichnis nicht finden.
 %1
 Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstellungen korrekt sind.</translation>
     </message>
@@ -1175,19 +1186,19 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="20"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="21"/>
         <source>No images are present in the pictures folder.</source>
         <translation>In diesem Ordner gibt es keine Bilder.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Image Gallery</source>
-        <translation>Bildergallerie</translation>
+        <translation>Bildergalerie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -1195,48 +1206,118 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>Keine Bilder im konfigurierten Verzeichnis gefunden.  Haben Sie das Plugin korrekt eingerichtet?</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="28"/>
         <source>SELECT: View</source>
         <translation>SELECT: Ansicht auswählen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="29"/>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Menü aktivieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Video Gallery</source>
         <translation>Videogalerie</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Filter/sort images</source>
         <translation>Bilder filtern/sortieren</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Syncing image %1</source>
+        <translation>Synchronisiere Bild %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Creating thumbnail %1</source>
+        <translation>Erstelle Vorschau %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Gallery Settings</source>
+        <translation>Galerie Einstellungen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Name of the storage group for the images:</source>
+        <translation>Name der Speichergruppe für die Bilder:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Sorting order of the shown images:</source>
+        <translation>Sortierreihenfolge der angezeigten Bilder:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Time to display each image during a slideshow (ms):</source>
+        <translation>Anzeigedauer der Bilder in einer Präsentation (ms):</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="13"/>
+        <source>Type of transition between two images:</source>
+        <translation>Art des Übergangs zwischen zwei Bildern:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Duration of an image transition (ms):</source>
+        <translation>Dauer eines Übergangs (ms):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Show files that are marked as hidden:</source>
+        <translation>Versteckte Dateien anzeigen:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Clear database contents (Resync required):</source>
+        <translation>Datenbankinhalte löschen (Synchronisation erforderlich):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Image Loading...</source>
+        <translation>Lade Bild...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
         <source>Directory filter:</source>
         <translation>Verzeichnisfilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Type filter:</source>
         <translation>Typenfilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Sort by:</source>
         <translation>Sortieren nach:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="27"/>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation>Geben Sie Ihre aktuelle Position oder die nächste Stadt ein. Für manche Länder wird auch die Postleitzahl unterstützt.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Verzeichnisfilter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Type filter :</source>
         <translation>Typenfilter :</translation>
     </message>
@@ -1245,22 +1326,22 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Sort by :</source>
         <translation>Sortieren nach:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Check Filter</source>
         <translation>Filter prüfen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Save as default</source>
         <translation>Als Standard speichern</translation>
     </message>

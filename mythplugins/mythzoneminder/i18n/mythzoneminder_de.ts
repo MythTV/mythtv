@@ -151,43 +151,63 @@
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Name:</source>
+        <translation>Name:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Duration:</source>
+        <translation>Dauer:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>ZoneMinder Live</source>
+        <translation>Zoneminder Live</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Läuft
 [S] = Gestoppt</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Select Camera:</source>
         <translation>Kamera auswählen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Select Date:</source>
         <translation>Datum auswählen:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Record</source>
         <translation>Aufnehmen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Store</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -319,17 +339,17 @@
         <translation>Monitor 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Show Console</source>
         <translation>Konsole anzeigen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Show Live View</source>
         <translation>Liveansicht zeigen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Show Events</source>
         <translation>Ereignisse anzeigen</translation>
     </message>

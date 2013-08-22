@@ -17,6 +17,13 @@ void strings_null() {
     ThemeUI::tr("Channel:");
     ThemeUI::tr("News Subscriptions");
     ThemeUI::tr("Choose the news sites you would like to read.");
+    ThemeUI::tr("News");
+    ThemeUI::tr("You Haven't Specified Any News Feeds.");
+    ThemeUI::tr("Edit News");
+    ThemeUI::tr("Ok");
+    ThemeUI::tr("News Config");
+    ThemeUI::tr("Available Categories");
+    ThemeUI::tr("Available Sites");
     ThemeUI::tr("News Feeds");
     ThemeUI::tr("Category");
     ThemeUI::tr("[x]");

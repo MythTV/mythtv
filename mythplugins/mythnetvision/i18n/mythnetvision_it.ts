@@ -257,32 +257,32 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="16"/>
         <source>No search scripts found!  This usually indicates missing prerequisites.</source>
         <translation>Non sono stati trovati script di ricerca! Questo di solito indica prerequisiti mancanti.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Page %1</source>
         <translation>Pagina: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Search:</source>
         <translation>Ricerca:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Author: %1</source>
         <translation>Autore: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Edit/Add a New RSS Feed</source>
         <translation>Modificare/Aggiungere un nuovo feed RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press &quot;Save&quot; to save/subscribe.
 
 For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;</source>
@@ -291,248 +291,319 @@ For new subscriptions, you can simply enter the URL and click &quot;Save.&quot;<
 Per nuove sottoscrizioni, inserire semplicemente l&apos;URL e clic &quot;salvare&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Title:</source>
         <translation>Titolo:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="22"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Author:</source>
         <translation>Autore:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Description:</source>
         <translation>Descrizione:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Download video from this feed automatically</source>
         <translation>Scaricare automaticamente video da questo feed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Select to change image...</source>
         <translation>Selezionare per cambiare immagine...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Save</source>
         <translation>Salvare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Cancel</source>
         <translation>Annulare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="29"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
         <translatorcomment>Fix case on sites...</translatorcomment>
         <translation>Non si sono aggiunti siti/feed RSS ora!. Per aggiungere un sito, premere MENÙ, poi scegliere &quot;Scansione/gestione sottoscrizioni&quot;, poi &quot;Gestione sottoscrizioni sito.&quot;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="15"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Internet Video Browser</source>
         <translation>Internet Video Browser</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="12"/>
         <source>No sites configured!</source>
         <translation>Non ci sono siti configurati!</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="13"/>
         <source>Videos - Gallery</source>
         <translation>Video - galleria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Videos - Tree</source>
         <translation>Video - struttura</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Manage Subscriptions</source>
         <translation>Gestione sottoscrizioni</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Choose the sites you wish to browse/search.</source>
         <translation>Scegliere i siti che si desidera navigare/ricercare.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="32"/>
         <source>New Site</source>
         <translation>Nuovo sito</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Edit Site</source>
         <translation>Modificare sito</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Unsubscribe</source>
         <translation>Annulla sottoscrizione</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Search Net Videos</source>
         <translation>Ricerca video in rete</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Search Term:</source>
         <translation>Ricerca termine:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Size: %1</source>
         <translation>Dimensione: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Description: %1</source>
         <translation>Descrizione: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Can&apos;t find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</source>
         <translation>Impossibile trovare script di ricerca! Questo di solito indica prerequisiti mancanti. Provare ad eseguire script dalla linea di comando.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Manage Site Subscriptions</source>
         <translation>Gestione sottoscrizioni sito</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Edit</source>
         <translation>Modificare</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="40"/>
         <source>New</source>
         <translation>Nuovo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Remove</source>
         <translation>Rimuovere</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Gestione sottoscrizioni RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Feed Name:</source>
         <translation>Nome feed:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Feed URL:</source>
         <translation>Feed URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Site Description:</source>
         <translation>Descrizione sito:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Feed Author:</source>
         <translation>Autore feed:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Download this feed automatically</source>
         <translation>Scaricare automaticamente questo feed</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Choose Image</source>
         <translation>Scegliere immagine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Browse Net Videos</source>
         <translation>Navgare video in rete</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Posted: %1</source>
         <translation>Inviao: %1</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Length: %1</source>
+        <translation>Lunghezza: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Runtime: %1</source>
+        <translation>Durata: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Rating: %1</source>
+        <translation>Valutazione: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Search Videos</source>
+        <translation>Ricerca video</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Can&apos;t find any search scripts!
+This usually indicates missing search script prerequisities.
+Try running a script from the command line.</source>
+        <translation>Impossibile trovare script di ricerca! 
+Questo di solito indica prerequisiti mancanti. 
+Provare ad eseguire script dalla linea di comando.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>Delete</source>
+        <translation>Eliminare</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Download this feed automatically:</source>
+        <translation>Scaricare automaticamente questo feed:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="47"/>
+        <source>Choose Image:</source>
+        <translation>Scegliere immagine:</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="48"/>
+        <source>NetVision Tree</source>
+        <translation>Struttura Netvision</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet! To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Non si sono aggiunti siti/feed RSS ora!. Per aggiungere un sito, premere MENÙ, poi scegliere &quot;Scansione/gestione sottoscrizioni&quot;, poi &quot;Gestione sottoscrizioni sito.&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
+        <source>NetVision Browser</source>
+        <translation>NetVision Browser</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="51"/>
+        <source>You haven&apos;t added any Sites/RSS Feeds yet!
+To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
+        <translation>Non si sono aggiunti siti/feed RSS ora!.
+Per aggiungere un sito, premere MENÙ, poi scegliere &quot;Scansione/gestione sottoscrizioni&quot;, poi &quot;Gestione sottoscrizioni sito.&quot;</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="52"/>
+        <source>NetVision Gallery</source>
+        <translation>Galleria NetVision</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="61"/>
         <source>Runtime</source>
         <translation>Durata</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Author</source>
         <translation>Autore</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Rating</source>
         <translation>Valutazione</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Search Internet Video</source>
         <translation>Ricerca internet video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Select to change image</source>
         <translation>Selezionare per cambiare immagine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Internet Video List</source>
         <translation>Elenco internet video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="67"/>
         <source>User Rating: %1</source>
         <translation>Valutazione utente: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="68"/>
         <source>By: %1</source>
         <translation>Da: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="69"/>
         <source>Internet Video Gallery</source>
         <translation>Galleria internet video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Search popular video sites</source>
         <translation>Ricerca di siti video popolari</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="71"/>
         <source>Browse Internet Video</source>
         <translation>Navigare internet video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="72"/>
         <source>Browse highlights and entire sites</source>
         <translation>Navigare nelle caratteristiche e in interi siti</translation>
     </message>

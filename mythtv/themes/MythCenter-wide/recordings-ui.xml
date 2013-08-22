@@ -450,9 +450,9 @@
 
     <window name="groupselector">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>12,4,470,90</area>
@@ -469,9 +469,9 @@
 
     <window name="changeview">
         <area>-1,-1,500,500</area>
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>12,34,470,30</area>
@@ -552,9 +552,9 @@
     <window name="passwordchanger">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>12,14,470,160</area>
@@ -590,10 +590,9 @@
     <window name="editmetadata">
         <area>-1,-1,800,600</area>
 
-        <imagetype name="backimg">
+        <shape name="backimg" from="basepopupbackground">
             <area>0,0,100%,100%</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        </shape>
 
         <textarea name="label" from="basetextarea">
             <area>20,10,100%-20,60</area>
@@ -669,10 +668,9 @@
     <window name="iconhelp">
         <area>-1,-1,700,500</area>
 
-        <imagetype name="backimg">
-            <area>0,0,700,500</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,0,700,50</area>

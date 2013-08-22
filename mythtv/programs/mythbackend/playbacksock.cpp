@@ -121,10 +121,10 @@ void PlaybackSock::GetDiskSpace(QStringList &o_strlist)
 {
     QStringList strlist(QString("QUERY_FREE_SPACE"));
 
-    SendReceiveStringList(strlist);
-
-    o_strlist += strlist;
-
+    if (SendReceiveStringList(strlist, 8))
+    {
+        o_strlist += strlist;
+    }
 }
 
 int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)

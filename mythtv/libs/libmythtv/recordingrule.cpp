@@ -48,7 +48,7 @@ RecordingRule::RecordingRule()
                 gCoreContext->GetNumSetting("prefDupMethod", kDupCheckSubDesc))),
     m_dupIn(kDupsInAll),
     m_filter(GetDefaultFilter()),
-    m_recProfile(QObject::tr("Default")),
+    m_recProfile(tr("Default")),
     m_recGroup("Default"),
     m_storageGroup("Default"),
     m_playGroup("Default"),
@@ -320,14 +320,15 @@ bool RecordingRule::MakeTemplate(QString category)
     if (m_recordID > 0)
         return false;
 
-    if (category.compare(QObject::tr("Default"), Qt::CaseInsensitive) == 0)
+    if (category.compare(tr("Default"), Qt::CaseInsensitive) == 0)
     {
         category = "Default";
-        m_title = QObject::tr("Default (Template)");
+        m_title = tr("Default (Template)");
     }
     else
     {
-        m_title = category + QObject::tr(" (Template)");
+        //: %1 is the category
+        m_title = tr("%1 (Template)").arg(category);
     }
 
     LoadTemplate(category);
@@ -351,7 +352,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
         return false;
 
     QString ltitle = QString("%1 (%2)").arg(textname)
-                                       .arg(QObject::tr("Power Search"));
+                                       .arg(tr("Power Search"));
     m_title = ltitle;
     m_subtitle = from;
     m_description = forwhat;
@@ -535,7 +536,7 @@ bool RecordingRule::Delete(bool sendSig)
 void RecordingRule::ToMap(InfoMap &infoMap) const
 {
     if (m_title == "Default (Template)")
-        infoMap["title"] = QObject::tr("Default (Template)");
+        infoMap["title"] = tr("Default (Template)");
     else
         infoMap["title"] = m_title;
     infoMap["subtitle"] = m_subtitle;
@@ -544,7 +545,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["episode"] = QString::number(m_episode);
 
     if (m_category == "Default")
-        infoMap["category"] = QObject::tr("Default");
+        infoMap["category"] = tr("Default", "category");
     else
         infoMap["category"] = m_category;
     infoMap["callsign"] = m_station;
@@ -571,17 +572,22 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     seconds = startts.secsTo(endts);
 
     minutes = seconds / 60;
-    infoMap["lenmins"] = QObject::tr("%n minute(s)","",minutes);
+    infoMap["lenmins"] = QCoreApplication::translate("(Common)", "%n minute(s)",
+        "", QCoreApplication::UnicodeUTF8, minutes);
     hours   = minutes / 60;
     minutes = minutes % 60;
 
-    QString minstring = QObject::tr("%n minute(s)","",minutes);
+    QString minstring  = QCoreApplication::translate("(Common)", "%n minute(s)",
+        "",QCoreApplication::UnicodeUTF8, minutes);
+
+    QString hourstring = QCoreApplication::translate("(Common)", "%n hour(s)",
+        "", QCoreApplication::UnicodeUTF8, hours);
 
     if (hours > 0)
     {
-        infoMap["lentime"] = QString("%1 %2")
-                                    .arg(QObject::tr("%n hour(s)","", hours))
-                                    .arg(minstring);
+        //: Time duration, %1 is replaced by the hours, %2 by the minutes
+        infoMap["lentime"] = QCoreApplication::translate("(Common)", "%1 %2",
+            "Hours and minutes").arg(hourstring).arg(minstring);
     }
     else
         infoMap["lentime"] = minstring;
@@ -608,10 +614,10 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
             findfrom = QString("%1, %2").arg(QDate::shortDayName(daynum))
                                         .arg(findfrom);
         }
-        infoMap["subtitle"] = QObject::tr("(%1 or later) %3",
-                                          "e.g. (Sunday or later) program "
-                                          "subtitle").arg(findfrom)
-                                          .arg(m_subtitle);
+        infoMap["subtitle"] = tr("(%1 or later) %3",
+                                 "e.g. (Sunday or later) program "
+                                 "subtitle").arg(findfrom)
+                                 .arg(m_subtitle);
     }
 
     infoMap["searchtype"] = SearchTypeToString(m_searchType);
@@ -639,7 +645,7 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["rectype"] = toString(m_type);
 
     if (m_template == "Default")
-        infoMap["template"] = QObject::tr("Default");
+        infoMap["template"] = tr("Default", "Default template");
     else
         infoMap["template"] = m_template;
 }
@@ -780,19 +786,19 @@ QString RecordingRule::SearchTypeToString(const RecSearchType searchType)
             searchTypeString = ""; // Allow themers to decide what to display
             break;
         case kPowerSearch:
-            searchTypeString = QObject::tr("Power Search");
+            searchTypeString = tr("Power Search");
             break;
         case kTitleSearch:
-            searchTypeString = QObject::tr("Title Search");
+            searchTypeString = tr("Title Search");
             break;
         case kKeywordSearch:
-            searchTypeString = QObject::tr("Keyword Search");
+            searchTypeString = tr("Keyword Search");
             break;
         case kPeopleSearch:
-            searchTypeString = QObject::tr("People Search");
+            searchTypeString = tr("People Search");
             break;
         default:
-            searchTypeString = QObject::tr("Unknown Search");
+            searchTypeString = tr("Unknown Search");
             break;
     }
 

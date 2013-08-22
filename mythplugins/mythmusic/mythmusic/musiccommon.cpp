@@ -1203,21 +1203,6 @@ void MusicCommon::customEvent(QEvent *event)
         // TODO only need to update the playlist times here
         updatePlaylistStats();
     }
-    else if (event->type() == OutputEvent::Error)
-    {
-        OutputEvent *aoe = dynamic_cast<OutputEvent *>(event);
-
-        if (!aoe)
-            return;
-
-        statusString = tr("Output error.");
-
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
-            .arg(*aoe->errorMessage()));
-        ShowOkPopup(tr("MythMusic has encountered the following error:\n%1")
-                    .arg(*aoe->errorMessage()));
-        stopAll();
-    }
     else if (event->type() == OutputEvent::Stopped)
     {
         statusString = tr("Stream stopped.");
@@ -1241,39 +1226,6 @@ void MusicCommon::customEvent(QEvent *event)
         }
 
         stopVisualizer();
-    }
-    else if (event->type() == DecoderEvent::Error)
-    {
-        stopAll();
-
-        statusString = tr("Decoder error.");
-
-        DecoderEvent *dxe = dynamic_cast<DecoderEvent *>(event);
-
-        if (!dxe)
-            return;
-
-        LOG(VB_GENERAL, LOG_ERR, QString("%1 %2").arg(statusString)
-            .arg(*dxe->errorMessage()));
-
-        ShowOkPopup(tr("MythMusic has encountered the following error:\n%1")
-                    .arg(*dxe->errorMessage()));
-    }
-    else if (event->type() == DecoderHandlerEvent::Error)
-    {
-        stopAll();
-
-        statusString = tr("Decoder Handler error.");
-
-        DecoderHandlerEvent *dhe = dynamic_cast<DecoderHandlerEvent*>(event);
-        if (!dhe)
-            return;
-
-        LOG(VB_GENERAL, LOG_ERR, QString("Decoder Handler Error - %1")
-                .arg(*dhe->getMessage()));
-
-        ShowOkPopup(QString("MythMusic has encountered the following error:\n%1")
-                .arg(*dhe->getMessage()));
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
@@ -2007,7 +1959,12 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
-        map["playlistname"] = gPlayer->getPlaylist()->getName();
+        QString playlistName = gPlayer->getPlaylist()->getName();
+        if (playlistName == "default_playlist_storage")
+            playlistName = tr("Default Playlist");
+        else if (playlistName ==  "stream_playlist")
+            playlistName = tr("Stream Playlist");
+        map["playlistname"] = playlistName;
     }
     else
     {
@@ -2223,6 +2180,8 @@ MythMenu* MusicCommon::createRepeatMenu(void)
     menu->AddItem(tr("Track"), qVariantFromValue((int)MusicPlayer::REPEAT_TRACK));
     menu->AddItem(tr("All"),   qVariantFromValue((int)MusicPlayer::REPEAT_ALL));
 
+    menu->SetSelectedByData(static_cast<int>(gPlayer->getRepeatMode()));
+
     return menu;
 }
 
@@ -2237,6 +2196,8 @@ MythMenu* MusicCommon::createShuffleMenu(void)
     menu->AddItem(tr("Smart"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
     menu->AddItem(tr("Album"),  qVariantFromValue((int)MusicPlayer::SHUFFLE_ALBUM));
     menu->AddItem(tr("Artist"), qVariantFromValue((int)MusicPlayer::SHUFFLE_ARTIST));
+
+    menu->SetSelectedByData(static_cast<int>(gPlayer->getShuffleMode()));
 
     return menu;
 }
@@ -2270,8 +2231,10 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "visualizermenu");
 
-    for (int x = 0; x < m_visualModes.count(); x++)
+    for (uint x = 0; x < static_cast<uint>(m_visualModes.count()); x++)
         menu->AddItem(m_visualModes.at(x), qVariantFromValue(x));
+
+    menu->SetSelectedByData(m_currentVisual);
 
     return menu;
 }

@@ -34,6 +34,7 @@ EITFixUp::EITFixUp()
       m_dishPPVCode("\\s*\\(([A-Z]|[0-9]){5}\\)\\s*$"),
       m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
       m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
+      m_ukNewTitle("^(Brand New|New:)\\s*",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
@@ -717,6 +718,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     // BBC three case (could add another record here ?)
     event.description = event.description.remove(m_ukThen);
     event.description = event.description.remove(m_ukNew);
+    event.title = event.title.remove(m_ukNewTitle);
 
     // Removal of Class TV, CBBC and CBeebies etc..
     event.title = event.title.remove(m_ukTitleRemove);
@@ -802,7 +804,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     }
 
     QRegExp tmp24ep = m_uk24ep;
-    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
+    if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:") &&
+        !event.title.startsWith("Mission: Impossible"))
     {
         if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&
             ((position2=event.description.indexOf(m_ukDoubleDotStart)) != -1))

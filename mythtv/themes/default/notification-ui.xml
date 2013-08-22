@@ -120,6 +120,14 @@
                     <area>18,18,144,144</area>
                 </imagetype>
             </state>
+            <state name="busy">
+                <area>0,0,100%,100%</area>
+                <imagetype name="animation">
+                    <area>40,40,105,105</area>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>250</delay>
+                </imagetype>
+            </state>
         </statetype>
 
         <imagetype name="image" depends="!mediastate&amp;!errorstate">
@@ -202,7 +210,7 @@
             </state>
             <state name="check">
                 <area>0,0,100%,100%</area>
-                <imagetype name="imageerror">
+                <imagetype name="imagecheck">
                     <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Select-icon.html -->
                     <filename>check.png</filename>
                     <area>704,189,512,512</area>
@@ -211,11 +219,19 @@
             </state>
             <state name="warning">
                 <area>0,0,100%,100%</area>
-                <imagetype name="imageerror">
+                <imagetype name="imagewarning">
                     <!-- Artist: Kyo-Tux http://www.iconarchive.com/show/phuzion-icons-by-kyo-tux/Sign-Alert-icon.html -->
                     <filename>warning.png</filename>
                     <area>704,189,512,512</area>
                     <preserveaspect>true</preserveaspect>
+                </imagetype>
+            </state>
+            <state name="busy">
+                <area>0,0,100%,100%</area>
+                <imagetype name="animation">
+                    <area>704,189,512,512</area>
+                    <filepattern low="0" high="24">busyimages/%1.png</filepattern>
+                    <delay>250</delay>
                 </imagetype>
             </state>
         </statetype>

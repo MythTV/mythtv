@@ -78,19 +78,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="47"/>
         <source>Weather forecasts</source>
         <translation>Προβλέψεις καιρού</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="53"/>
+        <location filename="../mythweather/main.cpp" line="49"/>
         <source>Pause current page</source>
         <translation>Παύση τρέχουσας σελίδας</translation>
     </message>
     <message>
+        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="53"/>
         <location filename="../mythweather/main.cpp" line="55"/>
-        <location filename="../mythweather/main.cpp" line="57"/>
-        <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Λίστα Αναζήτησης</translation>
     </message>
@@ -1080,7 +1080,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Κατέβασμα δεδομένων στο παρασκήνιο:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Weather Location Search</source>
         <translation>Αναζήτηση Τοποθεσίας</translation>
     </message>
@@ -1115,33 +1115,33 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
         <translation>Αναζήτηση Τοποθεσίας</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Humidity:</source>
         <translation>Υγρασία:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Pressure:</source>
         <translation>Πίεση:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Wind (Gust):</source>
         <oldsource>Wind(Gust):</oldsource>
         <translation>Άνεμος (Ριπή):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Wind Direction:</source>
         <translation>Κατεύθ. Ανέμου:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Visibility:</source>
         <translation>Ορατότητα:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Feels Like:</source>
         <translation>Αισθάνεσαι:</translation>
     </message>
@@ -1157,67 +1157,77 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
+        <source>This screen governs the behavior of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Η οθόνη ελέγχει τη συμπεριφορά των ρυθμίσεων του καιρού. Μπορείτε να ενεργοποιήσετε μια παρασκηνιακή ενημέρωση του καιρού που θα τρέχει και όταν δεν εμφανίζεται στην οθόνη, και να ρυθμίσετε πόσο χρόνο θα εμφανίζεται η κάθε οθόνη. Όταν ολοκληρώσετε τις ρυθμίσεις του Καιρού, πατήστε &quot;Τέλος&quot; για συνέχεια.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Ρυθμίσεις Καιρού</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Ρύθμιση Οθόνης Καιρού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Weather Source Setup</source>
         <translation>Ρύθμιση Πηγής Πρόγνωσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Source</source>
         <translation>Πηγή Πρόγνωσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="56"/>
         <source>: %1</source>
         <translation>: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="57"/>
         <source>100%</source>
         <translation>100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Global Weather Settings</source>
         <translation>Γενικές Επιλογές Καιρού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Seconds to display each page</source>
         <translation>Δευτερόλεπτα εμφάνισης σελίδων</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Retrieve data in the background</source>
         <translation>Κατέβασμα δεδομένων στο παρασκήνιο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="61"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Γενικές επιλογές πρόγνωσης καιρού</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Screen Settings</source>
         <translation>Ρυθμίσεις Οθόνης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Επιλέξτε ποιές προβλέψεις καιρού θα εμφανίζονται</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Source Settings</source>
         <translation>Ρυθμίσεις Πηγής Πρόγνωσης</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Ρύθμιση της συμπεριφοράς των script πρόγνωσης</translation>
     </message>
@@ -1225,12 +1235,12 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</sou
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="98"/>
+        <location filename="../mythweather/weather.cpp" line="99"/>
         <source>Paused</source>
         <translation>Σε παύση</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="210"/>
+        <location filename="../mythweather/weather.cpp" line="211"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Καμία από τις ρυθμισμένες οθόνες δεν είναι ολοκληρωμένη σ΄αυτό το Θέμα (λείπουν στοιχεία copyright).</translation>
     </message>

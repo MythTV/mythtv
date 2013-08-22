@@ -311,7 +311,7 @@ void Weather::hideScreen()
     if (!m_currScreen)
         return;
 
-    m_weatherStack->PopScreen(false,false);
+    m_weatherStack->PopScreen(NULL, false,false);
 }
 
 void Weather::holdPage()

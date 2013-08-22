@@ -13,6 +13,7 @@ using namespace std;
 #include <fcntl.h>
 #include <stdint.h>
 
+#include "mythbaseexp.h"
 #include "mthread.h"
 
 class ThreadedFileWriter;
@@ -37,7 +38,7 @@ class TFWSyncThread : public MThread
     ThreadedFileWriter *m_parent;
 };
 
-class ThreadedFileWriter
+class MBASE_PUBLIC ThreadedFileWriter
 {
     friend class TFWWriteThread;
     friend class TFWSyncThread;

@@ -6,12 +6,14 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
+// Qt headers
 #include <QCoreApplication>
 #include <QEvent>
 #include <QObject>
 #include <QThread>
 #include <QTimer>
 
+// MythTV headers
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
 
@@ -230,7 +232,8 @@ void MythNotificationScreen::SetNotification(MythNotification &notification)
 
     if (m_type == MythNotification::Error   ||
         m_type == MythNotification::Warning ||
-        m_type == MythNotification::Check)
+        m_type == MythNotification::Check ||
+        m_type == MythNotification::Busy)
     {
         m_update |= kImage;
         update = false;
@@ -409,7 +412,7 @@ void MythNotificationScreen::Init(void)
         else if (!m_image.isNull())
         {
             // We don't have a path to the image, but the image itself
-            MythImage *img = new MythImage(m_artworkImage->GetPainter());
+            MythImage *img = m_artworkImage->GetPainter()->GetFormatImage();
             img->Assign(m_image);
             m_artworkImage->SetImage(img);
             img->DecrRef();
@@ -530,6 +533,10 @@ void MythNotificationScreen::SetErrorState(void)
     else if (m_type == MythNotification::Check)
     {
         state = "check";
+    }
+    else if (m_type == MythNotification::Busy)
+    {
+        state = "busy";
     }
     else
     {
@@ -1494,16 +1501,20 @@ void ShowNotification(MythNotification::Type type,
     DMAP data;
 
     data["minm"] = msg;
-    data["asar"] = origin.isNull() ? QObject::tr("MythTV") : origin;
+    data["asar"] = origin.isNull() ? QCoreApplication::translate("(Common)",
+                                                                 "MythTV") : origin;
     data["asal"] = detail;
     data["asfm"] = extra;
 
     if (type == MythNotification::Error   ||
         type == MythNotification::Warning ||
-        type == MythNotification::Check)
+        type == MythNotification::Check ||
+        type == MythNotification::Busy)
     {
         n = new MythNotification(type, data);
-        if (!duration && type != MythNotification::Check)
+        if (!duration &&
+            type != MythNotification::Check &&
+            type != MythNotification::Busy)
         {
             // default duration for those type of notifications is 10s
             duration = 10;

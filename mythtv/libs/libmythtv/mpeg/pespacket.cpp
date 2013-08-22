@@ -158,7 +158,7 @@ bool PESPacket::VerifyCRC(void) const
         LOG(VB_SIPARSER, LOG_INFO,
             QString("PESPacket: Failed CRC check 0x%1 != 0x%2 "
                     "for StreamID = 0x%3")
-                .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
+                .arg(CRC(),8,16,QLatin1Char('0')).arg(CalcCRC(),8,16,QLatin1Char('0')).arg(StreamID(),0,16));
     }
     return ret;
 }

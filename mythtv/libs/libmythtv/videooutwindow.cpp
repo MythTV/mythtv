@@ -943,7 +943,7 @@ QString VideoOutWindow::GetZoomString(void) const
     float zh = GetMzScaleH();
     float zv = GetMzScaleV();
     QPoint zo = GetMzMove();
-    return QObject::tr("Zoom %1x%2 @ (%3,%4)")
+    return tr("Zoom %1x%2 @ (%3,%4)")
         .arg(zh, 0, 'f', 2).arg(zv, 0, 'f', 2).arg(zo.x()).arg(zo.y());
 }
 

@@ -21,6 +21,8 @@
 #include "gamescan.h"
 #include "gameui.h"
 
+static const QString _Location = "MythGame";
+
 class GameTreeInfo
 {
   public:
@@ -587,15 +589,15 @@ void GameUI::customEvent(QEvent *event)
 
         if (lul.count() == 1)
         {
-            OnGameSearchDone(lul.takeFirst());
+            OnGameSearchDone(lul[0]);
         }
         else
         {
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, lul);
 
-            connect(resultsdialog, SIGNAL(haveResult(MetadataLookup*)),
-                    SLOT(OnGameSearchListSelection(MetadataLookup*)),
+            connect(resultsdialog, SIGNAL(haveResult(RefCountHandler<MetadataLookup>)),
+                    SLOT(OnGameSearchListSelection(RefCountHandler<MetadataLookup>)),
                     Qt::QueuedConnection);
 
             if (resultsdialog->Create())
@@ -616,7 +618,7 @@ void GameUI::customEvent(QEvent *event)
 
         if (lul.size())
         {
-            MetadataLookup *lookup = lul.takeFirst();
+            MetadataLookup *lookup = lul[0];
             MythGenericTree *node = qVariantValue<MythGenericTree *>(lookup->GetData());
             if (node)
             {
@@ -639,6 +641,13 @@ void GameUI::customEvent(QEvent *event)
             return;
 
         handleDownloadedImages(lookup);
+    }
+    else if (event->type() == ImageDLFailureEvent::kEventType)
+    {
+        MythErrorNotification n(tr("Failed to retrieve image(s)"),
+                                _Location,
+                                tr("Check logs"));
+        GetNotificationCenter()->Queue(n);
     }
 }
 
@@ -948,12 +957,13 @@ void GameUI::createBusyDialog(QString title)
         m_popupStack->AddScreen(m_busyPopup);
 }
 
-void GameUI::OnGameSearchListSelection(MetadataLookup *lookup)
+void GameUI::OnGameSearchListSelection(RefCountHandler<MetadataLookup> lookup)
 {
     if (!lookup)
         return;
 
     lookup->SetStep(kLookupData);
+    lookup->IncrRef();
     m_query->prependLookup(lookup);
 }
 

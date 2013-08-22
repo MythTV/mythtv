@@ -847,12 +847,12 @@ di volerlo fare?</translation>
         <translation>Si</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Edit Game Information</source>
         <translation>Modificare informazioni gioco</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Game Name:</source>
         <translation>Nome gioco:</translation>
     </message>
@@ -882,12 +882,12 @@ di volerlo fare?</translation>
         <translation>Fanart:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="42"/>
         <source>Boxart:</source>
         <translation>Custodia:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="44"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/path/to/the/thing.jpg</translation>
     </message>
@@ -897,12 +897,12 @@ di volerlo fare?</translation>
         <translation>Fatto</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Game:</source>
         <translation>Gioco:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Type:</source>
         <translation>Tipo:</translation>
     </message>
@@ -916,17 +916,17 @@ di volerlo fare?</translation>
         <translation type="obsolete">Percorso Rom:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="36"/>
         <source>System(s):</source>
         <translation>Sistema:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>No Plot.</source>
         <translation>Nessuna trama.</translation>
     </message>
@@ -1001,77 +1001,92 @@ di volerlo fare?</translation>
         <translation>Clic qui per ricercare fanart esistenti...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="33"/>
+        <source>System: %1</source>
+        <translation>Sistema: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Genre: %1</source>
+        <translation>Genere: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Back</source>
+        <translation>Indietro</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
         <source>ROM Name:</source>
         <translation>Nome ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="39"/>
         <source>ROM Path:</source>
         <translation>Percorso ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game Information</source>
         <translation>Informazioni gioco</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="47"/>
         <source>ROM path:</source>
         <translation>Percorso ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Description:</source>
         <translation>Descrizione:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Games</source>
         <translation>Giochi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Favorite</source>
         <translation>Favoriti</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>General Settings</source>
         <translation>Impostazioni generali</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Game folders and general options</source>
         <translation>Cartelle gioco e opzioni generali</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Game Players</source>
         <translation>Giocatori</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Configure an emulator</source>
         <translation>Configurare un emulatore</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Scan for Games</source>
         <translation>Scansione per giochi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Add games to your library</source>
         <translation>Aggiungere giochi alla libreria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Clear Game Data</source>
         <translation>Cancellare dati gioco</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Empty your game library</source>
         <translation>Svuotare la libreria gioco</translation>
     </message>

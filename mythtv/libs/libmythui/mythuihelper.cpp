@@ -156,7 +156,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_cacheLock(new QMutex(QMutex::Recursive)),
-      m_cacheSize(0), m_maxCacheSize(20 * 1024 * 1024),
+      m_cacheSize(0), m_maxCacheSize(30 * 1024 * 1024),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
@@ -404,7 +404,7 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
     d->callbacks = cbs;
 
     d->m_maxCacheSize.fetchAndStoreRelease(
-        GetMythDB()->GetNumSetting("UIImageCacheSize", 20) * 1024 * 1024);
+        GetMythDB()->GetNumSetting("UIImageCacheSize", 30) * 1024 * 1024);
 
     LOG(VB_GUI, LOG_INFO, LOC +
         QString("MythUI Image Cache size set to %1 bytes")
@@ -1301,11 +1301,11 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     if (filename.isEmpty())
         return NULL;
 
-    if ((!FindThemeFile(filename)) &&
-        (!filename.startsWith("http://")) &&
+    if ((!filename.startsWith("http://")) &&
         (!filename.startsWith("https://")) &&
         (!filename.startsWith("ftp://")) &&
-        (!filename.startsWith("myth://")))
+        (!filename.startsWith("myth://")) &&
+        (!FindThemeFile(filename)))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("LoadScaleImage(%1) ")
             .arg(filename) + "Unable to find image file");
@@ -1357,17 +1357,17 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         tmpimage.load(filename);
     }
 
+    if (tmpimage.isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("LoadScaleImage(%1) failed to load image")
+            .arg(filename));
+
+        return NULL;
+    }
+
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
-        if (tmpimage.isNull())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("LoadScaleImage(%1) failed to load image")
-                .arg(filename));
-
-            return NULL;
-        }
-
         QImage tmp2 = tmpimage.scaled(
                           (int)(tmpimage.width() * wmult),
                           (int)(tmpimage.height() * hmult),
@@ -1493,7 +1493,9 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         // This code relaxes the original-file check so that the check
         // isn't repeated if it was already done within kImageCacheTimeout
         // seconds.
-        const uint kImageCacheTimeout = 5;
+
+        // This only applies to the MEMORY cache
+        const uint kImageCacheTimeout = 60;
         uint now = MythDate::current().toTime_t();
 
         QMutexLocker locker(d->m_cacheLock);
@@ -1506,47 +1508,76 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         }
     }
 
-    QString cachefilepath = GetThemeCacheDir() + '/' + label;
-    QFileInfo fi(cachefilepath);
-
     MythImage *ret = NULL;
 
-    if (!!(cacheMode & kCacheIgnoreDisk) || fi.exists())
+    // Check Memory Cache
+    ret = GetImageFromCache(label);
+
+    // If the image is in the memory or we are not ignoring the disk cache
+    // then proceed to check whether the source file is newer than our cached
+    // copy
+    if (ret || !(cacheMode & kCacheIgnoreDisk))
     {
+        // Create url to image in disk cache
+        QString cachefilepath = GetThemeCacheDir() + '/' + label;
+        QFileInfo cacheFileInfo(cachefilepath);
+
         // Now compare the time on the source versus our cached copy
-        if (!(cacheMode & kCacheIgnoreDisk))
-        {
-            if (!FindThemeFile(srcfile))
-                return NULL;
-        }
-
         QDateTime srcLastModified;
-        QFileInfo original(srcfile);
 
+        // For internet images this involves querying the headers of the remote
+        // image. This is slow even without redownloading the whole image
         if ((srcfile.startsWith("http://")) ||
             (srcfile.startsWith("https://")) ||
             (srcfile.startsWith("ftp://")))
         {
-            srcLastModified =
-                GetMythDownloadManager()->GetLastModified(srcfile);
+            // If the image is in the memory cache then skip the last modified
+            // check, since memory cached images are loaded in the foreground
+            // this can cause an intolerable delay. The images won't stay in
+            // the cache forever and so eventually they will be checked.
+            if (ret)
+                srcLastModified = cacheFileInfo.lastModified();
+            else
+            {
+                srcLastModified =
+                    GetMythDownloadManager()->GetLastModified(srcfile);
+            }
         }
         else if (srcfile.startsWith("myth://"))
             srcLastModified = RemoteFile::LastModified(srcfile);
-        else if (original.exists())
-            srcLastModified = original.lastModified();
-
-        if (!!(cacheMode & kCacheIgnoreDisk) ||
-            (fi.lastModified() >= srcLastModified))
+        else
         {
-            // Check Memory Cache
-            ret = GetImageFromCache(label);
+            if (!FindThemeFile(srcfile))
+                return NULL;
 
-            if (!ret && (cacheMode == kCacheNormal) && painter)
+            QFileInfo original(srcfile);
+
+            if (original.exists())
+                srcLastModified = original.lastModified();
+        }
+
+        // Now compare the timestamps, if the cached image is newer than the
+        // source image we can use it, otherwise we want to remove it from the
+        // cache
+        if (cacheFileInfo.lastModified() >= srcLastModified)
+        {
+            // If we haven't already loaded the image from the memory cache
+            // and we're not ignoring the disk cache, then it's time to load
+            // it from there instead
+            if (!ret && (cacheMode == kCacheNormal))
             {
-                // Load file from disk cache to memory cache
-                ret = painter->GetFormatImage();
 
-                if (!ret->Load(cachefilepath, false))
+                if (painter)
+                    ret = painter->GetFormatImage();
+
+                // Load file from disk cache to memory cache
+                if (ret && ret->Load(cachefilepath, false))
+                {
+                    // Add to ram cache, and skip saving to disk since that is
+                    // where we found this in the first place.
+                    CacheImage(label, ret, true);
+                }
+                else
                 {
                     LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
                         QString("LoadCacheImage: Could not load :%1")
@@ -1556,16 +1587,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                     ret->DecrRef();
                     ret = NULL;
                 }
-                else
-                {
-                    // Add to ram cache, and skip saving to disk since that is
-                    // where we found this in the first place.
-                    CacheImage(label, ret, true);
-                }
             }
         }
         else
         {
+            ret = NULL;
             // If file has changed on disk, then remove it from the memory
             // and disk cache
             RemoveFromCacheByURL(label);

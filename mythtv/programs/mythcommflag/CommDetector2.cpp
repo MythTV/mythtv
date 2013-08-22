@@ -598,9 +598,11 @@ bool CommDetector2::go(void)
             struct timeval start, end, elapsedtv;
 
             (void)gettimeofday(&start, NULL);
-            VideoFrame *currentFrame = player->GetRawVideoFrame(nextFrame);
+            bool fetchNext = (nextFrame == currentFrameNumber + 1);
+            VideoFrame *currentFrame =
+                player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = currentFrameNumber;
-            currentFrameNumber = currentFrame->frameNumber;
+            currentFrameNumber = currentFrame->frameNumber + 1;
             (void)gettimeofday(&end, NULL);
             timersub(&end, &start, &elapsedtv);
             timeradd(&getframetime, &elapsedtv, &getframetime);

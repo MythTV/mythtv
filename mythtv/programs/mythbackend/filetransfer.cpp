@@ -170,19 +170,48 @@ int FileTransfer::WriteBlock(int size)
 
     requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
     char *buf = &requestBuffer[0];
+    int attempts = 0;
+
     while (tot < size)
     {
         int request = size - tot;
+        int received;
 
-        if (sock->Read(buf, (uint)request, 25 /*ms */) != request)
-            break;
+        received = sock->Read(buf, (uint)request, 50 /*ms */);
 
-        ret = rbuffer->Write(buf, request);
-        
+        if (received != request)
+        {
+            LOG(VB_FILE, LOG_DEBUG,
+                QString("WriteBlock(): Read failed. Requested %1 got %2")
+                .arg(request).arg(received));
+            if (received < 0)
+            {
+                // An error occurred, abort immediately
+                break;
+            }
+            if (received == 0)
+            {
+                attempts++;
+                if (attempts >= 3)
+                {
+                    LOG(VB_FILE, LOG_ERR,
+                        "WriteBlock(): Read tried too many times, aborting "
+                        "(client or network too slow?)");
+                    break;
+                }
+                continue;
+            }
+        }
+        ret = rbuffer->Write(buf, received);
         if (ret <= 0)
+        {
+            LOG(VB_FILE, LOG_DEBUG,
+                QString("WriteBlock(): Write failed. Requested %1 got %2")
+                .arg(received).arg(ret));
             break;
+        }
 
-        tot += request;
+        tot += received;
     }
 
     if (pginfo)

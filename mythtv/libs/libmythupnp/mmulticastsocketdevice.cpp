@@ -110,7 +110,7 @@ qint64 MMulticastSocketDevice::writeBlock(
                            (const char *)&interface_addr,
                            sizeof(interface_addr)) < 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
                     "setsockopt - IP_MULTICAST_IF " + ENO);
             }
             retx = MSocketDevice::writeBlock(data, len, host, port);

@@ -2376,7 +2376,7 @@ void MythCommandLineParser::addUPnP(void)
 
 /** \brief Canned argument definition for all logging options, including
  *  --verbose, --logpath, --quiet, --loglevel, --syslog
- *  and --nodblog
+ *  and --enable-dblog
  */
 void MythCommandLineParser::addLogging(
     const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
@@ -2418,7 +2418,7 @@ void MythCommandLineParser::addLogging(
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
         "defaults to none.", "")
                 ->SetGroup("Logging");
-    add("--nodblog", "nodblog", false, "Disable database logging.", "")
+    add("--enable-dblog", "enabledblog", false, "Enable logging to database.", "")
                 ->SetGroup("Logging");
 
     add(QStringList( QStringList() << "-l" << "--logfile" ),
@@ -2577,7 +2577,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     }
 
     int facility = GetSyslogFacility();
-    bool dblog = !toBool("nodblog");
+    bool dblog = toBool("enabledblog");
     LogLevel_t level = GetLogLevel();
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;

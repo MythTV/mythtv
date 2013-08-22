@@ -12,6 +12,7 @@ using namespace std;
 // Qt headers
 #include <QWaitCondition>
 #include <QMutex>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "signalmonitorlistener.h"
@@ -30,6 +31,8 @@ class TVRec;
 
 class SignalMonitor : protected MThread
 {
+    Q_DECLARE_TR_FUNCTIONS(SignalMonitor)
+
   public:
     /// Returns true iff the card type supports signal monitoring.
     static inline bool IsRequired(const QString &cardtype);

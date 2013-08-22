@@ -68,7 +68,9 @@ void MultiplexSetting::Load(void)
                     ChannelNumber = QString("%1").arg(curList[x].name);
                 }
             }
-            DisplayText = QObject::tr("ATSC Channel %1").arg(ChannelNumber);
+
+            //: %1 is the channel number
+            DisplayText = tr("ATSC Channel %1").arg(ChannelNumber);
         }
         else
         {

@@ -1727,9 +1727,12 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         return true;
     }
 
+    if (!m_tvList->contains(rcinfo->GetCardID()))
+        return true;
+
     EncoderLink *rctv = (*m_tvList)[rcinfo->GetCardID()];
     // first check the card we will be recording on...
-    if (!rctv || rctv->IsBusyRecording())
+    if (rctv->IsBusyRecording())
         return true;
 
     // now check other cards in the same input group as the recording.
@@ -1739,8 +1742,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         inputid, rcinfo->GetCardID());
     for (uint i = 0; i < cardids.size(); i++)
     {
-        rctv = (*m_tvList)[cardids[i]];
-        if (!rctv)
+        if (!m_tvList->contains(cardids[i]))
         {
 #if 0
             LOG(VB_SCHEDULE, LOG_ERR, LOC +
@@ -1750,6 +1752,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
             return true;
         }
 
+        rctv = (*m_tvList)[cardids[i]];
         if (rctv->IsBusy(&busy_input, -1) &&
             igrp.GetSharedInputGroup(busy_input.inputid, inputid))
         {
@@ -3184,11 +3187,11 @@ void Scheduler::UpdateManuals(uint recordid)
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;
-    QDateTime lstartdt = QDateTime(query.value(3).toDate(),
-                               query.value(4).toTime(), Qt::UTC).toLocalTime();
-    int duration = lstartdt.secsTo(
+    QDateTime startdt = QDateTime(query.value(3).toDate(),
+                                  query.value(4).toTime(), Qt::UTC);
+    int duration = startdt.secsTo(
         QDateTime(query.value(5).toDate(),
-                  query.value(6).toTime(), Qt::UTC).toLocalTime());
+                  query.value(6).toTime(), Qt::UTC));
 
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
@@ -3206,7 +3209,8 @@ void Scheduler::UpdateManuals(uint recordid)
     int progcount;
     int skipdays;
     bool weekday;
-    int weeksoff;
+    int daysoff;
+    QDateTime lstartdt = startdt.toLocalTime();
 
     switch (rectype)
     {
@@ -3216,21 +3220,26 @@ void Scheduler::UpdateManuals(uint recordid)
         progcount = 1;
         skipdays = 1;
         weekday = false;
+        daysoff = 0;
         break;
     case kDailyRecord:
         progcount = 13;
         skipdays = 1;
         weekday = (lstartdt.date().dayOfWeek() < 6);
-        lstartdt = QDateTime(MythDate::current().toLocalTime().date(),
-                            lstartdt.time(), Qt::LocalTime);
+        daysoff = lstartdt.date().daysTo(
+            MythDate::current().toLocalTime().date());
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(), Qt::LocalTime).toUTC();
         break;
     case kWeeklyRecord:
         progcount = 2;
         skipdays = 7;
         weekday = false;
-        weeksoff = (lstartdt.date()
-                    .daysTo(MythDate::current().toLocalTime().date()) + 6) / 7;
-        lstartdt = lstartdt.addDays(weeksoff * 7);
+        daysoff = lstartdt.date().daysTo(
+            MythDate::current().toLocalTime().date());
+        daysoff = (daysoff + 6) / 7 * 7;
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(), Qt::LocalTime).toUTC();
         break;
     default:
         LOG(VB_GENERAL, LOG_ERR,
@@ -3242,7 +3251,7 @@ void Scheduler::UpdateManuals(uint recordid)
     {
         for (int i = 0; i < (int)chanidlist.size(); i++)
         {
-            if (weekday && lstartdt.toLocalTime().date().dayOfWeek() >= 6)
+            if (weekday && startdt.toLocalTime().date().dayOfWeek() >= 6)
                 continue;
 
             query.prepare("REPLACE INTO program (chanid, starttime, endtime,"
@@ -3250,10 +3259,10 @@ void Scheduler::UpdateManuals(uint recordid)
                           "VALUES (:CHANID, :STARTTIME, :ENDTIME, :TITLE,"
                           " :SUBTITLE, :RECORDID, 1)");
             query.bindValue(":CHANID", chanidlist[i]);
-            query.bindValue(":STARTTIME", lstartdt.toUTC());
-            query.bindValue(":ENDTIME", lstartdt.toUTC().addSecs(duration));
+            query.bindValue(":STARTTIME", startdt);
+            query.bindValue(":ENDTIME", startdt.addSecs(duration));
             query.bindValue(":TITLE", title);
-            query.bindValue(":SUBTITLE", lstartdt);
+            query.bindValue(":SUBTITLE", startdt.toLocalTime());
             query.bindValue(":RECORDID", recordid);
             if (!query.exec())
             {
@@ -3261,7 +3270,10 @@ void Scheduler::UpdateManuals(uint recordid)
                 return;
             }
         }
-        lstartdt = lstartdt.addDays(skipdays);
+
+        daysoff += skipdays;
+        startdt = QDateTime(lstartdt.date().addDays(daysoff),
+                            lstartdt.time(), Qt::LocalTime).toUTC();
     }
 }
 
@@ -4459,10 +4471,10 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
 {
     QMutexLocker lockit(&schedLock);
 
-    EncoderLink *tv = (*m_tvList)[cardid];
-
-    if (!tv)
+    if (!m_tvList->contains(cardid))
         return;
+
+    EncoderLink *tv = (*m_tvList)[cardid];
 
     QDateTime cur = MythDate::current(true);
     QString recording_dir;

@@ -816,7 +816,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     normalframes = max(normalframes, 0);
     SeekReset(lastKey, normalframes, needflush, discardFrames);
 
-    if (discardFrames)
+    if (discardFrames || transcoding)
         m_parent->SetFramesPlayed(framesPlayed+1);
 
     // Re-enable rawframe state if it was enabled before FF

@@ -18,17 +18,17 @@ endif
 
 SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 
-.PHONY: subdirs $(SUBDIRS)                            \
+.PHONY: subdirs $(SUBDIRS)                        \
 	clean     $(addsuffix _clean,    $(SUBDIRS))  \
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
 	libs/libmythbase/version.h force
 
-all: all_no_test test
+all: libs/libmythbase/version.h subdirs
+tests: test
+all_no_test: all
 force:
-
-all_no_test: libs/libmythbase/version.h subdirs
 
 config.mak:
 	$(error run configure to create $@)

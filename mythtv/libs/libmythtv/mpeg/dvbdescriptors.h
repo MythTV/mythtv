@@ -192,7 +192,7 @@ class LinkageDescriptor : public MPEGDescriptor
     //      for (i=0;i<N;i++)
     //        { private_data_byte 8 bslbf }
     const unsigned char *PrivateData(void) const
-        { return _data + m_offset; }
+        { return &_data[m_offset]; }
     uint PrivateDataLength(void) const
         { return DescriptorLength() + 2 - m_offset; }
 
@@ -654,7 +654,7 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     // for (i=0; i<selector_length; i++)
     // {
     //   selector_byte          8
-    const unsigned char *Selector(void) const { return _data + 6; }
+    const unsigned char *Selector(void) const { return &_data[6]; }
     // }
     // ISO_639_language_code   24
     int LanguageKey(void) const
@@ -2012,7 +2012,16 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
     QString ContentId(void) const
     {
-        return QString::fromLatin1((const char *)_data+4, _data[3]);
+        int length = _data[3];
+        int positionOfHash = length-1;
+        while (positionOfHash >= 0) {
+            if (_data[4 + positionOfHash] == '#') {
+                length = positionOfHash; /* remove the hash and the following IMI */
+                break;
+            }
+            positionOfHash--;
+        }
+        return QString::fromLatin1((const char *)&_data[4], length);
     }
 };
 

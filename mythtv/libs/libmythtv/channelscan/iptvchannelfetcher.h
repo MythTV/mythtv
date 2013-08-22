@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QMap>
+#include <QCoreApplication>
 
 // MythTV headers
 #include "iptvtuningdata.h"
@@ -22,6 +23,8 @@ class IPTVChannelFetcher;
 
 class IPTVChannelInfo
 {
+    Q_DECLARE_TR_FUNCTIONS(IPTVChannelInfo)
+
   public:
     IPTVChannelInfo() {}
     IPTVChannelInfo(const QString &name,
@@ -53,6 +56,8 @@ typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
 
 class IPTVChannelFetcher : public QRunnable
 {
+    Q_DECLARE_TR_FUNCTIONS(IPTVChannelFetcher)
+
   public:
     IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
                        ScanMonitor *monitor = NULL);

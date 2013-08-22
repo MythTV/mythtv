@@ -36,7 +36,7 @@ QEvent::Type MetadataFactoryVideoChanges::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 MetadataFactory::MetadataFactory(QObject *parent) :
-    m_parent(parent), m_scanning(false),
+    QObject(parent), m_scanning(false),
     m_returnList(), m_sync(false)
 {
     m_lookupthread = new MetadataDownload(this);
@@ -64,6 +64,9 @@ MetadataFactory::~MetadataFactory()
 
     if (m_videoscanner && m_videoscanner->wait())
         delete m_videoscanner;
+
+    delete m_mlm;
+    m_mlm = NULL;
 }
 
 void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
@@ -73,6 +76,7 @@ void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(recrule));
@@ -100,6 +104,7 @@ void MetadataFactory::Lookup(ProgramInfo *pginfo, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetSubtype(GuessLookupType(pginfo));
@@ -127,6 +132,7 @@ void MetadataFactory::Lookup(VideoMetadata *metadata, bool automatic,
         return;
 
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataVideo);
     if (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0)
@@ -179,6 +185,7 @@ META_PUBLIC MetadataLookupList MetadataFactory::SynchronousLookup(QString title,
                                                       bool allowgeneric)
 {
     MetadataLookup *lookup = new MetadataLookup();
+
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
     lookup->SetAutomatic(false);
@@ -219,8 +226,6 @@ MetadataLookupList MetadataFactory::SynchronousLookup(MetadataLookup *lookup)
     }
 
     m_sync = false;
-
-    delete lookup;
 
     return m_returnList;
 }
@@ -264,8 +269,8 @@ void MetadataFactory::OnMultiResult(MetadataLookupList list)
     if (list.isEmpty())
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactoryMultiResult(list));
 }
 
@@ -319,14 +324,15 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             }
         }
         lookup->SetDownloads(map);
+        lookup->IncrRef();
         m_imagedownload->addDownloads(lookup);
     }
     else
     {
         if (m_scanning)
             OnVideoResult(lookup);
-        else if (m_parent)
-            QCoreApplication::postEvent(m_parent,
+        else if (parent())
+            QCoreApplication::postEvent(parent(),
                 new MetadataFactorySingleResult(lookup));
     }
 }
@@ -336,8 +342,8 @@ void MetadataFactory::OnNoResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactoryNoResult(lookup));
 }
 
@@ -346,8 +352,8 @@ void MetadataFactory::OnImageResult(MetadataLookup *lookup)
     if (!lookup)
         return;
 
-    if (m_parent)
-        QCoreApplication::postEvent(m_parent,
+    if (parent())
+        QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
 }
 
@@ -491,14 +497,10 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     metadata->SetProcessed(true);
     metadata->UpdateDatabase();
 
-    if (gCoreContext->HasGUI() && m_parent)
+    if (gCoreContext->HasGUI() && parent())
     {
-        QCoreApplication::postEvent(m_parent,
+        QCoreApplication::postEvent(parent(),
             new MetadataFactorySingleResult(lookup));
-    }
-    else
-    {
-        lookup->deleteLater();
     }
 }
 
@@ -519,7 +521,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         else if (lul.count() == 1)
         {
-            OnSingleResult(lul.takeFirst());
+            OnSingleResult(lul[0]);
         }
         else
         {
@@ -542,7 +544,7 @@ void MetadataFactory::customEvent(QEvent *levent)
         }
         if (lul.size())
         {
-            OnNoResult(lul.takeFirst());
+            OnNoResult(lul[0]);
         }
     }
     else if (levent->type() == ImageDLEvent::kEventType)
@@ -558,6 +560,20 @@ void MetadataFactory::customEvent(QEvent *levent)
             OnVideoResult(lookup);
         else
             OnImageResult(lookup);
+    }
+    else if (levent->type() == ImageDLFailureEvent::kEventType)
+    {
+        ImageDLFailureEvent *ide = (ImageDLFailureEvent *)levent;
+
+        MetadataLookup *lookup = ide->item;
+
+        if (!lookup)
+            return;
+
+        // propagate event on image download failure
+        if (parent())
+            QCoreApplication::postEvent(parent(),
+                            new ImageDLFailureEvent(lookup));
     }
     else if (levent->type() == VideoScanChanges::kEventType)
     {
@@ -577,8 +593,8 @@ void MetadataFactory::customEvent(QEvent *levent)
                 .arg(additions.count()).arg(moves.count())
                 .arg(deletions.count()));
 
-            if (m_parent)
-                QCoreApplication::postEvent(m_parent,
+            if (parent())
+                QCoreApplication::postEvent(parent(),
                     new MetadataFactoryVideoChanges(additions, moves,
                                                     deletions));
         }

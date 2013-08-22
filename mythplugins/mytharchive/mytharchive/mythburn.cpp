@@ -1005,7 +1005,7 @@ void MythBurn::handleAddVideo()
     }
     else
     {
-        ShowOkPopup(QObject::tr("You don't have any videos!"));
+        ShowOkPopup(tr("You don't have any videos!"));
         return;
     }
 
@@ -1152,15 +1152,15 @@ void BurnMenu::start(void)
 {
     if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
-        showWarningDialog(QObject::tr("Cannot burn a DVD.\n"
-                                      "The last run failed to create a DVD."));
+        showWarningDialog(tr("Cannot burn a DVD.\n"
+                             "The last run failed to create a DVD."));
         return;
     }
 
     // ask the user what type of disk to burn to
-    QString title = QObject::tr("Burn DVD");
-    QString msg   = QObject::tr("\nPlace a blank DVD in the"
-                                " drive and select an option below.");
+    QString title = tr("Burn DVD");
+    QString msg   = tr("\nPlace a blank DVD in the"
+                      " drive and select an option below.");
     MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
     MythDialogBox   *menuPopup = new MythDialogBox(title, msg, mainStack,
                                                    "actionmenu", true);
@@ -1170,9 +1170,9 @@ void BurnMenu::start(void)
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(QObject::tr("Burn DVD"));
-    menuPopup->AddButton(QObject::tr("Burn DVD Rewritable"));
-    menuPopup->AddButton(QObject::tr("Burn DVD Rewritable (Force Erase)"));
+    menuPopup->AddButton(tr("Burn DVD"));
+    menuPopup->AddButton(tr("Burn DVD Rewritable"));
+    menuPopup->AddButton(tr("Burn DVD Rewritable (Force Erase)"));
 }
 
 void BurnMenu::customEvent(QEvent *event)
@@ -1228,8 +1228,8 @@ void BurnMenu::doBurn(int mode)
     uint retval = myth_system(commandline, flags);
     if (retval != GENERIC_EXIT_RUNNING && retval != GENERIC_EXIT_OK)
     {
-        showWarningDialog(QObject::tr("It was not possible to run "
-                                      "mytharchivehelper to burn the DVD."));
+        showWarningDialog(tr("It was not possible to run "
+                             "mytharchivehelper to burn the DVD."));
         return;
     }
 

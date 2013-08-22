@@ -506,14 +506,14 @@ class DBDataRef( list ):
         for dat in other:
             if dat not in self:
                 data.append(dat)
-        return self.fromCopy(data)
+        return self.fromCopy(data, self._db)
         
     def __and__(self, other):
         data = []
         for dat in self:
             if dat in other:
                 data.append(dat)
-        return self.fromCopy(data)
+        return self.fromCopy(data, self._db)
 
     @classmethod
     def _setClassDefs(cls, db=None):
@@ -562,26 +562,26 @@ class DBDataRef( list ):
         self._origdata = self.deepcopy()
 
     @classmethod
-    def fromRaw(cls, data):
-        c = cls('', bypass=True)
+    def fromRaw(cls, data, db=None):
+        c = cls('', db=db, bypass=True)
         c._populated = True
         for dat in data:
             list.append(c, c.SubData(zip(self._datfields, row)))
         return c
 
     @classmethod
-    def fromCopy(cls, data):
-        c = cls('', bypass=True)
+    def fromCopy(cls, data, db=None):
+        c = cls('', db=db, bypass=True)
         c._populated = True
         for dat in data: list.append(c, dat)
         return c
 
     def copy(self):
         if not self._populated: return []
-        return self.fromCopy(self)
+        return self.fromCopy(self, self._db)
     def deepcopy(self):
         if not self._populated: return []
-        return self.fromCopy([dat.copy() for dat in self])
+        return self.fromCopy([dat.copy() for dat in self], self._db)
 
     def revert(self):
         """Delete all local changes to database."""
@@ -871,6 +871,12 @@ class DatabaseConfig( object ):
 
     def __hash__(self):
         return hash(self.ident)
+
+    def __eq__(self, other):
+        try:
+            return self.ident == other.ident
+        except:
+            return False
 
     def copy(self):
         cls = self.__class__

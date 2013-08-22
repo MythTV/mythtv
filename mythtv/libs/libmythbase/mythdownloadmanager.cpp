@@ -240,6 +240,7 @@ void MythDownloadManager::run(void)
 
     bool downloading = false;
     bool itemsInQueue = false;
+    bool itemsInCancellationQueue = false;
     bool waitAnyway = false;
 
     m_queueThread = QThread::currentThread();
@@ -276,8 +277,13 @@ void MythDownloadManager::run(void)
         }
         m_infoLock->lock();
         downloading = !m_downloadInfos.isEmpty();
+        itemsInCancellationQueue = !m_cancellationQueue.isEmpty();
         m_infoLock->unlock();
 
+        if (itemsInCancellationQueue)
+        {
+            downloadCanceled();
+        }
         if (downloading)
             QCoreApplication::processEvents();
 
@@ -481,24 +487,28 @@ QNetworkReply *MythDownloadManager::download(const QString &url,
                                              const bool reload)
 {
     MythDownloadInfo *dlInfo = new MythDownloadInfo;
+    QNetworkReply *reply = NULL;
 
     dlInfo->m_url          = url;
     dlInfo->m_reload       = reload;
     dlInfo->m_syncMode     = true;
     dlInfo->m_processReply = false;
 
-    bool ok = downloadNow(dlInfo, false);
+    if (downloadNow(dlInfo, false))
+    {
+        if (dlInfo->m_reply)
+        {
+            reply = dlInfo->m_reply;
+            // prevent dlInfo dtor from deleting the reply
+            dlInfo->m_reply = NULL;
 
-    QNetworkReply *reply = dlInfo->m_reply;
+            delete dlInfo;
 
-    if (reply)
-        dlInfo->m_reply = NULL;
+            return reply;
+        }
 
-    delete dlInfo;
-    dlInfo = NULL;
-
-    if (ok && reply)
-        return reply;
+        delete dlInfo;
+    }
 
     return NULL;
 }
@@ -857,59 +867,94 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
 /** \brief Cancel a queued or current download.
  *  \param url for download to cancel
  */
-void MythDownloadManager::cancelDownload(const QString &url)
+void MythDownloadManager::cancelDownload(const QString &url, bool block)
 {
-    QMetaObject::invokeMethod(this, "downloadCanceled",
-                              Qt::QueuedConnection, Q_ARG(const QString&, url));
+    cancelDownload(QStringList(url), block);
 }
 
-void MythDownloadManager::downloadCanceled(const QString  &url)
+/** \brief Cancel a queued or current download.
+ *  \param list of urls for download to cancel
+ */
+void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
+{
+    MythDownloadInfo *dlInfo;
+
+    m_infoLock->lock();
+    foreach (QString url, urls)
+    {
+        QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
+        while (lit.hasNext())
+        {
+            lit.next();
+            dlInfo = lit.value();
+            if (dlInfo->m_url == url)
+            {
+                if (!m_cancellationQueue.contains(dlInfo))
+                    m_cancellationQueue.append(dlInfo);
+                lit.remove();
+            }
+        }
+
+        if (m_downloadInfos.contains(url))
+        {
+            dlInfo = m_downloadInfos[url];
+
+            if (!m_cancellationQueue.contains(dlInfo))
+                m_cancellationQueue.append(dlInfo);
+
+            if (dlInfo->m_reply)
+                m_downloadReplies.remove(dlInfo->m_reply);
+
+            m_downloadInfos.remove(url);
+        }
+    }
+    m_infoLock->unlock();
+
+    if (QThread::currentThread() == this->thread())
+    {
+        downloadCanceled();
+        return;
+    }
+
+    // wake-up running thread
+    m_queueWaitCond.wakeAll();
+
+    if (!block)
+        return;
+
+    while (!m_cancellationQueue.isEmpty())
+    {
+        usleep(50000); // re-test in another 50ms
+    }
+}
+
+void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
     MythDownloadInfo *dlInfo;
 
-    QMutableListIterator<MythDownloadInfo*> lit(m_downloadQueue);
+    QMutableListIterator<MythDownloadInfo*> lit(m_cancellationQueue);
     while (lit.hasNext())
     {
         lit.next();
         dlInfo = lit.value();
-        if (dlInfo->m_url == url)
-        {
-            // this shouldn't happen
-            if (dlInfo->m_reply)
-            {
-                LOG(VB_FILE, LOG_DEBUG,
-                    LOC + QString("Aborting download - user request"));
-                dlInfo->m_reply->abort();
-            }
-            lit.remove();
-            if (dlInfo->IsDone())
-                continue;
-            dlInfo->m_lock.lock();
-            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
-            dlInfo->m_done = true;
-            dlInfo->m_lock.unlock();
-        }
-    }
+        dlInfo->m_lock.lock();
 
-    if (m_downloadInfos.contains(url))
-    {
-        dlInfo = m_downloadInfos[url];
         if (dlInfo->m_reply)
         {
             LOG(VB_FILE, LOG_DEBUG,
                 LOC + QString("Aborting download - user request"));
-            m_downloadReplies.remove(dlInfo->m_reply);
             dlInfo->m_reply->abort();
         }
-        m_downloadInfos.remove(url);
-        if (!dlInfo->IsDone())
+        lit.remove();
+        if (dlInfo->m_done)
         {
-            dlInfo->m_lock.lock();
-            dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
-            dlInfo->m_done = true;
             dlInfo->m_lock.unlock();
+            continue;
         }
+        dlInfo->m_errorCode = QNetworkReply::OperationCanceledError;
+        dlInfo->m_done = true;
+        dlInfo->m_lock.unlock();
     }
 }
 
@@ -1324,8 +1369,8 @@ bool MythDownloadManager::saveFile(const QString &outFile,
 QDateTime MythDownloadManager::GetLastModified(const QString &url)
 {
     // If the header has not expired and
-    // the last modification date is less than 30 minutes old or if
-    // the cache object is less than 5 minutes old,
+    // the last modification date is less than 1 hours old or if
+    // the cache object is less than 20 minutes old,
     // then use the cached header otherwise redownload the header
 
     static const char dateFormat[] = "ddd, dd MMM yyyy hh:mm:ss 'GMT'";
@@ -1360,7 +1405,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         ((!urlData.expirationDate().isValid()) ||
          (urlData.expirationDate().secsTo(now) < 0)))
     {
-        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 1800)
+        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 3600) // 1 Hour
         {
             result = urlData.lastModified().toUTC();
         }
@@ -1372,7 +1417,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
                 QDateTime loadDate =
                     MythDate::fromString(date, dateFormat);
                 loadDate.setTimeSpec(Qt::UTC);
-                if (loadDate.secsTo(now) <= 720)
+                if (loadDate.secsTo(now) <= 1200) // 20 Minutes
                 {
                     result = urlData.lastModified().toUTC();
                 }
@@ -1388,15 +1433,21 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         // Head request, we only want to inspect the headers
         dlInfo->m_requestType = kRequestHead;
 
-        if (downloadNow(dlInfo, false) && dlInfo->m_reply)
+        if (downloadNow(dlInfo, false))
         {
-            QVariant lastMod =
-                dlInfo->m_reply->header(QNetworkRequest::LastModifiedHeader);
-            if (lastMod.isValid())
-                result = lastMod.toDateTime().toUTC();
-        }
+            if (dlInfo->m_reply)
+            {
+                QVariant lastMod =
+                    dlInfo->m_reply->header(
+                        QNetworkRequest::LastModifiedHeader);
+                if (lastMod.isValid())
+                    result = lastMod.toDateTime().toUTC();
+            }
 
-        delete dlInfo;
+            // downloadNow() will set a flag to trigger downloadFinished()
+            // to delete the dlInfo if the download times out
+            delete dlInfo;
+        }
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1'): Result %2")

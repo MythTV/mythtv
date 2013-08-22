@@ -828,7 +828,7 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
 
     // Get the external player binary
     QDomElement playertemp = item.firstChildElement("player");
-    if (!playertemp.isNull() && !playertemp.hasChildNodes())
+    if (!playertemp.isNull())
         player = playertemp.text();
 
     // Get the arguments to pass to the external player

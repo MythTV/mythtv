@@ -361,20 +361,77 @@ class MTV_PUBLIC TableID
 };
 
 /** \class PSIPTable
- *  \brief A PSIP table is a special type of PES packet containing an
- *         MPEG, ATSC, or DVB table.
+ *  \brief A PSIP table is a variant of a PES packet containing an
+ *         MPEG, ATSC or DVB table.
  */
 class MTV_PUBLIC PSIPTable : public PESPacket
 {
+    /// Only handles single TS packet PES packets, for PMT/PAT tables basically
+    void InitPESPacket(TSPacket& tspacket)
+    {
+        if (tspacket.PayloadStart())
+            _psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Started PESPacket, but !payloadStart()");
+            _psiOffset = tspacket.AFCOffset();
+        }
+        _pesdata = tspacket.data() + _psiOffset + 1;
+
+        _badPacket = true;
+        // first check if Length() will return something useful and
+        // than check if the packet ends in the first TSPacket
+        if ((_pesdata - tspacket.data()) <= (188-3) &&
+            (_pesdata + Length() - tspacket.data()) <= (188-3))
+        {
+            _badPacket = !VerifyCRC();
+        }
+    }
+
+  protected:
+    // does not create it's own data
+    PSIPTable(const TSPacket& tspacket, bool)
+        : PESPacket()
+    {
+        _pesdata = NULL;
+        _fullbuffer = NULL;
+         _ccLast = tspacket.ContinuityCounter();
+         _allocSize = 0;
+        InitPESPacket(const_cast<TSPacket&>(tspacket));
+        _fullbuffer = const_cast<unsigned char*>(tspacket.data());
+        _pesdataSize = TSPacket::kSize - (_pesdata - _fullbuffer);
+    }
+
+  public:
+
+    // may be modified
+    PSIPTable(const TSPacket &tspacket,
+              const unsigned char *pesdata, uint pes_size)
+        : PESPacket()
+    { // clone
+        _ccLast = tspacket.ContinuityCounter();
+        _pesdataSize = pes_size;
+        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
+        int len     = pes_size+4;
+        /* make alloc size multiple of 188 */
+        _allocSize  = ((len+_psiOffset+187)/188)*188;
+        _fullbuffer = pes_alloc(_allocSize);
+        _pesdata    = _fullbuffer + _psiOffset + 1;
+        memcpy(_fullbuffer, tspacket.data(), 188);
+        memcpy(_pesdata, pesdata, pes_size-1);
+    }
+
+
   private:
     // creates non-clone version, for View
     PSIPTable(const PESPacket& pkt, bool)
-        : PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false)
-        { ; }
+    {
+        PSIPTable(reinterpret_cast<const PESPacket&>(*pkt.data()), false);
+    }
   public:
     /// Constructor for viewing a section, does not create it's own data
     PSIPTable(const unsigned char *pesdata)
-        : PESPacket(pesdata, false)
+        : PESPacket(pesdata)
     {
         // fixup wrong assumption about length for sections without CRC
         _pesdataSize = SectionLength();
@@ -390,18 +447,35 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
-    PSIPTable(const TSPacket& table) : PESPacket(table)
+    // may be modified
+    PSIPTable(const TSPacket& table)
+        : PESPacket()
     {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
+
+        _ccLast = table.ContinuityCounter();
+        _pesdataSize = 188;
+
+        // clone
+        InitPESPacket(const_cast<TSPacket&>(table)); // sets _psiOffset
+
+        int len     = (4*1024) - 256; /* ~4KB */
+        _allocSize  = len + _psiOffset;
+        _fullbuffer = pes_alloc(_allocSize);
+        _pesdata    = _fullbuffer + _psiOffset + 1;
+        memcpy(_fullbuffer, table.data(), TSPacket::kSize);
     }
 
 
     static const PSIPTable View(const TSPacket& tspacket)
-        { return PSIPTable(PESPacket::View(tspacket), false); }
+        { return PSIPTable(tspacket, false); }
 
     static PSIPTable View(TSPacket& tspacket)
-        { return PSIPTable(PESPacket::View(tspacket), false); }
+        { return PSIPTable(tspacket, false); }
+
+    static const PSIPTable ViewData(const unsigned char* pesdata)
+        { return PSIPTable(pesdata); }
 
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
@@ -594,6 +668,12 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
     {
         assert(TableID::PMT == TableID());
         Parse();
+    }
+
+    static const ProgramMapTable ViewData(const unsigned char* pesdata)
+    {
+        /* needed to call Parse() */
+        return ProgramMapTable(PSIPTable::ViewData(pesdata));
     }
 
     static ProgramMapTable* Create(uint programNumber, uint basepid,

@@ -109,6 +109,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     uint GetTotalTimeOfTitle(void);
     float GetAspectOverride(void)     { return m_forcedAspect; }
     virtual bool IsBookmarkAllowed(void);
+    virtual bool IsSeekingAllowed(void);
     virtual bool IsStreamed(void)     { return true; }
     virtual int  BestBufferSize(void) { return 2048; }
 

@@ -321,7 +321,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {
-        delete sub_data.rbuffer_text;
+        delete[] sub_data.rbuffer_text;
         return;
     }
 
@@ -336,7 +336,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         textCodec = QTextCodec::codecForName("utf-8");
     if (!textCodec)
     {
-        delete sub_data.rbuffer_text;
+        delete[] sub_data.rbuffer_text;
         return;
     }
 
@@ -369,7 +369,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     // textCodec object is managed by Qt, do not delete...
 
     free(loaded_subs);
-    delete sub_data.rbuffer_text;
+    delete[] sub_data.rbuffer_text;
 
     target.SetLastLoaded();
 }

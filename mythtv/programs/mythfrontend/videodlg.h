@@ -5,6 +5,7 @@
 #include <QStringList>
 
 #include "mythscreentype.h"
+#include "metadatacommon.h"
 
 #include "parentalcontrols.h"
 #include "quicksp.h"
@@ -18,7 +19,6 @@ class MythUIImage;
 class MythUIStateType;
 class MythDialogBox;
 class MythGenericTree;
-class MetadataLookup;
 class MetadataFactory;
 class VideoMetadata;
 class VideoScanner;
@@ -130,7 +130,7 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoSearchListSelection(MetadataLookup *lookup);
+    void OnVideoSearchListSelection(RefCountHandler<MetadataLookup> lookup);
 
     void doVideoScan();
 
@@ -165,7 +165,9 @@ class VideoDialog : public MythScreenType
     void setParentalLevel(const ParentalLevel::Level &level);
     void shiftParental(int amount);
     bool createPopup();
-    void createBusyDialog(QString title);
+    void createBusyDialog(const QString &title);
+    void createFetchDialog(VideoMetadata *metadata);
+    void dismissFetchDialog(VideoMetadata *metadata, bool ok);
     void createOkDialog(QString title);
 
     void SwitchLayout(DialogType type, BrowseType browse);

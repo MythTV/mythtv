@@ -13,8 +13,15 @@ TEMPLATE = app
 TARGET = test_audioconvert
 DEPENDPATH += . ../.. ../../audio ../../logging ../../../libmythbase
 INCLUDEPATH += . ../.. ../../audio ../../../../external/FFmpeg ../../logging ../../../libmythbase
-LIBS += -L../.. -lmyth-$$LIBVERSION -L../../../libmythbase -lmythbase-$$LIBVERSION
+LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
+LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
+LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
+LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
+LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
 LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
+LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
+LIBS += -L../.. -lmyth-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage 
@@ -25,14 +32,14 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/zeromq/src/.libs/
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/nzmqt/src/
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/qjson/lib/
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavformat
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_audioconvert.h

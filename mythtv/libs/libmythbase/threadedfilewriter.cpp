@@ -15,7 +15,7 @@
 #include <QString>
 
 // MythTV headers
-#include "ThreadedFileWriter.h"
+#include "threadedfilewriter.h"
 #include "mythlogging.h"
 
 #include "mythtimer.h"

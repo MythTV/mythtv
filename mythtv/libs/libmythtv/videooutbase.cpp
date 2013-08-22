@@ -1870,7 +1870,8 @@ int VideoOutput::CalcHueBase(const QString &adaptor_name)
         (adaptor_name == "XV_SWOV" /* VIA 10K & 12K */) ||
         (adaptor_name == "Savage Streams Engine" /* S3 Prosavage DDR-K */) ||
         (adaptor_name == "SIS 300/315/330 series Video Overlay") ||
-        adaptor_name.toLower().contains("xvba")) /* VAAPI */
+        adaptor_name.toLower().contains("xvba") /* VAAPI */ ||
+        adaptor_name.toLower().startsWith("intel i965 driver"))
     {
         hue_adj = 50;
     }

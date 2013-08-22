@@ -31,8 +31,21 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
 {
   public:
     MetadataFactorySingleResult(MetadataLookup *res) : QEvent(kEventType),
-                                            result(res) {}
-    ~MetadataFactorySingleResult() {}
+                                            result(res)
+    {
+        if (result)
+        {
+            result->IncrRef();
+        }
+    }
+    ~MetadataFactorySingleResult()
+    {
+        if (result)
+        {
+            result->DecrRef();
+            result = NULL;
+        }
+    }
 
     MetadataLookup *result;
 
@@ -43,8 +56,21 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
 {
   public:
     MetadataFactoryNoResult(MetadataLookup *res) : QEvent(kEventType),
-                                            result(res) {}
-    ~MetadataFactoryNoResult() {}
+                                            result(res)
+    {
+        if (result)
+        {
+            result->IncrRef();
+        }
+    }
+    ~MetadataFactoryNoResult()
+    {
+        if (result)
+        {
+            result->DecrRef();
+            result = NULL;
+        }
+    }
 
     MetadataLookup *result;
 
@@ -112,7 +138,6 @@ class META_PUBLIC MetadataFactory : public QObject
 
     void OnVideoResult(MetadataLookup *lookup);
 
-    QObject *m_parent;
     MetadataDownload *m_lookupthread;
     MetadataImageDownload *m_imagedownload;
 

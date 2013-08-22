@@ -84,6 +84,40 @@ void MythMenu::AddItem(const QString &title, QVariant data, MythMenu *subMenu, b
         subMenu->SetParent(this);
 }
 
+void MythMenu::SetSelectedByTitle(const QString& title)
+{
+    QList<MythMenuItem*>::iterator it = m_menuItems.begin();
+    for ( ; it < m_menuItems.end(); ++it)
+    {
+        MythMenuItem *item = (*it);
+        if (!item)
+            continue;
+
+        if (item->Text == title)
+        {
+            m_selectedItem = m_menuItems.indexOf(item);
+            break;
+        }
+    }
+}
+
+void MythMenu::SetSelectedByData(QVariant data)
+{
+    QList<MythMenuItem*>::iterator it = m_menuItems.begin();
+    for ( ; it < m_menuItems.end(); ++it)
+    {
+        MythMenuItem *item = (*it);
+        if (!item)
+            continue;
+
+        if (item->Data == data)
+        {
+            m_selectedItem = m_menuItems.indexOf(item);
+            break;
+        }
+    }
+}
+
 /////////////////////////////////////////////////////////////////
 
 MythDialogBox::MythDialogBox(const QString &text,
@@ -283,7 +317,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     }
 
     if (m_ScreenStack)
-        m_ScreenStack->PopScreen(false);
+        m_ScreenStack->PopScreen(NULL, false);
 }
 
 void MythDialogBox::SetReturnEvent(QObject *retobject,

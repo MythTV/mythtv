@@ -6,6 +6,10 @@
 
 #include <unistd.h>
 
+//Qt headers
+#include <QCoreApplication>
+
+// MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbsignalmonitor.h"
@@ -44,13 +48,14 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       // This snr setup is incorrect for API 3.x but works better
       // than int16_t range in practice, however this is correct
       // for the 4.0 DVB API which uses a uint16_t for the snr
-      signalToNoise    (QObject::tr("Signal To Noise"),    "snr",
+      signalToNoise    (QCoreApplication::translate("(Common)",
+                        "Signal To Noise"),  "snr",
                         0,      true,      0, 65535, 0),
-      bitErrorRate     (QObject::tr("Bit Error Rate"),     "ber",
+      bitErrorRate     (tr("Bit Error Rate"),     "ber",
                         65535,  false,     0, 65535, 0),
-      uncorrectedBlocks(QObject::tr("Uncorrected Blocks"), "ucb",
+      uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
                         65535,  false,     0, 65535, 0),
-      rotorPosition    (QObject::tr("Rotor Progress"),     "pos",
+      rotorPosition    (tr("Rotor Progress"),     "pos",
                         100,    true,      0,   100, 0),
       streamHandlerStarted(false),
       streamHandler(NULL)
@@ -216,7 +221,7 @@ void DVBSignalMonitor::UpdateValues(void)
     {
         if (!streamHandler->IsRunning())
         {
-            error = QObject::tr("Error: stream handler died");
+            error = tr("Error: stream handler died");
             update_done = true;
             return;
         }

@@ -115,7 +115,7 @@ package MythTV;
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1315";
+    our $SCHEMA_VERSION = "1317";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -372,7 +372,7 @@ EOF
                                       $self->{'db_user'},
                                       $self->{'db_pass'})
             or die "Cannot connect to database: $!\n\n";
-        $self->{'dbh'}->do("SET time_zone = 'UTC'")
+        $self->{'dbh'}->do("SET time_zone = 'Etc/UTC'")
             or die "Can't set timezone: $!\n\n";
 
     # Check for supported schema version

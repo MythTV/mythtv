@@ -41,6 +41,8 @@ void strings_null() {
     ThemeUI::tr("Finish");
     ThemeUI::tr("Search");
     ThemeUI::tr("Enter Current Location");
+    ThemeUI::tr("This screen governs the behavior of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click \"Finish\" to continue.");
+    ThemeUI::tr("Weather settings");
     ThemeUI::tr("Weather Screen Setup");
     ThemeUI::tr("Weather Source Setup");
     ThemeUI::tr("Source");

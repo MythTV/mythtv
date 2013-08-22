@@ -40,12 +40,14 @@
 
 class PaneExistingScanImport : public VerticalConfigurationGroup
 {
+    Q_DECLARE_TR_FUNCTIONS(PaneExistingScanImport)
+
   public:
     PaneExistingScanImport() :
         VerticalConfigurationGroup(false,false,true,false),
         sourceid(0), scanSelect(new TransComboBoxSetting())
     {
-        scanSelect->setLabel(QObject::tr("Scan to Import"));
+        scanSelect->setLabel(tr("Scan to Import"));
         addChild(scanSelect);
     }
 
@@ -64,7 +66,7 @@ class PaneExistingScanImport : public VerticalConfigurationGroup
             QString scanDate = MythDate::toString(
                 scans[i].scandate, MythDate::kDateTimeFull);
             QString proc     = (scans[i].processed) ?
-                QObject::tr("processed") : QObject::tr("unprocessed");
+                tr("processed") : tr("unprocessed");
 
             scanSelect->addSelection(
                 QString("%1 %2").arg(scanDate).arg(proc),

@@ -22,8 +22,7 @@ class MUI_PUBLIC MythScreenStack : public QObject
     virtual ~MythScreenStack();
 
     virtual void AddScreen(MythScreenType *screen, bool allowFade = true);
-    virtual void PopScreen(bool allowFade = true, bool deleteScreen = true);
-    virtual void PopScreen(MythScreenType *screen, bool allowFade = true,
+    virtual void PopScreen(MythScreenType *screen = NULL, bool allowFade = true,
                            bool deleteScreen = true);
 
     virtual MythScreenType *GetTopScreen(void) const;

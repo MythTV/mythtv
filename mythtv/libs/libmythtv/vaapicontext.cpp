@@ -185,8 +185,19 @@ class VAAPIDisplay : ReferenceCounter
         return ret;
     }
 
-    static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type)
+    static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse)
     {
+        if (noreuse)
+        {
+            VAAPIDisplay *tmp = new VAAPIDisplay(display_type);
+            if (tmp->Create())
+            {
+                return tmp;
+            }
+            tmp->DecrRef();
+            return NULL;
+        }
+
         QMutexLocker locker(&s_VAAPIDisplayLock);
 
         if (s_VAAPIDisplay)
@@ -202,7 +213,7 @@ class VAAPIDisplay : ReferenceCounter
         }
 
         s_VAAPIDisplay = new VAAPIDisplay(display_type);
-        if (s_VAAPIDisplay && s_VAAPIDisplay->Create())
+        if (s_VAAPIDisplay->Create())
             return s_VAAPIDisplay;
 
         s_VAAPIDisplay->DecrRef();
@@ -225,7 +236,7 @@ bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
 {
     bool result = false;
     VAAPIContext *ctx = new VAAPIContext(kVADisplayX11, codec);
-    if (ctx && ctx->CreateDisplay(size))
+    if (ctx->CreateDisplay(size, true))
     {
         pix_fmt = ctx->GetPixelFormat();
         result = pix_fmt == PIX_FMT_VAAPI_VLD;
@@ -298,11 +309,11 @@ VAAPIContext::~VAAPIContext()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleted context");
 }
 
-bool VAAPIContext::CreateDisplay(QSize size)
+bool VAAPIContext::CreateDisplay(QSize size, bool noreuse)
 {
     m_size = size;
     bool ok = true;
-    m_display = VAAPIDisplay::GetDisplay(m_dispType);
+    m_display = VAAPIDisplay::GetDisplay(m_dispType, noreuse);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
     CREATE_CHECK(m_display != NULL, "Invalid display");
     CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");

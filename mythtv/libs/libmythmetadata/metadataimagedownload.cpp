@@ -40,7 +40,8 @@ MetadataImageDownload::~MetadataImageDownload()
 void MetadataImageDownload::addThumb(QString title,
                                      QString url, QVariant data)
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     ThumbnailData *id = new ThumbnailData();
     id->title = title;
     id->data = data;
@@ -48,26 +49,30 @@ void MetadataImageDownload::addThumb(QString title,
     m_thumbnailList.append(id);
     if (!isRunning())
         start();
-    m_mutex.unlock();
 }
 
+/**
+ * addLookup: Add lookup to bottom of the queue
+ * MetadataDownload::m_downloadList takes ownership of the given lookup
+ */
 void MetadataImageDownload::addDownloads(MetadataLookup *lookup)
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     m_downloadList.append(lookup);
+    lookup->DecrRef();
     if (!isRunning())
         start();
-    m_mutex.unlock();
 }
 
 void MetadataImageDownload::cancel()
 {
-    m_mutex.lock();
+    QMutexLocker lock(&m_mutex);
+
     qDeleteAll(m_thumbnailList);
     m_thumbnailList.clear();
-    qDeleteAll(m_downloadList);
+    // clearing m_downloadList automatically delete all its content
     m_downloadList.clear();
-    m_mutex.unlock();
 }
 
 void MetadataImageDownload::run()
@@ -108,12 +113,24 @@ void MetadataImageDownload::run()
             delete thumb;
     }
 
-    MetadataLookup *lookup;
-    while ((lookup = moreDownloads()) != NULL)
+    while (true)
     {
+        m_mutex.lock();
+        if (m_downloadList.isEmpty())
+        {
+            // no more to process, we're done
+            m_mutex.unlock();
+            break;
+        }
+        // Ref owns the MetadataLookup object for the duration of the loop
+        // and it will be deleted automatically when the loop completes
+        RefCountHandler<MetadataLookup> ref = m_downloadList.takeFirstAndDecr();
+        m_mutex.unlock();
+        MetadataLookup *lookup = ref;
         DownloadMap downloads = lookup->GetDownloads();
         DownloadMap downloaded;
 
+        bool errored = false;
         for (DownloadMap::iterator i = downloads.begin();
                 i != downloads.end(); ++i)
         {
@@ -131,8 +148,7 @@ void MetadataImageDownload::run()
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("Metadata Image Download: Unable to create "
                                     "path %1, aborting download.").arg(path));
-                        QCoreApplication::postEvent(m_parent,
-                                    new ImageDLFailureEvent(lookup));
+                        errored = true;
                         continue;
                     }
                 QString finalfile = path + "/" + filename;
@@ -164,8 +180,7 @@ void MetadataImageDownload::run()
                                 .arg(oldurl).arg(download->size()));
                         delete download;
                         download = NULL;
-                        QCoreApplication::postEvent(m_parent,
-                                    new ImageDLFailureEvent(lookup));
+                        errored = true;
                         continue;
                     }
 
@@ -173,13 +188,15 @@ void MetadataImageDownload::run()
                     {
                         off_t size = dest_file.write(*download,
                                                      download->size());
+                        dest_file.close();
                         if (size != download->size())
                         {
+                            // File creation failed for some reason, delete it
+                            RemoteFile::DeleteFile(finalfile);
                             LOG(VB_GENERAL, LOG_ERR,
                                 QString("Image Download: Error Writing Image "
                                         "to file: %1").arg(finalfile));
-                            QCoreApplication::postEvent(m_parent,
-                                        new ImageDLFailureEvent(lookup));
+                            errored = true;
                         }
                         else
                             downloaded.insert(type, info);
@@ -244,8 +261,7 @@ void MetadataImageDownload::run()
                                 .arg(oldurl).arg(download->size()));
                         delete download;
                         download = NULL;
-                        QCoreApplication::postEvent(m_parent,
-                                    new ImageDLFailureEvent(lookup));
+                        errored = true;
                         continue;
                     }
 
@@ -261,25 +277,26 @@ void MetadataImageDownload::run()
                                         .arg(finalfile));
                             delete outFile;
                             outFile = NULL;
-                            QCoreApplication::postEvent(m_parent,
-                                        new ImageDLFailureEvent(lookup));
+                            errored = true;
                         }
                         else
                         {
                             off_t written = outFile->Write(*download,
                                                            download->size());
+                            delete outFile;
+                            outFile = NULL;
                             if (written != download->size())
                             {
+                                // File creation failed for some reason, delete it
+                                RemoteFile::DeleteFile(finalfile);
+
                                 LOG(VB_GENERAL, LOG_ERR,
                                     QString("Image Download: Error Writing Image "
                                             "to file: %1").arg(finalfile));
-                                QCoreApplication::postEvent(m_parent,
-                                        new ImageDLFailureEvent(lookup));
+                                errored = true;
                             }
                             else
                                 downloaded.insert(type, info);
-                            delete outFile;
-                            outFile = NULL;
                         }
                     }
                     else
@@ -289,13 +306,15 @@ void MetadataImageDownload::run()
                         {
                             off_t size = dest_file.write(*download,
                                                          download->size());
+                            dest_file.close();
                             if (size != download->size())
                             {
+                                // File creation failed for some reason, delete it
+                                RemoteFile::DeleteFile(resolvedFN);
                                 LOG(VB_GENERAL, LOG_ERR,
                                     QString("Image Download: Error Writing Image "
                                             "to file: %1").arg(finalfile));
-                                QCoreApplication::postEvent(m_parent,
-                                            new ImageDLFailureEvent(lookup));
+                                errored = true;
                             }
                             else
                                 downloaded.insert(type, info);
@@ -308,6 +327,11 @@ void MetadataImageDownload::run()
                     downloaded.insert(type, info);
             }
         }
+        if (errored)
+        {
+            QCoreApplication::postEvent(m_parent,
+                    new ImageDLFailureEvent(lookup));
+        }
         lookup->SetDownloads(downloaded);
         QCoreApplication::postEvent(m_parent, new ImageDLEvent(lookup));
     }
@@ -317,21 +341,11 @@ void MetadataImageDownload::run()
 
 ThumbnailData* MetadataImageDownload::moreThumbs()
 {
+    QMutexLocker lock(&m_mutex);
     ThumbnailData *ret = NULL;
-    m_mutex.lock();
+
     if (!m_thumbnailList.isEmpty())
         ret = m_thumbnailList.takeFirst();
-    m_mutex.unlock();
-    return ret;
-}
-
-MetadataLookup* MetadataImageDownload::moreDownloads()
-{
-    MetadataLookup *ret = NULL;
-    m_mutex.lock();
-    if (!m_downloadList.isEmpty())
-        ret = m_downloadList.takeFirst();
-    m_mutex.unlock();
     return ret;
 }
 

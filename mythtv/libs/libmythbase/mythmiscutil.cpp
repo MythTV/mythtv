@@ -454,17 +454,8 @@ QString getResponse(const QString &query, const QString &def)
         return def;
     }
 
-    char response[80];
-    cin.clear();
-    cin.getline(response, 80);
-    if (!cin.good())
-    {
-        cout << endl;
-        LOG(VB_GENERAL, LOG_ERR, "Read from stdin failed");
-        return NULL;
-    }
-
-    QString qresponse = response;
+    QTextStream stream(stdin);
+    QString     qresponse = stream.readLine();
 
     if (qresponse.isEmpty())
         qresponse = def;

@@ -14,7 +14,7 @@
 #include <QFile>
 #include <QDateTime>
 
-#include "ThreadedFileWriter.h"
+#include "threadedfilewriter.h"
 #include "fileringbuffer.h"
 #include "streamingringbuffer.h"
 #include "livetvchain.h"

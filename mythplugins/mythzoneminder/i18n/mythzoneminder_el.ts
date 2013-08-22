@@ -28,64 +28,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation>Διεύθυνση IP του διακομιστή MythZoneMinder</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation>Δώστε τη διεύθυνση IP του διακομιστή MythZoneMinder που θα συνδέεται αυτός ο frontend.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="28"/>
-        <source>Port the server runs on</source>
-        <translation>Η θύρα όπου &quot;ακούει&quot; o διακομιστής</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="30"/>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation>Εκτός και αν έχετε πολύ καλό λόγο, μην το αλλάξετε.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="38"/>
-        <source>Date format</source>
-        <translation>Μορφή Ημερομηνίας</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation>Εμφανίζονται δείγματα βάσει της σημερινής ημερομηνίας.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="48"/>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation>Εμφανίζονται δείγματα βάσει της αυριανής ημερομηνίας.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="64"/>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation>Η μορφή που προτιμάτε να έχει η ημερομηνία στις οθόνες συμβάντων.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="72"/>
-        <source>Time format</source>
-        <translation>Μορφή ώρας</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="80"/>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation>Η μορφή που προτιμάτε να έχει η ώρα στις οθόνες συμβάντων.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="88"/>
-        <source>MythZoneMinder Settings</source>
-        <translation>Ρυθμίσεις MythZoneMinder</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="5"/>
@@ -154,44 +96,44 @@
         <translation>Ζωντανή Λήψη ZoneMinder</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Ενεργό
 [S] = Σταματημένο</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Select Camera:</source>
         <translation>Επιλογή Κάμερας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Select Date:</source>
         <translation>Επιλογή Ημερομηνίας:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Test</source>
         <translation>Δοκιμή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Record</source>
         <translation>Εγγραφή</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Store</source>
         <translation>Αποθήκευση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -311,17 +253,37 @@
         <translation>Οθόνη 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="41"/>
+        <source>Status:</source>
+        <translation>Κατάσταση:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Name:</source>
+        <translation>Όνομα:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Duration:</source>
+        <translation>Διάρκεια:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>ZoneMinder Live</source>
+        <translation>Ζωντανή Λήψη</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
         <source>Show Console</source>
         <translation>Διαχείριση</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Show Live View</source>
         <translation>Ζωντανή Λήψη</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Show Events</source>
         <translation>Συμβάντα</translation>
     </message>
@@ -334,7 +296,7 @@
         <translation>Δεν μπορώ να συνδεθώ στον mythzmserver - Είναι σε λειτουργία; Έχετε εισάγει τις σωστές τιμές IP και θύρας στις ρυθμίσεις;</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="194"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>O διακομιστής mythzmserver δεν αποκρίθηκε στην αίτηση για έκδοση πρωτοκόλλου!!</translation>
     </message>
@@ -342,12 +304,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="212"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Ενεργό</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="217"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Σταματημένο</translation>
     </message>
@@ -406,12 +368,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>Δεν μπορώ να δείξω ζωντανή λήψη.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Δεν έχετε ορίσει οθόνες!</translation>
     </message>
@@ -419,31 +381,90 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="291"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Παύση</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Previous</source>
         <translation>Προηγούμενο</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="298"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="377"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
+    </message>
+</context>
+<context>
+    <name>ZMSettings</name>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>Διεύθυνση IP του διακομιστή MythZoneMinder</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Δώστε τη διεύθυνση IP του διακομιστή MythZoneMinder που θα συνδέεται αυτός ο frontend.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
+        <source>Port the server runs on</source>
+        <translation>Η θύρα όπου &quot;ακούει&quot; o διακομιστής</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="31"/>
+        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
+        <translation>Εκτός και αν έχετε πολύ καλό λόγο, μην το αλλάξετε.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="39"/>
+        <source>Date format</source>
+        <translation>Μορφή Ημερομηνίας</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Εμφανίζονται δείγματα βάσει της σημερινής ημερομηνίας.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Εμφανίζονται δείγματα βάσει της αυριανής ημερομηνίας.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="65"/>
+        <source>Your preferred date format to use on the events screens. %1</source>
+        <extracomment>%1 gives additional info on the date used</extracomment>
+        <translation>Η μορφή ημερομηνίας που προτιμάτε για τις οθόνες συμβάντων. %1</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="74"/>
+        <source>Time format</source>
+        <translation>Μορφή ώρας</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="82"/>
+        <source>Your preferred time format to display on the events screens.</source>
+        <translation>Η μορφή που προτιμάτε να έχει η ώρα στις οθόνες συμβάντων.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
+        <source>MythZoneMinder Settings</source>
+        <translation>Ρυθμίσεις MythZoneMinder</translation>
     </message>
 </context>
 </TS>

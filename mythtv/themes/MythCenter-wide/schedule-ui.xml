@@ -802,9 +802,9 @@
     <window name="phrasepopup">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="box">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title_text" from="basetextarea">
             <area>20,20,460,40</area>
@@ -858,9 +858,9 @@
     <window name="timepopup">
         <area>-1,-1,580,166</area>
 
-        <imagetype name="box">
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,10,580,40</area>
@@ -887,9 +887,9 @@
     <window name="powersearchpopup">
         <area>-1,-1,500,500</area>
 
-        <imagetype name="box">
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title_text" from="basetextarea">
             <area>20,20,460,40</area>
@@ -936,10 +936,9 @@
     <window name="editpowersearchpopup">
         <area>-1,-1,500,550</area>
 
-        <imagetype name="box">
-            <area>0,0,500,550</area>
-            <filename>mythdialogbox-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="title_text" from="basetextarea">
             <area>20,10,460,40</area>
@@ -1130,9 +1129,9 @@
     <window name="searchpopup" from="MythTextInputDialog">
         <area>-1,10,580,166</area>
 
-        <imagetype name="backimg">
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
+        <shape name="backimg" from="basepopupbackground">
+            <area>0,0,100%,100%</area>
+        </shape>
 
         <textarea name="message" from="basetextarea">
             <area>20,14,540,30</area>

@@ -14,6 +14,7 @@
 #include "mythtypes.h"
 #include "mythmetaexp.h"
 #include "metadataimagehelper.h"
+#include "referencecounterlist.h"
 
 class ProgramInfo;
 
@@ -78,7 +79,7 @@ typedef QMap< VideoArtworkType, ArtworkInfo > DownloadMap;
 
 typedef QMultiMap< PeopleType, PersonInfo > PeopleMap;
 
-class META_PUBLIC MetadataLookup : public QObject
+class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 {
   public:
     MetadataLookup(void);
@@ -442,15 +443,15 @@ class META_PUBLIC MetadataLookup : public QObject
     DownloadMap m_downloads;
 };
 
-typedef QList<MetadataLookup*> MetadataLookupList;
+typedef RefCountedList<MetadataLookup> MetadataLookupList;
 
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookupList list);
 META_PUBLIC QDomDocument CreateMetadataXML(MetadataLookup *lookup);
 META_PUBLIC QDomDocument CreateMetadataXML(ProgramInfo *pginfo);
 
 META_PUBLIC void CreateMetadataXMLItem(MetadataLookup *lookup,
-                                   QDomElement placetoadd,
-                                   QDomDocument docroot);
+                                       QDomElement placetoadd,
+                                       QDomDocument docroot);
 
 META_PUBLIC void AddCertifications(MetadataLookup *lookup,
                                    QDomElement placetoadd,
@@ -465,21 +466,21 @@ META_PUBLIC void AddCountries(MetadataLookup *lookup,
                               QDomElement placetoadd,
                               QDomDocument docroot);
 
-META_PUBLIC MetadataLookup* LookupFromProgramInfo(ProgramInfo *pginfo);
+META_PUBLIC MetadataLookup *LookupFromProgramInfo(ProgramInfo *pginfo);
 
-META_PUBLIC MetadataLookup* ParseMetadataItem(const QDomElement& item,
-                                          MetadataLookup *lookup,
-                                          bool passseas = true);
-META_PUBLIC MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
-                                          MetadataLookup *lookup);
+META_PUBLIC MetadataLookup *ParseMetadataItem(const QDomElement &item,
+                                              MetadataLookup *lookup,
+                                              bool passseas = true);
+META_PUBLIC MetadataLookup *ParseMetadataMovieNFO(const QDomElement &item,
+                                                  MetadataLookup *lookup);
 META_PUBLIC PeopleMap ParsePeople(QDomElement people);
 META_PUBLIC ArtworkMap ParseArtwork(QDomElement artwork);
 
-META_PUBLIC int editDistance(const QString& s, const QString& t);
-META_PUBLIC QString nearestName(const QString& actual,
-                            const QStringList& candidates);
+META_PUBLIC int editDistance(const QString &s, const QString &t);
+META_PUBLIC QString nearestName(const QString &actual,
+                                const QStringList &candidates);
 
-META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString& t);
+META_PUBLIC QDateTime RFC822TimeToQDateTime(const QString &t);
 
 enum GrabberType {
     kGrabberMovie = 0,
@@ -526,9 +527,10 @@ class META_PUBLIC MetaGrabberScript : public QObject
     float m_version;
 };
 
-META_PUBLIC MetaGrabberScript* ParseGrabberVersion(const QDomElement& item);
+META_PUBLIC MetaGrabberScript *ParseGrabberVersion(const QDomElement &item);
 
 Q_DECLARE_METATYPE(MetaGrabberScript*)
 Q_DECLARE_METATYPE(MetadataLookup*)
+Q_DECLARE_METATYPE(RefCountHandler<MetadataLookup>)
 
 #endif // METADATACOMMON_H_

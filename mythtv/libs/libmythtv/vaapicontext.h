@@ -34,7 +34,7 @@ class VAAPIContext
     VAAPIContext(VAAPIDisplayType display_type, MythCodecID codec);
    ~VAAPIContext();
 
-    bool  CreateDisplay(QSize size);
+    bool  CreateDisplay(QSize size, bool noreuse = false);
     bool  CreateBuffers(void);
     void* GetVideoSurface(int i);
     uint8_t* GetSurfaceIDPointer(void* buf);
