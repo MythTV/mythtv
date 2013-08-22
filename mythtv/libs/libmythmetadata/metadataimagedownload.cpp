@@ -189,8 +189,11 @@ void MetadataImageDownload::run()
                     {
                         off_t size = dest_file.write(*download,
                                                      download->size());
+                        dest_file.close();
                         if (size != download->size())
                         {
+                            // File creation failed for some reason, delete it
+                            RemoteFile::DeleteFile(finalfile);
                             LOG(VB_GENERAL, LOG_ERR,
                                 QString("Image Download: Error Writing Image "
                                         "to file: %1").arg(finalfile));
@@ -284,8 +287,13 @@ void MetadataImageDownload::run()
                         {
                             off_t written = outFile->Write(*download,
                                                            download->size());
+                            delete outFile;
+                            outFile = NULL;
                             if (written != download->size())
                             {
+                                // File creation failed for some reason, delete it
+                                RemoteFile::DeleteFile(finalfile);
+
                                 LOG(VB_GENERAL, LOG_ERR,
                                     QString("Image Download: Error Writing Image "
                                             "to file: %1").arg(finalfile));
@@ -294,8 +302,6 @@ void MetadataImageDownload::run()
                             }
                             else
                                 downloaded.insert(type, info);
-                            delete outFile;
-                            outFile = NULL;
                         }
                     }
                     else
@@ -305,8 +311,11 @@ void MetadataImageDownload::run()
                         {
                             off_t size = dest_file.write(*download,
                                                          download->size());
+                            dest_file.close();
                             if (size != download->size())
                             {
+                                // File creation failed for some reason, delete it
+                                RemoteFile::DeleteFile(resolvedFN);
                                 LOG(VB_GENERAL, LOG_ERR,
                                     QString("Image Download: Error Writing Image "
                                             "to file: %1").arg(finalfile));
