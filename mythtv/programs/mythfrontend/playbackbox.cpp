@@ -2756,7 +2756,7 @@ MythMenu* PlaybackBox::createPlaylistStorageMenu()
     menu->AddItem(tr("Enable Auto Expire"), SLOT(doPlaylistExpireSetOn()));
     menu->AddItem(tr("Mark as Watched"), SLOT(doPlaylistWatchedSetOn()));
     menu->AddItem(tr("Mark as Unwatched"), SLOT(doPlaylistWatchedSetOff()));
-    menu->AddItem(tr("Allow this episode to re-record"), SLOT(doPlaylistAllowRerecord()));
+    menu->AddItem(tr("Allow Re-record"), SLOT(doPlaylistAllowRerecord()));
 
     return menu;
 }
