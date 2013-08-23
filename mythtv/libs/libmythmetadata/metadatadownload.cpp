@@ -101,7 +101,7 @@ void MetadataDownload::run()
             else
                 list = handleVideoUndetermined(lookup);
 
-            if (!list.size() &&
+            if (list.isEmpty() &&
                 lookup->GetSubtype() == kUnknownVideo)
             {
                 list = handleMovie(lookup);
