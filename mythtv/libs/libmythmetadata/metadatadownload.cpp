@@ -136,7 +136,7 @@ void MetadataDownload::run()
             list = handleGame(lookup);
 
         // inform parent we have lookup ready for it
-        if (m_parent && list.count() >= 1)
+        if (m_parent && !list.isEmpty())
         {
             // If there's only one result, don't bother asking
             // our parent about it, just add it to the back of
@@ -178,6 +178,8 @@ void MetadataDownload::run()
         }
         else
         {
+            if (list.isEmpty())
+                LOG(VB_GENERAL, LOG_INFO, "Metadata Lookup Failed: No Results");
             list.append(lookup);
             QCoreApplication::postEvent(m_parent,
                 new MetadataLookupFailure(list));
