@@ -572,16 +572,30 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     seconds = startts.secsTo(endts);
 
     minutes = seconds / 60;
-    infoMap["lenmins"] = QCoreApplication::translate("(Common)", "%n minute(s)",
-        "", QCoreApplication::UnicodeUTF8, minutes);
     hours   = minutes / 60;
     minutes = minutes % 60;
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+
+    infoMap["lenmins"] = QCoreApplication::translate("(Common)", "%n minute(s)",
+        "", QCoreApplication::UnicodeUTF8, minutes);
 
     QString minstring  = QCoreApplication::translate("(Common)", "%n minute(s)",
         "",QCoreApplication::UnicodeUTF8, minutes);
 
     QString hourstring = QCoreApplication::translate("(Common)", "%n hour(s)",
         "", QCoreApplication::UnicodeUTF8, hours);
+#else
+    infoMap["lenmins"] = QCoreApplication::translate("(Common)", "%n minute(s)",
+        "", minutes);
+
+    QString minstring  = QCoreApplication::translate("(Common)", "%n minute(s)",
+        "", minutes);
+
+    QString hourstring = QCoreApplication::translate("(Common)", "%n hour(s)",
+        "", hours);
+
+#endif
 
     if (hours > 0)
     {

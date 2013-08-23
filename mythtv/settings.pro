@@ -88,10 +88,13 @@ win32 {
     # All versions of Microsoft Visual Studio
 
     win32-msvc* {
-                                                             
+
         DEFINES += WIN32 WIN32_LEAN_AND_MEAN NOMINMAX _USE_MATH_DEFINES
         DEFINES += _CRT_SECURE_NO_WARNINGS
-    
+        DEFINES += __STDC_CONSTANT_MACROS
+        DEFINES += __STDC_FORMAT_MACROS
+        DEFINES += __STDC_LIMIT_MACROS
+
         Debug  :DEFINES += _DEBUG
         Release:DEFINES += NDEBUG
 
@@ -116,21 +119,21 @@ win32 {
         Release:LIBS           += -L$$SRC_PATH_BARE/bin/release
         Release:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/release
         Release:MOC_DIR         = release/moc
-        Release:QMAKE_CXXFLAGS  = /MD /MP /wd4100
+        Release:QMAKE_CXXFLAGS  = /MD /MP /wd4100 /wd4996
 
 
         Debug:DESTDIR         = $$SRC_PATH_BARE/bin/debug
         Debug:LIBS           += -L$$SRC_PATH_BARE/bin/debug
         Debug:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/debug
         Debug:MOC_DIR         = debug/moc
-        Debug:QMAKE_CXXFLAGS  = /MDd /MP /wd4100
+        Debug:QMAKE_CXXFLAGS  = /MDd /MP /wd4100 /wd4996
 
         EXTRA_LIBS += -llibzmq
         EXTRA_LIBS += -lmythnzmqt
         EXTRA_LIBS += -lmythqjson
         EXTRA_LIBS += -lpthreadVC2
 
-    } 
+    }
 
     # minGW Build Environment
 
@@ -145,7 +148,7 @@ win32 {
         # This corrects the moc tool path from a DOS-style to a unix style:
         QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
         QMAKE_EXTENSION_SHLIB = dll
-    } 
+    }
 
     # if CYGWIN compile, set up flag in CONFIG
     contains(TARGET_OS, CYGWIN) {

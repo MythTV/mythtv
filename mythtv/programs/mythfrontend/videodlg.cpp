@@ -3290,7 +3290,7 @@ void VideoDialog::customEvent(QEvent *levent)
         if (list.count() > 1)
         {
             VideoMetadata *metadata =
-                qVariantValue<VideoMetadata *>(list[0]->GetData());
+                list[0]->GetData().value<VideoMetadata *>();
             dismissFetchDialog(metadata, true);
             MetadataResultsDialog *resultsdialog =
                   new MetadataResultsDialog(m_popupStack, list);

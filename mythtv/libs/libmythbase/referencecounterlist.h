@@ -43,7 +43,7 @@ private:
  * provide the same access methods as a QList
  */
 template <class T>
-class MBASE_PUBLIC RefCountedList : public QList<RefCountHandler<T> >
+class RefCountedList : public QList<RefCountHandler<T> >
 {
 public:
     /**

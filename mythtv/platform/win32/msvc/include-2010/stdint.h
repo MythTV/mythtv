@@ -41,6 +41,8 @@
 #endif
 
 #include <limits.h>
+#include <math.h>
+
 
 // For Visual Studio 6 in C++ mode and for many Visual Studio versions when
 // compiling for ARM we should wrap <wchar.h> include with 'extern "C++" {}'
@@ -243,6 +245,7 @@ typedef uint64_t  uintmax_t;
 
 #endif // __STDC_CONSTANT_MACROS ]
 
+#define isnan( x )  _isnan( x )
 
 __inline double roundf(double x) 
 { 
