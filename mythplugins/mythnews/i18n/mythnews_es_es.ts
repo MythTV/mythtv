@@ -6,7 +6,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="47"/>
         <source>RSS News feed reader</source>
-        <translation>Lector de Canales de Noticias RSS</translation>
+        <translation>Lector de canales de noticias RSS</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="51"/>
@@ -42,14 +42,6 @@
         <translation>No ha configurado MythNews para acceder a ningún sitio.</translation>
     </message>
     <message>
-        <source>%1 of %2 (%3 percent)</source>
-        <translation type="obsolete">%1 de %2 (%3 por ciento)</translation>
-    </message>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Descargando medios...</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>¡No hay ningún navegador configurado! MythNews necesita que MythBrowser esté instalado.</translation>
@@ -57,22 +49,22 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
-        <translation>Gestionar Canales</translation>
+        <translation>Gestionar canales</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
-        <translation>Añadir Canal</translation>
+        <translation>Añadir canal</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
-        <translation>Editar Canal</translation>
+        <translation>Editar canal</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
-        <translation>Eliminar Canal</translation>
+        <translation>Eliminar canal</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="674"/>
@@ -85,12 +77,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation>Editar Detalles del Sitio</translation>
+        <translation>Editar detalles del sitio</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation>Introducir Detalles del Sitio</translation>
+        <translation>Introducir detalles del sitio</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
@@ -155,7 +147,7 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="227"/>
         <source>Retrieve Failed. </source>
-        <translation>Fallo en la Descarga.</translation>
+        <translation>Fallo en la descarga. </translation>
     </message>
 </context>
 <context>
@@ -168,14 +160,14 @@
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Edit RSS News Feeds</source>
-        <translation>Editar Canales de Noticias RSS</translation>
+        <translation>Editar canales de noticias RSS</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
-        <translation>En esta pantalla puede editar el nombre, URL, y la ruta del icono para el Canal RSS seleccionado. Puede también definir el elemento como un podcast
+        <translation>En esta pantalla puede editar el nombre, URL, y la ruta del icono para el canal RSS seleccionado. Puede también definir el elemento como un podcast.
 
 Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancelar&quot; para continuar.</translation>
     </message>
@@ -217,7 +209,7 @@ Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancel
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Bookmark Manager</source>
-        <translation>Administrador de Marcadores</translation>
+        <translation>Administrador de marcadores</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
@@ -227,7 +219,7 @@ Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancel
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>News Subscriptions</source>
-        <translation>Suscripciones a Noticias</translation>
+        <translation>Suscripciones a noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -235,42 +227,77 @@ Cuando haya terminado la edición, seleccione &quot;Aceptar&quot; o &quot;Cancel
         <translation>Elija qué sitios de noticias le gustaría leer.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
-        <translation>Canales de Noticias</translation>
+        <translation>Canales de noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
-        <translation>Configuración de Noticias</translation>
+        <translation>Configuración de noticias</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Noticias</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation>No ha especificado ningún canal de noticias.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Editar noticias</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation>Aceptar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>Configuración de las noticias</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Categorías disponibles</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Sitios disponibles</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Categoría</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
-        <translation>Sitio Web</translation>
+        <translation>Sitio web</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
-        <translation>Editar Canal de Noticias RSS</translation>
+        <translation>Editar canal de noticias RSS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Contextos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Acciones</translation>
     </message>

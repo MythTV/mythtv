@@ -578,12 +578,12 @@ Remove it from the database?</source>
         <translation>Sí</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Edit Game Information</source>
         <translation>Editar información del juego</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Game Name:</source>
         <translation>Nombre del juego:</translation>
     </message>
@@ -613,12 +613,32 @@ Remove it from the database?</source>
         <translation>Fanart:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>De %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>System: %1</source>
+        <translation>Sistema: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Genre: %1</source>
+        <translation>Género: %1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Back</source>
+        <translation>Contraportada</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
         <source>Boxart:</source>
         <translation>Carátula:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="44"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/ruta/al/archivo.jpg</translation>
     </message>
@@ -693,22 +713,22 @@ Remove it from the database?</source>
         <translation>Juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="43"/>
         <source>ROM Name:</source>
         <translation>Nombre de la ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="39"/>
         <source>ROM Path:</source>
         <translation>Ruta de las ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="45"/>
         <source>Game:</source>
         <translation>Juego:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Type:</source>
         <translation>Tipo:</translation>
     </message>
@@ -718,38 +738,38 @@ Remove it from the database?</source>
         <translation>Nombre de archivo:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="47"/>
         <source>ROM path:</source>
         <oldsource>Rompath:</oldsource>
         <translation>Ruta de las ROM:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="36"/>
         <source>System(s):</source>
         <translation>Sistema(s):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>CRC:</source>
         <translation>CRC:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Description:</source>
         <translation>Descripción:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Favorite</source>
         <translation>Favorito</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>No Plot.</source>
         <translation>Sin argumento.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Empty your game library</source>
         <translation>Vaciar su biblioteca de juegos</translation>
     </message>
@@ -759,47 +779,47 @@ Remove it from the database?</source>
         <translation>Jugar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Game Information</source>
         <translation>Información del juego</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Games</source>
         <translation>Juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>General Settings</source>
         <translation>Configuración general</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Game folders and general options</source>
         <translation>Carpetas de juegos y opciones generales</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Game Players</source>
         <translation>Emuladores</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Configure an emulator</source>
         <translation>Configurar un emulador</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="56"/>
         <source>Scan for Games</source>
         <translation>Buscar juegos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="57"/>
         <source>Add games to your library</source>
         <translation>Añadir juegos a su biblioteca</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Clear Game Data</source>
         <translation>Eliminar datos de los juegos</translation>
     </message>
