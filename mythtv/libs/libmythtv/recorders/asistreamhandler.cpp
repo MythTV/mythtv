@@ -15,7 +15,7 @@
 // MythTV headers
 #include "asistreamhandler.h"
 #include "asichannel.h"
-#include "ThreadedFileWriter.h"
+#include "threadedfilewriter.h"
 #include "dtvsignalmonitor.h"
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
