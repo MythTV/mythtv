@@ -179,10 +179,19 @@ void MetadataDownload::run()
         else
         {
             if (list.isEmpty())
-                LOG(VB_GENERAL, LOG_INFO, "Metadata Lookup Failed: No Results");
-            list.append(lookup);
-            QCoreApplication::postEvent(m_parent,
-                new MetadataLookupFailure(list));
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Metadata Lookup Failed: No Results %1 %2 %3")
+                        .arg(lookup->GetTitle()).arg(lookup->GetSeason())
+                        .arg(lookup->GetEpisode()));
+            }
+            if (m_parent)
+            {
+                // list is always empty here
+                list.append(lookup);
+                QCoreApplication::postEvent(m_parent,
+                    new MetadataLookupFailure(list));
+            }
         }
     }
 
