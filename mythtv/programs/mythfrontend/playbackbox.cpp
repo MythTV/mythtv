@@ -643,22 +643,17 @@ void PlaybackBox::displayRecGroup(const QString &newRecGroup)
 
 void PlaybackBox::checkPassword(const QString &password)
 {
-    m_passwordEntered = true;
-
-    QString grouppass = m_recGroupPwCache[m_newRecGroup];
-    if (password == grouppass)
+    if (password == m_recGroupPwCache[m_newRecGroup])
+    {
+        m_passwordEntered = true;
         setGroupFilter(m_newRecGroup);
-    else
-        qApp->postEvent(this, new MythEvent("DISPLAY_RECGROUP",
-                                            m_newRecGroup));
+    }
 }
 
 void PlaybackBox::passwordClosed(void)
 {
-    if (m_passwordEntered)
-        return;
-
-    if (m_usingGroupSelector || m_firstGroup)
+    if (!m_passwordEntered &&
+        (m_usingGroupSelector || m_firstGroup))
         showGroupFilter();
 }
 
