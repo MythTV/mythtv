@@ -799,11 +799,11 @@ void DecoderIOFactoryShoutCast::closeIODevice(void)
 void DecoderIOFactoryShoutCast::start(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
-        QString("DecoderIOFactoryShoutCast %1").arg(getUrl().toString()));
+        QString("DecoderIOFactoryShoutCast %1").arg(m_handler->getUrl().toString()));
     doOperationStart(tr("Connecting"));
 
     makeIODevice();
-    m_input->connectToUrl(getUrl());
+    m_input->connectToUrl(m_handler->getUrl());
 }
 
 void DecoderIOFactoryShoutCast::stop(void)
@@ -878,11 +878,11 @@ void DecoderIOFactoryShoutCast::shoutcastMeta(const QString &metadata)
         QString("DecoderIOFactoryShoutCast: metadata changed - %1")
             .arg(metadata));
     ShoutCastMetaParser parser;
-    parser.setMetaFormat(getMetadata().MetadataFormat());
+    parser.setMetaFormat(m_handler->getMetadata().MetadataFormat());
 
     ShoutCastMetaMap meta_map = parser.parseMeta(metadata);
 
-    MusicMetadata mdata = getMetadata();
+    MusicMetadata mdata = m_handler->getMetadata();
     mdata.setTitle(meta_map["title"]);
     mdata.setArtist(meta_map["artist"]);
     mdata.setAlbum(meta_map["album"]);
@@ -955,7 +955,7 @@ int DecoderIOFactoryShoutCast::checkResponseOK()
         !response.getLocation().isEmpty())
     {
         // restart with new location...
-        setUrl(response.getLocation());
+        m_handler->setUrl(response.getLocation());
         start();
         return 1;
     }
