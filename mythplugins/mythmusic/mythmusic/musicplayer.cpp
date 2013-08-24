@@ -1164,10 +1164,12 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
     if (getCurrentMetadata())
         curTrackID = getCurrentMetadata()->ID();
 
-    m_shuffleMode = mode;
+    // only save the mode if we are playing tracks
+    if (m_playMode == PLAYMODE_TRACKS)
+        m_shuffleMode = mode;
 
     if (m_currentPlaylist)
-        m_currentPlaylist->shuffleTracks(m_shuffleMode);
+        m_currentPlaylist->shuffleTracks(mode);
 
     if (curTrackID != -1)
     {
