@@ -688,7 +688,10 @@ void HouseKeeper::Run(void)
             if ((*it)->isRunning())
                 ++it;
             else
+            {
+                delete *it;
                 it = m_threadList.erase(it);
+            }
         }
 
         int count2 = m_threadList.size();
