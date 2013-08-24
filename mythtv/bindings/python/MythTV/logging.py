@@ -409,11 +409,15 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     def _logdatabase(self, mask, level, message, detail):
         if self.db and self._DBLOG:
             with self.db.cursor(DummyLogger()) as cursor:
+                application = argv[0]
+                if '/' in application:
+                    application = application.rsplit('/', 1)[1]
+
                 cursor.execute("""INSERT INTO logging
                                     (host, application, pid, thread,
                                      msgtime, level, message)
                                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (self.db.gethostname(), argv[0].rsplit('/', 1)[1],
+                    (self.db.gethostname(), application,
                      os.getpid(), self.module, self.time(), level,
                      message + (' -- {0}'.format(detail) if detail else '')))
 
