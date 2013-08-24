@@ -362,15 +362,11 @@ void MusicCommon::updateShuffleMode(bool updateUIList)
 
     if (updateUIList)
     {
-        // store id of current track
-        int curTrackID = -1;
-        if (gPlayer->getCurrentMetadata())
-            curTrackID = gPlayer->getCurrentMetadata()->ID();
-
         updateUIPlaylist();
 
-        if (!restorePosition(curTrackID))
-            playFirstTrack();
+        gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                         gPlayer->getCurrentTrackPos(), &m_playlistPlayedTime);
+        updatePlaylistStats();
 
         // need this to update the next track info
         MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
@@ -1875,10 +1871,13 @@ void MusicCommon::updateUIPlaylist(void)
 
     m_currentPlaylist->Reset();
 
+    m_currentTrack = -1;
+
     Playlist *playlist = gPlayer->getPlaylist();
 
     QList<MusicMetadata*> songlist = playlist->getSongs();
     QList<MusicMetadata*>::iterator it = songlist.begin();
+
     for (; it != songlist.end(); ++it)
     {
         MusicMetadata *mdata = (*it);
@@ -1911,6 +1910,7 @@ void MusicCommon::updateUIPlaylist(void)
                 }
 
                 m_currentPlaylist->SetItemCurrent(item);
+                m_currentTrack = m_currentPlaylist->GetCurrentPos();
             }
         }
     }
@@ -2398,6 +2398,8 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
         m_songList.clear();
     }
 
+    m_currentTrack = gPlayer->getCurrentTrackPos();
+
     updateUIPlaylist();
 
     if (startPlayback || gPlayer->isPlaying())
@@ -2447,16 +2449,13 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
     }
     else
     {
-        int trackPos = 0;
-
         switch (m_playlistOptions.playPLOption)
         {
             case PL_CURRENT:
-                trackPos = curPos;
                 break;
 
             case PL_FIRST:
-                trackPos = 0;
+                m_currentTrack = 0;
                 break;
 
             case PL_FIRSTNEW:
@@ -2464,31 +2463,33 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
                 switch (m_playlistOptions.insertPLOption)
                 {
                     case PL_REPLACE:
-                        trackPos = 0;
+                        m_currentTrack = 0;
                         break;
 
                     case PL_INSERTATEND:
-                        trackPos = 0;
+                        m_currentTrack = 0;
                         break;
 
                     case PL_INSERTAFTERCURRENT:
-                        trackPos = curPos + 1;
+                        // this wont work if the track are shuffled
+                        m_currentTrack = m_currentTrack + 1;
                         break;
 
                     default:
-                        trackPos = 0;
+                        m_currentTrack = 0;
                 }
 
                 break;
             }
         }
 
-        gPlayer->changeCurrentTrack(trackPos);
-        m_currentTrack = trackPos;
+        gPlayer->changeCurrentTrack(m_currentTrack);
     }
 
     gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
                                       m_currentTrack, &m_playlistPlayedTime);
+    updatePlaylistStats();
+    updateTrackInfo(gPlayer->getCurrentMetadata());
 }
 
 bool MusicCommon::restorePosition(int trackID)
