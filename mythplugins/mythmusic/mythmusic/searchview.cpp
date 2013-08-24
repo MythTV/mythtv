@@ -465,11 +465,11 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
         {
             QString artFile = mdata->getAlbumArtFile();
             if (artFile.isEmpty())
-                item->SetImage("mm_nothumb.png");
+                item->SetImage("");
             else
                 item->SetImage(mdata->getAlbumArtFile());
         }
         else
-            item->SetImage("mm_nothumb.png");
+            item->SetImage("");
     }
 }
