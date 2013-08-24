@@ -155,8 +155,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                                            " find mounted media, but failed?");
                     return false;
                 }
-                setStatus(MEDIASTAT_MOUNTED); // emit statusChanged
-                onDeviceMounted();
+                onDeviceMounted(); // Identify disk type & content
                 LOG(VB_GENERAL, LOG_INFO,
                         QString("Detected MediaType ") + MediaTypeString());
             }
