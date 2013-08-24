@@ -3903,11 +3903,14 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
 
-    if (!query.exec() || !query.next())
+    if (!query.exec())
     {
         MythDB::DBError("QueryAverageAspectRatio", query);
         return MARK_UNSET;
     }
+
+    if (!query.next())
+        return MARK_UNSET;
 
     return static_cast<MarkTypes>(query.value(0).toInt());
 }
