@@ -79,7 +79,7 @@ DEBUG = False
 def process_date(datestr):
     try:
         return datetime.date(*[int(x) for x in datestr.split('-')])
-    except ValueError:
+    except (TypeError, ValueError):
         import sys
         import warnings
         import traceback
