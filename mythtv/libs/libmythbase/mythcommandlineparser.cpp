@@ -2418,6 +2418,9 @@ void MythCommandLineParser::addLogging(
         "Set the syslog logging facility.\nSet to \"none\" to disable, "
         "defaults to none.", "")
                 ->SetGroup("Logging");
+    add("--nodblog", "nodblog", false, "Disable database logging.", "")
+                ->SetGroup("Logging")
+                ->SetDeprecated("this is now the default, see --enable-dblog");
     add("--enable-dblog", "enabledblog", false, "Enable logging to database.", "")
                 ->SetGroup("Logging");
 
