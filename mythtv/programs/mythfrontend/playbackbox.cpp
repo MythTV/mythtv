@@ -4238,12 +4238,6 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             m_playListPlay.clear();
         }
-        else if ((message == "DISPLAY_RECGROUP") &&
-                 (me->ExtraDataCount() >= 1))
-        {
-            QString recGroup = me->ExtraData(0);
-            displayRecGroup(recGroup);
-        }
     }
     else
         ScheduleCommon::customEvent(event);
