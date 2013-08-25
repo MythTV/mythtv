@@ -1563,8 +1563,10 @@ int main(int argc, char **argv)
         as.Save();
 
         gCoreContext->SaveSetting("Theme", DEFAULT_UI_THEME);
-        gCoreContext->SaveSetting("Language", "");
-        gCoreContext->SaveSetting("Country", "");
+        gCoreContext->GetDB()->ClearSetting("Language");
+        gCoreContext->GetDB()->ClearSettingOnHost("Language", NULL);
+        gCoreContext->GetDB()->ClearSetting("Country");
+        gCoreContext->GetDB()->ClearSettingOnHost("Country", NULL);
 
         LOG(VB_GENERAL, LOG_NOTICE, "Appearance settings and language have "
                                     "been reset to defaults. You will need to "
