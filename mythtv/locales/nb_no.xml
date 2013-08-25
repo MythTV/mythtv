@@ -18,10 +18,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">nb</setting>
+    <setting name="Language" global="true">nb</setting>
 
     <!-- Country -->
-    <setting name="Country">NO</setting>
+    <setting name="Country" global="true">NO</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd d MMM</setting>

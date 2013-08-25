@@ -204,12 +204,12 @@ void LanguageSelection::Save(void)
         Close();
 
     QString langCode = item->GetData().toString();
-    gCoreContext->SaveSetting("Language", langCode);
+    gCoreContext->SaveSettingOnHost("Language", langCode, NULL);
 
     item = m_countryList->GetItemCurrent();
 
     QString countryCode = item->GetData().toString();
-    gCoreContext->SaveSetting("Country", countryCode);
+    gCoreContext->SaveSettingOnHost("Country", countryCode, NULL);
 
     if (m_language != langCode)
         m_languageChanged = true;

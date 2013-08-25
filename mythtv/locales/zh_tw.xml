@@ -17,10 +17,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">zh_HK</setting> <!-- what translation to load -->
+    <setting name="Language" global="true">zh_HK</setting> <!-- what translation to load -->
 
     <!-- Country -->
-    <setting name="Country">TW</setting>
+    <setting name="Country" global="true">TW</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd M月d日</setting>

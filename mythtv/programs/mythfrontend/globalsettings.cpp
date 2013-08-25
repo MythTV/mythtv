@@ -2889,9 +2889,9 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-static HostComboBox *MythLanguage()
+static GlobalComboBox *MythLanguage()
 {
-    HostComboBox *gc = new HostComboBox("Language");
+    GlobalComboBox *gc = new GlobalComboBox("Language");
 
     gc->setLabel(AppearanceSettings::tr("Language"));
 
