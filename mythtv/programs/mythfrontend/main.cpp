@@ -1566,6 +1566,10 @@ int main(int argc, char **argv)
         gCoreContext->SaveSetting("Language", "");
         gCoreContext->SaveSetting("Country", "");
 
+        LOG(VB_GENERAL, LOG_NOTICE, "Appearance settings and language have "
+                                    "been reset to defaults. You will need to "
+                                    "restart the frontend.");
+
         return GENERIC_EXIT_OK;
     }
 
