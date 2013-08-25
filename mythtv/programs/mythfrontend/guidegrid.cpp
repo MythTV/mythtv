@@ -38,7 +38,7 @@ QWaitCondition epgIsVisibleCond;
 #define LOC_ERR  QString("GuideGrid, Error: ")
 #define LOC_WARN QString("GuideGrid, Warning: ")
 
-const QString kUnknownTitle = QObject::tr("Unknown");
+const QString kUnknownTitle = "";
 const QString kUnknownCategory = QObject::tr("Unknown");
 
 JumpToChannel::JumpToChannel(
@@ -1348,8 +1348,11 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             else
                 recStat = 0;
 
+            QString title = (pginfo->GetTitle() == kUnknownTitle) ?
+                                tr("Unknown", "Unknown program title") :
+                                pginfo->GetTitle();
             m_guideGrid->SetProgramInfo(
-                row, cnt, tempRect, pginfo->GetTitle(),
+                row, cnt, tempRect, title,
                 pginfo->GetCategory(), arrow, recFlag,
                 recStat, isCurrent);
 
@@ -1639,6 +1642,15 @@ void GuideGrid::updateInfo(void)
 
     chinfo->ToMap(infoMap);
     pginfo->ToMap(infoMap);
+    // HACK - This should be done in ProgramInfo, but that needs more careful
+    // review since it may have unintended consequences so we're doing it here
+    // for now
+    if (infoMap["title"] == kUnknownTitle)
+    {
+        infoMap["title"] = tr("Unknown", "Unknown program title");
+        infoMap["titlesubtitle"] = tr("Unknown", "Unknown program title");
+    }
+
     SetTextFromMap(infoMap);
 
     MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
