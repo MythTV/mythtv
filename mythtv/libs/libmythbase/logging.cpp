@@ -640,9 +640,10 @@ bool LoggerThread::logConsole(LoggingItem *item)
 ///        the queue to be flushed.
 void LoggerThread::stop(void)
 {
-    QMutexLocker qLock(&logQueueMutex);
+    logQueueMutex.lock();
     flush(1000);
     m_aborted = true;
+    logQueueMutex.unlock();
     m_waitNotEmpty->wakeAll();
 }
 
