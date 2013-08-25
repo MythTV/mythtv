@@ -1150,6 +1150,8 @@ void LogForwardThread::run(void)
 
     m_zmqPubSock->setLinger(0);
     m_zmqPubSock->close();
+    delete m_zmqPubSock;
+    m_zmqPubSock = NULL;
 
     if (m_shutdownTimer)
     {
@@ -1173,6 +1175,7 @@ void LogForwardThread::run(void)
     }
 
     delete m_zmqContext;
+    m_zmqContext = NULL;
 
     RunEpilog();
 }

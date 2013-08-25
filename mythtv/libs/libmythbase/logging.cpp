@@ -413,10 +413,15 @@ void LoggerThread::run(void)
     {
         m_zmqSocket->setLinger(0);
         m_zmqSocket->close();
+        delete m_zmqSocket;
+        m_zmqSocket = NULL;
     }
 
     if (!m_locallogs)
+    {
         delete m_zmqContext;
+        m_zmqContext = NULL;
+    }
 
     RunEpilog();
 
