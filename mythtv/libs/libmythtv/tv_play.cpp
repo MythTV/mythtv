@@ -4143,9 +4143,9 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_RIGHT, actions))
         ChangeAudioSync(ctx, 1);
     else if (has_action(ACTION_UP, actions))
-        ChangeAudioSync(ctx, -10);
-    else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, 10);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeAudioSync(ctx, -10);
     else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ClearOSD(ctx);
     else if (has_action(ACTION_SELECT, actions))
