@@ -800,7 +800,7 @@ void logPropagateCalc(void)
         logPropagateArgList << "--quiet";
     }
 
-    if (!logPropagateOpts.dblog)
+    if (logPropagateOpts.dblog)
     {
         logPropagateArgs += " --enable-dblog";
         logPropagateArgList << "--enable-dblog";
