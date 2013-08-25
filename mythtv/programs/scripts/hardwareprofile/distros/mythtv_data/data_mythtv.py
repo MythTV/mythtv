@@ -48,10 +48,18 @@ class _Mythtv_data:
         for name in ['version', 'branch', 'protocol', 'libapi', 'qtversion']:
             data[name] = 'Unknown'
 
-        try:
-            mbe = MythTV.System(MythTV.static.INSTALL_PREFIX + '/bin/mythbackend')
-            res = mbe.command('--version')
-        except:
+        executables = ('mythutil', 'mythbackend', 'mythfrontend')
+
+        for executable in executables:
+            execpath = os.path.join(MythTV.static.INSTALL_PREFIX,
+                                    'bin', executable)
+            try:
+                cmd = MythTV.System(execpath)
+                res = mbe.command('--version')
+                break
+            except:
+                continue
+        else:
             return data
 
         names = {'MythTV Version'  : 'version',
