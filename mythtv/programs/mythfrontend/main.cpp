@@ -255,7 +255,7 @@ namespace
         if (g_pUPnp)
         {
             // This takes a few seconds, so inform the user:
-            LOG(VB_GENERAL, LOG_INFO, "Deleting UPnP client...");
+            LOG(VB_GENERAL, LOG_INFO, "Shutting down UPnP client...");
             delete g_pUPnp;
             g_pUPnp = NULL;
         }
