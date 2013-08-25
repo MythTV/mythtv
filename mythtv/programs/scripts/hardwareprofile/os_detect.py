@@ -286,3 +286,8 @@ class get_os_info( object ):
         p.wait()
         return p.stdout.read().strip().replace('\n', ' ')
 
+    @OSFromUname
+    def Linux(self, OS, version):
+        if OS == 'Linux':
+            return 'Unknown Linux '+version
+        return False
