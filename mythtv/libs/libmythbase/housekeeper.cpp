@@ -581,7 +581,6 @@ HouseKeeperTask* HouseKeeper::GetQueuedTask(void)
     if (!m_taskQueue.isEmpty())
     {
         task = m_taskQueue.dequeue();
-        task->IncrRef();
     }
 
     // returning NULL tells the thread that the queue is empty and
