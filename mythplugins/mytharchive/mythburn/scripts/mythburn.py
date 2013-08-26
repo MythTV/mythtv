@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 # For this script to work you need to have...
 # Python - v2.6 or later
 # mythtv python bindings installed
-# python-imaging (PIL)
+# python-imaging (PIL) or Pillow the fork of PIL
 # dvdauthor - v0.6.14
 # dvd+rw-tools - v7.1
 # cdrtools - v3.01
@@ -46,7 +46,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130811-1"
+VERSION="0.1.20130826-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -85,10 +85,10 @@ import getopt
 import traceback
 import signal
 import xml.dom.minidom
-import Image
-import ImageDraw
-import ImageFont
-import ImageColor
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from PIL import ImageColor
 import unicodedata
 import time
 import datetime
