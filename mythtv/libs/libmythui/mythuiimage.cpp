@@ -1431,6 +1431,11 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     MythUIType::CopyFrom(base);
 
+    // We need to update forceSize in case the parent area has changed
+    // however we only want to set forceSize if it was previously in use
+    if (!m_imageProperties.forceSize.isNull())
+        m_imageProperties.forceSize = m_Area.size();
+
     m_NeedLoad = im->m_NeedLoad;
 
     d->m_UpdateLock.unlock();
