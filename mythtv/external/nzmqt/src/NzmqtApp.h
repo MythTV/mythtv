@@ -1,4 +1,4 @@
-// Copyright 2011-2013 Johann Duscher (a.k.a. Jonny Dee). All rights reserved.
+// Copyright 2011-2012 Johann Duscher. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
@@ -179,17 +179,17 @@ protected:
         QString executable = arguments().at(0);
         out << QString(
 "\n\
-USAGE: %1 [-h|--help]                                                                 -- Show this help message.\n\
+USAGE: %1 [-h|--help]                                                                   -- Show this help message.\n\
 \n\
-USAGE: %1 pubsub-server <address> <topic>                                             -- Start PUB server.\n\
-       %1 pubsub-client <address> <topic>                                             -- Start SUB client.\n\
+USAGE: %1 <pubsub-server> <address> <topic>                                             -- Start PUB server.\n\
+       %1 <pubsub-client> <address> <topic>                                             -- Start SUB client.\n\
 \n\
-USAGE: %1 reqrep-server <address> <reply-msg>                                         -- Start REQ server.\n\
-       %1 reqrep-client <address> <request-msg>                                       -- Start REP client.\n\
+USAGE: %1 <reqrep-server> <address> <reply-msg>                                         -- Start REQ server.\n\
+       %1 <reqrep-client> <address> <request-msg>                                       -- Start REP client.\n\
 \n\
-USAGE: %1 pushpull-ventilator <ventilator-address> <sink-address> <numberOfWorkItems> -- Start ventilator.\n\
-       %1 pushpull-worker <ventilator-address> <sink-address>                         -- Start a worker.\n\
-       %1 pushpull-sink <sink-address>                                                -- Start sink.\n\
+USAGE: %1 <pushpull-ventilator> <ventilator-address> <sink-address> <numberOfWorkItems> -- Start ventilator.\n\
+       %1 <pushpull-worker> <ventilator-address> <sink-address>                         -- Start a worker.\n\
+       %1 <pushpull-sink> <sink-address>                                                -- Start sink.\n\
 \n\
 Publish-Subscribe Sample:\n\
 * Server: %1 pubsub-server tcp://127.0.0.1:1234 ping\n\

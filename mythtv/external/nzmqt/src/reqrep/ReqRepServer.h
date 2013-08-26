@@ -1,4 +1,4 @@
-// Copyright 2011-2013 Johann Duscher (a.k.a. Jonny Dee). All rights reserved.
+// Copyright 2011-2012 Johann Duscher. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
