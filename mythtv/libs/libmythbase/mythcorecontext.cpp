@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QMutex>
+#include <QRunnable>
 #include <QWaitCondition>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
