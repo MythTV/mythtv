@@ -56,6 +56,11 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
+#ifndef NOLOGSERVER
+// nzmqt
+#include "nzmqt.hpp"
+#endif
+
 // QJson
 #include "QJson/QObjectHelper"
 #include "QJson/Serializer"

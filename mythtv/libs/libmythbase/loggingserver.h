@@ -16,12 +16,17 @@
 #include "verbosedefs.h"
 #include "mythsignalingtimer.h"
 #include "mthread.h"
-#include "nzmqt.hpp"
 
 #undef NOLOGSERVER
 #if !CONFIG_MYTHLOGSERVER
 #define NOLOGSERVER
 #endif
+
+// ZMQ forward declarations
+namespace nzmqt {
+    class ZMQSocket;
+    class ZMQContext;
+}
 
 #define LOGLINE_MAX (2048-120)
 

@@ -53,6 +53,11 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
+#ifndef NOLOGSERVER
+// nzmqt
+#include "nzmqt.hpp"
+#endif
+
 static QMutex                      loggerMapMutex;
 static QMap<QString, LoggerBase *> loggerMap;
 
