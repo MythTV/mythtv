@@ -153,6 +153,7 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
+  --disable-mythlogserver  Do not use mythlogserver logging daemon facility
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
@@ -1817,6 +1818,7 @@ MYTHTV_CONFIG_LIST='
     xv
     profiletype
     debugtype
+    mythlogserver
 '
 
 MYTHTV_HAVE_LIST='
@@ -2642,6 +2644,7 @@ disable indevs
 disable sdl
 enable libfftw3
 enable taglib
+enable mythlogserver
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -2851,6 +2854,8 @@ for opt do
         --disable-backend)
         ;;
         --enable-mac-bundle) enable mac_bundle
+        ;;
+        --disable-mythlogserver) disable mythlogserver
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
@@ -6014,6 +6019,7 @@ echo "libcrypto                 ${libcrypto-no}"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
 echo "OpenGL ES 2.0             ${opengles-no}"
+echo "mythlogserver             ${mythlogserver-no}"
 echo
 
 echo "# Bindings"
@@ -6464,14 +6470,16 @@ cp_if_changed $TMPH external/FFmpeg/libavutil/avconfig.h
 echo "config:$arch:$subarch:$cpu:$target_os:$cc_ident:$FFMPEG_CONFIGURATION" >config.fate
 BLOCKQUOTE
 
-# configure zeromq
-echo "Configuring zeromq..."
-(cd external/zeromq ; \
-         ./configure --quiet --without-documentation --prefix=${prefix} \
-                     --includedir=${prefix}/include/mythtv/zeromq)
-echo "Configuring nzmqt..."
-(cd external/nzmqt/src ; \
-       ${qmakeconf} -o Makefile)
+if enabled mythlogserver; then
+    # configure zeromq
+    echo "Configuring zeromq..."
+    (cd external/zeromq ; \
+             ./configure --quiet --without-documentation --prefix=${prefix} \
+                         --includedir=${prefix}/include/mythtv/zeromq)
+    echo "Configuring nzmqt..."
+    (cd external/nzmqt/src ; \
+           ${qmakeconf} -o Makefile)
+fi
 echo "Configuring qjson..."
 (cd external/qjson ; \
        ${qmakeconf} -o Makefile)

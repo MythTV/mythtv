@@ -11,11 +11,17 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "nzmqt.hpp"
+
+#undef NOLOGSERVER
+#if !CONFIG_MYTHLOGSERVER
+#define NOLOGSERVER
+#endif
 
 #define LOGLINE_MAX (2048-120)
 
@@ -149,6 +155,10 @@ class LogServerThread : public QObject, public MThread
     void run(void);
     void stop(void);
     nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
+
+  public slots:
+    void receivedMessage(const QList<QByteArray>&);
+
   private:
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqInSock;   ///< ZeroMQ feeding socket
@@ -157,7 +167,6 @@ class LogServerThread : public QObject, public MThread
                                           ///  heartbeats
 
   protected slots:
-    void receivedMessage(const QList<QByteArray>&);
     void checkHeartBeats(void);
     void pingClient(QString clientId);
 };

@@ -84,8 +84,6 @@ contains(CONFIG_DARWIN, yes) {
 }
 
 INCLUDEPATH += $$unique(CONFIG_INCLUDEPATH)
-INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
 INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/include
 
 # remove warn_{on|off} from CONFIG since we set it in our CFLAGS
@@ -166,8 +164,12 @@ EXTRA_LIBS += $$CONFIG_FIREWIRE_LIBS
 EXTRA_LIBS += $$LOCAL_LIBDIR_OGL
 EXTRA_LIBS += $$LOCAL_LIBDIR_X11
 EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
-EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
-EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
+contains(CONFIG_MYTHLOGSERVER, "yes") {
+    INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
+    INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
+    EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
+    EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
+}
 EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
 macx {

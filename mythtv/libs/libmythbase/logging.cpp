@@ -18,7 +18,6 @@ using namespace std;
 #include "mythlogging.h"
 #include "logging.h"
 #include "loggingserver.h"
-#include "mythconfig.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
@@ -57,8 +56,6 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
-// nzmqt
-#include "nzmqt.hpp"
 // QJson
 #include "QJson/QObjectHelper"
 #include "QJson/Serializer"
@@ -261,7 +258,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
-    m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL), 
+    m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL),
     m_heartbeatTimer(NULL)
 {
     char *debug = getenv("VERBOSE_THREADS");
@@ -273,6 +270,13 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
+#ifdef NOLOGSERVER
+    if (!logServerStart())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Failed to start LogServer thread");
+    }
+#endif
     moveToThread(qthread());
 }
 
@@ -282,6 +286,9 @@ LoggerThread::~LoggerThread()
     stop();
     wait();
 
+#ifdef NOLOGSERVER
+    logServerStop();
+#endif
     delete m_waitNotEmpty;
     delete m_waitEmpty;
 }
@@ -299,6 +306,8 @@ void LoggerThread::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
     bool dieNow = false;
+
+#ifndef NOLOGSERVER
     try
     {
         if (m_locallogs)
@@ -361,6 +370,9 @@ void LoggerThread::run(void)
         m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
         m_heartbeatTimer->start(1000);
     }
+#else
+    logServerWait();
+#endif
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -395,6 +407,7 @@ void LoggerThread::run(void)
     // thread tries to deregister, and we wait for it.
     logThreadFinished = true;
 
+#ifndef NOLOGSERVER
     if (m_initialTimer)
     {
         m_initialTimer->stop();
@@ -417,6 +430,7 @@ void LoggerThread::run(void)
 
     if (!m_locallogs)
         delete m_zmqContext;
+#endif
 
     RunEpilog();
 
@@ -430,6 +444,7 @@ void LoggerThread::run(void)
 ///         to show signs of life
 void LoggerThread::initialTimeout(void)
 {
+#ifndef NOLOGSERVER
     if (m_initialTimer)
     {
         m_initialTimer->stop();
@@ -445,12 +460,14 @@ void LoggerThread::initialTimeout(void)
     }
 
     LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver at TCP:35327");
+#endif
 }
 
 /// \brief  Handles heartbeat checking once a second.  If the server is not
 ///         heard from for at least 5s, restart it
 void LoggerThread::checkHeartBeat(void)
 {
+#ifndef NOLOGSERVER
     static bool launched = false;
     qlonglong epoch;
 
@@ -469,18 +486,22 @@ void LoggerThread::checkHeartBeat(void)
     {
         launched = false;
     }
+#endif
 }
 
 /// \brief  Send a ping to the log server
 void LoggerThread::pingLogServer(void)
 {
+#ifndef NOLOGSERVER
     // cout << "pong" << endl;
     m_zmqSocket->sendMessage(QByteArray(""));
+#endif
 }
 
 /// \brief  Launches the logging server daemon
 void LoggerThread::launchLogServer(void)
 {
+#ifndef NOLOGSERVER
     m_initialWaiting = false;
     if (!m_locallogs)
     {
@@ -496,6 +517,7 @@ void LoggerThread::launchLogServer(void)
         ms.Run();
         ms.Wait(0);
     }
+#endif
 }
 
 /// \brief  Handles messages received back from mythlogserver via ZeroMQ.
@@ -578,9 +600,19 @@ void LoggerThread::handleItem(LoggingItem *item)
 
     if (item->m_message[0] != '\0')
     {
+#ifndef NOLOGSERVER
         // Send it to mythlogserver
         if (!logThreadFinished && m_zmqSocket)
             m_zmqSocket->sendMessage(item->toByteArray());
+#else
+        if (logServerThread)
+        {
+            QList<QByteArray> list;
+            list.append(QByteArray());
+            list.append(item->toByteArray());
+            logServerThread->receivedMessage(list);
+        }
+#endif
     }
 }
 

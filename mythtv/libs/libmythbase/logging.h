@@ -11,12 +11,18 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "referencecounter.h"
 #include "nzmqt.hpp"
+
+#undef NOLOGSERVER
+#if !CONFIG_MYTHLOGSERVER
+#define NOLOGSERVER
+#endif
 
 #define LOGLINE_MAX (2048-120)
 
@@ -195,7 +201,7 @@ class LoggerThread : public QObject, public MThread
                             ///  mythlogserver itself)
     qlonglong m_epoch;      ///< Time last heard from the server (seconds)
 
-    nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use 
+    nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use
     nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
                                         /// mythlogserver
 

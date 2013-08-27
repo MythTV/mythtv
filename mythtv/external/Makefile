@@ -1,6 +1,9 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg zeromq nzmqt qjson libmythbluray libsamplerate
+SUBDIRS = FFmpeg qjson libmythbluray libsamplerate
+ifeq ($(CONFIG_MYTHLOGSERVER),yes)
+    SUBDIRS += zeromq nzmqt
+endif
 
 ifdef CONFIG_HDHOMERUN
     SUBDIRS += libhdhomerun
