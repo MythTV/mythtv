@@ -2375,8 +2375,8 @@ void MythCommandLineParser::addUPnP(void)
 }
 
 /** \brief Canned argument definition for all logging options, including
- *  --verbose, --logpath, --quiet, --loglevel, --syslog
- *  and --enable-dblog
+ *  --verbose, --logpath, --quiet, --loglevel, --syslog, --enable-dblog
+ *  and --nologserver
  */
 void MythCommandLineParser::addLogging(
     const QString &defaultVerbosity, LogLevel_t defaultLogLevel)
@@ -2432,6 +2432,8 @@ void MythCommandLineParser::addLogging(
             "scripts to use --syslog to interface with your system's "
             "existing system logging daemon, or --logpath to specify a "
             "dirctory for MythTV to write its logs to.", "0.25");
+    add("--nologserver", "nologserver", false, "Disable all logging but console.", "")
+                ->SetGroup("Logging");
 }
 
 /** \brief Canned argument definition for --pidfile
@@ -2581,6 +2583,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
 
     int facility = GetSyslogFacility();
     bool dblog = toBool("enabledblog");
+    bool noserver = toBool("nologserver");
     LogLevel_t level = GetLogLevel();
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;
@@ -2600,7 +2603,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     if (toBool("daemon"))
         quiet = max(quiet, 1);
 
-    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
+    logStart(logfile, progress, quiet, facility, level, dblog, propagate, noserver);
 
     return GENERIC_EXIT_OK;
 }

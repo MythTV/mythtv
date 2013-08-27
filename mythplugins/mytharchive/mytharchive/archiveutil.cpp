@@ -250,6 +250,8 @@ bool getFileDetails(ArchiveItem *a)
     command += logPropagateArgs;
     if (logPropagateQuiet())
         command += " --quiet";
+    if (logPropagateNoServer())
+        command += " --nologserver";
 
     uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
     if (myth_system(command, flags) != GENERIC_EXIT_OK)

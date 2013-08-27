@@ -1221,6 +1221,8 @@ void BurnMenu::doBurn(int mode)
     commandline += logPropagateArgs;
     if (logPropagateQuiet())
         commandline += " --quiet";
+    if (logPropagateNoServer())
+        commandline += " --nologserver";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

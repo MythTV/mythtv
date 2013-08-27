@@ -172,7 +172,7 @@ class LoggerThread : public QObject, public MThread
                              const char *, int, const char *, ... );
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
-                 int facility);
+                 int facility, bool noserver);
     ~LoggerThread();
     void run(void);
     void stop(void);
@@ -207,6 +207,8 @@ class LoggerThread : public QObject, public MThread
 
     MythSignalingTimer *m_initialTimer; ///< Timer for the initial startup
     MythSignalingTimer *m_heartbeatTimer;   ///< Timer for 1s heartbeats
+
+    bool m_noserver;
 
   protected:
     bool logConsole(LoggingItem *item);

@@ -81,6 +81,7 @@ typedef struct {
     int     facility;
     bool    dblog;
     QString path;
+    bool    noserver;
 } LogPropagateOpts;
 
 LogPropagateOpts        logPropagateOpts;
@@ -250,7 +251,7 @@ void LoggingItem::setThreadTid(void)
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           QString table, int facility) :
+                           QString table, int facility, bool noserver) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
@@ -259,7 +260,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
     m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL),
-    m_heartbeatTimer(NULL)
+    m_heartbeatTimer(NULL), m_noserver(noserver)
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != NULL)
@@ -271,7 +272,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
 #ifdef NOLOGSERVER
-    if (!logServerStart())
+    if (!m_noserver && !logServerStart())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Failed to start LogServer thread");
@@ -287,7 +288,10 @@ LoggerThread::~LoggerThread()
     wait();
 
 #ifdef NOLOGSERVER
-    logServerStop();
+    if (!m_noserver)
+    {
+        logServerStop();
+    }
 #endif
     delete m_waitNotEmpty;
     delete m_waitEmpty;
@@ -307,72 +311,75 @@ void LoggerThread::run(void)
 
     bool dieNow = false;
 
-#ifndef NOLOGSERVER
-    try
+    if (!m_noserver)
     {
-        if (m_locallogs)
+#ifndef NOLOGSERVER
+        try
         {
-            logServerWait();
-            m_zmqContext = logServerThread->getZMQContext();
-        }
-        else
-        {
-            m_zmqContext = nzmqt::createDefaultContext(NULL);
-            m_zmqContext->start();
-        }
+            if (m_locallogs)
+            {
+                logServerWait();
+                m_zmqContext = logServerThread->getZMQContext();
+            }
+            else
+            {
+                m_zmqContext = nzmqt::createDefaultContext(NULL);
+                m_zmqContext->start();
+            }
 
-        if (!m_zmqContext)
+            if (!m_zmqContext)
+            {
+                m_aborted = true;
+                dieNow = true;
+            }
+            else
+            {
+                qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
+
+                m_zmqSocket =
+                    m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER, this);
+                connect(m_zmqSocket,
+                        SIGNAL(messageReceived(const QList<QByteArray>&)),
+                        SLOT(messageReceived(const QList<QByteArray>&)),
+                        Qt::QueuedConnection);
+
+                if (m_locallogs)
+                    m_zmqSocket->connectTo("inproc://mylogs");
+                else
+                    m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
+            }
+        }
+        catch (nzmqt::ZMQException &e)
         {
+            cerr << "Exception during logging socket setup: " << e.what() << endl;
             m_aborted = true;
             dieNow = true;
         }
-        else
+
+        if (!m_aborted)
         {
-            qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
+            if (!m_locallogs)
+            {
+                m_initialWaiting = true;
+                pingLogServer();
 
-            m_zmqSocket =
-                m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER, this);
-            connect(m_zmqSocket,
-                    SIGNAL(messageReceived(const QList<QByteArray>&)),
-                    SLOT(messageReceived(const QList<QByteArray>&)),
-                    Qt::QueuedConnection);
-
-            if (m_locallogs)
-                m_zmqSocket->connectTo("inproc://mylogs");
+                // wait up to 150ms for mythlogserver to respond
+                m_initialTimer = new MythSignalingTimer(this,
+                                                        SLOT(initialTimeout()));
+                m_initialTimer->start(150);
+            }
             else
-                m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
+                LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
+
+            loggingGetTimeStamp(&m_epoch, NULL);
+            
+            m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
+            m_heartbeatTimer->start(1000);
         }
+    #else
+        logServerWait();
+    #endif
     }
-    catch (nzmqt::ZMQException &e)
-    {
-        cerr << "Exception during logging socket setup: " << e.what() << endl;
-        m_aborted = true;
-        dieNow = true;
-    }
-
-    if (!m_aborted)
-    {
-        if (!m_locallogs)
-        {
-            m_initialWaiting = true;
-            pingLogServer();
-
-            // wait up to 150ms for mythlogserver to respond
-            m_initialTimer = new MythSignalingTimer(this,
-                                                    SLOT(initialTimeout()));
-            m_initialTimer->start(150);
-        }
-        else
-            LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
-
-        loggingGetTimeStamp(&m_epoch, NULL);
-        
-        m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
-        m_heartbeatTimer->start(1000);
-    }
-#else
-    logServerWait();
-#endif
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -596,6 +603,11 @@ void LoggerThread::handleItem(LoggingItem *item)
             char *threadName = logThreadHash.take(item->m_threadId);
             free(threadName);
         }
+    }
+
+    if (m_noserver)
+    {
+        return;
     }
 
     if (item->m_message[0] != '\0')
@@ -852,6 +864,12 @@ void logPropagateCalc(void)
         logPropagateArgList << "--syslog" << syslogname->c_name;
     }
 #endif
+
+    if (logPropagateOpts.noserver)
+    {
+        logPropagateArgs += " --nologserver";
+        logPropagateArgList << "--nologserver";
+    }
 }
 
 /// \brief Check if we are propagating a "--quiet"
@@ -859,6 +877,13 @@ void logPropagateCalc(void)
 bool logPropagateQuiet(void)
 {
     return logPropagateOpts.quiet;
+}
+
+/// \brief Check if we are propagating a "--nologserver"
+/// \return true if --nologserver is being propagated
+bool logPropagateNoServer(void)
+{
+    return logPropagateOpts.noserver;
 }
 
 /// \brief  Entry point to start logging for the application.  This will
@@ -874,7 +899,7 @@ bool logPropagateQuiet(void)
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
 void logStart(QString logfile, int progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate)
+              LogLevel_t level, bool dblog, bool propagate, bool noserver)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -887,6 +912,7 @@ void logStart(QString logfile, int progress, int quiet, int facility,
     logPropagateOpts.quiet = quiet;
     logPropagateOpts.facility = facility;
     logPropagateOpts.dblog = dblog;
+    logPropagateOpts.noserver = noserver;
 
     if (propagate)
     {
@@ -900,7 +926,7 @@ void logStart(QString logfile, int progress, int quiet, int facility,
     QString table = dblog ? QString("logging") : QString("");
 
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, table, facility);
+        logThread = new LoggerThread(logfile, progress, quiet, table, facility, noserver);
 
     logThread->start();
 }
