@@ -58,10 +58,13 @@ QString LookupUDN( QString sDeviceType )
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
-    if (sUDN.isEmpty()) 
+    // Generate new UUID if current is missing or broken
+    if (sUDN.isEmpty() || sUDN.startsWith("{"))
     {
         sUDN = QUuid::createUuid().toString();
-	sUDN.chop(2);
+        // QUuid returns the uuid enclosed with braces {} which is not
+        // DLNA compliant, we need to remove them
+        sUDN = sUDN.mid(1, 36);
 
         Configuration *pConfig = UPnp::GetConfiguration();
 
