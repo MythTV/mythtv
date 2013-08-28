@@ -243,7 +243,10 @@ bool DecoderBase::PosMapFromEnc(void)
 
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
-    long long last_index = m_positionMap.back().index;
+    
+    long long last_index = 0;
+    if (!m_positionMap.empty())
+        last_index = m_positionMap.back().index;
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); ++it)
     {
