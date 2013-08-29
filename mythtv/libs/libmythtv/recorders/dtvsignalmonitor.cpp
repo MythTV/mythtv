@@ -321,6 +321,7 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
                 .arg(programNumber);
             LOG(VB_GENERAL, LOG_ERR, LOC + errStr + "\n" + pat->toString());
         }
+        // only one entry in the PAT, just use it
         if (pat->ProgramCount() == 1)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "But there is only one program "
@@ -328,6 +329,17 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
             SetProgramNumber(pat->ProgramNumber(0));
             AddFlags(kDTVSigMon_PATMatch);
             GetStreamData()->AddListeningPID(pat->ProgramPID(0));
+        }
+        // two entries, but one is a pointer to the NIT PID instead
+        // of a real program, use the other
+        if ((pat->ProgramCount() == 2) && ((pat->ProgramNumber(0) == 0) || (pat->ProgramNumber(1) == 0)))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "But there is only one program "
+                                           "in the PAT, so we'll just use it");
+            uint pid = pat->FindAnyPID();
+            SetProgramNumber(pat->FindProgram(pid));
+            AddFlags(kDTVSigMon_PATMatch);
+            GetStreamData()->AddListeningPID(pid);
         }
     }
 }
