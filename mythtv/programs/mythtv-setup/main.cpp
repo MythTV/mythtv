@@ -216,7 +216,10 @@ static int reloadTheme(void)
 
     GetMythUI()->LoadQtConfig();
 
-    menu->Close();
+    if (menu)
+    {
+        menu->Close();
+    }
 #if CONFIG_DARWIN
     GetMythMainWindow()->Init(QT_PAINTER);
 #else
