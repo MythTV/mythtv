@@ -756,6 +756,19 @@ void DBLoggerThread::stop(void)
     m_wait->wakeAll();
 }
 
+bool DBLoggerThread::enqueue(LoggingItem *item)
+{
+    QMutexLocker qLock(&m_queueMutex);
+    if (!m_aborted)
+    {
+        if (item)
+        {
+            item->IncrRef();
+        }
+        m_queue->enqueue(item);
+    }
+    return true;
+}
 
 
 #ifndef _WIN32
@@ -1044,7 +1057,7 @@ void FileLogger::receivedMessage(const QList<QByteArray> &msg)
 #endif
 
     QByteArray json     = msg.at(1);
-    LoggingItem *item = LoggingItem::create(json);
+    LoggingItem *item   = LoggingItem::create(json);
     logmsg(item);
     item->DecrRef();
 }
@@ -1067,7 +1080,7 @@ void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
 #endif
 
     QByteArray json     = msg.at(1);
-    LoggingItem *item = LoggingItem::create(json);
+    LoggingItem *item   = LoggingItem::create(json);
     logmsg(item);
     item->DecrRef();
 }
@@ -1100,9 +1113,9 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 #endif
 
     QByteArray json     = msg.at(1);
-    LoggingItem *item = LoggingItem::create(json);
-    if (!logmsg(item))
-        item->DecrRef();
+    LoggingItem *item   = LoggingItem::create(json);
+    logmsg(item);
+    item->DecrRef();
 }
 
 

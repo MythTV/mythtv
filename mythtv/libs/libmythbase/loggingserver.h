@@ -227,13 +227,7 @@ class DBLoggerThread : public MThread
     void stop(void);
     /// \brief Enqueues a LoggingItem onto the queue for the thread to 
     ///        consume.
-    bool enqueue(LoggingItem *item) 
-    { 
-        QMutexLocker qLock(&m_queueMutex); 
-        if (!m_aborted)
-            m_queue->enqueue(item); 
-        return true; 
-    }
+    bool enqueue(LoggingItem *item);
 
     /// \brief Indicates when the queue is full
     /// \return true when the queue is full
