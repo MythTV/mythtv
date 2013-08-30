@@ -841,7 +841,7 @@ class DatabaseConfig( object ):
     database =  QuickProperty('_database', 'mythconverg')
 
     @QuickProperty('_profile', gethostname())
-    def profile(self, value):
+    def profile(value):
         if value == 'my-unique-identifier-goes-here':
             raise Exception
         return value
