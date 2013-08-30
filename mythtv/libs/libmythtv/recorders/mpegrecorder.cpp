@@ -125,6 +125,16 @@ void MpegRecorder::TeardownAll(void)
         close(readfd);
         readfd = -1;
     }
+
+    if (_device_read_buffer)
+    {
+        if (_device_read_buffer->IsRunning())
+            _device_read_buffer->Stop();
+
+        delete _device_read_buffer;
+        _device_read_buffer = NULL;
+    }
+
 }
 
 static int find_index(const int *audio_rate, int value)
