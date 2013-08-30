@@ -140,6 +140,15 @@ win32-msvc* {
 
     LIBS += -lws2_32
     EXTRA_LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+
+    # we need to make sure version.h is generated.
+
+    versionTarget.target  = version.h
+    versionTarget.depends = FORCE
+    versionTarget.commands = powershell -File ..\..\version.ps1 ..\..
+
+    PRE_TARGETDEPS += version.h
+    QMAKE_EXTRA_TARGETS += versionTarget
 }
 
 QT += xml sql network

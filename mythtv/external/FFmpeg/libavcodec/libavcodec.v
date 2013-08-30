@@ -20,6 +20,9 @@ LIBAVCODEC_$MAJOR {
                 ff_faan*;
                 ff_mmx_idct;
                 ff_fdct*;
+                ff_ue_golomb_vlc_code;
+                ff_golomb_vlc_len;
+                ff_se_golomb_vlc_code;
                 fdct_ifast;
                 j_rev_dct;
                 ff_mmxext_idct;

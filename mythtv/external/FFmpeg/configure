@@ -2201,6 +2201,7 @@ CXX_C='-c'
 CXX_O='-o $@'
 LD_O='-o $@'
 LD_LIB='-l%'
+LD_MYTH_LIB='-lmyth%'
 LD_PATH='-L'
 HOSTCC_C='-c'
 HOSTCC_O='-o $@'
@@ -3301,13 +3302,16 @@ case $target_os in
         if enabled shared; then
             # Link to the import library instead of the normal static library
             # for shared libs.
-            LD_LIB='%.lib'
+            LD_LIB='myth%.lib'
+            LD_MYTH_LIB='myth%.lib'
+
             # Cannot build shared and static libraries at the same time with
             # MSVC.
             disable static
         fi
         shlibdir_default="$bindir_default"
-        SLIBPREF=""
+        LIBPREF="myth"
+        SLIBPREF="myth"
         SLIBSUF=".dll"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
         SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
@@ -4403,6 +4407,7 @@ CXX_C=$CXX_C
 CXX_O=$CXX_O
 LD_O=$LD_O
 LD_LIB=$LD_LIB
+LD_MYTH_LIB=$LD_MYTH_LIB
 LD_PATH=$LD_PATH
 DLLTOOL=$dlltool
 LDFLAGS=$LDFLAGS

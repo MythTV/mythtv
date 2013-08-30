@@ -86,7 +86,7 @@ FFLIBS    := $(FFLIBS-yes) $(FFLIBS)
 TESTPROGS += $(TESTPROGS-yes)
 
 LDLIBS       = $(FFLIBS:%=%$(BUILDSUF))
-FFEXTRALIBS := $(addprefix -lmyth,$(addsuffix $(BUILDSUF),$(FFLIBS))) $(EXTRALIBS)
+FFEXTRALIBS := $(LDLIBS:%=$(LD_MYTH_LIB)) $(EXTRALIBS)
 
 EXAMPLES  := $(EXAMPLES:%=$(SUBDIR)%-example$(EXESUF))
 OBJS      := $(sort $(OBJS:%=$(SUBDIR)%))

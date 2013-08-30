@@ -48,14 +48,14 @@ $(EXAMPLES) $(TOOLS): THISLIB = $(FULLNAME:%=$(LD_LIB))
 $(TESTPROGS):         THISLIB = $(SUBDIR)$(LIBNAME)
 
 $(EXAMPLES) $(TESTPROGS) $(TOOLS): %$(EXESUF): %.o $(EXEOBJS)
-	$$(LD) $(LDFLAGS) -o $$@ $$^ -l$(FULLNAME) $(FFEXTRALIBS) $$(ELIBS)
+	$$(LD) $(LDFLAGS) $$(LD_O) $$(filter %.o,$$^) $$(THISLIB) $(FFEXTRALIBS) $$(ELIBS)
 
 $(SUBDIR)$(SLIBNAME): $(SUBDIR)$(SLIBNAME_WITH_MAJOR)
 	$(Q)cd ./$(SUBDIR) && $(LN_S) $(SLIBNAME_WITH_MAJOR) $(SLIBNAME)
 
 $(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SUBDIR)lib$(NAME).ver
 	$(SLIB_CREATE_DEF_CMD)
-	$$(LD) $(SHFLAGS) $(LDFLAGS) -o $$@ $$(filter %.o,$$^) $(FFEXTRALIBS)
+	$$(LD) $(SHFLAGS) $(LDFLAGS) $$(LD_O) $$(filter %.o,$$^) $(FFEXTRALIBS)
 	$(SLIB_EXTRA_CMD)
 
 ifdef SUBDIR
