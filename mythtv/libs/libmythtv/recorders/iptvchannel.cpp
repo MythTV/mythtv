@@ -232,4 +232,17 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning)
     return true;
 }
 
+bool IPTVChannel::IsExternalChannelChangeSupported(void)
+{
+    if (m_inputs.find(m_currentInputID) == m_inputs.end())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("IsExternalChannelChangeSupported: "
+                    "non-existant input id '%1'").arg(m_currentInputID));
+        return false;
+    }
+
+    return !m_inputs[m_currentInputID]->externalChanger.isEmpty();
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
