@@ -33,6 +33,10 @@ static bool DBusHalt(void)
                               "/org/freedesktop/ConsoleKit/Manager",
                               "org.freedesktop.ConsoleKit.Manager",
                               QDBusConnection::systemBus());
+    QDBusInterface logind("org.freedesktop.login1",
+                          "/org/freedesktop/login1",
+                          "org.freedesktop.login1.Manager",
+                          QDBusConnection::systemBus());
     QDBusInterface hal("org.freedesktop.Hal",
                        "/org/freedesktop/Hal/devices/computer",
                        "org.freedesktop.Hal.Device.SystemPowerManagement",
@@ -41,7 +45,14 @@ static bool DBusHalt(void)
     QDBusReply<void> void_reply = kde.call("logout", 0, 2, 2);
     QDBusReply<bool> bool_reply;
     QDBusReply<int>  int_reply;
+    QDBusReply<QString> string_reply;
 
+    if (!void_reply.isValid())
+    {
+        bool_reply = logind.call("CanPowerOff");
+        if (string_reply.isValid() && string_reply.value() == "yes")
+            void_reply = logind.call("PowerOff", false);
+    }
     if (!void_reply.isValid())
     {
         bool_reply = gnome.call("CanShutdown");

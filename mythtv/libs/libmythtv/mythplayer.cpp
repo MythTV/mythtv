@@ -4500,16 +4500,17 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     infoMap["videoheight"]    = QString::number(height);
     infoMap["videoframerate"] = QString::number(video_frame_rate, 'f', 2);
 
-    if (height < 480)
+    if (width < 640)
         return;
 
     bool interlaced = is_interlaced(m_scan);
-    if (height == 480 || height == 576)
-        infoMap["videodescrip"] = "SD";
+    if (width == 1920 || height == 1080 || height == 1088)
+        infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
     else if (height == 720 && !interlaced)
         infoMap["videodescrip"] = "HD_720_P";
-    else if (height == 1080 || height == 1088)
-        infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
+    else if (height >= 720)
+        infoMap["videodescrip"] = "HD";
+    else infoMap["videodescrip"] = "SD";
 }
 
 bool MythPlayer::GetRawAudioState(void) const

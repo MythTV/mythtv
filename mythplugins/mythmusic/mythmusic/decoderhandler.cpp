@@ -83,7 +83,7 @@ DecoderIOFactory::~DecoderIOFactory(void)
 void DecoderIOFactory::doConnectDecoder(const QString &format)
 {
     m_handler->doOperationStop();
-    m_handler->doConnectDecoder(getUrl(), format);
+    m_handler->doConnectDecoder(m_handler->getUrl(), format);
 }
 
 Decoder *DecoderIOFactory::getDecoder(void)
@@ -94,7 +94,7 @@ Decoder *DecoderIOFactory::getDecoder(void)
 void DecoderIOFactory::doFailed(const QString &message)
 {
     m_handler->doOperationStop();
-    m_handler->doFailed(getUrl(), message);
+    m_handler->doFailed(m_handler->getUrl(), message);
 }
 
 void DecoderIOFactory::doOperationStart(const QString &name)
@@ -127,13 +127,13 @@ QIODevice* DecoderIOFactoryFile::getInput(void)
 
 void DecoderIOFactoryFile::start(void)
 {
-    QString sourcename = getMetadata().Filename();
+    QString sourcename = m_handler->getMetadata().Filename();
 
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactory: Opening Local File %1").arg(sourcename));
 
     m_input = new QFile(sourcename);
-    doConnectDecoder(getUrl().toLocalFile());
+    doConnectDecoder(m_handler->getUrl().toLocalFile());
 }
 
 /**********************************************************************/
@@ -156,11 +156,11 @@ QIODevice* DecoderIOFactorySG::getInput(void)
 
 void DecoderIOFactorySG::start(void)
 {
-    QString url = getUrl().toString();
+    QString url = m_handler->getUrl().toString();
     LOG(VB_PLAYBACK, LOG_INFO,
         QString("DecoderIOFactorySG: Opening Myth URL %1").arg(url));
     m_input = new MusicSGIODevice(url);
-    doConnectDecoder(getUrl().path());
+    doConnectDecoder(m_handler->getUrl().path());
 }
 
 /**********************************************************************/
@@ -195,13 +195,13 @@ QIODevice* DecoderIOFactoryUrl::getInput(void)
 void DecoderIOFactoryUrl::start(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO,
-        QString("DecoderIOFactory: Url %1").arg(getUrl().toString()));
+        QString("DecoderIOFactory: Url %1").arg(m_handler->getUrl().toString()));
 
     m_started = false;
 
     doOperationStart(tr("Fetching remote file"));
 
-    m_reply = m_accessManager->get(QNetworkRequest(getUrl()));
+    m_reply = m_accessManager->get(QNetworkRequest(m_handler->getUrl()));
 
     connect(m_reply, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(m_accessManager, SIGNAL(finished(QNetworkReply*)),
@@ -237,7 +237,7 @@ void DecoderIOFactoryUrl::replyFinished(QNetworkReply *reply)
         }
         else
         {
-            setUrl(possibleRedirectUrl);
+            m_handler->setUrl(possibleRedirectUrl);
             m_redirectedURL = possibleRedirectUrl;
             start();
         }
@@ -268,7 +268,7 @@ void DecoderIOFactoryUrl::readyRead(void)
 
 void DecoderIOFactoryUrl::doStart(void)
 {
-    doConnectDecoder(getUrl().toString());
+    doConnectDecoder(m_handler->getUrl().toString());
     m_started = true;
 }
 
@@ -285,7 +285,6 @@ DecoderHandler::DecoderHandler(void) :
     m_playlist_pos(0),
     m_io_factory(NULL),
     m_decoder(NULL),
-    m_meta(NULL),
     m_op(false),
     m_redirects(0)
 {
@@ -301,28 +300,26 @@ void DecoderHandler::start(MusicMetadata *mdata)
     m_state = LOADING;
 
     m_playlist.clear();
-    m_meta = mdata;
+    m_meta = *mdata;
     m_playlist_pos = -1;
     m_redirects = 0;
 
-    QUrl url;
     if (QFileInfo(mdata->Filename()).isAbsolute())
-        url = QUrl::fromLocalFile(mdata->Filename());
+        m_url = QUrl::fromLocalFile(mdata->Filename());
     else
-        url.setUrl(mdata->Filename());
+        m_url.setUrl(mdata->Filename());
 
-    createPlaylist(url);
+    createPlaylist(m_url);
 }
 
 void DecoderHandler::doStart(bool result)
 {
     doOperationStop();
 
-    QUrl url;
-    if (QFileInfo(m_meta->Filename()).isAbsolute())
-        url = QUrl::fromLocalFile(m_meta->Filename());
+    if (QFileInfo(m_meta.Filename()).isAbsolute())
+        m_url = QUrl::fromLocalFile(m_meta.Filename());
     else
-        url.setUrl(m_meta->Filename());
+        m_url.setUrl(m_meta.Filename());
 
     if (m_state == LOADING && result)
     {
@@ -335,7 +332,7 @@ void DecoderHandler::doStart(bool result)
     {
         if (m_state == STOPPED)
         {
-            doFailed(url, "Could not get playlist");
+            doFailed(m_url, "Could not get playlist");
         }
     }
 }
@@ -366,7 +363,7 @@ bool DecoderHandler::next(void)
     if (done())
         return false;
 
-    if (m_meta && m_meta->Format() == "cast")
+    if (m_meta.Format() == "cast")
     {
         m_playlist_pos = random() % m_playlist.size();
     }
@@ -377,23 +374,20 @@ bool DecoderHandler::next(void)
 
     PlayListFileEntry *entry = m_playlist.get(m_playlist_pos);
 
-    QUrl url;
     if (QFileInfo(entry->File()).isAbsolute())
-        url = QUrl::fromLocalFile(entry->File());
+        m_url = QUrl::fromLocalFile(entry->File());
     else
-        url.setUrl(entry->File());
+        m_url.setUrl(entry->File());
 
-    LOG(VB_PLAYBACK, LOG_INFO, QString("Now playing '%1'").arg(url.toString()));
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Now playing '%1'").arg(m_url.toString()));
 
     deleteIOFactory();
-    createIOFactory(url);
+    createIOFactory(m_url);
 
     if (! haveIOFactory())
         return false;
 
     getIOFactory()->addListener(this);
-    getIOFactory()->setUrl(url);
-    getIOFactory()->setMeta(m_meta);
     getIOFactory()->start();
     m_state = ACTIVE;
 
@@ -607,7 +601,7 @@ void DecoderHandler::createIOFactory(const QUrl &url)
 
     if (url.scheme() == "myth")
         m_io_factory = new DecoderIOFactorySG(this);
-    else if (m_meta && m_meta->Format() == "cast")
+    else if (m_meta.Format() == "cast")
         m_io_factory = new DecoderIOFactoryShoutCast(this);
     else if (url.scheme() == "http")
         m_io_factory = new DecoderIOFactoryUrl(this);

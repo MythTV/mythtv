@@ -484,6 +484,14 @@ void MythSocket::SetAnnounce(const QStringList &new_announce)
 
 void MythSocket::DisconnectFromHost(void)
 {
+    if (QThread::currentThread() != m_thread->qthread() &&
+        gCoreContext && gCoreContext->IsExiting())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Programmer error, QEventLoop isn't running and deleting "
+                    "MythSocket(0x%1)").arg(reinterpret_cast<intptr_t>(this),0,16));
+        return;
+    }
     QMetaObject::invokeMethod(
         this, "DisconnectFromHostReal",
         (QThread::currentThread() != m_thread->qthread()) ?

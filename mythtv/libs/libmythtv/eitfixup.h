@@ -62,6 +62,7 @@ class EITFixUp
         kEFixForceISO8859_1  = 0x2000,
         kEFixForceISO8859_15 = 0x4000,
         kEFixForceISO8859_9  = 0x80000,
+        kEFixForceISO8859_2  = 0x100000,
     };
 
     EITFixUp();

@@ -248,8 +248,10 @@ bool getFileDetails(ArchiveItem *a)
                               "--outfile \"%2\" --method %3")
             .arg(inFile).arg(outFile).arg(lenMethod);
     command += logPropagateArgs;
-    if (!logPropagateQuiet())
+    if (logPropagateQuiet())
         command += " --quiet";
+    if (logPropagateNoServer())
+        command += " --nologserver";
 
     uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing;
     if (myth_system(command, flags) != GENERIC_EXIT_OK)

@@ -224,6 +224,7 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
 
     // from EN 300 468, Appendix A.2 - Selection of character table
     unsigned char enc_1[3]  = { 0x10, 0x00, 0x01 };
+    unsigned char enc_2[3]  = { 0x10, 0x00, 0x02 };
     unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
     unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
@@ -235,6 +236,14 @@ static void parse_dvb_event_descriptors(desc_list_t list, uint fix,
     {
         enc = enc_1;
         enc_len = sizeof(enc_1);
+    }
+
+    // Is this broken DVB provider in Central Europe?
+    // Use an encoding override of ISO 8859-2 (Latin2)
+    if (fix & EITFixUp::kEFixForceISO8859_2)
+    {
+        enc = enc_2;
+        enc_len = sizeof(enc_2);
     }
 
     // Is this broken DVB provider in Western Europe?
@@ -1208,6 +1217,10 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
+
+    // DVB-C T-Kábel Hungary
+    // FIXME this should be more specific. Is the encoding really wrong for all services?
+    fix[  100 << 16] = EITFixUp::kEFixForceISO8859_2; 
 }
 
 /** \fn EITHelper::RescheduleRecordings(void)

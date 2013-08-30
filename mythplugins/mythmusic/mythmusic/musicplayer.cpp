@@ -1164,10 +1164,12 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
     if (getCurrentMetadata())
         curTrackID = getCurrentMetadata()->ID();
 
-    m_shuffleMode = mode;
+    // only save the mode if we are playing tracks
+    if (m_playMode == PLAYMODE_TRACKS)
+        m_shuffleMode = mode;
 
     if (m_currentPlaylist)
-        m_currentPlaylist->shuffleTracks(m_shuffleMode);
+        m_currentPlaylist->shuffleTracks(mode);
 
     if (curTrackID != -1)
     {
@@ -1335,9 +1337,6 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
     {
         if (deleted)
         {
-            // all tracks were removed
-            m_currentTrack = -1;
-            stop(true);
             MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
             dispatch(me);
         }
@@ -1359,6 +1358,39 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
             MusicPlayerEvent me(MusicPlayerEvent::TrackAddedEvent, trackID);
             dispatch(me);
         }
+    }
+
+    // if we don't have any tracks to play stop here
+    if (!m_currentPlaylist || m_currentPlaylist->getSongs().count() == 0)
+    {
+        m_currentTrack = -1;
+        if (isPlaying())
+            stop(true);
+        return;
+    }
+
+    int trackPos = -1;
+
+    // make sure the current playing track is still valid
+    if (isPlaying() && getDecoderHandler())
+    {
+        for (int x = 0; x < m_currentPlaylist->getSongs().size(); x++)
+        {
+            if (m_currentPlaylist->getSongs().at(x)->ID() == getDecoderHandler()->getMetadata().ID())
+            {
+                trackPos = x;
+                break;
+            }
+        }
+    }
+
+    if (trackPos != m_currentTrack)
+        m_currentTrack = trackPos;
+
+    if (!getCurrentMetadata())
+    {
+        m_currentTrack = -1;
+        stop(true);
     }
 }
 

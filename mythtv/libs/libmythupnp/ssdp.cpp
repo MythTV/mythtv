@@ -25,6 +25,7 @@
 #include <QStringList>
 
 #include <stdlib.h>
+#include <errno.h>
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -315,6 +316,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 {
     QByteArray buffer;
     long nBytes = 0;
+    int retries = 0;
 
     while ((nBytes = pSocket->bytesAvailable()) > 0)
     {
@@ -326,11 +328,24 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
             long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
             if (ret < 0)
             {
+                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    if (retries == 3)
+                    {
+                        nBytes = nRead;
+                        buffer.resize(nBytes);
+                        break;
+                    }
+                    retries++;
+                    usleep(10000);
+                    continue;
+                }
                 LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")
                     .arg(pSocket->error()));
                 buffer.clear();
                 break;
             }
+            retries = 0;
 
             nRead += ret;
 

@@ -219,6 +219,11 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
+    if (gCoreContext)
+    {
+        gCoreContext->SetExiting();
+    }
+
     if (mainServer)
         mainServer->Stop();
 

@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QDebug>
 #include <QMutex>
+#include <QRunnable>
 #include <QWaitCondition>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
@@ -96,6 +97,8 @@ class MythCoreContextPrivate : public QObject
     bool m_announcedProtocol;
 
     MythPluginManager *m_pluginmanager;
+
+    bool m_isexiting;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -118,7 +121,8 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_inwanting(false),
       m_intvwanting(false),
       m_announcedProtocol(false),
-      m_pluginmanager(NULL)
+      m_pluginmanager(NULL),
+      m_isexiting(false)
 {
     MThread::ThreadSetup("CoreContext");
     srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
@@ -1566,6 +1570,16 @@ void MythCoreContext::SetPluginManager(MythPluginManager *pmanager)
 MythPluginManager *MythCoreContext::GetPluginManager(void)
 {
     return d->m_pluginmanager;
+}
+
+void MythCoreContext::SetExiting(bool exiting)
+{
+    d->m_isexiting = exiting;
+}
+
+bool MythCoreContext::IsExiting(void)
+{
+    return d->m_isexiting;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

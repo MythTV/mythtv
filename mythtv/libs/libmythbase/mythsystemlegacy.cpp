@@ -16,7 +16,7 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 // compat header
@@ -142,14 +142,18 @@ void MythSystemLegacy::SetCommand(const QString &command,
         if (GetSetting("UseShell") && m_args.isEmpty())
         {
             m_command += logPropagateArgs;
-            if (!logPropagateQuiet())
+            if (logPropagateQuiet())
                 m_command += " --quiet";
+            if (logPropagateNoServer())
+                m_command += " --nologserver";
         }
         else
         {
             m_args << logPropagateArgList;
-            if (!logPropagateQuiet())
+            if (logPropagateQuiet())
                 m_args << "--quiet";
+            if (logPropagateNoServer())
+                m_args << "--nologserver";
         }
     }
 

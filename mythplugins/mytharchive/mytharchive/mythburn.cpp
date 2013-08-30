@@ -1219,8 +1219,10 @@ void BurnMenu::doBurn(int mode)
                   (bEraseDVDRW ? " --erasedvdrw" : "") + 
                   (bNativeFormat ? " --nativeformat" : "");
     commandline += logPropagateArgs;
-    if (!logPropagateQuiet())
+    if (logPropagateQuiet())
         commandline += " --quiet";
+    if (logPropagateNoServer())
+        commandline += " --nologserver";
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
     uint flags = kMSRunBackground | kMSDontBlockInputDevs | 

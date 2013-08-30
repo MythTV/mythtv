@@ -19,10 +19,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">da</setting>
+    <setting name="Language" global="true">da</setting>
 
     <!-- Country -->
-    <setting name="Country">DK</setting>
+    <setting name="Country" global="true">DK</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd d MMM</setting>

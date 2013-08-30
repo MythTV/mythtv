@@ -4143,9 +4143,9 @@ bool TV::AudioSyncHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_RIGHT, actions))
         ChangeAudioSync(ctx, 1);
     else if (has_action(ACTION_UP, actions))
-        ChangeAudioSync(ctx, -10);
-    else if (has_action(ACTION_DOWN, actions))
         ChangeAudioSync(ctx, 10);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeAudioSync(ctx, -10);
     else if (has_action(ACTION_TOGGELAUDIOSYNC, actions))
         ClearOSD(ctx);
     else if (has_action(ACTION_SELECT, actions))
@@ -4169,9 +4169,9 @@ bool TV::SubtitleZoomHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_RIGHT, actions))
         ChangeSubtitleZoom(ctx, 1);
     else if (has_action(ACTION_UP, actions))
-        ChangeSubtitleZoom(ctx, -10);
-    else if (has_action(ACTION_DOWN, actions))
         ChangeSubtitleZoom(ctx, 10);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeSubtitleZoom(ctx, -10);
     else if (has_action(ACTION_TOGGLESUBTITLEZOOM, actions))
         ClearOSD(ctx);
     else if (has_action(ACTION_SELECT, actions))
@@ -4195,9 +4195,9 @@ bool TV::SubtitleDelayHandleAction(PlayerContext *ctx,
     else if (has_action(ACTION_RIGHT, actions))
         ChangeSubtitleDelay(ctx, 5);
     else if (has_action(ACTION_UP, actions))
-        ChangeSubtitleDelay(ctx, -25);
-    else if (has_action(ACTION_DOWN, actions))
         ChangeSubtitleDelay(ctx, 25);
+    else if (has_action(ACTION_DOWN, actions))
+        ChangeSubtitleDelay(ctx, -25);
     else if (has_action(ACTION_TOGGLESUBTITLEDELAY, actions))
         ClearOSD(ctx);
     else if (has_action(ACTION_SELECT, actions))

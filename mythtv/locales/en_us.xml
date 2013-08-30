@@ -17,10 +17,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">en_US</setting>
+    <setting name="Language" global="true">en_US</setting>
 
     <!-- Country -->
-    <setting name="Country">US</setting>
+    <setting name="Country" global="true">US</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd MMM d yyyy</setting>

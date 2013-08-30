@@ -77,7 +77,6 @@ contains(CONFIG_DARWIN, yes) {
     }
 }
 
-
 # Windows...
 
 win32 {
@@ -102,9 +101,12 @@ win32 {
 
         INCLUDEPATH += ./
         INCLUDEPATH += $$SRC_PATH_BARE/external
-        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
         INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/src
+
+        contains( CONFIG_MYTHLOGSERVER, "yes" ) {
+            INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
+            INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
+        }
 
         INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/include
         INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/external/pthreads.2
@@ -175,8 +177,14 @@ win32 {
 
     INCLUDEPATH += $$unique(CONFIG_INCLUDEPATH)
 
-    INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-    INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
+    contains( CONFIG_MYTHLOGSERVER, "yes" ) {
+        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
+        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
+
+        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
+        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
+    }
+
     INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/include
 
     LOCAL_LIBDIR_OGL =
@@ -201,8 +209,6 @@ win32 {
     EXTRA_LIBS += $$LOCAL_LIBDIR_X11
     EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
 
-    EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
-    EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
     EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
 
     # remove warn_{on|off} from CONFIG since we set it in our CFLAGS

@@ -11,11 +11,22 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
 #include "mythsignalingtimer.h"
 #include "mthread.h"
-#include "nzmqt.hpp"
+
+#undef NOLOGSERVER
+#if !CONFIG_MYTHLOGSERVER
+#define NOLOGSERVER
+#endif
+
+// ZMQ forward declarations
+namespace nzmqt {
+    class ZMQSocket;
+    class ZMQContext;
+}
 
 #define LOGLINE_MAX (2048-120)
 
@@ -149,6 +160,10 @@ class LogServerThread : public QObject, public MThread
     void run(void);
     void stop(void);
     nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
+
+  public slots:
+    void receivedMessage(const QList<QByteArray>&);
+
   private:
     nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
     nzmqt::ZMQSocket *m_zmqInSock;   ///< ZeroMQ feeding socket
@@ -157,7 +172,6 @@ class LogServerThread : public QObject, public MThread
                                           ///  heartbeats
 
   protected slots:
-    void receivedMessage(const QList<QByteArray>&);
     void checkHeartBeats(void);
     void pingClient(QString clientId);
 };
@@ -213,13 +227,7 @@ class DBLoggerThread : public MThread
     void stop(void);
     /// \brief Enqueues a LoggingItem onto the queue for the thread to 
     ///        consume.
-    bool enqueue(LoggingItem *item) 
-    { 
-        QMutexLocker qLock(&m_queueMutex); 
-        if (!m_aborted)
-            m_queue->enqueue(item); 
-        return true; 
-    }
+    bool enqueue(LoggingItem *item);
 
     /// \brief Indicates when the queue is full
     /// \return true when the queue is full

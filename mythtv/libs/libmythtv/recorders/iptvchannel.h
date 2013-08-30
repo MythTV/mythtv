@@ -37,6 +37,8 @@ class IPTVChannel : QObject, public DTVChannel
     virtual bool Tune(const IPTVTuningData&);
     virtual bool Tune(const DTVMultiplex&, QString) { return false; }
 
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+
     // Sets
     void SetStreamData(MPEGStreamData*);
 

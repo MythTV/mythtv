@@ -5,7 +5,10 @@ TEMPLATE = subdirs
 # Directories
 using_frontend {
     SUBDIRS += mythavtest mythfrontend mythcommflag
-    SUBDIRS += mythjobqueue mythlcdserver mythlogserver
+    SUBDIRS += mythjobqueue mythlcdserver
+    contains(CONFIG_MYTHLOGSERVER, "yes") {
+        SUBDIRS += mythlogserver
+    }
     SUBDIRS += mythwelcome mythshutdown mythutil
     SUBDIRS += mythpreviewgen mythmediaserver mythccextractor
     SUBDIRS += mythscreenwizard

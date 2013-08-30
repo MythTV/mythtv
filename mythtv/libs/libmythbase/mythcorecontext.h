@@ -184,7 +184,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     void SetPluginManager(MythPluginManager *pmanager);
     MythPluginManager *GetPluginManager(void);
-    
+
+    // Set when QEventLoop has been stopped and about to exit application
+    void SetExiting(bool exiting = true);
+    bool IsExiting(void);
+
     // signal related methods
     void WaitUntilSignals(const char *signal1, ...);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }

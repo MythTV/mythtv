@@ -101,7 +101,7 @@ void MetadataDownload::run()
             else
                 list = handleVideoUndetermined(lookup);
 
-            if (!list.size() &&
+            if (list.isEmpty() &&
                 lookup->GetSubtype() == kUnknownVideo)
             {
                 list = handleMovie(lookup);
@@ -136,7 +136,7 @@ void MetadataDownload::run()
             list = handleGame(lookup);
 
         // inform parent we have lookup ready for it
-        if (m_parent && list.count() >= 1)
+        if (m_parent && !list.isEmpty())
         {
             // If there's only one result, don't bother asking
             // our parent about it, just add it to the back of
@@ -178,9 +178,20 @@ void MetadataDownload::run()
         }
         else
         {
-            list.append(lookup);
-            QCoreApplication::postEvent(m_parent,
-                new MetadataLookupFailure(list));
+            if (list.isEmpty())
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Metadata Lookup Failed: No Results %1 %2 %3")
+                        .arg(lookup->GetTitle()).arg(lookup->GetSeason())
+                        .arg(lookup->GetEpisode()));
+            }
+            if (m_parent)
+            {
+                // list is always empty here
+                list.append(lookup);
+                QCoreApplication::postEvent(m_parent,
+                    new MetadataLookupFailure(list));
+            }
         }
     }
 

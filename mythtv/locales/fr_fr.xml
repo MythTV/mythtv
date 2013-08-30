@@ -16,10 +16,10 @@
     <!-- Per-host Settings -->
 
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">fr</setting>
+    <setting name="Language" global="true">fr</setting>
 
     <!-- Country -->
-    <setting name="Country">FR</setting>
+    <setting name="Country" global="true">FR</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">dddd d MMM</setting>

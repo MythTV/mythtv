@@ -403,7 +403,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     }
 
   public:
-
     // may be modified
     PSIPTable(const TSPacket &tspacket,
               const unsigned char *pesdata, uint pes_size)
@@ -421,13 +420,6 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         memcpy(_pesdata, pesdata, pes_size-1);
     }
 
-
-  private:
-    // creates non-clone version, for View
-    PSIPTable(const PESPacket& pkt, bool)
-    {
-        PSIPTable(reinterpret_cast<const PESPacket&>(*pkt.data()), false);
-    }
   public:
     /// Constructor for viewing a section, does not create it's own data
     PSIPTable(const unsigned char *pesdata)

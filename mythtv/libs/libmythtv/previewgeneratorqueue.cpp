@@ -56,6 +56,7 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
     {
         if ((*it).gen)
             (*it).gen->deleteLater();
+        (*it).gen = NULL;
     }
     locker.unlock();
     wait();

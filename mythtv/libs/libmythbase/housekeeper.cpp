@@ -18,7 +18,7 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
 
 
@@ -581,7 +581,6 @@ HouseKeeperTask* HouseKeeper::GetQueuedTask(void)
     if (!m_taskQueue.isEmpty())
     {
         task = m_taskQueue.dequeue();
-        task->IncrRef();
     }
 
     // returning NULL tells the thread that the queue is empty and
@@ -688,7 +687,10 @@ void HouseKeeper::Run(void)
             if ((*it)->isRunning())
                 ++it;
             else
+            {
+                delete *it;
                 it = m_threadList.erase(it);
+            }
         }
 
         int count2 = m_threadList.size();

@@ -20,7 +20,7 @@ void MythFrontendCommandLineParser::LoadArguments(void)
     addLogging();
 
     add(QStringList( QStringList() << "-r" << "--reset" ), "reset", false,
-        "Resets appearance, settings, and language.", "");
+        "Resets appearance settings and language.", "");
     add(QStringList( QStringList() << "-p" << "--prompt" ), "prompt", false,
         "Always prompt for backend selection.", "");
     add(QStringList( QStringList() << "-d" << "--disable-autodiscovery" ),

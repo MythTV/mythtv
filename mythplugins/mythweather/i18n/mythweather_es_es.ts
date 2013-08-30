@@ -1101,22 +1101,22 @@ Cuando termine los cambios, pulse &quot;Finalizar&quot; para continuar.</transla
         <translation>Precip</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Configuración de la Pantalla de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Weather Source Setup</source>
         <translation>Configuración de las Fuentes de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Source</source>
         <translation>Fuente</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Weather Location Search</source>
         <translation>Búsqueda de Localidades</translation>
     </message>
@@ -1131,84 +1131,94 @@ Cuando termine los cambios, pulse &quot;Finalizar&quot; para continuar.</transla
         <translation>Buscar Localidad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="44"/>
+        <source>This screen governs the behavior of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Esta pantalla controla el comportamiento de las pantallas de El Tiempo. Puede activar una actualización de El Tiempo en segundo plano que se ejecutará independientemente y configurar cuántos segundos se mostrará cada pantalla. Cuando termine de configurar el complemento de El Tiempo, pulse &quot;Finalizar&quot; para continuar.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Configuración de El Tiempo</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="50"/>
         <source>Humidity:</source>
         <translation>Humedad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Pressure:</source>
         <translation>Presión:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Wind (Gust):</source>
         <oldsource>Wind(Gust):</oldsource>
         <translation>Viento (Rachas):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Wind Direction:</source>
         <translation>Dirección del Viento:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Visibility:</source>
         <translation>Visibilidad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Feels Like:</source>
         <translation>Sensación Térmica:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="56"/>
         <source>: %1</source>
         <translation>: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="57"/>
         <source>100%</source>
         <translation>100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Global Weather Settings</source>
         <translation>Configuración Global de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Seconds to display each page</source>
         <translation>Segundos a mostrar cada página</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Retrieve data in the background</source>
         <translation>Obtener datos en segundo plano</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="61"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Opciones Generales de El Tiempo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Screen Settings</source>
         <translation>Configuración de Pantalla</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Seleccione los pronósticos a mostrar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Source Settings</source>
         <translation>Configuración de Fuentes</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Configure el comportamiento de los guiones de El Tiempo</translation>
     </message>

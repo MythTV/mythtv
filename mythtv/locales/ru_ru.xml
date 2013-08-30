@@ -18,10 +18,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">ru</setting>
+    <setting name="Language" global="true">ru</setting>
 
     <!-- Country -->
-    <setting name="Country">RU</setting>
+    <setting name="Country" global="true">RU</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">ddd d MMM yyyy</setting>

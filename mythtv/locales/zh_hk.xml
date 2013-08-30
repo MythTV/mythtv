@@ -17,10 +17,10 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language">zh_HK</setting>
+    <setting name="Language" global="true">zh_HK</setting>
 
     <!-- Country -->
-    <setting name="Country">HK</setting>
+    <setting name="Country" global="true">HK</setting>
 
     <!-- Date/Time format -->
     <setting name="DateFormat">dddd yyyy年M月d日</setting>

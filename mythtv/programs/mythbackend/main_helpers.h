@@ -31,6 +31,7 @@ namespace
         ~CleanupGuard()
         {
             m_cleanFunction();
+            ReferenceCounter::PrintDebug();
         }
 
       private:

@@ -474,6 +474,7 @@ Cddb::Album::operator QString() const
 bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
 {
     res.matches.empty();
+    res.discID = discID;
 
     if (CacheGet(res, discID))
         return true;
@@ -563,20 +564,26 @@ bool Dbase::Write(const Cddb::Album& album)
 // static
 void Dbase::MakeAlias(const Cddb::Album& album, const Cddb::discid_t discID)
 {
-    s_cache[ discID] = album;
+    LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb MakeAlias %1 for %2 ")
+        .arg(discID,0,16).arg(album.discID,0,16)
+        + album.genre + " " + album.artist + " / " + album.title);
+    s_cache.insert(discID, album)->discID = discID;
 }
 
 // Create a new entry for a discID
 // static
 void Dbase::New(const Cddb::discid_t discID, const Cddb::Toc& toc)
 {
-    (s_cache[ discID] = Cddb::Album(discID)).toc = toc;
+    s_cache.insert(discID, Cddb::Album(discID))->toc = toc;
 }
 
 // static
 void Dbase::CachePut(const Cddb::Album& album)
 {
-    s_cache[ album.discID] = album;
+    LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CachePut %1 ")
+        .arg(album.discID,0,16)
+        + album.genre + " " + album.artist + " / " + album.title);
+    s_cache.insertMulti(album.discID, album);
 }
 
 // static
@@ -585,13 +592,13 @@ bool Dbase::CacheGet(Cddb::Matches& res, const Cddb::discid_t discID)
     bool ret = false;
     for (cache_t::const_iterator it = s_cache.find(discID); it != s_cache.end(); ++it)
     {
-        // NB it->discID may not equal discID if it's an alias
-        if (it->discID)
+        if (it->discID == discID)
         {
             ret = true;
             res.discID = discID;
-            LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CacheGet found %1 ").
-                arg(discID,0,16) + it->discGenre + " " + it->artist + " / " + it->title);
+            LOG(VB_MEDIA, LOG_DEBUG, QString("Cddb CacheGet %1 found %2 ")
+                .arg(discID,0,16).arg(it->discID,0,16)
+                + it->discGenre + " " + it->artist + " / " + it->title);
 
             // If it's marker for 'no match' then genre is empty
             if (!it->discGenre.isEmpty())

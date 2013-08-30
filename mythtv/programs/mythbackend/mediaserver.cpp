@@ -255,13 +255,10 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         m_bonjour = new BonjourRegister();
         if (m_bonjour)
         {
-            QByteArray dummy;
             QByteArray name("Mythbackend on ");
             name.append(gCoreContext->GetHostName());
-            m_bonjour->Register(nPort,
-                                bIsMaster ? "_mythbackend-master._tcp" :
-                                            "_mythbackend-slave._tcp",
-                                name, dummy);
+            QByteArray txt(bIsMaster ? "\x06master" : "\x05slave");
+            m_bonjour->Register(nPort, "_mythbackend._tcp", name, txt);
         }
 #endif
     }

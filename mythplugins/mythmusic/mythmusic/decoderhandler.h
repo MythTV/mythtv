@@ -110,6 +110,11 @@ class DecoderHandler : public QObject, public MythObservable
     bool next(void);
     void error(const QString &msg);
 
+    MusicMetadata& getMetadata() { return m_meta; }
+
+    QUrl& getUrl() { return m_url; }
+    void setUrl (const QUrl &url) { m_url = url; }
+
   protected:
     void doOperationStart(const QString &name);
     void doOperationStop(void);
@@ -132,7 +137,8 @@ class DecoderHandler : public QObject, public MythObservable
     PlayListFile      m_playlist;
     DecoderIOFactory *m_io_factory;
     Decoder          *m_decoder;
-    MusicMetadata    *m_meta;
+    MusicMetadata     m_meta;
+    QUrl              m_url;
     bool              m_op;
     uint              m_redirects;
 
@@ -154,9 +160,6 @@ class DecoderIOFactory : public QObject, public MythObservable
     virtual void stop(void) = 0;
     virtual QIODevice *getInput(void) = 0;
 
-    void setUrl (const QUrl &url) { m_url = url; }
-    void setMeta (MusicMetadata *meta) { m_meta = *meta; }
-
     static const uint DefaultPrebufferSize = 128 * 1024;
     static const uint DefaultBufferSize = 256 * 1024;
     static const uint MaxRedirects = 3;
@@ -167,13 +170,8 @@ class DecoderIOFactory : public QObject, public MythObservable
     void doFailed(const QString &message);
     void doOperationStart(const QString &name);
     void doOperationStop(void);
-    MusicMetadata& getMetadata() { return m_meta; }
-    QUrl& getUrl() { return m_url; }
 
-  private:
     DecoderHandler *m_handler;
-    MusicMetadata   m_meta;
-    QUrl            m_url;
 };
 
 class DecoderIOFactoryFile : public DecoderIOFactory
