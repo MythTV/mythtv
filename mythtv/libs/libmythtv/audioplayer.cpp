@@ -4,7 +4,7 @@
 
 #define LOC QString("AudioPlayer: ")
 
-static const QString _Location = AudioPlayer::tr("Audio Player");
+//static const QString _Location = AudioPlayer::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
   : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
@@ -156,7 +156,7 @@ QString AudioPlayer::ReinitAudio(void)
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Disabling Audio" +
                 QString(", reason is: %1").arg(errMsg));
         ShowNotificationError(tr("Disabling Audio"),
-                              _Location, errMsg);
+                              AudioPlayer::tr( "Audio Player" ), errMsg);
         m_no_audio_out = true;
     }
     else if (m_no_audio_out && m_audioOutput)

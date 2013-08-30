@@ -97,7 +97,7 @@ using namespace std;
         osd->HideWindow(WINDOW); \
     ReturnOSDLock(CTX, osd); }
 
-static const QString _Location = TV::tr("TV Player");
+//static const QString _Location = TV::tr("TV Player");
 
 const int  TV::kInitFFRWSpeed                = 0;
 const uint TV::kInputKeysMax                 = 6;
@@ -2355,7 +2355,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if (buffer && !buffer->GetLastError().isEmpty())
         {
             ShowNotificationError(tr("Can't start playback"),
-                                  _Location, buffer->GetLastError());
+                                  TV::tr( "TV Player" ), buffer->GetLastError());
             delete buffer;
             buffer = NULL;
         }
@@ -2410,7 +2410,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             if (ctx->IsPlayerErrored())
             {
                 ShowNotificationError(ctx->player->GetError(),
-                                      _Location,
+                                      TV::tr( "TV Player" ),
                                       buffer->GetFilename());
                 // We're going to display this error as notification
                 // no need to display it later as popup
