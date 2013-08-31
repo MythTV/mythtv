@@ -1373,6 +1373,8 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         CC708Window &win = cc708service->windows[i];
         if (win.GetExists() && win.GetVisible() && !win.GetChanged())
             continue;
+        if (!win.GetChanged())
+            continue;
 
         Clear708Cache(i);
         if (!win.GetExists() || !win.GetVisible())
