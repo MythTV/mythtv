@@ -119,8 +119,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
             CC708Window &win = GetCCWin(service_num, i);
             QMutexLocker locker(&win.lock);
 
-            win.exists  = false;
-            win.changed = true;
+            win.SetExists(false);
             if (win.text)
             {
                 delete [] win.text;
@@ -135,8 +134,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
         if ((1 << i ) & window_map)
         {
             CC708Window &win = GetCCWin(service_num, i);
-            win.visible = true;
-            win.changed = true;
+            win.SetVisible(true);
             LOG(VB_VBI, LOG_INFO, LOC +
                 QString("DisplayedWindow(%1, %2)").arg(service_num).arg(i));
         }
@@ -154,8 +152,7 @@ void CC708Reader::HideWindows(uint service_num, int window_map)
         if ((1 << i) & window_map)
         {
             CC708Window &win = GetCCWin(service_num, i);
-            win.visible = false;
-            win.changed = true;
+            win.SetVisible(false);
         }
     }
 }
@@ -182,8 +179,7 @@ void CC708Reader::ToggleWindows(uint service_num, int window_map)
         if ((1 << i) & window_map)
         {
             CC708Window &win = GetCCWin(service_num, i);
-            win.visible = !win.visible;
-            win.changed = true;
+            win.SetVisible(!win.GetVisible());
         }
     }
 }

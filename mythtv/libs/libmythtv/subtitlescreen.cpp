@@ -1359,8 +1359,8 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
                    m_textFontZoom != m_textFontZoomPrev);
         if (changed)
         {
-            for (uint i = 0; i < 8; i++)
-                cc708service->windows[i].changed = true;
+            for (int i = 0; i < k708MaxWindows; i++)
+                cc708service->windows[i].SetChanged();
         }
     }
     else
@@ -1368,14 +1368,14 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         return;
     }
 
-    for (uint i = 0; i < 8; i++)
+    for (int i = 0; i < k708MaxWindows; i++)
     {
         CC708Window &win = cc708service->windows[i];
-        if (win.exists && win.visible && !win.changed)
+        if (win.GetExists() && win.GetVisible() && !win.GetChanged())
             continue;
 
         Clear708Cache(i);
-        if (!win.exists || !win.visible)
+        if (!win.GetExists() || !win.GetVisible())
             continue;
 
         QMutexLocker locker(&win.lock);
@@ -1402,7 +1402,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         }
         for (uint j = 0; j < list.size(); j++)
             delete list[j];
-        win.changed = false;
+        win.ResetChanged();
     }
 }
 

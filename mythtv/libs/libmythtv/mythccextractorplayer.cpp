@@ -408,10 +408,10 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
             for (uint windowIdx = 0; windowIdx < 8; ++windowIdx)
             {
                 CC708Window &win = service->windows[windowIdx];
-                if (win.changed)
+                if (win.GetChanged())
                 {
                     vector<CC708String*> strings;
-                    if (win.visible)
+                    if (win.GetVisible())
                         strings = win.GetStrings();
                     Ingest708Caption(it.key(), serviceIdx, windowIdx,
                                      win.pen.row, win.pen.column, win, strings);
@@ -420,7 +420,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                         delete strings.back();
                         strings.pop_back();
                     }
-                    service->windows[windowIdx].changed = false;
+                    service->windows[windowIdx].ResetChanged();
                 }
             }
         }
