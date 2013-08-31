@@ -72,6 +72,7 @@ NetworkControl::NetworkControl() :
     jumpMap["mythnews"]              = "MythNews";
     jumpMap["playdvd"]               = "Play Disc";
     jumpMap["playmusic"]             = "Play music";
+    jumpMap["playlistview"]          = "Play music";
     jumpMap["programfinder"]         = "Program Finder";
     jumpMap["programguide"]          = "Program Guide";
     jumpMap["ripcd"]                 = "Rip CD";
