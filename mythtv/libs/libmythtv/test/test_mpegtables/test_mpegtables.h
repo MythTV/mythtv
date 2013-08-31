@@ -190,6 +190,7 @@ class TestMPEGTables: public QObject
         /* pick just the ContentIdentifierDescriptor from the event_information_section */
         DVBContentIdentifierDescriptor descriptor(&eit_data[407]);
 
+        QCOMPARE (descriptor.CRIDCount(),  (size_t) 2);
         QCOMPARE (descriptor.ContentId(),  QString("eventis.nl/00000000-0000-1000-0604-0000000E0711"));
 
         /* FIXME hack to test the case of no hash in the CRID until we support more then one CRID per descriptor */
@@ -201,5 +202,6 @@ class TestMPEGTables: public QObject
         };
         DVBContentIdentifierDescriptor descriptor2(cid_data);
         QCOMPARE (descriptor2.ContentId(), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
+        QCOMPARE (descriptor.ContentId(1), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
     }
 };
