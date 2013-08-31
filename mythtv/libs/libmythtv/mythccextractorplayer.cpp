@@ -402,7 +402,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
     CC708Info::const_iterator it = m_cc708_info.begin();
     for (; it != m_cc708_info.end(); ++it)
     {
-        for (uint serviceIdx = 1; serviceIdx < 64; ++serviceIdx)
+        for (uint serviceIdx = 1; serviceIdx < k708MaxServices; ++serviceIdx)
         {
             CC708Service *service = (*it).reader->GetService(serviceIdx);
             for (uint windowIdx = 0; windowIdx < 8; ++windowIdx)

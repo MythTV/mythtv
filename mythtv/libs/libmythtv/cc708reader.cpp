@@ -14,7 +14,7 @@
 CC708Reader::CC708Reader(MythPlayer *owner)
   : currentservice(1), parent(owner), enabled(false)
 {
-    for (uint i=0; i<64; i++)
+    for (uint i=0; i < k708MaxServices; i++)
     {
         buf_alloc[i] = 512;
         buf[i]       = (unsigned char*) malloc(buf_alloc[i]);
@@ -30,7 +30,7 @@ CC708Reader::CC708Reader(MythPlayer *owner)
 
 CC708Reader::~CC708Reader()
 {
-    for (uint i=0; i<64; i++)
+    for (uint i=0; i < k708MaxServices; i++)
     {
         free(buf[i]);
         free(temp_str[i]);
@@ -39,7 +39,7 @@ CC708Reader::~CC708Reader()
 
 void CC708Reader::ClearBuffers(void)
 {
-    for (uint i = 1; i < 64; i++)
+    for (uint i = 1; i < k708MaxServices; i++)
         DeleteWindows(i, 0xff);
 }
 
