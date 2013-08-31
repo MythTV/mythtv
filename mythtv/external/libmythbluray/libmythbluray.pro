@@ -15,7 +15,12 @@ INCLUDEPATH += ../../libs/libmythtv
 win32-msvc* {
     CONFIG += qt
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
-    QMAKE_CFLAGS += /TP "/FI compat.h"
+
+    # needed for vcxproj
+    QMAKE_CXXFLAGS += /TP "/FI compat.h"
+
+    # needed for nmake
+    QMAKE_CFLAGS   += /TP "/FI compat.h"
 
 } else {
     DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H HAVE_DIRENT_H HAVE_STRINGS_H
