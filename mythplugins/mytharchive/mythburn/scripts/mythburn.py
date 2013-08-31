@@ -46,7 +46,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130826-1"
+VERSION="0.1.20130831-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1706,8 +1706,11 @@ def getVideoSize(xmlFilename):
 def runMythtranscode(chanid, starttime, destination, usecutlist, localfile):
     """Use mythtranscode to cut commercials and/or clean up an mpeg2 file"""
 
-    rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
-    cutlist = rec.markup.getcutlist()
+    try:
+        rec = DB.searchRecorded(chanid=chanid, starttime=starttime).next()
+        cutlist = rec.markup.getcutlist()
+    except StopIteration:
+        cutlist = []
 
     cutlist_s = ""
     if usecutlist and len(cutlist):
