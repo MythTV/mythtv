@@ -272,6 +272,23 @@ CC708Character &CC708Window::GetCCChar(void) const
 
 vector<CC708String*> CC708Window::GetStrings(void) const
 {
+    // Note on implementation.  In many cases, one line will be
+    // computed as the concatenation of 3 strings: a prefix of spaces
+    // with a default foreground color, followed by the actual text in
+    // a specific foreground color, followed by a suffix of spaces
+    // with a default foreground color.  This leads to 3
+    // FormattedTextChunk objects when 1 would suffice.  The prefix
+    // and suffix ultimately get optimized away, but not before a
+    // certain amount of unnecessary work.
+    //
+    // This can be solved with two steps.  First, suppress a format
+    // change when only non-underlined spaces have been seen so far.
+    // (Background changes can be ignored because the subtitle code
+    // suppresses leading spaces.)  Second, for trailing
+    // non-underlined spaces, either suppress a format change, or
+    // avoid creating such a string when it appears at the end of the
+    // row.  (We can't do the latter for an initial string of spaces,
+    // because the spaces are needed for coordinate calculations.)
     QMutexLocker locker(&lock);
 
     vector<CC708String*> list;
@@ -281,36 +298,67 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     if (!text)
         return list;
 
+    bool createdNonblankStrings = false;
+    QChar chars[column_count];
     for (uint j = 0; j < row_count; j++)
     {
+        bool inLeadingSpaces = true;
+        bool inTrailingSpaces = true;
+        bool createdString = false;
+        uint strStart = 0;
         for (uint i = 0; i < column_count; i++)
         {
             CC708Character &chr = text[j * true_column_count + i];
+            chars[i] = chr.character;
             if (!cur)
             {
                 cur = new CC708String;
                 cur->x    = i;
                 cur->y    = j;
-                cur->str  = QString("%1").arg(chr.character);
                 cur->attr = chr.attr;
+                strStart = i;
             }
-            else if (cur->attr == chr.attr)
+            bool isDisplayable = (chr.character != ' ' || chr.attr.underline);
+            if (inLeadingSpaces && isDisplayable)
             {
-                cur->str = QString("%1%2").arg(cur->str).arg(chr.character);
+                cur->attr = chr.attr;
+                inLeadingSpaces = false;
             }
-            else// if (cur->attr != chr.attr)
+            if (isDisplayable)
             {
+                inTrailingSpaces = false;
+            }
+            if (cur->attr != chr.attr)
+            {
+                cur->str = QString(&chars[strStart], i - strStart);
                 list.push_back(cur);
+                createdString = true;
+                createdNonblankStrings = true;
+                inTrailingSpaces = true;
                 cur = NULL;
                 i--;
             }
         }
         if (cur)
         {
-            list.push_back(cur);
+            // If the entire string is spaces, we still may need to
+            // create a chunk to preserve spacing between lines.
+            if (!inTrailingSpaces || !createdString)
+            {
+                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                int length = allSpaces ? 0 : column_count - strStart;
+                if (length)
+                    createdNonblankStrings = true;
+                cur->str = QString(&chars[strStart], length);
+                list.push_back(cur);
+            }
+            else
+                delete cur;
             cur = NULL;
         }
     }
+    if (!createdNonblankStrings)
+        list.clear();
     return list;
 }
 

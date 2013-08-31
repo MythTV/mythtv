@@ -237,8 +237,10 @@ void CC708Reader::SetPenColor(
     int edge_color)
 {
     CHECKENABLED;
-    LOG(VB_VBI, LOG_INFO, LOC + QString("SetPenColor(%1...)")
-            .arg(service_num));
+    LOG(VB_VBI, LOG_INFO,
+        LOC + QString("SetPenColor(service=%1, fg%2.%3, bg=%4.%5, edge=%6)")
+        .arg(service_num).arg(fg_color).arg(fg_opacity)
+        .arg(bg_color).arg(bg_opacity).arg(edge_color));
 
     CC708CharacterAttribute &attr = GetCCWin(service_num).pen.attr;
 
