@@ -559,17 +559,20 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         for (uint j = 0; j < contentIds.size(); j++)
         {
             DVBContentIdentifierDescriptor desc(contentIds[j]);
-            if (desc.ContentEncoding() == 0)
+            for (uint k = 0; k < desc.CRIDCount(); k++)
             {
-                // The CRID is a URI.  It could contain UTF8 sequences encoded
-                // as %XX but there's no advantage in decoding them.
-                // The BBC currently uses private types 0x31 and 0x32.
-                if (desc.ContentType() == 0x01 || desc.ContentType() == 0x31)
-                    programId = desc.ContentId();
-                else if (desc.ContentType() == 0x02 || desc.ContentType() == 0x32)
+                if (desc.ContentEncoding(k) == 0)
                 {
-                    seriesId = desc.ContentId();
-                    category_type = ProgramInfo::kCategorySeries;
+                    // The CRID is a URI.  It could contain UTF8 sequences encoded
+                    // as %XX but there's no advantage in decoding them.
+                    // The BBC currently uses private types 0x31 and 0x32.
+                    if (desc.ContentType(k) == 0x01 || desc.ContentType(k) == 0x31)
+                        programId = desc.ContentId(k);
+                    else if (desc.ContentType(k) == 0x02 || desc.ContentType(k) == 0x32)
+                    {
+                        seriesId = desc.ContentId(k);
+                        category_type = ProgramInfo::kCategorySeries;
+                    }
                 }
             }
         }
