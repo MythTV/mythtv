@@ -15,8 +15,10 @@
 class CC608Text
 {
   public:
-    CC608Text(QString T, int X, int Y) :
+    CC608Text(const QString &T, int X, int Y) :
         text(T), x(X), y(Y) {}
+    CC608Text(const CC608Text &other) :
+        text(other.text), x(other.x), y(other.y) {}
     QString text;
     int x;
     int y;
