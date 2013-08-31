@@ -40,7 +40,7 @@ using namespace std;
 EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
                          QString lhostname)
     : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
-      freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false),
+      tv(NULL), local(false), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
     endRecordingTime = MythDate::current().addDays(-2);
@@ -59,7 +59,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
  */
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     : m_capturecardnum(capturecardnum), sock(NULL),
-      freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false),
+      tv(ltv), local(true), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
     endRecordingTime = MythDate::current().addDays(-2);

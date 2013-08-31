@@ -142,8 +142,6 @@ class EncoderLink
     PlaybackSock *sock;
     QString hostname;
 
-    long long freeDiskSpaceKB;
-
     TVRec *tv;
 
     bool local;
