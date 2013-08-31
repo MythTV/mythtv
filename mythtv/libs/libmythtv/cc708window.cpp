@@ -299,7 +299,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
         return list;
 
     bool createdNonblankStrings = false;
-    QChar chars[column_count];
+    QChar chars[k708MaxColumns];
     for (uint j = 0; j < row_count; j++)
     {
         bool inLeadingSpaces = true;

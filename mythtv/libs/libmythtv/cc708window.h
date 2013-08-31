@@ -67,6 +67,8 @@ extern const uint k708AttrOpacityTranslucent;
 extern const uint k708AttrOpacityTransparent;
 
 const int k708MaxWindows = 8;
+const int k708MaxRows    = 16; // 4-bit field in DefineWindow
+const int k708MaxColumns = 64; // 6-bit field in DefineWindow
 
 class CC708CharacterAttribute
 {
