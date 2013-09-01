@@ -411,6 +411,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     }
 
     struct dvb_frontend_info info;
+    memset(&info, 0, sizeof(info));
     int err = ioctl(fd_frontend, FE_GET_INFO, &info);
     if (err < 0)
     {
@@ -449,6 +450,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
         return "ERROR_OPEN";
 
     struct dvb_frontend_info info;
+    memset(&info, 0, sizeof(info));
     int err = ioctl(fd_frontend, FE_GET_INFO, &info);
     if (err < 0)
     {
