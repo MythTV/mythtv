@@ -290,7 +290,7 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
     }
     if (nframes > 0)
         LOG(VB_AUDIO, LOG_ERR, LOC_DEV +
-            QString("short pcm read, %1 of %2 frames, retries %1")
+            QString("short pcm read, %1 of %2 frames, retries %3")
                 .arg(to_read - nframes).arg(to_read).arg(retries));
     return snd_pcm_frames_to_bytes(pcm_handle, to_read - nframes);
 }
