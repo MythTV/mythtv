@@ -402,7 +402,8 @@ QString CardUtil::ProbeDVBType(const QString &device)
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     QByteArray dev = dvbdev.toLatin1();
-    int fd_frontend = open(dev.constData(), O_RDONLY | O_NONBLOCK);
+    
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Can't open DVB frontend (%1) for %2.")
