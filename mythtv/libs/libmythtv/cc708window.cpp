@@ -390,7 +390,6 @@ void CC708Window::SetWindowStyle(uint style)
     // It appears that ths is missused by broadcasters (FOX -- Dollhouse)
     fill_opacity   = k708AttrOpacityTransparent;
     /// HACK -- end
-    SetChanged();
 }
 
 void CC708Window::AddChar(QChar ch)
