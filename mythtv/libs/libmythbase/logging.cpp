@@ -703,7 +703,7 @@ bool LoggerThread::flush(int timeoutMS)
 {
     QTime t;
     t.start();
-    while (!m_aborted && logQueue.isEmpty() && t.elapsed() < timeoutMS)
+    while (!m_aborted && !logQueue.isEmpty() && t.elapsed() < timeoutMS)
     {
         m_waitNotEmpty->wakeAll();
         int left = timeoutMS - t.elapsed();
