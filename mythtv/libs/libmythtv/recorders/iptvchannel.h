@@ -37,8 +37,6 @@ class IPTVChannel : QObject, public DTVChannel
     virtual bool Tune(const IPTVTuningData&);
     virtual bool Tune(const DTVMultiplex&, QString) { return false; }
 
-    virtual bool IsExternalChannelChangeSupported(void);
-
     // Sets
     void SetStreamData(MPEGStreamData*);
 
@@ -48,6 +46,7 @@ class IPTVChannel : QObject, public DTVChannel
 
   protected:
     void timerEvent(QTimerEvent*);
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
   private:
     void SetStreamDataInternal(MPEGStreamData*, bool closeimmediately);
