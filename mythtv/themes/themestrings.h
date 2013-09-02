@@ -153,6 +153,8 @@ void strings_null() {
     ThemeUI::tr("Home");
     ThemeUI::tr("Select Time & Date");
     ThemeUI::tr("Please Wait...");
+    ThemeUI::tr("%TITLE%% - |SUBTITLE%% (|YEAR|)%");
+    ThemeUI::tr("%DESCRIPTION%");
     ThemeUI::tr("%DATE%, %TIME%");
     ThemeUI::tr("%LENMINS%");
     ThemeUI::tr("%TIME%");
@@ -350,6 +352,10 @@ void strings_null() {
     ThemeUI::tr("Alternate Player:");
     ThemeUI::tr("Appearance Wizard");
     ThemeUI::tr("Move the selected corner of the preview image to the corner of the TV screen.  Press SELECT to edit the other corner.  Press MENU for options and ESC to quit.");
+    ThemeUI::tr("Search List");
+    ThemeUI::tr("Previous");
+    ThemeUI::tr("Found");
+    ThemeUI::tr("Not Found");
     ThemeUI::tr("Search terms:");
     ThemeUI::tr("Search");
     ThemeUI::tr("Skip");
@@ -412,7 +418,6 @@ void strings_null() {
     ThemeUI::tr("My audio subsystem supports TrueHD");
     ThemeUI::tr("My audio subsystem supports DTS-HD");
     ThemeUI::tr("Number of Speakers:");
-    ThemeUI::tr("Previous");
     ThemeUI::tr("Video Configuration");
     ThemeUI::tr("Video Playback Profile:");
     ThemeUI::tr("Test Standard Definition");
@@ -506,9 +511,6 @@ void strings_null() {
     ThemeUI::tr("A long menu which breaks down the options by their category. TV, Music, Video etc");
     ThemeUI::tr("Search Listings");
     ThemeUI::tr("Play TV Recordings");
-    ThemeUI::tr("Search List");
-    ThemeUI::tr("Found");
-    ThemeUI::tr("Not Found");
     ThemeUI::tr("Select the country in which you currently reside");
     ThemeUI::tr("Language");
     ThemeUI::tr("Select your preferred language");
@@ -517,7 +519,6 @@ void strings_null() {
     ThemeUI::tr("Firewall");
     ThemeUI::tr("Select the server you wish to connect to");
     ThemeUI::tr("Manual");
-    ThemeUI::tr("%DESCRIPTION%");
     ThemeUI::tr("Filename :");
     ThemeUI::tr("Storage to Buffer :");
     ThemeUI::tr("Buffer to Decoder :");
@@ -982,16 +983,16 @@ void strings_null() {
     ThemeUI::tr("Browseable");
     ThemeUI::tr("Player Command:");
     ThemeUI::tr("Seas/Ep:");
-    ThemeUI::tr("%TITLE%% - |SUBTITLE%% (|YEAR|)%");
     ThemeUI::tr("%\"|SUBTITLE|\" %%00X00| %%(|ORIGINALAIRDATE|)\n%%YEARSTARS| %%DESCRIPTION%");
     ThemeUI::tr("%TITLESUBTITLE% %YEARSTARS%");
     ThemeUI::tr("Hide channels without channel number");
     ThemeUI::tr("Theater name");
     ThemeUI::tr("%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%");
     ThemeUI::tr("%STARTTIME%% - |ENDTIME|: %%LENMINS%");
+    ThemeUI::tr("%SUBTITLE% %YEARSTARS%");
     ThemeUI::tr("%1");
     ThemeUI::tr("No Recordings available, or screen loading...");
-    ThemeUI::tr("%\"|SUBTITLE|\" %%00X00| %%(|ORIGINALAIRDATE|)\n%");
+    ThemeUI::tr("%STARTTIME%%-|ENDTIME| %%\"|SUBTITLE|\" %%00X00| %%(|ORIGINALAIRDATE|)\n%");
     ThemeUI::tr("%YEARSTARS| %%DESCRIPTION%");
     ThemeUI::tr("(1) All (2) Important");
     ThemeUI::tr("INFO");
