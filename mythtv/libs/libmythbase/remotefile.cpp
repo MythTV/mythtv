@@ -259,6 +259,7 @@ bool RemoteFile::Open(void)
                     .arg(path));
                 return false;
             }
+            SetBlocking();
             return true;
         }
         // local mode, read only
@@ -891,4 +892,17 @@ QDateTime RemoteFile::LastModified(const QString &url)
     return result;
 }
 
+/** \fn RemoteFile::SetBlocking(void)
+ *  \brief Set write blocking mode for the ThreadedFileWriter instance
+ *  \return old mode value
+ *  \param false if not blocking, true if blocking
+ */
+bool RemoteFile::SetBlocking(bool block)
+{
+    if (fileWriter)
+    {
+        return fileWriter->SetBlocking(block);
+    }
+    return true;
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

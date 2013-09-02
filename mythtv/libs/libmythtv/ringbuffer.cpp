@@ -13,6 +13,7 @@
 // Qt headers
 #include <QFile>
 #include <QDateTime>
+#include <QReadLocker>
 
 #include "threadedfilewriter.h"
 #include "fileringbuffer.h"
@@ -1540,6 +1541,18 @@ void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
     if (tfw)
         tfw->SetWriteBufferMinWriteSize(newMinSize);
     rwlock.unlock();
+}
+
+/** \fn RingBuffer::WriterSetBlocking(bool)
+ *  \brief Calls ThreadedFileWriter::SetBlocking(bool)
+ */
+bool RingBuffer::WriterSetBlocking(bool block)
+{
+    QReadLocker lock(&rwlock);
+
+    if (tfw)
+        return tfw->SetBlocking(block);
+    return false;
 }
 
 /** \brief Tell RingBuffer if this is an old file or not.

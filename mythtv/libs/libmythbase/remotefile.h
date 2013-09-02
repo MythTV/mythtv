@@ -36,6 +36,7 @@ class MBASE_PUBLIC RemoteFile
     int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);
+    bool SetBlocking(bool block = true);
 
     bool SaveAs(QByteArray &data);
 

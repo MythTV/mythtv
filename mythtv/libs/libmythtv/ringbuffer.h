@@ -151,6 +151,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     void WriterFlush(void);
     void Sync(void);
     long long WriterSeek(long long pos, int whence, bool has_lock = false);
+    bool WriterSetBlocking(bool lock = true);
 
     long long SetAdjustFilesize(void);
 
