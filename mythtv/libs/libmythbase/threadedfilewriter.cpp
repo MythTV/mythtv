@@ -40,8 +40,9 @@ void TFWSyncThread::run(void)
     RunEpilog();
 }
 
-const uint ThreadedFileWriter::kMaxBufferSize = 128 * 1024 * 1024;
-const uint ThreadedFileWriter::kMinWriteSize = 64 * 1024;
+const uint ThreadedFileWriter::kMaxBufferSize   = 8 * 1024 * 1024;
+const uint ThreadedFileWriter::kMinWriteSize    = 64 * 1024;
+const uint ThreadedFileWriter::kMaxBlockSize    = 1 * 1024 * 1024;
 
 /** \class ThreadedFileWriter
  *  \brief This class supports the writing of recordings to disk.
@@ -67,7 +68,8 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     ignore_writes(false),                tfw_min_write_size(kMinWriteSize),
     totalBufferUse(0),
     // threads
-    writeThread(NULL),                   syncThread(NULL)
+    writeThread(NULL),                   syncThread(NULL),
+    m_warned(false),                     m_blocking(false)
 {
     filename.detach();
 }
@@ -206,51 +208,84 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
     if (ignore_writes)
         return count;
 
-    if (totalBufferUse + count > kMaxBufferSize)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Maximum buffer size exceeded."
-                "\n\t\t\tfile will be truncated, no further writing "
-                "will be done."
-                "\n\t\t\tThis generally indicates your disk performance "
-                "\n\t\t\tis insufficient to deal with the number of on-going "
-                "\n\t\t\trecordings, or you have a disk failure.");
-        ignore_writes = true;
-        return count;
-    }
+    uint written    = 0;
+    uint left       = count;
 
-    TFWBuffer *buf = NULL;
+    while (written < count)
+    {
+        uint towrite = (left > kMaxBlockSize) ? kMaxBlockSize : left;
 
-    if (!writeBuffers.empty() &&
-        (writeBuffers.back()->data.size() + count) < kMinWriteSize)
-    {
-        buf = writeBuffers.back();
-        writeBuffers.pop_back();
-    }
-    else
-    {
-        if (!emptyBuffers.empty())
+        if ((totalBufferUse + towrite) > (kMaxBufferSize * (m_blocking ? 1 : 8)))
         {
-            buf = emptyBuffers.front();
-            emptyBuffers.pop_front();
-            buf->data.clear();
+            if (!m_blocking)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Maximum buffer size exceeded."
+                    "\n\t\t\tfile will be truncated, no further writing "
+                    "will be done."
+                    "\n\t\t\tThis generally indicates your disk performance "
+                    "\n\t\t\tis insufficient to deal with the number of on-going "
+                    "\n\t\t\trecordings, or you have a disk failure.");
+                ignore_writes = true;
+                return count;
+            }
+            if (!m_warned)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "Maximum buffer size exceeded."
+                    "\n\t\t\tThis generally indicates your disk performance "
+                    "\n\t\t\tis insufficient or you have a disk failure.");
+                m_warned = true;
+            }
+            // wait until some was written to disk, and try again
+            if (!bufferWasFreed.wait(locker.mutex(), 1000))
+            {
+                LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                    QString("Taking a long time waiting to write.. "
+                            "buffer size %1 (needing %2, %3 to go)")
+                    .arg(totalBufferUse).arg(towrite)
+                    .arg(towrite-(kMaxBufferSize-totalBufferUse)));
+            }
+            continue;
+        }
+
+        TFWBuffer *buf = NULL;
+
+        if (!writeBuffers.empty() &&
+            (writeBuffers.back()->data.size() + towrite) < kMinWriteSize)
+        {
+            buf = writeBuffers.back();
+            writeBuffers.pop_back();
         }
         else
         {
-            buf = new TFWBuffer();
+            if (!emptyBuffers.empty())
+            {
+                buf = emptyBuffers.front();
+                emptyBuffers.pop_front();
+                buf->data.clear();
+            }
+            else
+            {
+                buf = new TFWBuffer();
+            }
         }
-    }
 
-    totalBufferUse += count;
-    const char *cdata = (const char*) data;
-    buf->data.insert(buf->data.end(), cdata, cdata+count);
-    buf->lastUsed = MythDate::current();
+        totalBufferUse += towrite;
 
-    writeBuffers.push_back(buf);
+        const char *cdata = (const char*) data + written;
+        buf->data.insert(buf->data.end(), cdata, cdata+towrite);
+        buf->lastUsed = MythDate::current();
 
-    if ((writeBuffers.size() > 1) || (buf->data.size() >= kMinWriteSize))
-    {
-        bufferHasData.wakeAll();
+        writeBuffers.push_back(buf);
+
+        if ((writeBuffers.size() > 1) || (buf->data.size() >= kMinWriteSize))
+        {
+            bufferHasData.wakeAll();
+        }
+
+        written += towrite;
+        left    -= towrite;
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("Write(*, %1) total %2 cnt %3")
@@ -435,6 +470,7 @@ void ThreadedFileWriter::DiskLoop(void)
         TFWBuffer *buf = writeBuffers.front();
         writeBuffers.pop_front();
         totalBufferUse -= buf->data.size();
+        bufferWasFreed.wakeAll();
         minWriteTimer.start();
 
         //////////////////////////////////////////
@@ -554,4 +590,18 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
         }
         ++it;
     }
+}
+
+/** \fn ThreadedFileWriter::SetBlocking(void)
+ *  \brief Set write blocking mode
+ *  While in blocking mode, ThreadedFileWriter::Write will wait for buffers
+ *  to be freed as required, so there's never any data loss
+ *  \return old mode value
+ *  \param false if not blocking, true if blocking
+ */
+bool ThreadedFileWriter::SetBlocking(bool block)
+{
+    bool old = m_blocking;
+    m_blocking = block;
+    return old;
 }
