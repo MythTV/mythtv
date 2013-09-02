@@ -81,6 +81,9 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
         { return _ptrs[i]+6; }
     // }
 
+    /// mutates a NITo into a NITa (vice versa) and recalculates the CRC
+    bool Mutate(void);
+
     void Parse(void) const;
     QString toString(void) const;
     QString NetworkName(void) const;
@@ -156,7 +159,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
     // }
     ServiceDescriptor *GetServiceDescriptor(uint i) const;
 
-    /// mutates a SDTo into a SDTa and recalculates the CRC
+    /// mutates a SDTo into a SDTa (vice versa) and recalculates the CRC
     bool Mutate(void);
 
     void Parse(void) const;
