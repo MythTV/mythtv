@@ -31,7 +31,10 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
 
     if (write)
+    {
         remote->SetReadyReadCallbackEnabled(false);
+        rbuffer->WriterSetBlocking(true);
+    }
 }
 
 FileTransfer::~FileTransfer()

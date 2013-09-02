@@ -746,7 +746,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
             return GENERIC_EXIT_NOT_OK;
         }
     }
-
+    out->WriterSetBlocking(true);
     bool autopts = !cmdline.toBool("noautopts");
     bool use_xml = cmdline.toBool("xml");
 
