@@ -29,7 +29,7 @@ case "${SOURCE_VERSION}" in
     exported|Unknown)
         if ! grep -q Format $GITTREEDIR/EXPORTED_VERSION; then
             . $GITTREEDIR/EXPORTED_VERSION
-            BRANCH=$(echo "${BRANCH}" | sed 's/ (.*, \(.*\))/\1/')
+            BRANCH=$(echo "${BRANCH}" | sed 's/ (\(.*, \)\{0,1\}\(.*\))/\2/')
         elif test -e $GITTREEDIR/VERSION ; then
             . $GITTREEDIR/VERSION
         fi
