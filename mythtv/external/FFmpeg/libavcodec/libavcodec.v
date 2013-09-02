@@ -32,10 +32,10 @@ LIBAVCODEC_$MAJOR {
                 ff_vdpau_vc1_decode_picture;
                 ff_dnxhd_get_cid_table;
                 ff_dnxhd_cid_table;
-		ff_codec_type_string;
-		ff_codec_id_string;
-		ff_*golomb*code;
-		ff_*golomb*len;
-		ff_inv_zigzag_direct16;
+                ff_codec_type_string;
+                ff_codec_id_string;
+                ff_*golomb*code;
+                ff_*golomb*len;
+                ff_inv_zigzag_direct16;
         local:  *;
 };

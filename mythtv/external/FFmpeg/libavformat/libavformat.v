@@ -34,6 +34,6 @@ LIBAVFORMAT_$MAJOR {
                 get_*;
                 put_*;
                 ff_codec_get_id;
-		ff_read_frame_flush;
+                ff_read_frame_flush;
         local: *;
 };
