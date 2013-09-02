@@ -201,7 +201,6 @@ class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
     };
 };
 
-#if 0 // bug #7486
 class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
 {
   public:
@@ -215,7 +214,6 @@ class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
                 "NIT. Leave at -1 if everything works out of the box."));
     };
 };
-#endif
 
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "freqtable")
@@ -677,9 +675,7 @@ VideoSource::VideoSource()
     group->addChild(name = new Name(*this));
     group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
-#if 0 // bug #7486
     group->addChild(new DVBNetID(*this, -1, -1));
-#endif
     addChild(group);
 }
 
