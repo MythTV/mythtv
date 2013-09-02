@@ -67,6 +67,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
         delete destRB;
         return GENERIC_EXIT_NOT_OK;
     }
+    destRB->WriterSetBlocking(true);
 
     long long totalBytes = srcRB->GetRealFileSize();
     long long totalBytesCopied = 0;
