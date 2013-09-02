@@ -56,6 +56,7 @@ class MBASE_PUBLIC ThreadedFileWriter
 
     void Sync(void);
     void Flush(void);
+    bool SetBlocking(bool block = true);
 
   protected:
     void DiskLoop(void);
@@ -95,11 +96,17 @@ class MBASE_PUBLIC ThreadedFileWriter
     QWaitCondition  bufferEmpty;
     QWaitCondition  bufferHasData;
     QWaitCondition  bufferSyncWait;
+    QWaitCondition  bufferWasFreed;
 
     // constants
     static const uint kMaxBufferSize;
     /// Minimum to write to disk in a single write, when not flushing buffer.
     static const uint kMinWriteSize;
+    /// Maximum block size to write at a time
+    static const uint kMaxBlockSize;
+
+    bool m_warned;
+    bool m_blocking;
 };
 
 #endif
