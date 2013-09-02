@@ -204,7 +204,7 @@ class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
 class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
 {
   public:
-    DVBNetID(const VideoSource &parent, uint value, signed int min_val) :
+    DVBNetID(const VideoSource &parent, signed int value, signed int min_val) :
         SpinBoxSetting(this, min_val, 100000, 1),
         VideoSourceDBStorage(this, parent, "dvb_nit_id")
     {
@@ -212,6 +212,7 @@ class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
        setHelpText(QObject::tr("Set this to the actual network ID at your "
                 "location, if you have a provider that broadcasts a broken "
                 "NIT. Leave at -1 if everything works out of the box."));
+       setValue(value);
     };
 };
 
