@@ -27,7 +27,6 @@ void strings_null() {
     ThemeUI::tr("Enter your current location, nearest large town or city. In some countries postal codes are also supported.");
     ThemeUI::tr("SELECT: View");
     ThemeUI::tr("MENU: Activate Menu");
-    ThemeUI::tr("Video Gallery");
     ThemeUI::tr("Done");
     ThemeUI::tr("Save as default");
     ThemeUI::tr("Folder filter :");
