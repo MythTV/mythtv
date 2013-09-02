@@ -236,6 +236,19 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     {
         case TableID::NIT:
         {
+            if (_dvb_real_network_id >= 0 && psip.TableIDExtension() != (uint)_dvb_real_network_id)
+            {
+                NetworkInformationTable *nit = new NetworkInformationTable(psip);
+                if (!nit->Mutate())
+                {
+                    delete nit;
+                    return true;
+                }
+                bool retval = HandleTables(pid, *nit);
+                delete nit;
+                return retval;
+            }
+
             SetVersionNIT(psip.Version(), psip.LastSection());
             SetNITSectionSeen(psip.Section());
 
@@ -293,6 +306,19 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::NITo:
         {
+            if (_dvb_real_network_id >= 0 && psip.TableIDExtension() == (uint)_dvb_real_network_id)
+            {
+                NetworkInformationTable *nit = new NetworkInformationTable(psip);
+                if (!nit->Mutate())
+                {
+                    delete nit;
+                    return true;
+                }
+                bool retval = HandleTables(pid, *nit);
+                delete nit;
+                return retval;
+            }
+
             SetVersionNITo(psip.Version(), psip.LastSection());
             SetNIToSectionSeen(psip.Section());
             NetworkInformationTable nit(psip);
