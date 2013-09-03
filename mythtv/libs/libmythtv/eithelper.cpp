@@ -784,6 +784,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2017LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2018LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2026LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2036LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2041LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2042LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2043LL << 32 | 2U << 16] = EITFixUp::kFixUK;
@@ -797,6 +798,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2053LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2054LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2057LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2061LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2063LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2068LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2301LL << 32 | 2U << 16] = EITFixUp::kFixUK;
@@ -810,10 +812,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[ 2313LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2314LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2401LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2411LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2412LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2413LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2602LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     fix[ 2612LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2614LL << 32 | 2U << 16] = EITFixUp::kFixUK;
     // R.caroline
     fix[ 2315LL << 32 | 59U << 16] = EITFixUp::kFixUK;
     // UK Sky
