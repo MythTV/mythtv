@@ -99,7 +99,7 @@ public:
         {
             m_remoteFile = NULL;
             m_localFile = new QFile(filename);
-            if (!m_localFile->open(QIODevice::ReadOnly | QIODevice::Text))
+            if (!m_localFile->open(QIODevice::ReadOnly))
             {
                 delete m_localFile;
                 m_localFile = NULL;
@@ -318,31 +318,68 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     LOG(VB_VBI, LOG_INFO,
         QString("Finished reading %1 subtitle bytes (requested %2)")
         .arg(numread).arg(new_len));
+
+    // try to determine the text codec
+    QByteArray test(sub_data.rbuffer_text, sub_data.rbuffer_len);
+    QTextCodec *textCodec = QTextCodec::codecForUtfText(test, NULL);
+    if (!textCodec)
+    {
+        LOG(VB_VBI, LOG_WARNING, "Failed to autodetect a UTF encoding.");
+        QString codec = gCoreContext->GetSetting("SubtitleCodec", "");
+        if (!codec.isEmpty())
+            textCodec = QTextCodec::codecForName(codec.toLatin1());
+        if (!textCodec)
+            textCodec = QTextCodec::codecForName("utf-8");
+        if (!textCodec)
+        {
+            LOG(VB_VBI, LOG_ERR,
+                QString("Failed to find codec for subtitle file '%1'")
+                .arg(fileName));
+            return;
+        }
+    }
+
+    LOG(VB_VBI, LOG_INFO, QString("Opened subtitle file '%1' with codec '%2'")
+        .arg(fileName).arg(textCodec->name().constData()));
+
+    // load the entire subtitle file, converting to unicode as we go
+    QScopedPointer<QTextDecoder> dec(textCodec->makeDecoder());
+    QString data = dec->toUnicode(sub_data.rbuffer_text, sub_data.rbuffer_len);
+    if (data.isEmpty())
+    {
+        LOG(VB_VBI, LOG_WARNING,
+            QString("Data loaded from subtitle file '%1' is empty.")
+            .arg(fileName));
+        return;
+    }
+
+    // convert back to utf-8 for parsing
+    QByteArray ba = data.toUtf8();
+    delete[] sub_data.rbuffer_text;
+    sub_data.rbuffer_text = ba.data();
+    sub_data.rbuffer_len = ba.size();
+
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {
-        delete[] sub_data.rbuffer_text;
+        // Don't delete[] sub_data.rbuffer_text; because the
+        // QByteArray destructor will clean up.
+        LOG(VB_VBI, LOG_ERR, QString("Failed to read subtitles from '%1'")
+            .arg(fileName));
         return;
     }
 
+    LOG(VB_VBI, LOG_INFO, QString("Found %1 subtitles in file '%2'")
+        .arg(sub_data.num).arg(fileName));
     target.SetFrameBasedTiming(!sub_data.uses_time);
     target.Clear();
 
-    QTextCodec *textCodec = NULL;
-    QString codec = gCoreContext->GetSetting("SubtitleCodec", "");
-    if (!codec.isEmpty())
-        textCodec = QTextCodec::codecForName(codec.toLatin1());
-    if (!textCodec)
-        textCodec = QTextCodec::codecForName("utf-8");
-    if (!textCodec)
-    {
-        delete[] sub_data.rbuffer_text;
-        return;
-    }
+    // convert the subtitles to our own format, free the original structures
+    // and convert back to unicode
+    textCodec = QTextCodec::codecForName("utf-8");
+    if (textCodec)
+        dec.reset(textCodec->makeDecoder());
 
-    QTextDecoder *dec = textCodec->makeDecoder();
-
-    // convert the subtitles to our own format and free the original structures
     for (int sub_i = 0; sub_i < sub_data.num; ++sub_i)
     {
         const subtitle_t *sub = &loaded_subs[sub_i];
@@ -357,7 +394,11 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         for (int line = 0; line < sub->lines; ++line)
         {
             const char *subLine = sub->text[line];
-            QString str = dec->toUnicode(subLine, strlen(subLine));
+            QString str;
+            if (textCodec)
+                str = dec->toUnicode(subLine, strlen(subLine));
+            else
+                str = QString(subLine);
             newsub.textLines.push_back(str);
 
             free(sub->text[line]);
@@ -365,11 +406,11 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
         target.AddSubtitle(newsub);
     }
 
-    delete dec;
     // textCodec object is managed by Qt, do not delete...
 
     free(loaded_subs);
-    delete[] sub_data.rbuffer_text;
+    // Don't delete[] sub_data.rbuffer_text; because the QByteArray
+    // destructor will clean up.
 
     target.SetLastLoaded();
 }
