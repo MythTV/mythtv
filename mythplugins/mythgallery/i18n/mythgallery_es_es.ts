@@ -760,12 +760,12 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="113"/>
+        <location filename="../mythgallery/imageview.cpp" line="118"/>
         <source>Random Slideshow</source>
         <translation>Presentación aleatoria</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="119"/>
+        <location filename="../mythgallery/imageview.cpp" line="124"/>
         <source>Slideshow</source>
         <translation>Presentación</translation>
     </message>
@@ -925,9 +925,8 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
         <translation>MENU: Activar menú</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Video Gallery</source>
-        <translation>Galería de vídeos</translation>
+        <translation type="obsolete">Galería de vídeos</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -1020,18 +1019,18 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
         <translation>Introduzca su localidad actual o población próxima más grande. En algunos países se admite tambien los códigos postales.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Filtro de carpetas :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Type filter :</source>
         <translation>Filtro de tipos:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Sort by :</source>
         <translation>Ordenar por:</translation>
     </message>
@@ -1041,12 +1040,12 @@ Compruebe que el directorio exista, sea legible y la configuración de MythGalle
         <translation>Marcar filtro</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Done</source>
         <translation>Hecho</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Save as default</source>
         <translation>Guardar como predeterminado</translation>
     </message>
