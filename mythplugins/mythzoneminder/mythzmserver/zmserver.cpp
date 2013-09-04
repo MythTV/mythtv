@@ -368,7 +368,7 @@ bool ZMServer::send(const string &s) const
     // send length
     size_t len = s.size();
     char buf[9];
-    sprintf(buf, "%8u", len);
+    sprintf(buf, "%8u", (unsigned int) len);
     int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;
@@ -386,7 +386,7 @@ bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) c
     // send length
     size_t len = s.size();
     char buf[9];
-    sprintf(buf, "%8u", len);
+    sprintf(buf, "%8u", (unsigned int) len);
     int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;
