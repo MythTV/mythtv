@@ -205,7 +205,7 @@ class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
 {
   public:
     DVBNetID(const VideoSource &parent, signed int value, signed int min_val) :
-        SpinBoxSetting(this, min_val, 100000, 1),
+        SpinBoxSetting(this, min_val, 0xffff, 1),
         VideoSourceDBStorage(this, parent, "dvb_nit_id")
     {
        setLabel(QObject::tr("Network ID"));
