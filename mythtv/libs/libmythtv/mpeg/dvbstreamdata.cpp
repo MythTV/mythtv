@@ -21,7 +21,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
                              int desired_program, int cardnum, bool cacheTables)
     : MPEGStreamData(desired_program, cardnum, cacheTables),
       _desired_netid(desired_netid), _desired_tsid(desired_tsid),
-      _dvb_eit_dishnet_long(false), _dvb_real_network_id(-1),
+      _dvb_real_network_id(-1), _dvb_eit_dishnet_long(false),
       _nit_version(-2), _nito_version(-2)
 {
     SetVersionNIT(-1,0);
