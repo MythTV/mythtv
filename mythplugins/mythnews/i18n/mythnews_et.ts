@@ -27,58 +27,55 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="453"/>
+        <location filename="../mythnews/mythnews.cpp" line="393"/>
         <source>Updated</source>
         <translation>Uuendatud</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="460"/>
+        <location filename="../mythnews/mythnews.cpp" line="400"/>
         <source>Unknown</source>
         <translation>Tundmatu</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="123"/>
+        <location filename="../mythnews/mythnews.cpp" line="121"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
         <translation>Uudiste lugeja on konfigureerimata.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="471"/>
-        <location filename="../mythnews/mythnews.cpp" line="730"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation>%1 %2-st (%3 protsenti)</translation>
+        <translation type="obsolete">%1 %2-st (%3 protsenti)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="703"/>
         <source>Downloading media...</source>
-        <translation>Laen alla...</translation>
+        <translation type="obsolete">Laen alla...</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Veebilehitseja käsku pole! MythNews vajab MythBrowser-it.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="900"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Manage Feeds</source>
         <translation>Halda uudisvooge</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="688"/>
         <source>Add Feed</source>
         <translation>Lisa voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="904"/>
+        <location filename="../mythnews/mythnews.cpp" line="691"/>
         <source>Edit Feed</source>
         <translation>Muuda voogu</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="905"/>
+        <location filename="../mythnews/mythnews.cpp" line="692"/>
         <source>Delete Feed</source>
         <translation>Kustuta voog</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="887"/>
+        <location filename="../mythnews/mythnews.cpp" line="674"/>
         <source>Options</source>
         <translation>Valikud</translation>
     </message>
@@ -250,36 +247,66 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
+        <source>You Haven&apos;t Specified Any News Feeds.</source>
+        <translation>Ühtegi uudisvoogu pole sisestatud.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Edit News</source>
+        <translation>Muuda uudiseid</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>News Config</source>
+        <translation>Uudiste seaded</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Available Categories</source>
+        <translation>Võimalikud kategooriad</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Available Sites</source>
+        <translation>Võimalikud allikad</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="29"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
         <translation>Veebileht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Edit RSS News Feed</source>
         <translation>Muuda RSS uudisvoogusid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Contexts</source>
         <translation>Kontekst</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Actions</source>
         <translation>Tegevused</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
         <translation>Uudisvood</translation>
     </message>
