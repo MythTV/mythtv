@@ -14108,51 +14108,51 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Setzen Sie einen positiven Wert, wenn dies ein präferierter Sender sein soll, oder einen Negativen, falls nicht.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1038"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1041"/>
         <source>Track</source>
         <translation>Spur</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1041"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1044"/>
         <source>Audio track</source>
         <translation>Tonspur</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1043"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1046"/>
         <source>Video track</source>
         <translation>Videospur</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1045"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1048"/>
         <source>Subtitle track</source>
         <translation>Untertitelspur</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1047"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1050"/>
         <source>CC</source>
         <comment>EIA-608 closed captions</comment>
         <translation>CC</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1049"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1052"/>
         <source>ATSC CC</source>
         <comment>EIA-708 closed captions</comment>
         <translation>ATSC CC</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1051"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1054"/>
         <source>TT CC</source>
         <comment>Teletext closed captions</comment>
         <translation>TT CC</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1053"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1056"/>
         <source>TT Menu</source>
         <comment>Teletext Menu</comment>
         <translation>TT-Menü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1055"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1058"/>
         <source>Text</source>
         <comment>Text stream</comment>
         <translation>Textspur</translation>
@@ -17178,7 +17178,7 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>UNBEKANNT</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/decoderbase.cpp" line="1057"/>
+        <location filename="../libs/libmythtv/decoderbase.cpp" line="1060"/>
         <source>TXT File</source>
         <comment>Text File</comment>
         <translation>Textdatei</translation>
@@ -23731,7 +23731,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="525"/>
         <source>Channels :</source>
-        <translation>Sender :</translation>
+        <translation>Kanäle :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="526"/>
