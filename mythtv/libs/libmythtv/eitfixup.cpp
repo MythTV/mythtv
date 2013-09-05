@@ -775,10 +775,12 @@ void EITFixUp::FixUK(DBEventEIT &event) const
         {
             event.partnumber = tmpExp1.cap(1).toUInt();
             event.parttotal  = tmpExp1.cap(2).toUInt();
-#if 0       // Remove from the description
-            event.description = event.description.left(position1) +
-                event.description.mid(position1+tmpExp1.cap(0).length());
-#endif
+            // Remove from the start of the description.
+            // Otherwise it ends up in the subtitle.
+            if (position1 == 0) {
+                event.description = event.description.left(position1) +
+                    event.description.mid(position1+tmpExp1.cap(0).length());
+            }
             series = true;
         }
     }
