@@ -1204,6 +1204,16 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Generelle innstillinger for værtillegg</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="62"/>
+        <source>Screen setup</source>
+        <translation>Skjermbildeoppsett</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="64"/>
+        <source>Source setup</source>
+        <translation>Kildeoppsett</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="67"/>
         <source>Global Weather Settings</source>
         <oldsource>General Mythweather options</oldsource>
