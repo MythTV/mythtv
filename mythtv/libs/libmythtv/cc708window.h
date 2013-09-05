@@ -219,7 +219,7 @@ class MTV_PUBLIC CC708Window
     }
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
-
+    void DisposeStrings(vector<CC708String*> &strings) const;
     QColor GetFillColor(void) const
     {
         QColor fill = CC708CharacterAttribute::ConvertToQColor(fill_color);

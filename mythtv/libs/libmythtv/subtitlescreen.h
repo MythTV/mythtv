@@ -20,12 +20,151 @@ extern "C" {
 #include "mythscreentype.h"
 #include "subtitlereader.h"
 #include "mythplayer.h"
+#include "mythuishape.h"
+#include "mythuisimpletext.h"
+#include "mythuiimage.h"
+
+class SubtitleScreen;
+
+class FormattedTextChunk
+{
+public:
+    FormattedTextChunk(const QString &t, CC708CharacterAttribute formatting,
+                       SubtitleScreen *p)
+        : text(t), m_format(formatting), parent(p), textFont(NULL) {}
+    FormattedTextChunk(void) : parent(NULL) {}
+
+    QSize CalcSize(float layoutSpacing = 0.0f) const;
+    void CalcPadding(bool isFirst, bool isLast, int &left, int &right) const;
+    bool Split(FormattedTextChunk &newChunk);
+    QString ToLogString(void) const;
+    bool PreRender(bool isFirst, bool isLast, int &x, int y, int height);
+
+    QString text;
+    CC708CharacterAttribute m_format; // const
+    const SubtitleScreen *parent; // where fonts and sizes are kept
+
+    // The following are calculated by PreRender().
+    QString bgShapeName;
+    QRect bgShapeRect;
+    MythFontProperties *textFont;
+    QString textName;
+    QRect textRect;
+};
+
+class FormattedTextLine
+{
+public:
+    FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
+        : x_indent(x), y_indent(y), orig_x(o_x), orig_y(o_y) {}
+
+    QSize CalcSize(float layoutSpacing = 0.0f) const;
+
+    QList<FormattedTextChunk> chunks;
+    int x_indent; // -1 means TBD i.e. centered
+    int y_indent; // -1 means TBD i.e. relative to bottom
+    int orig_x, orig_y; // original, unscaled coordinates
+};
+
+class FormattedTextSubtitle
+{
+protected:
+    FormattedTextSubtitle(const QString &base, const QRect &safearea,
+                          uint64_t start, uint64_t duration,
+                          SubtitleScreen *p);
+    FormattedTextSubtitle(void);
+public:
+    virtual ~FormattedTextSubtitle() {}
+    // These are the steps that can be done outside of the UI thread
+    // and the decoder thread.
+    virtual void WrapLongLines(void) {}
+    virtual void Layout(void);
+    virtual void PreRender(void);
+    // This is the step that can only be done in the UI thread.
+    virtual void Draw(void);
+    virtual int CacheNum(void) const { return -1; }
+    QStringList ToSRT(void) const;
+
+protected:
+    QString m_base;
+    QVector<FormattedTextLine> m_lines;
+    const QRect m_safeArea;
+    int m_cacheNum;
+    uint64_t m_start;
+    uint64_t m_duration;
+    SubtitleScreen *m_subScreen; // where fonts and sizes are kept
+    int m_xAnchorPoint; // 0=left, 1=center, 2=right
+    int m_yAnchorPoint; // 0=top,  1=center, 2=bottom
+    int m_xAnchor; // pixels from left
+    int m_yAnchor; // pixels from top
+    QRect m_bounds;
+};
+
+class FormattedTextSubtitleSRT : public FormattedTextSubtitle
+{
+public:
+    FormattedTextSubtitleSRT(const QString &base,
+                             const QRect &safearea,
+                             uint64_t start,
+                             uint64_t duration,
+                             SubtitleScreen *p,
+                             const QStringList &subs) :
+        FormattedTextSubtitle(base, safearea, start, duration, p)
+    {
+        Init(subs);
+    }
+    virtual void WrapLongLines(void);
+private:
+    void Init(const QStringList &subs);
+};
+
+class FormattedTextSubtitle608 : public FormattedTextSubtitle
+{
+public:
+    FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
+                             const QString &base = "",
+                             const QRect &safearea = QRect(),
+                             SubtitleScreen *p = NULL) :
+        FormattedTextSubtitle(base, safearea, 0, 0, p)
+    {
+        Init(buffers);
+    }
+    virtual void Layout(void);
+private:
+    void Init(const vector<CC608Text*> &buffers);
+};
+
+class FormattedTextSubtitle708 : public FormattedTextSubtitle
+{
+public:
+    FormattedTextSubtitle708(const CC708Window &win,
+                             int num,
+                             const vector<CC708String*> &list,
+                             const QString &base = "",
+                             const QRect &safearea = QRect(),
+                             SubtitleScreen *p = NULL,
+                             float aspect = 1.77777f) :
+        FormattedTextSubtitle(base, safearea, 0, 0, p),
+        m_num(num),
+        m_bgFillAlpha(win.GetFillAlpha()),
+        m_bgFillColor(win.GetFillColor())
+    {
+        Init(win, list, aspect);
+    }
+    virtual void Draw(void);
+    virtual int CacheNum(void) const { return m_num; }
+private:
+    void Init(const CC708Window &win,
+              const vector<CC708String*> &list,
+              float aspect);
+    int m_num;
+    uint m_bgFillAlpha;
+    QColor m_bgFillColor;
+};
 
 class SubtitleScreen : public MythScreenType
 {
-    friend class FormattedTextSubtitle;
-
-  public:
+public:
     SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
     virtual ~SubtitleScreen();
 
@@ -36,7 +175,6 @@ class SubtitleScreen : public MythScreenType
     void ClearAllSubtitles(void);
     void ClearNonDisplayedSubtitles(void);
     void ClearDisplayedSubtitles(void);
-    void ExpireSubtitles(void);
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos);
 
     void SetZoom(int percent);
@@ -44,15 +182,20 @@ class SubtitleScreen : public MythScreenType
     void SetDelay(int ms);
     int GetDelay(void) const;
 
+    class SubtitleFormat *GetSubtitleFormat(void) { return m_format; }
+    void Clear708Cache(uint64_t mask);
+    void SetElementAdded(void);
+    void SetElementResized(void);
+    void SetElementDeleted(void);
+
     QSize CalcTextSize(const QString &text,
                        const CC708CharacterAttribute &format,
                        float layoutSpacing) const;
-    int CalcPadding(const CC708CharacterAttribute &format, bool isLeft) const;
-
-    void RegisterExpiration(MythUIType *shape, long long endTime)
-    {
-        m_expireTimes.insert(shape, endTime);
-    }
+    void CalcPadding(const CC708CharacterAttribute &format,
+                     bool isFirst, bool isLast,
+                     int &left, int &right) const;
+    MythFontProperties* GetFont(const CC708CharacterAttribute &attr) const;
+    void SetFontSize(int pixelSize) { m_fontSize = pixelSize; }
 
     // Temporary method until teletextscreen.cpp is refactored into
     // subtitlescreen.cpp
@@ -62,10 +205,7 @@ class SubtitleScreen : public MythScreenType
     virtual bool Create(void);
     virtual void Pulse(void);
 
-  private:
-    void SetElementAdded(void);
-    void SetElementResized(void);
-    void SetElementDeleted(void);
+private:
     void ResetElementState(void);
     void OptimiseDisplayedArea(void);
     void DisplayAVSubtitles(void);
@@ -75,15 +215,12 @@ class SubtitleScreen : public MythScreenType
                                   long long displayuntil, long long late);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);
-    void DrawTextSubtitles(QStringList &wrappedsubs, uint64_t start,
+    void DrawTextSubtitles(const QStringList &subs, uint64_t start,
                            uint64_t duration);
     void DisplayCC608Subtitles(void);
     void DisplayCC708Subtitles(void);
     void AddScaledImage(QImage &img, QRect &pos);
-    void Clear708Cache(int num);
     void InitializeFonts(bool wasResized);
-    MythFontProperties* GetFont(const CC708CharacterAttribute &attr) const;
-    void SetFontSize(int pixelSize) { m_fontSize = pixelSize; }
 
     MythPlayer        *m_player;
     SubtitleReader    *m_subreader;
@@ -92,8 +229,6 @@ class SubtitleScreen : public MythScreenType
     QRect              m_safeArea;
     QRegExp            m_removeHTML;
     int                m_subtitleType;
-    QHash<MythUIType*, long long> m_expireTimes;
-    QHash<MythUIType*, MythImage*> m_avsubCache;
     int                m_fontSize;
     int                m_textFontZoom; // valid for 708 & text subs
     int                m_textFontZoomPrev;
@@ -101,9 +236,10 @@ class SubtitleScreen : public MythScreenType
     int                m_textFontDelayMsPrev;
     bool               m_refreshModified;
     bool               m_refreshDeleted;
-    QHash<int,QList<MythUIType*> > m_708imageCache;
     int                m_fontStretch;
     QString            m_family; // 608, 708, text, teletext
+    // Subtitles initialized but still to be processed and drawn
+    QList<FormattedTextSubtitle *> m_qInited;
     class SubtitleFormat *m_format;
 
 #ifdef USING_LIBASS
@@ -122,107 +258,6 @@ class SubtitleScreen : public MythScreenType
     ASS_Track         *m_assTrack;
     uint               m_assFontCount;
 #endif // USING_LIBASS
-};
-
-class FormattedTextChunk
-{
-  public:
-    FormattedTextChunk(const QString &t, CC708CharacterAttribute formatting,
-                       SubtitleScreen *p)
-        : text(t), format(formatting), parent(p)
-    {
-    }
-    FormattedTextChunk(void) : parent(NULL) {}
-
-    QSize CalcSize(float layoutSpacing = 0.0f) const
-    {
-        return parent->CalcTextSize(text, format, layoutSpacing);
-    }
-    int CalcPadding(bool isLeft) const
-    {
-        return parent->CalcPadding(format, isLeft);
-    }
-    bool Split(FormattedTextChunk &newChunk);
-    QString ToLogString(void) const;
-
-    QString text;
-    CC708CharacterAttribute format;
-    SubtitleScreen *parent; // where fonts and sizes are kept
-};
-
-class FormattedTextLine
-{
-  public:
-    FormattedTextLine(int x = -1, int y = -1, int o_x = -1, int o_y = -1)
-        : x_indent(x), y_indent(y), orig_x(o_x), orig_y(o_y) {}
-
-    QSize CalcSize(float layoutSpacing = 0.0f) const
-    {
-        int height = 0, width = 0;
-        int leftPadding = 0, rightPadding = 0;
-        QList<FormattedTextChunk>::const_iterator it;
-        for (it = chunks.constBegin(); it != chunks.constEnd(); ++it)
-        {
-            QSize tmp = (*it).CalcSize(layoutSpacing);
-            height = max(height, tmp.height());
-            width += tmp.width();
-            leftPadding = (*it).CalcPadding(true);
-            rightPadding = (*it).CalcPadding(false);
-            if (it == chunks.constBegin())
-                width += leftPadding;
-        }
-        return QSize(width + rightPadding, height);
-    }
-
-    QList<FormattedTextChunk> chunks;
-    int x_indent; // -1 means TBD i.e. centered
-    int y_indent; // -1 means TBD i.e. relative to bottom
-    int orig_x, orig_y; // original, unscaled coordinates
-};
-
-class FormattedTextSubtitle
-{
-  public:
-    FormattedTextSubtitle(const QRect &safearea, SubtitleScreen *p)
-        : m_safeArea(safearea), parent(p)
-    {
-        // make cppcheck happy
-        m_xAnchorPoint = 0;
-        m_yAnchorPoint = 0;
-        m_xAnchor = 0;
-        m_yAnchor = 0;
-    }
-    FormattedTextSubtitle(void)
-        : m_safeArea(QRect()), parent(NULL)
-    {
-        // make cppcheck happy
-        m_xAnchorPoint = 0;
-        m_yAnchorPoint = 0;
-        m_xAnchor = 0;
-        m_yAnchor = 0;
-    }
-    void InitFromCC608(vector<CC608Text*> &buffers, int textFontZoom = 100);
-    void InitFromCC708(const CC708Window &win, int num,
-                       const vector<CC708String*> &list,
-                       float aspect = 1.77777f,
-                       int textFontZoom = 100);
-    void InitFromSRT(QStringList &subs, int textFontZoom);
-    void WrapLongLines(void);
-    void Layout(void);
-    void Layout608(void);
-    bool Draw(const QString &base, QList<MythUIType*> *imageCache = NULL,
-              uint64_t start = 0, uint64_t duration = 0) const;
-    QStringList ToSRT(void) const;
-    QRect m_bounds;
-
-  private:
-    QVector<FormattedTextLine> m_lines;
-    const QRect m_safeArea;
-    SubtitleScreen *parent; // where fonts and sizes are kept
-    int m_xAnchorPoint; // 0=left, 1=center, 2=right
-    int m_yAnchorPoint; // 0=top,  1=center, 2=bottom
-    int m_xAnchor; // pixels from left
-    int m_yAnchor; // pixels from top
 };
 
 #endif // SUBTITLESCREEN_H

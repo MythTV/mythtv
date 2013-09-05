@@ -323,8 +323,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
                 continue;
             }
 
-            FormattedTextSubtitle fsub;
-            fsub.InitFromCC608(textlist->buffers);
+            FormattedTextSubtitle608 fsub(textlist->buffers);
             QStringList content = fsub.ToSRT();
 
             textlist->lock.unlock();
@@ -412,13 +411,12 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                 {
                     vector<CC708String*> strings;
                     if (win.GetVisible())
-                        strings = win.GetStrings();
-                    Ingest708Caption(it.key(), serviceIdx, windowIdx,
-                                     win.pen.row, win.pen.column, win, strings);
-                    while (!strings.empty())
                     {
-                        delete strings.back();
-                        strings.pop_back();
+                        strings = win.GetStrings();
+                        Ingest708Caption(it.key(), serviceIdx, windowIdx,
+                                         win.pen.row, win.pen.column,
+                                         win, strings);
+                        win.DisposeStrings(strings);
                     }
                     service->windows[windowIdx].ResetChanged();
                 }
@@ -433,8 +431,7 @@ void MythCCExtractorPlayer::Ingest708Caption(
     const CC708Window &win,
     const vector<CC708String*> &content)
 {
-    FormattedTextSubtitle fsub;
-    fsub.InitFromCC708(win, windowIdx, content);
+    FormattedTextSubtitle708 fsub(win, windowIdx, content);
     QStringList winContent = fsub.ToSRT();
 
     QMap<int, Window> &cc708win = m_cc708_windows[streamId][serviceIdx];
