@@ -2,6 +2,18 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="nb_NO">
 <context>
+    <name>(MythGalleryMain)</name>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="54"/>
+        <source>MythGallery cannot find its start directory.
+%1
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation>MythGallery kan ikke finne oppstartsmappen.
+%1
+Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</translation>
+    </message>
+</context>
+<context>
     <name>GLSingleView</name>
     <message>
         <location filename="../mythgallery/glsingleview.cpp" line="243"/>
@@ -748,12 +760,12 @@
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="113"/>
+        <location filename="../mythgallery/imageview.cpp" line="118"/>
         <source>Random Slideshow</source>
         <translation>Tilfeldig lysbildefremvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="119"/>
+        <location filename="../mythgallery/imageview.cpp" line="124"/>
         <source>Slideshow</source>
         <translation>Lysbildefremvisning</translation>
     </message>
@@ -761,113 +773,113 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythgallery/main.cpp" line="88"/>
+        <location filename="../mythgallery/main.cpp" line="89"/>
         <source>Image viewer / slideshow</source>
         <translation>Billedviser / lysbilder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="93"/>
+        <location filename="../mythgallery/main.cpp" line="94"/>
         <source>Start/Stop Slideshow</source>
         <translation>Start/stopp lysbildevisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="95"/>
+        <location filename="../mythgallery/main.cpp" line="96"/>
         <source>Go to the first image in thumbnail view</source>
         <translation>G√• til f√∏rste bilde i forh√•ndsvisninger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="97"/>
+        <location filename="../mythgallery/main.cpp" line="98"/>
         <source>Go to the last image in thumbnail view</source>
         <translation>G√• til siste bilde i forh√•ndsvisninger</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="99"/>
+        <location filename="../mythgallery/main.cpp" line="100"/>
         <source>Start Slideshow in thumbnail view</source>
         <translation>Start lysbilder i skjermbilde for forh√•ndsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="90"/>
-        <location filename="../mythgallery/main.cpp" line="101"/>
+        <location filename="../mythgallery/main.cpp" line="91"/>
+        <location filename="../mythgallery/main.cpp" line="102"/>
         <source>Start Random Slideshow in thumbnail view</source>
         <translation>Start tilfeldig lysbildevisning i skjermbilde for forh√•ndsvisning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="104"/>
+        <location filename="../mythgallery/main.cpp" line="105"/>
         <source>Rotate image right 90 degrees</source>
         <translation>Roter bilde 90 grader til h√∏yre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="106"/>
+        <location filename="../mythgallery/main.cpp" line="107"/>
         <source>Rotate image left 90 degrees</source>
         <translation>Roter bilde 90 grader til venstre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="108"/>
+        <location filename="../mythgallery/main.cpp" line="109"/>
         <source>Zoom image out</source>
         <translation>Zoom bilde ut</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="110"/>
+        <location filename="../mythgallery/main.cpp" line="111"/>
         <source>Zoom image in</source>
         <translation>Zoom bilde inn</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="112"/>
+        <location filename="../mythgallery/main.cpp" line="113"/>
         <source>Scroll image up</source>
         <translation>Zoom bilde opp</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="114"/>
+        <location filename="../mythgallery/main.cpp" line="115"/>
         <source>Scroll image left</source>
         <translation>Zoom bilde til venstre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="116"/>
+        <location filename="../mythgallery/main.cpp" line="117"/>
         <source>Scroll image right</source>
         <translation>Zoom bilde til h√∏yre</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="118"/>
+        <location filename="../mythgallery/main.cpp" line="119"/>
         <source>Scroll image down</source>
         <translation>Zoom bilde ned</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="120"/>
+        <location filename="../mythgallery/main.cpp" line="121"/>
         <source>Recenter image</source>
         <translation>Resentrer bilde</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="122"/>
+        <location filename="../mythgallery/main.cpp" line="123"/>
         <source>Full-size (un-zoom) image</source>
         <translation>Bilde i full st√∏rrelse</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="124"/>
+        <location filename="../mythgallery/main.cpp" line="125"/>
         <source>Go to the upper-left corner of the image</source>
         <translation>G√• til √∏verste venstre hj√∏rne av bildet</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="126"/>
+        <location filename="../mythgallery/main.cpp" line="127"/>
         <source>Go to the lower-right corner of the image</source>
         <translation>G√• til nederste h√∏yre hj√∏rne av bildet</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="128"/>
+        <location filename="../mythgallery/main.cpp" line="129"/>
         <source>Mark image</source>
         <translation>Marker bilde</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="130"/>
+        <location filename="../mythgallery/main.cpp" line="131"/>
         <source>Toggle scale to fullscreen/scale to fit</source>
         <translation>Velg mellom skalering til fullskjerm/skalering for √• passe</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="132"/>
+        <location filename="../mythgallery/main.cpp" line="133"/>
         <source>MythGallery Media Handler 1/2</source>
         <translation>MythGallery medieh√•ndterer 1/2</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="143"/>
+        <location filename="../mythgallery/main.cpp" line="144"/>
         <source>MythGallery Media Handler 2/2</source>
         <translation>MythGallery medieh√•ndterer 2/2</translation>
     </message>
@@ -999,11 +1011,10 @@
         <translation type="obsolete">MythGallery instillinger (Generelle)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="53"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation>MythGallery kan ikke finne oppstartsmappen.
+        <translation type="obsolete">MythGallery kan ikke finne oppstartsmappen.
 %1
 Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</translation>
     </message>
@@ -1177,9 +1188,8 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
         <source>Video Gallery</source>
-        <translation>Videogalleri</translation>
+        <translation type="obsolete">Videogalleri</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -1232,18 +1242,18 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
         <translation>Lagre som standard</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Mappefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Type filter :</source>
         <translation>Typefilter:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Sort by :</source>
         <translation>Sorter etter:</translation>
     </message>
