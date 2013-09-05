@@ -423,6 +423,11 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
         QString artist, genre, episode;
         while (query.next())
         {
+            // Exclude iso images as they aren't supported
+            QString filename = query.value(4).toString();
+            if (filename.endsWith(".iso") || filename.endsWith(".ISO"))
+                continue;
+
             VideoInfo *info = new VideoInfo;
 
             info->id = query.value(0).toInt();
