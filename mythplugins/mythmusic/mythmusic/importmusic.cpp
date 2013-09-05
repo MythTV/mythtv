@@ -34,6 +34,12 @@ static bool copyFile(const QString &src, const QString &dst)
 {
     const int bufferSize = 16*1024;
 
+    if (src == dst)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "copyFile: Cannot copy a file to itself");
+        return false;
+    }
+
     QFile s(src);
     QFile d(dst);
     char buffer[bufferSize];
@@ -508,6 +514,21 @@ void ImportMusicDialog::nextNewPressed()
 
 void ImportMusicDialog::startScan()
 {
+    // sanity check - make sure the user isn't trying to import tracks from the music directory
+    QString location = m_locationEdit->GetText();
+    if (!location.endsWith('/'))
+        location.append('/');
+
+    if (location.startsWith(getMusicDirectory()))
+    {
+        ShowOkPopup("Cannot import music from the music directory. "
+                    "You probably want to use 'Scan For New Music' instead.");
+        m_tracks->clear();
+        m_sourceFiles.clear();
+        fillWidgets();
+        return;
+    }
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythUIBusyDialog *busy = 
             new MythUIBusyDialog(tr("Searching for music files"),
