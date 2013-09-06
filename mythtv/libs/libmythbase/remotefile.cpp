@@ -407,9 +407,25 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
 {
     if (isLocal(url))
     {
+       LOG(VB_FILE, LOG_INFO,
+           QString("RemoteFile::Exists(): looking for local file: %1").arg(url));
+
         QFileInfo info(url);
+        if (info.exists())
+        {
+            if (stat(url.toLocal8Bit().constData(), fileinfo) == -1)
+            {
+                LOG(VB_FILE, LOG_ERR,
+                    QString("RemoteFile::Exists(): failed to stat file: %1").arg(url) + ENO);
+            }
+        }
+
         return info.exists() && info.isFile();
     }
+
+    LOG(VB_FILE, LOG_INFO,
+        QString("RemoteFile::Exists(): looking for remote file: %1").arg(url));
+
     QUrl qurl(url);
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
