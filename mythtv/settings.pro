@@ -1,6 +1,4 @@
-!win32-msvc* {
-  include ( config.mak )
-} else {
+win32-msvc* {
 
   SRC_PATH_BARE = $$(SRC_PATH_BARE)
 
@@ -8,13 +6,20 @@
     SRC_PATH_BARE = $${PWD}
   }
 
+  CONFIG -= debug_and_release
+  CONFIG -= debug_and_release_target
   CONFIG -= flat
+
   CONFIG *= using_backend using_frontend
   CONFIG *= using_opengl
+  CONFIG *= using_hdhomerun
 
   CONFIG_LIBMPEG2EXTERNAL = yes
   CONFIG_QTDBUS = no
 
+} else {
+
+  include ( config.mak )
 }
 
 CONFIG += $$CCONFIG
@@ -94,8 +99,8 @@ win32 {
         DEFINES += __STDC_FORMAT_MACROS
         DEFINES += __STDC_LIMIT_MACROS
 
-        Debug  :DEFINES += _DEBUG
-        Release:DEFINES += NDEBUG
+        debug  :DEFINES += _DEBUG
+        release:DEFINES += NDEBUG
 
         # msvc specific include path
 
@@ -117,23 +122,37 @@ win32 {
 
         # have visual studio place all DLL, EXE & lib files in the following directory
 
-        Release:DESTDIR         = $$SRC_PATH_BARE/bin/release
-        Release:LIBS           += -L$$SRC_PATH_BARE/bin/release
-        Release:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/release
-        Release:MOC_DIR         = release/moc
-        Release:QMAKE_CXXFLAGS  = /MD /MP /wd4100 /wd4996
+        CONFIG( debug, debug|release) {
 
+            # debug
 
-        Debug:DESTDIR         = $$SRC_PATH_BARE/bin/debug
-        Debug:LIBS           += -L$$SRC_PATH_BARE/bin/debug
-        Debug:QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/debug
-        Debug:MOC_DIR         = debug/moc
-        Debug:QMAKE_CXXFLAGS  = /MDd /MP /wd4100 /wd4996
+            DESTDIR         = $$SRC_PATH_BARE/bin/debug
+            QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/debug
+            MOC_DIR         = debug/moc
 
-        EXTRA_LIBS += -llibzmq
+            QMAKE_CXXFLAGS  = /MDd /MP /wd4100 /wd4996
+
+            LIBS           += -L$$SRC_PATH_BARE/bin/debug
+            EXTRA_LIBS     += -lpthreadVC2d -llibzmq -L$$SRC_PATH_BARE/bin/debug
+
+        } else {
+
+            # release
+
+            DESTDIR         = $$SRC_PATH_BARE/bin/release
+            QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/release
+            MOC_DIR         = release/moc
+
+            QMAKE_CXXFLAGS  = /MD /MP /wd4100 /wd4996
+
+            LIBS           += -L$$SRC_PATH_BARE/bin/release
+            EXTRA_LIBS     += -lpthreadVC2 -llibzmq -L$$SRC_PATH_BARE/bin/release
+
+        }
+
         EXTRA_LIBS += -lmythnzmqt
         EXTRA_LIBS += -lmythqjson
-        EXTRA_LIBS += -lpthreadVC2
+
 
     }
 

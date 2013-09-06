@@ -139,7 +139,8 @@ mingw:LIBS += -lws2_32
 win32-msvc* {
 
     LIBS += -lws2_32
-    EXTRA_LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+    EXTRA_LIBS += -lzlib
+    DEFINES += NOLOGSERVER
 
     # we need to make sure version.h is generated.
 

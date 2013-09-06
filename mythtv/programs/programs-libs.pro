@@ -57,10 +57,10 @@ mingw {
     POST_TARGETDEPS += ../../libs/libmythbase/libmythbase-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythservicecontracts/libmythservicecontracts-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
-}
 
-using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+    using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+    using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio
 DEPENDPATH += ../../libs/libmythtv

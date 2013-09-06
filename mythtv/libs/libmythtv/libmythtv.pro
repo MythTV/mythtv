@@ -786,7 +786,7 @@ mingw | win32-msvc* {
 }
 
 win32-msvc* {
-  LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+  LIBS += -lzlib
   QMAKE_CXXFLAGS += "/FI compat.h"
 }
 
@@ -822,10 +822,11 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
     POST_TARGETDEPS += ../../external/FFmpeg/libavformat/$$avLibName(avformat)
     POST_TARGETDEPS += ../../external/FFmpeg/libswscale/$$avLibName(swscale)
+
+    using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+    using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+    using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 }
-using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 include ( ../libs-targetfix.pro )
 

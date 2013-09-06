@@ -1,6 +1,6 @@
 Param(
     [Parameter( Mandatory=$false, ValueFromPipeline=$true )]
-    [ValidateSet( "debug", "release" )]
+    [ValidateSet( "clean", "debug", "release" )]
     [String]
     $BuildType = "debug",
 
@@ -37,7 +37,7 @@ Function Which( [string] $path )
 
 Function Run-Exe( [string] $path, [string] $exe, $params )
 {
-    Write-Host "Launching: $path$exe $params" -foregroundcolor blue
+    Write-Host "Launching: $path $exe $params" -foregroundcolor blue
 
     $ps = new-object System.Diagnostics.Process
 
@@ -91,7 +91,7 @@ Write-Host "--------------------------------------------------------------------
 Write-Host "Performing Environmental Checks" -foregroundcolor green
 Write-Host "--------------------------------------------------------------------------"  -foregroundcolor green
 
-if (-not (Test-Path $DestDir ))
+if ((-not (Test-Path $DestDir )) -and ($BuildType -ne "clean" ))
 {
     New-Item $DestDir -itemType directory
 }
@@ -115,6 +115,19 @@ Write-Host "Output Type: [$OutputType]" -ForegroundColor Cyan
 
 Write-Host
 
+switch( $BuildType )
+{
+    debug
+    {
+        $pThreadName = "pthreadVC2d.lib"
+    }
+
+    default
+    {
+        $pThreadName = "pthreadVC2.lib"
+    }
+}
+
 # ---------------------------------------------------------------------------
 
 
@@ -126,7 +139,7 @@ $tools = @{ "nmake"             = "Path";
             "yasm"              = "Path";    # FFmpeg
             "c99conv"           = "Path";    # FFmpeg
             "c99wrap"           = "Path";    # FFmpeg
-            "pthreadVC2.lib"    = "Build";
+            $pThreadName        = "Build";
             "zlib.lib"          = "Build";
             "mp3lame.lib"       = "Build";
             "tag.lib"           = "Build";
@@ -174,6 +187,8 @@ foreach( $key in $($tools.keys))
         {
             if ($BuildType -eq "clean")
             {
+                $Tools[ $Key ] = "Clean"
+
                 Write-Host "Clean" -ForegroundColor Yellow
             }
             else
@@ -233,94 +248,184 @@ Write-Host
 Write-Host "Building MSVC External dependencies"                                         -ForegroundColor green
 Write-Host "--------------------------------------------------------------------------"  -ForegroundColor green
 
-if ($tools.Get_Item( "mp3lame.lib") -eq "Build")
+switch ($tools.Get_Item( "mp3lame.lib"))
 {
-    Write-Host "Building: mp3lame.lib" -foregroundcolor cyan
-
-    if (!(Test-Path $basePath\platform\win32\msvc\external\lame\output\libmp3lame-static.lib))
+    Clean
     {
-
-        Copy-Item $basePath\platform\win32\msvc\external\lame\configMS.h `
-                  $basePath\platform\win32\msvc\external\lame\config.h
+        Write-Host "Clean: mp3lame.lib" -foregroundcolor cyan
 
         Run-Exe "$basePath\platform\win32\msvc\external\lame\" `
                 "nmake.exe"                          `
                 @( "-f Makefile.MSVC",
-                   "comp=msvc",
-                   "asm=no",
-                   "libmp3lame-static.lib" )
+                   "clean" )
+
+        Remove-Item $basePath\bin\debug\mp3lame.lib                     -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\mp3lame.lib                   -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\platform\win32\msvc\external\lame\lame.h  -ErrorAction SilentlyContinue
     }
 
-    # -- Copy lib to shared folder
+    Build
+    {
+        Write-Host "Building: mp3lame.lib" -foregroundcolor cyan
 
-    Copy-Item $basePath\platform\win32\msvc\external\lame\output\libmp3lame-static.lib `
-              $DestDir\mp3lame.lib
+        if (!(Test-Path $basePath\platform\win32\msvc\external\lame\output\libmp3lame-static.lib))
+        {
 
-    # Due to way it's included in source, lame.h must be in main lame directory, so copy it there.
+            Copy-Item $basePath\platform\win32\msvc\external\lame\configMS.h `
+                      $basePath\platform\win32\msvc\external\lame\config.h
 
-    Copy-Item $basePath\platform\win32\msvc\external\lame\include\lame.h `
-              $basePath\platform\win32\msvc\external\lame\
+            Run-Exe "$basePath\platform\win32\msvc\external\lame\" `
+                    "nmake.exe"                          `
+                    @( "-f Makefile.MSVC",
+                       "comp=msvc",
+                       "asm=no",
+                       "libmp3lame-static.lib" )
+        }
+
+        # Copy lib to shared folder
+
+        Copy-Item $basePath\platform\win32\msvc\external\lame\output\libmp3lame-static.lib `
+                  $DestDir\mp3lame.lib
+
+        # Due to way it's included in source, lame.h must be in main lame directory, so copy it there.
+
+        Copy-Item $basePath\platform\win32\msvc\external\lame\include\lame.h `
+                  $basePath\platform\win32\msvc\external\lame\
+    }
 }
 
 # ---------------------------------------------------------------------------
 
-if ($tools.Get_Item( "pthreadVC2.lib") -eq "Build")
+switch ($tools.Get_Item( $pThreadName ))
 {
-    Write-Host "Building: pthreads" -foregroundcolor cyan
-
-    if (!(Test-Path $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib ))
+    Clean
     {
-        Run-Exe "$basePath\platform\win32\msvc\external\pthreads.2\" "nmake.exe" @( "clean", "VC-inlined" )
+        Write-Host "Clean: pthreads" -foregroundcolor cyan
+
+        Run-Exe "$basePath\platform\win32\msvc\external\pthreads.2\" "nmake.exe" @( "clean" )
+
+        Remove-Item $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\debug\pthread*.*                                 -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\pthread*.*                               -ErrorAction SilentlyContinue
     }
 
-    # -- Copy lib to shared folder
-    Copy-Item $basePath\platform\win32\msvc\external\pthreads.2\pthread*.dll   $DestDir
-    Copy-Item $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib   $DestDir
+    Build
+    {
+        Write-Host "Building: pthreads" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib ))
+        {
+            if ($BuildType -eq "debug")
+            {
+                $pThreadTarget = "VC-inlined-debug"
+            }
+            else
+            {
+                $pThreadTarget = "VC-inlined"
+            }
+
+            Run-Exe "$basePath\platform\win32\msvc\external\pthreads.2\" "nmake.exe" @( "clean", $pThreadTarget )
+        }
+
+        # -- Copy lib to shared folder
+        Copy-Item $basePath\platform\win32\msvc\external\pthreads.2\pthread*.dll   $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib   $DestDir
+    }
 }
 
 # ---------------------------------------------------------------------------
 
-if ($tools.Get_Item( "zlib.lib") -eq "Build")
+switch ($tools.Get_Item( "zlib.lib" ))
 {
-    Write-Host "Building: zlib" -foregroundcolor cyan
-
-    if (!(Test-Path $basePath\platform\win32\msvc\external\zlib\*.dll ))
+    Clean
     {
-        Run-Exe "$basePath\platform\win32\msvc\external\zlib\" "nmake.exe" @( "-f win32/Makefile.msc" )
+        Write-Host "Clean: zlib" -ForegroundColor cyan
+
+        Run-Exe "$basePath\platform\win32\msvc\external\zlib\"      `
+                "nmake.exe"                                         `
+                @( "-f win32/Makefile.msc",                         `
+                   "clean" )
+
+        Remove-Item $basePath\bin\debug\zlib.lib   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\zlib.lib -ErrorAction SilentlyContinue
     }
 
-    # -- Copy lib to shared folder
-    Copy-Item $basePath\platform\win32\msvc\external\zlib\*.dll   $DestDir
-    Copy-Item $basePath\platform\win32\msvc\external\zlib\*.lib   $DestDir
+    Build
+    {
+        Write-Host "Building: zlib" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\zlib\zlib.lib ))
+        {
+            switch( $BuildType )
+            {
+                debug
+                {
+                    Run-Exe "$basePath\platform\win32\msvc\external\zlib\"  `
+                            "nmake.exe"                                     `
+                            @( "-f win32/Makefile.msc",                     `
+                               "CFLAGS=`"-nologo -MDd -W3 -Od -Zi`"",         `
+                               "zlib.lib" )
+                }
+
+                release
+                {
+                    Run-Exe "$basePath\platform\win32\msvc\external\zlib\"  `
+                            "nmake.exe"                                     `
+                            @( "-f win32/Makefile.msc",                     `
+                               "zlib.lib" )
+                }
+            }
+
+        }
+
+        # -- Copy lib to shared folder
+        Copy-Item $basePath\platform\win32\msvc\external\zlib\zlib.lib   $DestDir
+    }
 }
 
 # ---------------------------------------------------------------------------
 
-if ($tools.Get_Item( 'tag.lib') -eq "Build")
+switch ($tools.Get_Item( 'tag.lib'))
 {
-    Write-Host "Building: taglib" -foregroundcolor cyan
-
-    if (!(Test-Path $basePath\platform\win32\msvc\external\taglib\taglib\*.lib ))
+    Clean
     {
+        Run-Exe "$basePath\platform\win32\msvc\external\taglib" `
+                "nmake.exe"                                     `
+                "clean"
+
         Remove-Item $basePath\platform\win32\msvc\external\taglib\CMakeCache.txt -ErrorAction SilentlyContinue
 
-        Run-Exe "$basePath\platform\win32\msvc\external\taglib\" `
-                "cmake.exe"                            `
-                @("-G ""NMake Makefiles""";
-                  "-DZLIB_INCLUDE_DIR=..\zlib";
-                  "-DZLIB_LIBRARY=..\zlib\zlib.lib";
-                  "-DENABLE_STATIC=0";
-                  "-DWITH_MP4=1";
-                  "-DCMAKE_BUILD_TYPE=$BuildType" )
-
-        Run-Exe "$basePath\platform\win32\msvc\external\taglib" `
-                "nmake.exe"                           `
-                "tag"
+        Remove-Item $basePath\bin\debug\tag.*   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\tag.* -ErrorAction SilentlyContinue
     }
 
-    # -- Copy lib to shared folder
-    Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.lib   $DestDir
-    Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.dll   $DestDir
+    Build
+    {
+        Write-Host "Building: taglib" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\taglib\taglib\*.lib ))
+        {
+            Remove-Item $basePath\platform\win32\msvc\external\taglib\CMakeCache.txt -ErrorAction SilentlyContinue
+
+            Run-Exe "$basePath\platform\win32\msvc\external\taglib\" `
+                    "cmake.exe"                            `
+                    @("-G ""NMake Makefiles""";
+                      "-DZLIB_INCLUDE_DIR=..\zlib";
+                      "-DZLIB_LIBRARY=..\zlib\zlib.lib";
+                      "-DENABLE_STATIC=0";
+                      "-DWITH_MP4=1";
+                      "-DCMAKE_BUILD_TYPE=$BuildType" )
+
+            Run-Exe "$basePath\platform\win32\msvc\external\taglib" `
+                    "nmake.exe"                                     `
+                    "tag"
+        }
+
+        # -- Copy lib to shared folder
+        Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.lib   $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.dll   $DestDir
+    }
 }
 
 Write-Host "--------------------------------------------------------------------------"  -ForegroundColor green
@@ -328,116 +433,206 @@ Write-Host
 Write-Host "Building MythTV non-Qt External dependencies"                                -ForegroundColor green
 Write-Host "--------------------------------------------------------------------------"  -ForegroundColor green
 
-if ($tools.Get_Item( 'libzmq.lib') -eq "Build")
+switch ($tools.Get_Item( 'libzmq.lib'))
 {
-    Write-Host "Building: zeromq" -foregroundcolor cyan
-
-    if (!(Test-Path $basePath\external\zeromq\builds\msvc\$BuildType\*.lib ))
+    Clean
     {
-        # -- Upgrade solution to verion of visual studios being used
+        Write-Host "Clean: zeromq" -foregroundcolor cyan
 
-        Run-Exe "$basePath\external\zeromq\builds\msvc\" `
-                "devenv.exe"                   `
-                @( "msvc.sln",
-                   "/upgrade" )
+        if (Test-Path $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcxproj )
+        {
+            Run-Exe "$basePath\external\zeromq\builds\msvc\libzmq\"   `
+                    "msbuild.exe"                                     `
+                    @( "/target:clean",                               `
+                       "libzmq.vcxproj" )
+        }
 
-        # -- Build Solution
+        Remove-Item $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcxproj*.*  -ErrorAction SilentlyContinue
 
-        Run-Exe "$basePath\external\zeromq\builds\msvc\" `
-                "devenv.exe"                   `
-                @( "msvc.sln",
-                   "/Build $BuildType" )
+        Remove-Item $basePath\bin\debug\libzmq.*                                    -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\libzmq.*                                  -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\external\zeromq\builds\msvc\$BuildType\*.lib          -ErrorAction SilentlyContinue
+        Remove-Item $basePath\external\zeromq\lib\*.dll                             -ErrorAction SilentlyContinue
     }
 
-    # -- Copy dll & lib to shared folder
-    Copy-Item $basePath\external\zeromq\builds\msvc\$BuildType\*.lib $DestDir
-    Copy-Item $basePath\external\zeromq\lib\*.dll                    $DestDir
+    Build
+    {
+        Write-Host "Building: zeromq" -foregroundcolor cyan
 
+        if (!(Test-Path $basePath\external\zeromq\builds\msvc\$BuildType\*.lib ))
+        {
+            if (!(Test-Path $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcxproj ))
+            {
+                # -- Upgrade solution to verion of visual studios being used
+
+                # & vcupgrade $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcproj
+
+                Run-Exe "$basePath\external\zeromq\builds\msvc\libzmq\"     `
+                        "vcupgrade.exe"                                     `
+                        @( "libzmq.vcproj" )
+            }
+
+            # -- Build Solution
+
+            #& msbuild /target:build /p:Configuration=$BuildType $basePath\external\zeromq\builds\msvc\libzmq\libzmq.vcxproj
+
+            Run-Exe "$basePath\external\zeromq\builds\msvc\libzmq\"   `
+                    "msbuild.exe"                                     `
+                    @( "/target:build",                             `
+                       "/p:Configuration=$BuildType",                 `
+                       "libzmq.vcxproj" )
+        }
+
+        # -- Copy dll & lib to shared folder
+        Copy-Item $basePath\external\zeromq\builds\msvc\libzmq\$BuildType\*.lib $DestDir
+        Copy-Item $basePath\external\zeromq\lib\*.dll                    $DestDir
+
+    }
 }
 
 # ---------------------------------------------------------------------------
 
-if ($tools.Get_Item( 'FFmpeg') -eq "Build")
+$rootPath = "/" + $basePath.replace( '\', '/' ).replace( ':', '/' )
+$MSysPath = ($tools[ "msys" ] + "bin\")
+
+# create a script to call configure and make in msys environment.
+
+$scriptFile = "$basePath/_buildFFmpeg.sh"
+$OutPath    = $rootPath + "/bin/$BuildType"
+
+switch ($tools.Get_Item( 'FFmpeg'))
 {
-    Write-Host "Building: FFmpeg" -foregroundcolor cyan
-
-    $rootPath = "/" + $basePath.replace( '\', '/' ).replace( ':', '/' )
-    $MSysPath = ($tools[ "msys" ] + "bin\")
-
-    # create a script to call configure and make in msys environment.
-
-    $scriptFile = "$basePath/_buildFFmpeg.sh"
-    $OutPath    = $rootPath + "/bin/$BuildType"
-
-    $FFmegsConfigure = "./configure --toolchain=msvc "        + `
-                                   "--enable-shared "         + `
-                                   "--bindir=$OutPath "       + `
-                                   "--libdir=$OutPath "       + `
-                                   "--shlibdir=$OutPath "     + `
-                                   "--extra-cflags=-MD "      + `
-                                   "--extra-cxxflags=-MD "    + `
-                                   "--disable-decoder=mpeg_xvmc"
-
-    Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
-    Out-File $scriptFile -Append -Encoding Ascii -InputObject "pwd"
-    Out-File $scriptFile -Append -Encoding Ascii -InputObject "export SRC_PATH_BARE=$rootPath"
-    Out-File $scriptFile -Append -Encoding Ascii -InputObject $FFmegsConfigure
-    Out-File $scriptFile -Append -Encoding Ascii -InputObject "make && make install"
-
-    write-host "  Running FFmpeg configure & build."
-    write-host "  Using MinGW located at: " -NoNewLine ;  write-host $MSysPath -foregroundcolor cyan
-
-    write-host "  NOTE: There may be no output for a long time... Please be patient." -foregroundcolor yellow
-
-    & $MSysPath\sh.exe --login -c $rootPath/_buildFFmpeg.sh
-
-    Remove-Item $scriptFile -ErrorAction SilentlyContinue
-
-    if (-not (((Test-Path "$DestDir\mythavdevice.lib"  ) -eq $true ) -and `
-              ((Test-Path "$DestDir\mythavfilter.lib"  ) -eq $true ) -and `
-              ((Test-Path "$DestDir\mythavformat.lib"  ) -eq $true ) -and `
-              ((Test-Path "$DestDir\mythavutil.lib"    ) -eq $true ) -and `
-              ((Test-Path "$DestDir\mythswresample.lib") -eq $true ) -and `
-              ((Test-Path "$DestDir\mythswscale.lib"   ) -eq $true )))
+    Clean
     {
-        Write-Host "--------------------------------------------------------------------------"  -ForegroundColor red
-        Write-Host "Failed to build FFmpeg."                                                     -ForegroundColor red
-        Write-Host
+        Write-Host "Clean: FFmpeg" -foregroundcolor cyan
 
-        exit
+        Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "pwd"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "export SRC_PATH_BARE=$rootPath"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "make distclean"
+
+        write-host "  Running FFmpeg distclean."
+        write-host "  Using MinGW located at: " -NoNewLine ;  write-host $MSysPath -foregroundcolor cyan
+        WRITE-HOST "  NOTE: THERE MAY BE NO OUTPUT FOR A LONG TIME... PLEASE BE PATIENT." -FOREGROUNDCOLOR YELLOW
+
+        & $MSysPath\sh.exe --login -c $rootPath/_buildFFmpeg.sh
+
+        Remove-Item $scriptFile                   -ErrorAction SilentlyContinue
+
+        Remove-Item "$basePath\bin\debug\mythavcodec*.*"     -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythavdevice*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythavfilter*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythavformat*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythavutil*.*"      -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythswresample*.*"  -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\debug\mythswscale*.*"     -ErrorAction SilentlyContinue
+
+        Remove-Item "$basePath\bin\release\mythavcodec*.*"     -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythavdevice*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythavfilter*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythavformat*.*"    -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythavutil*.*"      -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythswresample*.*"  -ErrorAction SilentlyContinue
+        Remove-Item "$basePath\bin\release\mythswscale*.*"     -ErrorAction SilentlyContinue
+
+    }
+
+    Build
+    {
+        Write-Host "Building: FFmpeg" -foregroundcolor cyan
+
+        $FFmegsConfigure = "./configure --toolchain=msvc "        + `
+                                       "--enable-shared "         + `
+                                       "--bindir=$OutPath "       + `
+                                       "--libdir=$OutPath "       + `
+                                       "--shlibdir=$OutPath "     + `
+                                       "--extra-cflags=-MDd "      + `
+                                       "--extra-cxxflags=-MDd "    + `
+                                       "--disable-decoder=mpeg_xvmc"
+
+        Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "pwd"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "export SRC_PATH_BARE=$rootPath"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject $FFmegsConfigure
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "make && make install"
+
+        write-host "  Running FFmpeg configure & build."
+        write-host "  Using MinGW located at: " -NoNewLine ;  write-host $MSysPath -foregroundcolor cyan
+
+        WRITE-HOST "  NOTE: THERE MAY BE NO OUTPUT FOR A LONG TIME... PLEASE BE PATIENT." -FOREGROUNDCOLOR YELLOW
+
+        & $MSysPath\sh.exe --login -c $rootPath/_buildFFmpeg.sh
+
+        Remove-Item $scriptFile -ErrorAction SilentlyContinue
+
+        if (-not (((Test-Path "$DestDir\mythavdevice.lib"  ) -eq $true ) -and `
+                  ((Test-Path "$DestDir\mythavfilter.lib"  ) -eq $true ) -and `
+                  ((Test-Path "$DestDir\mythavformat.lib"  ) -eq $true ) -and `
+                  ((Test-Path "$DestDir\mythavutil.lib"    ) -eq $true ) -and `
+                  ((Test-Path "$DestDir\mythswresample.lib") -eq $true ) -and `
+                  ((Test-Path "$DestDir\mythswscale.lib"   ) -eq $true )))
+        {
+            Write-Host "--------------------------------------------------------------------------"  -ForegroundColor red
+            Write-Host "Failed to build FFmpeg."                                                     -ForegroundColor red
+            Write-Host
+
+            exit
+        }
     }
 }
-
 
 # ###########################################################################
 
 if ($OutputType -eq "nmake")
 {
-    # -----------------------------------------------------------------------
-    # delete external\Makefile since version in Git is for Linux.
-    # it will be re-created by qmake using external.pro
-    # -----------------------------------------------------------------------
+    if ($BuildType -ne "clean")
+    {
+        # -----------------------------------------------------------------------
+        # delete external\Makefile since version in Git is for Linux.
+        # it will be re-created by qmake using external.pro
+        # -----------------------------------------------------------------------
 
-    Remove-Item $basePath\external\Makefile -ErrorAction SilentlyContinue
+        Remove-Item $basePath\external\Makefile -ErrorAction SilentlyContinue
 
-    # -----------------------------------------------------------------------
-    Write-Host "Running qmake on mythtv to generating makefiles..." -foregroundcolor green
-    # -----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
+        Write-Host "Running qmake on mythtv to generating makefiles..." -foregroundcolor green
+        # -----------------------------------------------------------------------
 
-    Write-Host "qmake mythtv.pro" -Foregroundcolor blue
+        Write-Host "qmake mythtv.pro" -Foregroundcolor blue
 
-    &qmake mythtv.pro
+        &qmake "CONFIG+=$BuildType" mythtv.pro
+
+    }
 
     # -----------------------------------------------------------------------
     Write-Host
     Write-Host "Configure Completed." -foregroundcolor green
-    Write-Host "nmake $BuildType " -foregroundcolor Cyan -NoNewline
-    Write-Host "To build MythTV"
-    Write-Host
+    Write-Host "nmake " -foregroundcolor Cyan -NoNewline
+
+    if ($BuildType -eq "clean" )
+    {
+        Write-Host "To clean MythTV source tree"
+    }
+    else
+    {
+        Write-Host "To Build MythTV"
+    }
+
     # -----------------------------------------------------------------------
+
 }
 else
 {
+
+    # -----------------------------------------------------------------------
+    # Custom Targets are not working in vcxproj files yet so run verison.ps1
+    # to generate version.h.  This really should be done each build (reason
+    # for custom target in pro files... need to fix vcxproj to work)
+    # -----------------------------------------------------------------------
+    Write-Host "Generating version.h" -foregroundcolor cyan
+
+    & .\version.ps1 $basePath
 
     # -----------------------------------------------------------------------
     Write-Host "Running qmake on mythtv to generate Visual Studio Solution..." -foregroundcolor green
@@ -445,7 +640,7 @@ else
 
     Write-Host "qmake mythtv.pro -tp vc -r" -Foregroundcolor blue
 
-    &qmake mythtv.pro -tp vc -r
+    &qmake -tp vc -r "CONFIG+=$BuildType" mythtv.pro
 
     # -----------------------------------------------------------------------
     Write-Host

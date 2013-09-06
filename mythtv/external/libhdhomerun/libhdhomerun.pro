@@ -22,7 +22,7 @@ unix {
 
 }
 
-mingw {
+win32 {
 
     HEADERS += hdhomerun_os_windows.h
     SOURCES += hdhomerun_os_windows.c hdhomerun_sock_windows.c
@@ -32,7 +32,20 @@ mingw {
 
 }
 
-Makefile.lib {
+win32-msvc* {
+
+    # needed for vcxproj
+    QMAKE_CXXFLAGS += /TP
+
+    # needed for nmake
+    QMAKE_CFLAGS   += /TP
+
+    DEFINES += DLL_EXPORT
+
+    LIBS += -ladvapi32 -luser32
+}
+
+Makefile.lib | win32-msvc* {
 
     TEMPLATE = lib
     TARGET = mythhdhomerun-$$LIBVERSION

@@ -52,9 +52,9 @@
 #include <sys/timeb.h>
 
 #if defined(DLL_IMPORT)
-#define LIBTYPE __declspec( dllexport )
-#elif  defined(DLL_EXPORT)
 #define LIBTYPE __declspec( dllimport )
+#elif  defined(DLL_EXPORT)
+#define LIBTYPE __declspec( dllexport )
 #else
 #define LIBTYPE
 #endif

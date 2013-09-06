@@ -6,7 +6,7 @@ win32-msvc* {
 
 # Libraries without dependencies
 
-#SUBDIRS += libhdhomerun
+SUBDIRS += libhdhomerun
 SUBDIRS += libmythbluray
 SUBDIRS += libsamplerate
 SUBDIRS += qjson/src

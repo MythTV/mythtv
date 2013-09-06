@@ -28,7 +28,7 @@ CC	= cl
 CPPFLAGS = /I. /DHAVE_PTW32_CONFIG_H
 XCFLAGS = /W3 /MD /nologo
 CFLAGS	= /O2 /Ob2 $(XCFLAGS)
-CFLAGSD	= /Z7 $(XCFLAGS)
+CFLAGSD	= /Z7 /MDd /W3 /nologo
 
 # Uncomment this if config.h defines RETAIN_WSALASTERROR
 #XLIBS = wsock32.lib

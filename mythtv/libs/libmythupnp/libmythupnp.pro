@@ -63,7 +63,7 @@ mingw | win32-msvc* {
     LIBS += -lws2_32
 }
 
-win32-msvc*:LIBS += -L$$SRC_PATH_BARE/platform/win32/msvc/external/zlib/lib -lzlib
+win32-msvc*:LIBS += -lzlib
 
 
 inc.path = $${PREFIX}/include/mythtv/upnp/
