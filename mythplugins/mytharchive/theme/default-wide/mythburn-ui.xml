@@ -442,9 +442,9 @@ MythArchive GUI theme
     <window name="thumbfinder">
 
         <textarea name="title" from="basetextarea">
-            <area>0,10,800,45</area>
+            <area>20,10,800,45</area>
             <font>baselarge</font>
-            <align>allcenter</align>
+            <align>vcenter</align>
             <value>Thumb Image Selector</value>
         </textarea>
 
@@ -454,7 +454,7 @@ MythArchive GUI theme
         </imagetype>
 
         <button name="frame_button">
-            <position>22,65</position>
+            <position>25,65</position>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -476,7 +476,7 @@ MythArchive GUI theme
         </button>
 
         <imagetype name="frameimage">
-            <area>27,70,360,229</area>
+            <area>30,70,360,229</area>
             <filename>ma_black.png</filename>
         </imagetype>
 
@@ -488,7 +488,7 @@ MythArchive GUI theme
         </textarea>
 
         <textarea name="currentpos" from="basetextarea">
-            <area>420,95,365,40</area>
+            <area>420,100,365,40</area>
             <align>hcenter</align>
         </textarea>
 
@@ -511,28 +511,28 @@ MythArchive GUI theme
         </textarea>
 
         <imagetype name="positionimage">
-            <area>425,142,350,25</area>
+            <area>425,280,830,25</area>
             <filename>trans-cr-background.png</filename>
         </imagetype>
 
         <button name="cancel_button" from="basebutton">
-            <position>425,260</position>
+            <position>880,200</position>
             <value>Cancel</value>
         </button>
 
         <button name="save_button" from="basebutton">
-            <position>625,260</position>
+            <position>1100,200</position>
             <value>Save</value>
         </button>
 
         <buttonlist name="thumblist">
-            <area>25,320,760,280</area>
+            <area>25,320,1230,395</area>
             <layout>grid</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,0,760,270</buttonarea>
+            <spacing>7</spacing>
+            <buttonarea>0,0,1230,395</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,144,125</area>
+                    <area>0,0,240,190</area>
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
                         <fill style="gradient">
@@ -540,12 +540,12 @@ MythArchive GUI theme
                         </fill>
                     </shape>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>5,100,134,30</area>
+                        <area>5,160,230,30</area>
                         <font>basesmall</font>
-                        <align>hcenter,top</align>
+                        <align>allcenter</align>
                     </textarea>
                     <imagetype name="buttonimage">
-                        <area>5,5,134,90</area>
+                        <area>5,5,230,150</area>
                         <preserveaspect>false</preserveaspect>
                     </imagetype>
                 </state>
