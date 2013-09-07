@@ -35,6 +35,9 @@ from __future__ import unicode_literals
 # Optional (alternate demuxer)
 # ProjectX - >=0.91
 
+# Optional (to lower the ionice level)
+# psutil
+
 #******************************************************************************
 #******************************************************************************
 #******************************************************************************
@@ -46,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130907-1"
+VERSION="0.1.20130907-2"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -5199,6 +5202,15 @@ def main():
 
     nicelevel = os.nice(nicelevel)
     write( "Setting process priority to %s" % nicelevel)
+
+    try:
+        import psutil
+    except ImportError:
+        write( "Cannot change ionice level")
+    else:
+        write( "Setting ionice level to idle")
+        p = psutil.Process(os.getpid())
+        p.set_ionice(psutil.IOPRIO_CLASS_IDLE)
 
     import errno
 
