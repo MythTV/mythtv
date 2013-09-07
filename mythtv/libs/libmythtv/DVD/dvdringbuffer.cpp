@@ -675,7 +675,6 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
     char           *dest         = (char*) data;
     int             offset       = 0;
     bool            bReprocessing = false;
-    bool            stillSeen    = false;
     bool            waiting      = false;
 
     if (m_gotStop)
@@ -1155,18 +1154,18 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
 
-                m_still = still->length;
-
-                if (!bReprocessing && !m_skipstillorwait && !waiting)
+                if (!bReprocessing && !m_skipstillorwait)
                 {
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1) - waiting")
-                        .arg(m_still));
+                    if (m_still != still->length)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1) - waiting")
+                            .arg(still->length));
+                    }
+
                     m_processState = PROCESS_WAIT;
                 }
                 else
                 {
-                    waiting = true;
-
                     // pause a little as the dvdnav VM will continue to return
                     // this event until it has been skipped
                     rwlock.unlock();
@@ -1176,18 +1175,23 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     // when scanning the file or exiting playback, skip immediately
                     // otherwise update the timeout in the player
                     if (m_skipstillorwait)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Skipping DVDNAV_STILL_FRAME (%1)")
+                            .arg(still->length));
                         SkipStillFrame();
+                    }
                     else if (m_parent)
                     {
-                        m_parent->SetStillFrameTimeout(m_still);
-                    }
+                        // debug
+                        if (m_still != still->length)
+                        {
+                            LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
+                                .arg(still->length));
+                        }
 
-                    // debug
-                    if (!stillSeen)
-                    {
-                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
-                            .arg(m_still));
-                        stillSeen = true;
+                        m_still = still->length;
+                        sz = tot;
+                        m_parent->SetStillFrameTimeout(m_still);
                     }
 
                     // release buffer

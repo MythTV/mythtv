@@ -287,8 +287,8 @@ MHLineArt::MHLineArt(const MHLineArt &ref): MHVisible(ref)
     m_fBorderedBBox = ref.m_fBorderedBBox;
     m_nOriginalLineWidth = ref.m_nOriginalLineWidth;
     m_OriginalLineStyle = ref.m_OriginalLineStyle;
-    m_OrigLineColour = ref.m_OrigLineColour;
-    m_OrigFillColour = ref.m_OrigFillColour;
+    m_OrigLineColour.Copy(ref.m_OrigLineColour);
+    m_OrigFillColour.Copy(ref.m_OrigFillColour);
     m_nLineWidth = ref.m_nLineWidth;
     m_LineStyle = ref.m_LineStyle;
 }
