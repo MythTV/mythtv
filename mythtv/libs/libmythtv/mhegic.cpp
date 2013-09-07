@@ -18,6 +18,7 @@ using std::getenv;
 // Myth
 #include "netstream.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 
 #define LOC QString("[mhegic] ")
 
@@ -48,14 +49,16 @@ MHInteractionChannel::EStatus MHInteractionChannel::status()
         return kInactive;
     }
 
-    // TODO get this from mythdb
+    if (!gCoreContext->GetNumSetting("EnableMHEG", 0))
+        return kDisabled;
+
     QStringList opts = QString(getenv("MYTHMHEG")).split(':');
     if (opts.contains("noice", Qt::CaseInsensitive))
         return kDisabled;
     else if (opts.contains("ice", Qt::CaseInsensitive))
         return kActive;
-    else // Default
-        return kActive;
+
+    return gCoreContext->GetNumSetting("EnableMHEGic", 1) ? kActive : kDisabled;
 }
 
 static inline bool isCached(const QString& csPath)
