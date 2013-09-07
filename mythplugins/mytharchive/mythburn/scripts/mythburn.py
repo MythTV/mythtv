@@ -1495,7 +1495,7 @@ def getFileInformation(file, folder):
 def WriteXMLToFile(myDOM, filename):
     #Save the XML file to disk for use later on
     f=open(filename, 'w')
-    f.write(myDOM.toxml("UTF-8"))
+    f.write(myDOM.toprettyxml(indent="    ", encoding="UTF-8"))
     f.close()
 
 
