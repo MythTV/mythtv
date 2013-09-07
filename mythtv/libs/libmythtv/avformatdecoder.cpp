@@ -1764,6 +1764,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
         if (! StreamID::IsObjectCarousel(pmt.StreamType(i)))
             continue;
 
+        LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams Found Object Carousel in Stream %1").arg(QString::number(i)));
+
         const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
@@ -1775,6 +1777,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             uint length = *desc++;
             const unsigned char *endDesc = desc+length;
             uint dataBroadcastId = desc[0]<<8 | desc[1];
+            LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams dataBroadcastId %1").arg(QString::number(dataBroadcastId)));
             if (dataBroadcastId != 0x0106) // ETSI/UK Profile
                 continue;
             desc += 2; // Skip data ID
@@ -1784,6 +1787,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
 #ifdef USING_MHEG
+                LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams AppTypeCode %1").arg(QString::number(appTypeCode)));
                 if (appTypeCode == 0x101) // UK MHEG profile
                 {
                     const unsigned char *subDescEnd = desc + appSpecDataLen;
