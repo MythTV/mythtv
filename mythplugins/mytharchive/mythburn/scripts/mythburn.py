@@ -46,7 +46,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130831-1"
+VERSION="0.1.20130907-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -193,6 +193,7 @@ cpuCount = 1
 
 DB = MythTV.MythDB()
 MVID = MythTV.MythVideo(db=DB)
+Video = MythTV.Video
 
 configHostname = DB.gethostname()
 
@@ -1518,11 +1519,11 @@ def preProcessFile(file, folder, count):
     else:
         fatalError("Unknown type of video file it must be 'recording', 'video' or 'file'.")
 
-    if doesFileExist(mediafile) == False:
-        fatalError("Source file does not exist: " + mediafile)
-
     if file.hasAttribute("localfilename"):
         mediafile = file.attributes["localfilename"].value
+
+    if doesFileExist(mediafile) == False:
+        fatalError("Source file does not exist: " + mediafile)
 
     getStreamInformation(mediafile, os.path.join(folder, "streaminfo.xml"), 0)
     copy(os.path.join(folder, "streaminfo.xml"), os.path.join(folder, "streaminfo_orig.xml"))
@@ -4830,7 +4831,8 @@ def copyRemote(files, tmpPath):
         filename = os.path.basename(tmpfile)
 
         res = runCommand("mytharchivehelper -q -q --isremote --infile " + quoteCmdArg(tmpfile))
-        if res == 2:
+        #If User wants to, copy remote files to a tmp dir
+        if res == 2 and copyremoteFiles==True:
             # file is on a remote filesystem so copy it to a local file
             write("Copying file from " + tmpfile)
             write("to " + os.path.join(localTmpPath, filename))
@@ -4841,6 +4843,18 @@ def copyRemote(files, tmpPath):
 
             # update node
             node.setAttribute("localfilename", os.path.join(localTmpPath, filename))
+        elif res == 3:
+            # file is on a remote myth backend so copy it to a local file
+            write("Copying file from " + tmpfile)
+            localfile = os.path.join(localTmpPath, filename)
+            write("to " + localfile)
+
+            # Copy file
+            if not doesFileExist(localfile):
+                runCommand("mythutil --copyfile --infile " + quoteCmdArg(tmpfile) + " --outfile " + quoteCmdArg(localfile))
+
+            # update node
+            node.setAttribute("localfilename", localfile)
     return files
 
 #############################################################
@@ -4904,13 +4918,9 @@ def processJob(job):
             if debug_secondrunthrough==False:
                 #Delete all the temporary files that currently exist
                 deleteEverythingInFolder(getTempPath())
-
-            #If User wants to, copy remote files to a tmp dir
-            if copyremoteFiles==True:
-                if debug_secondrunthrough==False:
-                    localCopyFolder=os.path.join(getTempPath(),"localcopy")
-                    os.makedirs(localCopyFolder)
-                files=copyRemote(files,getTempPath())
+                localCopyFolder=os.path.join(getTempPath(),"localcopy")
+                os.makedirs(localCopyFolder)
+            files=copyRemote(files,getTempPath())
 
             #First pass through the files to be recorded - sense check
             #we dont want to find half way through this long process that
