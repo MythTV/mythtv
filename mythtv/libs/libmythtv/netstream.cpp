@@ -683,8 +683,7 @@ void NAMThread::run()
         QDesktopServices::storageLocation(QDesktopServices::CacheLocation) );
     m_nam->setCache(cache.take());
 
-    // Setup a network proxy e.g. for TOR: socks://localhost:9050
-    // TODO get this from mythdb
+    // Setup a network proxy
     QString proxy(getenv("HTTP_PROXY"));
     if (!proxy.isEmpty())
     {
