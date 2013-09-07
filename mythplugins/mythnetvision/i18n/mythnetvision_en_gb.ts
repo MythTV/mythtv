@@ -93,14 +93,14 @@
         <translation>Downloading Video...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="857"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="854"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Downloading Video...
 (%1 of %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="883"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="880"/>
         <source>Error downloading video to backend.</source>
         <translation>Error downloading video to backend.</translation>
     </message>
@@ -226,14 +226,14 @@
         <translation>Updating Site Maps.  This could take a while...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1315"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1312"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Downloading Video...
 (%1 of %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="1341"/>
+        <location filename="../mythnetvision/nettree.cpp" line="1338"/>
         <source>Error downloading video to backend.</source>
         <translation>Error downloading video to backend.</translation>
     </message>

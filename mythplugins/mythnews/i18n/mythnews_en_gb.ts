@@ -42,14 +42,6 @@
         <translation>Unknown</translation>
     </message>
     <message>
-        <source>%1 of %2 (%3 percent)</source>
-        <translation type="obsolete">%1 of %2 (%3 percent)</translation>
-    </message>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Downloading media...</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>No browser command set! MythNews needs MythBrowser to be installed.</translation>
