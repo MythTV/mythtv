@@ -328,6 +328,11 @@ void MHText::Preparation(MHEngine *engine)
 
     MHVisible::Preparation(engine);
 
+    if (m_pDisplay == NULL)
+    {
+	    m_pDisplay = engine->GetContext()->CreateText();
+    }
+
     m_pDisplay->SetSize(m_nBoxWidth, m_nBoxHeight);
     m_fNeedsRedraw = true;
 }

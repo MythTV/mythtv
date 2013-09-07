@@ -932,7 +932,7 @@ void MHEngine::GenerateUserAction(int nCode)
     {
         case 104:
         case 105: // Text key
-            EventTriggered(pScene, EventEngineEvent, 4);
+            EngineEvent(4);
             break;
         case 16: // Text Exit/Cancel key
         case 100: // Red
@@ -940,7 +940,7 @@ void MHEngine::GenerateUserAction(int nCode)
         case 102: // Yellow
         case 103: // Blue
         case 300: // EPG
-            EventTriggered(pScene, EventEngineEvent, nCode);
+            EngineEvent(nCode);
             break;
     }
 
@@ -1282,6 +1282,10 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
             return false;
         }
         else if ((strings[2] == "720" && strings[3] == "576") || (strings[2] == "360" && strings[3] == "288"))
+        {
+            return true;
+        }
+        else if (strings[1] == "1285")
         {
             return true;
         }
