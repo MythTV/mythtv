@@ -24,18 +24,20 @@ const int kDecoderProbeBufferSize = 256 * 1024;
 typedef enum TrackTypes
 {
     kTrackTypeUnknown = 0,
-    kTrackTypeAudio,
-    kTrackTypeVideo,
-    kTrackTypeSubtitle,
-    kTrackTypeCC608,
-    kTrackTypeCC708,
-    kTrackTypeTeletextCaptions,
-    kTrackTypeTeletextMenu,
-    kTrackTypeRawText,
-    kTrackTypeAttachment,
-    kTrackTypeCount,
-
-    kTrackTypeTextSubtitle,
+    kTrackTypeAudio,            // 1
+    kTrackTypeVideo,            // 2
+    kTrackTypeSubtitle,         // 3
+    kTrackTypeCC608,            // 4
+    kTrackTypeCC708,            // 5
+    kTrackTypeTeletextCaptions, // 6
+    kTrackTypeTeletextMenu,     // 7
+    kTrackTypeRawText,          // 8
+    kTrackTypeAttachment,       // 9
+    kTrackTypeCount,            // 10
+    // The following are intentionally excluded from kTrackTypeCount which
+    // is used when auto-selecting the correct tracks to decode according to
+    // language, bitrate etc
+    kTrackTypeTextSubtitle,     // 11
 } TrackType;
 QString toString(TrackType type);
 int to_track_type(const QString &str);
