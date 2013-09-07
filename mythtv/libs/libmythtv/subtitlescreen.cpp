@@ -100,7 +100,12 @@ private:
     QHash<QString, MythFontProperties *> m_fontMap;
     QHash<QString, MythUIShape *>       m_shapeMap;
     QHash<QString, QSet<QString> >     m_changeMap;
+    // The following m_*Map fields are the original values from the
+    // m_fontMap, which are preserved because the text font zoom
+    // factor affects the actual values stored in the font.
     QHash<QString, int>             m_pixelSizeMap;
+    QHash<QString, int>           m_outlineSizeMap;
+    QHash<QString, QPoint>       m_shadowOffsetMap;
     QVector<MythUIType *> m_cleanup;
 };
 
@@ -119,11 +124,11 @@ static const QString kSubAttrUnderline("underline");
 static const QString kSubAttrPixelsize("pixelsize");
 static const QString kSubAttrColor    ("color");
 static const QString kSubAttrBGfill   ("bgfill");
-static const QString kSubAttrShadow      ("shadow");
+static const QString kSubAttrShadow      ("shadow"); // unused
 static const QString kSubAttrShadowoffset("shadowoffset");
 static const QString kSubAttrShadowcolor ("shadowcolor");
 static const QString kSubAttrShadowalpha ("shadowalpha");
-static const QString kSubAttrOutline     ("outline");
+static const QString kSubAttrOutline     ("outline"); // unused
 static const QString kSubAttrOutlinecolor("outlinecolor");
 static const QString kSubAttrOutlinesize ("outlinesize");
 static const QString kSubAttrOutlinealpha("outlinealpha");
@@ -317,8 +322,15 @@ void SubtitleFormat::Load(const QString &family,
         QString("testFont = %1").arg(fontToString(testFont)));
     m_changeMap[prefix] = Diff(family, attr, resultFont, testFont,
                                resultBG, testBG);
-    if (!IsUnlocked(prefix, kSubAttrPixelsize))
-        m_pixelSizeMap[prefix] = resultFont->GetFace()->pixelSize();
+    QPoint offset;
+    QColor color;
+    int alpha;
+    int size;
+    resultFont->GetShadow(offset, color, alpha);
+    resultFont->GetOutline(color, size, alpha);
+    m_outlineSizeMap[prefix] = size;
+    m_shadowOffsetMap[prefix] = offset;
+    m_pixelSizeMap[prefix] = resultFont->GetFace()->pixelSize();
 
     delete negFont;
 }
@@ -421,58 +433,67 @@ SubtitleFormat::GetFont(const QString &family,
         result->GetFace()->setBold(attr.boldface);
     if (IsUnlocked(prefix, kSubAttrColor))
         result->SetColor(attr.GetFGColor());
-    if (IsUnlocked(prefix, kSubAttrShadow))
+
+    MythPoint offset;
+    QColor color;
+    int alpha;
+    bool shadow = result->hasShadow();
+    result->GetShadow(offset, color, alpha);
+    if (IsUnlocked(prefix, kSubAttrShadowcolor))
+        color = attr.GetEdgeColor();
+    if (IsUnlocked(prefix, kSubAttrShadowalpha))
+        alpha = attr.GetFGAlpha();
+    if (IsUnlocked(prefix, kSubAttrShadowoffset))
     {
-        QPoint offset;
-        QColor color;
-        int alpha;
-        bool shadow = result->hasShadow();
-        result->GetShadow(offset, color, alpha);
-        if (IsUnlocked(prefix, kSubAttrShadowcolor))
-            color = attr.GetEdgeColor();
-        if (IsUnlocked(prefix, kSubAttrShadowalpha))
-            alpha = attr.GetFGAlpha();
-        if (IsUnlocked(prefix, kSubAttrShadowoffset))
+        int off = scale * pixelSize / 20 + 0.5;
+        offset = QPoint(off, off);
+        if (attr.edge_type == k708AttrEdgeLeftDropShadow)
         {
-            int off = pixelSize / 20;
-            offset = QPoint(off, off);
-            if (attr.edge_type == k708AttrEdgeLeftDropShadow)
-            {
-                shadow = true;
-                offset.setX(-off);
-            }
-            else if (attr.edge_type == k708AttrEdgeRightDropShadow)
-                shadow = true;
-            else
-                shadow = false;
+            shadow = true;
+            offset.setX(-off);
         }
-        result->SetShadow(shadow, offset, color, alpha);
+        else if (attr.edge_type == k708AttrEdgeRightDropShadow)
+            shadow = true;
+        else
+            shadow = false;
     }
-    if (IsUnlocked(prefix, kSubAttrOutline))
+    else
     {
-        QColor color;
-        int off;
-        int alpha;
-        bool outline = result->hasOutline();
-        result->GetOutline(color, off, alpha);
-        if (IsUnlocked(prefix, kSubAttrOutlinecolor))
-            color = attr.GetEdgeColor();
-        if (IsUnlocked(prefix, kSubAttrOutlinealpha))
-            alpha = attr.GetFGAlpha();
-        if (IsUnlocked(prefix, kSubAttrOutlinesize))
-        {
-            if (attr.edge_type == k708AttrEdgeUniform ||
-                attr.edge_type == k708AttrEdgeRaised  ||
-                attr.edge_type == k708AttrEdgeDepressed)
-            {
-                outline = true;
-                off = pixelSize / 20;
-            }
-            else
-                outline = false;
-        }
-        result->SetOutline(outline, color, off, alpha);
+        offset = m_shadowOffsetMap[prefix];
+        offset.NormPoint();
+        offset.setX(offset.x() * scale + 0.5);
+        offset.setY(offset.y() * scale + 0.5);
     }
+    result->SetShadow(shadow, offset, color, alpha);
+
+    int off;
+    bool outline = result->hasOutline();
+    result->GetOutline(color, off, alpha);
+    if (IsUnlocked(prefix, kSubAttrOutlinecolor))
+        color = attr.GetEdgeColor();
+    if (IsUnlocked(prefix, kSubAttrOutlinealpha))
+        alpha = attr.GetFGAlpha();
+    if (IsUnlocked(prefix, kSubAttrOutlinesize))
+    {
+        if (attr.edge_type == k708AttrEdgeUniform ||
+            attr.edge_type == k708AttrEdgeRaised  ||
+            attr.edge_type == k708AttrEdgeDepressed)
+        {
+            outline = true;
+            off = scale * pixelSize / 20 + 0.5;
+        }
+        else
+            outline = false;
+    }
+    else
+    {
+        off = m_outlineSizeMap[prefix];
+        MythPoint point(off, off);
+        point.NormPoint();
+        off = point.x() * scale + 0.5;
+    }
+    result->SetOutline(outline, color, off, alpha);
+
     LOG(VB_VBI, LOG_DEBUG,
         QString("GetFont(family=%1, prefix=%2, orig pixelSize=%3, "
                 "new pixelSize=%4 zoom=%5) = %6")
@@ -2072,11 +2093,15 @@ static QSize CalcShadowOffsetPadding(MythFontProperties *mythfont)
     if (mythfont->hasOutline())
     {
         mythfont->GetOutline(color, outlineSize, alpha);
+        MythPoint outline(outlineSize, outlineSize);
+        outline.NormPoint();
+        outlineSize = outline.x();
     }
     if (mythfont->hasShadow())
     {
-        QPoint shadowOffset;
+        MythPoint shadowOffset;
         mythfont->GetShadow(shadowOffset, color, alpha);
+        shadowOffset.NormPoint();
         shadowWidth = abs(shadowOffset.x());
         shadowHeight = abs(shadowOffset.y());
         // Shadow and outline overlap, so don't just add them.
