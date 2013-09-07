@@ -4665,23 +4665,17 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
 
             int retval = 0;
-            avcodeclock->lock();
             if (!ic || ((retval = ReadPacket(ic, pkt, storevideoframes)) < 0))
             {
                 if (retval == -EAGAIN)
-                {
-                    avcodeclock->unlock();
                     continue;
-                }
 
                 SetEof(true);
                 delete pkt;
                 errno = -retval;
                 LOG(VB_GENERAL, LOG_ERR, QString("decoding error") + ENO);
-                avcodeclock->unlock();
                 return false;
             }
-            avcodeclock->unlock();
 
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
@@ -4848,6 +4842,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
+    QMutexLocker locker(avcodeclock);
+
     return av_read_frame(ctx, pkt);
 }
 
