@@ -493,7 +493,7 @@ switch ($tools.Get_Item( 'libzmq.lib'))
 
 # ---------------------------------------------------------------------------
 
-$rootPath = "/" + $basePath.replace( '\', '/' ).replace( ':', '/' )
+$rootPath = "/" + $basePath.replace( '\', '/' ).replace( ':', '' )
 $MSysPath = ($tools[ "msys" ] + "bin\")
 
 # create a script to call configure and make in msys environment.
@@ -510,6 +510,7 @@ switch ($tools.Get_Item( 'FFmpeg'))
         Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
         Out-File $scriptFile -Append -Encoding Ascii -InputObject "pwd"
         Out-File $scriptFile -Append -Encoding Ascii -InputObject "export SRC_PATH_BARE=$rootPath"
+        Out-File $scriptFile -Append -Encoding Ascii -InputObject "make clean"
         Out-File $scriptFile -Append -Encoding Ascii -InputObject "make distclean"
 
         write-host "  Running FFmpeg distclean."
@@ -542,13 +543,28 @@ switch ($tools.Get_Item( 'FFmpeg'))
     {
         Write-Host "Building: FFmpeg" -foregroundcolor cyan
 
+        if ($BuildType -eq "debug")
+        {
+            $ffmpegExtra = "-MDd"
+        }
+        else
+        {
+            $ffmpegExtra = "-MD"
+        }
+
+        if ($VCVerStr -eq "Visual Studio 10")
+        {
+            $vs2010inc = "$rootPath/platform/win32/msvc/include-2010"
+            $ffmpegExtra = $ffmpegExtra + " -I $vs2010inc"
+        }
+
         $FFmegsConfigure = "./configure --toolchain=msvc "        + `
                                        "--enable-shared "         + `
                                        "--bindir=$OutPath "       + `
                                        "--libdir=$OutPath "       + `
                                        "--shlibdir=$OutPath "     + `
-                                       "--extra-cflags=-MDd "      + `
-                                       "--extra-cxxflags=-MDd "    + `
+                                       "--extra-cflags='$ffmpegExtra' "      + `
+                                       "--extra-cxxflags='$ffmpegExtra' "    + `
                                        "--disable-decoder=mpeg_xvmc"
 
         Out-File $scriptFile         -Encoding Ascii -InputObject "cd $rootPath/external/FFmpeg"
@@ -584,6 +600,10 @@ switch ($tools.Get_Item( 'FFmpeg'))
 
 # ###########################################################################
 
+Copy-Item $basePath\platform\win32\msvc\include\mythconfig.h   $basePath\config.h
+
+# ###########################################################################
+
 if ($OutputType -eq "nmake")
 {
     if ($BuildType -ne "clean")
@@ -608,14 +628,18 @@ if ($OutputType -eq "nmake")
     # -----------------------------------------------------------------------
     Write-Host
     Write-Host "Configure Completed." -foregroundcolor green
-    Write-Host "nmake " -foregroundcolor Cyan -NoNewline
 
     if ($BuildType -eq "clean" )
     {
+        Write-Host "nmake clean "     -foregroundcolor Cyan -NoNewline
+        Write-Host "or "                                    -NoNewline
+        Write-Host "nmake distclean " -foregroundcolor Cyan -NoNewline
+
         Write-Host "To clean MythTV source tree"
     }
     else
     {
+        Write-Host "nmake " -foregroundcolor Cyan -NoNewline
         Write-Host "To Build MythTV"
     }
 

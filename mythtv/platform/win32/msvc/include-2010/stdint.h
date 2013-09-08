@@ -245,41 +245,4 @@ typedef uint64_t  uintmax_t;
 
 #endif // __STDC_CONSTANT_MACROS ]
 
-#define isnan( x )  _isnan( x )
-
-__inline double roundf(double x) 
-{ 
-    return floor(x + 0.5); 
-}
-
-__inline int truncf( float flt )
-{
-    return (int)floor( flt );
-}
-
-__inline long int lrint (double flt)
-{  
-    int intgr;  
-    _asm  
-    {      
-        fld flt      
-        fistp intgr  
-    };  
-
-    return intgr;
-}
-
-__inline long int lrintf (float flt)
-{   
-    int intgr;   
-    _asm  
-    {    
-        fld flt    
-        fistp intgr  
-    }; 
-
-    return intgr;
-}
-
-
 #endif // _MSC_STDINT_H_ ]

@@ -93,6 +93,16 @@ win32 {
 
     win32-msvc* {
 
+        win32-msvc2010 {
+            # need to force include missing math.h functions.
+
+            # needed for vcxproj
+            QMAKE_CXXFLAGS += "/FI mathex.h"
+
+            # needed for nmake
+            QMAKE_CFLAGS   += "/FI mathex.h"
+        }
+
         DEFINES += WIN32 WIN32_LEAN_AND_MEAN NOMINMAX _USE_MATH_DEFINES
         DEFINES += _CRT_SECURE_NO_WARNINGS
         DEFINES += __STDC_CONSTANT_MACROS
@@ -130,7 +140,7 @@ win32 {
             QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/debug
             MOC_DIR         = debug/moc
 
-            QMAKE_CXXFLAGS  = /MDd /MP /wd4100 /wd4996
+            QMAKE_CXXFLAGS *= /MDd /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/debug
             EXTRA_LIBS     += -lpthreadVC2d -llibzmq -L$$SRC_PATH_BARE/bin/debug
@@ -143,7 +153,7 @@ win32 {
             QMAKE_LIBDIR   += $$SRC_PATH_BARE/bin/release
             MOC_DIR         = release/moc
 
-            QMAKE_CXXFLAGS  = /MD /MP /wd4100 /wd4996
+            QMAKE_CXXFLAGS *= /MD /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/release
             EXTRA_LIBS     += -lpthreadVC2 -llibzmq -L$$SRC_PATH_BARE/bin/release
