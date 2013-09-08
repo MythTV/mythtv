@@ -3318,7 +3318,9 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Decoder timed out waiting for free video buffers.");
-                videobuf_retries = 0;
+                // We've tried for 20 seconds now, give up so that we don't
+                // get stuck permanently in this state
+                SetErrored("Decoder timed out waiting for free video buffers.");
             }
             return false;
         }
