@@ -120,10 +120,7 @@ public:
     static NAMThread & manager(); // Singleton
     virtual ~NAMThread();
 
-    static inline void PostEvent(QEvent *e) { manager().Post(e); }
-    void Post(QEvent *event);
-
-    static inline QMutex* GetMutex() { return &manager().m_mutexNAM; }
+    static void PostEvent(QEvent *);
 
     static bool isAvailable(); // is network usable
     static QDateTime GetLastModified(const QString &url);
@@ -146,9 +143,8 @@ private:
 
     volatile bool m_bQuit;
     QSemaphore m_running;
-    mutable QMutex m_mutexNAM; // Provides recursive access to m_nam
-    QNetworkAccessManager *m_nam;
     mutable QMutex m_mutex; // Protects r/w access to the following data
+    QNetworkAccessManager *m_nam;
     QQueue< QEvent * > m_workQ;
     QWaitCondition m_work;
 };
