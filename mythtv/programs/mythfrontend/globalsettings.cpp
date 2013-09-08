@@ -1595,12 +1595,12 @@ static HostCheckBox *EnableMHEG()
 static HostCheckBox *EnableMHEGic()
 {
     HostCheckBox *gc = new HostCheckBox("EnableMHEGic");
-    gc->setLabel(QObject::tr("Enable network access for interactive TV"));
+    gc->setLabel("Enable network access for interactive TV");
     gc->setValue(true);
-    gc->setHelpText(QObject::tr(
+    gc->setHelpText(
                         "If enabled, interactive TV applications (MHEG) will "
                         "be able to access interactive content over the "
-                        "internet. This is used for BBC iPlayer."));
+                        "internet. This is used for BBC iPlayer.");
     return gc;
 }
 
