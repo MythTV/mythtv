@@ -323,26 +323,18 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if ((dbChan.icon != localfile) ||
-                     (dbChan.xmltvid != (*i).xmltvid))
+            else if (!m_guideDataOnly &&
+                        ((dbChan.icon != localfile) ||
+                        (dbChan.xmltvid != (*i).xmltvid)))
             {
                 LOG(VB_XMLTV, LOG_NOTICE, QString("Updating channel %1 (%2)")
                                         .arg(dbChan.name).arg(dbChan.chanid));
-                if (!m_nonUSUpdating && !localfile.isEmpty())
-                {
-                    MSqlQuery subquery(MSqlQuery::InitCon());
-                    subquery.prepare("UPDATE channel SET icon = :ICON WHERE "
-                                     "chanid = :CHANID;");
-                    subquery.bindValue(":ICON", localfile);
-                    subquery.bindValue(":CHANID", dbChan.chanid);
 
-                    if (!subquery.exec())
-                        MythDB::DBError("Channel icon change", subquery);
-                }
-                else
+                if (localfile.isEmpty())
+                    localfile = dbChan.icon;
+
+                if (dbChan.xmltvid != (*i).xmltvid)
                 {
-                    if (localfile.isEmpty())
-                        localfile = dbChan.icon;
                     MSqlQuery subquery(MSqlQuery::InitCon());
 
                     subquery.prepare("UPDATE channel SET icon = :ICON "
@@ -355,6 +347,18 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     if (!subquery.exec())
                         MythDB::DBError("Channel icon change", subquery);
                 }
+                else
+                {
+                    MSqlQuery subquery(MSqlQuery::InitCon());
+                    subquery.prepare("UPDATE channel SET icon = :ICON WHERE "
+                                     "chanid = :CHANID;");
+                    subquery.bindValue(":ICON", localfile);
+                    subquery.bindValue(":CHANID", dbChan.chanid);
+
+                    if (!subquery.exec())
+                        MythDB::DBError("Channel icon change", subquery);
+                }
+
             }
         }
         else if (insert_chan(id)) // Only insert channels for non-scannable sources
@@ -418,10 +422,10 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if (!m_nonUSUpdating && ((minor == 0) || (freq > 0)))
+            else if (!m_guideDataOnly && ((minor == 0) || (freq > 0)))
             {
                 // We only do this if we are not asked to skip it with the
-                // --updating flag.
+                // --update-guide-only (formerly --update) flag.
                 int mplexid = 0, chanid = 0;
                 if (minor > 0)
                 {
