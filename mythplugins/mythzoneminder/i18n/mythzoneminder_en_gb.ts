@@ -28,53 +28,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation type="obsolete">IP address of the MythZoneMinder server</translation>
-    </message>
-    <message>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation type="obsolete">Enter the IP address of the MythZoneMinder server that this frontend should connect to.</translation>
-    </message>
-    <message>
-        <source>Port the server runs on</source>
-        <translation type="obsolete">Port the server runs on</translation>
-    </message>
-    <message>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="obsolete">Unless you&apos;ve got good reason to, don&apos;t change this.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Date format</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Samples are shown using today&apos;s date.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Samples are shown using tomorrow&apos;s date.</translation>
-    </message>
-    <message>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation type="obsolete">Your preferred date format to use on the events screens.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Time format</translation>
-    </message>
-    <message>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation type="obsolete">Your preferred time format to display on the events screens.</translation>
-    </message>
-    <message>
-        <source>MythZoneMinder Settings</source>
-        <translation type="obsolete">MythZoneMinder Settings</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="5"/>

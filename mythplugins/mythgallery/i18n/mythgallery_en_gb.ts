@@ -760,12 +760,12 @@ Check the directory exists, is readable and the setting is correct on MythGaller
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="113"/>
+        <location filename="../mythgallery/imageview.cpp" line="118"/>
         <source>Random Slideshow</source>
         <translation>Random Slideshow</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="119"/>
+        <location filename="../mythgallery/imageview.cpp" line="124"/>
         <source>Slideshow</source>
         <translation>Slideshow</translation>
     </message>
@@ -885,189 +885,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Directory that holds images</source>
-        <translation type="obsolete">Directory that holds images</translation>
-    </message>
-    <message>
-        <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation type="obsolete">This directory must exist and MythGallery needs to have read permission.</translation>
-    </message>
-    <message>
-        <source>Store thumbnails in image directory</source>
-        <translation type="obsolete">Store thumbnails in image directory</translation>
-    </message>
-    <message>
-        <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="obsolete">If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</translation>
-    </message>
-    <message>
-        <source>Sort order when browsing</source>
-        <translation type="obsolete">Sort order when browsing</translation>
-    </message>
-    <message>
-        <source>This is the sort order for the displayed picture thumbnails.</source>
-        <translation type="obsolete">This is the sort order for the displayed picture thumbnails.</translation>
-    </message>
-    <message>
-        <source>Directory filter</source>
-        <translation type="obsolete">Directory filter</translation>
-    </message>
-    <message>
-        <source>Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</source>
-        <translation type="obsolete">Enter directory names to be excluded in browser. (multiple entries delimited with &apos;:&apos;)</translation>
-    </message>
-    <message>
-        <source>Type filter</source>
-        <translation type="obsolete">Type filter</translation>
-    </message>
-    <message>
-        <source>This is the type filter for the displayed thumbnails.</source>
-        <translation type="obsolete">This is the type filter for the displayed thumbnails.</translation>
-    </message>
-    <message>
-        <source>Overlay caption</source>
-        <translation type="obsolete">Overlay caption</translation>
-    </message>
-    <message>
-        <source>This is the number of seconds to show a caption on top of a full size picture.</source>
-        <translation type="obsolete">This is the number of seconds to show a caption on top of a full size picture.</translation>
-    </message>
-    <message>
-        <source>Paths to import images from</source>
-        <translation type="obsolete">Paths to import images from</translation>
-    </message>
-    <message>
-        <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation type="obsolete">This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</translation>
-    </message>
-    <message>
-        <source>Automatically load MythGallery to display pictures</source>
-        <translation type="obsolete">Automatically load MythGallery to display pictures</translation>
-    </message>
-    <message>
-        <source>When a new CD-Rom or removable storage device containing pictures is detected then load MythGallery to display the content.</source>
-        <translation type="obsolete">When a new CD, DVD or removable storage device containing pictures is detected then load MythGallery to display the content.</translation>
-    </message>
-    <message>
-        <source>Use OpenGL transitions</source>
-        <translation type="obsolete">Use OpenGL transitions</translation>
-    </message>
-    <message>
-        <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="obsolete">Check this to enable OpenGL based slideshow transitions</translation>
-    </message>
-    <message>
-        <source>Type of OpenGL transition</source>
-        <translation type="obsolete">Type of OpenGL transition</translation>
-    </message>
-    <message>
-        <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="obsolete">This is the type of OpenGL transition used between pictures in slideshow mode.</translation>
-    </message>
-    <message>
-        <source>Duration of OpenGL Transition (milliseconds)</source>
-        <translation type="obsolete">Duration of OpenGL Transition (milliseconds)</translation>
-    </message>
-    <message>
-        <source>Type of transition</source>
-        <translation type="obsolete">Type of transition</translation>
-    </message>
-    <message>
-        <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation type="obsolete">This is the type of transition used between pictures in slideshow mode.</translation>
-    </message>
-    <message>
-        <source>Type of background</source>
-        <translation type="obsolete">Type of background</translation>
-    </message>
-    <message>
-        <source>This is the type of background for each picture in single view mode.</source>
-        <translation type="obsolete">This is the type of background for each picture in single view mode.</translation>
-    </message>
-    <message>
-        <source>Slideshow Delay</source>
-        <translation type="obsolete">Slideshow Delay</translation>
-    </message>
-    <message>
-        <source>This is the number of seconds to display each picture.</source>
-        <translation type="obsolete">This is the number of seconds to display each picture.</translation>
-    </message>
-    <message>
-        <source>Recurse into directories</source>
-        <translation type="obsolete">Recurse into directories</translation>
-    </message>
-    <message>
-        <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="obsolete">Check this to let the slideshow recurse into sub-directories.</translation>
-    </message>
-    <message>
-        <source>MythGallery Settings (Slideshow)</source>
-        <translation type="obsolete">MythGallery Settings (Slideshow)</translation>
-    </message>
-    <message>
-        <source>MythGallery Settings (General)</source>
-        <translation type="obsolete">MythGallery Settings (General)</translation>
-    </message>
-    <message>
-        <source>MythGallery cannot find its start directory.
-%1
-Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation type="obsolete">MythGallery cannot find its start directory.
-%1
-Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">All</translation>
-    </message>
-    <message>
-        <source>Images only</source>
-        <translation type="obsolete">Images only</translation>
-    </message>
-    <message>
-        <source>Movies only</source>
-        <translation type="obsolete">Films only</translation>
-    </message>
-    <message>
-        <source>Unsorted</source>
-        <translation type="obsolete">Unsorted</translation>
-    </message>
-    <message>
-        <source>Name (A-Z alpha)</source>
-        <translation type="obsolete">Name (A-Z alpha)</translation>
-    </message>
-    <message>
-        <source>Reverse Name (Z-A alpha)</source>
-        <translation type="obsolete">Reverse Name (Z-A alpha)</translation>
-    </message>
-    <message>
-        <source>Mod Time (oldest first)</source>
-        <translation type="obsolete">Mod Time (oldest first)</translation>
-    </message>
-    <message>
-        <source>Reverse Mod Time (newest first)</source>
-        <translation type="obsolete">Reverse Mod Time (newest first)</translation>
-    </message>
-    <message>
-        <source>Extension (A-Z alpha)</source>
-        <translation type="obsolete">Extension (A-Z alpha)</translation>
-    </message>
-    <message>
-        <source>Reverse Extension (Z-A alpha)</source>
-        <translation type="obsolete">Reverse Extension (Z-A alpha)</translation>
-    </message>
-    <message>
-        <source>Filesize (smallest first)</source>
-        <translation type="obsolete">Filesize (smallest first)</translation>
-    </message>
-    <message>
-        <source>Reverse Filesize (largest first)</source>
-        <translation type="obsolete">Reverse Filesize (largest first)</translation>
-    </message>
-</context>
-<context>
     <name>SingleView</name>
     <message>
         <location filename="../mythgallery/singleview.cpp" line="211"/>
@@ -1106,11 +923,6 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <location filename="themestrings.h" line="29"/>
         <source>MENU: Activate Menu</source>
         <translation>MENU: Activate Menu</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="30"/>
-        <source>Video Gallery</source>
-        <translation>Video Gallery</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -1208,28 +1020,28 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Done</source>
         <translation>Done</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Save as default</source>
         <translation>Save as default</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Folder filter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Type filter :</source>
         <translation>Type filter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Sort by :</source>
         <translation>Sort by :</translation>
     </message>
