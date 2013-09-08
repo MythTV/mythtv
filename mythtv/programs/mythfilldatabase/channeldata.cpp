@@ -164,6 +164,12 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
 
 void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
 {
+    if (m_guideDataOnly)
+    {
+        LOG(VB_GENERAL, LOG_NOTICE, "Skipping Channel Updates");
+        return;
+    }
+
     QHash<QString, ChannelInfo> existingChannels = channelList(id);
     QString fileprefix = SetupIconCacheDirectory();
 
@@ -323,9 +329,8 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if (!m_guideDataOnly &&
-                        ((dbChan.icon != localfile) ||
-                        (dbChan.xmltvid != (*i).xmltvid)))
+            else if ((dbChan.icon != localfile) ||
+                     (dbChan.xmltvid != (*i).xmltvid))
             {
                 LOG(VB_XMLTV, LOG_NOTICE, QString("Updating channel %1 (%2)")
                                         .arg(dbChan.name).arg(dbChan.chanid));
@@ -422,7 +427,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if (!m_guideDataOnly && ((minor == 0) || (freq > 0)))
+            else if ((minor == 0) || (freq > 0))
             {
                 // We only do this if we are not asked to skip it with the
                 // --update-guide-only (formerly --update) flag.
