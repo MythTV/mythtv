@@ -2082,8 +2082,8 @@
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1117"/>
-        <source>Failed to open
- &apos;%1&apos; in %2
+        <source>Failed to open 
+ &apos;%1&apos; in %2 
 Check if the video exists</source>
         <translation>Ei õnnestunud avada
 &apos;%1&apos; %2-st
@@ -2250,12 +2250,12 @@ Kontrolli, kas video on olemas</translation>
 <context>
     <name>ASIConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1715"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1712"/>
         <source>Not a valid DVEO ASI card</source>
         <translation>Sobimatu DVEO ASI kaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1720"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1717"/>
         <source>Valid DVEO ASI card</source>
         <translation>Sobiv DVEO ASI kaart</translation>
     </message>
@@ -3242,13 +3242,6 @@ Seade toetab kuni %1</translation>
     </message>
 </context>
 <context>
-    <name>BackendConnectionManager</name>
-    <message>
-        <source>Your frontend and backend are configured in different timezones.  You must correct this mismatch to continue.</source>
-        <translation type="obsolete">Kliendi ja taustaserveri ajavööndi seadistus on erinev.  Jätkamiseks kõrvalda see erinevus.</translation>
-    </message>
-</context>
-<context>
     <name>BackendSelection</name>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="285"/>
@@ -3282,65 +3275,65 @@ Seade toetab kuni %1</translation>
 <context>
     <name>CaptureCardEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3292"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3289"/>
         <source>Capture Card Menu</source>
         <translation>Hõivekaardi menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3370"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3367"/>
         <source>Are you sure you want to delete this capture card?</source>
         <translation>Oled sa kindel, et soovid selle hõivekaardi kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3371"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3368"/>
         <source>Yes, delete capture card</source>
         <translation>Jah, kustuta hõivekaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3314"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3349"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3372"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3311"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3346"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3369"/>
         <source>No, don&apos;t</source>
         <translation>Ei, ära kustuta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3248"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3245"/>
         <source>Capture cards</source>
         <translation>Hõivekaardid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3346"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3343"/>
         <source>Are you sure you want to delete ALL capture cards?</source>
         <translation>Oled sa kindel, et soovid KÕIK hõivekaardid kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3313"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3348"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3310"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3345"/>
         <source>Yes, delete capture cards</source>
         <translation>Jah, kustuta hõivekaardid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3293"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3290"/>
         <source>Edit...</source>
         <translation>Muuda...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3294"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3291"/>
         <source>Delete...</source>
         <translation>Kustuta...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3311"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3308"/>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
         <translation>Oled sa kindel, et soovid KÕIK hõivekaardid masinast %1 kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3330"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3327"/>
         <source>Error getting list of cards for this host</source>
         <translation>Viga selle masina hõivekaartide nimekirja tekitamisel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3331"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3328"/>
         <source>Unable to delete capturecards for %1</source>
         <translation>Ei saa %1 hõivekaarte kustutada</translation>
     </message>
@@ -3348,53 +3341,53 @@ Seade toetab kuni %1</translation>
 <context>
     <name>CardInput</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2929"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2926"/>
         <source>Scan for channels</source>
         <translation>Kanaliuuring</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2931"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2928"/>
         <source>Use channel scanner to find channels for this input.</source>
         <translation>Kasuta kanaliuuringut sellelt sisendilt kanalite leidmiseks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2933"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2930"/>
         <source>Fetch channels from listings source</source>
         <translation>Lae kanalid saadete nimekirjast</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2935"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2932"/>
         <source>This uses the listings data source to provide the channels for this input.</source>
         <translation>Selle sisendi kanalite leidmiseks kasutatakse saadete nimekirja.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2937"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2934"/>
         <source>This can take a long time to run.</source>
         <translation>Käivitamine võib võtta kaua aega.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3018"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3015"/>
         <source>Create Input Group</source>
         <translation>Loo uus sisendgrupp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3019"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3016"/>
         <source>Enter new group name</source>
         <translation>Uus grupi nimi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3029"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3050"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3026"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3047"/>
         <source>Error</source>
         <translation>Viga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3030"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3027"/>
         <source>Sorry, this Input Group name cannot be blank.</source>
         <translation>Sisendgrupil peab olema nimi.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3051"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3048"/>
         <source>Sorry, this Input Group name is already in use.</source>
         <translation>Sisendgrupi nimi on juba kasutusel.</translation>
     </message>
@@ -3402,7 +3395,7 @@ Seade toetab kuni %1</translation>
 <context>
     <name>CardInputEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3483"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3480"/>
         <source>Input connections</source>
         <translation>Sisendite ühendused</translation>
     </message>
@@ -3410,7 +3403,7 @@ Seade toetab kuni %1</translation>
 <context>
     <name>CetonConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2051"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2048"/>
         <source>Description</source>
         <translation>Kirjeldus</translation>
     </message>
@@ -3418,12 +3411,12 @@ Seade toetab kuni %1</translation>
 <context>
     <name>CetonDeviceID</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2004"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2001"/>
         <source>Device ID</source>
         <translation>Seadme ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2005"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2002"/>
         <source>Device ID of Ceton device</source>
         <translation>Ceton seadme seadme ID</translation>
     </message>
@@ -3922,10 +3915,6 @@ Seade toetab kuni %1</translation>
         <translation>Ei õnnestunud avada &apos;%1&apos;</translation>
     </message>
     <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Viga otsimise alustamisel</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner.cpp" line="312"/>
         <source>Programmer Error: No Device</source>
         <translation>Programmaatori viga: Seade puudub</translation>
@@ -4138,14 +4127,6 @@ Seade toetab kuni %1</translation>
         <translation>Mitte tippajal</translation>
     </message>
     <message>
-        <source>Category type</source>
-        <translation type="obsolete">Kategooria tüüp</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="obsolete">või</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="471"/>
         <source>Limit movies by the year of release</source>
         <translation>Piira filme väljalaske aasta järgi</translation>
@@ -4204,14 +4185,6 @@ Seade toetab kuni %1</translation>
         <location filename="../programs/mythfrontend/customedit.cpp" line="340"/>
         <source>Only on weekends</source>
         <translation>Ainult nädalavahetustel</translation>
-    </message>
-    <message>
-        <source>Only in primetime</source>
-        <translation type="obsolete">Ainult tippajal</translation>
-    </message>
-    <message>
-        <source>Not in primetime</source>
-        <translation type="obsolete">Mitte tippajal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="384"/>
@@ -4534,27 +4507,27 @@ Seade toetab kuni %1</translation>
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3810"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3807"/>
         <source>Recording Options</source>
         <translation>Salvestamise valikud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3819"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3816"/>
         <source>Input and satellite settings.</source>
         <translation>Sisendite ning satelliidi seaded.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3620"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3617"/>
         <source>Could not open card %1</source>
         <translation>Ei suuda kaari %1 avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3621"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3618"/>
         <source>Could not get card info for card %1</source>
         <translation>Ei saa infot kaardi %1 kohta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3818"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3815"/>
         <source>DiSEqC (Switch, LNB, and Rotor Configuration)</source>
         <translation>DiSEqC (Lüliti, LNB, ja rootori seadistamine)</translation>
     </message>
@@ -4606,7 +4579,7 @@ Seade toetab kuni %1</translation>
 <context>
     <name>DataDirectLineupSelector</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="363"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="362"/>
         <source>Fetching lineups from %1...</source>
         <translation>Kava laadimine %1 pealt...</translation>
     </message>
@@ -4895,50 +4868,38 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>DemoConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2172"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2169"/>
         <source>A local MPEG file used to simulate a recording. Must be entered as file:/path/movie.mpg</source>
         <translation>Kohalik MPEG fail salvestamise simuleerimiseks. Sisestusformaat on file:/tee/video.mpg</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2180"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2177"/>
         <source>File info</source>
         <translation>Faili info</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2183"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2180"/>
         <source>File size</source>
         <translation>Faili suurus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2209"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2206"/>
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2212"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2209"/>
         <source>File not readable</source>
         <translation>Fail pole loetav</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2216"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2213"/>
         <source>File does not exist</source>
         <translation>Fail puudub</translation>
     </message>
 </context>
 <context>
     <name>DeviceTree</name>
-    <message>
-        <source>The Cartesian latitude for your location.</source>
-        <translation type="obsolete">Sinu asukoha Cartesiuse laiuskraad.</translation>
-    </message>
-    <message>
-        <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="obsolete">Kasuta negatiivset numbrit lõuna- ning läänekoordinaatide jaoks.</translation>
-    </message>
-    <message>
-        <source>The Cartesian longitude for your location.</source>
-        <translation type="obsolete">Sinu asukoha Cartesiuse pikkuskraad.</translation>
-    </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="47"/>
         <source>Device Type</source>
@@ -5478,10 +5439,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Jah, välju ja lülita välja</translation>
     </message>
     <message>
-        <source>No</source>
-        <translation type="obsolete">Ei</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="39"/>
         <source>If you&apos;ve added or altered channels, please run &apos;mythfilldatabase&apos; on the master backend to populate the database with guide information.</source>
         <translation>Kui kanaleid on lisatud või kustutatud, tuleb peamises taustaserveris kava info lisamiseks andmebaasi käivitada &apos;mythfilldatabase&apos;.</translation>
@@ -5595,7 +5552,7 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>FirewireDesc</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1228"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1225"/>
         <source>Description</source>
         <translation>Kirjeldus</translation>
     </message>
@@ -6125,14 +6082,6 @@ Delete the current cut or preserved region</extracomment>
 			Saatekava ei saa mdagi näidata.</translation>
     </message>
     <message>
-        <source>Change Channel</source>
-        <translation type="obsolete">Muuda kanalit</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation type="obsolete">Salvesta</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="604"/>
         <source>Guide Options</source>
         <translation>Kava valikud</translation>
@@ -6206,10 +6155,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Näita tulevasi</translation>
     </message>
     <message>
-        <source>Upcoming</source>
-        <translation type="obsolete">Tulevased</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="664"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1467"/>
         <source>Custom Edit</source>
@@ -6264,12 +6209,12 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1834"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1831"/>
         <source>Recording Options</source>
         <translation>Salvestamise valikud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1819"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1816"/>
         <source>Description</source>
         <translation>Kirjeldus</translation>
     </message>
@@ -6277,12 +6222,12 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>HDHomeRunDeviceID</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1388"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1385"/>
         <source>Device ID</source>
         <translation>Seadme ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1389"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1386"/>
         <source>Device ID of HDHomeRun device</source>
         <translation>HDHomeRun seadme ID</translation>
     </message>
@@ -6290,9 +6235,9 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>HDHomeRunDeviceIDList</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1482"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1538"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1548"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1479"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1535"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1545"/>
         <source>Manually Enter IP Address</source>
         <translation>Sisesta IP aadress</translation>
     </message>
@@ -6300,17 +6245,17 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>HDPVRConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2231"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2228"/>
         <source>Probed info</source>
         <translation>Tuvastatud info</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2248"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2245"/>
         <source>Failed to open</source>
         <translation>Ei õnnestunud avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2254"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2251"/>
         <source>Failed to probe</source>
         <translation>Ei õnnestunud tuvastada</translation>
     </message>
@@ -7073,32 +7018,32 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>ImportConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1732"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1729"/>
         <source>A local file used to simulate a recording. Leave empty to use MythEvents to trigger an external program to import recording files.</source>
         <translation>Kohalik fail salvestamise simuleerimiseks. MythEvents kasutamisel salvestusfailide importimiseks jäta tühjaks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1740"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1737"/>
         <source>File info</source>
         <translation>Faili info</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1743"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1740"/>
         <source>File size</source>
         <translation>Faili suurus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1766"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1763"/>
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1769"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1766"/>
         <source>File not readable</source>
         <translation>Fail pole loetav</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1773"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1770"/>
         <source>File %1 does not exist</source>
         <translation>Faili %1 pole olemas</translation>
     </message>
@@ -7189,10 +7134,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="740"/>
         <source>You now have the opportunity to transmit your choices back to mythtv.org so that others can benefit from your selections.</source>
         <translation>Sul on nüüd võimalus saata oma valikud tagasi mythtv.org-i, et teistel oleks samuti Sinu valikutest kasu.</translation>
-    </message>
-    <message>
-        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
-        <translation type="obsolete">Sul on nüüd võimalus saata oma valikud tagasi mythtv.org-i, et teised saaksid samuti neid kasutada.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="763"/>
@@ -7670,17 +7611,17 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MPEGConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2133"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2130"/>
         <source>Probed info</source>
         <translation>Tuvastatud info</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2148"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2145"/>
         <source>Failed to open</source>
         <translation>Ei õnnestunud avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2155"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2152"/>
         <source>Failed to probe</source>
         <translation>Ei õnnestunud tuvastada</translation>
     </message>
@@ -8123,10 +8064,6 @@ Delete the current cut or preserved region</extracomment>
 <context>
     <name>MetadataOptions</name>
     <message>
-        <source>Trying to automatically find this recording online...</source>
-        <translation type="obsolete">Üritan automaatselt seda salvestust võrgust leida...</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="1457"/>
         <source>Trying to manually find this recording online...</source>
         <translation>Üritan kohandatult seda salvestust võrgust leida...</translation>
@@ -8352,10 +8289,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Klahviseos on konfliktis %1-ga %2 kontekstis. Kas soovid sellegi poolest seost luua?</translation>
     </message>
     <message>
-        <source>This key binding conflicts with %1 in the %2 context.</source>
-        <translation type="obsolete">Klahvi seos on konfliktis %1-ga %2 kontekstis.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="574"/>
         <source>This action is mandatory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
         <translation>Toiming on kohustuslik ja nõuab vähemalt ühte seotud klahvi. Proovi siduda mõne teise klahviga.</translation>
@@ -8364,14 +8297,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="265"/>
         <source>Save changes?</source>
         <translation>Salvestan muudatused?</translation>
-    </message>
-    <message>
-        <source> Unable to bind key.</source>
-        <translation type="obsolete">Ei suuda klahvi siduda.</translation>
-    </message>
-    <message>
-        <source> Do you want to bind it anyway?</source>
-        <translation type="obsolete">Soovid ikkagi siduda?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="733"/>
@@ -8417,10 +8342,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Halda salvestusi / Paranda konfliktid</translation>
     </message>
     <message>
-        <source>Program Recording Priorities</source>
-        <translation type="obsolete">Saadete salvestusprioriteedid</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1310"/>
         <source>Manage Recording Rules</source>
         <translation>Halda salvestusreegleid</translation>
@@ -8434,10 +8355,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../programs/mythfrontend/main.cpp" line="1314"/>
         <source>TV Recording Playback</source>
         <translation>TV salvestuse esitus</translation>
-    </message>
-    <message>
-        <source>TV Recording Deletion</source>
-        <translation type="obsolete">TV salvestuse kustutamine</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="1316"/>
@@ -8752,14 +8669,6 @@ Delete the current cut or preserved region</extracomment>
         <location filename="../libs/libmythtv/tv_play.cpp" line="611"/>
         <source>Jump to bookmark</source>
         <translation>Hüppa järjehoidjani</translation>
-    </message>
-    <message>
-        <source>Fast Forward (Sticky) or Forward one frame while paused</source>
-        <translation type="obsolete">Edasi kerimine(kleepuv) või keri üks kaader edasi kui peatatakse</translation>
-    </message>
-    <message>
-        <source>Rewind (Sticky) or Rewind one frame while paused</source>
-        <translation type="obsolete">Tagasi kerimine(kleepuv) või keri üks kaader tagasi kui peatatakse</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="617"/>
@@ -9886,10 +9795,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Videoväljundi aktiveerimine ebaõnnestus</translation>
     </message>
     <message>
-        <source>Need to switch video renderer.</source>
-        <translation type="obsolete">Vaja on vahetada video renderdajat.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/mythplayer.cpp" line="578"/>
         <source>Need to switch video renderer</source>
         <translation>On vaja lülituda mõnele teisele video renderdajale</translation>
@@ -10981,10 +10886,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <translation>Sisesta grupi nimi või vajuta SELECT teksti sisestamiseks ekraaniklaviatuuri kaudu</translation>
     </message>
     <message>
-        <source>Delete playback group:</source>
-        <translation type="obsolete">Kustuta esitlusgrupp:</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="283"/>
         <source>Delete playback group:
 &apos;%1&apos;?</source>
@@ -11015,14 +10916,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
 <context>
     <name>PlaybackBox</name>
     <message>
-        <source>% used</source>
-        <translation type="obsolete">% kasutatud</translation>
-    </message>
-    <message>
-        <source>, %1 GB free</source>
-        <translation type="obsolete">, %1 GB vaba</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2410"/>
         <source>Change Group View</source>
         <translation>Vaheta grupi vaadet</translation>
@@ -11031,10 +10924,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2414"/>
         <source>Change Group Password</source>
         <translation>Vaheta grupi parooli</translation>
-    </message>
-    <message>
-        <source>Playlist options</source>
-        <translation type="obsolete">Esitusloendi valikud</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2430"/>
@@ -11172,14 +11061,6 @@ Tagasipöördumine eelmisesse menüüsse.</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="3223"/>
         <source>Delete</source>
         <translation>Kustuta</translation>
-    </message>
-    <message>
-        <source>Mark As Watched</source>
-        <translation type="obsolete">Märgi vaadatuks</translation>
-    </message>
-    <message>
-        <source>Mark As Unwatched</source>
-        <translation type="obsolete">Märgi mittevaadatuks</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2820"/>
@@ -12273,7 +12154,7 @@ ei saa olla tühi.</translation>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3901"/>
         <source>General Playback (%1/%2)</source>
         <extracomment>%2 is the position, %2 is the total</extracomment>
-        <translation></translation>
+        <translation>Üldine taasesitus (%1/%2)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3936"/>
@@ -12376,13 +12257,6 @@ ei saa olla tühi.</translation>
         <location filename="../programs/mythfrontend/videoplayersettings.cpp" line="184"/>
         <source>Region C: Eastern Europe, Central and South Asia</source>
         <translation>C regioon: Ida-Euroopa, Kesk- ja Lõuna-Aasia</translation>
-    </message>
-</context>
-<context>
-    <name>PostProcEditor</name>
-    <message>
-        <source>Run &apos;%1&apos;</source>
-        <translation type="obsolete">Käivita &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -12658,10 +12532,6 @@ ei saa olla tühi.</translation>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="570"/>
         <source>MythTV Status</source>
         <translation>MythTV olek</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="obsolete">Olek</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="603"/>
@@ -13364,114 +13234,18 @@ ei saa olla tühi.</translation>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Kustutan &apos;%1&apos; %2 reegli?</translation>
     </message>
-    <message>
-        <source> + %1 automatic priority (%2hr)</source>
-        <translation type="obsolete"> + %1 automaatne prioriteet (%2t)</translation>
-    </message>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>DVD/Video contains a bookmark</source>
-        <translation type="obsolete">DVD/Video sisaldab järjehoidjat</translation>
-    </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="612"/>
         <source>Searching for icons for channel %1</source>
         <translation>Otsin %1 jaoks logo</translation>
     </message>
     <message>
-        <source>Failed to configure plugin %1</source>
-        <translation type="obsolete">%1 seadistamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>The plugin %1 has failed to run for some reason...</source>
-        <translation type="obsolete">%1 töö ebaõnnestus mingil põhjusel...</translation>
-    </message>
-    <message>
-        <source>Channel Name</source>
-        <translation type="obsolete">Kanali nimi</translation>
-    </message>
-    <message>
-        <source>Channel Number</source>
-        <translation type="obsolete">Kanali number</translation>
-    </message>
-    <message>
-        <source>Video Source</source>
-        <translation type="obsolete">Videoallikas</translation>
-    </message>
-    <message>
-        <source>[Not Selected]</source>
-        <translation type="obsolete">[Pole valitud]</translation>
-    </message>
-    <message>
-        <source>Callsign</source>
-        <translation type="obsolete">Kutsung</translation>
-    </message>
-    <message>
-        <source>TV Format</source>
-        <translation type="obsolete">TV formaat</translation>
-    </message>
-    <message>
-        <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation type="obsolete">Kui see kanal ei kasuta sama formaati, mis on määratud üldise taustserveri sätetes, siis määra see siin.</translation>
-    </message>
-    <message>
-        <source>Icon</source>
-        <translation type="obsolete">Ikoon</translation>
-    </message>
-    <message>
-        <source>Video filters</source>
-        <translation type="obsolete">Video filtrid</translation>
-    </message>
-    <message>
-        <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation type="obsolete">Filtrid, mida kasutatakse sellelt kanalilt salvestamisel.  Ei kasutata kaartidel, mis kodeerivad riistvaras.</translation>
-    </message>
-    <message>
-        <source>Playback filters</source>
-        <translation type="obsolete">Esitlusfiltrid</translation>
-    </message>
-    <message>
-        <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation type="obsolete">Filtrid, mida kasutatakse selle kanali salvestuste vaatamisel.  Alusta plussiga, kui soovid lisada globaalsetele esitusfiltritele.</translation>
-    </message>
-    <message>
-        <source>XMLTV ID</source>
-        <translation type="obsolete">XMLTV ID</translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency (in kHz) or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Sisesta täpne sagedus (kHz) või TV formaadile vastav korrektne kanal.</translation>
-    </message>
-    <message>
-        <source>Channel Options - Video4Linux</source>
-        <translation type="obsolete">Kanalite valikud - Video 4 Linux</translation>
-    </message>
-    <message>
-        <source>Channel Options - Raw Transport Stream</source>
-        <translation type="obsolete">Kanali valikud - Toorvoog (Raw Transport Stream)</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="5042"/>
         <source>Commercial Free</source>
         <translation>Reklaamivaba</translation>
-    </message>
-    <message>
-        <source>Visible</source>
-        <translation type="obsolete">Nähtav</translation>
-    </message>
-    <message>
-        <source>Use on air guide</source>
-        <translation type="obsolete">Kasuta eetriabi</translation>
-    </message>
-    <message>
-        <source>Finetune</source>
-        <translation type="obsolete">Täppishäälestus</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency (in kHz) for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Soovitud sagedusele (kHZ) lisatud väärtus &apos;täppishäälestus&apos;.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="304"/>
@@ -13494,110 +13268,10 @@ ei saa olla tühi.</translation>
         <translation>Toon</translation>
     </message>
     <message>
-        <source>Channel Options - Common</source>
-        <translation type="obsolete">Kanalite valikud - tavaline</translation>
-    </message>
-    <message>
-        <source>Channel Options</source>
-        <translation type="obsolete">Kanalite valikud</translation>
-    </message>
-    <message>
-        <source>TXT</source>
-        <translation type="obsolete">Teletekst (TXT)</translation>
-    </message>
-    <message>
-        <source>Unable to create AudioOutput.</source>
-        <translation type="obsolete">Ei saa luua heliväljundit.</translation>
-    </message>
-    <message>
-        <source>(Nothing to undo)</source>
-        <translation type="obsolete">(Midagi pole tagasi võtta)</translation>
-    </message>
-    <message>
-        <source>(Nothing to redo)</source>
-        <translation type="obsolete">(Midagi pole uuesti teha)</translation>
-    </message>
-    <message>
-        <source>Clear Cuts</source>
-        <translation type="obsolete">Puhasta lõigetest</translation>
-    </message>
-    <message>
-        <source>cut point</source>
-        <translation type="obsolete">lõikekoht</translation>
-    </message>
-    <message>
-        <source>keyframe</source>
-        <translation type="obsolete">võtmekaader</translation>
-    </message>
-    <message>
-        <source>1 frame</source>
-        <translation type="obsolete">1 kaader</translation>
-    </message>
-    <message>
-        <source>0.5 seconds</source>
-        <translation type="obsolete">0,5 sekundit</translation>
-    </message>
-    <message>
-        <source>error</source>
-        <translation type="obsolete">viga</translation>
-    </message>
-    <message>
-        <source>cut</source>
-        <translation type="obsolete">lõika</translation>
-    </message>
-    <message>
-        <source>Reverse Cuts</source>
-        <translation type="obsolete">Pööratud lõiked</translation>
-    </message>
-    <message>
-        <source>New Cut</source>
-        <translation type="obsolete">Uus lõige</translation>
-    </message>
-    <message>
-        <source>Move Mark</source>
-        <translation type="obsolete">Liiguta märgistust</translation>
-    </message>
-    <message>
-        <source>Load Detected Commercials</source>
-        <translation type="obsolete">Laadi tuvastatud reklaamid</translation>
-    </message>
-    <message>
-        <source>Load Auto-saved Cuts</source>
-        <translation type="obsolete">Laadi automaatselt salvestatud lõiked</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="823"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1174"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
-    </message>
-    <message>
-        <source>%1 of %2</source>
-        <translation type="obsolete">%1 %2-st</translation>
-    </message>
-    <message>
-        <source>Skip %1</source>
-        <translation type="obsolete">Jäta vahele %1</translation>
-    </message>
-    <message>
-        <source>Commercial: %1</source>
-        <translation type="obsolete">Reklaam: %1</translation>
-    </message>
-    <message>
-        <source>At End, cannot Skip.</source>
-        <translation type="obsolete">Lõpus, ei saa vahele jätta.</translation>
-    </message>
-    <message>
-        <source>Not Flagged</source>
-        <translation type="obsolete">Pole tähistatud</translation>
-    </message>
-    <message>
-        <source>Skipping Back.</source>
-        <translation type="obsolete">Tagasi vahelejätmine.</translation>
-    </message>
-    <message>
-        <source>Start of program.</source>
-        <translation type="obsolete">Saate algus.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="78"/>
@@ -13878,34 +13552,6 @@ ei saa olla tühi.</translation>
         <translation>Salvesta kasutades profiili &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>ProfileGroup</source>
-        <translation type="obsolete">Profiiligrupp</translation>
-    </message>
-    <message>
-        <source>Transcoders</source>
-        <translation type="obsolete">Transkoodrid</translation>
-    </message>
-    <message>
-        <source>New Profile Group Name</source>
-        <translation type="obsolete">Uus profiiligrupi nimi</translation>
-    </message>
-    <message>
-        <source>(Create new profile group)</source>
-        <translation type="obsolete">(Loo uus profiiligrupp)</translation>
-    </message>
-    <message>
-        <source>Delete profile group:</source>
-        <translation type="obsolete">Kustuta profiiligrupp:</translation>
-    </message>
-    <message>
-        <source>Yes, delete group</source>
-        <translation type="obsolete">Jah, kustuta grupp</translation>
-    </message>
-    <message>
-        <source>No, Don&apos;t delete group</source>
-        <translation type="obsolete">Ei, ära kustuta gruppi</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="641"/>
         <source>Standard</source>
         <translation>Standardne</translation>
@@ -13971,41 +13617,9 @@ ei saa olla tühi.</translation>
         <translation>Vasak ringpolarisatsioon</translation>
     </message>
     <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Maapealne</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="506"/>
         <source>Modulation</source>
         <translation>Modulatsioon</translation>
-    </message>
-    <message>
-        <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="obsolete">Modulatsioon, 8-VSB, QAM-256, jne.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">Enamus kaablisüsteeme USA-s kasutab QAM-256 või QAM-64, osad süsteemid võivad kasutada 8-VSB maapealse levi kanalite jaoks.</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulatsioon (Vaikimisi Auto)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Tähtkuju</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Tähtkuju (Constellation) (Vaikimisi: Auto)</translation>
-    </message>
-    <message>
-        <source>Modulation, QPSK, 8PSK, QAM-16</source>
-        <translation type="obsolete">Modulatsioon, QPSK, 8PSK, QAM-16</translation>
-    </message>
-    <message>
-        <source>Most DVB-S transponders use QPSK, while DVB-S2 use 8PSK. QAM-16 is not available for DVB-S2 transports.</source>
-        <translation type="obsolete">Enamik DVB-S saatjaid kasutab QPSK, DVB-S2 8PSK QAM-16 pole saadaval DVB-S2 jaoks.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="219"/>
@@ -14180,10 +13794,6 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>8 MHz</translation>
     </message>
     <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Kaanepilt puudub</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelinfo.cpp" line="220"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1025"/>
         <source>Yes</source>
@@ -14196,22 +13806,6 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>Ei</translation>
     </message>
     <message>
-        <source>Details Downloaded</source>
-        <translation type="obsolete">Üksikasjad allalaetud</translation>
-    </message>
-    <message>
-        <source>Waiting for Detail Download</source>
-        <translation type="obsolete">Ootan üksikasjade allalaadimist</translation>
-    </message>
-    <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Hinnang puudub.</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">NR</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="250"/>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="331"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="580"/>
@@ -14220,38 +13814,6 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <location filename="../libs/libmythtv/videoouttypes.h" line="297"/>
         <source>None</source>
         <translation>Puudub</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Pealkiri</translation>
-    </message>
-    <message>
-        <source>Season/Episode</source>
-        <translation type="obsolete">Hooaeg/osa</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="obsolete">Aasta</translation>
-    </message>
-    <message>
-        <source>User Rating</source>
-        <translation type="obsolete">Kasutaja hinnang</translation>
-    </message>
-    <message>
-        <source>Runtime</source>
-        <translation type="obsolete">Pikkus</translation>
-    </message>
-    <message>
-        <source>Filename</source>
-        <translation type="obsolete">Failinimi</translation>
-    </message>
-    <message>
-        <source>Video ID</source>
-        <translation type="obsolete">Video ID</translation>
-    </message>
-    <message>
-        <source>Date Added</source>
-        <translation type="obsolete">Lisamise kuupäev</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="269"/>
@@ -14361,35 +13923,6 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>Vaikimisi (mall)</translation>
     </message>
     <message>
-        <source> (Template)</source>
-        <translation type="obsolete">(mall)</translation>
-    </message>
-    <message>
-        <source>Power Search</source>
-        <translation type="obsolete">Võimas otsing</translation>
-    </message>
-    <message>
-        <source>Title Search</source>
-        <translation type="obsolete">Pealkirja otsing</translation>
-    </message>
-    <message>
-        <source>Keyword Search</source>
-        <translation type="obsolete">Märksõna otsing</translation>
-    </message>
-    <message>
-        <source>People Search</source>
-        <translation type="obsolete">Inimeste otsing</translation>
-    </message>
-    <message>
-        <source>Unknown Search</source>
-        <translation type="obsolete">Tundmatu otsing</translation>
-    </message>
-    <message>
-        <source>(%1 or later) %3</source>
-        <comment>e.g. (Sunday or later) program subtitle</comment>
-        <translation type="obsolete">(%1 või hiljem) %3</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1614"/>
         <location filename="../libs/libmyth/programinfo.cpp" line="1618"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="126"/>
@@ -14406,327 +13939,303 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>Kaabel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="223"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="238"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="222"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="237"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="170"/>
         <source>Channel frequency table</source>
         <translation>Kanalite sagedustabel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="229"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="228"/>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>Kasuta vaikeväärtus välja arvatud juhul, kui allikas kasutab süsteemi põhisätetest erinevat sagedustabelit.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="320"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="319"/>
         <source>Perform EIT scan</source>
         <translation>Kava (EIT) tuvastamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="321"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="320"/>
         <source>If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves &apos;Over-the-Air&apos;.</source>
         <translation>Lubades uuendatakse kava infot telekanalis edastatava info põhjal &apos;eetrist&apos;.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="334"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="333"/>
         <source>User ID</source>
         <translation>Kasutaja ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="346"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="345"/>
         <source>Password</source>
         <translation>Parool</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="740"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="737"/>
         <source>Video device</source>
         <translation>Videoseade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="846"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="843"/>
         <source>VBI device</source>
         <translation>VBI seade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="924"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="921"/>
         <source>Audio device</source>
         <translation>Heliseade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="934"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="982"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2572"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2583"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="931"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="979"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2569"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2580"/>
         <source>(None)</source>
         <translation>(Puudub)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="962"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="959"/>
         <source>Maximum time (in milliseconds) MythTV waits for a channel lock.  For recordings, this value will be doubled.</source>
         <translation>Maksimaalne aeg (ms), mille jooksul MythTV ootab sgnaali lukustust. Salvestuste puhul see väärtus kahekordistub.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="996"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="993"/>
         <source>Do not adjust volume</source>
         <translation>Ära muuda helitugevust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1011"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1008"/>
         <source>DVB device</source>
         <translation>DVB seade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1013"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1010"/>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
         <translation>Selle seade muutmisel peab allolev tekst näitama kaardi nime ja tüüpi. Kui kaarti ei õnnestu avada, näidatakse viga.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1101"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1098"/>
         <source>Wait for SEQ start header.</source>
         <translation>Oota SEQ alguspäist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1116"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1113"/>
         <source>Open DVB card on demand</source>
         <translation>Ava DigiTV kaart nõudmisel</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation type="obsolete">Muu</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1248"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1245"/>
         <source>Point to Point</source>
         <translation>Punktist punkti</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="38"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1249"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1246"/>
         <source>Broadcast</source>
         <translation>Leviedastus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1261"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1258"/>
         <source>100Mbps</source>
         <translation>100 Mb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1262"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1259"/>
         <source>200Mbps</source>
         <translation>200 Mb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1263"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1260"/>
         <source>400Mbps</source>
         <translation>400 Mb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="676"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="675"/>
         <source>Video Source Setup</source>
         <translation>Videoallika seadistamine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="480"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="479"/>
         <source>Warning.</source>
         <translation>Tähelepanu.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="913"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="910"/>
         <source>File path</source>
         <translation>Faili asukoht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="945"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="942"/>
         <source>Signal timeout (ms)</source>
         <translation>Signaali aegumine (ms)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="947"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="944"/>
         <source>Maximum time (in milliseconds) MythTV waits for a signal when scanning for channels.</source>
         <translation>Maksimaalne aeg(ms), mille jooksul MythTV ootab signaali kanalite tuvastamisel.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="960"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="957"/>
         <source>Tuning timeout (ms)</source>
         <translation>Häälestamise aegumine (ms)</translation>
     </message>
     <message>
-        <source>Maximum time (in milliseconds) MythTV waits for a channel lock when scanning for channels during setup, or for issuing a warning in Live TV mode.</source>
-        <translation type="obsolete">Maksimaalne aeg, mille jooksul MythTV kanalite otsingul ajal ootab kanalilt signaali või aeg, peale mida antakse otse eetri vaatamisel hoiatus.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="976"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="973"/>
         <source>Force audio sampling rate</source>
         <translation>Sunni heli sämplisagedus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="978"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="975"/>
         <source>If non-zero, override the audio sampling rate in the recording profile when this card is used.  Use this if your capture card does not support all of the standard rates.</source>
         <translation>Kui pole null, muudab seda kaarti kasutades heli sämplikiirust salvestusprofiilis. Kasuta kui hõivekaart ei toeta kõiki standardkiirusi.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1104"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1101"/>
         <source>If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.</source>
         <translation>Lubades eemaldatakse DVB salvestusest kõik paketid kuni järgmise stardi päise tuvastamiseni.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1119"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1116"/>
         <source>If enabled, only open the DVB card when required, leaving it free for other programs at other times.</source>
         <translation>Lubades avatakse DVB kaart ainult vajadusel, jättes ülejäänud ajal kaardi vabaks teistele rakendustele.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1131"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1128"/>
         <source>Use DVB card for active EIT scan</source>
         <translation>Kasuta DVB kaarti aktiivseks kava (EIT) tuvastamiseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1134"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1131"/>
         <source>If enabled, activate active scanning for program data (EIT). When this option is enabled the DVB card is constantly in-use.</source>
         <translation>Lubades aktiveeritakse aktiivse programmiinfo(EIT) tuvastamine. Valiku korral on DVB kaart kogu aeg kasutusel.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1147"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1144"/>
         <source>DVB tuning delay (ms)</source>
         <translation>DVB häälestamise viide (ms)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1149"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1146"/>
         <source>Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process by specifying a delay (in milliseconds).</source>
         <translation>Mõned DigiTV draiverid, näiteks Hauppauge Nova-T, tahavad aeglasemat häälestamist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1189"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1186"/>
         <source>Motorola Generic</source>
         <translation>Motorola üldine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1190"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1187"/>
         <source>SA/Cisco Generic</source>
         <translation>SA/Cisco üldine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1444"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1441"/>
         <source>Available devices</source>
         <translation>Võimalikud seadmed</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1446"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1443"/>
         <source>Device ID and Tuner Number of available HDHomeRun devices.</source>
         <translation>Võimaliku HDHomeRun seadme ID ja Tüüneri number.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1573"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1570"/>
         <source>URL of M3U containing RTSP/RTP/UDP channel URLs.</source>
         <translation>RTSP/RTP/UDP kanalite URL-e sisaldava M3U URL.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1602"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1599"/>
         <source>ASI device</source>
         <translation>ASI seade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1661"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1658"/>
         <source>Warning: unable to open</source>
         <translation>Tähelepanu: ei õnnestu avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2267"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2264"/>
         <source>Capture Card Setup</source>
         <translation>Hõivekaardi seadistus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2468"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2465"/>
         <source>Card type</source>
         <translation>Kaardi tüüp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2469"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2466"/>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
         <translation>Sea kaarditüüp vastavusse konfigureeritava hõivekaardi tüübiga.</translation>
     </message>
     <message>
-        <source>MJPEG capture card (Matrox G200, DC10)</source>
-        <translation type="obsolete">MJPEG hõivekaart (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 encoder card</source>
-        <translation type="obsolete">MPEG-2 enkooder kaart</translation>
-    </message>
-    <message>
-        <source>Network recorder</source>
-        <translation type="obsolete">Võrgusalvesti</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2522"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2519"/>
         <source>DVEO ASI recorder</source>
         <translation>DVEO ASI salvesti</translation>
     </message>
     <message>
-        <source>Ceton Cablecard tuner </source>
-        <translation type="obsolete">Ceton Cablecard tüüner</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2525"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2522"/>
         <source>Import test recorder</source>
         <translation>Impordi test salvestaja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2526"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2523"/>
         <source>Demo test recorder</source>
         <translation>Demo test salvestaja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2535"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2532"/>
         <source>Capture device</source>
         <translation>Salvestusseade</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2556"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2553"/>
         <source>Display name (optional)</source>
         <translation>Näita nime (pole kohustuslik)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2557"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2554"/>
         <source>This name is displayed on screen when Live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
         <translation>Seda nime näidatakse TV vaatamise alustamisel ja valitud sisendi või kaardi vahetamisel. Selle kasutamisel veendu, et info oleks erinev igal sisendil.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2571"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2568"/>
         <source>Video source</source>
         <translation>Videoallikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2594"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2591"/>
         <source>Input</source>
         <translation>Sisend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2605"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2602"/>
         <source>Input group</source>
         <translation>Sisendigrupp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2733"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2730"/>
         <source>If enabled, MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
         <translation>Lubamise korral häälestub MythTV ainult MPEG kanali numbri järgi. Kanali numbrid vahetuvad sagedamini kui DVB või ATSC häälestusparameetrid, seega on valik vähem usaldusväärne. See keelab samuti EIT hankimise TV vaatamise ja salvestamise korral.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2751"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2748"/>
         <source>External channel change command</source>
         <translation>Väline käsk kanali vahetusseks</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2753"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2750"/>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
         <translation>Kui on määratud, siis käivitatakse see käsk välisevastuvõtja kanali vahetamisel. Esimeseks argumendiks antakse kanali number.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2767"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2764"/>
         <source>Preset tuner to channel</source>
         <translation>Eelhäälestatud kanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2769"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2766"/>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Kasuta vaid juhul, kui su sisendkaardiga on ühendatud väline vastuvõtja. Sel juhul pead sa valima kanali, mida kasutatakse (tavalisel 3 või 4).</translation>
     </message>
@@ -14736,127 +14245,25 @@ Enamik DVB-C saatjaid edastab 6.9 või 6.875 millionit märki sekundis.</transla
         <translation>Algkanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2906"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2903"/>
         <source>Connect source to input</source>
         <translation>Ühenda allikas sisendiga</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3263"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3260"/>
         <source>(New capture card)</source>
         <translation>(Uus hõivekaart)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3408"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3405"/>
         <source>(New video source)</source>
         <translation>(Uus videoallikas)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1797"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3771"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1794"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3768"/>
         <source>Recorder Options</source>
         <translation>Salvestaja valikud</translation>
-    </message>
-    <message>
-        <source>30m</source>
-        <translation type="obsolete">30 m</translation>
-    </message>
-    <message>
-        <source>1h</source>
-        <translation type="obsolete">1 tund</translation>
-    </message>
-    <message>
-        <source>1h30m</source>
-        <translation type="obsolete">1 tund 30 min</translation>
-    </message>
-    <message>
-        <source>2h</source>
-        <translation type="obsolete">2 tundi</translation>
-    </message>
-    <message>
-        <source>MythTV was set to sleep after %1 minutes and will exit in %d seconds.
-Do you wish to continue watching?</source>
-        <translation type="obsolete">MythTV on seatud uinuma peale %1 minutit ja seiskub %d sekundi pärast.
-Soovid edasi vaadata?</translation>
-    </message>
-    <message>
-        <source>MythTV has been idle for %1 minutes and will exit in %d seconds. Are you still watching?</source>
-        <translation type="obsolete">MythTV on jõude %1 minutit ja sulgub %d sekundi pärast. Kas vaatad veel midagi?</translation>
-    </message>
-    <message>
-        <source>Edit Cut Points</source>
-        <translation type="obsolete">Muuda lõikekohti</translation>
-    </message>
-    <message>
-        <source>Move Previous Cut End Here</source>
-        <translation type="obsolete">Liiguta eelmise lõike lõpp siia</translation>
-    </message>
-    <message>
-        <source>Save Cuts</source>
-        <translation type="obsolete">Salvesta lõikeloend</translation>
-    </message>
-    <message>
-        <source>Save Cuts and Exit</source>
-        <translation type="obsolete">Salvesta lõikeloend ja välju</translation>
-    </message>
-    <message>
-        <source>Exit Recording Editor</source>
-        <translation type="obsolete">Välju Salvestuse redaktorist</translation>
-    </message>
-    <message>
-        <source>Cannot delete program </source>
-        <translation type="obsolete">Ei saa saadet kustutada</translation>
-    </message>
-    <message>
-        <source>Cut to Beginning</source>
-        <translation type="obsolete">Lõika alguseni</translation>
-    </message>
-    <message>
-        <source>Cut to End</source>
-        <translation type="obsolete">Lõika lõpuni</translation>
-    </message>
-    <message>
-        <source>Move Next Cut Start Here</source>
-        <translation type="obsolete">Liiguta järgmise lõike algus siia</translation>
-    </message>
-    <message>
-        <source>Move Start of Cut Here</source>
-        <translation type="obsolete">Liiguta lõike algus siia</translation>
-    </message>
-    <message>
-        <source>Move End of Cut Here</source>
-        <translation type="obsolete">Liiguta lõike lõpp siia</translation>
-    </message>
-    <message>
-        <source>Delete This Cut</source>
-        <translation type="obsolete">Kustuta lõige</translation>
-    </message>
-    <message>
-        <source>Add New Cut</source>
-        <translation type="obsolete">Lisa uus lõige</translation>
-    </message>
-    <message>
-        <source>Join Surrounding Cuts</source>
-        <translation type="obsolete">Ühenda ümbritsevad lõiked</translation>
-    </message>
-    <message>
-        <source>Cut List Options</source>
-        <translation type="obsolete">Lõikeloendi valikud</translation>
-    </message>
-    <message>
-        <source>Undo Changes</source>
-        <translation type="obsolete">Võta tagasi</translation>
-    </message>
-    <message>
-        <source>Exit Without Saving</source>
-        <translation type="obsolete">Välju salvestamata</translation>
-    </message>
-    <message>
-        <source>because it is not a recording.</source>
-        <translation type="obsolete">sest see pole salvestus.</translation>
-    </message>
-    <message>
-        <source>because it is in use by</source>
-        <translation type="obsolete">sest seda kasutab</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1638"/>
@@ -14864,11 +14271,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmyth/programtypes.cpp" line="214"/>
         <source>Repeat</source>
         <translation>Kordus</translation>
-    </message>
-    <message>
-        <source>GB</source>
-        <comment>GigaBytes</comment>
-        <translation type="obsolete">GB</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2841"/>
@@ -14887,51 +14289,16 @@ Soovid edasi vaadata?</translation>
         <translation>S</translation>
     </message>
     <message>
-        <source>T</source>
-        <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="obsolete">W</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="obsolete">C</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="106"/>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
         <translation>A</translation>
     </message>
     <message>
-        <source>F</source>
-        <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="obsolete">d</translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="obsolete">w</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="115"/>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
         <translation>O</translation>
-    </message>
-    <message>
-        <source>t</source>
-        <comment>RecTypeChar kTemplateRecord</comment>
-        <translation type="obsolete">t</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="30"/>
@@ -14978,25 +14345,9 @@ Soovid edasi vaadata?</translation>
         <translation>T</translation>
     </message>
     <message>
-        <source>Channel Record</source>
-        <translation type="obsolete">Kanali salvestamine</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="32"/>
         <source>Record All</source>
         <translation>Salvesta kõik</translation>
-    </message>
-    <message>
-        <source>Find One</source>
-        <translation type="obsolete">Otsi üks</translation>
-    </message>
-    <message>
-        <source>Find Daily</source>
-        <translation type="obsolete">Otsi iga päev</translation>
-    </message>
-    <message>
-        <source>Find Weekly</source>
-        <translation type="obsolete">Otsi iga nädal</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="41"/>
@@ -15195,10 +14546,6 @@ Soovid edasi vaadata?</translation>
         <translation>Saade salvestati.</translation>
     </message>
     <message>
-        <source>This showing was not recorded because the master backend was hung or not running.</source>
-        <translation type="obsolete">Saadet ei salvestatud sest peataustaserver oli hangunud või ei töötanud.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="307"/>
         <source>The status of this showing is unknown.</source>
         <translation>Saate olek on teadmata.</translation>
@@ -15299,17 +14646,9 @@ Soovid edasi vaadata?</translation>
         <translation>salvestatakse mingit teist saadet, millel on  kõrgem prioriteet.</translation>
     </message>
     <message>
-        <source>this episode will be recorded at a later time.</source>
-        <translation type="obsolete">see osa salvestatakse hiljem.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/setupwizard_audio.cpp" line="295"/>
         <source>Stereo</source>
         <translation>Stereo</translation>
-    </message>
-    <message>
-        <source>Program ID</source>
-        <translation type="obsolete">Saate ID</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="702"/>
@@ -15317,74 +14656,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="142"/>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Use custom identifier for frontend preferences</source>
-        <translation type="obsolete">Kasuta spetsiaalset tunnust kasutajaliidese eelistustes salvestamisel</translation>
-    </message>
-    <message>
-        <source>Database Configuration</source>
-        <translation type="obsolete">Andmebaasi seaded</translation>
-    </message>
-    <message>
-        <source>All database settings take effect when you restart this program.</source>
-        <translation type="obsolete">Kõik andmebaasi muudatused hakkavad mõjuma peale MythTV taaskäivitamist.</translation>
-    </message>
-    <message>
-        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="obsolete">Andmebaasimasina nimi või IP aadress (kohustuslik).</translation>
-    </message>
-    <message>
-        <source>The name of the database. This information is required.</source>
-        <translation type="obsolete">Andmebaasi nimi (kohustuslik).</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="obsolete">Kasutaja</translation>
-    </message>
-    <message>
-        <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="obsolete">Admebaasiga ühendumisel kasutatav kasutajanimi (kohustuslik).</translation>
-    </message>
-    <message>
-        <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="obsolete">Admebaasiga ühendumisel kasutatav parool (kohustuslik).</translation>
-    </message>
-    <message>
-        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="obsolete">Kui masina nimi muutub tihti, märgi see kastike ning anna unikaalne nimi, mille järgi masin ära tunda. Kui on märkimata, siis kasutatakse andmebaasi eelistuste salvestamisel masina nime.</translation>
-    </message>
-    <message>
-        <source>Custom identifier</source>
-        <translation type="obsolete">Spetsiaalne tunnus</translation>
-    </message>
-    <message>
-        <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="obsolete">Selle kasutajaliidese sätete salvestamisel kasutatav tunnus.</translation>
-    </message>
-    <message>
-        <source>Enable database server wakeup</source>
-        <translation type="obsolete">Luba andmebaasi serveri äratus</translation>
-    </message>
-    <message>
-        <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation type="obsolete">Valimisel kasutab klient andmebaasiga ühendumisel  äratamise parameetreid.</translation>
-    </message>
-    <message>
-        <source>Reconnect time</source>
-        <translation type="obsolete">Taasühendumise aeg</translation>
-    </message>
-    <message>
-        <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="obsolete">Serveri ärkamise ootamise aeg sekundites.</translation>
-    </message>
-    <message>
-        <source>Retry attempts</source>
-        <translation type="obsolete">Kordamiste arv</translation>
-    </message>
-    <message>
-        <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="obsolete">Serveri äratamise katsete arv enne kui kasutajaliides loobub.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="346"/>
@@ -15586,165 +14857,9 @@ Soovid edasi vaadata?</translation>
         <translation>Tööjärjekord (töökäsud)</translation>
     </message>
     <message>
-        <source>Audio output device</source>
-        <translation type="obsolete">Heli väljundseade</translation>
-    </message>
-    <message>
-        <source>Rescan</source>
-        <translation type="obsolete">Otsi uuesti</translation>
-    </message>
-    <message>
-        <source>Rescan for available audio devices. Current entry will be checked and capability entries populated.</source>
-        <translation type="obsolete">Otsi heliseadmeid. Tuvastatakse iga seadme võimalused.</translation>
-    </message>
-    <message>
-        <source>Digital Audio Capabilities</source>
-        <translation type="obsolete">Digitaalheli võimalused</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="obsolete">Proovi</translation>
-    </message>
-    <message>
-        <source>Will play a test pattern on all configured speakers</source>
-        <translation type="obsolete">Kõigis häälestatud kõlarites mängitakse testheli</translation>
-    </message>
-    <message>
-        <source>Advanced Audio Settings</source>
-        <translation type="obsolete">Laiendatud heliseaded</translation>
-    </message>
-    <message>
-        <source>Enable extra audio settings. Under most usage all options should be left alone</source>
-        <translation type="obsolete">Luba täpsemad heliseaded. Enamikul juhtudest peaks siin jätma kõik nagu on</translation>
-    </message>
-    <message>
-        <source>Passthrough device is invalid or not useable. Check configuration in Advanced Settings:</source>
-        <translation type="obsolete">Läbilaskeseade on vale või pole kasutatav. Kontrolli seadeid täpsemate heliseadete alt:</translation>
-    </message>
-    <message>
-        <source>TrueHD</source>
-        <translation type="obsolete">TrueHD</translation>
-    </message>
-    <message>
-        <source>DTS-HD</source>
-        <translation type="obsolete">DTS-HD</translation>
-    </message>
-    <message>
-        <source>Audio Configuration Testing</source>
-        <translation type="obsolete">Heli seadistuse testimine</translation>
-    </message>
-    <message>
-        <source>Test All</source>
-        <translation type="obsolete">Proovi kõiki</translation>
-    </message>
-    <message>
-        <source>Start all channels test</source>
-        <translation type="obsolete">Käivita kõikide kanalite test</translation>
-    </message>
-    <message>
-        <source>Front Left</source>
-        <translation type="obsolete">Esimene vasak</translation>
-    </message>
-    <message>
-        <source>Front Right</source>
-        <translation type="obsolete">Esimene parem</translation>
-    </message>
-    <message>
-        <source>Center</source>
-        <translation type="obsolete">Keskmine</translation>
-    </message>
-    <message>
-        <source>Rear Left</source>
-        <translation type="obsolete">Tagumine vasak</translation>
-    </message>
-    <message>
-        <source>Surround Left</source>
-        <translation type="obsolete">Ruumiline vasak</translation>
-    </message>
-    <message>
-        <source>Surround Right</source>
-        <translation type="obsolete">Ruumiline parem</translation>
-    </message>
-    <message>
-        <source>LFE</source>
-        <translation type="obsolete">LFE</translation>
-    </message>
-    <message>
-        <source>Passive</source>
-        <translation type="obsolete">Passiivne</translation>
-    </message>
-    <message>
-        <source>Hall</source>
-        <translation type="obsolete">Saal</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports AC-3/Dolby Digital. You must use a digital connection. Uncheck if using an analog connection.</source>
-        <translation type="obsolete">Luba, kui võimendi või helidekooder toetab AC-3/Dolby Digital-i. Pead kasutama digitaalset ühendust. Analoogühenduse puhul keela.</translation>
-    </message>
-    <message>
-        <source>E-AC-3</source>
-        <translation type="obsolete">E-AC-3</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports E-AC-3 (DD+). You must use a HDMI connection.</source>
-        <translation type="obsolete">Luba, kui võimendi või helidekooder toetab E-AC-3 (DD+). Pead kasutama hdmi ühendust.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports Dolby TrueHD. You must use a HDMI connection.</source>
-        <translation type="obsolete">Luba, kui võimendi või helidekooder toetab Dolby TrueHD. Pead kasutama HDMI ühendust.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports DTS-HD. You must use a HDMI connection.</source>
-        <translation type="obsolete">Luba, kui võimendi või helidekooder toetab DTS-HD. Pead kasutama HDMI ühendust.</translation>
-    </message>
-    <message>
-        <source>Use Highest Quality Mode</source>
-        <translation type="obsolete">Kasuta kõrgeimat kvaliteeti</translation>
-    </message>
-    <message>
-        <source>Use the highest audio quality settings supported by your audio card. This will be a good place to start troubleshooting potential errors</source>
-        <translation type="obsolete">Kasuta kõrgeimat helikvaliteedi seadistust, mida helikaart toetab. See on hea koht potensiaalsete vigade tuvastamiseks</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation type="obsolete">Lõpeta</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/setupwizard_audio.cpp" line="442"/>
         <source>Audio device is invalid or not useable.</source>
         <translation>Heliseade on vigane või pole kasutatav.</translation>
-    </message>
-    <message>
-        <source>Use internal volume controls</source>
-        <translation type="obsolete">Kasuta sisemist helitugevuse juhtimist</translation>
-    </message>
-    <message>
-        <source>Changing the volume adjusts the selected mixer.</source>
-        <translation type="obsolete">Helitugevuse muutmiseks kasutatav mikser.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder only supports 2 channel PCM (typically an old HDMI 1.0 device). Multichannel audio will be re-encoded to AC-3 when required</source>
-        <translation type="obsolete">Luba kui võimendi või dekooder toetab ainult 2 kanalit (tavaliselt vana HDMI 1.0 seade). Mitmekanalilise heli saab vajadusel kodeerida AC-3-ks</translation>
-    </message>
-    <message>
-        <source>Audio output device to use for digital audio. This value is currently only used with ALSA and DirectX sound output.</source>
-        <translation type="obsolete">Väljundseade digitaalheli jaoks. Väärtust kasutatakse ainult ALSA ja DirectX heli väljundis.</translation>
-    </message>
-    <message>
-        <source>SPDIF 48kHz rate override</source>
-        <translation type="obsolete">SPDIF 48kHz kiiruse jõustamine</translation>
-    </message>
-    <message>
-        <source>ALSA only. By default, let ALSA determine the passthrough sampling rate. If checked set the sampling rate to 48kHz for passthrough. (default is not checked)</source>
-        <translation type="obsolete">Ainult ALSA puhul. Vaikimisi lubatakse ALSA-l tuvastada läbilaske sämplisagedus. Valides seatakse läbilaske režiimis sämplisagedus 48kHz (vaikimisi pole valitud)</translation>
-    </message>
-    <message>
-        <source>HBR passthrough support</source>
-        <translation type="obsolete">HBR läbilaske tugi</translation>
-    </message>
-    <message>
-        <source>HBR support is required for TrueHD and DTS-HD passthrough. If unchecked, Myth will limit the passthrough bitrate to 6.144Mbit/s.This will disable True-HD passthrough, however will allow DTS-HD content to be sent as DTS-HD Hi-Res. (default is checked)</source>
-        <translation type="obsolete">HBR tugi on vajalik TrueHD ja DTS-HD läbilaske puhul. Kui pole valitud piirab Myth läbilaske kiiruse 6.144Mbit/s peale. See keelab True-HD läbilaske, kuid lubab DTS-HD sisu saata kui DTS-HD Hi-Res. (vaikimisi on valitud)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="706"/>
@@ -15755,10 +14870,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="722"/>
         <source>One field</source>
         <translation>Üks väli</translation>
-    </message>
-    <message>
-        <source>Extra audio buffering</source>
-        <translation type="obsolete">Täiendav heli puhverdamine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="190"/>
@@ -15781,38 +14892,6 @@ Soovid edasi vaadata?</translation>
         <translation>all paremal</translation>
     </message>
     <message>
-        <source>Location of PIP Video window.</source>
-        <translation type="obsolete">Pilt pildis videoakna asukoht.</translation>
-    </message>
-    <message>
-        <source>All Programs</source>
-        <translation type="obsolete">Kõik saated</translation>
-    </message>
-    <message>
-        <source>How many minutes to jump forward or backward when the jump keys are pressed.</source>
-        <translation type="obsolete">Kui mitu minutit liigutakse edasi või tagasi hüppenuppude vajutatamisel.</translation>
-    </message>
-    <message>
-        <source>How many seconds to skip forward on a fast forward.</source>
-        <translation type="obsolete">Mitu sekundit jäetakse vahele edasikerimisel.</translation>
-    </message>
-    <message>
-        <source>How many seconds to skip backward on a rewind.</source>
-        <translation type="obsolete">Mitu sekundit jäetakse vahele tagasikerimisel.</translation>
-    </message>
-    <message>
-        <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation type="obsolete">Märkimisel jäetakse koheselt tagasikerimisele järgneval edasikerimisel sama palju vahele, kui tagasikerimisel jäeti.</translation>
-    </message>
-    <message>
-        <source>Seek to exact frame</source>
-        <translation type="obsolete">Otsi kindlat kaadrit</translation>
-    </message>
-    <message>
-        <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation type="obsolete">Märkimisel otsitakse täpselt õiget kaadrit (aeglasem).</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="5057"/>
         <source>Blank Frame + Scene Change</source>
         <translation>Tühja kaadri + stseeni muutuse avastamine</translation>
@@ -15833,1315 +14912,9 @@ Soovid edasi vaadata?</translation>
         <translation>Kõik</translation>
     </message>
     <message>
-        <source>Upconvert stereo to 5.1 surround</source>
-        <translation type="obsolete">Teisenda stereo 5.1 ruumiliseks</translation>
-    </message>
-    <message>
-        <source>Stereo PCM Only</source>
-        <translation type="obsolete">Ainult Stereo PCM</translation>
-    </message>
-    <message>
-        <source>Fastest</source>
-        <translation type="obsolete">Kiireim</translation>
-    </message>
-    <message>
-        <source>Good</source>
-        <translation type="obsolete">Hea</translation>
-    </message>
-    <message>
-        <source>Best</source>
-        <translation type="obsolete">Parim</translation>
-    </message>
-    <message>
-        <source>Override SRC quality</source>
-        <translation type="obsolete">Eira SRC kvaliteeti</translation>
-    </message>
-    <message>
-        <source>Disabled</source>
-        <translation type="obsolete">Keelatud</translation>
-    </message>
-    <message>
-        <source>Use a distinct digital output device from default. (default is not checked)</source>
-        <translation type="obsolete">Kasuta vaikimisi seadmest erinevat digiseadet. (vaikimisi pole valitud)</translation>
-    </message>
-    <message>
-        <source>Digital output device</source>
-        <translation type="obsolete">Digitaal väljundseade</translation>
-    </message>
-    <message>
-        <source>Setting the mixer device to &quot;software&quot; lets MythTV control the volume of all audio at the expense of a slight quality loss.</source>
-        <translation type="obsolete">Seades mikseri seadme &quot;tarkvara&quot;-le lubab MythTV-l muuta väikese kvaliteedi kaoga helitugevust kogu seadmes.</translation>
-    </message>
-    <message>
-        <source>Dolby Digital</source>
-        <translation type="obsolete">Dolby Digital</translation>
-    </message>
-    <message>
-        <source> is invalid or not useable.</source>
-        <translation type="obsolete"> on vigane või pole kasutatav.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/setupwizard_audio.cpp" line="444"/>
         <source>Warning</source>
         <translation>Tähelepanu</translation>
-    </message>
-    <message>
-        <source>7.1</source>
-        <translation type="obsolete">7.1</translation>
-    </message>
-    <message>
-        <source>Speaker configuration</source>
-        <translation type="obsolete">Kõlarite seadistamine</translation>
-    </message>
-    <message>
-        <source>Select the maximum number of audio channels supported by your receiver and speakers.</source>
-        <translation type="obsolete">Vali võimendi ja kõlarite poolt toetatud maksimaalne kanalite arv.</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will upconvert stereo to 5.1 audio. You can enable or disable the upconversion during playback at any time.</source>
-        <translation type="obsolete">Lubades suudab MythTV konvertida stereo 5.1 heliks. Saad seda muuta ka taasesituse ajal.</translation>
-    </message>
-    <message>
-        <source>Upmix Quality</source>
-        <translation type="obsolete">Konvertimise kvaliteet</translation>
-    </message>
-    <message>
-        <source>Set the audio surround-upconversion quality.</source>
-        <translation type="obsolete">Sea heli ruumiliseks konvertimise kvaliteet.</translation>
-    </message>
-    <message>
-        <source>DTS</source>
-        <translation type="obsolete">DTS</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports DTS. You must use a digital connection. Uncheck if using an analog connection</source>
-        <translation type="obsolete">Luba, kui võimendi või helidekooder toetab DTS-i. Pead kasutama digitaalset ühendust. Analoogühenduse puhul keela</translation>
-    </message>
-    <message>
-        <source>Notify, but do not skip</source>
-        <translation type="obsolete">Anna märku kuid ära vahele jäta</translation>
-    </message>
-    <message>
-        <source>Automatically Skip</source>
-        <translation type="obsolete">Jäta automaatselt vahele</translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="obsolete">See üldine säte lubab salvestamist alustada enne määratud aega. See ei muuda planeerijat. Juhul kui kahe saate vahel pole piisavalt aega, siis seda väärtust ignoreeritakse.</translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="obsolete">See üldine säte lubab salvestajal lõpetada peale määratud aega. See ei muuda planeerijat. Juhul kui kahe saate vahel pole piisavalt aega, siis seda väärtust ignoreeritakse.</translation>
-    </message>
-    <message>
-        <source>Record date</source>
-        <translation type="obsolete">Salvestusaeg</translation>
-    </message>
-    <message>
-        <source>Selects how to sort a shows episodes</source>
-        <translation type="obsolete">Mille järgi osasid järjestatakse</translation>
-    </message>
-    <message>
-        <source>Reverse direction in fast forward/rewind</source>
-        <translation type="obsolete">Suuna muutimine edasi-tagasi kerimisel</translation>
-    </message>
-    <message>
-        <source>Menu theme</source>
-        <translation type="obsolete">Menüü kujundus</translation>
-    </message>
-    <message>
-        <source>default</source>
-        <translation type="obsolete">vaikimisi</translation>
-    </message>
-    <message>
-        <source>Channel ordering</source>
-        <translation type="obsolete">Kanalite järjestus</translation>
-    </message>
-    <message>
-        <source>Scan displacement (X)</source>
-        <translation type="obsolete">Vaate horisontaalne nihutus</translation>
-    </message>
-    <message>
-        <source>Adjust this to move the image horizontally.</source>
-        <translation type="obsolete">Seda muutes saab muuta pildi horisontaalset asukohta.</translation>
-    </message>
-    <message>
-        <source>Scan displacement (Y)</source>
-        <translation type="obsolete">Vaate vertikaalne nihutus</translation>
-    </message>
-    <message>
-        <source>Adjust this to move the image vertically.</source>
-        <translation type="obsolete">Seda muutes saab muuta pildi vertikaalset asukohta.</translation>
-    </message>
-    <message>
-        <source>Action on playback exit</source>
-        <translation type="obsolete">Tegevus mahamängimise lõpetamisel</translation>
-    </message>
-    <message>
-        <source>Just exit</source>
-        <translation type="obsolete">Lihtsalt välju</translation>
-    </message>
-    <message>
-        <source>Save position and exit</source>
-        <translation type="obsolete">Salvesta asukoht ja välju</translation>
-    </message>
-    <message>
-        <source>Prompt at end of recording</source>
-        <translation type="obsolete">Menüü salvestamise lõpetamisel</translation>
-    </message>
-    <message>
-        <source>Customize exit menu options</source>
-        <translation type="obsolete">Muuda väljumismenüü valikuid</translation>
-    </message>
-    <message>
-        <source>Halt command</source>
-        <translation type="obsolete">Seiskamiskäsk</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation type="obsolete">PIN-i kasutatakse seadete menüüle ligipääsu kontrollimiseks. Seda võimalust kasutades teed oma elu lihtsamaks seades väärtuseks ainult numbrid. PIN-i keelamiseks jäta väärtus määramata. Kui PIN on eelnevalt määratud, siis pead selle muutmiseks või kustutamiseks eelmist väärtust teadma. </translation>
-    </message>
-    <message>
-        <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="obsolete">Käivita antud ekraanil või üle kõikide ekraanide.</translation>
-    </message>
-    <message>
-        <source>GUI X offset</source>
-        <translation type="obsolete">Graafilise kasutajaliidese horisontaalne nihe</translation>
-    </message>
-    <message>
-        <source>GUI Y offset</source>
-        <translation type="obsolete">Graafilise kasutajaliidese vertikaalne nihe</translation>
-    </message>
-    <message>
-        <source>Use GUI size for TV playback</source>
-        <translation type="obsolete">Kasuta TV vaatamisel graafilise kasutajaliidese suurust</translation>
-    </message>
-    <message>
-        <source>If enabled, use the above size for TV, otherwise use full screen.</source>
-        <translation type="obsolete">Märkimisel kasutatakse eelnevat suurust TV vaatamisel. Mittemärkimisel kasutatakse kogu ekraani.</translation>
-    </message>
-    <message>
-        <source>Separate video modes for GUI and TV playback</source>
-        <translation type="obsolete">Erinevad videorežiimid graafilise kasutajaliidese ning TV vaatamiseks</translation>
-    </message>
-    <message>
-        <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
-        <translation type="obsolete">Muuda X-i videorežiimi TV vaatamisel. Vajab &quot;xrandr&quot; tuge.</translation>
-    </message>
-    <message>
-        <source>In X</source>
-        <translation type="obsolete">Horisontaalne</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="obsolete">Horisontaalne kuvatihedus videopildile, mis vajab näitamiseks erilist kuvatihedust.</translation>
-    </message>
-    <message>
-        <source>In Y</source>
-        <translation type="obsolete">Vertikaalne</translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="obsolete">Vertikaalne kuvatihedus videopildile, mis vajab näitamiseks erilist kuvatihedust.</translation>
-    </message>
-    <message>
-        <source>GUI</source>
-        <translation type="obsolete">Graafiline kasutajaliides</translation>
-    </message>
-    <message>
-        <source>Resolution of screen when not watching a video.</source>
-        <translation type="obsolete">Ekraani kuvatihedus kui videot ei vaadata.</translation>
-    </message>
-    <message>
-        <source>Default screen resolution when watching a video.</source>
-        <translation type="obsolete">Vaikimisi ekraani kuvatihedus video vaatamisel.</translation>
-    </message>
-    <message>
-        <source>Screen resolution when watching a video at a specific resolution.</source>
-        <translation type="obsolete">Vaikimisi ekraani kuvatihedus erilise kuvatihedusega video vaatamisel.</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="obsolete">Väljund</translation>
-    </message>
-    <message>
-        <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="obsolete">Vaikimisi värskendussagedus video vaatamisel. Parima automaatseks valikuks jäta &quot;Auto&quot;</translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="obsolete">Värskendussagedus kindla resolutsiooniga video vaatamisel. Parima automaatseks valikuks jäta &quot;Auto&quot;</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation type="obsolete">Sagedus</translation>
-    </message>
-    <message>
-        <source>Aspect ratio when watching a video.</source>
-        <translation type="obsolete">Kuvasuhe video vaatamisel.</translation>
-    </message>
-    <message>
-        <source>Aspect</source>
-        <translation type="obsolete">Kuvasuhe</translation>
-    </message>
-    <message>
-        <source>Video Mode Settings</source>
-        <translation type="obsolete">Videorežiimi seaded</translation>
-    </message>
-    <message>
-        <source>Toggles mouse cursor visibility for touchscreens. By default MythTV will auto-hide the cursor if the mouse doesn&apos;t move for a period, this setting disables the cursor entirely.</source>
-        <translation type="obsolete">Lülita hiire kursori nähtavust puuteekraani jaoks. Vaikimisi peidab MythTV kursori kui see mingi aeg ei liigu. Siit saab kursori täielikult peita.</translation>
-    </message>
-    <message>
-        <source>Toggles between windowed and borderless operation.</source>
-        <translation type="obsolete">Kasutajaliidese üle ekraani või aknas töötamise valik.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Kuupäeva formaat</translation>
-    </message>
-    <message>
-        <source>Your preferred date format.</source>
-        <translation type="obsolete">Eelistatud kuupäeva formaat.</translation>
-    </message>
-    <message>
-        <source>Your preferred short date format.</source>
-        <translation type="obsolete">Eelistatud lühike kuupäeva formaat.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Kellaaja formaat</translation>
-    </message>
-    <message>
-        <source>Long channel format</source>
-        <translation type="obsolete">Pikk kanali formaat</translation>
-    </message>
-    <message>
-        <source>Allow Live TV to move scheduled shows</source>
-        <translation type="obsolete">Luba otse eetril muuta salvestuste planeeringuid</translation>
-    </message>
-    <message>
-        <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that Live TV will not be interrupted.</source>
-        <translation type="obsolete">Lubades liigutatakse salvestused teisele kaardile(kui võimalik), et otse eetri vaatamist mitte katkestada.</translation>
-    </message>
-    <message>
-        <source>Browse/change channels from Channel Group</source>
-        <translation type="obsolete">Sirvi/muuda kanaleid kanaligrupis</translation>
-    </message>
-    <message>
-        <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
-        <translation type="obsolete">Lubades saad otse eetris vahetada või sirvida kanaleid valitud kanaligrupis. Kõigi kanalite sirvimiseks vali &quot;Kõik kanalid&quot; grupp.</translation>
-    </message>
-    <message>
-        <source>Reschedule higher priorities</source>
-        <translation type="obsolete">Ajasta ümber tähtsamad salvestamised</translation>
-    </message>
-    <message>
-        <source>Move higher priority programs to other cards and showings when resolving conflicts. This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="obsolete">Konfliktide lahendamisel liiguta kõrgemate prioriteetidega saateid teistele kaartidele ja aegadele.  Sellega võimaldatakse salvestada madalamate prioriteetidega saateid, mis jääksid muidu salvestamata. Samas tekib risk, et kõrgema prioriteediga saade jääb salvestamata, kui saatekava peaks vahepeal muutuma.</translation>
-    </message>
-    <message>
-        <source>Avoid back to back recordings</source>
-        <translation type="obsolete">Väldi kokkujooksvaid salvestamisi</translation>
-    </message>
-    <message>
-        <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="obsolete">Lubades ei panda sama ühe saate lõpu ja teise alguse ajaga saateid ühele kaardile. Kui vajalik, siis konfliktide vältimiseks lubatakse.</translation>
-    </message>
-    <message>
-        <source>Different Channels</source>
-        <translation type="obsolete">Erinevad kanalid</translation>
-    </message>
-    <message>
-        <source>Preferred input priority</source>
-        <translation type="obsolete">Eelistatud sisendi prioriteet</translation>
-    </message>
-    <message>
-        <source>HDTV recording priority</source>
-        <translation type="obsolete">HDTV salvestusprioriteet</translation>
-    </message>
-    <message>
-        <source>Widescreen recording priority</source>
-        <translation type="obsolete">Laiekraani salvestus prioriteet</translation>
-    </message>
-    <message>
-        <source>Automatic priority range (+/-)</source>
-        <translation type="obsolete">Automaatne prioriteedivahemik (+/-)</translation>
-    </message>
-    <message>
-        <source>Sign language recording priority</source>
-        <translation type="obsolete">Keele salvestus proriteet</translation>
-    </message>
-    <message>
-        <source>Subtitles/CC recording priority</source>
-        <translation type="obsolete">Subtiitrid/teletekst salvestus prioriteet</translation>
-    </message>
-    <message>
-        <source>Hard of hearing priority</source>
-        <translation type="obsolete">Vaegkuulmise prioriteet</translation>
-    </message>
-    <message>
-        <source>Audio described priority</source>
-        <translation type="obsolete">Heli kirjelduse prioriteet</translation>
-    </message>
-    <message>
-        <source>Single recordings priority</source>
-        <translation type="obsolete">Ühekordse salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Single recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Ühekordsed salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>Weekslot recordings priority</source>
-        <translation type="obsolete">Iganädalase salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Weekslot recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Iganädalased salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>Timeslot recordings priority</source>
-        <translation type="obsolete">Ajavahemiku salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Timeslot recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Ajavahemiku salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>Channel recordings priority</source>
-        <translation type="obsolete">Kanali salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Channel recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Kanali salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>All recordings priority</source>
-        <translation type="obsolete">Kõigi salvestamiste prioriteet</translation>
-    </message>
-    <message>
-        <source>The &apos;All&apos; recording type will receive this additional recording priority value.</source>
-        <translation type="obsolete">&apos;Kõik&apos; salvestustüüp saab sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>Find one recordings priority</source>
-        <translation type="obsolete">Ühekordse otsitud salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Override recordings priority</source>
-        <translation type="obsolete">Muudetud salvestamise prioriteet</translation>
-    </message>
-    <message>
-        <source>Override recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Muudetud salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>The program guide starts on this channel if it is run from outside of Live TV mode.</source>
-        <translation type="obsolete">Saatekava näitab väljaspool otse eetri vaatamist esimesena antud kanalit.</translation>
-    </message>
-    <message>
-        <source>Record threshold</source>
-        <translation type="obsolete">Salvestamise lävi</translation>
-    </message>
-    <message>
-        <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="obsolete">Valides saate, mis on vähemalt nii palju minuteid tulevikus planeerib salvestamise.</translation>
-    </message>
-    <message>
-        <source>Guide language #%1</source>
-        <translation type="obsolete">Kava keel #%1</translation>
-    </message>
-    <message>
-        <source>Your #%1 preferred language for Program Guide data and captions.</source>
-        <translation type="obsolete">Sinu #%1. keele eelistus saatekava ning subtiitrite jaoks.</translation>
-    </message>
-    <message>
-        <source>Network Remote Control port</source>
-        <translation type="obsolete">Võrgust juhtimise port</translation>
-    </message>
-    <message>
-        <source>This specifies what port the network remote Control interface will listen on for new connections.</source>
-        <translation type="obsolete">Määrab pordi, mille kaudu kasutajaliidest juhtida.</translation>
-    </message>
-    <message>
-        <source>UDP notify port</source>
-        <translation type="obsolete">UDP teavituse port</translation>
-    </message>
-    <message>
-        <source>Enable AirPlay</source>
-        <translation type="obsolete">Luba AirPlay</translation>
-    </message>
-    <message>
-        <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
-        <translation type="obsolete">AirPlay võimaldab iPhonel, iPadil, iPod Touchil või iTunesil olevat meediat näha TV-s.</translation>
-    </message>
-    <message>
-        <source>Only support AirTunes (no video)</source>
-        <translation type="obsolete">Yoetatud on ainult AirTunes (video puudub)</translation>
-    </message>
-    <message>
-        <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
-        <translation type="obsolete">Audio voogedastus iPhonest, iPadist, iPod Touchist või iTunest</translation>
-    </message>
-    <message>
-        <source>Require password</source>
-        <translation type="obsolete">Nõua salasõna</translation>
-    </message>
-    <message>
-        <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
-        <translation type="obsolete">AirPlay kasutamiseks nõutakse salasõna</translation>
-    </message>
-    <message>
-        <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
-        <translation type="obsolete">iPhone, iPad, iPod Touch või iTunes küsivad seda salasõna</translation>
-    </message>
-    <message>
-        <source>All AirPlay settings take effect when you restart MythFrontend.</source>
-        <translation type="obsolete">AirPlay seadete jõustamiseks tuleb MythTV klientprogramm taaskäivitada.</translation>
-    </message>
-    <message>
-        <source>AirTunes RSA key couldn&apos;t be loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. Last Error: %1</source>
-        <translation type="obsolete">AirTunesi RSA võtme laadimie ebaõnestus. Uuri http://www.mythtv.org/wiki/AirTunes/AirPlay. Viimane viga: %1</translation>
-    </message>
-    <message>
-        <source>AirTunes RSA key successfully loaded.</source>
-        <translation type="obsolete">AirTunes RSA võtme laadimine õnnestus.</translation>
-    </message>
-    <message>
-        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
-        <translation type="obsolete">Jälgitakse CD/DVD seadet ning uue plaadi sisestamisel käivitatakse vastav rakendus.</translation>
-    </message>
-    <message>
-        <source>Ignore devices</source>
-        <translation type="obsolete">Ignoreeri seadmeid</translation>
-    </message>
-    <message>
-        <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
-        <translation type="obsolete">Kui mingeid seadmeid ei peaks jälgima, siis sisesta need komaga eraldatult siia. Vajab restarti.</translation>
-    </message>
-    <message>
-        <source>Sort titles</source>
-        <translation type="obsolete">Sorteeri pealkirjad</translation>
-    </message>
-    <message>
-        <source>By recording priority</source>
-        <translation type="obsolete">salvestusprioriteedi järgi</translation>
-    </message>
-    <message>
-        <source>Sets the title sorting order when the view is set to Titles only.</source>
-        <translation type="obsolete">Pealkirjade järjestamine ainult pealkirjade näitamise korral.</translation>
-    </message>
-    <message>
-        <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="obsolete">Valimisel kui lähed &apos;Vaata salvestusi&apos; menüsse näidatakse alati &apos;Esitusloendit&apos;</translation>
-    </message>
-    <message>
-        <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="obsolete">Kasuta juhul kui automaatne aegumine puudub vaid salvestustel, mis on vaadatud ning mida peaks säilitama. Sellel juhul ei näidata neid &quot;Vaatlusnimekirjas&quot;.</translation>
-    </message>
-    <message>
-        <source>Display time</source>
-        <translation type="obsolete">Kuva aeg</translation>
-    </message>
-    <message>
-        <source>Display recording status</source>
-        <translation type="obsolete">Kuva salvestamisolek</translation>
-    </message>
-    <message>
-        <source>Display menus</source>
-        <translation type="obsolete">Kuva menüü</translation>
-    </message>
-    <message>
-        <source>Menu pop-up time</source>
-        <translation type="obsolete">Hüpikmenüü aeg</translation>
-    </message>
-    <message>
-        <source>How many seconds the menu will remain visible after navigation.</source>
-        <translation type="obsolete">Menüü näitamise aeg sekundites peale navigeerimist.</translation>
-    </message>
-    <message>
-        <source>Display music artist and title</source>
-        <translation type="obsolete">Kuva muusika esitajat ja pealkirja</translation>
-    </message>
-    <message>
-        <source>Display channel information</source>
-        <translation type="obsolete">Kuva kanaliinfot</translation>
-    </message>
-    <message>
-        <source>Display volume information</source>
-        <translation type="obsolete">Kuva helitugevuse infot</translation>
-    </message>
-    <message>
-        <source>Display generic information</source>
-        <translation type="obsolete">Kuva üldist informatsiooni</translation>
-    </message>
-    <message>
-        <source>Backlight always on</source>
-        <translation type="obsolete">Taustavalgus alati sees</translation>
-    </message>
-    <message>
-        <source>Heartbeat always on</source>
-        <translation type="obsolete">Olekuteave alati näha</translation>
-    </message>
-    <message>
-        <source>Display large clock</source>
-        <translation type="obsolete">Näita suurt kella</translation>
-    </message>
-    <message>
-        <source>LCD key order</source>
-        <translation type="obsolete">LCD nupud</translation>
-    </message>
-    <message>
-        <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
-        <translation type="obsolete">Märkimisel parandab QuickTime videogammat vastavalt monitorile.  Selle keelamine hoiab kokku mõned protsessori tsüklid.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="obsolete">Märkimisel skaleeritakse video aken kogu ekraani suuruseks. Mittemärkimisel ei teisendata videot kunagi suuremaks kui on selle originaalsuurus.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Märkimisel näidatakse videot graafilise kasutajaliidese peaaknas. Keela ainult juhul, kui soovid videot töölauale või liikuvasse aknasse. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Märkimisel näidatakse videot liikuvas aknas. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Märkimisel näidatakse videot dokiikoonil. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Märkimisel näidatakse videot töölaual otsinguikoonide all. Kasutatav ainult juhul, kui on märgitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ning &quot;Käivita kasutajaliides aknas&quot;.</translation>
-    </message>
-    <message>
-        <source>AirPlay Settings</source>
-        <translation type="obsolete">AirPlay seaded</translation>
-    </message>
-    <message>
-        <source>Mac OS X Video Settings</source>
-        <translation type="obsolete">Mac OS X video seaded</translation>
-    </message>
-    <message>
-        <source>On-screen Display</source>
-        <translation type="obsolete">Ekraanimenüü</translation>
-    </message>
-    <message>
-        <source>General (Auto-Expire)</source>
-        <translation type="obsolete">Üldine (automaatne aegumine)</translation>
-    </message>
-    <message>
-        <source>Default Job Queue Settings for New Scheduled Recordings</source>
-        <translation type="obsolete">Vaikimisi tööjärjekorra seaded uutele salvestamise planeeringutele</translation>
-    </message>
-    <message>
-        <source>General (Channel Groups)</source>
-        <translation type="obsolete">Üldine (Kanaligrupid)</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="obsolete">Kujundus</translation>
-    </message>
-    <message>
-        <source>Channel format</source>
-        <translation type="obsolete">Kanali formaat</translation>
-    </message>
-    <message>
-        <source>number</source>
-        <translation type="obsolete">number</translation>
-    </message>
-    <message>
-        <source>number callsign</source>
-        <translation type="obsolete">number kutsung</translation>
-    </message>
-    <message>
-        <source>number name</source>
-        <translation type="obsolete">number nimi</translation>
-    </message>
-    <message>
-        <source>callsign</source>
-        <translation type="obsolete">kutsung</translation>
-    </message>
-    <message>
-        <source>Enable to override audio sample rate conversion quality.</source>
-        <translation type="obsolete">Luba muuta heli sämplisageduse teisendamise kvaliteeti.</translation>
-    </message>
-    <message>
-        <source>Sample rate conversion</source>
-        <translation type="obsolete">Kvantimis kiiruse teisendamine</translation>
-    </message>
-    <message>
-        <source>Set the quality of audio sample-rate conversion. &quot;Good&quot; (default) provides the best compromise between CPU usage and quality. &quot;Disabled&quot; lets the audio device handle sample-rate conversion.</source>
-        <translation type="obsolete">Määra heli konvertimise sämplisagedus. &quot;Hea&quot; (vaikimisi) parim kompromiss koormuse ja kvaliteedi osas. &quot;Keelatud&quot; helikaart tegeleb sämplisagedusega.</translation>
-    </message>
-    <message>
-        <source>Force audio device output to 48kHz</source>
-        <translation type="obsolete">Sea heliseadme väljund 48kHz</translation>
-    </message>
-    <message>
-        <source>Force audio sample rate to 48kHz. Some audio devices will report various rates, but they ultimately crash.</source>
-        <translation type="obsolete">Sea heli sämplisagedus 48kHz. Osad heliseadmed raporteerivad erinevaid sagedusi, kuid astuvad nende peale pange.</translation>
-    </message>
-    <message>
-        <source>Separate digital output device</source>
-        <translation type="obsolete">Eralda digiväljundseade</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will control the PCM and master mixer volume. Disable this option if you prefer to control the volume externally (for example, using your amplifier) or if you use an external mixer program.</source>
-        <translation type="obsolete">Lubades kontrollib MythTV  PCM ja peamikseri helitugevust. Kui soovid helitugevust välisseadmega muuta (näiteks võimendi) või kasutada välist mikseri rakendust, keela see valik.</translation>
-    </message>
-    <message>
-        <source>Mixer device</source>
-        <translation type="obsolete">Mikseri seade</translation>
-    </message>
-    <message>
-        <source>Mixer controls</source>
-        <translation type="obsolete">Mikseri juhtimine</translation>
-    </message>
-    <message>
-        <source>Master mixer volume</source>
-        <translation type="obsolete">Süsteemimikseri helitugevus</translation>
-    </message>
-    <message>
-        <source>Initial volume for the Master mixer. This affects all sound created by the audio device. Note: Do not set this too low.</source>
-        <translation type="obsolete">Algne peamikseri helitugevus.  See muudab helikaardist tuleva heli tugevust.  Märkus: ära liiga maha keera.</translation>
-    </message>
-    <message>
-        <source>PCM mixer volume</source>
-        <translation type="obsolete">PCM mikseri helitugevus</translation>
-    </message>
-    <message>
-        <source>Initial volume for PCM output. Using the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="obsolete">PCM väljundi algne helitugevus.  MythTV helitugevuse klahvid muudavad seda parameetrit.</translation>
-    </message>
-    <message>
-        <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio. This setting affects digital tuners (QAM/DVB/ATSC) and hardware encoders. It will have no effect on framegrabbers (MPEG-4/RTJPEG). MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation type="obsolete">Luba see kui MythTV esitatav heli on &quot;krõbisev&quot;. See seadistus mõjutab digitaalseid vastuvõtjaid  (QAM/DVB/ATSC) ja riistvaralisi enkoodreid.  (MPEG-4/RTJPEG) video hõivajatel pole sellest kasu. Sellest veast ülesaamiseks hoiab MythTV lisa helipuhvrit.</translation>
-    </message>
-    <message>
-        <source>PIP video location</source>
-        <translation type="obsolete">Pilt pildis video asukoht</translation>
-    </message>
-    <message>
-        <source>If enabled, always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
-        <translation type="obsolete">Lubades küsitakse salvestuste kuvamisel alati millist filtrit kasutada.</translation>
-    </message>
-    <message>
-        <source>If enabled, remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation type="obsolete">Lubades jäetakse vaikimisi filtri asemel meelde viimane valitud filter.</translation>
-    </message>
-    <message>
-        <source>If enabled, use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="obsolete">Lubades näidatakse mahamängimise ekraanil &quot;Kõik saated&quot; asemel hetkel määratud filtrit.</translation>
-    </message>
-    <message>
-        <source>Smart fast forwarding</source>
-        <translation type="obsolete">Tark edasikerimine</translation>
-    </message>
-    <message>
-        <source>Commercial detection method</source>
-        <translation type="obsolete">Reklaamide tuvastamise meetod</translation>
-    </message>
-    <message>
-        <source>Enable experimental speedup of commercial detection</source>
-        <translation type="obsolete">Luba eksperimentaalne reklaamide tuvastamise kiirendamine</translation>
-    </message>
-    <message>
-        <source>If enabled, experimental commercial detection speedups will be enabled.</source>
-        <translation type="obsolete">Lubades käivitatakse eksperimentaalne reklaamide tuvastamise kiirendamine.</translation>
-    </message>
-    <message>
-        <source>Automatically skip commercials</source>
-        <translation type="obsolete">Jäta reklaamid automaatselt vahele</translation>
-    </message>
-    <message>
-        <source>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</source>
-        <translation type="obsolete">Kas jätta mythcommflag poolt automaatselt märgitud reklaamid vahele või lihtsalt anda reklaamidest märku.</translation>
-    </message>
-    <message>
-        <source>Run metadata lookup</source>
-        <translation type="obsolete">Käivita metaandmete otsing</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic metadata lookup setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Seda väärtust kasutatakse automaatsel metaandmete otsingul kui luuakse uus ajastataud salvestus.</translation>
-    </message>
-    <message>
-        <source>Run commercial detection</source>
-        <translation type="obsolete">Käivita reklaamide tuvastamine</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic commercial detection setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Seda kasutatakse reklaamide automaatse märkimise puhul uute saadete salvestamisel.</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the automatic-transcode setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Seda väärtust kasutatakse uue salvestuse tekitamisel autotranskodeerimise seadena.</translation>
-    </message>
-    <message>
-        <source>Default transcoder</source>
-        <translation type="obsolete">Vaikimisi transkooder</translation>
-    </message>
-    <message>
-        <source>Deferral days for auto transcode jobs</source>
-        <translation type="obsolete">Automaatse transkodeerimise edasi lükkamine päevades</translation>
-    </message>
-    <message>
-        <source>If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="obsolete">Kui on suurem 0-st näitab mitme päeva pärast peale salvestamise lõppu toimub automaatne transkodeerimine.</translation>
-    </message>
-    <message>
-        <source>Run user job #%1</source>
-        <translation type="obsolete">Käivita kasutaja tegevus #%1</translation>
-    </message>
-    <message>
-        <source>Strict commercial detection</source>
-        <translation type="obsolete">Range reklaamide avastamine</translation>
-    </message>
-    <message>
-        <source>Enable stricter commercial detection code. Disable if some commercials are not being detected.</source>
-        <translation type="obsolete">Kasuta rangemat reklaamide avastamise koodi. Keela, kui osa reklaame jääb avastamata.</translation>
-    </message>
-    <message>
-        <source>Commercial skip automatic rewind amount (secs)</source>
-        <translation type="obsolete">Reklaami vahelejätmisel automaatne edasikerimine</translation>
-    </message>
-    <message>
-        <source>MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">MythTV kerib peale reklaamide vahelejätmist automaatselt nii palju sekundeid tagasi.</translation>
-    </message>
-    <message>
-        <source>Commercial skip notify amount (secs)</source>
-        <translation type="obsolete">Reklaami vahelejätmise-eelne teavitus (sek)</translation>
-    </message>
-    <message>
-        <source>MythTV will act like a commercial begins this many seconds early. This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="obsolete">MythTV käitub nagu oleks reklaam nii palju varem alanud.  See võib olla kasulik, kui kasutatakse reklaamide automaatse vahelejätmise aja teavitust.</translation>
-    </message>
-    <message>
-        <source>Maximum commercial skip (secs)</source>
-        <translation type="obsolete">Maksimaalne reklaami vahelejätmine (sek)</translation>
-    </message>
-    <message>
-        <source>MythTV will discourage long manual commercial skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="obsolete">MythTV hoidub pikkadest reklaamide ülehüppamistest. Reklaamipauside, mis on sellest pikemad, vahelejätmiseks tuleb vajutada SKIP nuppu kaks korda. Automaatne reklaamidest ülehüppamine sellest piirangust ei sõltu.</translation>
-    </message>
-    <message>
-        <source>Merge short commercial breaks (secs)</source>
-        <translation type="obsolete">Ühend lühikesed reklaamipausid (sek)</translation>
-    </message>
-    <message>
-        <source>Extra disk space (GB)</source>
-        <translation type="obsolete">Lisa kettaruum (GB)</translation>
-    </message>
-    <message>
-        <source>Extra disk space (in gigabytes) beyond what MythTV requires that you want to keep free on the recording file systems.</source>
-        <translation type="obsolete">Lisa kettaruum(GB) mida vajad salvestamise failisüsteemis lisaks MythTV nõudmistele.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire instead of delete recording</source>
-        <translation type="obsolete">Kustutamise asemel märgi salvestused vaadatuks</translation>
-    </message>
-    <message>
-        <source>If enabled, move deleted recordings to the &apos;Deleted&apos; recgroup and turn on autoexpire instead of deleting immediately.</source>
-        <translation type="obsolete">Lubades liigutatakse salvestus kustutamise asemel &apos;Kustutatud&apos; salvestusgruppi ja lülitatakse automaatne aegumine sisse.</translation>
-    </message>
-    <message>
-        <source>If enabled, delete recordings in the order which they were originally deleted.</source>
-        <translation type="obsolete">Kustutatud salvestused aeguvad kustutamise järjekorras.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire method</source>
-        <translation type="obsolete">Automaatse aegumise meetod</translation>
-    </message>
-    <message>
-        <source>Oldest show first</source>
-        <translation type="obsolete">Vanim saade esimesena</translation>
-    </message>
-    <message>
-        <source>Lowest priority first</source>
-        <translation type="obsolete">Madalama prioriteediga esimesena</translation>
-    </message>
-    <message>
-        <source>Weighted time/priority combination</source>
-        <translation type="obsolete">Kaalutud aja/prioriteedi kombinatsioon</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to delete first. Live TV recordings will always expire before normal recordings.</source>
-        <translation type="obsolete">Esimesena kustutatavate salvestuste määramise meetod.  Otse eetri salvestused aeguvad alati enne planeeritud salvestusi.</translation>
-    </message>
-    <message>
-        <source>Watched before unwatched</source>
-        <translation type="obsolete">Vaadatud enne vaatamata</translation>
-    </message>
-    <message>
-        <source>If enabled, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="obsolete">Lubades aeguvad vaadatud enne vaatamata saateid.</translation>
-    </message>
-    <message>
-        <source>Priority weight</source>
-        <translation type="obsolete">Prioriteedi kaal</translation>
-    </message>
-    <message>
-        <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</source>
-        <translation type="obsolete">Salvestuse prioriteedi iga taseme puhul lisatav päevade arv. Seda kasutatakse vaid juhul, kui on märgitud kaalutud aja-prioriteedi kombinatsiooni kasutamine.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire default</source>
-        <translation type="obsolete">Vaikimisi automaatne aegumine</translation>
-    </message>
-    <message>
-        <source>If enabled, any new recording schedules will be marked as eligible for auto-expiration. Existing schedules will keep their current value.</source>
-        <translation type="obsolete">Lubades märgitakse uued salvestamiste planeeringud automaatselt aeguvateks. Olemasolevad planeeringud säilitavad oma väärtuse.</translation>
-    </message>
-    <message>
-        <source>Live TV max age (days)</source>
-        <translation type="obsolete">Otse eetri maksimaalne aeg (päevades)</translation>
-    </message>
-    <message>
-        <source>Auto-Expire will force expiration of Live TV recordings when they are this many days old. Live TV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="obsolete">Kui otse eetri salvestused on vanemad kui siin, siis märgitakse nad automaatselt aeguvateks. Otse eetri salvestused võivad ka varem aeguda, kui tekkib vaba kettaruumi vajadus.</translation>
-    </message>
-    <message>
-        <source>New recording free disk space threshold (MB)</source>
-        <translation type="obsolete">Uue salvestuse jaoks vajaliku kettamahu (MB) lävi</translation>
-    </message>
-    <message>
-        <source>MythTV will stop scheduling new recordings on a backend when its free disk space (in megabytes) falls below this value.</source>
-        <translation type="obsolete">MythTV ei käivita uut salvestamist kui taustaserveri vaba kettamaht langeb allapoole seda väärtust.</translation>
-    </message>
-    <message>
-        <source>Re-record watched</source>
-        <translation type="obsolete">Salvesta vaadatud uuesti</translation>
-    </message>
-    <message>
-        <source>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</source>
-        <translation type="obsolete">Valimisel salvestatakse vaadatuks märgitud ning automaatselt aegunud saated võimaluse korral hiljem uuesti.</translation>
-    </message>
-    <message>
-        <source>Time to record before start of show (secs)</source>
-        <translation type="obsolete">Alusta salvestamist varem (sek)</translation>
-    </message>
-    <message>
-        <source>Time to record past end of show (secs)</source>
-        <translation type="obsolete">Lõpeta salvestamine hiljem (sek)</translation>
-    </message>
-    <message>
-        <source>Record past end of show (mins)</source>
-        <translation type="obsolete">Salvesta edasi peale saate lõppu (min)</translation>
-    </message>
-    <message>
-        <source>For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time in-between.</source>
-        <translation type="obsolete">Määratud kategooria puhul püütakse laiendada salvestamist antud aja võrra.  Seda ei tehta vaid juhul, kui kahe järjestikuse salvestamise vahele ei jää piisavalt aega.</translation>
-    </message>
-    <message>
-        <source>Example custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="obsolete">Kohandatud filtrite näide: &apos;ivtc,denoise3d&apos;</translation>
-    </message>
-    <message>
-        <source>Sorry, playback group
-name cannot be blank.</source>
-        <translation type="obsolete">Esitusgrupi nimi
-ei saa olla tühi.</translation>
-    </message>
-    <message>
-        <source>Sort episodes</source>
-        <translation type="obsolete">Sorteeri osad</translation>
-    </message>
-    <message>
-        <source>Original air date</source>
-        <translation type="obsolete">Esmane eetriaeg</translation>
-    </message>
-    <message>
-        <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="obsolete">Tagasikerimisnupu vajutamisel edasikerimisel aktiveerib tagasikerimise ja vastupidi. Ilma selleta vähendab tagasikerimisnupp kerimiskiirust kuni lülitub mahamängimisele.</translation>
-    </message>
-    <message>
-        <source>PAL teletext</source>
-        <translation type="obsolete">PAL teletekst</translation>
-    </message>
-    <message>
-        <source>NTSC closed caption</source>
-        <translation type="obsolete">NTSC teletekst</translation>
-    </message>
-    <message>
-        <source>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
-        <translation type="obsolete">Kui on seatud, kirjutab üle mythtv-setup seaded.</translation>
-    </message>
-    <message>
-        <source>Subtitle text zoom percentage</source>
-        <translation type="obsolete">Subtiitrite teksti suurendamise protsent</translation>
-    </message>
-    <message>
-        <source>Use this to enlarge or shrink text based subtitles.</source>
-        <translation type="obsolete">Kasuta tekstipõhiste subtiitrite suuruse muutmiseks.</translation>
-    </message>
-    <message>
-        <source>Subtitle Font</source>
-        <translation type="obsolete">Subtiitri font</translation>
-    </message>
-    <message>
-        <source>The font to use for text based subtitles.</source>
-        <translation type="obsolete">Font, mida kasutatakse tekstipõhiste subtiitrite jaoks.</translation>
-    </message>
-    <message>
-        <source>If enabled, captions will be displayed over a black background for better contrast.</source>
-        <translation type="obsolete">Lubades kuvatakse subtiitrite all musta tausta.</translation>
-    </message>
-    <message>
-        <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation type="obsolete">Kui on lubatud, näidatakse salvestuste või otse-eetri vaatamisel teleteksti subtiitreid. Subtiitreid saab sisse-välja lülitada vajutades klahvile &quot;T&quot;.</translation>
-    </message>
-    <message>
-        <source>If enabled, the newer EIA-708 captions will be preferred over the older EIA-608 captions in ATSC streams.</source>
-        <translation type="obsolete">Lubades eelistatakse ATSC voo puhul uuemat EIA-708 teleteksti vanemale EIA-608.</translation>
-    </message>
-    <message>
-        <source>Enable interactive TV</source>
-        <translation type="obsolete">Luba interaktiivne TV</translation>
-    </message>
-    <message>
-        <source>If enabled, interactive TV applications (MHEG) will be activated. This is used for teletext and logos for radio and channels that are currently off-air.</source>
-        <translation type="obsolete">Interaktiivse TV (MHEG) lubamine.Kasutatakse eetriväliseks logode ning teleteksti allalaadimiseks.</translation>
-    </message>
-    <message>
-        <source>Always use browse mode in Live TV</source>
-        <translation type="obsolete">Otse eetri puhul kasuta alati sirvimist</translation>
-    </message>
-    <message>
-        <source>If enabled, browse mode will automatically be activated whenever you use channel up/down while watching Live TV.</source>
-        <translation type="obsolete">Otse-eetri vaatamise ajal aktiveerub üles-alla nupu vajutusega automaatselt lehitsemine.</translation>
-    </message>
-    <message>
-        <source>If enabled, automatically clear the bookmark on a recording when the recording is played back. If disabled, you can mark the beginning with rewind then save position.</source>
-        <translation type="obsolete">Kustuta taasesitamisel järjehoidja automaatselt. Kui on keelatud, saad märkida alguse kerides ja positsiooni salvestades.</translation>
-    </message>
-    <message>
-        <source>During playback the SELECT key (Enter or Space) will alternate between &quot;Bookmark Saved&quot; and &quot;Bookmark Cleared&quot;. If disabled, the SELECT key will save the current position for each keypress.</source>
-        <translation type="obsolete">Taasesitamisel vahetab valiku nupp (Enter või tühik) &quot;Järjehoidja salvestatud&quot; ja &quot;Järjehoidja kustutatud&quot; vahel. Kui on keelatud, salvestab valiku nupp asukoha iga vajutuse korral.</translation>
-    </message>
-    <message>
-        <source>If set to prompt, a menu will be displayed when you exit playback mode. The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation type="obsolete">Valimisel kuvatakse esitusrežiimist lahkumisel menüü. Valida saab asukoha salvestamise, salvestuse kustutamise või vaatamise jätkamise vahel.</translation>
-    </message>
-    <message>
-        <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
-        <translation type="obsolete">Märkimisel kuvatakse mahamängimise lõpetamisel menüü, kus saab salvestuse kustutada.</translation>
-    </message>
-    <message>
-        <source>Jump to program OSD</source>
-        <translation type="obsolete">Lülitu saate OSD menüüle</translation>
-    </message>
-    <message>
-        <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
-        <translation type="obsolete">Vali kas hetke salvestusgruppi näidatakse OSD(Onscreen display) menüüs või näidatakse &apos;Salvestatud&apos; ekraani kui &apos;Lülitu saatele&apos; on aktiveeritud. Valiku korral näidatakse salvestusi OSD-l</translation>
-    </message>
-    <message>
-        <source>Continue playback when embedded</source>
-        <translation type="obsolete">Siirdudes taustale jätka esitamist</translation>
-    </message>
-    <message>
-        <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation type="obsolete">Lubades jätkab TV peale akna taustale saatmist mängimist. Vaikimisi peatatakse.</translation>
-    </message>
-    <message>
-        <source>If enabled, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
-        <translation type="obsolete">Valimisel märgitakse saate lõpu lähedall väljumisel saade vaadatuks. Selline automaatika pole kaugeltki täpne ning kui soovid, et tegelikul lõpuni vaatamata saateid ei märgitaks vaadatuks, ära seda automaatikat kasuta.</translation>
-    </message>
-    <message>
-        <source>Live TV idle timeout (mins)</source>
-        <translation type="obsolete">Otse eetri jõude ajapiir (min)</translation>
-    </message>
-    <message>
-        <source>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
-        <translation type="obsolete">Välju otse eetrist kui see on jõude märgitud arv minuteid. 0 keelab väljumise.</translation>
-    </message>
-    <message>
-        <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
-        <translation type="obsolete">Lubab väljade sisestamisel kasutada virtuaalset klaviatuuri. Klaviatuur tekitatakse väljal olles OK või valikuklahvi vajutamisel.</translation>
-    </message>
-    <message>
-        <source>Idle time before entering standby mode (minutes)</source>
-        <translation type="obsolete">Jõudeaeg enne ooterežiimi minekut (minutites)</translation>
-    </message>
-    <message>
-        <source>Number of minutes to wait when the frontend is idle before entering standby mode. Standby mode allows the backend to power down if configured to do so. Any remote or mouse input will cause the countdown to start again and/or exit idle mode. Video playback suspends the countdown. A value of zero prevents the frontend automatically entering standby.</source>
-        <translation type="obsolete">Mitu minutit peab klient jõude olema enne ooterežiimi minekut. Ooterežiim võimaldab vastava seadistuse puhul taustaserveril ennast välja lülitada. Iga hiire- või pulditegevus ja video taasesitus katkestab jõudeoleku arvestuse. Väärtus 0 keelab kliendil ooterežiimi minna.</translation>
-    </message>
-    <message>
-        <source>Optional. Script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="obsolete">Pole kohustuslik. Käsk või skript mis käivitatakse valides menüüst taaskäivituse. Et väljumis menüüd näha peab väljumisklahv olema defineeritud.</translation>
-    </message>
-    <message>
-        <source>Optional. Script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="obsolete">Pole kohustuslik. Käsk või skript mis käivitatakse valides menüüst seiskamise. Et väljumis menüüd näha peab väljumisklahv olema defineeritud.</translation>
-    </message>
-    <message>
-        <source>LIRC daemon socket</source>
-        <translation type="obsolete">LIRC deemoni sokkel</translation>
-    </message>
-    <message>
-        <source>Screen shot path</source>
-        <translation type="obsolete">Ekraanitõmmiste asukoht</translation>
-    </message>
-    <message>
-        <source>Setup PIN code</source>
-        <translation type="obsolete">Seadete PIN kood</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.</source>
-        <translation type="obsolete">See PIN kood on vajalik seadete menüüsse pöördumiseks. Kõige lihtsam oleks siin kasutada numbreid. Keelamiseks jäta tühjaks.</translation>
-    </message>
-    <message>
-        <source>Require setup PIN</source>
-        <translation type="obsolete">Küsi seadete PIN koodi</translation>
-    </message>
-    <message>
-        <source>If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation type="obsolete">Märkimisel ei saa siia menüüsse ega PIN koodi kustutada ilma PIN koodi sisestamata.</translation>
-    </message>
-    <message>
-        <source>Monitor aspect ratio</source>
-        <translation type="obsolete">Monitori kuvasuhe</translation>
-    </message>
-    <message>
-        <source>The aspect ratio of a Xinerama display cannot be queried from the display, so it must be specified.</source>
-        <translation type="obsolete">Xinerama kuvasuhet ei saa kindlaks teha, seeg tuleb see ise sisestada.</translation>
-    </message>
-    <message>
-        <source>Letterboxing color</source>
-        <translation type="obsolete">Letterbox-i värv</translation>
-    </message>
-    <message>
-        <source>Video aspect override</source>
-        <translation type="obsolete">Video suhte mittearvestamine</translation>
-    </message>
-    <message>
-        <source>GUI width (pixels)</source>
-        <translation type="obsolete">Kasutajaliidese laius (pikselites)</translation>
-    </message>
-    <message>
-        <source>The width of the GUI. Do not make the GUI wider than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="obsolete">Ära ületa oma ekraani maksimaalset laiust. 0 paneb automaatselt täisekraanile.</translation>
-    </message>
-    <message>
-        <source>GUI height (pixels)</source>
-        <translation type="obsolete">Kasutajaliidese kõrgus (pikselites)</translation>
-    </message>
-    <message>
-        <source>The height of the GUI. Do not make the GUI taller than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="obsolete">Ära ületa ekraani maksimaalset kõrgust. 0 paneb automaatselt täisekraanile.</translation>
-    </message>
-    <message>
-        <source>The horizontal offset where the GUI will be displayed. May only work if run in a window.</source>
-        <translation type="obsolete">Horisontaalne nihe. Võib töötada ainult juhul kui on käivitatud aknas.</translation>
-    </message>
-    <message>
-        <source>The vertical offset where the GUI will be displayed.</source>
-        <translation type="obsolete">Vertikaalne nihe. Võib töötada ainult juhul kui on käivitatud aknas.</translation>
-    </message>
-    <message>
-        <source>Display size - width</source>
-        <translation type="obsolete">Ekraani suurus - laius</translation>
-    </message>
-    <message>
-        <source>Display size - height</source>
-        <translation type="obsolete">Ekraani suurus - kõrgus</translation>
-    </message>
-    <message>
-        <source>Video output</source>
-        <translation type="obsolete">Video väljund</translation>
-    </message>
-    <message>
-        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation type="obsolete">Vaikimisi valitakse monitori poolt raporteeritud kuvasuhe. Määra 16:9 või 4:3 erilise kuvasuhte pealesundimiseks.</translation>
-    </message>
-    <message>
-        <source>Hide mouse cursor in MythTV</source>
-        <translation type="obsolete">Peida MythTV-s hiire kursor</translation>
-    </message>
-    <message>
-        <source>If disabled, the video playback window can be resized</source>
-        <translation type="obsolete">Kui on keelatud, saab akna suurust muuta</translation>
-    </message>
-    <message>
-        <source>Short date format</source>
-        <translation type="obsolete">Lühike kuupäeva formaat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Ajaformaadi eelistus.  Formaat ilma &quot;AM&quot; või &quot;PM&quot; tähistuseta on 24-tunnine.</translation>
-    </message>
-    <message>
-        <source>Paint engine</source>
-        <translation type="obsolete">Graafikamootor</translation>
-    </message>
-    <message>
-        <source>Qt</source>
-        <translation type="obsolete">Qt</translation>
-    </message>
-    <message>
-        <source>OpenGL</source>
-        <translation type="obsolete">OpenGL</translation>
-    </message>
-    <message>
-        <source>Direct3D</source>
-        <translation type="obsolete">Direct3D</translation>
-    </message>
-    <message>
-        <source>This selects what MythTV uses to draw. Choosing &apos;Auto&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
-        <translation type="obsolete">Siin saad valida graafikamootori kuva joonistamiseks. &apos;Auto&apos; on soovituslik. Teised valikud võivad abiks olla katkiste draiverite või vigase riistvara puhul.</translation>
-    </message>
-    <message>
-        <source>name</source>
-        <translation type="obsolete">nimi</translation>
-    </message>
-    <message>
-        <source>Your preferred channel format.</source>
-        <translation type="obsolete">Eelistatav kanali formaat.</translation>
-    </message>
-    <message>
-        <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
-        <translation type="obsolete">Sellel pordil kuulab MythTV &quot;mythutil&quot; rakenduse ühendusi.</translation>
-    </message>
-    <message>
-        <source>Screen Settings</source>
-        <translation type="obsolete">Ekraani seaded</translation>
-    </message>
-    <message>
-        <source>Your preferred long channel format.</source>
-        <translation type="obsolete">Eelistatav pikk kanali formaat.</translation>
-    </message>
-    <message>
-        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="obsolete">Ühekordse, iganädalase ja igapäevase otsingu salvestamised saavad sellise lisaprioriteedi.</translation>
-    </message>
-    <message>
-        <source>Guide starts at channel</source>
-        <translation type="obsolete">Kava algkanal</translation>
-    </message>
-    <message>
-        <source>Language</source>
-        <translation type="obsolete">Keel</translation>
-    </message>
-    <message>
-        <source>Enable realtime priority threads</source>
-        <translation type="obsolete">Luba reaalajaprioriteetidega lõimed</translation>
-    </message>
-    <message>
-        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="obsolete">MythTV klientprogrammi juurkasutaja õigustes käivitamisel saavad mõned lõimed lisaprioriteedi. Keela juhul kui rakendus video mängimisel hangub.</translation>
-    </message>
-    <message>
-        <source>Monitor CD/DVD</source>
-        <translation type="obsolete">Jälgi CD/DVD mängijat</translation>
-    </message>
-    <message>
-        <source>Enable LCD device</source>
-        <translation type="obsolete">Luba LCD</translation>
-    </message>
-    <message>
-        <source>LCD device display</source>
-        <translation type="obsolete">LCD seade</translation>
-    </message>
-    <message>
-        <source>Enable gamma correction for video</source>
-        <translation type="obsolete">Luba video gammakorrektsioon</translation>
-    </message>
-    <message>
-        <source>Scale video as necessary</source>
-        <translation type="obsolete">Vajadusel skaleeri videot</translation>
-    </message>
-    <message>
-        <source>Frames to skip in fullscreen mode</source>
-        <translation type="obsolete">Täisekraanirežiimis vahelejäetavaid kaadreid</translation>
-    </message>
-    <message>
-        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="obsolete">Video näitamisel täisekraani- või mitte-aknarežiimil jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;. Kasutatav ainult juhul, kui pole valitud &quot;Kasuta TV vaatamisel graafilise kasutajaliidese suurust&quot; ega &quot;Käivita kasutajaliides aknas&quot;.</translation>
-    </message>
-    <message>
-        <source>Video in main window</source>
-        <translation type="obsolete">Video peaaknas</translation>
-    </message>
-    <message>
-        <source>Frames to skip</source>
-        <translation type="obsolete">Kaadrite vahelejätmine</translation>
-    </message>
-    <message>
-        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video näitamisel peaaknas jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
-    </message>
-    <message>
-        <source>Opacity</source>
-        <translation type="obsolete">Läbipaistvus</translation>
-    </message>
-    <message>
-        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="obsolete">Peaakna läbipaistvus vahemikus 0 (täiesti läbipaistev) kuni 100 (täiesti läbipaistmatu).</translation>
-    </message>
-    <message>
-        <source>Video in floating window</source>
-        <translation type="obsolete">Video liikuvas aknas</translation>
-    </message>
-    <message>
-        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video näitamisel liikuvas aknas jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
-    </message>
-    <message>
-        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="obsolete">Liikuva akna läbipaistvus vahemikus 0 (täiesti läbipaistev) kuni 100 (täiesti läbipaistmatu).</translation>
-    </message>
-    <message>
-        <source>Video in the dock</source>
-        <translation type="obsolete">Video dokis</translation>
-    </message>
-    <message>
-        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video näitamisel dokiikoonil jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
-    </message>
-    <message>
-        <source>Video on the desktop</source>
-        <translation type="obsolete">Video töölaual</translation>
-    </message>
-    <message>
-        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video näitamisel töölaual jäetakse iga kaadri näitamisel nii palju kaadreid vahele. Kõigi kaadrite näitamiseks sisesta &quot;0&quot;.</translation>
-    </message>
-    <message>
-        <source>Show the program guide when starting Live TV</source>
-        <translation type="obsolete">Näita otse eetri vaatamise alustamisel saatekava</translation>
-    </message>
-    <message>
-        <source>This starts the program guide immediately upon starting to watch Live TV.</source>
-        <translation type="obsolete">See avab otse eetri vaatamise valikul koheselt saatekava.</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="obsolete">Üldine</translation>
-    </message>
-    <message>
-        <source>View Recordings</source>
-        <translation type="obsolete">Salvestuste vaatamine</translation>
-    </message>
-    <message>
-        <source>Seeking</source>
-        <translation type="obsolete">Otsimine</translation>
-    </message>
-    <message>
-        <source>Commercial Skip</source>
-        <translation type="obsolete">Reklaamide vahelejätmine</translation>
-    </message>
-    <message>
-        <source>Program Guide</source>
-        <translation type="obsolete">Saatekava</translation>
-    </message>
-    <message>
-        <source>Localization</source>
-        <translation type="obsolete">Lokaliseerimine</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="884"/>
@@ -17196,46 +14969,6 @@ ei saa olla tühi.</translation>
         <translation>Transpordi redaktor</translation>
     </message>
     <message>
-        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="obsolete">Selle kanali ikoonifail.</translation>
-    </message>
-    <message>
-        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="obsolete">ID, mida kasutatakse saatekavade ning Sinu kanalite vastavusse viimisel. Üldiselt seatakse see automaatselt &apos;mythfilldatabase&apos; käivitamisel.</translation>
-    </message>
-    <message>
-        <source>Commercial Detection Method</source>
-        <translation type="obsolete">Reklaamide tuvastamise meetod</translation>
-    </message>
-    <message>
-        <source>If enabled, the channel will be visible in the EPG.</source>
-        <translation type="obsolete">Märkimisel on kanal saatekavas nähtav.</translation>
-    </message>
-    <message>
-        <source>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; program listings.</source>
-        <translation type="obsolete">Numbri valimisel hüpatakse koheselt sisestatud kanali peale.</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="obsolete">või</translation>
-    </message>
-    <message>
-        <source>Channel</source>
-        <translation type="obsolete">Kanal</translation>
-    </message>
-    <message>
-        <source>Signal Lock</source>
-        <translation type="obsolete">Signaal leitud</translation>
-    </message>
-    <message>
-        <source>Signal Power</source>
-        <translation type="obsolete">Signaalitugevus</translation>
-    </message>
-    <message>
-        <source>Script Status</source>
-        <translation type="obsolete">Skripti staatus</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1598"/>
         <source>Re-Record</source>
         <translation>Ülesalvestamine</translation>
@@ -17245,11 +14978,6 @@ ei saa olla tühi.</translation>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation>A</translation>
-    </message>
-    <message>
-        <source>t</source>
-        <comment>RecStatusChar rsTuning</comment>
-        <translation type="obsolete">t</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="121"/>
@@ -17262,11 +14990,6 @@ ei saa olla tühi.</translation>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
         <translation>M</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>RecStatusChar rsMissedFuture</comment>
-        <translation type="obsolete">m</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="151"/>
@@ -17296,10 +15019,6 @@ ei saa olla tühi.</translation>
         <translation>Puudu</translation>
     </message>
     <message>
-        <source>Missed Future</source>
-        <translation type="obsolete">Möödunud tulevikus</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="224"/>
         <source>Not Listed</source>
         <translation>Pole nimekirjas</translation>
@@ -17315,29 +15034,9 @@ ei saa olla tühi.</translation>
         <translation>See saade pole salvestamiseks planeeritud</translation>
     </message>
     <message>
-        <source>The channel is being tuned.</source>
-        <translation type="obsolete">Kanal on häälestatud.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation type="obsolete">Seda saadet salvestati kuid katkestati enne lõppu.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="287"/>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Seda saadet ei salvestatud sest see oli kasutajal tühistatud.</translation>
-    </message>
-    <message>
-        <source>There wasn&apos;t enough disk space available.</source>
-        <translation type="obsolete">polnud piisavalt vaba kettaruumi.</translation>
-    </message>
-    <message>
-        <source>The tuner card was already being used.</source>
-        <translation type="obsolete">vastuvõtja kaart oli juba kasutusel.</translation>
-    </message>
-    <message>
-        <source>The recorder failed to record.</source>
-        <translation type="obsolete">salvestamine ebaõnnestus.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="361"/>
@@ -17360,17 +15059,9 @@ ei saa olla tühi.</translation>
         <translation>Seda saadet ei salvestatud.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1957"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1974"/>
         <source>ATSC Channel %1</source>
         <translation>ATSC kanal %1</translation>
-    </message>
-    <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">Kaardi tuvastus ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">Kaardi avamine ebaõnnestus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="63"/>
@@ -17527,54 +15218,42 @@ ei saa olla tühi.</translation>
         <translation>Transkodeeri kasutades &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1313"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1310"/>
         <source>IP Address</source>
         <translation>IP aadress</translation>
     </message>
     <message>
-        <source>Analog V4L capture card</source>
-        <translation type="obsolete">V4L analoog hõivekaart</translation>
-    </message>
-    <message>
-        <source>DVB DTV capture card (v3.x)</source>
-        <translation type="obsolete">DVB DTV hõivekaart (v3.x)</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2495"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2492"/>
         <source>FireWire cable box</source>
         <translation>FireWire hõivekaart</translation>
     </message>
     <message>
-        <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">USB MPEG-4 kodeerija (Plextor ConvertX, jt)</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2836"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2833"/>
         <source>Schedule order</source>
         <translation>Planeeringu järjekord</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2838"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2835"/>
         <source>If priorities and other factors are equal the scheduler will choose the available input with the lowest, non-zero value.  Setting this value to zero will make the input unavailable to the scheduler.</source>
         <translation>Kui prioriteedid ja muud väärtused on võrdsed, siis valitakse sisend millel on madalaim mitte 0 väärtus. 0 puhul sisendit salvestamiseks ei kasutata.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2853"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2850"/>
         <source>Live TV order</source>
         <translation>TV vaatamise järjekord</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2855"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2852"/>
         <source>When entering Live TV, the available, local input with the lowest, non-zero value will be used.  If no local inputs are available, the available, remote input with the lowest, non-zero value will be used.  Setting this value to zero will make the input unavailable to live TV.</source>
         <translation>TV vaatamise  puhul valitakse võimalusel madalaima mitte 0 väärtusega lokaalne sisend, selle puudumisel madalaima mitte 0 väärtusega mingi teise masina sisend. 0 puhul sisendit TV vaatamiseks ei kasutata.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3266"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3263"/>
         <source>(Delete all capture cards)</source>
         <translation>(Kustuta kõik hõivekaardid)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3409"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3406"/>
         <source>(Delete all video sources)</source>
         <translation>(Kustuta kõik videoallikad)</translation>
     </message>
@@ -17582,46 +15261,6 @@ ei saa olla tühi.</translation>
         <location filename="../libs/libmythtv/videosource.h" line="776"/>
         <source>This is updated on every successful channel change.</source>
         <translation>Seda uuendatakse iga õnnestunud kanalivahetusega.</translation>
-    </message>
-    <message>
-        <source>Default group filter to apply</source>
-        <translation type="obsolete">Vaikimisi lisatav grupifilter</translation>
-    </message>
-    <message>
-        <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="obsolete">Vaikimisi grupifilter salvestuste vaatamise kuval.</translation>
-    </message>
-    <message>
-        <source>Always prompt for initial group filter</source>
-        <translation type="obsolete">Küsi alati algset grupifiltrit</translation>
-    </message>
-    <message>
-        <source>Save current group filter when changed</source>
-        <translation type="obsolete">Muutmisel salvesta hetke grupifilter</translation>
-    </message>
-    <message>
-        <source>Show filter name instead of &quot;All Programs&quot;</source>
-        <translation type="obsolete">&quot;Kõik saated&quot; asemel näita filtri nime</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Seda väärtust kasutatakse uue salvestuse transkodeerimisel.</translation>
-    </message>
-    <message>
-        <source>Category of shows to be extended</source>
-        <translation type="obsolete">Saatekategooria laiendamine</translation>
-    </message>
-    <message>
-        <source>Category record over-time</source>
-        <translation type="obsolete">Salvestuskategooria ajaületus</translation>
-    </message>
-    <message>
-        <source>Fast forward/rewind reposition amount</source>
-        <translation type="obsolete">Edasi-tagasikerimise paranduse aeg</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">Kui väljuda lukustatud kerimise režiimist, loetakse nii paju sajandiksekundeid mittekerituks ning naastakse mahamängimisrežiimi. See kompenseerib soovitud asukoha nägemise ning sellele reageerimise vahel tekkinud ülekerimise.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="669"/>
@@ -17637,86 +15276,6 @@ ei saa olla tühi.</translation>
         <location filename="../libs/libmythtv/videoouttypes.h" line="208"/>
         <source>16:9</source>
         <translation>16:9</translation>
-    </message>
-    <message>
-        <source>16:10</source>
-        <translation type="obsolete">16:10</translation>
-    </message>
-    <message>
-        <source>Your preferred language for the user interface.</source>
-        <translation type="obsolete">Kasutajaliidese eelistatud keel.</translation>
-    </message>
-    <message>
-        <source>Display current time on idle LCD display. </source>
-        <translation type="obsolete">Kuva LCD jõudeolekus kellaaega. </translation>
-    </message>
-    <message>
-        <source>Display current recordings information on LCD display.</source>
-        <translation type="obsolete">Kuva LCD ekraanil informatsiooni hetkel käiva salvestamise kohta.</translation>
-    </message>
-    <message>
-        <source>Display selected menu on LCD display. </source>
-        <translation type="obsolete">Kuva valitud menüü LCD ekraanile. </translation>
-    </message>
-    <message>
-        <source>Display playing artist and song title in MythMusic on LCD display.</source>
-        <translation type="obsolete">Kuva MythMusic esitaja ja loo pealkiri LCD ekraanile.</translation>
-    </message>
-    <message>
-        <source>Items</source>
-        <translation type="obsolete">Elemente</translation>
-    </message>
-    <message>
-        <source>Artist - Title</source>
-        <translation type="obsolete">Esitaja - Pealkiri</translation>
-    </message>
-    <message>
-        <source>Artist [Album] Title</source>
-        <translation type="obsolete">Esitaja [Album] Pealkiri</translation>
-    </message>
-    <message>
-        <source>Which items to show when playing music.</source>
-        <translation type="obsolete">Milliseid elemente muusika mängimisel kuvada.</translation>
-    </message>
-    <message>
-        <source>Display tuned channel information on LCD display.</source>
-        <translation type="obsolete">Kuva näidatava kanali info LCD ekraanile.</translation>
-    </message>
-    <message>
-        <source>Display volume level information on LCD display.</source>
-        <translation type="obsolete">Kuva helitugevuse info LCD ekraanile.</translation>
-    </message>
-    <message>
-        <source>Display generic information on LCD display.</source>
-        <translation type="obsolete">Kuva LCD ekraanil üldist infot.</translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently on the LCD display.</source>
-        <translation type="obsolete">Lülita LCD ekraani taustavalgus alaliselt sisse.</translation>
-    </message>
-    <message>
-        <source>Turn on the LCD heartbeat.</source>
-        <translation type="obsolete">Lülita sisse LCD südamelöökide näitamine.</translation>
-    </message>
-    <message>
-        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="obsolete">Sisesta LCD nuppude koodid sellises järjekorras: üles, alla, vasakule, paremale, jah, ei (vaata lcdproc/server/drivers/hd44780.c/keyMapMatrix[] või oma ekraani maatriksist)</translation>
-    </message>
-    <message>
-        <source>Use an LCD display to view MythTV status information.</source>
-        <translation type="obsolete">Kasuta MythTV olekuinfo kuvamiseks LCD ekraani.</translation>
-    </message>
-    <message>
-        <source>General (Basic)</source>
-        <translation type="obsolete">Üldine (lihtne)</translation>
-    </message>
-    <message>
-        <source>General (Jobs)</source>
-        <translation type="obsolete">Üldine (tööd)</translation>
-    </message>
-    <message>
-        <source>General (Advanced)</source>
-        <translation type="obsolete">Üldine (edasijõudnud)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="184"/>
@@ -17740,112 +15299,44 @@ ei saa olla tühi.</translation>
         <translation>Kasutatav sagedustabel.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1081"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1078"/>
         <source>Subtype</source>
         <translation>Alamtüüp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1090"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1087"/>
         <source>Frontend ID</source>
         <translation>Kasutajaliidese ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1188"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1185"/>
         <source>Cable box model</source>
         <translation>TV-boksi mudel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1247"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1244"/>
         <source>Connection Type</source>
         <translation>Ühenduse tüüp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1260"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1257"/>
         <source>Speed</source>
         <translation>Kiirus</translation>
     </message>
     <message>
-        <source>Use line edit virtual keyboards</source>
-        <translation type="obsolete">Virtuaalne klaviatuur väljade sisestamiseks</translation>
-    </message>
-    <message>
-        <source>MythWelcome Settings</source>
-        <translation type="obsolete">MythWelcome seaded</translation>
-    </message>
-    <message>
-        <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
-        <translation type="obsolete">Käsk nvram äratuse seadmiseks. Näiteid leiab README failist.</translation>
-    </message>
-    <message>
-        <source>nvram-wakeup Restart Command</source>
-        <translation type="obsolete">nvram-äratuse taaskäivituse käks</translation>
-    </message>
-    <message>
-        <source>Command to reboot</source>
-        <translation type="obsolete">Käsk taaskäivitamiseks</translation>
-    </message>
-    <message>
-        <source>Command to reboot computer.</source>
-        <translation type="obsolete">Käsk arvuti taaskäivitamiseks.</translation>
-    </message>
-    <message>
-        <source>Command to shutdown</source>
-        <translation type="obsolete">Käsk seiskamiseks</translation>
-    </message>
-    <message>
-        <source>Command to shutdown computer.</source>
-        <translation type="obsolete">Käsk arvuti seiskamiseks.</translation>
-    </message>
-    <message>
-        <source>Command to run Xterm</source>
-        <translation type="obsolete">Käsk Xterm käivitamiseks</translation>
-    </message>
-    <message>
-        <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
-        <translation type="obsolete">Käsk Xterm käivitamiseks. Keelamiseks jäta tühjaks.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="502"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="501"/>
         <source>Use only the transmitted guide data.</source>
         <translation>Kasuta ainult edastatud saatekava.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="506"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="505"/>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation>See töötab tavaliselt ATSC ning DVB kanalitega</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="510"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="509"/>
         <source>and generally provides data only for the next few days.</source>
         <translation>ning enamasti pakub kava vaid mõneks järgnevaks päevaks.</translation>
-    </message>
-    <message>
-        <source>Title match (regex)</source>
-        <translation type="obsolete">Pealkirja sobivus (regex)</translation>
-    </message>
-    <message>
-        <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="obsolete">Kui pealkiri vastab antud regulaaravaldisele seatakse automaatselt selle grupi salvestusparameetrid.  Näiteks &quot;(News|CNN)&quot; leiab iga pealkirja, kus esineb sõna &quot;News&quot; või &quot;CNN&quot;.</translation>
-    </message>
-    <message>
-        <source>Skip ahead (seconds)</source>
-        <translation type="obsolete">Edasikerimine (sek)</translation>
-    </message>
-    <message>
-        <source>Skip back (seconds)</source>
-        <translation type="obsolete">Tagasikerimine (sek)</translation>
-    </message>
-    <message>
-        <source>Jump amount (minutes)</source>
-        <translation type="obsolete">Hüppe pikkus (minutites)</translation>
-    </message>
-    <message>
-        <source>Time stretch (speed x 100)</source>
-        <translation type="obsolete">Aja skaleerimine (kiirus x 100)</translation>
-    </message>
-    <message>
-        <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="obsolete">Esialgne mahamängimiskiirus koos kohandatud heliga.  Normaalne kiirus on 100, 50 on poole väiksem ning 200 topeltkiirus.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2832"/>
@@ -17888,81 +15379,9 @@ ei saa olla tühi.</translation>
         <translation>Saate olek</translation>
     </message>
     <message>
-        <source>Period</source>
-        <translation type="obsolete">Periood</translation>
-    </message>
-    <message>
-        <source>start time</source>
-        <translation type="obsolete">käivitusaeg</translation>
-    </message>
-    <message>
-        <source>Defines a period the master backend should be awake</source>
-        <translation type="obsolete">Määrab perioodi, millal peamine taustaserver peab olema ärkvel</translation>
-    </message>
-    <message>
-        <source>Set both Start &amp; End times to 00:00 to disable.</source>
-        <translation type="obsolete">Algus- ja lõpuaja 00:00 seadmine tühistab selle.</translation>
-    </message>
-    <message>
-        <source>end time</source>
-        <translation type="obsolete">lõpuaeg</translation>
-    </message>
-    <message>
-        <source>Automatically Start mythfrontend</source>
-        <translation type="obsolete">Käivita automaatselt MythTV klient</translation>
-    </message>
-    <message>
-        <source>Mythwelcome will automatically start mythfrontend if it is determined that it was not started to record a program.</source>
-        <translation type="obsolete">Kui ta pole käivitatud salvestamiseks, käivitab Mythwelcome automaatselt kliendi.</translation>
-    </message>
-    <message>
-        <source>Shutdown with Master Backend</source>
-        <translation type="obsolete">Seiska koos peamise taustaserveriga</translation>
-    </message>
-    <message>
-        <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="obsolete">Mythwelcome seiskab peamise tasutaserveri seiskumisel automaatselt selle arvuti. Tuleks kasutada ainult eraldiseisvates kasutajaliidestes</translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period</source>
-        <translation type="obsolete">Igapäevane seiskamis/äratus periood</translation>
-    </message>
-    <message>
-        <source>Command to run to start the Frontend</source>
-        <translation type="obsolete">Kasutajaliidese käivitamiskäsk</translation>
-    </message>
-    <message>
-        <source>Command to start mythfrontend.</source>
-        <translation type="obsolete">Kasutajaliidese käivitamiskäsk.</translation>
-    </message>
-    <message>
-        <source>MythShutdown/MythWelcome Settings</source>
-        <translation type="obsolete">MythShutdown/MythWelcome seaded</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Näites on toodud tänane kuupäev.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Näites on toodud homne kuupäev.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="74"/>
         <source>Spain</source>
         <translation>Hispaania</translation>
-    </message>
-    <message>
-        <source>Enable Network Remote Control interface</source>
-        <translation type="obsolete">Luba juhtida üle võrgu</translation>
-    </message>
-    <message>
-        <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="obsolete">See lubab kasutajaliidest juhtida üle võrgu.</translation>
-    </message>
-    <message>
-        <source>Too Far %1</source>
-        <translation type="obsolete">Liiga kaugel %1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1065"/>
@@ -17983,10 +15402,6 @@ ei saa olla tühi.</translation>
         <location filename="../libs/libmyth/programinfo.cpp" line="5063"/>
         <source>Blank Frame Detection</source>
         <translation>Tühja kaadri avastamine</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="obsolete">Reklaamide avastamiseks kasutatav meetod.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="642"/>
@@ -18030,37 +15445,9 @@ ei saa olla tühi.</translation>
         <translation>Salvestaja välja lülitatud</translation>
     </message>
     <message>
-        <source>the backend recorder is off-line.</source>
-        <translation type="obsolete">taustaserveri salvestaja on välja lülitatud.</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2875"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2872"/>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
         <translation>Kui võtad vastu DishNeti satelliitidelt, on võimalik saada sealt ka pikaajalist saatekava. Parima tulemuse saavutamiseks tuleks lubada ka EIT.</translation>
-    </message>
-    <message>
-        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="obsolete">Kui BIOS vajab nvram-äratuse aktiveerimiseks alglaadimist, siis tuleb siia sisestada alglaadimiskäsk. Erinevaid näiteid tasub vaadata README failist.</translation>
-    </message>
-    <message>
-        <source>Education</source>
-        <translation type="obsolete">Haridus</translation>
-    </message>
-    <message>
-        <source>Entertainment</source>
-        <translation type="obsolete">Meelelahutus</translation>
-    </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">Film</translation>
-    </message>
-    <message>
-        <source>News</source>
-        <translation type="obsolete">Uudised</translation>
-    </message>
-    <message>
-        <source>Religious</source>
-        <translation type="obsolete">Religioon</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/eithelper.cpp" line="640"/>
@@ -18068,369 +15455,9 @@ ei saa olla tühi.</translation>
         <translation>Sport</translation>
     </message>
     <message>
-        <source>Action</source>
-        <translation type="obsolete">Märul</translation>
-    </message>
-    <message>
-        <source>Advertisement</source>
-        <translation type="obsolete">Reklaam</translation>
-    </message>
-    <message>
-        <source>Animated</source>
-        <translation type="obsolete">Animatsioon</translation>
-    </message>
-    <message>
-        <source>Anthology</source>
-        <translation type="obsolete">Antoloogia</translation>
-    </message>
-    <message>
-        <source>Automobile</source>
-        <translation type="obsolete">Autod</translation>
-    </message>
-    <message>
-        <source>Awards</source>
-        <translation type="obsolete">Auhinnad</translation>
-    </message>
-    <message>
-        <source>Baseball</source>
-        <translation type="obsolete">Pesapall</translation>
-    </message>
-    <message>
-        <source>Basketball</source>
-        <translation type="obsolete">Korvpall</translation>
-    </message>
-    <message>
-        <source>Bulletin</source>
-        <translation type="obsolete">Bülletään</translation>
-    </message>
-    <message>
-        <source>Business</source>
-        <translation type="obsolete">Äri</translation>
-    </message>
-    <message>
-        <source>Classical</source>
-        <translation type="obsolete">Klassika</translation>
-    </message>
-    <message>
-        <source>College</source>
-        <translation type="obsolete">Kolledž</translation>
-    </message>
-    <message>
-        <source>Combat</source>
-        <translation type="obsolete">Sõda</translation>
-    </message>
-    <message>
-        <source>Comedy</source>
-        <translation type="obsolete">Komöödia</translation>
-    </message>
-    <message>
-        <source>Commentary</source>
-        <translation type="obsolete">Kommentaarid</translation>
-    </message>
-    <message>
-        <source>Concert</source>
-        <translation type="obsolete">Kontsert</translation>
-    </message>
-    <message>
-        <source>Consumer</source>
-        <translation type="obsolete">Tarbimine</translation>
-    </message>
-    <message>
-        <source>Contemporary</source>
-        <translation type="obsolete">Kaasaeg</translation>
-    </message>
-    <message>
-        <source>Crime</source>
-        <translation type="obsolete">Kriminull</translation>
-    </message>
-    <message>
-        <source>Dance</source>
-        <translation type="obsolete">Tants</translation>
-    </message>
-    <message>
-        <source>Documentary</source>
-        <translation type="obsolete">Dokumentaal</translation>
-    </message>
-    <message>
-        <source>Drama</source>
-        <translation type="obsolete">Draama</translation>
-    </message>
-    <message>
-        <source>Elementary</source>
-        <translation type="obsolete">Elementaarne</translation>
-    </message>
-    <message>
-        <source>Erotica</source>
-        <translation type="obsolete">Erootika</translation>
-    </message>
-    <message>
-        <source>Exercise</source>
-        <translation type="obsolete">Harjutused</translation>
-    </message>
-    <message>
-        <source>Fantasy</source>
-        <translation type="obsolete">Fantaasia</translation>
-    </message>
-    <message>
-        <source>Farm</source>
-        <translation type="obsolete">Talupidamine</translation>
-    </message>
-    <message>
-        <source>Fashion</source>
-        <translation type="obsolete">Mood</translation>
-    </message>
-    <message>
-        <source>Fiction</source>
-        <translation type="obsolete">Ulme</translation>
-    </message>
-    <message>
-        <source>Food</source>
-        <translation type="obsolete">Kokandus</translation>
-    </message>
-    <message>
-        <source>Football</source>
-        <translation type="obsolete">Jalgpall</translation>
-    </message>
-    <message>
-        <source>Foreign</source>
-        <translation type="obsolete">Välismaa</translation>
-    </message>
-    <message>
-        <source>Fund Raiser</source>
-        <translation type="obsolete">Finants</translation>
-    </message>
-    <message>
-        <source>Game/Quiz</source>
-        <translation type="obsolete">Mängud-mõistatused</translation>
-    </message>
-    <message>
-        <source>Garden</source>
-        <translation type="obsolete">Aiandus</translation>
-    </message>
-    <message>
-        <source>Golf</source>
-        <translation type="obsolete">Golf</translation>
-    </message>
-    <message>
-        <source>Government</source>
-        <translation type="obsolete">Valitsus</translation>
-    </message>
-    <message>
-        <source>Health</source>
-        <translation type="obsolete">Tervis</translation>
-    </message>
-    <message>
-        <source>High School</source>
-        <translation type="obsolete">Keskkool</translation>
-    </message>
-    <message>
-        <source>History</source>
-        <translation type="obsolete">Ajalugu</translation>
-    </message>
-    <message>
-        <source>Hobby</source>
-        <translation type="obsolete">Hobid</translation>
-    </message>
-    <message>
-        <source>Hockey</source>
-        <translation type="obsolete">Hoki</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Kodu</translation>
-    </message>
-    <message>
-        <source>Horror</source>
-        <translation type="obsolete">Õudus</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation type="obsolete">Info</translation>
-    </message>
-    <message>
-        <source>Instruction</source>
-        <translation type="obsolete">Juhendamine</translation>
-    </message>
-    <message>
-        <source>International</source>
-        <translation type="obsolete">Rahvusvaheline</translation>
-    </message>
-    <message>
-        <source>Interview</source>
-        <translation type="obsolete">Intervjuud</translation>
-    </message>
-    <message>
-        <source>Legal</source>
-        <translation type="obsolete">Õigus</translation>
-    </message>
-    <message>
-        <source>Live</source>
-        <translation type="obsolete">Otse</translation>
-    </message>
-    <message>
-        <source>Local</source>
-        <translation type="obsolete">Kohalik</translation>
-    </message>
-    <message>
-        <source>Math</source>
-        <translation type="obsolete">Matemaatika</translation>
-    </message>
-    <message>
-        <source>Medical</source>
-        <translation type="obsolete">Meditsiin</translation>
-    </message>
-    <message>
-        <source>Meeting</source>
-        <translation type="obsolete">Koosolekud</translation>
-    </message>
-    <message>
-        <source>Military</source>
-        <translation type="obsolete">Sõjandus</translation>
-    </message>
-    <message>
-        <source>Miniseries</source>
-        <translation type="obsolete">Miniseriaalid</translation>
-    </message>
-    <message>
-        <source>Music</source>
-        <translation type="obsolete">Muusika</translation>
-    </message>
-    <message>
-        <source>Mystery</source>
-        <translation type="obsolete">Müsteeria</translation>
-    </message>
-    <message>
-        <source>National</source>
-        <translation type="obsolete">Rahvuslik</translation>
-    </message>
-    <message>
-        <source>Nature</source>
-        <translation type="obsolete">Loodus</translation>
-    </message>
-    <message>
-        <source>Police</source>
-        <translation type="obsolete">Politsei</translation>
-    </message>
-    <message>
-        <source>Politics</source>
-        <translation type="obsolete">Poliitika</translation>
-    </message>
-    <message>
-        <source>Premiere</source>
-        <translation type="obsolete">Esilinastus</translation>
-    </message>
-    <message>
-        <source>Prerecorded</source>
-        <translation type="obsolete">Eelsalvestatud</translation>
-    </message>
-    <message>
-        <source>Product</source>
-        <translation type="obsolete">Toode</translation>
-    </message>
-    <message>
-        <source>Professional</source>
-        <translation type="obsolete">Profesionaalne</translation>
-    </message>
-    <message>
-        <source>Public</source>
-        <translation type="obsolete">Avalik</translation>
-    </message>
-    <message>
-        <source>Racing</source>
-        <translation type="obsolete">Võidusõit</translation>
-    </message>
-    <message>
-        <source>Reading</source>
-        <translation type="obsolete">Lugemine</translation>
-    </message>
-    <message>
-        <source>Repair</source>
-        <translation type="obsolete">Parandamine</translation>
-    </message>
-    <message>
-        <source>Review</source>
-        <translation type="obsolete">Ülevaated</translation>
-    </message>
-    <message>
-        <source>Romance</source>
-        <translation type="obsolete">Romantika</translation>
-    </message>
-    <message>
-        <source>Science</source>
-        <translation type="obsolete">Teadus</translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation type="obsolete">Seriaalid</translation>
-    </message>
-    <message>
-        <source>Service</source>
-        <translation type="obsolete">Teenindus</translation>
-    </message>
-    <message>
-        <source>Shopping</source>
-        <translation type="obsolete">Sisseostud</translation>
-    </message>
-    <message>
-        <source>Soap Opera</source>
-        <translation type="obsolete">Seebikad</translation>
-    </message>
-    <message>
-        <source>Special</source>
-        <translation type="obsolete">Erilised</translation>
-    </message>
-    <message>
-        <source>Suspense</source>
-        <translation type="obsolete">Põnevusfilm</translation>
-    </message>
-    <message>
-        <source>Talk</source>
-        <translation type="obsolete">Jutusaade</translation>
-    </message>
-    <message>
-        <source>Technical</source>
-        <translation type="obsolete">Tehniline</translation>
-    </message>
-    <message>
-        <source>Tennis</source>
-        <translation type="obsolete">Tennis</translation>
-    </message>
-    <message>
-        <source>Travel</source>
-        <translation type="obsolete">Reisimine</translation>
-    </message>
-    <message>
-        <source>Variety</source>
-        <translation type="obsolete">Erinevad</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1702"/>
         <source>Video</source>
         <translation>Video</translation>
-    </message>
-    <message>
-        <source>Weather</source>
-        <translation type="obsolete">Ilm</translation>
-    </message>
-    <message>
-        <source>Western</source>
-        <translation type="obsolete">Vestern</translation>
-    </message>
-    <message>
-        <source>DataDirect</source>
-        <translation type="obsolete">DataDirect</translation>
-    </message>
-    <message>
-        <source>Time Offset</source>
-        <translation type="obsolete">kellaaja nihe</translation>
-    </message>
-    <message>
-        <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="obsolete">Saatekava aegadele importimisel lisatav nihe (minutites).  Seda kasutatakse juhul kui antud kanali saateajad on mõne teise ajavööndi järgi.</translation>
-    </message>
-    <message>
-        <source>(Works for DataDirect listings only.)</source>
-        <translation type="obsolete">(töötab vaid DataDirect  kavadega)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/decoderbase.cpp" line="1127"/>
@@ -18519,23 +15546,6 @@ ei saa olla tühi.</translation>
         <translation>Normaalne</translation>
     </message>
     <message>
-        <source>TXT CAP</source>
-        <translation type="obsolete">TXT CAP</translation>
-    </message>
-    <message>
-        <source>No captions</source>
-        <comment>CC/Teletext/Subtitle text not available</comment>
-        <translation type="obsolete">Subtiitrid puuduvad</translation>
-    </message>
-    <message>
-        <source>Searching</source>
-        <translation type="obsolete">Otsimine</translation>
-    </message>
-    <message>
-        <source>No Seektable</source>
-        <translation type="obsolete">Pole keritav</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="994"/>
         <source>Recording Type</source>
         <translation>Salvestuse tüüp</translation>
@@ -18552,51 +15562,34 @@ ei saa olla tühi.</translation>
         <translation>IRC kaabel-tv</translation>
     </message>
     <message>
-        <source>UNKNOWN%1</source>
-        <comment>Synthesized callsign</comment>
-        <translation type="obsolete">TUNDMATU %1</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1349"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1346"/>
         <source>Tuner</source>
         <translation>Vastuvõtja</translation>
     </message>
     <message>
-        <source>HDHomeRun DTV tuner box</source>
-        <translation type="obsolete">HDHomeRun DTV vastuvõtja</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2820"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2817"/>
         <source>Input priority</source>
         <translation>Sisendi prioriteet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2822"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2819"/>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
         <translation>Kui sisendite prioriteedid pole võrdsed, võib planeerija salvestada saate hiljem, et saada see kõrgema prioriteediga sisendist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2872"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2869"/>
         <source>Use DishNet long-term EIT data</source>
         <translation>Kasuta DishNetilt tulevat pikaajalist EIT saatekava</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2960"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2957"/>
         <source>Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box.</source>
         <translation>Sisendgrupid on vajalikud ainult juhul kui üle ühe kaardi jagab sama ressurssi. Näiteks firewire kaart ja analoogkaardi sisend sama STB-d.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3264"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3261"/>
         <source>(Delete all capture cards on %1)</source>
         <translation>(Kustuta kõik masina %1 hõivekaardid)</translation>
-    </message>
-    <message>
-        <source>Always display closed captioning or subtitles</source>
-        <translation type="obsolete">Näita alati subtiitreid</translation>
-    </message>
-    <message>
-        <source>Time offset for EIT listings</source>
-        <translation type="obsolete">EIT saatekava ajanihe</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="314"/>
@@ -18607,26 +15600,6 @@ ei saa olla tühi.</translation>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="872"/>
         <source>EIT Scanner Options</source>
         <translation>Kava (EIT) tuvastamise valikud</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation type="obsolete">Prioriteet</translation>
-    </message>
-    <message>
-        <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
-        <translation type="obsolete">Planeerimisel igale kanalile omistatav lisaprioriteet.</translation>
-    </message>
-    <message>
-        <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="obsolete">Kasuta kanali eelistamiseks positiivset numbrit ning kanali vältimiseks negatiivset numbrit.</translation>
-    </message>
-    <message>
-        <source>Text subtitles</source>
-        <translation type="obsolete">subtiitrid</translation>
-    </message>
-    <message>
-        <source>Position</source>
-        <translation type="obsolete">Asukoht</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1003"/>
@@ -18649,54 +15622,6 @@ ei saa olla tühi.</translation>
         <translation>Transkodeerimisel kasutatavad filtrid. Kadudeta transkodeerimiseks tuleb jätta tühjaks.  Formaat: [[&lt;filter&gt;=&lt;valikud&gt;,]...]</translation>
     </message>
     <message>
-        <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
-        <translation type="obsolete">Uute reeglite &quot;Alusta varem&quot; vaikimisi aeg minutites</translation>
-    </message>
-    <message>
-        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="obsolete">Sisesta nullist erinev number vaid juhul, kui suurem osa saatekavade aegu ei lange kokku tegelike saadete aegadega. See määrab algse varem või hiljem alustamise aja uute salvestusreeglite loomisel. Iga reegli juures saab neid hiljem muuta.</translation>
-    </message>
-    <message>
-        <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation type="obsolete">Uute reeglite &quot;Lõpeta hiljem&quot; vaikimisi aeg minutites</translation>
-    </message>
-    <message>
-        <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="obsolete">Sisesta nullist erinev number vaid juhul, kui suurem osa saatekavade aegu ei lange kokku tegelike saadete aegadega. See määrab algse varem või hiljem lõpetamise aja uute salvestusreeglite loomisel. Iga reegli juures saab neid hiljem muuta.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="obsolete">Lisaprioriteet, mis antakse juhul kui saade tuleb &quot;Planeerimissätete&quot; alt eelistusena valitud sisendist.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="obsolete">Lisaprioriteet kavas HDTV-ks märgitud saadetele.</translation>
-    </message>
-    <message>
-        <source>Alphabetically</source>
-        <translation type="obsolete">tähestikuliselt</translation>
-    </message>
-    <message>
-        <source>Scheduler Options</source>
-        <translation type="obsolete">Planeerija valikud</translation>
-    </message>
-    <message>
-        <source>Accessibility Options</source>
-        <translation type="obsolete">Hõlbustusvalikud</translation>
-    </message>
-    <message>
-        <source>Recording Type Priority Settings</source>
-        <translation type="obsolete">Salvestustüüpide prioriteetide seaded</translation>
-    </message>
-    <message>
-        <source>Season</source>
-        <translation type="obsolete">Hooaeg</translation>
-    </message>
-    <message>
-        <source>Episode</source>
-        <translation type="obsolete">Osa</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="381"/>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
@@ -18713,17 +15638,9 @@ ei saa olla tühi.</translation>
         <translation>Kuna enamus digitaalseid kanaleid on kõrgetel sagedustel, siis on kasulik uurida ainult kõrgeid sagedusi.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1206"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1203"/>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
         <translation>Vali kõige rohkem oma STB-ga sarnanev mudel. Olenevalt firmware versioonist võib SA3250HD jaoks SA4200HD töötada paremini.</translation>
-    </message>
-    <message>
-        <source>channel number</source>
-        <translation type="obsolete">kanali number</translation>
-    </message>
-    <message>
-        <source>On multiline displays try and display the time as large as possible.</source>
-        <translation type="obsolete">Mitmerealistel ekraanidel proovi näidata aega nii suurena kui võimalik.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="5070"/>
@@ -18762,7 +15679,7 @@ ei saa olla tühi.</translation>
         <translation>Helitugevus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="998"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="995"/>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
         <translation>Märgi see juhul, kui kasutad odavat BT878  kiviga DVB-T kaarti nagu näiteks AverTV DVB-T, mis ei luba helitugevust puutuda.</translation>
     </message>
@@ -18781,39 +15698,6 @@ ei saa olla tühi.</translation>
         <location filename="../libs/libmythtv/videosource.cpp" line="200"/>
         <source>Listings grabber</source>
         <translation>Saatekavade hankija</translation>
-    </message>
-    <message>
-        <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="obsolete">Kaasa &quot;Vaatlusnimekirja&quot; grupp</translation>
-    </message>
-    <message>
-        <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="obsolete">Vaatlusnimekiri on lühendatud nimekiri salvestustest, mis vajavad tähelepanu.</translation>
-    </message>
-    <message>
-        <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="obsolete">Automaatse aegumiseta salvestuste väljajätmine</translation>
-    </message>
-    <message>
-        <source>Maximum days counted in the score</source>
-        <translation type="obsolete">Maksimaalne punktipäevade arv</translation>
-    </message>
-    <message>
-        <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="obsolete">Vaatlusnimekirja punktide arvestamisel annab iga salvestamisest möödunud päev ühe punkti. Sellega saab piirata maksimaalset punktide arvu.</translation>
-    </message>
-    <message>
-        <source>Days to exclude weekly episodes after delete</source>
-        <translation type="obsolete">Peale kustutamist väljajäetavate osade vahe päevades</translation>
-    </message>
-    <message>
-        <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="obsolete">Kui osa on kustutatud või vaadatuks märgitud, ei näidata vaatlusnimekirjas teisi sellise ajavahemiku jooksul salvestatud osasid. Igapäevased saated saavad ka vastavalt sellele valikule väiksem ajavahemiku.</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <comment>Play Group</comment>
-        <translation type="obsolete">Grupp</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="371"/>
@@ -18841,37 +15725,9 @@ ei saa olla tühi.</translation>
         <translation>Mitmekeelse heli salvestamise valik. Kahekeelne salvestamine on võimalik ainult Layer II peal. Vajalik on ivtv 0.4.0 või uuem.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1571"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1568"/>
         <source>M3U URL</source>
         <translation>M3U URL</translation>
-    </message>
-    <message>
-        <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation type="obsolete">IPTV kanalite aadresse sisaldava M3U URL.</translation>
-    </message>
-    <message>
-        <source>Sort all sub-titles/multi-titles Ascending</source>
-        <translation type="obsolete">Alam- ja multipealkirjade kasvavas järjekorras sorteerimine</translation>
-    </message>
-    <message>
-        <source>Sort all sub-titles/multi-titles Descending</source>
-        <translation type="obsolete">Alam- ja multipealkirjade kahanevas järjekorras sorteerimine</translation>
-    </message>
-    <message>
-        <source>Sort sub-titles Descending, multi-titles Ascending</source>
-        <translation type="obsolete">Alam- kahanevas ja multipealkirjad kasvavas järjekorras</translation>
-    </message>
-    <message>
-        <source>Sort sub-titles Ascending, multi-titles Descending</source>
-        <translation type="obsolete">Alam- kasvavas ja multipealkirjad kahanevas järjekorras</translation>
-    </message>
-    <message>
-        <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
-        <translation type="obsolete">Osade järjestamise valik. Alampealikirjad on mingi kindla pealkirja all olevad osade nimed. Multipealkirjad viitavad pealkirjade sektsioonide nimedele (nt. &quot;Kõik saated&quot;).</translation>
-    </message>
-    <message>
-        <source>Episode sort orderings</source>
-        <translation type="obsolete">Osade järjestamine</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="759"/>
@@ -18948,16 +15804,6 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>QAM Auto</translation>
     </message>
     <message>
-        <source>DVD Menu Not Available</source>
-        <translation type="obsolete">DVD menüü puudub</translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecStatusChar rsOtherShowing</comment>
-        <translatorcomment>Teine</translatorcomment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="230"/>
         <source>Other Showing</source>
         <translation>Muu näitamine</translation>
@@ -18978,38 +15824,34 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Kodeerimiseks kasutatav kõrgus. Märkus: PVR-x50 kaardid võivad varje tekitada, kui see väärtus pole 480 või 576 vastavalt NTSC ja PAL jaoks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1163"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1160"/>
         <source>GUID</source>
         <translation>GUID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2651"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2648"/>
         <source>Generic</source>
         <translation>Üldine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1264"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1261"/>
         <source>800Mbps</source>
         <translation>800 Mb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2729"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2726"/>
         <source>Use quick tuning</source>
         <translation>Kasuta kiirhäälestust</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2730"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2727"/>
         <source>Never</source>
         <translation>Kunagi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2732"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2729"/>
         <source>Always</source>
         <translation>Alati</translation>
-    </message>
-    <message>
-        <source>Start from the Watch List view</source>
-        <translation type="obsolete">Alusta Esitusloendi vaatest</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/checksetup.cpp" line="62"/>
@@ -19018,71 +15860,15 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Hoidlatele pole kataloogi määratud. Pead lisama vähemalt ühe kataloogi vaikimisi hoidla jaoks kuhu uued salvestused salvestatakse.</translation>
     </message>
     <message>
-        <source>Command to Set Wakeup Time</source>
-        <translation type="obsolete">Käsk ärkamisaja seadistamiseks</translation>
-    </message>
-    <message>
-        <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
-        <translation type="obsolete">Aja formaat on sekundid unixi epohhi algusest.</translation>
-    </message>
-    <message>
-        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
-        <translation type="obsolete">Muuda reklaamide tuvastamise meetodit sellel kanalil või keela reklaamide tuvastamine märkides kanali reklaamivabaks.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="5044"/>
         <source>Use Global Setting</source>
         <translation>Kasuta üldisi seadistusi</translation>
-    </message>
-    <message>
-        <source>Channel Options - Filters</source>
-        <translation type="obsolete">Kanali valikud - Filtrid</translation>
-    </message>
-    <message>
-        <source>Aspect ratio when watching a video at a specific resolution.</source>
-        <translation type="obsolete">Kuvasuhe kindla resolutsiooniga video puhul.</translation>
-    </message>
-    <message>
-        <source>Backend Server Wakeup settings</source>
-        <translation type="obsolete">Taustaserveri äratus seadistused</translation>
-    </message>
-    <message>
-        <source>MythTV could not connect to the database. Please verify your database settings below.</source>
-        <translation type="obsolete">Myth ei saa luua ühendust andmebaasiga. Palun kontrolli oma andmebaasi seadeid.</translation>
-    </message>
-    <message>
-        <source>Database Server Settings</source>
-        <translation type="obsolete">Andmebaasi serveri seadistused</translation>
-    </message>
-    <message>
-        <source>Ping test server?</source>
-        <translation type="obsolete">Pingi serverit?</translation>
-    </message>
-    <message>
-        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="obsolete">Kontrolli masina olemasolu kasutades ping käsku. Lülita välja kui võrk või masin ei toeta ping (ICMP ECHO) pkette</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="88"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="122"/>
         <source>Port</source>
         <translation>Port</translation>
-    </message>
-    <message>
-        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="obsolete">Millises pordis andmebaas kuulab. Vaikimisi pordi (3306) puhul jäta tühjaks.</translation>
-    </message>
-    <message>
-        <source>Database name</source>
-        <translation type="obsolete">Andmebaasi nimi</translation>
-    </message>
-    <message>
-        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation type="obsolete">Käsk mida kasutatakse kliendis andmebaasi äratamiseks (näit. sudo /etc/init.d/mysql restart).</translation>
-    </message>
-    <message>
-        <source>Required fields are marked with an asterisk (*).</source>
-        <translation type="obsolete">Nõutud väljad on märgitud tärniga(*).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="162"/>
@@ -19100,17 +15886,9 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Kõik vastuvõtjad on juba kasutusel. TV vaatamiseks pead mõne salvestamise peatama</translation>
     </message>
     <message>
-        <source>Cannot find (ping) database host %1 on the network</source>
-        <translation type="obsolete">Ei leia (ping) andmebaasi masinat %1</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1133"/>
         <source>This application is not compatible with the installed MythTV libraries.</source>
         <translation>See rakendus ei ühildu paigaldatud MythTV teekidega.</translation>
-    </message>
-    <message>
-        <source>Plugin %1 is not compatible with the installed MythTV libraries.</source>
-        <translation type="obsolete">%1 plugin pole paigaldatud MythTV teekidega ühilduv.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1028"/>
@@ -19171,20 +15949,6 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Server kasutab võrguprotokolli versiooni %1,kuid klient oskab ainult versiooni %2. Kontrolli, et kasutad ainult omavahel sobivaid kliendi-serveri versioone.</translation>
     </message>
     <message>
-        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation type="obsolete">Rakendus pole ühilduv paigaldatud MythTV teekidega. Kompileeri uuesti peale &quot;make distclean&quot;-i</translation>
-    </message>
-    <message>
-        <source> (Audio Description)</source>
-        <comment>Audio described for the visually impaired</comment>
-        <translation type="obsolete">(Heli kirjeldus)</translation>
-    </message>
-    <message>
-        <source> (Commentary)</source>
-        <comment>Audio commentary track</comment>
-        <translation type="obsolete">(Kommentaarid)</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="3885"/>
         <source>Subtitle</source>
         <translation>Alampealkiri</translation>
@@ -19241,48 +16005,20 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>, püsivara: %2</translation>
     </message>
     <message>
-        <source>Title %1 chapter %2</source>
-        <translation type="obsolete">Pealkiri: %1 peatükk %2</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/programtypes.cpp" line="357"/>
         <source>this rule does not match any showings in the current program listings.</source>
         <translation>sellele reeglile ei vasta kavas ükski saade.</translation>
     </message>
     <message>
-        <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="obsolete">selles ajaaknas salvestatakse osa erineval kanalil.</translation>
-    </message>
-    <message>
-        <source>Could not open tuner device</source>
-        <translation type="obsolete">Vastuvõtja seadme avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Bad connection to backend</source>
-        <translation type="obsolete">Halb taustaserveri ühendus</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1120"/>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1650"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1137"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1667"/>
         <source> offset %2</source>
         <translation>nihe %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1654"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1671"/>
         <source>Tuning to %1 mplexid(%2)</source>
         <translation>Häälestun %1-le mplexid(%2)</translation>
-    </message>
-    <message>
-        <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="obsolete">MythTV soovib järgnevaid saateid %n sekundi pärast salvestada:</translation>
-    </message>
-    <message>
-        <source>&quot;%1&quot; on %2</source>
-        <translation type="obsolete">&quot;%1&quot; %2</translation>
-    </message>
-    <message>
-        <source>Do you want to:</source>
-        <translation type="obsolete">Kas soovid:</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_rec.cpp" line="3749"/>
@@ -19629,17 +16365,17 @@ Enamik DVB saatjaid edastab 27,5 millionit märki sekundis.</translation>
         <translation>Seadme toetatav maksimaalne arv üheaegseid salvestamisi. Mõned digitaalsed saatjad võimaldavad edastada mitut saadet ühelt muxilt. Kui see väärtus on seatud ühest suuremaks, siis suudab MythTV sellest vahel kasu lõigata.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="212"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="211"/>
         <source>Network ID</source>
         <translation>Võrgu ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="213"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="212"/>
         <source>Set this to the actual network ID at your location, if you have a provider that broadcasts a broken NIT. Leave at -1 if everything works out of the box.</source>
         <translation>Kui teenuspakkuja levitab vigast NIT-i sea see vastavalt võrgule Sinu asukohas. Kui kõik töötab niigi, siis jäta väärtus -1-ks.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="471"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="470"/>
         <source>You MUST run &apos;mythfilldatabase --manual&apos; the first time,
 instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
@@ -19648,74 +16384,74 @@ mitte lihtsalt &apos;mythfilldatabase&apos;.
 Hõiveseade ei anna kanali numbreid, seega tuleb need käsitsi sisestada.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1053"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1499"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1644"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1050"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1496"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1641"/>
         <source>Warning: already in use</source>
         <translation>Hoiatus: juba kasutusel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2478"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2475"/>
         <source>DVB-T/S/C, ATSC or ISDB-T tuner card</source>
         <translation>DVB-T/S/C, ATSC või ISDB-T tüüneri kaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2484"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2481"/>
         <source>HD-PVR H.264 encoder</source>
         <translation>HD-PVR H.264 enkooder kaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2490"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2487"/>
         <source>HDHomeRun networked tuner</source>
         <translation>HDHomeRun võrgutüüner</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2500"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2497"/>
         <source>Ceton Cablecard tuner</source>
         <translation>Ceton Cablecard tüüner</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2504"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2501"/>
         <source>IPTV recorder</source>
         <translation>IPTV salvesti</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2510"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2507"/>
         <source>Analog to MPEG-2 encoder card (PVR-150/250/350, etc)</source>
         <translation>Analoog MPEG-2 enkooder (PVR-150/250/350, jne)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2513"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2510"/>
         <source>Analog to MJPEG encoder card (Matrox G200, DC10, etc)</source>
         <translation>Analoog MJPEG enkooder (Matrox G200, DC10, jne)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2515"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2512"/>
         <source>Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)</source>
         <translation>Analoog MPEG-4 enkooder (Plextor ConvertX USB, jne)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2518"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2515"/>
         <source>Analog capture card</source>
         <translation>Analoog hõivekaart</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2607"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2604"/>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
         <translation>Kuni see sisend pole teiste seadmetega jagatud Jäta &apos;Üldine&apos;. Ainult üks sisend sisendgrupis saab samaaegselt salvestada.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2731"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2728"/>
         <source>Live TV only</source>
         <translation>Ainult TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2952"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2949"/>
         <source>Interactions between inputs</source>
         <translation>Sisendite vaheline koosmõju</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2958"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2955"/>
         <source>Create a New Input Group</source>
         <translation>Loo uus sisendgrupp</translation>
     </message>
@@ -19841,30 +16577,6 @@ Hõiveseade ei anna kanali numbreid, seega tuleb need käsitsi sisestada.</trans
         <translation>Stuudiotasemed</translation>
     </message>
     <message>
-        <source>Special Events (World Cup, World Series, etc)</source>
-        <translation type="obsolete">Erilised sündmused (MM, EM, MK, jne)</translation>
-    </message>
-    <message>
-        <source>Intelligent Programs</source>
-        <translation type="obsolete">Haridussaated</translation>
-    </message>
-    <message>
-        <source>Pre-School Children&apos;s Programs</source>
-        <translation type="obsolete">Lastesaated eelkooli ealistele</translation>
-    </message>
-    <message>
-        <source>Entertainment Programs for 6 to 14</source>
-        <translation type="obsolete">Meelelahutussaated 6-14 aastastele</translation>
-    </message>
-    <message>
-        <source>Entertainment Programs for 10 to 16</source>
-        <translation type="obsolete">Meelelahutussaated 10-16 aastastele</translation>
-    </message>
-    <message>
-        <source>&quot;Unpublished&quot; Programs</source>
-        <translation type="obsolete">&quot;Avaldamata&quot; saated</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="221"/>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="420"/>
         <location filename="../programs/mythfilldatabase/main.cpp" line="340"/>
@@ -19889,297 +16601,14 @@ Hõiveseade ei anna kanali numbreid, seega tuleb need käsitsi sisestada.</trans
         <translation>EBAÕNNESTUS: XMLTV hankija tagastas veakoodi %1.</translation>
     </message>
     <message>
-        <source>FAILED: xmltv ran but was interrupted.</source>
-        <translation type="obsolete">EBAÕNNESTUS: xmltv käivitus, kuid katkestati.</translation>
-    </message>
-    <message>
-        <source>FAILED: xmltv returned error code %1.</source>
-        <translation type="obsolete">EBAÕNNESTUS: xmltv tagastas veateate %1.</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfilldatabase/filldata.cpp" line="981"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide for %1 of %2 sources. This can indicate a potential grabber failure.</source>
         <translation>mythfilldatabase käivitus, kuid ei lisanud midagi kavasse allika %1 %2-st kohta. See võib olla mingi kavahankija probleem.</translation>
     </message>
     <message>
-        <source>5.1</source>
-        <translation type="obsolete">5.1</translation>
-    </message>
-    <message>
-        <source>Run transcoder</source>
-        <translation type="obsolete">Käivita transkooder</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">See on vaikimisi väärtus mida kasutatakse &apos;Käivita %1&apos; seadistuses, kui salvestus on  lõppenud.</translation>
-    </message>
-    <message>
-        <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="obsolete">Vahele jättes arva lühemad kui see järgnevad reklaamipausid üheks. Kasulik kui pead reklaami pauside ajal mitu korda edasi hüppama. Toimib ka automaatse vahelejätu korral. Keelamiseks sisesta 0.</translation>
-    </message>
-    <message>
-        <source>Expire in deleted order</source>
-        <translation type="obsolete">Aegumine kustutamise järjekorras</translation>
-    </message>
-    <message>
-        <source>DeletedExpireOptions</source>
-        <translation type="obsolete">Kostutatud aegumisvalikud</translation>
-    </message>
-    <message>
-        <source>Profile Item</source>
-        <translation type="obsolete">Profiili element</translation>
-    </message>
-    <message>
-        <source>Main deinterlacing method.</source>
-        <translation type="obsolete">Peamine ülerealaotuse eemaldamise meetod.</translation>
-    </message>
-    <message>
-        <source>Fallback deinterlacing method.</source>
-        <translation type="obsolete">Tagavara ülerealaotuse eemaldamise meetod.</translation>
-    </message>
-    <message>
-        <source>&amp;</source>
-        <comment>and</comment>
-        <translation type="obsolete">&amp;</translation>
-    </message>
-    <message>
-        <source>if rez</source>
-        <translation type="obsolete">kui reso</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Muuda</translation>
-    </message>
-    <message>
-        <source>Add New Entry</source>
-        <translation type="obsolete">Lisa uus väli</translation>
-    </message>
-    <message>
-        <source>Playback Profiles</source>
-        <translation type="obsolete">Esitusprofiilid</translation>
-    </message>
-    <message>
-        <source>Current Video Playback Profile</source>
-        <translation type="obsolete">Hetke video taasesitamise profiil</translation>
-    </message>
-    <message>
-        <source>Add New</source>
-        <translation type="obsolete">Lisa uus</translation>
-    </message>
-    <message>
-        <source>Enter Playback Group Name</source>
-        <translation type="obsolete">Sisesta Esitusgrupi nimi</translation>
-    </message>
-    <message>
-        <source>Sorry, playback group name
-&apos;%1&apos; is already being used.</source>
-        <translation type="obsolete">Esitusgrupi nimi
-&apos;%1&apos; on juba kasutusel.</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Viga</translation>
-    </message>
-    <message>
-        <source>Vertical scaling</source>
-        <translation type="obsolete">Vertikaalne skaleerimine</translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="obsolete">Sea kui pilt ei täida ekraani vertikaalselt. Vahemik -100% kuni 100%</translation>
-    </message>
-    <message>
-        <source>Horizontal scaling</source>
-        <translation type="obsolete">Horisontaalne skaleerimine</translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="obsolete">Sea kui pilt ei täida ekraani horisontaalselt. Vahemik -100% kuni 100%</translation>
-    </message>
-    <message>
-        <source>Black background for closed captioning</source>
-        <translation type="obsolete">Teletekstile must taust</translation>
-    </message>
-    <message>
-        <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="obsolete">Eelista EIA-708 teleteksti EIA-608-le</translation>
-    </message>
-    <message>
-        <source>Always prompt (excluding Live TV)</source>
-        <translation type="obsolete">Küsi alati (väljaarvatud otse eeter)</translation>
-    </message>
-    <message>
-        <source>Always prompt (including Live TV)</source>
-        <translation type="obsolete">Küsi alati (kaasaarvatud otse eeter)</translation>
-    </message>
-    <message>
-        <source>Prompt for Live TV only</source>
-        <translation type="obsolete">Küsi ainult otse eetri puhul</translation>
-    </message>
-    <message>
-        <source>Automatically mark a recording as watched</source>
-        <translation type="obsolete">Märgi salvestus automaatselt vaadatuks</translation>
-    </message>
-    <message>
-        <source>Show quit</source>
-        <translation type="obsolete">Näita &apos;välju&apos; valikut</translation>
-    </message>
-    <message>
-        <source>Show quit and shutdown</source>
-        <translation type="obsolete">Näita &apos;välju&apos; ja &apos;seiska&apos; valikuid</translation>
-    </message>
-    <message>
-        <source>Show quit, reboot and shutdown</source>
-        <translation type="obsolete">Näita &apos;välju&apos;, &apos;seiska&apos; ja &apos;taaskäivita&apos; valikuid</translation>
-    </message>
-    <message>
-        <source>Show shutdown</source>
-        <translation type="obsolete">Näita &apos;seiska&apos; valikut</translation>
-    </message>
-    <message>
-        <source>Show reboot</source>
-        <translation type="obsolete">Näita &apos;taaskäivita&apos; valikut</translation>
-    </message>
-    <message>
-        <source>Show reboot and shutdown</source>
-        <translation type="obsolete">Näita &apos;taaskäivita&apos; ja &apos;seiska&apos; valikuid</translation>
-    </message>
-    <message>
-        <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="obsolete">Vaikimisi näitavad ainult kaugkliendid seiskamise valikut väljumis menüüs. Siin saad valida mida näidatakse.</translation>
-    </message>
-    <message>
-        <source>Reboot command</source>
-        <translation type="obsolete">Taaskäivituskäsk</translation>
-    </message>
-    <message>
-        <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
-        <translation type="obsolete">Vaikimisi kasutab MythTV kui pilt kogu ekraani ei kata äärte jaoks musta värvi. Plasmaekraani kasutajad võivad pildi &quot;sissepõlemise&quot; vältimiseks eelistada näiteks halli.</translation>
-    </message>
-    <message>
-        <source>Currently only works with XVideo video renderer.</source>
-        <translation type="obsolete">Hetkel töötab ainult XVideo renderdajaga.</translation>
-    </message>
-    <message>
-        <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
-        <translation type="obsolete">Lubades ei arvestata kuvasuhtega, mida edastaja videovooga kaasa saadab.</translation>
-    </message>
-    <message>
-        <source>Zoom</source>
-        <translation type="obsolete">Suurend</translation>
-    </message>
-    <message>
-        <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
-        <translation type="obsolete">Lubades rakendatakse eeldefineeritud suurendus videoesitusele kogu MythTV-s.</translation>
-    </message>
-    <message>
-        <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="obsolete">Monitori/TV horisontaalne suurus ekraani tegeliku kuva suhte arvutamiseks. See kirjutab üle süsteemilt saadud  ekraani suuruse.</translation>
-    </message>
-    <message>
-        <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="obsolete">Monitori/TV vertikaalne suurus ekraani tegeliku kuva suhte arvutamiseks. See kirjutab üle süsteemilt saadud  ekraani suuruse.</translation>
-    </message>
-    <message>
-        <source>Remember last channel group</source>
-        <translation type="obsolete">Jäta viimane kanaligrupp meelde</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
-        <translation type="obsolete">Lubades näitab kava ainult viimase kanaligrupi kanaleid. 4 vajutades vahetatakse kanaligruppe.</translation>
-    </message>
-    <message>
-        <source>Default channel group</source>
-        <translation type="obsolete">Vaikimisi kanaligrupp</translation>
-    </message>
-    <message>
-        <source>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</source>
-        <translation type="obsolete">Vaikimisi kanaligrupp, mida näidatakse kavas. GUIDE nupp vahetab gruppe.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
-        <translation type="obsolete">Lisaprioriteet kui saade on märgitud kavas laiekraan.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having in-vision sign language.</source>
-        <translation type="obsolete">Lisaprioriteet saatel on kavas märge in-vision keele kohta.</translation>
-    </message>
-    <message>
-        <source>In-vision Subtitles Recording Priority</source>
-        <translation type="obsolete">In-vision subtiitrite prioriteet</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
-        <translation type="obsolete">Lisaprioriteet saatel on kavas märge in-vision subtiitrite kohta.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
-        <translation type="obsolete">Lisa prioriteet saatel on kavas märge teleteksti või subtiitrite kohta.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
-        <translation type="obsolete">Lisab prioriteeti kui saatel on kavas märge toele vaegkuulmisega inimestele.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as being Audio Described.</source>
-        <translation type="obsolete">Lisa b prioriteedi kui saatel on kavas märge helikirjelduse kohta.</translation>
-    </message>
-    <message>
-        <source> (and other removable devices)</source>
-        <translation type="obsolete"> (ja teisi eemaldatavad seadmed)</translation>
-    </message>
-    <message>
-        <source>MythMediaMonitor</source>
-        <translation type="obsolete">MythMediaMonitor</translation>
-    </message>
-    <message>
-        <source>Settings Access</source>
-        <translation type="obsolete">Ligipääs seadetele</translation>
-    </message>
-    <message>
-        <source>Shutdown/Reboot Settings</source>
-        <translation type="obsolete">Seiskamine/taaskäivitus seadistused</translation>
-    </message>
-    <message>
-        <source>General Playback</source>
-        <translation type="obsolete">Üldine taasesitus</translation>
-    </message>
-    <message>
-        <source>Recording Groups</source>
-        <translation type="obsolete">Salvestusgrupp</translation>
-    </message>
-    <message>
-        <source>Play from bookmark</source>
-        <translation type="obsolete">Mängi järjehoidjast</translation>
-    </message>
-    <message>
-        <source>Play from beginning</source>
-        <translation type="obsolete">Mängi algusest</translation>
-    </message>
-    <message>
-        <source>All tuners are currently busy.</source>
-        <translation type="obsolete">Kõik tüünerid on hetkel hõivatud.</translation>
-    </message>
-    <message>
-        <source>There are no configured tuners.</source>
-        <translation type="obsolete">Seadistatud tüünerid puuduvad.</translation>
-    </message>
-    <message>
-        <source>Failed to open
- &apos;%1&apos; in %2
-Check if the video exists</source>
-        <translation type="obsolete">Ei õnnestunud avada
-&apos;%1&apos; %2-st
-Kontrolli, kas video on olemas</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="109"/>
         <source>IP address</source>
         <translation>IP aadress</translation>
-    </message>
-    <message>
-        <source>Used if the XMLTV data comes from a different time zone than your own and modifies the date and time before insertion into the database. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s time zone. &apos;None&apos; ignores the XMLTV time zone, interpreting times as local.</source>
-        <translation type="obsolete">Kasutatakse kui XMLTV andmed tulevad erinevast ajavööndist. &apos;Auto&apos; konverdib XMLTV ajad arvuti ajavööndi järgi. &apos;None&apos; ignoreerib XMLTV ajavööndit ja tõlgendab seda lokaalsena.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="324"/>
@@ -20341,14 +16770,6 @@ Kontrolli, kas video on olemas</translation>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="277"/>
         <source>External application or script that outputs extra information for inclusion in the backend status page. See http://www.mythtv.org/wiki/Miscellaneous_Status_Information</source>
         <translation>Väline rakendus või skript, mis väljastab lisaandmeid taustaserveri olekulehele. Loe lisaks contrib/info/misc_status_info/README</translation>
-    </message>
-    <message>
-        <source>Your local time zone (for XMLTV)</source>
-        <translation type="obsolete">Sinu ajavöönd (XMLTV jaoks)</translation>
-    </message>
-    <message>
-        <source>Adjust the relative time zone of the EIT EPG data. &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s time zone. &apos;None&apos; ignores the EIT time zone, interpreting times as local.</source>
-        <translation type="obsolete">EIT saatekava suhtelise ajanihke muutmine.  &apos;Auto&apos; muudab EIT aja kohalikusk ajaks kasutades arvuti ajatsooni.  &apos;None&apos; ignoreerib EIT ajatsooni ning peab seda kohalikuks ajaks.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="287"/>
@@ -20650,136 +17071,10 @@ Kontrolli, kas video on olemas</translation>
         <translation>UPnP serveri seaded</translation>
     </message>
     <message>
-        <source>Tuner %1 is recording:
-</source>
-        <translation type="obsolete">Vastuvõtja %1 salvestab:
-</translation>
-    </message>
-    <message>
-        <source>Tuner %1 is not recording</source>
-        <translation type="obsolete">Vastuvõtja %1 ei salvesta</translation>
-    </message>
-    <message>
-        <source>Date Format</source>
-        <translation type="obsolete">Kuupäeva formaat</translation>
-    </message>
-    <message>
-        <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation type="obsolete">Kasutatakse kuupäeva kuvamiseks. Vaata http://doc.trolltech.com/3.3/qdate.html#toString sobivate formaadimärkide leidmiseks.</translation>
-    </message>
-    <message>
-        <source>Cannot login to database?</source>
-        <translation type="obsolete">Andmebaasi sisenemine ebaõnnestus?</translation>
-    </message>
-    <message>
-        <source>Unable to open or close the empty drive %1.
-
-You may have to use the eject button under its tray.</source>
-        <translation type="obsolete">Ei suuda tühja seadet %1 avada või sulgeda
-
-kasuta väljastamise nuppu seadmel.</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/decoderbase.cpp" line="1146"/>
         <source>TXT File</source>
         <comment>Text File</comment>
         <translation>TXT fail</translation>
-    </message>
-    <message>
-        <source>Failed to initialize video output</source>
-        <translation type="obsolete">Videoväljundi aktiveerimine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Failed to reinitialize video output</source>
-        <translation type="obsolete">Videoväljundi uuesti aktiveerimine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Need to switch video renderer.</source>
-        <translation type="obsolete">On vaja lülituda mõnele teisele video renderdajale.</translation>
-    </message>
-    <message>
-        <source>Forced Subtitles On</source>
-        <translation type="obsolete">Pealesunnitud subtiitrid sees</translation>
-    </message>
-    <message>
-        <source>Forced Subtitles Off</source>
-        <translation type="obsolete">Pealesunnitud subtiitrid väljas</translation>
-    </message>
-    <message>
-        <source>Failed to initialize A/V Sync</source>
-        <translation type="obsolete">A/V sünk. ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Serious error detected in Video Output</source>
-        <translation type="obsolete">Video väljundis on tõsine viga</translation>
-    </message>
-    <message>
-        <source>Video frame buffering failed too many times.</source>
-        <translation type="obsolete">Video kaadri puhverdamine on liiga palju ebaõnnestunud.</translation>
-    </message>
-    <message>
-        <source>Error opening switch program buffer</source>
-        <translation type="obsolete">Lüliti programmi puhvri avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Error opening switch program file</source>
-        <translation type="obsolete">Lüliti programmi faili avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Error opening jump program file buffer</source>
-        <translation type="obsolete">Saate faili puhvri avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Error opening jump program file</source>
-        <translation type="obsolete">Hüppe programmi faili avamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Error reopening video decoder</source>
-        <translation type="obsolete">Video dekoodri taasavamine ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>Irrecoverable recorder error</source>
-        <translation type="obsolete">Parandamatu salvestaja viga</translation>
-    </message>
-    <message>
-        <source>Using previously auto-saved cuts</source>
-        <translation type="obsolete">Kasutan varem automaatselt salvestatud lõikeid</translation>
-    </message>
-    <message>
-        <source>New cut added.</source>
-        <translation type="obsolete">Uus lõige lisatud.</translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation type="obsolete">Võta tagasi</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation type="obsolete">Tee uuesti</translation>
-    </message>
-    <message>
-        <source>Enabled Studio Levels</source>
-        <translation type="obsolete">Luba stuudio tasemed</translation>
-    </message>
-    <message>
-        <source>Disabled Studio Levels</source>
-        <translation type="obsolete">Keela stuudio tasemed</translation>
-    </message>
-    <message>
-        <source>Enabled Night Mode</source>
-        <translation type="obsolete">Öö seadistus sees</translation>
-    </message>
-    <message>
-        <source>Disabled Night Mode</source>
-        <translation type="obsolete">Öö seadistus väljas</translation>
-    </message>
-    <message>
-        <source>Bookmark Saved</source>
-        <translation type="obsolete">Järjehoidja salvestatud</translation>
-    </message>
-    <message>
-        <source>Bookmark Cleared</source>
-        <translation type="obsolete">Järjehoidja kustutatud</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1907"/>
@@ -20787,207 +17082,72 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>VIGA, helisisendite tuvastamiseks kompileeri V4L toega</translation>
     </message>
     <message>
-        <source>Channel Importer</source>
-        <translation type="obsolete">Kanalite importija</translation>
-    </message>
-    <message>
-        <source>Failed to find any new channels!</source>
-        <translation type="obsolete">Ei leidnud ühtegi uut kanalit!</translation>
-    </message>
-    <message>
-        <source>Failed to find any channels.</source>
-        <translation type="obsolete">Ei leidnud ühtegi kanalit.</translation>
-    </message>
-    <message>
-        <source>Channels: FTA Enc Dec
-</source>
-        <translation type="obsolete">Kanalid: FTA Enk Dek
-</translation>
-    </message>
-    <message>
-        <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
-</source>
-        <translation type="obsolete">Unikaalne: prog %1 atsc %2 atsc väiks. %3 kanalinr. %4</translation>
-    </message>
-    <message>
-        <source>Max atsc major count: %1</source>
-        <translation type="obsolete">Maks atsc peamine arv: %1</translation>
-    </message>
-    <message>
-        <source>Insert all</source>
-        <translation type="obsolete">Sisesta kõik</translation>
-    </message>
-    <message>
-        <source>Insert manually</source>
-        <translation type="obsolete">Kohandatud sisestamine</translation>
-    </message>
-    <message>
-        <source>Ignore all</source>
-        <translation type="obsolete">Ignoreeri kõiki</translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n off-air channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n off-air kanal.</numerusform>
-            <numerusform>Leitud %n off-air kanalit.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n unused transport(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n kasutamata ülekanne.</numerusform>
-            <numerusform>Leitud %n kasutamata ülekannet.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n old %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n vana %1 kanal.</numerusform>
-            <numerusform>Leitud %n vana %1 kanalit.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n new non-conflicting %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n uut mitte konfliktset %1 kanal.</numerusform>
-            <numerusform>Leitud %n uut mitte konfliktset %1 kanalit.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n new conflicting %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n uus konfliktne %1 kanal.</numerusform>
-            <numerusform>Leitud %n uut konfliktset %1 kanalit.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n conflicting old %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n vana konfliktne %1 kanal.</numerusform>
-            <numerusform>Leitud %n vana konfliktset %1 kanalit.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n transport(s):
-</source>
-        <translation type="obsolete">
-            <numerusform>Leitud %n ülekanne:
-</numerusform>
-            <numerusform>Leitud %n ülekannet:
-</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Delete all</source>
-        <translation type="obsolete">Kustuta kõik</translation>
-    </message>
-    <message>
-        <source>Set all invisible</source>
-        <translation type="obsolete">Sea nähtamatuks</translation>
-    </message>
-    <message>
-        <source>Update all</source>
-        <translation type="obsolete">Uuenda kõik</translation>
-    </message>
-    <message>
-        <source>Update manually</source>
-        <translation type="obsolete">Kohandatud uuendamine</translation>
-    </message>
-    <message>
-        <source>Please enter either 1, 2, or 3:</source>
-        <translation type="obsolete">Sisesta kas 1,2 või 3:</translation>
-    </message>
-    <message>
-        <source>Suggest</source>
-        <translation type="obsolete">Soovita</translation>
-    </message>
-    <message>
-        <source>Cancel All</source>
-        <translation type="obsolete">Tühista kõik</translation>
-    </message>
-    <message>
-        <source>Channel %1 was found to be in conflict with other channels. </source>
-        <translation type="obsolete">Kanal %1 on konfliktis teiste kanalitega.</translation>
-    </message>
-    <message>
-        <source>You chose to manually insert channel %1.</source>
-        <translation type="obsolete">Tahtsid kanali %1 käsitsi sisestada.</translation>
-    </message>
-    <message>
-        <source>Please enter a unique channel number. </source>
-        <translation type="obsolete">Sisesta unikaalne kanali number.</translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
-        <translation type="obsolete">Sisesta mitte konfliktne kanali number (või vajuta %1 vahelejätuks, %2 jäta kõik vahele):</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="247"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="264"/>
         <source>Updated Channel %1</source>
         <translation>Uuendatud kanal %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="272"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="289"/>
         <source>Added Channel %1</source>
         <translation>Lisatud kanal %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="273"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="290"/>
         <source>Failed to add channel %1</source>
         <translation>Kanali %1 lisamine ebaõnnestus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="596"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="613"/>
         <source>%1 -- Testing decryption of program %2</source>
         <translation>%1 -- Testin saate %2 dekrüptimist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="868"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="885"/>
         <source>Program %1</source>
         <translation>Saade %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="869"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="886"/>
         <source>Unknown decryption status</source>
         <translation>Tundmatu krüpteeringu olek</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="871"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="888"/>
         <source>Encrypted</source>
         <translation>Krüptitud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="873"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="890"/>
         <source>Decrypted</source>
         <translation>Avatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="908"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="925"/>
         <source>%1 -- Timed out</source>
         <translation>%1 -- Ajapiir ületatud</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="931"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="948"/>
         <source>%1 possible channels</source>
         <translation>%1 võimalikud kanalid</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="932"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="949"/>
         <source>no channels</source>
         <translation>kanalid puuduvad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="943"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="960"/>
         <source>%1, no signal</source>
         <translation>%1, signaal puudub</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="948"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="965"/>
         <source>%1 -- Found %2 probable channels</source>
         <translation>%1 -- Leitud %2 võimalikku kanalit</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1668"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1685"/>
         <source>: Found %n</source>
         <translation>
             <numerusform>: Leitud %n</numerusform>
@@ -20995,51 +17155,19 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1894"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1911"/>
         <source>Frequency %1</source>
         <translation>Sagedus %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2052"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2069"/>
         <source>as</source>
         <translation>nagu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2057"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2074"/>
         <source>Skipping %1, not in imported channel map</source>
         <translation>Jäta %1 vahele, importimata kanali kaart</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Ülekande häälestamise viga</translation>
-    </message>
-    <message>
-        <source>Programmer Error: Failed to handle tune complete.</source>
-        <translation type="obsolete">Programmaatori viga: Ebaõnnestunud häälestumine.</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Ei õnnestunud parsida &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Ei õnnestunud avada &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Viga otsimise alustamisel</translation>
-    </message>
-    <message>
-        <source>Programmer Error: No Device</source>
-        <translation type="obsolete">Programmaatori viga: Seade puudub</translation>
-    </message>
-    <message>
-        <source>Programmer Error: Channel not created</source>
-        <translation type="obsolete">Programmaatori viga: Kanalit ei loodud</translation>
-    </message>
-    <message>
-        <source>Channel could not be opened.</source>
-        <translation type="obsolete">Kanalit ei saa avada.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="73"/>
@@ -21055,11 +17183,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../libs/libmyth/programinfo.cpp" line="5061"/>
         <source>Scene Change + Logo Detection</source>
         <translation>Stseeni muutus + logo tuvastamine</translation>
-    </message>
-    <message>
-        <source>UNKNOWN</source>
-        <comment>Synthesized callsign</comment>
-        <translation type="obsolete">TUNDMATU</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recorders/dtvsignalmonitor.cpp" line="49"/>
@@ -21082,26 +17205,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../libs/libmythtv/recorders/dtvsignalmonitor.cpp" line="62"/>
         <source>Matching</source>
         <translation>Leitud</translation>
-    </message>
-    <message>
-        <source>Signal To Noise</source>
-        <translation type="obsolete">Signaali/müra suhe</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Bitivigade hulk</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Parandamata blokid</translation>
-    </message>
-    <message>
-        <source>Rotor Progress</source>
-        <translation type="obsolete">Pööramise edenemine</translation>
-    </message>
-    <message>
-        <source>Error: stream handler died</source>
-        <translation type="obsolete">VIGA: voohaldur suri</translation>
     </message>
     <message numerus="yes">
         <location filename="../libs/libmyth/programinfo.cpp" line="1570"/>
@@ -21450,41 +17553,29 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>See on NVidia VDPAU dekodeerimise jaoks ainuke renderdaja.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="530"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="529"/>
         <source>Do not configure a grabber</source>
         <translation>Ära seadista hankijat</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="561"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="560"/>
         <source>North America (SchedulesDirect.org) (Internal)</source>
         <translation>Põhja Ameerika (SchedulesDirect.org) (Sisemine)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="565"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="564"/>
         <source>Transmitted guide only (EIT)</source>
         <translation>Ainult edastatav kava (EIT)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="567"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="566"/>
         <source>No grabber</source>
         <translation>Hankija puudub</translation>
     </message>
     <message>
-        <source>H.264 encoder card (HD-PVR)</source>
-        <translation type="obsolete">H.264 enkooder kaart (HD-PVR)</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3727"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3724"/>
         <source>Audio input</source>
         <translation>Helisisend</translation>
-    </message>
-    <message>
-        <source>MythTV could not locate the menu file %1</source>
-        <translation type="obsolete">Myth ei leia menüü faili %1</translation>
-    </message>
-    <message>
-        <source>The menu file %1 is incomplete.</source>
-        <translation type="obsolete">Menüü fail %1 pole täielik.</translation>
     </message>
     <message>
         <location filename="../programs/mythbackend/httpstatus.cpp" line="414"/>
@@ -21536,162 +17627,14 @@ kasuta väljastamise nuppu seadmel.</translation>
         </translation>
     </message>
     <message>
-        <source>Building Head Start Buffer</source>
-        <translation type="obsolete">Tekitan käivituspuhvrit</translation>
-    </message>
-    <message>
-        <source>Building Logo Detection Buffer</source>
-        <translation type="obsolete">Tekitan logo leidmise puhvrit</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation type="obsolete">Otsin logo</translation>
-    </message>
-    <message>
         <location filename="../programs/mythtranscode/transcode.cpp" line="1498"/>
         <source>%1% Completed @ %2 fps.</source>
         <translation>%1% tehtud @ %2 fps.</translation>
     </message>
     <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="obsolete">%1 kaadrit tehtud @ %2 fps.</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation type="obsolete">Järjekorras</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">Ootel</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">Käivitan</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">Lõpetan</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Peatatud</translation>
-    </message>
-    <message>
-        <source>Retrying</source>
-        <translation type="obsolete">Uuesti</translation>
-    </message>
-    <message>
-        <source>Erroring</source>
-        <translation type="obsolete">Vigane</translation>
-    </message>
-    <message>
-        <source>Aborting</source>
-        <translation type="obsolete">Katkestan</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">Tehtud (vigane olek!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">Lõpetatud</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">Ebaõnnestunud</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">Tühistatud</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">Käivitatud</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfilldatabase/main.cpp" line="379"/>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
         <translation>mythfilldatabase käivitus, kuid ei lisanud midagi kavasse. See võib olla mingi kava hankija probleem.</translation>
-    </message>
-    <message>
-        <source>Start in group list</source>
-        <translation type="obsolete">Käivitu grupi loendis</translation>
-    </message>
-    <message>
-        <source>If enabled, the focus will start on the group list, otherwise the focus will default to the recordings.</source>
-        <translation type="obsolete">Lubades on käivitumisel fookus grupi loendil, muidu on fookus salvestustel.</translation>
-    </message>
-    <message>
-        <source>Time to retain deleted recordings (days)</source>
-        <translation type="obsolete">Kaua kustutatud salvestusi säilitatakse (päevad)</translation>
-    </message>
-    <message>
-        <source>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</source>
-        <translation type="obsolete">Aeg, mille möödudes pole kustutatud salvestuste taastamine enam võimalik. 0 puhul kustutatakse salvestused 5-20 min jooksul. -1 puhul hoitakse kustutatud salvestusi kuni tekkib vajadus vaba ruumi järele. Salvestusi võib ka enne selle aja möödumist kustutada, kui tekkib vajadus vaba ruumi järele.</translation>
-    </message>
-    <message>
-        <source>For a special category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="obsolete">Spetsiaalsete kategooriate jaoks (näit. Spordisündmus). Töötab kui saate kategooria on automaatselt tuvastatav.</translation>
-    </message>
-    <message>
-        <source>Decode VBI format</source>
-        <translation type="obsolete">Dekodeeri VBI formaat</translation>
-    </message>
-    <message>
-        <source>Subtitle Codec</source>
-        <translation type="obsolete">Subtiitrite koodek</translation>
-    </message>
-    <message>
-        <source>Browse all channels</source>
-        <translation type="obsolete">Sirvi kõiki kanaleid</translation>
-    </message>
-    <message>
-        <source>If enabled, browse mode will shows channels on all available recording devices, instead of showing channels on just the current recorder.</source>
-        <translation type="obsolete">Lubades näidatakse sirvides kanaleid kõigilt salvestusseadmetelt. Mitte ainult hetkel kasutusel olevast seadmest.</translation>
-    </message>
-    <message>
-        <source>Clear bookmark on playback</source>
-        <translation type="obsolete">Kustuta taasesitamisel järjehoidja</translation>
-    </message>
-    <message>
-        <source>Alternate clear and save bookmark</source>
-        <translation type="obsolete">Alternatiivne järjehoidja kustutamine ja salvestamine</translation>
-    </message>
-    <message>
-        <source>UNIX socket or IP address[:port] to connect in order to communicate with the LIRC Daemon.</source>
-        <translation type="obsolete">UNIX sokkel või Ip aadress[:port] LIRC deemoniga ühendumiseks.</translation>
-    </message>
-    <message>
-        <source>Path to screenshot storage location. Should be writable by the frontend</source>
-        <translation type="obsolete">Kus ekraanitõmmised asuvad. Peab olema kliendi poolt kirjutatav</translation>
-    </message>
-    <message>
-        <source>Display on screen</source>
-        <translation type="obsolete">Näita ekraanil</translation>
-    </message>
-    <message>
-        <source>Overrides for specific video sizes</source>
-        <translation type="obsolete">Uued väärtused kindlatele videosuurustele</translation>
-    </message>
-    <message>
-        <source>Use window border</source>
-        <translation type="obsolete">Kasuta akna äärist</translation>
-    </message>
-    <message>
-        <source>Use fixed window size</source>
-        <translation type="obsolete">Kasuta kindlat akna suurust</translation>
-    </message>
-    <message>
-        <source>Up to this number of priority points may be added for titles that are usually watched soon after recording or subtracted for titles that are often watched several days or weeks later.</source>
-        <translation type="obsolete">Niipalju prioriteedipunkte lisatakse kui saadet vaadatakse tavaliselt kohe peale salvestamist või vähendatakse kui saadet vaadatakse tavaliselt palju aega peale salvestamist.</translation>
-    </message>
-    <message>
-        <source>Audio System</source>
-        <translation type="obsolete">Helisüsteem</translation>
-    </message>
-    <message>
-        <source>Audio Mixer</source>
-        <translation type="obsolete">Helimikser</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="37"/>
@@ -21707,14 +17650,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="257"/>
         <source>You may have to use the eject button under its tray</source>
         <translation>Võimalik, et pead plaadiseadme nuppu kasutama</translation>
-    </message>
-    <message>
-        <source>Remote Control</source>
-        <translation type="obsolete">Kaug kontroll</translation>
-    </message>
-    <message>
-        <source>MythTV Frontend</source>
-        <translation type="obsolete">MythTV klient</translation>
     </message>
     <message>
         <location filename="../programs/mythtranscode/main.cpp" line="77"/>
@@ -21792,13 +17727,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <source>MythTV Setup</source>
         <translation>MythTV seadistus</translation>
     </message>
-    <message numerus="yes">
-        <source>%n second(s)</source>
-        <translation type="obsolete">
-            <numerusform>%n sekund</numerusform>
-            <numerusform>%n sekundit</numerusform>
-        </translation>
-    </message>
     <message>
         <location filename="../libs/libmythtv/playercontext.cpp" line="774"/>
         <source>Play</source>
@@ -21810,74 +17738,10 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>PBP</translation>
     </message>
     <message>
-        <source>Yes, Exit now</source>
-        <translation type="obsolete">Jah, välju</translation>
-    </message>
-    <message>
-        <source>Yes, Exit and Reboot</source>
-        <translation type="obsolete">Jah, välju ja taaskäivita</translation>
-    </message>
-    <message>
-        <source>Yes, Exit and Shutdown</source>
-        <translation type="obsolete">Jah, välju ja lülita välja</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1491"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1733"/>
         <source>All Channels</source>
         <translation>Kõik kanalid</translation>
-    </message>
-    <message>
-        <source>Select/Unselect channels for this channel group</source>
-        <translation type="obsolete">Muuda selle kanaligrupi kanaleid</translation>
-    </message>
-    <message>
-        <source>Channel Group - Page </source>
-        <translation type="obsolete">Kanaligrupp - leht</translation>
-    </message>
-    <message>
-        <source>of</source>
-        <translation type="obsolete">/</translation>
-    </message>
-    <message>
-        <source>Downloading Playlist</source>
-        <translation type="obsolete">Laen esitusloendit</translation>
-    </message>
-    <message>
-        <source>Processing Playlist</source>
-        <translation type="obsolete">Töötlen esitusloendit</translation>
-    </message>
-    <message>
-        <source>Adding Channels</source>
-        <translation type="obsolete">Lisan kanaleid</translation>
-    </message>
-    <message>
-        <source>Channel #%1 : %2</source>
-        <translation type="obsolete">Kanal #%1 : %2</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Lisan %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Uuendan %1</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Tehtud</translation>
-    </message>
-    <message>
-        <source>ERROR: M3U channel list is malformed</source>
-        <translation type="obsolete">VIGA: M3U kanaliloend pole korrektne</translation>
-    </message>
-    <message>
-        <source>Encountered malformed channel</source>
-        <translation type="obsolete">Leidsin ebakorrektse kanali</translation>
-    </message>
-    <message>
-        <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation type="obsolete">Parsin kanalit #%1 : %2 : %3</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/rssparse.cpp" line="112"/>
@@ -21913,205 +17777,9 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Tagasiviiteid</translation>
     </message>
     <message>
-        <source>Scan to Import</source>
-        <translation type="obsolete">Otsi importimiseks</translation>
-    </message>
-    <message>
-        <source>processed</source>
-        <translation type="obsolete">töödeldud</translation>
-    </message>
-    <message>
-        <source>unprocessed</source>
-        <translation type="obsolete">töötlemata</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.h" line="93"/>
         <source>Scan Type</source>
         <translation>Signaali tüüp</translation>
-    </message>
-    <message>
-        <source>Angle %1</source>
-        <translation type="obsolete">Nurk %1</translation>
-    </message>
-    <message>
-        <source>Failed to switch title.</source>
-        <translation type="obsolete">Pealkirjale lülitumine nurjus.</translation>
-    </message>
-    <message>
-        <source>Performing Logo Identification</source>
-        <translation type="obsolete">Tuvasta logo</translation>
-    </message>
-    <message>
-        <source>Waiting to pass preroll + head start</source>
-        <translation type="obsolete">Ootan eeltöötlust jä käivitamist</translation>
-    </message>
-    <message>
-        <source>Waiting for recording to finish</source>
-        <translation type="obsolete">Ootan salvestamise lõppu</translation>
-    </message>
-    <message>
-        <source>Starting Parental Level</source>
-        <translation type="obsolete">Algne vanemlik tase</translation>
-    </message>
-    <message>
-        <source>4 - Highest</source>
-        <translation type="obsolete">4 - kõrgeim</translation>
-    </message>
-    <message>
-        <source>1 - Lowest</source>
-        <translation type="obsolete">1 - madalaim</translation>
-    </message>
-    <message>
-        <source>This is the &apos;level&apos; that Video starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation type="obsolete">Video alustab sellel tasemel. Kõik sellise või madalama tasemega videod on näha nimekirjas ning vaikimisi lehitsetavad. Vaikimisi taseme muutmiseks tuleb sisestada vanemlik kood.</translation>
-    </message>
-    <message>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Ainult numbrite kasutamine teeb elu edaspidi palju lihtsamaks.</translation>
-    </message>
-    <message>
-        <source>Parental Level 4 PIN</source>
-        <translation type="obsolete">4. vanemliku taseme kood</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation type="obsolete">Selle koodiga saab aktiveerida 4. vanemliku taseme, mis annab ligipääsu ka videohaldusele.</translation>
-    </message>
-    <message>
-        <source>Parental Level 3 PIN</source>
-        <translation type="obsolete">3. vanemliku taseme kood</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation type="obsolete">Selle koodiga saab aktiveerida 3. vanemliku taseme.</translation>
-    </message>
-    <message>
-        <source>Parental Level 2 PIN</source>
-        <translation type="obsolete">2. vanemliku taseme kood</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation type="obsolete">Selle koodiga saab aktiveerida 2. vanemliku taseme.</translation>
-    </message>
-    <message>
-        <source>Aggressive Parental Control</source>
-        <translation type="obsolete">Agressiivne vanemlik kontroll</translation>
-    </message>
-    <message>
-        <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation type="obsolete">Märkimisel ei ole siia menüüsse enam koodi teadmata võimalik siseneda.</translation>
-    </message>
-    <message>
-        <source>Directories that hold videos</source>
-        <translation type="obsolete">Videofailide kataloog</translation>
-    </message>
-    <message>
-        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running the frontend.</source>
-        <translation type="obsolete">Mitme kataloogi kasutamisel tuleb need eraldada &apos;:&apos;. Kõik kataloogid peavad eksisteerima ning olema mythfrontend-i käivitanud kasutajale loetavad.</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running the frontend needs to have read/write permission to the directory.</source>
-        <translation type="obsolete">Kataloog peab eksisteerima ning olema loetav ja kirjutatav mythfrontend-i käivitanud kasutajale.</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie posters</source>
-        <translation type="obsolete">Filmiplakatite kataloog</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie screenshots</source>
-        <translation type="obsolete">Kuvatõmmiste salvestamise kataloog</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie/TV Banners</source>
-        <translation type="obsolete">Bännerite kataloog</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie fanart</source>
-        <translation type="obsolete">Filmiplakatite kataloog</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie trailers</source>
-        <translation type="obsolete">Treilerite kataloog</translation>
-    </message>
-    <message>
-        <source>On DVD insertion</source>
-        <translation type="obsolete">DVD sisestamisel</translation>
-    </message>
-    <message>
-        <source>Display mythdvd menu</source>
-        <translation type="obsolete">Kuva mythdvd menüü</translation>
-    </message>
-    <message>
-        <source>Do nothing</source>
-        <translation type="obsolete">Ära tee midagi</translation>
-    </message>
-    <message>
-        <source>Play DVD</source>
-        <translation type="obsolete">Esita DVD</translation>
-    </message>
-    <message>
-        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
-        <translation type="obsolete">Selle võimaluse kasutamiseks peab meedia jälgimine olema sisse lülitatud (Seaded -&gt; Üldine -&gt; CD/DVD jälgimine).</translation>
-    </message>
-    <message>
-        <source>Video Tree remembers last selected position</source>
-        <translation type="obsolete">Video puu jätab viimase valiku asukoha meelde</translation>
-    </message>
-    <message>
-        <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="obsolete">Valides on hetke asukoht videopuus püsiv.</translation>
-    </message>
-    <message>
-        <source>Enable automatic Parental Level from rating</source>
-        <translation type="obsolete">Luba automaatne vanemlik tase hinnangust</translation>
-    </message>
-    <message>
-        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="obsolete">Märkimisel seatakse vanemlik tase hinnangu alusel automaatselt.</translation>
-    </message>
-    <message>
-        <source>G</source>
-        <comment>PL 1 default search string.</comment>
-        <translation type="obsolete">G</translation>
-    </message>
-    <message>
-        <source>PG</source>
-        <comment>PL 2 default search string.</comment>
-        <translation type="obsolete">PG</translation>
-    </message>
-    <message>
-        <source>PG-13</source>
-        <comment>PL3 default search string.</comment>
-        <translation type="obsolete">PG-13</translation>
-    </message>
-    <message>
-        <source>R:NC-17</source>
-        <comment>PL4 default search string.</comment>
-        <translation type="obsolete">R:NC-17</translation>
-    </message>
-    <message>
-        <source>Level %1</source>
-        <translation type="obsolete">Tase %1</translation>
-    </message>
-    <message>
-        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="obsolete">Hinnangud mis sisaldavad järgnevaid sõnu (eraldaja &apos;:&apos;) omistatakse vanemlik tase %1.</translation>
-    </message>
-    <message>
-        <source>Parental Control Settings</source>
-        <translation type="obsolete">Vanemliku kontrolli seaded</translation>
-    </message>
-    <message>
-        <source>General Settings (%1/%2)</source>
-        <translation type="obsolete">Üldised seadistused (%1/%2)</translation>
-    </message>
-    <message>
-        <source>Loading videos ...</source>
-        <translation type="obsolete">Videode lugemine ...</translation>
-    </message>
-    <message>
-        <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
-        <translation type="obsolete">Vanemliku kontrolli hoiatus: vigane parool. MythVideo seadetele on ligipääs piiraud.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videolist.cpp" line="640"/>
@@ -22155,79 +17823,39 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Viga: faili &apos;%1&apos; räsi tekitamine ebaõnnestus</translation>
     </message>
     <message>
-        <source>Today</source>
-        <translation type="obsolete">Täna</translation>
-    </message>
-    <message>
-        <source>Yesterday</source>
-        <translation type="obsolete">Eile</translation>
-    </message>
-    <message>
-        <source>Tomorrow</source>
-        <translation type="obsolete">Homme</translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1337"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1338"/>
         <source>&gt;1Gbps</source>
         <translation>&gt;1Gb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1341"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1342"/>
         <source>%1Mbps</source>
         <translation>%1 Mb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1341"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1342"/>
         <source>%1MHz</source>
         <translation>%1MHz</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1347"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1348"/>
         <source>%1kHz</source>
         <translation>%1KHz</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1347"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1348"/>
         <source>%1kbps</source>
         <translation>%1 kb/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1353"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1354"/>
         <source>%1bps</source>
         <translation>%1 b/s</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1353"/>
+        <location filename="../libs/libmythtv/ringbuffer.cpp" line="1354"/>
         <source>%1Hz</source>
         <translation>%1Hz</translation>
-    </message>
-    <message>
-        <source>Downloading file. Please wait...</source>
-        <translation type="obsolete">Faili allalaadimine. Palun oota...</translation>
-    </message>
-    <message>
-        <source>Would you like to share your hardware profile with the MythTV developers? Profiles are anonymous and are a great way to help with future development.</source>
-        <translation type="obsolete">Kas sooviksid oma riistvara profiili arendajatele jagada? Profiilid on anonüümsed ja abiks MythTV edasisel arendamisel.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete your online profile?  Your information is anonymous and helps the developers to know what hardware the majority of users prefer.</source>
-        <translation type="obsolete">Oled kindel, et soovid avaldatud profiili kustutada. See info on anonüümne ja annab arendajatele teada millist riistvara kasutajad eelistavad.</translation>
-    </message>
-    <message>
-        <source>Parental PIN:</source>
-        <translation type="obsolete">Vanemlik PIN:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Otsin videofaile</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation type="obsolete">Kontrollin videofaile</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Uuendan videoandmebaasi</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1039"/>
@@ -22765,29 +18393,6 @@ kasuta väljastamise nuppu seadmel.</translation>
     </message>
 </context>
 <context>
-    <name>RatingsToPL</name>
-    <message>
-        <source>G</source>
-        <comment>PL 1 default search string.</comment>
-        <translation type="obsolete">G</translation>
-    </message>
-    <message>
-        <source>PG</source>
-        <comment>PL 2 default search string.</comment>
-        <translation type="obsolete">PG</translation>
-    </message>
-    <message>
-        <source>PG-13</source>
-        <comment>PL3 default search string.</comment>
-        <translation type="obsolete">PG-13</translation>
-    </message>
-    <message>
-        <source>R:NC-17</source>
-        <comment>PL4 default search string.</comment>
-        <translation type="obsolete">R:NC-17</translation>
-    </message>
-</context>
-<context>
     <name>RawSettingsEditor</name>
     <message>
         <location filename="../libs/libmyth/rawsettingseditor.cpp" line="21"/>
@@ -23053,90 +18658,7 @@ kasuta väljastamise nuppu seadmel.</translation>
     </message>
 </context>
 <context>
-    <name>SchedOptEditor</name>
-    <message>
-        <source>Use any available input</source>
-        <translation type="obsolete">Kasuta suvalist vaba sisendit</translation>
-    </message>
-    <message>
-        <source>Prefer input %1</source>
-        <translation type="obsolete">Eelista sisendit %1</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="obsolete">Otsi kordusi alampealkirja ning kirjelduse järgi</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle then description</source>
-        <translation type="obsolete">Otsi kordusi alampealkirja ja siis kirjelduse järgi</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle</source>
-        <translation type="obsolete">Otsi kordusi alampealkirja järgi</translation>
-    </message>
-    <message>
-        <source>Match duplicates using description</source>
-        <translation type="obsolete">Otsi kordusi kirjelduse järgi</translation>
-    </message>
-    <message>
-        <source>Don&apos;t match duplicates</source>
-        <translation type="obsolete">Ära otsi kordusi</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current and previous recordings</source>
-        <translation type="obsolete">Otsi duplikaate praegustes ja varasematest salvestustes</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current recordings only</source>
-        <translation type="obsolete">Otsi duplikaate ainult praegustest salvestustest</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in previous recordings only</source>
-        <translation type="obsolete">Otsi duplikaate ainult varasematest salvestustest</translation>
-    </message>
-    <message>
-        <source>Record new episodes only</source>
-        <translation type="obsolete">Salvesta ainult uued osad</translation>
-    </message>
-</context>
-<context>
     <name>ScheduleCommon</name>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Uuesti aktiveerimine</translation>
-    </message>
-    <message>
-        <source>Stop recording</source>
-        <translation type="obsolete">Lõpeta salvestamine</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record</source>
-        <translation type="obsolete">Ei salvesta</translation>
-    </message>
-    <message>
-        <source>Never record</source>
-        <translation type="obsolete">Ära kunagi salvesta</translation>
-    </message>
-    <message>
-        <source>Modify Recording Options</source>
-        <translation type="obsolete">Muuda salvestamise valikuid</translation>
-    </message>
-    <message>
-        <source>Edit Options</source>
-        <translation type="obsolete">Muuda valikuid</translation>
-    </message>
-    <message>
-        <source>Add Override</source>
-        <translation type="obsolete">Lisa tühistus</translation>
-    </message>
-    <message>
-        <source>Edit Override</source>
-        <translation type="obsolete">Muuda tühistusi</translation>
-    </message>
-    <message>
-        <source>Clear Override</source>
-        <translation type="obsolete">Eemalda tühistus</translation>
-    </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="241"/>
         <source>The following programs will be recorded instead:</source>
@@ -23240,14 +18762,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <source>Delete recording rule</source>
         <translation>Kustuta planeering</translation>
     </message>
-    <message>
-        <source>Record anyway</source>
-        <translation type="obsolete">Salvesta igal juhul</translation>
-    </message>
-    <message>
-        <source>Forget Previous</source>
-        <translation type="obsolete">Unusta eelmine</translation>
-    </message>
 </context>
 <context>
     <name>ScheduleEditor</name>
@@ -23272,10 +18786,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Salvesta see saade valikute muutmisega</translation>
     </message>
     <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation type="obsolete">Ära luba seda saadet salvestada</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="285"/>
         <source>Do not record this program</source>
         <translation>Ära seda saadet salvesta</translation>
@@ -23284,30 +18794,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="289"/>
         <source>Record only this showing</source>
         <translation>Salvesta ainult see saade</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation type="obsolete">Salvesta üks sellise nimega saade</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation type="obsolete">Salvesta iga nädal sel ajal</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation type="obsolete">Salvesta üks sellise nimega saade iga nädal</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation type="obsolete">Salvesta iga päev sel ajal</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation type="obsolete">Salvesta üks sellise nimega saade iga päev</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation type="obsolete">Salvesta suvalisel ajal sellelt kanalilt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="500"/>
@@ -23320,10 +18806,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="585"/>
         <source>Upcoming Recordings</source>
         <translation>Tulevased salvestamised</translation>
-    </message>
-    <message>
-        <source>Previously Scheduled</source>
-        <translation type="obsolete">Varem planeeritud</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="276"/>
@@ -23431,10 +18913,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <translation>Vaikimisi</translation>
     </message>
     <message>
-        <source>Record at any time on any channel</source>
-        <translation type="obsolete">Salvesta suvalisel ajal suvaliselt kanalilt</translation>
-    </message>
-    <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="489"/>
         <source>Schedule Information</source>
         <translation>Planeerimisinfo</translation>
@@ -23444,18 +18922,6 @@ kasuta väljastamise nuppu seadmel.</translation>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="581"/>
         <source>Program Details</source>
         <translation>Saate üksikasjad</translation>
-    </message>
-    <message>
-        <source>Upcoming episodes</source>
-        <translation type="obsolete">Tulevased osad</translation>
-    </message>
-    <message>
-        <source>Upcoming recordings</source>
-        <translation type="obsolete">Tulevased</translation>
-    </message>
-    <message>
-        <source>Previously scheduled</source>
-        <translation type="obsolete">Varem planeeritud</translation>
     </message>
 </context>
 <context>
@@ -23546,44 +19012,6 @@ is located in %2</source>
     </message>
 </context>
 <context>
-    <name>ScreenWizard</name>
-    <message>
-        <source>Size: %1 x %2</source>
-        <translation type="obsolete">Suurus: %1 x %2</translation>
-    </message>
-    <message>
-        <source>Offset: %1 x %2</source>
-        <translation type="obsolete">Nihe: %1 x %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>Change amount: %n pixel(s)</source>
-        <translation type="obsolete">
-            <numerusform>Muuda %n piksel</numerusform>
-            <numerusform>Muuda %n pikslit</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="obsolete">Valikud</translation>
-    </message>
-    <message>
-        <source>Save and Quit</source>
-        <translation type="obsolete">Salvesta ja välju</translation>
-    </message>
-    <message>
-        <source>Reset Changes and Quit</source>
-        <translation type="obsolete">Tühista muudatused ja välju</translation>
-    </message>
-    <message>
-        <source>Coarse/Fine adjustment</source>
-        <translation type="obsolete">Täppishäälestus</translation>
-    </message>
-    <message>
-        <source>Close Menu</source>
-        <translation type="obsolete">Sulge menüü</translation>
-    </message>
-</context>
-<context>
     <name>SignalMonitorValue</name>
     <message>
         <location filename="../libs/libmythtv/signalmonitorvalue.cpp" line="24"/>
@@ -23642,7 +19070,7 @@ is located in %2</source>
 <context>
     <name>StartingChannel</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2789"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2786"/>
         <source>Please add channels to this source</source>
         <translation>Lisa sellele sisendile kanalid</translation>
     </message>
@@ -24266,14 +19694,6 @@ kataloog hoidlast?</translation>
         <translation>(Loo uus grupp)</translation>
     </message>
     <message>
-        <source>(from remote hosts)</source>
-        <translation type="obsolete">(kaugmasinast)</translation>
-    </message>
-    <message>
-        <source>(from all hosts</source>
-        <translation type="obsolete">(kõigist masinatest</translation>
-    </message>
-    <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="323"/>
         <source>Yes, delete group</source>
         <translation>Jah, kustuta grupp</translation>
@@ -24293,49 +19713,6 @@ kataloog hoidlast?</translation>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="464"/>
         <source>(Create %1 group)</source>
         <translation>(Loo %1 grupp)</translation>
-    </message>
-</context>
-<context>
-    <name>StoreOptEditor</name>
-    <message>
-        <source>Create New Recording Group. Enter group name: </source>
-        <translation type="obsolete">Loo uus salvestusgrupp. Sisesta grupi nimi:</translation>
-    </message>
-    <message>
-        <source>Record using the %1 profile</source>
-        <translation type="obsolete">Salvesta kasutades profiili %1</translation>
-    </message>
-    <message>
-        <source>Create a new recording group</source>
-        <translation type="obsolete">Loo uus salvestusgrupp</translation>
-    </message>
-    <message>
-        <source>Include in the &quot;%1&quot; recording group</source>
-        <translation type="obsolete">Lisa salvestusgruppi &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">Vaikimisi</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; storage group</source>
-        <translation type="obsolete">Salvesta hoidlasse &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Live TV</source>
-        <translation type="obsolete">Otse eeter</translation>
-    </message>
-    <message>
-        <source>Use &quot;%1&quot; playback group settings</source>
-        <translation type="obsolete">Kasuta esitlusgrupi &quot;%1&quot; seadeid</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="obsolete">Ära salvesta, kui maksimaalne osade arv on ületatud</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="obsolete">Kustuta vanim, kui maksimaalne osade arv on ületatud</translation>
     </message>
 </context>
 <context>
@@ -24834,7 +20211,7 @@ Soovid edasi vaadata?</translation>
         <source>Close PIP(s)</source>
         <translation>
             <numerusform>Sulge PIP</numerusform>
-            <numerusform>Sulge PIP-d</numerusform>
+            <numerusform>Sulge PIP</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -24842,7 +20219,7 @@ Soovid edasi vaadata?</translation>
         <source>Close PBP(s)</source>
         <translation>
             <numerusform>Sulge PBP</numerusform>
-            <numerusform>Sulge PBP-d</numerusform>
+            <numerusform>Sulge PBP</numerusform>
         </translation>
     </message>
     <message>
@@ -24865,10 +20242,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11727"/>
         <source>Disable Audio Upmixer</source>
         <translation>Keela heli mitmekanaliliseks muutmine</translation>
-    </message>
-    <message>
-        <source>Enable Audio Upmixer</source>
-        <translation type="obsolete">Luba heli mitmekanaliliseks muutmine</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11425"/>
@@ -25040,38 +20413,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11506"/>
         <source>Adjust</source>
         <translation>Kohanda</translation>
-    </message>
-    <message>
-        <source>0.5X</source>
-        <translation type="obsolete">0,5X</translation>
-    </message>
-    <message>
-        <source>0.9X</source>
-        <translation type="obsolete">0,9X</translation>
-    </message>
-    <message>
-        <source>1.0X</source>
-        <translation type="obsolete">1,0X</translation>
-    </message>
-    <message>
-        <source>1.1X</source>
-        <translation type="obsolete">1,1X</translation>
-    </message>
-    <message>
-        <source>1.2X</source>
-        <translation type="obsolete">1,2X</translation>
-    </message>
-    <message>
-        <source>1.3X</source>
-        <translation type="obsolete">1,3X</translation>
-    </message>
-    <message>
-        <source>1.4X</source>
-        <translation type="obsolete">1,4X</translation>
-    </message>
-    <message>
-        <source>1.5X</source>
-        <translation type="obsolete">1,5X</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12301"/>
@@ -25437,16 +20778,6 @@ Soovid edasi vaadata?</translation>
         <translation>Muuda sisendit</translation>
     </message>
     <message>
-        <source>C</source>
-        <comment>Card</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>I</source>
-        <comment>Input</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12312"/>
         <source>Switch Source</source>
         <translation>Muuda allikat</translation>
@@ -25710,22 +21041,6 @@ Soovid edasi vaadata?</translation>
         <translation>Ava salvestav PBP</translation>
     </message>
     <message>
-        <source>Close PBP</source>
-        <translation type="obsolete">Sulge PBP</translation>
-    </message>
-    <message>
-        <source>Close PIP</source>
-        <translation type="obsolete">Sulge PIP</translation>
-    </message>
-    <message>
-        <source>Close PBPs</source>
-        <translation type="obsolete">Sulge PBP-d</translation>
-    </message>
-    <message>
-        <source>Close PIPs</source>
-        <translation type="obsolete">Sulge PIP-d</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11894"/>
         <source>Swap Windows</source>
         <translation>Vaheta aknad</translation>
@@ -25779,14 +21094,6 @@ Soovid edasi vaadata?</translation>
         <translation>Laiendatud</translation>
     </message>
     <message>
-        <source>Disable studio levels</source>
-        <translation type="obsolete">Keela stuudiotasemed</translation>
-    </message>
-    <message>
-        <source>Enable studio levels</source>
-        <translation type="obsolete">Luba stuudiotasemed</translation>
-    </message>
-    <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12291"/>
         <source>Deinterlacer</source>
         <translation>Ülerealaotuse eemaldaja</translation>
@@ -25820,10 +21127,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11910"/>
         <source>Toggle Browse Mode</source>
         <translation>Lehitsemise lülitamine</translation>
-    </message>
-    <message>
-        <source>Playback data</source>
-        <translation type="obsolete">Taasesituse andmed</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="12308"/>
@@ -26236,10 +21539,6 @@ Soovid edasi vaadata?</translation>
         <translation>Salvestamise prioriteedid</translation>
     </message>
     <message>
-        <source>Prioritize some shows over others</source>
-        <translation type="obsolete">Sea mõned saated olulisemaks</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="59"/>
         <source>System Status</source>
         <translation>Süsteemi olek</translation>
@@ -26288,10 +21587,6 @@ Soovid edasi vaadata?</translation>
         <location filename="../themes/themestrings.h" line="786"/>
         <source>Modify, Add, and Delete television channels.</source>
         <translation>Muuda, lisa ja eemalda kanaleid.</translation>
-    </message>
-    <message>
-        <source>Delete Source</source>
-        <translation type="obsolete">Kustuta allikas</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="788"/>
@@ -27338,14 +22633,6 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Otsi 
         <translation>Video seaded</translation>
     </message>
     <message>
-        <source>%PLAYEDTIME%</source>
-        <translation type="obsolete">%PLAYEDTIME%</translation>
-    </message>
-    <message>
-        <source>%(|REMAININGTIME|)%%(|BEHINDTIME|)%</source>
-        <translation type="obsolete">%(|REMAININGTIME|)%%(|BEHINDTIME|)%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="188"/>
         <source>Inetref:</source>
         <translation>URL:</translation>
@@ -27508,12 +22795,6 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Otsi 
         <translation>%STARTTIME%% - |ENDTIME|: %%LENMINS%</translation>
     </message>
     <message>
-        <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
-%</source>
-        <translation type="obsolete">%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
-%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="996"/>
         <source>%YEARSTARS| %%DESCRIPTION%</source>
         <translation>%YEARSTARS| %%DESCRIPTION%</translation>
@@ -27588,66 +22869,14 @@ Kui oled lõpetanud vajuta &quot;Salvesta&quot; nuppu.</translation>
         <translation>Kasuta [Menu] või [PREVVIEW]/[NEXTVIEW] seadete vahel liikumiseks</translation>
     </message>
     <message>
-        <source>Radio Stream</source>
-        <translation type="obsolete">Raadio voogedastus</translation>
-    </message>
-    <message>
-        <source>Press MENU to add some radio streams to play.</source>
-        <translation type="obsolete">Klõpsa MENU raadiovoogude lisamiseks.</translation>
-    </message>
-    <message>
-        <source>%channel% (%station%)</source>
-        <translation type="obsolete">%channel% (%station%)</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1126"/>
         <source>%1 -</source>
         <translation>%1 -</translation>
     </message>
     <message>
-        <source>Add/Edit Music Stream</source>
-        <translation type="obsolete">Lisa/Muuda muusikavoog</translation>
-    </message>
-    <message>
-        <source>Station:</source>
-        <translation type="obsolete">Jaam:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <source>Logo URL:</source>
-        <translation type="obsolete">Logo URL:</translation>
-    </message>
-    <message>
-        <source>Genres:</source>
-        <translation type="obsolete">Žanr:</translation>
-    </message>
-    <message>
-        <source>Metadata Format:</source>
-        <translation type="obsolete">Metaandmete vorming:</translation>
-    </message>
-    <message>
-        <source>Search for Music Stream</source>
-        <translation type="obsolete">Otsi muusikavooge</translation>
-    </message>
-    <message>
-        <source>%STATION% - %Channel%</source>
-        <translation type="obsolete">%STATION% - %Channel%</translation>
-    </message>
-    <message>
-        <source>Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃ§ais. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="obsolete">Kujundatud erinevate Myth 0.25 võimaluste näitamiseks. Testitud 1280x720 resolutsiooniga ja prantsuse keelega. Vaata salvestusi vaates saab [Rew] ja [FF] klahve salvestusgruppide vahetamiseks kasutada.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1070"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press MENU and select &quot;Scan for Changes.&quot;</source>
         <translation>Meediavaramus pole videosid või ei leitud midagi. Kui videokataloog on seadistatud, klõpsa &quot;M&quot; (või Menüü nupp) ja vali &quot;Tuvasta muudatusi.&quot;</translation>
-    </message>
-    <message>
-        <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This theme can be used with MythTV 0.26 and later.</source>
-        <translation type="obsolete">Blue-abstract on kaasaegne teema, mis on mõeldud HD ekraanidele. Sinine taust ja ühtne paigutus muudab selle atraktiivseks ja hea välimusega teemaks. Teemat saab kasutada MythTV 0.26 ja uuemaga.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="154"/>
@@ -28489,7 +23718,7 @@ Kui oled lõpetanud vajuta &quot;Salvesta&quot; nuppu.</translation>
         <source>%name%% (v.|version%)</source>
         <translation>
             <numerusform>%name%% (v.|version%)</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%name%% (v.|version%)</numerusform>
         </translation>
     </message>
     <message>
@@ -29345,17 +24574,9 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <translation>(1) kõiki (2) tähtsaid</translation>
     </message>
     <message>
-        <source>Cert.:</source>
-        <translation type="obsolete">Sert:</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1013"/>
         <source>Age:</source>
         <translation>Vanus:</translation>
-    </message>
-    <message>
-        <source>TMDB/TVDB No.:</source>
-        <translation type="obsolete">TMDB/TVDB Nr.:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1015"/>
@@ -29717,21 +24938,9 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <translation>Filtreeri videoloendit</translation>
     </message>
     <message>
-        <source>%CHANNEL% (%STATION%)</source>
-        <translation type="obsolete">%CHANNEL% (%STATION%)</translation>
-    </message>
-    <message>
-        <source>Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="obsolete">Kujundatud erinevate Myth 0.25 võimaluste näitamiseks. Vaata salvestusi vaates saab [Rew] ja [FF] klahve salvestusgruppide vahetamiseks kasutada.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="737"/>
         <source>Animation, transparency and fanart for mythtv 0.25</source>
         <translation>Animatsioonid, läbipaistvus ja filmiplakatid mythtv 0.25 jaoks</translation>
-    </message>
-    <message>
-        <source>Inspired by MediaStream: The theme has been made to look like the original XBMC skin were posible. Looks best with the matching menu structure in the MythMediaStreamMenu folder as this theme its menu lay-out is tailored for this particular menu.</source>
-        <translation type="obsolete">Inspireeritud MediaStream-st:Teema on üritatud kujundada võimalikult originaalse XBMC teema sarnaseks.Parma väljanägemise saab valides menüü struktuuriks MythMediaStreamMenu kausta kuna teema välimus on kohandatud selle jaoks.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1180"/>
@@ -29742,10 +24951,6 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <location filename="../themes/themestrings.h" line="1184"/>
         <source>A UI and OSD theme with focus on fanart, banners and cover display.</source>
         <translation>Teema, mille fookuses on esitatava meedia kujundus.</translation>
-    </message>
-    <message>
-        <source>Another Theme build on the new UI library Any suggestions or bugs to https://code.google.com/p/a-forest/ A special thank to Steve Adeff for his help on this project.</source>
-        <translation type="obsolete">Veel üks teema, mis on teostatud uute UI teekidega. Ettepanekud ja probleemid siia: https://code.google.com/p/a-forest/ Eriline tänu abi eest Steve Adeffile.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1177"/>
@@ -29778,17 +24983,9 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <translation>Lahe läbipaistev teema võimaldab kasutada enda valitud tausta. Kopeeri oma taust (peab olema resolutsiooniga 1920x1200) kataloogi /usr/share/mythtv/themes/TransBlue/background.jpg</translation>
     </message>
     <message>
-        <source>A UI and OSD theme with focus for fanart, banners and cover display.</source>
-        <translation type="obsolete">Kasutajaliides ja teadete teema mis on rajatud plakatitele, bänneritele ja kaanepiltidele.</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="1185"/>
         <source>blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.</source>
         <translation>Blootube-ng baseerub blootube-wide-l teostatud Justin Hornsby (justin.hornsby@gmail.com) poolt. Kasutab iga menüü jaoks mahukat graafikat. Kõik muudatused on tehtud kohandumaks MythTV 0.24-ga.</translation>
-    </message>
-    <message>
-        <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.</source>
-        <translation type="obsolete">Blue-abstract on kaasaegne teema, mis on mõeldud HD ekraanidele. Sinine taust ja ühtne paigutus muudab selle atraktiivseks ja hea välimusega teemaks.</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="1049"/>
@@ -29937,14 +25134,6 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <location filename="../themes/themestrings.h" line="113"/>
         <source>Watch live television</source>
         <translation>Vaata televisiooni otse</translation>
-    </message>
-    <message>
-        <source>Delete Recordings</source>
-        <translation type="obsolete">Kustuta salvestus</translation>
-    </message>
-    <message>
-        <source>Remove television recordings</source>
-        <translation type="obsolete">Kustuta TV salvestus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="114"/>
@@ -30578,10 +25767,6 @@ Kui videote kataloog on seadistatud vajuta &quot;M&quot; (menüü klahv) ja vali
         <translation>Luba salvestustel aeguda?</translation>
     </message>
     <message>
-        <source>Mythbuntu is based on ProjectGrayhem - a dark, shiny theme originally inspired by XBMC&apos;s ProjectMayhem skin</source>
-        <translation type="obsolete">Mythbuntu põhineb ProjectGrayhem-il, tume, särav teema, mis on inspireeritud XBMC ProjectMayhem teemast</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="238"/>
         <source>Search For</source>
         <translation>Otsi</translation>
@@ -31091,10 +26276,6 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation>Näidis klauslid:</translation>
     </message>
     <message>
-        <source>Recording Rule Priorities</source>
-        <translation type="obsolete">Salvestusreeglite prioriteet</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="469"/>
         <source>Type</source>
         <translation>Tüüp</translation>
@@ -31520,10 +26701,6 @@ Laiendi jaoks valitud mängijat ignoreeritakse, kui valid &quot;Kasuta vaikimisi
         <translation>Oleku ikoon</translation>
     </message>
     <message>
-        <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="obsolete">%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
-    </message>
-    <message>
         <location filename="../themes/themestrings.h" line="952"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
@@ -31763,10 +26940,6 @@ Planeerimiseks lahku sellelt lehelt, vali &apos;Saatekava&apos; või &apos;Otsi 
         <location filename="../themes/themestrings.h" line="594"/>
         <source>Configure MythTV and plugins</source>
         <translation>MythTV seadistamine</translation>
-    </message>
-    <message>
-        <source>Set Priorities</source>
-        <translation type="obsolete">Prioriteedid</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="600"/>
@@ -32312,17 +27485,17 @@ pp KKK aaaa</translation>
 <context>
     <name>V4LConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2086"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2083"/>
         <source>Probed info</source>
         <translation>Tuvastatud info</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2104"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2101"/>
         <source>Failed to open</source>
         <translation>Ei õnnestunud avada</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2111"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2108"/>
         <source>Failed to probe</source>
         <translation>Ei õnnestunud tuvastada</translation>
     </message>
@@ -32681,10 +27854,6 @@ pp KKK aaaa</translation>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="2136"/>
         <source>Fetching details for %1</source>
         <translation>Laen alla %1 andmeid</translation>
-    </message>
-    <message>
-        <source> %1x%2</source>
-        <translation type="obsolete"> %1x%2</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/videodlg.cpp" line="3541"/>
@@ -33114,12 +28283,12 @@ pp KKK aaaa</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2287"/>
         <source>Aspect ratio when watching a video. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation></translation>
+        <translation>Kuvasuhe video vaatamisel. Monitori poolt raporteeritud suhte kasutamiseks jäta &quot;%1&quot;. Määra 16:9 või 4:3 kindla kuvasuhte jõustamiseks.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2295"/>
         <source>Aspect ratio when watching a video at a specific resolution. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation></translation>
+        <translation>Kuvasuhe video vaatamisel kindla resolutsiooniga. Monitori poolt raporteeritud suhte kasutamiseks jäta &quot;%1&quot;. Määra 16:9 või 4:3 kindla kuvasuhte jõustamiseks.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2307"/>
@@ -33153,14 +28322,6 @@ pp KKK aaaa</translation>
 </context>
 <context>
     <name>VideoScanner</name>
-    <message>
-        <source>Failed to Scan SG Video Hosts</source>
-        <translation type="obsolete">Videote hoidla masinate otsing ebaõnnestus</translation>
-    </message>
-    <message>
-        <source>If they no longer exist please remove them</source>
-        <translation type="obsolete">Eemalda kui neid enam pole</translation>
-    </message>
     <message>
         <location filename="../libs/libmythmetadata/videoscan.cpp" line="474"/>
         <source>Failed to Scan SG Video Hosts:
@@ -33261,48 +28422,48 @@ Eemalda, kui neid enam pole</translation>
 <context>
     <name>VideoSourceEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3425"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3422"/>
         <source>Video Source Menu</source>
         <translation>Videoallika menüü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3468"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3465"/>
         <source>Are you sure you want to delete this video source?</source>
         <translation>Oled sa kindel, et soovid selle videoallika kustutada?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3470"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3467"/>
         <source>Yes, delete video source</source>
         <translation>Jah, kustuta videoallikas</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3447"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3471"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3444"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3468"/>
         <source>No, don&apos;t</source>
         <translation>Ei, ära kustuta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3383"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3380"/>
         <source>Video sources</source>
         <translation>Videoallikad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3426"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3423"/>
         <source>Edit...</source>
         <translation>Muuda...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3427"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3424"/>
         <source>Delete...</source>
         <translation>Kustuta...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3444"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3441"/>
         <source>Are you sure you want to delete ALL video sources?</source>
         <translation>Oled sa kindel, et soovid kustutada KÕIK videoallikad?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3446"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3443"/>
         <source>Yes, delete video sources</source>
         <translation>Jah, kustuta videoallikad</translation>
     </message>
@@ -33617,10 +28778,6 @@ Eemalda, kui neid enam pole</translation>
         <translation>MythTV ei saa seiskuda kuna läheb äratuse/seiskumise tsüklisse.</translation>
     </message>
     <message>
-        <source>to</source>
-        <translation type="obsolete">tee</translation>
-    </message>
-    <message>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="419"/>
         <source>Please Wait...</source>
         <translation>Oota veidi...</translation>
@@ -33634,12 +28791,12 @@ Eemalda, kui neid enam pole</translation>
 <context>
     <name>XMLTV_generic_config</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="459"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="458"/>
         <source>Configure</source>
         <translation>Seadista</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="460"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="459"/>
         <source>Run XMLTV configure command.</source>
         <translation>Käivita XMLTV konfigureerimise käsk.</translation>
     </message>

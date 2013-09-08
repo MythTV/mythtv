@@ -42,14 +42,6 @@
         <translation>Uudiste lugeja on konfigureerimata.</translation>
     </message>
     <message>
-        <source>%1 of %2 (%3 percent)</source>
-        <translation type="obsolete">%1 %2-st (%3 protsenti)</translation>
-    </message>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Laen alla...</translation>
-    </message>
-    <message>
         <location filename="../mythnews/mythnews.cpp" line="595"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Veebilehitseja käsku pole! MythNews vajab MythBrowser-it.</translation>
@@ -159,13 +151,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Laen alla...</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="9"/>
@@ -244,6 +229,11 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
         <location filename="themestrings.h" line="8"/>
         <source>News Settings</source>
         <translation>Uudiste seaded</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>News</source>
+        <translation>Uudised</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
