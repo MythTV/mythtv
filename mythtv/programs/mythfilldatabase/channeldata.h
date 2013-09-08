@@ -11,7 +11,7 @@ class ChannelData
 {
   public:
     ChannelData() :
-        m_interactive(false),         m_nonUSUpdating(false),
+        m_interactive(false),         m_guideDataOnly(false),
         m_channelPreset(false),       m_channelUpdates(false),
         m_removeNewChannels(false),   m_filterNewChannels(true) {}
 
@@ -27,7 +27,7 @@ class ChannelData
 
   public:
     bool    m_interactive;
-    bool    m_nonUSUpdating;
+    bool    m_guideDataOnly;
     bool    m_channelPreset;
     bool    m_channelUpdates;
     bool    m_removeNewChannels;
