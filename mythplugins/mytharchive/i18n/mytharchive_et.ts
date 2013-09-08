@@ -737,309 +737,6 @@ Selleks võib kuluda mõni minut.</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
-        <translation type="obsolete">Siin kataloogis hoiab MythArchive skripte, klippe ning kujundusfaile</translation>
-    </message>
-    <message>
-        <source>Video format</source>
-        <translation type="obsolete">Videoformaat</translation>
-    </message>
-    <message>
-        <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation type="obsolete">DVD salvestiste videoformaat. PAL või NTSC.</translation>
-    </message>
-    <message>
-        <source>File Selector Filter</source>
-        <translation type="obsolete">Failivalija filter</translation>
-    </message>
-    <message>
-        <source>The file name filter to use in the file selector.</source>
-        <translation type="obsolete">Valimisel kasutatav failinime filter.</translation>
-    </message>
-    <message>
-        <source>Location of DVD</source>
-        <translation type="obsolete">DVD asukoht</translation>
-    </message>
-    <message>
-        <source>Which DVD drive to use when burning discs.</source>
-        <translation type="obsolete">DVD-de kirjutamiseks kasutatav seade.</translation>
-    </message>
-    <message>
-        <source>Copy remote files</source>
-        <translation type="obsolete">Võrgufailide kopeerimine</translation>
-    </message>
-    <message>
-        <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation type="obsolete">Määramisel kopeeritakse võrgufailid enne töötlemist kohalikule kettale. See kiirendab töötlust ning vähendab võrgu koormust</translation>
-    </message>
-    <message>
-        <source>Always Use Mythtranscode</source>
-        <translation type="obsolete">Kasuta alati Mythtranscode-t</translation>
-    </message>
-    <message>
-        <source>Use FIFOs</source>
-        <translation type="obsolete">Kasutatakse FIFO puhvreid</translation>
-    </message>
-    <message>
-        <source>Main Menu Aspect Ratio</source>
-        <translation type="obsolete">Peamenüü kuvasuhe</translation>
-    </message>
-    <message>
-        <source>Aspect ratio to use when creating the main menu.</source>
-        <translation type="obsolete">Peamenüü valmistamisel kasutatav kuvasuhe.</translation>
-    </message>
-    <message>
-        <source>Chapter Menu Aspect Ratio</source>
-        <translation type="obsolete">Peatükkide menüü kuvasuhe</translation>
-    </message>
-    <message>
-        <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
-        <translation type="obsolete">Peatükkide menüü valmistamisel kasutatav kuvasuhe. &quot;Video&quot; valiku puhul kasutatakse videoga sama kuvasuhet.</translation>
-    </message>
-    <message>
-        <source>mplex Command</source>
-        <translation type="obsolete">mplex käsk</translation>
-    </message>
-    <message>
-        <source>Command to run mplex</source>
-        <translation type="obsolete">Käsk mplex-i käivitamiseks</translation>
-    </message>
-    <message>
-        <source>dvdauthor command</source>
-        <translation type="obsolete">dvdauthor käsk</translation>
-    </message>
-    <message>
-        <source>Command to run dvdauthor.</source>
-        <translation type="obsolete">Käsk dvdauthor-i käivitamiseks.</translation>
-    </message>
-    <message>
-        <source>mkisofs command</source>
-        <translation type="obsolete">mkisofs  käsk</translation>
-    </message>
-    <message>
-        <source>Command to run mkisofs. (Used to create ISO images)</source>
-        <translation type="obsolete">Käsk mkisofs-i käivitamiseks. (Kasutatakse ISO tõmmiste valmistamiseks)</translation>
-    </message>
-    <message>
-        <source>growisofs command</source>
-        <translation type="obsolete">growisofs käsk</translation>
-    </message>
-    <message>
-        <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
-        <translation type="obsolete">Käsk growisofs-i käivitamiseks. (Kasutatakse DVD-de kirjutamiseks)</translation>
-    </message>
-    <message>
-        <source>spumux command</source>
-        <translation type="obsolete">spumux käsk</translation>
-    </message>
-    <message>
-        <source>Command to run spumux. Part of dvdauthor package</source>
-        <translation type="obsolete">Käsk spumux-i käivitamiseks (dvdauthor pakist)</translation>
-    </message>
-    <message>
-        <source>mpeg2enc command</source>
-        <translation type="obsolete">mpeg2enc käsk</translation>
-    </message>
-    <message>
-        <source>Command to run mpeg2enc. Part of mjpegtools package</source>
-        <translation type="obsolete">Käsk mpeg2enc-i käivitamiseks (mjpegtools pakist)</translation>
-    </message>
-    <message>
-        <source>MythArchive Settings</source>
-        <translation type="obsolete">MythArchive seaded</translation>
-    </message>
-    <message>
-        <source>MythArchive Settings (2)</source>
-        <translation type="obsolete">MythArchive seaded (2)</translation>
-    </message>
-    <message>
-        <source>MythArchive External Commands (1)</source>
-        <translation type="obsolete">MythArchive välised käsud (1)</translation>
-    </message>
-    <message>
-        <source>MythArchive External Commands (2)</source>
-        <translation type="obsolete">MythArchive välised käsud (2)</translation>
-    </message>
-    <message>
-        <source>Background creation has been asked to stop.
-This may take a few minutes.</source>
-        <translation type="obsolete">Taustakirjutamine on peatatud.
-Selleks võib kuluda mõni minut.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Kuupäeva formaat</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Näidetes kasutatakse tänast kuupäeva.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Näidetes kasutatakse homset kuupäeva.</translation>
-    </message>
-    <message>
-        <source>Your preferred date format to use on DVD menus.</source>
-        <translation type="obsolete">DVD menüüdes kasutatav kuupäevaformaat.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Ajaformaat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">DVD menüüdes kasutatav ajaformaat. Valida on 12-tunnise AM/PM ja 24-tunnise formaadi vahel.</translation>
-    </message>
-    <message>
-        <source>DVD Drive Write Speed</source>
-        <translation type="obsolete">DVD kirjutamise kiirus</translation>
-    </message>
-    <message>
-        <source>MythArchive Temp Directory</source>
-        <translation type="obsolete">Myth arhiveerija ajutine kataloog</translation>
-    </message>
-    <message>
-        <source>Location where MythArchive should create its temporary work files. LOTS of free space required here.</source>
-        <translation type="obsolete">Siia kataloogi tekitab MythArchive ajutised tööfailid. Siin peab olema VÄGA PALJU ruumi.</translation>
-    </message>
-    <message>
-        <source>MythArchive Share Directory</source>
-        <translation type="obsolete">Myth arhiveerija jagatud kataloog</translation>
-    </message>
-    <message>
-        <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="obsolete">See on DVD kirjutamise kiirus. Kui on 0 valib growisofs ise kiireima võimaliku.</translation>
-    </message>
-    <message>
-        <source>Command to play DVD</source>
-        <translation type="obsolete">DVD esitamise käsk</translation>
-    </message>
-    <message>
-        <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation type="obsolete">Käsk, mida kasutatakse loodud DVD testimiseks. &apos;Sisemine&apos; kasutab MythTV sisemist mängijat. %f asendatakse loodud DVD struktuuri asukohaga. Näiteks &apos;xine -pfhg --no-splash dvd:/%f&apos;.</translation>
-    </message>
-    <message>
-        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="obsolete">Valides läbivad mpeg2 failid alati vigade eemaldamiseks mythtranscode. Aitab parandada audio probleeme. Ignoreeritakse kui &apos;Kasuta ProjectX-i&apos; on valitud.</translation>
-    </message>
-    <message>
-        <source>Use ProjectX</source>
-        <translation type="obsolete">Kasuta ProjectX-i</translation>
-    </message>
-    <message>
-        <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="obsolete">Valides kasutatakse mythtranscode ja mythreplex-i asemel reklaamide eemaldamiseks mpeg2 failide tükeldamiseks ProjectX-1.</translation>
-    </message>
-    <message>
-        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="obsolete">Skript kasutab mplex-i väljundi saatmiseks dvdauthor-sse vahefailide asemel FIFO-t. Säästab aega ja kettaruumi, kuid pole toetatud Windowsis</translation>
-    </message>
-    <message>
-        <source>Add Subtitles</source>
-        <translation type="obsolete">Lisa subtiitrid</translation>
-    </message>
-    <message>
-        <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="obsolete">See valik lisab olemasolu korral DVD-le ka subtiitrid. Vajalik on ka &apos;Kasuta ProjectX-i&apos; sisse lülitamine.</translation>
-    </message>
-    <message>
-        <source>Default Encoder Profile</source>
-        <translation type="obsolete">Vaikimisi kodeerimise profiil</translation>
-    </message>
-    <message>
-        <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="obsolete">Vaikimisi kodeerimis profiil mida kasutatakse kui fail nõuab transkodeerimist.</translation>
-    </message>
-    <message>
-        <source>M2VRequantiser command</source>
-        <translation type="obsolete">M2VRequantiser käsk</translation>
-    </message>
-    <message>
-        <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
-        <translation type="obsolete">Käsk M2VRequantiser-i käivitamiseks. Mittekohustuslik - kui M2VRequantiser pole paigaldatud, jäta vahele.</translation>
-    </message>
-    <message>
-        <source>jpeg2yuv command</source>
-        <translation type="obsolete">jpeg2yuv käsk</translation>
-    </message>
-    <message>
-        <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
-        <translation type="obsolete">Käsk jpeg2yuv käivitamiseks. mjpegtools paki koosseisus</translation>
-    </message>
-    <message>
-        <source>projectx command</source>
-        <translation type="obsolete">projectx käsk</translation>
-    </message>
-    <message>
-        <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="obsolete">Käsk ProjectX-i käivitamiseks. Kasutatakse mythtranscode ja mythreplex asemel reklaamide eemaldamiseks ja mpeg failide tükeldamiseks.</translation>
-    </message>
-    <message>
-        <source>DVD Menu Settings</source>
-        <translation type="obsolete">DVD menüü seaded</translation>
-    </message>
-    <message>
-        <source>Cannot find the MythArchive work directory.
-Have you set the correct path in the settings?</source>
-        <translation type="obsolete">Ei leia MythArchive töö kataloogi
-Sisestasid ikka õige asukoha seadistustes?</translation>
-    </message>
-    <message>
-        <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="obsolete">DVD-d ei olnud võimalik luua. Skripti töös ilmnesid vead</translation>
-    </message>
-    <message>
-        <source>Cannot find any logs to show!</source>
-        <translation type="obsolete">Ei leia ühtegi logi mida näidata!</translation>
-    </message>
-    <message>
-        <source>Found a lock file but the owning process isn&apos;t running!
-Removing stale lock file.</source>
-        <translation type="obsolete">Leidsin lukustusfaili, kuid seda omavat protsessi pole enam! Eemaldan faili.</translation>
-    </message>
-    <message>
-        <source>Last run did not create a playable DVD.</source>
-        <translation type="obsolete">Viimane käivitus ei loonud esitatavat DVD-d.</translation>
-    </message>
-    <message>
-        <source>Last run failed to create a DVD.</source>
-        <translation type="obsolete">Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any videos!</source>
-        <translation type="obsolete">Sul pole ühtegi videot!</translation>
-    </message>
-    <message>
-        <source>Cannot burn a DVD.
-The last run failed to create a DVD.</source>
-        <translation type="obsolete">Ei saa DVD-d kirjutada.
-Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
-    </message>
-    <message>
-        <source>Burn DVD</source>
-        <translation type="obsolete">Kirjuta DVD</translation>
-    </message>
-    <message>
-        <source>
-Place a blank DVD in the drive and select an option below.</source>
-        <translation type="obsolete">Aseta DVD toorik seadmesseja tee allpool valik.</translation>
-    </message>
-    <message>
-        <source>Burn DVD Rewritable</source>
-        <translation type="obsolete">Kirjuta ülekirjutatav DVD</translation>
-    </message>
-    <message>
-        <source>Burn DVD Rewritable (Force Erase)</source>
-        <translation type="obsolete">Kirjuta ülekirjutatav DVD (kustuta enne)</translation>
-    </message>
-    <message>
-        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
-        <translation type="obsolete">Pole võimalik  mytharchivehelper-it DVD kirjutamiseks käivitada.</translation>
-    </message>
-</context>
-<context>
     <name>RecordingSelector</name>
     <message>
         <location filename="../mytharchive/recordingselector.cpp" line="133"/>
@@ -1744,28 +1441,28 @@ Palun oota...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="162"/>
         <source>Clear All</source>
         <translation>Puhasta kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="163"/>
         <source>Select All</source>
         <translation>Vali kõik</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="368"/>
+        <location filename="../mytharchive/videoselector.cpp" line="505"/>
         <source>All Videos</source>
         <translation>Kõik videod</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="562"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Selle vanemliku taseme jaoks on vajalik sisestada salasõna</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="155"/>
         <source>Menu</source>
         <translation>Menüü</translation>
     </message>

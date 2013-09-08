@@ -96,37 +96,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Current Conditions</source>
-        <translation type="obsolete">Hetke ilm</translation>
-    </message>
-    <message>
-        <source>Three Day Forecast</source>
-        <translation type="obsolete">Kolme päeva ilmateade</translation>
-    </message>
-    <message>
-        <source>18 Hour Forecast</source>
-        <translation type="obsolete">18 tunni ilmateade</translation>
-    </message>
-    <message>
-        <source>Severe Weather Alerts</source>
-        <translation type="obsolete">Ilma hoiatused</translation>
-    </message>
-    <message>
-        <source>Six Day Forecast</source>
-        <translation type="obsolete">Kuue päeva ilmateade</translation>
-    </message>
-    <message>
-        <source>Static Map</source>
-        <translation type="obsolete">Staatiline kaart</translation>
-    </message>
-    <message>
-        <source>Animated Map</source>
-        <translation type="obsolete">Animeeritud kaart</translation>
-    </message>
-</context>
-<context>
     <name>ScreenSetup</name>
     <message>
         <location filename="../mythweather/weatherSetup.cpp" line="151"/>
@@ -991,6 +960,11 @@
 Kui kõik on tehtud, kliki jätkamiseks &quot;Lõpeta&quot;.</translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Ilmateate seaded</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Ilma kuva seadistus</translation>
@@ -1219,10 +1193,6 @@ Kui kõik on tehtud, vajuta jätkamiseks &quot;Lõpeta&quot;.</translation>
         <location filename="themestrings.h" line="60"/>
         <source>Retrieve data in the background</source>
         <translation>Hangi andmeid taustal</translation>
-    </message>
-    <message>
-        <source>Enter your current location,nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation type="obsolete">Sisesta asukoht. Lähim suurem linn. Osades riikides sobib ka posti sihtnumber.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>

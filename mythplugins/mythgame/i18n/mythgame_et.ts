@@ -230,10 +230,6 @@ Kustutada andmebaasist?</translation>
         <translation>-   avaldaja järgi</translation>
     </message>
     <message>
-        <source>Choose System for</source>
-        <translation type="obsolete">Vali süsteem</translation>
-    </message>
-    <message>
         <location filename="../mythgame/gameui.cpp" line="281"/>
         <source>Choose System for:
 %1</source>
@@ -560,223 +556,6 @@ Kustutada andmebaasist?</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Tundmatu</translation>
-    </message>
-    <message>
-        <source>Game display order</source>
-        <translation type="obsolete">Mängude kuvamise järjekord</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="obsolete">Millises järjekorras mänge kuvatakse. Võimalikud valikud on: platvorm, aasta, žanr või mängu nimi</translation>
-    </message>
-    <message>
-        <source>Indepth Game Scan</source>
-        <translation type="obsolete">Põhjalikum mängude otsimine</translation>
-    </message>
-    <message>
-        <source>Display Files Names in Game Tree</source>
-        <translation type="obsolete">Näita mängude puus failide nimesid</translation>
-    </message>
-    <message>
-        <source>MythGame Settings -- General</source>
-        <translation type="obsolete">MythGame seaded -- Üldine</translation>
-    </message>
-    <message>
-        <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation type="obsolete">Selle lubamisel loetakse näiteks game.1.rom ja game.2.rom üheks mänguks.
-
-</translation>
-    </message>
-    <message>
-        <source>Command</source>
-        <translation type="obsolete">Käsk</translation>
-    </message>
-    <message>
-        <source>Favorite display order</source>
-        <translation type="obsolete">Lemmikute kuvamise järjekord</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the games marked as favorites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="obsolete">Millises järjekorras kuvatakse lemmikuid. Võimalikud valikud on: platvorm, aasta, žanr või mängu nimi</translation>
-    </message>
-    <message>
-        <source>Enabling this causes a game scan to gather CRC values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a game scan takes based on the amount of games scanned.</source>
-        <translation type="obsolete">Sellega kontrollitakse CRC väärtusi ning üritatakse leida mängu kohta rohkem informatsiooni. TÄHELEPANU, olenevalt mängude arvust, võin see suurendada oluliselt mängude otsimise aega.</translation>
-    </message>
-    <message>
-        <source>Prompt for removal of deleted ROM(s)</source>
-        <translation type="obsolete">Kustutatud ROMi(de) eemaldamisel küsi kinnitust</translation>
-    </message>
-    <message>
-        <source>This enables a prompt for removing deleted ROMs from the database during a  game scan</source>
-        <translation type="obsolete">Küsib üle mängude otsimisel avastautud kustutatud ROMi(de) eemaldamise andmebaasist</translation>
-    </message>
-    <message>
-        <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up game name</source>
-        <translation type="obsolete">Näitab lühendatud nimede või mängudest leitud nimede asemel failinimesid</translation>
-    </message>
-    <message>
-        <source>Allow games to span multiple ROMs/disks</source>
-        <translation type="obsolete">Luba mängude asetsemist mitmel ROMil või kettal</translation>
-    </message>
-    <message>
-        <source>Binary and optional parameters. Multiple commands separated with &apos;;&apos; . Use %s for the ROM name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="obsolete">Binaari ning valikulised parameetrid. Mitme käsu puhul on eraldajaks &quot;;&quot;. %s on rom nimi, %d1, %d2, %d3 ja %d4 esindavad diske multidisk mängude korral. Kui midagi pole määratud, lisatakse automaatselt %s</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="obsolete">Tüüp</translation>
-    </message>
-    <message>
-        <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation type="obsolete">Mängu või emulaatori tüüp. Sellel parameetril mõju praktiliselt puudub ning on ette nähtud peamiselt informatsiooniks.</translation>
-    </message>
-    <message>
-        <source>ROM Path</source>
-        <translation type="obsolete">ROM otsingutee</translation>
-    </message>
-    <message>
-        <source>Location of the ROM files for this emulator</source>
-        <translation type="obsolete">Selle emulaatori ROM failide asukoht</translation>
-    </message>
-    <message>
-        <source>Working Directory</source>
-        <translation type="obsolete">Töökataloog</translation>
-    </message>
-    <message>
-        <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation type="obsolete">Aktiivne ataloog emulaatori käivitamisel. Tavaliselt võib jätta tühjaks</translation>
-    </message>
-    <message>
-        <source>File Extensions</source>
-        <translation type="obsolete">Faililaiendid</translation>
-    </message>
-    <message>
-        <source>A comma separated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="obsolete">Selle emulaatori faililaiendite nimekiri (komadega eraldatud). Tühja välja puhul loetakse kõiki kataloogis olevaid faile emulaatori failideks</translation>
-    </message>
-    <message>
-        <source>Game Player Setup</source>
-        <translation type="obsolete">Mängija seadistus</translation>
-    </message>
-    <message>
-        <source>(New Game Player)</source>
-        <translation type="obsolete">(Uus mängija)</translation>
-    </message>
-    <message>
-        <source>OTHER</source>
-        <translation type="obsolete">MUU</translation>
-    </message>
-    <message>
-        <source>MAME</source>
-        <translation type="obsolete">MAMA</translation>
-    </message>
-    <message>
-        <source>NES</source>
-        <translation type="obsolete">NES</translation>
-    </message>
-    <message>
-        <source>SNES</source>
-        <translation type="obsolete">SNES</translation>
-    </message>
-    <message>
-        <source>N64</source>
-        <translation type="obsolete">N64</translation>
-    </message>
-    <message>
-        <source>PCE/TG16</source>
-        <translation type="obsolete">PCE/TG16</translation>
-    </message>
-    <message>
-        <source>GENESIS/MEGADRIVE</source>
-        <translation type="obsolete">GENESIS/MEGADRIVE</translation>
-    </message>
-    <message>
-        <source>PC GAME</source>
-        <translation type="obsolete">PC GAME</translation>
-    </message>
-    <message>
-        <source>AMIGA</source>
-        <translation type="obsolete">AMIGA</translation>
-    </message>
-    <message>
-        <source>ATARI</source>
-        <translation type="obsolete">ATARI</translation>
-    </message>
-    <message>
-        <source>Player Name</source>
-        <translation type="obsolete">Mängija nimi</translation>
-    </message>
-    <message>
-        <source>Name of this Game and or Emulator</source>
-        <translation type="obsolete">Selle mängu ja/või emulaatori nimi</translation>
-    </message>
-    <message>
-        <source>19xx</source>
-        <translation type="obsolete">19xx</translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation type="obsolete">0</translation>
-    </message>
-    <message>
-        <source>Verifying %1 files...</source>
-        <translation type="obsolete">Kontrollin %1 faili...</translation>
-    </message>
-    <message>
-        <source>Scanning for %1 games...</source>
-        <translation type="obsolete">Otsin %1 mängu...</translation>
-    </message>
-    <message>
-        <source>SEGA/MASTER SYSYTEM</source>
-        <translation type="obsolete">SEGA/MASTER SYSYTEM</translation>
-    </message>
-    <message>
-        <source>GAMEGEAR</source>
-        <translation type="obsolete">GAMEGEAR</translation>
-    </message>
-    <message>
-        <source>Hash filenames in display</source>
-        <translation type="obsolete">Tükelda näidatavad failinimed</translation>
-    </message>
-    <message>
-        <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="obsolete">Nimede tükeldamine teeb pikkade nimekirjade korral navigeerimise natuke kiiremaks</translation>
-    </message>
-    <message>
-        <source>Updating %1(%2) ROM database</source>
-        <translation type="obsolete">Uuendan %1(%2) ROM-ide andmebaasi</translation>
-    </message>
-    <message>
-        <source>Directory where Game Screenshots are stored</source>
-        <translation type="obsolete">Mängude ekraanitõmmiste kataloog</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="obsolete">Ekraanitõmmised pannakse vaikimisi siia kataloogi.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Fanart is stored</source>
-        <translation type="obsolete">Mängude reklaamplakatite kataloog</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="obsolete">Reklaamplakatid pannakse vaikimisi siia kataloogi.</translation>
-    </message>
-    <message>
-        <source>Directory where Game Boxart is stored</source>
-        <translation type="obsolete">Karbikujunduse kataloog</translation>
-    </message>
-    <message>
-        <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="obsolete">Karbikujundus pannakse vaikimisi siia kataloogi.</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -992,6 +771,11 @@ Kustutada andmebaasist?</translation>
         <location filename="themestrings.h" line="31"/>
         <source>Games</source>
         <translation>Mängud</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="32"/>
+        <source>From %1</source>
+        <translation>%1-st</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
