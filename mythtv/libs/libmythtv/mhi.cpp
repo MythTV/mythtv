@@ -603,7 +603,9 @@ bool MHIContext::OfferKey(QString key)
     { QMutexLocker locker(&m_keyLock);
     m_keyQueue.enqueue(action);}
     m_engine_wait.wakeAll();
-    return true;
+    // Accept the key except 'exit' (16) in 'always available' (3) state.
+    // This allows re-use of Esc as TEXTEXIT for RC's with a single backup button
+    return action != 16 || m_keyProfile != 3;
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
@@ -1053,7 +1055,7 @@ bool MHIContext::BeginAudio(int tag)
         return m_parent->GetNVP()->SetAudioByComponentTag(tag);
     return false;
  }
-
+ 
 // Stop playing audio
 void MHIContext::StopAudio()
 {
@@ -1067,13 +1069,13 @@ bool MHIContext::BeginVideo(int tag)
 
     if (tag < 0)
         return true; // Leave it at the default.
-
+ 
     m_videoTag = tag;
     if (m_parent->GetNVP())
         return m_parent->GetNVP()->SetVideoByComponentTag(tag);
     return false;
 }
-
+ 
  // Stop displaying video
 void MHIContext::StopVideo()
 {
