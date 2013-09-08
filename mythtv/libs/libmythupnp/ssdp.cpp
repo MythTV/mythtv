@@ -373,7 +373,8 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
         QString     sRequestLine = lines.size() ? lines[0] : "";
 
-        lines.pop_front();
+        if (!lines.isEmpty())
+            lines.pop_front();
 
         // ------------------------------------------------------------------
         // Parse request Type
