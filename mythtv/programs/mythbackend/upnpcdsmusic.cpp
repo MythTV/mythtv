@@ -145,11 +145,13 @@ QString UPnpCDSMusic::GetItemListSQL( QString /* sColumn */ )
     return "SELECT song.song_id as intid, artist.artist_name as artist, "     \
            "album.album_name as album, song.name as title, "                  \
            "genre.genre, song.year, song.track as tracknum, "                 \
-           "song.description, song.filename, song.length, song.size "         \
+           "song.description, song.filename, song.length, song.size, "        \
+           "albumart.albumart_id "                                             \
            "FROM music_songs song "                                           \
            " join music_artists artist on artist.artist_id = song.artist_id " \
            " join music_albums album on album.album_id = song.album_id "      \
-           " join music_genres genre on  genre.genre_id = song.genre_id ";
+           " join music_genres genre on  genre.genre_id = song.genre_id "     \
+           " join music_albumart albumart on albumart.song_id = song.song_id";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -269,6 +271,7 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     QString        sFileName    = query.value( 8).toString();
     uint           nLength      = query.value( 9).toInt();
     uint64_t       nFileSize    = (quint64)query.value(10).toULongLong();
+    int            nArtworkId   = query.value(11).toInt();
 
 #if 0
     if ((nNodeIdx == 0) || (nNodeIdx == 1))
@@ -351,6 +354,19 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
+
+    QString sArtURI = QString( "%1GetAlbumArt?Id=%2&amp;Width=160")
+                                                .arg( sURIBase   )
+                                                .arg( nArtworkId );
+
+    pItem->SetPropValue( "albumArtURI", sArtURI );
+    Property *pProp = pItem->GetProperty("albumArtURI");
+    if (pProp)
+    {
+        pProp->AddAttribute("dlna:profileID", "PNG_TN");
+        pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+
+    }
 
     pResults->Add( pItem );
 
