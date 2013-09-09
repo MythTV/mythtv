@@ -84,6 +84,9 @@ Function FindMSys()
 #
 # ###########################################################################
 
+$BuildType  = $BuildType.tolower();
+$OutputType = $OutputType.tolower();
+
 $basePath  = (Get-Location).Path
 $DestDir   = "$basePath\bin\$BuildType"
 
@@ -649,30 +652,62 @@ if ($OutputType -eq "nmake")
 else
 {
 
-    # -----------------------------------------------------------------------
-    # Custom Targets are not working in vcxproj files yet so run verison.ps1
-    # to generate version.h.  This really should be done each build (reason
-    # for custom target in pro files... need to fix vcxproj to work)
-    # -----------------------------------------------------------------------
-    Write-Host "Generating version.h" -foregroundcolor cyan
+    if ($BuildType -eq "clean")
+    {
+        Write-Host "Cleaning Visual Studio files" -foregroundcolor cyan
 
-    & .\version.ps1 $basePath
+        Get-ChildItem libs\* -include *.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem programs\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
 
-    # -----------------------------------------------------------------------
-    Write-Host "Running qmake on mythtv to generate Visual Studio Solution..." -foregroundcolor green
-    # -----------------------------------------------------------------------
+        # Note: can't do all the external directories with one del because of zeromq
 
-    Write-Host "qmake mythtv.pro -tp vc -r" -Foregroundcolor blue
+        Get-ChildItem external\FFmpeg\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\libhdhomerun\*.vcxproj*  -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\libmythbluray\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\libsamplerate\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\nzmqt\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\qjson\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
 
-    &qmake -tp vc -r "CONFIG+=$BuildType" mythtv.pro
+        Remove-Item mythtv.sln  -ErrorAction SilentlyContinue
+        Remove-Item mythtv.suo  -ErrorAction SilentlyContinue
+        Remove-Item mythtv.sdf  -ErrorAction SilentlyContinue
 
-    # -----------------------------------------------------------------------
-    Write-Host
-    Write-Host "Configure Completed." -foregroundcolor green
-    Write-Host "You can now open the " -NoNewline
-    Write-Host "mythtv.sln" -foregroundcolor Cyan -NoNewline
-    Write-Host " file in $VCVerStr"
-    Write-Host
-    # -----------------------------------------------------------------------
+        Remove-Item config.h    -ErrorAction SilentlyContinue
+        Remove-Item version.h   -ErrorAction SilentlyContinue
+
+        # --------------------------------------------------------------------
+        Write-Host
+        Write-Host "Clean Completed." -foregroundcolor green
+
+    }
+    else
+    {
+
+        # -----------------------------------------------------------------------
+        # Custom Targets are not working in vcxproj files yet so run verison.ps1
+        # to generate version.h.  This really should be done each build (reason
+        # for custom target in pro files... need to fix vcxproj to work)
+        # -----------------------------------------------------------------------
+        Write-Host "Generating version.h" -foregroundcolor cyan
+
+        & .\version.ps1 $basePath
+
+        # -----------------------------------------------------------------------
+        Write-Host "Running qmake on mythtv to generate Visual Studio Solution..." -foregroundcolor green
+        # -----------------------------------------------------------------------
+
+        Write-Host "qmake mythtv.pro -tp vc -r" -Foregroundcolor blue
+
+        &qmake -tp vc -r "CONFIG+=$BuildType" mythtv.pro
+
+        # -----------------------------------------------------------------------
+        Write-Host
+        Write-Host "Configure Completed." -foregroundcolor green
+        Write-Host "You can now open the " -NoNewline
+        Write-Host "mythtv.sln" -foregroundcolor Cyan -NoNewline
+        Write-Host " file in $VCVerStr"
+        Write-Host
+        # -----------------------------------------------------------------------
+    }
 }
 

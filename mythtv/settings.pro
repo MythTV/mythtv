@@ -205,15 +205,6 @@ win32 {
     MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
     INCLUDEPATH += $$unique(CONFIG_INCLUDEPATH)
-
-    contains( CONFIG_MYTHLOGSERVER, "yes" ) {
-        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
-
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
-    }
-
     INCLUDEPATH += $$SRC_PATH_BARE/external/qjson/include
 
     LOCAL_LIBDIR_OGL =
@@ -239,6 +230,14 @@ win32 {
     EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
 
     EXTRA_LIBS += -L$$SRC_PATH_BARE/external/qjson/lib -lmythqjson
+
+    contains( CONFIG_MYTHLOGSERVER, "yes" ) {
+        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
+        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
+
+        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
+        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
+    }
 
     # remove warn_{on|off} from CONFIG since we set it in our CFLAGS
     CONFIG -= warn_on warn_off
