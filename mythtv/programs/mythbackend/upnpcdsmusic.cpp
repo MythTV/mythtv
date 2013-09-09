@@ -80,10 +80,8 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "GROUP BY a.album_name "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY", "album.album_name" },
-
-#if 0
     {   "By Artist",
-        "artist_id",
+        "song.artist_id",
         "SELECT a.artist_id as id, "
           "a.artist_name as name, "
           "count( distinct song.artist_id ) as children "
@@ -94,7 +92,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
         "WHERE song.artist_id=:KEY", "" },
 
 {   "By Genre",
-        "genre_id",
+        "song.genre_id",
         "SELECT g.genre_id as id, "
           "genre as name, "
           "count( distinct song.genre_id ) as children "
@@ -103,7 +101,6 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
         "WHERE song.genre_id=:KEY", "" },
-#endif
 
 };
 
