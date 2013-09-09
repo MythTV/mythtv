@@ -101,6 +101,7 @@ class MPUBLIC MusicCommon : public MythScreenType
   protected:
     void showExitMenu(void);
     void showPlaylistOptionsMenu(bool addMainMenu = false);
+    void storePlaylists(void);
 
   protected:
     QString getTimeString(int exTime, int maxTime);
