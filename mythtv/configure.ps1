@@ -66,7 +66,7 @@ Function FindMSys()
 
     # not set, so check registry (only works if an installer was used for a specific appid)
 
-    $MSysPath = (Get-ItemProperty -Path hklm:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\`{AC2C1BDB-1E91-4F94-B99C-E716FE2E9C75`}_is1 -Name InstallLocation).InstallLocation
+    $MSysPath = (Get-ItemProperty -Path hklm:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\`{AC2C1BDB-1E91-4F94-B99C-E716FE2E9C75`}_is1 -Name InstallLocation -ErrorAction SilentlyContinue).InstallLocation
 
     $MSysPath += "msys\1.0\"
 
