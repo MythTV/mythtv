@@ -659,7 +659,7 @@ else
         Get-ChildItem libs\* -include *.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem programs\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
 
-        # Note: can't do all the external directories with one del because of zeromq
+        # Note: can't do all the external directories with one command because of zeromq and zlib
 
         Get-ChildItem external\FFmpeg\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libhdhomerun\*.vcxproj*  -recurse | remove-item -ErrorAction SilentlyContinue
@@ -669,7 +669,7 @@ else
         Get-ChildItem external\qjson\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
 
         Remove-Item mythtv.sln  -ErrorAction SilentlyContinue
-        Remove-Item mythtv.suo  -ErrorAction SilentlyContinue
+        Remove-Item mythtv.suo  -ErrorAction SilentlyContinue -force
         Remove-Item mythtv.sdf  -ErrorAction SilentlyContinue
 
         Remove-Item config.h    -ErrorAction SilentlyContinue
