@@ -84,6 +84,15 @@ Function FindMSys()
     return $null
 }
 
+Function GetQtVersion()
+{
+
+    $QMakeVersion = qmake -version | Out-String -Stream
+    $QtVer        = ($QMakeVersion -match 'Using').TrimStart("Using Qt version ")
+
+    return $QtVer
+}
+
 # ###########################################################################
 #
 # Check for existance of required Environment and Tools
@@ -117,8 +126,10 @@ if (-not (Test-Path Env:\VCINSTALLDIR ))
 # lets get version of visual studio for cmake.
 
 $VCVerStr = $Env:VCINSTALLDIR -replace ".*(Visual Studio [0-9][0-9]).*", '$1'
+$QtVerStr = GetQtVersion
 
 Write-Host "Using      : [$VCVerStr]"   -ForegroundColor Cyan
+Write-Host "Qt Version : [$QtVerStr]"   -ForegroundColor Cyan
 Write-Host "Build Type : [$BuildType]"  -ForegroundColor Cyan
 Write-Host "Output Type: [$OutputType]" -ForegroundColor Cyan
 
