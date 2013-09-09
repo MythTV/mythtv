@@ -1259,6 +1259,8 @@ bool MythUIType::ParseElement(
     {
         int order = getFirstText(element).toInt();
         SetFocusOrder(order);
+        if(order < 0)
+            SetCanTakeFocus(false)            
     }
     else if (element.tagName() == "loadondemand")
     {
