@@ -41,9 +41,11 @@
 #include "mythdate.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
+#include "musicmetadata.h"
 #include "videometadatalistmanager.h"
 #include "HLS/httplivestream.h"
 #include "mythmiscutil.h"
+#include "remotefile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -343,44 +345,29 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
+QFileInfo Content::GetAlbumArt( int nSongId, int nWidth, int nHeight )
 {
-    QString sFullFileName;
-
     // ----------------------------------------------------------------------
     // Read AlbumArt file path from database
     // ----------------------------------------------------------------------
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    MusicMetadata *metadata = MusicMetadata::createFromID(nSongId);
 
-    query.prepare("SELECT CONCAT_WS('/', music_directories.path, "
-                  "music_albumart.filename) FROM music_albumart "
-                  "LEFT JOIN music_directories ON "
-                  "music_directories.directory_id=music_albumart.directory_id "
-                  "WHERE music_albumart.albumart_id = :ARTID;");
+    if (!metadata)
+        return QFileInfo();
 
-    query.bindValue(":ARTID", nId );
+    QString sFullFileName = metadata->getAlbumArtFile();
 
-    if (!query.exec())
-        MythDB::DBError("Select ArtId", query);
+    delete metadata;
 
-    QString sMusicBasePath = gCoreContext->GetSetting("MusicLocation", "");
-
-    if (query.next())
-    {
-        sFullFileName = QString( "%1/%2" )
-                        .arg( sMusicBasePath )
-                        .arg( query.value(0).toString() );
-    }
-
-    if (!QFile::exists( sFullFileName ))
+    if (!RemoteFile::Exists(sFullFileName))
         return QFileInfo();
 
     if ((nWidth == 0) && (nHeight == 0))
         return QFileInfo( sFullFileName );
 
-    QString sNewFileName = QString( "%1.%2x%3.png" )
-                              .arg( sFullFileName )
+    QString sNewFileName = QString( "/tmp/%1.%2x%3.png" )
+                              .arg( QFileInfo(sFullFileName).fileName() )
                               .arg( nWidth    )
                               .arg( nHeight   );
 
@@ -396,14 +383,23 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     // ----------------------------------------------------------------------
 
     float fAspect = 0.0;
+    QImage img;
+    if (sFullFileName.startsWith("myth://"))
+    {
+        RemoteFile rf(sFullFileName, false, false, 0);
+        QByteArray data;
+        rf.SaveAs(data);
 
-    QImage *pImage = new QImage( sFullFileName);
+        img.loadFromData(data);
+    }
+    else
+        img.load(sFullFileName);
 
-    if (!pImage)
+    if (img.isNull())
         return QFileInfo();
 
     if (fAspect <= 0)
-           fAspect = (float)(pImage->width()) / pImage->height();
+           fAspect = (float)(img.width()) / img.height();
 
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
@@ -411,13 +407,12 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     if ( nHeight == 0 )
         nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
-                                Qt::SmoothTransformation);
+    img = img.scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                       Qt::SmoothTransformation);
 
-    QByteArray fname = sNewFileName.toLatin1();
-    img.save( fname.constData(), "PNG" );
-
-    delete pImage;
+    QString fname = sNewFileName.toLatin1().constData();
+    if (!img.save( fname, "PNG" ))
+        return QFileInfo();
 
     return QFileInfo( sNewFileName );
 }

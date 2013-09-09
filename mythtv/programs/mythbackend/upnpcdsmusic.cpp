@@ -352,6 +352,18 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
 
+    QString sArtURI = QString( "%1GetAlbumArt?Id=%2").arg( sURIBase   )
+                                                     .arg( nId );
+
+    pItem->SetPropValue( "albumArtURI", sArtURI );
+    Property *pProp = pItem->GetProperty("albumArtURI");
+    if (pProp)
+    {
+        pProp->AddAttribute("dlna:profileID", "PNG_TN");
+        pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+
+    }
+
     pResults->Add( pItem );
 
     // ----------------------------------------------------------------------
