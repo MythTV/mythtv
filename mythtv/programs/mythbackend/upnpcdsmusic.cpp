@@ -77,7 +77,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
           "count( song.album_id ) as children "
             "FROM music_songs song join music_albums a on a.album_id = song.album_id "
             "%1 "
-            "GROUP BY a.album_id "
+            "GROUP BY a.album_name "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY", "album.album_name" },
 
