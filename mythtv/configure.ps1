@@ -68,6 +68,12 @@ Function FindMSys()
 
     $MSysPath = (Get-ItemProperty -Path hklm:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\`{AC2C1BDB-1E91-4F94-B99C-E716FE2E9C75`}_is1 -Name InstallLocation -ErrorAction SilentlyContinue).InstallLocation
 
+    if (-not $MSysPath)
+    {
+        # try Current User
+        $MSysPath = (Get-ItemProperty -Path hkcu:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\`{AC2C1BDB-1E91-4F94-B99C-E716FE2E9C75`}_is1 -Name InstallLocation -ErrorAction SilentlyContinue).InstallLocation
+    }
+
     $MSysPath += "msys\1.0\"
 
     if ( Which( $MSysPath + "msys.bat" ))
