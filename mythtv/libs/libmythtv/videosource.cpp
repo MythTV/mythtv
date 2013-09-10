@@ -213,7 +213,7 @@ class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
        //: Information standard specification.
        setHelpText(QObject::tr("If your provider has asked you to configure a "
                                "specific network identifier (Network_ID), "
-                               "enter it here.  Leave it at -1 otherwise."));
+                               "enter it here. Leave it at -1 otherwise."));
        setValue(value);
     };
 };
