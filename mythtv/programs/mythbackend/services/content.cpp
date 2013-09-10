@@ -289,6 +289,7 @@ DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+// NOTE: If you rename this, you must also update upnpcdsvideo.cpp
 QFileInfo Content::GetVideoArtwork( const QString &sType,
                                     int nId, int nWidth, int nHeight )
 {
