@@ -1595,12 +1595,12 @@ static HostCheckBox *EnableMHEG()
 static HostCheckBox *EnableMHEGic()
 {
     HostCheckBox *gc = new HostCheckBox("EnableMHEGic");
-    gc->setLabel("Enable network access for interactive TV");
+    gc->setLabel(OSDSettings::tr("Enable network access for interactive TV"));
     gc->setValue(true);
-    gc->setHelpText(
-                        "If enabled, interactive TV applications (MHEG) will "
-                        "be able to access interactive content over the "
-                        "internet. This is used for BBC iPlayer.");
+    gc->setHelpText(OSDSettings::tr("If enabled, interactive TV applications "
+                                    "(MHEG) will be able to access interactive "
+                                    "content over the Internet. This is used "
+                                    "for BBC iPlayer."));
     return gc;
 }
 
@@ -2715,7 +2715,7 @@ static GlobalComboBox *GRSchedOpenEnd()
                                                   "recordings"));
 
     bc->setHelpText(
-        GeneralRecPrioritiesSettings::tr("Selects the situations where the"
+        GeneralRecPrioritiesSettings::tr("Selects the situations where the "
                                          "scheduler will avoid assigning shows "
                                          "to the same card if their end time "
                                          "and start time match. This will be "
