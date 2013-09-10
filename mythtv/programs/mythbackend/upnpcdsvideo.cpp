@@ -339,7 +339,7 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     //pItem->SetPropValue( "relation"       , );
     //pItem->SetPropValue( "region"         , );
 
-    if ((sCoverArt != "") && (sCoverArt != "No Cover"))
+    if ((!sCoverArt.isEmpty()) && (sCoverArt != "No Cover"))
         pItem->SetPropValue( "albumArtURI"    , sAlbumArtURI);
 
     if ( bAddRef )
