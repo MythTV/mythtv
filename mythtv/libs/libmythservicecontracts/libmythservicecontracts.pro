@@ -53,8 +53,6 @@ INCLUDEPATH += ./services
 DEPENDPATH += ../libmyth
 INCLUDEPATH += $$DEPENDPATH
 
-#LIBS += $$EXTRA_LIBS
-
 inc.path = $${PREFIX}/include/mythtv/libmythservicecontracts/
 inc.files = serviceexp.h service.h datacontracthelper.h
 
@@ -97,4 +95,4 @@ use_hidesyms {
 
 include ( ../libs-targetfix.pro )
 
-#LIBS += $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS
