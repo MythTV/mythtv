@@ -77,13 +77,11 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
           "count( song.album_id ) as children "
             "FROM music_songs song join music_albums a on a.album_id = song.album_id "
             "%1 "
-            "GROUP BY a.album_id "
+            "GROUP BY a.album_name "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY", "album.album_name" },
-
-#if 0
     {   "By Artist",
-        "artist_id",
+        "song.artist_id",
         "SELECT a.artist_id as id, "
           "a.artist_name as name, "
           "count( distinct song.artist_id ) as children "
@@ -94,7 +92,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
         "WHERE song.artist_id=:KEY", "" },
 
 {   "By Genre",
-        "genre_id",
+        "song.genre_id",
         "SELECT g.genre_id as id, "
           "genre as name, "
           "count( distinct song.genre_id ) as children "
@@ -103,7 +101,6 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
         "WHERE song.genre_id=:KEY", "" },
-#endif
 
 };
 
@@ -354,6 +351,18 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
+
+    QString sArtURI = QString( "%1GetAlbumArt?Id=%2").arg( sURIBase   )
+                                                     .arg( nId );
+
+    pItem->SetPropValue( "albumArtURI", sArtURI );
+    Property *pProp = pItem->GetProperty("albumArtURI");
+    if (pProp)
+    {
+        pProp->AddAttribute("dlna:profileID", "PNG_TN");
+        pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+
+    }
 
     pResults->Add( pItem );
 
