@@ -345,13 +345,13 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetAlbumArt( int nSongId, int nWidth, int nHeight )
+QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
 {
     // ----------------------------------------------------------------------
     // Read AlbumArt file path from database
     // ----------------------------------------------------------------------
 
-    MusicMetadata *metadata = MusicMetadata::createFromID(nSongId);
+    MusicMetadata *metadata = MusicMetadata::createFromID(nTrackId);
 
     if (!metadata)
         return QFileInfo();

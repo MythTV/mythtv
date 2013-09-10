@@ -65,7 +65,7 @@ class Content : public ContentServices
         QFileInfo           GetVideoArtwork     ( const QString   &Type,
                                                   int Id, int Width, int Height );
 
-        QFileInfo           GetAlbumArt         ( int SongId, int Width, int Height );
+        QFileInfo           GetAlbumArt         ( int Id, int Width, int Height );
 
         QFileInfo           GetPreviewImage     ( int              ChanId,
                                                   const QDateTime &StartTime,
