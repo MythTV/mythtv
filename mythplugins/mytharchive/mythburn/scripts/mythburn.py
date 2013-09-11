@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130911-3"
+VERSION="0.1.20130911-4"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -74,8 +74,8 @@ useSyncOffset = True
 # chapter marks will be set to the cut point end marks
 addCutlistChapters = False
 
-# by default we always convert any audio tracks to ac3 for better compatibility
-encodetoac3 = True
+# change this to True to always convert any audio tracks to ac3 for better compatibility
+encodetoac3 = False
 
 #*********************************************************************************
 #Dont change the stuff below!!
