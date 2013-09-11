@@ -379,42 +379,57 @@ Kas URL on ikka õige.</translation>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="969"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1141"/>
+        <location filename="../mythmusic/importmusic.cpp" line="970"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1146"/>
         <source>Front Cover</source>
         <translation>Esikaan</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="971"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1143"/>
+        <location filename="../mythmusic/importmusic.cpp" line="972"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1148"/>
         <source>Back Cover</source>
         <translation>Tagakaan</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="973"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1147"/>
+        <location filename="../mythmusic/importmusic.cpp" line="974"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1152"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="975"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1145"/>
+        <location filename="../mythmusic/importmusic.cpp" line="976"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1150"/>
         <source>Inlay</source>
         <translation>Sisekülg</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="977"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1149"/>
+        <location filename="../mythmusic/importmusic.cpp" line="978"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1154"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Tundmatu&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1116"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1016"/>
+        <source>Copy CoverArt Failed.
+Copying to %1</source>
+        <extracomment>%1 is the filename</extracomment>
+        <translation>Plaadikujunduse kopeerimine ebaõnnestus.
+Kopeerin: %1</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1087"/>
+        <source>%1 of %2</source>
+        <comment>Current file copied</comment>
+        <extracomment>%1 is the current position of the file being copied, %2 is the total number of files</extracomment>
+        <translation>%1 %2-st</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
         <source>File Already Exists</source>
         <translation>Fail on juba olemas</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1118"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
         <source>New File</source>
         <translation>Uus fail</translation>
     </message>
@@ -468,47 +483,52 @@ Ei õnnestu faili kopeerida: %1</translation>
         <translation>%1 uut lugu lisati andmebaasi</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="534"/>
+        <location filename="../mythmusic/importmusic.cpp" line="524"/>
+        <source>Cannot import music from the music directory. You probably want to use &apos;Scan For New Music&apos; instead.</source>
+        <translation>Ei saa muusika kataloogist muusikat importida. Tõenäoliselt on kõigepealt tarvis kasutada &apos;Tuvasta uut muusikat&apos; valikut.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="535"/>
         <source>Searching for music files</source>
         <translation>Muusikafailide otsimine</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="671"/>
+        <location filename="../mythmusic/importmusic.cpp" line="672"/>
         <source>Save Defaults</source>
         <translation>Salvesta vaikimisi</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="675"/>
+        <location filename="../mythmusic/importmusic.cpp" line="676"/>
         <source>Change Compilation Flag</source>
         <translation>Muuda kooostaja lippu</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="676"/>
+        <location filename="../mythmusic/importmusic.cpp" line="677"/>
         <source>Change Compilation Artist</source>
         <translation>Muuda koostajat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="678"/>
+        <location filename="../mythmusic/importmusic.cpp" line="679"/>
         <source>Change Artist</source>
         <translation>Muuda esitajat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="679"/>
+        <location filename="../mythmusic/importmusic.cpp" line="680"/>
         <source>Change Album</source>
         <translation>Muuda albumit</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="680"/>
+        <location filename="../mythmusic/importmusic.cpp" line="681"/>
         <source>Change Genre</source>
         <translation>Muuda žanri</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="681"/>
+        <location filename="../mythmusic/importmusic.cpp" line="682"/>
         <source>Change Year</source>
         <translation>Muuda aastat</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="682"/>
+        <location filename="../mythmusic/importmusic.cpp" line="683"/>
         <source>Change Rating</source>
         <translation>Muuda hinnangut</translation>
     </message>
