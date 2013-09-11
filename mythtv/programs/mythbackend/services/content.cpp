@@ -193,7 +193,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     if ( nHeight == 0 )
         nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::KeepAspectRatio,
                                 Qt::SmoothTransformation);
 
     QByteArray fname = sNewFileName.toLatin1();
@@ -364,10 +364,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     if (!RemoteFile::Exists(sFullFileName))
         return QFileInfo();
 
-    if ((nWidth == 0) && (nHeight == 0))
-        return QFileInfo( sFullFileName );
-
-    QString sNewFileName = QString( "/tmp/%1.%2x%3.png" )
+    QString sNewFileName = QString( "/tmp/%1.%2x%3.jpg" )
                               .arg( QFileInfo(sFullFileName).fileName() )
                               .arg( nWidth    )
                               .arg( nHeight   );
@@ -383,7 +380,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     // Must generate Albumart Image, Generate Image and save.
     // ----------------------------------------------------------------------
 
-    float fAspect = 0.0;
+
     QImage img;
     if (sFullFileName.startsWith("myth://"))
     {
@@ -399,20 +396,42 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     if (img.isNull())
         return QFileInfo();
 
-    if (fAspect <= 0)
-           fAspect = (float)(img.width()) / img.height();
+    // We don't need to scale if no height and width were specified
+    // but still need to save as jpg if it's in another format
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        QFileInfo fi(sFullFileName);
+        if (fi.suffix().toLower() == "jpg")
+            return fi;
+    }
+    else if (nWidth > img.width() && nHeight > img.height())
+    {
+        // Requested dimensions are larger than the source image, so instead of
+        // scaling up which will produce horrible results return the fullsize
+        // image and the user can scale further if they want instead
+        // NOTE: If this behaviour is changed, for example making it optional,
+        //       then upnp code will need changing to compensate
+    }
+    else
+    {
+        float fAspect = 0.0;
+        if (fAspect <= 0)
+            fAspect = (float)(img.width()) / img.height();
 
-    if ( nWidth == 0 )
-        nWidth = (int)rint(nHeight * fAspect);
+        if ( nWidth == 0 || nWidth > img.width() )
+            nWidth = (int)rint(nHeight * fAspect);
 
-    if ( nHeight == 0 )
-        nHeight = (int)rint(nWidth / fAspect);
+        if ( nHeight == 0 || nHeight > img.height() )
+            nHeight = (int)rint(nWidth / fAspect);
 
-    img = img.scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
-                                       Qt::SmoothTransformation);
+        img = img.scaled( nWidth, nHeight, Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation);
+    }
 
     QString fname = sNewFileName.toLatin1().constData();
-    if (!img.save( fname, "PNG" ))
+    // Use JPG not PNG for compatibility with the most uPnP devices and
+    // faster loading (smaller file to send over network)
+    if (!img.save( fname, "JPG" ))
         return QFileInfo();
 
     return QFileInfo( sNewFileName );

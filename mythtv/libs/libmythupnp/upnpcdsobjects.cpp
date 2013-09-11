@@ -401,7 +401,10 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 
-    pObject->AddProperty( new Property( "albumArtURI"         , "upnp" ));
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // TN
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // SM
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
 
     return( pObject );
 }
@@ -477,8 +480,11 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "album"          , "upnp" ));
     pObject->AddProperty( new Property( "date"           , "dc"   ));
 
-    pObject->AddProperty( new Property( "albumArtURI"    , "upnp"   ));
 
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // TN
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // SM
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // MED
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // LRG
     return( pObject );
 }
 
