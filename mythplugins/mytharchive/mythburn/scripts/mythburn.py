@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130907-2"
+VERSION="0.1.20130911-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2733,7 +2733,6 @@ def createDVDAuthorXML(screensize, numberofitems):
 
         #Pick the correct intro movie based on video format ntsc/pal
         vob = dvddom.createElement("vob")
-        vob.setAttribute("pause","")
         vob.setAttribute("file",os.path.join(getThemeFile(themeName, videomode + '_' + introFile)))
         pgc.appendChild(vob)
         del vob
@@ -2751,7 +2750,6 @@ def createDVDAuthorXML(screensize, numberofitems):
         #For each menu page we need to create a new PGC structure
         menupgc = dvddom.createElement("pgc")
         menus_element.appendChild(menupgc)
-        menupgc.setAttribute("pause","inf")
 
         menupgc.appendChild( dvddom.createComment("Menu Page %s" % page) )
 
@@ -2763,7 +2761,7 @@ def createDVDAuthorXML(screensize, numberofitems):
 
         vob = dvddom.createElement("vob")
         vob.setAttribute("file",os.path.join(getTempPath(),"menu-%s.mpg" % page))
-        menupgc.appendChild(vob)    
+        menupgc.appendChild(vob)
 
         #Loop menu forever
         post = dvddom.createElement("post")
@@ -2830,7 +2828,6 @@ def createDVDAuthorXML(screensize, numberofitems):
             if wantChapterMenu:
                 mymenupgc = dvddom.createElement("pgc")
                 menus.appendChild(mymenupgc)
-                mymenupgc.setAttribute("pause","inf")
 
                 pre = dvddom.createElement("pre")
                 mymenupgc.appendChild(pre)
@@ -2910,7 +2907,6 @@ def createDVDAuthorXML(screensize, numberofitems):
 
             pgc = dvddom.createElement("pgc")
             titles.appendChild(pgc)
-            #pgc.setAttribute("pause","inf")
 
             if wantDetailsPage:
                 #add the detail page intro for this item
@@ -3106,7 +3102,6 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
 
     # create menu 2 - dummy menu that allows us to jump to each titleset in sequence
     menu_pgc = dvddom.createElement("pgc")
-    menu_pgc.setAttribute("pause", "0")
 
     preText = "if (g1==0) g1=1;"
     for i in range(numberofitems):
@@ -3133,7 +3128,6 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         menu = dvddom.createElement("menus")
         menupgc = dvddom.createElement("pgc")
         menu.appendChild(menupgc)
-        menupgc.setAttribute("pause","0")
         titleset.appendChild(menu)
 
         if wantDetailsPage:
