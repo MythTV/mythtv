@@ -8,7 +8,8 @@ $SourceVersion = git describe --dirty | Out-String
 $SourceVersion = $SourceVersion.SubString( 0, $SourceVersion.length - 2)
 
 $branch_git = git branch --no-color | Out-String -Stream
-$branch     = ($branch_git -match '\*').TrimStart("* ")
+[string]$branch  = ($branch_git -match '\*')
+$branch          = $branch.TrimStart("* ")
 
 Write-Host -NoNewline "Source Version : "; Write-Host $SourceVersion -foregroundColor cyan
 Write-Host -NoNewline "Branch         : "; Write-Host $Branch        -foregroundColor cyan
