@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130911-2"
+VERSION="0.1.20130911-3"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -735,6 +735,20 @@ def frameToTime(frame, fps):
     mins %= 60
 
     return '%02d:%02d:%02d' % (hour, mins, sec)
+
+#############################################################
+# Convert a time string of format 00:00:00 to number of seconds
+
+def timeStringToSeconds(formatedtime):
+    parts = string.split(formatedtime, ':')
+    if len(parts) != 3:
+        return 0
+
+    sec = int(parts[2])
+    mins = int(parts[1])
+    hour = int(parts[0])
+
+    return sec + (mins * 60) + (hour * 60 * 60)
 
 #############################################################
 # Creates a set of chapter points evenly spread thoughout a file
@@ -3762,7 +3776,6 @@ def createChapterMenu(screensize, screendpi, numberofitems):
 
         haspreview = False
 
-        previewsegment=int(getLengthOfVideo(page) / itemsperpage)
         previewtime = 0
         previewchapter = 0
         previewx = []
@@ -3773,6 +3786,8 @@ def createChapterMenu(screensize, screendpi, numberofitems):
 
         while previewchapter < itemsperpage:
             menuitem=menuitems[ previewchapter ]
+
+            previewtime = timeStringToSeconds(chapterlist[previewchapter])
 
             #generate the preview if required (px=9999 means not required)
             px, py, pw, ph, maskimage = generateVideoPreview(page, previewchapter, menuitem, previewtime, menulength, previewfolder)
@@ -3786,7 +3801,6 @@ def createChapterMenu(screensize, screendpi, numberofitems):
                 haspreview = True
 
             previewchapter+=1
-            previewtime+=previewsegment
 
         #Loop through all the items on this menu page
         chapter=0
