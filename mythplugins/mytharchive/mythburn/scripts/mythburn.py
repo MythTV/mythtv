@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130911-4"
+VERSION="0.1.20130911-5"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2123,10 +2123,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     outaudiosamplerate = 48000
     outaudiocodec = "ac3"
     deinterlace = 0
-    croptop = 0
-    cropright = 0
-    cropbottom = 0
-    cropleft = 0
+    filter = ""
     qmin = 5
     qmax = 31
     qdiff = 31
@@ -2150,14 +2147,8 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
             outvideores = value
         if name == "-deinterlace":
             deinterlace = 1
-        if name == "-croptop":
-            croptop = value
-        if name == "-cropright":
-            cropright = value
-        if name == "-cropbottom":
-            cropbottom = value
-        if name == "-cropleft":
-           cropleft = value
+        if name == "-filter:v":
+            filter = " -filter:v " + quoteCmdArg(value) + " "
         if name == "-qmin":
            qmin = value
         if name == "-qmax":
@@ -2206,7 +2197,7 @@ def encodeNuvToMPEG2(chanid, starttime, mediafile, destvideofile, folder, profil
     command += "-aspect %s -r %s " % (aspectratio, fps)
     if (deinterlace == 1):
         command += "-deinterlace "
-    command += "-croptop %s -cropright %s -cropbottom %s -cropleft %s " % (croptop, cropright, cropbottom, cropleft)
+    command += "%s" % filter
     command += "-s %s -b %s -vcodec mpeg2video " % (outvideores, outvideobitrate)
     command += "-qmin %s -qmax %s -qdiff %s " % (qmin, qmax, qdiff)
     command += "-ab %s -ar %s -acodec %s " % (outaudiobitrate, outaudiosamplerate, outaudiocodec)
