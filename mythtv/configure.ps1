@@ -25,7 +25,7 @@ Param(
 
 Function Which( [string] $path )
 {
-    $info = Get-Command $path -ErrorAction SilentlyContinue
+    $info = Get-Command $path -TotalCount 1 -ErrorAction SilentlyContinue
 
     if ($info)
     {
@@ -61,7 +61,7 @@ Function FindMSys()
 
     if (Test-Path Env:\MINGW_INSTALLDIR )
     {
-        return $Env:MINGW_INSTALLDIR
+        return "$Env:MINGW_INSTALLDIR\msys\1.0\"
     }
 
     # not set, so check registry (only works if an installer was used for a specific appid)
@@ -88,7 +88,8 @@ Function GetQtVersion()
 {
 
     $QMakeVersion = qmake -version | Out-String -Stream
-    $QtVer        = ($QMakeVersion -match 'Using').TrimStart("Using Qt version ")
+    [string]$QtVer= ($QMakeVersion -match 'Using')
+    $QtVer        = $QtVer.TrimStart("Using Qt version ")
 
     return $QtVer
 }
