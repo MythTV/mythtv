@@ -24000,22 +24000,23 @@ Kui oled lõpetanud vajuta &quot;Salvesta&quot; nuppu.</translation>
         <location filename="../themes/themestrings.h" line="1009"/>
         <source>%DESCRIPTION|
 %%ERRATA%</source>
-        <translation></translation>
+        <translation>%DESCRIPTION|
+%%ERRATA%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1012"/>
         <source>%director%</source>
-        <translation></translation>
+        <translation>%director%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1013"/>
         <source>%year%</source>
-        <translation></translation>
+        <translation>%year%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1049"/>
         <source>%channum% %callsign%</source>
-        <translation></translation>
+        <translation>%channum% %callsign%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1089"/>
