@@ -1,12 +1,12 @@
 #include <math.h>
 #include <sys/types.h>
 #include <inttypes.h>
-#include "bswap.h"
 
 #include "mythconfig.h"
 #include "mythlogging.h"
 #include "audiooutpututil.h"
 #include "audioconvert.h"
+#include "bswap.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
