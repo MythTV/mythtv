@@ -630,7 +630,7 @@ def getAudioParams(folder):
 # of a video file from its stream info file
 
 def getVideoParams(folder):
-    """Returns the video resolution, fps and aspect ratio for the video file from the streamindo.xml file"""
+    """Returns the video resolution, fps and aspect ratio for the video file from the streaminfo.xml file"""
 
     #open the XML containing information about this file
     infoDOM = xml.dom.minidom.parse(os.path.join(folder, 'streaminfo.xml'))
