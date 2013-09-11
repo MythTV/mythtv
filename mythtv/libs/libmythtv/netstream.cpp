@@ -321,7 +321,7 @@ static qlonglong inline ContentRange(const QNetworkReply *reply,
 
     // See RFC 2616 14.16: 'bytes begin-end/size'
     qlonglong len;
-    if (3 != std::sscanf(range.constData(), " bytes %lld - %lld / %lld", &first, &last, &len))
+    if (3 != std::sscanf(range.constData(), " bytes %20lld - %20lld / %20lld", &first, &last, &len))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Content-Range:'%1'")
             .arg(range.constData()) );
@@ -340,7 +340,7 @@ static bool inline RequestRange(const QNetworkRequest &request,
     if (range.isEmpty())
         return false;
 
-    if (1 > std::sscanf(range.constData(), " bytes %lld - %lld", &first, &last))
+    if (1 > std::sscanf(range.constData(), " bytes %20lld - %20lld", &first, &last))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Range:'%1'")
             .arg(range.constData()) );
