@@ -5017,20 +5017,22 @@ def processJob(job):
             if infoDOM.documentElement.tagName != "fileinfo":
                 fatalError("The info.xml file (%s) doesn't look right" % os.path.join(folder,"info.xml"))
             title = expandItemText(infoDOM,"%title",1,0,0,0,0)
-
             # replace all non-ascii-characters
-            title.encode('ascii', 'replace').decode('ascii', 'replace')
-            title.strip()
+            title = title.encode('ascii', 'replace').decode('ascii', 'replace')
+            title = title.strip()
+
             # replace not-allowed characters
             index = 0
             title_new = ''
-            while (index < len(title)) and (index<=7):
+            while (index < len(title)) and (index < 32):
                 if title[index].isalnum and title[index] != ' ':
                     title_new += title[index]
                 else:
                     title_new += '_'
                 index = index + 1
+
             title = title_new.upper()
+
             if len(title) < 1:
                 title = 'UNNAMED'
 
