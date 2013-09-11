@@ -213,6 +213,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       disp_timecode(0),             avsync_audiopaused(false),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
+      savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
       m_tv(NULL),                   isDummy(false),
       // Debugging variables
@@ -240,7 +241,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
-    tc_wrap[TC_AUDIO]  = gCoreContext->GetNumSetting("AudioSyncOffset", 0);
 
     // Get VBI page number
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
@@ -3525,7 +3525,6 @@ int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
         tc_wrap[TC_AUDIO] = newsync;
     else
         tc_wrap[TC_AUDIO] += v;
-    gCoreContext->SaveSetting("AudioSyncOffset", tc_wrap[TC_AUDIO]);
     return tc_wrap[TC_AUDIO];
 }
 
@@ -4032,12 +4031,12 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     if (clearvideobuffers && videoOutput)
         videoOutput->ClearAfterSeek();
 
-    int64_t savedAudioTimecodeOffset = tc_wrap[TC_AUDIO];
+    int64_t savedTC = tc_wrap[TC_AUDIO];
 
     for (int j = 0; j < TCTYPESMAX; j++)
         tc_wrap[j] = tc_lastval[j] = 0;
 
-    tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
+    tc_wrap[TC_AUDIO] = savedTC;
 
     audio.Reset();
     // Reenable (or re-disable) subtitles, which ultimately does
@@ -4084,6 +4083,9 @@ bool MythPlayer::EnableEdit(void)
     m_audiograph.SetSampleRate(sample_rate);
     m_audiograph.SetSampleCount((unsigned)(sample_rate / video_frame_rate));
     GetAudio()->addVisual(&m_audiograph);
+
+    savedAudioTimecodeOffset = tc_wrap[TC_AUDIO];
+    tc_wrap[TC_AUDIO] = 0;
 
     speedBeforeEdit = play_speed;
     pausedBeforeEdit = Pause();
@@ -4138,6 +4140,9 @@ void MythPlayer::DisableEdit(int howToSave)
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
     GetAudio()->removeVisual(&m_audiograph);
     m_audiograph.Reset();
+    tc_wrap[TC_AUDIO] = savedAudioTimecodeOffset;
+    savedAudioTimecodeOffset = 0;
+
     if (!pausedBeforeEdit)
         Play(speedBeforeEdit);
     else

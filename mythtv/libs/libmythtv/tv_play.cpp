@@ -10047,6 +10047,17 @@ void TV::HandleOSDClosed(int osdType)
             break;
         case kOSDFunctionalType_AudioSyncAdjust:
             audiosyncAdjustment = false;
+            {
+            PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+            ctx->LockDeletePlayer(__FILE__, __LINE__);
+            if (ctx->player)
+            {
+                int64_t aoff = ctx->player->GetAudioTimecodeOffset();
+                gCoreContext->SaveSetting("AudioSyncOffset", QString::number(aoff));
+            }
+            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+            ReturnPlayerLock(ctx);
+            }
             break;
         case kOSDFunctionalType_SubtitleZoomAdjust:
             subtitleZoomAdjustment = false;
