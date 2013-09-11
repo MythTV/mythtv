@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130911-1"
+VERSION="0.1.20130911-2"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2849,16 +2849,14 @@ def createDVDAuthorXML(screensize, numberofitems):
                 # throws of the chapter selection - so make sure we add it if needed so we
                 # can compensate for it in the chapter selection menu 
                 firstChapter = 0
-                thumbNode = infoDOM.getElementsByTagName("thumblist")
-                if thumbNode.length > 0:
-                    thumblist = getText(thumbNode[0])
-                    chapterlist = string.split(thumblist, ",")
-                    if chapterlist[0] != '00:00:00':
-                        firstChapter = 1
-                x=1
-                while x<=chapters:
+                thumblist = createVideoChapters(itemnum, chapters, getLengthOfVideo(itemnum), False)
+                chapterlist = string.split(thumblist, ",")
+                if chapterlist[0] != '00:00:00':
+                    firstChapter = 1
+                x = 1
+                while x <= chapters:
                     #Add this recording to this page's menu...
-                    button=dvddom.createElement("button")
+                    button = dvddom.createElement("button")
                     button.setAttribute("name","%s" % x)
                     if wantDetailsPage: 
                         button.appendChild(dvddom.createTextNode("jump title %s chapter %s;" % (1, firstChapter + x + 1)))
@@ -2867,7 +2865,7 @@ def createDVDAuthorXML(screensize, numberofitems):
 
                     mymenupgc.appendChild(button)
                     del button
-                    x+=1
+                    x += 1
 
                 #add the titlemenu button if required
                 submenunode = themeDOM.getElementsByTagName("submenu")
@@ -2916,11 +2914,11 @@ def createDVDAuthorXML(screensize, numberofitems):
 
             vob = dvddom.createElement("vob")
             if wantChapterMenu:
-                vob.setAttribute("chapters",
-                    createVideoChapters(itemnum,
-                                        chapters,
-                                        getLengthOfVideo(itemnum),
-                                        False))
+                thumblist = createVideoChapters(itemnum, chapters, getLengthOfVideo(itemnum), False)
+                chapterlist = string.split(thumblist, ",")
+                if chapterlist[0] != '00:00:00':
+                    thumblist = '00:00:00,' + thumblist
+                vob.setAttribute("chapters", thumblist)
             else:
                 vob.setAttribute("chapters", 
                     createVideoChaptersFixedLength(itemnum,
