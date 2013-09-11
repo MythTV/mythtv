@@ -491,9 +491,9 @@ void VideoOutputNullVDPAU::ReleaseFrame(VideoFrame *frame)
                 {
                     VideoFrame *vf = m_shadowBuffers->At(i);
                     uint32_t pitches[] = {
-                        vf->pitches[0],
-                        vf->pitches[2],
-                        vf->pitches[1] };
+                        (uint32_t)vf->pitches[0],
+                        (uint32_t)vf->pitches[2],
+                        (uint32_t)vf->pitches[1] };
                     void* const planes[] = {
                         vf->buf,
                         vf->buf + vf->offsets[2],

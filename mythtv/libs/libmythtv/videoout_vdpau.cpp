@@ -463,9 +463,9 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
                             NUM_REFERENCE_FRAMES];
 
         uint32_t pitches[3] = {
-            frame->pitches[0],
-            frame->pitches[2],
-            frame->pitches[1]
+            (uint32_t)frame->pitches[0],
+            (uint32_t)frame->pitches[2],
+            (uint32_t)frame->pitches[1]
         };
         void* const planes[3] = {
             frame->buf,
@@ -842,9 +842,9 @@ void VideoOutputVDPAU::UpdatePauseFrame(int64_t &disp_timecode)
         if (codec_is_std(video_codec_id))
         {
             m_pause_surface = m_video_surfaces[0];
-            uint32_t pitches[3] = { frame->pitches[0],
-                                    frame->pitches[2],
-                                    frame->pitches[1] };
+            uint32_t pitches[3] = { (uint32_t)frame->pitches[0],
+                                    (uint32_t)frame->pitches[2],
+                                    (uint32_t)frame->pitches[1] };
             void* const planes[3] = { frame->buf,
                                       frame->buf + frame->offsets[2],
                                       frame->buf + frame->offsets[1] };
@@ -1142,9 +1142,9 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, MythPlayer *pipplayer,
                                      kVDPBlendNull);
 
             uint32_t pitches[] = {
-                pipimage->pitches[0],
-                pipimage->pitches[2],
-                pipimage->pitches[1] };
+                (uint32_t)pipimage->pitches[0],
+                (uint32_t)pipimage->pitches[2],
+                (uint32_t)pipimage->pitches[1] };
             void* const planes[] = {
                 pipimage->buf,
                 pipimage->buf + pipimage->offsets[2],
