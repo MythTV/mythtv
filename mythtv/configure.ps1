@@ -7,7 +7,15 @@ Param(
     [Parameter( Mandatory=$false, ValueFromPipeline=$true )]
     [ValidateSet( "nmake", "sln")]
     [String]
-    $OutputType = "nmake"
+    $OutputType = "nmake",
+
+    [switch]
+    $AutoMake = $false,
+
+    [Parameter( Mandatory=$false, ValueFromPipeline=$true )]
+    [ValidateSet( "10", "11", "12")]
+    [String]
+    $VcVerIn
 
 )
 
@@ -22,6 +30,22 @@ Param(
 # ===========================================================================
 
 # helper Functions
+
+Function Invoke-Environment( [string] $Command )
+{
+    Write-Host "Invoke-Environment: $Command" -foregroundcolor blue
+
+    cmd /c "$Command > nul 2>&1 && set" | .{process{
+        if ($_ -match '^([^=]+)=(.*)') {
+            [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+        }
+    }}
+
+    if ($LASTEXITCODE) 
+    {
+        throw "Command '$Command': exit code: $LASTEXITCODE"
+    }
+}
 
 Function Which( [string] $path )
 {
@@ -99,6 +123,13 @@ Function GetQtVersion()
 # Check for existance of required Environment and Tools
 #
 # ###########################################################################
+
+if ($VcVerIn)
+{
+    $VsComnTools= (get-item env:$("VS" + $VcVerIn + "0COMNTOOLS")).value
+
+    Invoke-Environment "`"$VsComnTools\vsvars32.bat`""
+}
 
 $BuildType  = $BuildType.tolower();
 $OutputType = $OutputType.tolower();
@@ -660,8 +691,18 @@ if ($OutputType -eq "nmake")
     }
     else
     {
-        Write-Host "nmake " -foregroundcolor Cyan -NoNewline
-        Write-Host "To Build MythTV"
+        if ($AutoMake)
+        {
+            Write-Host "Building MythTV Source: " -foregroundcolor cyan -nonewline
+            Write-Host "nmake" -foregroundcolor blue
+
+            & nmake
+        }
+        else
+        {
+            Write-Host "nmake " -foregroundcolor Cyan -NoNewline
+            Write-Host "To Build MythTV"
+        }
     }
 
     # -----------------------------------------------------------------------
