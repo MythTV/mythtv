@@ -4801,9 +4801,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 // NB but allow for data only (MHEG) streams
                 allowedquit = true;
             }
-            else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
+            else if ((decodetype & kDecodeAV) == kDecodeAV &&
                      (storedPackets.count() < max_video_queue_size) &&
-                     (lastapts < lastvpts + 100) &&
+                     lastapts < (lowbuffers ? lastvpts + 100 : lastvpts) &&
                      !ringBuffer->IsInStillFrame())
             {
                 storevideoframes = true;
