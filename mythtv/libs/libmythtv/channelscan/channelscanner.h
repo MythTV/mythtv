@@ -50,7 +50,7 @@ class ChannelBase;
 
 class MTV_PUBLIC ChannelScanner
 {
-    Q_DECLARE_TR_FUNCTIONS(ChannelScanner) 
+    Q_DECLARE_TR_FUNCTIONS(ChannelScanner)
 
     friend class ScanMonitor;
 

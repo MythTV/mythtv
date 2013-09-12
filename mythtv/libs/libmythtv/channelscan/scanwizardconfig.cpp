@@ -441,4 +441,3 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
 
     return startChan;
 }
-
