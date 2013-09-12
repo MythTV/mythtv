@@ -663,6 +663,8 @@ switch ($tools.Get_Item( 'FFmpeg'))
 # ###########################################################################
 
 Copy-Item $basePath\platform\win32\msvc\include\mythconfig.h   $basePath\config.h
+Copy-Item $basePath\platform\win32\msvc\include\mythconfig.h   $basePath\libs\libmythbase\mythconfig.h
+
 
 # ###########################################################################
 

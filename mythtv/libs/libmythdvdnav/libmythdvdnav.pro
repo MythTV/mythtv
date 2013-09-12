@@ -33,8 +33,8 @@ SOURCES += dvdnav/vm/vmcmd.c
 
 # dvdread
 HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
-HEADERS += dvdread/dvdread/dvd_udf.h dvdread/md5.h
-HEADERS += dvdread/dvdread/bitreader.h
+HEADERS += dvdread//dvd_udf.h dvdread/md5.h
+HEADERS += dvdread/bitreader.h
 
 SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
 SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c
