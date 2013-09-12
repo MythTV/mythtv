@@ -12,6 +12,9 @@ Param(
     [switch]
     $AutoMake = $false,
 
+    [switch]
+    $Force    = $false,
+
     [Parameter( Mandatory=$false, ValueFromPipeline=$true )]
     [ValidateSet( "10", "11", "12")]
     [String]
@@ -237,45 +240,52 @@ foreach( $key in $($tools.keys))
 
         Build
         {
-            if ($BuildType -eq "clean")
+            if ($Force)
             {
-                $Tools[ $Key ] = "Clean"
-
-                Write-Host "Clean" -ForegroundColor Yellow
+                Write-Host "Build" -ForegroundColor Yellow
+                $Tools[ $Key ] = "Build"
             }
             else
             {
-                if ($key -ne "FFmpeg")
+                if ($BuildType -eq "clean")
                 {
-                    if (Test-Path( "$DestDir\$($key)") )
-                    {
-                        Write-Host "Ok" -ForegroundColor green
-                        $Tools[ $Key ] = "Ok"
-                    }
-                    else
-                    {
-                        Write-Host "Build" -ForegroundColor Yellow
-                    }
+                    $Tools[ $Key ] = "Clean"
+
+                    Write-Host "Clean" -ForegroundColor Yellow
                 }
                 else
                 {
-                    if (((Test-Path "$DestDir\mythavdevice.lib"  ) -eq $true ) -and `
-                        ((Test-Path "$DestDir\mythavfilter.lib"  ) -eq $true ) -and `
-                        ((Test-Path "$DestDir\mythavformat.lib"  ) -eq $true ) -and `
-                        ((Test-Path "$DestDir\mythavutil.lib"    ) -eq $true ) -and `
-                        ((Test-Path "$DestDir\mythswresample.lib") -eq $true ) -and `
-                        ((Test-Path "$DestDir\mythswscale.lib"   ) -eq $true ))
+                    if ($key -ne "FFmpeg")
                     {
-                        Write-Host "Ok" -ForegroundColor green
-                        $Tools[ $Key ] = "Ok"
+                        if (Test-Path( "$DestDir\$($key)") )
+                        {
+                            Write-Host "Ok" -ForegroundColor green
+                            $Tools[ $Key ] = "Ok"
+                        }
+                        else
+                        {
+                            Write-Host "Build" -ForegroundColor Yellow
+                        }
                     }
                     else
                     {
-                        Write-Host "Build" -ForegroundColor Yellow
+                        if (((Test-Path "$DestDir\mythavdevice.lib"  ) -eq $true ) -and `
+                            ((Test-Path "$DestDir\mythavfilter.lib"  ) -eq $true ) -and `
+                            ((Test-Path "$DestDir\mythavformat.lib"  ) -eq $true ) -and `
+                            ((Test-Path "$DestDir\mythavutil.lib"    ) -eq $true ) -and `
+                            ((Test-Path "$DestDir\mythswresample.lib") -eq $true ) -and `
+                            ((Test-Path "$DestDir\mythswscale.lib"   ) -eq $true ))
+                        {
+                            Write-Host "Ok" -ForegroundColor green
+                            $Tools[ $Key ] = "Ok"
+                        }
+                        else
+                        {
+                            Write-Host "Build" -ForegroundColor Yellow
+                        }
                     }
                 }
             }
-
         }
     }
 }
