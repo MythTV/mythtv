@@ -379,42 +379,57 @@ Check the URL is correct.</translation>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="969"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1141"/>
+        <location filename="../mythmusic/importmusic.cpp" line="970"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1146"/>
         <source>Front Cover</source>
         <translation>Front Cover</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="971"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1143"/>
+        <location filename="../mythmusic/importmusic.cpp" line="972"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1148"/>
         <source>Back Cover</source>
         <translation>Back Cover</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="973"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1147"/>
+        <location filename="../mythmusic/importmusic.cpp" line="974"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1152"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="975"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1145"/>
+        <location filename="../mythmusic/importmusic.cpp" line="976"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1150"/>
         <source>Inlay</source>
         <translation>Inlay</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="977"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1149"/>
+        <location filename="../mythmusic/importmusic.cpp" line="978"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1154"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Unknown&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1116"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1016"/>
+        <source>Copy CoverArt Failed.
+Copying to %1</source>
+        <extracomment>%1 is the filename</extracomment>
+        <translation>Copy CoverArt Failed.
+Copying to %1</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1087"/>
+        <source>%1 of %2</source>
+        <comment>Current file copied</comment>
+        <extracomment>%1 is the current position of the file being copied, %2 is the total number of files</extracomment>
+        <translation>%1 of %2</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
         <source>File Already Exists</source>
         <translation>File Already Exists</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1118"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
         <source>New File</source>
         <translation>New File</translation>
     </message>
@@ -468,47 +483,52 @@ Could not copy file to: %1</translation>
         <translation>%1 new tracks were added to the database</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="534"/>
+        <location filename="../mythmusic/importmusic.cpp" line="524"/>
+        <source>Cannot import music from the music directory. You probably want to use &apos;Scan For New Music&apos; instead.</source>
+        <translation>Cannot import music from the music directory. You probably want to use &apos;Scan For New Music&apos; instead.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="535"/>
         <source>Searching for music files</source>
         <translation>Searching for music files</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="671"/>
+        <location filename="../mythmusic/importmusic.cpp" line="672"/>
         <source>Save Defaults</source>
         <translation>Save Defaults</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="675"/>
+        <location filename="../mythmusic/importmusic.cpp" line="676"/>
         <source>Change Compilation Flag</source>
         <translation>Change Compilation Flag</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="676"/>
+        <location filename="../mythmusic/importmusic.cpp" line="677"/>
         <source>Change Compilation Artist</source>
         <translation>Change Compilation Artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="678"/>
+        <location filename="../mythmusic/importmusic.cpp" line="679"/>
         <source>Change Artist</source>
         <translation>Change Artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="679"/>
+        <location filename="../mythmusic/importmusic.cpp" line="680"/>
         <source>Change Album</source>
         <translation>Change Album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="680"/>
+        <location filename="../mythmusic/importmusic.cpp" line="681"/>
         <source>Change Genre</source>
         <translation>Change Genre</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="681"/>
+        <location filename="../mythmusic/importmusic.cpp" line="682"/>
         <source>Change Year</source>
         <translation>Change Year</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="682"/>
+        <location filename="../mythmusic/importmusic.cpp" line="683"/>
         <source>Change Rating</source>
         <translation>Change Rating</translation>
     </message>
