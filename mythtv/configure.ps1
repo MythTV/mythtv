@@ -78,7 +78,7 @@ Function Run-Exe( [string] $path, [string] $exe, $params )
 
     if ($ps.ExitCode -ne 0)
     {
-        throw "cmake exited with error code $LastExitCode."
+        throw "$exe exited with error code $LastExitCode."
     }
 }
 
@@ -168,7 +168,10 @@ Write-Host "Qt Version : [$QtVerStr]"   -ForegroundColor Cyan
 Write-Host "Build Type : [$BuildType]"  -ForegroundColor Cyan
 Write-Host "Output Type: [$OutputType]" -ForegroundColor Cyan
 
-Write-Host
+if ($AutoMake) { Write-Host "AutoMake   : True" -ForegroundColor Cyan }
+if ($Force   ) { Write-Host "Force      : True" -ForegroundColor Cyan }
+
+Write-Host "--------------------------------------------------------------------------"  -foregroundcolor green
 
 switch( $BuildType )
 {
@@ -709,6 +712,12 @@ if ($OutputType -eq "nmake")
             Write-Host "nmake" -foregroundcolor blue
 
             & nmake
+
+            if ($LASTEXITCODE)
+            {
+                throw "nmake : exit code: $LASTEXITCODE"
+            }
+
         }
         else
         {
