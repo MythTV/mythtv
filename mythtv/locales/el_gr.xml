@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythlocale>
+  <!-- Global Settings -->
+    <!-- EIT, Subtitle, Audio Stream Language Preferences -->
+    <setting name="ISO639Language0" global="true">gre</setting>
+    <setting name="ISO639Language1" global="true">eng</setting>
+
+    <!-- Recording -->
+    <setting name="TVFormat" global="true">PAL-BG</setting>
+    <setting name="VbiFormat" global="true">PAL Teletext</setting>
+    <setting name="FreqTable" global="true">europe-west</setting>
+
+    <!-- Scheduling -->
+
+    <!-- Advert Detection -->
+
+
+  <!-- Per-host Settings -->
+    <!-- Languages - Self Explanatory -->
+    <setting name="Language" global="true">el</setting>
+
+    <!-- Country -->
+    <setting name="Country" global="true">GR</setting>
+
+    <!-- Date/Time format -->
+    <setting name="DateFormat">ddd d MMM yyyy</setting>
+    <setting name="TimeFormat">h:mm AP</setting>
+    <setting name="ShortDateFormat">d/M</setting>
+
+    <!-- Playback -->
+
+  <!-- Plugins -->
+
+    <!-- MythArchive -->
+    <setting name="MythArchiveDateFormat">%a %b %d %Y</setting>
+    <setting name="MythArchiveTimeFormat">%I:%M %p</setting>
+    <setting name="MythArchiveVideoFormat">PAL</setting>
+
+    <!-- MythWelcome  -->
+    <setting name="MythWelcomeDateFormat">dddd\\nMMM dd yyyy</setting>
+
+    <!-- MythZoneMinder  -->
+    <setting name="ZoneMinderDateFormat">ddd d MMM yyyy</setting>
+    <setting name="ZoneMinderTimeFormat">hh:mm AP</setting>
+</mythlocale>
