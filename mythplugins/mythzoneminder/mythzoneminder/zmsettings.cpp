@@ -59,6 +59,7 @@ static HostComboBox *ZMDateFormat()
     gc->addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy"); 
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(sampdate.toString("ddd dd MMM yyyy"), "ddd dd MMM yyyy");
 
     //: %1 gives additional info on the date used
