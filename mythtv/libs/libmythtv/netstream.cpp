@@ -241,7 +241,7 @@ bool NetStream::Request(const QUrl& url)
                 if (f.open(QIODevice::ReadOnly))
                 {
                     QSslKey key(&f, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey,
-                        gCoreContext->GetSetting("MhegClientKeyPass", "").toAscii());
+                        gCoreContext->GetSetting("MhegClientKeyPass", "").toLatin1());
                     if (!key.isNull())
                         ssl.setPrivateKey(key);
                     else
