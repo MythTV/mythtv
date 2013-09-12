@@ -1767,7 +1767,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString filename)
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         QString(url.encodedQuery()).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
 #else
-        QString(url.query( QUrl::ComponentFormattingOption::FullyEncoded )).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
+        QString(url.query( QUrl::FullyEncoded )).contains(QLatin1String("m3u8"), Qt::CaseInsensitive);
 #endif
     }
     return isHLS;
