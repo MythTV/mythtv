@@ -117,53 +117,53 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="148"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>Enter URL</source>
         <translation>Sisesta URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="280"/>
         <source>Loading...</source>
         <translation>Laadin...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="350"/>
         <source>Actions</source>
         <translation>Tegevus</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Back</source>
         <translation>Tagasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Forward</source>
         <translation>Edasi</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Zoom In</source>
         <translation>Suurenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
         <source>Zoom Out</source>
         <translation>Vähenda</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="371"/>
         <source>New Tab</source>
         <translation>Uus tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
         <source>Delete Tab</source>
         <translation>Kustuta tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
         <source>Add Bookmark</source>
         <translation>Lisa järjehoidja</translation>
     </message>
@@ -171,17 +171,17 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="66"/>
+        <location filename="../mythbrowser/main.cpp" line="65"/>
         <source>Move to next browser tab</source>
         <translation>Järgmine veebilehitseja tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="68"/>
+        <location filename="../mythbrowser/main.cpp" line="67"/>
         <source>Move to previous browser tab</source>
         <translation>Eelmine veebilehitseja tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="71"/>
+        <location filename="../mythbrowser/main.cpp" line="70"/>
         <source>Internal Web Browser</source>
         <translation>Sisemine veebilehitseja</translation>
     </message>
@@ -194,77 +194,77 @@ Kasuta lisamiseks &apos;Lisa järjehoidja&apos; menüü valikut</translation>
         <translation>Järjehoidjate haldur</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Category</source>
         <translation>Kategooria</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="7"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Name</source>
         <translation>Nimi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="9"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Category:</source>
         <translation>Kategooria:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Web Page</source>
         <translation>Veebileht</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="23"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Web Bookmarks</source>
         <translation>Järjehoidjad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Browse your favorite web sites.</source>
         <translation>Lehitse lemmiklehekülgi.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Browser:</source>
         <translation>Veebilehitseja:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Luba lehitseja pluginad (Flash, jne.):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Rating Settings</source>
         <translation>Hinnangu seaded</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Configure Web Browser</source>
         <translation>Veebilehitseja seadistamine</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="29"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -273,67 +273,107 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Genre:</source>
         <translation>Žanr:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Channel:</source>
         <translation>Kanal:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Click to choose from existing categories...</source>
         <translation>Klõpsa olemasolevatest kategooriatest valimiseks...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Find</source>
         <translation>Otsi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="33"/>
+        <source>Webbrowser</source>
+        <translation>Veebilehitseja</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Bookmarks</source>
+        <translation>Järjehoidjad</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Url</source>
+        <translation>URL</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Homepage</source>
+        <translation>Koduleht</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Edit Bookmark</source>
+        <translation>Muuda järjehoidjat</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Homepage:</source>
+        <translation>Koduleht:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Save</source>
+        <translation>Salvesta</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Browser Settings</source>
+        <translation>MythBrowser-i seaded</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Luba lehitseja pluginad (Flash, jne.)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Enable plugins</source>
         <translation>Luba pluginad</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Enable plugins:</source>
         <translation>Luba pluginad:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Find...</source>
         <translation>Otsi...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>Nimi:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Cancel</source>
         <translation>Tühista</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Browser Command:</source>
         <translation>Veebilehitseja käsk:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Text Size:</source>
         <translation>Teksti suurus:</translation>
     </message>
@@ -341,7 +381,7 @@ Jätkamiseks vajuta &quot;OK&quot; või &quot;Tühista&quot;.</translation>
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="126"/>
+        <location filename="../mythbrowser/webpage.cpp" line="128"/>
         <source>Loading...</source>
         <translation>Laen...</translation>
     </message>

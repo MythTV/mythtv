@@ -366,9 +366,9 @@ bool ZMServer::processRequest(char* buf, int nbytes)
 bool ZMServer::send(const string &s) const
 {
     // send length
-    uint32_t len = s.size();
+    size_t len = s.size();
     char buf[9];
-    sprintf(buf, "%8d", len);
+    sprintf(buf, "%8u", (unsigned int) len);
     int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;
@@ -384,9 +384,9 @@ bool ZMServer::send(const string &s) const
 bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) const
 {
     // send length
-    uint32_t len = s.size();
+    size_t len = s.size();
     char buf[9];
-    sprintf(buf, "%8d", len);
+    sprintf(buf, "%8u", (unsigned int) len);
     int status = ::send(m_sock, buf, 8, MSG_NOSIGNAL);
     if (status == -1)
         return false;

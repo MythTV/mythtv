@@ -49,6 +49,14 @@ MHEngine::MHEngine(MHContext *context): m_Context(context)
     m_fInTransition = false;
     m_fBooting = true;
     m_Interacting = 0;
+
+    // Required for BBC Freeview iPlayer
+    MHPSEntry *pEntry = new MHPSEntry;
+    pEntry->m_FileName.Copy("ram://bbcipstr");
+    pEntry->m_Data.Append(new MHUnion(true)); // Default true
+    // The next value must be true to enable Freeview interaction channel
+    pEntry->m_Data.Append(new MHUnion(true)); // Default false
+    m_PersistentStore.Append(pEntry);
 }
 
 MHEngine::~MHEngine()
@@ -932,7 +940,7 @@ void MHEngine::GenerateUserAction(int nCode)
     {
         case 104:
         case 105: // Text key
-            EventTriggered(pScene, EventEngineEvent, 4);
+            EngineEvent(4);
             break;
         case 16: // Text Exit/Cancel key
         case 100: // Red
@@ -940,7 +948,7 @@ void MHEngine::GenerateUserAction(int nCode)
         case 102: // Yellow
         case 103: // Blue
         case 300: // EPG
-            EventTriggered(pScene, EventEngineEvent, nCode);
+            EngineEvent(nCode);
             break;
     }
 
@@ -1117,6 +1125,9 @@ void MHEngine::CheckContentRequests()
 
 bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, const MHSequence<MHObjectRef *> &variables)
 {
+    QString const csFile = QString::fromUtf8(
+            (const char *)fileName.Bytes(), fileName.Size() );
+
     // See if there is an entry there already.
     MHPSEntry *pEntry = NULL;
     int i;
@@ -1136,6 +1147,9 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         // If we're loading then we've failed.
         if (fIsLoad)
         {
+            MHLOG(MHLogNotifications, QString(
+                "Load Persistent(%1) #%2: no such file")
+                .arg(csFile).arg(variables.Size()) );
             return false;
         }
 
@@ -1150,12 +1164,17 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         // Check that we have sufficient data before we continue?
         if (pEntry->m_Data.Size() < variables.Size())
         {
+            MHLOG(MHLogWarning, QString(
+                "Load Persistent(%1): size mismatch").arg(csFile));
             return false;
         }
 
         for (i = 0; i < variables.Size(); i++)
         {
-            FindObject(*(variables.GetAt(i)))->SetVariableValue(*(pEntry->m_Data.GetAt(i)));
+            MHUnion *pValue = pEntry->m_Data.GetAt(i);
+            MHLOG(MHLogNotifications, QString("Load Persistent(%1) #%2=%3")
+                .arg(csFile).arg(i).arg(pValue->Printable()) );
+            FindObject(*(variables.GetAt(i)))->SetVariableValue(*pValue);
         }
     }
 
@@ -1173,6 +1192,8 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
             MHUnion *pValue = new MHUnion;
             pEntry->m_Data.Append(pValue);
             FindObject(*(variables.GetAt(i)))->GetVariableValue(*pValue, this);
+            MHLOG(MHLogNotifications, QString("Store Persistent(%1) %2=>#%3")
+                .arg(csFile).arg(pValue->Printable()).arg(i) );
         }
     }
 
@@ -1285,6 +1306,10 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
+        else if (strings[1] == "1285")
+        {
+            return true;
+        }
         else
         {
             return false;
@@ -1346,22 +1371,37 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         // The UK profile 1.06 seems a bit confused on this point.  It is not clear whether
         // we are supposed to return true for UKEngineProfile(2) or not.
         if (strings[1] == "2")
-        {
             return true;
-        }
-        else
-        {
-            return false;
-        }
+        if (strings[1] == "1")
+            return true;
+        // 'The Space' on Freeview checks this...
+        if (strings[1] == "PANT11001")
+            return true;
+        return false;
     }
 
     // InteractionChannelExtension.
     if (strings[0] == "ICProfile" || strings[0] == "ICP") {
-        if (strings.count() != 2) return false;
+        if (strings.count() < 2) return false;
         if (strings[1] == "0")
-            return true; // // InteractionChannelExtension.
+            return true; // InteractionChannelExtension.
         if (strings[1] == "1")
-            return false; // ICStreamingExtension.
+            return true; // ICStreamingExtension. This is a deliberate lie
+        return false;
+    }
+
+    if (strings[0] == "HDExtension" || strings[0] == "HDE") {
+        if (strings.count() < 2) return false;
+        if (strings[1] == "0")
+            return false; // HDVideoExtension.
+        if (strings[1] == "1")
+            return false; // HDGraphicsPlaneExtension
+        return false;
+    }
+    if (strings[0] == "HDGraphicsPlaneExtension" || strings[0] == "HDG") {
+        if (strings.count() < 2) return false;
+        if (strings[1] == "0")
+            return true; // HDGraphicsPlaneExtension
         return false;
     }
 

@@ -66,6 +66,10 @@ extern const uint k708AttrOpacityFlash;
 extern const uint k708AttrOpacityTranslucent;
 extern const uint k708AttrOpacityTransparent;
 
+const int k708MaxWindows = 8;
+const int k708MaxRows    = 16; // 4-bit field in DefineWindow
+const int k708MaxColumns = 64; // 6-bit field in DefineWindow
+
 class CC708CharacterAttribute
 {
   public:
@@ -188,7 +192,7 @@ class CC708String
 
 class MTV_PUBLIC CC708Window
 {
-  public:
+ public:
     CC708Window();
     ~CC708Window();
 
@@ -215,7 +219,7 @@ class MTV_PUBLIC CC708Window
     }
     CC708Character &GetCCChar(void) const;
     vector<CC708String*> GetStrings(void) const;
-
+    void DisposeStrings(vector<CC708String*> &strings) const;
     QColor GetFillColor(void) const
     {
         QColor fill = CC708CharacterAttribute::ConvertToQColor(fill_color);
@@ -229,12 +233,14 @@ class MTV_PUBLIC CC708Window
         return alpha[fill_opacity & 0x3];
     }
 
-  private:
+ private:
     void Scroll(int row, int col);
 
-  public:
+ public:
     uint priority;
-    uint visible;
+ private:
+    uint m_visible;
+ public:
     enum {
         kAnchorUpperLeft  = 0, kAnchorUpperCenter, kAnchorUpperRight,
         kAnchorCenterLeft = 3, kAnchorCenter,      kAnchorCenterRight,
@@ -271,10 +277,35 @@ class MTV_PUBLIC CC708Window
     CC708Character *text;
     CC708Pen        pen;
 
+ private:
     /// set to false when DeleteWindow is called on the window.
-    bool            exists;
-    bool            changed;
+    bool            m_exists;
+    bool            m_changed;
 
+ public:
+    bool GetExists(void) const { return m_exists; }
+    bool GetVisible(void) const { return m_visible; }
+    bool GetChanged(void) const { return m_changed; }
+    void SetExists(bool value)
+    {
+        if (m_exists != value)
+            SetChanged();
+        m_exists = value;
+    }
+    void SetVisible(bool value)
+    {
+        if (m_visible != value)
+            SetChanged();
+        m_visible = value;
+    }
+    void SetChanged(void)
+    {
+        m_changed = true;
+    }
+    void ResetChanged(void)
+    {
+        m_changed = false;
+    }
     mutable QMutex  lock;
 };
 
@@ -285,7 +316,7 @@ class CC708Service
 
   public:
     uint current_window;
-    CC708Window windows[8];
+    CC708Window windows[k708MaxWindows];
 };
 
 #endif // _CC708_WINDOW_

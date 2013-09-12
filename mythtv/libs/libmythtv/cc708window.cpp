@@ -91,12 +91,12 @@ const uint k708AttrFontCasual                = 5;
 const uint k708AttrFontCursive               = 6;
 const uint k708AttrFontSmallCaps             = 7;
 
-extern const uint k708AttrEdgeNone            = 0;
-extern const uint k708AttrEdgeRaised          = 1;
-extern const uint k708AttrEdgeDepressed       = 2;
-extern const uint k708AttrEdgeUniform         = 3;
-extern const uint k708AttrEdgeLeftDropShadow  = 4;
-extern const uint k708AttrEdgeRightDropShadow = 5;
+const uint k708AttrEdgeNone            = 0;
+const uint k708AttrEdgeRaised          = 1;
+const uint k708AttrEdgeDepressed       = 2;
+const uint k708AttrEdgeUniform         = 3;
+const uint k708AttrEdgeLeftDropShadow  = 4;
+const uint k708AttrEdgeRightDropShadow = 5;
 
 const uint k708AttrColorBlack         = 0;
 const uint k708AttrColorWhite         = 63;
@@ -107,7 +107,7 @@ const uint k708AttrOpacityTranslucent = 2;
 const uint k708AttrOpacityTransparent = 3;
 
 CC708Window::CC708Window()
-    : priority(0),              visible(0),
+    : priority(0),              m_visible(0),
       anchor_point(0),          relative_pos(0),
       anchor_vertical(0),       anchor_horizontal(0),
       row_count(0),             column_count(0),
@@ -122,8 +122,8 @@ CC708Window::CC708Window()
       justify(0),               word_wrap(0),
 
       true_row_count(0),        true_column_count(0),
-      text(NULL),               exists(false),
-      changed(true),            lock(QMutex::Recursive)
+      text(NULL),               m_exists(false),
+      m_changed(true),          lock(QMutex::Recursive)
 {
 }
 
@@ -150,7 +150,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     _column_count++;
 
     priority          = _priority;
-    visible           = _visible;
+    SetVisible(_visible);
     anchor_point      = _anchor_point;
     relative_pos      = _relative_pos;
     anchor_vertical   = _anchor_vertical;
@@ -158,10 +158,10 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     row_lock          = _row_lock;
     column_lock       = _column_lock;
 
-    if ((!_pen_style && !exists) || _pen_style)
+    if ((!_pen_style && !GetExists()) || _pen_style)
         pen.SetPenStyle(_pen_style ? _pen_style : 1);
 
-    if ((!_window_style && !exists) || _window_style)
+    if ((!_window_style && !GetExists()) || _window_style)
         SetWindowStyle(_window_style ? _window_style : 1);
 
     Resize(_row_count, _column_count);
@@ -169,8 +169,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     column_count = _column_count;
     LimitPenLocation();
 
-    exists  = true;
-    changed = true;
+    SetExists(true);
 }
 
 // Expand the internal array of characters if necessary to accommodate
@@ -179,7 +178,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 // end, row_count and column_count are NOT updated.
 void CC708Window::Resize(uint new_rows, uint new_columns)
 {
-    if (!exists || text == NULL)
+    if (!GetExists() || text == NULL)
     {
         true_row_count = 0;
         true_column_count = 0;
@@ -208,7 +207,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
         text = new_text;
         true_row_count = new_rows;
         true_column_count = new_columns;
-        changed = true;
+        SetChanged();
     }
     else if (new_rows > row_count || new_columns > column_count)
     {
@@ -226,9 +225,9 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
                 text[i * true_column_count + j].character = ' ';
                 text[i * true_column_count + j].attr = pen.attr;
             }
-        changed = true;
+        SetChanged();
     }
-    exists = true;
+    SetExists(true);
 }
 
 
@@ -236,7 +235,7 @@ CC708Window::~CC708Window()
 {
     QMutexLocker locker(&lock);
 
-    exists = false;
+    SetExists(false);
     true_row_count    = 0;
     true_column_count = 0;
 
@@ -251,7 +250,7 @@ void CC708Window::Clear(void)
 {
     QMutexLocker locker(&lock);
 
-    if (!exists || !text)
+    if (!GetExists() || !text)
         return;
 
     for (uint i = 0; i < true_row_count * true_column_count; i++)
@@ -259,12 +258,12 @@ void CC708Window::Clear(void)
         text[i].character = QChar(' ');
         text[i].attr = pen.attr;
     }
-    changed = true;
+    SetChanged();
 }
 
 CC708Character &CC708Window::GetCCChar(void) const
 {
-    assert(exists);
+    assert(GetExists());
     assert(text);
     assert(pen.row    < true_row_count);
     assert(pen.column < true_column_count);
@@ -273,6 +272,23 @@ CC708Character &CC708Window::GetCCChar(void) const
 
 vector<CC708String*> CC708Window::GetStrings(void) const
 {
+    // Note on implementation.  In many cases, one line will be
+    // computed as the concatenation of 3 strings: a prefix of spaces
+    // with a default foreground color, followed by the actual text in
+    // a specific foreground color, followed by a suffix of spaces
+    // with a default foreground color.  This leads to 3
+    // FormattedTextChunk objects when 1 would suffice.  The prefix
+    // and suffix ultimately get optimized away, but not before a
+    // certain amount of unnecessary work.
+    //
+    // This can be solved with two steps.  First, suppress a format
+    // change when only non-underlined spaces have been seen so far.
+    // (Background changes can be ignored because the subtitle code
+    // suppresses leading spaces.)  Second, for trailing
+    // non-underlined spaces, either suppress a format change, or
+    // avoid creating such a string when it appears at the end of the
+    // row.  (We can't do the latter for an initial string of spaces,
+    // because the spaces are needed for coordinate calculations.)
     QMutexLocker locker(&lock);
 
     vector<CC708String*> list;
@@ -282,37 +298,77 @@ vector<CC708String*> CC708Window::GetStrings(void) const
     if (!text)
         return list;
 
+    bool createdNonblankStrings = false;
+    QChar chars[k708MaxColumns];
     for (uint j = 0; j < row_count; j++)
     {
+        bool inLeadingSpaces = true;
+        bool inTrailingSpaces = true;
+        bool createdString = false;
+        uint strStart = 0;
         for (uint i = 0; i < column_count; i++)
         {
             CC708Character &chr = text[j * true_column_count + i];
+            chars[i] = chr.character;
             if (!cur)
             {
                 cur = new CC708String;
                 cur->x    = i;
                 cur->y    = j;
-                cur->str  = QString("%1").arg(chr.character);
                 cur->attr = chr.attr;
+                strStart = i;
             }
-            else if (cur->attr == chr.attr)
+            bool isDisplayable = (chr.character != ' ' || chr.attr.underline);
+            if (inLeadingSpaces && isDisplayable)
             {
-                cur->str = QString("%1%2").arg(cur->str).arg(chr.character);
+                cur->attr = chr.attr;
+                inLeadingSpaces = false;
             }
-            else// if (cur->attr != chr.attr)
+            if (isDisplayable)
             {
+                inTrailingSpaces = false;
+            }
+            if (cur->attr != chr.attr)
+            {
+                cur->str = QString(&chars[strStart], i - strStart);
                 list.push_back(cur);
+                createdString = true;
+                createdNonblankStrings = true;
+                inTrailingSpaces = true;
                 cur = NULL;
                 i--;
             }
         }
         if (cur)
         {
-            list.push_back(cur);
+            // If the entire string is spaces, we still may need to
+            // create a chunk to preserve spacing between lines.
+            if (!inTrailingSpaces || !createdString)
+            {
+                int allSpaces = (inLeadingSpaces || inTrailingSpaces);
+                int length = allSpaces ? 0 : column_count - strStart;
+                if (length)
+                    createdNonblankStrings = true;
+                cur->str = QString(&chars[strStart], length);
+                list.push_back(cur);
+            }
+            else
+                delete cur;
             cur = NULL;
         }
     }
+    if (!createdNonblankStrings)
+        list.clear();
     return list;
+}
+
+void CC708Window::DisposeStrings(vector<CC708String*> &strings) const
+{
+    while (!strings.empty())
+    {
+        delete strings.back();
+        strings.pop_back();
+    }
 }
 
 void CC708Window::SetWindowStyle(uint style)
@@ -343,12 +399,11 @@ void CC708Window::SetWindowStyle(uint style)
     // It appears that ths is missused by broadcasters (FOX -- Dollhouse)
     fill_opacity   = k708AttrOpacityTransparent;
     /// HACK -- end
-    changed = true;
 }
 
 void CC708Window::AddChar(QChar ch)
 {
-    if (!exists)
+    if (!GetExists())
         return;
 
     QString dbg_char = ch;
@@ -357,7 +412,7 @@ void CC708Window::AddChar(QChar ch)
 
     if (!IsPenValid())
     {
-        LOG(VB_VBI, LOG_INFO,
+        LOG(VB_VBI, LOG_DEBUG,
             QString("AddChar(%1) at (c %2, r %3) INVALID win(%4,%5)")
                 .arg(dbg_char).arg(pen.column).arg(pen.row)
                 .arg(true_column_count).arg(true_row_count));
@@ -367,7 +422,7 @@ void CC708Window::AddChar(QChar ch)
     if (ch.toLatin1() == 0x0D)
     {
         Scroll(pen.row + 1, 0);
-        changed = true;
+        SetChanged();
         return;
     }
     QMutexLocker locker(&lock);
@@ -378,7 +433,7 @@ void CC708Window::AddChar(QChar ch)
         CC708Character& chr = GetCCChar();
         chr.attr      = pen.attr;
         chr.character = QChar(' ');
-        changed = true;
+        SetChanged();
         return;
     }
 
@@ -388,9 +443,9 @@ void CC708Window::AddChar(QChar ch)
     int c = pen.column;
     int r = pen.row;
     IncrPenLocation();
-    changed = true;
+    SetChanged();
 
-    LOG(VB_VBI, LOG_INFO, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_DEBUG, QString("AddChar(%1) at (c %2, r %3) -> (%4,%5)")
             .arg(dbg_char).arg(c).arg(r).arg(pen.column).arg(pen.row));
 }
 
@@ -416,7 +471,7 @@ void CC708Window::Scroll(int row, int col)
             text[(true_column_count * (true_row_count - 1)) + i] = tmp;
 
         pen.row = true_row_count - 1;
-        changed = true;
+        SetChanged();
     }
     else
     {
@@ -439,7 +494,7 @@ void CC708Window::IncrPenLocation(void)
     new_row    += (print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
-    LOG(VB_VBI, LOG_INFO, QString("IncrPen dir%1: (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_DEBUG, QString("IncrPen dir%1: (c %2, r %3) -> (%4,%5)")
             .arg(print_dir).arg(pen.column).arg(pen.row)
             .arg(new_column).arg(new_row));
 #endif
@@ -481,7 +536,7 @@ void CC708Window::DecrPenLocation(void)
     new_row    -= (print_dir == k708DirBottomToTop) ? -1 : 0;
 
 #if 0
-    LOG(VB_VBI, LOG_INFO, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
+    LOG(VB_VBI, LOG_DEBUG, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
             .arg(print_dir).arg(pen.column).arg(pen.row)
             .arg(new_column).arg(new_row));
 #endif

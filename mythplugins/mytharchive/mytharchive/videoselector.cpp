@@ -17,6 +17,8 @@
 #include <mythuibuttonlist.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
+#include <metadata/videoutils.h>
+#include <remotefile.h>
 
 // mytharchive
 #include "videoselector.h"
@@ -241,10 +243,16 @@ void VideoSelector::titleChanged(MythUIButtonListItem *item)
     {
         if (v->size == 0)
         {
-            QFile file(v->filename);
-            if (file.exists())
-                v->size = (uint64_t)file.size();
-            else
+            bool bExists;
+
+            struct stat fileinfo;
+            memset(&fileinfo, 0, sizeof(fileinfo ));
+
+            bExists = RemoteFile::Exists(v->filename, &fileinfo);
+            if (bExists)
+                v->size = (uint64_t)fileinfo.st_size;
+
+            if (!bExists)
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("VideoSelector: Cannot find file: %1")
                         .arg(v->filename));
@@ -316,6 +324,7 @@ void VideoSelector::OKPressed()
         a->startDate = "";
         a->startTime = "";
         a->size = v->size;
+        a->newsize = v->size;
         a->filename = v->filename;
         a->hasCutlist = false;
         a->useCutlist = false;
@@ -414,7 +423,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     }
 
     query.prepare("SELECT intid, title, plot, length, filename, coverfile, "
-                  "category, showlevel, subtitle, season, episode "
+                  "category, showlevel, subtitle, season, episode, host "
                   "FROM videometadata ORDER BY title,season,episode");
 
     if (query.exec() && query.size())
@@ -423,6 +432,11 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
         QString artist, genre, episode;
         while (query.next())
         {
+            // Exclude iso images as they aren't supported
+            QString filename = query.value(4).toString();
+            if (filename.endsWith(".iso") || filename.endsWith(".ISO"))
+                continue;
+
             VideoInfo *info = new VideoInfo;
 
             info->id = query.value(0).toInt();
@@ -442,7 +456,9 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 
             info->plot = query.value(2).toString();
             info->size = 0; //query.value(3).toInt();
-            info->filename = query.value(4).toString();
+            QString host = query.value(11).toString();
+            info->filename = host.isEmpty() ? filename
+                : generate_file_url("Videos", host, filename);
             info->coverfile = query.value(5).toString();
             info->category = categoryMap[query.value(6).toInt()];
             info->parentalLevel = query.value(7).toInt();

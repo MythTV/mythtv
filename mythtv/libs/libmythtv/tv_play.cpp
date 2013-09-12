@@ -4873,6 +4873,14 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             if (!paused)
                 DoTogglePause(ctx, true);
         }
+        else if (tokens[2] == "normal")
+        {
+            NormalSpeed(ctx);
+            StopFFRew(ctx);
+            if (paused)
+                DoTogglePause(ctx, true);
+            return;
+        }
         else
         {
             float tmpSpeed = 1.0f;

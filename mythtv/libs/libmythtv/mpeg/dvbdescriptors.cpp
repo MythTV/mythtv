@@ -279,7 +279,7 @@ QString ContentDescriptor::toString() const
 {
     QString tmp("ContentDescriptor: ");
     for (uint i = 0; i < Count(); i++)
-        tmp += GetMythCategory(i) + " : " + GetDescription(i) + ", ";
+        tmp += myth_category_type_to_string(GetMythCategory(i)) + " : " + GetDescription(i) + ", ";
     return tmp;
 }
 

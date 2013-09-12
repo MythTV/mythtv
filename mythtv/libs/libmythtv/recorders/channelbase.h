@@ -56,7 +56,7 @@ class ChannelBase
     /// \brief Returns file descriptor, -1 if it does not exist.
     virtual int GetFd(void) const { return -1; };
     virtual bool Tune(const QString &freqid, int finetune) { return true; }
-    virtual bool IsExternalChannelChangeSupported(void) { return false; }
+    virtual bool IsExternalChannelChangeInUse(void);
 
     // Gets
     virtual uint GetNextChannel(uint chanid, ChannelChangeDirection direction) const;
@@ -137,6 +137,7 @@ class ChannelBase
     virtual bool SwitchToInput(int inputNum, bool setstarting);
     virtual bool IsInputAvailable(
         int inputNum, uint &mplexid_restriction) const;
+    virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
     int GetStartInput(uint cardid);
     void ClearInputMap(void);

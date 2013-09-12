@@ -900,7 +900,8 @@ void GLSingleView::EffectInOut(void)
 
     int  texnum  = m_texCur;
     bool fadeout = false;
-    if (m_effect_frame_time.elapsed() <= m_effect_transition_timeout / 2)
+    float const elapsed = m_effect_frame_time.elapsed();
+    if (elapsed <= m_effect_transition_timeout / 2)
     {
         texnum  = (m_texCur) ? 0 : 1;
         fadeout = true;
@@ -909,14 +910,14 @@ void GLSingleView::EffectInOut(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float tt = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
-    float t = 2.0f / ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
+    float tt = elapsed * m_effect_transition_timeout_inv;
+    float t = 2.0f * ((fadeout) ? (0.5f - tt) : (tt - 0.5f));
 
-    glScalef(t, t, 1.0f);
+    glScalef(t, t, 1);
     t = 1.0f - t;
-    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? 1 : -1) * t : 0.0f,
-                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? 1 : -1) * t : 0.0f,
-                 0.0f);
+    glTranslatef((m_effect_rotate_direction % 2 == 0) ? ((m_effect_rotate_direction == 2)? t : -t) : 0,
+                 (m_effect_rotate_direction % 2 == 1) ? ((m_effect_rotate_direction == 1)? t : -t) : 0,
+                 0);
 
     m_texItem[texnum].MakeQuad();
 
@@ -1050,8 +1051,8 @@ void GLSingleView::EffectFlutter(void)
 
 void GLSingleView::EffectCube(void)
 {
-    float tot      = m_effect_transition_timeout ? m_effect_transition_timeout : 1.0f;
-    float rotStart = 0.25f * m_effect_transition_timeout;
+    float const tot      = m_effect_transition_timeout ? m_effect_transition_timeout : 1;
+    float const rotStart = 0.25 * m_effect_transition_timeout;
 
     if (m_effect_frame_time.elapsed() > m_effect_transition_timeout)
     {
@@ -1073,72 +1074,74 @@ void GLSingleView::EffectCube(void)
     glLoadIdentity();
 
 //    float PI = 4.0f * atan(1.0f);
-    float znear = 3.0f;
+    float const znear = 3.0f;
 //     float theta = 2.0f * atan2(2.0f / 2.0f, znear);
 //     theta = theta * 180.0f/PI;
 
-    glFrustum(-1.0f, 1.0f, -1.0f, 1.0f, znear - 0.01f, 10.0f);
+    glFrustum(-1, 1, -1, 1, znear, 10);
 
     if (m_effect_current_frame == 0)
     {
-        m_effect_cube_xrot = 0.0f;
-        m_effect_cube_yrot = 0.0f;
-        m_effect_cube_zrot = 0.0f;
+        m_effect_cube_xrot = 0;
+        m_effect_cube_yrot = 0;
+        m_effect_cube_zrot = 0;
     }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    float elapsed = (float) m_effect_frame_time.elapsed();
-    float tmp     = ((elapsed <= tot * 0.5) ? elapsed : tot - elapsed);
-    float trans   = 5.0f * tmp / tot;
+    float const elapsed = static_cast<float>(m_effect_frame_time.elapsed());
+    float const tmp     = (elapsed <= tot * 0.5f) ? elapsed : tot - elapsed;
+    float const trans   = 5.0f * tmp / tot;
 
-    glTranslatef(0.0f, 0.0f, -znear - 1.0f - trans);
+    glTranslatef(0, 0, -znear - 1.0f - trans);
 
-    glRotatef(m_effect_cube_xrot, 1.0f, 0.0f, 0.0f);
-    glRotatef(m_effect_cube_yrot, 0.0f, 1.0f, 0.0f);
+    glRotatef(m_effect_cube_xrot, 1, 0, 0);
+    glRotatef(m_effect_cube_yrot, 0, 1, 0);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glBegin(GL_QUADS);
     {
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+        GLfloat const v = 0.999f; // <1 to avoid conflicts along edges
+
+        glColor4f(0, 0, 0, 1);
 
         /* Front Face */
-        glVertex3f(-1.00f, -1.00f,  0.99f);
-        glVertex3f( 1.00f, -1.00f,  0.99f);
-        glVertex3f( 1.00f,  1.00f,  0.99f);
-        glVertex3f(-1.00f,  1.00f,  0.99f);
+        glVertex3f(-1, -1,  v);
+        glVertex3f( 1, -1,  v);
+        glVertex3f( 1,  1,  v);
+        glVertex3f(-1,  1,  v);
 
         /* Back Face */
-        glVertex3f(-1.00f, -1.00f, -0.99f);
-        glVertex3f(-1.00f,  1.00f, -0.99f);
-        glVertex3f( 1.00f,  1.00f, -0.99f);
-        glVertex3f( 1.00f, -1.00f, -0.99f);
+        glVertex3f(-1, -1, -v);
+        glVertex3f(-1,  1, -v);
+        glVertex3f( 1,  1, -v);
+        glVertex3f( 1, -1, -v);
 
         /* Top Face */
-        glVertex3f(-1.00f,  0.99f, -1.00f);
-        glVertex3f(-1.00f,  0.99f,  1.00f);
-        glVertex3f( 1.00f,  0.99f,  1.00f);
-        glVertex3f( 1.00f,  0.99f, -1.00f);
+        glVertex3f(-1,  v, -1);
+        glVertex3f(-1,  v,  1);
+        glVertex3f( 1,  v,  1);
+        glVertex3f( 1,  v, -1);
 
         /* Bottom Face */
-        glVertex3f(-1.00f, -0.99f, -1.00f);
-        glVertex3f( 1.00f, -0.99f, -1.00f);
-        glVertex3f( 1.00f, -0.99f,  1.00f);
-        glVertex3f(-1.00f, -0.99f,  1.00f);
+        glVertex3f(-1, -v, -1);
+        glVertex3f( 1, -v, -1);
+        glVertex3f( 1, -v,  1);
+        glVertex3f(-1, -v,  1);
 
         /* Right face */
-        glVertex3f(0.99f, -1.00f, -1.00f);
-        glVertex3f(0.99f,  1.00f, -1.00f);
-        glVertex3f(0.99f,  1.00f,  1.00f);
-        glVertex3f(0.99f, -1.00f,  1.00f);
+        glVertex3f(v, -1, -1);
+        glVertex3f(v,  1, -1);
+        glVertex3f(v,  1,  1);
+        glVertex3f(v, -1,  1);
 
         /* Left Face */
-        glVertex3f(-0.99f, -1.00f, -1.00f);
-        glVertex3f(-0.99f, -1.00f,  1.00f);
-        glVertex3f(-0.99f,  1.00f,  1.00f);
-        glVertex3f(-0.99f,  1.00f, -1.00f);
+        glVertex3f(-v, -1, -1);
+        glVertex3f(-v, -1,  1);
+        glVertex3f(-v,  1,  1);
+        glVertex3f(-v,  1, -1);
 
     }
     glEnd();
@@ -1147,57 +1150,57 @@ void GLSingleView::EffectCube(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
+        glColor4d(1, 1, 1, 1);
 
         // Front Face
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-ta.GetTextureX(), -ta.GetTextureY(),  1.00f);
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(+ta.GetTextureX(), -ta.GetTextureY(),  1.00f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(+ta.GetTextureX(), +ta.GetTextureY(),  1.00f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-ta.GetTextureX(), +ta.GetTextureY(),  1.00f);
+        glTexCoord2f(0, 0);
+        glVertex3f(-ta.GetTextureX(), -ta.GetTextureY(),  1);
+        glTexCoord2f(1, 0);
+        glVertex3f(+ta.GetTextureX(), -ta.GetTextureY(),  1);
+        glTexCoord2f(1, 1);
+        glVertex3f(+ta.GetTextureX(), +ta.GetTextureY(),  1);
+        glTexCoord2f(0, 1);
+        glVertex3f(-ta.GetTextureX(), +ta.GetTextureY(),  1);
 
         // Top Face
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(-ta.GetTextureX(),  1.00f, -ta.GetTextureY());
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-ta.GetTextureX(),  1.00f, +ta.GetTextureY());
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(+ta.GetTextureX(),  1.00f, +ta.GetTextureY());
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(+ta.GetTextureX(),  1.00f, -ta.GetTextureY());
+        glTexCoord2f(1, 1);
+        glVertex3f(-ta.GetTextureX(),  1, -ta.GetTextureY());
+        glTexCoord2f(1, 0);
+        glVertex3f(-ta.GetTextureX(),  1, +ta.GetTextureY());
+        glTexCoord2f(0, 0);
+        glVertex3f(+ta.GetTextureX(),  1, +ta.GetTextureY());
+        glTexCoord2f(0, 1);
+        glVertex3f(+ta.GetTextureX(),  1, -ta.GetTextureY());
 
         // Bottom Face
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-ta.GetTextureX(), -1.00f, -ta.GetTextureY());
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(+ta.GetTextureX(), -1.00f, -ta.GetTextureY());
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(+ta.GetTextureX(), -1.00f, +ta.GetTextureY());
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-ta.GetTextureX(), -1.00f, +ta.GetTextureY());
+        glTexCoord2f(0, 1);
+        glVertex3f(-ta.GetTextureX(), -1, -ta.GetTextureY());
+        glTexCoord2f(1, 1);
+        glVertex3f(+ta.GetTextureX(), -1, -ta.GetTextureY());
+        glTexCoord2f(1, 0);
+        glVertex3f(+ta.GetTextureX(), -1, +ta.GetTextureY());
+        glTexCoord2f(0, 0);
+        glVertex3f(-ta.GetTextureX(), -1, +ta.GetTextureY());
 
         // Right face
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(1.00f, -ta.GetTextureX(), -ta.GetTextureY());
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(1.00f, -ta.GetTextureX(), +ta.GetTextureY());
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(1.00f, +ta.GetTextureX(), +ta.GetTextureY());
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(1.00f, +ta.GetTextureX(), -ta.GetTextureY());
+        glTexCoord2f(0, 0);
+        glVertex3f(1, -ta.GetTextureX(), -ta.GetTextureY());
+        glTexCoord2f(0, 1);
+        glVertex3f(1, -ta.GetTextureX(), +ta.GetTextureY());
+        glTexCoord2f(1, 1);
+        glVertex3f(1, +ta.GetTextureX(), +ta.GetTextureY());
+        glTexCoord2f(1, 0);
+        glVertex3f(1, +ta.GetTextureX(), -ta.GetTextureY());
 
         // Left Face
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-1.00f, -ta.GetTextureX(), -ta.GetTextureY());
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(-1.00f, +ta.GetTextureX(), -ta.GetTextureY());
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(-1.00f, +ta.GetTextureX(), +ta.GetTextureY());
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(-1.00f, -ta.GetTextureX(), +ta.GetTextureY());
+        glTexCoord2f(1, 0);
+        glVertex3f(-1, -ta.GetTextureX(), -ta.GetTextureY());
+        glTexCoord2f(0, 0);
+        glVertex3f(-1, +ta.GetTextureX(), -ta.GetTextureY());
+        glTexCoord2f(0, 1);
+        glVertex3f(-1, +ta.GetTextureX(), +ta.GetTextureY());
+        glTexCoord2f(1, 1);
+        glVertex3f(-1, -ta.GetTextureX(), +ta.GetTextureY());
     }
     glEnd();
 
@@ -1205,24 +1208,31 @@ void GLSingleView::EffectCube(void)
 
     glBegin(GL_QUADS);
     {
-        glColor4d(1.0f, 1.0f, 1.0f, 1.0f);
+        glColor4d(1, 1, 1, 1);
 
         // Back Face
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex3f(-tb.GetTextureX(), -tb.GetTextureY(), -1.00f);
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex3f(-tb.GetTextureX(), +tb.GetTextureY(), -1.00f);
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex3f(+tb.GetTextureX(), +tb.GetTextureY(), -1.00f);
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex3f(+tb.GetTextureX(), -tb.GetTextureY(), -1.00f);
+        glTexCoord2f(1, 0);
+        glVertex3f(-tb.GetTextureX(), -tb.GetTextureY(), -1);
+        glTexCoord2f(1, 1);
+        glVertex3f(-tb.GetTextureX(), +tb.GetTextureY(), -1);
+        glTexCoord2f(0, 1);
+        glVertex3f(+tb.GetTextureX(), +tb.GetTextureY(), -1);
+        glTexCoord2f(0, 0);
+        glVertex3f(+tb.GetTextureX(), -tb.GetTextureY(), -1);
     }
     glEnd();
 
-    if ((elapsed >= rotStart) && (elapsed < (tot - rotStart)))
+    if (elapsed < rotStart)
+        ;
+    else if (elapsed < (tot - rotStart))
     {
-        m_effect_cube_xrot = 360.0f * (elapsed - rotStart) / (tot - 2 * rotStart);
+        m_effect_cube_xrot = 360.0f * (elapsed - rotStart) / (tot - 2.0f * rotStart);
         m_effect_cube_yrot = 0.5f * m_effect_cube_xrot;
+    }
+    else
+    {
+        m_effect_cube_xrot = 0;
+        m_effect_cube_yrot = 180.0f;
     }
 
     m_effect_current_frame++;

@@ -2373,7 +2373,9 @@ void PlaybackBox::popupClosed(QString which, int result)
             {
                 m_helper.CheckAvailability(*pginfo, kCheckForMenuAction);
 
-                if (asPendingDelete == pginfo->GetAvailableStatus())
+                if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
+                    (asDeleted == pginfo->GetAvailableStatus()) ||
+                    (asNotYetAvailable == pginfo->GetAvailableStatus()))
                 {
                     ShowAvailabilityPopup(*pginfo);
                 }
@@ -2916,7 +2918,8 @@ void PlaybackBox::ShowMenu()
                 *pginfo, kCheckForMenuAction);
 
             if ((asPendingDelete == pginfo->GetAvailableStatus()) ||
-                (asPendingDelete == pginfo->GetAvailableStatus()))
+                (asDeleted == pginfo->GetAvailableStatus()) ||
+                (asNotYetAvailable == pginfo->GetAvailableStatus()))
             {
                 ShowAvailabilityPopup(*pginfo);
             }

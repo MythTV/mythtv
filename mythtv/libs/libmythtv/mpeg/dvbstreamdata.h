@@ -44,6 +44,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool IsRedundant(uint pid, const PSIPTable&) const;
     void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
 
+    // NIT for broken providers
+    inline void SetRealNetworkID(int);
+
     // EIT info/processing
     inline void SetDishNetEIT(bool);
     inline bool HasAnyEIT(void) const;
@@ -216,6 +219,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     uint                      _desired_netid;
     uint                      _desired_tsid;
 
+    // Real network ID for broken providers
+    int                       _dvb_real_network_id;
+
     /// Decode DishNet's long-term DVB EIT
     bool                      _dvb_eit_dishnet_long;
     /// Tell us if the DVB service has EIT
@@ -253,6 +259,12 @@ inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)
 {
     QMutexLocker locker(&_listener_lock);
     _dvb_eit_dishnet_long = use_dishnet_eit;
+}
+
+inline void DVBStreamData::SetRealNetworkID(int real_network_id)
+{
+    QMutexLocker locker(&_listener_lock);
+    _dvb_real_network_id = real_network_id;
 }
 
 inline bool DVBStreamData::HasAnyEIT(void) const

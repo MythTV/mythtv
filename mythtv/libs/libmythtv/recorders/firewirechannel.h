@@ -36,6 +36,8 @@ class FirewireChannel : public DTVChannel
     // Gets
     virtual bool IsOpen(void) const { return isopen; }
     virtual QString GetDevice(void) const;
+
+  protected:
     virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
   private:

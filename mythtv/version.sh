@@ -27,12 +27,17 @@ SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
 
 case "${SOURCE_VERSION}" in
     exported|Unknown)
-        if test -e $GITTREEDIR/VERSION ; then
+        if ! grep -q Format $GITTREEDIR/EXPORTED_VERSION; then
+            . $GITTREEDIR/EXPORTED_VERSION
+            BRANCH=$(echo "${BRANCH}" | sed 's/ (\(.*, \)\{0,1\}\(.*\))/\2/')
+        elif test -e $GITTREEDIR/VERSION ; then
             . $GITTREEDIR/VERSION
         fi
     ;;
     *)
-    BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+        if [ -z "${BRANCH}" ]; then
+            BRANCH=$(git branch --no-color | sed -e '/^[^\*]/d' -e 's/^\* //' -e 's/(no branch)/exported/')
+        fi
     ;;
 esac
 

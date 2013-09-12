@@ -75,18 +75,23 @@ ImageView::ImageView(const ThumbList &itemList,
     if (m_pos < m_itemList.size())
         origItem = m_itemList.at(m_pos);
 
-    // FIXME this looks wrong
-    //remove all dirs from m_itemList;
-    ThumbItem *item;
-    for (int x = 0; x < m_itemList.size(); x++)
+    // Load pictures from all directories if requested
+    for (int x = 0; recurse && x < m_itemList.size(); ++x)
     {
-        item = m_itemList.at(x);
+        ThumbItem *item = m_itemList.at(x);
         if (item->IsDir())
-        {
-            if (recurse)
                 GalleryUtil::LoadDirectory(m_itemList, item->GetPath(),
                                            sortorder, recurse, NULL, NULL);
+    }
+
+    //remove all dirs from m_itemList;
+    for (int x = 0; x < m_itemList.size(); ++x)
+    {
+        ThumbItem *item = m_itemList.at(x);
+        if (item->IsDir())
+        {
             m_itemList.takeAt(x);
+            --x;
         }
     }
 

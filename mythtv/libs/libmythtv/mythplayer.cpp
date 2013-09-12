@@ -3152,6 +3152,7 @@ void MythPlayer::DecoderEnd(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to stop decoder loop.");
     else
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Exited decoder loop.");
+    SetDecoder(NULL);
 }
 
 void MythPlayer::DecoderPauseCheck(void)
@@ -3316,7 +3317,9 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Decoder timed out waiting for free video buffers.");
-                videobuf_retries = 0;
+                // We've tried for 20 seconds now, give up so that we don't
+                // get stuck permanently in this state
+                SetErrored("Decoder timed out waiting for free video buffers.");
             }
             return false;
         }
@@ -4435,12 +4438,8 @@ void MythPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
         }
     }
 
-    // Only do seek if we have position map
-    if (hasFullPositionMap)
-    {
-        DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
-        DoJumpToFrame(number, kInaccuracyNone);
-    }
+    DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
+    DoJumpToFrame(number, kInaccuracyNone);
 }
 
 /** \fn MythPlayer::GetRawVideoFrame(long long)
@@ -5003,8 +5002,7 @@ InteractiveTV *MythPlayer::GetInteractiveTV(void)
     {
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&itvLock);
-        if (osd)
-            interactiveTV = new InteractiveTV(this);
+        interactiveTV = new InteractiveTV(this);
     }
 #endif // USING_MHEG
     return interactiveTV;

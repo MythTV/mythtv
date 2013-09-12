@@ -552,33 +552,26 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
 {
     av_register_all();
 
-    m_inputFC = NULL;
-
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("ThumbFinder: Opening '%1'")
             .arg(inFile));
 
-    QByteArray inFileBA = inFile.toLocal8Bit();
-
-    int ret = avformat_open_input(&m_inputFC, inFileBA.constData(), NULL, NULL);
-
-    if (ret)
+    if (!m_inputFC.Open(inFile))
     {
         LOG(VB_GENERAL, LOG_ERR, "ThumbFinder, Couldn't open input file" + ENO);
         return false;
     }
 
     // Getting stream information
-    if ((ret = avformat_find_stream_info(m_inputFC, NULL)) < 0)
+    int ret = avformat_find_stream_info(m_inputFC, NULL);
+    if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        avformat_close_input(&m_inputFC);
-        m_inputFC = NULL;
         return false;
     }
-    av_estimate_timings(m_inputFC, 0);
-    av_dump_format(m_inputFC, 0, inFileBA.constData(), 0);
+
+    av_dump_format(m_inputFC, 0, qPrintable(inFile), 0);
 
     // find the first video stream
     m_videostream = -1;
@@ -909,10 +902,11 @@ void ThumbFinder::closeAVCodec()
     av_free(m_frame);
 
     // close the codec
-    avcodec_close(m_codecCtx);
+    if (m_codecCtx)
+        avcodec_close(m_codecCtx);
 
     // close the video file
-    avformat_close_input(&m_inputFC);
+    m_inputFC.Close();
 }
 
 void ThumbFinder::showMenu()

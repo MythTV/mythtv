@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <algorithm>
 
 // QT headers
 #include <QRect>
@@ -197,20 +198,58 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
     if (!im)
         return;
 
-    QPoint drawOffset;
-    font.GetOffset(drawOffset);
+    QColor outlineColor;
+    int outlineSize = 0;
+    int outlineAlpha;
+    if (font.hasOutline())
+        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
+
+    QPoint shadowOffset(0, 0);
+    QColor shadowColor;
+    int shadowAlpha;
+    if (font.hasShadow())
+        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
+
+    QFontMetrics fm(font.face());
+    int totalHeight = fm.height() + outlineSize +
+        std::max(outlineSize, std::abs(shadowOffset.y()));
+
+    // initialPaddingX is the number of pixels from the left of the
+    // input QRect to the left of the actual text.  It is always 0
+    // because we don't add padding to the text rectangle.
+    int initialPaddingX = 0;
+
+    // initialPaddingY is the number of pixels from the top of the
+    // input QRect to the top of the actual text.  It may be nonzero
+    // because of extra vertical padding.
+    int initialPaddingY = (r.height() - totalHeight) / 2;
+    // Hack.  Normally we vertically center the text due to some
+    // (solvable) issues in the SubtitleScreen code - the text rect
+    // and the background rect are both created with PAD_WIDTH extra
+    // padding, and to honor Qt::AlignTop, the text rect needs to be
+    // without padding.  This doesn't work for Qt::TextWordWrap, since
+    // the first line will be vertically centered with subsequence
+    // lines below.  So if Qt::TextWordWrap is set, we do top
+    // alignment.
+    if (flags & Qt::TextWordWrap)
+        initialPaddingY = 0;
+
+    // textOffsetX is the number of pixels from r.left() to the left
+    // edge of the core text.  This assumes that flags contains
+    // Qt::AlignLeft.
+    int textOffsetX =
+        initialPaddingX + std::max(outlineSize, -shadowOffset.x());
+
+    // textOffsetY is the number of pixels from r.top() to the top
+    // edge of the core text.  This assumes that flags contains
+    // Qt::AlignTop.
+    int textOffsetY =
+        initialPaddingY + std::max(outlineSize, -shadowOffset.y());
 
     QImage pm(r.size(), QImage::Format_ARGB32);
     QColor fillcolor = font.color();
     if (font.hasOutline())
-    {
-        QColor outlineColor;
-        int outlineSize, outlineAlpha;
-
-        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
-
         fillcolor = outlineColor;
-    }
     fillcolor.setAlpha(0);
     pm.fill(fillcolor.rgba());
 
@@ -219,17 +258,15 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
     tmpfont.setStyleStrategy(QFont::OpenGLCompatible);
     tmp.setFont(tmpfont);
 
+    QPainterPath path;
+    if (font.hasOutline())
+        path.addText(0, 0, tmpfont, msg);
+
     if (font.hasShadow())
     {
-        QPoint shadowOffset;
-        QColor shadowColor;
-        int shadowAlpha;
-
-        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
-
         QRect a = QRect(0, 0, r.width(), r.height());
-        a.translate(shadowOffset.x() + drawOffset.x(),
-                    shadowOffset.y() + drawOffset.y());
+        a.translate(shadowOffset.x() + textOffsetX,
+                    shadowOffset.y() + textOffsetY);
 
         shadowColor.setAlpha(shadowAlpha);
         tmp.setPen(shadowColor);
@@ -238,49 +275,31 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
 
     if (font.hasOutline())
     {
-        QColor outlineColor;
-        int outlineSize, outlineAlpha;
+        // QPainter::drawText() treats the Y coordinate as the top of
+        // the text (when Qt::AlignTop is used).  However,
+        // QPainterPath::addText() treats the Y coordinate as the base
+        // line of the text.  To translate from the top to the base
+        // line, we need to add QFontMetrics::ascent().
+        int adjX = 0;
+        int adjY = fm.ascent();
 
-        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
-
-        /* FIXME: use outlineAlpha */
-        int outalpha = 16;
-
-        QRect a = QRect(0, 0, r.width(), r.height());
-        a.translate(-outlineSize + drawOffset.x(),
-                    -outlineSize + drawOffset.y());
-
-        outlineColor.setAlpha(outalpha);
+        outlineColor.setAlpha(outlineAlpha);
         tmp.setPen(outlineColor);
-        tmp.drawText(a, flags, msg);
 
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(1, 0);
-            tmp.drawText(a, flags, msg);
-        }
+        path.translate(adjX + textOffsetX, adjY + textOffsetY);
+        QPen pen = tmp.pen();
+        pen.setWidth(outlineSize * 2 + 1);
+        pen.setCapStyle(Qt::RoundCap);
+        pen.setJoinStyle(Qt::RoundJoin);
+        tmp.setPen(pen);
+        tmp.drawPath(path);
 
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(0, 1);
-            tmp.drawText(a, flags, msg);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(-1, 0);
-            tmp.drawText(a, flags, msg);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.translate(0, -1);
-            tmp.drawText(a, flags, msg);
-        }
+        path.translate(outlineSize, outlineSize);
     }
 
     tmp.setPen(QPen(font.GetBrush(), 0));
-    tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(),
+    tmp.setBrush(font.GetBrush());
+    tmp.drawText(textOffsetX, textOffsetY, r.width(), r.height(),
                  flags, msg);
     tmp.end();
     im->Assign(pm);

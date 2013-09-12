@@ -49,6 +49,7 @@
 #include "cdrip.h"
 #endif
 
+#if defined HAVE_CDIO
 /**
  * \brief Work out the best CD drive to use at this time
  */
@@ -63,6 +64,7 @@ static QString chooseCD(void)
 
     return MediaMonitor::defaultCDdevice();
 }
+#endif
 
 static void loadMusic()
 {

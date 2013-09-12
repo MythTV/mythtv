@@ -20,8 +20,7 @@ static GlobalLineEdit *DiSEqCLatitude(void)
     gc->setLabel("Latitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian latitude for your location. "
-                       "Use negative numbers for southern "
-                       "and western coordinates."));
+                       "Use negative numbers for southern coordinates."));
     return gc;
 }
 
@@ -31,8 +30,7 @@ static GlobalLineEdit *DiSEqCLongitude(void)
     gc->setLabel("Longitude");
     gc->setHelpText(
         DeviceTree::tr("The Cartesian longitude for your location. "
-                       "Use negative numbers for southern "
-                       "and western coordinates."));
+                       "Use negative numbers for western coordinates."));
     return gc;
 }
 

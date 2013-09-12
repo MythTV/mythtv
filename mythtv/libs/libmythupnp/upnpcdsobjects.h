@@ -48,19 +48,23 @@ class Property
         QString  m_sNameSpace;
         bool     m_bRequired;
         QString  m_sValue;
+        bool     m_bMultiValue;
         NameValues      m_lstAttributes;
 
     public:
 
         explicit Property( const QString &sName,
-                           const QString &sNameSpace = "",
-                           bool           bRequired  = false,
-                           const QString &sValue     = "" )
+                           const QString &sNameSpace  = "",
+                           bool           bRequired   = false,
+                           const QString &sValue      = "",
+                           bool           bMultiValue = false
+                         )
         {
-            m_sName      = sName;
-            m_sNameSpace = sNameSpace;
-            m_bRequired  = bRequired;
-            m_sValue     = sValue;
+            m_sName       = sName;
+            m_sNameSpace  = sNameSpace;
+            m_bRequired   = bRequired;
+            m_sValue      = sValue;
+            m_bMultiValue = bMultiValue;
         }
 
         void AddAttribute( const QString &sName,
@@ -176,14 +180,14 @@ class UPNP_PUBLIC CDSObject
                                  const QString sParentId = "-1" );
         virtual      ~CDSObject();
 
-        Property     *AddProperty( Property *pProp  );
-        Property     *GetProperty( QString sName );
-        CDSObject    *AddChild   ( CDSObject   *pChild );
+        Property         *AddProperty( Property *pProp  );
+        QList<Property*>  GetProperties( const QString &sName );
+        CDSObject        *AddChild   ( CDSObject   *pChild );
 
         ContainerClass *AddSearchClass( ContainerClass *pClass );
         ContainerClass *AddCreateClass( ContainerClass *pClass );
 
-        void          SetPropValue( QString sName, QString sValue );
+        void          SetPropValue( const QString &sName, const QString &sValue );
         QString       GetPropValue( const QString &sName ) const;
         QString       toXml      ( FilterMap &filter ) const;
         void          toXml      ( QTextStream &os, FilterMap &filter ) const;

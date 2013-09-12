@@ -107,7 +107,7 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 /* Block to Stream (encoding)                         */
 /*                                                    */
 
-int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
+int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t /*bt8*/)
 {
  register int ci, co=1;
  register int16_t ZZvalue;
@@ -115,7 +115,6 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  register unsigned char bitoff;
 
  uint8_t *ustrm = (uint8_t *)strm;
- bt8 = bt8;
 #ifdef SHOWBLOCK
 
   int ii;
@@ -279,7 +278,7 @@ fprintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla)
+int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
 {
  uint32_t *qtbl = (uint32_t *)qtbla;
  int ci;
@@ -288,7 +287,6 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla)
  register unsigned char bitten;
  register unsigned char bitoff;
 
- bt8 = bt8;
  /* first byte always read */
  i=RTjpeg_ZZ[0];
  data[i]=((uint8_t)strm[0])*qtbl[i];

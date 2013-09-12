@@ -182,7 +182,15 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                     ringBuffer->DVD()->UnblockReading();
                 }
 
+                avcodeclock->lock();
                 result = av_read_frame(ctx, pkt);
+                avcodeclock->unlock();
+
+                // Make sure we yield.  Otherwise other threads may not
+                // get chance to take the lock.  Shouldn't be necessary
+                // but calling up the OSD menu in a still frame without
+                // this still causes a deadlock.
+                usleep(0);
             }while (ringBuffer->DVD()->IsReadingBlocked());
 
             if (result >= 0)

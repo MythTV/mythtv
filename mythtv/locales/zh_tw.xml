@@ -17,13 +17,13 @@
 
   <!-- Per-host Settings -->
     <!-- Languages - Self Explanatory -->
-    <setting name="Language" global="true">zh_HK</setting> <!-- what translation to load -->
+    <setting name="Language" global="true">zh_HK</setting> <!-- which translation to load -->
 
     <!-- Country -->
     <setting name="Country" global="true">TW</setting>
 
     <!-- Date/Time format -->
-    <setting name="DateFormat">ddd M月d日</setting>
+    <setting name="DateFormat">dddd M月d日</setting>
     <setting name="TimeFormat">AP h:mm</setting>
     <setting name="ShortDateFormat">M月d日</setting>
 

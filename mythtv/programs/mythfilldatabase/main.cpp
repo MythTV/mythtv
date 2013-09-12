@@ -112,15 +112,11 @@ int main(int argc, char *argv[])
         fill_data.chan_data.m_interactive = true;
     }
 
-    if (cmdline.toBool("update"))
+    if (cmdline.toBool("onlyguide") || cmdline.toBool("update"))
     {
-        if (cmdline.toBool("manual"))
-        {
-            cerr << "--update and --manual cannot be used simultaneously"
-                 << endl;
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
-        fill_data.chan_data.m_nonUSUpdating = true;
+        LOG(VB_GENERAL, LOG_NOTICE,
+            "Only updating guide data, channel and icon updates will be ignored");
+        fill_data.chan_data.m_guideDataOnly = true;
     }
 
     if (cmdline.toBool("preset"))

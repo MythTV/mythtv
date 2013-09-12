@@ -312,10 +312,6 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
 
     QString sParentID = "Videos/0";
 
-    QString sAlbumArtURI= QString( "%1GetVideoArt%2")
-                        .arg( sURIBase   )
-                        .arg( sURIParams );
-
     CDSObject *pItem = CDSObject::CreateVideoItem( sId, sName, sParentID );
 
     pItem->m_bRestricted  = false;
@@ -339,8 +335,68 @@ void UPnpCDSVideo::AddItem( const UPnpCDSRequest    *pRequest,
     //pItem->SetPropValue( "relation"       , );
     //pItem->SetPropValue( "region"         , );
 
-    if ((sCoverArt != "") && (sCoverArt != "No Cover"))
-        pItem->SetPropValue( "albumArtURI"    , sAlbumArtURI);
+    QString sArtURI= QString( "%1GetVideoArtwork%2")
+                        .arg( sURIBase   )
+                        .arg( sURIParams );
+
+    QList<Property*> propList = pItem->GetProperties("albumArtURI");
+    if ((!sCoverArt.isEmpty()) && (sCoverArt != "No Cover")
+                               && propList.size() >= 4)
+    {
+        // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
+        // has wider device support and crucially the filesizes are smaller
+        // which speeds up loading times over the network
+
+        // We MUST include the thumbnail size, but since some clients may use the
+        // first image they see and the thumbnail is tiny, instead return the
+        // medium first. The large could be very large, which is no good if the
+        // client is pulling images for an entire list at once!
+
+        // Medium
+        Property *pProp = propList.at(0);
+        if (pProp)
+        {
+            // Must be no more than 1024x768
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Thumbnail
+        pProp = propList.at(1);
+        if (pProp)
+        {
+            // At least one albumArtURI must be a ThumbNail (TN) no larger
+            // than 160x160, and it must also be a jpeg
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
+            pProp->AddAttribute("dlna:profileID", "JPG_TN");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Medium
+        pProp = propList.at(2);
+        if (pProp)
+        {
+            // Must be no more than 1024x768
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Large
+        pProp = propList.at(3);
+        if (pProp)
+        {
+            // Must be no more than 4096x4096 - for our purposes, just return
+            // a fullsize image
+            pProp->m_sValue = sArtURI;
+            pProp->AddAttribute("dlna:profileID", "JPG_LRG");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+    }
 
     if ( bAddRef )
     {

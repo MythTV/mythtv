@@ -200,7 +200,7 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
       running(false),                  exit(false),
       statusLock(QMutex::Recursive)
 {
-    if (!channel->IsExternalChannelChangeSupported())
+    if (!channel->IsExternalChannelChangeInUse())
     {
         scriptStatus.SetValue(3);
     }
@@ -413,7 +413,7 @@ void SignalMonitor::SendMessage(
 void SignalMonitor::UpdateValues(void)
 {
     QMutexLocker locker(&statusLock);
-    if (channel->IsExternalChannelChangeSupported() &&
+    if (channel->IsExternalChannelChangeInUse() &&
         (scriptStatus.GetValue() < 2))
     {
         scriptStatus.SetValue(channel->GetScriptStatus());

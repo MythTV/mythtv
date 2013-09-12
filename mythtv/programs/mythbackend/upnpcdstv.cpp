@@ -147,7 +147,7 @@ QString UPnpCDSTv::GetItemListSQL( QString /* sColumn */ )
                   "subtitle, description, category, "   \
                   "hostname, recgroup, filesize, "      \
                   "basename, progstart, progend, "      \
-                  "storagegroup "                       \
+                  "storagegroup, inetref "              \
            "FROM recorded ";
 }
 
@@ -301,6 +301,8 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
     QDateTime      dtProgEnd    =
         MythDate::as_utc(query.value(12).toDateTime());
     QString        sStorageGrp  = query.value(13).toString();
+
+    QString        sInetRef     = query.value(14).toString();
 
     // ----------------------------------------------------------------------
     // Cache Host ip Address & Port
@@ -457,21 +459,84 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 */
 
     // ----------------------------------------------------------------------
-    // Add Preview URI as albumArt
+    // Add Preview URI as <res>
+    // MUST be _TN and 160px
     // ----------------------------------------------------------------------
 
     sURI = QString( "%1GetPreviewImage%2%3").arg( sURIBase   )
                                             .arg( sURIParams )
-                                            .arg( "&amp;Width=160" ); 
+                                            .arg( "&amp;Width=160" );
 
-    pItem->SetPropValue( "albumArtURI", sURI );
-    Property *pProp = pItem->GetProperty("albumArtURI");
-    if (pProp)
+    // TODO: Must be JPG for minimal compliance
+    sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=PNG_TN");
+    pRes = pItem->AddResource( sProtocol, sURI );
+
+    // ----------------------------------------------------------------------
+    // Add Artwork URI as albumArt
+    // ----------------------------------------------------------------------
+
+    sURI = QString( "%1GetRecordingArtwork?Type=coverart&amp;Inetref=%3")
+                                              .arg( sURIBase   )
+                                              .arg( sInetRef   );
+
+    QList<Property*> propList = pItem->GetProperties("albumArtURI");
+    if (propList.size() >= 4)
     {
-        pProp->AddAttribute("dlna:profileID", "PNG_TN");
-        pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
-    
+        // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
+        // has wider device support and crucially the filesizes are smaller
+        // which speeds up loading times over the network
+
+        // We MUST include the thumbnail size, but since some clients may use the
+        // first image they see and the thumbnail is tiny, instead return the
+        // medium first. The large could be very large, which is no good if the
+        // client is pulling images for an entire list at once!
+
+        // Medium
+        Property *pProp = propList.at(0);
+        if (pProp)
+        {
+            // Must be no more than 1024x768
+            pProp->m_sValue = sURI;
+            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Thumbnail
+        pProp = propList.at(1);
+        if (pProp)
+        {
+            // At least one albumArtURI must be a ThumbNail (TN) no larger
+            // than 160x160, and it must also be a jpeg
+            pProp->m_sValue = sURI;
+            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
+            pProp->AddAttribute("dlna:profileID", "JPG_TN");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Medium
+        pProp = propList.at(2);
+        if (pProp)
+        {
+            // Must be no more than 1024x768
+            pProp->m_sValue = sURI;
+            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Large
+        pProp = propList.at(3);
+        if (pProp)
+        {
+            // Must be no more than 4096x4096 - for our purposes, just return
+            // a fullsize image
+            pProp->m_sValue = sURI;
+            pProp->AddAttribute("dlna:profileID", "JPG_LRG");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
     }
+
 
 }
 

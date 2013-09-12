@@ -321,7 +321,7 @@ bool DXVA2Decoder::CreateSurfaces(void)
 
     HRESULT hr = IDirectXVideoDecoderService_CreateSurface(
         m_service, (m_width + 15) & ~15, (m_height + 15) & ~15,
-        m_context.surface_count, m_format.Format,
+        m_context.surface_count - 1, m_format.Format,
         D3DPOOL_DEFAULT, 0, DXVA2_VideoDecoderRenderTarget,
         m_context.surface, NULL);
 
@@ -331,16 +331,19 @@ bool DXVA2Decoder::CreateSurfaces(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 decoder surfaces.")
                                          .arg(m_context.surface_count));
 
-    for (uint i = 0; i < m_context.surface_count; i++)
-        m_context.surface[i]->AddRef();
     return true;
 }
 
 void DXVA2Decoder::DestroySurfaces(void)
 {
     for (uint i = 0; i < m_context.surface_count; i++)
+    {
         if (m_context.surface[i])
+        {
             m_context.surface[i]->Release();
+            m_context.surface[i] = NULL;
+        }
+    }
     m_context.surface = NULL;
     m_context.surface_count = 0;
 }

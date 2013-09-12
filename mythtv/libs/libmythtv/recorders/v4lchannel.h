@@ -57,12 +57,14 @@ class V4LChannel : public DTVChannel
     int  GetFd(void)        const { return videofd; }
     QString GetDevice(void) const { return device; }
     QString GetSIStandard(void) const { return "atsc"; }
-    virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
     // Picture attributes.
     bool InitPictureAttributes(void);
     int  GetPictureAttribute(PictureAttribute) const;
     int  ChangePictureAttribute(PictureAdjustType, PictureAttribute, bool up);
+
+  protected:
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
   private:
     // Helper Sets

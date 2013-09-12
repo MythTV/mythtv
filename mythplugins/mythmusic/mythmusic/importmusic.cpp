@@ -34,6 +34,12 @@ static bool copyFile(const QString &src, const QString &dst)
 {
     const int bufferSize = 16*1024;
 
+    if (src == dst)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "copyFile: Cannot copy a file to itself");
+        return false;
+    }
+
     QFile s(src);
     QFile d(dst);
     char buffer[bufferSize];
@@ -508,6 +514,22 @@ void ImportMusicDialog::nextNewPressed()
 
 void ImportMusicDialog::startScan()
 {
+    // sanity check - make sure the user isn't trying to import tracks from the music directory
+    QString location = m_locationEdit->GetText();
+    if (!location.endsWith('/'))
+        location.append('/');
+
+    if (location.startsWith(getMusicDirectory()))
+    {
+        ShowOkPopup(tr("Cannot import music from the music directory. "
+                       "You probably want to use 'Scan For New Music' "
+                       "instead."));
+        m_tracks->clear();
+        m_sourceFiles.clear();
+        fillWidgets();
+        return;
+    }
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythUIBusyDialog *busy = 
             new MythUIBusyDialog(tr("Searching for music files"),
@@ -990,7 +1012,8 @@ void ImportCoverArtDialog::copyPressed()
     {
         if (!copyFile(m_filelist[m_currentFile], m_saveFilename))
         {
-            ShowOkPopup(QString("Copy CoverArt Failed. \nCopying to %1")
+            //: %1 is the filename
+            ShowOkPopup(tr("Copy CoverArt Failed.\nCopying to %1")
                     .arg(m_saveFilename));
             return;
         }
@@ -1059,8 +1082,11 @@ void ImportCoverArtDialog::updateStatus()
     if (m_filelist.size() > 0)
     {
         if (m_currentText)
-            m_currentText->SetText(QString("%1 of %2").arg(m_currentFile + 1)
-                                                      .arg(m_filelist.size()));
+            //: %1 is the current position of the file being copied,
+            //: %2 is the total number of files
+            m_currentText->SetText(tr("%1 of %2", "Current file copied")
+                                   .arg(m_currentFile + 1)
+                                   .arg(m_filelist.size()));
         m_filenameText->SetText(m_filelist[m_currentFile]);
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();

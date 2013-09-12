@@ -361,7 +361,12 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
 
     // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
     if (!diseqc_tree)
-        CheckFrequency(tuning.frequency);
+    {
+        const DVBChannel *master = GetMasterLock();
+        if (master == NULL || !master->diseqc_tree)
+            CheckFrequency(tuning.frequency);
+        ReturnMasterLock(master);
+    }
 
     if (tunerType.IsFECVariable() &&
         symbol_rate_minimum && symbol_rate_maximum &&

@@ -1343,7 +1343,6 @@ void ProgramRecPriority::SortList(ProgramRecPriorityInfo *newCurrentItem)
     }
 
     QMap<int, ProgramRecPriorityInfo>::Iterator pit;
-    vector<ProgramRecPriorityInfo *>::iterator sit;
 
     // copy m_programData into m_sortedProgram
     m_sortedProgram.clear();

@@ -11,6 +11,8 @@
 
 class MythPlayer;
 
+const uint k708MaxServices = 64;
+
 class CC708Reader
 {
   public:
@@ -73,18 +75,18 @@ class CC708Reader
                            short* unicode_string, short len);
 
     // Data
-    unsigned char* buf[64];
-    uint   buf_alloc[64];
-    uint   buf_size[64];
-    bool   delayed[64];
+    unsigned char* buf[k708MaxServices];
+    uint   buf_alloc[k708MaxServices];
+    uint   buf_size[k708MaxServices];
+    bool   delayed[k708MaxServices];
 
-    short* temp_str[64];
-    int    temp_str_alloc[64];
-    int    temp_str_size[64];
+    short* temp_str[k708MaxServices];
+    int    temp_str_alloc[k708MaxServices];
+    int    temp_str_size[k708MaxServices];
 
     int        currentservice;
-    CC708Service CC708services[64];
-    int        CC708DelayedDeletes[64];
+    CC708Service CC708services[k708MaxServices];
+    int        CC708DelayedDeletes[k708MaxServices];
     QString    osdfontname;
     QString    osdccfontname;
     QString    osd708fontnames[20];

@@ -1592,6 +1592,18 @@ static HostCheckBox *EnableMHEG()
     return gc;
 }
 
+static HostCheckBox *EnableMHEGic()
+{
+    HostCheckBox *gc = new HostCheckBox("EnableMHEGic");
+    gc->setLabel(OSDSettings::tr("Enable network access for interactive TV"));
+    gc->setValue(true);
+    gc->setHelpText(OSDSettings::tr("If enabled, interactive TV applications "
+                                    "(MHEG) will be able to access interactive "
+                                    "content over the Internet. This is used "
+                                    "for BBC iPlayer."));
+    return gc;
+}
+
 static HostCheckBox *PersistentBrowseMode()
 {
     HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
@@ -2703,7 +2715,7 @@ static GlobalComboBox *GRSchedOpenEnd()
                                                   "recordings"));
 
     bc->setHelpText(
-        GeneralRecPrioritiesSettings::tr("Selects the situations where the"
+        GeneralRecPrioritiesSettings::tr("Selects the situations where the "
                                          "scheduler will avoid assigning shows "
                                          "to the same card if their end time "
                                          "and start time match. This will be "
@@ -4025,6 +4037,7 @@ OSDSettings::OSDSettings()
     osd->setLabel(tr("On-screen Display"));
 
     osd->addChild(EnableMHEG());
+    osd->addChild(EnableMHEGic());
     osd->addChild(PersistentBrowseMode());
     osd->addChild(BrowseAllTuners());
     osd->addChild(DefaultCCMode());

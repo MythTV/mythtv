@@ -1075,7 +1075,7 @@ When you have completed your changes, click &quot;Finish&quot; to continue.</tra
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Weather settings</source>
-        <translation type="unfinished">Weather settings</translation>
+        <translation>Weather settings</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>

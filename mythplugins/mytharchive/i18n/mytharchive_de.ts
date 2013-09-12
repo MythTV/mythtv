@@ -441,7 +441,7 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
         <translation>DVD-RW brennen (löschen forcieren)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Konnte mytharchivehelper nicht starten um die DVD zu brennen.</translation>
     </message>
@@ -2011,12 +2011,12 @@ Bitte warten...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="162"/>
         <source>Clear All</source>
         <translation>Auswahl löschen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="163"/>
         <source>Select All</source>
         <translation>Alles auswählen</translation>
     </message>
@@ -2025,7 +2025,7 @@ Bitte warten...</translation>
         <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="562"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Sie müssen ein gültiges Passwort für diese Stufe der Altersfreigabe angeben</translation>
     </message>
@@ -2034,8 +2034,8 @@ Bitte warten...</translation>
         <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="368"/>
+        <location filename="../mytharchive/videoselector.cpp" line="505"/>
         <source>All Videos</source>
         <translation>Alle Videos</translation>
     </message>
@@ -2044,7 +2044,7 @@ Bitte warten...</translation>
         <translation type="obsolete">Kindersicherungs-PIN:</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="155"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>

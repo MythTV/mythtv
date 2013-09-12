@@ -421,7 +421,7 @@ Introduzca un DVD virgen en la unidad y elija una opción de entre las siguiente
         <translation>Grabar DVD reescribible (forzar borrado)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>No fue posible ejecutar mytharchivehelper para grabar el DVD.</translation>
     </message>

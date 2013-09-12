@@ -125,6 +125,16 @@ void MpegRecorder::TeardownAll(void)
         close(readfd);
         readfd = -1;
     }
+
+    if (_device_read_buffer)
+    {
+        if (_device_read_buffer->IsRunning())
+            _device_read_buffer->Stop();
+
+        delete _device_read_buffer;
+        _device_read_buffer = NULL;
+    }
+
 }
 
 static int find_index(const int *audio_rate, int value)
@@ -853,18 +863,40 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 #ifdef V4L2_CAP_SLICED_VBI_CAPTURE
     if (supports_sliced_vbi)
     {
+        int fd;
+
+        if (OpenVBIDevice() >= 0)
+            fd = vbi_fd;
+        else
+            fd = chanfd;
+
         struct v4l2_format vbifmt;
         memset(&vbifmt, 0, sizeof(struct v4l2_format));
         vbifmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
         vbifmt.fmt.sliced.service_set |= (VBIMode::PAL_TT == vbimode) ?
             V4L2_SLICED_VBI_625 : V4L2_SLICED_VBI_525;
 
-        if (ioctl(chanfd, VIDIOC_S_FMT, &vbifmt) < 0)
+        if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                "Unable to enable VBI embedding" + ENO);
+            if (vbi_fd >= 0)
+            {
+                fd = chanfd; // Retry with video device instead
+                if (ioctl(fd, VIDIOC_S_FMT, &vbifmt) < 0)
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
+                        "Unable to enable VBI embedding (/dev/vbiX)" + ENO);
+                    return false;
+                }
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "Unable to enable VBI embedding (/dev/videoX)" + ENO);
+                return false;
+            }
         }
-        else if (ioctl(chanfd, VIDIOC_G_FMT, &vbifmt) >= 0)
+
+        if (ioctl(fd, VIDIOC_G_FMT, &vbifmt) >= 0)
         {
             LOG(VB_RECORD, LOG_INFO,
                 LOC + QString("VBI service: %1, io size: %2")
@@ -881,7 +913,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
             ctrls.count      = 1;
             ctrls.controls   = &vbi_ctrl;
 
-            if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
+            if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Unable to set VBI embedding format" + ENO);

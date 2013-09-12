@@ -1257,3 +1257,19 @@ ChannelBase *ChannelBase::CreateChannel(
     return channel;
 }
 
+bool ChannelBase::IsExternalChannelChangeInUse(void)
+{
+    if (!IsExternalChannelChangeSupported())
+        return false;
+
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("IsExternalChannelChangeInUse: "
+                    "non-existant input id '%1'").arg(m_currentInputID));
+        return false;
+    }
+
+    return !(*it)->externalChanger.isEmpty();
+}

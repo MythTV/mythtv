@@ -19,7 +19,7 @@
     <message>
         <location filename="../mythzoneminder/main.cpp" line="132"/>
         <source>ZoneMinder Live View</source>
-        <translation>Vista en Directo de ZoneMinder</translation>
+        <translation>Vista en vivo de ZoneMinder</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/main.cpp" line="134"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Edit Monitor Function</source>
-        <translation>Editar Función de Monitor</translation>
+        <translation>Editar función de monitor</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
@@ -88,12 +88,12 @@
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>ZoneMinder Event Player</source>
-        <translation>Reproductor de Eventos de ZoneMinder</translation>
+        <translation>Reproductor de eventos de ZoneMinder</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>ZoneMinder Live Player</source>
-        <translation>Reproductor en Directo de ZoneMinder</translation>
+        <translation>Reproductor en vivo de ZoneMinder</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="52"/>
@@ -108,12 +108,12 @@
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>Select Camera</source>
-        <translation>Seleccionar Cámara</translation>
+        <translation>Seleccionar cámara</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Select Date</source>
-        <translation>Seleccionar Fecha</translation>
+        <translation>Seleccionar fecha</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
@@ -123,7 +123,7 @@
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Event Name</source>
-        <translation>Nombre del Evento</translation>
+        <translation>Nombre del evento</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -158,7 +158,7 @@
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Event Name (1/123)</source>
-        <translation>Nombre del Evento (1/123)</translation>
+        <translation>Nombre del evento (1/123)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -168,7 +168,7 @@
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Camera Name</source>
-        <translation>Nombre de la Cámara</translation>
+        <translation>Nombre de la cámara</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
@@ -233,7 +233,7 @@
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>ZoneMinder Live</source>
-        <translation>ZoneMinder en Vivo</translation>
+        <translation>ZoneMinder en vivo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -245,12 +245,12 @@
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Select Camera:</source>
-        <translation>Seleccionar Cámara:</translation>
+        <translation>Seleccionar cámara:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Select Date:</source>
-        <translation>Seleccionar Fecha:</translation>
+        <translation>Seleccionar fecha:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
@@ -275,17 +275,17 @@
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Show Console</source>
-        <translation>Mostrar Consola</translation>
+        <translation>Mostrar consola</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Show Live View</source>
-        <translation>Mostrar Vista en Directo</translation>
+        <translation>Mostrar vista en vivo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Show Events</source>
-        <translation>Mostrar Eventos</translation>
+        <translation>Mostrar eventos</translation>
     </message>
 </context>
 <context>
@@ -298,7 +298,7 @@
     <message>
         <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
-        <translation>¡¡El mythzmserver no respondió a nuestras peticiones de obtener la versión del protocolo!!</translation>
+        <translation>¡¡El mythzmserver no respondió a nuestra petición de obtener la versión del protocolo!!</translation>
     </message>
 </context>
 <context>
@@ -331,13 +331,13 @@
         <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
-        <translation>Todas las Cámaras</translation>
+        <translation>Todas las cámaras</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
         <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
-        <translation>Todas las Fechas</translation>
+        <translation>Todas las fechas</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
@@ -347,17 +347,17 @@
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
         <source>Change View</source>
-        <translation>Cambiar Vista</translation>
+        <translation>Cambiar vista</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Delete All</source>
-        <translation>Eliminar Todos</translation>
+        <translation>Eliminar todos</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All Events?</source>
-        <translation>¿Eliminar Todos los Eventos?</translation>
+        <translation>¿Eliminar todos los eventos?</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
@@ -370,7 +370,7 @@
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
-        <translation>No es posible mostrar la vista en directo.</translation>
+        <translation>No es posible mostrar la vista en vivo.</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>

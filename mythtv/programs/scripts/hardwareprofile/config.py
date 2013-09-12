@@ -9,6 +9,11 @@ SECURE = 0
 
 from MythTV import MythDB
 confdir = os.path.join(MythDB().dbconfig.confdir, 'HardwareProfile')
+try:
+    os.mkdir(confdir, 0700)
+except OSError:
+    pass
+
 HW_UUID     = os.path.join(confdir, 'hw-uuid')
 PUB_UUID    = os.path.join(confdir, 'pub-uuid')
 UUID_DB     = os.path.join(confdir, 'uuiddb.cfg')

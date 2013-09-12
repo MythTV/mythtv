@@ -39,8 +39,6 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
         MythUIType *parent = NULL, bool addToGlobal = false,
         bool showWarnings = true);
 
-    void GetOffset(QPoint &offset) const;
-
     void SetRelativeSize(float rSize) { m_relativeSize = rSize; }
     float GetRelativeSize(void) const { return m_relativeSize; }
     void SetPixelSize(float size);
@@ -67,8 +65,6 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     QColor  m_outlineColor;
     int     m_outlineSize;
     int     m_outlineAlpha;
-
-    QPoint  m_drawingOffset;
 
     float   m_relativeSize;
 

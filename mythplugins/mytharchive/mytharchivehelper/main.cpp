@@ -75,6 +75,7 @@ extern "C" {
 
 // mytharchive headers
 #include "../mytharchive/archiveutil.h"
+#include "../mytharchive/remoteavformatcontext.h"
 
 namespace
 {
@@ -1610,16 +1611,12 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
 {
     av_register_all();
 
-    AVFormatContext *inputFC = NULL;
-
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("grabThumbnail(): Opening '%1'")
             .arg(inFile));
 
-    QByteArray inFileBA = inFile.toLocal8Bit();
-
-    int ret = avformat_open_input(&inputFC, inFileBA.constData(), NULL, NULL);
-    if (ret)
+    RemoteAVFormatContext inputFC(inFile);
+    if (!inputFC.isOpen())
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "grabThumbnail(): Couldn't open input file" +
                                   ENO);
@@ -1627,12 +1624,11 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     }
 
     // Getting stream information
-    if ((ret = avformat_find_stream_info(inputFC, NULL)) < 0)
+    int ret = avformat_find_stream_info(inputFC, NULL);
+    if (ret < 0)
     {
         LOG(VB_JOBQUEUE, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        avformat_close_input(&inputFC);
-        inputFC = NULL;
         return 1;
     }
 
@@ -1804,9 +1800,6 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     // close the codec
     avcodec_close(codecCtx);
 
-    // close the video file
-    avformat_close_input(&inputFC);
-
     return 0;
 }
 
@@ -1950,18 +1943,12 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
     av_register_all();
 
-    AVFormatContext *inputFC = NULL;
-    AVInputFormat *fmt = NULL;
-
     // Open recording
-    LOG(VB_JOBQUEUE, LOG_INFO, QString("getFileInfo(): Opening '%1'")
+    LOG(VB_JOBQUEUE , LOG_INFO, QString("getFileInfo(): Opening '%1'")
             .arg(inFile));
 
-    QByteArray inFileBA = inFile.toLocal8Bit();
-
-    int ret = avformat_open_input(&inputFC, inFileBA.constData(), fmt, NULL);
-
-    if (ret)
+    RemoteAVFormatContext inputFC(inFile);
+    if (!inputFC.isOpen())
     {
         LOG(VB_JOBQUEUE, LOG_ERR, "getFileInfo(): Couldn't open input file" +
                                   ENO);
@@ -1969,21 +1956,17 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     }
 
     // Getting stream information
-    ret = avformat_find_stream_info(inputFC, NULL);
+    int ret = avformat_find_stream_info(inputFC, NULL);
 
     if (ret < 0)
     {
         LOG(VB_JOBQUEUE, LOG_ERR,
             QString("Couldn't get stream info, error #%1").arg(ret));
-        avformat_close_input(&inputFC);
-        inputFC = NULL;
         return 1;
     }
 
-    // av_estimate_timings(inputFC, 0);
-
     // Dump stream information
-    av_dump_format(inputFC, 0, inFileBA.constData(), 0);
+    av_dump_format(inputFC, 0, qPrintable(inFile), 0);
 
     QDomDocument doc("FILEINFO");
 
@@ -2094,12 +2077,25 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                             // use info from pos map in db
                             // (only useful if the file is a myth recording)
                             frameCount = getFrameCount(inFile, fps);
-                            LOG(VB_JOBQUEUE, LOG_INFO,
-                                QString("frames = %1").arg(frameCount));
-                            duration = (uint)(frameCount / fps);
-                            LOG(VB_JOBQUEUE, LOG_INFO,
-                                QString("duration = %1").arg(duration));
-                            root.setAttribute("duration", duration);
+                            if (frameCount)
+                            {
+                                LOG(VB_JOBQUEUE, LOG_INFO,
+                                    QString("frames = %1").arg(frameCount));
+                                duration = (uint)(frameCount / fps);
+                                LOG(VB_JOBQUEUE, LOG_INFO,
+                                    QString("duration = %1").arg(duration));
+                                root.setAttribute("duration", duration);
+                            }
+                            else if (inputFC->duration != (uint) AV_NOPTS_VALUE)
+                            {
+                                duration = (uint) (inputFC->duration / AV_TIME_BASE);
+                                root.setAttribute("duration", duration);
+                                LOG(VB_JOBQUEUE, LOG_INFO,
+                                    QString("duration = %1").arg(duration));
+                                frameCount = (int64_t)(duration * fps);
+                            }
+                            else
+                                root.setAttribute("duration", "N/A");
                             break;
                         }
                         default:
@@ -2223,10 +2219,6 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     t << doc.toString(4);
     f.close();
 
-    // Close input file
-    avformat_close_input(&inputFC);
-    inputFC = NULL;
-
     return 0;
 }
 
@@ -2258,6 +2250,9 @@ static int getDBParamters(QString outFile)
 
 static int isRemote(QString filename)
 {
+    if (filename.startsWith("myth://"))
+        return 3;
+
     // check if the file exists
     if (!QFile::exists(filename))
         return 0;
