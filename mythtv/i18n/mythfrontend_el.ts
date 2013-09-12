@@ -12076,7 +12076,7 @@ name cannot be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2007"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in. Currently only works with XVideo video renderer.</source>
-        <translation></translation>
+        <translation>Από προεπιλογή το MythTV χρησιμοποιεί μαύρο φόντο στους υποτίτλους για να ταιριάζει με του παρόχου, αλλά όσοι έχουν τηλεοράσης Plasma προτείνεται να χρησιμοποιούν γκρι για ελαχιστοποίηση της φθοράς. Επί του παρόντος λειτουργεί μόνο με την απεικόνιση εικόνας XVideo.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2020"/>
@@ -22539,7 +22539,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
         <source>%&quot;|SUBTITLE|&quot; %%(|YEAR|) %%DESCRIPTION%</source>
-        <translation></translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%(|YEAR|) %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="354"/>
@@ -23687,7 +23687,8 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
         <location filename="../themes/themestrings.h" line="984"/>
         <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %%YEARSTARS| %%DESCRIPTION%</source>
-        <translation></translation>
+        <translation>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
+%%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="986"/>
