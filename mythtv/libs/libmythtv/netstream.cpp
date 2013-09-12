@@ -15,9 +15,13 @@ using std::getenv;
 #include <QNetworkReply>
 #include <QNetworkProxy>
 #include <QNetworkDiskCache>
+#ifndef QT_NO_OPENSSL
 #include <QSslConfiguration>
 #include <QSslError>
 #include <QSslSocket>
+#include <QSslKey>
+#endif
+#include <QFile>
 #include <QUrl>
 #include <QThread>
 #include <QMutexLocker>
@@ -87,14 +91,16 @@ public:
 /**
  * Network streaming request
  */
-NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/) :
+NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
+        const QByteArray &cert) :
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
     m_state(kClosed),
     m_pending(0),
     m_reply(0),
     m_nRedirections(0),
     m_size(-1),
-    m_pos(0)
+    m_pos(0),
+    m_cert(cert)
 {
     setObjectName("NetStream " + url.toString());
 
@@ -187,15 +193,70 @@ bool NetStream::Request(const QUrl& url)
         m_request.setRawHeader("Range", QString("bytes=%1-").arg(m_pos).toLatin1());
 
 #ifndef QT_NO_OPENSSL
-#if 1 // The BBC use a self certified cert so don't verify it
     if (m_request.url().scheme() == "https")
     {
-        // TODO use cert from carousel auth.tls.<x>
         QSslConfiguration ssl(QSslConfiguration::defaultConfiguration());
-        ssl.setPeerVerifyMode(QSslSocket::VerifyNone);
+
+        QList<QSslCertificate> clist;
+        if (!m_cert.isEmpty())
+        {
+            clist = QSslCertificate::fromData(m_cert, QSsl::Der);
+            if (clist.isEmpty())
+                LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid certificate: %1")
+                    .arg(m_cert.toPercentEncoding().constData()) );
+        }
+
+        if (clist.isEmpty())
+            // The BBC servers use a self certified cert so don't verify it
+            ssl.setPeerVerifyMode(QSslSocket::VerifyNone);
+        else
+            ssl.setCaCertificates(clist);
+
+        // We need to provide a client certificate for the BBC,  See:
+        // openssl s_client -state -prexit -connect securegate.iplayer.bbc.co.uk:443
+        // for a list of accepted certificates
+        QString fname = gCoreContext->GetSetting("MhegClientCert", "");
+        if (!fname.isEmpty())
+        {
+            QFile f(QFile::exists(fname) ? fname : GetShareDir() + fname);
+            if (f.open(QIODevice::ReadOnly))
+            {
+                QSslCertificate cert(&f, QSsl::Pem);
+                if (!cert.isNull())
+                    ssl.setLocalCertificate(cert);
+                else
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
+                        QString("'%1' is an invalid certificate").arg(f.fileName()) );
+            }
+            else
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Opening client certificate '%1': %2")
+                    .arg(f.fileName()).arg(f.errorString()) );
+
+            // Get the private key
+            fname = gCoreContext->GetSetting("MhegClientKey", "");
+            if (!fname.isEmpty())
+            {
+                QFile f(QFile::exists(fname) ? fname : GetShareDir() + fname);
+                if (f.open(QIODevice::ReadOnly))
+                {
+                    QSslKey key(&f, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey,
+                        gCoreContext->GetSetting("MhegClientKeyPass", "").toAscii());
+                    if (!key.isNull())
+                        ssl.setPrivateKey(key);
+                    else
+                        LOG(VB_GENERAL, LOG_WARNING, LOC +
+                            QString("'%1' is an invalid key").arg(f.fileName()) );
+                }
+                else
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
+                        QString("Opening private key '%1': %2")
+                        .arg(f.fileName()).arg(f.errorString()) );
+            }
+        }
+
         m_request.setSslConfiguration(ssl);
     }
-#endif
 #endif
 
     LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) Requesting %2 from %3")
@@ -260,7 +321,7 @@ static qlonglong inline ContentRange(const QNetworkReply *reply,
 
     // See RFC 2616 14.16: 'bytes begin-end/size'
     qlonglong len;
-    if (3 != std::sscanf(range.constData(), " bytes %lld - %lld / %lld", &first, &last, &len))
+    if (3 != std::sscanf(range.constData(), " bytes %20lld - %20lld / %20lld", &first, &last, &len))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Content-Range:'%1'")
             .arg(range.constData()) );
@@ -279,7 +340,7 @@ static bool inline RequestRange(const QNetworkRequest &request,
     if (range.isEmpty())
         return false;
 
-    if (1 > std::sscanf(range.constData(), " bytes %lld - %lld", &first, &last))
+    if (1 > std::sscanf(range.constData(), " bytes %20lld - %20lld", &first, &last))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid Range:'%1'")
             .arg(range.constData()) );
@@ -683,8 +744,7 @@ void NAMThread::run()
         QDesktopServices::storageLocation(QDesktopServices::CacheLocation) );
     m_nam->setCache(cache.take());
 
-    // Setup a network proxy e.g. for TOR: socks://localhost:9050
-    // TODO get this from mythdb
+    // Setup a network proxy
     QString proxy(getenv("HTTP_PROXY"));
     if (!proxy.isEmpty())
     {

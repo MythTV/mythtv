@@ -18,12 +18,6 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "Manual mode will interactively ask you questions about "
             "each channel as it is processed, to configure for "
             "future use.");
-    add("--update", "update", false, "Run non-destructive updates",
-            "Run non-destructive updates on the database for "
-            "users in xmltv zones that do not provide channel "
-            "data. Stops the addition of new channels and the "
-            "changing of channel icons.")
-        ->SetBlocks("manual");
 
     add("--preset", "preset", false,
             "Use channel preset values instead of numbers",
@@ -62,6 +56,21 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "rather than pull data through the specified grabber.")
         ->SetRequiredChildOf("ddfile")
         ->SetRequiredChildOf("file");
+
+
+    add("--update", "update", false, "Run non-destructive updates",
+            "Run non-destructive updates on the database for "
+            "users in xmltv zones that do not provide channel "
+            "data. Stops the addition of new channels and the "
+            "changing of channel icons.")
+        ->SetBlocks("manual")
+        ->SetDeprecated("Use --only-update-guide instead.")
+        ->SetGroup("Guide Data Handling");
+    add("--only-update-guide", "onlyguide", false, "Only update guide data",
+            "Only update the guide data, do not alter channels or icons.")
+        ->SetBlocks("manual")
+        ->SetGroup("Guide Data Handling");
+
 
     add("--do-channel-updates", "dochannelupdates", false,
             "update channels using datadirect",

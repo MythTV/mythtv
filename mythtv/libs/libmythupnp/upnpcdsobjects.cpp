@@ -15,6 +15,7 @@
 #include <QUrl>
 
 #include "upnpcds.h"
+#include "mythlogging.h"
 
 inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 
@@ -70,13 +71,23 @@ Property *CDSObject::AddProperty( Property *pProp )
 {
     if (pProp)
     {
-        Properties::iterator it = m_properties.find(pProp->m_sName);
-        if (it != m_properties.end())
+        // If this property is allowed multiple times in an object
+        // e.g. Different sizes of artwork, then just insert it
+        // Otherwise remove all existing instances of this property first
+        // NOTE: This requires ALL instances of a property which can exist
+        //       more than once to have m_bAllowMulti set to true.
+        if (pProp->m_bMultiValue)
+            m_properties.insertMulti(pProp->m_sName, pProp);
+        else
         {
-            delete *it;
-            m_properties.erase(it);
+            Properties::iterator it = m_properties.find(pProp->m_sName);
+            while (it != m_properties.end() && it.key() == pProp->m_sName)
+            {
+                delete *it;
+                it = m_properties.erase(it);
+            }
+            m_properties[pProp->m_sName] = pProp;
         }
-        m_properties[pProp->m_sName] = pProp;
     }
 
     return pProp;
@@ -86,24 +97,33 @@ Property *CDSObject::AddProperty( Property *pProp )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Property *CDSObject::GetProperty( QString sName )
+QList<Property*> CDSObject::GetProperties( const QString &sName )
 {
+    QList<Property*> props;
     Properties::iterator it = m_properties.find(sName);
-    if (it !=  m_properties.end() && *it)
-        return (*it);
+    while (it != m_properties.end() && it.key() == sName)
+    {
+        if (*it)
+            props.append(*it);
+        ++it;
+    }
 
-    return 0;
+    return props;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::SetPropValue( QString sName, QString sValue )
+void CDSObject::SetPropValue( const QString &sName, const QString &sValue )
 {
     Properties::iterator it = m_properties.find(sName);
     if (it !=  m_properties.end() && *it)
     {
+        if ((*it)->m_bMultiValue)
+            LOG(VB_UPNP, LOG_WARNING,
+                QString("SetPropValue(%1) called on property with bAllowMulti. "
+                        "Only the last inserted property will be updated."));
         (*it)->m_sValue = HTTPRequest::Encode(sValue);
     }
 }
@@ -117,7 +137,13 @@ QString CDSObject::GetPropValue(const QString &sName) const
     Properties::const_iterator it = m_properties.find(sName);
 
     if (it !=  m_properties.end() && *it)
+    {
+        if ((*it)->m_bMultiValue)
+            LOG(VB_UPNP, LOG_WARNING,
+                QString("GetPropValue(%1) called on property with bAllowMulti. "
+                        "Only the last inserted property will be return."));
         return QUrl::fromPercentEncoding((*it)->m_sValue.toUtf8());
+    }
     
     return "";
 }
@@ -375,7 +401,10 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 
-    pObject->AddProperty( new Property( "albumArtURI"         , "upnp" ));
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // TN
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // SM
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
 
     return( pObject );
 }
@@ -451,8 +480,11 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
     pObject->AddProperty( new Property( "album"          , "upnp" ));
     pObject->AddProperty( new Property( "date"           , "dc"   ));
 
-    pObject->AddProperty( new Property( "albumArtURI"    , "upnp"   ));
 
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // TN
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // SM
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // MED
+    pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // LRG
     return( pObject );
 }
 

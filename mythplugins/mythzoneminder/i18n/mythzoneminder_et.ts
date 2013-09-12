@@ -28,53 +28,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation type="obsolete">MythZoneMinder serveri IP aadress</translation>
-    </message>
-    <message>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation type="obsolete">Sisesta MythZoneMinder serveri IP aadress, millega see klient peaks ühenduma.</translation>
-    </message>
-    <message>
-        <source>Port the server runs on</source>
-        <translation type="obsolete">Port kus server kuulab</translation>
-    </message>
-    <message>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="obsolete">Kui sa ei tea täpselt mida teed, jäta see muutmata.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Kuupäeva formaat</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Vaated kuvatakse tänase kuupäevaga.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Vaated kuvatakse homse kuupäevaga.</translation>
-    </message>
-    <message>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation type="obsolete">Eelistatud kuupäeva formaat sündmuste lehel.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Aja formaat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation type="obsolete">Eelistatud aja formaat sündmuste lehel.</translation>
-    </message>
-    <message>
-        <source>MythZoneMinder Settings</source>
-        <translation type="obsolete">MythZoneMinder seaded</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="5"/>

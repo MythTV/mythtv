@@ -274,6 +274,7 @@ class MHUnion
     MHUnion(const MHContentRef &cnVal) : m_Type(U_ContentRef), m_nIntVal(0), m_fBoolVal(false) { m_ContentRefVal.Copy(cnVal); }
 
     void GetValueFrom(const MHParameter &value, MHEngine *engine); // Copies the argument, getting the value of an indirect args.
+    QString Printable() const;
 
     enum UnionTypes { U_Int, U_Bool, U_String, U_ObjRef, U_ContentRef, U_None } m_Type;
     void CheckType (enum UnionTypes) const; // Check a type and fail if it doesn't match. 

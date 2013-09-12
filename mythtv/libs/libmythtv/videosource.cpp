@@ -209,9 +209,11 @@ class DVBNetID : public SpinBoxSetting, public VideoSourceDBStorage
         VideoSourceDBStorage(this, parent, "dvb_nit_id")
     {
        setLabel(QObject::tr("Network ID"));
-       setHelpText(QObject::tr("Set this to the actual network ID at your "
-                "location, if you have a provider that broadcasts a broken "
-                "NIT. Leave at -1 if everything works out of the box."));
+       //: Network_ID is the name of an identifier in the DVB's Service
+       //: Information standard specification.
+       setHelpText(QObject::tr("If your provider has asked you to configure a "
+                               "specific network identifier (Network_ID), "
+                               "enter it here. Leave it at -1 otherwise."));
        setValue(value);
     };
 };

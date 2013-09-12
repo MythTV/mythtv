@@ -1764,6 +1764,8 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
         if (! StreamID::IsObjectCarousel(pmt.StreamType(i)))
             continue;
 
+        LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams Found Object Carousel in Stream %1").arg(QString::number(i)));
+
         const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
             pmt.StreamInfo(i), pmt.StreamInfoLength(i),
             DescriptorID::data_broadcast_id);
@@ -1775,6 +1777,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
             uint length = *desc++;
             const unsigned char *endDesc = desc+length;
             uint dataBroadcastId = desc[0]<<8 | desc[1];
+            LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams dataBroadcastId %1").arg(QString::number(dataBroadcastId)));
             if (dataBroadcastId != 0x0106) // ETSI/UK Profile
                 continue;
             desc += 2; // Skip data ID
@@ -1784,6 +1787,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
 #ifdef USING_MHEG
+                LOG(VB_DSMCC, LOG_NOTICE, QString("ScanDSMCCStreams AppTypeCode %1").arg(QString::number(appTypeCode)));
                 if (appTypeCode == 0x101) // UK MHEG profile
                 {
                     const unsigned char *subDescEnd = desc + appSpecDataLen;
@@ -4620,8 +4624,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             {
                 // no need to buffer audio or video if we
                 // only care about building a keyframe map.
+                // NB but allow for data only (MHEG) streams
                 allowedquit = true;
-                continue;
             }
             else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
                      (storedPackets.count() < max_video_queue_size) &&
@@ -4661,23 +4665,17 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
 
             int retval = 0;
-            avcodeclock->lock();
             if (!ic || ((retval = ReadPacket(ic, pkt, storevideoframes)) < 0))
             {
                 if (retval == -EAGAIN)
-                {
-                    avcodeclock->unlock();
                     continue;
-                }
 
                 SetEof(true);
                 delete pkt;
                 errno = -retval;
                 LOG(VB_GENERAL, LOG_ERR, QString("decoding error") + ENO);
-                avcodeclock->unlock();
                 return false;
             }
-            avcodeclock->unlock();
 
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
@@ -4844,6 +4842,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
+    QMutexLocker locker(avcodeclock);
+
     return av_read_frame(ctx, pkt);
 }
 

@@ -812,12 +812,12 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
 <context>
     <name>ImageView</name>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="113"/>
+        <location filename="../mythgallery/imageview.cpp" line="118"/>
         <source>Random Slideshow</source>
         <translation>Zufällige Präsentation</translation>
     </message>
     <message>
-        <location filename="../mythgallery/imageview.cpp" line="119"/>
+        <location filename="../mythgallery/imageview.cpp" line="124"/>
         <source>Slideshow</source>
         <translation>Präsentation</translation>
     </message>
@@ -1216,9 +1216,8 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>MENU: Menü aktivieren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Video Gallery</source>
-        <translation>Videogalerie</translation>
+        <translation type="obsolete">Videogalerie</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -1311,13 +1310,13 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>Geben Sie Ihre aktuelle Position oder die nächste Stadt ein. Für manche Länder wird auch die Postleitzahl unterstützt.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Folder filter :</source>
         <oldsource>Directory filter :</oldsource>
         <translation>Verzeichnisfilter :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Type filter :</source>
         <translation>Typenfilter :</translation>
     </message>
@@ -1326,7 +1325,7 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation type="obsolete">NumImages_Text</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Sort by :</source>
         <translation>Sortieren nach:</translation>
     </message>
@@ -1336,12 +1335,12 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
         <translation>Filter prüfen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Save as default</source>
         <translation>Als Standard speichern</translation>
     </message>

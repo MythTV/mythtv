@@ -18,6 +18,8 @@ using namespace std;
 #include <QImage>
 #include <QList>
 #include <QRect>
+#include <QPoint>
+#include <QPair>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -165,6 +167,9 @@ class MHIContext : public MHContext, public QRunnable
     void NetworkBootRequested(void);
     void ClearDisplay(void);
     void ClearQueue(void);
+    bool LoadChannelCache();
+    bool GetDSMCCObject(const QString &objectPath, QByteArray &result);
+    bool CheckAccess(const QString &objectPath, QByteArray &cert);
 
     InteractiveTV   *m_parent;
 
@@ -208,6 +213,17 @@ class MHIContext : public MHContext, public QRunnable
 
     QRect            m_videoRect, m_videoDisplayRect;
     QRect            m_displayRect;
+
+    // Channel index database cache
+    typedef QPair< int, int > Val_t; // transportid, chanid
+    typedef QPair< int, int > Key_t; // networkid, serviceid
+    typedef QMap< Key_t, Val_t > ChannelCache_t;
+    ChannelCache_t  m_channelCache;
+    QMutex          m_channelMutex;
+    static inline int Tid(ChannelCache_t::const_iterator it) { return it->first; }
+    static inline int Cid(ChannelCache_t::const_iterator it) { return it->second; }
+    static inline int Nid(ChannelCache_t::const_iterator it) { return it.key().first; }
+    static inline int Sid(ChannelCache_t::const_iterator it) { return it.key().second; }
 };
 
 // Object for drawing text.

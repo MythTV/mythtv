@@ -803,7 +803,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             (token2.contains(QRegExp("^\\-*\\d*\\.\\d+x$"))))
             message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
         else if (is_abbrev("normal", token2))
-            message = QString("NETWORK_CONTROL SPEED 1x");
+            message = QString("NETWORK_CONTROL SPEED normal");
         else if (is_abbrev("pause", token2))
             message = QString("NETWORK_CONTROL SPEED 0x");
         else

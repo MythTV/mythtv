@@ -33,7 +33,7 @@
 /* The function pointers that is the exported interface of this file. */
 dvd_input_t (*dvdinput_open)  (const char *);
 int         (*dvdinput_close) (dvd_input_t);
-int         (*dvdinput_seek)  (dvd_input_t, int);
+int         (*dvdinput_seek)  (dvd_input_t, int, int);
 int         (*dvdinput_title) (dvd_input_t, int);
 int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
 char *      (*dvdinput_error) (dvd_input_t);
@@ -116,10 +116,9 @@ static char *css_error(dvd_input_t dev)
 /**
  * seek into the device.
  */
-static int css_seek(dvd_input_t dev, int blocks)
+static int css_seek(dvd_input_t dev, int blocks, int flags)
 {
-  /* DVDINPUT_NOFLAGS should match the DVDCSS_NOFLAGS value. */
-  return DVDcss_seek(dev->dvdcss, blocks, DVDINPUT_NOFLAGS);
+  return DVDcss_seek(dev->dvdcss, blocks, flags);
 }
 
 /**
@@ -196,9 +195,10 @@ static char *file_error(dvd_input_t dev)
 /**
  * seek into the device.
  */
-static int file_seek(dvd_input_t dev, int blocks)
+static int file_seek(dvd_input_t dev, int blocks, int flags)
 {
   off_t pos;
+  (void)flags;
 
   pos = mythfile_seek(dev->fd, (off_t)blocks * (off_t)DVD_VIDEO_LB_LEN, SEEK_SET);
   if(pos < 0) {

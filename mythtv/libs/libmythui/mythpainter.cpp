@@ -223,6 +223,16 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
     // input QRect to the top of the actual text.  It may be nonzero
     // because of extra vertical padding.
     int initialPaddingY = (r.height() - totalHeight) / 2;
+    // Hack.  Normally we vertically center the text due to some
+    // (solvable) issues in the SubtitleScreen code - the text rect
+    // and the background rect are both created with PAD_WIDTH extra
+    // padding, and to honor Qt::AlignTop, the text rect needs to be
+    // without padding.  This doesn't work for Qt::TextWordWrap, since
+    // the first line will be vertically centered with subsequence
+    // lines below.  So if Qt::TextWordWrap is set, we do top
+    // alignment.
+    if (flags & Qt::TextWordWrap)
+        initialPaddingY = 0;
 
     // textOffsetX is the number of pixels from r.left() to the left
     // edge of the core text.  This assumes that flags contains

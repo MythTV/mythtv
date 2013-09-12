@@ -236,6 +236,9 @@ HEADERS += channelscan/iptvchannelfetcher.h
 SOURCES += channelscan/scaninfo.cpp channelscan/channelimporter.cpp
 SOURCES += channelscan/iptvchannelfetcher.cpp
 
+HEADERS += dvdstream.h
+SOURCES += dvdstream.cpp
+
 # subtitles: srt
 HEADERS += srtwriter.h
 SOURCES += srtwriter.cpp
@@ -248,6 +251,7 @@ INSTALLS += inc
 
 #DVD stuff
 DEPENDPATH  += ../libmythdvdnav/
+DEPENDPATH  += ../libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
 INCLUDEPATH += ../libmythdvdnav
 POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 HEADERS += DVD/dvdringbuffer.h

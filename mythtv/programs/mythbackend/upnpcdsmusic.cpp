@@ -77,13 +77,11 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
           "count( song.album_id ) as children "
             "FROM music_songs song join music_albums a on a.album_id = song.album_id "
             "%1 "
-            "GROUP BY a.album_id "
+            "GROUP BY a.album_name "
             "ORDER BY a.album_name",
         "WHERE song.album_id=:KEY", "album.album_name" },
-
-#if 0
     {   "By Artist",
-        "artist_id",
+        "song.artist_id",
         "SELECT a.artist_id as id, "
           "a.artist_name as name, "
           "count( distinct song.artist_id ) as children "
@@ -94,7 +92,7 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
         "WHERE song.artist_id=:KEY", "" },
 
 {   "By Genre",
-        "genre_id",
+        "song.genre_id",
         "SELECT g.genre_id as id, "
           "genre as name, "
           "count( distinct song.genre_id ) as children "
@@ -103,7 +101,6 @@ UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
             "GROUP BY g.genre_id "
             "ORDER BY g.genre",
         "WHERE song.genre_id=:KEY", "" },
-#endif
 
 };
 
@@ -354,6 +351,67 @@ void UPnpCDSMusic::AddItem( const UPnpCDSRequest    *pRequest,
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
     pObject->AddProperty( new Property( "date"                , "dc"   ));
 #endif
+
+    QString sArtURI = QString( "%1GetAlbumArt?Id=%2").arg( sURIBase   )
+                                                     .arg( nId );
+
+    QList<Property*> propList = pItem->GetProperties("albumArtURI");
+    if (propList.size() >= 4)
+    {
+        // Prefer JPEG over PNG here, although PNG is allowed JPEG probably
+        // has wider device support and crucially the filesizes are smaller
+        // which speeds up loading times over the network
+
+        // We MUST include the thumbnail size, but since some clients may use the
+        // first image they see and the thumbnail is tiny, instead return the
+        // medium first. The large could be very large, which is no good if the
+        // client is pulling images for an entire list at once!
+
+        // Medium
+        Property *pProp = propList.at(0);
+        if (pProp)
+        {
+            // Must be no more than 1024x768
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=1024&amp;Height=768");
+            pProp->AddAttribute("dlna:profileID", "JPG_MED");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Thumbnail
+        pProp = propList.at(1);
+        if (pProp)
+        {
+            // At least one albumArtURI must be a ThumbNail (TN) no larger
+            // than 160x160, and it must also be a jpeg
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=160&amp;Height=160");
+            pProp->AddAttribute("dlna:profileID", "JPG_TN");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Small
+        pProp = propList.at(2);
+        if (pProp)
+        {
+            // Must be no more than 640x480
+            pProp->m_sValue = sArtURI;
+            pProp->m_sValue.append("&amp;Width=640&amp;Height=480");
+            pProp->AddAttribute("dlna:profileID", "JPG_SM");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+
+        // Large
+        pProp = propList.at(3);
+        if (pProp)
+        {
+            // Must be no more than 4096x4096 - for our purposes, just return
+            // a fullsize image
+            pProp->m_sValue = sArtURI;
+            pProp->AddAttribute("dlna:profileID", "JPG_LRG");
+            pProp->AddAttribute("xmlns:dlna", "urn:schemas-dlna-org:metadata-1-0");
+        }
+    }
 
     pResults->Add( pItem );
 

@@ -77,7 +77,7 @@ RemoteFile::~RemoteFile()
 
 bool RemoteFile::isLocal(const QString &path)
 {
-    bool is_local =
+    bool is_local = !path.isEmpty() &&
         !path.startsWith("/dev") && !path.startsWith("myth:") &&
         (path.startsWith("/") || QFile::exists(path));
     return is_local;
@@ -399,12 +399,18 @@ bool RemoteFile::DeleteFile(const QString &url)
 
 bool RemoteFile::Exists(const QString &url)
 {
+    if (url.isEmpty())
+        return false;
+
     struct stat fileinfo;
     return Exists(url, &fileinfo);
 }
 
 bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
 {
+    if (url.isEmpty())
+        return false;
+
     if (isLocal(url))
     {
        LOG(VB_FILE, LOG_INFO,

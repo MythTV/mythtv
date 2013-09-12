@@ -41,9 +41,11 @@
 #include "mythdate.h"
 #include "mythdownloadmanager.h"
 #include "metadataimagehelper.h"
+#include "musicmetadata.h"
 #include "videometadatalistmanager.h"
 #include "HLS/httplivestream.h"
 #include "mythmiscutil.h"
+#include "remotefile.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -191,7 +193,7 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     if ( nHeight == 0 )
         nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::KeepAspectRatio,
                                 Qt::SmoothTransformation);
 
     QByteArray fname = sNewFileName.toLatin1();
@@ -287,6 +289,7 @@ DTC::ArtworkInfoList* Content::GetProgramArtworkList( const QString &sInetref,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+// NOTE: If you rename this, you must also update upnpcdsvideo.cpp
 QFileInfo Content::GetVideoArtwork( const QString &sType,
                                     int nId, int nWidth, int nHeight )
 {
@@ -343,44 +346,26 @@ QFileInfo Content::GetVideoArtwork( const QString &sType,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
+QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
 {
-    QString sFullFileName;
-
     // ----------------------------------------------------------------------
     // Read AlbumArt file path from database
     // ----------------------------------------------------------------------
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    MusicMetadata *metadata = MusicMetadata::createFromID(nTrackId);
 
-    query.prepare("SELECT CONCAT_WS('/', music_directories.path, "
-                  "music_albumart.filename) FROM music_albumart "
-                  "LEFT JOIN music_directories ON "
-                  "music_directories.directory_id=music_albumart.directory_id "
-                  "WHERE music_albumart.albumart_id = :ARTID;");
-
-    query.bindValue(":ARTID", nId );
-
-    if (!query.exec())
-        MythDB::DBError("Select ArtId", query);
-
-    QString sMusicBasePath = gCoreContext->GetSetting("MusicLocation", "");
-
-    if (query.next())
-    {
-        sFullFileName = QString( "%1/%2" )
-                        .arg( sMusicBasePath )
-                        .arg( query.value(0).toString() );
-    }
-
-    if (!QFile::exists( sFullFileName ))
+    if (!metadata)
         return QFileInfo();
 
-    if ((nWidth == 0) && (nHeight == 0))
-        return QFileInfo( sFullFileName );
+    QString sFullFileName = metadata->getAlbumArtFile();
 
-    QString sNewFileName = QString( "%1.%2x%3.png" )
-                              .arg( sFullFileName )
+    delete metadata;
+
+    if (!RemoteFile::Exists(sFullFileName))
+        return QFileInfo();
+
+    QString sNewFileName = QString( "/tmp/%1.%2x%3.jpg" )
+                              .arg( QFileInfo(sFullFileName).fileName() )
                               .arg( nWidth    )
                               .arg( nHeight   );
 
@@ -395,29 +380,59 @@ QFileInfo Content::GetAlbumArt( int nId, int nWidth, int nHeight )
     // Must generate Albumart Image, Generate Image and save.
     // ----------------------------------------------------------------------
 
-    float fAspect = 0.0;
 
-    QImage *pImage = new QImage( sFullFileName);
+    QImage img;
+    if (sFullFileName.startsWith("myth://"))
+    {
+        RemoteFile rf(sFullFileName, false, false, 0);
+        QByteArray data;
+        rf.SaveAs(data);
 
-    if (!pImage)
+        img.loadFromData(data);
+    }
+    else
+        img.load(sFullFileName);
+
+    if (img.isNull())
         return QFileInfo();
 
-    if (fAspect <= 0)
-           fAspect = (float)(pImage->width()) / pImage->height();
+    // We don't need to scale if no height and width were specified
+    // but still need to save as jpg if it's in another format
+    if ((nWidth == 0) && (nHeight == 0))
+    {
+        QFileInfo fi(sFullFileName);
+        if (fi.suffix().toLower() == "jpg")
+            return fi;
+    }
+    else if (nWidth > img.width() && nHeight > img.height())
+    {
+        // Requested dimensions are larger than the source image, so instead of
+        // scaling up which will produce horrible results return the fullsize
+        // image and the user can scale further if they want instead
+        // NOTE: If this behaviour is changed, for example making it optional,
+        //       then upnp code will need changing to compensate
+    }
+    else
+    {
+        float fAspect = 0.0;
+        if (fAspect <= 0)
+            fAspect = (float)(img.width()) / img.height();
 
-    if ( nWidth == 0 )
-        nWidth = (int)rint(nHeight * fAspect);
+        if ( nWidth == 0 || nWidth > img.width() )
+            nWidth = (int)rint(nHeight * fAspect);
 
-    if ( nHeight == 0 )
-        nHeight = (int)rint(nWidth / fAspect);
+        if ( nHeight == 0 || nHeight > img.height() )
+            nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
-                                Qt::SmoothTransformation);
+        img = img.scaled( nWidth, nHeight, Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation);
+    }
 
-    QByteArray fname = sNewFileName.toLatin1();
-    img.save( fname.constData(), "PNG" );
-
-    delete pImage;
+    QString fname = sNewFileName.toLatin1().constData();
+    // Use JPG not PNG for compatibility with the most uPnP devices and
+    // faster loading (smaller file to send over network)
+    if (!img.save( fname, "JPG" ))
+        return QFileInfo();
 
     return QFileInfo( sNewFileName );
 }
