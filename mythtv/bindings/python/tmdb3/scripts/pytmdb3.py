@@ -29,14 +29,13 @@ if __name__ == '__main__':
         print "Version: "+__version__
         sys.exit(0)
 
-#   TODO: make this actually do something
-#    if opts.debug:
-#        DEBUG = True
-
     if opts.nocache:
         set_cache(engine='null')
     else:
         set_cache(engine='file', filename='/tmp/pytmdb3.cache')
+
+    if opts.debug:
+        request.DEBUG = True
 
     banner = 'PyTMDB3 Interactive Shell.'
     import code
