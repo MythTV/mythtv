@@ -41,13 +41,13 @@ class MythBackend {
                             ."need to check your mythweb.conf file or re-run mythtv-setup",
                             FATAL);
         }
-		
-		if (!isset($Backends[$host]))
-			$Backends[$host] = array();
+                
+                if (!isset($Backends[$host]))
+                        $Backends[$host] = array();
 
         if (!isset($Backends[$host][$port]))
             $Backends[$host][$port] = new MythBackend($host, $port);
-			
+
         return $Backends[$host][$port];
     }
 
@@ -68,7 +68,7 @@ class MythBackend {
         $this->disconnect();
     }
 
-    private function connect() {
+    private function connect($listen_events) {
         if ($this->fp)
             return;
         $this->fp = @fsockopen($this->ip, $this->port, $errno, $errstr, 25);
@@ -76,7 +76,7 @@ class MythBackend {
             custom_error("Unable to connect to the master backend at {$this->ip}:{$this->port}".(($this->host == $this->ip)?'':" (hostname: {$this->host})").".\nIs it running?");
         socket_set_timeout($this->fp, 30);
         $this->checkProtocolVersion();
-        $this->announce();
+        $this->announce($listen_events);
     }
 
     private function disconnect() {
@@ -84,6 +84,7 @@ class MythBackend {
             return;
         $this->sendCommand('DONE');
         fclose($this->fp);
+        $this->fp = null;
     }
 
     private function checkProtocolVersion() {
@@ -110,8 +111,8 @@ class MythBackend {
         return false;
     }
 
-    private function announce() {
-        $response = $this->sendCommand('ANN Monitor '.hostname.' 0' );
+    private function announce($listen_events) {
+        $response = $this->sendCommand('ANN Monitor '.hostname.($listen_events ? ' 2' : ' 0') );
         if ($response == 'OK')
             return true;
         return false;
@@ -133,7 +134,7 @@ class MythBackend {
     }
 
     public function sendCommand($command = null) {
-        $this->connect();
+        $this->connect(false);
     // The format should be <length + whitespace to 8 total bytes><data>
         if (is_array($command))
             $command = implode(MythBackend::$backend_separator, $command);
@@ -142,8 +143,8 @@ class MythBackend {
         return $this->receiveData();
     }
 
-    public function receiveData($timeout = 30) {
-        $this->connect();
+    private function receiveDataReal($timeout, $listen_events) {
+        $this->connect($listen_events);
         stream_set_timeout($this->fp, $timeout);
 
     // Read the response header to find out how much data we'll be grabbing
@@ -166,11 +167,19 @@ class MythBackend {
         return $response;
     }
 
+    public function receiveData($timeout = 30) {
+        return $this->receiveDataReal($timeout, false);
+    }
+
     public function listenForEvent($event, $timeout = 120) {
+        if ($this->fp)
+            $this->disconnect();
         $endtime = time() + $timeout;
         do {
-            $response = $this->receiveData();
+            $response = $this->receiveDataReal($timeout, true);
         } while ($response[1] != $event && $endtime < time());
+        if ($this->fp)
+            $this->disconnect();
         if ($response[1] == $event)
             return $response;
         return false;
