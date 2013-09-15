@@ -78,19 +78,19 @@
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="47"/>
         <source>Weather forecasts</source>
         <translation>Prévisions météorologiques</translation>
     </message>
     <message>
-        <location filename="../mythweather/main.cpp" line="53"/>
+        <location filename="../mythweather/main.cpp" line="49"/>
         <source>Pause current page</source>
         <translation>Pause sur la page actuelle</translation>
     </message>
     <message>
+        <location filename="../mythweather/main.cpp" line="51"/>
+        <location filename="../mythweather/main.cpp" line="53"/>
         <location filename="../mythweather/main.cpp" line="55"/>
-        <location filename="../mythweather/main.cpp" line="57"/>
-        <location filename="../mythweather/main.cpp" line="59"/>
         <source>Search List</source>
         <translation>Liste de recherche</translation>
     </message>
@@ -999,17 +999,17 @@
         <translation>Précip</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Weather Screen Setup</source>
         <translation>Configuration des écrans météo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Weather Source Setup</source>
         <translation>Configuration des sources météo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Source</source>
         <translation>Source</translation>
     </message>
@@ -1034,53 +1034,53 @@
         <translation>Entrez l&apos;emplacement :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
+        <location filename="themestrings.h" line="56"/>
         <source>: %1</source>
         <translation>: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
+        <location filename="themestrings.h" line="57"/>
         <source>100%</source>
         <translation>100%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="58"/>
         <source>Global Weather Settings</source>
         <translation>Météo - Réglages généraux</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
+        <location filename="themestrings.h" line="59"/>
         <source>Seconds to display each page</source>
         <translation>Secondes d&apos;affichage de chaque page</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="60"/>
         <source>Retrieve data in the background</source>
         <translation>Récupérer les données en arrière-plan</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="61"/>
         <source>General weather options</source>
         <oldsource>General weather plugin options</oldsource>
         <translation>Options générales de la météo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="62"/>
         <source>Screen Settings</source>
         <translation>Réglages des écrans</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="63"/>
         <source>Choose which weather forecasts to display</source>
         <translation>Choisir quelles prévisions météo afficher</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="64"/>
         <source>Source Settings</source>
         <translation>Réglages des sources</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
+        <location filename="themestrings.h" line="65"/>
         <source>Configure the behavior of weather scripts</source>
         <translation>Configurer le comportement des scripts météo</translation>
     </message>
@@ -1127,7 +1127,7 @@ When you are done configuring the weather plugin, click &quot;Finish&quot; to co
         <oldsource>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</oldsource>
-        <translation>Cet écran régit le comportement des écrans météo. Vous pouvez activer la mise à jour de la météo en arrière-plan qui sera éxécuté que vous soyez ou non dans l&apos;écran de la météo, et configurer le nombre de secondes d&apos;affichage de chaque écran .
+        <translation>Cet écran régit le comportement des écrans météo. Vous pouvez activer la mise à jour de la météo en arrière-plan qui sera exécuté que vous soyez ou non dans l&apos;écran de la météo, et configurer le nombre de secondes d&apos;affichage de chaque écran .
 
 Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Terminer&quot; pour continuer.</translation>
     </message>
@@ -1186,38 +1186,49 @@ Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Te
         <translation>Entrez votre emplacement</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="44"/>
+        <source>This screen governs the behavior of the weather screens. You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display. When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
+        <translatorcomment>tradcution existante</translatorcomment>
+        <translation>Cet écran régit le comportement des écrans météo. Vous pouvez activer la mise à jour de la météo en arrière-plan qui sera exécuté que vous soyez ou non dans l&apos;écran de la météo, et configurer le nombre de secondes d&apos;affichage de chaque écran . Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Terminer&quot; pour continuer.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="45"/>
+        <source>Weather settings</source>
+        <translation>Configuration météo</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="49"/>
         <source>Weather Location Search</source>
         <translation>Recherche de l&apos;emplacement météo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Humidity:</source>
         <translation>Humidité :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Pressure:</source>
         <translation>Pression :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="52"/>
         <source>Wind (Gust):</source>
         <oldsource>Wind(Gust):</oldsource>
         <translation>Vent (Bourrasques) :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="53"/>
         <source>Wind Direction:</source>
         <translation>Direction du vent :</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Visibility:</source>
         <translation>Visibilité.:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Feels Like:</source>
         <translation>Température ressentie :</translation>
     </message>
@@ -1225,12 +1236,12 @@ Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Te
 <context>
     <name>Weather</name>
     <message>
-        <location filename="../mythweather/weather.cpp" line="98"/>
+        <location filename="../mythweather/weather.cpp" line="99"/>
         <source>Paused</source>
         <translation>En pause</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="210"/>
+        <location filename="../mythweather/weather.cpp" line="211"/>
         <source>None of the configured screens are complete in this theme (missing copyright information).</source>
         <translation>Les écrans configurés sont incomplets dans ce thème (absence d&apos;information de droit d&apos;auteur).</translation>
     </message>
