@@ -714,7 +714,7 @@ bool FillData::Run(SourceList &sourcelist)
 
             vector<bool> refresh_request;
             refresh_request.resize(grabdays, refresh_all);
-            for (int i = 0; i < refresh_day.size(); i++)
+            for (int i = 0; i < grabdays; i++)
                 refresh_request[i] = refresh_day[i];
 
             if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)

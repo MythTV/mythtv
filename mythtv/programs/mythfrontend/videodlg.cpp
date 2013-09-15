@@ -287,11 +287,10 @@ namespace
         Q_OBJECT
 
       public:
-        FanartLoader() : itemsPast(0), m_fanart(NULL)
+        FanartLoader() : itemsPast(0), m_fanart(NULL), m_bConnected( false )
         {
-            //TODO: This causes a runtime error on windows since FanartLoader is
-            //      Initialized with a static variable.  Must fix.
-            connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+            // NOTE: Moved call to connect to first call of LoadImage/
+            //       Having it here causes a runtime error on windows
         }
 
        ~FanartLoader()
@@ -302,6 +301,12 @@ namespace
 
         void LoadImage(const QString &filename, MythUIImage *image)
         {
+            if (!m_bConnected)
+            {
+                connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+                m_bConnected = true;
+            }
+
             bool wasActive = m_fanartTimer.isActive();
             if (filename.isEmpty())
             {
@@ -349,6 +354,7 @@ namespace
         QMutex          m_fanartLock;
         MythUIImage    *m_fanart;
         QTimer          m_fanartTimer;
+        bool            m_bConnected;
     };
 
     FanartLoader fanartLoader;

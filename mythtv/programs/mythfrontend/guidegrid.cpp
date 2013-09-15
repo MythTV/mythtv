@@ -39,7 +39,7 @@ QWaitCondition epgIsVisibleCond;
 #define LOC_WARN QString("GuideGrid, Warning: ")
 
 const QString kUnknownTitle = "";
-const QString kUnknownCategory = QObject::tr("Unknown");
+//const QString kUnknownCategory = QObject::tr("Unknown");
 
 JumpToChannel::JumpToChannel(
     JumpToChannelListener *parent, const QString &start_entry,
@@ -1182,7 +1182,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             }
             else
             {
-                proginfo = new ProgramInfo(kUnknownTitle, kUnknownCategory,
+                proginfo = new ProgramInfo(kUnknownTitle, tr("Unknown"),
                                            ts, ts.addSecs(5*60));
                 unknownlist.push_back(proginfo);
                 proginfo->startCol = x;

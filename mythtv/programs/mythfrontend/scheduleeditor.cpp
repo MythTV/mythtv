@@ -43,7 +43,7 @@
 
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
-static const QString _Location = QObject::tr("Schedule Editor");
+//static const QString _Location = QObject::tr("Schedule Editor");
 
 // Define the strings inserted into the recordfilter table in the
 // database.  This should make them available to the translators.
@@ -1692,7 +1692,7 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
 
     if (list.isEmpty())
     {
-        MythWarningNotification n(tr("No image found"), _Location);
+        MythWarningNotification n(tr("No image found"), tr("Schedule Editor"));
         GetNotificationCenter()->Queue(n);
         return;
     }
@@ -1942,7 +1942,7 @@ void MetadataOptions::customEvent(QEvent *levent)
             m_busyPopup = NULL;
         }
         MythErrorNotification n(tr("Failed to retrieve image(s)"),
-                                _Location,
+                                tr("Schedule Editor"),
                                 tr("Check logs"));
         GetNotificationCenter()->Queue(n);
     }
