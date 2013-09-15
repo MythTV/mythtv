@@ -75,8 +75,8 @@ class HTTPLiveStreamThread : public QRunnable
     {
         uint flags = kMSDontBlockInputDevs;
 
-        QString command = GetInstallPrefix() +
-            QString("/bin/mythtranscode --hls --hlsstreamid %1")
+        QString command = GetAppBinDir() +
+            QString("mythtranscode --hls --hlsstreamid %1")
                     .arg(m_streamID) + logPropagateArgs;
 
         uint result = myth_system(command, flags);

@@ -532,7 +532,7 @@ void LoggerThread::launchLogServer(void)
         QStringList args;
         args << "--daemon" << logPropagateArgs;
 
-        MythSystemLegacy ms(GetInstallPrefix() + "/bin/mythlogserver", args, mask);
+        MythSystemLegacy ms(GetAppBinDir() + "mythlogserver", args, mask);
         ms.Run();
         ms.Wait(0);
     }

@@ -316,7 +316,7 @@ static void startAppearWiz(void)
     else
     {
         MythSystemLegacy *wizard = new MythSystemLegacy(
-            GetInstallPrefix() + "/bin/mythscreenwizard",
+            GetAppBinDir() + "mythscreenwizard",
             QStringList(),
             kMSDisableUDPListener | kMSPropagateLogs);
         wizard->Run();

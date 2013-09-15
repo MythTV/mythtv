@@ -448,7 +448,7 @@ bool ArtworkTask::DoRun(void)
         m_msMML = NULL;
     }
 
-    QString command = GetInstallPrefix() + "/bin/mythmetadatalookup";
+    QString command = GetAppBinDir() + "mythmetadatalookup";
     QStringList args;
     args << "--refresh-all-artwork";
     args << logPropagateArgs;
@@ -604,7 +604,7 @@ bool MythFillDatabaseTask::DoRun(void)
     if (mfpath == "mythfilldatabase")
     {
         opts |= kMSPropagateLogs;
-        mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
+        mfpath = GetAppBinDir() + "mythfilldatabase";
     }
 
     QString cmd = QString("%1 %2").arg(mfpath).arg(mfarg);

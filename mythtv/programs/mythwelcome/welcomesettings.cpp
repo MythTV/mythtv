@@ -180,7 +180,7 @@ static HostLineEdit *MythShutdownStartFECmd()
     HostLineEdit *gc = new HostLineEdit("MythWelcomeStartFECmd");
     gc->setLabel(MythShutdownSettings::tr("Command to run to start the "
                                           "Frontend"));
-    gc->setValue(GetInstallPrefix() + "/bin/mythfrontend");
+    gc->setValue(GetAppBinDir() + "mythfrontend");
     gc->setHelpText(MythShutdownSettings::tr("Command to start mythfrontend."));
     return gc;
 };

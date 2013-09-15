@@ -9,6 +9,7 @@
 #include "mythlogging.h"
 
 static QString installprefix = QString::null;
+static QString appbindir = QString::null;
 static QString sharedir = QString::null;
 static QString libdir = QString::null;
 static QString confdir = QString::null;
@@ -71,6 +72,12 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Using configuration directory = %1").arg(confdir));
 
+#ifdef _WIN32
+    appbindir = installprefix;
+#else
+    appbindir = installprefix + "/bin/";
+#endif
+
     sharedir = installprefix + "/share/mythtv/";
     libdir = installprefix + '/' + QString(LIBDIRNAME) + "/mythtv/";
     themedir = sharedir + "themes/";
@@ -78,8 +85,8 @@ void InitializeMythDirs(void)
     translationsdir = sharedir + "i18n/";
     filtersdir = libdir + "filters/";
 }
-
 QString GetInstallPrefix(void) { return installprefix; }
+QString GetAppBinDir(void) { return appbindir; }
 QString GetShareDir(void) { return sharedir; }
 QString GetLibraryDir(void) { return libdir; }
 QString GetConfDir(void) { return confdir; }

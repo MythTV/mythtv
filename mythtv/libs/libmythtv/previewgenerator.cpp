@@ -196,7 +196,7 @@ bool PreviewGenerator::Run(void)
     QDateTime dtm = MythDate::current();
     QTime tm = QTime::currentTime();
     bool ok = false;
-    QString command = GetInstallPrefix() + "/bin/mythpreviewgen";
+    QString command = GetAppBinDir() + "mythpreviewgen";
     bool local_ok = ((IsLocal() || !!(mode & kForceLocal)) &&
                      (!!(mode & kLocal)) &&
                      QFileInfo(command).isExecutable());

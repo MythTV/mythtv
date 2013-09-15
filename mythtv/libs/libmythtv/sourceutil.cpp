@@ -364,8 +364,8 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
 {
     if (wait)
     {
-        QString cmd = GetInstallPrefix() +
-                      "/bin/mythfilldatabase";
+        QString cmd = GetAppBinDir() +
+                      "mythfilldatabase";
         QStringList args;
         args.append("--only-update-channels");
 
@@ -386,8 +386,8 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype, boo
     }
     else
     {
-        QString cmd = GetInstallPrefix() +
-                      "/bin/mythfilldatabase --only-update-channels";
+        QString cmd = GetAppBinDir() +
+                      "mythfilldatabase --only-update-channels";
         if (sourceid)
             cmd += QString(" --sourceid %1").arg(sourceid);
         if (!cardtype.isEmpty())

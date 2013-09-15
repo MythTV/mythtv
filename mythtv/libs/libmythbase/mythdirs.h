@@ -7,6 +7,7 @@
  MBASE_PUBLIC  void InitializeMythDirs(void);
 
  MBASE_PUBLIC  QString GetInstallPrefix(void);
+ MBASE_PUBLIC  QString GetAppBinDir(void);
  MBASE_PUBLIC  QString GetShareDir(void);
  MBASE_PUBLIC  QString GetLibraryDir(void);
  MBASE_PUBLIC  QString GetConfDir(void);
