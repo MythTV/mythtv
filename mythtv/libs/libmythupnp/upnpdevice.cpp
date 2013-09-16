@@ -351,9 +351,7 @@ void UPnpDeviceDesc::GetValidXML(
             "<specVersion>\n"
               "<major>1</major>\n"
               "<minor>0</minor>\n"
-            "</specVersion>\n"
-            "<URLBase>http://"
-       << BaseAddr << ":" << nPort << "/</URLBase>\n";
+            "</specVersion>\n";
 
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
