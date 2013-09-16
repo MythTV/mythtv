@@ -115,24 +115,24 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                          QString::number(FullScan_DVBT), true);
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBT));
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
         case CardUtil::DVBS:
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBS));
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
         case CardUtil::DVBS2:
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBS2));
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
@@ -141,16 +141,16 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                          QString::number(NITAddScan_DVBC));
             addSelection(tr("Full Scan"),
                          QString::number(FullScan_DVBC));
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
         case CardUtil::ATSC:
             addSelection(tr("Full Scan"),
                          QString::number(FullScan_ATSC), true);
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
@@ -165,8 +165,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             else
                 addSelection(tr("Full Scan"),
                              QString::number(FullScan_ATSC), true);
-            addSelection(tr("Import channels.conf"),
-                         QString::number(DVBUtilsImport));
+//             addSelection(tr("Import channels.conf"),
+//                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
@@ -243,8 +243,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
               new BlankSetting());
-    addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
-              paneDVBUtilsImport);
+//     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
+//               paneDVBUtilsImport);
     addTarget(QString::number(ScanTypeSetting::ExistingScanImport),
               paneExistingScanImport);
 }
