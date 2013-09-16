@@ -446,42 +446,57 @@ Sjekk at URLen er riktig.</translation>
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="948"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1120"/>
+        <location filename="../mythmusic/importmusic.cpp" line="970"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1146"/>
         <source>Front Cover</source>
         <translation>Omslagsforside</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="950"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1122"/>
+        <location filename="../mythmusic/importmusic.cpp" line="972"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1148"/>
         <source>Back Cover</source>
         <translation>Omslagsbakside</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="952"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1126"/>
+        <location filename="../mythmusic/importmusic.cpp" line="974"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1152"/>
         <source>CD</source>
         <translation>CD</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="954"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1124"/>
+        <location filename="../mythmusic/importmusic.cpp" line="976"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1150"/>
         <source>Inlay</source>
         <translation>Innstikk</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="956"/>
-        <location filename="../mythmusic/importmusic.cpp" line="1128"/>
+        <location filename="../mythmusic/importmusic.cpp" line="978"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1154"/>
         <source>&lt;Unknown&gt;</source>
         <translation>&lt;Ukjent&gt;</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1095"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1016"/>
+        <source>Copy CoverArt Failed.
+Copying to %1</source>
+        <extracomment>%1 is the filename</extracomment>
+        <translation>Kopiering av omslagsbilde feilet.
+Kopierer til %1</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1087"/>
+        <source>%1 of %2</source>
+        <comment>Current file copied</comment>
+        <extracomment>%1 is the current position of the file being copied, %2 is the total number of files</extracomment>
+        <translation>%1 av %2</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="1121"/>
         <source>File Already Exists</source>
         <translation>Filen finnes allerede</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="1097"/>
+        <location filename="../mythmusic/importmusic.cpp" line="1123"/>
         <source>New File</source>
         <translation>Ny fil</translation>
     </message>
@@ -489,93 +504,98 @@ Sjekk at URLen er riktig.</translation>
 <context>
     <name>ImportMusicDialog</name>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="159"/>
+        <location filename="../mythmusic/importmusic.cpp" line="165"/>
         <source>New File</source>
         <translation>Ny fil</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="459"/>
+        <location filename="../mythmusic/importmusic.cpp" line="465"/>
         <source>This track is already in the database</source>
         <translation>Dette sporet finnes allerede i databasen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="164"/>
+        <location filename="../mythmusic/importmusic.cpp" line="170"/>
         <source>Already in Database</source>
         <translation>Allerede i databasen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="143"/>
+        <location filename="../mythmusic/importmusic.cpp" line="149"/>
         <source>%1 of %2</source>
         <comment>Current track position</comment>
         <extracomment>%1 is the current track, %2 is the number of tracks</extracomment>
         <translation>%1 av %2</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="170"/>
+        <location filename="../mythmusic/importmusic.cpp" line="176"/>
         <source>Not found</source>
         <translation>Ikke funnet</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="233"/>
+        <location filename="../mythmusic/importmusic.cpp" line="239"/>
         <source>You might have unsaved changes.
 Are you sure you want to exit this screen?</source>
         <translation>Du har kanskje endringer som ikke er lagret.
 Er du sikker på at du vil avslutte skjermbildet?</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="417"/>
+        <location filename="../mythmusic/importmusic.cpp" line="423"/>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation>Kopiering feilet
 Klarte ikke å kopiere filen til: %1</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="488"/>
+        <location filename="../mythmusic/importmusic.cpp" line="494"/>
         <source>%1 new tracks were added to the database</source>
         <translation>%1 nye spor lagt til i databasen</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="513"/>
+        <location filename="../mythmusic/importmusic.cpp" line="524"/>
+        <source>Cannot import music from the music directory. You probably want to use &apos;Scan For New Music&apos; instead.</source>
+        <translation>Kan ikke kopiere musikk fra musikkatalogen. Du ønsker nok å bruke &apos;Søk etter ny musikk&apos; i stedetfor.</translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/importmusic.cpp" line="535"/>
         <source>Searching for music files</source>
         <translation>Søker etter musikkfiler</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="650"/>
+        <location filename="../mythmusic/importmusic.cpp" line="672"/>
         <source>Save Defaults</source>
         <translation>Lagre standardinnstillinger</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="654"/>
+        <location filename="../mythmusic/importmusic.cpp" line="676"/>
         <source>Change Compilation Flag</source>
         <translation>Endre samlingsflagg</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="655"/>
+        <location filename="../mythmusic/importmusic.cpp" line="677"/>
         <source>Change Compilation Artist</source>
         <translation>Endre samlingsartist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="657"/>
+        <location filename="../mythmusic/importmusic.cpp" line="679"/>
         <source>Change Artist</source>
         <translation>Endre artist</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="658"/>
+        <location filename="../mythmusic/importmusic.cpp" line="680"/>
         <source>Change Album</source>
         <translation>Endre album</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="659"/>
+        <location filename="../mythmusic/importmusic.cpp" line="681"/>
         <source>Change Genre</source>
         <translation>Endre sjanger</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="660"/>
+        <location filename="../mythmusic/importmusic.cpp" line="682"/>
         <source>Change Year</source>
         <translation>Endre år</translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="661"/>
+        <location filename="../mythmusic/importmusic.cpp" line="683"/>
         <source>Change Rating</source>
         <translation>Endre karakter</translation>
     </message>
@@ -3034,7 +3054,6 @@ Stasjon: %1 - Kanal: %2</translation>
     <message>
         <location filename="themestrings.h" line="301"/>
         <source>Listen to Music</source>
-        <oldsource>Search Music</oldsource>
         <translation>Lytt til musikk</translation>
     </message>
     <message>

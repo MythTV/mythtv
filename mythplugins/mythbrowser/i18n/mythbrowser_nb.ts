@@ -365,13 +365,11 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Webbrowser</source>
-        <oldsource>WEB BROWSER</oldsource>
         <translation>Webleser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Bookmarks</source>
-        <oldsource>BOOKMARK MANAGER</oldsource>
         <translation>Bokmerkebehandler</translation>
     </message>
     <message>
