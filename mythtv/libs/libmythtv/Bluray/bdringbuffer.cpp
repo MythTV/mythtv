@@ -125,6 +125,7 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     else
     {
         Seek(new_pos);
+        m_currentTime = bd_tell_time(bdnav);
         ret = new_pos;
     }
 
@@ -780,7 +781,7 @@ int BDRingBuffer::safe_read(void *data, uint sz)
         result = bd_read(bdnav, (unsigned char *)data, sz);
     }
 
-    m_currentTime = bd_tell(bdnav);
+    m_currentTime = bd_tell_time(bdnav);
     return result;
 }
 
