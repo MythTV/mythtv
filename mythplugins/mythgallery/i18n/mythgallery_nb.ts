@@ -1244,7 +1244,6 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Folder filter :</source>
-        <oldsource>Directory filter :</oldsource>
         <translation>Mappefilter:</translation>
     </message>
     <message>

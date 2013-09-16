@@ -978,9 +978,6 @@
         <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
 
 When you are done configuring the weather plugin, click &quot;Finish&quot; to continue.</source>
-        <oldsource>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
-
-When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</oldsource>
         <translation>Dette skjermbildet styrer hvordan værskjermbildene oppfører seg.  Du kan slå på oppdatering av værinformasjon i bakgrunnen, som vil kjøre automatisk uavhengig om du viser skjermbilder, samt konfigurere hvor mange sekunder hvert skjermbilde skal vises.
 
 Når du er ferdig med å konfigurere værtillegget må du klikke «Ferdig» for å fortsette.</translation>
@@ -1216,7 +1213,6 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
     <message>
         <location filename="themestrings.h" line="67"/>
         <source>Global Weather Settings</source>
-        <oldsource>General Mythweather options</oldsource>
         <translation>Generelle innstillinger for MythWeather</translation>
     </message>
     <message>
@@ -1247,7 +1243,6 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>General weather options</source>
-        <oldsource>General weather plugin options</oldsource>
         <translation>Generelle innstillinger for værtillegg</translation>
     </message>
     <message>

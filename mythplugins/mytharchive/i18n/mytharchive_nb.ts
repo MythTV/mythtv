@@ -1355,7 +1355,6 @@ Vennligst vent...</translation>
     <message>
         <location filename="themestrings.h" line="163"/>
         <source>Old size:</source>
-        <oldsource>Current Size:</oldsource>
         <translation>Gjeldende størrelse:</translation>
     </message>
     <message>

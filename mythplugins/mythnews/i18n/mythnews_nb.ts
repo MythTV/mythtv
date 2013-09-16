@@ -247,7 +247,6 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>News Feeds</source>
-        <oldsource>NEWS</oldsource>
         <translation>Nyhetsmatinger</translation>
     </message>
     <message>
@@ -268,7 +267,6 @@ Når du er ferdig å redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for 
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Web Site</source>
-        <oldsource>Site icon:</oldsource>
         <translation>Nettsted</translation>
     </message>
     <message>
