@@ -306,9 +306,11 @@ void CetonStreamHandler::RepeatTuning(void)
 
 bool CetonStreamHandler::TunerOff(void)
 {
-    bool result = TuneFrequency(0, "qam_256");
-    if (result && _using_cablecard)
+    bool result;
+    if (_using_cablecard)
         result = TuneVChannel("0");
+    else
+        result = TuneFrequency(0, "qam_256");
 
     return result;
 }
