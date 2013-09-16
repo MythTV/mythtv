@@ -22,6 +22,7 @@
 #endif
 
 #include "file.h"
+#include "file_mythiowrapper.h"
 #include "util/macro.h"
 #include "util/logging.h"
 #include "util/strutl.h"
@@ -91,6 +92,9 @@ static int dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 
 static BD_DIR_H *dir_open_posix(const char* dirname)
 {
+    if(strncmp(dirname, "myth://", 7) == 0)
+        return dir_open_mythiowrapper(dirname);		
+    
     BD_DIR_H *dir = malloc(sizeof(BD_DIR_H));
 
     BD_DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, dir);
