@@ -117,53 +117,53 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="124"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="331"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="148"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="361"/>
         <source>Enter URL</source>
         <translation>輸入網址</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="256"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="280"/>
         <source>Loading...</source>
         <translation>正在載入...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="320"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="350"/>
         <source>Actions</source>
         <translation>行動</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="334"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Back</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="337"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
         <source>Forward</source>
         <translation>前進</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
         <source>Zoom In</source>
         <translation>放大</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="340"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="370"/>
         <source>Zoom Out</source>
         <translation>縮小</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="341"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="371"/>
         <source>New Tab</source>
         <translation>新分頁</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="344"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
         <source>Delete Tab</source>
         <translation>刪除分頁</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
         <source>Add Bookmark</source>
         <translation>添加書籤</translation>
     </message>
@@ -171,17 +171,17 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="66"/>
+        <location filename="../mythbrowser/main.cpp" line="65"/>
         <source>Move to next browser tab</source>
         <translation>移至下個瀏覽器分頁</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="68"/>
+        <location filename="../mythbrowser/main.cpp" line="67"/>
         <source>Move to previous browser tab</source>
         <translation>移至上個瀏覽器分頁</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="71"/>
+        <location filename="../mythbrowser/main.cpp" line="70"/>
         <source>Internal Web Browser</source>
         <translation>內置網頁瀏覽器</translation>
     </message>
@@ -194,72 +194,72 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation>書籤管理員</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Web Page</source>
         <translation>網頁</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Rating Settings</source>
         <translation>評級設定</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="16"/>
         <source>Browser Command:</source>
         <translation>瀏覽器指令：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Text Size:</source>
         <translation>文字大小：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Enable plugins:</source>
         <translation>啟用插件：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="15"/>
         <source>OK</source>
         <translation>好</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="23"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%  %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="24"/>
         <source>Web Bookmarks</source>
         <translation>網頁書籤</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Browse your favorite web sites.</source>
-        <translation>瀏覽閣下最愛的網站。</translation>
+        <translation>瀏覽閣下最愛網站。</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Browser:</source>
         <translation>瀏覽器：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>啟用瀏覽器插件 (Flash 等)：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Configure Web Browser</source>
         <translation>設定網頁瀏覽器</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="29"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -268,72 +268,112 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 完成後按「好」或「取消」繼續。</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Category:</source>
         <translation>分類：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="12"/>
         <source>Name:</source>
         <translation>名稱：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="13"/>
         <source>URL:</source>
         <translation>網址：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Genre:</source>
         <translation>種類：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Channel:</source>
         <translation>頻道：</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Click to choose from existing categories...</source>
         <translation>點此從現有分類選擇...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Category</source>
         <translation>分類</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="7"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Name</source>
         <translation>名稱</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="9"/>
         <source>URL</source>
         <translation>網址</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Find...</source>
         <translation>尋找...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Find</source>
         <translation>尋找</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="33"/>
+        <source>Webbrowser</source>
+        <translation>網頁瀏覽器</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Bookmarks</source>
+        <translation>書籤</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Url</source>
+        <translation>網址</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Homepage</source>
+        <translation>主網頁</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Edit Bookmark</source>
+        <translation>編輯書籤</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Homepage:</source>
+        <translation>主網頁：</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Save</source>
+        <translation>儲存</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Browser Settings</source>
+        <translation>瀏覽器設定</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>啟用瀏覽器插件 (Flash 等)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Enable plugins</source>
         <translation>啟用插件</translation>
     </message>
@@ -341,7 +381,7 @@ When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to c
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="126"/>
+        <location filename="../mythbrowser/webpage.cpp" line="128"/>
         <source>Loading...</source>
         <translation>正在載入...</translation>
     </message>
