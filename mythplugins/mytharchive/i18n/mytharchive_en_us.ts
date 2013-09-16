@@ -134,7 +134,8 @@ Removing stale lock file.</translation>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="132"/>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</translation>
+        <translatorcomment>Fix spelling of MPEG-2</translatorcomment>
+        <translation>If set MPEG-2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</translation>
     </message>
     <message>
         <location filename="../mytharchive/archivesettings.cpp" line="144"/>
@@ -1427,17 +1428,17 @@ Please Wait...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="915"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="922"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Exit, Save Thumbnails</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="923"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Exit, Don&apos;t Save Thumbnails</translation>
     </message>
@@ -1445,28 +1446,28 @@ Please Wait...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="155"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="162"/>
         <source>Clear All</source>
         <translation>Clear All</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="163"/>
         <source>Select All</source>
         <translation>Select All</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="368"/>
+        <location filename="../mytharchive/videoselector.cpp" line="505"/>
         <source>All Videos</source>
         <translation>All Videos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="562"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>You need to enter a valid password for this parental level</translation>
     </message>
