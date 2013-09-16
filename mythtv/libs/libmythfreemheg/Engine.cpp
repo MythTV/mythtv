@@ -1306,10 +1306,6 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         {
             return true;
         }
-        else if (strings[1] == "1285")
-        {
-            return true;
-        }
         else
         {
             return false;
@@ -1377,6 +1373,10 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
         // 'The Space' on Freeview checks this...
         if (strings[1] == "PANT11001")
             return true;
+	// Irish DTT expects "1285". From ETSI ES 202 184: UEP(1285) means the receiver has been verified as fully conformant.
+        if (strings[1] == "1285")
+            return true;
+        
         return false;
     }
 
