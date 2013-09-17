@@ -647,23 +647,23 @@
         <translation>Eksempler vises med morgendagens dato.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="65"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="66"/>
         <source>Your preferred date format to use on the events screens. %1</source>
         <extracomment>%1 gives additional info on the date used</extracomment>
         <translation>Det datoformatet som du foretrekker å bruke på hendelsesskjermene. %1</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="74"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="75"/>
         <source>Time format</source>
         <translation>Tidsformat</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="82"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="83"/>
         <source>Your preferred time format to display on the events screens.</source>
         <translation>Det tidsformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="91"/>
         <source>MythZoneMinder Settings</source>
         <translation>MythZoneMinderinnstillinger</translation>
     </message>

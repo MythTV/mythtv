@@ -3235,22 +3235,22 @@ Enhet støtter opp til %1</translation>
 <context>
     <name>BDRingBuffer</name>
     <message>
-        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="172"/>
+        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="173"/>
         <source>Title %1 chapter %2</source>
         <translation>Tittel %1 kapittel %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="315"/>
+        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="316"/>
         <source>Could not open Blu-ray device: %1</source>
         <translation>Kunne ikke åpne Blu-ray enhet: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="384"/>
+        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="385"/>
         <source>Unable to find any Blu-ray compatible titles</source>
         <translation>Kunne ikke finne en Bluray-kompatibel tittel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="484"/>
+        <location filename="../libs/libmythtv/Bluray/bdringbuffer.cpp" line="485"/>
         <source>Unable to find any usable Blu-ray titles</source>
         <translation>Kunne ikke finne noen Bluray-kompatibele titler</translation>
     </message>
