@@ -32,57 +32,6 @@
     </message>
 </context>
 <context>
-    <name>AlbumArtImages</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Ukjent</translation>
-    </message>
-    <message>
-        <source>Front Cover</source>
-        <translation type="obsolete">Omslagsforside</translation>
-    </message>
-    <message>
-        <source>Back Cover</source>
-        <translation type="obsolete">Omslagsbakside</translation>
-    </message>
-    <message>
-        <source>CD</source>
-        <translation type="obsolete">CD</translation>
-    </message>
-    <message>
-        <source>Inlay</source>
-        <translation type="obsolete">Innstikk</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artist</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation type="obsolete">ukjent</translation>
-    </message>
-    <message>
-        <source>front</source>
-        <translation type="obsolete">forside</translation>
-    </message>
-    <message>
-        <source>back</source>
-        <translation type="obsolete">bakside</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
-    </message>
-    <message>
-        <source>inlay</source>
-        <translation type="obsolete">innstikk</translation>
-    </message>
-    <message>
-        <source>artist</source>
-        <translation type="obsolete">artist</translation>
-    </message>
-</context>
-<context>
     <name>CDRipperThread</name>
     <message>
         <source>Importing %1</source>
@@ -314,18 +263,6 @@ Sjekk at URLen er riktig.</translation>
 <context>
     <name>GeneralSettings</name>
     <message>
-        <source>UTF-16</source>
-        <translation type="obsolete">UTF-16</translation>
-    </message>
-    <message>
-        <source>UTF-8</source>
-        <translation type="obsolete">UTF-8</translation>
-    </message>
-    <message>
-        <source>ASCII</source>
-        <translation type="obsolete">ASCII</translation>
-    </message>
-    <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
         <translation>Katalogen må finnes, og brukeren som kjører MythMusic må ha skrivetilgang til den.</translation>
     </message>
@@ -348,10 +285,6 @@ Sjekk at URLen er riktig.</translation>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
         <translation>Hvis dette aktiveres sjekker ikke MythMusic ID3-data i filer, men prøver heller å hente informasjon om sjanger, artist, album, spornummer og tittel fra filnavn.</translation>
-    </message>
-    <message>
-        <source>Some MP3 players don&apos;t understand tags encoded in UTF-8 or UTF-16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="obsolete">Noen mp3-spillere forstår ikke tagger kodet med UTF8 eller UTF16. Denne innstillingen lar deg velge hvilket format som brukes for kodingen. For øyeblikket gjelder dette kun for ID3-tagger.</translation>
     </message>
     <message>
         <source>If set, MythMusic will be allowed to update the metadata in the file (e.g. ID3) to match the database. This means allowing MythTV to write to the file and permissions must be set accordingly. Features such as ID3 playcounts and ratings depend on this being enabled.</source>
@@ -594,22 +527,8 @@ GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
         <translation>ka</translation>
     </message>
     <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Avspillingsfeil.</translation>
-    </message>
-    <message>
-        <source>MythMusic has encountered the following error:
-%1</source>
-        <translation type="obsolete">MythMusic har følgende feil:
-%1</translation>
-    </message>
-    <message>
         <source>Stream stopped.</source>
         <translation>Strømmen stoppet.</translation>
-    </message>
-    <message>
-        <source>Decoder Handler error.</source>
-        <translation type="obsolete">Dekodingshåndterer-feil.</translation>
     </message>
     <message>
         <source>Save To New Playlist</source>
@@ -822,10 +741,6 @@ Vil du fortsette avspillingen i bakgrunnen?</translation>
     <message>
         <source>More Options</source>
         <translation>Flere innstillinger</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Dekoder-feil.</translation>
     </message>
     <message>
         <source>Search List...</source>
@@ -1238,145 +1153,6 @@ Navn: %1</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Various Artists</source>
-        <translation type="obsolete">Flere artister</translation>
-    </message>
-    <message>
-        <source>Track %1</source>
-        <translation type="obsolete">Spor %1</translation>
-    </message>
-    <message>
-        <source>Audio CD parser</source>
-        <translation type="obsolete">Lyd-CD tolk</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Ukjent</translation>
-    </message>
-    <message>
-        <source>Searching for music files</source>
-        <translation type="obsolete">Søker etter musikkfiler</translation>
-    </message>
-    <message>
-        <source>Updating music database</source>
-        <translation type="obsolete">Oppdaterer musikkdatabase</translation>
-    </message>
-    <message>
-        <source>Unknown Artist</source>
-        <translation type="obsolete">Ukjent artist</translation>
-    </message>
-    <message>
-        <source>Unknown Album</source>
-        <translation type="obsolete">Ukjent album</translation>
-    </message>
-    <message>
-        <source>Unknown Genre</source>
-        <translation type="obsolete">Ukjent sjanger</translation>
-    </message>
-    <message>
-        <source>CD -- none</source>
-        <translation type="obsolete">CD -- ingen</translation>
-    </message>
-    <message>
-        <source>Never Played</source>
-        <translation type="obsolete">Aldri spilt</translation>
-    </message>
-    <message>
-        <source>front</source>
-        <translation type="obsolete">forside</translation>
-    </message>
-    <message>
-        <source>back</source>
-        <translation type="obsolete">bakside</translation>
-    </message>
-    <message>
-        <source>inlay</source>
-        <translation type="obsolete">innstikk</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
-    </message>
-    <message>
-        <source>cover</source>
-        <translation type="obsolete">omslag</translation>
-    </message>
-    <message>
-        <source>oops</source>
-        <translation type="obsolete">oisann</translation>
-    </message>
-    <message>
-        <source>Something is Wrong</source>
-        <translation type="obsolete">Noe er galt</translation>
-    </message>
-    <message>
-        <source>Default Playlist</source>
-        <translation type="obsolete">Standard spilleliste</translation>
-    </message>
-    <message>
-        <source>Creating CD File System</source>
-        <translation type="obsolete">Lager CD-filsystem</translation>
-    </message>
-    <message>
-        <source>Burning CD</source>
-        <translation type="obsolete">Brenner CD</translation>
-    </message>
-    <message>
-        <source>?</source>
-        <translation type="obsolete">?</translation>
-    </message>
-    <message>
-        <source>Scanning music files</source>
-        <translation type="obsolete">Søker gjennom musikkfiler</translation>
-    </message>
-    <message>
-        <source>Rebuilding music tree</source>
-        <translation type="obsolete">Bygger musikktre på nytt</translation>
-    </message>
-    <message>
-        <source>Importing </source>
-        <translation type="obsolete">Importerer </translation>
-    </message>
-    <message>
-        <source>Scanning CD. Please Wait ...</source>
-        <translation type="obsolete">Søker gjennom CD. Vennligst vent...</translation>
-    </message>
-    <message>
-        <source>Cleaning music database</source>
-        <translation type="obsolete">Rydder i musikkdatabasen</translation>
-    </message>
-    <message>
-        <source>Scanning Album Artwork</source>
-        <translation type="obsolete">Søker gjennom albumomslag</translation>
-    </message>
-    <message>
-        <source>Internal Decoder</source>
-        <translation type="obsolete">Intern dekoder</translation>
-    </message>
-    <message>
-        <source>Loading Music. Please wait ...</source>
-        <translation type="obsolete">Laster musikk. Vennligst vent ...</translation>
-    </message>
-    <message>
-        <source>You need to tell me where to find your music on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages.</source>
-        <translation type="obsolete">Du må fortelle meg hvor musikken din ligger under &apos;Generelle innstillinger&apos; for MythMusic.</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find your music directory. Have you set it correctly on the &apos;General Settings&apos; page of MythMusic&apos;s settings pages?</source>
-        <translation type="obsolete">Kan ikke finner musikkmappe. Har du satt det opp riktig under &apos;Generelle innstillinger&apos; for MythMusic?</translation>
-    </message>
-    <message>
-        <source>Unsupported content type for ShoutCast stream: %1</source>
-        <translation type="obsolete">Ikke støttet innholdstype i Shoutcast strøm: %1</translation>
-    </message>
-    <message>
-        <source>and</source>
-        <translation type="obsolete">og</translation>
-    </message>
-</context>
-<context>
     <name>RatingSettings</name>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
@@ -1558,49 +1334,6 @@ Vil du permanent slette eksisterende fil(er)?</translation>
     <message>
         <source>%1 of %2</source>
         <translation>%1 av %2</translation>
-    </message>
-</context>
-<context>
-    <name>SmartPlaylistDialog</name>
-    <message>
-        <source>Smart Playlists</source>
-        <translation type="obsolete">Smarte spillelister</translation>
-    </message>
-    <message>
-        <source>1 Select</source>
-        <translation type="obsolete">1 Velg</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation type="obsolete">Velg</translation>
-    </message>
-    <message>
-        <source>2 New</source>
-        <translation type="obsolete">2 Ny</translation>
-    </message>
-    <message>
-        <source>New</source>
-        <translation type="obsolete">Ny</translation>
-    </message>
-    <message>
-        <source>3 Edit</source>
-        <translation type="obsolete">3 Rediger</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Rediger</translation>
-    </message>
-    <message>
-        <source>4 Delete</source>
-        <translation type="obsolete">4 Slett</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">Slett</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="obsolete">Virkelig slette denne smarte spillelisten?</translation>
     </message>
 </context>
 <context>
@@ -2392,10 +2125,6 @@ Stasjon: %1 - Kanal: %2</translation>
     <message>
         <source>Rating</source>
         <translation>Rangering</translation>
-    </message>
-    <message>
-        <source>Last played: %lastplayed% (played: %playcount% times)</source>
-        <translation type="obsolete">Sist spilt: %lastplayed% (spilt: %playcount% ganger)</translation>
     </message>
     <message>
         <source>Playing</source>

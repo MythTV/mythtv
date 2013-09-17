@@ -469,62 +469,10 @@ For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonne
         <translation>Søk etter:</translation>
     </message>
     <message>
-        <source>Published on %date%</source>
-        <translation type="obsolete">Publisert den %date%</translation>
-    </message>
-    <message>
-        <source>%RESOLUTION|, %%filesize_str%</source>
-        <translation type="obsolete">%RESOLUTION|, %%filesize_str%</translation>
-    </message>
-    <message>
-        <source>Available in %countries%</source>
-        <translation type="obsolete">Tilgjengelig i %countries%</translation>
-    </message>
-    <message>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</source>
         <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|RATING| - %%DESCRIPTION%</translation>
-    </message>
-    <message>
-        <source>No Resolution details available</source>
-        <translation type="obsolete">Ingen detaljer om oppløsning tilgjengelig</translation>
-    </message>
-    <message>
-        <source>Date unknown</source>
-        <translation type="obsolete">Ukjent dato</translation>
-    </message>
-    <message>
-        <source>Length unknown</source>
-        <translation type="obsolete">Ukjent lengde</translation>
-    </message>
-    <message>
-        <source>No rating</source>
-        <translation type="obsolete">Ingen rating</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Lengde</translation>
-    </message>
-    <message>
-        <source>Resolution</source>
-        <translation type="obsolete">Oppløsning</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="obsolete">Størrelse</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation type="obsolete">Last ned</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Nei</translation>
     </message>
     <message>
         <source>Can&apos;t find any search scripts! This usually indicates missing search script prerequisites. Try running a script from the command line.</source>
@@ -575,28 +523,12 @@ For å legge til et nettsted, trykk MENY, velg så &quot;Søk/Administrer abonne
         <translation>Filmdetaljer</translation>
     </message>
     <message>
-        <source>None</source>
-        <translation type="obsolete">Ingen</translation>
-    </message>
-    <message>
-        <source>N/A</source>
-        <translation type="obsolete">Ikke aktuelt</translation>
-    </message>
-    <message>
         <source>Movie URL</source>
         <translation>URL for film</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Ukjent</translation>
-    </message>
-    <message>
         <source>Season and Episode</source>
         <translation>Sesong og episode</translation>
-    </message>
-    <message>
-        <source>s00e00</source>
-        <translation type="obsolete">s00e00</translation>
     </message>
     <message>
         <source>VIDEO INTERNET GALLERY</source>

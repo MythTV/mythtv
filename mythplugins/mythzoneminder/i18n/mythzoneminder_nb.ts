@@ -24,53 +24,6 @@
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation type="obsolete">IP-adressen til MythZoneMinder tjeneren</translation>
-    </message>
-    <message>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation type="obsolete">Legg inn IP-adressen til MythZoneMinder-tjeneren som denne grenseflaten skal koble til.</translation>
-    </message>
-    <message>
-        <source>Port the server runs on</source>
-        <translation type="obsolete">Port som serveren kjører på</translation>
-    </message>
-    <message>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="obsolete">Ikke endre dette uten en god grunn.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Datoformat</translation>
-    </message>
-    <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Eksempler vises med dagens dato.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Eksempler vises med morgendagens dato.</translation>
-    </message>
-    <message>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation type="obsolete">Det datoformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Tidsformat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation type="obsolete">Det tidsformatet som du foretrekker å bruke på hendelsesskjermene.</translation>
-    </message>
-    <message>
-        <source>MythZoneMinder Settings</source>
-        <translation type="obsolete">MythZoneMinderinnstillinger</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <source>Edit Monitor Function</source>
@@ -329,41 +282,6 @@
     <message>
         <source>Save</source>
         <translation>Lagre</translation>
-    </message>
-    <message numerus="yes">
-        <source>%name%  -  Source: %zmastatus%, function: %zmcstatus%</source>
-        <translation type="obsolete">
-            <numerusform>%name%  -  Kilde: %zmastatus%, function: %zmcstatus%</numerusform>
-            <numerusform>%name%  -  Kilder: %zmastatus%, function: %zmcstatus%</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>(%eventcount%)</source>
-        <translation type="obsolete">(%eventcount%)</translation>
-    </message>
-    <message>
-        <source>%eventcount% Events:  %zmastatus% - %zmcstatus% function</source>
-        <translation type="obsolete">%eventcount% Hendelser:  %zmastatus% - %zmcstatus% funksjon</translation>
-    </message>
-    <message>
-        <source>CCTV Status</source>
-        <translation type="obsolete">CCTV Status</translation>
-    </message>
-    <message>
-        <source>System Load</source>
-        <translation type="obsolete">Systemlast</translation>
-    </message>
-    <message>
-        <source>Disk Usage</source>
-        <translation type="obsolete">Diskbruk</translation>
-    </message>
-    <message>
-        <source>CCTV Time</source>
-        <translation type="obsolete">CCTV Tid</translation>
-    </message>
-    <message>
-        <source>CCTV Date</source>
-        <translation type="obsolete">CCTV Dato</translation>
     </message>
     <message>
         <source>0.12</source>
