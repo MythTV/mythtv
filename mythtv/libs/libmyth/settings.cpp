@@ -930,6 +930,9 @@ void CheckBoxSetting::setVisible(bool b)
 
 void CheckBoxSetting::setLabel(QString str)
 {
+    // QT treats a single ampersand as special,
+    // we must double up ampersands to display them
+    str = str.replace(" & ", " && ");
     BooleanSetting::setLabel(str);
     if (widget)
         widget->setText(str);
