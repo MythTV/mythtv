@@ -31,10 +31,6 @@
         <translation>Ukjent</translation>
     </message>
     <message>
-        <source>Downloading media...</source>
-        <translation type="obsolete">Laster ned media...</translation>
-    </message>
-    <message>
         <source>Manage Feeds</source>
         <translation>Administrer matinger</translation>
     </message>
@@ -61,10 +57,6 @@
     <message>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Ingen nettleser er satt! MythBrowser må være installert for at MythNews skal virke.</translation>
-    </message>
-    <message>
-        <source>%1 of %2 (%3 percent)</source>
-        <translation type="obsolete">%1 av %2 (%3 prosent)</translation>
     </message>
 </context>
 <context>

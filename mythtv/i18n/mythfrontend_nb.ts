@@ -1146,10 +1146,6 @@
         <translation>Prioritet</translation>
     </message>
     <message>
-        <source>Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="obsolete">Antall prioritetspoeng som legges til alle opptak fra denne kanalen. Bruk et positivt tall hvis du vil at denne kanalen skal være foretrukket, eller et negativt hvis kanalen skal vektes lavere.</translation>
-    </message>
-    <message>
         <source>Icon</source>
         <translation>Ikon</translation>
     </message>
@@ -1172,10 +1168,6 @@
     <message>
         <source>Filters to be used when recordings from this channel are viewed. Start with a plus to append to the global playback filters.</source>
         <translation>Filtre som skal brukes når opptak vises fra denne kanalen. Start med et plusstegn for å legge denne til globale avspillingsfiltre.</translation>
-    </message>
-    <message>
-        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="obsolete">ID som brukes av listetjenester for å få en eksakt korrespondanse mellom en kanal du har og en kanal i deres database. Dette oppdages som regel automatisk når «mythfilldatabase» kjøres.</translation>
     </message>
     <message>
         <source>Number of priority points to be added to any recording on this channel during scheduling. Use a positive number as the priority if you want this to be a preferred channel, a negative one to depreciate this channel.</source>
@@ -1731,11 +1723,6 @@ Se etter at videoen finnes</translation>
             <numerusform>%n reklamepause</numerusform>
             <numerusform>%n reklamepauser</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>%1 commercial break(s)</source>
-        <comment>Job status</comment>
-        <translation type="obsolete">%1 reklamepause(r)</translation>
     </message>
 </context>
 <context>
@@ -2535,18 +2522,6 @@ Enhet støtter opp til %1</translation>
         <source>Unable to find any usable Blu-ray titles</source>
         <translation>Kunne ikke finne noen Bluray-kompatibele titler</translation>
     </message>
-    <message>
-        <source>Couldn&apos;t open Blu-ray device: %1</source>
-        <translation type="obsolete">Kunne ikke åpne Blu-ray enhet: %1</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find any Bluray-compatible title</source>
-        <translation type="obsolete">Kan ikke finne en Bluray-kompatibel tittel</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find any usable Bluray title</source>
-        <translation type="obsolete">Kan ikke finne noen brukbar Bluray-tittel</translation>
-    </message>
 </context>
 <context>
     <name>BackendSelection</name>
@@ -3087,10 +3062,6 @@ Enhet støtter opp til %1</translation>
         <translation>Klarte ikke åpne &apos;%1&apos;</translation>
     </message>
     <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Klarte ikke å starte søk</translation>
-    </message>
-    <message>
         <source>Programmer Error: No Device</source>
         <translation>Programmeringsfeil: Ingen enhet</translation>
     </message>
@@ -3253,14 +3224,6 @@ Enhet støtter opp til %1</translation>
     <message>
         <source>Exclude unidentified episodes</source>
         <translation>Ikke ta med uidentifiserte episoder</translation>
-    </message>
-    <message>
-        <source>Category type</source>
-        <translation type="obsolete">Kategoritype</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="obsolete">eller</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
@@ -4151,14 +4114,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Repeteringsantall</translation>
     </message>
     <message>
-        <source>The Cartesian latitude for your location. Use negative numbers for southern and western coordinates.</source>
-        <translation type="obsolete">Kartesisk breddegrad for din posisjon. Bruk negative tall for sørlige og vestlige koordinater. </translation>
-    </message>
-    <message>
-        <source>The Cartesian longitude for your location. Use negative numbers for southern and western coordinates.</source>
-        <translation type="obsolete">Kartesisk lengdegrad for din posisjon. Bruk negative tall for sørlige og vestlige koordinater. </translation>
-    </message>
-    <message>
         <source>Number of times to repeat DiSEqC commands sent to this device. Larger values may help with less reliable devices.</source>
         <translation>Antall ganger DiSEqC kommandoer sendt til denne enheten blir repetert. Høyere verdier kan hjelpe med mer ustabile enheter.</translation>
     </message>
@@ -4327,10 +4282,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Ja, avslutt og slå av</translation>
     </message>
     <message>
-        <source>No</source>
-        <translation type="obsolete">Nei</translation>
-    </message>
-    <message>
         <source>If you&apos;ve added or altered channels, please run &apos;mythfilldatabase&apos; on the master backend to populate the database with guide information.</source>
         <translation>Hvis du har lagt til eller endret noen kanaler bør du kjøre &apos;mythfilldatabase&apos; på hovedtjeneren for å oppdatere databasen med programguide informasjon.</translation>
     </message>
@@ -4434,10 +4385,6 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <source>Avoid back to back recordings</source>
         <translation>Unngå opptak som kommer etter hverandre</translation>
-    </message>
-    <message>
-        <source>Selects the situations where thescheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="obsolete">Velger situasjonene hvor tidsplanleggeren vil unngå å tilordne opptak til samme kort hvis sluttid og starttid er den samme. Dette vil bli tillatt når nødvendig for å unngå konflikter.</translation>
     </message>
     <message>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
@@ -6142,10 +6089,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Video i hovedvindu</translation>
     </message>
     <message>
-        <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Hvis valgt vil video bli vist i hovedgrensesnittet. Slå dette av hvis du bare vil video på skrivebordet eller i et flytende vindu. Kun gyldig når &quot;Bruk størrelse for grensesnitt for TV-avspilling&quot; og &quot;Kjør klienten i et vindu&quot; er slått på.</translation>
-    </message>
-    <message>
         <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Hvis valgt vil video bli vist i hovedgrensesnittet. Slå dette av hvis du bare vil video på skrivebordet eller i et flytende vindu. Kun gyldig når &quot;Bruk størrelse for grensesnitt for TV-avspilling&quot; og &quot;Kjør klienten i et vindu&quot; er slått på.</translation>
     </message>
@@ -6806,14 +6749,6 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <source>Jump to bookmark</source>
         <translation>Hopp til bokmerke</translation>
-    </message>
-    <message>
-        <source>Fast Forward (Sticky) or Forward one frame while paused</source>
-        <translation type="obsolete">Spol fremover (fast) eller spol frem ett bilde når pauset</translation>
-    </message>
-    <message>
-        <source>Rewind (Sticky) or Rewind one frame while paused</source>
-        <translation type="obsolete">Spol bakover (fast) eller spol tilbake ett bilde når pauset</translation>
     </message>
     <message>
         <source>Next Video Source</source>
@@ -7596,10 +7531,6 @@ Delete the current cut or preserved region</extracomment>
         <translation>Behandle opptak/fiks konflikter</translation>
     </message>
     <message>
-        <source>Program Recording Priorities</source>
-        <translation type="obsolete">Opptaksprioritet for programmer</translation>
-    </message>
-    <message>
         <source>Manage Recording Rules</source>
         <translation>Behandle opptaksregler</translation>
     </message>
@@ -7610,10 +7541,6 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <source>TV Recording Playback</source>
         <translation>Avspilling av TV opptak</translation>
-    </message>
-    <message>
-        <source>TV Recording Deletion</source>
-        <translation type="obsolete">Sletting av TV opptak</translation>
     </message>
     <message>
         <source>Live TV</source>
@@ -7815,10 +7742,6 @@ Delete the current cut or preserved region</extracomment>
     <message>
         <source>Failed to initialize video output</source>
         <translation>Kunne ikke initialisere videoutgangen</translation>
-    </message>
-    <message>
-        <source>Need to switch video renderer.</source>
-        <translation type="obsolete">Må bytte videogjengiver.</translation>
     </message>
     <message>
         <source>Need to switch video renderer</source>
@@ -8739,10 +8662,6 @@ Går tilbake til forrige meny.</translation>
         <translation>Endre gruppens passord</translation>
     </message>
     <message>
-        <source>Playlist options</source>
-        <translation type="obsolete">Spillelisteinnstillinger</translation>
-    </message>
-    <message>
         <source>Add this recording to Playlist</source>
         <translation>Legg dette opptaket til i spillelisten</translation>
     </message>
@@ -9115,14 +9034,6 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <source>This recording has been deleted and is unavailable</source>
         <translation>Dette opptaket har blitt slettet og er utilgjengelig</translation>
-    </message>
-    <message>
-        <source>Mark As Watched</source>
-        <translation type="obsolete">Merk som sett</translation>
-    </message>
-    <message>
-        <source>Mark As Unwatched</source>
-        <translation type="obsolete">Merk som ikke sett</translation>
     </message>
     <message>
         <source>Begin Commercial Detection</source>
@@ -10453,10 +10364,6 @@ avspillingsgruppe med navnet «%1».</translation>
         <translation>Navn for mal</translation>
     </message>
     <message>
-        <source> + %1 automatic priority (%2hr)</source>
-        <translation type="obsolete"> + %1 automatisk prioritet (%2hr)</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Innstillinger</translation>
     </message>
@@ -10536,76 +10443,8 @@ avspillingsgruppe med navnet «%1».</translation>
 <context>
     <name>QObject</name>
     <message>
-        <source>Use custom identifier for frontend preferences</source>
-        <translation type="obsolete">Bruk egendefinert identifikator for klientinnstillinger</translation>
-    </message>
-    <message>
-        <source>Database Configuration</source>
-        <translation type="obsolete">Databasekonfigurasjon</translation>
-    </message>
-    <message>
-        <source>All database settings take effect when you restart this program.</source>
-        <translation type="obsolete">Alle databaseinnstillinger trer i kraft når programmet startes på nytt.</translation>
-    </message>
-    <message>
-        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="obsolete">Vertsnavnet eller IP-adressen til maskinen som har databasen. Dette feltet må fylles ut.</translation>
-    </message>
-    <message>
-        <source>The name of the database. This information is required.</source>
-        <translation type="obsolete">Databasens navn. Dette feltet må fylles ut.</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="obsolete">Bruker</translation>
-    </message>
-    <message>
-        <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="obsolete">Brukernavnet som skal brukes for å koble til databasen. Dette feltet må fylles ut.</translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation>Passord</translation>
-    </message>
-    <message>
-        <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="obsolete">Passordet som skal brukes for å koble til databasen. Dette feltet må fylles ut.</translation>
-    </message>
-    <message>
-        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="obsolete">Hvis klientens vertsnavn endres ofte, kryss av denne boksen og oppgi et unikt nettverksnavn for å identifisere den. Er dette ikke avkrysset, vil klientens lokale vertsnavn bli brukt for å lagre innstillinger i databasen.</translation>
-    </message>
-    <message>
-        <source>Custom identifier</source>
-        <translation type="obsolete">Egendefinert identifikator</translation>
-    </message>
-    <message>
-        <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="obsolete">En identifiserer som skal brukes når innstillinger for denne klienten lagres.</translation>
-    </message>
-    <message>
-        <source>Enable database server wakeup</source>
-        <translation type="obsolete">Slå på vekking for databasetjener</translation>
-    </message>
-    <message>
-        <source>If enabled, the frontend will use database wakeup parameters to reconnect to the database server.</source>
-        <translation type="obsolete">Hvis valgt vil frontenden bruke oppvekkingsparametrene for databasen til å koble seg til databasetjeneren på nytt.</translation>
-    </message>
-    <message>
-        <source>Reconnect time</source>
-        <translation type="obsolete">Gjenoppkoblingstid</translation>
-    </message>
-    <message>
-        <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="obsolete">Tiden i sekunder det skal ventes på at tjeneren våkner opp.</translation>
-    </message>
-    <message>
-        <source>Retry attempts</source>
-        <translation type="obsolete">Prøv på nytt-forsøk</translation>
-    </message>
-    <message>
-        <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="obsolete">Antall ganger klienten på nytt skal prøve å vekke tjeneren før den gir opp.</translation>
     </message>
     <message>
         <source>Wake command</source>
@@ -10616,92 +10455,8 @@ avspillingsgruppe med navnet «%1».</translation>
         <translation>Standard</translation>
     </message>
     <message>
-        <source>Channel Options</source>
-        <translation type="obsolete">Kanalinnstillinger</translation>
-    </message>
-    <message>
-        <source>Channel Name</source>
-        <translation type="obsolete">Kanalnavn</translation>
-    </message>
-    <message>
-        <source>Channel Number</source>
-        <translation type="obsolete">Kanalnummer</translation>
-    </message>
-    <message>
-        <source>Video Source</source>
-        <translation type="obsolete">Videokilde</translation>
-    </message>
-    <message>
-        <source>[Not Selected]</source>
-        <translation type="obsolete">[Ikke valgt]</translation>
-    </message>
-    <message>
-        <source>Callsign</source>
-        <translation type="obsolete">Forkorting</translation>
-    </message>
-    <message>
-        <source>TV Format</source>
-        <translation type="obsolete">TV-standard</translation>
-    </message>
-    <message>
-        <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation type="obsolete">Hvis denne kanalen bruker et annet format enn «TV-format» i «Generell hovedtjenerkonfigurasjon» kan det velges her.</translation>
-    </message>
-    <message>
-        <source>Icon</source>
-        <translation type="obsolete">Ikon</translation>
-    </message>
-    <message>
-        <source>Video filters</source>
-        <translation type="obsolete">Videofiltre</translation>
-    </message>
-    <message>
-        <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation type="obsolete">Filtre som skal brukes når det taes opp fra denne kanalen. Ikke i bruk med maskinvarekodingskort.</translation>
-    </message>
-    <message>
-        <source>Playback filters</source>
-        <translation type="obsolete">Avspillingsfiltre</translation>
-    </message>
-    <message>
-        <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation type="obsolete">Filtre som skal brukes når opptak fra denne kanalen blir vist. Start med et plusstegn for å også bruke de globale avspillingsfiltrene.</translation>
-    </message>
-    <message>
-        <source>XMLTV ID</source>
-        <translation type="obsolete">XMLTV-ID</translation>
-    </message>
-    <message>
-        <source>Specify either the exact frequency (in kHz) or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="obsolete">Oppgi enten den eksakte frekvensen (i kHz) eller en gyldig kanal for ditt TV-format.</translation>
-    </message>
-    <message>
-        <source>Channel Options - Video4Linux</source>
-        <translation type="obsolete">Kanalinnstillinger - Video4Linux</translation>
-    </message>
-    <message>
-        <source>Channel Options - Raw Transport Stream</source>
-        <translation type="obsolete">Kanalinnstillinger - Rå transportstrøm</translation>
-    </message>
-    <message>
         <source>Commercial Free</source>
         <translation>Reklamefri</translation>
-    </message>
-    <message>
-        <source>Visible</source>
-        <translation type="obsolete">Synlig</translation>
-    </message>
-    <message>
-        <source>Use on air guide</source>
-        <translation type="obsolete">Bruk på luften-oversikt</translation>
-    </message>
-    <message>
-        <source>Finetune</source>
-        <translation type="obsolete">Finjustering</translation>
-    </message>
-    <message>
-        <source>Value to be added to your desired frequency (in kHz) for &apos;fine tuning&apos;.</source>
-        <translation type="obsolete">Verdi som legges til den oppgitte frekvensen (i kHz), for finjustering.</translation>
     </message>
     <message>
         <source>Contrast</source>
@@ -10718,10 +10473,6 @@ avspillingsgruppe med navnet «%1».</translation>
     <message>
         <source>Hue</source>
         <translation>Nyanse</translation>
-    </message>
-    <message>
-        <source>Channel Options - Common</source>
-        <translation type="obsolete">Kanalinnstillinger - vanlige</translation>
     </message>
     <message>
         <source>Standard</source>
@@ -10768,40 +10519,8 @@ avspillingsgruppe med navnet «%1».</translation>
         <translation>Venstresirkulær</translation>
     </message>
     <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Bakkenett</translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation>Modulering</translation>
-    </message>
-    <message>
-        <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="obsolete">Modulasjon, 8-VSB, QAM-256, etc.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">De fleste kabeltv systemene i USA bruker QAM-256 eller QAM-64, men noen blandede systemer kan bruke 8-VSB.</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulasjon (Standard: Auto)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Konstellasjon</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Konstellasjon (Standard: Auto)</translation>
-    </message>
-    <message>
-        <source>Modulation, QPSK, 8PSK, QAM-16</source>
-        <translation type="obsolete">Modulasjon, QPSK, 8PSK, QAM-16</translation>
-    </message>
-    <message>
-        <source>Most DVB-S transponders use QPSK, while DVB-S2 use 8PSK. QAM-16 is not available for DVB-S2 transports.</source>
-        <translation type="obsolete">De fleste DVB-S transpondere bruker QPSK, mens DVB-S2 bruker 8PSK. QAM-16 er ikke tilgjengelig for DVB-S2 transporter.</translation>
     </message>
     <message>
         <source>Inversion</source>
@@ -10924,10 +10643,6 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>8MHz</translation>
     </message>
     <message>
-        <source>NR</source>
-        <translation type="obsolete">NR</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -11004,48 +10719,8 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>Transportinnstillinger</translation>
     </message>
     <message>
-        <source>Unable to create AudioOutput.</source>
-        <translation type="obsolete">Kunne ikke lage lyd for avspilling.</translation>
-    </message>
-    <message>
-        <source>Clear Cuts</source>
-        <translation type="obsolete">Tøm kutt</translation>
-    </message>
-    <message>
-        <source>Reverse Cuts</source>
-        <translation type="obsolete">Reverser kutt</translation>
-    </message>
-    <message>
-        <source>Load Detected Commercials</source>
-        <translation type="obsolete">Last reklamer som er funnet</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>%1 of %2</source>
-        <translation type="obsolete">%1 av %2</translation>
-    </message>
-    <message>
-        <source>Skip %1</source>
-        <translation type="obsolete">Spol %1</translation>
-    </message>
-    <message>
-        <source>Commercial: %1</source>
-        <translation type="obsolete">Reklame: %1</translation>
-    </message>
-    <message>
-        <source>At End, cannot Skip.</source>
-        <translation type="obsolete">Ved slutten; kan ikke spole forbi.</translation>
-    </message>
-    <message>
-        <source>Skipping Back.</source>
-        <translation type="obsolete">Spoler tilbake.</translation>
-    </message>
-    <message>
-        <source>Start of program.</source>
-        <translation type="obsolete">Begynnelsen av programmet.</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -11061,49 +10736,14 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>E</translation>
     </message>
     <message>
-        <source>T</source>
-        <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="obsolete">U</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
         <translation>A</translation>
     </message>
     <message>
-        <source>F</source>
-        <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="obsolete">d</translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="obsolete">u</translation>
-    </message>
-    <message>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
         <translation>O</translation>
-    </message>
-    <message>
-        <source>t</source>
-        <comment>RecTypeChar kTemplateRecord</comment>
-        <translation type="obsolete">t</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -11142,24 +10782,8 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>T</translation>
     </message>
     <message>
-        <source>Channel Record</source>
-        <translation type="obsolete">Kanalopptak</translation>
-    </message>
-    <message>
         <source>Record All</source>
         <translation>Ta opp alle</translation>
-    </message>
-    <message>
-        <source>Find One</source>
-        <translation type="obsolete">Finn én</translation>
-    </message>
-    <message>
-        <source>Find Daily</source>
-        <translation type="obsolete">Finn daglig</translation>
-    </message>
-    <message>
-        <source>Find Weekly</source>
-        <translation type="obsolete">Finn ukentlig</translation>
     </message>
     <message>
         <source>Override Recording</source>
@@ -11302,22 +10926,6 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>Denne sendingen ble tatt opp.</translation>
     </message>
     <message>
-        <source>This showing was not recorded because the master backend was hung or not running.</source>
-        <translation type="obsolete">Denne sendingen ble ikke tatt opp fordi hovedtjeneren hang eller eller ikke gikk.</translation>
-    </message>
-    <message>
-        <source>There wasn&apos;t enough disk space available.</source>
-        <translation type="obsolete">Det var ikke nok tilgjengelig diskplass.</translation>
-    </message>
-    <message>
-        <source>The tuner card was already being used.</source>
-        <translation type="obsolete">TV-kortet var allerede i bruk.</translation>
-    </message>
-    <message>
-        <source>The recorder failed to record.</source>
-        <translation type="obsolete">Denne opptakeren klarte ikke ta opp.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Statusen til denne sendingen er ukjent.</translation>
     </message>
@@ -11374,16 +10982,8 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
         <translation>et annet program med en høyere prioritet taes opp i stedet.</translation>
     </message>
     <message>
-        <source>this episode will be recorded at a later time.</source>
-        <translation type="obsolete">denne episoden vil bli tatt opp ved en seinere sending.</translation>
-    </message>
-    <message>
         <source>Stereo</source>
         <translation>Stereo</translation>
-    </message>
-    <message>
-        <source>Program ID</source>
-        <translation type="obsolete">Program-ID</translation>
     </message>
     <message>
         <source>OK</source>
@@ -11396,132 +10996,6 @@ De fleste DVB-C-sendere bruker 6.9 eller 6.875 millioner symboler per sekund.</t
     <message>
         <source>Default (Template)</source>
         <translation>Standard (mal)</translation>
-    </message>
-    <message>
-        <source> (Template)</source>
-        <translation type="obsolete"> (mal)</translation>
-    </message>
-    <message>
-        <source>Power Search</source>
-        <translation type="obsolete">Avansert søk</translation>
-    </message>
-    <message>
-        <source>Title Search</source>
-        <translation type="obsolete">Tittelsøk</translation>
-    </message>
-    <message>
-        <source>Keyword Search</source>
-        <translation type="obsolete">Nøkkelordsøk</translation>
-    </message>
-    <message>
-        <source>People Search</source>
-        <translation type="obsolete">Søk på folk</translation>
-    </message>
-    <message>
-        <source>Unknown Search</source>
-        <translation type="obsolete">Ukjent søk</translation>
-    </message>
-    <message>
-        <source>30m</source>
-        <translation type="obsolete">30m</translation>
-    </message>
-    <message>
-        <source>1h</source>
-        <translation type="obsolete">1t</translation>
-    </message>
-    <message>
-        <source>1h30m</source>
-        <translation type="obsolete">1t30m</translation>
-    </message>
-    <message>
-        <source>2h</source>
-        <translation type="obsolete">2t</translation>
-    </message>
-    <message>
-        <source>MythTV was set to sleep after %1 minutes and will exit in %d seconds.
-Do you wish to continue watching?</source>
-        <translation type="obsolete">MythTV er satt til å sove om %1 minutter og vil slås av om %d sekunder.
-Vil du fortsette å se?</translation>
-    </message>
-    <message>
-        <source>MythTV has been idle for %1 minutes and will exit in %d seconds. Are you still watching?</source>
-        <translation type="obsolete">MythTV har vært passiv i %1 minutter og vil slås av om %d sekunder. Ser du fremdeles på TV?</translation>
-    </message>
-    <message>
-        <source>Edit Cut Points</source>
-        <translation type="obsolete">Rediger klippepunkter</translation>
-    </message>
-    <message>
-        <source>Move Previous Cut End Here</source>
-        <translation type="obsolete">Flytt forrige kuttstopp her</translation>
-    </message>
-    <message>
-        <source>Save Cuts</source>
-        <translation type="obsolete">Lagre kutt</translation>
-    </message>
-    <message>
-        <source>Save Cuts and Exit</source>
-        <translation type="obsolete">Lagre kutt og avslutt</translation>
-    </message>
-    <message>
-        <source>Exit Recording Editor</source>
-        <translation type="obsolete">Avslutt opptaksredigerer</translation>
-    </message>
-    <message>
-        <source>Cannot delete program </source>
-        <translation type="obsolete">Kan ikke slette program </translation>
-    </message>
-    <message>
-        <source>Cut to Beginning</source>
-        <translation type="obsolete">Kutt til begynnelsen</translation>
-    </message>
-    <message>
-        <source>Cut to End</source>
-        <translation type="obsolete">Kutt til slutten</translation>
-    </message>
-    <message>
-        <source>Move Next Cut Start Here</source>
-        <translation type="obsolete">Flytt neste kuttstart her</translation>
-    </message>
-    <message>
-        <source>Move Start of Cut Here</source>
-        <translation type="obsolete">Flytt kuttstart her</translation>
-    </message>
-    <message>
-        <source>Move End of Cut Here</source>
-        <translation type="obsolete">Flytt kuttstopp her</translation>
-    </message>
-    <message>
-        <source>Delete This Cut</source>
-        <translation type="obsolete">Slett dette kuttet</translation>
-    </message>
-    <message>
-        <source>Add New Cut</source>
-        <translation type="obsolete">Legg til nytt kutt</translation>
-    </message>
-    <message>
-        <source>Join Surrounding Cuts</source>
-        <translation type="obsolete">Slå sammen omliggende kutt</translation>
-    </message>
-    <message>
-        <source>Cut List Options</source>
-        <translation type="obsolete">Kuttliste innstillinger</translation>
-    </message>
-    <message>
-        <source>Undo Changes</source>
-        <translation type="obsolete">Angre endringer</translation>
-    </message>
-    <message>
-        <source>Exit Without Saving</source>
-        <translation type="obsolete">Avslutt uten å lagre</translation>
-    </message>
-    <message>
-        <source>because it is not a recording.</source>
-        <translation type="obsolete">fordi det ikke er et opptak.</translation>
-    </message>
-    <message>
-        <source>because it is in use by</source>
-        <translation type="obsolete">fordi den er i bruk av</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
@@ -11776,10 +11250,6 @@ Vil du fortsette å se?</translation>
         <translation>Tidsavbrudd for tuning (ms)</translation>
     </message>
     <message>
-        <source>Maximum time (in milliseconds) MythTV waits for a channel lock when scanning for channels during setup, or for issuing a warning in Live TV mode.</source>
-        <translation type="obsolete">Maksimal tid (i millisekunder) MythTV venter på et signaltreff når det søker etter kanaler, eller viser en advarsel når du ser på TV.</translation>
-    </message>
-    <message>
         <source>If non-zero, override the audio sampling rate in the recording profile when this card is used.  Use this if your capture card does not support all of the standard rates.</source>
         <translation>Hvis denne er ulik null blir samplingsraten for lyd i opptaksprofilen overstyrt når dette kortet brukes. Bruk dette hvis kortet ikke støtter alle standard samplingsrater.</translation>
     </message>
@@ -11844,24 +11314,8 @@ Vil du fortsette å se?</translation>
         <translation>Sett korttypen til den passende typen for kortet som konfigureres.</translation>
     </message>
     <message>
-        <source>MJPEG capture card (Matrox G200, DC10)</source>
-        <translation type="obsolete">MJPEG-kort (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>MPEG-2 encoder card</source>
-        <translation type="obsolete">MPEG-2 kodingskort</translation>
-    </message>
-    <message>
-        <source>Network recorder</source>
-        <translation type="obsolete">Nettverksopptaker</translation>
-    </message>
-    <message>
         <source>DVEO ASI recorder</source>
         <translation>DVEO ASI opptaker</translation>
-    </message>
-    <message>
-        <source>Ceton Cablecard tuner </source>
-        <translation type="obsolete">Ceton Cablecard tuner </translation>
     </message>
     <message>
         <source>Import test recorder</source>
@@ -11952,132 +11406,8 @@ Vil du fortsette å se?</translation>
         <translation>Kanal direkte TV starter på.</translation>
     </message>
     <message>
-        <source>Audio output device</source>
-        <translation type="obsolete">Enhet for lydavspilling</translation>
-    </message>
-    <message>
-        <source>TrueHD</source>
-        <translation type="obsolete">TrueHD</translation>
-    </message>
-    <message>
-        <source>DTS-HD</source>
-        <translation type="obsolete">DTS-HD</translation>
-    </message>
-    <message>
-        <source>Audio Configuration Testing</source>
-        <translation type="obsolete">Testing av lydkonfigurasjon</translation>
-    </message>
-    <message>
-        <source>Test All</source>
-        <translation type="obsolete">Test alle</translation>
-    </message>
-    <message>
-        <source>Start all channels test</source>
-        <translation type="obsolete">Start test av alle kanaler</translation>
-    </message>
-    <message>
-        <source>Front Left</source>
-        <translation type="obsolete">Venstre front</translation>
-    </message>
-    <message>
-        <source>Front Right</source>
-        <translation type="obsolete">Høyre front</translation>
-    </message>
-    <message>
-        <source>Center</source>
-        <translation type="obsolete">Senter</translation>
-    </message>
-    <message>
-        <source>Rear Left</source>
-        <translation type="obsolete">Venstre bak</translation>
-    </message>
-    <message>
-        <source>Surround Left</source>
-        <translation type="obsolete">Venstre Surround</translation>
-    </message>
-    <message>
-        <source>Surround Right</source>
-        <translation type="obsolete">Høyre Surround</translation>
-    </message>
-    <message>
-        <source>LFE</source>
-        <translation type="obsolete">LFE</translation>
-    </message>
-    <message>
-        <source>Passive</source>
-        <translation type="obsolete">Passiv</translation>
-    </message>
-    <message>
-        <source>Hall</source>
-        <translation type="obsolete">Hall</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports AC-3/Dolby Digital. You must use a digital connection. Uncheck if using an analog connection.</source>
-        <translation type="obsolete">Aktiviser hvis din forsterker eller lyd-dekoder støtter AC3/Dolby Digital. Du må da bruke en digital forbindelse. Slå av hvis du bruker en analog forbindelse.</translation>
-    </message>
-    <message>
-        <source>E-AC-3</source>
-        <translation type="obsolete">E-AC-3</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports E-AC-3 (DD+). You must use a HDMI connection.</source>
-        <translation type="obsolete">Aktiviser hvis din forsterker eller lyddekoder støtter E-AC3 (DD+). Du må bruke en HDMI forbindelse.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports Dolby TrueHD. You must use a HDMI connection.</source>
-        <translation type="obsolete">Aktiviser hvis din forsterker eller lyddekoder støtter Dolby TrueHD. Du må bruke en HDMI forbindelse.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports DTS-HD. You must use a HDMI connection.</source>
-        <translation type="obsolete">Aktiviser hvis din forsterker eller lyddekoder støtter DTS HD. Du må bruke en HDMI forbindelse.</translation>
-    </message>
-    <message>
-        <source>Use Highest Quality Mode</source>
-        <translation type="obsolete">Bruk høyeste kvalitet</translation>
-    </message>
-    <message>
-        <source>Use the highest audio quality settings supported by your audio card. This will be a good place to start troubleshooting potential errors</source>
-        <translation type="obsolete">Bruk beste innstilling for lydkvalitet som er støttet av lydkortet ditt. Dette er et godt sted å feilsøke ved potensielle feil</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation type="obsolete">Stopp</translation>
-    </message>
-    <message>
         <source>Audio device is invalid or not useable.</source>
         <translation>Lydenhet er ugyldig eller ikke mulig å bruke.</translation>
-    </message>
-    <message>
-        <source>Use internal volume controls</source>
-        <translation type="obsolete">Bruk interne volumkontrollere</translation>
-    </message>
-    <message>
-        <source>Changing the volume adjusts the selected mixer.</source>
-        <translation type="obsolete">Å endre volumet justerer den valgte mikseren.</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder only supports 2 channel PCM (typically an old HDMI 1.0 device). Multichannel audio will be re-encoded to AC-3 when required</source>
-        <translation type="obsolete">Slå på hvis din forsterker eller lyddekoder bare støtte 2-kanals PCM (typisk en eldre HDMI 1.0-enhet). Multikanals lyd vil da bli rekodet til AC3 hvis behov</translation>
-    </message>
-    <message>
-        <source>Audio output device to use for digital audio. This value is currently only used with ALSA and DirectX sound output.</source>
-        <translation type="obsolete">Lyd-utenhet som skal brukes for digital lyd. Denne verdien brukes for øyeblikket bare av ALSA og DirectX lydutgang.</translation>
-    </message>
-    <message>
-        <source>SPDIF 48kHz rate override</source>
-        <translation type="obsolete">SPDIF 48k rate-overstyring</translation>
-    </message>
-    <message>
-        <source>ALSA only. By default, let ALSA determine the passthrough sampling rate. If checked set the sampling rate to 48kHz for passthrough. (default is not checked)</source>
-        <translation type="obsolete">Kun for ALSA. Som standard, la ALSA avgjøre samplingsraten for gjennomgang av lyd. Hvis valgt vil samplingsraten bli satt til 48kHz (standard er ikke valgt)</translation>
-    </message>
-    <message>
-        <source>HBR passthrough support</source>
-        <translation type="obsolete">Støtte for HBR gjennomgang</translation>
-    </message>
-    <message>
-        <source>HBR support is required for TrueHD and DTS-HD passthrough. If unchecked, Myth will limit the passthrough bitrate to 6.144Mbit/s.This will disable True-HD passthrough, however will allow DTS-HD content to be sent as DTS-HD Hi-Res. (default is checked)</source>
-        <translation type="obsolete">HBR støtte er nødvendig for gjennomgang av TrueHD og DTS-HD lyd. Hvis ikke valgt vil Myth begrense bitraten for gjennomgang til 6.144Mbit/s. Dette vil slå av True HD lydgjennomgang, men vil tillate at DTS-HD materiale blir overført som DTS-HD Hi-Res. (standard: valgt)</translation>
     </message>
     <message>
         <source>Linear blend</source>
@@ -12086,10 +11416,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>One field</source>
         <translation>Ett felt</translation>
-    </message>
-    <message>
-        <source>Extra audio buffering</source>
-        <translation type="obsolete">Ekstra hurtiglagring av lyd</translation>
     </message>
     <message>
         <source>Top Left</source>
@@ -12108,18 +11434,6 @@ Vil du fortsette å se?</translation>
         <translation>Nedre høyre hjørne</translation>
     </message>
     <message>
-        <source>Location of PIP Video window.</source>
-        <translation type="obsolete">Plassering av bilde-i-bilde-videovinduet.</translation>
-    </message>
-    <message>
-        <source>All Programs</source>
-        <translation type="obsolete">Alle programmer</translation>
-    </message>
-    <message>
-        <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation type="obsolete">Hvis dette slås på vil det bare spoles like mye framover som når det spoles bakover rett etter at spol tilbake er brukt.</translation>
-    </message>
-    <message>
         <source>Blank Frame + Scene Change</source>
         <translation>Oppdaging av tomme bilder og sceneendringer</translation>
     </message>
@@ -12134,426 +11448,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>All</source>
         <translation>Alle</translation>
-    </message>
-    <message>
-        <source>Notify, but do not skip</source>
-        <translation type="obsolete">Gi beskjed, men ikke hopp over</translation>
-    </message>
-    <message>
-        <source>Automatically Skip</source>
-        <translation type="obsolete">Hopp over automatisk</translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="obsolete">Denne globale innstillingen gjør at opptakeren starter før den planlagte opptakstiden. Dette påvirker ikke opptakeren, og blir ignorert når to opptak er planlagt uten nødvendig mellomrom.</translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="obsolete">Denne globale innstillingen tillater opptakeren å ta opp etter den planlagte sluttiden. Dette påvirker ikke planleggeren, og ignoreres når to opptak er planlagt uten nok tid mellom dem.</translation>
-    </message>
-    <message>
-        <source>Record date</source>
-        <translation type="obsolete">Opptaksdato</translation>
-    </message>
-    <message>
-        <source>Selects how to sort a shows episodes</source>
-        <translation type="obsolete">Velg hvordan et programs episoder skal sorteres</translation>
-    </message>
-    <message>
-        <source>Reverse direction in fast forward/rewind</source>
-        <translation type="obsolete">Omvendt retning for spoling fram-/bakover</translation>
-    </message>
-    <message>
-        <source>Menu theme</source>
-        <translation type="obsolete">Menytema</translation>
-    </message>
-    <message>
-        <source>Channel ordering</source>
-        <translation type="obsolete">Kanalsortering</translation>
-    </message>
-    <message>
-        <source>Scan displacement (X)</source>
-        <translation type="obsolete">Søkeforflytning (X)</translation>
-    </message>
-    <message>
-        <source>Adjust this to move the image horizontally.</source>
-        <translation type="obsolete">Juster dette for å flytte bildet horisontalt.</translation>
-    </message>
-    <message>
-        <source>Scan displacement (Y)</source>
-        <translation type="obsolete">Søkeforflytning (Y)</translation>
-    </message>
-    <message>
-        <source>Adjust this to move the image vertically.</source>
-        <translation type="obsolete">Juster dette for å flytte bildet vertikalt.</translation>
-    </message>
-    <message>
-        <source>Action on playback exit</source>
-        <translation type="obsolete">Handling når avspilling avsluttes</translation>
-    </message>
-    <message>
-        <source>Just exit</source>
-        <translation type="obsolete">Bare avslutt</translation>
-    </message>
-    <message>
-        <source>Save position and exit</source>
-        <translation type="obsolete">Lagre posisjon og avslutt</translation>
-    </message>
-    <message>
-        <source>Prompt at end of recording</source>
-        <translation type="obsolete">Spør ved slutten av opptaket</translation>
-    </message>
-    <message>
-        <source>Halt command</source>
-        <translation type="obsolete">Stoppkommando</translation>
-    </message>
-    <message>
-        <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="obsolete">Kjør på den bestemte skjermen eller dekk alle skjermer.</translation>
-    </message>
-    <message>
-        <source>GUI X offset</source>
-        <translation type="obsolete">Forskyving av X for grensesnittet</translation>
-    </message>
-    <message>
-        <source>GUI Y offset</source>
-        <translation type="obsolete">Forskyving av Y for grensesnittet</translation>
-    </message>
-    <message>
-        <source>Use GUI size for TV playback</source>
-        <translation type="obsolete">Bruk størrelse for grafisk grensesnitt for TV-avspilling</translation>
-    </message>
-    <message>
-        <source>If enabled, use the above size for TV, otherwise use full screen.</source>
-        <translation type="obsolete">Bruker størrelsen ovenfor for TV når det er på, ellers fullskjerm.</translation>
-    </message>
-    <message>
-        <source>Separate video modes for GUI and TV playback</source>
-        <translation type="obsolete">Forskjellige videomoder for grafisk grensesnitt og TV-avspilling</translation>
-    </message>
-    <message>
-        <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
-        <translation type="obsolete">Bytt X-vindusystemets videomoder for TV. Krever støtte for «xrandr».</translation>
-    </message>
-    <message>
-        <source>In X</source>
-        <translation type="obsolete">I X</translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="obsolete">Den horisontale oppløsningen til videoen som krever en bestemt visningsoppløsning.</translation>
-    </message>
-    <message>
-        <source>In Y</source>
-        <translation type="obsolete">I Y</translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="obsolete">Den vertikale oppløsningen til videoen som krever en bestemt visningsoppløsning.</translation>
-    </message>
-    <message>
-        <source>GUI</source>
-        <translation type="obsolete">Grafisk grensesnitt</translation>
-    </message>
-    <message>
-        <source>Resolution of screen when not watching a video.</source>
-        <translation type="obsolete">Skjermoppløsningen når det ikke vises video.</translation>
-    </message>
-    <message>
-        <source>Default screen resolution when watching a video.</source>
-        <translation type="obsolete">Standardoppløsning når video vises.</translation>
-    </message>
-    <message>
-        <source>Screen resolution when watching a video at a specific resolution.</source>
-        <translation type="obsolete">Skjermoppløsning når video med en spesiell oppløsning vises.</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="obsolete">Framvisning</translation>
-    </message>
-    <message>
-        <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="obsolete">Standard oppfriskningsrate under avspilling av video. Sett til auto for å bruke den best tilgjengelige automatisk</translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
-        <translation type="obsolete">Oppfriskningsrate under avspilling av video med en spesifikk oppløsning. Sett til auto for å bruke den best tilgjengelige automatisk</translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation type="obsolete">Frekvens</translation>
-    </message>
-    <message>
-        <source>Aspect ratio when watching a video.</source>
-        <translation type="obsolete">Aspektforhold når video vises.</translation>
-    </message>
-    <message>
-        <source>Aspect</source>
-        <translation type="obsolete">Aspekt</translation>
-    </message>
-    <message>
-        <source>Video Mode Settings</source>
-        <translation type="obsolete">Innstillinger for videomodus</translation>
-    </message>
-    <message>
-        <source>Toggles mouse cursor visibility for touchscreens. By default MythTV will auto-hide the cursor if the mouse doesn&apos;t move for a period, this setting disables the cursor entirely.</source>
-        <translation type="obsolete">Slår av og på visning av muspeker for berøringsskjermer. Som standard vil MythTV skjule pekeren etter en stund hvis musen ikke flyttes, denne innstillingen slår av visningen av pekeren permanent.</translation>
-    </message>
-    <message>
-        <source>Toggles between windowed and borderless operation.</source>
-        <translation type="obsolete">Bytter mellom visning i vindu og uten kanter.</translation>
-    </message>
-    <message>
-        <source>Date format</source>
-        <translation type="obsolete">Datoformat</translation>
-    </message>
-    <message>
-        <source>Your preferred date format.</source>
-        <translation type="obsolete">Det foretrukne datoformatet.</translation>
-    </message>
-    <message>
-        <source>Your preferred short date format.</source>
-        <translation type="obsolete">Det foretrukne formatet for kort datovisning.</translation>
-    </message>
-    <message>
-        <source>Time format</source>
-        <translation type="obsolete">Tidsformat</translation>
-    </message>
-    <message>
-        <source>Direct3D</source>
-        <translation type="obsolete">Direct3D</translation>
-    </message>
-    <message>
-        <source>This selects what MythTV uses to draw. Choosing &apos;Auto&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
-        <translation type="obsolete">Dette velger hva MythTV bruker for å vise grensesnittet. &apos;Auto&apos; er anbefalt med mindre du har et system hvor OpenGL er defekt (pga ødelagt maskinvare, drivere eller vindussystem), og kun Qt virker.</translation>
-    </message>
-    <message>
-        <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
-        <translation type="obsolete">MythTV vil se etter tilkoblinger fra &apos;mythutil&apos; programmet på denne porten.</translation>
-    </message>
-    <message>
-        <source>Enable AirPlay</source>
-        <translation type="obsolete">Slå på Airplay</translation>
-    </message>
-    <message>
-        <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
-        <translation type="obsolete">Airplay lar deg vise innhold på din tv fra din iPhone, iPad, iPod Touch eller iTunes på din pc.</translation>
-    </message>
-    <message>
-        <source>Only support AirTunes (no video)</source>
-        <translation type="obsolete">Bare støtt AirTunes (ingen video)</translation>
-    </message>
-    <message>
-        <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
-        <translation type="obsolete">Bare strøm lyd fra din iPhone, iPad, iPod Touch eller iTunes på din pc</translation>
-    </message>
-    <message>
-        <source>Require password</source>
-        <translation type="obsolete">Krev passord</translation>
-    </message>
-    <message>
-        <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
-        <translation type="obsolete">Krev passord for å bruke AirPlay. Din iPhone, iPad, iPod Touch eller iTunes vil spørre om passord ved behov</translation>
-    </message>
-    <message>
-        <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
-        <translation type="obsolete">Din iPhone, iPad, iPod Touch eller iTunes vil spørre om passord ved behov</translation>
-    </message>
-    <message>
-        <source>AirPlay full screen playback</source>
-        <translation type="obsolete">AirPlay fullskjermsavspilling</translation>
-    </message>
-    <message>
-        <source>During music playback, displays album cover and various media information in full screen mode</source>
-        <translation type="obsolete">Vis albumomslag og mediainformasjon under avspilling i fullskjermsmodus</translation>
-    </message>
-    <message>
-        <source>All AirPlay settings take effect when you restart MythFrontend.</source>
-        <translation type="obsolete">Alle Airplay-innstillinger tar effekt når du restarter MythFrontend.</translation>
-    </message>
-    <message>
-        <source>AirTunes RSA key couldn&apos;t be loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. Last Error: %1</source>
-        <translation type="obsolete">AirTunes RSA nøkkel kunne ikke lastes. Se http://www.mythtv.org/wiki/AirTunes/AirPlay. Siste feil: %1</translation>
-    </message>
-    <message>
-        <source>AirTunes RSA key successfully loaded.</source>
-        <translation type="obsolete">AirTunes RSA nøkkel lastet.</translation>
-    </message>
-    <message>
-        <source>AirPlay Settings</source>
-        <translation type="obsolete">Innstillinger for AirPlay</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="obsolete">Tema</translation>
-    </message>
-    <message>
-        <source>Channel format</source>
-        <translation type="obsolete">Kanalformat</translation>
-    </message>
-    <message>
-        <source>Use FFmpeg&apos;s original MPEG-TS demuxer</source>
-        <translation type="obsolete">Bruk FFmpeg orginal MPEG-TS demultiplekser</translation>
-    </message>
-    <message>
-        <source>Experimental: Enable this setting to use FFmpeg&apos;s native demuxer. Things will be broken.</source>
-        <translation type="obsolete">Eksperimentelt: Slå på for å bruke FFmpegs egen demultiplekser. Ting vil ikke virke.</translation>
-    </message>
-    <message>
-        <source>number</source>
-        <translation type="obsolete">Nummer</translation>
-    </message>
-    <message>
-        <source>number callsign</source>
-        <translation type="obsolete">nummer forkorting</translation>
-    </message>
-    <message>
-        <source>number name</source>
-        <translation type="obsolete">nummer navn</translation>
-    </message>
-    <message>
-        <source>callsign</source>
-        <translation type="obsolete">forkorting</translation>
-    </message>
-    <message>
-        <source>name</source>
-        <translation type="obsolete">Navn</translation>
-    </message>
-    <message>
-        <source>Your preferred channel format.</source>
-        <translation type="obsolete">Det foretrukne kanalformatet.</translation>
-    </message>
-    <message>
-        <source>Your preferred long channel format.</source>
-        <translation type="obsolete">Det foretrukne formatet for lang kanalvisning.</translation>
-    </message>
-    <message>
-        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="obsolete">Finn ett, finn ukentlig og finn daglig-opptak vil motta denne ekstra prioriteten.</translation>
-    </message>
-    <message>
-        <source>Guide starts at channel</source>
-        <translation type="obsolete">Oversikt starter med kanal</translation>
-    </message>
-    <message>
-        <source>Language</source>
-        <translation type="obsolete">Språk</translation>
-    </message>
-    <message>
-        <source>Enable realtime priority threads</source>
-        <translation type="obsolete">Slår på tråder med sanntidsprioritet</translation>
-    </message>
-    <message>
-        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="obsolete">Når mythfrontend kjøres med superbrukerprivilegier kan noen tråder gis høyere prioritet. Slå av dette hvis mythfrontend henger under avspilling av video.</translation>
-    </message>
-    <message>
-        <source>Monitor CD/DVD</source>
-        <translation type="obsolete">Overvåk CD/DVD</translation>
-    </message>
-    <message>
-        <source>Enable LCD device</source>
-        <translation type="obsolete">Slå på LCD-enhet</translation>
-    </message>
-    <message>
-        <source>LCD device display</source>
-        <translation type="obsolete">LCD-skjerm</translation>
-    </message>
-    <message>
-        <source>Enable gamma correction for video</source>
-        <translation type="obsolete">Slå på gamma-korrigering for video</translation>
-    </message>
-    <message>
-        <source>Scale video as necessary</source>
-        <translation type="obsolete">Skaler video når nødvendig</translation>
-    </message>
-    <message>
-        <source>Frames to skip in fullscreen mode</source>
-        <translation type="obsolete">Bilder å hoppe over i fullskjermmodus</translation>
-    </message>
-    <message>
-        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="obsolete">Video vist i fullskjerm- eller ikke-vindumodus vil hoppe over så mange bilder for hvert bilde som tegnes. Angi 0 for å vise alle bilder. Dette er kun gyldig når «Bruk grensesnittstørrelse for TV-avspilling» eller «Kjør klienten i et vindu» ikke er valgt.</translation>
-    </message>
-    <message>
-        <source>Video in main window</source>
-        <translation type="obsolete">Video i hovedvindu</translation>
-    </message>
-    <message>
-        <source>Frames to skip</source>
-        <translation type="obsolete">Bilder å hoppe over</translation>
-    </message>
-    <message>
-        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video i hovedvinduet vil hoppe over dette antall bilder for hvert bilde som vises. Sett til 0 for å vise hvert eneste bilde.</translation>
-    </message>
-    <message>
-        <source>Opacity</source>
-        <translation type="obsolete">Gjennomsiktighet</translation>
-    </message>
-    <message>
-        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="obsolete">Hovedvinduets gjennomsiktighet. 100 for helt ugjennomsiktig, 0 for helt gjennomsiktig.</translation>
-    </message>
-    <message>
-        <source>Video in floating window</source>
-        <translation type="obsolete">Video i flytende vindu</translation>
-    </message>
-    <message>
-        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video i et flytende vindu vil hoppe over så mange bilder for hvert bilde som tegnes. Angi 0 for å vise alle bilder.</translation>
-    </message>
-    <message>
-        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="obsolete">Det flytende vinduets gjennomsiktighet. 100 for helt ugjennomsiktig, 0 for helt gjennomsiktig.</translation>
-    </message>
-    <message>
-        <source>Video in the dock</source>
-        <translation type="obsolete">Video i dokken</translation>
-    </message>
-    <message>
-        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video i dokken hopper over så mange bilder for hvert bilde som tegnes. 0 viser alle bilder.</translation>
-    </message>
-    <message>
-        <source>Video on the desktop</source>
-        <translation type="obsolete">Video på skrivebordet</translation>
-    </message>
-    <message>
-        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="obsolete">Video på skrivebordet vil hoppe over så mange bilder for hvert bilde som tegnes. Angi 0 for å vise alle bilder.</translation>
-    </message>
-    <message>
-        <source>Show the program guide when starting Live TV</source>
-        <translation type="obsolete">Vis programoversikten når direkte TV startes</translation>
-    </message>
-    <message>
-        <source>This starts the program guide immediately upon starting to watch Live TV.</source>
-        <translation type="obsolete">Dette viser programoversikten med én gang når direkte TV startes.</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="obsolete">Generelt</translation>
-    </message>
-    <message>
-        <source>View Recordings</source>
-        <translation type="obsolete">Vis opptak</translation>
-    </message>
-    <message>
-        <source>Seeking</source>
-        <translation type="obsolete">Søking</translation>
-    </message>
-    <message>
-        <source>Commercial Skip</source>
-        <translation type="obsolete">Reklamehopping</translation>
-    </message>
-    <message>
-        <source>Program Guide</source>
-        <translation type="obsolete">Programoversikt</translation>
-    </message>
-    <message>
-        <source>Localization</source>
-        <translation type="obsolete">Lokalisering</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -12704,18 +11598,6 @@ Vil du fortsette å se?</translation>
         <translation>Jobbkø (jobbkommandoer)</translation>
     </message>
     <message>
-        <source>Signal Lock</source>
-        <translation type="obsolete">Signal-låsing</translation>
-    </message>
-    <message>
-        <source>Signal Power</source>
-        <translation type="obsolete">Signalstyrke</translation>
-    </message>
-    <message>
-        <source>Script Status</source>
-        <translation type="obsolete">Status for skript</translation>
-    </message>
-    <message>
         <source>Re-Record</source>
         <translation>Ta opp på nytt</translation>
     </message>
@@ -12799,14 +11681,6 @@ Vil du fortsette å se?</translation>
         <translation>ATSC-kanal %1</translation>
     </message>
     <message>
-        <source>Failed to probe the card</source>
-        <translation type="obsolete">Kunne ikke undersøke kortet</translation>
-    </message>
-    <message>
-        <source>Failed to open the card</source>
-        <translation type="obsolete">Kunne ikke åpne kortet</translation>
-    </message>
-    <message>
         <source>Country</source>
         <translation>Land</translation>
     </message>
@@ -12867,130 +11741,6 @@ Vil du fortsette å se?</translation>
         <translation>Konverter ved bruk av «%1»</translation>
     </message>
     <message>
-        <source>Default group filter to apply</source>
-        <translation type="obsolete">Standard gruppefilter å bruke</translation>
-    </message>
-    <message>
-        <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="obsolete">Standard gruppefilter for «Se på opptak».</translation>
-    </message>
-    <message>
-        <source>Save current group filter when changed</source>
-        <translation type="obsolete">Lagre gjeldende gruppefilter når endret</translation>
-    </message>
-    <message>
-        <source>Show filter name instead of &quot;All Programs&quot;</source>
-        <translation type="obsolete">Vis filternavn i stedet for «Alle programmer»</translation>
-    </message>
-    <message>
-        <source>Time to retain deleted recordings (days)</source>
-        <translation type="obsolete">Tid slettede opptak skal tas vare på (dager)</translation>
-    </message>
-    <message>
-        <source>Determines the maximum number of days before undeleting a recording will become impossible. A value of zero means the recording will be permanently deleted between 5 and 20 minutes later. A value of minus one means recordings will be retained until space is required. A recording will always be removed before this time if the space is needed for a new recording.</source>
-        <translation type="obsolete">Bestemmer maksimalt antall dager før det vil være umulig å gjenopprette et slettet opptak. Verdien null betyr at opptaket blir slettet mellom 5 og 20 minutter senere. Minus en betyr at opptaket vil bli tatt vare på inntil plassen på disken trengs. Et opptak vil alltid bli slettet før dette hvis plassen trengs for et nytt opptak.</translation>
-    </message>
-    <message>
-        <source>Category of shows to be extended</source>
-        <translation type="obsolete">Kategori hvor programmene skal utvides</translation>
-    </message>
-    <message>
-        <source>Category record over-time</source>
-        <translation type="obsolete">Kategori tar opp på overtid</translation>
-    </message>
-    <message>
-        <source>Fast forward/rewind reposition amount</source>
-        <translation type="obsolete">Justeringsmengde for spoling</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">Endre posisjon så mange hundredels sekunder før normal avspilling startes når trege taster spol framover-/bakover-modus avsluttes. Dette kompenserer for reaksjonstiden mellom å se hvor avspillingen skal fortsette og avslutte søkingen.</translation>
-    </message>
-    <message>
-        <source>Display current time on idle LCD display. </source>
-        <translation type="obsolete">Vis klokkeslett på arbeidsledig LCD-skjerm. </translation>
-    </message>
-    <message>
-        <source>Display selected menu on LCD display. </source>
-        <translation type="obsolete">Vis den valgte menyen på LCD-skjerm. </translation>
-    </message>
-    <message>
-        <source>Items</source>
-        <translation type="obsolete">Elementer</translation>
-    </message>
-    <message>
-        <source>Artist - Title</source>
-        <translation type="obsolete">Artist - Tittel</translation>
-    </message>
-    <message>
-        <source>Artist [Album] Title</source>
-        <translation type="obsolete">Artist [Album] Tittel</translation>
-    </message>
-    <message>
-        <source>Which items to show when playing music.</source>
-        <translation type="obsolete">Hvilke elementer som skal vises når det spilles musikk.</translation>
-    </message>
-    <message>
-        <source>Use an LCD display to view MythTV status information.</source>
-        <translation type="obsolete">Bruk en LCD-skjerm for å vise statusinformasjon fra MythTV.</translation>
-    </message>
-    <message>
-        <source>Mac OS X Video Settings</source>
-        <translation type="obsolete">Videoinnstillinger for Mac OS X</translation>
-    </message>
-    <message>
-        <source>On-screen Display</source>
-        <translation type="obsolete">Skjermtekst</translation>
-    </message>
-    <message>
-        <source>General (Basic)</source>
-        <translation type="obsolete">Generelt (Grunnleggende)</translation>
-    </message>
-    <message>
-        <source>General (Auto-Expire)</source>
-        <translation type="obsolete">Generelt (Auto-utløping)</translation>
-    </message>
-    <message>
-        <source>General (Jobs)</source>
-        <translation type="obsolete">Generelt (Jobber)</translation>
-    </message>
-    <message>
-        <source>General (Advanced)</source>
-        <translation type="obsolete">Generelt (Avansert)</translation>
-    </message>
-    <message>
-        <source>Turn on the LCD heartbeat.</source>
-        <translation type="obsolete">Skru på LCD-hjertebankingen.</translation>
-    </message>
-    <message>
-        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="obsolete">Bildefil for bruk som ikon for denne kanalen på diverse MythTV-visninger.</translation>
-    </message>
-    <message>
-        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="obsolete">ID som brukes av listetjenester for å få en eksakt korrespondanse mellom en kanal du har og en kanal i deres database. Dette oppdages som regel automatisk når «mythfilldatabase» kjøres.</translation>
-    </message>
-    <message>
-        <source>Commercial Detection Method</source>
-        <translation type="obsolete">Metode for reklamedeteksjon</translation>
-    </message>
-    <message>
-        <source>If enabled, the channel will be visible in the EPG.</source>
-        <translation type="obsolete">Hvis slått på vil kanalen være synlig i programoversikten.</translation>
-    </message>
-    <message>
-        <source>If enabled, guide information for this channel will be updated using &apos;Over-the-Air&apos; program listings.</source>
-        <translation type="obsolete">Hvis aktivert vil programinformasjon for denne kanalen bli oppdatert ved bruk av programinformasjon &apos;over luften&apos;.</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="obsolete">eller</translation>
-    </message>
-    <message>
-        <source>Channel</source>
-        <translation type="obsolete">Kanal</translation>
-    </message>
-    <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation>A</translation>
@@ -13017,44 +11767,8 @@ Vil du fortsette å se?</translation>
         <translation>Denne visningen er ikke planlagt tatt opp</translation>
     </message>
     <message>
-        <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation type="obsolete">Denne sendingen ble tatt opp, men ble avbrutt før opptaket var ferdig.</translation>
-    </message>
-    <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Denne sendingen ble ikke tatt opp fordi den ble avbrutt manuelt.</translation>
-    </message>
-    <message>
-        <source>Always prompt for initial group filter</source>
-        <translation type="obsolete">Alltid spør om første gruppefilter</translation>
-    </message>
-    <message>
-        <source>Your preferred language for the user interface.</source>
-        <translation type="obsolete">Foretrukket språk for brukergrensesnittet.</translation>
-    </message>
-    <message>
-        <source>Display current recordings information on LCD display.</source>
-        <translation type="obsolete">Vis informasjon om gjeldende opptak på LCD-enhet.</translation>
-    </message>
-    <message>
-        <source>Display playing artist and song title in MythMusic on LCD display.</source>
-        <translation type="obsolete">Vis gjeldende artist og sangtittel i MythMusic på LCD-enhet.</translation>
-    </message>
-    <message>
-        <source>Display tuned channel information on LCD display.</source>
-        <translation type="obsolete">Vis informasjon om gjeldende kanal på LCD-enhet.</translation>
-    </message>
-    <message>
-        <source>Display generic information on LCD display.</source>
-        <translation type="obsolete">Vis generisk informasjon på LCD-enhet.</translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently on the LCD display.</source>
-        <translation type="obsolete">Skru på LCD-enhetens bakbelysning permanent.</translation>
-    </message>
-    <message>
-        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="obsolete">Skriv inn de seks returkodene for LCD-talltastaturet i den rekkefølgen du vil ha funksjonene opp/ned/venstre/høyre/ja/nei. (Se «lcdproc/server/drivers/hd44780.c/keyMapMatrix[]» eller matrisen for din enhet)</translation>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
@@ -13077,36 +11791,16 @@ Vil du fortsette å se?</translation>
         <translation>16:9</translation>
     </message>
     <message>
-        <source>16:10</source>
-        <translation type="obsolete">16:10</translation>
-    </message>
-    <message>
         <source>(Delete all video sources)</source>
         <translation>(Slett alle videokilder)</translation>
-    </message>
-    <message>
-        <source>Display volume level information on LCD display.</source>
-        <translation type="obsolete">Vis volumnivå på LCD-enhet.</translation>
     </message>
     <message>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
     <message>
-        <source>Analog V4L capture card</source>
-        <translation type="obsolete">Analogt V4L-opptakskort</translation>
-    </message>
-    <message>
-        <source>DVB DTV capture card (v3.x)</source>
-        <translation type="obsolete">DVB DTV-opptakskort (v3.x)</translation>
-    </message>
-    <message>
         <source>FireWire cable box</source>
         <translation>FireWire-kabelboks</translation>
-    </message>
-    <message>
-        <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
-        <translation type="obsolete">USB MPEG-4-koderboks (Plextor ConvertX etc.)</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
@@ -13165,10 +11859,6 @@ Vil du fortsette å se?</translation>
         <translation>Fart</translation>
     </message>
     <message>
-        <source>Use line edit virtual keyboards</source>
-        <translation type="obsolete">Bruk virtuelle tastatur for linjeredigering</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation>Dette virker som regel bare med ATSC- eller DVB-kanaler,</translation>
     </message>
@@ -13209,28 +11899,8 @@ Vil du fortsette å se?</translation>
         <translation>Kod på nytt igjen kun der det er absolutt nødvendig (som regel kun rundt klippepunkt). Ellers beholdes lyd- og videoformat identiske til kilden. Dette skal gi høyest kvalitet, men vil ikke spare så mye plass.</translation>
     </message>
     <message>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation type="obsolete">Prøver vises med dagens dato.</translation>
-    </message>
-    <message>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="obsolete">Prøver vises med morgendagens dato.</translation>
-    </message>
-    <message>
         <source>Spain</source>
         <translation>Spania</translation>
-    </message>
-    <message>
-        <source>Enable Network Remote Control interface</source>
-        <translation type="obsolete">Slå på grensesnitt for fjernkontroll over nettverk</translation>
-    </message>
-    <message>
-        <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="obsolete">Dette slår på støtte for å kontrollere mythfrontend over nettverket.</translation>
-    </message>
-    <message>
-        <source>Too Far %1</source>
-        <translation type="obsolete">For langt %1</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
@@ -13247,10 +11917,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>Blank Frame Detection</source>
         <translation>Oppdaging av tomme bilder</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="obsolete">Dette bestemmer metoden som skal brukes for å oppdage når reklamer begynner og slutter.</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
@@ -13289,10 +11955,6 @@ Vil du fortsette å se?</translation>
         <translation>Opptaker er av</translation>
     </message>
     <message>
-        <source>the backend recorder is off-line.</source>
-        <translation type="obsolete">opptakstjeneren er av.</translation>
-    </message>
-    <message>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
         <translation>Hvis du peker parabolen mot en satellitt fra DishNet, så bør du velge dette alternativet. For best resultat bør du også slå på Generell EIT innsamling i tillegg.</translation>
     </message>
@@ -13303,34 +11965,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>Video</source>
         <translation>Video</translation>
-    </message>
-    <message>
-        <source>DataDirect</source>
-        <translation type="obsolete">DataDirect</translation>
-    </message>
-    <message>
-        <source>Time Offset</source>
-        <translation type="obsolete">Tidsforskyvning</translation>
-    </message>
-    <message>
-        <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="obsolete">Legg denne forskyvningen (i minutter) til programoversikt-dataene ved importering. Dette kan være nyttig hvis data for en spesiell kanal er i en annen tidssone.</translation>
-    </message>
-    <message>
-        <source>(Works for DataDirect listings only.)</source>
-        <translation type="obsolete">(Virker kun for DataDirect.)</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation type="obsolete">Prioritet</translation>
-    </message>
-    <message>
-        <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
-        <translation type="obsolete">Antall prioritetspoeng som skal legges til ethvert opptak på denne kanalen ved planlegging.</translation>
-    </message>
-    <message>
-        <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="obsolete">Bruk et positivt tall som prioritet hvis du vil at dette skal være en prioritert kanal, eller et negativt for å gjøre det motsatte.</translation>
     </message>
     <message>
         <source>Track</source>
@@ -13404,10 +12038,6 @@ Vil du fortsette å se?</translation>
         <translation>Normal</translation>
     </message>
     <message>
-        <source>Position</source>
-        <translation type="obsolete">Posisjon</translation>
-    </message>
-    <message>
         <source>Recording Type</source>
         <translation>Opptakstype</translation>
     </message>
@@ -13436,17 +12066,8 @@ Vil du fortsette å se?</translation>
         <translation>Kabel IRC</translation>
     </message>
     <message>
-        <source>UNKNOWN%1</source>
-        <comment>Synthesized callsign</comment>
-        <translation type="obsolete">UKJENT%1</translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation>Opptaker</translation>
-    </message>
-    <message>
-        <source>HDHomeRun DTV tuner box</source>
-        <translation type="obsolete">HDHomeRun DTV-boks</translation>
     </message>
     <message>
         <source>Input priority</source>
@@ -13485,44 +12106,8 @@ Vil du fortsette å se?</translation>
         <translation>(Slett alle opptakskort på %1)</translation>
     </message>
     <message>
-        <source>Always display closed captioning or subtitles</source>
-        <translation type="obsolete">Alltid vis undertekster</translation>
-    </message>
-    <message>
-        <source>Qt</source>
-        <translation type="obsolete">Qt</translation>
-    </message>
-    <message>
-        <source>OpenGL</source>
-        <translation type="obsolete">OpenGL</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="obsolete">Ytterligere prioritet når en sending passer den foretrukne inndatakilden valgt i «Planleggingsinnstillinger»-delen av opptaksregelen.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="obsolete">Ytterligere prioritet når en sending er merket som en HDTV-kringkasting i TV-dataene.</translation>
-    </message>
-    <message>
-        <source>Alphabetically</source>
-        <translation type="obsolete">Alfabetisk</translation>
-    </message>
-    <message>
-        <source>Scheduler Options</source>
-        <translation type="obsolete">Planleggingsinnstillinger</translation>
-    </message>
-    <message>
-        <source>Recording Type Priority Settings</source>
-        <translation type="obsolete">Innstillinger for opptakstypeprioritet</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
         <translation>^(|A |An )</translation>
-    </message>
-    <message>
-        <source>Time offset for EIT listings</source>
-        <translation type="obsolete">Tidsforskyvning for EIT programinfo</translation>
     </message>
     <message>
         <source>The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.</source>
@@ -13549,22 +12134,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
         <translation>Velg modellen som likner mest på TV-boksen din. Avhengig av forskjellige fastvareversjoner virker kanskje SA4200HD bedre for en SA3250HD-boks.</translation>
-    </message>
-    <message>
-        <source>channel number</source>
-        <translation type="obsolete">kanalnummer</translation>
-    </message>
-    <message>
-        <source>On multiline displays try and display the time as large as possible.</source>
-        <translation type="obsolete">Prøv å vise klokken så stor som mulig på skjermer med flere linjer.</translation>
-    </message>
-    <message>
-        <source>Failed to open 
- &apos;%1&apos; in %2 
-Check if the video exists</source>
-        <translation type="obsolete">Klarte ikke åpne 
- «%1» i %2 
-Se etter at videoen finnes</translation>
     </message>
     <message>
         <source>Experimental</source>
@@ -13764,10 +12333,6 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
         <translation>Network ID</translation>
     </message>
     <message>
-        <source>Set this to the actual network ID at your location, if you have a provider that broadcasts a broken NIT. Leave at -1 if everything works out of the box.</source>
-        <translation type="obsolete">Sett denne til nettverksid for din plassering, hvis du har en distributør som sender en defekt NIT. La stå som -1 hvis alt virker.</translation>
-    </message>
-    <message>
         <source>Perform EIT scan</source>
         <translation>Utfør EIT-søk</translation>
     </message>
@@ -13892,10 +12457,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>URL til M3U</translation>
     </message>
     <message>
-        <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation type="obsolete">URL til M3U som inneholder adresser for IPTV-kanaler.</translation>
-    </message>
-    <message>
         <source>Use quick tuning</source>
         <translation>Bruk rask tuning</translation>
     </message>
@@ -13908,62 +12469,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>Alltid</translation>
     </message>
     <message>
-        <source>Sort all sub-titles/multi-titles Ascending</source>
-        <translation type="obsolete">Sorter alle undertitler/multititler i stigende rekkefølge</translation>
-    </message>
-    <message>
-        <source>Sort all sub-titles/multi-titles Descending</source>
-        <translation type="obsolete">Sorter alle undertitler/multititler i synkende rekkefølge</translation>
-    </message>
-    <message>
-        <source>Sort sub-titles Descending, multi-titles Ascending</source>
-        <translation type="obsolete">Sorter alle undertitler i synkende, og multititler i stigende rekkefølge</translation>
-    </message>
-    <message>
-        <source>Sort sub-titles Ascending, multi-titles Descending</source>
-        <translation type="obsolete">Sorter alle undertitler i stigende, og multititler i synkende rekkefølge</translation>
-    </message>
-    <message>
-        <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
-        <translation type="obsolete">Velger hvordan episoder skal sorteres. Undertitler refererer til episoder som vises under en gitt tittel. Multitittel refererer til seksjonen (f.eks. &quot;Alle programmer&quot;) som lister flere titler. Seksjonene i parantes er ikke påvirket av dette valget.</translation>
-    </message>
-    <message>
-        <source>Episode sort orderings</source>
-        <translation type="obsolete">Sorteringsrekkefølge for episoder</translation>
-    </message>
-    <message>
-        <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="obsolete">Inkluder i &apos;Se-liste&apos; gruppen</translation>
-    </message>
-    <message>
-        <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="obsolete">Se-listen er en forkortet liste over opptak som er sortert for å vise serier og programmer som bør sees for å følge med på disse.</translation>
-    </message>
-    <message>
-        <source>Start from the Watch List view</source>
-        <translation type="obsolete">Start fra Se-liste visning</translation>
-    </message>
-    <message>
-        <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="obsolete">Ekskluder opptak som ikke skal autoutløpe</translation>
-    </message>
-    <message>
-        <source>Maximum days counted in the score</source>
-        <translation type="obsolete">Maksimalt antall dager som telles inn i skår</translation>
-    </message>
-    <message>
-        <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="obsolete">&quot;Se-liste&quot; skåren er basert på ett poeng per dag siden opptak. Denne innstillingen begrenser maksimal skår basert på alder og påvirker andre vektingsfaktorer.</translation>
-    </message>
-    <message>
-        <source>Days to exclude weekly episodes after delete</source>
-        <translation type="obsolete">Antall dager ukentlige episoder skal ekskluderes etter sletting</translation>
-    </message>
-    <message>
-        <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="obsolete">Når en episode er slettet eller markert som sett vil andre episoder fra samme serie ikke vises i &quot;Se-listen&quot; basert på denne innstillingen. Daglige sendinger har et kortere intervall basert på denne innstillingen.</translation>
-    </message>
-    <message>
         <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
         <translation>Bruk mythfilldatabase eller navnet på et egendefinert skript som fyller programoversikten for alle videokilder.</translation>
     </message>
@@ -13972,60 +12477,12 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>Ingen lagringsgruppe er definert. Du må legge til minst en mappe til Standard lagringsgruppe hvor opptak skal lagres.</translation>
     </message>
     <message>
-        <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
-        <translation type="obsolete">Endrer metoden for oppdaging av reklame som blir brukt for opptak på denne kanalen eller slår av oppdaging ved å markere kanalen som reklamefri.</translation>
-    </message>
-    <message>
         <source>Use Global Setting</source>
         <translation>Bruk global innstilling</translation>
     </message>
     <message>
-        <source>Channel Options - Filters</source>
-        <translation type="obsolete">Kanalinnstillinger - Filtre</translation>
-    </message>
-    <message>
-        <source>Aspect ratio when watching a video at a specific resolution.</source>
-        <translation type="obsolete">Aspektforhold som skal brukes ved visning av video basert på en gitt oppløsning.</translation>
-    </message>
-    <message>
-        <source>Backend Server Wakeup settings</source>
-        <translation type="obsolete">Wakeup innstillinger for tjener</translation>
-    </message>
-    <message>
-        <source>MythTV could not connect to the database. Please verify your database settings below.</source>
-        <translation type="obsolete">MythTV kunne ikke koble til databasen. Vennligst kontroller databaseinnstillingene under.</translation>
-    </message>
-    <message>
-        <source>Database Server Settings</source>
-        <translation type="obsolete">Innstillinger for databasetjener</translation>
-    </message>
-    <message>
-        <source>Ping test server?</source>
-        <translation type="obsolete">Send ping til testtjener?</translation>
-    </message>
-    <message>
-        <source>Test basic host connectivity using the ping command. Turn off if your host or network don&apos;t support ping (ICMP ECHO) packets</source>
-        <translation type="obsolete">Test grunnleggende forbindelse til verten ved å bruke ping-kommandoen. Skruv av hvis verten eller nettverket ikke støtter ping (ICMP ECHO)-pakker</translation>
-    </message>
-    <message>
         <source>Port</source>
         <translation>Port</translation>
-    </message>
-    <message>
-        <source>The port number the database is running on.  Leave blank if using the default port (3306).</source>
-        <translation type="obsolete">Port-nummer som databasen kjører på. Sett til blank hvis du bruker standardporten (3306).</translation>
-    </message>
-    <message>
-        <source>Database name</source>
-        <translation type="obsolete">Databasenavn</translation>
-    </message>
-    <message>
-        <source>The command executed on this frontend to wake up the database server (eg. sudo /etc/init.d/mysql restart).</source>
-        <translation type="obsolete">Kommandoen som skal kjøres på denne frontenden for å vekke opp database tjeneren (f.eks. sudo /etc/init.d/mysql restart).</translation>
-    </message>
-    <message>
-        <source>Required fields are marked with an asterisk (*).</source>
-        <translation type="obsolete">Påkrevde felter er markert med en stjerne (*).</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason. Is it running?</source>
@@ -14034,16 +12491,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
     <message>
         <source>Could not connect to the master backend server. Is it running?  Is the IP address set for it in mythtv-setup correct?</source>
         <translation>Kunne ikke koble til hovedtjeneren. Den kjører kanskje ikke, eller IP-adressen angitt i oppsettsprogrammet kan være feil?</translation>
-    </message>
-    <message>
-        <source> (Audio Description)</source>
-        <comment>Audio described for the visually impaired</comment>
-        <translation type="obsolete"> (Beskrevet med lyd)</translation>
-    </message>
-    <message>
-        <source> (Commentary)</source>
-        <comment>Audio commentary track</comment>
-        <translation type="obsolete"> (Kommentert)</translation>
     </message>
     <message>
         <source>Subtitle</source>
@@ -14078,18 +12525,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>denne reglen finner ingen programmer med gjeldende programoversikt.</translation>
     </message>
     <message>
-        <source>this episode will be recorded on a different channel in this time slot.</source>
-        <translation type="obsolete">denne episoden vil bli tatt opp på en annen kanal i denne tidsperioden.</translation>
-    </message>
-    <message>
-        <source>Could not open tuner device</source>
-        <translation type="obsolete">Klarte ikke å åpne TV-kort</translation>
-    </message>
-    <message>
-        <source>Bad connection to backend</source>
-        <translation type="obsolete">Feil tilkobling til tjeneren</translation>
-    </message>
-    <message>
         <source> offset %2</source>
         <translation> forskyvning %2</translation>
     </message>
@@ -14098,28 +12533,12 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>Tuner til %1 mplexid(%2)</translation>
     </message>
     <message>
-        <source>MythTV wants to record these programs in %d seconds:</source>
-        <translation type="obsolete">Disse programmene er planlagt å ta opp om %d sekunder:</translation>
-    </message>
-    <message>
-        <source>&quot;%1&quot; on %2</source>
-        <translation type="obsolete">«%1» på %2</translation>
-    </message>
-    <message>
-        <source>Do you want to:</source>
-        <translation type="obsolete">Vil du:</translation>
-    </message>
-    <message>
         <source>On known multiplex...</source>
         <translation>På kjent multipleks...</translation>
     </message>
     <message>
         <source>DXVA2 will use the graphics hardware to accelerate video decoding and playback (requires Windows Vista or later).</source>
         <translation>DXVA2 vil forsøke å bruker grafikkhardwaren for å akselerere video dekoding og avpilling (krever Windows Vista eller nyere).</translation>
-    </message>
-    <message>
-        <source>VAAPI will attempt to use the graphics hardware to accelerate video decoding.</source>
-        <translation type="obsolete">VAAPI vil forsøke å bruker grafikkhardwaren for å akselerere video dekoding.</translation>
     </message>
     <message>
         <source>VDA will attempt to use the graphics hardware to accelerate video decoding. (H264 only, requires Mac OS 10.6.3)</source>
@@ -14446,220 +12865,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>mythfilldatabase kjørte, men la ikke inn nye data for %1 av %2 kilder. Dette kan skyldes en feil i programmet som henter data.</translation>
     </message>
     <message>
-        <source>5.1</source>
-        <translation type="obsolete">5.1</translation>
-    </message>
-    <message>
-        <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="obsolete">Behandle sammenhengende reklamepauser kortere enn dette som en reklamepause ved hopping fremover. Nyttig hvis du må hoppe fremover noen ganger under reklamepauser. Gjelder også for automatisk hopping. Sett til 0 for å slå av.</translation>
-    </message>
-    <message>
-        <source>DeletedExpireOptions</source>
-        <translation type="obsolete">Innstillinger for sletting og utløping</translation>
-    </message>
-    <message>
-        <source>Profile Item</source>
-        <translation type="obsolete">Profilpost</translation>
-    </message>
-    <message>
-        <source>Main deinterlacing method.</source>
-        <translation type="obsolete">Hovedmetode for avfletting.</translation>
-    </message>
-    <message>
-        <source>Fallback deinterlacing method.</source>
-        <translation type="obsolete">Reservemetode for avfletting.</translation>
-    </message>
-    <message>
-        <source>&amp;</source>
-        <comment>and</comment>
-        <translation type="obsolete">og</translation>
-    </message>
-    <message>
-        <source>if rez</source>
-        <translation type="obsolete">Hvis oppløsning</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="obsolete">Rediger</translation>
-    </message>
-    <message>
-        <source>Add New Entry</source>
-        <translation type="obsolete">Legg til</translation>
-    </message>
-    <message>
-        <source>Playback Profiles</source>
-        <translation type="obsolete">Avspillingsprofiler</translation>
-    </message>
-    <message>
-        <source>Current Video Playback Profile</source>
-        <translation type="obsolete">Gjeldende avspillingsprofil for video</translation>
-    </message>
-    <message>
-        <source>Add New</source>
-        <translation type="obsolete">Legg til</translation>
-    </message>
-    <message>
-        <source>Enter Playback Group Name</source>
-        <translation type="obsolete">Skriv inn navnet på avspillingsgruppen</translation>
-    </message>
-    <message>
-        <source>Sorry, playback group name
-&apos;%1&apos; is already being used.</source>
-        <translation type="obsolete">Det finnes allerede en avspillingsgruppe med navnet «%1».</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">Feil</translation>
-    </message>
-    <message>
-        <source>Vertical scaling</source>
-        <translation type="obsolete">Juster høyde</translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="obsolete">Juster dette hvis høyden på bildet ikke passer skjermen. Verdier fra - 100% til 100%</translation>
-    </message>
-    <message>
-        <source>Horizontal scaling</source>
-        <translation type="obsolete">Juster bredde</translation>
-    </message>
-    <message>
-        <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="obsolete">Juster dette hvis bredden på bildet ikke passer skjermen. Verdier fra - 100% til 100%</translation>
-    </message>
-    <message>
-        <source>Always prompt (excluding Live TV)</source>
-        <translation type="obsolete">Alltid advarsel (ikke for direkte TV)</translation>
-    </message>
-    <message>
-        <source>Always prompt (including Live TV)</source>
-        <translation type="obsolete">Alltid advarsel (også for direkte TV)</translation>
-    </message>
-    <message>
-        <source>Prompt for Live TV only</source>
-        <translation type="obsolete">Kun advarsel for direkte TV</translation>
-    </message>
-    <message>
-        <source>Automatically mark a recording as watched</source>
-        <translation type="obsolete">Merk opptak som sett automatisk</translation>
-    </message>
-    <message>
-        <source>Show quit</source>
-        <translation type="obsolete">Vis «Avslutt»</translation>
-    </message>
-    <message>
-        <source>Show quit and shutdown</source>
-        <translation type="obsolete">Vis «Avslutt og slå av»</translation>
-    </message>
-    <message>
-        <source>Show quit, reboot and shutdown</source>
-        <translation type="obsolete">Vis «Avslutt», «Start på nytt» og «Slå av»</translation>
-    </message>
-    <message>
-        <source>Show shutdown</source>
-        <translation type="obsolete">Vis «Slå av»</translation>
-    </message>
-    <message>
-        <source>Show reboot</source>
-        <translation type="obsolete">Vis «Start på nytt»</translation>
-    </message>
-    <message>
-        <source>Show reboot and shutdown</source>
-        <translation type="obsolete">Vis «Start på nytt» og «Slå av»</translation>
-    </message>
-    <message>
-        <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="obsolete">Standardverdien er at bare fjerne frontender viser Slå av valget på avlsutningsmenyen. Du kan her tvinge spesifikke innstillinger for Slå av og Restart som skal vises.</translation>
-    </message>
-    <message>
-        <source>Reboot command</source>
-        <translation type="obsolete">Kommando for omstart</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable.If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation type="obsolete">Denne PIN-koden brukes for å styre tilgang til oppsettsmenyene. Hvis du vil bruke denne funksjonen er det lurt å kun bruke tall. Sett feltet tomt for å slå av. Hvis PIN-kode funksjonen blir slått på vil du ikke kunne åpne dette skjermbildet igjen for å resette PIN-koden uten først å taste inn gjeldende PIN-kode.</translation>
-    </message>
-    <message>
-        <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
-        <translation type="obsolete">Som standard bruker MythTV svart farge for å matche Letterbox formatet fra kringkasteren, men de med plasmaskjermer kan foretrekke grå for å minimere innbrenning av skjermen.</translation>
-    </message>
-    <message>
-        <source>Currently only works with XVideo video renderer.</source>
-        <translation type="obsolete">For øyeblikket virker dette bare med XVideo gjengiver.</translation>
-    </message>
-    <message>
-        <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
-        <translation type="obsolete">Overstyrer høyde/bredde-forholdet som oppgis fra alle kanaler.</translation>
-    </message>
-    <message>
-        <source>Zoom</source>
-        <translation type="obsolete">Forstørring</translation>
-    </message>
-    <message>
-        <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
-        <translation type="obsolete">Forstørrer all video som spilles av.</translation>
-    </message>
-    <message>
-        <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="obsolete">Bredden på skjermen eller TV&apos;et. Brukes for å regne ut høyde/bredde-forholdet. Dette overstyrer systeminnstillingen.</translation>
-    </message>
-    <message>
-        <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="obsolete">Høyden på skjermen eller TV&apos;et. Brukes for å regne ut høyde/bredde-forhold. Dette overstyrer systeminnstillingen.</translation>
-    </message>
-    <message>
-        <source> (and other removable devices)</source>
-        <translation type="obsolete"> (og andre enheter som kan fjernes)</translation>
-    </message>
-    <message>
-        <source>MythMediaMonitor</source>
-        <translation type="obsolete">MythMediaMonitor</translation>
-    </message>
-    <message>
-        <source>Settings Access</source>
-        <translation type="obsolete">Tilgang til innstillinger</translation>
-    </message>
-    <message>
-        <source>Shutdown/Reboot Settings</source>
-        <translation type="obsolete">Innstillinger for &quot;Slå av&quot; og &quot;Start på nytt&quot;</translation>
-    </message>
-    <message>
-        <source>General Playback</source>
-        <translation type="obsolete">Generell avspilling</translation>
-    </message>
-    <message>
-        <source>Recording Groups</source>
-        <translation type="obsolete">Opptakgrupper</translation>
-    </message>
-    <message>
-        <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
-        <translation type="obsolete">Advarsel fra Aggressiv Foreldrestyring: Feil passord. Tilgang til MythVideo innstillingsvindu ble stoppet.</translation>
-    </message>
-    <message>
-        <source>Play from bookmark</source>
-        <translation type="obsolete">Spill av fra bokmerke</translation>
-    </message>
-    <message>
-        <source>Play from beginning</source>
-        <translation type="obsolete">Spill av fra begynnelsen</translation>
-    </message>
-    <message>
-        <source>The ScreenSetupWizard cannot be used while mythfrontend is operating in windowed mode.</source>
-        <translation type="obsolete">Veiviser for skjermoppsett kan ikke brukes når mythfrontend er i vindusmodus.</translation>
-    </message>
-    <message>
-        <source>All tuners are currently busy.</source>
-        <translation type="obsolete">Alle TV-kort er nå opptatt.</translation>
-    </message>
-    <message>
-        <source>There are no configured tuners.</source>
-        <translation type="obsolete">Ingen tunere er konfigurert.</translation>
-    </message>
-    <message>
-        <source>Loading videos ...</source>
-        <translation type="obsolete">Laster videoer...</translation>
-    </message>
-    <message>
         <source>IP address</source>
         <translation>IP-adresse</translation>
     </message>
@@ -14770,14 +12975,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
     <message>
         <source>External application or script that outputs extra information for inclusion in the backend status page. See http://www.mythtv.org/wiki/Miscellaneous_Status_Information</source>
         <translation>Ekstern applikasjon eller skript som gir ut ekstra informasjon som skal vises i backend statussiden. Se http://www.mythtv.org/wiki/Miscellaneous_Status_Information</translation>
-    </message>
-    <message>
-        <source>Your local time zone (for XMLTV)</source>
-        <translation type="obsolete">Din lokale tidssone (for XMLTV)</translation>
-    </message>
-    <message>
-        <source>Adjust the relative time zone of the EIT EPG data. &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s time zone. &apos;None&apos; ignores the EIT time zone, interpreting times as local.</source>
-        <translation type="obsolete">Juster den relative tidssonen for EIT EPG-data. &apos;Auto&apos; konverterer EIT tiden til lokal tid basert på datamaskinens tidssone. &apos;None&apos; ignorerer EIT tidssonen, og tolker alle tider som lokal tid.</translation>
     </message>
     <message>
         <source>EIT transport timeout (mins)</source>
@@ -14972,10 +13169,6 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>Som standard vil MythTV resette FireWire bussen når en FireWire opptager slutter å reagere på kommandoer. Hvis dette skaper problemer kan du er slå av denne funksjonen her.</translation>
     </message>
     <message>
-        <source>Used if the XMLTV data comes from a different time zone than your own and modifies the date and time before insertion into the database. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s time zone. &apos;None&apos; ignores the XMLTV time zone, interpreting times as local.</source>
-        <translation type="obsolete">Brukes hvis XMLTV-data er for en annen tidssone enn din egen, og funksjonen justerer tidene før disse legges inn i databasebn. &apos;Auto&apos; konverterer XMLTVs tidssone til lokal tid ved å bruke maskinens tidssone. &apos;None&apos; ignorerer XMLTVs tidssone og behandler alle datoer som lokal tid.</translation>
-    </message>
-    <message>
         <source>Allow metadata lookup jobs</source>
         <translation>Tillat jobber for metadataoppslag</translation>
     </message>
@@ -15036,85 +13229,13 @@ Grabberen din gir ikke kanalnumre, så du må spesifisere disse manuelt.</transl
         <translation>Innstillinger for UPnP-tjener</translation>
     </message>
     <message>
-        <source>Unable to open or close the empty drive %1.
-
-You may have to use the eject button under its tray.</source>
-        <translation type="obsolete">Kan ikke åpne eller lukke den tomme spilleren %1.
-
-Du må kanskje bruke eject knappen under skuffen.</translation>
-    </message>
-    <message>
         <source>TXT File</source>
         <comment>Text File</comment>
         <translation>TXT fil</translation>
     </message>
     <message>
-        <source>Undo</source>
-        <translation type="obsolete">Anfre</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation type="obsolete">Gjenopprett</translation>
-    </message>
-    <message>
-        <source>Bookmark Saved</source>
-        <translation type="obsolete">Bokmerke er lagret</translation>
-    </message>
-    <message>
-        <source>Bookmark Cleared</source>
-        <translation type="obsolete">Bokmerke er fjernet</translation>
-    </message>
-    <message>
         <source>ERROR, Compile with V4L support to query audio inputs</source>
         <translation>FEIL, kompiler med V4l støtte for å lete etter lydinnganger</translation>
-    </message>
-    <message>
-        <source>Channel Importer</source>
-        <translation type="obsolete">Kanalimporterer</translation>
-    </message>
-    <message>
-        <source>Found %1 channels</source>
-        <translation type="obsolete">Fant %1 kanaler</translation>
-    </message>
-    <message>
-        <source>Channels: FTA Enc Dec
-</source>
-        <translation type="obsolete">Kanaler: FTA Enc Dec
-</translation>
-    </message>
-    <message>
-        <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
-</source>
-        <translation type="obsolete">Unikt: prog %1 atsc %2 atsc minor %3 channum %4
-</translation>
-    </message>
-    <message>
-        <source>Max atsc major count: %1</source>
-        <translation type="obsolete">Maksimal atsc major count: %1</translation>
-    </message>
-    <message>
-        <source>Insert all</source>
-        <translation type="obsolete">Legg til alle</translation>
-    </message>
-    <message>
-        <source>Insert manually</source>
-        <translation type="obsolete">Legg til manuelt</translation>
-    </message>
-    <message>
-        <source>Ignore all</source>
-        <translation type="obsolete">Ignorer alle</translation>
-    </message>
-    <message>
-        <source>Update all</source>
-        <translation type="obsolete">Oppdater alle</translation>
-    </message>
-    <message>
-        <source>Update manually</source>
-        <translation type="obsolete">Oppdater manuelt</translation>
-    </message>
-    <message>
-        <source>Please enter either 1, 2, or 3:</source>
-        <translation type="obsolete">Vennligst legg til enten 1, 2 eller 3:</translation>
     </message>
     <message>
         <source>Updated Channel %1</source>
@@ -15193,33 +13314,12 @@ Du må kanskje bruke eject knappen under skuffen.</translation>
         <translation>Sceneendring og logodeteksjon</translation>
     </message>
     <message>
-        <source>UNKNOWN</source>
-        <comment>Synthesized callsign</comment>
-        <translation type="obsolete">Ukjent</translation>
-    </message>
-    <message>
         <source>Seen</source>
         <translation>Sett</translation>
     </message>
     <message>
         <source>Matching</source>
         <translation>Treffende</translation>
-    </message>
-    <message>
-        <source>Signal To Noise</source>
-        <translation type="obsolete">Signal til støy</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Bitfeil-rate</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Urettede blokker</translation>
-    </message>
-    <message>
-        <source>Rotor Progress</source>
-        <translation type="obsolete">Rotor-framgang</translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
@@ -15471,922 +13571,24 @@ Du må kanskje bruke eject knappen under skuffen.</translation>
         <translation>Ingen grabber</translation>
     </message>
     <message>
-        <source>H.264 encoder card (HD-PVR)</source>
-        <translation type="obsolete">H.264 kodingskort (HD-PVR)</translation>
-    </message>
-    <message>
         <source>Audio input</source>
         <translation>Lydinngang</translation>
-    </message>
-    <message>
-        <source>MythTV could not locate the menu file %1</source>
-        <translation type="obsolete">MythTV kunne ikke lokalisere menyfilen %1</translation>
-    </message>
-    <message>
-        <source>The menu file %1 is incomplete.</source>
-        <translation type="obsolete">Menyfilen %1 er ikke komplett.</translation>
     </message>
     <message>
         <source>master</source>
         <translation>hoved</translation>
     </message>
     <message>
-        <source>Building Head Start Buffer</source>
-        <translation type="obsolete">Bygger buffer for forhåndsstart</translation>
-    </message>
-    <message>
-        <source>Building Logo Detection Buffer</source>
-        <translation type="obsolete">Bygger buffer for logodeteksjon</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation type="obsolete">Søker etter logo</translation>
-    </message>
-    <message>
         <source>%1% Completed @ %2 fps.</source>
         <translation>%1% Ferdig ved %2 fps.</translation>
-    </message>
-    <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="obsolete">%1 Rammer er ferdig ved %2 fps.</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation type="obsolete">Lagt i kø</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation type="obsolete">Venter</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation type="obsolete">Starter</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation type="obsolete">Stopper</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation type="obsolete">Pauset</translation>
-    </message>
-    <message>
-        <source>Retrying</source>
-        <translation type="obsolete">Prøver på nytt</translation>
-    </message>
-    <message>
-        <source>Erroring</source>
-        <translation type="obsolete">Feiler</translation>
-    </message>
-    <message>
-        <source>Aborting</source>
-        <translation type="obsolete">Avbryter</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation type="obsolete">Fullført (ugyldig status!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation type="obsolete">Ferdig</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation type="obsolete">Feilet</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation type="obsolete">Kansellert</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation type="obsolete">Kjører</translation>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
         <translation>mythfilldatabase kjørte, men la ikke til noen nye data i programoversikten. Dette kan indikere et potensielt problem med XML filen som brukes for oppdateringen.</translation>
     </message>
     <message>
-        <source>Start in group list</source>
-        <translation type="obsolete">Start i gruppeliste</translation>
-    </message>
-    <message>
-        <source>If enabled, the focus will start on the group list, otherwise the focus will default to the recordings.</source>
-        <translation type="obsolete">Hvis slått på vil fokuset være på gruppelisten, ellers vil fokuset være på opptakene.</translation>
-    </message>
-    <message>
-        <source>For a special category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="obsolete">For en spesiell kategori (feks sportssendinger), be om at sendingene blir utvidet automatisk. Dette virker kun hvis sendingens kategori kan bestemmes.</translation>
-    </message>
-    <message>
-        <source>Decode VBI format</source>
-        <translation type="obsolete">Dekod VBI format</translation>
-    </message>
-    <message>
-        <source>Subtitle Codec</source>
-        <translation type="obsolete">Kodek for undertekster</translation>
-    </message>
-    <message>
-        <source>Browse all channels</source>
-        <translation type="obsolete">Bla mellom alle kanaler</translation>
-    </message>
-    <message>
-        <source>If enabled, browse mode will shows channels on all available recording devices, instead of showing channels on just the current recorder.</source>
-        <translation type="obsolete">Hvis slått på vil bla-modus vise alle kanaler på alle tilgjengelige opptakskort, istedenfor å vise kanaler som kun er tilgjengelig på gjeldende opptaker.</translation>
-    </message>
-    <message>
-        <source>Clear bookmark on playback</source>
-        <translation type="obsolete">Fjern bokmerke ved avspilling</translation>
-    </message>
-    <message>
-        <source>Alternate clear and save bookmark</source>
-        <translation type="obsolete">Alternativ fjerning og lagring av bokmerker</translation>
-    </message>
-    <message>
-        <source>UNIX socket or IP address[:port] to connect in order to communicate with the LIRC Daemon.</source>
-        <translation type="obsolete">UNIX socket eller IP adresse[:port] som skal brukes for tilkobling til LIRC Daemon.</translation>
-    </message>
-    <message>
-        <source>Path to screenshot storage location. Should be writable by the frontend</source>
-        <translation type="obsolete">Sti for lagring av Screenshots. Denne bør være skrivbar for frontenden</translation>
-    </message>
-    <message>
-        <source>Display on screen</source>
-        <translation type="obsolete">Vis på skjermen</translation>
-    </message>
-    <message>
-        <source>Overrides for specific video sizes</source>
-        <translation type="obsolete">Overstyring for spesifikke videostørrelser</translation>
-    </message>
-    <message>
-        <source>Use window border</source>
-        <translation type="obsolete">Bruk vindusramme</translation>
-    </message>
-    <message>
-        <source>Use fixed window size</source>
-        <translation type="obsolete">Bruk fast vindusstørrelse</translation>
-    </message>
-    <message>
-        <source>Up to this number of priority points may be added for titles that are usually watched soon after recording or subtracted for titles that are often watched several days or weeks later.</source>
-        <translation type="obsolete">Opp til så mange prioriteringspoeng kan bli lagt til for titler som vanligvis er sett snart etter opptak eller fjernet for titler som ofte er sett mange dager eller uker etter.</translation>
-    </message>
-    <message>
-        <source>Audio System</source>
-        <translation type="obsolete">Lydsystem</translation>
-    </message>
-    <message>
-        <source> is invalid or not useable.</source>
-        <translation type="obsolete"> er ugyldig eller ikke brukbar.</translation>
-    </message>
-    <message>
         <source>Warning</source>
         <translation>Advarsel</translation>
-    </message>
-    <message>
-        <source>7.1</source>
-        <translation type="obsolete">7.1</translation>
-    </message>
-    <message>
-        <source>Speaker configuration</source>
-        <translation type="obsolete">Høyttalerkonfigurasjon</translation>
-    </message>
-    <message>
-        <source>Select the maximum number of audio channels supported by your receiver and speakers.</source>
-        <translation type="obsolete">Velg maksimalt antall lydkanaler som er støttet av din forsterker og dine høyttalere.</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will upconvert stereo to 5.1 audio. You can enable or disable the upconversion during playback at any time.</source>
-        <translation type="obsolete">Hvis aktivisert vil MythTV oppkonvertere stereolyd til 5.1 lyd. Du kan når som helst slå av eller på oppkonvertering under avspilling.</translation>
-    </message>
-    <message>
-        <source>Upmix Quality</source>
-        <translation type="obsolete">Kvalitet for oppmiksing</translation>
-    </message>
-    <message>
-        <source>Set the audio surround-upconversion quality.</source>
-        <translation type="obsolete">Setter kvalitet for oppkonvertering av kringlyd.</translation>
-    </message>
-    <message>
-        <source>Enable to override audio sample rate conversion quality.</source>
-        <translation type="obsolete">Aktiviser for å overstyre sats for konverteringskvalitet for lydsampling.</translation>
-    </message>
-    <message>
-        <source>Sample rate conversion</source>
-        <translation type="obsolete">Konvertering av samplerate for lyd</translation>
-    </message>
-    <message>
-        <source>Set the quality of audio sample-rate conversion. &quot;Good&quot; (default) provides the best compromise between CPU usage and quality. &quot;Disabled&quot; lets the audio device handle sample-rate conversion.</source>
-        <translation type="obsolete">Setter kvaliteten for konvertering av lydsamplerate. &quot;Good&quot; (standard) gir det beste kompromisset mellom CPU last og kvalitet. &quot;Disabled&quot; lar lydkortet håndtere konvertering av samplerate.</translation>
-    </message>
-    <message>
-        <source>Force audio device output to 48kHz</source>
-        <translation type="obsolete">Tving lydenhet utgang til 48kHz</translation>
-    </message>
-    <message>
-        <source>Force audio sample rate to 48kHz. Some audio devices will report various rates, but they ultimately crash.</source>
-        <translation type="obsolete">Tving lydenhet utgang til 48kHz. Noen lydenheter vil rapportere forskjellige rater, men de vil til slutt krasje.</translation>
-    </message>
-    <message>
-        <source>Separate digital output device</source>
-        <translation type="obsolete">Separat lydutgang for digital lyd</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will control the PCM and master mixer volume. Disable this option if you prefer to control the volume externally (for example, using your amplifier) or if you use an external mixer program.</source>
-        <translation type="obsolete">Hvis aktivisert vil MythTV kontrollere PCM og hovedmikservolumet. Slå av denne innstillingen hvis du foretrekker å justere volumet eksternt (feks med forsterkeren) eller bruker et eksternt mikserprogram.</translation>
-    </message>
-    <message>
-        <source>Mixer device</source>
-        <translation type="obsolete">Mikserenhet</translation>
-    </message>
-    <message>
-        <source>Mixer controls</source>
-        <translation type="obsolete">Mikserkontrollere</translation>
-    </message>
-    <message>
-        <source>Master mixer volume</source>
-        <translation type="obsolete">Hovedmikservolum</translation>
-    </message>
-    <message>
-        <source>Initial volume for the Master mixer. This affects all sound created by the audio device. Note: Do not set this too low.</source>
-        <translation type="obsolete">Standardvolum for hovedmikseren. Dette påvirker all lyd som lages av lydkortet, og bør ikke settes for lavt.</translation>
-    </message>
-    <message>
-        <source>PCM mixer volume</source>
-        <translation type="obsolete">PCM-mikservolum</translation>
-    </message>
-    <message>
-        <source>Initial volume for PCM output. Using the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="obsolete">Startvolum for PCM-lyd. Volumknappene i MythTV vil justere dette.</translation>
-    </message>
-    <message>
-        <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio. This setting affects digital tuners (QAM/DVB/ATSC) and hardware encoders. It will have no effect on framegrabbers (MPEG-4/RTJPEG). MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation type="obsolete">Slå på dette hvis MythTV spiller krakkelert lyd. Denne innstillingen påvirker digitale tunere (QAM/DVB/ATSC) og maskinvarekodere. Den har ingen effekt på framegrabbere (MPEG-4/RTJPEG). MythTV vil her ta vare på ekstra lydinformasjon i den interne bufferen for å omgå denne bug&apos;en.</translation>
-    </message>
-    <message>
-        <source>PIP video location</source>
-        <translation type="obsolete">BiB-plassering</translation>
-    </message>
-    <message>
-        <source>If enabled, always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
-        <translation type="obsolete">Hvis slått på, spør alltid brukeren om hvilket startfilter som skal brukes når denne går inn på Se på opptak-menyen.</translation>
-    </message>
-    <message>
-        <source>If enabled, remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation type="obsolete">Hvis slått på, husk det sist valgte filteret i stedet for å bruke standardfilteret hver gang du går til avspillingsskjermen.</translation>
-    </message>
-    <message>
-        <source>If enabled, use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="obsolete">Hvis slått på, viser navnet på filteret som brukes i stedet for teksten «Alle programmer» i avspillingsmenyen.</translation>
-    </message>
-    <message>
-        <source>Smart fast forwarding</source>
-        <translation type="obsolete">Smart framoverspoling</translation>
-    </message>
-    <message>
-        <source>Commercial detection method</source>
-        <translation type="obsolete">Metode for reklamedeteksjon</translation>
-    </message>
-    <message>
-        <source>Enable experimental speedup of commercial detection</source>
-        <translation type="obsolete">Slå på eksperimentell hastighetsøkning for reklamedeteksjon</translation>
-    </message>
-    <message>
-        <source>If enabled, experimental commercial detection speedups will be enabled.</source>
-        <translation type="obsolete">Hvis slått på vil eksperimentell hastighetsøkning for reklamedeteksjon bli aktivert.</translation>
-    </message>
-    <message>
-        <source>Automatically skip commercials</source>
-        <translation type="obsolete">Hopp over reklamer automatisk</translation>
-    </message>
-    <message>
-        <source>Automatically skip commercial breaks that have been flagged during automatic commercial detection or by the mythcommflag program, or just notify that a commercial has been detected.</source>
-        <translation type="obsolete">Automatisk hopp over reklamepauser som har blitt merket under «Automatisk merking av reklamer» eller av «mythcommflag»-programmet, eller bare gi beskjed om at en reklame er oppdaget.</translation>
-    </message>
-    <message>
-        <source>Deferral days for auto transcode jobs</source>
-        <translation type="obsolete">Antall dager å utsette automatiske konverteringsjobber</translation>
-    </message>
-    <message>
-        <source>If non-zero, automatic transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="obsolete">Hvis denne ikke er null vil automatiske konverteringsjobber bli planlagt til å kjøre X antall dager etter at opptaket er ferdig istedenfor at konverteringen kjøres med en gang.</translation>
-    </message>
-    <message>
-        <source>Strict commercial detection</source>
-        <translation type="obsolete">Streng reklameoppdaging</translation>
-    </message>
-    <message>
-        <source>Enable stricter commercial detection code. Disable if some commercials are not being detected.</source>
-        <translation type="obsolete">Slår på strengere reklameoppdagingskode. Slå av dette hvis noen reklamer ikke oppdages.</translation>
-    </message>
-    <message>
-        <source>Commercial skip automatic rewind amount (secs)</source>
-        <translation type="obsolete">Automatisk tilbakespolingsmengde for reklamehopping (sek)</translation>
-    </message>
-    <message>
-        <source>MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">MythTV vil automatisk spole tilbake valgte antall sekunder etter å ha hoppet over reklame.</translation>
-    </message>
-    <message>
-        <source>Commercial skip notify amount (secs)</source>
-        <translation type="obsolete">Varslingsmengde for reklamehopping (sek)</translation>
-    </message>
-    <message>
-        <source>MythTV will act like a commercial begins this many seconds early. This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="obsolete">MythTV vil oppføre seg som om en reklame begynner angitte sekunder tidligere. Dette kan være nyttig når varsling av reklamer brukes i stedet for automatisk reklamehopping.</translation>
-    </message>
-    <message>
-        <source>Maximum commercial skip (secs)</source>
-        <translation type="obsolete">Lengste reklamehopping (sek)</translation>
-    </message>
-    <message>
-        <source>MythTV will discourage long manual commercial skips. Skips which are longer than this will require the user to hit the SKIP key twice. Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="obsolete">MythTV vil fraråde lange, manuelle reklamehopp. Hopp som er lengre enn dette vil kreve at brukeren trykker HOPP-tasten to ganger. Dette har ingen effekt for automatisk reklamehopping.</translation>
-    </message>
-    <message>
-        <source>Merge short commercial breaks (secs)</source>
-        <translation type="obsolete">Slå sammen korte reklamepauser (sek)</translation>
-    </message>
-    <message>
-        <source>Extra disk space (GB)</source>
-        <translation type="obsolete">Ekstra diskplass (GB)</translation>
-    </message>
-    <message>
-        <source>Extra disk space (in gigabytes) beyond what MythTV requires that you want to keep free on the recording file systems.</source>
-        <translation type="obsolete">Ekstra diskplass (i GB) som skal holdes ledig på filsystemene ut over det MythTV krever.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire instead of delete recording</source>
-        <translation type="obsolete">Autoutløp istedenfor å slette opptak</translation>
-    </message>
-    <message>
-        <source>If enabled, move deleted recordings to the &apos;Deleted&apos; recgroup and turn on autoexpire instead of deleting immediately.</source>
-        <translation type="obsolete">Hvis slått på, flyttes opptaket til opptaksgruppe &apos;Slettet&apos; og autoutløping blir slått på istedenfor at opptaket blir slettet med en gang.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire method</source>
-        <translation type="obsolete">Metode for automatisk utløping</translation>
-    </message>
-    <message>
-        <source>Oldest show first</source>
-        <translation type="obsolete">Eldste sending først</translation>
-    </message>
-    <message>
-        <source>Lowest priority first</source>
-        <translation type="obsolete">Laveste prioritet først</translation>
-    </message>
-    <message>
-        <source>Weighted time/priority combination</source>
-        <translation type="obsolete">Vektlagt tid/prioritet-kombinasjon</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to delete first. Live TV recordings will always expire before normal recordings.</source>
-        <translation type="obsolete">Metoden som brukes for å bestemme hvilke programmer som skal slettes først. «Direkte TV»-opptak utløper alltid før vanlige opptak.</translation>
-    </message>
-    <message>
-        <source>Watched before unwatched</source>
-        <translation type="obsolete">Sette før usette</translation>
-    </message>
-    <message>
-        <source>If enabled, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="obsolete">Hvis slått på, vil programmer som er markert som sett utløpe for programmer som ikke har blitt sett.</translation>
-    </message>
-    <message>
-        <source>Priority weight</source>
-        <translation type="obsolete">Prioritetsvekting</translation>
-    </message>
-    <message>
-        <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted time/priority Auto-Expire method is selected.</source>
-        <translation type="obsolete">Antall ekstra dager et program får for hvert prioriteringspoeng. Dette brukes bare hvis metoden Vektlagt tid/prioritet er valgt.</translation>
-    </message>
-    <message>
-        <source>Live TV max age (days)</source>
-        <translation type="obsolete">Maks alder for Direkte TV (dager)</translation>
-    </message>
-    <message>
-        <source>Auto-Expire will force expiration of Live TV recordings when they are this many days old. Live TV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="obsolete">Autoutløping vil tvinge utløping for Direkte TV opptak når de er så mange dager gamle. Direkte TV opptak kan også autoutløpe før hvis dette er nødvendig for å frigjøre diskplass.</translation>
-    </message>
-    <message>
-        <source>New recording free disk space threshold (MB)</source>
-        <translation type="obsolete">Minste ledig diskplass for å ta opp (MB)</translation>
-    </message>
-    <message>
-        <source>MythTV will stop scheduling new recordings on a backend when its free disk space (in megabytes) falls below this value.</source>
-        <translation type="obsolete">MythTV vil stoppe å ta opp nye opptak på en tjener hvor det er mindre ledig diskplass (i megabytes) enn denne verdien.</translation>
-    </message>
-    <message>
-        <source>Re-record watched</source>
-        <translation type="obsolete">Ta opp programmer som er sett på nytt</translation>
-    </message>
-    <message>
-        <source>If enabled, programs that have been marked as watched and are Auto-Expired will be re-recorded if they are shown again.</source>
-        <translation type="obsolete">Hvis slått på vil programmer som er markert som sett og har autoutløpt bli tatt opp igjen hvis de blir sendt på nytt.</translation>
-    </message>
-    <message>
-        <source>Time to record before start of show (secs)</source>
-        <translation type="obsolete">Tid å ta opp før programstart (sek)</translation>
-    </message>
-    <message>
-        <source>Time to record past end of show (secs)</source>
-        <translation type="obsolete">Hvor lenge det skal taes opp etter programslutt (sek)</translation>
-    </message>
-    <message>
-        <source>Record past end of show (mins)</source>
-        <translation type="obsolete">Ta opp etter programslutt (min)</translation>
-    </message>
-    <message>
-        <source>For the specified category, an attempt will be made to extend the recording by the specified number of minutes. It is ignored when two shows have been scheduled without enough time in-between.</source>
-        <translation type="obsolete">Det vil gjøres forsøk på å utvide opptaket med den angitte tiden for valgt kategori. Dette ignoreres hvis et annet opptak er planlagt i denne perioden.</translation>
-    </message>
-    <message>
-        <source>Example custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="obsolete">Eksempel på tilpasset filterliste: &apos;ivtc, denoise3d&apos;</translation>
-    </message>
-    <message>
-        <source>Sorry, playback group
-name cannot be blank.</source>
-        <translation type="obsolete">Beklager, avspillingsgruppen
-må ha et navn.</translation>
-    </message>
-    <message>
-        <source>Sort episodes</source>
-        <translation type="obsolete">Sorter episoder</translation>
-    </message>
-    <message>
-        <source>Season/Episode</source>
-        <translation type="obsolete">Sesong/Episode</translation>
-    </message>
-    <message>
-        <source>Original air date</source>
-        <translation type="obsolete">Opprinnelig sendedato</translation>
-    </message>
-    <message>
-        <source>Selects how to sort a show&apos;s episodes</source>
-        <translation type="obsolete">Velg hvordan et programs episoder skal sorteres</translation>
-    </message>
-    <message>
-        <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="obsolete">Hvis på vil et trykk på den trege spole tilbake-knappen i framoverspillingsmodus bytte til bakoverspoling, og omvendt. Hvis av vil den nevnte handlingen senke farten eller bytte til avspillingsmodus hvis farten ikke kan reduseres mer.</translation>
-    </message>
-    <message>
-        <source>PAL teletext</source>
-        <translation type="obsolete">PAL tekst-tv</translation>
-    </message>
-    <message>
-        <source>NTSC closed caption</source>
-        <translation type="obsolete">NTSC undertekster</translation>
-    </message>
-    <message>
-        <source>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
-        <translation type="obsolete">Hvis slått på overstyrer dette mythtv-setup innstillingene som blir brukt under opptak når undertekster skal dekodes.</translation>
-    </message>
-    <message>
-        <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation type="obsolete">Undertekster blir vist under avspilling av opptak og direkte TV. De kan slås av og på ved å trykke «T» under avspilling.</translation>
-    </message>
-    <message>
-        <source>Enable interactive TV</source>
-        <translation type="obsolete">Slå på interaktivt TV</translation>
-    </message>
-    <message>
-        <source>If enabled, interactive TV applications (MHEG) will be activated. This is used for teletext and logos for radio and channels that are currently off-air.</source>
-        <translation type="obsolete">Hvis dette er på vil interaktive TV-programmer (MHEG) være tilgjengelige. Dette brukes til tekst-TV og logoer for radiokanaler og kanaler som for øyeblikket er av luften.</translation>
-    </message>
-    <message>
-        <source>Always use browse mode in Live TV</source>
-        <translation type="obsolete">Bruk alltid blamodus i Direkte TV</translation>
-    </message>
-    <message>
-        <source>If enabled, browse mode will automatically be activated whenever you use channel up/down while watching Live TV.</source>
-        <translation type="obsolete">Er dette på vil bla-modus bli automatisk slått på når knappene for kanal opp/ned benyttes med direkte TV.</translation>
-    </message>
-    <message>
-        <source>If enabled, browse mode will show channels on all available recording devices, instead of showing channels on just the current recorder.</source>
-        <translation type="obsolete">Hvis slått på vil bla-modus vise alle kanaler på alle tilgjengelige opptakskort, istedenfor å vise kanaler som kun er tilgjengelig på gjeldende opptaker.</translation>
-    </message>
-    <message>
-        <source>If enabled, automatically clear the bookmark on a recording when the recording is played back. If disabled, you can mark the beginning with rewind then save position.</source>
-        <translation type="obsolete">Hvis aktivisert vil bokmerket fjernes automatisk på et opptak når opptaket blir spilt. Hvis dette er slått av kan du merke begynnelsen av opptaket med å spole tilbake for så å lagre posisjonen.</translation>
-    </message>
-    <message>
-        <source>During playback the SELECT key (Enter or Space) will alternate between &quot;Bookmark Saved&quot; and &quot;Bookmark Cleared&quot;. If disabled, the SELECT key will save the current position for each keypress.</source>
-        <translation type="obsolete">Under avspilling vil VALG-knappen (Enter eller mellomrom) alternere mellom &apos;Bokmerke lagret&apos; og &apos;Bokmerke fjernet&apos;. Hvis dette er slått av vil VELG-knappen alltid lagre gjeldene posisjon for hver gang knappen trykkes.</translation>
-    </message>
-    <message>
-        <source>If set to prompt, a menu will be displayed when you exit playback mode. The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation type="obsolete">Når satt til spør vil en meny vises når avspilling avsluttes. De tilgjengelige valgene vil være å lagre posisjonen, slette opptaket eller å fortsette å se på.</translation>
-    </message>
-    <message>
-        <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
-        <translation type="obsolete">Hvis aktivisert vil en meny med valg om å slette opptaket vises når opptaket har blitt sett ferdig.</translation>
-    </message>
-    <message>
-        <source>Jump to program OSD</source>
-        <translation type="obsolete">Hopp til skjermtekst</translation>
-    </message>
-    <message>
-        <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
-        <translation type="obsolete">Velger om gjeldende opptaksgruppe skal vises som skjermtekst, eller om &apos;Se på opptak&apos; skjermen skal vises hvis &apos;Hopp til programinfo&apos; er aktivert. Hvis satt så blir opptak vist i skjermteksten</translation>
-    </message>
-    <message>
-        <source>Continue playback when embedded</source>
-        <translation type="obsolete">Fortsett avspilling når innkapslet</translation>
-    </message>
-    <message>
-        <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation type="obsolete">Hvis aktivisert vil TV avspilling fortsette når TV vinduet er innkapslet i programoversikten eller listen over opptak. Standardverdien er å pause opptaket når innkapslet.</translation>
-    </message>
-    <message>
-        <source>If enabled, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
-        <translation type="obsolete">Hvis aktivisert vil et opptak bli merket som sett hvis du stopper å se nær slutten. Den automatisk oppdagingen er ikke perfekt, så ikke aktiviser denne innstillingen hvis du ikke vil at et opptak som ikke er sett skal bli merket som sett.</translation>
-    </message>
-    <message>
-        <source>Live TV idle timeout (mins)</source>
-        <translation type="obsolete">Tidsavbrudd for Direkte TV når passiv (min)</translation>
-    </message>
-    <message>
-        <source>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
-        <translation type="obsolete">Gå ut av Direkte TV automatisk etter et antall minutter hvis denne er passiv. 0 slår av tidsavbruddet.</translation>
-    </message>
-    <message>
-        <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
-        <translation type="obsolete">Hvis aktivisert så kan du bruke et virtuelt tastatur i Myths linjeredigeringsbokser. Trykk VELG (Enter eller mellomrom) når linjeredigering er i fokus for å bruke dette.</translation>
-    </message>
-    <message>
-        <source>Idle time before entering standby mode (minutes)</source>
-        <translation type="obsolete">Tid før systemet går i hvilemodus (minutter)</translation>
-    </message>
-    <message>
-        <source>Number of minutes to wait when the frontend is idle before entering standby mode. Standby mode allows the backend to power down if configured to do so. Any remote or mouse input will cause the countdown to start again and/or exit idle mode. Video playback suspends the countdown. A value of zero prevents the frontend automatically entering standby.</source>
-        <translation type="obsolete">Antall minutter klienten skal være ledig før den går i hvilemodus. Hvilkemodus gir tjeneren mulighet til å kjøre ned hvis den er konfigurert for dette. Enhver mus- eller fjernkontrollaktivitet vil stanse nedtellingen og avlutte hvilkemodus. Videoavspilling stanser også nedtellingen. Verdien 0 forhindrer klienten i å gå inn i hvilemodus.</translation>
-    </message>
-    <message>
-        <source>Customize exit menu options</source>
-        <translation type="obsolete">Tilpass Avslutt-menyen</translation>
-    </message>
-    <message>
-        <source>Optional. Script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="obsolete">Valgfritt. Skript som skal kjøres hvis du velger Restart valget fra avslutningsmenyen, hvis dette valget vises. Du må konfigurere en tastetilordning for å vise denne menyen.</translation>
-    </message>
-    <message>
-        <source>Optional. Script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="obsolete">Valgfritt. Skript som skal kjøres hvis du velger Slå av valget fra avslutningsmenyen, hvis dette valget vises. Du må konfigurere en tastetilordning for å vise denne menyen.</translation>
-    </message>
-    <message>
-        <source>LIRC daemon socket</source>
-        <translation type="obsolete">LIRC daemon Socket</translation>
-    </message>
-    <message>
-        <source>Screen shot path</source>
-        <translation type="obsolete">Sti for Screenshots</translation>
-    </message>
-    <message>
-        <source>Setup PIN code</source>
-        <translation type="obsolete">Sett opp PIN-kode</translation>
-    </message>
-    <message>
-        <source>Monitor aspect ratio</source>
-        <translation type="obsolete">Skjermens aspektforhold</translation>
-    </message>
-    <message>
-        <source>The aspect ratio of a Xinerama display cannot be queried from the display, so it must be specified.</source>
-        <translation type="obsolete">Høyde/Bredde-forholdet til en Xinerama-skjerm kan ikke oppdages automatisk, og må oppgis manuelt.</translation>
-    </message>
-    <message>
-        <source>Letterboxing color</source>
-        <translation type="obsolete">Farge ved Letterbox visning</translation>
-    </message>
-    <message>
-        <source>Video aspect override</source>
-        <translation type="obsolete">Overstyr høyde/bredde-forhold</translation>
-    </message>
-    <message>
-        <source>GUI width (pixels)</source>
-        <translation type="obsolete">Bredde for grafisk grensesnitt (piksler)</translation>
-    </message>
-    <message>
-        <source>The width of the GUI. Do not make the GUI wider than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="obsolete">Bredden til det grafiske grensesnittet. Ikke gjør grensesnittet bredere enn skjermoppløsningen. Angi 0 for å automatisk skalere til fullskjerm.</translation>
-    </message>
-    <message>
-        <source>GUI height (pixels)</source>
-        <translation type="obsolete">Høyde for grafisk grensesnitt (piksler)</translation>
-    </message>
-    <message>
-        <source>The height of the GUI. Do not make the GUI taller than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="obsolete">Høyden til det grafiske grensesnittet. Ikke gjør grensesnittet høyere enn skjermoppløsningen. Angi 0 for å automatisk skalere til fullskjerm.</translation>
-    </message>
-    <message>
-        <source>The horizontal offset where the GUI will be displayed. May only work if run in a window.</source>
-        <translation type="obsolete">Den horisontale posisjonen grensesnittet vil vises på, virker kanskje kun hvis kjørt i et vindu.</translation>
-    </message>
-    <message>
-        <source>The vertical offset where the GUI will be displayed.</source>
-        <translation type="obsolete">Den vertikale plasseringen grensesnittet vil vises på.</translation>
-    </message>
-    <message>
-        <source>Display size - width</source>
-        <translation type="obsolete">Visningsstørrelse - bredde</translation>
-    </message>
-    <message>
-        <source>Display size - height</source>
-        <translation type="obsolete">Visningsstørrelse - høyde</translation>
-    </message>
-    <message>
-        <source>Video output</source>
-        <translation type="obsolete">Videoframvisning</translation>
-    </message>
-    <message>
-        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation type="obsolete">Velg «Standard» for å bruke forhold oppgitt av skjermen. Sett det til «16:9» eller «4:3» for å tvinge et spesielt aspektforhold.</translation>
-    </message>
-    <message>
-        <source>Hide mouse cursor in MythTV</source>
-        <translation type="obsolete">Skjul musepekeren i MythTV</translation>
-    </message>
-    <message>
-        <source>If disabled, the video playback window can be resized</source>
-        <translation type="obsolete">Hvis slått av kan størrelsen til videoavspillingsvinduet forandres</translation>
-    </message>
-    <message>
-        <source>Short date format</source>
-        <translation type="obsolete">Kort datoformat</translation>
-    </message>
-    <message>
-        <source>Your preferred time format. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="obsolete">Foretrukket tidsformat. Du må velge et format med AM eller PM hvis ikke tidsformatet skal vises i 24-timers format.</translation>
-    </message>
-    <message>
-        <source>Paint engine</source>
-        <translation type="obsolete">Malingsmotor</translation>
-    </message>
-    <message>
-        <source>Long channel format</source>
-        <translation type="obsolete">Langt kanalformat</translation>
-    </message>
-    <message>
-        <source>Allow Live TV to move scheduled shows</source>
-        <translation type="obsolete">Tillat direkte TV å flytte planlagte opptak</translation>
-    </message>
-    <message>
-        <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that Live TV will not be interrupted.</source>
-        <translation type="obsolete">Flytt planlagte opptak til andre kort (når mulig), slik at det går an å se på TV uforstyrret.</translation>
-    </message>
-    <message>
-        <source>Browse/change channels from Channel Group</source>
-        <translation type="obsolete">Bla/skift kanaler fra kanalgruppen</translation>
-    </message>
-    <message>
-        <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
-        <translation type="obsolete">Hvis slått på vil Direkte TV bla eller skifte kanaler fra den valgte kanalgruppe. Kanalgruppe &quot;Alle kanaler&quot; kan velges for å bla i alle kanaler.</translation>
-    </message>
-    <message>
-        <source>Reschedule higher priorities</source>
-        <translation type="obsolete">Planlegg høyere prioriteter på nytt</translation>
-    </message>
-    <message>
-        <source>Move higher priority programs to other cards and showings when resolving conflicts. This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="obsolete">Flytt programmer med høyere prioritet til andre kort og sendinger når konflikter løses. Dette kan brukes til å ta opp lavprioritetsprogrammer som ellers ikke ville blitt tatt opp, men risikerer at programmer med høyere prioritet går tapt hvis planen endres.</translation>
-    </message>
-    <message>
-        <source>Avoid back to back recordings</source>
-        <translation type="obsolete">Unngå opptak som kommer etter hverandre</translation>
-    </message>
-    <message>
-        <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="obsolete">Velger situasjonene hvor tidsplanleggeren vil unngå å tilordne opptak til samme kort hvis sluttid og starttid er den samme. Dette vil bli tillatt når nødvendig for å unngå konflikter.</translation>
-    </message>
-    <message>
-        <source>Different Channels</source>
-        <translation type="obsolete">Ulike kanaler</translation>
-    </message>
-    <message>
-        <source>Preferred input priority</source>
-        <translation type="obsolete">Foretrukket inndata-prioritet</translation>
-    </message>
-    <message>
-        <source>HDTV recording priority</source>
-        <translation type="obsolete">Opptaksprioritet for HDTV</translation>
-    </message>
-    <message>
-        <source>Widescreen recording priority</source>
-        <translation type="obsolete">Opptaksprioritet for bredskjerm</translation>
-    </message>
-    <message>
-        <source>Automatic priority range (+/-)</source>
-        <translation type="obsolete">Automatisk prioriteringsområde (+/-)</translation>
-    </message>
-    <message>
-        <source>Sign language recording priority</source>
-        <translation type="obsolete">Opptaksprioritet for tegnspråk</translation>
-    </message>
-    <message>
-        <source>Subtitles/CC recording priority</source>
-        <translation type="obsolete">Opptaksprioritet for undertekster</translation>
-    </message>
-    <message>
-        <source>Hard of hearing priority</source>
-        <translation type="obsolete">Prioritet for hørselshemming</translation>
-    </message>
-    <message>
-        <source>Audio described priority</source>
-        <translation type="obsolete">Prioritet for &apos;Audio described&apos;</translation>
-    </message>
-    <message>
-        <source>Single recordings priority</source>
-        <translation type="obsolete">Prioritet for enslige opptak</translation>
-    </message>
-    <message>
-        <source>Single recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Enslige opptak vil motta denne prioriteten i tillegg.</translation>
-    </message>
-    <message>
-        <source>Weekslot recordings priority</source>
-        <translation type="obsolete">Prioritet for ukentlige opptak</translation>
-    </message>
-    <message>
-        <source>Weekslot recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Ukentlige opptak vil motta denne ekstra prioriteten.</translation>
-    </message>
-    <message>
-        <source>Timeslot recordings priority</source>
-        <translation type="obsolete">Prioritet for tidsrom-opptak</translation>
-    </message>
-    <message>
-        <source>Timeslot recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Opptak i et spesielt tidsrom vil motta denne ekstra prioriteten.</translation>
-    </message>
-    <message>
-        <source>Channel recordings priority</source>
-        <translation type="obsolete">Prioritet for kanalopptak</translation>
-    </message>
-    <message>
-        <source>Channel recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Kanalopptak vil motta denne ekstra prioriteten.</translation>
-    </message>
-    <message>
-        <source>All recordings priority</source>
-        <translation type="obsolete">Prioritet for alle opptak</translation>
-    </message>
-    <message>
-        <source>The &apos;All&apos; recording type will receive this additional recording priority value.</source>
-        <translation type="obsolete">Prioriteten for opptakstypen «Alle» blir hevet med denne verdien.</translation>
-    </message>
-    <message>
-        <source>Find one recordings priority</source>
-        <translation type="obsolete">Prioritet for finn ett-opptak</translation>
-    </message>
-    <message>
-        <source>Override recordings priority</source>
-        <translation type="obsolete">Prioritet for overstyringsopptak</translation>
-    </message>
-    <message>
-        <source>Override recordings will receive this additional recording priority value.</source>
-        <translation type="obsolete">Overstyringsopptak vil motta denne ekstra prioriteten.</translation>
-    </message>
-    <message>
-        <source>The program guide starts on this channel if it is run from outside of Live TV mode.</source>
-        <translation type="obsolete">Programoversikten starter på denne kanalen hvis den kjøres utenfra direkte TV-modus.</translation>
-    </message>
-    <message>
-        <source>Record threshold</source>
-        <translation type="obsolete">Opptaksterskel</translation>
-    </message>
-    <message>
-        <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="obsolete">Hvis du trykker VELG-knappen på et program som skal vises minst så mange minutter inn i fremtiden så vil et programopptak bli planlagt.</translation>
-    </message>
-    <message>
-        <source>Audio Mixer</source>
-        <translation type="obsolete">Lydmikser</translation>
-    </message>
-    <message>
-        <source>Guide language #%1</source>
-        <translation type="obsolete">Oversiktspråk #%1</translation>
-    </message>
-    <message>
-        <source>Your #%1 preferred language for Program Guide data and captions.</source>
-        <translation type="obsolete">Ditt #%1 foretrukne språk for programoversiktdata og filmtekst.</translation>
-    </message>
-    <message>
-        <source>Network Remote Control port</source>
-        <translation type="obsolete">Port for fjernkontroll over nettverk</translation>
-    </message>
-    <message>
-        <source>This specifies what port the network remote Control interface will listen on for new connections.</source>
-        <translation type="obsolete">Dette angir hvilken port grensesnittet for fjernkontroll over nettverk lytter på for nye forbindelser.</translation>
-    </message>
-    <message>
-        <source>UDP notify port</source>
-        <translation type="obsolete">UDP varslingsport</translation>
-    </message>
-    <message>
-        <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them. Requires restart.</source>
-        <translation type="obsolete">Slår på støtte for å overvåke CD-/DVD-stasjoner for nye plater og deretter håndtere dem med riktig tilleggsmodul. Krever omstart.</translation>
-    </message>
-    <message>
-        <source>Ignore devices</source>
-        <translation type="obsolete">Ignorer enheter</translation>
-    </message>
-    <message>
-        <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
-        <translation type="obsolete">Liste over enheter som du ikke vil skal overvåkes, adskilt med komma. Tilleggene vil da ignorere dem. Krever omstart.</translation>
-    </message>
-    <message>
-        <source>Sort titles</source>
-        <translation type="obsolete">Sorter titler</translation>
-    </message>
-    <message>
-        <source>By recording priority</source>
-        <translation type="obsolete">Etter opptaksprioritet</translation>
-    </message>
-    <message>
-        <source>Sets the title sorting order when the view is set to Titles only.</source>
-        <translation type="obsolete">Angir sorteringsrekkefølgen for titler når kun titler vises.</translation>
-    </message>
-    <message>
-        <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="obsolete">Hvis satt så blir &quot;Se-liste&quot; standardvisningen hver gang du åpner &quot;Se på opptak&quot;</translation>
-    </message>
-    <message>
-        <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="obsolete">Aktiver dette hvis du slår av autoutløping bare for opptak som du har sett men vil ta vare på. Med dette alternativet vil disse ikke vises i &quot;Se-listen&quot;.</translation>
-    </message>
-    <message>
-        <source>Display time</source>
-        <translation type="obsolete">Vis tid</translation>
-    </message>
-    <message>
-        <source>Display recording status</source>
-        <translation type="obsolete">Vis opptakstatus</translation>
-    </message>
-    <message>
-        <source>Display menus</source>
-        <translation type="obsolete">Vis menyer</translation>
-    </message>
-    <message>
-        <source>Menu pop-up time</source>
-        <translation type="obsolete">Visningstid for meny</translation>
-    </message>
-    <message>
-        <source>How many seconds the menu will remain visible after navigation.</source>
-        <translation type="obsolete">Hvor mange sekunder menyen vil vises etter navigering.</translation>
-    </message>
-    <message>
-        <source>Display music artist and title</source>
-        <translation type="obsolete">Vis musikkartist og tittel</translation>
-    </message>
-    <message>
-        <source>Display channel information</source>
-        <translation type="obsolete">Vis kanalinformasjon</translation>
-    </message>
-    <message>
-        <source>Display volume information</source>
-        <translation type="obsolete">Vis voluminformasjon</translation>
-    </message>
-    <message>
-        <source>Display generic information</source>
-        <translation type="obsolete">Vis generisk informasjon</translation>
-    </message>
-    <message>
-        <source>Backlight always on</source>
-        <translation type="obsolete">Bakbelysning alltid på</translation>
-    </message>
-    <message>
-        <source>Heartbeat always on</source>
-        <translation type="obsolete">Hjerterytme alltid på</translation>
-    </message>
-    <message>
-        <source>Display large clock</source>
-        <translation type="obsolete">Vis stor klokke</translation>
-    </message>
-    <message>
-        <source>LCD key order</source>
-        <translation type="obsolete">LCD-tasterekkefølge</translation>
-    </message>
-    <message>
-        <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
-        <translation type="obsolete">Hvis dette er på justerer QuickTime videoens gamma til å passe skjermen. Å slå dette av kan spare litt prosessorkraft.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="obsolete">Hvis valgt vil video bli skalert for å passe til ditt vindu eller din skjerm. Hvis ikke valgt vil video aldri bli forstørret mer en faktisk pikselstørrelse.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Hvis valgt vil video bli vist i hovedgrensesnittet. Slå dette av hvis du bare vil video på skrivebordet eller i et flytende vindu. Kun gyldig når &quot;Bruk størrelse for grensesnitt for TV-avspilling&quot; og &quot;Kjør klienten i et vindu&quot; er slått på.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Hvis på vises video i et flytende vindu. Dette virker kun når «Bruk størrelse for grensesnitt for TV-avspilling» og «Kjør klienten i et vindu» er valgt.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Video vises i programmets dokkeikon. Dette virker bare når «Bruk størrelse for grafisk grensesnitt for TV-avspilling» og «Kjør klienten i et vindu» er valgt.</translation>
-    </message>
-    <message>
-        <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="obsolete">Video vises på skrivebordet, bak finner-ikonene. Dette virker bare når «Bruk størrelse for grafisk grensesnitt for TV-avspilling» og «Kjør klienten i et vindu» er valgt.</translation>
     </message>
     <message>
         <source>Media Monitor</source>
@@ -16399,18 +13601,6 @@ må ha et navn.</translation>
     <message>
         <source>You may have to use the eject button under its tray</source>
         <translation>Du må kanskje bruke eject-knappen</translation>
-    </message>
-    <message>
-        <source>Remote Control</source>
-        <translation type="obsolete">Fjernkontroll</translation>
-    </message>
-    <message>
-        <source>Screen Settings</source>
-        <translation type="obsolete">Skjerminnstillinger</translation>
-    </message>
-    <message>
-        <source>MythTV Frontend</source>
-        <translation type="obsolete">MythTV Frontend</translation>
     </message>
     <message>
         <source>Generating Keyframe Index</source>
@@ -16468,13 +13658,6 @@ må ha et navn.</translation>
         <source>MythTV Setup</source>
         <translation>MythTV Oppsett</translation>
     </message>
-    <message numerus="yes">
-        <source>%n second(s)</source>
-        <translation type="obsolete">
-            <numerusform>%n sekund</numerusform>
-            <numerusform>%n sekunder</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Play</source>
         <translation>Spill av</translation>
@@ -16482,18 +13665,6 @@ må ha et navn.</translation>
     <message>
         <source>PBP</source>
         <translation>Bilde-ved-bilde</translation>
-    </message>
-    <message>
-        <source>Yes, Exit now</source>
-        <translation type="obsolete">Ja, avslutt nå</translation>
-    </message>
-    <message>
-        <source>Yes, Exit and Reboot</source>
-        <translation type="obsolete">Ja, avslutt og start på nytt</translation>
-    </message>
-    <message>
-        <source>Yes, Exit and Shutdown</source>
-        <translation type="obsolete">Ja, avslutt og slå av</translation>
     </message>
     <message>
         <source>Unable to connect to device.</source>
@@ -16510,74 +13681,6 @@ må ha et navn.</translation>
     <message>
         <source>All Channels</source>
         <translation>Alle kanaler</translation>
-    </message>
-    <message>
-        <source>Select/Unselect channels for this channel group</source>
-        <translation type="obsolete">Velg eller velg vekk kanaler for denne kanalgruppen</translation>
-    </message>
-    <message>
-        <source>Channel Group - Page </source>
-        <translation type="obsolete">Side for kanalgruppe</translation>
-    </message>
-    <message>
-        <source>of</source>
-        <translation type="obsolete">av</translation>
-    </message>
-    <message>
-        <source>Failed to find any new channels!</source>
-        <translation type="obsolete">Kunne ikke finne noen nye kanaler!</translation>
-    </message>
-    <message>
-        <source>Failed to find any channels.</source>
-        <translation type="obsolete">Kunne ikke finne noen kanaler.</translation>
-    </message>
-    <message>
-        <source>Please enter a unique channel number. </source>
-        <translation type="obsolete">Vennligst skriv inn et unikt kanalnummer.</translation>
-    </message>
-    <message>
-        <source>Downloading Playlist</source>
-        <translation type="obsolete">Laster ned spilleliste</translation>
-    </message>
-    <message>
-        <source>Downloading Playlist Failed</source>
-        <translation type="obsolete">Nedlasting av spilleliste feilet</translation>
-    </message>
-    <message>
-        <source>Processing Playlist</source>
-        <translation type="obsolete">Prosesserer spilleliste</translation>
-    </message>
-    <message>
-        <source>Adding Channels</source>
-        <translation type="obsolete">Legger til kanaler</translation>
-    </message>
-    <message>
-        <source>Channel #%1 : %2</source>
-        <translation type="obsolete">Kanal #%1 : %2</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Legger til %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Oppdaterer %1</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Ferdig</translation>
-    </message>
-    <message>
-        <source>ERROR: M3U channel list is malformed</source>
-        <translation type="obsolete">FEIL: M3U kanalliste har feil i formatet</translation>
-    </message>
-    <message>
-        <source>Encountered malformed channel</source>
-        <translation type="obsolete">Møtte en kanal med feil i formatet</translation>
-    </message>
-    <message>
-        <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation type="obsolete">Leser kanal #%1 : %2 : %3</translation>
     </message>
     <message>
         <source>Kernel (2x)</source>
@@ -16628,56 +13731,8 @@ må ha et navn.</translation>
         <translation>V.strekking</translation>
     </message>
     <message>
-        <source>Remember last channel group</source>
-        <translation type="obsolete">Husk siste kanalgruppe</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
-        <translation type="obsolete">Hvis slått på vil programoversikten initielt vise bare kanalene fra forrige kanalgruppe som ble valgt. Ved å trykke &quot;4&quot; kan du slå av og på kanalgrupper.</translation>
-    </message>
-    <message>
-        <source>Default channel group</source>
-        <translation type="obsolete">Standard kanalgruppe</translation>
-    </message>
-    <message>
-        <source>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</source>
-        <translation type="obsolete">Standard kanalgruppe som skal vises i programoversikten. Ved å trykke på &quot;GUIDE&quot; knappen vil kanalgruppen slås av eller på.</translation>
-    </message>
-    <message>
-        <source>General (Channel Groups)</source>
-        <translation type="obsolete">Generelt (Kanalgrupper)</translation>
-    </message>
-    <message>
         <source>The command used to put this slave to sleep. If set, the master backend will use this command to put this slave to sleep when it is not needed for recording.</source>
         <translation>Kommando som brukes for å sette denne slaven i sovemodus. Hvis satt vil hovedtjeneren bruke denne kommandoen for å sette denne slaven i sovemodus hvis det ikke er behov for at denne slaven skal ta opp noen programmer.</translation>
-    </message>
-    <message>
-        <source>Failed to configure plugin %1</source>
-        <translation type="obsolete">Kunne ikke konfigurere tillegg %1</translation>
-    </message>
-    <message>
-        <source>The plugin %1 has failed to run for some reason...</source>
-        <translation type="obsolete">Tillegget %1 kunne ikke kjøre av en eller annen grunn...</translation>
-    </message>
-    <message>
-        <source>Suggest</source>
-        <translation type="obsolete">Foreslå</translation>
-    </message>
-    <message>
-        <source>Cancel All</source>
-        <translation type="obsolete">Avbryt alle</translation>
-    </message>
-    <message>
-        <source>Channel %1 was found to be in conflict with other channels. </source>
-        <translation type="obsolete">Kanalen %1 er i konflikt med andre kanaler. </translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
-        <translation type="obsolete">Vennligst skriv inn et kanalnummer som ikke er i konflikt (eller trykk %1 for å hoppe over, eller %2 for å hoppe over alle): </translation>
-    </message>
-    <message>
-        <source>Error: stream handler died</source>
-        <translation type="obsolete">Feil: stream-handler døde</translation>
     </message>
     <message>
         <source>IP Address</source>
@@ -16781,14 +13836,6 @@ må ha et navn.</translation>
         <translation>Denne applikasjonen er ikke kompatibel med den installerte versjonen av MythTV bibliotekene.</translation>
     </message>
     <message>
-        <source>Plugin %1 is not compatible with the installed MythTV libraries.</source>
-        <translation type="obsolete">Tillegg %1 er ikke kompatibel med de installerte MythTV bibliotekene.</translation>
-    </message>
-    <message>
-        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation type="obsolete">Denne applikasjoner er ikke kompatibel med det installerte MythTV biblioteket. Vennligst rekompiler etter en &apos;make distclean&apos;</translation>
-    </message>
-    <message>
         <source>Pre &amp; Post Roll</source>
         <translation>Pre &amp; Post Roll</translation>
     </message>
@@ -16797,57 +13844,12 @@ må ha et navn.</translation>
         <translation>, firmvare: %2</translation>
     </message>
     <message>
-        <source>Delete all</source>
-        <translation type="obsolete">Slett alle</translation>
-    </message>
-    <message>
-        <source>Set all invisible</source>
-        <translation type="obsolete">Sett alle som usynlige</translation>
-    </message>
-    <message>
-        <source>(%1 or later) %3</source>
-        <comment>e.g. (Sunday or later) program subtitle</comment>
-        <translation type="obsolete">(%1 eller senere) %3</translation>
-    </message>
-    <message>
         <source>Auto Detect (Default Off)</source>
         <translation>Autodetekter (Standard av)</translation>
     </message>
     <message>
         <source>Auto Detect (Default Half)</source>
         <translation>Autodetekter (Standard Halv)</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
-        <translation type="obsolete">Ekstra prioritet når en sending er merket med widescreen i programoversikten.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having in-vision sign language.</source>
-        <translation type="obsolete">Ekstra prioritet når en sending er markert med tegnspråk tilgjengelig.</translation>
-    </message>
-    <message>
-        <source>In-vision Subtitles Recording Priority</source>
-        <translation type="obsolete">Opptaksprioritet for sendinger med tegnspråk som undertekster</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
-        <translation type="obsolete">Ekstra prioritet når en sending er markert med tegnspråk som undertekstet tilgjengelig.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
-        <translation type="obsolete">Ytterligere prioritet når en sending er merket med teksting i TV-dataene.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
-        <translation type="obsolete">Ekstra prioritet når en sending er markert med støtte for seere med hørselshemming.</translation>
-    </message>
-    <message>
-        <source>Additional priority when a showing is marked as being Audio Described.</source>
-        <translation type="obsolete">Ytterligere prioritet når en sending er merket med &apos;Audio Described&apos;.</translation>
-    </message>
-    <message>
-        <source>Accessibility Options</source>
-        <translation type="obsolete">Tilgjengelighetsinnstillinger</translation>
     </message>
     <message>
         <source>Combination</source>
@@ -16860,10 +13862,6 @@ må ha et navn.</translation>
     <message>
         <source>Searching for icons for channel %1</source>
         <translation>Søker etter ikoner for kanal %1</translation>
-    </message>
-    <message>
-        <source>DVD/Video contains a bookmark</source>
-        <translation type="obsolete">DVD/video inneholder et bokmerke</translation>
     </message>
     <message>
         <source>File transfer</source>
@@ -16917,61 +13915,6 @@ må ha et navn.</translation>
         <translation>Direkte TV</translation>
     </message>
     <message numerus="yes">
-        <source>Found %n off-air channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n kanal som er av luften.</numerusform>
-            <numerusform>Fant %n kanaler som er av luften.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n unused transport(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n transport som ikke er i bruk.</numerusform>
-            <numerusform>Fant %n transporter som ikke er i bruk.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n old %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n gammel %1 kanal.</numerusform>
-            <numerusform>Fant %n gamle %1 kanaler.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n new non-conflicting %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n ny %1 kanal som ikke er i konflikt.</numerusform>
-            <numerusform>Fant %n nye %1 kanaler som ikke er i konflikt.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n new conflicting %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n ny %1 kanal som er i konflikt.</numerusform>
-            <numerusform>Fant %n nye %1 kanaler som er i konflikt.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n conflicting old %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n gammel %1 kanal som er i konflikt.</numerusform>
-            <numerusform>Fant %n gamle %1 kanaler som er i konflikt.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n transport(s):
-</source>
-        <translation type="obsolete">
-            <numerusform>Fant %n transport:
-</numerusform>
-            <numerusform>Fant %n transporter:</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>You chose to manually insert channel %1.</source>
-        <translation type="obsolete">Du valgte å legge til kanal %1 manuelt.</translation>
-    </message>
-    <message numerus="yes">
         <source>: Found %n</source>
         <translation>
             <numerusform>: Fant %n</numerusform>
@@ -16996,90 +13939,6 @@ må ha et navn.</translation>
     <message>
         <source>2.35:1</source>
         <translation>2.35:1</translation>
-    </message>
-    <message>
-        <source>Upconvert stereo to 5.1 surround</source>
-        <translation type="obsolete">Oppkonverter stereo til 5.1 kringlyd</translation>
-    </message>
-    <message>
-        <source>Stereo PCM Only</source>
-        <translation type="obsolete">Kun Stereo PCM</translation>
-    </message>
-    <message>
-        <source>Fastest</source>
-        <translation type="obsolete">Raskest</translation>
-    </message>
-    <message>
-        <source>Good</source>
-        <translation type="obsolete">Bra</translation>
-    </message>
-    <message>
-        <source>Best</source>
-        <translation type="obsolete">Best</translation>
-    </message>
-    <message>
-        <source>Override SRC quality</source>
-        <translation type="obsolete">Overstyr SRC kvalitet</translation>
-    </message>
-    <message>
-        <source>Disabled</source>
-        <translation type="obsolete">Deaktivert</translation>
-    </message>
-    <message>
-        <source>Use a distinct digital output device from default. (default is not checked)</source>
-        <translation type="obsolete">Bruk en spesiell lydutgang for digital lyd.(standard innstilling er av)</translation>
-    </message>
-    <message>
-        <source>Digital output device</source>
-        <translation type="obsolete">Utenhet for digital lyd</translation>
-    </message>
-    <message>
-        <source>Setting the mixer device to &quot;software&quot; lets MythTV control the volume of all audio at the expense of a slight quality loss.</source>
-        <translation type="obsolete">Hvis du setter mikserenheten til &quot;software&quot; lar du MythTV styre volumet av all lyd på bekostning av et lite kvalitetstap.</translation>
-    </message>
-    <message>
-        <source>Rescan</source>
-        <translation type="obsolete">Søk igjen</translation>
-    </message>
-    <message>
-        <source>Rescan for available audio devices. Current entry will be checked and capability entries populated.</source>
-        <translation type="obsolete">Søk om igjen etter tilgjengelige lydenheter. Gjeldende enhet vil bli skannet og kapasitetsfeltene vil bli fylt inn.</translation>
-    </message>
-    <message>
-        <source>Digital Audio Capabilities</source>
-        <translation type="obsolete">Digital lyd kapasiteter</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="obsolete">Test</translation>
-    </message>
-    <message>
-        <source>Will play a test pattern on all configured speakers</source>
-        <translation type="obsolete">Vil spille et testmønster på alle konfigurerte høyttalere</translation>
-    </message>
-    <message>
-        <source>Advanced Audio Settings</source>
-        <translation type="obsolete">Avanserte lydinnstillinger</translation>
-    </message>
-    <message>
-        <source>Enable extra audio settings. Under most usage all options should be left alone</source>
-        <translation type="obsolete">Slå på ekstra lydinnstillinger. I de fleste tilfeller bør ingen valg endres</translation>
-    </message>
-    <message>
-        <source>Passthrough device is invalid or not useable. Check configuration in Advanced Settings:</source>
-        <translation type="obsolete">Lydenhet for gjennomgang er ugyldig eller ikke mulig å benytte. Undersøk innstillingene under avanserte innstillinger:</translation>
-    </message>
-    <message>
-        <source>Dolby Digital</source>
-        <translation type="obsolete">Dolby Digital</translation>
-    </message>
-    <message>
-        <source>DTS</source>
-        <translation type="obsolete">DTS</translation>
-    </message>
-    <message>
-        <source>Enable if your amplifier or sound decoder supports DTS. You must use a digital connection. Uncheck if using an analog connection</source>
-        <translation type="obsolete">Aktiviser hvis din forsterker eller lyddekoder støtter DTS. Du må da bruke en digital forbindelse. Slå av hvis du bruker en analog forbindelse</translation>
     </message>
     <message>
         <source>Program Status</source>
@@ -17119,48 +13978,8 @@ må ha et navn.</translation>
         <translation>Tilbakekoblinger</translation>
     </message>
     <message>
-        <source>Scan to Import</source>
-        <translation type="obsolete">Søk for å importere</translation>
-    </message>
-    <message>
-        <source>processed</source>
-        <translation type="obsolete">prosessert</translation>
-    </message>
-    <message>
-        <source>unprocessed</source>
-        <translation type="obsolete">ikke prosessert</translation>
-    </message>
-    <message>
         <source>Scan Type</source>
         <translation>Type søk</translation>
-    </message>
-    <message>
-        <source>Performing Logo Identification</source>
-        <translation type="obsolete">Gjennomfører logoidentifikasjon</translation>
-    </message>
-    <message>
-        <source>Waiting to pass preroll + head start</source>
-        <translation type="obsolete">Venter på å fullføre preroll + head start</translation>
-    </message>
-    <message>
-        <source>Waiting for recording to finish</source>
-        <translation type="obsolete">Venter på at opptak er fullført</translation>
-    </message>
-    <message>
-        <source>Today</source>
-        <translation type="obsolete">I dag</translation>
-    </message>
-    <message>
-        <source>Yesterday</source>
-        <translation type="obsolete">I går</translation>
-    </message>
-    <message>
-        <source>Tomorrow</source>
-        <translation type="obsolete">I morgen</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Uten omslag</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -17169,18 +13988,6 @@ må ha et navn.</translation>
     <message>
         <source>No</source>
         <translation>Nei</translation>
-    </message>
-    <message>
-        <source>Details Downloaded</source>
-        <translation type="obsolete">Detaljer er lastet ned</translation>
-    </message>
-    <message>
-        <source>Waiting for Detail Download</source>
-        <translation type="obsolete">Venter på nedlasting av detaljer</translation>
-    </message>
-    <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Ingen rangering tilgjengelig.</translation>
     </message>
     <message>
         <source>&gt;1Gbps</source>
@@ -17219,202 +14026,6 @@ må ha et navn.</translation>
         <translation>Error: kunne ikke beregne hast av filen &apos;%1&apos;</translation>
     </message>
     <message>
-        <source>Downloading file. Please wait...</source>
-        <translation type="obsolete">Laster ned fil. Vennligst vent...</translation>
-    </message>
-    <message>
-        <source>Would you like to share your hardware profile with the MythTV developers? Profiles are anonymous and are a great way to help with future development.</source>
-        <translation type="obsolete">Vil du dele din maskinvareprofil med MythTV utviklerene ? Profilene er anonyme og er en god måte å hjelpe til med fremtidig utvikling.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete your online profile?  Your information is anonymous and helps the developers to know what hardware the majority of users prefer.</source>
-        <translation type="obsolete">Er du sikker på at du vil slette din profil på nettet?  Din informasjon er anonym og hjelper utviklerene til å vite hvilken maskinvare brukerne benytter.</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Tittel</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="obsolete">År</translation>
-    </message>
-    <message>
-        <source>User Rating</source>
-        <translation type="obsolete">Rangering</translation>
-    </message>
-    <message>
-        <source>Runtime</source>
-        <translation type="obsolete">Spilletid</translation>
-    </message>
-    <message>
-        <source>Filename</source>
-        <translation type="obsolete">Filnavn</translation>
-    </message>
-    <message>
-        <source>Video ID</source>
-        <translation type="obsolete">Video-ID</translation>
-    </message>
-    <message>
-        <source>Date Added</source>
-        <translation type="obsolete">Dato lagt til</translation>
-    </message>
-    <message>
-        <source>Starting Parental Level</source>
-        <translation type="obsolete">Standard foreldernivå</translation>
-    </message>
-    <message>
-        <source>4 - Highest</source>
-        <translation type="obsolete">4 - høyest</translation>
-    </message>
-    <message>
-        <source>1 - Lowest</source>
-        <translation type="obsolete">1 - lavest</translation>
-    </message>
-    <message>
-        <source>This is the &apos;level&apos; that Video starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation type="obsolete">Dette er foreldrenivået som vises som standard. Alle videoer med likt eller lavere nivå vil bli vist i listen som standard. PIN-kode for foreldrenivå bør settes for å begrense tilgang til å endre standardnivået.</translation>
-    </message>
-    <message>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
-    </message>
-    <message>
-        <source>Parental Level 4 PIN</source>
-        <translation type="obsolete">Kode for foreldernivå 4</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation type="obsolete">Denne koden brukes for å aktivere forelderkontroll nivå 4 og i videobehandleren.</translation>
-    </message>
-    <message>
-        <source>Parental Level 3 PIN</source>
-        <translation type="obsolete">Kode for foreldernivå 3</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation type="obsolete">Denne koden brukes for å aktivere forelderkontroll nivå 3.</translation>
-    </message>
-    <message>
-        <source>Parental Level 2 PIN</source>
-        <translation type="obsolete">Kode for foreldernivå 2</translation>
-    </message>
-    <message>
-        <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation type="obsolete">Denne koden brukes for å aktivere forelderkontroll nivå 2.</translation>
-    </message>
-    <message>
-        <source>Aggressive Parental Control</source>
-        <translation type="obsolete">Aggressiv forelderkontroll</translation>
-    </message>
-    <message>
-        <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation type="obsolete">Velges dette kan du ikke returnere til denne skjermen og fjerne forelder-koden uten først å skrive inn den nåværende koden.</translation>
-    </message>
-    <message>
-        <source>Directories that hold videos</source>
-        <translation type="obsolete">Mapper som inneholder videofiler</translation>
-    </message>
-    <message>
-        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running the frontend.</source>
-        <translation type="obsolete">Flere mapper kan skilles med kolon (:). Hver mappe må finnes og være tilgjengelig for brukeren som kjører klienten.</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie posters</source>
-        <translation type="obsolete">Katalog for lagring av filmplakater</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running the frontend needs to have read/write permission to the directory.</source>
-        <translation type="obsolete">Denne katalogen må finnes fra før, og brukeren som kjører klienten må ha lese- og skrivetillatelse til den.</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie screenshots</source>
-        <translation type="obsolete">Mappe som inneholder Screenshots for filmer</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie/TV Banners</source>
-        <translation type="obsolete">Mappe som inneholder bannere for filmer og TV</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie fanart</source>
-        <translation type="obsolete">Mappe som inneholder fanplakater for filmer</translation>
-    </message>
-    <message>
-        <source>Directory that holds movie trailers</source>
-        <translation type="obsolete">Mappe som inneholder filmtrailere</translation>
-    </message>
-    <message>
-        <source>On DVD insertion</source>
-        <translation type="obsolete">Handling ved DVD-innsetting</translation>
-    </message>
-    <message>
-        <source>Display mythdvd menu</source>
-        <translation type="obsolete">Vis MythDVD-menyen</translation>
-    </message>
-    <message>
-        <source>Do nothing</source>
-        <translation type="obsolete">Ikke gjør noe</translation>
-    </message>
-    <message>
-        <source>Play DVD</source>
-        <translation type="obsolete">Spill av DVD</translation>
-    </message>
-    <message>
-        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
-        <translation type="obsolete">Dette krever at medieovervåking er aktivert (Innstillinger -&gt; Generelt -&gt; Overvåk CD/DVD).</translation>
-    </message>
-    <message>
-        <source>Video Tree remembers last selected position</source>
-        <translation type="obsolete">Videotreet husker sist valgte posisjon</translation>
-    </message>
-    <message>
-        <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="obsolete">Hvis satt vil gjeldende posisjon i videotreet bli lagret som standard.</translation>
-    </message>
-    <message>
-        <source>Enable automatic Parental Level from rating</source>
-        <translation type="obsolete">Velg foreldernivå automatisk fra aldersgrensen</translation>
-    </message>
-    <message>
-        <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="obsolete">La søk sette nivået for forelderkontroll automatisk ut i fra aldersgrensen under.</translation>
-    </message>
-    <message>
-        <source>G</source>
-        <comment>PL 1 default search string.</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>PG</source>
-        <comment>PL 2 default search string.</comment>
-        <translation type="obsolete">7 år</translation>
-    </message>
-    <message>
-        <source>PG-13</source>
-        <comment>PL3 default search string.</comment>
-        <translation type="obsolete">11 år</translation>
-    </message>
-    <message>
-        <source>R:NC-17</source>
-        <comment>PL4 default search string.</comment>
-        <translation type="obsolete">18 år</translation>
-    </message>
-    <message>
-        <source>Level %1</source>
-        <translation type="obsolete">Nivå %1</translation>
-    </message>
-    <message>
-        <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="obsolete">Aldersgrenser som inneholder disse tekstene (skilles med kolon) blir gitt forelderkontroll nivå %1.</translation>
-    </message>
-    <message>
-        <source>Parental Control Settings</source>
-        <translation type="obsolete">Innstillinger for Forelderkontroll</translation>
-    </message>
-    <message>
-        <source>General Settings (%1/%2)</source>
-        <translation type="obsolete">Generelle innstillinger (%1/%2)</translation>
-    </message>
-    <message>
         <source>Video Home</source>
         <translation>Video Hjem</translation>
     </message>
@@ -17437,22 +14048,6 @@ må ha et navn.</translation>
     <message>
         <source>videos</source>
         <translation>filmer</translation>
-    </message>
-    <message>
-        <source>Parental PIN:</source>
-        <translation type="obsolete">PIN for aldersgrense:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Søker etter videofiler</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation type="obsolete">Verifiserer videofiler</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Oppdaterer videodatabase</translation>
     </message>
     <message>
         <source>%1 TB</source>
@@ -17580,58 +14175,6 @@ må ha et navn.</translation>
     <message>
         <source>7.1 Channel Audio</source>
         <translation>7.1-kanals lyd</translation>
-    </message>
-    <message>
-        <source>Unknown Artist</source>
-        <translation type="obsolete">Ukjent artist</translation>
-    </message>
-    <message>
-        <source>Unknown Album</source>
-        <translation type="obsolete">Ukjent album</translation>
-    </message>
-    <message>
-        <source>Unknown Genre</source>
-        <translation type="obsolete">Ukjent sjanger</translation>
-    </message>
-    <message>
-        <source>Never Played</source>
-        <translation type="obsolete">Aldri spilt</translation>
-    </message>
-    <message>
-        <source>CD -- none</source>
-        <translation type="obsolete">CD - ingen</translation>
-    </message>
-    <message>
-        <source>front</source>
-        <translation type="obsolete">front</translation>
-    </message>
-    <message>
-        <source>back</source>
-        <translation type="obsolete">bak</translation>
-    </message>
-    <message>
-        <source>inlay</source>
-        <translation type="obsolete">innstikk</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
-    </message>
-    <message>
-        <source>cover</source>
-        <translation type="obsolete">omslag</translation>
-    </message>
-    <message>
-        <source>Error opening remote stream buffer</source>
-        <translation type="obsolete">Kunne ikke åpne buffer for fjern strøm</translation>
-    </message>
-    <message>
-        <source>Error opening remote stream</source>
-        <translation type="obsolete">Kunne ikke åpne fjern strøm</translation>
-    </message>
-    <message>
-        <source>Zoom %1x%2 @ (%3,%4)</source>
-        <translation type="obsolete">Zoom %1x%2 @ (%3,%4)</translation>
     </message>
     <message>
         <source>Choose a channel name (any string, long version) </source>
@@ -18032,10 +14575,6 @@ må ha et navn.</translation>
         <translation>Fullt søk</translation>
     </message>
     <message>
-        <source>Import channels.conf</source>
-        <translation type="obsolete">Importer «channels.conf»</translation>
-    </message>
-    <message>
         <source>Full Scan (Tuned)</source>
         <translation>Fullt Søk (Tuned)</translation>
     </message>
@@ -18140,42 +14679,6 @@ må ha et navn.</translation>
 <context>
     <name>ScheduleCommon</name>
     <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Slå på på nytt</translation>
-    </message>
-    <message>
-        <source>Stop recording</source>
-        <translation type="obsolete">Stopp opptak</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record</source>
-        <translation type="obsolete">Ikke ta opp</translation>
-    </message>
-    <message>
-        <source>Never record</source>
-        <translation type="obsolete">Aldri ta opp</translation>
-    </message>
-    <message>
-        <source>Modify Recording Options</source>
-        <translation type="obsolete">Endre opptaksinnstillinger</translation>
-    </message>
-    <message>
-        <source>Edit Options</source>
-        <translation type="obsolete">Rediger innstillinger</translation>
-    </message>
-    <message>
-        <source>Add Override</source>
-        <translation type="obsolete">Legg til overstyring</translation>
-    </message>
-    <message>
-        <source>Edit Override</source>
-        <translation type="obsolete">Rediger overstyring</translation>
-    </message>
-    <message>
-        <source>Clear Override</source>
-        <translation type="obsolete">Fjern overstyring</translation>
-    </message>
-    <message>
         <source>The following programs will be recorded instead:</source>
         <translation>Følgende programmer tas opp i stedet:</translation>
     </message>
@@ -18243,14 +14746,6 @@ må ha et navn.</translation>
         <source>Delete recording rule</source>
         <translation>Slett opptaksregel</translation>
     </message>
-    <message>
-        <source>Record anyway</source>
-        <translation type="obsolete">Ta opp uansett</translation>
-    </message>
-    <message>
-        <source>Forget Previous</source>
-        <translation type="obsolete">Glem forrige</translation>
-    </message>
 </context>
 <context>
     <name>ScheduleEditor</name>
@@ -18271,10 +14766,6 @@ må ha et navn.</translation>
         <translation>Ta opp denne sendingen med overstyringsinnstillinger</translation>
     </message>
     <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation type="obsolete">Ikke tillat dette programmet å bli tatt opp</translation>
-    </message>
-    <message>
         <source>Do not record this program</source>
         <translation>Ikke ta opp dette programmet</translation>
     </message>
@@ -18283,40 +14774,12 @@ må ha et navn.</translation>
         <translation>Ta kun opp denne sendingen</translation>
     </message>
     <message>
-        <source>Record one showing of this title</source>
-        <translation type="obsolete">Ta opp én sending med denne tittelen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation type="obsolete">Ta opp i denne tidsperioden hver uke</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation type="obsolete">Ta opp én sending hver uke med denne tittelen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation type="obsolete">Ta opp i denne tidsperioden hver dag</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation type="obsolete">Ta opp én sending hver dag med denne tittelen </translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation type="obsolete">Ta opp når som helst på denne kanalen</translation>
-    </message>
-    <message>
         <source>Upcoming Episodes</source>
         <translation>Kommende episoder</translation>
     </message>
     <message>
         <source>Upcoming Recordings</source>
         <translation>Kommende opptak</translation>
-    </message>
-    <message>
-        <source>Previously Scheduled</source>
-        <translation type="obsolete">Tatt opp tidligere</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
@@ -18474,44 +14937,6 @@ i %2</translation>
 Database Name: %2</source>
         <translation>Databasevert: %1
 Databasenavn: %2</translation>
-    </message>
-</context>
-<context>
-    <name>ScreenWizard</name>
-    <message>
-        <source>Size: %1 x %2</source>
-        <translation type="obsolete">Størrelse: %1 x %2</translation>
-    </message>
-    <message>
-        <source>Offset: %1 x %2</source>
-        <translation type="obsolete">Forskyvning: %1 x %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>Change amount: %n pixel(s)</source>
-        <translation type="obsolete">
-            <numerusform>Endringsmengde: %n piksel</numerusform>
-            <numerusform>Endringsmengde: %n piksler</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="obsolete">Innstillinger</translation>
-    </message>
-    <message>
-        <source>Save and Quit</source>
-        <translation type="obsolete">Lagre og lukk</translation>
-    </message>
-    <message>
-        <source>Reset Changes and Quit</source>
-        <translation type="obsolete">Resett endringer og lukk</translation>
-    </message>
-    <message>
-        <source>Coarse/Fine adjustment</source>
-        <translation type="obsolete">Grov/fin justering</translation>
-    </message>
-    <message>
-        <source>Close Menu</source>
-        <translation type="obsolete">Lukk meny</translation>
     </message>
 </context>
 <context>
@@ -19071,11 +15496,6 @@ fra opptaksgruppen?</translation>
         <source>(Create new group)</source>
         <translation>(Lag ny gruppe)</translation>
     </message>
-    <message>
-        <source>new</source>
-        <comment>New storage group</comment>
-        <translation type="obsolete">ny</translation>
-    </message>
 </context>
 <context>
     <name>TV</name>
@@ -19298,38 +15718,6 @@ fra opptaksgruppen?</translation>
     <message>
         <source>Adjust</source>
         <translation>Juster</translation>
-    </message>
-    <message>
-        <source>0.5X</source>
-        <translation type="obsolete">0,5X</translation>
-    </message>
-    <message>
-        <source>0.9X</source>
-        <translation type="obsolete">0,9X</translation>
-    </message>
-    <message>
-        <source>1.0X</source>
-        <translation type="obsolete">1,0X</translation>
-    </message>
-    <message>
-        <source>1.1X</source>
-        <translation type="obsolete">1,1X</translation>
-    </message>
-    <message>
-        <source>1.2X</source>
-        <translation type="obsolete">1,2X</translation>
-    </message>
-    <message>
-        <source>1.3X</source>
-        <translation type="obsolete">1,3X</translation>
-    </message>
-    <message>
-        <source>1.4X</source>
-        <translation type="obsolete">1,4X</translation>
-    </message>
-    <message>
-        <source>1.5X</source>
-        <translation type="obsolete">1,5X</translation>
     </message>
     <message>
         <source>Sleep</source>
@@ -19617,11 +16005,6 @@ fra opptaksgruppen?</translation>
         <translation>Bytt inndata</translation>
     </message>
     <message>
-        <source>I</source>
-        <comment>Input</comment>
-        <translation type="obsolete">I</translation>
-    </message>
-    <message>
         <source>Switch Source</source>
         <translation>Bytt kilde</translation>
     </message>
@@ -19756,14 +16139,6 @@ fra opptaksgruppen?</translation>
         <translation>Avansert</translation>
     </message>
     <message>
-        <source>Disable studio levels</source>
-        <translation type="obsolete">Slå av &quot;Studio levels&quot;</translation>
-    </message>
-    <message>
-        <source>Enable studio levels</source>
-        <translation type="obsolete">Slå på &quot;Studio levels&quot;</translation>
-    </message>
-    <message>
         <source>Deinterlacer</source>
         <translation>Avfletter</translation>
     </message>
@@ -19828,10 +16203,6 @@ fra opptaksgruppen?</translation>
         <translation>Bytt modus for blaing</translation>
     </message>
     <message>
-        <source>Playback data</source>
-        <translation type="obsolete">Avspillingsdata</translation>
-    </message>
-    <message>
         <source>Open Live TV PIP</source>
         <translation>Åpne Direkte TV B-i-B</translation>
     </message>
@@ -19848,22 +16219,6 @@ fra opptaksgruppen?</translation>
         <translation>Åpne B-v-B fra opptak</translation>
     </message>
     <message>
-        <source>Close PBP</source>
-        <translation type="obsolete">Lukk B-v-B</translation>
-    </message>
-    <message>
-        <source>Close PIP</source>
-        <translation type="obsolete">Lukk B-i-B</translation>
-    </message>
-    <message>
-        <source>Close PBPs</source>
-        <translation type="obsolete">Lukk B-v-B&apos;er</translation>
-    </message>
-    <message>
-        <source>Close PIPs</source>
-        <translation type="obsolete">Lukk B-i-B&apos;er</translation>
-    </message>
-    <message>
         <source>Swap Windows</source>
         <translation>Bytt vinduer</translation>
     </message>
@@ -19874,11 +16229,6 @@ fra opptaksgruppen?</translation>
     <message>
         <source>Switch to PBP</source>
         <translation>Bytt til B-v-B</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>Card</comment>
-        <translation type="obsolete">K</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -19909,10 +16259,6 @@ fra opptaksgruppen?</translation>
     <message>
         <source>Disable Audio Upmixer</source>
         <translation>Slå av oppmikser</translation>
-    </message>
-    <message>
-        <source>Enable Audio Upmixer</source>
-        <translation type="obsolete">Slå på oppmikser</translation>
     </message>
     <message>
         <source>None</source>
@@ -20494,10 +16840,6 @@ Vil du fortsette å se?</translation>
         <translation>Kinonavn</translation>
     </message>
     <message>
-        <source>Mythbuntu is based on ProjectGrayhem - a dark, shiny theme originally inspired by XBMC&apos;s ProjectMayhem skin</source>
-        <translation type="obsolete">Mythbuntu er basert på ProjectGrayhem - ett mørkt, skinnende tema som er inspirert av XBMCs ProjectMayhem</translation>
-    </message>
-    <message>
         <source>1. General</source>
         <translation>1. Generelt</translation>
     </message>
@@ -20894,14 +17236,6 @@ Vil du fortsette å se?</translation>
         <translation>Konfigurer video og DVD-avspilling</translation>
     </message>
     <message>
-        <source>%PLAYEDTIME%</source>
-        <translation type="obsolete">%PLAYEDTIME%</translation>
-    </message>
-    <message>
-        <source>%(|REMAININGTIME|)%%(|BEHINDTIME|)%</source>
-        <translation type="obsolete">%(|REMAININGTIME|)%%(|BEHINDTIME|)%</translation>
-    </message>
-    <message>
         <source>Inetref:</source>
         <translation>InetRef:</translation>
     </message>
@@ -21056,66 +17390,6 @@ Vil du fortsette å se?</translation>
         <translation>Flytt den valgte pilen til hjørnet av TV skjermen.  Trykk på VELG for å redigere den andre pilen.  Trykk på MENY for innstillinger og ESC for å avslutte.</translation>
     </message>
     <message>
-        <source>Create a</source>
-        <translation type="obsolete">Lag en</translation>
-    </message>
-    <message>
-        <source>Export your</source>
-        <translation type="obsolete">Eksporter din</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation type="obsolete">Fil</translation>
-    </message>
-    <message>
-        <source>Encode your video</source>
-        <translation type="obsolete">Kod din video</translation>
-    </message>
-    <message>
-        <source>Archive</source>
-        <translation type="obsolete">Arkiv</translation>
-    </message>
-    <message>
-        <source>Import an</source>
-        <translation type="obsolete">Importer en</translation>
-    </message>
-    <message>
-        <source>Utilities</source>
-        <translation type="obsolete">Verktøy</translation>
-    </message>
-    <message>
-        <source>Use archive</source>
-        <translation type="obsolete">Bruk arkiv</translation>
-    </message>
-    <message>
-        <source>Media</source>
-        <translation type="obsolete">Media</translation>
-    </message>
-    <message>
-        <source>Eject your</source>
-        <translation type="obsolete">Løs ut din</translation>
-    </message>
-    <message>
-        <source>Log</source>
-        <translation type="obsolete">Logg</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation type="obsolete">Show</translation>
-    </message>
-    <message>
-        <source>Test created</source>
-        <translation type="obsolete">Test laget</translation>
-    </message>
-    <message>
-        <source>Burn</source>
-        <translation type="obsolete">Brenn</translation>
-    </message>
-    <message>
-        <source>Start to</source>
-        <translation type="obsolete">Start å</translation>
-    </message>
-    <message>
         <source>hh:mm AP</source>
         <translation>hh:mm AP</translation>
     </message>
@@ -21136,22 +17410,10 @@ Vil du fortsette å se?</translation>
         <translation>Skjermtittel 3</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Ukjent</translation>
-    </message>
-    <message>
-        <source>Directed by %DIRECTOR%, %YEAR%</source>
-        <translation type="obsolete">Regissert av %DIRECTOR%, %YEAR%</translation>
-    </message>
-    <message>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
         <translation>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</translation>
-    </message>
-    <message>
-        <source>Cast: %cast%</source>
-        <translation type="obsolete">Skuespillere: %cast%</translation>
     </message>
     <message>
         <source>Coverart Image:</source>
@@ -21316,10 +17578,6 @@ Vil du fortsette å se?</translation>
         <translation>Taster</translation>
     </message>
     <message>
-        <source>Switch to Channel: %1</source>
-        <translation type="obsolete">Bytt til kanal: %1</translation>
-    </message>
-    <message>
         <source>Storage Details</source>
         <translation>Lagringsdetaljer</translation>
     </message>
@@ -21392,10 +17650,6 @@ Vil du fortsette å se?</translation>
         <translation>Samplingsrate:</translation>
     </message>
     <message>
-        <source>%STARTTIME%-%ENDTIME% : %LENMINS% - %LONGCHANNEL%</source>
-        <translation type="obsolete">%STARTTIME%-%ENDTIME% : %LENMINS% - %LONGCHANNEL%</translation>
-    </message>
-    <message>
         <source>LiveTV</source>
         <translation>Direkte TV</translation>
     </message>
@@ -21420,14 +17674,6 @@ Vil du fortsette å se?</translation>
         <translation>Oppdater kanalene dine</translation>
     </message>
     <message>
-        <source>Seek Amount:</source>
-        <translation type="obsolete">Søkemengde:</translation>
-    </message>
-    <message>
-        <source>Frame Number:</source>
-        <translation type="obsolete">Rammenummer:</translation>
-    </message>
-    <message>
         <source>%FRAMEDISPLAY% / %CUTINDICATOR%</source>
         <translation>%FRAMEDISPLAY% / %CUTINDICATOR%</translation>
     </message>
@@ -21438,22 +17684,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>WATCH RECORDINGS</source>
         <translation>SE PÅ OPPTAK</translation>
-    </message>
-    <message>
-        <source>channel</source>
-        <translation type="obsolete">kanal</translation>
-    </message>
-    <message>
-        <source>%startdate%, %starttime% - %endtime%</source>
-        <translation type="obsolete">%startdate%, %starttime% - %endtime%</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="obsolete">Størrelse</translation>
-    </message>
-    <message>
-        <source>Storage</source>
-        <translation type="obsolete">Lagring</translation>
     </message>
     <message>
         <source>%timedate% - %description%</source>
@@ -21470,34 +17700,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>Settings</source>
         <translation>Innstillinger</translation>
-    </message>
-    <message>
-        <source>Game folders and general</source>
-        <translation type="obsolete">Spillmapper og generelt</translation>
-    </message>
-    <message>
-        <source>Players</source>
-        <translation type="obsolete">Avspillere</translation>
-    </message>
-    <message>
-        <source>Configure your game</source>
-        <translation type="obsolete">Konfigurer spillet ditt</translation>
-    </message>
-    <message>
-        <source>Library</source>
-        <translation type="obsolete">Bibliotek</translation>
-    </message>
-    <message>
-        <source>Add games to your</source>
-        <translation type="obsolete">Legg til spill i ditt</translation>
-    </message>
-    <message>
-        <source>Data</source>
-        <translation type="obsolete">Data</translation>
-    </message>
-    <message>
-        <source>Clear your game</source>
-        <translation type="obsolete">Nullstill spillet ditt</translation>
     </message>
     <message>
         <source>Location and sources for</source>
@@ -21824,68 +18026,8 @@ Vil du fortsette å se?</translation>
         <translation>Del dine</translation>
     </message>
     <message>
-        <source>General music</source>
-        <translation type="obsolete">Generelt musikk</translation>
-    </message>
-    <message>
         <source>Player</source>
         <translation>Avspiller</translation>
-    </message>
-    <message>
-        <source>Setup you music</source>
-        <translation type="obsolete">Sett opp din musikk</translation>
-    </message>
-    <message>
-        <source>Ripper</source>
-        <translation type="obsolete">Ripper</translation>
-    </message>
-    <message>
-        <source>Configure your CD</source>
-        <translation type="obsolete">Konfigurer din CD</translation>
-    </message>
-    <message>
-        <source>Ratings</source>
-        <translation type="obsolete">Rangeringer</translation>
-    </message>
-    <message>
-        <source>Setup your music</source>
-        <translation type="obsolete">Sett opp din musikk</translation>
-    </message>
-    <message>
-        <source>Visualizer</source>
-        <translation type="obsolete">Visualiserer</translation>
-    </message>
-    <message>
-        <source>Configure settings for</source>
-        <translation type="obsolete">Konfigurer innstillinger for</translation>
-    </message>
-    <message>
-        <source>Playlists</source>
-        <translation type="obsolete">Spillelister</translation>
-    </message>
-    <message>
-        <source>Create your</source>
-        <translation type="obsolete">Lag din</translation>
-    </message>
-    <message>
-        <source>Files</source>
-        <translation type="obsolete">Filer</translation>
-    </message>
-    <message>
-        <source>Import your Music</source>
-        <translation type="obsolete">Importer din musikk</translation>
-    </message>
-    <message>
-        <source>Scan for new</source>
-        <translation type="obsolete">Søk etter ny</translation>
-    </message>
-    <message>
-        <source>CD</source>
-        <translation type="obsolete">CD</translation>
-    </message>
-    <message>
-        <source>Import your</source>
-        <translation type="obsolete">Importer din</translation>
     </message>
     <message>
         <source>Play a film on</source>
@@ -21918,18 +18060,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>%TITLE|  %%00x00| - %%SUBTITLE%</source>
         <translation>%TITLE|  %%00x00| - %%SUBTITLE%</translation>
-    </message>
-    <message>
-        <source>Aired %startdate%, %starttime% - %endtime%</source>
-        <translation type="obsolete">Sendt %startdate%, %starttime% - %endtime%</translation>
-    </message>
-    <message>
-        <source>Using %filesize_str% of %storagegroup% Storage</source>
-        <translation type="obsolete">Bruker %filesize_str% av %storagegroup% lagring</translation>
-    </message>
-    <message>
-        <source>Next recording: %rectypestatus%</source>
-        <translation type="obsolete">Nest opptak: %rectypestatus%</translation>
     </message>
     <message>
         <source>Change display groups</source>
@@ -22268,10 +18398,6 @@ Vil du fortsette å se?</translation>
         <translation>Automatisk utløping:</translation>
     </message>
     <message>
-        <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This theme can be used with MythTV 0.26 and later.</source>
-        <translation type="obsolete">Blue-abstract er et tema med moderne utseende ment for bredskjerm HD-format. Den blå bakgrunnen og det gjennomgående oppsettet gjør dette til et attraktivt og elegant tema. Dette temaet kan brukes med MythTV 0.26 eller nyere.</translation>
-    </message>
-    <message>
         <source>To be determined</source>
         <translation>Må defineres</translation>
     </message>
@@ -22368,10 +18494,6 @@ Vil du fortsette å se?</translation>
         <translation>Systemstatus</translation>
     </message>
     <message>
-        <source>Inspired by MediaStream: The theme has been made to look like the original XBMC skin were posible. Looks best with the matching menu structure in the MythMediaStreamMenu folder as this theme its menu lay-out is tailored for this particular menu.</source>
-        <translation type="obsolete">Inspirert av MediaStream: Temaet er laget for å ligne på det orginale XMBC temaet der det er mulig. Temaet ser best ut med menystrukturen i MythMediaStream-mappen da menylayouten er laget for dette spesielle temaet. </translation>
-    </message>
-    <message>
         <source>VIDEO MANAGER</source>
         <translation>VIDEOBEHANDLER</translation>
     </message>
@@ -22388,10 +18510,6 @@ Vil du fortsette å se?</translation>
         <translation>Rangering</translation>
     </message>
     <message>
-        <source>%USERRATING% - %RATING% - %STARS%</source>
-        <translation type="obsolete">%USERRATING% - %RATING% - %STARS%</translation>
-    </message>
-    <message>
         <source>Season</source>
         <translation>Sesong</translation>
     </message>
@@ -22402,10 +18520,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>%TITLE% %SUBTITLE% (%YEAR%)</source>
         <translation>%TITLE% %SUBTITLE% (%YEAR%)</translation>
-    </message>
-    <message>
-        <source>%USERRATING%/10 - %RATING%</source>
-        <translation type="obsolete">%USERRATING%/10 - %RATING%</translation>
     </message>
     <message>
         <source>VIDEO BROWSER</source>
@@ -22432,16 +18546,8 @@ Vil du fortsette å se?</translation>
         <translation>Sesong og episode</translation>
     </message>
     <message>
-        <source>s00e00</source>
-        <translation type="obsolete">s00e00</translation>
-    </message>
-    <message>
         <source>VIDEO GALLERY</source>
         <translation>VIDEOGALLERI</translation>
-    </message>
-    <message>
-        <source>Star rating:</source>
-        <translation type="obsolete">Stjernerating:</translation>
     </message>
     <message>
         <source>Customize meta data of your videos</source>
@@ -22470,10 +18576,6 @@ Vil du fortsette å se?</translation>
     <message>
         <source>Full plot:</source>
         <translation>Full handling:</translation>
-    </message>
-    <message>
-        <source>Season and Episode:</source>
-        <translation type="obsolete">Sesong og episode:</translation>
     </message>
     <message>
         <source>Setup file associations for your videos</source>
@@ -22540,16 +18642,8 @@ Når du er ferdig med å endre teksten, trykk &quot;Lagre&quot; knappen.</transl
         <translation>Gjentaginger:</translation>
     </message>
     <message>
-        <source>Designed to show off some different element arrangements available in Myth 0.25.  Tested at 1280x720 and with FranÃ§ais. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="obsolete">Designet for å vise forskjellige elementorganiseringer tilgjengelig i MythTV 0.25.  Testet med 1280x720 på fransk. Husk: I &apos;Vis opptak&apos; skjermbildet brukes [Rew] og [Fwd] for å bytte opptaksgruppe.</translation>
-    </message>
-    <message>
         <source>No videos in library, or no files found.  If you have configured a video directory, press MENU and select &quot;Scan for Changes.&quot;</source>
         <translation>Ingen videoer i biblioteket, eller ingen filer funnet.  Hvis du har konfigurert en videokatalog, trykk MENY knappen og velg &quot;Søk etter endringer.&quot;</translation>
-    </message>
-    <message>
-        <source>Designed to show off some different element arrangements available in Myth 0.25.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="obsolete">Designet for å vise forskjellige elementorganiseringer tilgjengelig i MythTV 0.25.  Husk: I &apos;Vis opptak&apos; skjermbildet brukes [Rew] og [Fwd] for å bytte opptaksgruppe.</translation>
     </message>
     <message>
         <source>Animation, transparency and fanart for mythtv 0.25</source>
@@ -23231,12 +19325,6 @@ Når du er ferdig med å endre teksten, trykk &quot;Lagre&quot; knappen.</transl
         <translation>For %ASPECT% skjermer.% Av |AUTHORNAME%% &lt;|AUTHOREMAIL|&gt;%.</translation>
     </message>
     <message>
-        <source>%DESCRIPTION%
-%ERRATA%</source>
-        <translation type="obsolete">%DESCRIPTION%
-%ERRATA%</translation>
-    </message>
-    <message>
         <source>= Update available</source>
         <translation>= Oppdatering tilgjengelig</translation>
     </message>
@@ -23301,52 +19389,8 @@ Når du er ferdig med å endre teksten, trykk &quot;Lagre&quot; knappen.</transl
         <translation>%|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
-        <source>Radio Stream</source>
-        <translation type="obsolete">Radiostrøm</translation>
-    </message>
-    <message>
-        <source>Press MENU to add some radio streams to play.</source>
-        <translation type="obsolete">Trykk MENY for å legge til noen radiostrømmer for avspilling.</translation>
-    </message>
-    <message>
-        <source>%channel% (%station%)</source>
-        <translation type="obsolete">%channel% (%station%)</translation>
-    </message>
-    <message>
         <source>%1 -</source>
         <translation>%1 -</translation>
-    </message>
-    <message>
-        <source>Add/Edit Music Stream</source>
-        <translation type="obsolete">Legg til/rediger musikkstrøm</translation>
-    </message>
-    <message>
-        <source>Station:</source>
-        <translation type="obsolete">Stasjon:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <source>Logo URL:</source>
-        <translation type="obsolete">Logo URL:</translation>
-    </message>
-    <message>
-        <source>Genres:</source>
-        <translation type="obsolete">Sjangre:</translation>
-    </message>
-    <message>
-        <source>Metadata Format:</source>
-        <translation type="obsolete">Metadata format:</translation>
-    </message>
-    <message>
-        <source>Search for Music Stream</source>
-        <translation type="obsolete">Søk etter musikkstrøm</translation>
-    </message>
-    <message>
-        <source>%STATION% - %Channel%</source>
-        <translation type="obsolete">%STATION% - %Channel%</translation>
     </message>
     <message>
         <source>Designed to show off some different element arrangements.  Tested at 1280x720 and with FranÃ§ais. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
@@ -23861,10 +19905,6 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
         <translation>Bakgrunn:</translation>
     </message>
     <message>
-        <source>%CHANNEL% (%STATION%)</source>
-        <translation type="obsolete">%CHANNEL% (%STATION%)</translation>
-    </message>
-    <message>
         <source>Designed to show off some different element arrangements.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
         <translation>Designet for å vise forskjellige elementorganiseringer.  Husk: I &apos;Vis opptak&apos; skjermbildet brukes [Rew] og [Fwd] for å bytte opptaksgruppe.</translation>
     </message>
@@ -23993,70 +20033,6 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
         <translation>Søkestatus:</translation>
     </message>
     <message>
-        <source>No files are selected for archive</source>
-        <translation type="obsolete">Ingen filer valgt for arkivering</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="obsolete">Legg til opptak</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="obsolete">Legg til video</translation>
-    </message>
-    <message>
-        <source>Add File</source>
-        <translation type="obsolete">Legg til fil</translation>
-    </message>
-    <message>
-        <source>0 mb</source>
-        <translation type="obsolete">0 mb</translation>
-    </message>
-    <message>
-        <source>xxxxx mb</source>
-        <translation type="obsolete">xxxxx mb</translation>
-    </message>
-    <message>
-        <source>Now Playing: %TITLE% by %ARTIST% on %ALBUM%</source>
-        <translation type="obsolete">Spiller nå: %TITLE% av %ARTIST% fra %ALBUM%</translation>
-    </message>
-    <message>
-        <source>%ALBUM%</source>
-        <translation type="obsolete">%ALBUM%</translation>
-    </message>
-    <message>
-        <source>%ARTIST%</source>
-        <translation type="obsolete">%ARTIST%</translation>
-    </message>
-    <message>
-        <source>%GENRE%</source>
-        <translation type="obsolete">%GENRE%</translation>
-    </message>
-    <message>
-        <source>Author: %1</source>
-        <translation type="obsolete">Forfatter: %1</translation>
-    </message>
-    <message>
-        <source>Posted: %1</source>
-        <translation type="obsolete">Postet: %1</translation>
-    </message>
-    <message>
-        <source>Length: %1</source>
-        <translation type="obsolete">Lengde: %1</translation>
-    </message>
-    <message>
-        <source>Runtime: %1</source>
-        <translation type="obsolete">Spilletid: %1</translation>
-    </message>
-    <message>
-        <source>Rating: %1</source>
-        <translation type="obsolete">Rangering: %1</translation>
-    </message>
-    <message>
-        <source>Size: %1</source>
-        <translation type="obsolete">Størrelse: %1</translation>
-    </message>
-    <message>
         <source>%&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|) %%(|STARS|) %%DESCRIPTION%</source>
         <translation>%&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|) %%(|STARS|) %%DESCRIPTION%</translation>
     </message>
@@ -24135,50 +20111,6 @@ Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for en
     <message>
         <source>Blocked By Firewall</source>
         <translation>Blokkert av brannmur</translation>
-    </message>
-    <message>
-        <source>Syncing image %1</source>
-        <translation type="obsolete">Synkroniserer bilde %1</translation>
-    </message>
-    <message>
-        <source>Creating thumbnail %1</source>
-        <translation type="obsolete">Lager miniatyrbilde %1</translation>
-    </message>
-    <message>
-        <source>Gallery Settings</source>
-        <translation type="obsolete">Galleri-innstillinger</translation>
-    </message>
-    <message>
-        <source>Name of the storage group for the images:</source>
-        <translation type="obsolete">Navn på lagringsgruppe for bilder:</translation>
-    </message>
-    <message>
-        <source>Sorting order of the shown images:</source>
-        <translation type="obsolete">Sorteringsrekkefølge for viste bilder:</translation>
-    </message>
-    <message>
-        <source>Time to display each image during a slideshow (ms):</source>
-        <translation type="obsolete">Tid for visning av bilde i billedvisning (ms):</translation>
-    </message>
-    <message>
-        <source>Type of transition between two images:</source>
-        <translation type="obsolete">Overgang mellom to bilder:</translation>
-    </message>
-    <message>
-        <source>Duration of an image transition (ms):</source>
-        <translation type="obsolete">Lengde på overgang mellom bilder (ms):</translation>
-    </message>
-    <message>
-        <source>Show files that are marked as hidden:</source>
-        <translation type="obsolete">Vis filer som er merket som skjult:</translation>
-    </message>
-    <message>
-        <source>Clear database contents (Resync required):</source>
-        <translation type="obsolete">Fjern databaseinnhold (ny synkronisering nødvendig):</translation>
-    </message>
-    <message>
-        <source>Image Loading...</source>
-        <translation type="obsolete">Laster bilde...</translation>
     </message>
     <message>
         <source>Watch live TV or schedule recordings</source>
@@ -24275,34 +20207,6 @@ Sammendrag: %ERRATA%</translation>
         <translation>Frontend er i hvilemodus</translation>
     </message>
     <message>
-        <source>Internet Stream View</source>
-        <translation type="obsolete">Internett strømvisning</translation>
-    </message>
-    <message>
-        <source>%STATION% - %CHANNEL%</source>
-        <translation type="obsolete">%STATION% - %CHANNEL%</translation>
-    </message>
-    <message>
-        <source>Last played: %1</source>
-        <translation type="obsolete">Sist spilt: %1</translation>
-    </message>
-    <message>
-        <source>Played %1 times</source>
-        <translation type="obsolete">Spilt %1 ganger</translation>
-    </message>
-    <message>
-        <source>Matches:</source>
-        <translation type="obsolete">Treff:</translation>
-    </message>
-    <message>
-        <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This theme can be used with the development version of MythTV (master).</source>
-        <translation type="obsolete">Blue-abstract er et tema med moderne utseende ment for bredskjerm HD-format. Den blå bakgrunnen og det gjennomgående oppsettet gjør dette til et attraktivt og elegant tema. Dette temaet kan brukes med utviklingsversjonen av MythTV (master).</translation>
-    </message>
-    <message>
-        <source>No videos in library or files are being loaded...&quot;</source>
-        <translation type="obsolete">Ingen videoer i bibliotek eller filer lastes...&quot;</translation>
-    </message>
-    <message>
         <source>No videos in library, or no files found.
 
  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
@@ -24379,10 +20283,6 @@ Sammendrag: %ERRATA%</translation>
         <translation>blootube-ng er et tema basert på blootube-wide av Justin Hornsby (justin.hornsby@gmail.com) som bruker stor grafikk knyttet til alle menyvalgene. Alle nødvendige endringer er gjort for å utvikle dette temaet videre til MythTV 0.24.</translation>
     </message>
     <message>
-        <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme.</source>
-        <translation type="obsolete">Blue-abstract er et tema med moderne utseende ment for bredskjerm HD-format. Den blå bakgrunnen og det gjennomgående oppsettet gjør dette til et attraktivt og elegant tema.</translation>
-    </message>
-    <message>
         <source>Playback Groups</source>
         <translation>Avspillingsgrupper</translation>
     </message>
@@ -24405,14 +20305,6 @@ Sammendrag: %ERRATA%</translation>
     <message>
         <source>Watch live television</source>
         <translation>Se Direkte TV</translation>
-    </message>
-    <message>
-        <source>Delete Recordings</source>
-        <translation type="obsolete">Slett opptak</translation>
-    </message>
-    <message>
-        <source>Remove television recordings</source>
-        <translation type="obsolete">Fjern TV opptak</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
@@ -25272,10 +21164,6 @@ Sammendrag: %ERRATA%</translation>
         <translation>Statusikoner</translation>
     </message>
     <message>
-        <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="obsolete">%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
-    </message>
-    <message>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;%
@@ -25464,10 +21352,6 @@ Sammendrag: %ERRATA%</translation>
     <message>
         <source>Configure MythTV and plugins</source>
         <translation>Konfigurer MythTV og MythTV-tillegg</translation>
-    </message>
-    <message>
-        <source>Set Priorities</source>
-        <translation type="obsolete">Sett prioriteter</translation>
     </message>
     <message>
         <source>Write video to a data DVD</source>
@@ -26332,38 +22216,12 @@ Når du er ferdig kan du trykke &quot;OK&quot; for å søke.</translation>
 %%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <source>%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%</source>
-        <translation type="obsolete">%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%</translation>
-    </message>
-    <message>
-        <source>%STARTTIME%% - |ENDTIME|: %%LENMINS%</source>
-        <translation type="obsolete">%STARTTIME%% - |ENDTIME|: %%LENMINS%</translation>
-    </message>
-    <message>
-        <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
-%</source>
-        <translation type="obsolete">%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
-%</translation>
-    </message>
-    <message>
         <source>%YEARSTARS| %%DESCRIPTION%</source>
         <translation>%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <source>(1) All (2) Important</source>
-        <translation type="obsolete">(1) Alle (2) Viktige</translation>
-    </message>
-    <message>
-        <source>Cert.:</source>
-        <translation type="obsolete">Sertifikat:</translation>
-    </message>
-    <message>
         <source>Age:</source>
         <translation>Alder:</translation>
-    </message>
-    <message>
-        <source>TMDB/TVDB No.:</source>
-        <translation type="obsolete">TMDB/TVDB nr:</translation>
     </message>
     <message>
         <source>Unique Player:</source>
@@ -26964,10 +22822,6 @@ Til slutt kan du teste, slå på, lagre eller slå av regelen din.</translation>
     <message>
         <source>Sample Clauses:</source>
         <translation>Eksempler på klausuler:</translation>
-    </message>
-    <message>
-        <source>Recording Rule Priorities</source>
-        <translation type="obsolete">Sett prioriteter for opptaksregler</translation>
     </message>
     <message>
         <source>Type</source>
@@ -27591,10 +23445,6 @@ dd MMM yyyy</translation>
     <message>
         <source>Fetching details for %1</source>
         <translation>Henter detaljer for %1</translation>
-    </message>
-    <message>
-        <source> %1x%2</source>
-        <translation type="obsolete"> %1x%2</translation>
     </message>
     <message>
         <source>Failed to delete file</source>

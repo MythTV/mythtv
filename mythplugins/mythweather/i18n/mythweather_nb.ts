@@ -926,10 +926,6 @@ Når du er ferdig må du klikke «Ferdig» for å fortsette.</translation>
         <translation>Trykk:</translation>
     </message>
     <message>
-        <source>Wind(Gust):</source>
-        <translation type="obsolete">Vind(i kastene):</translation>
-    </message>
-    <message>
         <source>Wind Direction:</source>
         <translation>Vindretning:</translation>
     </message>
