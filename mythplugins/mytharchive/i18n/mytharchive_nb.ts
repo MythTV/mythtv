@@ -420,7 +420,7 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Brenn DVD Rewritable (Tving Sletting)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1231"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1233"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Det var ikke mulig å kjøre mytharchivehelper for å brenne en DVD.</translation>
     </message>
@@ -2001,17 +2001,17 @@ Vennligst vent...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="928"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="922"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Avslutt, og lagre miniatyrbildene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="929"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="923"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Avslutt, Ikke lagre miniatyrbildene</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="921"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="915"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
@@ -2019,28 +2019,28 @@ Vennligst vent...</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="160"/>
+        <location filename="../mytharchive/videoselector.cpp" line="162"/>
         <source>Clear All</source>
         <translation>Velg ingen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="161"/>
+        <location filename="../mytharchive/videoselector.cpp" line="163"/>
         <source>Select All</source>
         <translation>Velg alle</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="359"/>
-        <location filename="../mytharchive/videoselector.cpp" line="489"/>
+        <location filename="../mytharchive/videoselector.cpp" line="368"/>
+        <location filename="../mytharchive/videoselector.cpp" line="505"/>
         <source>All Videos</source>
         <translation>Alle videoer</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="546"/>
+        <location filename="../mytharchive/videoselector.cpp" line="562"/>
         <source>You need to enter a valid password for this parental level</source>
         <translation>Du må angi et gyldig passord for dette foreldrenivået</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="153"/>
+        <location filename="../mytharchive/videoselector.cpp" line="155"/>
         <source>Menu</source>
         <translation>Meny</translation>
     </message>
