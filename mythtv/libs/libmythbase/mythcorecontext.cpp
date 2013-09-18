@@ -309,10 +309,7 @@ bool MythCoreContext::SafeConnectToMasterServer(bool blockingClient,
                                                 bool openEventSocket)
 {
     QMutexLocker locker(&d->m_sockLock);
-    bool success = true;
-
-    if (!d->m_serverSock || !d->m_serverSock->IsConnected())
-        success = ConnectToMasterServer(blockingClient, openEventSocket);
+    bool success = ConnectToMasterServer(blockingClient, openEventSocket);
 
     return success;
 }
