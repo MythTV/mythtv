@@ -25,6 +25,7 @@
 #include "exitcodes.h"
 #include "mythdownloadmanager.h"
 #include "mythtvexp.h"
+#include "mythdate.h"
 
 #define LOC QString("DataDirect: ")
 
@@ -275,7 +276,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     else if (pqname == "schedule")
     {
         QDateTime endtime = curr_schedule.time.addSecs(
-            QTime().secsTo(curr_schedule.duration));
+            MythDate::toSeconds( curr_schedule.duration ));
 
         query.prepare(
             "INSERT INTO dd_schedule "

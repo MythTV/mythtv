@@ -47,6 +47,9 @@ MBASE_PUBLIC QString toString(
 MBASE_PUBLIC QString toString(
     const QDate &date, uint format = MythDate::kDateFull);
 
+// Returns the total number of seconds since midnight
+MBASE_PUBLIC int toSeconds( const QTime &time );
+
 };
 
 #endif // _MYTH_DATE_H_

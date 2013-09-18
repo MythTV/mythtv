@@ -157,4 +157,21 @@ QString toString(const QDate &date, uint format)
     return result;
 }
 
+/** \brief Returns the total number of seconds since midnight of the supplied QTime
+ *
+ *  \param date     The QDate object to use
+ *  \param format   The format of the string to return
+ */
+int toSeconds( const QTime &time )
+{
+    if (!time.isValid())
+        return 0;
+
+    int nSecs = time.hour() * 3600;
+    nSecs += (time.minute() * 60 );
+    nSecs += time.second();
+
+    return nSecs;
+}
+
 }; // namespace MythDate
