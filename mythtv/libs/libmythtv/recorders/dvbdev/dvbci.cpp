@@ -636,8 +636,7 @@ cCiTransportConnection *cCiTransportLayer::Process(int Slot)
            case stCREATION:
            case stACTIVE:
                 if (!Tc->DataAvailable()) {
-                    if (Tc->Poll() != OK)
-                        esyslog("ERROR: Poll Error");
+                    Tc->Poll();
                    }
                 switch (Tc->LastResponse()) {
                   case T_REQUEST_TC:
