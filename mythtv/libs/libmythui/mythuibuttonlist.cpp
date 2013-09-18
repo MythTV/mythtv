@@ -781,6 +781,18 @@ bool MythUIButtonList::DistributeButtons(void)
                                    "selected item %1 total items %2")
         .arg(start_item).arg(m_itemCount));
 
+    // if there are no items to show make sure all the buttons are made invisible
+    if (m_itemCount == 0)
+    {
+        for (int i = 0; i < m_ButtonList.count(); i++)
+        {
+            if (m_ButtonList[i])
+                m_ButtonList[i]->SetVisible(false);
+        }
+
+        return false;
+    }
+
     /*
      * Try fewer and fewer columns until each row can fit the same
      * number of columns.
