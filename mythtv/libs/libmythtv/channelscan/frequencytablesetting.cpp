@@ -86,4 +86,3 @@ ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
     addSelection(QObject::tr("Germany"),        "de", country == "de");
     addSelection(QObject::tr("United Kingdom"), "gb", country == "gb");
 }
-

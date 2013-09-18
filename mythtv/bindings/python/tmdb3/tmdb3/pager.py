@@ -105,5 +105,8 @@ class PagedRequest( PagedList ):
         res = req.readJSON()
         self._len = res['total_results']
         for item in res['results']:
-            yield self._handler(item)
+            if item is None:
+                yield None
+            else:
+                yield self._handler(item)
 

@@ -1549,19 +1549,20 @@ int SubtitleScreen::GetDelay(void) const
 
 void SubtitleScreen::Clear708Cache(uint64_t mask)
 {
-    QList<MythUIType *>::iterator it, itNext;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); it = itNext)
+    QList<MythUIType *> list = m_ChildrenList;
+    QList<MythUIType *>::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
     {
-        itNext = it + 1;
         MythUIType *child = *it;
         SubWrapper *wrapper = dynamic_cast<SubWrapper *>(child);
-        if (!wrapper)
-            continue;
-        int whichImageCache = wrapper->GetWhichImageCache();
-        if (whichImageCache != -1 && (mask & (1ul << whichImageCache)))
+        if (wrapper)
         {
-            SetElementDeleted();
-            DeleteChild(child);
+            int whichImageCache = wrapper->GetWhichImageCache();
+            if (whichImageCache != -1 && (mask & (1ul << whichImageCache)))
+            {
+                SetElementDeleted();
+                DeleteChild(child);
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ class MythSystemLegacyPrivate : public QObject, public ReferenceCounter
     QBuffer *GetBuffer(int index)    { return m_parent->GetBuffer(index); }
     // FIXME: This is likely a bad idea, but possibly manageable
     //        since this is a private class.
-    void Unlock(void)                { m_parent->Unlock(); }
+    void Unlock(void)                { if (m_parent) m_parent->Unlock(); }
 
   signals:
     void started(void);

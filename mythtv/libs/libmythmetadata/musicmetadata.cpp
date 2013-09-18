@@ -231,7 +231,7 @@ MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
         return NULL;
     }
 
-    if (query.numRowsAffected() == 0)
+    if (!query.next())
     {
         LOG(VB_GENERAL, LOG_WARNING,
             QString("MusicMetadata::createFromFilename: Could not find '%1'")

@@ -3777,7 +3777,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
 
     QTextCodec *codec = QTextCodec::codecForName("utf-8");
     QTextDecoder *dec = codec->makeDecoder();
-    QString text      = dec->toUnicode((const char*)pkt->data, pkt->size);
+    QString text      = dec->toUnicode((const char*)pkt->data, pkt->size - 1);
     QStringList list  = text.split('\n', QString::SkipEmptyParts);
     delete dec;
 

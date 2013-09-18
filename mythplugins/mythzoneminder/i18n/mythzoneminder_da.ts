@@ -4,7 +4,7 @@
 <context>
     <name>FunctionDialog</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="69"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="70"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -25,64 +25,6 @@
         <location filename="../mythzoneminder/main.cpp" line="134"/>
         <source>ZoneMinder Events</source>
         <translation>ZoneMinder events</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>
-        <source>IP address of the MythZoneMinder server</source>
-        <translation>IP adresse for MythZoneMinder-serveren</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="19"/>
-        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
-        <translation>Indtast IP adressen på MythZoneMinder-serveren som denne frontend skal forbinde til.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="27"/>
-        <source>Port the server runs on</source>
-        <translation>Porten som serveren kører på</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
-        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation>Medmindre du har en god grund til det, så lad være med at ændre denne.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="37"/>
-        <source>Date format</source>
-        <translation>Dato format</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="41"/>
-        <source>Samples are shown using today&apos;s date.</source>
-        <translation>Eksempler bruger datoen for idag til at vise dato formatet.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
-        <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation>Eksempler bruger datoen for imorgen til at vise dato formatet.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="63"/>
-        <source>Your preferred date format to use on the events screens.</source>
-        <translation>Dit foretrukne dato format til at vise på event siden.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="71"/>
-        <source>Time format</source>
-        <translation>Tidsformat</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="79"/>
-        <source>Your preferred time format to display on the events screens.</source>
-        <translation>Dit foretrukne tidsformat til at vise på event siden.</translation>
-    </message>
-    <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="87"/>
-        <source>MythZoneMinder Settings</source>
-        <translation>MythZoneMinder indstillinger</translation>
     </message>
 </context>
 <context>
@@ -143,44 +85,44 @@
         <translation>ZoneMinder live afspiller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="45"/>
         <source>[R] = Running
 [S] = Stopped</source>
         <translation>[R] = Kører
 [S] = Stoppet</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Select Camera:</source>
         <translation>Vælg kamera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="47"/>
         <source>Select Date:</source>
         <translation>Vælg dato:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="48"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="49"/>
         <source>Record</source>
         <translation>Optag</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="50"/>
         <source>Cancel</source>
         <translation>Annuller</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
+        <location filename="themestrings.h" line="51"/>
         <source>Store</source>
         <translation>Gem</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="48"/>
+        <location filename="themestrings.h" line="52"/>
         <source>[x]</source>
         <translation>[x]</translation>
     </message>
@@ -310,17 +252,37 @@
         <translation>Skærm 4</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
+        <location filename="themestrings.h" line="41"/>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Name:</source>
+        <translation>Navn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="43"/>
+        <source>Duration:</source>
+        <translation>Varighed:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="44"/>
+        <source>ZoneMinder Live</source>
+        <translation>ZoneMinder live</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="53"/>
         <source>Show Console</source>
         <translation>Vis konsol</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
+        <location filename="themestrings.h" line="54"/>
         <source>Show Live View</source>
         <translation>Direkte visning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="55"/>
         <source>Show Events</source>
         <translation>Vis events</translation>
     </message>
@@ -333,7 +295,7 @@
         <translation>Kan ikke forbinde til mythzmserveren. Kører den? Har du indtastet den rigitge IP og port i indstillingerne?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmclient.cpp" line="194"/>
+        <location filename="../mythzoneminder/zmclient.cpp" line="200"/>
         <source>The mythzmserver didn&apos;t respond to our request to get the protocol version!!</source>
         <translation>Mythzmserveren svarede ikke på en forespørgsel om protokol versionen!!</translation>
     </message>
@@ -341,12 +303,12 @@
 <context>
     <name>ZMConsole</name>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="211"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="208"/>
         <source>Running</source>
         <translation>Kører</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmconsole.cpp" line="216"/>
+        <location filename="../mythzoneminder/zmconsole.cpp" line="213"/>
         <source>Stopped</source>
         <translation>Stoppet</translation>
     </message>
@@ -365,39 +327,39 @@
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="179"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="350"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="365"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="354"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="369"/>
         <source>All Cameras</source>
         <translation>Alle kameraer</translation>
     </message>
     <message>
         <location filename="../mythzoneminder/zmevents.cpp" line="182"/>
-        <location filename="../mythzoneminder/zmevents.cpp" line="374"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="378"/>
         <source>All Dates</source>
         <translation>Alle datoer</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="450"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="454"/>
         <source>Refresh</source>
         <translation>Genindlæs</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="451"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="455"/>
         <source>Change View</source>
         <translation>Skift visning</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="452"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="456"/>
         <source>Delete All</source>
         <translation>Slet alle</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="464"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="468"/>
         <source>Delete All Events?</source>
         <translation>Slet alle events?</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmevents.cpp" line="465"/>
+        <location filename="../mythzoneminder/zmevents.cpp" line="469"/>
         <source>Deleting %1 events in this view.</source>
         <translation>Sletter %1 events i denne visning.</translation>
     </message>
@@ -405,12 +367,12 @@
 <context>
     <name>ZMLivePlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="124"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="119"/>
         <source>Can&apos;t show live view.</source>
         <translation>Kan ikke starte live visning.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmliveplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmliveplayer.cpp" line="120"/>
         <source>You don&apos;t have any monitors defined!</source>
         <translation>Du har ikke defineret nogen skærme!</translation>
     </message>
@@ -418,31 +380,90 @@
 <context>
     <name>ZMPlayer</name>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="289"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="101"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="290"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="107"/>
         <source>Delete</source>
         <translation>Slet</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="113"/>
         <source>Previous</source>
         <translation>Forrige</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="125"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="119"/>
         <source>Next</source>
         <translation>Næste</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="296"/>
-        <location filename="../mythzoneminder/zmplayer.cpp" line="375"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="297"/>
+        <location filename="../mythzoneminder/zmplayer.cpp" line="376"/>
         <source>Play</source>
         <translation>Afspil</translation>
+    </message>
+</context>
+<context>
+    <name>ZMSettings</name>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="18"/>
+        <source>IP address of the MythZoneMinder server</source>
+        <translation>IP adresse for MythZoneMinder-serveren</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="20"/>
+        <source>Enter the IP address of the MythZoneMinder server that this frontend should connect to.</source>
+        <translation>Indtast IP adressen på MythZoneMinder-serveren som denne frontend skal forbinde til.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="29"/>
+        <source>Port the server runs on</source>
+        <translation>Porten som serveren kører på</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="31"/>
+        <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
+        <translation>Medmindre du har en god grund til det, så lad være med at ændre denne.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="39"/>
+        <source>Date format</source>
+        <translation>Dato format</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="42"/>
+        <source>Samples are shown using today&apos;s date.</source>
+        <translation>Eksempler bruger datoen for idag til at vise dato formatet.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="47"/>
+        <source>Samples are shown using tomorrow&apos;s date.</source>
+        <translation>Eksempler bruger datoen for imorgen til at vise dato formatet.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="66"/>
+        <source>Your preferred date format to use on the events screens. %1</source>
+        <extracomment>%1 gives additional info on the date used</extracomment>
+        <translation>Dit foretrukne datoformat som benyttes på event skærmene. %1</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="75"/>
+        <source>Time format</source>
+        <translation>Tidsformat</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="83"/>
+        <source>Your preferred time format to display on the events screens.</source>
+        <translation>Dit foretrukne tidsformat som benyttes på event skærmene.</translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="91"/>
+        <source>MythZoneMinder Settings</source>
+        <translation>MythZoneMinder indstillinger</translation>
     </message>
 </context>
 </TS>

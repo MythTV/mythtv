@@ -430,7 +430,7 @@ bool RecorderBase::GetKeyframePositions(
              (it.key() <= (uint64_t)end); ++it)
         map[it.key()] = *it;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC +
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("GetKeyframePositions(%1,%2,#%3) out of %4")
             .arg(start).arg(end).arg(map.size()).arg(positionMap.size()));
 
@@ -452,7 +452,7 @@ bool RecorderBase::GetKeyframeDurations(
              (it.key() <= (uint64_t)end); ++it)
         map[it.key()] = *it;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC +
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
         QString("GetKeyframeDurations(%1,%2,#%3) out of %4")
             .arg(start).arg(end).arg(map.size()).arg(durationMap.size()));
 

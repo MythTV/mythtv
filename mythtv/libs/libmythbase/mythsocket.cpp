@@ -330,6 +330,19 @@ bool MythSocket::ReadStringList(QStringList &list, uint timeoutMS)
 bool MythSocket::SendReceiveStringList(
     QStringList &strlist, uint min_reply_length, uint timeoutMS)
 {
+    if (m_callback)
+    {
+        // If callbacks are enabled then SendReceiveStringList() will conflict
+        // causing failed reads and socket disconnections - see #11777
+        // SendReceiveStringList() should NOT be used with an event socket, only
+        // the control socket
+        LOG(VB_GENERAL, LOG_EMERG, QString("Programmer Error! "
+                                           "SendReceiveStringList(%1) used on "
+                                           "socket with callbacks.")
+                                .arg(strlist.isEmpty() ? "empty" : strlist[0]));
+        return false;
+    }
+
     if (!WriteStringList(strlist))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to send command.");
@@ -348,11 +361,13 @@ bool MythSocket::SendReceiveStringList(
         return false;
     }
 
+#if 0
     if (!strlist.empty() && strlist[0] == "BACKEND_MESSAGE")
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Got MythEvent on non-event socket");
         return false;
     }
+#endif
 
     return true;
 }

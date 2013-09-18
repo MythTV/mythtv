@@ -1854,15 +1854,14 @@ void Scheduler::run(void)
 
         nextWakeTime = min(nextWakeTime, nextStartTime);
         QDateTime curtime = MythDate::current();
-        int secs_to_next =
-            max(qint64(curtime.secsTo(nextStartTime)), qint64(0));
+        int secs_to_next = curtime.secsTo(nextStartTime);
         int sched_sleep = max(curtime.msecsTo(nextWakeTime), qint64(0));
         bool haveRequests = HaveQueuedRequests();
         bool checkSlaves = lastSleepCheck.secsTo(curtime) >= 300;
 
         // If we're about to start a recording don't do any reschedules...
         // instead sleep for a bit
-        if (secs_to_next < schedRunTime ||
+        if ((secs_to_next > -60 && secs_to_next < schedRunTime) ||
             (!haveRequests && !checkSlaves))
         {
             if (sched_sleep)

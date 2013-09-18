@@ -45,7 +45,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
 
             MythPopupBox::showOkPopup(
                 GetMythMainWindow(), tr("Channel Importer"),
-                channels ? 
+                channels ?
                 (m_success ? tr("Found %n channel(s)", "", channels) :
                              tr("Failed to find any new channels!"))
                            : tr("Failed to find any channels."));
@@ -314,7 +314,7 @@ void ChannelImporter::InsertChannels(
         if (new_chan)
         {
             //: %n is the number of channels, %1 is the type of channel
-            QString msg = tr("Found %n new non-conflicting %1 channel(s).", 
+            QString msg = tr("Found %n new non-conflicting %1 channel(s).",
                               "", new_chan).arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
@@ -1364,7 +1364,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     }
     else if (is_interactive)
     {
-        cout << msg.toLatin1().constData()          
+        cout << msg.toLatin1().constData()
              << endl
              << tr("Do you want to:").toLatin1().constData()
              << endl
