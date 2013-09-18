@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <QStandardPaths>
-
 #include <QDir>
 #include <QCoreApplication>
 
