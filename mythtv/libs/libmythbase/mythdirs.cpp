@@ -41,7 +41,7 @@ void InitializeMythDirs(void)
     sharedir = qgetenv( "ProgramData"  ) + "\\mythtv\\";
 
     if (confdir.length() == 0)
-        confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv\\";
+        confdir  = qgetenv( "LOCALAPPDATA" ) + "\\mythtv";
 
   #if 0
     // The following code only works for Qt 5.0 and above, but it may
