@@ -41,7 +41,7 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 {
     gCoreContext->addListener(this);
 
-    m_installDir = GetInstallPrefix();
+    m_appBinDir = GetAppBinDir();
     m_preRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll");
     m_idleWaitForRecordingTime =
                        gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
@@ -105,7 +105,7 @@ bool WelcomeDialog::Create(void)
 void WelcomeDialog::startFrontend(void)
 {
     QString startFECmd = gCoreContext->GetSetting("MythWelcomeStartFECmd",
-                         m_installDir + "/bin/mythfrontend");
+                         m_appBinDir + "mythfrontend");
 
     myth_system(startFECmd, kMSDisableUDPListener);
     updateAll();
@@ -127,7 +127,7 @@ void WelcomeDialog::checkAutoStart(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup
-    QString command = m_installDir + "/bin/mythshutdown --startup";
+    QString command = m_appBinDir + "mythshutdown --startup";
     command += logPropagateArgs;
     uint state = myth_system(command);
 
@@ -267,11 +267,11 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         else if (action == "0")
         {
             QString mythshutdown_status =
-                m_installDir + "/bin/mythshutdown --status 0";
+                m_appBinDir + "mythshutdown --status 0";
             QString mythshutdown_unlock =
-                m_installDir + "/bin/mythshutdown --unlock";
+                m_appBinDir + "mythshutdown --unlock";
             QString mythshutdown_lock =
-                m_installDir + "/bin/mythshutdown --lock";
+                m_appBinDir + "mythshutdown --lock";
 
             uint statusCode;
             statusCode = myth_system(mythshutdown_status + logPropagateArgs);
@@ -297,7 +297,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "STARTSETUP")
         {
-            QString mythtv_setup = m_installDir + "/bin/mythtv-setup";
+            QString mythtv_setup = m_appBinDir + "mythtv-setup";
             myth_system(mythtv_setup + logPropagateArgs);
         }
         else
@@ -530,7 +530,7 @@ void WelcomeDialog::updateStatusMessage(void)
         m_statusList.append(tr("MythTV is busy recording."));
     }
 
-    QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
+    QString mythshutdown_status = m_appBinDir + "mythshutdown --status 0";
     uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
 
     if (!(statusCode & 0xFF00))
@@ -601,7 +601,7 @@ void WelcomeDialog::showMenu(void)
 
     m_menuPopup->SetReturnEvent(this, "action");
 
-    QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
+    QString mythshutdown_status = m_appBinDir + "mythshutdown --status 0";
     uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
@@ -617,7 +617,7 @@ void WelcomeDialog::showMenu(void)
 
 void WelcomeDialog::lockShutdown(void)
 {
-    QString command = m_installDir + "/bin/mythshutdown --lock";
+    QString command = m_appBinDir + "mythshutdown --lock";
     command += logPropagateArgs;
     myth_system(command);
     updateStatusMessage();
@@ -626,7 +626,7 @@ void WelcomeDialog::lockShutdown(void)
 
 void WelcomeDialog::unlockShutdown(void)
 {
-    QString command = m_installDir + "/bin/mythshutdown --unlock";
+    QString command = m_appBinDir + "mythshutdown --unlock";
     command += logPropagateArgs;
     myth_system(command);
     updateStatusMessage();
@@ -673,7 +673,7 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // don't shutdown if we are about to start a wakeup/shutdown period
-    QString command = m_installDir + "/bin/mythshutdown --status 0";
+    QString command = m_appBinDir + "mythshutdown --status 0";
     command += logPropagateArgs;
 
     uint statusCode = myth_system(command);
@@ -717,8 +717,13 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // run command to set wakeuptime in bios and shutdown the system
-    command = "sudo " + m_installDir + "/bin/mythshutdown --shutdown";
-    command += logPropagateArgs;
+    command = QString();
+
+#ifndef _WIN32
+    command = "sudo ";
+#endif
+
+    command += m_appBinDir + "mythshutdown --shutdown" + logPropagateArgs;
 
     myth_system(command);
 }

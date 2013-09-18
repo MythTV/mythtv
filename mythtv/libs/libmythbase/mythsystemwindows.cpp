@@ -718,6 +718,10 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
     if( timeout )
         m_timeout += time(NULL);
 
+    LPCWSTR pDir = NULL;
+    if (dir.length() > 0)
+        pDir = (LPCWSTR)dir.utf16();
+
     bool success = CreateProcess( NULL,
                     (LPWSTR)sCmd.utf16(),       // command line 
                     NULL,          // process security attributes 
@@ -725,7 +729,7 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
                     bInherit,      // handles are inherited
                     0,             // creation flags 
                     NULL,          // use parent's environment 
-                    (LPCWSTR)dir.utf16(),   // use parent's current directory 
+                    pDir,          // use parent's current directory
                    &si,            // STARTUPINFO pointer 
                    &pi);           // receives PROCESS_INFORMATION 
 

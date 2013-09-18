@@ -66,7 +66,7 @@ class WelcomeDialog : public MythScreenType
     QTimer        *m_updateStatusTimer; // audited ref #5318
     QTimer        *m_updateScreenTimer; // audited ref #5318
 
-    QString        m_installDir;
+    QString        m_appBinDir;
     QString        m_timeFormat;
     QString        m_dateFormat;
     bool           m_isRecording;
