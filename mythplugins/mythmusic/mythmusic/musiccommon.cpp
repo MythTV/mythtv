@@ -1497,11 +1497,7 @@ void MusicCommon::customEvent(QEvent *event)
                 MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
                 if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
                 {
-                    // work around a bug in MythUIButtonlist not updating properly after removing the last item
-                    if (m_currentPlaylist->GetCount() == 1)
-                        m_currentPlaylist->Reset();
-                    else
-                        m_currentPlaylist->RemoveItem(item);
+                    m_currentPlaylist->RemoveItem(item);
                     break;
                 }
             }
