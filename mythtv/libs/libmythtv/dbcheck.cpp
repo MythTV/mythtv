@@ -2480,6 +2480,48 @@ NULL
             return false;
     }
 
+    if (dbver == "1317")
+    {
+        const char *updates[] = {
+            "CREATE TABLE IF NOT EXISTS gallery_directories ("
+            "  dir_id       INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+            "  filename     VARCHAR(255) NOT NULL,"
+            "  name         VARCHAR(255) NOT NULL,"
+            "  path         VARCHAR(255) NOT NULL,"
+            "  parent_id    INT(11) NOT NULL,"
+            "  dir_count    INT(11) NOT NULL DEFAULT '0',"
+            "  file_count   INT(11) NOT NULL DEFAULT '0',"
+            "  hidden       TINYINT(1) NOT NULL DEFAULT '0'"
+            ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            "CREATE TABLE IF NOT EXISTS gallery_files ("
+            "  file_id      INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+            "  filename     VARCHAR(255) NOT NULL,"
+            "  name         VARCHAR(255) NOT NULL,"
+            "  path         VARCHAR(255) NOT NULL,"
+            "  dir_id       INT(11) NOT NULL DEFAULT '0',"
+            "  type         INT(11) NOT NULL DEFAULT '0',"
+            "  modtime      INT(11) NOT NULL DEFAULT '0',"
+            "  size         INT(11) NOT NULL DEFAULT '0',"
+            "  extension    VARCHAR(255) NOT NULL,"
+            "  angle        INT(11) NOT NULL DEFAULT '0',"
+            "  date         INT(11) NOT NULL DEFAULT '0',"
+            "  zoom         INT(11) NOT NULL DEFAULT '0',"
+            "  hidden       TINYINT(1) NOT NULL DEFAULT '0',"
+            "  orientation  INT(11) NOT NULL DEFAULT '0'"
+            ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            "INSERT INTO settings VALUES ('ImageStorageGroupName', 'Images', NULL);",
+            "INSERT INTO settings VALUES ('ImageSortOrder', 0, NULL);",
+            "INSERT INTO settings VALUES ('ImageShowHiddenFiles', 0, NULL);",
+            "INSERT INTO settings VALUES ('ImageSlideShowTime', 3500, NULL);",
+            "INSERT INTO settings VALUES ('ImageTransitionType', 1, NULL);",
+            "INSERT INTO settings VALUES ('ImageTransitionTime', 1000, NULL);",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1318", dbver))
+            return false;
+    }
+    
 
     return true;
 }

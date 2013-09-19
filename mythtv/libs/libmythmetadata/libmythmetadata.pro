@@ -25,6 +25,7 @@ HEADERS += mythuiimageresults.h
 HEADERS += musicmetadata.h musicutils.h metaio.h metaiotaglib.h
 HEADERS += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
 HEADERS += metaiowavpack.h metaioid3.h metaiooggvorbis.h
+HEADERS += imagemetadata.h imageutils.h imagescan.h imagescanthread.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
@@ -35,6 +36,7 @@ SOURCES += mythuiimageresults.cpp
 SOURCES += musicmetadata.cpp musicutils.cpp metaio.cpp metaiotaglib.cpp
 SOURCES += metaioflacvorbis.cpp metaioavfcomment.cpp metaiomp4.cpp
 SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggvorbis.cpp
+SOURCES += imagemetadata.cpp imageutils.cpp imagescan.cpp imagescanthread.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
@@ -94,6 +96,7 @@ inc.files += musicmetadata.h musicutils.h
 inc.files += metaio.h metaiotaglib.h
 inc.files += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
 inc.files += metaiowavpack.h metaioid3.h metaiooggvorbis.h
+inc.files += imagemetadata.h imageutils.h imagescan.h imagescanthread.h
 
 INSTALLS += inc
 
@@ -107,4 +110,4 @@ use_hidesyms {
 
 include ( ../libs-targetfix.pro )
 
-LIBS += $$EXTRA_LIBS $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS -lexiv2
