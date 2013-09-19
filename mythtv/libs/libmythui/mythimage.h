@@ -45,7 +45,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 
     bool IsGradient() const { return m_isGradient; }
     bool IsReflected() const { return m_isReflected; }
-    bool IsRotated() const { return m_isRotated; }
 
     void SetToYUV(void) { m_isYUV = true; }
     void ConvertToYUV(void);
@@ -56,7 +55,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     bool Load(MythImageReader *reader);
     bool Load(const QString &filename, bool scale = true);
 
-    void Rotate(int rotationAngle, QSize size);
     void Resize(const QSize &newSize, bool preserveAspect = false);
     void Reflect(ReflectAxis axis, int shear, int scale, int length,
                  int spacing = 0);
@@ -81,7 +79,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     QString GetFileName(void) const { return m_FileName; }
 
     void setIsReflected(bool reflected) { m_isReflected = reflected; }
-    void setIsRotated(bool rotated) { m_isRotated = rotated; }
 
     void SetIsInCache(bool bCached);
 
@@ -106,7 +103,6 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     int m_gradAlpha;
     FillDirection m_gradDirection;
 
-    bool m_isRotated;
     bool m_isReflected;
     bool m_isYUV;
 

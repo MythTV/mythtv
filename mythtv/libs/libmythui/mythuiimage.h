@@ -56,14 +56,12 @@ class ImageProperties
     bool isGreyscale;
     bool isReflected;
     bool isMasked;
-    bool isRotated;
 
     ReflectAxis reflectAxis;
     int reflectScale;
     int reflectLength;
     int reflectShear;
     int reflectSpacing;
-    int rotationAngle;
 
   private:
     void Init(void);
@@ -120,8 +118,6 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     virtual void Pulse(void);
 
     virtual void LoadNow(void);
-
-    void SetRotation(int rotationAngle);
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,

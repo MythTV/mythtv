@@ -41,7 +41,6 @@ MythImage::MythImage(MythPainter *parent, const char *name) :
     m_gradAlpha = 255;
     m_gradDirection = FillTopToBottom;
 
-    m_isRotated = false;
     m_isReflected = false;
     m_isYUV = false;
 
@@ -111,24 +110,6 @@ void MythImage::Assign(const QImage &img)
 void MythImage::Assign(const QPixmap &pix)
 {
     Assign(pix.toImage());
-}
-
-void MythImage::Rotate(int rotationAngle, QSize size)
-{
-    if (m_isRotated)
-        return;
-
-    QMatrix matrix;
-    matrix.rotate(rotationAngle);
-    Assign(transformed(matrix, Qt::SmoothTransformation));
-
-    // TODO: The rotated image is higher than the parent area
-    // the image needs to be resized to be with the areas dimensions
-    if (!size.isNull())
-    {
-        Resize(size, true);
-    }
-    m_isRotated = true;
 }
 
 void MythImage::Resize(const QSize &newSize, bool preserveAspect)
