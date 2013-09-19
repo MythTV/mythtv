@@ -54,8 +54,6 @@ class PlaybackSock : public ReferenceCounter
     bool isMediaServer(void) const { return mediaserver; }
     void setAsMediaServer(void) { mediaserver = true; }
 
-    bool isExpectingReply(void) const { return expectingreply; }
-
     void setIP(QString &lip) { ip = lip; }
     QString getIP(void) const { return ip; }
 
@@ -118,7 +116,6 @@ class PlaybackSock : public ReferenceCounter
 
     QMutex sockLock;
 
-    bool expectingreply;
     bool disconnected;
 
     MainServer *m_parent;

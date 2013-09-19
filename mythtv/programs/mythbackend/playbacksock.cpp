@@ -28,7 +28,6 @@ PlaybackSock::PlaybackSock(
     ip = "";
     backend = false;
     mediaserver = false;
-    expectingreply = false;
 
     disconnected = false;
     blockshutdown = true;
@@ -81,7 +80,7 @@ bool PlaybackSock::SendReceiveStringList(
 
     {
         QMutexLocker locker(&sockLock);
-        expectingreply = true;
+        sock->SetReadyReadCallbackEnabled(false);
 
         ok = sock->SendReceiveStringList(strlist);
         while (ok && strlist[0] == "BACKEND_MESSAGE")
@@ -98,8 +97,7 @@ bool PlaybackSock::SendReceiveStringList(
 
             ok = sock->ReadStringList(strlist);
         }
-
-        expectingreply = false;
+        sock->SetReadyReadCallbackEnabled(true);
     }
 
     sock->DecrRef();
