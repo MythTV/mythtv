@@ -425,16 +425,6 @@ void MainServer::NewConnection(int socketDescriptor)
 
 void MainServer::readyRead(MythSocket *sock)
 {
-    sockListLock.lockForRead();
-    PlaybackSock *testsock = GetPlaybackBySock(sock);
-    bool expecting_reply = testsock && testsock->isExpectingReply();
-    sockListLock.unlock();
-    if (expecting_reply)
-    {
-        LOG(VB_GENERAL, LOG_INFO, "readyRead ignoring, expecting reply");
-        return;
-    }
-
     threadPool.startReserved(
         new ProcessRequestRunnable(*this, sock),
         "ProcessRequest", PRT_TIMEOUT);
@@ -6247,6 +6237,9 @@ void MainServer::reconnectTimeout(void)
         }
     }
 
+    // Calling SendReceiveStringList() with callbacks enabled is asking for
+    // trouble, our reply might be swallowed by readyRead
+    masterServerSock->SetReadyReadCallbackEnabled(false);
     if (!masterServerSock->SendReceiveStringList(strlist, 1) ||
         (strlist[0] == "ERROR"))
     {
@@ -6268,6 +6261,7 @@ void MainServer::reconnectTimeout(void)
         masterServerReconnect->start(kMasterServerReconnectTimeout);
         return;
     }
+    masterServerSock->SetReadyReadCallbackEnabled(true);
 
     masterServer = new PlaybackSock(this, masterServerSock, server,
                                     kPBSEvents_Normal);
