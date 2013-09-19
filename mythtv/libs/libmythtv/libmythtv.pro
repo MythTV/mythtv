@@ -320,6 +320,8 @@ using_frontend {
     SOURCES += mythiowrapper.cpp        tvbrowsehelper.cpp
     SOURCES += netstream.cpp
 
+    win32-msvc*:SOURCES += ../../platform/win32/msvc/src/posix/dirent.c
+
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h
     SOURCES += textsubtitleparser.cpp   xine_demux_sputext.cpp

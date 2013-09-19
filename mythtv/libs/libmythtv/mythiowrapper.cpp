@@ -24,10 +24,6 @@
 
 #include "mythiowrapper.h"
 
-#ifndef _MSC_VER
-#  define HAS_DIR
-#endif
-
 const int maxID = 1024 * 1024;
 
 QReadWriteLock            m_fileWrapperLock;
