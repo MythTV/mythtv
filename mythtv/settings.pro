@@ -108,7 +108,6 @@ win32 {
         DEFINES += __STDC_CONSTANT_MACROS
         DEFINES += __STDC_FORMAT_MACROS
         DEFINES += __STDC_LIMIT_MACROS
-        DEFINES += HAS_DIR
 
         debug  :DEFINES += _DEBUG
         release:DEFINES += NDEBUG

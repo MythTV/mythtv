@@ -36,10 +36,7 @@ QReadWriteLock            m_dirWrapperLock;
 QHash <int, QStringList>  m_remotedirs;
 QHash <int, int>          m_remotedirPositions;
 QHash <int, QString>      m_dirnames;
-
-#ifdef HAS_DIR
 QHash <int, DIR *>        m_localdirs;
-#endif
 
 class Callback
 {
@@ -387,8 +384,6 @@ int mythfile_exists(const char *path, const char *file)
 
 //////////////////////////////////////////////////////////////////////////////
 
-#ifdef HAS_DIR
-
 static int getNextDirID(void)
 {
     int id = 100000;
@@ -533,7 +528,6 @@ char *mythdir_readdir(int dirID)
 
     return result;
 }
-#endif
 } // extern "C"
 
 /////////////////////////////////////////////////////////////////////////////
