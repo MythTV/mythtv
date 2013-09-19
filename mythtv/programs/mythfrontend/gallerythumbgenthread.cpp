@@ -6,7 +6,7 @@
 #include "mythcontext.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-#include "mythsystem.h"
+#include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
 #include "imagemetadata.h"
@@ -215,7 +215,7 @@ void GalleryThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
     args << "--infile"  << '"' + im->m_fileName + '"';
     args << "--outfile" << '"' + im->m_thumbFileNameList->at(0) + '"';
 
-    MythSystem ms(cmd, args, kMSRunShell);
+    MythSystemLegacy ms(cmd, args, kMSRunShell);
     ms.SetDirectory(im->m_thumbPath);
     ms.Run();
 
