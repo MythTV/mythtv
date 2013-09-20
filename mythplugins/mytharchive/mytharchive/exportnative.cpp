@@ -352,18 +352,18 @@ void ExportNative::saveConfiguration(void)
 
     // save new list of archive items to DB
     ArchiveItem *a;
+    query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
+                    "description, startdate, starttime, size, filename, hascutlist, "
+                    "duration, cutduration, videowidth, videoheight, filecodec,"
+                    "videocodec, encoderprofile) "
+                    "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
+                    ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST, :DURATION, "
+                    ":CUTDURATION, :VIDEOWIDTH, :VIDEOHEIGHT, :FILECODEC, "
+                    ":VIDEOCODEC, :ENCODERPROFILE);");
     for (int x = 0; x < m_archiveList.size(); x++)
     {
         a = m_archiveList.at(x);
 
-        query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
-                "description, startdate, starttime, size, filename, hascutlist, "
-                "duration, cutduration, videowidth, videoheight, filecodec,"
-                "videocodec, encoderprofile) "
-                "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST, :DURATION, "
-                ":CUTDURATION, :VIDEOWIDTH, :VIDEOHEIGHT, :FILECODEC, "
-                ":VIDEOCODEC, :ENCODERPROFILE);");
         query.bindValue(":TYPE", a->type);
         query.bindValue(":TITLE", a->title);
         query.bindValue(":SUBTITLE", a->subtitle);

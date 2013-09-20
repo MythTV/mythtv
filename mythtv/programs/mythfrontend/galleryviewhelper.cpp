@@ -139,7 +139,7 @@ void GalleryViewHelper::LoadTreeData()
     // If the parentId is not one of the directories in the storage group
     // then add a additional directory at the beginning of the list that
     // is of the type kUpDirectory so that the user can navigate one level up.
-    if (!m_dbHelper->GetStorageDirIDs(m_sgDirList).contains(id))
+    if (!m_dbHelper->GetStorageDirIDs().contains(id))
     {
         m_dbHelper->LoadParentDirectory(dirList, id);
         LoadTreeNodeData(dirList, m_currentNode);
