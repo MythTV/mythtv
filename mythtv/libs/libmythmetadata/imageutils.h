@@ -8,7 +8,11 @@
 // Note: Older versions of Exiv2 don't have the exiv2.hpp include
 // file.  Using image.hpp instead seems to work.
 //#include <exiv2/exiv2.hpp>
+#ifdef _MSC_VER
+#include <exiv2/src/image.hpp>
+#else
 #include <exiv2/image.hpp>
+#endif
 
 // MythTV headers
 #include "mythdbcon.h"
