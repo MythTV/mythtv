@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{831EF580-92C8-4CA8-B0CE-3D906280A54D}</ProjectGuid>
+    <RootNamespace>exiv2lib</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugDWin32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">build\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">build\$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>msvc64/include;msvc64/include/exiv2;xmpsdk/include;xmpsdk/src;../expat/lib;../zlib</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;EXV_HAVE_DLL;EXV_BUILDING_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:LIBMTD %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(Platform)\$(Configuration)\xmpsdk.lib;..\expat\$(Platform)\bin\$(Configuration)\libexpat.lib;..\zlib\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)exiv2.dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>$(TargetDir)\exiv2.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ProgramDatabaseFile>$(TargetDir)exiv2.pdb</ProgramDatabaseFile>
+      <ManifestFile>$(IntDir)exiv2$(TargetExt).intermediate.manifest</ManifestFile>
+      <ProfileGuidedDatabase>$(TargetDir)exiv2.pgd</ProfileGuidedDatabase>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MinSpace</Optimization>
+      <AdditionalIncludeDirectories>msvc64/include;msvc64/include/exiv2;xmpsdk/include;xmpsdk/src;../expat/lib;../zlib</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_NDEBUG;EXV_HAVE_DLL;EXV_BUILDING_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:LIBCMT %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(Platform)\$(Configuration)\xmpsdk.lib;..\expat\$(Platform)\bin\$(Configuration)\libexpat.lib;..\zlib\zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)exiv2.dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>$(TargetDir)\exiv2.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ProgramDatabaseFile>$(TargetDir)exiv2.pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(TargetDir)exiv2.pgd</ProfileGuidedDatabase>
+      <ManifestFile>$(IntDir)exiv2$(TargetExt).intermediate.manifest</ManifestFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\basicio.cpp" />
+    <ClCompile Include="src\bmpimage.cpp" />
+    <ClCompile Include="src\canonmn.cpp" />
+    <ClCompile Include="src\convert.cpp" />
+    <ClCompile Include="src\cr2image.cpp" />
+    <ClCompile Include="src\crwimage.cpp" />
+    <ClCompile Include="src\datasets.cpp" />
+    <ClCompile Include="src\easyaccess.cpp" />
+    <ClCompile Include="src\epsimage.cpp" />
+    <ClCompile Include="src\error.cpp" />
+    <ClCompile Include="src\exif.cpp" />
+    <ClCompile Include="src\fujimn.cpp" />
+    <ClCompile Include="src\futils.cpp" />
+    <ClCompile Include="src\gifimage.cpp" />
+    <ClCompile Include="src\image.cpp" />
+    <ClCompile Include="src\iptc.cpp" />
+    <ClCompile Include="src\jp2image.cpp" />
+    <ClCompile Include="src\jpgimage.cpp" />
+    <ClCompile Include="src\localtime.c" />
+    <ClCompile Include="src\makernote.cpp" />
+    <ClCompile Include="src\metadatum.cpp" />
+    <ClCompile Include="src\minoltamn.cpp" />
+    <ClCompile Include="src\mrwimage.cpp" />
+    <ClCompile Include="src\nikonmn.cpp" />
+    <ClCompile Include="src\olympusmn.cpp" />
+    <ClCompile Include="src\orfimage.cpp" />
+    <ClCompile Include="src\panasonicmn.cpp" />
+    <ClCompile Include="src\pentaxmn.cpp" />
+    <ClCompile Include="src\pgfimage.cpp" />
+    <ClCompile Include="src\pngchunk.cpp" />
+    <ClCompile Include="src\pngimage.cpp" />
+    <ClCompile Include="src\preview.cpp" />
+    <ClCompile Include="src\properties.cpp" />
+    <ClCompile Include="src\psdimage.cpp" />
+    <ClCompile Include="src\rafimage.cpp" />
+    <ClCompile Include="src\rw2image.cpp" />
+    <ClCompile Include="src\samsungmn.cpp" />
+    <ClCompile Include="src\sigmamn.cpp" />
+    <ClCompile Include="src\sonymn.cpp" />
+    <ClCompile Include="src\tags.cpp" />
+    <ClCompile Include="src\tgaimage.cpp" />
+    <ClCompile Include="src\tiffcomposite.cpp" />
+    <ClCompile Include="src\tiffimage.cpp" />
+    <ClCompile Include="src\tiffvisitor.cpp" />
+    <ClCompile Include="src\types.cpp" />
+    <ClCompile Include="src\value.cpp" />
+    <ClCompile Include="src\version.cpp" />
+    <ClCompile Include="src\xmp.cpp" />
+    <ClCompile Include="src\xmpsidecar.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\basicio.hpp" />
+    <ClInclude Include="src\bmpimage.hpp" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="src\convert.hpp" />
+    <ClInclude Include="src\cr2image.hpp" />
+    <ClInclude Include="src\crwimage.hpp" />
+    <ClInclude Include="src\datasets.hpp" />
+    <ClInclude Include="src\easyaccess.hpp" />
+    <ClInclude Include="src\epsimage.hpp" />
+    <ClInclude Include="src\error.hpp" />
+    <ClInclude Include="src\exif.hpp" />
+    <ClInclude Include="src\futils.hpp" />
+    <ClInclude Include="src\gifimage.hpp" />
+    <ClInclude Include="src\image.hpp" />
+    <ClInclude Include="src\iptc.hpp" />
+    <ClInclude Include="src\jp2image.hpp" />
+    <ClInclude Include="src\jpgimage.hpp" />
+    <ClInclude Include="src\makernote.hpp" />
+    <ClInclude Include="src\metadatum.hpp" />
+    <ClInclude Include="src\mrwimage.hpp" />
+    <ClInclude Include="src\orfimage.hpp" />
+    <ClInclude Include="src\pgfimage.hpp" />
+    <ClInclude Include="src\pngimage.hpp" />
+    <ClInclude Include="src\preview.hpp" />
+    <ClInclude Include="src\properties.hpp" />
+    <ClInclude Include="src\psdimage.hpp" />
+    <ClInclude Include="src\rafimage.hpp" />
+    <ClInclude Include="src\rcsid.hpp" />
+    <ClInclude Include="src\rw2image.hpp" />
+    <ClInclude Include="src\tags.hpp" />
+    <ClInclude Include="src\tgaimage.hpp" />
+    <ClInclude Include="src\tiffcomposite.hpp" />
+    <ClInclude Include="src\tiffimage.hpp" />
+    <ClInclude Include="src\tiffvisitor.hpp" />
+    <ClInclude Include="src\types.hpp" />
+    <ClInclude Include="src\value.hpp" />
+    <ClInclude Include="src\version.hpp" />
+    <ClInclude Include="src\xmp.hpp" />
+    <ClInclude Include="src\xmpsidecar.hpp" />
+    <ClInclude Include="msvc64\include\exv_msvc.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

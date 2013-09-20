@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{09877CF4-83B6-44FE-A2E2-629AA5C8093E}</ProjectGuid>
+    <RootNamespace>xmpsdk</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\build\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\build\$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>msvc64/include;msvc64/include/exiv2;xmpsdk/include;xmpsdk/src;../expat/lib;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DebugDLL;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)xmpsdk.lib</OutputFile>
+      <AdditionalLibraryDirectories>..\expat\win32\bin\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>msvc64/include;msvc64/include/exiv2;xmpsdk/include;xmpsdk/src;../expat/lib;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)xmpsdk.lib</OutputFile>
+      <AdditionalLibraryDirectories>..\expat\win32\bin\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="xmpsdk\src\ExpatAdapter.cpp" />
+    <ClCompile Include="xmpsdk\src\MD5.cpp" />
+    <ClCompile Include="xmpsdk\src\ParseRDF.cpp" />
+    <ClCompile Include="xmpsdk\src\UnicodeConversions.cpp" />
+    <ClCompile Include="xmpsdk\src\WXMPIterator.cpp" />
+    <ClCompile Include="xmpsdk\src\WXMPMeta.cpp" />
+    <ClCompile Include="xmpsdk\src\WXMPUtils.cpp" />
+    <ClCompile Include="xmpsdk\src\XML_Node.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPCore_Impl.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPIterator.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPMeta-GetSet.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPMeta-Parse.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPMeta-Serialize.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPMeta.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPUtils-FileInfo.cpp" />
+    <ClCompile Include="xmpsdk\src\XMPUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="xmpsdk\src\ExpatAdapter.hpp" />
+    <ClInclude Include="xmpsdk\src\MD5.h" />
+    <ClInclude Include="xmpsdk\include\TXMPFiles.hpp" />
+    <ClInclude Include="xmpsdk\include\TXMPIterator.hpp" />
+    <ClInclude Include="xmpsdk\include\TXMPMeta.hpp" />
+    <ClInclude Include="xmpsdk\include\TXMPUtils.hpp" />
+    <ClInclude Include="xmpsdk\src\UnicodeConversions.hpp" />
+    <ClInclude Include="xmpsdk\include\client-glue\WXMP_Common.hpp" />
+    <ClInclude Include="xmpsdk\include\client-glue\WXMPFiles.hpp" />
+    <ClInclude Include="xmpsdk\include\client-glue\WXMPIterator.hpp" />
+    <ClInclude Include="xmpsdk\include\client-glue\WXMPMeta.hpp" />
+    <ClInclude Include="xmpsdk\include\client-glue\WXMPUtils.hpp" />
+    <ClInclude Include="xmpsdk\src\XMLParserAdapter.hpp" />
+    <ClInclude Include="xmpsdk\include\XMP.hpp" />
+    <ClInclude Include="xmpsdk\src\XMP_BuildInfo.h" />
+    <ClInclude Include="xmpsdk\include\XMP_Const.h" />
+    <ClInclude Include="xmpsdk\include\XMP_Environment.h" />
+    <ClInclude Include="xmpsdk\include\XMP_Version.h" />
+    <ClInclude Include="xmpsdk\src\XMPCore_Impl.hpp" />
+    <ClInclude Include="xmpsdk\src\XMPIterator.hpp" />
+    <ClInclude Include="xmpsdk\src\XMPMeta.hpp" />
+    <ClInclude Include="xmpsdk\src\XMPUtils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xmpsdk\include\client-glue\TXMPFiles.incl_cpp" />
+    <None Include="xmpsdk\include\client-glue\TXMPIterator.incl_cpp" />
+    <None Include="xmpsdk\include\client-glue\TXMPMeta.incl_cpp" />
+    <None Include="xmpsdk\include\client-glue\TXMPUtils.incl_cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
