@@ -38,13 +38,7 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ImageMetadataInfoList  >();
-            qRegisterMetaType< ImageMetadataInfoList* >();
-
-            ImageMetadataInfo::InitializeCustomTypes();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -87,5 +81,16 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
 
 Q_DECLARE_METATYPE( DTC::ImageMetadataInfoList  )
 Q_DECLARE_METATYPE( DTC::ImageMetadataInfoList* )
+
+namespace DTC
+{
+inline void ImageMetadataInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ImageMetadataInfoList  >();
+    qRegisterMetaType< ImageMetadataInfoList* >();
+
+    ImageMetadataInfo::InitializeCustomTypes();
+}
+}
 
 #endif // IMAGEMETADATAINFOLIST_H
