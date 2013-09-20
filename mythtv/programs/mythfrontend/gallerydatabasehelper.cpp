@@ -24,28 +24,27 @@ GalleryDatabaseHelper::~GalleryDatabaseHelper()
 
 /** \fn     GalleryDatabaseHelper::GetStorageDirIDs(QStringList)
  *  \brief  Loads the directory ids of the storage groups from the database
- *  \param  sgList The list of storage groups
  *  \return The list with the ids of the found directories
  */
-QList<int> GalleryDatabaseHelper::GetStorageDirIDs(QStringList sgList)
+// FIXME This doesn't do what it's supposed to do because we don't insert the
+//       storage group root directories into the database! The storage group
+//       needs to be inserted as the root node, with parentId of zero
+QList<int> GalleryDatabaseHelper::GetStorageDirIDs()
 {
     QList<int> sgIDs;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT dir_id FROM gallery_directories "
-                        "WHERE filename = '%1';")
-                .arg(sgList.join("' OR filename = '")));
-
-
-    if (!query.exec())
-        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
-
-    if (query.size() > 0)
-    {
-        while (query.next())
-            sgIDs.append(query.value(0).toInt());
-    }
+//     MSqlQuery query(MSqlQuery::InitCon());
+//     query.prepare("SELECT dir_id FROM gallery_directories "
+//                   "WHERE parent_id = 0;");
+//
+//
+//     if (!query.exec())
+//         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
+//
+//     while (query.next())
+//     {
+//         sgIDs.append(query.value(0).toInt());
+//     }
 
     return sgIDs;
 }
@@ -63,29 +62,25 @@ void GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* dbList, 
     dbList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT "
-                        "dir_id, filename, name, path, parent_id, "
-                        "dir_count, file_count, "
-                        "hidden "
-                        "FROM gallery_directories "
-                        "WHERE dir_id = '%1';")
-                .arg(parentId));
+    query.prepare("SELECT "
+                  "dir_id, filename, name, path, parent_id, "
+                  "dir_count, file_count, "
+                  "hidden "
+                  "FROM gallery_directories "
+                  "WHERE dir_id = :PARENTID;");
+    query.bindValue(":PARENTID", parentId);
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    if (query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
-        {
-            ImageMetadata *im = new ImageMetadata();
-            LoadDirectoryValues(query, im);
+        ImageMetadata *im = new ImageMetadata();
+        LoadDirectoryValues(query, im);
 
-            // Overwrite the folder type
-            im->m_type = kUpDirectory;
-            dbList->append(im);
-        }
+        // Overwrite the folder type
+        im->m_type = kUpDirectory;
+        dbList->append(im);
     }
 }
 
@@ -101,24 +96,19 @@ void GalleryDatabaseHelper::LoadDirectories(QMap<QString, ImageMetadata *>* dbLi
     dbList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT "
-                        "dir_id, filename, name, path, parent_id, "
-                        "dir_count, file_count, "
-                        "hidden "
-                        "FROM gallery_directories"));
+    query.prepare("SELECT "
+                   "dir_id, filename, name, path, parent_id, "
+                   "dir_count, file_count, hidden "
+                   "FROM gallery_directories");
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    if (query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
-        {
-            ImageMetadata *im = new ImageMetadata();
-            LoadDirectoryValues(query, im);
-            dbList->insert(im->m_fileName, im);
-        }
+        ImageMetadata *im = new ImageMetadata();
+        LoadDirectoryValues(query, im);
+        dbList->insert(im->m_fileName, im);
     }
 }
 
@@ -135,29 +125,25 @@ void GalleryDatabaseHelper::LoadDirectories(QList<ImageMetadata *>* dbList, int 
     dbList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT "
+    query.prepare("SELECT "
                         "dir_id, filename, name, path, parent_id, "
                         "dir_count, file_count, "
                         "hidden "
                         "FROM gallery_directories "
-                        "WHERE (parent_id = '%1') "
-                        "AND (hidden = '0' OR hidden = '%2') "
-                        "ORDER BY name ASC;")
-                .arg(parentId)
-                .arg(gCoreContext->GetNumSetting("GalleryShowHiddenFiles")));
+                        "WHERE (parent_id = :PARENTID) "
+                        "AND (hidden = '0' OR hidden = :HIDDEN) "
+                        "ORDER BY name ASC;");
+    query.bindValue(":PARENTID", parentId);
+    query.bindValue(":HIDDEN", gCoreContext->GetNumSetting("GalleryShowHiddenFiles"));
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    if (query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
-        {
-            ImageMetadata *im = new ImageMetadata();
-            LoadDirectoryValues(query, im);
-            dbList->append(im);
-        }
+        ImageMetadata *im = new ImageMetadata();
+        LoadDirectoryValues(query, im);
+        dbList->append(im);
     }
 }
 
@@ -173,25 +159,20 @@ void GalleryDatabaseHelper::LoadFiles(QMap<QString, ImageMetadata *>* dbList)
     dbList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT "
-                        "file_id, filename, name, path, dir_id, "
-                        "type, modtime, size, extension, "
-                        "angle, date, zoom, "
-                        "hidden, orientation "
-                        "FROM gallery_files"));
+    query.prepare("SELECT "
+                    "file_id, filename, name, path, dir_id, "
+                    "type, modtime, size, extension, "
+                    "angle, date, zoom, hidden, orientation "
+                    "FROM gallery_files");
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    if (query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
-        {
-            ImageMetadata *im = new ImageMetadata();
-            LoadFileValues(query, im);
-            dbList->insert(im->m_fileName, im);
-        }
+        ImageMetadata *im = new ImageMetadata();
+        LoadFileValues(query, im);
+        dbList->insert(im->m_fileName, im);
     }
 }
 
@@ -209,31 +190,26 @@ void GalleryDatabaseHelper::LoadFiles(QList<ImageMetadata *>* dbList, int parent
     dbList->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("SELECT "
-                        "file_id, filename, name, path, dir_id, "
-                        "type, modtime, size, extension, "
-                        "angle, date, zoom, "
-                        "hidden, orientation "
-                        "FROM gallery_files "
-                        "WHERE (dir_id = '%1') "
-                        "AND (hidden = '0' OR hidden = '%2') "
-                        "ORDER BY %3;")
-                .arg(parentId)
-                .arg(gCoreContext->GetNumSetting("GalleryShowHiddenFiles"))
-                .arg(GetSortOrder()));
+    query.prepare("SELECT "
+                    "file_id, filename, name, path, dir_id, "
+                    "type, modtime, size, extension, "
+                    "angle, date, zoom, hidden, orientation "
+                    "FROM gallery_files "
+                    "WHERE (dir_id = :PARENTID) "
+                    "AND (hidden = '0' OR hidden = :HIDDEN) "
+                    "ORDER BY :ORDERBY");
+    query.bindValue(":PARENTID", parentId);
+    query.bindValue(":HIDDEN", gCoreContext->GetNumSetting("GalleryShowHiddenFiles"));
+    query.bindValue(":ORDERBY", GetSortOrder());
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    if (query.size() > 0)
+    while (query.next())
     {
-        while (query.next())
-        {
-            ImageMetadata *im = new ImageMetadata();
-            LoadFileValues(query, im);
-            dbList->append(im);
-        }
+        ImageMetadata *im = new ImageMetadata();
+        LoadFileValues(query, im);
+        dbList->append(im);
     }
 }
 
@@ -247,15 +223,14 @@ void GalleryDatabaseHelper::LoadFiles(QList<ImageMetadata *>* dbList, int parent
 int GalleryDatabaseHelper::InsertDirectory(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("INSERT INTO gallery_directories ("
+    query.prepare("INSERT INTO gallery_directories ("
                         "filename, name, path, parent_id, "
                         "dir_count, file_count, "
                         "hidden "
                         ") VALUES ("
                         ":FILENAME, :NAME, :PATH, :PARENT_ID, "
                         ":DIRCOUNT, :FILECOUNT, "
-                        ":HIDDEN);"));
+                        ":HIDDEN)");
     query.bindValue(":FILENAME",    im->m_fileName);
     query.bindValue(":NAME",        im->m_name);
     query.bindValue(":PATH",        im->m_path);
@@ -280,17 +255,16 @@ int GalleryDatabaseHelper::InsertDirectory(ImageMetadata *im)
 int GalleryDatabaseHelper::InsertFile(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("INSERT INTO gallery_files ("
-                        "filename, name, path, dir_id, "
-                        "type, modtime, size, extension, "
-                        "angle, date, zoom, "
-                        "hidden, orientation "
-                        ") VALUES ("
-                        ":FILENAME, :NAME, :PATH, :DIR_ID, "
-                        ":TYPE, :MODTIME, :SIZE, :EXTENSION, "
-                        ":ANGLE, :DATE, :ZOOM, "
-                        ":HIDDEN, :ORIENT)"));
+    query.prepare("INSERT INTO gallery_files ("
+                    "filename, name, path, dir_id, "
+                    "type, modtime, size, extension, "
+                    "angle, date, zoom, "
+                    "hidden, orientation "
+                    ") VALUES ("
+                    ":FILENAME, :NAME, :PATH, :DIR_ID, "
+                    ":TYPE, :MODTIME, :SIZE, :EXTENSION, "
+                    ":ANGLE, :DATE, :ZOOM, "
+                    ":HIDDEN, :ORIENT)");
     query.bindValue(":FILENAME",    im->m_fileName);
     query.bindValue(":NAME",        im->m_name);
     query.bindValue(":PATH",        im->m_path);
@@ -321,16 +295,15 @@ int GalleryDatabaseHelper::InsertFile(ImageMetadata *im)
 void GalleryDatabaseHelper::UpdateDirectory(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("UPDATE gallery_directories SET "
-                        "filename =     :FILENAME, "
-                        "name =         :NAME, "
-                        "path =         :PATH, "
-                        "parent_id =    :PARENT_ID, "
-                        "dir_count =    :DIR_COUNT, "
-                        "file_count =   :FILE_COUNT, "
-                        "hidden =       :HIDDEN "
-                        "WHERE dir_id = :ID;"));
+    query.prepare("UPDATE gallery_directories SET "
+                    "filename =     :FILENAME, "
+                    "name =         :NAME, "
+                    "path =         :PATH, "
+                    "parent_id =    :PARENT_ID, "
+                    "dir_count =    :DIR_COUNT, "
+                    "file_count =   :FILE_COUNT, "
+                    "hidden =       :HIDDEN "
+                    "WHERE dir_id = :ID;");
     query.bindValue(":FILENAME",    im->m_fileName);
     query.bindValue(":NAME",        im->m_name);
     query.bindValue(":PATH",        im->m_path);
@@ -354,22 +327,21 @@ void GalleryDatabaseHelper::UpdateDirectory(ImageMetadata *im)
 void GalleryDatabaseHelper::UpdateFile(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("UPDATE gallery_files SET "
-                        "filename       = :FILENAME, "
-                        "name           = :NAME, "
-                        "path           = :PATH, "
-                        "dir_id         = :DIR_ID, "
-                        "type           = :TYPE, "
-                        "modtime        = :MODTIME, "
-                        "size           = :SIZE, "
-                        "extension      = :EXTENSION, "
-                        "angle          = :ANGLE, "
-                        "date           = :DATE, "
-                        "zoom           = :ZOOM, "
-                        "hidden         = :HIDDEN, "
-                        "orientation    = :ORIENT "
-                        "WHERE file_id  = :ID;"));
+    query.prepare("UPDATE gallery_files SET "
+                    "filename       = :FILENAME, "
+                    "name           = :NAME, "
+                    "path           = :PATH, "
+                    "dir_id         = :DIR_ID, "
+                    "type           = :TYPE, "
+                    "modtime        = :MODTIME, "
+                    "size           = :SIZE, "
+                    "extension      = :EXTENSION, "
+                    "angle          = :ANGLE, "
+                    "date           = :DATE, "
+                    "zoom           = :ZOOM, "
+                    "hidden         = :HIDDEN, "
+                    "orientation    = :ORIENT "
+                    "WHERE file_id  = :ID;");
     query.bindValue(":FILENAME",    im->m_fileName);
     query.bindValue(":NAME",        im->m_name);
     query.bindValue(":PATH",        im->m_path);
@@ -399,9 +371,7 @@ void GalleryDatabaseHelper::UpdateFile(ImageMetadata *im)
 void GalleryDatabaseHelper::RemoveDirectory(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("DELETE from gallery_directories "
-                        "WHERE dir_id = :ID;"));
+    query.prepare("DELETE from gallery_directories WHERE dir_id = :ID;");
     query.bindValue(":ID", im->m_id);
 
     if (!query.exec())
@@ -418,9 +388,7 @@ void GalleryDatabaseHelper::RemoveDirectory(ImageMetadata *im)
 void GalleryDatabaseHelper::RemoveFile(ImageMetadata *im)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-                QString("DELETE from gallery_files "
-                        "WHERE file_id = :ID;"));
+    query.prepare("DELETE from gallery_files WHERE file_id = :ID;");
     query.bindValue(":ID", im->m_id);
 
     if (!query.exec())
@@ -550,25 +518,29 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
     // Try to get four new thumbnail filenames
     // from the available images in this folder
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT filename, path FROM gallery_files "
-                          "WHERE path LIKE '\%%1\%' "
+    query.prepare("SELECT filename, path FROM gallery_files "
+                          "WHERE path LIKE :PATH "
                           "AND type = '4' "
-                          "AND hidden = '0' LIMIT %2;")
-                  .arg(im->m_fileName)
-                  .arg(kMaxFolderThumbnails));
+                          "AND hidden = '0' LIMIT :LIMIT");
+    query.bindValue(":PATH", im->m_path);
+    query.bindValue(":LIMIT", kMaxFolderThumbnails);
 
     if (!query.exec())
         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
 
-    for (int i = 0; i < query.size(); ++i)
+    int i = 0;
+    while (query.next())
     {
-        query.next();
         QString thumbFileName = QString("%1%2")
                 .arg(GetConfDir().append("/MythImage/"))
                 .arg(query.value(0).toString());
 
+        if (i >= im->m_thumbFileNameList->size())
+            break;
+
         im->m_thumbFileNameList->replace(i, thumbFileName);
         im->m_thumbPath = query.value(1).toString();
+        ++i;
     }
 
     // Set the path to the thumbnail files. As a default this will be
