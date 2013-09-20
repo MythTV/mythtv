@@ -188,7 +188,6 @@ switch( $BuildType )
 
 # ---------------------------------------------------------------------------
 
-
 $tools = @{ "nmake"             = "Path";
             "cmake"             = "Path";
             "nasm"              = "Path";
@@ -202,7 +201,10 @@ $tools = @{ "nmake"             = "Path";
             "mp3lame.lib"       = "Build";
             "tag.lib"           = "Build";
             "libzmq.lib"        = "Build";
-            "FFmpeg"            = "Build"
+            "FFmpeg"            = "Build";
+            "libexpat.lib"      = "Build";
+            "xmpsdk.lib"        = "Build";
+            "exiv2.lib"         = "Build"
           }
 
 $bToolsValid = $TRUE
@@ -490,6 +492,155 @@ switch ($tools.Get_Item( 'tag.lib'))
         # -- Copy lib to shared folder
         Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.lib   $DestDir
         Copy-Item $basePath\platform\win32\msvc\external\taglib\taglib\*.dll   $DestDir
+    }
+}
+
+# ---------------------------------------------------------------------------
+
+switch ($tools.Get_Item( 'libexpat.lib'))
+{
+    Clean
+    {
+        Write-Host "Clean: expat" -foregroundcolor cyan
+
+        if (Test-Path $basePath\platform\win32\msvc\external\expat\lib\expat.vcxproj )
+        {
+            Run-Exe "$basePath\platform\win32\msvc\external\expat\lib\"   `
+                    "msbuild.exe"                                     `
+                    @( "/target:clean",                               `
+                       "expat.vcxproj" )
+        }
+
+        Remove-Item $basePath\platform\win32\msvc\external\expat\lib\expat.vcxproj*.*  -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\bin\debug\libexpat.*                                     -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\libexpat.*                                   -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\platform\win32\msvc\external\expat\win32\bin\debug\*.*   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\platform\win32\msvc\external\expat\win32\bin\release\*.* -ErrorAction SilentlyContinue
+    }
+
+    Build
+    {
+        Write-Host "Building: expat" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.lib ))
+        {
+            if (!(Test-Path $basePath\platform\win32\msvc\external\expat\lib\expat.vcxproj ))
+            {
+                # -- Upgrade solution to verion of visual studios being used
+
+                # & vcupgrade $basePath\platform\win32\msvc\external\expat\lib\expat.dspj
+
+                Run-Exe "$basePath\platform\win32\msvc\external\expat\lib\" `
+                        "vcupgrade.exe"                                     `
+                        @( "expat.dsp" )
+            }
+
+            # -- Build Solution
+
+            #& msbuild /target:build /p:Configuration=$BuildType $basePath\platform\win32\msvc\external\expat\lib\expat.vcxproj
+
+            Run-Exe "$basePath\platform\win32\msvc\external\expat\lib\" `
+                    "msbuild.exe"                                       `
+                    @( "/target:build",                                 `
+                       "/p:Configuration=$BuildType",                   `
+                       "expat.vcxproj" )
+        }
+
+        # -- Copy dll & lib to shared folder
+
+        Copy-Item $basePath\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.lib $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\expat\win32\bin\$BuildType\*.dll $DestDir
+    }
+}
+
+# ---------------------------------------------------------------------------
+
+switch ($tools.Get_Item( 'xmpsdk.lib'))
+{
+    Clean
+    {
+        Write-Host "Clean: xmpsdk" -foregroundcolor cyan
+
+        if (Test-Path $basePath\platform\win32\msvc\external\exiv2\mythxmpsdk.vcxproj )
+        {
+            Run-Exe "$basePath\platform\win32\msvc\external\exiv2\"   `
+                    "msbuild.exe"                                     `
+                    @( "/target:clean",                               `
+                       "mythxmpsdk.vcxproj" )
+        }
+
+        Remove-Item $basePath\bin\debug\xmpsdk.*                                     -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\xmpsdk.*                                   -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\platform\win32\msvc\external\exiv2\win32\debug\xmpsdk.*   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\platform\win32\msvc\external\exiv2\win32\release\xmpsdk.* -ErrorAction SilentlyContinue
+    }
+
+    Build
+    {
+        Write-Host "Building: xmpsdk" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\exiv2\win32\$BuildType\xmpsdk.lib ))
+        {
+            # -- Build Solution
+
+            Run-Exe "$basePath\platform\win32\msvc\external\exiv2\" `
+                    "msbuild.exe"                                   `
+                    @( "/target:build",                             `
+                       "/p:Configuration=$BuildType",
+                       "mythxmpsdk.vcxproj" )
+        }
+
+        # -- Copy lib to shared folder
+
+        Copy-Item $basePath\platform\win32\msvc\external\exiv2\win32\$BuildType\xmpsdk.lib $DestDir
+    }
+}
+
+# ---------------------------------------------------------------------------
+
+switch ($tools.Get_Item( 'exiv2.lib'))
+{
+    Clean
+    {
+        Write-Host "Clean: exiv2" -foregroundcolor cyan
+
+        if (Test-Path $basePath\platform\win32\msvc\external\exiv2\mythexiv2lib.vcxproj )
+        {
+            Run-Exe "$basePath\platform\win32\msvc\external\exiv2\"   `
+                    "msbuild.exe"                                     `
+                    @( "/target:clean",                               `
+                       "mythexiv2lib.vcxproj" )
+        }
+
+        Remove-Item $basePath\bin\debug\exiv2.*                                     -ErrorAction SilentlyContinue
+        Remove-Item $basePath\bin\release\exiv2.*                                   -ErrorAction SilentlyContinue
+
+        Remove-Item $basePath\platform\win32\msvc\external\exiv2\win32\debug\exiv2.*   -ErrorAction SilentlyContinue
+        Remove-Item $basePath\platform\win32\msvc\external\exiv2\win32\release\exiv2.* -ErrorAction SilentlyContinue
+    }
+
+    Build
+    {
+        Write-Host "Building: exiv2" -foregroundcolor cyan
+
+        if (!(Test-Path $basePath\platform\win32\msvc\external\exiv2\win32\$BuildType\exiv2.lib ))
+        {
+            # -- Build Solution
+
+            Run-Exe "$basePath\platform\win32\msvc\external\exiv2\" `
+                    "msbuild.exe"                                   `
+                    @( "/target:build",                             `
+                       "/p:Configuration=$BuildType",
+                       "mythexiv2lib.vcxproj" )
+        }
+
+        # -- Copy lib & dll to shared folder
+
+        Copy-Item $basePath\platform\win32\msvc\external\exiv2\win32\$BuildType\exiv2.lib $DestDir
+        Copy-Item $basePath\platform\win32\msvc\external\exiv2\win32\$BuildType\exiv2.dll $DestDir
     }
 }
 
