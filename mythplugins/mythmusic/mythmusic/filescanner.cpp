@@ -358,10 +358,11 @@ void FileScanner::cleanDB()
                     "LEFT JOIN music_songs s ON g.genre_id=s.genre_id "
                     "WHERE s.genre_id IS NULL;"))
         MythDB::DBError("FileScanner::cleanDB - select music_genres", query);
+
+    deletequery.prepare("DELETE FROM music_genres WHERE genre_id=:GENREID");
     while (query.next())
     {
         int genreid = query.value(0).toInt();
-        deletequery.prepare("DELETE FROM music_genres WHERE genre_id=:GENREID");
         deletequery.bindValue(":GENREID", genreid);
         if (!deletequery.exec())
             MythDB::DBError("FileScanner::cleanDB - delete music_genres",
@@ -375,10 +376,11 @@ void FileScanner::cleanDB()
                     "LEFT JOIN music_songs s ON a.album_id=s.album_id "
                     "WHERE s.album_id IS NULL;"))
         MythDB::DBError("FileScanner::cleanDB - select music_albums", query);
+
+    deletequery.prepare("DELETE FROM music_albums WHERE album_id=:ALBUMID");
     while (query.next())
     {
         int albumid = query.value(0).toInt();
-        deletequery.prepare("DELETE FROM music_albums WHERE album_id=:ALBUMID");
         deletequery.bindValue(":ALBUMID", albumid);
         if (!deletequery.exec())
             MythDB::DBError("FileScanner::cleanDB - delete music_albums",
@@ -393,10 +395,12 @@ void FileScanner::cleanDB()
                     "LEFT JOIN music_albums l ON a.artist_id=l.artist_id "
                     "WHERE s.artist_id IS NULL AND l.artist_id IS NULL"))
         MythDB::DBError("FileScanner::cleanDB - select music_artists", query);
+
+
+    deletequery.prepare("DELETE FROM music_artists WHERE artist_id=:ARTISTID");
     while (query.next())
     {
         int artistid = query.value(0).toInt();
-        deletequery.prepare("DELETE FROM music_artists WHERE artist_id=:ARTISTID");
         deletequery.bindValue(":ARTISTID", artistid);
         if (!deletequery.exec())
             MythDB::DBError("FileScanner::cleanDB - delete music_artists",
@@ -410,10 +414,11 @@ void FileScanner::cleanDB()
                     "music_songs s ON a.song_id=s.song_id WHERE "
                     "embedded='1' AND s.song_id IS NULL;"))
         MythDB::DBError("FileScanner::cleanDB - select music_albumart", query);
+
+    deletequery.prepare("DELETE FROM music_albumart WHERE albumart_id=:ALBUMARTID");
     while (query.next())
     {
         int albumartid = query.value(0).toInt();
-        deletequery.prepare("DELETE FROM music_albumart WHERE albumart_id=:ALBUMARTID");
         deletequery.bindValue(":ALBUMARTID", albumartid);
         if (!deletequery.exec())
             MythDB::DBError("FileScanner::cleanDB - delete music_albumart",
