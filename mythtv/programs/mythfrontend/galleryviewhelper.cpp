@@ -208,7 +208,7 @@ void GalleryViewHelper::RenameCurrentNode(QString &newName)
     QList<MythGenericTree *> *nodeTree = m_currentNode->getAllChildren();
     for (int i = 0; i < nodeTree->size(); i++)
     {
-        ImageMetadata *im = qVariantValue<ImageMetadata *>(nodeTree->at(i)->GetData());
+        ImageMetadata *im = nodeTree->at(i)->GetData().value<ImageMetadata *>();
         if (im)
         {
             if (im->m_name.compare(newName) == 0)
@@ -279,7 +279,7 @@ void GalleryViewHelper::DeleteSelectedNodes()
     QList<MythGenericTree *> *nodeTree = m_currentNode->getAllChildren();
     for (int i = 0; i < nodeTree->size(); i++)
     {
-        ImageMetadata *im = qVariantValue<ImageMetadata *>(nodeTree->at(i)->GetData());
+        ImageMetadata *im = nodeTree->at(i)->GetData().value<ImageMetadata *>();
         if (im && im->m_selected)
         {
             // Delete the file and remove the
@@ -340,7 +340,7 @@ void GalleryViewHelper::SetNodeSelectionState(MythGenericTree *node,
     // set the given node as selected / unselected
     if (node)
     {
-        ImageMetadata *im = qVariantValue<ImageMetadata *>(node->GetData());
+        ImageMetadata *im = node->GetData().value<ImageMetadata *>();
 
         // Allow a selection / deselection only for images
         if (im &&
@@ -458,7 +458,7 @@ ImageMetadata *GalleryViewHelper::GetImageMetadataFromSelectedNode()
     if (!node)
         return NULL;
 
-    ImageMetadata *im = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *im = node->GetData().value<ImageMetadata *>();
     if (!im)
         return NULL;
 
@@ -477,7 +477,7 @@ ImageMetadata *GalleryViewHelper::GetImageMetadataFromNode(MythGenericTree *node
     if (!node)
         return NULL;
 
-    ImageMetadata *im = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *im = node->GetData().value<ImageMetadata *>();
     if (!im)
         return NULL;
 
@@ -500,7 +500,7 @@ ImageMetadata *GalleryViewHelper::GetImageMetadataFromNode(int i)
     if (!node)
         return NULL;
 
-    ImageMetadata *im = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *im = node->GetData().value<ImageMetadata *>();
     if (!im)
         return NULL;
 

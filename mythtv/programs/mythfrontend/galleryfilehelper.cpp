@@ -4,6 +4,10 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#   include <QUrlQuery>
+#endif
+
 // MythTV headers
 #include "mythcontext.h"
 #include "storagegroup.h"
@@ -135,8 +139,18 @@ bool GalleryFileHelper::RenameFile(ImageMetadata *im, const QString &name)
              .arg(m_backendHost)
              .arg(m_backendPort));
 
-    url.addQueryItem("FileName", im->m_fileName);
-    url.addQueryItem("NewName", name);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    QUrl &urlQuery = url;
+#else
+    QUrlQuery urlQuery;
+#endif
+
+    urlQuery.addQueryItem("FileName", im->m_fileName);
+    urlQuery.addQueryItem("NewName", name);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    url.setQuery( urlQuery );
+#endif
 
     QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
 
@@ -178,7 +192,17 @@ bool GalleryFileHelper::RemoveFile(ImageMetadata *im)
              .arg(m_backendHost)
              .arg(m_backendPort));
 
-    url.addQueryItem("FileName", im->m_fileName);
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    QUrl &urlQuery = url;
+#else
+    QUrlQuery urlQuery;
+#endif
+
+    urlQuery.addQueryItem("FileName", im->m_fileName);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    url.setQuery( urlQuery );
+#endif
 
     QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
 
@@ -221,13 +245,23 @@ bool GalleryFileHelper::SetImageOrientation(ImageMetadata *im)
 
     bool ok = false;
 
-    QUrl url(QString("http://%1:%2/Image/SetImageInfo")
+    QUrl url( QString("http://%1:%2/Image/SetImageInfo")
              .arg(m_backendHost)
              .arg(m_backendPort));
 
-    url.addQueryItem("Id", QString::number(im->m_id));
-    url.addQueryItem("Tag", "Exif.Image.Orientation");
-    url.addQueryItem("Value", QString::number(im->GetOrientation()));
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    QUrl &urlQuery = url;
+#else
+    QUrlQuery urlQuery;
+#endif
+
+    urlQuery.addQueryItem("Id", QString::number(im->m_id));
+    urlQuery.addQueryItem("Tag", "Exif.Image.Orientation");
+    urlQuery.addQueryItem("Value", QString::number(im->GetOrientation()));
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    url.setQuery( urlQuery );
+#endif
 
     QByteArray ba = SendRequest(url, QNetworkAccessManager::PostOperation);
     if (ba.count() > 0)
@@ -267,7 +301,17 @@ QByteArray GalleryFileHelper::GetExifValues(ImageMetadata *im)
              .arg(m_backendHost)
              .arg(m_backendPort));
 
-    url.addQueryItem("Id", QString::number(im->m_id));
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    QUrl &urlQuery = url;
+#else
+    QUrlQuery urlQuery;
+#endif
+
+    urlQuery.addQueryItem("Id", QString::number(im->m_id));
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    url.setQuery( urlQuery );
+#endif
 
     return SendRequest(url, QNetworkAccessManager::GetOperation);
 }

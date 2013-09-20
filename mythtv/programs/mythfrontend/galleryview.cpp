@@ -445,7 +445,7 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
     // update the position in the node list
     m_galleryViewHelper->m_currentNode->setSelectedChild(node);
 
-    ImageMetadata *im = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *im = node->GetData().value<ImageMetadata *>();
     if (!im)
         return;
 
@@ -1408,7 +1408,7 @@ ImageMetadata *GalleryView::GetImageMetadataFromSelectedButton()
     if (!node)
         return NULL;
 
-    ImageMetadata *data = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *data = node->GetData().value<ImageMetadata *>();
     if (!data)
         return NULL;
 
@@ -1431,7 +1431,7 @@ ImageMetadata *GalleryView::GetImageMetadataFromButton(MythUIButtonListItem *ite
     if (!node)
         return NULL;
 
-    ImageMetadata *data = qVariantValue<ImageMetadata *>(node->GetData());
+    ImageMetadata *data = node->GetData().value<ImageMetadata *>();
     if (!data)
         return NULL;
 
