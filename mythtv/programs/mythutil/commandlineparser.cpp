@@ -10,6 +10,8 @@ MythUtilCommandLineParser::MythUtilCommandLineParser() :
 
 void MythUtilCommandLineParser::LoadArguments(void)
 {
+    QStringList ChanidStartimeVideo;
+    ChanidStartimeVideo << "chanid" << "starttime" << "video";
     CommandLineArg::AllowOneOf( QList<CommandLineArg*>()
         // fileutils.cpp
         << add("--copyfile", "copyfile", false,
@@ -40,37 +42,37 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--gencutlist", "gencutlist", false,
                 "Copy the commercial skip list to the cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--getcutlist", "getcutlist", false,
                 "Display the current cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--setcutlist", "setcutlist", "",
                 "Set a new cutlist in the form:\n"
                 "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--clearcutlist", "clearcutlist", false,
                 "Clear the cutlist.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--getskiplist", "getskiplist", false,
                 "Display the current commercial skip list.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--setskiplist", "setskiplist", "",
                 "Set a new commercial skip list in the form:\n"
                 "#-#[,#-#]... (ie, 1-100,1520-3012,4091-5094)", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--clearskiplist", "clearskiplist", false,
                 "Clear the commercial skip list.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
         << add("--clearseektable", "clearseektable", false,
                 "Clear the seek table.", "")
                 ->SetGroup("Recording Markup")
-                ->SetRequiredChild(QStringList("chanid") << "starttime")
+                ->SetParentOf(ChanidStartimeVideo)
 
         // backendutils.cpp
         << add("--resched", "resched", false,
@@ -191,6 +193,14 @@ void MythUtilCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
     allowExtras();
+    // Note: This globally prevents --chanid and --video from being
+    // used together, but this is almost certainly a valid restriction
+    // in all cases.
+    CommandLineArg::AllowOneOf(QList<CommandLineArg*>() <<
+                               new CommandLineArg("chanid") <<
+                               add("--video", "video", "",
+                                   "Specify path name of Video Gallery video "
+                                   "to operate on.", ""));
 }
 
 QString MythUtilCommandLineParser::GetHelpHeader(void) const
