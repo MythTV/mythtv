@@ -2345,7 +2345,8 @@ void MythCommandLineParser::addRecording(void)
         ->SetRequires("starttime");
 
     add("--starttime", "starttime", QDateTime(),
-            "Specify start time of recording to operate on.", "");
+            "Specify start time of recording to operate on.", "")
+        ->SetRequires("chanid");
 }
 
 /** \brief Canned argument definition for --geometry

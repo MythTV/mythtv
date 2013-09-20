@@ -11,6 +11,12 @@
 bool GetProgramInfo(const MythUtilCommandLineParser &cmdline,
                     ProgramInfo &pginfo)
 {
+    if (cmdline.toBool("video"))
+    {
+        QString video = cmdline.toString("video");
+        pginfo = ProgramInfo(video);
+        return true;
+    }
     if (!cmdline.toBool("chanid"))
     {
         LOG(VB_GENERAL, LOG_ERR, "No chanid specified");
