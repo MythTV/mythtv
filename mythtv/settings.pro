@@ -109,6 +109,8 @@ win32 {
         DEFINES += __STDC_FORMAT_MACROS
         DEFINES += __STDC_LIMIT_MACROS
 
+        #DEFINES += QT_DISABLE_DEPRECATED_BEFORE
+
         debug  :DEFINES += _DEBUG
         release:DEFINES += NDEBUG
 
@@ -129,6 +131,8 @@ win32 {
         INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/external
 
         win32-msvc2010:INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/include-2010
+
+        INCLUDEPATH += $$SRC_PATH_BARE/platform/win32/msvc/external/exiv2/msvc64/include
 
         # have visual studio place all DLL, EXE & lib files in the following directory
 
