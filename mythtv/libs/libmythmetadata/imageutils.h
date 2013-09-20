@@ -5,7 +5,10 @@
 #include <QDirIterator>
 
 // Other headers
-#include <exiv2/exiv2.hpp>
+// Note: Older versions of Exiv2 don't have the exiv2.hpp include
+// file.  Using image.hpp instead seems to work.
+//#include <exiv2/exiv2.hpp>
+#include <exiv2/image.hpp>
 
 // MythTV headers
 #include "mythdbcon.h"
