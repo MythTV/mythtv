@@ -272,7 +272,6 @@ check_lib_cxx(){
 PLUGIN_LIST="
 archive
 browser
-flix
 gallery
 game
 music
@@ -280,6 +279,11 @@ netvision
 news
 weather
 zoneminder
+"
+
+DEPRECATED_PLUGIN_LIST="
+flix
+gallery
 "
 
 CONFIG_LIST="
@@ -298,6 +302,7 @@ mp3lame
 "
 
 enable $PLUGIN_LIST $CONFIG_LIST $DEPEND_LIST
+disable $DEPRECATED_PLUGIN_LIST
 
 prefix="/usr/local"
 libdir_name="lib"
@@ -327,7 +332,7 @@ Generic options:
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
   --enable-all             Enable all options
-  --enable-opengl          enable OpenGL (Music and Gallery) [$opengl]
+  --enable-opengl          enable OpenGL (MythGallery) [$opengl]
   --previous               use previous configure parameters if possible
 
 MythArchive related options:
@@ -416,6 +421,8 @@ for opt do
   eval $(echo "$opt" | sed 's/--/action=/;s/-myth/ option=/;s/-/_/g')
   if is_in $option $PLUGIN_LIST; then
       $action $option
+  elif is_in $option $DEPRECATED_PLUGIN_LIST; then
+      $action $option
   else
       die_unknown $opt
   fi
@@ -431,10 +438,10 @@ for opt do
   --icc-profile=*) icc=`echo $opt | cut -d '=' -f 2`
   ;;
   --enable-all)
-      enable $PLUGIN_LIST $CONFIG_LIST
+      enable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
   ;;
   --disable-all)
-      disable $PLUGIN_LIST $CONFIG_LIST
+      disable $DEPRECATED_PLUGIN_LIST $PLUGIN_LIST $CONFIG_LIST
   ;;
   --enable-?*|--disable-?*)
   eval $(echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g')
