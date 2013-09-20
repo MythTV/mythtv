@@ -781,9 +781,13 @@ QStringList StorageGroup::getRecordingsGroups(void)
     sql.append(" );");
 
     query.prepare(sql);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
+    {
         while (query.next())
+        {
             groups += query.value(0).toString();
+        }
+    }
 
     groups.sort();
     groups.detach();
@@ -813,7 +817,7 @@ QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
     if (!host.isEmpty())
         query.bindValue(":HOSTNAME", host);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         QString dirname;
         while (query.next())
