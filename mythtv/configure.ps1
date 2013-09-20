@@ -245,7 +245,7 @@ foreach( $key in $($tools.keys))
 
         Build
         {
-            if ($Force)
+            if (($Force) -and ($key -ne "FFmpeg"))
             {
                 Write-Host "Build" -ForegroundColor Yellow
                 $Tools[ $Key ] = "Build"
