@@ -26,11 +26,7 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes()
-        {
-            qRegisterMetaType< ImageSyncInfo  >();
-            qRegisterMetaType< ImageSyncInfo* >();
-        }
+        static inline void InitializeCustomTypes();
 
     public:
 
@@ -59,5 +55,14 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
 
 Q_DECLARE_METATYPE( DTC::ImageSyncInfo  )
 Q_DECLARE_METATYPE( DTC::ImageSyncInfo* )
+
+namespace DTC
+{
+inline void ImageSyncInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ImageSyncInfo  >();
+    qRegisterMetaType< ImageSyncInfo* >();
+}
+}
 
 #endif // IMAGESYNCINFO_H
