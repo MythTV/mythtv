@@ -81,7 +81,7 @@ setup(
         version='0.26.0',
         description='MythTV Python bindings.',
         long_description='Provides canned database and protocol access to the MythTV database, mythproto, mythxml, and frontend remote control.',
-        packages=['MythTV', 'MythTV/tmdb', 'MythTV/tmdb3', 'MythTV/ttvdb',
+        packages=['MythTV', 'MythTV/tmdb3', 'MythTV/ttvdb',
                   'MythTV/wikiscripts', 'MythTV/utility'],
         package_dir={'MythTV/tmdb3':'./tmdb3/tmdb3'},
         data_files=[('MythTV/tmdb/XSLT',glob.glob('MythTV/tmdb/XSLT/*')), ('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
