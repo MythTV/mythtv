@@ -84,7 +84,7 @@ setup(
         packages=['MythTV', 'MythTV/tmdb3', 'MythTV/ttvdb',
                   'MythTV/wikiscripts', 'MythTV/utility'],
         package_dir={'MythTV/tmdb3':'./tmdb3/tmdb3'},
-        data_files=[('MythTV/tmdb/XSLT',glob.glob('MythTV/tmdb/XSLT/*')), ('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
+        data_files=[('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
         url=['http://www.mythtv.org/'],
         scripts=SCRIPTS,
         requires=['MySQLdb','lxml'],
