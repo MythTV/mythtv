@@ -19,6 +19,7 @@ GalleryView::GalleryView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
       m_menuPopup(NULL),
       m_confirmPopup(NULL),
+      m_inputPopup(NULL),
       m_imageList(NULL),
       m_captionText(NULL),
       m_crumbsText(NULL),

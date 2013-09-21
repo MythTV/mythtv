@@ -306,6 +306,8 @@ bool Image::RemoveImage( int id )
         return false;
     }
 
+    delete im;
+
     // Remove the database entry if the file has been deleted.
     return RemoveImageFromDB(id);
 }

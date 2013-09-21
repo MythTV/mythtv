@@ -156,11 +156,8 @@ void GalleryViewHelper::LoadTreeData()
     m_thumbGenThread->start();
 
     // clean up
-    if (dirList)
-        delete dirList;
-
-    if (fileList)
-        delete fileList;
+    delete dirList;
+    delete fileList;
 }
 
 

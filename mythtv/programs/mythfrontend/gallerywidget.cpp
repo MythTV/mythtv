@@ -107,36 +107,25 @@ GalleryWidget::GalleryWidget(MythScreenStack *parent,
 GalleryWidget::~GalleryWidget()
 {
     if (m_timer)
-    {
         m_timer->stop();
-        delete m_timer;
-        m_timer = NULL;
-    }
 
-    if (m_fileList)
-    {
-        delete m_fileList;
-        m_fileList = NULL;
-    }
+    delete m_timer;
+    m_timer = NULL;
 
-    if (m_fileDataList)
-    {
-        delete m_fileDataList;
-        m_fileDataList = NULL;
-    }
+    delete m_fileList;
+    m_fileList = NULL;
 
-    if (m_fh)
-    {
-        delete m_fh;
-        m_fh = NULL;
-    }
+    delete m_fileDataList;
+    m_fileDataList = NULL;
+
+    delete m_fh;
+    m_fh = NULL;
 
     if (m_ilt)
-    {
         m_ilt->wait();
-        delete m_ilt;
-        m_ilt = NULL;
-    }
+
+    delete m_ilt;
+    m_ilt = NULL;
 
     // Set the selected image in the gallery view to the saved one
     // so that the initially selected image is the correct one again.
@@ -435,10 +424,7 @@ void GalleryWidget::ShowFileDetails()
 {
     ImageMetadata *im = m_fileDataList->at(m_index);
     if (!im)
-    {
-        delete im;
         return;
-    }
 
     if (im->m_type != kImageFile)
     {

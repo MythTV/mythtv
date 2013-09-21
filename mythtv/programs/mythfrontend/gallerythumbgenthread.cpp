@@ -19,12 +19,11 @@
  *  \return void
  */
 GalleryThumbGenThread::GalleryThumbGenThread()
+        :   m_fileHelper(new GalleryFileHelper()),
+            m_dbHelper(new GalleryDatabaseHelper()),
+            m_width(0), m_height(0),
+            m_pause(false), m_fileListSize(0)
 {
-    m_fileHelper = new GalleryFileHelper();
-    m_dbHelper = new GalleryDatabaseHelper();
-
-    m_fileListSize = 0;
-    m_pause = false;
 }
 
 
