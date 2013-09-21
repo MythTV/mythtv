@@ -1144,6 +1144,10 @@ class VideoGrabber( Grabber ):
                         prefix=os.path.join(INSTALL_PREFIX, 'share/mythtv'))
         except KeyError:
             raise MythError('Invalid MythVideo grabber')
+
+        if self.path[-7:] == 'tmdb.py':
+            self.path = self.path[:-7] + 'tmdb3.py'
+
         self.append('-l',lang)
 
 #### MYTHNETVISION ####

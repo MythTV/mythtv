@@ -244,8 +244,14 @@ MetadataLookupList MetadataDownload::runGrabber(QString cmd, QStringList args,
 
 QString MetadataDownload::GetMovieGrabber()
 {
-    QString def_cmd = "metadata/Movie/tmdb.py";
+    QString def_cmd = "metadata/Movie/tmdb3.py";
     QString db_cmd = gCoreContext->GetSetting("MovieGrabber", def_cmd);
+
+    // we cannot issue a schema update to force the use of tmdb3.py, so if
+    // users attempt to use the old (and now non-functional) tmdb.py, just
+    // "do the right thing" and use the new script
+    if (db_cmd == "metadata/Movie/tmdb.py")
+        db_cmd = def_cmd;
 
     return QDir::cleanPath(QString("%1/%2")
             .arg(GetShareDir())
