@@ -511,8 +511,6 @@ switch ($tools.Get_Item( 'libexpat.lib'))
                        "expat.vcxproj" )
         }
 
-        Remove-Item $basePath\platform\win32\msvc\external\expat\lib\expat.vcxproj*.*  -ErrorAction SilentlyContinue
-
         Remove-Item $basePath\bin\debug\libexpat.*                                     -ErrorAction SilentlyContinue
         Remove-Item $basePath\bin\release\libexpat.*                                   -ErrorAction SilentlyContinue
 
