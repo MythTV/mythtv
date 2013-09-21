@@ -79,10 +79,17 @@ class System( DBCache ):
         self.path = None
 
         if setting is not None:
-            # pull setting from database, substitute from argument if needed
+            # pull local setting from database
             host = self.gethostname()
             self.path = self.settings[host][setting]
-            if (self.path is None) and (path is None):
+            if self.path is None:
+                # see if that setting is applied globally
+                self.path = self.settings['NULL'][setting]
+            if self.path is None:
+                # not set globally either, use supplied default
+                self.path = path
+            if self.path is None:
+                # no default supplied, just error out
                 raise MythDBError(MythError.DB_SETTING, setting, host)
 
         if self.path is None:
