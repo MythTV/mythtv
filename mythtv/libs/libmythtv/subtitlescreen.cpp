@@ -1225,8 +1225,10 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
     int pixelSize = m_safeArea.height() / (yscale * LINE_SPACING);
     int fontwidth = 0;
     int xmid = 0;
+    int zoom = 100;
     if (m_subScreen)
     {
+        zoom = m_subScreen->GetZoom();
         m_subScreen->SetFontSize(pixelSize);
         CC708CharacterAttribute def_attr(false, false, false, clr[0]);
         QFont *font = m_subScreen->GetFont(def_attr)->GetFace();
@@ -1234,7 +1236,7 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
         fontwidth = fm.averageCharWidth();
         xmid = m_safeArea.width() / 2;
         // Disable centering for zoom factor >= 100%
-        if (m_subScreen->GetZoom() >= 100)
+        if (zoom >= 100)
             xscale = m_safeArea.width() / fontwidth;
     }
 
@@ -1260,7 +1262,6 @@ void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
 
         int orig_y = cc->y;
         int y;
-        int zoom = m_subScreen->GetZoom();
         if (orig_y < yscale / 2)
             // top half -- anchor up
             y = (orig_y * m_safeArea.height() * zoom / (yscale * 100));
