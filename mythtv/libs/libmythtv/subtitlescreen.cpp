@@ -40,9 +40,6 @@ protected:
     const MythRect m_swOrigArea;
     const int m_swWhichImageCache; // cc708 only; -1 = none
     const long long m_swExpireTime; // avsubs only; -1 = none
-    // Delay state
-    uint32_t m_swDrawDelay; // increments every tick when !m_Visible
-    uint32_t m_swDeleteDelay; // decrements every tick; set to m_swDrawDelay on delete
 };
 
 class SubSimpleText : public MythUISimpleText, public SubWrapper
@@ -752,7 +749,7 @@ FormattedTextSubtitle::FormattedTextSubtitle(const QString &base,
 }
 
 FormattedTextSubtitle::FormattedTextSubtitle(void) :
-    m_safeArea(QRect()), m_subScreen(NULL)
+    m_start(0), m_duration(0), m_subScreen(NULL)
 {
     // make cppcheck happy
     m_xAnchorPoint = 0;

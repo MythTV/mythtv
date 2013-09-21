@@ -89,7 +89,6 @@ protected:
     QString m_base;
     QVector<FormattedTextLine> m_lines;
     const QRect m_safeArea;
-    int m_cacheNum;
     uint64_t m_start;
     uint64_t m_duration;
     SubtitleScreen *m_subScreen; // where fonts and sizes are kept
