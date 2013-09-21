@@ -922,6 +922,17 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         }
     } // for (; i < TSPacket::kSize; ++i)
 
+    // If it has been more than 511 frames since the last keyframe,
+    // pretend we have one.
+    if (hasFrame && !hasKeyFrame &&
+        (_frames_seen_count - _last_keyframe_seen) > 511)
+    {
+        hasKeyFrame = true;
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            QString("FindH264Keyframes: %1 frames without a keyframe.")
+            .arg(_frames_seen_count - _last_keyframe_seen));
+    }
+
     // _buffer_packets will only be true if a payload start has been seen
     if (hasKeyFrame && (_buffer_packets || _first_keyframe >= 0))
     {
