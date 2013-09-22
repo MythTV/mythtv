@@ -48,7 +48,7 @@ extern "C" {
 }
 
 // size of the buffer used for streaming
-#define BUFFER_SIZE 8192
+#define BUFFER_SIZE 16384
 
 // streaming callbacks
 static int ReadFunc(void *opaque, uint8_t *buf, int buf_size)
@@ -264,7 +264,7 @@ bool avfDecoder::initialize()
         probe_data.filename = filename.toLocal8Bit().constData();
         probe_data.buf_size = min(BUFFER_SIZE, (int) input()->bytesAvailable());
         probe_data.buf = m_buffer;
-        input()->read((char*)probe_data.buf, probe_data.buf_size);
+        input()->peek((char*)probe_data.buf, probe_data.buf_size);
         m_inputFormat = av_probe_input_format(&probe_data, 1);
 
         if (!m_inputFormat)
