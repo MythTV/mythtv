@@ -35,6 +35,13 @@
     </button>
 
     <button>
+        <type>IMAGES</type>
+        <text>New Image Gallery</text>
+        <description>Look at Pictures</description>
+        <action>JUMP Gallery Default</action>
+    </button>
+
+    <button>
         <type>GAME</type>
         <text>Games</text>
         <action>PLUGIN mythgame</action>
