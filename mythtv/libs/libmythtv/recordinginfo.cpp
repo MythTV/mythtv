@@ -1233,6 +1233,8 @@ void RecordingInfo::DeleteHistory(void)
 void RecordingInfo::ForgetHistory(void)
 {
     uint erecid = parentid ? parentid : recordid;
+    uint din = dupin ? dupin : kDupsInAll;
+    uint dmeth = dupmethod ? dupmethod : kDupCheckSubDesc;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
@@ -1249,7 +1251,7 @@ void RecordingInfo::ForgetHistory(void)
         MythDB::DBError("forgetRecorded1", result);
 
     // Handle other matching entries in recorded.
-    if (dupmethod && (dupin & kDupsInRecorded))
+    if (din & kDupsInRecorded)
     {
         result.prepare(
             "UPDATE recorded SET duplicate = 0 "
@@ -1299,9 +1301,9 @@ void RecordingInfo::ForgetHistory(void)
         result.bindValue(":PROGRAMID3", null_to_empty(programid));
         result.bindValue(":PROGRAMID4", null_to_empty(programid));
         result.bindValue(":PROGRAMID5", null_to_empty(programid));
-        result.bindValue(":DUPMETHOD1", dupmethod);
-        result.bindValue(":DUPMETHOD2", dupmethod);
-        result.bindValue(":DUPMETHOD3", dupmethod);
+        result.bindValue(":DUPMETHOD1", dmeth);
+        result.bindValue(":DUPMETHOD2", dmeth);
+        result.bindValue(":DUPMETHOD3", dmeth);
 
         if (!result.exec())
             MythDB::DBError("forgetRecorded2", result);
@@ -1312,7 +1314,7 @@ void RecordingInfo::ForgetHistory(void)
                    "WHERE station = :STATION "
                        "AND starttime = :STARTTIME "
                        "AND title = :TITLE;");
-    result.bindValue(":STARTTIME", recstartts);
+    result.bindValue(":STARTTIME", startts);
     result.bindValue(":TITLE", title);
     result.bindValue(":STATION", chansign);
 
@@ -1320,7 +1322,7 @@ void RecordingInfo::ForgetHistory(void)
         MythDB::DBError("forgetOldRecorded1", result);
 
     // Handle other matching entries in oldrecorded.
-    if (dupmethod && (dupin & kDupsInOldRecorded))
+    if (din & kDupsInOldRecorded)
     {
         result.prepare(
             "UPDATE oldrecorded SET duplicate = 0 "
@@ -1370,9 +1372,9 @@ void RecordingInfo::ForgetHistory(void)
         result.bindValue(":PROGRAMID3", null_to_empty(programid));
         result.bindValue(":PROGRAMID4", null_to_empty(programid));
         result.bindValue(":PROGRAMID5", null_to_empty(programid));
-        result.bindValue(":DUPMETHOD1", dupmethod);
-        result.bindValue(":DUPMETHOD2", dupmethod);
-        result.bindValue(":DUPMETHOD3", dupmethod);
+        result.bindValue(":DUPMETHOD1", dmeth);
+        result.bindValue(":DUPMETHOD2", dmeth);
+        result.bindValue(":DUPMETHOD3", dmeth);
 
         if (!result.exec())
             MythDB::DBError("forgetOldRecorded2", result);
