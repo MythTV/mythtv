@@ -520,8 +520,8 @@ ProgramInfo::ProgramInfo(
     recstatus(_recstatus),
     oldrecstatus(rsUnknown),
     rectype(_rectype),
-    dupin(kDupsInAll),
-    dupmethod(kDupCheckSubDesc),
+    dupin(0),
+    dupmethod(0),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),

@@ -1236,6 +1236,7 @@ void RecordingInfo::ForgetHistory(void)
 
     MSqlQuery result(MSqlQuery::InitCon());
 
+    // Handle this specific entry in recorded.
     result.prepare("UPDATE recorded SET duplicate = 0 "
                    "WHERE chanid = :CHANID "
                        "AND starttime = :STARTTIME "
@@ -1245,24 +1246,139 @@ void RecordingInfo::ForgetHistory(void)
     result.bindValue(":CHANID", chanid);
 
     if (!result.exec())
-        MythDB::DBError("forgetRecorded", result);
+        MythDB::DBError("forgetRecorded1", result);
 
+    // Handle other matching entries in recorded.
+    if (dupmethod && (dupin & kDupsInRecorded))
+    {
+        result.prepare(
+            "UPDATE recorded SET duplicate = 0 "
+            "WHERE duplicate = 1 AND "
+            "      title = :TITLE AND "
+            "      ( "
+            "        (:PROGRAMID1 <> '' AND "
+            "         :PROGRAMID2 = recorded.programid) "
+            "        OR "
+            "        ( "
+            "          (:PROGRAMID3 = '' OR recorded.programid = '' OR "
+            "           LEFT(:PROGRAMID4, LOCATE('/', :PROGRAMID5)) <> "
+            "             LEFT(recorded.programid, "
+            "                  LOCATE('/', recorded.programid))) "
+            "          AND "
+            "          (((:DUPMETHOD1 & 0x02) = 0) OR (:SUBTITLE1 <> '' "
+            "            AND :SUBTITLE2 = recorded.subtitle)) "
+            "          AND "
+            "          (((:DUPMETHOD2 & 0x04) = 0) OR (:DESCRIPTION1 <> '' "
+            "            AND :DESCRIPTION2 = recorded.description)) "
+            "          AND "
+            "          (((:DUPMETHOD3 & 0x08) = 0) OR "
+            "            (:SUBTITLE3 <> '' AND "
+            "             (:SUBTITLE4 = recorded.subtitle OR "
+            "              (recorded.subtitle = '' AND "
+            "               :SUBTITLE5 = recorded.description))) OR "
+            "            (:SUBTITLE6 = '' AND :DESCRIPTION3 <> '' AND "
+            "             (:DESCRIPTION4 = recorded.subtitle OR "
+            "              (recorded.subtitle = '' AND "
+            "               :DESCRIPTION5 = recorded.description)))) "
+            "        ) "
+            "      )" );
+        result.bindValue(":TITLE", title);
+        result.bindValue(":SUBTITLE1", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE2", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE3", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE4", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE5", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE6", null_to_empty(subtitle));
+        result.bindValue(":DESCRIPTION1", null_to_empty(description));
+        result.bindValue(":DESCRIPTION2", null_to_empty(description));
+        result.bindValue(":DESCRIPTION3", null_to_empty(description));
+        result.bindValue(":DESCRIPTION4", null_to_empty(description));
+        result.bindValue(":DESCRIPTION5", null_to_empty(description));
+        result.bindValue(":PROGRAMID1", null_to_empty(programid));
+        result.bindValue(":PROGRAMID2", null_to_empty(programid));
+        result.bindValue(":PROGRAMID3", null_to_empty(programid));
+        result.bindValue(":PROGRAMID4", null_to_empty(programid));
+        result.bindValue(":PROGRAMID5", null_to_empty(programid));
+        result.bindValue(":DUPMETHOD1", dupmethod);
+        result.bindValue(":DUPMETHOD2", dupmethod);
+        result.bindValue(":DUPMETHOD3", dupmethod);
+
+        if (!result.exec())
+            MythDB::DBError("forgetRecorded2", result);
+    }
+
+    // Handle this specific entry in oldrecorded.
     result.prepare("UPDATE oldrecorded SET duplicate = 0 "
-                   "WHERE duplicate = 1 "
-                   "AND title = :TITLE AND "
-                   "((programid = '' AND subtitle = :SUBTITLE"
-                   "  AND description = :DESC) OR "
-                   " (programid <> '' AND programid = :PROGRAMID) OR "
-                   " (findid <> 0 AND findid = :FINDID))");
+                   "WHERE station = :STATION "
+                       "AND starttime = :STARTTIME "
+                       "AND title = :TITLE;");
+    result.bindValue(":STARTTIME", recstartts);
     result.bindValue(":TITLE", title);
-    result.bindValue(":SUBTITLE", null_to_empty(subtitle));
-    result.bindValue(":DESC", null_to_empty(description));
-    result.bindValue(":PROGRAMID", null_to_empty(programid));
-    result.bindValue(":FINDID", findid);
+    result.bindValue(":STATION", chansign);
 
     if (!result.exec())
-        MythDB::DBError("forgetHistory", result);
+        MythDB::DBError("forgetOldRecorded1", result);
 
+    // Handle other matching entries in oldrecorded.
+    if (dupmethod && (dupin & kDupsInOldRecorded))
+    {
+        result.prepare(
+            "UPDATE oldrecorded SET duplicate = 0 "
+            "WHERE duplicate = 1 AND "
+            "      title = :TITLE AND "
+            "      ( "
+            "        (:PROGRAMID1 <> '' AND "
+            "         :PROGRAMID2 = oldrecorded.programid) "
+            "        OR "
+            "        ( "
+            "          (:PROGRAMID3 = '' OR oldrecorded.programid = '' OR "
+            "           LEFT(:PROGRAMID4, LOCATE('/', :PROGRAMID5)) <> "
+            "             LEFT(oldrecorded.programid, "
+            "                  LOCATE('/', oldrecorded.programid))) "
+            "          AND "
+            "          (((:DUPMETHOD1 & 0x02) = 0) OR (:SUBTITLE1 <> '' "
+            "            AND :SUBTITLE2 = oldrecorded.subtitle)) "
+            "          AND "
+            "          (((:DUPMETHOD2 & 0x04) = 0) OR (:DESCRIPTION1 <> '' "
+            "            AND :DESCRIPTION2 = oldrecorded.description)) "
+            "          AND "
+            "          (((:DUPMETHOD3 & 0x08) = 0) OR "
+            "            (:SUBTITLE3 <> '' AND "
+            "             (:SUBTITLE4 = oldrecorded.subtitle OR "
+            "              (oldrecorded.subtitle = '' AND "
+            "               :SUBTITLE5 = oldrecorded.description))) OR "
+            "            (:SUBTITLE6 = '' AND :DESCRIPTION3 <> '' AND "
+            "             (:DESCRIPTION4 = oldrecorded.subtitle OR "
+            "              (oldrecorded.subtitle = '' AND "
+            "               :DESCRIPTION5 = oldrecorded.description)))) "
+            "        ) "
+            "      )" );
+        result.bindValue(":TITLE", title);
+        result.bindValue(":SUBTITLE1", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE2", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE3", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE4", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE5", null_to_empty(subtitle));
+        result.bindValue(":SUBTITLE6", null_to_empty(subtitle));
+        result.bindValue(":DESCRIPTION1", null_to_empty(description));
+        result.bindValue(":DESCRIPTION2", null_to_empty(description));
+        result.bindValue(":DESCRIPTION3", null_to_empty(description));
+        result.bindValue(":DESCRIPTION4", null_to_empty(description));
+        result.bindValue(":DESCRIPTION5", null_to_empty(description));
+        result.bindValue(":PROGRAMID1", null_to_empty(programid));
+        result.bindValue(":PROGRAMID2", null_to_empty(programid));
+        result.bindValue(":PROGRAMID3", null_to_empty(programid));
+        result.bindValue(":PROGRAMID4", null_to_empty(programid));
+        result.bindValue(":PROGRAMID5", null_to_empty(programid));
+        result.bindValue(":DUPMETHOD1", dupmethod);
+        result.bindValue(":DUPMETHOD2", dupmethod);
+        result.bindValue(":DUPMETHOD3", dupmethod);
+
+        if (!result.exec())
+            MythDB::DBError("forgetOldRecorded2", result);
+    }
+
+    // Remove any never records which aren't need anymore.
     result.prepare("DELETE FROM oldrecorded "
                    "WHERE recstatus = :NEVER AND duplicate = 0");
     result.bindValue(":NEVER", rsNeverRecord);
@@ -1270,6 +1386,7 @@ void RecordingInfo::ForgetHistory(void)
     if (!result.exec())
         MythDB::DBError("forgetNeverHisttory", result);
 
+    // Handle matching entries in oldfind.
     if (findid)
     {
         result.prepare("DELETE FROM oldfind WHERE "
