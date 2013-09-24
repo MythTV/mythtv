@@ -173,7 +173,8 @@ static int ClearSeekTable(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NO_RECORDING_DATA;
 
     cout << "Clearing Seek Table\n";
-    LOG(VB_GENERAL, LOG_NOTICE,
+    LOG(VB_GENERAL, LOG_NOTICE, pginfo.IsVideo() ?
+        QString("Clearing Seek Table for Video %1").arg(pginfo.GetPathname()) :
         QString("Clearing Seek Table for Channel ID %1 @ %2")
                 .arg(pginfo.GetChanID())
                 .arg(pginfo.GetScheduledStartTime().toString()));
@@ -181,6 +182,8 @@ static int ClearSeekTable(const MythUtilCommandLineParser &cmdline)
     pginfo.ClearPositionMap(MARK_GOP_START);
     pginfo.ClearPositionMap(MARK_KEYFRAME);
     pginfo.ClearPositionMap(MARK_DURATION_MS);
+    pginfo.ClearMarkupFlag(MARK_DURATION_MS);
+    pginfo.ClearMarkupFlag(MARK_TOTAL_FRAMES);
 
     return GENERIC_EXIT_OK;
 }
