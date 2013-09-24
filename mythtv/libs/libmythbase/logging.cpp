@@ -871,7 +871,7 @@ void logPropagateCalc(void)
 #ifndef _WIN32
     if (logPropagateOpts.facility >= 0)
     {
-        CODE *syslogname;
+        const CODE *syslogname;
 
         for (syslogname = &facilitynames[0];
              (syslogname->c_name &&
@@ -1008,7 +1008,7 @@ int syslogGetFacility(QString facility)
         "Windows does not support syslog, disabling" );
     return( -2 );
 #else
-    CODE *name;
+    const CODE *name;
     int i;
     QByteArray ba = facility.toLocal8Bit();
     char *string = (char *)ba.constData();
