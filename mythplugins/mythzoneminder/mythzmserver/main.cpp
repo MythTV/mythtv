@@ -44,6 +44,7 @@
 #define EXIT_OPENING_LOGFILE_ERROR   136  // mapped to _PERMISSIONS_ERROR
 #define EXIT_DAEMONIZING_ERROR       145
 #define EXIT_SOCKET_ERROR            135
+#define EXIT_VERSION_ERROR           136
 
 using namespace std;
 
@@ -207,7 +208,18 @@ int main(int argc, char **argv)
     // load the config
     loadZMConfig(zmconfig);
 
-    cout << "ZM is version '" << g_zmversion << "'" << endl;
+    // we support version 1.24.0 or later
+    int major, minor, revision;
+    sscanf(g_zmversion.c_str(), "%d.%d.%d", &major, &minor, &revision);
+    if (major >= 1 && minor >= 24 && revision >= 0)
+    {
+        cout << "ZM is version '" << g_zmversion << "'" << endl;
+    }
+    else
+    {
+        cout << "This version of ZM is to old you need 1.24.0 or later '" << g_zmversion << "'" << endl;
+        return EXIT_VERSION_ERROR;
+    }
 
     // connect to the DB
     connectToDatabase();

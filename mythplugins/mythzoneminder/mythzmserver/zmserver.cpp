@@ -49,7 +49,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "7"
+#define ZM_PROTOCOL_VERSION "8"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -1379,13 +1379,7 @@ void ZMServer::initMonitor(MONITOR *monitor)
 
     int shared_data_size;
 
-    if (g_zmversion == "1.22.2")
-        shared_data_size = sizeof(SharedData) +
-            sizeof(TriggerData_old) +
-            ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
-            ((monitor->image_buffer_count) * monitor->frame_size);
-    else
-        shared_data_size = sizeof(SharedData) +
+    shared_data_size = sizeof(SharedData) +
             sizeof(TriggerData) +
             ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
             ((monitor->image_buffer_count) * monitor->frame_size);
@@ -1474,16 +1468,16 @@ void ZMServer::initMonitor(MONITOR *monitor)
 
     monitor->shared_data = (SharedData*)monitor->shm_ptr;
 
-    if (g_zmversion == "1.22.2")
-        monitor->shared_images = (unsigned char*) monitor->shm_ptr +
-            sizeof(SharedData) +
-            sizeof(TriggerData_old) +
-            ((monitor->image_buffer_count) * sizeof(struct timeval));
-    else
-        monitor->shared_images = (unsigned char*) monitor->shm_ptr +
+    monitor->shared_images = (unsigned char*) monitor->shm_ptr +
             sizeof(SharedData) +
             sizeof(TriggerData) +
             ((monitor->image_buffer_count) * sizeof(struct timeval));
+
+#if 0
+    // if this a v4l2 source align the buffer to 16 bytes
+    if (monitor->palette > 255)
+        monitor->shared_images = (unsigned char*) ((size_t(monitor->shared_images) + 15) & ~0x0f);
+#endif
 }
 
 int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
@@ -1529,7 +1523,6 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     // FIXME: should do some sort of compression JPEG??
     // just copy the data to our buffer for now
     memcpy(buffer, data, monitor->frame_size);
-
 
     return monitor->frame_size;
 }

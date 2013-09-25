@@ -425,7 +425,7 @@ void Player::updateFrame(const unsigned char* buffer)
 {
     unsigned int pos_data;
     unsigned int pos_rgba = 0;
-    unsigned int r,g,b;
+    unsigned char r,g,b;
 
     if (m_monitor.palette == MP_GREY)
     {
@@ -446,20 +446,11 @@ void Player::updateFrame(const unsigned char* buffer)
             r = buffer[pos_data++];
             g = buffer[pos_data++];
             b = buffer[pos_data++];
-            if (m_monitor.isV4L2)
-            {
-                m_rgba[pos_rgba++] = g;
-                m_rgba[pos_rgba++] = r;
-                m_rgba[pos_rgba++] = b;
-                m_rgba[pos_rgba++] = 0xff;
-            }
-            else
-            {
-                m_rgba[pos_rgba++] = b;
-                m_rgba[pos_rgba++] = g;
-                m_rgba[pos_rgba++] = r;
-                m_rgba[pos_rgba++] = 0xff;
-            }
+
+            m_rgba[pos_rgba++] = b;
+            m_rgba[pos_rgba++] = g;
+            m_rgba[pos_rgba++] = r;
+            m_rgba[pos_rgba++] = 0xff;
         }
     }
 
