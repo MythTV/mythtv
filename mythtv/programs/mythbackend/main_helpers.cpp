@@ -359,9 +359,14 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         cmdline.toBool("testsched"))
     {
         Scheduler *sched = new Scheduler(false, &tvList);
-        if (!cmdline.toBool("testsched") &&
-            gCoreContext->ConnectToMasterServer())
+        if (cmdline.toBool("printsched"))
         {
+            if (!gCoreContext->ConnectToMasterServer())
+            {
+                LOG(VB_GENERAL, LOG_ERR, "Cannot connect to master");
+                delete sched;
+                return GENERIC_EXIT_CONNECT_ERROR;
+            }
             cout << "Retrieving Schedule from Master backend.\n";
             sched->FillRecordListFromMaster();
         }
