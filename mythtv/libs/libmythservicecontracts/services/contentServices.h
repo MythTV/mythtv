@@ -41,6 +41,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.33" );
     Q_CLASSINFO( "DownloadFile_Method",            "POST" )
+    Q_CLASSINFO( "DeleteFile_Method",              "POST" )
+    Q_CLASSINFO( "RenameFile_Method",              "POST" )
 
     public:
 
@@ -63,6 +65,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           int Width, int Height ) = 0;
 
         virtual QStringList         GetFileList         ( const QString   &StorageGroup ) = 0;
+
+        virtual QStringList         GetDirList          ( const QString   &StorageGroup ) = 0;
 
         virtual QFileInfo           GetRecordingArtwork ( const QString   &Type,
                                                           const QString   &Inetref,
@@ -101,6 +105,13 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
 
         virtual bool                DownloadFile        ( const QString   &URL,
                                                           const QString   &StorageGroup ) = 0;
+
+        virtual bool                DeleteFile          ( const QString   &StorageGroup,
+                                                          const QString   &FileName ) = 0;
+
+        virtual bool                RenameFile          ( const QString   &StorageGroup,
+                                                          const QString   &FileName,
+                                                          const QString   &NewName ) = 0;
 
         virtual DTC::LiveStreamInfo     *AddLiveStream          ( const QString   &StorageGroup,
                                                                   const QString   &FileName,
