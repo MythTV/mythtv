@@ -584,18 +584,18 @@ static lnb_preset lnb_presets[] =
 {
 
     /* description, type, LOF switch, LOF low, LOF high, inverted polarity */
-    lnb_preset(QT_TR_NOOP( "Universal (Europe)"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "Universal (Europe)"),
                DiSEqCDevLNB::kTypeVoltageAndToneControl,
                11700000,  9750000, 10600000),
-    lnb_preset(QT_TR_NOOP( "Single (Europe)"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "Single (Europe)"),
                DiSEqCDevLNB::kTypeVoltageControl,       0,  9750000),
-    lnb_preset(QT_TR_NOOP( "Circular (N. America)"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "Circular (N. America)"),
                DiSEqCDevLNB::kTypeVoltageControl,       0, 11250000),
-    lnb_preset(QT_TR_NOOP( "Linear (N. America)"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "Linear (N. America)"),
                DiSEqCDevLNB::kTypeVoltageControl,       0, 10750000),
-    lnb_preset(QT_TR_NOOP( "C Band"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "C Band"),
                DiSEqCDevLNB::kTypeVoltageControl,       0,  5150000),
-    lnb_preset(QT_TR_NOOP( "DishPro Bandstacked"),
+    lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "DishPro Bandstacked"),
                DiSEqCDevLNB::kTypeBandstacked,          0, 11250000, 14350000),
     lnb_preset(QString::null, DiSEqCDevLNB::kTypeVoltageControl),
 };
