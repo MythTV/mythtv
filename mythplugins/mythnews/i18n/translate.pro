@@ -1,3 +1,7 @@
+lessThan(QT_MAJOR_VERSION, 5) {
+    CODECFORTR = UTF-8
+}
+
 SOURCES += ../mythnews/*.cpp
 SOURCES += ../mythnews/*.h
 SOURCES += ./themestrings.h

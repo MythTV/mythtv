@@ -1,3 +1,7 @@
+lessThan(QT_MAJOR_VERSION, 5) {
+    CODECFORTR = UTF-8
+}
+
 SOURCES += ../mythgame/*.cpp
 SOURCES += ../mythgame/*.h
 SOURCES += ./themestrings.h

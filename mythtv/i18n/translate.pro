@@ -1,3 +1,7 @@
+lessThan(QT_MAJOR_VERSION, 5) {
+    CODECFORTR = UTF-8
+}
+
 SOURCES += ../libs/libmythbase/*.cpp
 SOURCES += ../libs/libmythbase/*.h
 SOURCES += ../libs/libmyth/*.cpp
