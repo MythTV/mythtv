@@ -133,7 +133,7 @@ class MainServer : public QObject, public MythSocketCBs
     void autoexpireUpdate(void);
 
   private slots:
-    void NewConnection(int socketDescriptor);
+    void NewConnection(qt_socket_fd_t socketDescriptor);
 
   private:
 

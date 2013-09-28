@@ -283,8 +283,8 @@ MainServer::MainServer(bool master, int port,
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
         return;
     }
-    connect(mythserver, SIGNAL(NewConnection(int)),
-            this,       SLOT(NewConnection(int)));
+    connect(mythserver, SIGNAL(NewConnection(qt_socket_fd_t)),
+            this,       SLOT(NewConnection(qt_socket_fd_t)));
 
     gCoreContext->addListener(this);
 
@@ -417,7 +417,7 @@ void MainServer::autoexpireUpdate(void)
     AutoExpire::Update(false);
 }
 
-void MainServer::NewConnection(int socketDescriptor)
+void MainServer::NewConnection(qt_socket_fd_t socketDescriptor)
 {
     QWriteLocker locker(&sockListLock);
     controlSocketList.insert(new MythSocket(socketDescriptor, this));
