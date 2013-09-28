@@ -2459,6 +2459,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     "Unknown video codec - defaulting to MPEG2");
                 video_codec_id = kCodec_MPEG2;
             }
+            else
+            {
+                codec = avcodec_find_decoder(enc->codec_id);
+            }
 
             if (enc->codec)
             {

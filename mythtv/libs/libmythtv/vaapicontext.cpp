@@ -79,7 +79,7 @@ VAProfile preferredProfile(MythCodecID codec)
     if (kCodec_VC1_VAAPI   == codec) return VAProfileVC1Advanced;
     if (kCodec_WMV3_VAAPI  == codec) return VAProfileVC1Main;
     if (kCodec_MPEG2_VAAPI == codec) return VAProfileMPEG2Main;
-    if (kCodec_MPEG1_VAAPI == codec) return VAProfileMPEG2Main;
+    // NB Ffmpeg 1.2.2 doesn't support MPEG1 with VAAPI pix_fmts
     return VAProfileMPEG2Simple; // error
 }
 
