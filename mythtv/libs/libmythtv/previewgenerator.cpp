@@ -555,8 +555,8 @@ bool PreviewGenerator::SavePreview(QString filename,
     bool desired_size_exactly_specified = true;
     if ((ppw < 1.0f) && (pph < 1.0f))
     {
-        ppw = gCoreContext->GetNumSetting("PreviewPixmapWidth",  320);
-        pph = gCoreContext->GetNumSetting("PreviewPixmapHeight", 240);
+        ppw = img.width();
+        pph = img.height();
         desired_size_exactly_specified = false;
     }
 
