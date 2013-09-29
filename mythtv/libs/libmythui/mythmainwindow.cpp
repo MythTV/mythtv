@@ -990,6 +990,10 @@ void MythMainWindow::Init(QString forcedpainter)
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
 
+    LOG(VB_GENERAL, LOG_INFO, QString("UI Screen Resolution: %1 x %2")
+                                        .arg(QString::number(d->screenwidth))
+                                        .arg(QString::number(d->screenheight)));
+
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
