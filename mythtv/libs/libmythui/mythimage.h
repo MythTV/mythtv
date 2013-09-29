@@ -54,7 +54,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     void Assign(const QPixmap &pix);
 
     bool Load(MythImageReader *reader);
-    bool Load(const QString &filename, bool scale = true);
+    bool Load(const QString &filename);
 
     void Orientation(int orientation);
     void Resize(const QSize &newSize, bool preserveAspect = false);

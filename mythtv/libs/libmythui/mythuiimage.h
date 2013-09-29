@@ -66,6 +66,8 @@ class ImageProperties
 
     int orientation;
 
+    bool isThemeImage;
+
   private:
     void Init(void);
     void Copy(const ImageProperties &other);

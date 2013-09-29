@@ -316,47 +316,44 @@ bool MythImage::Load(MythImageReader *reader)
     return false;
 }
 
-// FIXME: Get rid of LoadScaleImage
-bool MythImage::Load(const QString &filename, bool scale)
+bool MythImage::Load(const QString &filename)
 {
     QImage *im = NULL;
-    if (scale)
-        im = GetMythUI()->LoadScaleImage(filename);
-    else
+    if (filename.startsWith("myth://"))
     {
-        if (filename.startsWith("myth://"))
-        {
-            im = new QImage();
-            RemoteFile *rf = new RemoteFile(filename, false, false, 0);
+        im = new QImage();
+        RemoteFile *rf = new RemoteFile(filename, false, false, 0);
 
-            QByteArray data;
-            bool ret = rf->SaveAs(data);
+        QByteArray data;
+        bool ret = rf->SaveAs(data);
 
-            delete rf;
+        delete rf;
 
-            if (ret)
-                im->loadFromData(data);
+        if (ret)
+            im->loadFromData(data);
 #if 0
-            else
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("MythImage::Load failed to load remote image %1")
-                        .arg(filename));
+        else
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MythImage::Load failed to load remote image %1")
+                    .arg(filename));
 #endif
 
-        }
-        else if ((filename.startsWith("http://")) ||
-                 (filename.startsWith("https://")) ||
-                 (filename.startsWith("ftp://")))
-        {
-            im = new QImage();
-            QByteArray data;
-            if (GetMythDownloadManager()->download(filename, &data))
-                im->loadFromData(data);
-        }
-        else
-        {
-            im = new QImage(filename);
-        }
+    }
+    else if ((filename.startsWith("http://")) ||
+                (filename.startsWith("https://")) ||
+                (filename.startsWith("ftp://")))
+    {
+        im = new QImage();
+        QByteArray data;
+        if (GetMythDownloadManager()->download(filename, &data))
+            im->loadFromData(data);
+    }
+    else
+    {
+        QString absoluteUrl = filename;
+        if (!absoluteUrl.startsWith('/'))
+            GetMythUI()->FindThemeFile(absoluteUrl);
+        im = new QImage(absoluteUrl);
     }
 
     SetFileName(filename);

@@ -73,6 +73,7 @@ void ImageProperties::Init()
     reflectShear = 0;
     reflectSpacing = 0;
     orientation = 1;
+    isThemeImage = false;
     maskImage = NULL;
 }
 
@@ -96,6 +97,8 @@ void ImageProperties::Copy(const ImageProperties &other)
     reflectShear = other.reflectShear;
     reflectSpacing = other.reflectSpacing;
     orientation = other.orientation;
+
+    isThemeImage = other.isThemeImage;
 
     SetMaskImage(other.maskImage);
 }
@@ -238,7 +241,7 @@ class ImageLoader
         QString filename = imProps.filename;
         MythImage *image = NULL;
 
-        bool bForceResize = false;
+        bool bResize = false;
         bool bFoundInCache = false;
 
         int w = -1;
@@ -252,7 +255,7 @@ class ImageLoader
             if (imProps.forceSize.height() != -1)
                 h = imProps.forceSize.height();
 
-            bForceResize = true;
+            bResize = true;
         }
 
         if (!imageReader)
@@ -314,7 +317,23 @@ class ImageLoader
 
         if (image && !bFoundInCache)
         {
-            if (bForceResize)
+            // Even if an explicit size wasn't defined this image may still need
+            // to be scaled because of a difference between the theme resolution
+            // and the screen resolution. We want to avoid scaling twice.
+            if (!bResize && imProps.isThemeImage)
+            {
+                float wmult; // Width multipler
+                float hmult; // Height multipler
+                GetMythUI()->GetScreenSettings(wmult, hmult);
+                if (wmult != 1.0f || hmult != 1.0f)
+                {
+                    w = image->size().width() * wmult;
+                    h = image->size().height() * hmult;
+                    bResize = true;
+                }
+            }
+
+            if (bResize)
                 image->Resize(QSize(w, h), imProps.preserveAspect);
 
             if (imProps.isMasked)
@@ -633,6 +652,7 @@ void MythUIImage::Reset(void)
 
     if (m_imageProperties.filename != m_OrigFilename)
     {
+        m_imageProperties.isThemeImage = true;
         m_imageProperties.filename = m_OrigFilename;
 
         if (m_animatedImage)
@@ -675,6 +695,7 @@ void MythUIImage::Init(void)
 void MythUIImage::SetFilename(const QString &filename)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
+    m_imageProperties.isThemeImage = false;
     m_imageProperties.filename = filename;
     if (filename == m_OrigFilename)
         emit DependChanged(true);
@@ -690,6 +711,7 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
                                  int high)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
+    m_imageProperties.isThemeImage = false;
     m_imageProperties.filename = filepattern;
     m_LowNum = low;
     m_HighNum = high;
@@ -754,6 +776,7 @@ void MythUIImage::SetImage(MythImage *img)
         return;
     }
 
+    m_imageProperties.isThemeImage = false;
     m_imageProperties.filename = img->GetFileName();
 
     img->IncrRef();
@@ -810,6 +833,8 @@ void MythUIImage::SetImages(QVector<MythImage *> *images)
 
     QWriteLocker updateLocker(&d->m_UpdateLock);
     QSize aSize = GetFullArea().size();
+
+    m_imageProperties.isThemeImage = false;
 
     QVector<MythImage *>::iterator it;
 
@@ -1273,6 +1298,7 @@ bool MythUIImage::ParseElement(
 
     if (element.tagName() == "filename")
     {
+        m_imageProperties.isThemeImage = true; // This is an image distributed with the them
         m_OrigFilename = m_imageProperties.filename = getFirstText(element);
 
         if (m_imageProperties.filename.endsWith('/'))
@@ -1309,6 +1335,7 @@ bool MythUIImage::ParseElement(
     }
     else if (element.tagName() == "filepattern")
     {
+        m_imageProperties.isThemeImage = true; // This is an image distributed with the theme
         m_OrigFilename = m_imageProperties.filename = getFirstText(element);
         QString tmp = element.attribute("low");
 
