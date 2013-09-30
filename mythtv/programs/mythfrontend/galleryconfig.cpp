@@ -25,7 +25,6 @@
  */
 GalleryConfig::GalleryConfig(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_storageGroupName(NULL),
       m_sortOrder(NULL),
       m_slideShowTime(NULL),
       m_transitionType(NULL),
@@ -63,7 +62,6 @@ bool GalleryConfig::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_storageGroupName, "storagegroupname", &err);
     UIUtilE::Assign(this, m_sortOrder, "sortorder", &err);
     UIUtilE::Assign(this, m_slideShowTime, "slideshowtime", &err);
     UIUtilE::Assign(this, m_transitionType, "transitiontype", &err);
@@ -93,7 +91,7 @@ bool GalleryConfig::Create()
 
     BuildFocusList();
 
-    SetFocusWidget(m_storageGroupName);
+    SetFocusWidget(m_sortOrder);
 
     return true;
 }
@@ -158,8 +156,6 @@ void GalleryConfig::customEvent(QEvent *event)
  */
 void GalleryConfig::Load()
 {
-    m_storageGroupName->SetText(gCoreContext->GetSetting("GalleryStorageGroupName", "Pictures"));
-
     new MythUIButtonListItem(m_sortOrder, tr("Name (A-Z alpha)"),
                              qVariantFromValue(QString::number(kSortByNameAsc)));
     new MythUIButtonListItem(m_sortOrder, tr("Reverse Name (Z-A alpha)"),
@@ -205,8 +201,6 @@ void GalleryConfig::Load()
  */
 void GalleryConfig::Save()
 {
-    gCoreContext->SaveSetting("GalleryStorageGroupName",
-                              m_storageGroupName->GetText());
     gCoreContext->SaveSetting("GallerySortOrder",
                               m_sortOrder->GetDataValue().toString());
     gCoreContext->SaveSetting("GallerySlideShowTime",

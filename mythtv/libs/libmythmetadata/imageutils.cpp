@@ -10,8 +10,6 @@
 // The maximum possible value of the utc time
 #define MAX_UTCTIME 2147483646;
 
-
-
 ImageUtils* ImageUtils::m_instance = NULL;
 
 ImageUtils::ImageUtils()
@@ -422,9 +420,7 @@ QStringList ImageUtils::GetStorageDirs()
 {
     QStringList sgDirList;
 
-    // The name that shall be used for the images storage group. It must be
-    // specified because its not part of the default storage group names
-    QString sgName = gCoreContext->GetSetting("GalleryStorageGroupName");
+    QString sgName = IMAGE_STORAGE_GROUP;
 
     if (!sgName.isEmpty())
     {
@@ -456,7 +452,7 @@ void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
                                    int parentId)
 {
     data->m_parentId    = parentId;
-    data->m_fileName	= fileInfo.absoluteFilePath();
+    data->m_fileName    = fileInfo.absoluteFilePath();
     data->m_name        = fileInfo.fileName();
     data->m_path        = fileInfo.path();
     data->m_isHidden    = fileInfo.isHidden();
@@ -484,7 +480,7 @@ void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
 void ImageUtils::LoadFileData(QFileInfo &fileInfo,
                               ImageMetadata *data)
 {
-    data->m_fileName	= fileInfo.absoluteFilePath();
+    data->m_fileName    = fileInfo.absoluteFilePath();
     data->m_name        = fileInfo.fileName();
     data->m_path        = fileInfo.path();
     data->m_modTime     = fileInfo.lastModified().toTime_t();

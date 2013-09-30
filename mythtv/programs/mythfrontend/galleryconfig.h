@@ -23,7 +23,6 @@ signals:
     void configSaved();
 
 private:
-    MythUITextEdit     *m_storageGroupName;
     MythUIButtonList   *m_sortOrder;
     MythUISpinBox      *m_slideShowTime;
     MythUIButtonList   *m_transitionType;

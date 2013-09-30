@@ -19,7 +19,7 @@
 #include "imagemetadata.h"
 #include "mythmetaexp.h"
 
-
+#define IMAGE_STORAGE_GROUP "Photographs";
 
 class META_PUBLIC ImageUtils
 {

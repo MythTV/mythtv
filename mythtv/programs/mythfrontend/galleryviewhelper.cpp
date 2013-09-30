@@ -4,6 +4,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "storagegroup.h"
+#include "imageutils.h"
 
 #include "galleryviewhelper.h"
 
@@ -17,7 +18,7 @@ GalleryViewHelper::GalleryViewHelper(MythScreenType *parent)
 {
     m_parent = parent;
 
-    m_sgName    = gCoreContext->GetSetting("GalleryStorageGroupName");
+    m_sgName    = IMAGE_STORAGE_GROUP;
     m_sgDirList = StorageGroup::getGroupDirs(m_sgName, "");
 
     m_dbHelper = new GalleryDatabaseHelper();

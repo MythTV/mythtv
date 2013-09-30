@@ -12,22 +12,6 @@
             </textarea>
         </textarea>
 
-        <!-- The clock that is shown at the top right of each screen -->
-        <shape name="clock_background">
-            <area>0,-4,244,36</area>
-            <type>roundbox</type>
-            <fill color="#000000" alpha="130" />
-            <line color="#AAAAAA" alpha="150" width="1" />
-            <cornerradius>2</cornerradius>
-        </shape>
-        <clock name="text">
-            <area>0,0,244,30</area>
-            <font>text</font>
-            <template>%DATE%, %TIME%</template>
-            <align>allcenter</align>
-            <alpha>255</alpha>
-        </clock>
-
         <!-- the shape where the imagelist is displayed -->
         <shape name="gallerybackground">
             <area>25,60,1230,633</area>
@@ -432,22 +416,6 @@
             </textarea>
         </textarea>
 
-        <!-- The clock that is shown at the top right of each screen -->
-        <shape name="clock_background">
-            <area>0,-4,244,36</area>
-            <type>roundbox</type>
-            <fill color="#000000" alpha="130" />
-            <line color="#AAAAAA" alpha="150" width="1" />
-            <cornerradius>2</cornerradius>
-        </shape>
-        <clock name="text">
-            <area>0,0,244,30</area>
-            <font>text</font>
-            <template>%DATE%, %TIME%</template>
-            <align>allcenter</align>
-            <alpha>255</alpha>
-        </clock>
-
         <!-- the shape where the imagelist is displayed -->
         <shape name="galleryconfig_background">
             <area>160,170,960,460</area>
@@ -457,39 +425,32 @@
             <cornerradius>2</cornerradius>
         </shape>
 
-        <textarea name="sgname_label" from="basetextarea">
+        <textarea name="sortorder_label" from="basetextarea">
             <area>180,190,540,40</area>
             <align>right,vcenter</align>
-            <value>Name of the storage group for the images:</value>
-        </textarea>
-        <textarea name="sortorder_label" from="sgname_label">
-            <position>180,240</position>
             <value>Sorting order of the shown images:</value>
         </textarea>
-        <textarea name="slideshowtime_label" from="sgname_label">
+        <textarea name="slideshowtime_label" from="sortorder_label">
             <position>180,290</position>
             <value>Time to display each image during a slideshow (ms):</value>
         </textarea>
-        <textarea name="transitiontype_label" from="sgname_label">
+        <textarea name="transitiontype_label" from="sortorder_label">
             <position>180,340</position>
             <value>Type of transition between two images:</value>
         </textarea>
-        <textarea name="transitiontime_label" from="sgname_label">
+        <textarea name="transitiontime_label" from="sortorder_label">
             <position>180,390</position>
             <value>Duration of an image transition (ms):</value>
         </textarea>
-        <textarea name="showhiddenfiles_label" from="sgname_label">
+        <textarea name="showhiddenfiles_label" from="sortorder_label">
             <position>180,440</position>
             <value>Show files that are marked as hidden:</value>
         </textarea>
-        <textarea name="cleardatabase_label" from="sgname_label">
+        <textarea name="cleardatabase_label" from="sortorder_label">
             <position>180,490</position>
             <value>Clear database contents (Resync required):</value>
         </textarea>
 
-        <textedit name="storagegroupname" from="basetextedit">
-            <position>730,190</position>
-        </textedit>
         <buttonlist name="sortorder" from="basewideselector">
             <position>730,240</position>
         </buttonlist>
