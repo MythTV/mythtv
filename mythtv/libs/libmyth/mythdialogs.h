@@ -22,10 +22,6 @@ class MythListBox;
 struct fontProp;
 class QVBoxLayout;
 class QProgressBar;
-class UIType;
-class UIKeyboardType;
-class LayerSet;
-class XMLParse;
 
 typedef enum DialogCode
 {
@@ -254,83 +250,5 @@ class MPUBLIC MythProgressDialog: public MythDialog
     int m_totalSteps;
 };
 
-
-/*!
- * \deprecated Due for removal, use libmythui's MythScreenType instead
- */
-class MythThemedDialog : public MythDialog
-{
-    Q_OBJECT
-
-  public:
-    MythThemedDialog(MythMainWindow *parent,
-                     const QString  &window_name,
-                     const QString  &theme_filename = QString(),
-                     const char     *name = "MythThemedDialog",
-                     bool            setsize = true) MDEPRECATED;
-    MythThemedDialog(MythMainWindow *parent,
-                     const char     *name = "MythThemedDialog",
-                     bool            setsize = true) MDEPRECATED;
-
-    virtual bool loadThemedWindow(QString window_name, QString theme_filename);
-    virtual void loadWindow(QDomElement &);
-    virtual void parseContainer(QDomElement &);
-    virtual void parseFont(QDomElement &);
-    bool buildFocusList();
-
-    UIType *getUIObject(const QString &name);
-
-    UIType *getCurrentFocusWidget();
-    void setCurrentFocusWidget(UIType *widget);
-
-    UIKeyboardType *getUIKeyboardType(const QString &name);
-
-    LayerSet* getContainer(const QString &name);
-    fontProp* getFont(const QString &name);
-
-    void setContext(int a_context) { context = a_context; }
-    int  getContext(){return context;}
-
-  public slots:
-    virtual void deleteLater(void);
-    virtual void updateBackground();
-    virtual void initForeground();
-    virtual void updateForeground();
-    /// draws anything that intersects
-    virtual void updateForeground(const QRect &);
-    /// only draws the region
-    virtual void updateForegroundRegion(const QRect &);
-    virtual bool assignFirstFocus();
-    virtual bool nextPrevWidgetFocus(bool up_or_down);
-    virtual void activateCurrent();
-
-  protected:
-    ~MythThemedDialog(); // use deleteLater() instead for thread safety
-
-    void paintEvent(QPaintEvent* e);
-    UIType *widget_with_current_focus;
-
-    // These need to be just "protected" so that subclasses can mess with them
-    XMLParse *getTheme() {return theme;}
-    QDomElement& getXmlData() {return xmldata;}
-
-    QPixmap my_background;
-    QPixmap my_foreground;
-
-  private:
-
-    void ReallyUpdateForeground(const QRect &);
-
-    void UpdateForegroundRect(const QRect &inv_rect);
-
-    XMLParse *theme;
-    QDomElement xmldata;
-    int context;
-
-    QList<LayerSet*>  my_containers;
-    vector<UIType*>   focus_taking_widgets;
-
-    QRect redrawRect;
-};
 
 #endif

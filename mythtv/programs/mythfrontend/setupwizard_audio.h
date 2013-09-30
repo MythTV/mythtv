@@ -1,10 +1,6 @@
 #ifndef AUDIOSETUPWIZARD_H
 #define AUDIOSETUPWIZARD_H
 
-#include <uitypes.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // libmythui
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>

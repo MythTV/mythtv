@@ -1,10 +1,6 @@
 #ifndef VIDEOSETUPWIZARD_H
 #define VIDEOSETUPWIZARD_H
 
-#include <uitypes.h>
-#include <mythwidgets.h>
-#include <mythdialogs.h>
-
 // Utility headers
 #include <videodisplayprofile.h>
 

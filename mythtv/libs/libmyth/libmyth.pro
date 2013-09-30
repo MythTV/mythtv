@@ -40,7 +40,7 @@ HEADERS += mythexp.h mythmediamonitor.h
 HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h
 HEADERS += settings.h
-HEADERS += visual.h xmlparse.h
+HEADERS += visual.h
 HEADERS += storagegroupeditor.h
 HEADERS += mythterminal.h
 HEADERS += remoteutil.h
@@ -48,9 +48,6 @@ HEADERS += rawsettingseditor.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
 HEADERS += rssparse.h
-
-# remove when everything is switched to mythui
-HEADERS += virtualkeyboard_qt.h uitypes.h xmlparse.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
@@ -75,9 +72,6 @@ SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
 SOURCES += rssparse.cpp
-
-# remove when everything is switched to mythui
-SOURCES += virtualkeyboard_qt.cpp uitypes.cpp xmlparse.cpp
 
 # This stuff is not Qt5 compatible..
 contains(QT_VERSION, ^4\\.[0-9]\\..*) {
@@ -122,7 +116,7 @@ LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h mythcontext.h
 inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
-inc.files += settings.h uitypes.h mythdialogs.h
+inc.files += settings.h mythdialogs.h
 inc.files += audio/audiooutput.h audio/audiosettings.h
 inc.files += audio/audiooutputsettings.h audio/audiooutpututil.h
 inc.files += audio/audioconvert.h
@@ -142,9 +136,6 @@ contains(QT_VERSION, ^4\\.[0-9]\\..*) {
 inc.files += mythrssmanager.h     netutils.h
 inc.files += netgrabbermanager.h
 }
-
-# remove when everything is switched to mythui
-inc.files += virtualkeyboard_qt.h xmlparse.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

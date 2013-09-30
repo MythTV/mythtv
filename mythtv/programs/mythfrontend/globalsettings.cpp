@@ -32,7 +32,6 @@
 #include "recordingprofile.h"
 #include "mythdisplay.h"
 #include "DisplayRes.h"
-#include "uitypes.h"
 #include "cardutil.h"
 #include "themeinfo.h"
 #include "mythdirs.h"

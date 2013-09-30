@@ -1,10 +1,6 @@
 #ifndef GRABBERSETTINGS_H
 #define GRABBERSETTINGS_H
 
-#include "uitypes.h"
-#include "mythwidgets.h"
-#include "mythdialogs.h"
-
 // libmythui
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"

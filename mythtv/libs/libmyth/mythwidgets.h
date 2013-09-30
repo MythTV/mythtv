@@ -25,8 +25,6 @@
 
 using namespace std;
 
-#include "virtualkeyboard_qt.h"
-
 #include "mythexp.h"
 
 // These widgets follow these general navigation rules:
@@ -48,10 +46,6 @@ class MPUBLIC MythComboBox: public QComboBox
 
     void setAcceptOnSelect(bool Accept)      { AcceptOnSelect = Accept; }
     void setStep(int _step = 1)              { step = _step; }
-    void setAllowVirtualKeyboard(bool allowKbd = true)
-    { allowVirtualKeyboard = allowKbd; }
-    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
-    PopupPositionQt getPopupPosition(void)     { return popupPosition; }
 
   signals:
     void changeHelpText(QString);
@@ -72,15 +66,10 @@ class MPUBLIC MythComboBox: public QComboBox
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
     void Init(void);
-    virtual void popupVirtualKeyboard(void);
 
   private:
-    VirtualKeyboardQt *popup;
     QString helptext;
     bool AcceptOnSelect;
-    bool useVirtualKeyboard;
-    bool allowVirtualKeyboard;
-    PopupPositionQt popupPosition;
     int step;
 };
 
@@ -150,14 +139,6 @@ class MPUBLIC MythLineEdit : public QLineEdit
     void setHelpText(const QString&);;
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
-    void setAllowVirtualKeyboard(bool allowKbd = true)
-        { allowVirtualKeyboard = allowKbd; }
-    // muthui's MythUITextEdit m_Filter & FilterNumeric
-    // may be a better way to do it
-    //void setSmartVirtualKeyboard(bool allowKbd = true)
-    //       { allowSmartKeyboard   = allowKbd; }
-    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
-    PopupPositionQt getPopupPosition(void) { return popupPosition; }
 
     virtual QString text();
 
@@ -177,15 +158,10 @@ class MPUBLIC MythLineEdit : public QLineEdit
     virtual void focusOutEvent(QFocusEvent *e);
     virtual void hideEvent(QHideEvent *e);
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
-    virtual void popupVirtualKeyboard(void);
 
   private:
-    VirtualKeyboardQt *popup;
     QString helptext;
     bool rw;
-    bool useVirtualKeyboard;
-    bool allowVirtualKeyboard;
-    PopupPositionQt popupPosition;
 };
 
 /**
@@ -212,8 +188,6 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     void insert(QString text);
     void backspace();
     void del();
-    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; };
-    PopupPositionQt getPopupPosition(void)     { return popupPosition; };
 
     virtual QString text();
 
@@ -236,7 +210,6 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
     virtual void keyPressEvent(QKeyEvent *e);
-    virtual void popupVirtualKeyboard(void);
 
   private slots:
     void    startCycle(QString current_choice, QString set);
@@ -271,10 +244,6 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     QString  hex_special;
 
     int m_lines;
-
-    VirtualKeyboardQt *popup;
-    bool             useVirtualKeyboard;
-    PopupPositionQt    popupPosition;
 };
 
 class MPUBLIC MythPushButton : public QPushButton

@@ -1,10 +1,6 @@
 #ifndef GENERALSETUPWIZARD_H
 #define GENERALSETUPWIZARD_H
 
-#include "uitypes.h"
-#include "mythwidgets.h"
-#include "mythdialogs.h"
-
 // libmythui
 #include "mythuitext.h"
 #include "mythuibutton.h"
