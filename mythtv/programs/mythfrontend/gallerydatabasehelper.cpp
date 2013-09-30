@@ -22,35 +22,6 @@ GalleryDatabaseHelper::~GalleryDatabaseHelper()
 
 
 
-/** \fn     GalleryDatabaseHelper::GetStorageDirIDs(QStringList)
- *  \brief  Loads the directory ids of the storage groups from the database
- *  \return The list with the ids of the found directories
- */
-// FIXME This doesn't do what it's supposed to do because we don't insert the
-//       storage group root directories into the database! The storage group
-//       needs to be inserted as the root node, with parentId of zero
-QList<int> GalleryDatabaseHelper::GetStorageDirIDs()
-{
-    QList<int> sgIDs;
-
-//     MSqlQuery query(MSqlQuery::InitCon());
-//     query.prepare("SELECT dir_id FROM gallery_directories "
-//                   "WHERE parent_id = 0;");
-//
-//
-//     if (!query.exec())
-//         LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
-//
-//     while (query.next())
-//     {
-//         sgIDs.append(query.value(0).toInt());
-//     }
-
-    return sgIDs;
-}
-
-
-
 /** \fn     GalleryDatabaseHelper::LoadParentDirectory(QList<ImageMetadata *>* , int)
  *  \brief  Loads the information from the database for a given directory
  *  \param  dbList The list where the results are stored
@@ -160,7 +131,7 @@ void GalleryDatabaseHelper::LoadFiles(QMap<QString, ImageMetadata *>* dbList)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT "
-                    "file_id, filename, name, path, dir_id, "
+                    "file_id, CONCAT_WS('/', path, filename), name, path, dir_id, "
                     "type, modtime, size, extension, "
                     "angle, date, zoom, hidden, orientation "
                     "FROM gallery_files");
@@ -191,7 +162,7 @@ void GalleryDatabaseHelper::LoadFiles(QList<ImageMetadata *>* dbList, int parent
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT "
-                    "file_id, filename, name, path, dir_id, "
+                    "file_id, CONCAT_WS('/', path, filename), name, path, dir_id, "
                     "type, modtime, size, extension, "
                     "angle, date, zoom, hidden, orientation "
                     "FROM gallery_files "
@@ -518,8 +489,8 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
     // Try to get four new thumbnail filenames
     // from the available images in this folder
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT filename, path FROM gallery_files "
-                          "WHERE path LIKE :PATH "
+    query.prepare("SELECT CONCAT_WS('/', path, filename), path FROM gallery_files "
+                          "WHERE path = :PATH "
                           "AND type = '4' "
                           "AND hidden = '0' LIMIT :LIMIT");
     query.bindValue(":PATH", im->m_path);

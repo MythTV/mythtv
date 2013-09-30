@@ -17,7 +17,6 @@ public:
     GalleryDatabaseHelper();
     ~GalleryDatabaseHelper();
 
-    QList<int> GetStorageDirIDs();
     void LoadParentDirectory(QList<ImageMetadata *>*, int);
     void LoadDirectories(QMap<QString, ImageMetadata *>*);
     void LoadDirectories(QList<ImageMetadata *>*, int);

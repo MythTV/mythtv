@@ -42,8 +42,8 @@ public:
     bool RemoveFileFromDB(ImageMetadata *);
     bool RemoveFileFromDB(int);
 
-    void LoadDirectoryData(QFileInfo &, ImageMetadata *, int);
-    void LoadFileData(QFileInfo &, ImageMetadata *);
+    void LoadDirectoryData(QFileInfo &, ImageMetadata *, int, const QString &);
+    void LoadFileData(QFileInfo &, ImageMetadata *, const QString &);
 
     QStringList  GetStorageDirs();
 

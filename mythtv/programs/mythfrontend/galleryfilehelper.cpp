@@ -24,7 +24,7 @@
  */
 GalleryFileHelper::GalleryFileHelper()
 {
-    m_backendHost   = gCoreContext->GetSetting("BackendServerIP","localhost");
+    m_backendHost   = gCoreContext->GetSetting("MasterServerIP","localhost");
     m_backendPort   = gCoreContext->GetNumSetting("BackendStatusPort", 6544);
 
     m_manager = new QNetworkAccessManager();

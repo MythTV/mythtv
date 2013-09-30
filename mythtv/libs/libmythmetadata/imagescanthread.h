@@ -28,9 +28,9 @@ protected:
 private slots:
 
 private:
-    void SyncFilesFromDir(QString &path, int parentId);
-    int  SyncDirectory(QFileInfo &fileInfo, int parentId);
-    void SyncFile(QFileInfo &fileInfo, int parentId);
+    void SyncFilesFromDir(QString &path, int parentId, const QString &baseDirectory);
+    int  SyncDirectory(QFileInfo &fileInfo, int parentId, const QString &baseDirectory);
+    void SyncFile(QFileInfo &fileInfo, int parentId, const QString &baseDirectory);
 
     QMap<QString, ImageMetadata *> *m_dbDirList;
     QMap<QString, ImageMetadata *> *m_dbFileList;

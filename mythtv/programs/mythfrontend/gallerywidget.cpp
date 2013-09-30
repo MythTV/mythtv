@@ -560,41 +560,10 @@ void GalleryWidget::LoadFile()
  */
 QString GalleryWidget::CreateImageUrl(QString &fileName)
 {
-    // TODO another way to get the images could be changing the
-    //      myth://SGNAME@host:Port/filename request to
-    //      http://host:Port/StorageGroup/SGNAME/filename
-
-    // Loop through all directories that belong to the defined storage
-    // group. Check if the current image belongs to one of them an
-    // remove the storage group path from the start of the image path.
-    // Example: If we have a storage group of "/mnt/pictures" and the
-    // path of the image is "/mnt/pictures/animals/mycat.png" then we
-    // want to get "animals/mycat.png" as a result.
-
-    for (int i = 0; i < m_gvh->m_sgDirList.size(); ++i)
-    {
-        // Unfortunately the path of the directory in the storage group
-        // has the format "myth://Bilder@ubuntu/mnt/pictures/" so we need
-        // to remove the stuff before the third slash.
-
-        QString path = m_gvh->m_sgDirList.at(i);
-        path.replace(QString("myth://%1@%2")
-                     .arg(m_gvh->m_sgName)
-                     .arg(gCoreContext->GetHostName()),"");
-
-        if (fileName.startsWith(path))
-        {
-            fileName.replace(path, "");
-            break;
-        }
-    }
-
-    // Prepare the url that will hold the path to the image
-    QString url = QString("myth://%1@%2:%3/%4")
-            .arg(m_gvh->m_sgName)
-            .arg(m_backendHost)
-            .arg(m_backendPort)
-            .arg(fileName);
+    QString url = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                           gCoreContext->GetNumSetting("MasterServerPort"),
+                                           fileName,
+                                           m_gvh->m_sgName);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Loading image from url '%1'").arg(url));
 

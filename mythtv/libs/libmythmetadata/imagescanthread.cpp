@@ -14,8 +14,6 @@
  */
 ImageScanThread::ImageScanThread() : MThread("ImageScanThread")
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("ImageScanThread::ctor"));
-
     // initialize all required data structures
     m_dbDirList   = new QMap<QString, ImageMetadata *>;
     m_dbFileList  = new QMap<QString, ImageMetadata *>;
@@ -33,8 +31,6 @@ ImageScanThread::ImageScanThread() : MThread("ImageScanThread")
  */
 ImageScanThread::~ImageScanThread()
 {
-    LOG(VB_GENERAL, LOG_INFO, QString("ImageScanThread::dtor"));
-
     if (m_dbDirList)
     {
         delete m_dbDirList;
@@ -97,7 +93,10 @@ void ImageScanThread::run()
     for (int i = 0; i < paths.size(); ++i)
     {
         QString path = paths.at(i);
-        SyncFilesFromDir(path, 0);
+        QString base = path;
+        if (!base.endsWith('/'))
+            base.append('/');
+        SyncFilesFromDir(path, 0, base);
     }
 
     // Adding or updating directories have been completed.
@@ -129,18 +128,20 @@ void ImageScanThread::run()
  *          backend and syncs depending if they are a directory or file
  *  \param  path The current directory with the files that shall be scanned syncronized
  *  \param  parentId The id of the parent directory which is required for possible subdirectories
+ *  \param  baseDirectory The current root storage group path, this will be stripped before insertion into the database
  *  \return void
  */
-void ImageScanThread::SyncFilesFromDir(QString &path, int parentId)
+void ImageScanThread::SyncFilesFromDir(QString &path, int parentId,
+                                       const QString &baseDirectory)
 {
     if (!m_continue)
     {
-        LOG(VB_GENERAL, LOG_DEBUG,
+        LOG(VB_FILE, LOG_DEBUG,
             QString("Syncing from SG dir %1 interrupted").arg(path));
         return;
     }
 
-    LOG(VB_GENERAL, LOG_DEBUG,
+    LOG(VB_FILE, LOG_DEBUG,
         QString("Syncing from SG dir %1").arg(path));
 
     QDir dir(path);
@@ -158,7 +159,7 @@ void ImageScanThread::SyncFilesFromDir(QString &path, int parentId)
     {
         if (!m_continue)
         {
-            LOG(VB_GENERAL, LOG_DEBUG,
+            LOG(VB_FILE, LOG_DEBUG,
                 QString("Syncing from SG dir %1 interrupted").arg(path));
             return;
         }
@@ -168,15 +169,15 @@ void ImageScanThread::SyncFilesFromDir(QString &path, int parentId)
         {
             // Get the id. This will be new parent id
             // when we traverse down the current directory.
-            int id = SyncDirectory(fileInfo, parentId);
+            int id = SyncDirectory(fileInfo, parentId, baseDirectory);
 
             // Get new files within this directory
             QString fileName = fileInfo.absoluteFilePath();
-            SyncFilesFromDir(fileName, id);
+            SyncFilesFromDir(fileName, id, baseDirectory);
         }
         else
         {
-            SyncFile(fileInfo, parentId);
+            SyncFile(fileInfo, parentId, baseDirectory);
         }
 
         // Increase the current progress count in case a
@@ -193,11 +194,13 @@ void ImageScanThread::SyncFilesFromDir(QString &path, int parentId)
  *          Either inserts or deletes the information in the database.
  *  \param  fileInfo The information of the directory
  *  \param  parentId The parent directory which will be saved with the file
+ *  \param  baseDirectory The current root storage group path, this will be stripped before insertion into the database
  *  \return void
  */
-int ImageScanThread::SyncDirectory(QFileInfo &fileInfo, int parentId)
+int ImageScanThread::SyncDirectory(QFileInfo &fileInfo, int parentId, const QString &baseDirectory)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Syncing directory %1")
+
+    LOG(VB_FILE, LOG_DEBUG, QString("Syncing directory %1")
         .arg(fileInfo.absoluteFilePath()));
 
     ImageMetadata *im = new ImageMetadata();
@@ -206,7 +209,7 @@ int ImageScanThread::SyncDirectory(QFileInfo &fileInfo, int parentId)
     {
         // Load all required information of the directory
         ImageUtils *iu = ImageUtils::getInstance();
-        iu->LoadDirectoryData(fileInfo, im, parentId);
+        iu->LoadDirectoryData(fileInfo, im, parentId, baseDirectory);
 
         // The directory is not in the database list
         // add it to the database and get the new id. This
@@ -240,9 +243,10 @@ int ImageScanThread::SyncDirectory(QFileInfo &fileInfo, int parentId)
  *  \param  parentId The parent directory which will be saved with the file
  *  \return void
  */
-void ImageScanThread::SyncFile(QFileInfo &fileInfo, int parentId)
+void ImageScanThread::SyncFile(QFileInfo &fileInfo, int parentId,
+                               const QString &baseDirectory)
 {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Syncing file %1")
+    LOG(VB_FILE, LOG_DEBUG, QString("Syncing file %1")
         .arg(fileInfo.absoluteFilePath()));
 
     if (!m_dbFileList->contains(fileInfo.absoluteFilePath()))
@@ -251,10 +255,10 @@ void ImageScanThread::SyncFile(QFileInfo &fileInfo, int parentId)
 
         // Load all required information of the file
         ImageUtils *iu = ImageUtils::getInstance();
-        iu->LoadFileData(fileInfo, im);
+        iu->LoadFileData(fileInfo, im, baseDirectory);
 
         // Only load the file if contains a valid file extension
-        LOG(VB_GENERAL, LOG_INFO, QString("Type of file %1 is %2, extension %3").arg(im->m_fileName).arg(im->m_type).arg(im->m_extension));
+        LOG(VB_FILE, LOG_DEBUG, QString("Type of file %1 is %2, extension %3").arg(im->m_fileName).arg(im->m_type).arg(im->m_extension));
         if (im->m_type != kUnknown)
         {
             // Load any required exif information if the file is an image
@@ -262,11 +266,11 @@ void ImageScanThread::SyncFile(QFileInfo &fileInfo, int parentId)
             {
                 bool ok;
 
-                int exifOrientation = iu->GetExifOrientation(im->m_fileName, &ok);
+                int exifOrientation = iu->GetExifOrientation(fileInfo.absoluteFilePath(), &ok);
                 if (ok)
                     im->SetOrientation(exifOrientation, true);
 
-                int exifDate = iu->GetExifDate(im->m_fileName, &ok);
+                int exifDate = iu->GetExifDate(fileInfo.absoluteFilePath(), &ok);
                 if (ok)
                     im->m_date = exifDate;
             }

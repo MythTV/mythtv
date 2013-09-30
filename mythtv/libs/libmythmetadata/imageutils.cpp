@@ -82,8 +82,8 @@ void ImageUtils::LoadFilesFromDB(QMap<QString, ImageMetadata *>* dbList)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
                 QString("SELECT "
-                        "file_id, filename, name, path, dir_id, "
-                        "type, modtime, size, extension, "
+                        "file_id, CONCAT_WS('/', path, filename), name, path, "
+                        "dir_id, type, modtime, size, extension, "
                         "angle, date, zoom, "
                         "hidden, orientation "
                         "FROM gallery_files"));
@@ -114,7 +114,7 @@ void ImageUtils::LoadFileFromDB(ImageMetadata * im, int id)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
                 QString("SELECT "
-                        "file_id, filename, name, path, dir_id, "
+                        "file_id, CONCAT_WS('/', path, filename), name, path, dir_id, "
                         "type, modtime, size, extension, "
                         "angle, date, zoom, "
                         "hidden, orientation "
@@ -449,12 +449,14 @@ QStringList ImageUtils::GetStorageDirs()
  */
 void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
                                    ImageMetadata *data,
-                                   int parentId)
+                                   int parentId,
+                                   const QString &baseDirectory)
 {
+    QDir baseDir(baseDirectory);
     data->m_parentId    = parentId;
-    data->m_fileName    = fileInfo.absoluteFilePath();
+    data->m_fileName    = baseDir.relativeFilePath(fileInfo.absoluteFilePath());
     data->m_name        = fileInfo.fileName();
-    data->m_path        = fileInfo.path();
+    data->m_path        = baseDir.relativeFilePath(fileInfo.absoluteFilePath());
     data->m_isHidden    = fileInfo.isHidden();
 
     QDir dir(data->m_fileName);
@@ -478,11 +480,15 @@ void ImageUtils::LoadDirectoryData(QFileInfo &fileInfo,
  *  \return void
  */
 void ImageUtils::LoadFileData(QFileInfo &fileInfo,
-                              ImageMetadata *data)
+                              ImageMetadata *data,
+                              const QString &baseDirectory)
 {
-    data->m_fileName    = fileInfo.absoluteFilePath();
+    QDir baseDir(baseDirectory);
+    data->m_fileName    = fileInfo.fileName();
     data->m_name        = fileInfo.fileName();
-    data->m_path        = fileInfo.path();
+    data->m_path        = baseDir.relativeFilePath(fileInfo.absolutePath());
+    if (data->m_path.isNull()) // Hack because relativeFilePath will return a null instead of empty string
+        data->m_path = "";
     data->m_modTime     = fileInfo.lastModified().toTime_t();
     data->m_size        = fileInfo.size();
     data->m_isHidden    = fileInfo.isHidden();
@@ -634,7 +640,7 @@ QList<QStringList> ImageUtils::GetAllExifValues(const QString &fileName)
             Exiv2::ExifData &exifData = image->exifData();
             if (!exifData.empty())
             {
-                LOG(VB_GENERAL, LOG_DEBUG,
+                LOG(VB_FILE, LOG_DEBUG,
                     QString("Found %1 tag(s) for file %2")
                     .arg(exifData.count())
                     .arg(fileName));
@@ -665,7 +671,7 @@ QList<QStringList> ImageUtils::GetAllExifValues(const QString &fileName)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR,
+                LOG(VB_FILE, LOG_DEBUG,
                     QString("Exiv2 error: No header, file %1")
                     .arg(fileName));
             }
@@ -727,14 +733,14 @@ QString ImageUtils::GetExifValue(const QString &fileName,
                 }
                 else
                 {
-                    LOG(VB_GENERAL, LOG_ERR,
+                    LOG(VB_FILE, LOG_DEBUG,
                         QString("Exiv2 error: No tag found, file %1, tag %2")
                         .arg(fileName).arg(exifTag));
                 }
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR,
+                LOG(VB_FILE, LOG_DEBUG,
                     QString("Exiv2 error: No header, file %1, tag %2")
                     .arg(fileName).arg(exifTag));
             }

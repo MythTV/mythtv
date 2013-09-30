@@ -10,9 +10,10 @@
 #include "exitcodes.h"
 
 #include "imagemetadata.h"
+#include "imageutils.h"
 #include "gallerythumbgenthread.h"
 
-
+// FIXME: This should be on the backend only, not the frontend!
 
 /** \fn     GalleryThumbGenThread::GalleryThumbGenThread()
  *  \brief  Constructor
@@ -24,6 +25,8 @@ GalleryThumbGenThread::GalleryThumbGenThread()
             m_width(0), m_height(0),
             m_pause(false), m_fileListSize(0)
 {
+    QString sgName = IMAGE_STORAGE_GROUP;
+    m_storageGroup = StorageGroup(sgName, gCoreContext->GetHostName());
 }
 
 
@@ -124,7 +127,8 @@ void GalleryThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
     if (!dir.exists(im->m_thumbPath))
         dir.mkpath(im->m_thumbPath);
 
-    QString imageFileName = im->m_fileName;
+    QString imageFileName = m_storageGroup.FindFile(im->m_fileName);
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Creating thumbnail for %1").arg(imageFileName));
 
     // If a folder thumbnail shall be created we need to get
     // the real filename from the thumbnail filename by removing
@@ -208,10 +212,12 @@ void GalleryThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
     if (!dir.exists(im->m_thumbPath))
         dir.mkpath(im->m_thumbPath);
 
+    QString videoFileName = m_storageGroup.FindFile(im->m_fileName);
+
     QString cmd = "mythpreviewgen";
     QStringList args;
     args << logPropagateArgs.split(" ", QString::SkipEmptyParts);
-    args << "--infile"  << '"' + im->m_fileName + '"';
+    args << "--infile"  << '"' + videoFileName + '"';
     args << "--outfile" << '"' + im->m_thumbFileNameList->at(0) + '"';
 
     MythSystemLegacy ms(cmd, args, kMSRunShell);

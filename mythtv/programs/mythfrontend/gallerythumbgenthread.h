@@ -8,6 +8,7 @@
 // MythTV headers
 #include "mythuibuttontree.h"
 #include "imagemetadata.h"
+#include "storagegroup.h"
 
 #include "galleryfilehelper.h"
 #include "gallerydatabasehelper.h"
@@ -56,6 +57,7 @@ private:
     int m_fileListSize;
 
     QWaitCondition      m_condition;
+    StorageGroup        m_storageGroup;
 };
 
 #endif // GALLERYTHUMBGENTHREAD_H
