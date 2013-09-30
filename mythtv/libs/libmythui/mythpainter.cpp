@@ -19,7 +19,7 @@ MythPainter::MythPainter()
   : m_Parent(0), m_HardwareCacheSize(0), m_SoftwareCacheSize(0),
     m_showBorders(false), m_showNames(false)
 {
-    SetMaximumCacheSizes(96, 96);
+    SetMaximumCacheSizes(96, 48);
 }
 
 void MythPainter::Teardown(void)
