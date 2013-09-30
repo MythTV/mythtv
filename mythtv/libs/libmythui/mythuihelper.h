@@ -81,8 +81,8 @@ class MUI_PUBLIC MythUIHelper
     static void ParseGeometryOverride(const QString &geometry);
     bool IsGeometryOverridden(void);
 
-    QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
-    QImage *LoadScaleImage(QString filename, bool fromcache = true);
+    QPixmap *LoadScalePixmap(QString filename, bool fromcache = true) MDEPRECATED;
+    QImage *LoadScaleImage(QString filename, bool fromcache = true) MDEPRECATED;
     /// Returns a reference counted image from the cache.
     /// \note The reference count is set for one use call DecrRef() to delete.
     MythImage *LoadCacheImage(QString srcfile, QString label,

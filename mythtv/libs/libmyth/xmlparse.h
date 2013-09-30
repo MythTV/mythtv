@@ -12,7 +12,7 @@ class MythUIHelper;
 class XMLParse
 {
   public:
-    XMLParse();
+    XMLParse() MDEPRECATED;
    ~XMLParse();
 
   protected:

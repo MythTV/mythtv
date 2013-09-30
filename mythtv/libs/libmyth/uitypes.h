@@ -20,6 +20,7 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythwidgets.h"
 #include "mythfontproperties.h"
+#include "mythexp.h"
 
 #ifdef _WIN32
 #undef LoadImage
@@ -80,7 +81,7 @@ class MPUBLIC UIType : public QObject
   Q_OBJECT
 
   public:
-    UIType(const QString &name);
+    UIType(const QString &name) MDEPRECATED;
     virtual ~UIType();
 
     void SetOrder(int order);
@@ -238,7 +239,7 @@ class MPUBLIC UIKeyboardType : public UIType
     Q_OBJECT
 
   public:
-    UIKeyboardType(const QString &, int);
+    UIKeyboardType(const QString &, int) MDEPRECATED;
     ~UIKeyboardType();
 
     typedef QList<UIKeyType*> KeyList;

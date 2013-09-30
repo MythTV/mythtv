@@ -5,6 +5,7 @@
 #include <QCheckBox>
 
 #include "mythdialogs.h"
+#include "mythexp.h"
 #include "compat.h" // to undef DialogBox
 class QVBoxLayout;
 class QButtonGroup;
@@ -14,7 +15,7 @@ class MPUBLIC DialogBox : public MythDialog
     Q_OBJECT
   public:
     DialogBox(MythMainWindow *parent, const QString &text, 
-              const char *checkboxtext = NULL, const char *name = NULL);
+              const char *checkboxtext = NULL, const char *name = NULL) MDEPRECATED;
 
     void AddButton(const QString &title);
 

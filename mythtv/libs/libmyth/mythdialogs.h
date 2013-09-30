@@ -124,10 +124,10 @@ class MPUBLIC MythPopupBox : public MythDialog
     Q_OBJECT
 
   public:
-    MythPopupBox(MythMainWindow *parent, const char *name = "MythPopupBox");
+    MythPopupBox(MythMainWindow *parent, const char *name = "MythPopupBox") MDEPRECATED;
     MythPopupBox(MythMainWindow *parent, bool graphicPopup,
                  QColor popupForeground, QColor popupBackground,
-                 QColor popupHighlight, const char *name = "MythPopupBox");
+                 QColor popupHighlight, const char *name = "MythPopupBox") MDEPRECATED;
 
     void addWidget(QWidget *widget, bool setAppearance = true);
     void addLayout(QLayout *layout, int stretch = 0);
@@ -217,7 +217,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
     MythProgressDialog(const QString& message, int totalSteps = 0,
                        bool cancelButton = false,
                        const QObject * target = NULL,
-                       const char * slot = NULL);
+                       const char * slot = NULL) MDEPRECATED;
 
     /* \brief Close the dialog.
 
@@ -267,10 +267,10 @@ class MythThemedDialog : public MythDialog
                      const QString  &window_name,
                      const QString  &theme_filename = QString(),
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true);
+                     bool            setsize = true) MDEPRECATED;
     MythThemedDialog(MythMainWindow *parent,
                      const char     *name = "MythThemedDialog",
-                     bool            setsize = true);
+                     bool            setsize = true) MDEPRECATED;
 
     virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
