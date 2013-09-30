@@ -72,13 +72,11 @@ SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
 
 /**
  * Delete any current "busy" popup, create new one.
- *
- * Wish there was a way to change the message on existing popup.
  */
 void SchemaUpgradeWizard::BusyPopup(const QString &message)
 {
     if (m_busyPopup)
-        m_busyPopup->Close();
+        m_busyPopup->SetMessage(message);
 
     m_busyPopup = ShowBusyPopup(message);
 }
@@ -144,7 +142,7 @@ int SchemaUpgradeWizard::Compare(void)
 MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
                                                  bool upgradable, bool expert)
 {
-    DialogBox       * dlg;
+    DialogBox   * dlg;
     MythMainWindow  * win = GetMythMainWindow();
 
     if (!win)
