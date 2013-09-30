@@ -426,7 +426,7 @@
         </shape>
 
         <textarea name="sortorder_label" from="basetextarea">
-            <area>180,190,540,40</area>
+            <area>180,240,540,40</area>
             <align>right,vcenter</align>
             <value>Sorting order of the shown images:</value>
         </textarea>
