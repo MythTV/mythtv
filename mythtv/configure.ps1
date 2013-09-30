@@ -121,6 +121,25 @@ Function GetQtVersion()
     return $QtVer
 }
 
+Function RunQMake()
+{
+    # -----------------------------------------------------------------------
+    # delete external\Makefile since version in Git is for Linux.
+    # it will be re-created by qmake using external.pro
+    # -----------------------------------------------------------------------
+
+    Remove-Item $basePath\external\Makefile -ErrorAction SilentlyContinue
+
+    # -----------------------------------------------------------------------
+    Write-Host "Running qmake on mythtv to generating makefiles..." -foregroundcolor green
+    # -----------------------------------------------------------------------
+
+    Write-Host "qmake mythtv.pro" -Foregroundcolor blue
+
+    &qmake "CONFIG+=$BuildType" mythtv.pro
+}
+
+
 # ###########################################################################
 #
 # Check for existance of required Environment and Tools
@@ -381,7 +400,7 @@ switch ($tools.Get_Item( $pThreadName ))
     {
         Write-Host "Building: pthreads" -foregroundcolor cyan
 
-        if (!(Test-Path $basePath\platform\win32\msvc\external\pthreads.2\pthread*.lib ))
+        if (!(Test-Path $basePath\platform\win32\msvc\external\pthreads.2\$pThreadName ))
         {
             if ($BuildType -eq "debug")
             {
@@ -824,21 +843,21 @@ if ($OutputType -eq "nmake")
 {
     if ($BuildType -ne "clean")
     {
-        # -----------------------------------------------------------------------
-        # delete external\Makefile since version in Git is for Linux.
-        # it will be re-created by qmake using external.pro
-        # -----------------------------------------------------------------------
+        RunQMake
 
-        Remove-Item $basePath\external\Makefile -ErrorAction SilentlyContinue
+        if ($Force)
+        {
+            # we actually want to perform a 'nmake distclean' to force all 
+            # projects to be re-compiled.  This is used by the BuildBot
 
-        # -----------------------------------------------------------------------
-        Write-Host "Running qmake on mythtv to generating makefiles..." -foregroundcolor green
-        # -----------------------------------------------------------------------
+            Write-Host "Force requested: nmake distclean" -foregroundcolor cyan
 
-        Write-Host "qmake mythtv.pro" -Foregroundcolor blue
+            & nmake distclean
+    
+            # the above deletes the makefile, so need to re-create it again.
 
-        &qmake "CONFIG+=$BuildType" mythtv.pro
-
+            RunQMake
+        }
     }
 
     # -----------------------------------------------------------------------
