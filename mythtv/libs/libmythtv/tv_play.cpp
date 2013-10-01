@@ -1618,17 +1618,17 @@ void TV::GetStatus(void)
                 status.insert("brightness",
                   vo->GetPictureAttribute(kPictureAttribute_Brightness));
             }
-            if (supp & kPictureAttributeSupported_Brightness)
+            if (supp & kPictureAttributeSupported_Contrast)
             {
                 status.insert("contrast",
                   vo->GetPictureAttribute(kPictureAttribute_Contrast));
             }
-            if (supp & kPictureAttributeSupported_Brightness)
+            if (supp & kPictureAttributeSupported_Colour)
             {
                 status.insert("colour",
                   vo->GetPictureAttribute(kPictureAttribute_Colour));
             }
-            if (supp & kPictureAttributeSupported_Brightness)
+            if (supp & kPictureAttributeSupported_Hue)
             {
                 status.insert("hue",
                   vo->GetPictureAttribute(kPictureAttribute_Hue));
