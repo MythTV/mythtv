@@ -9,19 +9,16 @@
 #include "mythuibuttontree.h"
 #include "imagemetadata.h"
 #include "storagegroup.h"
-
-#include "galleryfilehelper.h"
-#include "gallerydatabasehelper.h"
+#include "mythmetaexp.h"
 
 
-
-class GalleryThumbGenThread : public QThread
+class META_PUBLIC ImageThumbGenThread : public QThread
 {
     Q_OBJECT
 
 public:
-    GalleryThumbGenThread();
-    ~GalleryThumbGenThread();
+    ImageThumbGenThread();
+    ~ImageThumbGenThread();
 
     void cancel();
     void Pause();
@@ -48,8 +45,6 @@ private:
 
     QList<ImageMetadata *>    m_fileList;
     QMutex              m_mutex;
-    GalleryFileHelper         *m_fileHelper;
-    GalleryDatabaseHelper     *m_dbHelper;
 
     int m_width;
     int m_height;

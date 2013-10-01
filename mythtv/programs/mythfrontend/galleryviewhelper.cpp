@@ -1,3 +1,6 @@
+
+#include "galleryviewhelper.h"
+
 // Qt headers
 #include <QFile>
 
@@ -5,10 +8,6 @@
 #include "mythcontext.h"
 #include "storagegroup.h"
 #include "imageutils.h"
-
-#include "galleryviewhelper.h"
-
-
 
 /** \fn     GalleryViewHelper::GalleryViewHelper(MythScreenType *)
  *  \brief  Constructor
@@ -22,7 +21,7 @@ GalleryViewHelper::GalleryViewHelper(MythScreenType *parent)
     m_sgDirList = StorageGroup::getGroupDirs(m_sgName, "");
 
     m_dbHelper = new GalleryDatabaseHelper();
-    m_thumbGenThread = new GalleryThumbGenThread();
+    m_thumbGenThread = new ImageThumbGenThread();
     m_fileHelper  = new GalleryFileHelper();
 
     connect(m_thumbGenThread,  SIGNAL(ThumbnailCreated(ImageMetadata *, int)),

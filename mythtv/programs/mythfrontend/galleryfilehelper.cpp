@@ -1,3 +1,6 @@
+
+#include "galleryfilehelper.h"
+
 // Qt headers
 #include <QNetworkAccessManager>
 #include <QXmlStreamReader>
@@ -13,7 +16,6 @@
 #include "storagegroup.h"
 #include "remoteutil.h"
 
-#include "galleryfilehelper.h"
 #include "gallerytypedefs.h"
 
 

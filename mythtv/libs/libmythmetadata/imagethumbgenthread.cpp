@@ -11,56 +11,45 @@
 
 #include "imagemetadata.h"
 #include "imageutils.h"
-#include "gallerythumbgenthread.h"
+#include "imagethumbgenthread.h"
 
 // FIXME: This should be on the backend only, not the frontend!
 
-/** \fn     GalleryThumbGenThread::GalleryThumbGenThread()
+/** \fn     ImageThumbGenThread::ImageThumbGenThread()
  *  \brief  Constructor
  *  \return void
  */
-GalleryThumbGenThread::GalleryThumbGenThread()
-        :   m_fileHelper(new GalleryFileHelper()),
-            m_dbHelper(new GalleryDatabaseHelper()),
-            m_width(0), m_height(0),
+ImageThumbGenThread::ImageThumbGenThread()
+        :   m_width(0), m_height(0),
             m_pause(false), m_fileListSize(0)
 {
     QString sgName = IMAGE_STORAGE_GROUP;
     m_storageGroup = StorageGroup(sgName, gCoreContext->GetHostName());
+
+    if (!gCoreContext->IsMasterBackend())
+        LOG(VB_GENERAL, LOG_ERR, "ImageThumbGenThread MUST be run on the master backend");
 }
 
 
 
-/** \fn     GalleryThumbGenThread::~GalleryThumbGenThread()
+/** \fn     ImageThumbGenThread::~ImageThumbGenThread()
  *  \brief  Destructor
  *  \return void
  */
-GalleryThumbGenThread::~GalleryThumbGenThread()
+ImageThumbGenThread::~ImageThumbGenThread()
 {
     cancel();
     wait();
-
-    if (m_fileHelper)
-    {
-        delete m_fileHelper;
-        m_fileHelper = NULL;
-    }
-
-    if (m_dbHelper)
-    {
-        delete m_dbHelper;
-        m_dbHelper = NULL;
-    }
 }
 
 
 
-/** \fn     GalleryThumbGenThread::run()
+/** \fn     ImageThumbGenThread::run()
  *  \brief  Called when the thread starts. Tries to generate
  *          thumbnails from the file list until its empty or aborted.
  *  \return void
  */
-void GalleryThumbGenThread::run()
+void ImageThumbGenThread::run()
 {
     volatile bool exit = false;
 
@@ -112,13 +101,13 @@ void GalleryThumbGenThread::run()
 
 
 
-/** \fn     GalleryThumbGenThread::CreateImageThumbnail(ImageMetadata *, int)
+/** \fn     ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *, int)
  *  \brief  Creates a thumbnail with the correct size and rotation
  *  \param  im The thumbnail details
  *  \param  dataid The id of the thumbnail
  *  \return void
  */
-void GalleryThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
+void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
 {
     if (QFile(im->m_thumbFileNameList->at(id)).exists())
         return;
@@ -198,12 +187,12 @@ void GalleryThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
 
 
 
-/** \fn     GalleryThumbGenThread::CreateVideoThumbnail(ImageMetadata *)
+/** \fn     ImageThumbGenThread::CreateVideoThumbnail(ImageMetadata *)
  *  \brief  Creates a video preview image with the correct size
  *  \param  im The thumbnail details
  *  \return void
  */
-void GalleryThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
+void ImageThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
 {
     if (QFile(im->m_thumbFileNameList->at(0)).exists())
         return;
@@ -242,13 +231,13 @@ void GalleryThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
 
 
 
-/** \fn     GalleryThumbGenThread::Resize(QImage)
+/** \fn     ImageThumbGenThread::Resize(QImage)
  *  \brief  Resizes the thumbnail to prevent black areas 
  *          around the image when its shown in a widget.
  *  \param  The image that shall be resized
  *  \return void
  */
-void GalleryThumbGenThread::Resize(QImage &image)
+void ImageThumbGenThread::Resize(QImage &image)
 {
     // If the factor of the width to height of the image is smaller
     // than of the widget stretch the image horizontally. The image
@@ -279,12 +268,12 @@ void GalleryThumbGenThread::Resize(QImage &image)
 
 
 
-/** \fn     GalleryThumbGenThread::AddToThumbnailList(ImageMetadata *)
+/** \fn     ImageThumbGenThread::AddToThumbnailList(ImageMetadata *)
  *  \brief  Adds a file to the thumbnail list
  *  \param  im The file information
  *  \return void
  */
-void GalleryThumbGenThread::AddToThumbnailList(ImageMetadata *im)
+void ImageThumbGenThread::AddToThumbnailList(ImageMetadata *im)
 {
     if (!im)
         return;
@@ -297,12 +286,12 @@ void GalleryThumbGenThread::AddToThumbnailList(ImageMetadata *im)
 
 
 
-/** \fn     GalleryThumbGenThread::RecreateThumbnail(ImageMetadata *)
+/** \fn     ImageThumbGenThread::RecreateThumbnail(ImageMetadata *)
  *  \brief  Deletes the old thumbnail and creates a new one
  *  \param  im The thumbnail information
  *  \return void
  */
-void GalleryThumbGenThread::RecreateThumbnail(ImageMetadata *im)
+void ImageThumbGenThread::RecreateThumbnail(ImageMetadata *im)
 {
     if (!im)
         return;
@@ -318,11 +307,11 @@ void GalleryThumbGenThread::RecreateThumbnail(ImageMetadata *im)
 
 
 
-/** \fn     GalleryThumbGenThread::cancel()
+/** \fn     ImageThumbGenThread::cancel()
  *  \brief  Clears the thumbnail list so that the thread can exit.
  *  \return void
  */
-void GalleryThumbGenThread::cancel()
+void ImageThumbGenThread::cancel()
 {
     m_mutex.lock();
     m_fileList.clear();
@@ -334,22 +323,22 @@ void GalleryThumbGenThread::cancel()
 
 
 
-/** \fn     GalleryThumbGenThread::Pause()
+/** \fn     ImageThumbGenThread::Pause()
  *  \brief  Pauses the thumbnail generation
  *  \return void
  */
-void GalleryThumbGenThread::Pause()
+void ImageThumbGenThread::Pause()
 {
     m_pause = true;
 }
 
 
 
-/** \fn     GalleryThumbGenThread::Resume()
+/** \fn     ImageThumbGenThread::Resume()
  *  \brief  Resumes the thumbnail generation
  *  \return void
  */
-void GalleryThumbGenThread::Resume()
+void ImageThumbGenThread::Resume()
 {
     m_condition.wakeAll();
     m_pause = false;
@@ -357,11 +346,11 @@ void GalleryThumbGenThread::Resume()
 
 
 
-/** \fn     GalleryThumbGenThread::SetThumbnailSize(int, int)
+/** \fn     ImageThumbGenThread::SetThumbnailSize(int, int)
  *  \brief  Saves and specifies the size of the thumbnails.
  *  \return void
  */
-void GalleryThumbGenThread::SetThumbnailSize(int width, int height)
+void ImageThumbGenThread::SetThumbnailSize(int width, int height)
 {
     if (width > 0)
         m_width = width;

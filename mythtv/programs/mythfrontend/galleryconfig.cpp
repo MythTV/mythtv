@@ -1,3 +1,6 @@
+
+#include "galleryconfig.h"
+
 // Qt headers
 
 // MythTV headers
@@ -11,7 +14,6 @@
 #include "mythdialogbox.h"
 #include "mythscreentype.h"
 
-#include "galleryconfig.h"
 #include "gallerydatabasehelper.h"
 #include "gallerytypedefs.h"
 

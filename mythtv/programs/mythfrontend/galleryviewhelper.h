@@ -9,10 +9,10 @@
 // MythTV headers
 #include "mythgenerictree.h"
 #include "imagemetadata.h"
+#include "imagethumbgenthread.h"
 
-#include "gallerythumbgenthread.h"
 #include "galleryfilehelper.h"
-
+#include "gallerydatabasehelper.h"
 
 
 class GalleryViewHelper : public QObject
@@ -24,7 +24,7 @@ public:
     ~GalleryViewHelper();
 
     MythGenericTree         *m_currentNode;
-    GalleryThumbGenThread   *m_thumbGenThread;
+    ImageThumbGenThread   *m_thumbGenThread;
 
     QStringList m_sgDirList;
     QString     m_sgName;

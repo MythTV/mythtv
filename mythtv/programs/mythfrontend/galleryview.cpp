@@ -1,10 +1,13 @@
+
+#include "galleryview.h"
+
 // Qt headers
 
 // MythTV headers
 #include "mythcontext.h"
 
-#include "galleryview.h"
 #include "galleryconfig.h"
+#include "gallerytypedefs.h"
 #include "imagescan.h"
 
 

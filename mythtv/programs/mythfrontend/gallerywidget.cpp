@@ -1,3 +1,6 @@
+
+#include "gallerywidget.h"
+
 // Qt headers
 #include <QByteArray>
 #include <QXmlStreamReader>
@@ -6,8 +9,7 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 
-#include "gallerywidget.h"
-
+#include "imagethumbgenthread.h"
 
 
 ImageLoadingThread::ImageLoadingThread() :
