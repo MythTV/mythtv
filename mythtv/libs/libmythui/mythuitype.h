@@ -38,6 +38,7 @@ class MythUIWebBrowser;
 
 #define QT_PAINTER      "qt"
 #define OPENGL_PAINTER  "opengl"
+#define OPENGL_PAINTER2 "opengl2"
 #define AUTO_PAINTER    "auto"
 #define D3D9_PAINTER    "d3d9"
 
