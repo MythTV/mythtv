@@ -2571,7 +2571,7 @@ static HostComboBox *ThemePainter()
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 1"),
                      OPENGL_PAINTER);
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 2"),
-                     OPENGL_PAINTER2);
+                     OPENGL2_PAINTER);
 #endif
 #ifdef _WIN32
     gc->addSelection(QCoreApplication::translate("(Common)", "Direct3D"),
