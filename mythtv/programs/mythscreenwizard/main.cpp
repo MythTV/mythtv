@@ -219,7 +219,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
 #if CONFIG_DARWIN
-    mainWindow->Init(OPENGL_PAINTER);
+    mainWindow->Init(OPENGL2_PAINTER);
 #else
     mainWindow->Init();
 #endif

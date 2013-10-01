@@ -1231,7 +1231,7 @@ static bool resetTheme(QString themedir, const QString badtheme)
     gCoreContext->ReInitLocale();
     GetMythUI()->LoadQtConfig();
 #if CONFIG_DARWIN
-    GetMythMainWindow()->Init(OPENGL_PAINTER);
+    GetMythMainWindow()->Init(OPENGL2_PAINTER);
 #else
     GetMythMainWindow()->Init();
 #endif
@@ -1264,7 +1264,7 @@ static int reloadTheme(void)
         menu->Close();
     }
 #if CONFIG_DARWIN
-    GetMythMainWindow()->Init(gLoaded ? OPENGL_PAINTER : QT_PAINTER);
+    GetMythMainWindow()->Init(gLoaded ? OPENGL2_PAINTER : QT_PAINTER);
 #else
     GetMythMainWindow()->Init();
 #endif
@@ -1753,7 +1753,7 @@ int main(int argc, char **argv)
 
 #if CONFIG_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
-    GetMythMainWindow()->Init(OPENGL_PAINTER);
+    GetMythMainWindow()->Init(OPENGL2_PAINTER);
     GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     gLoaded = true;
