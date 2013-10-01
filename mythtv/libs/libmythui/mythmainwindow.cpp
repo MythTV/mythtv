@@ -1040,7 +1040,10 @@ void MythMainWindow::Init(QString forcedpainter)
     if ((painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
         painter.contains(OPENGL_PAINTER))
     {
-        LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
+        if (painter == OPENGL_PAINTER)
+            LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL painter");
+        else if (painter == OPENGL_PAINTER2)
+            LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 2 painter");
         d->painter = new MythOpenGLPainter();
         d->render = MythRenderOpenGL::Create(painter);
         MythRenderOpenGL *gl = dynamic_cast<MythRenderOpenGL*>(d->render);
