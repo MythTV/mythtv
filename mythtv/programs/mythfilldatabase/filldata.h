@@ -22,6 +22,7 @@ using namespace std;
 bool updateLastRunEnd();
 bool updateLastRunStart();
 bool updateLastRunStatus(QString &status);
+bool updateNextScheduledRun();
 
 struct Source
 {

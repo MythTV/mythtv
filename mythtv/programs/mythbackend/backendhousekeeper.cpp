@@ -523,27 +523,27 @@ void MythFillDatabaseTask::SetHourWindowFromDB(void)
 
 bool MythFillDatabaseTask::UseSuggestedTime(void)
 {
-    if (!gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
-        // this feature is disabled, so don't bother with a deeper check
-        return false;
+//     if (!gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+//         // this feature is disabled, so don't bother with a deeper check
+//         return false;
+//
+//     MSqlQuery result(MSqlQuery::InitCon());
+//     if (result.isConnected())
+//     {
+//         // check to see if we have any of a list of supported grabbers in use
+//         // TODO: this is really cludgy. there has to be a better way to test
+//         result.prepare("SELECT COUNT(*) FROM videosource"
+//                        " WHERE xmltvgrabber IN"
+//                        "        ( 'datadirect',"
+//                        "          'technovera',"
+//                        "          'schedulesdirect1' );");
+//         if ((result.exec()) &&
+//             (result.next()) &&
+//             (result.value(0).toInt() > 0))
+//                 return true;
+//     }
 
-    MSqlQuery result(MSqlQuery::InitCon());
-    if (result.isConnected())
-    {
-        // check to see if we have any of a list of supported grabbers in use
-        // TODO: this is really cludgy. there has to be a better way to test
-        result.prepare("SELECT COUNT(*) FROM videosource"
-                       " WHERE xmltvgrabber IN"
-                       "        ( 'datadirect',"
-                       "          'technovera',"
-                       "          'schedulesdirect1' );");
-        if ((result.exec()) &&
-            (result.next()) &&
-            (result.value(0).toInt() > 0))
-                return true;
-    }
-
-    return false;
+    return gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1);
 }
 
 bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
