@@ -64,9 +64,9 @@ bool updateLastRunStatus(QString &status)
 bool updateNextScheduledRun()
 {
     QDateTime nextSuggestedTime = MythDate::current().addDays(1);
-    gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
-                                    nextSuggestedTime.toString(Qt::ISODate),
-                                    NULL);
+    return gCoreContext->SaveSettingOnHost("MythFillSuggestedRunTime",
+                                        nextSuggestedTime.toString(Qt::ISODate),
+                                        NULL);
 }
 
 void FillData::SetRefresh(int day, bool set)
