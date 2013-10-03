@@ -2715,6 +2715,19 @@ void Scheduler::HandleIdleShutdown(
                         idleSince = QDateTime();
                     }
                 }
+
+                // If we're due to grab guide data, then block shutdown
+                if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime"))
+                {
+                    QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+                    QDateTime guideRunTime = QDateTime::fromString(str);
+
+                    if (curtime.secsTo(guideRunTime) <
+                        (idleWaitForRecordingTime * 60))
+                    {
+                        idleSince = QDateTime();
+                    }
+                }
             }
 
             if (idleSince.isValid())
@@ -2846,6 +2859,10 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 {
     m_isShuttingDown = true;
 
+    // Check if we need to wake up to grab guide date before the next recording
+    QString str = gCoreContext->GetSetting("MythFillGrabberSuggestsTime");
+    QDateTime guideRefreshTime = QDateTime::fromString(str);
+
     RecIter recIter = reclist.begin();
     for ( ; recIter != reclist.end(); ++recIter)
         if ((*recIter)->GetRecordingStatus() == rsWillRecord)
@@ -2857,6 +2874,9 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
         RecordingInfo *nextRecording = (*recIter);
         QDateTime restarttime = nextRecording->GetRecordingStartTime()
             .addSecs((-1) * prerollseconds);
+
+        if (guideRefreshTime < restarttime)
+            restarttime = guideRefreshTime;
 
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
@@ -2900,6 +2920,10 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
             m_isShuttingDown = false;
             return;
         }
+
+        gCoreContext->SaveSettingOnHost("MythShutdownWakeupTime",
+                                        MythDate::toString(restarttime, MythDate::kDatabase),
+                                        NULL);
     }
 
     // tell anyone who is listening the master server is going down now
@@ -5078,17 +5102,29 @@ bool Scheduler::WasStartedAutomatically()
     // if we don't have a valid startup time assume we were started manually
     if (startupTime.isValid())
     {
-        // if we started within 15mins of the saved wakeup time assume we
-        // started automatically to record or for a daily wakeup/shutdown period
-
-        if (abs(startupTime.secsTo(MythDate::current())) < (15 * 60))
+        int startupSecs = gCoreContext->GetNumSetting("StartupSecsBeforeRecording");
+        // If we started within 'StartupSecsBeforeRecording' OR 15 minutes
+        // of the saved wakeup time assume we either started automatically
+        // to record, to obtain guide data or or for a
+        // daily wakeup/shutdown period
+        if (abs(startupTime.secsTo(MythDate::current())) <
+            max(startupSecs, 15 * 60))
         {
-            LOG(VB_SCHEDULE, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO,
                 "Close to auto-start time, AUTO-Startup assumed");
+
+            QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+            QDateTime guideRunTime = QDateTime::fromString(str);
+            if (guideRunTime.secsTo(MythDate::current()) <
+                max(startupSecs, 15 * 60))
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    "Close to MythFillDB suggested run time, AUTO-Startup to fetch guide data?");
+            }
             autoStart = true;
         }
         else
-            LOG(VB_SCHEDULE, LOG_DEBUG,
+            LOG(VB_GENERAL, LOG_DEBUG,
                 "NOT close to auto-start time, USER-initiated startup assumed");
     }
     else if (!s.isEmpty())
