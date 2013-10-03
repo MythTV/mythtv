@@ -10,7 +10,7 @@ target.path = $${LIBDIR}
 
 !win32-msvc*:DESTDIR  = $$QJSON_BASE/lib
 
-CONFIG += create_prl
+#CONFIG += create_prl
 INSTALLS = target
 
 !mingw {
@@ -86,7 +86,7 @@ symbian: {
 }
 
 inc.files += $${PUBLIC_HEADERS}
-inc.path  = $${PREFIX}/include/QJson/
+inc.path  = $${PREFIX}/include/mythtv/QJson/
 
 INSTALLS += inc
 
@@ -96,7 +96,7 @@ PUBLIC_CPPHEADERS += \
   Parser
 
 cppinc.files += $${PUBLIC_CPPHEADERS}
-cppinc.path  += $${PREFIX}/include/QJson/
+cppinc.path  += $${PREFIX}/include/mythtv/QJson/
 
 INSTALLS += cppinc
 
