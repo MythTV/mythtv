@@ -464,21 +464,9 @@ bool DDStructureParser::characters(const QString& pchars)
                 LOG(VB_GENERAL, LOG_INFO, LOC + ExpirationDateMessage);
             }
 
-            MSqlQuery query(MSqlQuery::DDCon());
-
-            QString querystr = QString(
-                "UPDATE settings "
-                "SET data ='%1' "
-                "WHERE value='DataDirectMessage'")
-                .arg(ExpirationDateMessage);
-
-            query.prepare(querystr);
-
-            if (!query.exec())
-            {
-                MythDB::DBError("Updating DataDirect Status Message",
-                                     query);
-            }
+            gCoreContext->SaveSettingOnHost("DataDirectMessage",
+                                            ExpirationDateMessage,
+                                            NULL);
         }
     }
     if (currtagname == "callSign")
