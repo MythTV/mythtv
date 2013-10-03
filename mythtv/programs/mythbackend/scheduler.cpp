@@ -2859,10 +2859,6 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 {
     m_isShuttingDown = true;
 
-    // Check if we need to wake up to grab guide date before the next recording
-    QString str = gCoreContext->GetSetting("MythFillGrabberSuggestsTime");
-    QDateTime guideRefreshTime = QDateTime::fromString(str);
-
     RecIter recIter = reclist.begin();
     for ( ; recIter != reclist.end(); ++recIter)
         if ((*recIter)->GetRecordingStatus() == rsWillRecord)
@@ -2875,7 +2871,14 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
         QDateTime restarttime = nextRecording->GetRecordingStartTime()
             .addSecs((-1) * prerollseconds);
 
-        if (guideRefreshTime < restarttime)
+        // Check if we need to wake up to grab guide date before the next recording
+        QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+        QDateTime guideRefreshTime = QDateTime::fromString(str);
+
+        if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
+            guideRefreshTime.isValid() &&
+            (guideRefreshTime > MythDate::current()) &&
+            (guideRefreshTime < restarttime))
             restarttime = guideRefreshTime;
 
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
