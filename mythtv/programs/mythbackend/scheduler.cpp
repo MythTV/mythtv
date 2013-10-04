@@ -2712,6 +2712,9 @@ void Scheduler::HandleIdleShutdown(
                         (idleWaitForRecordingTime * 60) +
                         idleTimeoutSecs)
                     {
+                        LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
+                                                    "a recording is due to "
+                                                    "start soon.");
                         idleSince = QDateTime();
                     }
                 }
@@ -2725,6 +2728,9 @@ void Scheduler::HandleIdleShutdown(
                     if (curtime.secsTo(guideRunTime) <
                         (idleWaitForRecordingTime * 60))
                     {
+                        LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
+                                                    "mythfilldatabase is due to "
+                                                    "run soon.");
                         idleSince = QDateTime();
                     }
                 }
