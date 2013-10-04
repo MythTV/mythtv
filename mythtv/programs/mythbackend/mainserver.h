@@ -108,7 +108,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     void customEvent(QEvent *e);
 
-    bool isClientConnected();
+    bool isClientConnected(bool onlyBlockingClients = false);
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
