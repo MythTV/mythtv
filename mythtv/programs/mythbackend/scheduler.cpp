@@ -2730,13 +2730,13 @@ void Scheduler::HandleIdleShutdown(
 
                 // If we're due to grab guide data, then block shutdown
                 if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
-                    gCoreContext->GetNumSetting("MythFillEnabled")
-                )
+                    gCoreContext->GetNumSetting("MythFillEnabled"))
                 {
                     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
                     QDateTime guideRunTime = QDateTime::fromString(str);
 
-                    if ((guideRunTime > MythDate::current()) &&
+                    if (guideRunTime.isValid() &&
+                        (guideRunTime > MythDate::current()) &&
                         curtime.secsTo(guideRunTime) <
                         (idleWaitForRecordingTime * 60))
                     {
