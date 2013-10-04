@@ -6280,7 +6280,7 @@ void MainServer::reconnectTimeout(void)
 
 // returns true, if a client (slavebackends are not counted!)
 // is connected by checking the lists.
-bool MainServer::isClientConnected()
+bool MainServer::isClientConnected(bool onlyBlockingClients)
 {
     bool foundClient = false;
 
@@ -6291,10 +6291,16 @@ bool MainServer::isClientConnected()
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; !foundClient && (it != playbackList.end()); ++it)
     {
-        // we simply ignore slaveBackends!
-        // and clients that don't want to block shutdown
-        if (!(*it)->isSlaveBackend() && (*it)->getBlockShutdown())
-            foundClient = true;
+        // Ignore slave backends
+        if ((*it)->isSlaveBackend())
+            continue;
+
+        // If we are only interested in blocking clients then ignore
+        // non-blocking ones
+        if (onlyBlockingClients && !(*it)->getBlockShutdown())
+            continue;
+
+        foundClient = true;
     }
 
     sockListLock.unlock();

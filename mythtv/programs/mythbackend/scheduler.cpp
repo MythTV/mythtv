@@ -2665,6 +2665,8 @@ void Scheduler::HandleIdleShutdown(
         return;
 
     // we release the block when a client connects
+    // Allow the presence of a non-blocking client to release this,
+    // the frontend may have connected then gone idle between scheduler runs
     if (blockShutdown)
         blockShutdown &= !m_mainServer->isClientConnected();
     else
@@ -2681,7 +2683,8 @@ void Scheduler::HandleIdleShutdown(
                 recording = true;
         }
 
-        if (!(m_mainServer->isClientConnected()) && !recording)
+        // If there are BLOCKING clients, then we're not idle
+        if (!(m_mainServer->isClientConnected(true)) && !recording)
         {
             // have we received a RESET_IDLETIME message?
             resetIdleTime_lock.lock();
