@@ -2715,11 +2715,9 @@ void Scheduler::HandleIdleShutdown(
 
                 if (idleIter != reclist.end())
                 {
-                    if (curtime.secsTo
-                        ((*idleIter)->GetRecordingStartTime()) -
-                        prerollseconds <
-                        (idleWaitForRecordingTime * 60) +
-                        idleTimeoutSecs)
+                    if ((curtime.secsTo((*idleIter)->GetRecordingStartTime()) -
+                        prerollseconds) <
+                        ((idleWaitForRecordingTime * 60) + idleTimeoutSecs))
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
                                                     "a recording is due to "
@@ -2737,8 +2735,8 @@ void Scheduler::HandleIdleShutdown(
 
                     if (guideRunTime.isValid() &&
                         (guideRunTime > MythDate::current()) &&
-                        curtime.secsTo(guideRunTime) <
-                        (idleWaitForRecordingTime * 60))
+                        (curtime.secsTo(guideRunTime) <
+                        (idleWaitForRecordingTime * 60)))
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
                                                     "mythfilldatabase is due to "
