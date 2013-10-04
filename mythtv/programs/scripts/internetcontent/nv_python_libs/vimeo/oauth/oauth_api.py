@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 The MIT License
 
