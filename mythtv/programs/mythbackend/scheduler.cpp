@@ -2668,7 +2668,13 @@ void Scheduler::HandleIdleShutdown(
     // Allow the presence of a non-blocking client to release this,
     // the frontend may have connected then gone idle between scheduler runs
     if (blockShutdown)
-        blockShutdown &= !m_mainServer->isClientConnected();
+    {
+        if (m_mainServer->isClientConnected())
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, "Client is connected, removing startup block on shutdown");
+            blockShutdown = false;
+        }
+    }
     else
     {
         QDateTime curtime = MythDate::current();
