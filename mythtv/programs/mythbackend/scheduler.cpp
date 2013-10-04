@@ -2720,12 +2720,15 @@ void Scheduler::HandleIdleShutdown(
                 }
 
                 // If we're due to grab guide data, then block shutdown
-                if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime"))
+                if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
+                    gCoreContext->GetNumSetting("MythFillEnabled")
+                )
                 {
                     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
                     QDateTime guideRunTime = QDateTime::fromString(str);
 
-                    if (curtime.secsTo(guideRunTime) <
+                    if ((guideRunTime > MythDate::current()) &&
+                        curtime.secsTo(guideRunTime) <
                         (idleWaitForRecordingTime * 60))
                     {
                         LOG(VB_GENERAL, LOG_NOTICE, "Blocking shutdown because "
