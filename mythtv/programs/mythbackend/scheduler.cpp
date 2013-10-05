@@ -2731,7 +2731,7 @@ void Scheduler::HandleIdleShutdown(
                     gCoreContext->GetNumSetting("MythFillEnabled"))
                 {
                     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
-                    QDateTime guideRunTime = QDateTime::fromString(str);
+                    QDateTime guideRunTime = MythDate::fromString(str);
 
                     if (guideRunTime.isValid() &&
                         (guideRunTime > MythDate::current()) &&
@@ -2889,7 +2889,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         // Check if we need to wake up to grab guide date before the next recording
         QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
-        QDateTime guideRefreshTime = QDateTime::fromString(str);
+        QDateTime guideRefreshTime = MythDate::fromString(str);
 
         if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
             guideRefreshTime.isValid() &&
@@ -5133,7 +5133,7 @@ bool Scheduler::WasStartedAutomatically()
                 "Close to auto-start time, AUTO-Startup assumed");
 
             QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
-            QDateTime guideRunTime = QDateTime::fromString(str);
+            QDateTime guideRunTime = MythDate::fromString(str);
             if (guideRunTime.secsTo(MythDate::current()) <
                 max(startupSecs, 15 * 60))
             {
