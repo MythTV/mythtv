@@ -73,6 +73,15 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "Clear the seek table.", "")
                 ->SetGroup("Recording Markup")
                 ->SetParentOf(ChanidStartimeVideo)
+        << add("--getmarkup", "getmarkup", "",
+               "Write markup data to the specified local file.", "")
+                ->SetGroup("Recording Markup")
+                ->SetParentOf(ChanidStartimeVideo)
+        << add("--setmarkup", "setmarkup", "",
+               "Read markup data from the specified local file, and\n"
+               "use it to set the markup for the recording or video.", "")
+                ->SetGroup("Recording Markup")
+                ->SetParentOf(ChanidStartimeVideo)
 
         // backendutils.cpp
         << add("--resched", "resched", false,
