@@ -5007,7 +5007,7 @@ int64_t MythPlayer::GetChapter(int chapter)
 InteractiveTV *MythPlayer::GetInteractiveTV(void)
 {
 #ifdef USING_MHEG
-    if (!interactiveTV && itvEnabled)
+    if (!interactiveTV && itvEnabled && !FlagIsSet(kNoITV))
     {
         QMutexLocker locker1(&osdLock);
         QMutexLocker locker2(&itvLock);
