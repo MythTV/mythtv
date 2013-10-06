@@ -92,6 +92,7 @@ enum PlayerFlags
     kDecodeAllowEXT       = 0x000080, // VDA, CrystalHD
     kVideoIsNull          = 0x000100,
     kAudioMuted           = 0x010000,
+    kNoITV                = 0x020000,
 };
 
 #define FlagIsSet(arg) (playerFlags & arg)

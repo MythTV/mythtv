@@ -888,7 +888,8 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                                       kVideoIsNull  |
                                       kDecodeLowRes |
                                       kDecodeSingleThreaded |
-                                      kDecodeNoLoopFilter);
+                                      kDecodeNoLoopFilter |
+                                      kNoITV);
     /* blank detector needs to be only sample center for this optimization. */
     if ((COMM_DETECT_BLANKS  == commDetectMethod) ||
         (COMM_DETECT_2_BLANK == commDetectMethod))
@@ -1042,7 +1043,8 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
     }
 
     MythCommFlagPlayer *cfp = new MythCommFlagPlayer(
-                (PlayerFlags)(kAudioMuted | kVideoIsNull | kDecodeNoDecode));
+                                    (PlayerFlags)(kAudioMuted | kVideoIsNull |
+                                                  kDecodeNoDecode | kNoITV));
     PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
