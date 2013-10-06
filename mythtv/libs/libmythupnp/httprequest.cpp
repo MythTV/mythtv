@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <cerrno>
+// FOR DEBUGGING
+#include <iostream>
 
 #ifndef _WIN32
 #include <netinet/tcp.h>
@@ -281,6 +283,12 @@ long HTTPRequest::SendResponse( void )
     int nContentLen = m_response.buffer().length();
 
     QBuffer *pBuffer = &m_response;
+
+    // ----------------------------------------------------------------------
+    // DEBUGGING
+    if (getenv("HTTPREQUEST_DEBUG"))
+        cout << m_response.data().constData() << endl;
+    // ----------------------------------------------------------------------
 
     // ----------------------------------------------------------------------
     // Should we try to return data gzip'd?
