@@ -599,6 +599,23 @@ class MPUBLIC ProgramInfo
                          int64_t min_frm = -1, int64_t max_frm = -1) const;
     void SavePositionMapDelta(frm_pos_map_t &, MarkTypes type) const;
 
+    // Get/set all markup
+    struct MarkupEntry
+    {
+        int type; // MarkTypes
+        uint64_t frame;
+        uint64_t data;
+        bool isDataNull;
+        MarkupEntry(int t, uint64_t f, uint64_t d, bool n)
+            : type(t), frame(f), data(d), isDataNull(n) {}
+        MarkupEntry(void)
+            : type(-1), frame(0), data(0), isDataNull(true) {}
+    };
+    void QueryMarkup(QVector<MarkupEntry> &mapMark,
+                     QVector<MarkupEntry> &mapSeek) const;
+    void SaveMarkup(const QVector<MarkupEntry> &mapMark,
+                    const QVector<MarkupEntry> &mapSeek) const;
+
     /// Sends event out that the ProgramInfo should be reloaded.
     void SendUpdateEvent(void);
     /// Sends event out that the ProgramInfo should be added to lists.
