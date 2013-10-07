@@ -32,8 +32,11 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_preview(NULL),               m_previewtitle(NULL)
 {
     m_strChannelname.detach();
-    LOG(VB_GENERAL, LOG_INFO,
-        QString("Fetch Icons for channel %1").arg(m_strChannelname));
+    if (!m_strChannelname.isEmpty())
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Fetching icon for channel %1").arg(m_strChannelname));
+    else
+        LOG(VB_GENERAL, LOG_INFO, "Fetching icons for multiple channels");
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
