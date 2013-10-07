@@ -106,6 +106,27 @@ VisualNode* VideoVisual::GetNode(void)
     return m_nodes.first();
 }
 
+// TODO Add MMX path
+static inline void stereo16_from_stereofloat32(
+    short l[], short r[], const float s[], unsigned long cnt)
+{
+    const float f((1 << 15) - 1);
+    while (cnt--)
+    {
+        *l++ = short(f * *s++);
+        *r++ = short(f * *s++);
+    }
+}
+
+// TODO Add MMX path
+static inline void mono16_from_monofloat32(
+    short l[], const float s[], unsigned long cnt)
+{
+    const float f((1 << 15) - 1);
+    while (cnt--)
+        *l++ = short(f * *s++);
+}
+
 // caller holds lock
 void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c,
                       int p)
@@ -141,6 +162,10 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
             stereo16_from_stereopcm8(l, r, (uchar *) b, cnt);
         else if (p == 16)
             stereo16_from_stereopcm16(l, r, (short *) b, cnt);
+        else if (p == 32)
+            stereo16_from_stereofloat32(l, r, reinterpret_cast<const float * >(b), cnt);
+        else
+            len = 0;
     }
     else if (c == 1)
     {
@@ -150,6 +175,10 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
             mono16_from_monopcm8(l, (uchar *) b, cnt);
         else if (p == 16)
             mono16_from_monopcm16(l, (short *) b, cnt);
+        else if (p == 32)
+            mono16_from_monofloat32(l, reinterpret_cast<const float * >(b), cnt);
+        else
+            len = 0;
     }
     else
         len = 0;
