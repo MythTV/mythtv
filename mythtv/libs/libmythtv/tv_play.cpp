@@ -8574,7 +8574,7 @@ void TV::DoEditSchedule(int editType)
     const ProgramInfo pginfo(*actx->playingInfo);
     uint    chanid  = pginfo.GetChanID();
     QString channum = pginfo.GetChanNum();
-    QDateTime starttime = pginfo.GetScheduledStartTime();
+    QDateTime starttime = MythDate::current();
     actx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     ClearOSD(actx);
