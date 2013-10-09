@@ -1436,7 +1436,19 @@ bool MythUIImage::ParseElement(
 
         MythImage *newMaskImage = GetPainter()->GetFormatImage();
         if (newMaskImage->Load(maskfile))
+        {
+            float wmult; // Width multipler
+            float hmult; // Height multipler
+            GetMythUI()->GetScreenSettings(wmult, hmult);
+            if (wmult != 1.0f || hmult != 1.0f)
+            {
+                int width = newMaskImage->size().width() * wmult;
+                int height = newMaskImage->size().height() * hmult;
+                newMaskImage->Resize(QSize(width, height));
+            }
+
             m_imageProperties.SetMaskImage(newMaskImage);
+        }
         else
             m_imageProperties.SetMaskImage(NULL);
         newMaskImage->DecrRef();
