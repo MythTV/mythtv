@@ -113,12 +113,13 @@ bool HouseKeeperTask::CheckRun(QDateTime now)
 
 bool HouseKeeperTask::CheckImmediate(void)
 {
-    return (m_startup == kHKRunImmediateOnStartup);
+    return ((m_startup == kHKRunImmediateOnStartup) &&
+            DoCheckRun(MythDate::current()));
 }
 
 bool HouseKeeperTask::CheckStartup(void)
 {
-    if (m_startup == kHKRunOnStartup)
+    if ((m_startup == kHKRunOnStartup) && DoCheckRun(MythDate::current()))
     {
         m_confirm = true;
         return true;
