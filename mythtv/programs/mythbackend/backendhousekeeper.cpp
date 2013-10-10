@@ -480,6 +480,14 @@ ArtworkTask::~ArtworkTask(void)
     m_msMML = NULL;
 }
 
+bool ArtworkTask::DoCheckRun(QDateTime now)
+{
+    if (gCoreContext->GetNumSetting("DailyArtworkUpdates", 0) &&
+            PeriodicHouseKeeperTask::DoCheckRun(now))
+        return true;
+    return false;
+}
+
 void ArtworkTask::Terminate(void)
 {
     if (m_msMML && (m_msMML->GetStatus() == GENERIC_EXIT_RUNNING))
