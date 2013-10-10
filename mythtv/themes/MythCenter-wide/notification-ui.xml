@@ -262,7 +262,7 @@
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
-        <shape name="textbackground">
+        <shape name="textbackground" depends="description|description_noprogress|extra|title|origin">
             <area>85,100%-260,-85,-55</area>
             <fill color="#000000" alpha="100" />
         </shape>
