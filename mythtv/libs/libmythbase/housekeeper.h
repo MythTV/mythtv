@@ -46,6 +46,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     bool            CheckRun(QDateTime now);
     bool            Run(void);
     bool            ConfirmRun(void)                { return m_confirm;     }
+    bool            IsRunning(void)                 { return m_running;     }
 
     bool            CheckImmediate(void);
     bool            CheckStartup(void);
@@ -71,6 +72,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     bool                m_confirm;
     HouseKeeperScope    m_scope;
     HouseKeeperStartup  m_startup;
+    bool                m_running;
 
     QDateTime   m_lastRun;
 };
