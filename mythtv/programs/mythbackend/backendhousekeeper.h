@@ -47,7 +47,6 @@ class ArtworkTask : public DailyHouseKeeperTask
     ArtworkTask(void);
     virtual ~ArtworkTask(void);
     bool DoRun(void);
-    virtual bool DoCheckRun(QDateTime now);
     virtual void Terminate(void);
   private:
     MythSystemLegacy *m_msMML;
