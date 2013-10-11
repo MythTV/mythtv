@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="es_ES">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>FunctionDialog</name>
     <message>
@@ -446,23 +447,23 @@
         <translation>Los ejemplos se muestran usando la fecha de mañana.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="65"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="66"/>
         <source>Your preferred date format to use on the events screens. %1</source>
         <extracomment>%1 gives additional info on the date used</extracomment>
         <translation>Su formato de fecha preferido para usar en las pantallas de eventos. %1</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="74"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="75"/>
         <source>Time format</source>
         <translation>Formato de hora</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="82"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="83"/>
         <source>Your preferred time format to display on the events screens.</source>
         <translation>Su formato de hora preferido para usar en las pantallas de eventos.</translation>
     </message>
     <message>
-        <location filename="../mythzoneminder/zmsettings.cpp" line="90"/>
+        <location filename="../mythzoneminder/zmsettings.cpp" line="91"/>
         <source>MythZoneMinder Settings</source>
         <translation>Configuración de MythZoneMinder</translation>
     </message>
