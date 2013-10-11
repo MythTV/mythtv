@@ -182,7 +182,7 @@ bool PreviewGenerator::RunReal(void)
         list.push_back(programInfo.MakeUniqueKey());
         list.push_back(output_fn);
         list.push_back(msg);
-        list.push_back(dt.isValid()?dt.toString(Qt::ISODate):"");
+        list.push_back(dt.isValid()?dt.toUTC().toString(Qt::ISODate):"");
         list.push_back(token);
         QCoreApplication::postEvent(listener, new MythEvent(message, list));
     }
@@ -327,7 +327,7 @@ bool PreviewGenerator::Run(void)
         list.push_back(outFileName.isEmpty() ?
                        (programInfo.GetPathname()+".png") : outFileName);
         list.push_back(msg);
-        list.push_back(dt.isValid()?dt.toString(Qt::ISODate):"");
+        list.push_back(dt.isValid()?dt.toUTC().toString(Qt::ISODate):"");
         list.push_back(token);
         QCoreApplication::postEvent(listener, new MythEvent(message, list));
     }
