@@ -1274,7 +1274,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 }
 
                 nvr->WriteVideo(&frame, true, writekeyframe);
-                lastWrittenTime = frame.timecode;
+// FIXME lastWrittenTime is not used in this mode at all, why are we setting it?
+//                lastWrittenTime = frame.timecode;
             }
             GetPlayer()->GetCC608Reader()->FlushTxtBuffers();
         }
@@ -1417,7 +1418,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     if (avfw->WriteVideoFrame(&frame) > 0)
                     {
-                        lastWrittenTime = frame.timecode;
+                        lastWrittenTime = frame.timecode + timecodeOffset;
                         if (hls)
                             ++hlsSegmentFrames;
                     }
@@ -1430,7 +1431,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     nvr->WriteVideo(&frame, true, true);
                 else
                     nvr->WriteVideo(&frame);
-                lastWrittenTime = frame.timecode;
+                lastWrittenTime = frame.timecode + timecodeOffset;
             }
         }
         if (MythDate::current() > statustime)
