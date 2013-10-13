@@ -1416,7 +1416,8 @@ bool AlbumArt::cycleImage(void)
     AlbumArtImages *albumArt = gPlayer->getCurrentMetadata()->getAlbumArtImages();
     int newType = m_currImageType;
 
-    if (albumArt->getImageCount() > 0)
+    // If we only have one image there is nothing to cycle
+    if (albumArt->getImageCount() > 1)
     {
         do
         {
