@@ -24,8 +24,10 @@ class AudioBuffer
     long long   m_time;
 };
 
-// This class is to act as a fake audio output device to store the data
-// for reencoding.
+/**
+ * This class is to act as a fake audio output device to store the data
+ * for reencoding.
+ */
 class AudioReencodeBuffer : public AudioOutput
 {
   public:

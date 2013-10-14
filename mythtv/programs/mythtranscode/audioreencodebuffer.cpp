@@ -79,7 +79,9 @@ AudioReencodeBuffer::~AudioReencodeBuffer()
         delete m_saveBuffer;
 }
 
-// reconfigure sound out for new params
+/**
+ * reconfigure sound out for new params
+ */
 void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
 {
     ClearError();
@@ -91,7 +93,9 @@ void AudioReencodeBuffer::Reconfigure(const AudioSettings &settings)
     m_eff_audiorate   = settings.samplerate;
 }
 
-// dsprate is in 100 * frames/second
+/**
+ * \param dsprate is in 100 * frames/second
+ */
 void AudioReencodeBuffer::SetEffDsp(int dsprate)
 {
     m_eff_audiorate = (dsprate / 100);
@@ -107,13 +111,17 @@ void AudioReencodeBuffer::Reset(void)
     m_bufferList.clear();
 }
 
-// timecode is in milliseconds.
+/**
+ * \param timecode is in milliseconds.
+ */
 bool AudioReencodeBuffer::AddFrames(void *buffer, int frames, int64_t timecode)
 {
     return AddData(buffer, frames * m_bytes_per_frame, timecode, frames);
 }
 
-// timecode is in milliseconds.
+/**
+  * \param timecode is in milliseconds.
+  */
 bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
                                   int frames)
 {
