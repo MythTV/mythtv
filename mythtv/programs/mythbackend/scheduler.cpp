@@ -2686,10 +2686,7 @@ void Scheduler::HandleIdleShutdown(
                  !recording; ++it)
         {
             if ((*it)->IsBusy())
-            {
                 recording = true;
-                break;
-            }
         }
 
         // If there are BLOCKING clients, then we're not idle
