@@ -2257,13 +2257,15 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 uint8_t line_offset = get_bits(&gb, 5);
                 uint8_t cc_data_1 = av_reverse[get_bits(&gb, 8)];
                 uint8_t cc_data_2 = av_reverse[get_bits(&gb, 8)];
-                uint8_t type = (1 == field_no) ? 0x00 : 0x01;
+                uint8_t type = (2 == field_no) ? 0x01 : 0x00;
+                if (!s->top_field_first)
+                    type ^= 0x01;
                 (void) priority; // we use all the data, don't need priority
                 marker &= get_bits(&gb, 1);
                 // dump if marker bit missing
                 valid = marker;
-                // ignore forbidden and repeated (3:2 pulldown) field numbers
-                valid = valid && (1 == field_no || 2 == field_no);
+                // ignore forbidden field numbers
+                valid = valid && (0 != field_no);
                 // ignore content not in line 21
                 valid = valid && (11 == line_offset);
                 if (!valid)
