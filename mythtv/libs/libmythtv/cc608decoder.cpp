@@ -175,10 +175,15 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
 #if 1
-    LOG(VB_VBI, LOG_DEBUG, QString("Format CC @%1/%2 = %3 %4")
-                    .arg(tc).arg(field)
-                    .arg((data&0xff), 2, 16)
-                    .arg((data&0xff00)>>8, 2, 16));
+    LOG(VB_VBI, LOG_DEBUG,
+        QString("Format CC @%1/%2 = %3 %4, %5/%6 = '%7' '%8'")
+        .arg(tc).arg(field)
+        .arg((data&0xff), 2, 16)
+        .arg((data&0xff00)>>8, 2, 16)
+        .arg(b1, 2, 16, QChar('0'))
+        .arg(b2, 2, 16, QChar('0'))
+        .arg(QChar((b1 & 0x60) ? b1 : '_'))
+        .arg(QChar((b2 & 0x60) ? b2 : '_')));
 #endif
     if (ccmode[field] >= 0)
     {
