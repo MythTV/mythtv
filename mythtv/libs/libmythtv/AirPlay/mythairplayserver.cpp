@@ -903,10 +903,10 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
 
         if (!file.isEmpty())
         {
-            m_pathname = file;
-            StartPlayback(file);
+            m_pathname = QUrl::fromPercentEncoding(file);
+            StartPlayback(m_pathname);
             GetPlayerStatus(playing, playerspeed, position, duration, pathname);
-            m_connections[session].url = QUrl(file);
+            m_connections[session].url = QUrl(m_pathname);
             m_connections[session].position = start_pos * duration;
             SeekPosition(duration * start_pos);
         }
