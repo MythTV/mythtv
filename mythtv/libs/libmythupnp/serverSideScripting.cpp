@@ -141,7 +141,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
             if ( m_engine.hasUncaughtException() )
             {
                 LOG(VB_GENERAL, LOG_ERR,
-                    QString("Error Loading QSP File: %1 - (%2)%3")
+                    QString("Error Loading QSP File: %1 - (line %2) %3")
                         .arg(sFileName)
                         .arg(m_engine.uncaughtExceptionLineNumber())
                         .arg(m_engine.uncaughtException().toString()));
