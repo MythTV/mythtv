@@ -68,18 +68,17 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
-        int chanid = chanList.at(n);
-        QString channum = ChannelUtil::GetChanNum(chanid);
-        QString format, modulation, freqtable, freqid, dtv_si_std,
+        uint chanid = chanList.at(n);
+        QString channum, format, modulation, freqtable, freqid, dtv_si_std,
                 xmltvid, default_authority, icon;
         int finetune, program_number;
         uint64_t frequency;
-        uint atscmajor, atscminor, transportid, networkid, mplexid;
+        uint atscmajor, atscminor, transportid, networkid, mplexid, sourceid;
         bool commfree = false;
         bool eit = false;
         bool visible = true;
 
-        if (ChannelUtil::GetExtendedChannelData( nSourceID, channum, format, modulation,
+        if (ChannelUtil::GetExtendedChannelData( chanid, sourceid, channum, format, modulation,
                             freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
@@ -103,8 +102,8 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
             pChannelInfo->setSIStandard(dtv_si_std);
             pChannelInfo->setTransportId(transportid);
             pChannelInfo->setNetworkId(networkid);
-            pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(nSourceID, channum));
-            pChannelInfo->setSourceId(nSourceID);
+            pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(sourceid, channum));
+            pChannelInfo->setSourceId(sourceid);
             pChannelInfo->setCommFree(commfree);
             pChannelInfo->setUseEIT(eit);
             pChannelInfo->setVisible(visible);
@@ -144,24 +143,22 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
 DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
 {
-    if (nChanID == 0)
+    if (nChanID <= 0)
         throw( QString("Channel ID appears invalid."));
 
     DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();
 
-    QString channum = ChannelUtil::GetChanNum(nChanID);
-    uint sourceid = ChannelUtil::GetSourceIDForChannel(nChanID);
-    QString format, modulation, freqtable, freqid, dtv_si_std,
+    QString channum, format, modulation, freqtable, freqid, dtv_si_std,
             xmltvid, default_authority, icon;
     int finetune, program_number;
     uint64_t frequency;
-    uint atscmajor, atscminor, transportid, networkid, mplexid;
+    uint atscmajor, atscminor, transportid, networkid, mplexid, sourceid;
     bool commfree = false;
     bool eit = false;
     bool visible = true;
 
-    if (ChannelUtil::GetExtendedChannelData( sourceid, channum, format, modulation,
-                            freqtable, freqid, finetune, frequency,
+    if (ChannelUtil::GetExtendedChannelData( (uint)nChanID, sourceid, channum, format,
+                            modulation, freqtable, freqid, finetune, frequency,
                             dtv_si_std, program_number, atscmajor,
                             atscminor, transportid, networkid, mplexid,
                             commfree, eit, visible, xmltvid, default_authority, icon ))

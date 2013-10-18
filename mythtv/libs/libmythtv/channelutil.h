@@ -180,7 +180,8 @@ class MTV_PUBLIC ChannelUtil
         uint    &dvb_transportid, uint          &dvb_networkid,
         uint    &mplexid,         bool          &commfree);
     static bool    GetExtendedChannelData(
-        uint sourceid,            const QString &channum,
+        const uint chanid, // Key
+        uint    &sourceid,        QString       &channum,
         QString &tvformat,        QString       &modulation,
         QString &freqtable,       QString       &freqid,
         int     &finetune,        uint64_t      &frequency,

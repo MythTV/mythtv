@@ -1958,7 +1958,8 @@ bool ChannelUtil::GetChannelData(
 }
 
 bool ChannelUtil::GetExtendedChannelData(
-    uint    sourceid,         const QString &channum,
+    const uint chanid,
+    uint    &sourceid,        QString       &channum,
     QString &tvformat,        QString       &modulation,
     QString &freqtable,       QString       &freqid,
     int     &finetune,        uint64_t      &frequency,
@@ -1973,6 +1974,7 @@ bool ChannelUtil::GetExtendedChannelData(
     tvformat          = modulation = freqtable = QString::null;
     freqid            = dtv_si_std = xmltvid = QString::null;
     default_authority = icon       = QString::null;
+    sourceid         = 0;
     finetune         = 0;
     frequency        = 0;
     mpeg_prog_num    = -1;
@@ -1987,13 +1989,12 @@ bool ChannelUtil::GetExtendedChannelData(
         "SELECT finetune, freqid, tvformat, freqtable, "
         "       commmethod, mplexid, "
         "       atsc_major_chan, atsc_minor_chan, serviceid, "
-        "       useonairguide, visible, xmltvid, default_authority, icon "
+        "       useonairguide, visible, xmltvid, default_authority, icon, "
+        "       channum, channel.sourceid "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
-        "      channum              = :CHANNUM         AND "
-        "      channel.sourceid     = :SOURCEID");
-    query.bindValue(":CHANNUM",  channum);
-    query.bindValue(":SOURCEID", sourceid);
+        "      chanid               = :CHANID");
+    query.bindValue(":CHANID",  chanid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2003,7 +2004,7 @@ bool ChannelUtil::GetExtendedChannelData(
     else if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("GetChannelData() failed because it could not\n"
+            QString("GetExtendedChannelData() failed because it could not\n"
                     "\t\t\tfind channel number '%1' in DB for source '%2'.")
                 .arg(channum).arg(sourceid));
         return false;
@@ -2023,6 +2024,8 @@ bool ChannelUtil::GetExtendedChannelData(
     xmltvid           = query.value(11).toString();
     default_authority = query.value(12).toString();
     icon              = query.value(13).toString();
+    channum           = query.value(14).toString();
+    sourceid          = query.value(15).toUInt();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;
