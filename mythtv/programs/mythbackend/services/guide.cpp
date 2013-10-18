@@ -263,7 +263,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     // -------------------------------------------------------------------
 
     QString sNewFileName = QString( "%1.%2x%3.png" )
-                              .arg( sFileName )
+                              .arg( sFullFileName )
                               .arg( nWidth    )
                               .arg( nHeight   );
 
@@ -280,7 +280,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
 
     float fAspect = 0.0;
 
-    QImage *pImage = new QImage( sFileName );
+    QImage *pImage = new QImage( sFullFileName );
 
     if (!pImage)
         return QFileInfo();
