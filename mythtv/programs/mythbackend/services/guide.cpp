@@ -136,7 +136,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
             pChannel = pGuide->AddNewChannel();
 
-            FillChannelInfo( pChannel, pInfo, bDetails );
+            FillChannelInfo( pChannel, pInfo->GetChanID(), bDetails );
         }
 
         

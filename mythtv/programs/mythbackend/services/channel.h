@@ -42,11 +42,11 @@ class Channel : public ChannelServices
 
         /* Channel Methods */
 
-        DTC::ChannelInfoList*  GetChannelInfoList  ( int      SourceID,
-                                                     int      StartIndex,
-                                                     int      Count      );
+        DTC::ChannelInfoList*  GetChannelInfoList  ( uint      SourceID,
+                                                     uint      StartIndex,
+                                                     uint      Count      );
 
-        DTC::ChannelInfo*      GetChannelInfo      ( int      ChanID     );
+        DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     );
 
         bool                   UpdateDBChannel     ( uint          MplexID,
                                                      uint          SourceID,
@@ -123,13 +123,13 @@ class Channel : public ChannelServices
 
         /* Multiplex Methods */
 
-        DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
-                                                           int StartIndex,
-                                                           int Count      );
+        DTC::VideoMultiplexList*  GetVideoMultiplexList  ( uint SourceID,
+                                                           uint StartIndex,
+                                                           uint Count      );
 
-        DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    );
+        DTC::VideoMultiplex*      GetVideoMultiplex      ( uint MplexID    );
 
-        QStringList               GetXMLTVIdList         ( int SourceID );
+        QStringList               GetXMLTVIdList         ( uint SourceID );
 
 };
 

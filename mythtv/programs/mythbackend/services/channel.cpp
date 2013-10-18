@@ -38,7 +38,6 @@
 #include "channelutil.h"
 #include "sourceutil.h"
 #include "cardutil.h"
-#include "channelinfo.h"
 #include "datadirect.h"
 #include "mythdate.h"
 
@@ -48,9 +47,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
-                                                   int nStartIndex,
-                                                   int nCount )
+DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
+                                                   uint nStartIndex,
+                                                   uint nCount )
 {
     vector<uint> chanList;
 
@@ -62,70 +61,18 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 
     DTC::ChannelInfoList *pChannelInfos = new DTC::ChannelInfoList();
 
-    nStartIndex   = min( nStartIndex, (int)chanList.size() );
-    nCount        = (nCount > 0) ? min( nCount, (int)chanList.size() ) : chanList.size();
-    int nEndIndex = min((nStartIndex + nCount), (int)chanList.size() );
+    nStartIndex   = min( nStartIndex, (uint)chanList.size() );
+    nCount        = (nCount > 0) ? min( nCount, (uint)chanList.size() ) : chanList.size();
+    int nEndIndex = min((nStartIndex + nCount), (uint)chanList.size() );
 
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
         DTC::ChannelInfo *pChannelInfo = pChannelInfos->AddNewChannelInfo();
 
         uint chanid = chanList.at(n);
-        QString channum, format, modulation, freqtable, freqid, dtv_si_std,
-                xmltvid, default_authority, icon;
-        int finetune, program_number;
-        uint64_t frequency;
-        uint atscmajor, atscminor, transportid, networkid, mplexid, sourceid;
-        bool commfree = false;
-        bool eit = false;
-        bool visible = true;
 
-        ChannelInfo channel;
-        if (channel.Load(chanid))
-        {
-            // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
-            //      ultimately replacing it's progenitor?
-            pChannelInfo->setChanId(channel.chanid);
-            pChannelInfo->setChanNum(channel.channum);
-            pChannelInfo->setCallSign(channel.callsign);
-            if (!channel.icon.isEmpty())
-            {
-                QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                        .arg( chanid );
-                pChannelInfo->setIconURL( sIconURL );
-            }
-            pChannelInfo->setChannelName(channel.name);
-            pChannelInfo->setMplexId(channel.mplexid);
-            pChannelInfo->setServiceId(channel.serviceid);
-            pChannelInfo->setATSCMajorChan(channel.atsc_major_chan);
-            pChannelInfo->setATSCMinorChan(channel.atsc_minor_chan);
-            pChannelInfo->setFormat(channel.tvformat);
-            pChannelInfo->setFineTune(channel.finetune);
-            pChannelInfo->setFrequencyId(channel.freqid);
-            pChannelInfo->setChanFilters(channel.videofilters);
-            pChannelInfo->setSourceId(channel.sourceid);
-            pChannelInfo->setCommFree(channel.commmethod == -2);
-            pChannelInfo->setUseEIT(channel.useonairguide);
-            pChannelInfo->setVisible(channel.visible);
-            pChannelInfo->setXMLTVID(channel.xmltvid);
-            pChannelInfo->setDefaultAuth(channel.default_authority);
-
-            // Extended data - This doesn't come from the channel table but the
-            // dtv_multiplex table
-            QString format, modulation, freqtable, freqid, dtv_si_std;
-            uint64_t frequency = 0;
-            uint transportid = 0;
-            uint networkid = 0;
-            ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
-                                        transportid, networkid, dtv_si_std);
-
-            pChannelInfo->setModulation(modulation);
-            pChannelInfo->setFrequencyTable(freqtable);
-            pChannelInfo->setFrequency((long)frequency);
-            pChannelInfo->setSIStandard(dtv_si_std);
-            pChannelInfo->setTransportId(transportid);
-            pChannelInfo->setNetworkId(networkid);
-        }
+        if (!FillChannelInfo(pChannelInfo, chanid, true))
+            throw( QString("Channel ID appears invalid."));
     }
 
     int curPage = 0, totalPages = 0;
@@ -157,60 +104,14 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
+DTC::ChannelInfo* Channel::GetChannelInfo( uint nChanID )
 {
     if (nChanID <= 0)
         throw( QString("Channel ID appears invalid."));
 
     DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();
 
-    ChannelInfo channel;
-    if (channel.Load(nChanID))
-    {
-        // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
-        //      ultimately replacing it's progenitor?
-        pChannelInfo->setChanId(channel.chanid);
-        pChannelInfo->setChanNum(channel.channum);
-        pChannelInfo->setCallSign(channel.callsign);
-        if (!channel.icon.isEmpty())
-        {
-            QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                       .arg( nChanID );
-            pChannelInfo->setIconURL( sIconURL );
-        }
-        pChannelInfo->setChannelName(channel.name);
-        pChannelInfo->setMplexId(channel.mplexid);
-        pChannelInfo->setServiceId(channel.serviceid);
-        pChannelInfo->setATSCMajorChan(channel.atsc_major_chan);
-        pChannelInfo->setATSCMinorChan(channel.atsc_minor_chan);
-        pChannelInfo->setFormat(channel.tvformat);
-        pChannelInfo->setFineTune(channel.finetune);
-        pChannelInfo->setFrequencyId(channel.freqid);
-        pChannelInfo->setChanFilters(channel.videofilters);
-        pChannelInfo->setSourceId(channel.sourceid);
-        pChannelInfo->setCommFree(channel.commmethod == -2);
-        pChannelInfo->setUseEIT(channel.useonairguide);
-        pChannelInfo->setVisible(channel.visible);
-        pChannelInfo->setXMLTVID(channel.xmltvid);
-        pChannelInfo->setDefaultAuth(channel.default_authority);
-
-        // Extended data - This doesn't come from the channel table but the
-        // dtv_multiplex table
-        QString format, modulation, freqtable, freqid, dtv_si_std;
-        uint64_t frequency = 0;
-        uint transportid = 0;
-        uint networkid = 0;
-        ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
-                                     transportid, networkid, dtv_si_std);
-
-        pChannelInfo->setModulation(modulation);
-        pChannelInfo->setFrequencyTable(freqtable);
-        pChannelInfo->setFrequency((long)frequency);
-        pChannelInfo->setSIStandard(dtv_si_std);
-        pChannelInfo->setTransportId(transportid);
-        pChannelInfo->setNetworkId(networkid);
-    }
-    else
+    if (!FillChannelInfo(pChannelInfo, nChanID, true))
         throw( QString("Channel ID appears invalid."));
 
     return pChannelInfo;
@@ -515,9 +416,9 @@ int Channel::FetchChannelsFromSource( const uint nSourceId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
-                                                         int nStartIndex,
-                                                         int nCount )
+DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( uint nSourceID,
+                                                         uint nStartIndex,
+                                                         uint nCount )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -541,7 +442,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
         throw( QString( "Database Error executing query." ));
     }
 
-    int muxCount = query.size();
+    uint muxCount = (uint)query.size();
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -612,7 +513,7 @@ DTC::VideoMultiplexList* Channel::GetVideoMultiplexList( int nSourceID,
     return pVideoMultiplexes;
 }
 
-DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
+DTC::VideoMultiplex* Channel::GetVideoMultiplex( uint nMplexID )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -674,7 +575,7 @@ DTC::VideoMultiplex* Channel::GetVideoMultiplex( int nMplexID )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Channel::GetXMLTVIdList( int SourceID )
+QStringList Channel::GetXMLTVIdList( uint SourceID )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

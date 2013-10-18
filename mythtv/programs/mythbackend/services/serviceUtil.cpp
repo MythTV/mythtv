@@ -31,6 +31,7 @@
 #include "recordinginfo.h"
 #include "recordingtypes.h"
 #include "channelutil.h"
+#include "channelinfo.h"
 #include "videoutils.h"
 #include "metadataimagehelper.h"
 
@@ -85,7 +86,7 @@ void FillProgramInfo( DTC::Program *pProgram,
     {
         // Build Channel Child Element
 
-        FillChannelInfo( pProgram->Channel(), pInfo, bDetails );
+        FillChannelInfo( pProgram->Channel(), pInfo->GetChanID(), bDetails );
     }
 
     // Build Recording Child Element
@@ -132,35 +133,66 @@ void FillProgramInfo( DTC::Program *pProgram,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void FillChannelInfo( DTC::ChannelInfo *pChannel,
-                      ProgramInfo      *pInfo,
+bool FillChannelInfo( DTC::ChannelInfo *pChannel,
+                      uint              nChanID,
                       bool              bDetails  /* = true */ )
 {
-    if (pInfo)
+    ChannelInfo channel;
+    if (channel.Load(nChanID))
     {
-        if (!ChannelUtil::GetIcon(pInfo->GetChanID()).isEmpty())
+        // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
+        //      ultimately replacing it's progenitor?
+        pChannel->setChanId(channel.chanid);
+        pChannel->setChanNum(channel.channum);
+        pChannel->setCallSign(channel.callsign);
+        if (!channel.icon.isEmpty())
         {
             QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
-                                       .arg( pInfo->GetChanID() );
-            pChannel->setIconURL    ( sIconURL                    );
+                                       .arg( nChanID );
+            pChannel->setIconURL( sIconURL );
         }
-
-        pChannel->setChanId     ( pInfo->GetChanID()              );
-        pChannel->setChanNum    ( pInfo->GetChanNum()             );
-        pChannel->setCallSign   ( pInfo->GetChannelSchedulingID() );
-        pChannel->setChannelName( pInfo->GetChannelName()         );
+        pChannel->setChannelName(channel.name);
+        pChannel->setVisible(channel.visible);
 
         pChannel->setSerializeDetails( bDetails );
 
         if (bDetails)
         {
-            pChannel->setChanFilters( pInfo->GetChannelPlaybackFilters() );
-            pChannel->setSourceId   ( pInfo->GetSourceID()               );
-            pChannel->setInputId    ( pInfo->GetInputID()                );
-            pChannel->setCommFree   ( (pInfo->IsCommercialFree()) ? 1 : 0);
+            pChannel->setMplexId(channel.mplexid);
+            pChannel->setServiceId(channel.serviceid);
+            pChannel->setATSCMajorChan(channel.atsc_major_chan);
+            pChannel->setATSCMinorChan(channel.atsc_minor_chan);
+            pChannel->setFormat(channel.tvformat);
+            pChannel->setFineTune(channel.finetune);
+            pChannel->setFrequencyId(channel.freqid);
+            pChannel->setChanFilters(channel.videofilters);
+            pChannel->setSourceId(channel.sourceid);
+            pChannel->setCommFree(channel.commmethod == -2);
+            pChannel->setUseEIT(channel.useonairguide);
+            pChannel->setXMLTVID(channel.xmltvid);
+            pChannel->setDefaultAuth(channel.default_authority);
+
+            // Extended data - This doesn't come from the channel table but the
+            // dtv_multiplex table
+            QString format, modulation, freqtable, freqid, dtv_si_std;
+            uint64_t frequency = 0;
+            uint transportid = 0;
+            uint networkid = 0;
+            ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
+                                        transportid, networkid, dtv_si_std);
+
+            pChannel->setModulation(modulation);
+            pChannel->setFrequencyTable(freqtable);
+            pChannel->setFrequency((long)frequency);
+            pChannel->setSIStandard(dtv_si_std);
+            pChannel->setTransportId(transportid);
+            pChannel->setNetworkId(networkid);
         }
+
+        return true;
     }
 
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////

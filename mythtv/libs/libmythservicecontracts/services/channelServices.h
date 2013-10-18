@@ -41,7 +41,7 @@
 class SERVICE_PUBLIC ChannelServices : public Service
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.2" );
+    Q_CLASSINFO( "version"    , "1.3" );
     Q_CLASSINFO( "AddDBChannel_Method",              "POST" )
     Q_CLASSINFO( "UpdateDBChannel_Method",           "POST" )
     Q_CLASSINFO( "RemoveDBChannel_Method",           "POST" )
@@ -69,11 +69,11 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         /* Channel Methods */
 
-        virtual DTC::ChannelInfoList*  GetChannelInfoList  ( int           SourceID,
-                                                             int           StartIndex,
-                                                             int           Count      ) = 0;
+        virtual DTC::ChannelInfoList*  GetChannelInfoList  ( uint           SourceID,
+                                                             uint           StartIndex,
+                                                             uint           Count      ) = 0;
 
-        virtual DTC::ChannelInfo*      GetChannelInfo      ( int           ChanID     ) = 0;
+        virtual DTC::ChannelInfo*      GetChannelInfo      ( uint           ChanID     ) = 0;
 
         virtual bool                   UpdateDBChannel     ( uint          MplexID,
                                                              uint          SourceID,
@@ -150,13 +150,13 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
         /* Multiplex Methods */
 
-        virtual DTC::VideoMultiplexList*  GetVideoMultiplexList  ( int SourceID,
-                                                                   int StartIndex,
-                                                                   int Count      ) = 0;
+        virtual DTC::VideoMultiplexList*  GetVideoMultiplexList  ( uint SourceID,
+                                                                   uint StartIndex,
+                                                                   uint Count      ) = 0;
 
-        virtual DTC::VideoMultiplex*      GetVideoMultiplex      ( int MplexID    ) = 0;
+        virtual DTC::VideoMultiplex*      GetVideoMultiplex      ( uint MplexID    ) = 0;
 
-        virtual QStringList               GetXMLTVIdList         ( int SourceID ) = 0;
+        virtual QStringList               GetXMLTVIdList         ( uint SourceID ) = 0;
 };
 
 #endif

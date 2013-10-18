@@ -40,8 +40,8 @@ void FillProgramInfo( DTC::Program *pProgram,
                       bool          bIncChannel = true,
                       bool          bDetails    = true );
 
-void FillChannelInfo( DTC::ChannelInfo *pChannel, 
-                      ProgramInfo      *pInfo,
+bool FillChannelInfo( DTC::ChannelInfo *pChannel,
+                      uint              nChanID,
                       bool              bDetails = true );
 
 void FillRecRuleInfo( DTC::RecRule  *pRecRule,
