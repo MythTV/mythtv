@@ -29,7 +29,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.06" );
+    Q_CLASSINFO( "version", "1.07" );
 
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details
@@ -58,7 +58,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( QString   ChanFilters     READ ChanFilters    WRITE setChanFilters    DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       SourceId        READ SourceId       WRITE setSourceId       DESIGNABLE SerializeDetails )
     Q_PROPERTY( int       InputId         READ InputId        WRITE setInputId        DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int       CommFree        READ CommFree       WRITE setCommFree       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( bool      CommFree        READ CommFree       WRITE setCommFree       DESIGNABLE SerializeDetails )
     Q_PROPERTY( bool      UseEIT          READ UseEIT         WRITE setUseEIT         DESIGNABLE SerializeDetails )
     Q_PROPERTY( bool      Visible         READ Visible        WRITE setVisible        DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   XMLTVID         READ XMLTVID        WRITE setXMLTVID        DESIGNABLE SerializeDetails )
@@ -87,7 +87,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( QString     , ChanFilters    )
     PROPERTYIMP       ( int         , SourceId       )
     PROPERTYIMP       ( int         , InputId        )
-    PROPERTYIMP       ( int         , CommFree       )
+    PROPERTYIMP       ( bool        , CommFree       )
     PROPERTYIMP       ( bool        , UseEIT         )
     PROPERTYIMP       ( bool        , Visible        )
     PROPERTYIMP       ( QString     , XMLTVID        )
