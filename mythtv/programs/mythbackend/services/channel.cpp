@@ -3,6 +3,7 @@
 // Created     : Apr. 8, 2011
 //
 // Copyright (c) 2011 Robert McNamara <rmcnamara@mythtv.org>
+// Copyright (c) 2013 MythTV Developers
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@
 #include "channelutil.h"
 #include "sourceutil.h"
 #include "cardutil.h"
+#include "channelinfo.h"
 #include "datadirect.h"
 #include "mythdate.h"
 
@@ -78,37 +80,51 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( int nSourceID,
         bool eit = false;
         bool visible = true;
 
-        if (ChannelUtil::GetExtendedChannelData( chanid, sourceid, channum, format, modulation,
-                            freqtable, freqid, finetune, frequency,
-                            dtv_si_std, program_number, atscmajor,
-                            atscminor, transportid, networkid, mplexid,
-                            commfree, eit, visible, xmltvid, default_authority, icon ))
+        ChannelInfo channel;
+        if (channel.Load(chanid))
         {
-            pChannelInfo->setChanId(chanid);
-            pChannelInfo->setChanNum(channum);
-            pChannelInfo->setCallSign(ChannelUtil::GetCallsign(chanid));
-            pChannelInfo->setIconURL(icon);
-            pChannelInfo->setChannelName(ChannelUtil::GetServiceName(chanid));
-            pChannelInfo->setMplexId(mplexid);
-            pChannelInfo->setServiceId(program_number);
-            pChannelInfo->setATSCMajorChan(atscmajor);
-            pChannelInfo->setATSCMinorChan(atscminor);
-            pChannelInfo->setFormat(format);
+            // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
+            //      ultimately replacing it's progenitor?
+            pChannelInfo->setChanId(channel.chanid);
+            pChannelInfo->setChanNum(channel.channum);
+            pChannelInfo->setCallSign(channel.callsign);
+            if (!channel.icon.isEmpty())
+            {
+                QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
+                                        .arg( chanid );
+                pChannelInfo->setIconURL( sIconURL );
+            }
+            pChannelInfo->setChannelName(channel.name);
+            pChannelInfo->setMplexId(channel.mplexid);
+            pChannelInfo->setServiceId(channel.serviceid);
+            pChannelInfo->setATSCMajorChan(channel.atsc_major_chan);
+            pChannelInfo->setATSCMinorChan(channel.atsc_minor_chan);
+            pChannelInfo->setFormat(channel.tvformat);
+            pChannelInfo->setFineTune(channel.finetune);
+            pChannelInfo->setFrequencyId(channel.freqid);
+            pChannelInfo->setChanFilters(channel.videofilters);
+            pChannelInfo->setSourceId(channel.sourceid);
+            pChannelInfo->setCommFree(channel.commmethod == -2);
+            pChannelInfo->setUseEIT(channel.useonairguide);
+            pChannelInfo->setVisible(channel.visible);
+            pChannelInfo->setXMLTVID(channel.xmltvid);
+            pChannelInfo->setDefaultAuth(channel.default_authority);
+
+            // Extended data - This doesn't come from the channel table but the
+            // dtv_multiplex table
+            QString format, modulation, freqtable, freqid, dtv_si_std;
+            uint64_t frequency = 0;
+            uint transportid = 0;
+            uint networkid = 0;
+            ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
+                                        transportid, networkid, dtv_si_std);
+
             pChannelInfo->setModulation(modulation);
             pChannelInfo->setFrequencyTable(freqtable);
-            pChannelInfo->setFineTune(finetune);
             pChannelInfo->setFrequency((long)frequency);
-            pChannelInfo->setFrequencyId(freqid);
             pChannelInfo->setSIStandard(dtv_si_std);
             pChannelInfo->setTransportId(transportid);
             pChannelInfo->setNetworkId(networkid);
-            pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(sourceid, channum));
-            pChannelInfo->setSourceId(sourceid);
-            pChannelInfo->setCommFree(commfree);
-            pChannelInfo->setUseEIT(eit);
-            pChannelInfo->setVisible(visible);
-            pChannelInfo->setXMLTVID(xmltvid);
-            pChannelInfo->setDefaultAuth(default_authority);
         }
     }
 
@@ -148,46 +164,51 @@ DTC::ChannelInfo* Channel::GetChannelInfo( int nChanID )
 
     DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();
 
-    QString channum, format, modulation, freqtable, freqid, dtv_si_std,
-            xmltvid, default_authority, icon;
-    int finetune, program_number;
-    uint64_t frequency;
-    uint atscmajor, atscminor, transportid, networkid, mplexid, sourceid;
-    bool commfree = false;
-    bool eit = false;
-    bool visible = true;
-
-    if (ChannelUtil::GetExtendedChannelData( (uint)nChanID, sourceid, channum, format,
-                            modulation, freqtable, freqid, finetune, frequency,
-                            dtv_si_std, program_number, atscmajor,
-                            atscminor, transportid, networkid, mplexid,
-                            commfree, eit, visible, xmltvid, default_authority, icon ))
+    ChannelInfo channel;
+    if (channel.Load(nChanID))
     {
-        pChannelInfo->setChanId(nChanID);
-        pChannelInfo->setChanNum(channum);
-        pChannelInfo->setCallSign(ChannelUtil::GetCallsign(nChanID));
-        pChannelInfo->setIconURL(icon);
-        pChannelInfo->setChannelName(ChannelUtil::GetServiceName(nChanID));
-        pChannelInfo->setMplexId(mplexid);
-        pChannelInfo->setServiceId(program_number);
-        pChannelInfo->setATSCMajorChan(atscmajor);
-        pChannelInfo->setATSCMinorChan(atscminor);
-        pChannelInfo->setFormat(format);
+        // TODO update DTC::ChannelInfo to match functionality of ChannelInfo,
+        //      ultimately replacing it's progenitor?
+        pChannelInfo->setChanId(channel.chanid);
+        pChannelInfo->setChanNum(channel.channum);
+        pChannelInfo->setCallSign(channel.callsign);
+        if (!channel.icon.isEmpty())
+        {
+            QString sIconURL  = QString( "/Guide/GetChannelIcon?ChanId=%3")
+                                       .arg( nChanID );
+            pChannelInfo->setIconURL( sIconURL );
+        }
+        pChannelInfo->setChannelName(channel.name);
+        pChannelInfo->setMplexId(channel.mplexid);
+        pChannelInfo->setServiceId(channel.serviceid);
+        pChannelInfo->setATSCMajorChan(channel.atsc_major_chan);
+        pChannelInfo->setATSCMinorChan(channel.atsc_minor_chan);
+        pChannelInfo->setFormat(channel.tvformat);
+        pChannelInfo->setFineTune(channel.finetune);
+        pChannelInfo->setFrequencyId(channel.freqid);
+        pChannelInfo->setChanFilters(channel.videofilters);
+        pChannelInfo->setSourceId(channel.sourceid);
+        pChannelInfo->setCommFree(channel.commmethod == -2);
+        pChannelInfo->setUseEIT(channel.useonairguide);
+        pChannelInfo->setVisible(channel.visible);
+        pChannelInfo->setXMLTVID(channel.xmltvid);
+        pChannelInfo->setDefaultAuth(channel.default_authority);
+
+        // Extended data - This doesn't come from the channel table but the
+        // dtv_multiplex table
+        QString format, modulation, freqtable, freqid, dtv_si_std;
+        uint64_t frequency = 0;
+        uint transportid = 0;
+        uint networkid = 0;
+        ChannelUtil::GetTuningParams(channel.mplexid, modulation, frequency,
+                                     transportid, networkid, dtv_si_std);
+
         pChannelInfo->setModulation(modulation);
         pChannelInfo->setFrequencyTable(freqtable);
-        pChannelInfo->setFineTune(finetune);
         pChannelInfo->setFrequency((long)frequency);
-        pChannelInfo->setFrequencyId(freqid);
         pChannelInfo->setSIStandard(dtv_si_std);
         pChannelInfo->setTransportId(transportid);
         pChannelInfo->setNetworkId(networkid);
-        pChannelInfo->setChanFilters(ChannelUtil::GetVideoFilters(sourceid, channum));
-        pChannelInfo->setSourceId(sourceid);
-        pChannelInfo->setCommFree(commfree);
-        pChannelInfo->setUseEIT(eit);
-        pChannelInfo->setVisible(visible);
-        pChannelInfo->setXMLTVID(xmltvid);
-        pChannelInfo->setDefaultAuth(default_authority);
     }
     else
         throw( QString("Channel ID appears invalid."));

@@ -36,6 +36,8 @@ class MTV_PUBLIC ChannelInfo
     bool operator == (uint _chanid) const
         { return chanid == _chanid; }
         
+    bool Load(uint lchanid = -1);
+
     enum ChannelFormat { kChannelShort, kChannelLong };
     QString GetFormatted(const ChannelFormat &format) const;
     void ToMap(InfoMap &infoMap);

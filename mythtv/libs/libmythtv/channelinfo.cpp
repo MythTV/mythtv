@@ -174,6 +174,66 @@ void ChannelInfo::Init()
     m_sourcename.clear();
 }
 
+bool ChannelInfo::Load(uint lchanid)
+{
+    if (lchanid <= 0 && chanid <= 0)
+        return false;
+
+    if (lchanid <= 0)
+        lchanid = chanid;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT channum, freqid, sourceid, "
+                    "callsign, name, icon, finetune, videofilters, xmltvid, "
+                    "recpriority, contrast, brightness, colour, hue, tvformat, "
+                    "visible, outputfilters, useonairguide, mplexid, "
+                    "serviceid, atsc_major_chan, atsc_minor_chan, last_record, "
+                    "default_authority, commmethod, tmoffset, iptvid "
+                    "FROM channel WHERE chanid = :CHANID ;");
+
+    query.bindValue(":CHANID", lchanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelInfo::Load()", query);
+        return false;
+    }
+
+    if (!query.next())
+        return false;
+
+    chanid        = lchanid;
+    channum       = query.value(0).toString();
+    freqid        = query.value(1).toString();
+    sourceid      = query.value(2).toUInt();
+    callsign      = query.value(3).toString();
+    name          = query.value(4).toString();
+    icon          = query.value(5).toString();
+    finetune      = query.value(6).toInt();
+    videofilters  = query.value(7).toString();
+    xmltvid       = query.value(8).toString();
+    recpriority   = query.value(9).toInt();
+    contrast      = query.value(10).toUInt();
+    brightness    = query.value(11).toUInt();
+    colour        = query.value(12).toUInt();
+    hue           = query.value(13).toUInt();
+    tvformat      = query.value(14).toString();
+    visible       = query.value(15).toBool();
+    outputfilters = query.value(16).toString();
+    useonairguide = query.value(17).toBool();
+    mplexid       = query.value(18).toUInt();
+    serviceid     = query.value(19).toUInt();
+    atsc_major_chan = query.value(20).toUInt();
+    atsc_minor_chan = query.value(21).toUInt();
+    last_record   = query.value(22).toDateTime();
+    default_authority = query.value(23).toString();
+    commmethod    = query.value(24).toUInt();
+    tmoffset      = query.value(25).toUInt();
+    iptvid        = query.value(26).toUInt();
+
+    return true;
+}
+
 QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
 {
     QString tmp;
