@@ -96,7 +96,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                          "AND program.starttime <= :EndDate "
                         "GROUP BY program.starttime, channel.channum, "
                          "channel.callsign, program.title "
-                        "ORDER BY program.chanid ";
+                        "ORDER BY program.chanid, program.starttime ";
 
     bindings[":StartChanId"] = nStartChanId;
     bindings[":EndChanId"  ] = nEndChanId;
