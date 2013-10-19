@@ -179,6 +179,8 @@ options:
     \%om  = Original Airdate:  month, leading zero
     \%oj  = Original Airdate:  day of month
     \%od  = Original Airdate:  day of month, leading zero
+    \%sea = Season number
+    \%ep  = Episode number
     \%%   = a literal % character
 
     * The program start time is the time from the listings data and is not
