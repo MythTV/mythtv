@@ -90,13 +90,16 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     ProgramList  schedList;
     MSqlBindings bindings;
 
+    // lpad is to allow natural sorting of numbers
     QString      sSQL = "WHERE program.chanid >= :StartChanId "
                          "AND program.chanid <= :EndChanId "
                          "AND program.endtime >= :StartDate "
                          "AND program.starttime <= :EndDate "
-                        "GROUP BY program.starttime, channel.channum, "
-                         "channel.callsign, program.title "
-                        "ORDER BY program.chanid, program.starttime ";
+                         "GROUP BY program.starttime, channel.chanid "
+                         "ORDER BY lpad(channel.channum, 10, 0), "
+                         "         callsign,                     "
+                         "         lpad(program.chanid, 10, 0),  "
+                         "         program.starttime ";
 
     bindings[":StartChanId"] = nStartChanId;
     bindings[":EndChanId"  ] = nEndChanId;
@@ -123,10 +126,15 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     int               nChanCount = 0;
     uint              nCurChanId = 0;
     DTC::ChannelInfo *pChannel   = NULL;
+    QString           sCurCallsign;
+    uint              nSkipChanId = 0;
 
     for( uint n = 0; n < progList.size(); n++)
     {
         ProgramInfo *pInfo = progList[ n ];
+
+        if ( nSkipChanId == pInfo->GetChanID())
+            continue;
 
         if ( nCurChanId != pInfo->GetChanID() )
         {
@@ -134,11 +142,20 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
 
             nCurChanId = pInfo->GetChanID();
 
+            // Filter out channels with the same callsign, keeping just the
+            // first seen
+            if (sCurCallsign == pInfo->GetChannelSchedulingID())
+            {
+                nSkipChanId = pInfo->GetChanID();
+                continue;
+            }
+
             pChannel = pGuide->AddNewChannel();
 
             FillChannelInfo( pChannel, pInfo->GetChanID(), bDetails );
-        }
 
+            sCurCallsign = pChannel->CallSign();
+        }
         
         DTC::Program *pProgram = pChannel->AddNewProgram();
 
