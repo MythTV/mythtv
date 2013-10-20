@@ -215,7 +215,6 @@ class MTV_PUBLIC CardUtil
     static bool         DeleteCard(uint cardid);
     static bool         DeleteAllCards(void);
     static vector<uint> GetCardList(void);
-    static vector<uint> GetLiveTVCardList(void);
 
     /// Convenience function for GetCardIDs()
     static uint         GetFirstCardID(const QString &videodevice)
