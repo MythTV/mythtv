@@ -613,6 +613,9 @@ void GuideGrid::ShowMenu(void)
 
         if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             menuPopup->AddButton(tr("Change to Channel"));
+        else
+            // XXX Make sure this channel/program is watchable
+            menuPopup->AddButton(tr("Watch This Channel"));
 
         menuPopup->AddButton(tr("Record This"));
 
@@ -1413,6 +1416,11 @@ void GuideGrid::customEvent(QEvent *event)
             else if (resulttext == tr("Change to Channel"))
             {
                 enter();
+            }
+            else if (resulttext == tr("Watch This Channel"))
+            {
+                // XXX Do another check that this channel/program is watchable
+                TV::StartTV(NULL, kStartTVNoFlags, GetSelection());
             }
             else if (resulttext == tr("Program Details"))
             {
