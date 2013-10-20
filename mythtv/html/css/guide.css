@@ -1,0 +1,241 @@
+#content
+{
+    padding: 10px;
+}
+
+.pageTitle
+{
+    float:left;
+}
+
+.navigateBox
+{
+    float: right;
+    margin: 5px 5px 10px 5px;
+    background-color: #333333;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.guideGrid
+{
+    width: 100%;
+    clear: both;
+    /*overflow: visible;*/
+}
+
+.guideGrid div
+{
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.guideGrid .timeBar
+{
+    clear:both;
+    width: 100%;
+    margin: 5px 0px 5px 0px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.guideGrid .timeBarDate
+{
+    float: left;
+    background-color: #333333;
+    border-radius: 10px;
+    font-size: 0.8em;
+    width: 10%;
+    height: 100%;
+    text-align: center;
+    padding: 8px 4px 8px 4px;
+}
+
+.guideGrid .timeBarTimes
+{
+    float: left;
+    width: 90%;
+    height: 100%;
+}
+
+.guideGrid .timeBarTime
+{
+    background-color: #333333;
+    border-radius: 10px;
+    padding: 5px 4px 5px 4px;
+    height: 100%;
+}
+
+.guideGrid .channelRow
+{
+    clear: both;
+    width: 100%;
+    height: 80px;
+    margin: 2px;
+    overflow: visible;
+}
+
+.guideGrid .channelBox
+{
+    float: left;
+    width: 10%;
+    height: 100%;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #333333;
+    color: #FFFFFF;
+    border-radius: 10px;
+}
+
+.guideGrid .channelIcon
+{
+    margin: 5px 5px 1px 5px;
+}
+
+.guideGrid .channelText
+{
+    font-weight: bold;
+}
+
+.guideGrid .programBox
+{
+    float: left;
+    height: 100%;
+}
+
+.guideGrid .programBoxInner
+{
+    margin:0px 1px 0px 1px;
+    height: 100%;
+    background-color: #666666;
+    border-radius: 10px;
+}
+
+.guideGrid .programStartsOffScreen
+{
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.guideGrid .programEndsOffScreen
+{
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.guideGrid .programHeader
+{
+    padding: 6px 8px 6px 8px;
+    color: #FFFFFF;
+    font-size: 1.1em;
+    width: 100%;
+    height: 30px;
+    font-weight: bold;
+    background-color: #444444;
+    border-radius: inherit;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    z-index: 5;
+    position:relative;
+}
+
+.guideGrid .programBody
+{
+    padding: 5px 5px 5px 5px;
+    color: #DDDDDD;
+    height: 45px;
+    z-index:5;
+    font-size: 0.8em;
+}
+
+.guideGrid .programDescription
+{
+    position:relative;
+    z-index:5; /* We want this to appear above the black veil */
+}
+
+.guideGrid .programSubtitle
+{
+    position:relative;
+    font-weight: bold;
+    font-size: 0.8em;
+    margin-right:5px;
+    z-index:5; /* We want this to appear above the black veil */
+}
+
+.guideGrid .programArrow
+{
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.guideGrid .programWillRecord
+{
+    background-color:#37912F;
+}
+
+.guideGrid .programRecording
+{
+    background-color:#00CC00;
+}
+
+.guideGrid .programOtherShowing
+{
+    border:2px #37912F dashed;
+}
+
+.guideGrid .programSelected
+{
+    border:2px #045FB4 solid;
+}
+
+.guideGrid .relentlessMarchOfTime
+{
+    background-color: rgba(51, 51, 78, 0.7);
+    border-radius: 10px;
+    z-index: 1;
+    height: 80px;
+    margin-left:2px;
+}
+
+#recMenu
+{
+    background-color: rgba(51, 51, 51, 0.85);
+    border: 2px #045FB4 solid;
+    box-shadow: 6px 6px 4px #222222;
+    display: none;
+    z-index: 99;
+    position: absolute;
+    padding: 5px;
+}
+
+#recMenu .button
+{
+    background-color:#444444;
+    border:1px #FFFFFF solid;
+    color: #FFFFFF;
+    margin: 5px
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 5px;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 8px;
+}
+
+#programDetails
+{
+    background-color: rgba(51, 51, 51, 0.85);
+    border: 2px #045FB4 solid;
+    box-shadow: 6px 6px 4px #222222;
+    width: 30%;
+    display: none;
+    z-index: 50;
+    position: absolute;
+    padding: 10px;
+}

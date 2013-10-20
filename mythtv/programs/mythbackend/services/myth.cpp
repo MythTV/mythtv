@@ -381,6 +381,46 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
+{
+    QString dateFormat;
+    if (ShortDate)
+        dateFormat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
+    else
+        dateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMMM");
+
+    return gCoreContext->GetQLocale().toString(Date, dateFormat);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString Myth::GetFormatTime(const QDateTime Time)
+{
+    QString timeFormat = GetMythDB()->GetSetting("TimeFormat", "hh:mm");
+
+    return gCoreContext->GetQLocale().toString(Time, timeFormat);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QDateTime Myth::ParseISODateString(const QString& DateTimeString)
+{
+    QDateTime dateTime = QDateTime().fromString(DateTimeString, Qt::ISODate);
+
+    if (!dateTime.isValid())
+        throw( "Unable to parse DateTimeString" );
+
+    return dateTime;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
                                      const QString   &Application,
                                      int             PID,
@@ -540,7 +580,7 @@ DTC::SettingList *Myth::GetSetting( const QString &sHostName,
         // Key Supplied, lookup just its value.
         // ------------------------------------------------------------------
 
-        query.prepare("SELECT data, hostname from settings "
+        query.prepare("SELECT data, hostname FROM settings "
                       "WHERE value = :KEY AND "
                       "(hostname = :HOSTNAME OR hostname IS NULL) "
                       "ORDER BY hostname DESC;" );

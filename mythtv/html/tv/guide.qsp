@@ -1,0 +1,263 @@
+<%
+    var args = arguments[1];
+    function toCapitalCase(str)
+    {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function isValidObject(variable)
+    {
+        return ((typeof variable === "object")
+                && typeof variable !== "undefined"
+                && (variable != null));
+    }
+
+    var timeBarInterval = 30; // Display time markers every X minutes
+    var guideRange = 2; // Show X hours from the start time
+
+    var myth  = new Myth();
+    var guide = new Guide();
+
+    var now = new Date();
+    var guideStartTime;
+
+    // Use the StartTime argument if it was defined
+    if (typeof args.StartTime !== "undefined")
+    {
+        //guideStartTime = new Date();
+        guideStartTime = myth.ParseISODateString(args.StartTime);
+    }
+
+    // If the StartTime wasn't valid or wasn't defined then use the current time
+    if (!isValidObject(guideStartTime))
+        guideStartTime = new Date(now);
+
+    // Round down to the nearest half hour
+    guideStartTime.setMinutes(guideStartTime.getMinutes() >= 30 ? 30 : 0);
+
+    // Remove any stray seconds that would break date comparisons later
+    guideStartTime.setSeconds(0);
+    guideStartTime.setMilliseconds(0);
+
+    var guideEndTime = new Date(guideStartTime);
+    guideEndTime.setHours(guideStartTime.getHours() + guideRange);
+    // Hack because GetProgramGuide will include programs with a starttime matching our endtime
+    guideEndTime.setSeconds(guideEndTime.getSeconds() - 1);
+    var guidePeriod = new Date(guideEndTime - guideStartTime);
+
+    // Actually fetch the guide data
+    var guideResult = guide.GetProgramGuide(guideStartTime, guideEndTime, 0, 0, true);
+    var channelList = guideResult.Channels;
+
+    // Indicator of time in past
+    var darkVeilWidth = 0;
+    if ((now - guideStartTime) > 0)
+    {
+        darkVeilWidth = Math.round(((now - guideStartTime)/guidePeriod) * 100);
+        if (darkVeilWidth > 100)
+            darkVeilWidth = 100;
+    }
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
+       <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/css/guide.css">
+<link rel="stylesheet" type="text/css" href="/css/category_colors.css">
+<script type="text/javascript" src="/js/util.qjs"></script>
+<script type="text/javascript" src="/js/guide.js"></script>
+</head>
+<body>
+
+<h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
+
+<!-- Popup Recording Menu -->
+<div id="recMenu">
+    <div class="button" onClick="recordProgram(chanID, startTime, 'Single Record')">
+        Record this showing
+    </div>
+    <div class="button" onClick="recordProgram(chanID, startTime, 'Record All')">
+        Record all showings
+    </div>
+    <div class="button" onClick="recordProgram(chanID, startTime, 'Record One')">
+        Record one showing
+    </div>
+    <div class="button" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
+        Record all showings (this channel)
+    </div>
+    <div class="button" onClick="loadContent('/tv/schedule.qsp')">
+        Edit recording rule
+    </div>
+</div>
+
+<!-- Popup Program Details Box -->
+<div id="programDetails" class="programExDetail">
+</div>
+
+<!-- Navigation by day or time -->
+<div class="navigateBox">
+
+    <label for="guideStartDate"><%=qsTr("Date")%>:</label>
+    <select id="guideStartDate" onChange="loadContent('/tv/guide.qsp?StartTime=' + this.options[this.options.selectedIndex].value);">
+<%
+    var startDay = new Date(guideStartTime);
+    startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
+    for (var dateIdx = 0; dateIdx < 28; dateIdx++)
+    {
+        var selected = (startDay.getDate() == guideStartTime.getDate()) ? "selected" : "";
+
+%>
+        <option label="<%=myth.GetFormatDate(startDay)%>" <%=selected%> value="<%=startDay.toISOString()%>"><%=myth.GetFormatDate(startDay)%></option>
+<%
+        startDay.setDate(startDay.getDate() + 1);
+    }
+%>
+    </select>
+
+    <label for="guideStartTime"><%=qsTr("Time")%>:</label>
+    <select id="guideStartTime" onChange="loadContent('/tv/guide.qsp?StartTime=' + this.options[this.options.selectedIndex].value);">
+<%
+    var startTime = new Date(guideStartTime);
+    startTime.setHours(0);
+    startTime.setMinutes(0);
+    for (var hourIdx = 0; hourIdx < 48; hourIdx++)
+    {
+        var selected = ((startTime.getHours() == guideStartTime.getHours()) &&
+                        (startTime.getMinutes() == guideStartTime.getMinutes())) ? "selected" : "";
+%>
+        <option label="<%=myth.GetFormatTime(startTime)%>" value="<%=startTime.toISOString()%>" <%=selected%>><%=myth.GetFormatTime(startTime)%></option>
+<%
+        startTime.setMinutes(startTime.getMinutes() + 30);
+    }
+%>
+    </select>
+
+</div>
+
+<div class="guideGrid">
+
+    <div class="timeBar">
+        <div class="timeBarDate">
+            <%=myth.GetFormatDate(guideStartTime, true)%>
+        </div>
+        <div class="timeBarTimes">
+<%
+    var numTimePeriods = (guideRange * 60) / timeBarInterval;
+    var width = (100 / numTimePeriods);
+    for (var timeIdx=0; timeIdx < numTimePeriods; timeIdx++)
+    {
+        var displayTime = new Date(guideStartTime);
+        displayTime.setMinutes(displayTime.getMinutes() + (timeIdx * timeBarInterval));
+%>
+            <div style="width:<%=width%>%;float:left;height:100%;padding-left:2px;">
+                <div class="timeBarTime">
+                    <%=myth.GetFormatTime(displayTime)%>
+                    <span style="float:right;">&rsaquo;</span>
+                </div>
+            </div>
+<%
+    }
+%>
+        </div>
+    </div>
+
+<%
+    for (var chanIdx=0; chanIdx < channelList.length; chanIdx++)
+    {
+        var channel = channelList[chanIdx];
+        if (!channel.Visible)
+            continue;
+        var programList = channel.Programs;
+%>
+
+    <div class="channelRow">
+        <div class="channelBox">
+            <img class="channelIcon" alt="<%=channel.ChannelName%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
+            <div class="channelText"><%=channel.ChannelName%></div>
+        </div>
+        <div style="float:left;width:90%;height:100%;position:relative;overflow:visible;">
+
+            <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
+<%
+        var programNum = 0;
+        var cumulativeWidth = 0;
+        for (var progIdx=0; progIdx < programList.length; progIdx++)
+        {
+            var program =  programList[progIdx];
+            if (program.EndTime <= guideStartTime)
+                continue;
+            if (program.StartTime >= (guideEndTime))
+                continue;
+            var altClass = "";
+            if (program.StartTime < guideStartTime)
+                altClass = "programStartsOffScreen";
+            else if (program.EndTime > guideEndTime)
+                altClass = "programEndsOffScreen";
+
+            programNum++;
+            var windowStart = (program.StartTime > guideStartTime ? program.StartTime : guideStartTime);
+            var windowEnd = (program.EndTime > guideEndTime ? guideEndTime : program.EndTime);
+            var windowLength = (windowEnd - windowStart);
+            var width = Math.round(((windowLength / guidePeriod) * 100));
+            cumulativeWidth += width;
+
+            // Due to rounding issues we can end up a percentage point or two over
+            // this just trims the last width to prevent that happening.
+            if (progIdx == (programList.length - 1))
+            {
+                width = (cumulativeWidth < 100) ? width + (100 - cumulativeWidth) : width;
+                width = (cumulativeWidth > 100) ? width - (cumulativeWidth - 100) : width;
+            }
+            var category = toCapitalCase(program.Category.replace(/ /g, ''))
+            var status = "";
+            switch (program.Recording.Status)
+            {
+                case -1:
+                    status = "programWillRecord";
+                    break;
+                case -2:
+                    status = "programRecording";
+                    break;
+                case 4: case 8: case 13:
+                    status = "programOtherShowing";
+                    break;
+            }
+
+            var showArrow = (program.EndTime > windowEnd) ? "block" : "none";
+
+            // Used as a unique identifier and also to access the chanid
+            // and starttime for the AJAX scheduling stuff
+            var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
+%>
+            <div class="programBox" style="width:<%=width%>%;" title="<%=program.Title%>">
+                <div class="programBoxInner category_<%=category%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
+                    <div class="programHeader <%=status%>"><%=program.Title%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
+                    <div class="programBody">
+                        <span class="programSubtitle"><%=program.SubTitle%></span>
+                        <span class="programDescription"><%=program.Description%></span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none" id="<%=programIdentifier%>_detail">
+                <label for="progStartTime">Duration: </label><span id="progStartTime"><%=myth.GetFormatTime(program.StartTime)%> - <%=myth.GetFormatTime(program.EndTime)%></span><br />
+                <label for="progCategory">Category: </label><span id="progCategory"><%=program.Category%></span><br />
+                <label for="progSeason">Season: </label><span id="progSeason"><%=program.Season%></span><br />
+                <label for="progEpisode">Episode: </label><span id="progEpisode"><%=program.Episode%></span>
+            </div>
+<%
+        }
+%>
+        </div>
+    </div>
+<%
+    }
+%>
+
+</div>
+
+</body>
+</html>

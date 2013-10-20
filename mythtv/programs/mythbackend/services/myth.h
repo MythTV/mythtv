@@ -59,6 +59,11 @@ class Myth : public MythServices
 
         DTC::TimeZoneInfo*  GetTimeZone         ( );
 
+        QString             GetFormatDate       ( const QDateTime Date,
+                                                  bool            ShortDate );
+        QString             GetFormatTime       ( const QDateTime Time );
+        QDateTime           ParseISODateString  ( const QString   &DateTime );
+
         DTC::LogMessageList* GetLogs            ( const QString   &HostName,
                                                   const QString   &Application,
                                                   int             PID,
@@ -186,6 +191,22 @@ class ScriptableMyth : public QObject
         }
 
         QObject* GetTimeZone() { return m_obj.GetTimeZone( ); }
+
+        QString   GetFormatDate( const QDateTime Date,
+                                 bool            ShortDate = false )
+        {
+            return m_obj.GetFormatDate( Date, ShortDate );
+        }
+
+        QString   GetFormatTime( const QDateTime Time )
+        {
+            return m_obj.GetFormatTime( Time );
+        }
+
+        QDateTime ParseISODateString( const QString &DateTime )
+        {
+            return m_obj.ParseISODateString(DateTime);
+        }
 
         QObject* GetLogs( const QString   &HostName,
                           const QString   &Application,
