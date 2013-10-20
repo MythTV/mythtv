@@ -307,8 +307,7 @@ void TV::StopPlayback(void)
 /**
  * \brief returns true if the recording completed when exiting.
  */
-bool TV::StartTV(ProgramInfo *tvrec, uint flags,
-                 const ChannelInfoList &selection)
+bool TV::StartTV(ProgramInfo *tvrec, uint flags)
 {
     TV *tv = GetTV();
     if (!tv)
@@ -377,7 +376,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
         else if (RemoteGetFreeRecorderCount())
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->LiveTV() -- begin");
-            if (!tv->LiveTV(showDialogs, selection))
+            if (!tv->LiveTV(showDialogs))
             {
                 tv->SetExitPlayer(true, true);
                 quitAll = true;
@@ -1022,7 +1021,6 @@ TV::TV(void)
       asInputMode(false),
       // Channel changing state variables
       queuedChanNum(""),
-      initialChanID(0),
       lockTimerOn(false),
       // channel browsing
       browsehelper(NULL),
@@ -1677,7 +1675,7 @@ TVState TV::GetState(const PlayerContext *actx) const
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
  */
-bool TV::LiveTV(bool showDialogs, const ChannelInfoList &selection)
+bool TV::LiveTV(bool showDialogs)
 {
     requestDelete = false;
     allowRerecord = false;
@@ -1685,7 +1683,7 @@ bool TV::LiveTV(bool showDialogs, const ChannelInfoList &selection)
 
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
     if (actx->GetState() == kState_None &&
-        RequestNextRecorder(actx, showDialogs, selection))
+        RequestNextRecorder(actx, showDialogs))
     {
         actx->SetInitialTVState(true);
         HandleStateChange(actx, actx);
@@ -1714,8 +1712,7 @@ int TV::GetLastRecorderNum(int player_idx) const
     return ret;
 }
 
-bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
-                             const ChannelInfoList &selection)
+bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs)
 {
     if (!ctx)
         return false;
@@ -1728,24 +1725,6 @@ bool TV::RequestNextRecorder(PlayerContext *ctx, bool showDialogs,
         // If this is set we, already got a new recorder in SwitchCards()
         testrec = switchToRec;
         switchToRec = NULL;
-    }
-    else if (!selection.empty())
-    {
-        for (uint i = 0; i < selection.size(); i++)
-        {
-            uint    chanid  = selection[i].chanid;
-            QString channum = selection[i].channum;
-            if (!chanid || channum.isEmpty())
-                continue;
-            QSet<uint> cards = IsTunableOn(ctx, chanid, false, true);
-
-            if (chanid && !channum.isEmpty() && !cards.isEmpty())
-            {
-                testrec = RemoteGetExistingRecorder(*(cards.begin()));
-                initialChanID = chanid;
-                break;
-            }
-        }
     }
     else
     {
@@ -2241,9 +2220,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         SET_NEXT();
 
-        uint chanid = initialChanID;
-        if (!chanid)
-            chanid = gCoreContext->GetNumSetting("DefaultChanid", 0);
+        uint chanid = gCoreContext->GetNumSetting("DefaultChanid", 0);
 
         if (chanid && !IsTunable(ctx, chanid))
             chanid = 0;
