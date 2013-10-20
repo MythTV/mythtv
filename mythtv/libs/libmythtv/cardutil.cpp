@@ -2317,6 +2317,28 @@ vector<uint> CardUtil::GetCardList(void)
     return list;
 }
 
+vector<uint> CardUtil::GetLiveTVCardList(void)
+{
+    vector<uint> list;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT DISTINCT cardid "
+        "FROM cardinput "
+        "WHERE livetvorder <> 0 "
+        "ORDER BY livetvorder");
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::GetCardList()", query);
+    else
+    {
+        while (query.next())
+            list.push_back(query.value(0).toUInt());
+    }
+
+    return list;
+}
+
 
 QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {

@@ -164,7 +164,7 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
     return list;
 #endif
     vector<uint> result;
-    vector<uint> cards = CardUtil::GetCardList();
+    vector<uint> cards = CardUtil::GetLiveTVCardList();
     for (uint i = 0; i < cards.size(); i++)
     {
         vector<InputInfo> inputs =
