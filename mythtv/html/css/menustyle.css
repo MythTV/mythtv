@@ -1,9 +1,4 @@
-body {
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 0.9em;
-}
-
-p {
+#menu p {
   line-height: 1.5em;
 }
 
@@ -53,7 +48,7 @@ ul.menu a.active, ul.menu ul.menu li a.active, ul.menu a.active:hover, ul.menu u
     text-decoration: underline;
     background: #c00;
 }
-div.panel {
+#menu div.panel {
     border: 1px #000 solid;
     padding: 5px;
     margin-top: 1px;
@@ -74,16 +69,16 @@ ul.menu div.panel a:hover {
 }
 
 
-.code { border: 1px solid #ccc; list-style-type: decimal-leading-zero; padding: 5px; margin: 0; }
-.code code { display: block; padding: 3px; margin-bottom: 0; }
-.code li { background: #ddd; border: 1px solid #ccc; margin: 0 0 2px 2.2em; }
-.indent1 { padding-left: 1em; }
-.indent2 { padding-left: 2em; }
-.indent3 { padding-left: 3em; }
-.indent4 { padding-left: 4em; }
-.indent5 { padding-left: 5em; }
-.indent6 { padding-left: 6em; }
-.indent7 { padding-left: 7em; }
-.indent8 { padding-left: 8em; }
-.indent9 { padding-left: 9em; }
-.indent10 { padding-left: 10em; }
+#menu .code { border: 1px solid #ccc; list-style-type: decimal-leading-zero; padding: 5px; margin: 0; }
+#menu .code code { display: block; padding: 3px; margin-bottom: 0; }
+#menu .code li { background: #ddd; border: 1px solid #ccc; margin: 0 0 2px 2.2em; }
+#menu .indent1 { padding-left: 1em; }
+#menu .indent2 { padding-left: 2em; }
+#menu .indent3 { padding-left: 3em; }
+#menu .indent4 { padding-left: 4em; }
+#menu .indent5 { padding-left: 5em; }
+#menu .indent6 { padding-left: 6em; }
+#menu .indent7 { padding-left: 7em; }
+#menu .indent8 { padding-left: 8em; }
+#menu .indent9 { padding-left: 9em; }
+#menu .indent10 { padding-left: 10em; }
