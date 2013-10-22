@@ -5,6 +5,17 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
+    function escapeHTML(str)
+    {
+        str = str.replace(/&/g, "&amp;")
+                 .replace(/'/g, "&apos;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;");
+
+        return str;
+    }
+
     function isValidObject(variable)
     {
         return ((typeof variable === "object")
@@ -176,8 +187,8 @@
 
     <div class="channelRow">
         <div class="channelBox">
-            <img class="channelIcon" alt="<%=channel.ChannelName%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
-            <div class="channelText"><%=channel.ChannelName%></div>
+            <img class="channelIcon" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
+            <div class="channelText"><%=escapeHTML(channel.ChannelName)%></div>
         </div>
         <div style="float:left;width:90%;height:100%;position:relative;overflow:visible;">
 
@@ -212,7 +223,7 @@
                 width = (cumulativeWidth < 100) ? width + (100 - cumulativeWidth) : width;
                 width = (cumulativeWidth > 100) ? width - (cumulativeWidth - 100) : width;
             }
-            var category = toCapitalCase(program.Category.replace(/ /g, ''))
+            var category = toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
             var status = "";
             switch (program.Recording.Status)
             {
@@ -233,18 +244,18 @@
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
-            <div class="programBox" style="width:<%=width%>%;" title="<%=program.Title%>">
+            <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
                 <div class="programBoxInner category_<%=category%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
-                    <div class="programHeader <%=status%>"><%=program.Title%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
+                    <div class="programHeader <%=status%>"><%=escapeHTML(program.Title)%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
                     <div class="programBody">
-                        <span class="programSubtitle"><%=program.SubTitle%></span>
-                        <span class="programDescription"><%=program.Description%></span>
+                        <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
+                        <span class="programDescription"><%=escapeHTML(program.Description)%></span>
                     </div>
                 </div>
             </div>
             <div style="display: none" id="<%=programIdentifier%>_detail">
                 <label for="progStartTime">Duration: </label><span id="progStartTime"><%=myth.GetFormatTime(program.StartTime)%> - <%=myth.GetFormatTime(program.EndTime)%></span><br />
-                <label for="progCategory">Category: </label><span id="progCategory"><%=program.Category%></span><br />
+                <label for="progCategory">Category: </label><span id="progCategory"><%=escapeHTML(program.Category)%></span><br />
                 <label for="progSeason">Season: </label><span id="progSeason"><%=program.Season%></span><br />
                 <label for="progEpisode">Episode: </label><span id="progEpisode"><%=program.Episode%></span>
             </div>
