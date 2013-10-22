@@ -69,9 +69,10 @@ function installPackage(packageName) {
 }
 
 function loadDiv(divName, contentURL, jsURL) {
+
+    $("#busyPopup").show();
+
     divName = "#" + divName;
-    
-    $(divName).html("<br><br><b><i18n>Loading</i18n>...</b>");
 
     var html = $.ajax({
       url: contentURL,
@@ -87,6 +88,8 @@ function loadDiv(divName, contentURL, jsURL) {
     }
 
     setUIAttributes();
+
+    $("#busyPopup").hide();
 }
 
 function setUIAttributes() {
