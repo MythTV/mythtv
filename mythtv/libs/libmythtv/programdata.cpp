@@ -167,6 +167,8 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     previouslyshown = other.previouslyshown;
     ratings         = other.ratings;
     listingsource   = other.listingsource;
+    season          = other.season;
+    episode         = other.episode;
 
     Squeeze();
 
@@ -253,7 +255,8 @@ uint DBEvent::GetOverlappingPrograms(
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
         "       previouslyshown,listingsource, "
-        "       stars+0 "
+        "       stars+0, "
+        "       season,         episode, "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -290,7 +293,9 @@ uint DBEvent::GetOverlappingPrograms(
             query.value(19).toDouble(),
             query.value(10).toString(),
             query.value(11).toString(),
-            query.value(18).toUInt());
+            query.value(18).toUInt(),
+            query.value(20).toUInt(),  // Season
+            query.value(21).toUInt()); // Episode
 
         prog.partnumber = query.value(12).toUInt();
         prog.parttotal  = query.value(13).toUInt();
@@ -298,7 +303,6 @@ uint DBEvent::GetOverlappingPrograms(
         prog.airdate    = query.value(15).toUInt();
         prog.originalairdate  = query.value(16).toDate();
         prog.previouslyshown  = query.value(17).toBool();
-        ;
 
         programs.push_back(prog);
         count++;
@@ -839,7 +843,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
         "  seriesid,       programid,      previouslyshown, "
-        "  stars,          showtype,       title_pronounce, colorcode ) "
+        "  stars,          showtype,       title_pronounce, colorcode, "
+        "  season,         episode ) "
 
         "VALUES("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
@@ -851,7 +856,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
-        " :STARS,         :SHOWTYPE,      :TITLEPRON,      :COLORCODE)");
+        " :STARS,         :SHOWTYPE,      :TITLEPRON,      :COLORCODE, "
+        " :SEASON,        :EPISODE )");
 
     QString cattype = myth_category_type_to_string(categoryType);
 
@@ -887,6 +893,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":SHOWTYPE",    showtype);
     query.bindValue(":TITLEPRON",   title_pronounce);
     query.bindValue(":COLORCODE",   colorcode);
+    query.bindValue(":SEASON",      season);
+    query.bindValue(":EPISODE",     episode);
 
     if (!query.exec())
     {

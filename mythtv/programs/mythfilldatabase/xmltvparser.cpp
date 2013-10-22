@@ -465,7 +465,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     if (!season.isEmpty())
                     {
                         tmp = season.toUInt() + 1;
-                        pginfo->episode = tmp;
+                        pginfo->season = tmp;
                         season = QString::number(tmp);
                         pginfo->syndicatedepisodenumber.append(QString('S' + season));
                     }

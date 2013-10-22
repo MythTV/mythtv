@@ -90,7 +90,9 @@ class MTV_PUBLIC DBEvent
         seriesId(),
         programId(),
         previouslyshown(false),
-        listingsource(_listingsource) {}
+        listingsource(_listingsource),
+        season(0),
+        episode(0) {}
 
     DBEvent(const QString   &_title,     const QString   &_subtitle,
             const QString   &_desc,
@@ -101,7 +103,8 @@ class MTV_PUBLIC DBEvent
             unsigned char    _videoProps,
             float            _stars,
             const QString   &_seriesId,  const QString   &_programId,
-            uint32_t         _listingsource) :
+            uint32_t         _listingsource,
+            uint _season,                uint _episode) :
         title(_title),           subtitle(_subtitle),
         description(_desc),
         category(_category),
@@ -117,7 +120,9 @@ class MTV_PUBLIC DBEvent
         seriesId(_seriesId),
         programId(_programId),
         previouslyshown(false),
-        listingsource(_listingsource)
+        listingsource(_listingsource),
+        season(_season),
+        episode(_episode)
     {
     }
 
@@ -187,10 +192,12 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _audioProps,
                unsigned char    _videoProps,
                float            _stars,
-               const QString   &_seriesId,  const QString   &_programId) :
+               const QString   &_seriesId,  const QString   &_programId,
+               uint _season,                uint _episode ) :
         DBEvent(_title, _subtitle, _desc, _category, _category_type,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                _stars, _seriesId, _programId, kListingSourceEIT),
+                _stars, _seriesId, _programId, kListingSourceEIT,
+                _season, _episode),
         chanid(_chanid), fixup(_fixup)
     {
     }
@@ -204,7 +211,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _videoProps) :
         DBEvent(_title, QString(), _desc, QString(), ProgramInfo::kCategoryNone,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                0.0, QString(), QString(), kListingSourceEIT),
+                0.0, QString(), QString(), kListingSourceEIT, 0, 0), // Season and Episode are not set with this constructor!
         chanid(_chanid), fixup(_fixup)
     {
     }
