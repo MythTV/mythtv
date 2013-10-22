@@ -454,20 +454,20 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
                     pginfo->categoryType = ProgramInfo::kCategorySeries;
 
-                    if (!episode.isEmpty())
-                    {
-                        tmp = episode.toUInt() + 1;
-                        pginfo->episode = tmp;
-                        episode = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber = QString('E' + episode);
-                    }
-
                     if (!season.isEmpty())
                     {
                         tmp = season.toUInt() + 1;
                         pginfo->season = tmp;
                         season = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber.append(QString('S' + season));
+                        pginfo->syndicatedepisodenumber = QString('S' + season);
+                    }
+
+                    if (!episode.isEmpty())
+                    {
+                        tmp = episode.toUInt() + 1;
+                        pginfo->episode = tmp;
+                        episode = QString::number(tmp);
+                        pginfo->syndicatedepisodenumber.append(QString('E' + episode));
                     }
 
                     uint partno = 0;
