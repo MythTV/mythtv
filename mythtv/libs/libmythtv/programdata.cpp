@@ -710,7 +710,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         "  stars,          partnumber,     parttotal, "
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
-        "  seriesid,       programid,      previouslyshown ) "
+        "  seriesid,       programid,      previouslyshown, "
+        "  season,         episode ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
@@ -720,7 +721,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         " :STARS,         :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
-        " :SERIESID,      :PROGRAMID,     :PREVSHOWN) ");
+        " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
+        " :SEASON,        :EPISODE ) ");
 
     QString cattype = myth_category_type_to_string(categoryType);
     QString empty("");
@@ -749,6 +751,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":SERIESID",    denullify(seriesId));
     query.bindValue(":PROGRAMID",   denullify(programId));
     query.bindValue(":PREVSHOWN",   previouslyshown);
+    query.bindValue(":SEASON",      season);
+    query.bindValue(":EPISODE",     episode);
 
     if (!query.exec())
     {

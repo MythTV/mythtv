@@ -456,14 +456,16 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
                     if (!episode.isEmpty())
                     {
-                        tmp = episode.toInt() + 1;
+                        tmp = episode.toUInt() + 1;
+                        pginfo->episode = tmp;
                         episode = QString::number(tmp);
                         pginfo->syndicatedepisodenumber = QString('E' + episode);
                     }
 
                     if (!season.isEmpty())
                     {
-                        tmp = season.toInt() + 1;
+                        tmp = season.toUInt() + 1;
+                        pginfo->episode = tmp;
                         season = QString::number(tmp);
                         pginfo->syndicatedepisodenumber.append(QString('S' + season));
                     }

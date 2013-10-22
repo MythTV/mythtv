@@ -170,6 +170,8 @@ class MTV_PUBLIC DBEvent
     bool          previouslyshown;
     uint32_t      listingsource;
     QList<EventRating> ratings;
+    uint          season;
+    uint          episode;
 };
 
 class MTV_PUBLIC DBEventEIT : public DBEvent
