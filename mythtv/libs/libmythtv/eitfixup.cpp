@@ -1390,6 +1390,8 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
                 QString("E%1S%2").arg(episode).arg(season);
+        event.season = season;
+        event.episode = episode;
         event.categoryType = ProgramInfo::kCategorySeries;
     }
 
@@ -2049,6 +2051,12 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         }
     }
 
+    if (episode > 0)
+        event.episode = episode;
+
+    if (season > 0)
+        event.season = season;
+    
     //Feature:
     tmpRegEx = m_dkFeatures;
     position = event.description.indexOf(tmpRegEx);
@@ -2099,14 +2107,15 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         event.programId[0]='_';
 
     // Add season and episode number to subtitle
-    if(episode>0)
+    if (episode > 0)
     {
         event.subtitle = QString("%1 (%2").arg(event.subtitle).arg(episode);
         if (event.parttotal >0)
             event.subtitle = QString("%1:%2").arg(event.subtitle).
                     arg(event.parttotal);
-        if (season>0)
+        if (season > 0)
         {
+            event.season = season;
             event.syndicatedepisodenumber =
                     QString("E%1S%2").arg(episode).arg(season);
             event.subtitle = QString("%1 Sæson %2").arg(event.subtitle).
@@ -2114,6 +2123,7 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         }
         event.subtitle = QString("%1)").arg(event.subtitle);
     }
+
     // Find actors and director in description
     tmpRegEx = m_dkDirector;
     bool directorPresent = false;
