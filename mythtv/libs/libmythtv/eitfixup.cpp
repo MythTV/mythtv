@@ -1389,7 +1389,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         uint episode   = tmpExp1.cap(2).toUInt();
         event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
-                QString("E%1S%2").arg(episode).arg(season);
+                QString("S%1E%2").arg(season).arg(episode);
         event.season = season;
         event.episode = episode;
         event.categoryType = ProgramInfo::kCategorySeries;
@@ -2116,8 +2116,9 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         if (season > 0)
         {
             event.season = season;
+            event.episode = episode;
             event.syndicatedepisodenumber =
-                    QString("E%1S%2").arg(episode).arg(season);
+                    QString("S%1E%2").arg(season).arg(episode);
             event.subtitle = QString("%1 Sæson %2").arg(event.subtitle).
                     arg(season);
         }
