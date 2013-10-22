@@ -256,7 +256,7 @@ uint DBEvent::GetOverlappingPrograms(
         "       airdate,        originalairdate, "
         "       previouslyshown,listingsource, "
         "       stars+0, "
-        "       season,         episode, "
+        "       season,         episode "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
