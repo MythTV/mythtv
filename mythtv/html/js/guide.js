@@ -39,16 +39,17 @@ function moveToPosition(layer, customer)
     var pageBottom = window.innerHeight; //document.body.clientHeight;
     var pageWidth = document.body.clientWidth; //window.innerHeight;
 
-    //alert("Page Bottom: " + pageBottom + " Parent Bottom: " + customerBottom + " Layer Height: " + layerHeight);
+    //alert("Page Width: " + pageWidth + " Customer Left: " + customerLeft + " Layer Width: " + layerWidth + " Parent Offset: " + parentXOffset);
+    //alert("Page Height: " + pageHeight + " Customer Bottom: " + customerBottom + " Layer Height: " + layerHeight + " Parent Offset: " + parentYOffset);
 
-    if ((customerLeft + layerWidth + 10 - parentXOffset) < pageWidth)
+    if ((customerLeft + layerWidth + 10) < pageWidth + window.pageXOffset)
     {
         layer.style.left = (customerLeft + 10 - parentXOffset) + "px";
     }
     else
         layer.style.left = (pageWidth - layerWidth - 5 - parentXOffset) + "px";
 
-    if ((customerBottom + layerHeight - parentYOffset) < pageBottom + window.pageYOffset)
+    if ((customerBottom + layerHeight) < pageBottom + window.pageYOffset)
     {
         layer.style.top = (customerBottom - parentYOffset) + "px";
     }
