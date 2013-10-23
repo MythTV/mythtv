@@ -2919,7 +2919,7 @@ CardInput::CardInput(const QString & cardtype,
     if (CardUtil::IsEncoder(cardtype) || CardUtil::IsUnscanable(cardtype))
     {
         basic->addChild(new ExternalChannelCommand(*this));
-        if (!CardUtil::IsEncoder(cardtype))
+        if (CardUtil::IsV4L(cardtype) && cardtype != "HDPVR")
             basic->addChild(new PresetTuner(*this));
     }
     else
