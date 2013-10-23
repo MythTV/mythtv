@@ -274,7 +274,7 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
 
 ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
-    QString uniqueid, season, episode;
+    QString uniqueid, season, episode, totalepisodes;
     int dd_progid_done = 0;
     ProgInfo *pginfo = new ProgInfo();
 
@@ -446,6 +446,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     int tmp;
                     QString episodenum(getFirstText(info));
                     episode = episodenum.section('.',1,1);
+                    totalepisodes = episode.section('/',1,1).trimmed();
                     episode = episode.section('/',0,0).trimmed();
                     season = episodenum.section('.',0,0).trimmed();
                     QString part(episodenum.section('.',2,2));
@@ -468,6 +469,11 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                         pginfo->episode = tmp;
                         episode = QString::number(tmp);
                         pginfo->syndicatedepisodenumber.append(QString('E' + episode));
+                    }
+
+                    if (!totalepisodes.isEmpty())
+                    {
+                        pginfo->totalepisodes = totalepisodes.toUInt() + 1;
                     }
 
                     uint partno = 0;

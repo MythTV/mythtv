@@ -133,6 +133,7 @@ class EITFixUp
     const QRegExp m_ukDotEnd;
     const QRegExp m_ukSpaceColonStart;
     const QRegExp m_ukSpaceStart;
+    const QRegExp m_ukPart;
     const QRegExp m_ukSeries;
     const QRegExp m_ukCC;
     const QRegExp m_ukYear;

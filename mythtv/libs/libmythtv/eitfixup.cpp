@@ -41,7 +41,8 @@ EITFixUp::EITFixUp()
       m_ukDotEnd("\\.$"),
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
-      m_ukSeries("\\s*\\(?\\s*(?:Episode|Part|Pt)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
+      m_ukPart("\\s*\\(?\\s*(?:Part|Pt)\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
+      m_ukSeries("\\s*\\(?\\s*(?!Part|Pt)(?:Season|Series|S)?\\s*(\\d{1,2})(?:,|:)?\\s*(?:Episode|Ep)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
       m_ukCC("\\[(?:(AD|SL|S|W),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
@@ -752,40 +753,92 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     event.title       = event.title.trimmed();
     event.description = event.description.trimmed();
 
-    // Work out the episode numbers (if any)
+    // Work out the season and episode numbers (if any)
+    // Matching pattern "Season 2 Episode|Ep 3 of 14|3/14" etc
     bool    series  = false;
-    QRegExp tmpExp1 = m_ukSeries;
-    if ((position1 = tmpExp1.indexIn(event.title)) != -1)
+    QRegExp tmpSeries = m_ukSeries;
+    if ((position1 = tmpSeries.indexIn(event.title)) != -1)
     {
-        if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
-            && tmpExp1.cap(2).toUInt()<=50)
+        if (!tmpSeries.cap(1).isEmpty())
         {
-            event.partnumber = tmpExp1.cap(1).toUInt();
-            event.parttotal  = tmpExp1.cap(2).toUInt();
-            // Remove from the title
+            event.season = tmpSeries.cap(1).toUInt();
+            series = true;
+        }
+
+        if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(3).toUInt())
+            && tmpSeries.cap(3).toUInt()<=50)
+        {
+            event.episode = tmpSeries.cap(2).toUInt();
+            event.totalepisodes  = tmpSeries.cap(3).toUInt();
+            series = true;
+        }
+
+         // Remove from the title
+        if (series)
             event.title = event.title.left(position1) +
-                event.title.mid(position1 + tmpExp1.cap(0).length());
-            series = true;
-        }
+                event.title.mid(position1 + tmpSeries.cap(0).length());
     }
-    else if ((position1 = tmpExp1.indexIn(event.description)) != -1)
+    else if ((position1 = tmpSeries.indexIn(event.description)) != -1)
     {
-        if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
-            && tmpExp1.cap(2).toUInt()<=50)
+        if (!tmpSeries.cap(1).isEmpty())
         {
-            event.partnumber = tmpExp1.cap(1).toUInt();
-            event.parttotal  = tmpExp1.cap(2).toUInt();
-            // Remove from the start of the description.
-            // Otherwise it ends up in the subtitle.
-            if (position1 == 0) {
-                event.description = event.description.left(position1) +
-                    event.description.mid(position1+tmpExp1.cap(0).length());
-            }
+            event.season = tmpSeries.cap(1).toUInt();
             series = true;
         }
+
+        if ((tmpSeries.cap(2).toUInt() <= tmpSeries.cap(3).toUInt())
+            && tmpSeries.cap(3).toUInt() <= 50)
+        {
+            event.episode = tmpSeries.cap(2).toUInt();
+            event.totalepisodes  = tmpSeries.cap(3).toUInt();
+            series = true;
+        }
+
+        // Remove from the start of the description.
+        // Otherwise it ends up in the subtitle.
+        if (series && position1 == 0)
+        {
+            event.description = event.description.left(position1) +
+                event.description.mid(position1 + tmpSeries.cap(0).length());
+        }
     }
+
     if (series)
         event.categoryType = ProgramInfo::kCategorySeries;
+
+    // Multi-part episodes, or films (e.g. ITV film split by news)
+    // Matching pattern "Part|Pt 1 of 2|1/2"
+    QRegExp tmpPart = m_ukPart;
+    if ((position1 = tmpPart.indexIn(event.title)) != -1)
+    {
+        if ((tmpPart.cap(1).toUInt() <= tmpPart.cap(2).toUInt())
+            && tmpPart.cap(2).toUInt() <= 50)
+        {
+            event.partnumber = tmpPart.cap(1).toUInt();
+            event.parttotal  = tmpPart.cap(2).toUInt();
+
+            // Remove from the title
+            event.title = event.title.left(position1) +
+                event.title.mid(position1 + tmpPart.cap(0).length());
+        }
+    }
+    else if ((position1 = tmpPart.indexIn(event.description)) != -1)
+    {
+        if ((tmpPart.cap(1).toUInt() <= tmpPart.cap(2).toUInt())
+            && tmpPart.cap(2).toUInt() <= 50)
+        {
+            event.partnumber = tmpPart.cap(1).toUInt();
+            event.parttotal  = tmpPart.cap(2).toUInt();
+
+            // Remove from the start of the description.
+            // Otherwise it ends up in the subtitle.
+            if (position1 == 0)
+            {
+                event.description = event.description.left(position1) +
+                    event.description.mid(position1 + tmpPart.cap(0).length());
+            }
+        }
+    }
 
     QRegExp tmpStarring = m_ukStarring;
     if (tmpStarring.indexIn(event.description) != -1)

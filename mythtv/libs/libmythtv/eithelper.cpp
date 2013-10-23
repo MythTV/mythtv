@@ -363,7 +363,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         QString category      = QString("");
         ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
         unsigned char subtitle_type=0, audio_props=0, video_props=0;
-        uint season = 0, episode = 0;
+        uint season = 0, episode = 0, totalepisodes = 0;
 
         // Parse descriptors
         desc_list_t list = MPEGDescriptor::Parse(
@@ -593,7 +593,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             audio_props,
             video_props, stars,
             seriesId,  programId,
-            season, episode);
+            season, episode, totalepisodes);
 
         db_events.enqueue(event);
     }
@@ -613,7 +613,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
     QString category      = QString("");
     ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
     unsigned char subtitle_type=0, audio_props=0, video_props=0;
-    uint season = 0, episode = 0;
+    uint season = 0, episode = 0, totalepisodes = 0;
 
     // Parse descriptors
     desc_list_t list = MPEGDescriptor::Parse(
@@ -702,7 +702,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 audio_props,
                 video_props, 0.0,
                 "",  "",
-                season, episode);
+                season, episode, totalepisodes);
 
             db_events.enqueue(event);
         }

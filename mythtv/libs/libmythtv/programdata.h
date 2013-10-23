@@ -92,7 +92,8 @@ class MTV_PUBLIC DBEvent
         previouslyshown(false),
         listingsource(_listingsource),
         season(0),
-        episode(0) {}
+        episode(0),
+        totalepisodes(0) {}
 
     DBEvent(const QString   &_title,     const QString   &_subtitle,
             const QString   &_desc,
@@ -104,7 +105,8 @@ class MTV_PUBLIC DBEvent
             float            _stars,
             const QString   &_seriesId,  const QString   &_programId,
             uint32_t         _listingsource,
-            uint _season,                uint _episode) :
+            uint _season,                uint _episode,
+            uint _totalepisodes ) :
         title(_title),           subtitle(_subtitle),
         description(_desc),
         category(_category),
@@ -122,7 +124,8 @@ class MTV_PUBLIC DBEvent
         previouslyshown(false),
         listingsource(_listingsource),
         season(_season),
-        episode(_episode)
+        episode(_episode),
+        totalepisodes(_totalepisodes)
     {
     }
 
@@ -177,6 +180,7 @@ class MTV_PUBLIC DBEvent
     QList<EventRating> ratings;
     uint          season;
     uint          episode;
+    uint          totalepisodes;
 };
 
 class MTV_PUBLIC DBEventEIT : public DBEvent
@@ -193,11 +197,12 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _videoProps,
                float            _stars,
                const QString   &_seriesId,  const QString   &_programId,
-               uint _season,                uint _episode ) :
+               uint _season,                uint _episode,
+               uint _totalepisodes ) :
         DBEvent(_title, _subtitle, _desc, _category, _category_type,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
                 _stars, _seriesId, _programId, kListingSourceEIT,
-                _season, _episode),
+                _season, _episode, _totalepisodes),
         chanid(_chanid), fixup(_fixup)
     {
     }
@@ -211,7 +216,7 @@ class MTV_PUBLIC DBEventEIT : public DBEvent
                unsigned char    _videoProps) :
         DBEvent(_title, QString(), _desc, QString(), ProgramInfo::kCategoryNone,
                 _start, _end, _subtitleType, _audioProps, _videoProps,
-                0.0, QString(), QString(), kListingSourceEIT, 0, 0), // Season and Episode are not set with this constructor!
+                0.0, QString(), QString(), kListingSourceEIT, 0, 0, 0), // Season, Episode and Total Episodes are not set with this constructor!
         chanid(_chanid), fixup(_fixup)
     {
     }
