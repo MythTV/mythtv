@@ -256,8 +256,8 @@
             <div style="display: none" id="<%=programIdentifier%>_detail">
                 <label for="progStartTime">Duration: </label><span id="progStartTime"><%=myth.GetFormatTime(program.StartTime)%> - <%=myth.GetFormatTime(program.EndTime)%></span><br />
                 <label for="progCategory">Category: </label><span id="progCategory"><%=escapeHTML(program.Category)%></span><br />
-                <label for="progSeason">Season: </label><span id="progSeason"><%=program.Season%></span><br />
-                <label for="progEpisode">Episode: </label><span id="progEpisode"><%=program.Episode%></span>
+                <% if (program.Season > 0) {%><label for="progSeason">Season: </label><span id="progSeason"><%=program.Season%></span><br /><%}%>
+                <% if (program.Episode > 0) {%><label for="progEpisode">Episode: </label><span id="progEpisode"><%=program.Episode%><% if (program.TotalEpisodes > 0) {%>/<%=program.TotalEpisodes%><%}%></span><%}%>
             </div>
 <%
         }
