@@ -2538,6 +2538,22 @@ NULL
             return false;
     }
 
+    if (dbver == "1319")
+    {
+        // Total number of episodes in the series (season)
+        const char *updates[] = {
+            "ALTER TABLE program "
+            " ADD COLUMN totalepisodes INT(4) NOT NULL DEFAULT '0';",
+            "ALTER TABLE recordedprogram "
+            " ADD COLUMN totalepisodes INT(4) NOT NULL DEFAULT '0';",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1320", dbver))
+            return false;
+    }
+
+
     return true;
 }
 
