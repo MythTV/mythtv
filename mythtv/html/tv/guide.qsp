@@ -33,10 +33,10 @@
     var guideStartTime;
 
     // Use the StartTime argument if it was defined
-    if (typeof args.StartTime !== "undefined")
+    if (typeof args.starttime !== "undefined")
     {
         //guideStartTime = new Date();
-        guideStartTime = myth.ParseISODateString(args.StartTime);
+        guideStartTime = myth.ParseISODateString(args.starttime);
     }
 
     // If the StartTime wasn't valid or wasn't defined then use the current time
