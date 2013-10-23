@@ -272,7 +272,7 @@ QString XmlSerializer::GetItemName( const QString &sName )
 {
     QString sTypeName( sName );
 
-    if (sName.at(0) == 'Q')
+    if ((sName.length() > 0) && (sName.at(0) == 'Q'))
         sTypeName = sName.mid( 1 );
 
     sTypeName.remove( "DTC::"    );
@@ -311,7 +311,7 @@ QString XmlSerializer::GetContentName( const QString        &sName,
 
     QString sTypeName( sName );    
 
-    if (sName.at(0) == 'Q')        
+    if ((sName.length() > 0) && (sName.at(0) == 'Q'))
         sTypeName = sName.mid( 1 );    
 
     sTypeName.remove( "DTC::"    );    
