@@ -115,6 +115,7 @@ ProgramInfo::ProgramInfo(void) :
     description(),
     season(0),
     episode(0),
+    totalepisodes(0),
     syndicatedepisode(),
     category(),
     director(),
@@ -198,6 +199,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     description(other.description),
     season(other.season),
     episode(other.episode),
+    totalepisodes(other.totalepisodes),
     syndicatedepisode(other.syndicatedepisode),
     category(other.category),
     director(other.director),
@@ -578,12 +580,14 @@ ProgramInfo::ProgramInfo(
     uint _audioproperties,
     uint _subtitleType,
 
+    uint _season,
+    uint _episode,
+    uint _totalepisodes,
+
     const ProgramList &schedList) :
     title(_title),
     subtitle(_subtitle),
     description(_description),
-    season(0),
-    episode(0),
     syndicatedepisode(_syndicatedepisode),
     category(_category),
     director(),
@@ -646,6 +650,10 @@ ProgramInfo::ProgramInfo(
     rectype(_rectype),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubDesc),
+
+    season(_season),
+    episode(_episode),
+    totalepisodes(_totalepisodes),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -714,6 +722,7 @@ ProgramInfo::ProgramInfo(
     const QString &_description,
     uint  _season,
     uint  _episode,
+    uint  _totalepisodes,
     const QString &_category,
 
     uint _chanid,
@@ -738,6 +747,7 @@ ProgramInfo::ProgramInfo(
     description(_description),
     season(_season),
     episode(_episode),
+    totalepisodes(_totalepisodes),
     category(_category),
     director(),
 
@@ -977,6 +987,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
     description = other.description;
     season = other.season;
     episode = other.episode;
+    totalepisodes = other.totalepisodes;
     syndicatedepisode = other.syndicatedepisode;
     category = other.category;
     director = other.director;
@@ -1085,6 +1096,7 @@ void ProgramInfo::clear(void)
     description.clear();
     season = 0;
     episode = 0;
+    totalepisodes = 0;
     syndicatedepisode.clear();
     category.clear();
     director.clear();
@@ -1257,52 +1269,53 @@ void ProgramInfo::ToStringList(QStringList &list) const
     STR_TO_LIST(description);  // 2
     INT_TO_LIST(season);       // 3
     INT_TO_LIST(episode);      // 4
-    STR_TO_LIST(syndicatedepisode); // 5
-    STR_TO_LIST(category);     // 6
-    INT_TO_LIST(chanid);       // 7
-    STR_TO_LIST(chanstr);      // 8
-    STR_TO_LIST(chansign);     // 9
-    STR_TO_LIST(channame);     // 10
-    STR_TO_LIST(pathname);     // 11
-    INT_TO_LIST(filesize);     // 12
+    INT_TO_LIST(totalepisodes); // 5
+    STR_TO_LIST(syndicatedepisode); // 6
+    STR_TO_LIST(category);     // 7
+    INT_TO_LIST(chanid);       // 8
+    STR_TO_LIST(chanstr);      // 9
+    STR_TO_LIST(chansign);     // 10
+    STR_TO_LIST(channame);     // 11
+    STR_TO_LIST(pathname);     // 12
+    INT_TO_LIST(filesize);     // 13
 
-    DATETIME_TO_LIST(startts); // 13
-    DATETIME_TO_LIST(endts);   // 14
-    INT_TO_LIST(findid);       // 15
-    STR_TO_LIST(hostname);     // 16
-    INT_TO_LIST(sourceid);     // 17
-    INT_TO_LIST(cardid);       // 18
-    INT_TO_LIST(inputid);      // 19
-    INT_TO_LIST(recpriority);  // 20
-    INT_TO_LIST(recstatus);    // 21
-    INT_TO_LIST(recordid);     // 22
+    DATETIME_TO_LIST(startts); // 14
+    DATETIME_TO_LIST(endts);   // 15
+    INT_TO_LIST(findid);       // 16
+    STR_TO_LIST(hostname);     // 17
+    INT_TO_LIST(sourceid);     // 18
+    INT_TO_LIST(cardid);       // 19
+    INT_TO_LIST(inputid);      // 20
+    INT_TO_LIST(recpriority);  // 21
+    INT_TO_LIST(recstatus);    // 22
+    INT_TO_LIST(recordid);     // 23
 
-    INT_TO_LIST(rectype);      // 23
-    INT_TO_LIST(dupin);        // 24
-    INT_TO_LIST(dupmethod);    // 25
-    DATETIME_TO_LIST(recstartts);//26
-    DATETIME_TO_LIST(recendts);// 27
-    INT_TO_LIST(programflags); // 28
-    STR_TO_LIST((!recgroup.isEmpty()) ? recgroup : "Default"); // 29
-    STR_TO_LIST(chanplaybackfilters); // 30
-    STR_TO_LIST(seriesid);     // 31
-    STR_TO_LIST(programid);    // 32
-    STR_TO_LIST(inetref);      // 33
+    INT_TO_LIST(rectype);      // 24
+    INT_TO_LIST(dupin);        // 25
+    INT_TO_LIST(dupmethod);    // 26
+    DATETIME_TO_LIST(recstartts);//27
+    DATETIME_TO_LIST(recendts);// 28
+    INT_TO_LIST(programflags); // 29
+    STR_TO_LIST((!recgroup.isEmpty()) ? recgroup : "Default"); // 30
+    STR_TO_LIST(chanplaybackfilters); // 31
+    STR_TO_LIST(seriesid);     // 32
+    STR_TO_LIST(programid);    // 33
+    STR_TO_LIST(inetref);      // 34
 
-    DATETIME_TO_LIST(lastmodified); // 34
-    FLOAT_TO_LIST(stars);           // 35
-    DATE_TO_LIST(originalAirDate);  // 36
-    STR_TO_LIST((!playgroup.isEmpty()) ? playgroup : "Default"); // 37
-    INT_TO_LIST(recpriority2);      // 38
-    INT_TO_LIST(parentid);          // 39
-    STR_TO_LIST((!storagegroup.isEmpty()) ? storagegroup : "Default"); // 40
-    INT_TO_LIST(GetAudioProperties()); // 41
-    INT_TO_LIST(GetVideoProperties()); // 42
-    INT_TO_LIST(GetSubtitleType());    // 43
+    DATETIME_TO_LIST(lastmodified); // 35
+    FLOAT_TO_LIST(stars);           // 36
+    DATE_TO_LIST(originalAirDate);  // 37
+    STR_TO_LIST((!playgroup.isEmpty()) ? playgroup : "Default"); // 38
+    INT_TO_LIST(recpriority2);      // 39
+    INT_TO_LIST(parentid);          // 40
+    STR_TO_LIST((!storagegroup.isEmpty()) ? storagegroup : "Default"); // 41
+    INT_TO_LIST(GetAudioProperties()); // 42
+    INT_TO_LIST(GetVideoProperties()); // 43
+    INT_TO_LIST(GetSubtitleType());    // 44
 
-    INT_TO_LIST(year);              // 44
-    INT_TO_LIST(partnumber);   // 45
-    INT_TO_LIST(parttotal);    // 46
+    INT_TO_LIST(year);              // 45
+    INT_TO_LIST(partnumber);   // 46
+    INT_TO_LIST(parttotal);    // 47
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -1355,56 +1368,57 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     STR_FROM_LIST(description);      // 2
     INT_FROM_LIST(season);           // 3
     INT_FROM_LIST(episode);          // 4
-    STR_FROM_LIST(syndicatedepisode); // 5
-    STR_FROM_LIST(category);         // 6
-    INT_FROM_LIST(chanid);           // 7
-    STR_FROM_LIST(chanstr);          // 8
-    STR_FROM_LIST(chansign);         // 9
-    STR_FROM_LIST(channame);         // 10
-    STR_FROM_LIST(pathname);         // 11
-    INT_FROM_LIST(filesize);         // 12
+    INT_FROM_LIST(totalepisodes);    // 5
+    STR_FROM_LIST(syndicatedepisode); // 6
+    STR_FROM_LIST(category);         // 7
+    INT_FROM_LIST(chanid);           // 8
+    STR_FROM_LIST(chanstr);          // 9
+    STR_FROM_LIST(chansign);         // 10
+    STR_FROM_LIST(channame);         // 11
+    STR_FROM_LIST(pathname);         // 12
+    INT_FROM_LIST(filesize);         // 13
 
-    DATETIME_FROM_LIST(startts);     // 13
-    DATETIME_FROM_LIST(endts);       // 14
-    INT_FROM_LIST(findid);           // 15
-    STR_FROM_LIST(hostname);         // 16
-    INT_FROM_LIST(sourceid);         // 17
-    INT_FROM_LIST(cardid);           // 18
-    INT_FROM_LIST(inputid);          // 19
-    INT_FROM_LIST(recpriority);      // 20
-    ENUM_FROM_LIST(recstatus, RecStatusType); // 21
-    INT_FROM_LIST(recordid);         // 22
+    DATETIME_FROM_LIST(startts);     // 14
+    DATETIME_FROM_LIST(endts);       // 15
+    INT_FROM_LIST(findid);           // 16
+    STR_FROM_LIST(hostname);         // 17
+    INT_FROM_LIST(sourceid);         // 18
+    INT_FROM_LIST(cardid);           // 19
+    INT_FROM_LIST(inputid);          // 20
+    INT_FROM_LIST(recpriority);      // 21
+    ENUM_FROM_LIST(recstatus, RecStatusType); // 22
+    INT_FROM_LIST(recordid);         // 23
 
-    ENUM_FROM_LIST(rectype, RecordingType);            // 23
-    ENUM_FROM_LIST(dupin, RecordingDupInType);         // 24
-    ENUM_FROM_LIST(dupmethod, RecordingDupMethodType); // 25
-    DATETIME_FROM_LIST(recstartts);   // 26
-    DATETIME_FROM_LIST(recendts);     // 27
-    INT_FROM_LIST(programflags);      // 28
-    STR_FROM_LIST(recgroup);          // 29
-    STR_FROM_LIST(chanplaybackfilters);//30
-    STR_FROM_LIST(seriesid);          // 31
-    STR_FROM_LIST(programid);         // 32
-    STR_FROM_LIST(inetref);           // 33
+    ENUM_FROM_LIST(rectype, RecordingType);            // 24
+    ENUM_FROM_LIST(dupin, RecordingDupInType);         // 25
+    ENUM_FROM_LIST(dupmethod, RecordingDupMethodType); // 26
+    DATETIME_FROM_LIST(recstartts);   // 27
+    DATETIME_FROM_LIST(recendts);     // 28
+    INT_FROM_LIST(programflags);      // 29
+    STR_FROM_LIST(recgroup);          // 30
+    STR_FROM_LIST(chanplaybackfilters);//31
+    STR_FROM_LIST(seriesid);          // 32
+    STR_FROM_LIST(programid);         // 33
+    STR_FROM_LIST(inetref);           // 34
 
-    DATETIME_FROM_LIST(lastmodified); // 34
-    FLOAT_FROM_LIST(stars);           // 35
-    DATE_FROM_LIST(originalAirDate);; // 36
-    STR_FROM_LIST(playgroup);         // 37
-    INT_FROM_LIST(recpriority2);      // 38
-    INT_FROM_LIST(parentid);          // 39
-    STR_FROM_LIST(storagegroup);      // 40
+    DATETIME_FROM_LIST(lastmodified); // 35
+    FLOAT_FROM_LIST(stars);           // 36
+    DATE_FROM_LIST(originalAirDate);; // 37
+    STR_FROM_LIST(playgroup);         // 38
+    INT_FROM_LIST(recpriority2);      // 39
+    INT_FROM_LIST(parentid);          // 40
+    STR_FROM_LIST(storagegroup);      // 41
     uint audioproperties, videoproperties, subtitleType;
-    INT_FROM_LIST(audioproperties);   // 41
-    INT_FROM_LIST(videoproperties);   // 42
-    INT_FROM_LIST(subtitleType);      // 43
+    INT_FROM_LIST(audioproperties);   // 42
+    INT_FROM_LIST(videoproperties);   // 43
+    INT_FROM_LIST(subtitleType);      // 44
     properties = ((subtitleType    << kSubtitlePropertyOffset) |
                   (videoproperties << kVideoPropertyOffset)    |
                   (audioproperties << kAudioPropertyOffset));
 
-    INT_FROM_LIST(year);              // 44
-    INT_FROM_LIST(partnumber);        // 45
-    INT_FROM_LIST(parttotal);         // 46
+    INT_FROM_LIST(year);              // 45
+    INT_FROM_LIST(partnumber);        // 46
+    INT_FROM_LIST(parttotal);         // 47
 
     if (!origChanid || !origRecstartts.isValid() ||
         (origChanid != chanid) || (origRecstartts != recstartts))
@@ -1457,6 +1471,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         progMap["season"] = format_season_and_episode(season, 1);
         progMap["episode"] = format_season_and_episode(episode, 1);
+        progMap["totalepisodes"] = format_season_and_episode(totalepisodes, 1);
         progMap["s00e00"] = QString("s%1e%2")
             .arg(format_season_and_episode(GetSeason(), 2))
             .arg(format_season_and_episode(GetEpisode(), 2));
@@ -1467,6 +1482,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else
     {
         progMap["season"] = progMap["episode"] = "";
+        progMap["totalepisodes"] = "";
         progMap["s00e00"] = progMap["00x00"] = "";
     }
     progMap["syndicatedepisode"] = syndicatedepisode;
@@ -1883,6 +1899,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     description  = query.value(2).toString();
     season       = query.value(3).toUInt();
     episode      = query.value(4).toUInt();
+    totalepisodes = 0;
     syndicatedepisode = query.value(48).toString();
     category     = query.value(5).toString();
 
@@ -4816,6 +4833,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
     str.replace(QString("%SUBTITLE%"), subtitle);
     str.replace(QString("%SEASON%"), QString::number(season));
     str.replace(QString("%EPISODE%"), QString::number(episode));
+    str.replace(QString("%TOTALEPISODES%"), QString::number(totalepisodes));
     str.replace(QString("%SYNDICATEDEPISODE%"), syndicatedepisode);
     str.replace(QString("%DESCRIPTION%"), description);
     str.replace(QString("%HOSTNAME%"), hostname);
@@ -4959,7 +4977,8 @@ static bool FromProgramQuery(
         "    oldrecstatus.rectype, oldrecstatus.recstatus, "
         "    oldrecstatus.findid, program.videoprop+0, program.audioprop+0, "
         "    program.subtitletypes+0, program.syndicatedepisodenumber, "
-        "    program.partnumber, program.parttotal "
+        "    program.partnumber, program.parttotal, "
+        "    program.season, program.episode, program.totalepisodes "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "LEFT JOIN oldrecorded AS oldrecstatus ON "
@@ -5054,6 +5073,9 @@ bool LoadFromProgram(
                 query.value(23).toInt(), // videoprop
                 query.value(24).toInt(), // audioprop
                 query.value(25).toInt(), // subtitletypes
+                query.value(29).toUInt(), // season
+                query.value(30).toUInt(), // episode
+                query.value(31).toUInt(), // totalepisodes
 
                 schedList));
     }

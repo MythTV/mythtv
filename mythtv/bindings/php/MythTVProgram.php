@@ -10,6 +10,7 @@ class MythTVProgram {
     public $description    = 'No Description';
     public $season;
     public $episode;
+    public $totalepisodes;
     public $syndicatedepisodenumber;
     public $category;
     public $chanid;

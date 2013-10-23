@@ -78,6 +78,7 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setInetref    ( pInfo->GetInetRef()     );
         pProgram->setSeason     ( pInfo->GetSeason()      );
         pProgram->setEpisode    ( pInfo->GetEpisode()     );
+        pProgram->setTotalEpisodes( pInfo->GetEpisodeTotal() );
     }
 
     pProgram->setSerializeChannel( bIncChannel );

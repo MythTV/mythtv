@@ -39,8 +39,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "77"
-#define MYTH_PROTO_TOKEN "WindMark"
+#define MYTH_PROTO_VERSION "78"
+#define MYTH_PROTO_TOKEN "IceBurns"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

@@ -4056,6 +4056,7 @@ void Scheduler::AddNewRecords(void)
             result.value(6).toString(),//description
             0, // season
             0, // episode
+            0, // total episodes
             result.value(48).toString(),//synidcatedepisode
             result.value(11).toString(),//category
 

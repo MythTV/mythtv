@@ -167,19 +167,20 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( int         AudioProps   READ AudioProps   WRITE setAudioProps)
     Q_PROPERTY( int         SubProps     READ SubProps     WRITE setSubProps  )
 
-    Q_PROPERTY( QString     SeriesId     READ SeriesId     WRITE setSeriesId     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     ProgramId    READ ProgramId    WRITE setProgramId    DESIGNABLE SerializeDetails )
-    Q_PROPERTY( double      Stars        READ Stars        WRITE setStars        DESIGNABLE SerializeDetails )
-    Q_PROPERTY( qlonglong   FileSize     READ FileSize     WRITE setFileSize     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QDateTime   LastModified READ LastModified WRITE setLastModified DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int         ProgramFlags READ ProgramFlags WRITE setProgramFlags DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     FileName     READ FileName     WRITE setFileName     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     HostName     READ HostName     WRITE setHostName     DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QDate       Airdate      READ Airdate      WRITE setAirdate      DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     Description  READ Description  WRITE setDescription  DESIGNABLE SerializeDetails )
-    Q_PROPERTY( QString     Inetref      READ Inetref      WRITE setInetref      DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int         Season       READ Season       WRITE setSeason       DESIGNABLE SerializeDetails )
-    Q_PROPERTY( int         Episode      READ Episode      WRITE setEpisode      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     SeriesId      READ SeriesId      WRITE setSeriesId      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     ProgramId     READ ProgramId     WRITE setProgramId     DESIGNABLE SerializeDetails )
+    Q_PROPERTY( double      Stars         READ Stars         WRITE setStars         DESIGNABLE SerializeDetails )
+    Q_PROPERTY( qlonglong   FileSize      READ FileSize      WRITE setFileSize      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QDateTime   LastModified  READ LastModified  WRITE setLastModified  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         ProgramFlags  READ ProgramFlags  WRITE setProgramFlags  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     FileName      READ FileName      WRITE setFileName      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     HostName      READ HostName      WRITE setHostName      DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QDate       Airdate       READ Airdate       WRITE setAirdate       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     Description   READ Description   WRITE setDescription   DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString     Inetref       READ Inetref       WRITE setInetref       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         Season        READ Season        WRITE setSeason        DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         Episode       READ Episode       WRITE setEpisode       DESIGNABLE SerializeDetails )
+    Q_PROPERTY( int         TotalEpisodes READ TotalEpisodes WRITE setTotalEpisodes DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
@@ -209,6 +210,7 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP    ( QString     , Inetref      )
     PROPERTYIMP    ( int         , Season       )
     PROPERTYIMP    ( int         , Episode      )
+    PROPERTYIMP    ( int         , TotalEpisodes)
 
     PROPERTYIMP_PTR( ChannelInfo    , Channel     )
     PROPERTYIMP_PTR( RecordingInfo  , Recording   )
@@ -237,6 +239,7 @@ class SERVICE_PUBLIC Program : public QObject
               m_SubProps            ( 0      ),
               m_Season              ( 0      ),
               m_Episode             ( 0      ),
+              m_TotalEpisodes       ( 0      ),
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
               m_Artwork             ( NULL   ),
@@ -277,6 +280,7 @@ class SERVICE_PUBLIC Program : public QObject
             m_Inetref           = src.m_Inetref;
             m_Season            = src.m_Season;
             m_Episode           = src.m_Episode;
+            m_TotalEpisodes     = src.m_TotalEpisodes;
             m_SerializeDetails  = src.m_SerializeDetails;
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  

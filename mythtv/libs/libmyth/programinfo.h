@@ -30,7 +30,7 @@
    mythtv/bindings/python/MythTV/static.py (version number)
    mythtv/bindings/python/MythTV/mythproto.py (layout)
 */
-#define NUMPROGRAMLINES 47
+#define NUMPROGRAMLINES 48
 
 class ProgramInfo;
 typedef AutoDeleteDeque<ProgramInfo*> ProgramList;
@@ -212,6 +212,10 @@ class MPUBLIC ProgramInfo
                 uint audioprops,
                 uint subtitletype,
 
+                uint season,
+                uint episode,
+                uint totalepisodes,
+
                 const ProgramList &schedList);
     /// Constructs a basic ProgramInfo (used by RecordingInfo)
     ProgramInfo(const QString &title,
@@ -219,6 +223,7 @@ class MPUBLIC ProgramInfo
                 const QString &description,
                 uint season,
                 uint episode,
+                uint totalepisodes,
                 const QString &category,
 
                 uint chanid,
@@ -335,6 +340,7 @@ class MPUBLIC ProgramInfo
     QString GetDescription(void)  const { return description; }
     uint    GetSeason(void)       const { return season; }
     uint    GetEpisode(void)      const { return episode; }
+    uint    GetEpisodeTotal(void) const { return totalepisodes; }
     QString GetCategory(void)     const { return category; }
     /// This is the unique key used in the database to locate tuning
     /// information. [1..2^32] are valid keys, 0 is not.
@@ -673,6 +679,7 @@ class MPUBLIC ProgramInfo
     QString description;
     uint    season;
     uint    episode;
+    uint    totalepisodes;
     QString syndicatedepisode;
     QString category;
     QString director;

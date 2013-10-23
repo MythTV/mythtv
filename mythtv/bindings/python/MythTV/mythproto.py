@@ -826,7 +826,8 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
     """Represents a program with all detail returned by the backend."""
 
     _field_order = [ 'title',        'subtitle',     'description',
-                     'season',       'episode',      'syndicatedepisode',
+                     'season',       'episode',      'totalepisodes',
+                     'syndicatedepisode',
                      'category',     'chanid',       'channum',
                      'callsign',     'channame',     'filename',
                      'filesize',     'starttime',    'endtime',
@@ -842,7 +843,8 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                      'video_props',  'subtitle_type','year',
                      'part_number',  'part_total']
     _field_type = [  3,      3,      3,
-                     0,      0,      3,
+                     0,      0,      0,
+                     3,
                      3,      0,      3,
                      3,      3,      3,
                      0,      4,      4,

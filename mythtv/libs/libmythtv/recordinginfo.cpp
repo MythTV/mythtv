@@ -49,6 +49,7 @@ RecordingInfo::RecordingInfo(
     const QString &_description,
     uint _season,
     uint _episode,
+    uint _totalepisodes,
     const QString &_syndicatedepisode,
     const QString &_category,
 
@@ -107,7 +108,7 @@ RecordingInfo::RecordingInfo(
     int _schedorder,
     uint _mplexid) :
     ProgramInfo(
-        _title, _subtitle, _description, _season, _episode,
+        _title, _subtitle, _description, _season, _episode, _totalepisodes,
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
@@ -207,7 +208,7 @@ RecordingInfo::RecordingInfo(
 
     bool _commfree) :
     ProgramInfo(
-        _title, _subtitle, _description, _season, _episode,
+        _title, _subtitle, _description, _season, _episode, 0,
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
