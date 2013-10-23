@@ -85,7 +85,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
         for( int nIdx = 0; nIdx < paramNames.length(); nIdx++ )
         {
-            QString sValue     = reqParams[ paramNames[ nIdx ] ];
+            QString sValue     = reqParams[ paramNames[ nIdx ].toLower() ];
             QString sParamType = paramTypes[ nIdx ];
 
             int     nId        = QMetaType::type( paramTypes[ nIdx ] );
