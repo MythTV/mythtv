@@ -1291,8 +1291,7 @@ bool MythCoreContext::SendReceiveStringList(
                 d->m_eventSock = NULL;
             }
 
-            bool blockingClient = GetNumSetting("idleTimeoutSecs",0);
-            ConnectToMasterServer(blockingClient);
+            ConnectToMasterServer(d->m_blockingClient);
 
             if (d->m_serverSock)
             {
