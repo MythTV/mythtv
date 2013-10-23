@@ -1214,8 +1214,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
             m_sResourceUrl = m_sBaseUrl; // Save complete url without parameters
 
             // Process any Query String Parameters
-            QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toUtf8()))
-                                     .section( '?', 1, 1 );
+            QString sQueryStr = tokens[1].section( '?', 1, 1 );
 
             if (sQueryStr.length() > 0)
                 GetParameters( sQueryStr, m_mapParams );
