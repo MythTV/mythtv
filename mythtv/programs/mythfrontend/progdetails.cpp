@@ -204,7 +204,7 @@ void ProgDetails::loadPage(void)
     loadHTML();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString category_type, showtype, year, epinum, rating, colorcode,
+    QString category_type, showtype, year, syndicatedEpisodeNum, rating, colorcode,
             title_pronounce;
     float stars = 0.0;
     int partnumber = 0, parttotal = 0;
@@ -247,7 +247,7 @@ void ProgDetails::loadPage(void)
             audioprop = query.value(5).toInt();
             videoprop = query.value(6).toInt();
             subtype = query.value(7).toInt();
-            epinum = query.value(8).toString();
+            syndicatedEpisodeNum = query.value(8).toString();
             generic = query.value(9).toInt();
             showtype = query.value(10).toString();
             colorcode = query.value(11).toString();
@@ -377,7 +377,16 @@ void ProgDetails::loadPage(void)
     }
     addItem("CATEGORY_TYPE", tr("Type", "category_type"), s);
 
-    addItem("EPISODE", tr("Episode Number"), epinum);
+    QString episode;
+    if (m_progInfo.GetEpisodeTotal() > 0)
+        episode = tr("%1 of %2").arg(m_progInfo.GetEpisode()).arg(m_progInfo.GetEpisodeTotal());
+    else
+        episode = QString::number(m_progInfo.GetEpisode());
+
+    addItem("EPISODE", tr("Episode"), episode);
+    addItem("SEASON", tr("Season"), QString::number(m_progInfo.GetSeason()));
+
+    addItem("SYNDICATEDEPISODENUMBER", tr("Syndicated Episode Number"), syndicatedEpisodeNum);
 
     s.clear();
     if (m_progInfo.GetOriginalAirDate().isValid() &&
