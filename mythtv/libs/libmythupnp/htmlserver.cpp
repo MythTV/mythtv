@@ -39,6 +39,8 @@ HtmlServerExtension::HtmlServerExtension( const QString sSharePath,
     }
 
     m_sSharePath =  dir.canonicalPath();
+
+    m_Scripting.SetResourceRootPath( m_sSharePath );
 }
 
 /////////////////////////////////////////////////////////////////////////////

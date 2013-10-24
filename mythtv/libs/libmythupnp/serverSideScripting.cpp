@@ -92,6 +92,19 @@ ServerSideScripting::~ServerSideScripting()
 //
 //////////////////////////////////////////////////////////////////////////////
 
+QString ServerSideScripting::SetResourceRootPath( const QString &path )
+{
+    QString sOrig = m_sResRootPath;
+
+    m_sResRootPath = path;
+
+    return sOrig;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
 void ServerSideScripting::RegisterMetaObjectType( const QString &sName, 
                                                   const QMetaObject *pMetaObject,
                                                   QScriptEngine::FunctionSignature  pFunction)
@@ -106,24 +119,37 @@ void ServerSideScripting::RegisterMetaObjectType( const QString &sName,
 //
 //////////////////////////////////////////////////////////////////////////////
 
+ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
+{
+    ScriptInfo *pInfo = NULL;
+
+    Lock();
+
+    if ( m_mapScripts.contains( sFileName ) )
+        pInfo = m_mapScripts[ sFileName ];
+
+    Unlock();
+
+    return pInfo;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
 bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
                                         const QStringMap &mapParams )
 {
     try
     {
-        bool       bFound( false     );
+        bool       bFound;( false );
         ScriptInfo *pInfo = NULL;
 
         // ------------------------------------------------------------------
         // See if page has already been loaded
         // ------------------------------------------------------------------
 
-        Lock();
-
-        if ( (bFound = m_mapScripts.contains( sFileName )) == true )
-            pInfo = m_mapScripts[ sFileName ];
-
-        Unlock();
+        bFound = (pInfo = GetLoadedScript( sFileName )) != NULL;
 
         // ------------------------------------------------------------------
         // Load Script File and Create Function
@@ -261,6 +287,35 @@ QString ServerSideScripting::CreateMethodFromFile( const QString &sFileName )
 //
 //////////////////////////////////////////////////////////////////////////////
 
+QString ServerSideScripting::ReadFileContents( const QString &sFileName )
+{
+    QString  sCode;
+    QFile    scriptFile( sFileName );
+
+    if (!scriptFile.open( QIODevice::ReadOnly ))
+        throw "Unable to open file";
+
+    try
+    {
+        QTextStream stream( &scriptFile );
+
+        sCode = stream.readAll();
+    }
+    catch(...)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Exception while Reading File Contents File: %1") .arg(sFileName));
+    }
+
+    scriptFile.close();
+
+    return sCode;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////////////
+
 bool ServerSideScripting::ProcessLine( QTextStream &sCode, 
                                        QString     &sLine, 
                                        bool         bInCode,
@@ -355,8 +410,38 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
                 // Add Code
     
                 if (sSegment.startsWith( "=" ))
+                {
+                    // Evaluate statement and render results.
+
                     sCode << "os.write( " << sSegment.mid( 1 ) << " ); "
                           << "\n";
+                }
+                else if (sSegment.startsWith( "import" ))
+                {
+                    // Loads supplied path as script file. 
+                    //
+                    // Syntax: import "/relative/path/to/script.js"
+                    //   - must be at start of line (no leading spaces)
+                    //
+
+                    // Extract filename (remove quotes)
+
+                    QString sFileName = sSegment.mid( 8, sSegment.length() - 9 );
+
+                    QFileInfo oInfo( m_sResRootPath + sFileName );
+
+                    if (oInfo.exists())
+                    {
+                        sCode << ReadFileContents( oInfo.canonicalFilePath() )
+                              << "\n";
+                    }
+                    else
+                        LOG(VB_GENERAL, LOG_ERR,
+                            QString("LoadScriptFromFile - File not found: %1%2") 
+                               .arg(m_sResRootPath)
+                               .arg(sFileName));
+
+                }
                 else
                     sCode << sSegment << "\n";
 
