@@ -17,6 +17,7 @@
 
 #include "datacontracts/programList.h"
 #include "datacontracts/encoderList.h"
+#include "datacontracts/recRule.h"
 #include "datacontracts/recRuleList.h"
 #include "datacontracts/titleInfoList.h"
 
