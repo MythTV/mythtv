@@ -23,6 +23,24 @@
                 && (variable != null));
     }
 
+    function recStatusToClass(statusInt)
+    {
+        var classStr = "";
+        switch (statusInt)
+        {
+            case -1:
+                classStr = "programWillRecord";
+                break;
+            case -2:
+                classStr = "programRecording";
+                break;
+            case 4: case 8: case 13:
+                classStr = "programOtherShowing";
+                break;
+        }
+        return classStr;
+    }
+
     var timeBarInterval = 30; // Display time markers every X minutes
     var guideRange = 2; // Show X hours from the start time
 
@@ -34,10 +52,7 @@
 
     // Use the StartTime argument if it was defined
     if (typeof args.starttime !== "undefined")
-    {
-        //guideStartTime = new Date();
         guideStartTime = myth.ParseISODateString(args.starttime);
-    }
 
     // If the StartTime wasn't valid or wasn't defined then use the current time
     if (!isValidObject(guideStartTime))
@@ -224,19 +239,8 @@
                 width = (cumulativeWidth > 100) ? width - (cumulativeWidth - 100) : width;
             }
             var category = toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
-            var status = "";
-            switch (program.Recording.Status)
-            {
-                case -1:
-                    status = "programWillRecord";
-                    break;
-                case -2:
-                    status = "programRecording";
-                    break;
-                case 4: case 8: case 13:
-                    status = "programOtherShowing";
-                    break;
-            }
+
+            var status = recStatusToClass(program.Recording.Status);
 
             var showArrow = (program.EndTime > windowEnd) ? "block" : "none";
 
@@ -245,11 +249,14 @@
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
-                <div class="programBoxInner category_<%=category%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
-                    <div class="programHeader <%=status%>"><%=escapeHTML(program.Title)%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
+                <div class="programBoxInner category_<%=category%> <%=status%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
+                    <div class="programHeader"><%=escapeHTML(program.Title)%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                         <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                    </div>
+                    <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
+                        <%=qsTr("Scheduling")%> ...
                     </div>
                 </div>
             </div>

@@ -42,6 +42,7 @@
 
 #include "serviceUtil.h"
 #include <mythscheduler.h>
+#include "scheduler.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;

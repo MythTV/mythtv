@@ -1,0 +1,68 @@
+<%
+    var args = arguments[1];
+    var myth = new Myth();
+
+    function recStatusToClass(statusInt)
+    {
+        var classStr = "";
+        switch (statusInt)
+        {
+            case -1:
+                classStr = "programWillRecord";
+                break;
+            case -2:
+                classStr = "programRecording";
+                break;
+            case 4: case 8: case 13:
+                classStr = "programOtherShowing";
+                break;
+        }
+        return classStr;
+    }
+
+    function scheduleSimpleRecording(chanID, startTime, type)
+    {
+        var dvr = new Dvr();
+
+        var recRule = dvr.GetRecordSchedule(0, "", chanID, startTime, false);
+
+        // Prevent duplicate recording rules being created
+        if (recRule.Id > 0 && recRule.Type == type)
+            return chanID + "#" + startTime.toISOString() + "#" + recRule.Id;
+
+        if (type == "Record All (Channel)")
+        {
+            type = "Record All";
+            recRule.Filter |= 1024;
+        }
+
+        recRule.Type = type;
+
+        var recRuleId = dvr.AddRecordSchedule(recRule);
+
+        return chanID + "#" + startTime.toISOString() + "#" + recRuleId;
+    }
+
+    function checkRecordingStatus(chanID, startTime)
+    {
+        var guide = new Guide();
+        var program = guide.GetProgramDetails(chanID, startTime);
+        return chanID + "#" + startTime.toISOString()  + "#" + recStatusToClass(program.Recording.Status);
+    }
+
+    var ret;
+    switch (args.action)
+    {
+        case "simpleRecord":
+            var validDate = myth.ParseISODateString(args.starttime);
+            ret = scheduleSimpleRecording(args.chanid, validDate, args.type);
+            break;
+        case "checkRecStatus":
+            var validDate = myth.ParseISODateString(args.starttime);
+            ret = checkRecordingStatus(args.chanid, validDate);
+            break;
+        default:
+            break;
+    }
+%>
+<%=ret%>

@@ -61,10 +61,10 @@ function toggleClass(element, className)
 {
     class_array = element.className.split(" ");
 
-    if (class_array.length > 0 &&
-        class_array[class_array.length - 1] == className)
+    var index = class_array.lastIndexOf(className);
+    if (index >= 0)
     {
-        class_array.pop();
+        class_array.splice(index,1);
     }
     else
     {
@@ -118,15 +118,7 @@ function showRecMenu(parent)
 {
     hideDetail(parent);
     var menu = document.getElementById('recMenu');
-    // Reset visibility
-    if (checkVisibility(menu))
-    {
-        toggleVisibility(menu);
-
-        // Reset any currently selected program
-        if (isValidObject(selectedElement))
-            toggleClass(selectedElement, "programSelected");
-    }
+    hideRecMenu();
 
     if (selectedElement === parent)
     {
@@ -153,7 +145,54 @@ function showRecMenu(parent)
     moveToPosition(menu, parent);
 }
 
+function hideRecMenu()
+{
+    var menu = document.getElementById('recMenu');
+    // Reset visibility
+    if (checkVisibility(menu))
+    {
+        toggleVisibility(menu);
+
+        // Reset any currently selected program
+        if (isValidObject(selectedElement))
+            toggleClass(selectedElement, "programSelected");
+    }
+}
+
 function recordProgram(chanID, startTime, type)
 {
-    
+    hideRecMenu();
+    var url = "/tv/dvr.qsp?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
+    var ajaxRequest = $.ajax( url )
+                            .done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                recRuleCreated( response[0], response[1] );
+                            });
 }
+
+function checkRecordingStatus(chanID, startTime)
+{
+    var url = "/tv/dvr.qsp?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url ).done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                var id = response[0] + "_" + response[1];
+                                var layer = document.getElementById(id);
+                                toggleClass(layer, "programScheduling");
+                                toggleClass(layer, response[2]);
+                                var popup = document.getElementById(id + "_schedpopup");
+                                toggleVisibility(popup);
+                            });
+}
+
+function recRuleCreated(chandID, startTime)
+{
+    var layer = document.getElementById(chanID + "_" + startTime);
+    toggleClass(layer, "programScheduling");
+    var popup = document.getElementById(chanID + "_" + startTime + "_schedpopup");
+    toggleVisibility(popup);
+
+    setTimeout(function(){checkRecordingStatus(chanID, startTime)}, 2500);
+}
+
