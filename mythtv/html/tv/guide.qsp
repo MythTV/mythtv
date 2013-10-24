@@ -65,6 +65,12 @@
     guideStartTime.setSeconds(0);
     guideStartTime.setMilliseconds(0);
 
+    // Set Next/Prev guide start times for navigation
+    var prevGuideStartTime = new Date(guideStartTime);
+    prevGuideStartTime.setHours(prevGuideStartTime.getHours() - guideRange);
+    var nextGuideStartTime = new Date(guideStartTime);
+    nextGuideStartTime.setHours(nextGuideStartTime.getHours() + guideRange);
+
     var guideEndTime = new Date(guideStartTime);
     guideEndTime.setHours(guideStartTime.getHours() + guideRange);
     // Hack because GetProgramGuide will include programs with a starttime matching our endtime
@@ -162,6 +168,14 @@
 %>
     </select>
 
+</div>
+
+<div class="pageLeft" onClick="loadContent('/tv/guide.qsp?StartTime=<%=prevGuideStartTime.toISOString()%>')">
+    &lt;
+</div>
+
+<div class="pageRight" onClick="loadContent('/tv/guide.qsp?StartTime=<%=nextGuideStartTime.toISOString()%>')">
+    &gt;
 </div>
 
 <div class="guideGrid">

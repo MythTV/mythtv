@@ -18,6 +18,37 @@
     font-weight: bold;
 }
 
+.pageLeft, .pageRight
+{
+    background-color: rgba(26, 26, 26, 0.5);
+    color: rgba(255, 255, 255, 0.5);
+    width: 30px;
+    height: 40px;
+    position: fixed;
+    font-size: 2.2em;
+    font-weight: bold;
+    z-index: 15;
+    top: 50%;
+}
+
+.pageLeft
+{
+    left: 200px;
+    border-radius: 0px 10px 10px 0px;
+}
+
+.pageRight
+{
+    right: 0px;
+    border-radius: 10px 0px 0px 10px;
+}
+
+.pageLeft:hover, .pageRight:hover
+{
+    background-color: rgba(26, 26, 26, 1.0);
+    color: rgba(255, 255, 255, 1.0);
+}
+
 .guideGrid
 {
     width: 100%;
@@ -92,6 +123,8 @@
 .guideGrid .channelIcon
 {
     margin: 5px 5px 1px 5px;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .guideGrid .channelText
