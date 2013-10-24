@@ -81,6 +81,8 @@ function loadDiv(divName, contentURL, jsURL) {
 
     $(divName).html(html);
 
+    $("#busyPopup").hide();
+
     if (jsURL) {
         $.ajaxSetup({ async: false });
         $.getScript(jsURL);
@@ -88,8 +90,6 @@ function loadDiv(divName, contentURL, jsURL) {
     }
 
     setUIAttributes();
-
-    $("#busyPopup").hide();
 }
 
 function setUIAttributes() {
