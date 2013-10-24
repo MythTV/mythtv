@@ -236,7 +236,6 @@
     display: none;
     z-index: 99;
     position: absolute;
-    padding: 3px;
 }
 
 #recMenu .button
@@ -244,10 +243,10 @@
     background-color:#444444;
     border:3px #FFFFFF outset;
     color: #DDDDDD;
-    margin: 8px;
+    margin: 7px;
     font-weight: bold;
     font-size: 1.1em;
-    padding: 5px;
+    padding: 4px;
     vertical-align: middle;
     text-align: center;
     white-space: nowrap;
