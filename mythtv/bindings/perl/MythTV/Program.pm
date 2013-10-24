@@ -127,6 +127,8 @@ package MythTV::Program;
         $self->{'title'}       = 'Untitled'       unless ($self->{'title'} =~ /\S/);
         $self->{'subtitle'}    = 'Untitled'       unless ($self->{'subtitle'} =~ /\S/);
         $self->{'description'} = 'No Description' unless ($self->{'description'} =~ /\S/);
+        $self->{'season'}      = '00' unless $self->{'season'};
+        $self->{'episode'}     = '00' unless $self->{'episode'};
 
     # Credits
         $self->load_credits();
@@ -401,6 +403,9 @@ package MythTV::Program;
         $fields{'om'} = $omonth;            # month, leading zero
         $fields{'oj'} = int($oday);         # day of month
         $fields{'od'} = $oday;              # day of month, leading zero
+    # Season & Episode
+        $fields{'sea'} = $self->{'season'};
+        $fields{'ep'}  = $self->{'episode'};
     # Literals
         $fields{'%'}   = '%';
         ($fields{'-'}  = $separator) =~ s/%/%%/g;
