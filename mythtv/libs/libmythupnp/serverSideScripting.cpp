@@ -426,20 +426,31 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
                     // Extract filename (remove quotes)
 
-                    QString sFileName = sSegment.mid( 8, sSegment.length() - 9 );
+                    QStringList sParts = sSegment.split( ' ', QString::SplitBehavior::SkipEmptyParts );
 
-                    QFileInfo oInfo( m_sResRootPath + sFileName );
-
-                    if (oInfo.exists())
+                    if (sParts.length() > 1 )
                     {
-                        sCode << ReadFileContents( oInfo.canonicalFilePath() )
-                              << "\n";
+                        QString sFileName = sParts[1].mid( 1, sParts[1].length() - 2 );
+
+                        QFileInfo oInfo( m_sResRootPath + sFileName );
+
+                        if (oInfo.exists())
+                        {
+                            sCode << ReadFileContents( oInfo.canonicalFilePath() )
+                                  << "\n";
+                        }
+                        else
+                            LOG(VB_GENERAL, LOG_ERR,
+                                QString("ServerSideScripting::ProcessLine 'import' - File not found: %1%2")
+                                   .arg(m_sResRootPath)
+                                   .arg(sFileName));
                     }
                     else
+                    {
                         LOG(VB_GENERAL, LOG_ERR,
-                            QString("LoadScriptFromFile - File not found: %1%2") 
-                               .arg(m_sResRootPath)
-                               .arg(sFileName));
+                            QString("ServerSideScripting::ProcessLine 'import' - Malformed [%1]")
+                                .arg( sSegment ));
+                    }
 
                 }
                 else
