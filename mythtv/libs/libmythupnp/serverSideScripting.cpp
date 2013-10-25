@@ -426,7 +426,7 @@ bool ServerSideScripting::ProcessLine( QTextStream &sCode,
 
                     // Extract filename (remove quotes)
 
-                    QStringList sParts = sSegment.split( ' ', QString::SplitBehavior::SkipEmptyParts );
+                    QStringList sParts = sSegment.split( ' ', QString::SkipEmptyParts );
 
                     if (sParts.length() > 1 )
                     {
