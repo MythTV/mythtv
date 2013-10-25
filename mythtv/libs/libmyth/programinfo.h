@@ -687,8 +687,8 @@ class MPUBLIC ProgramInfo
     int32_t recpriority;
 
     uint32_t chanid;
-    QString chanstr;
-    QString chansign;
+    QString chanstr; // Channum
+    QString chansign; // Callsign
     QString channame;
     QString chanplaybackfilters;
 
