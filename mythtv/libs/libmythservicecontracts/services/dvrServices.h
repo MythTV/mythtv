@@ -195,6 +195,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
 
+        virtual QString            RecStatusToString     ( int              RecStatus  ) = 0;
+
 };
 
 #endif

@@ -938,3 +938,8 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     return bResult;
 }
 
+QString Dvr::RecStatusToString(int RecStatus)
+{
+    RecStatusType type = static_cast<RecStatusType>(RecStatus);
+    return toString(type);
+}

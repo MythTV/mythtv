@@ -81,7 +81,7 @@ QString toUIState(RecStatusType recstatus)
     return "warning";
 }
 
-/// \brief Converts "recstatus" into a human readable string.
+/// \brief Converts "recstatus" into a short (unreadable) string.
 QString toString(RecStatusType recstatus, uint id)
 {
     QString ret = "-";
@@ -172,7 +172,7 @@ QString toString(RecStatusType recstatus, uint id)
     return (ret.isEmpty()) ? QString("-") : ret;
 }
 
-/// \brief Converts "recstatus" into a short human readable description.
+/// \brief Converts "recstatus" into a human readable string
 QString toString(RecStatusType recstatus, RecordingType rectype)
 {
     if (recstatus == rsUnknown && rectype == kNotRecording)

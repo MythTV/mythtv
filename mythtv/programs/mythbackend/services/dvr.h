@@ -172,6 +172,8 @@ class Dvr : public DvrServices
         bool              EnableRecordSchedule ( uint             RecordId   );
 
         bool              DisableRecordSchedule( uint             RecordId   );
+
+        QString           RecStatusToString    ( int              RecStatus );
 };
 
 // --------------------------------------------------------------------------
@@ -325,6 +327,11 @@ class ScriptableDvr : public QObject
         bool DisableRecordSchedule( uint RecordId )
         {
             return m_obj.DisableRecordSchedule(RecordId);
+        }
+
+        QString RecStatusToString( int RecStatus )
+        {
+            return m_obj.RecStatusToString(RecStatus);
         }
 
 };
