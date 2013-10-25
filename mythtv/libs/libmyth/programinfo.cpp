@@ -691,17 +691,6 @@ ProgramInfo::ProgramInfo(
             else if (s.recstatus == rsTuning)
                 recstatus = rsOtherTuning;
         }
-
-        // Stop recording keys on chanid (and recstarts).  If the
-        // recording is running, override the chanid, so we can stop
-        // it from any matching program.  Remove this hack when we
-        // replace chanid/recstartts as the primary key for the
-        // recorded and related tables with something better.
-        if (s.recstatus == rsRecording ||
-            s.recstatus == rsTuning)
-        {
-            chanid = s.chanid;
-        }
     }
 }
 

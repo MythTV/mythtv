@@ -2418,10 +2418,27 @@ void MainServer::HandleCheckRecordingActive(QStringList &slist,
 
 void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
 {
+    ProgramList schedList;
+    bool hasConflicts = false;
+    LoadFromScheduler(schedList, hasConflicts);
+
     QStringList::const_iterator it = slist.begin() + 1;
     RecordingInfo recinfo(it, slist.end());
     if (recinfo.GetChanID())
+    {
+        // Stop recording may have been called for the same program on
+        // different channel in the guide, we need to find the actual channel
+        // that the recording is occurring on
+        for( uint n = 0; n < schedList.size(); n++)
+        {
+            ProgramInfo *pInfo = schedList[n];
+            if ((pInfo->GetRecordingStatus() == rsTuning ||
+                 pInfo->GetRecordingStatus() == rsRecording)
+                && recinfo.IsSameProgram(*pInfo))
+                recinfo.SetChanID(pInfo->GetChanID());
+        }
         DoHandleStopRecording(recinfo, pbs);
+    }
 }
 
 void MainServer::DoHandleStopRecording(
