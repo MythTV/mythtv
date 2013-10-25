@@ -588,6 +588,9 @@ ProgramInfo::ProgramInfo(
     title(_title),
     subtitle(_subtitle),
     description(_description),
+    season(_season),
+    episode(_episode),
+    totalepisodes(_totalepisodes),
     syndicatedepisode(_syndicatedepisode),
     category(_category),
     director(),
@@ -650,10 +653,6 @@ ProgramInfo::ProgramInfo(
     rectype(_rectype),
     dupin(kDupsInAll),
     dupmethod(kDupCheckSubDesc),
-
-    season(_season),
-    episode(_episode),
-    totalepisodes(_totalepisodes),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
