@@ -1,51 +1,14 @@
 <%
+import "/js/utility.js"
+
     var args = arguments[1];
-    function toCapitalCase(str)
-    {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    function escapeHTML(str)
-    {
-        str = str.replace(/&/g, "&amp;")
-                 .replace(/'/g, "&apos;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;");
-
-        return str;
-    }
-
-    function isValidObject(variable)
-    {
-        return ((typeof variable === "object")
-                && typeof variable !== "undefined"
-                && (variable != null));
-    }
-
-    function recStatusToClass(statusInt)
-    {
-        var classStr = "";
-        switch (statusInt)
-        {
-            case -1:
-                classStr = "programWillRecord";
-                break;
-            case -2:
-                classStr = "programRecording";
-                break;
-            case 4: case 8: case 13:
-                classStr = "programOtherShowing";
-                break;
-        }
-        return classStr;
-    }
 
     var timeBarInterval = 30; // Display time markers every X minutes
     var guideRange = 2; // Show X hours from the start time
 
     var myth  = new Myth();
     var guide = new Guide();
+    var dvr = new Dvr();
 
     var now = new Date();
     var guideStartTime;
@@ -100,6 +63,7 @@
 <link rel="stylesheet" type="text/css" href="/css/site.css">
 <link rel="stylesheet" type="text/css" href="/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/css/category_colors.css">
+<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script type="text/javascript" src="/js/util.qjs"></script>
 <script type="text/javascript" src="/js/guide.js"></script>
 </head>
@@ -252,9 +216,10 @@
                 width = (cumulativeWidth < 100) ? width + (100 - cumulativeWidth) : width;
                 width = (cumulativeWidth > 100) ? width - (cumulativeWidth - 100) : width;
             }
-            var category = toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
+            var categoryClass = "category_" + toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
 
-            var status = recStatusToClass(program.Recording.Status);
+            var statusStr = dvr.RecStatusToString(program.Recording.Status);
+            var statusClass = "program" + statusStr.replace(/ /g, '');
 
             var showArrow = (program.EndTime > windowEnd) ? "block" : "none";
 
@@ -263,7 +228,7 @@
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
-                <div class="programBoxInner category_<%=category%> <%=status%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
+                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
                     <div class="programHeader"><%=escapeHTML(program.Title)%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
@@ -275,8 +240,9 @@
                 </div>
             </div>
             <div style="display: none" id="<%=programIdentifier%>_detail">
+                <% if (program.Recording.Status != 0) {%><label for="progRecStatus">Recording Status: </label><span id="progRecStatus"><%=statusStr%></span><br /><%}%>
                 <label for="progStartTime">Duration: </label><span id="progStartTime"><%=myth.GetFormatTime(program.StartTime)%> - <%=myth.GetFormatTime(program.EndTime)%></span><br />
-                <label for="progCategory">Category: </label><span id="progCategory"><%=escapeHTML(program.Category)%></span><br />
+                <label for="progCategory">Category: </label><span id="progCategory"><%=escapeHTML(toCapitalCase(program.Category))%></span><br />
                 <% if (program.Season > 0) {%><label for="progSeason">Season: </label><span id="progSeason"><%=program.Season%></span><br /><%}%>
                 <% if (program.Episode > 0) {%><label for="progEpisode">Episode: </label><span id="progEpisode"><%=program.Episode%><% if (program.TotalEpisodes > 0) {%>/<%=program.TotalEpisodes%><%}%></span><%}%>
             </div>

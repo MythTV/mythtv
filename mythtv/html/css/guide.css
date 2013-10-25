@@ -8,6 +8,7 @@
     float:left;
 }
 
+/* Guide Navigation */
 .navigateBox
 {
     float: right;
@@ -49,6 +50,7 @@
     color: rgba(255, 255, 255, 1.0);
 }
 
+/* Guide Grid */
 .guideGrid
 {
     width: 100%;
@@ -219,14 +221,22 @@
     background-color:#00CC00;
 }
 
-.guideGrid .programScheduling .programHeader
-{
-    background-color:#045FB4;
-}
-
+.guideGrid .programEarlierShowing .programHeader,
+.guideGrid .programLaterShowing .programHeader,
 .guideGrid .programOtherShowing .programHeader
 {
     border:2px #37912F dashed;
+}
+
+.guideGrid .programConflicting .programHeader,
+.guideGrid .programRecorderFailed .programHeader,
+{
+    background-color:#CC0000;
+}
+
+.guideGrid .programScheduling .programHeader
+{
+    background-color:#045FB4;
 }
 
 .guideGrid .programSelected
@@ -261,6 +271,7 @@
     margin-left:2px;
 }
 
+/* Recording Menu */
 #recMenu
 {
     background-color: rgba(51, 51, 51, 0.85);
