@@ -4,20 +4,10 @@
 
     function recStatusToClass(statusInt)
     {
-        var classStr = "";
-        switch (statusInt)
-        {
-            case -1:
-                classStr = "programWillRecord";
-                break;
-            case -2:
-                classStr = "programRecording";
-                break;
-            case 4: case 8: case 13:
-                classStr = "programOtherShowing";
-                break;
-        }
-        return classStr;
+        var dvr = new Dvr();
+        var statusStr = dvr.RecStatusToString(statusInt);
+        var statusClass = "program" + statusStr.replace(/ /g, '');
+        return statusClass;
     }
 
     function scheduleSimpleRecording(chanID, startTime, type)
@@ -50,6 +40,13 @@
         return chanID + "#" + startTime.toISOString()  + "#" + recStatusToClass(program.Recording.Status);
     }
 
+    function deleteRecRule(recRuleID, chanID, startTime)
+    {
+        var dvr = new Dvr();
+        dvr.RemoveRecordSchedule(recRuleID);
+        return chanID + "#" + startTime.toISOString()  + "#" + recRuleID;
+    }
+
     var ret;
     switch (args.action)
     {
@@ -60,6 +57,10 @@
         case "checkRecStatus":
             var validDate = myth.ParseISODateString(args.starttime);
             ret = checkRecordingStatus(args.chanid, validDate);
+            break;
+        case "deleteRecRule":
+            var validDate = myth.ParseISODateString(args.starttime);
+            ret = deleteRecRule(args.recruleid, args.chanid, validDate);
             break;
         default:
             break;

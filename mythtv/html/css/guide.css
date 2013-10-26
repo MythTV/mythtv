@@ -272,7 +272,7 @@
 }
 
 /* Recording Menu */
-#recMenu
+.guideMenu
 {
     background-color: rgba(51, 51, 51, 0.85);
     border: 2px #045FB4 solid;
@@ -282,7 +282,7 @@
     position: absolute;
 }
 
-#recMenu .button
+.guideMenu .button
 {
     background-color:#444444;
     border:3px #FFFFFF outset;
@@ -297,13 +297,13 @@
     border-radius: 8px;
 }
 
-#recMenu .button:hover
+.guideMenu .button:hover
 {
     background-color:#555555;
     color: #FFFFFF;
 }
 
-#recMenu .button:active
+.guideMenu .button:active
 {
     border-style:inset;
 }

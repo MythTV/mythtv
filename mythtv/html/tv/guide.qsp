@@ -72,21 +72,31 @@ import "/js/utility.js"
 <h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
 
 <!-- Popup Recording Menu -->
-<div id="recMenu">
+<div id="recMenu" class="guideMenu">
     <div class="button" onClick="recordProgram(chanID, startTime, 'Single Record')">
-        Record this showing
+        <%=qsTr("Record this showing")%>
     </div>
     <div class="button" onClick="recordProgram(chanID, startTime, 'Record All')">
-        Record all showings
+        <%=qsTr("Record all showings")%>
     </div>
     <div class="button" onClick="recordProgram(chanID, startTime, 'Record One')">
-        Record one showing
+        <%=qsTr("Record one showing")%>
     </div>
     <div class="button" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
-        Record all showings (this channel)
+        <%=qsTr("Record all showings (this channel)")%>
     </div>
     <div class="button" onClick="loadContent('/tv/schedule.qsp')">
-        Edit recording rule
+        <%=qsTr("Edit recording rule")%>
+    </div>
+</div>
+
+<!-- Popup Edit Recording Menu -->
+<div id="editRecMenu" class="guideMenu">
+    <div class="button" onClick="deleteRecRule(chanID, startTime)">
+        <%=qsTr("Delete Recording Rule")%>
+    </div>
+    <div class="button" onClick="loadContent('/tv/schedule.qsp')">
+        <%=qsTr("Edit recording rule")%>
     </div>
 </div>
 
@@ -100,7 +110,7 @@ import "/js/utility.js"
     <label for="guideStartDate"><%=qsTr("Date")%>:</label>
     <select id="guideStartDate" onChange="loadContent('/tv/guide.qsp?StartTime=' + this.options[this.options.selectedIndex].value);">
 <%
-    var startDay = new Date(guideStartTime);
+    var startDay = new Date(now);
     startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
     for (var dateIdx = 0; dateIdx < 28; dateIdx++)
     {
@@ -221,15 +231,17 @@ import "/js/utility.js"
             var statusStr = dvr.RecStatusToString(program.Recording.Status);
             var statusClass = "program" + statusStr.replace(/ /g, '');
 
-            var showArrow = (program.EndTime > windowEnd) ? "block" : "none";
+            var menu = "editRecMenu";
+            if (program.Recording.Status == 0)
+                menu = "recMenu";
 
             // Used as a unique identifier and also to access the chanid
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
-                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
-                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%><!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
+                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                         <span class="programDescription"><%=escapeHTML(program.Description)%></span>
@@ -237,6 +249,9 @@ import "/js/utility.js"
                     <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
                         <%=qsTr("Scheduling")%> ...
                     </div>
+                    <input type="hidden" name="chanid" value="<%=channel.ChanId%>" />
+                    <input type="hidden" name="starttime" value="<%=program.StartTime.toISOString()%>" />
+                    <input type="hidden" name="recordid" value="<%=program.Recording.RecordId%>" />
                 </div>
             </div>
             <div style="display: none" id="<%=programIdentifier%>_detail">

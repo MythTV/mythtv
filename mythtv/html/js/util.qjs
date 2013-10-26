@@ -106,8 +106,16 @@ function clearDiv(divName) {
     $("#" + divName).html("");
 }
 
+var currentContentURL;
+var currentJsUrl;
 function loadContent(contentURL, jsURL) {
+    currentContentURL = contentURL;
+    currentJsUrl = jsURL;
     loadDiv("content", contentURL, jsURL);
+}
+
+function reloadContent() {
+    loadContent(currentContentURL, currentJsUrl);
 }
 
 function loadSetupContent(contentURL, jsURL) {
