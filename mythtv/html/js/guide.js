@@ -231,3 +231,99 @@ function deleteRecRule(chandID, startTime)
                                 recRuleChanged( response[0], response[1] );
                             });
 }
+
+function funkyAnimation()
+{
+    var guideDivID = "guideGrid";
+    var newDivID = "newGuideGrid";
+    var guideDiv = document.getElementById(guideDivID);
+    var newDiv = document.createElement('div');
+    newDiv.style = "left: 100%";
+    newDiv.id = newDivID;
+    document.getElementById("content").insertBefore(newDiv, null);
+
+    newDiv.innerHTML = guideDiv.innerHTML;
+    newDiv.className = "guideGrid";
+    leftSlideLoad(guideDivID, newDivID);
+    newDiv.id = "guideGrid";
+}
+
+function leftSlideTransition(oldDivID, newDivID)
+{
+    // Transition works much better with a fixed width, so temporarily set
+    // the width based on the parent,
+    $("#" + newDivID).css("width", $("#" + oldDivID).width());
+    $("#" + oldDivID).css("z-index", "-20");
+    $("#" + newDivID).css("z-index", "-10");
+    var oldLeft = $("#" + oldDivID).position().left;
+    $("#" + oldDivID).animate({opacity: "0.3"}, 1000, function() {
+                   $("#" + oldDivID).remove(); });
+    $("#" + newDivID).animate({left: oldLeft}, 1000, function() {
+                   $("#" + newDivID).css("width", '');
+                   $("#" + newDivID).css("z-index", "0"); });
+}
+
+function rightSlideTransition(oldDivID, newDivID)
+{
+    $("#" + newDivID).css("width", $("#" + oldDivID).width());
+    $("#" + newDivID).css("left", "-100%");
+    $("#" + oldDivID).css("z-index", "-20");
+    $("#" + newDivID).css("z-index", "-10");
+    var oldLeft = $("#" + oldDivID).position().left;
+    $("#" + oldDivID).animate({opacity: "0.3"}, 1000, function() {
+                   $("#" + oldDivID).remove(); });
+    $("#" + newDivID).animate({left: oldLeft}, 1000, function() {
+                   $("#" + newDivID).css("width", '');
+                   $("#" + newDivID).css("z-index", "0"); });
+}
+
+function dissolveTransition(oldDivID, newDivID)
+{
+    $("#" + newDivID).css("opacity", "0.0");
+    var oldLeft = $("#" + oldDivID).position().left;
+    $("#" + newDivID).css("left", oldLeft);
+    $("#" + oldDivID).animate({opacity: "0.0"}, 1000, function() {
+                   $("#" + oldDivID).remove(); });
+    $("#" + newDivID).animate({opacity: "1.0"}, 1000);
+}
+
+function loadGuideContent(url, transition)
+{
+    if (!transition)
+        transition = "dissolve";
+
+    $("#busyPopup").show();
+
+    var guideDivID = "guideGrid";
+    var guideDiv = document.getElementById(guideDivID);
+    var newDiv = document.createElement('div');
+    newDiv.style = "left: 100%";
+    document.getElementById("content").insertBefore(newDiv, null);
+
+    var html = $.ajax({
+      url: url,
+        async: false
+     }).responseText;
+
+    newDiv.innerHTML = html;
+    newDiv.className = "guideGrid";
+
+    // Need to assign the id to the new div
+    newDiv.id = guideDivID;
+    guideDiv.id = "old" + guideDivID;
+    switch (transition)
+    {
+        case 'left':
+            leftSlideTransition(guideDiv.id, newDiv.id);
+            break;
+        case 'right':
+            rightSlideTransition(guideDiv.id, newDiv.id);
+            break;
+        case 'dissolve':
+            dissolveTransition(guideDiv.id, newDiv.id);
+            break;
+    }
+    newDiv.id = "guideGrid";
+
+    $("#busyPopup").hide();
+}

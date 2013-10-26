@@ -1,7 +1,18 @@
 <%
+"use strict";
+
 import "/js/utility.js"
 
     var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var guideOnly = 0;
+    if (getArg("GuideOnly"))
+        guideOnly = 1;
 
     var timeBarInterval = 30; // Display time markers every X minutes
     var guideRange = 2; // Show X hours from the start time
@@ -14,8 +25,8 @@ import "/js/utility.js"
     var guideStartTime;
 
     // Use the StartTime argument if it was defined
-    if (typeof args.starttime !== "undefined")
-        guideStartTime = myth.ParseISODateString(args.starttime);
+    if (typeof getArg("StartTime") !== "undefined")
+        guideStartTime = myth.ParseISODateString(getArg("StartTime"));
 
     // If the StartTime wasn't valid or wasn't defined then use the current time
     if (!isValidObject(guideStartTime))
@@ -54,6 +65,7 @@ import "/js/utility.js"
     }
 %>
 
+<% if (!guideOnly) {%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -65,11 +77,12 @@ import "/js/utility.js"
 <link rel="stylesheet" type="text/css" href="/css/category_colors.css">
 <script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script type="text/javascript" src="/js/util.qjs"></script>
+<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
 <script type="text/javascript" src="/js/guide.js"></script>
 </head>
 <body>
 
-<h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
+<h2 class="pageTitle" id="title" onClick="funkyAnimation()"><%=qsTr("Program Guide")%></h2>
 
 <!-- Popup Recording Menu -->
 <div id="recMenu" class="guideMenu">
@@ -108,7 +121,7 @@ import "/js/utility.js"
 <div class="navigateBox">
 
     <label for="guideStartDate"><%=qsTr("Date")%>:</label>
-    <select id="guideStartDate" onChange="loadContent('/tv/guide.qsp?StartTime=' + this.options[this.options.selectedIndex].value);">
+    <select id="guideStartDate" onChange="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=' + this.options[this.options.selectedIndex].value);">
 <%
     var startDay = new Date(now);
     startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
@@ -117,7 +130,7 @@ import "/js/utility.js"
         var selected = (startDay.getDate() == guideStartTime.getDate()) ? "selected" : "";
 
 %>
-        <option label="<%=myth.GetFormatDate(startDay)%>" <%=selected%> value="<%=startDay.toISOString()%>"><%=myth.GetFormatDate(startDay)%></option>
+        <option label="<%=myth.GetFormatDate(startDay)%>" value="<%=startDay.toISOString()%>" <%=selected%>><%=myth.GetFormatDate(startDay)%></option>
 <%
         startDay.setDate(startDay.getDate() + 1);
     }
@@ -125,7 +138,7 @@ import "/js/utility.js"
     </select>
 
     <label for="guideStartTime"><%=qsTr("Time")%>:</label>
-    <select id="guideStartTime" onChange="loadContent('/tv/guide.qsp?StartTime=' + this.options[this.options.selectedIndex].value);">
+    <select id="guideStartTime" onChange="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=' + this.options[this.options.selectedIndex].value);">
 <%
     var startTime = new Date(guideStartTime);
     startTime.setHours(0);
@@ -144,15 +157,18 @@ import "/js/utility.js"
 
 </div>
 
-<div class="pageLeft" onClick="loadContent('/tv/guide.qsp?StartTime=<%=prevGuideStartTime.toISOString()%>')">
+<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+
+<div id="guideGrid" class="guideGrid">
+<%} // End of the header %>
+
+<div class="pageLeft" onClick="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=prevGuideStartTime.toISOString()%>', 'right')">
     &lt;
 </div>
 
-<div class="pageRight" onClick="loadContent('/tv/guide.qsp?StartTime=<%=nextGuideStartTime.toISOString()%>')">
+<div class="pageRight" onClick="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=nextGuideStartTime.toISOString()%>', 'left')">
     &gt;
 </div>
-
-<div class="guideGrid">
 
     <div class="timeBar">
         <div class="timeBarDate">
@@ -190,10 +206,10 @@ import "/js/utility.js"
 
     <div class="channelRow">
         <div class="channelBox">
-            <img class="channelIcon" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
+            <img class="channelIcon" height="50" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
             <div class="channelText"><%=escapeHTML(channel.ChannelName)%></div>
         </div>
-        <div style="float:left;width:90%;height:100%;position:relative;overflow:visible;">
+        <div class="programsBox">
 
             <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
 <%
@@ -269,8 +285,12 @@ import "/js/utility.js"
 <%
     }
 %>
+<% if (!guideOnly) {%>
+</div> <!-- End ProgramGuide -->
+
 
 </div>
 
 </body>
 </html>
+<%}%>

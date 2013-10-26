@@ -53,8 +53,10 @@
 /* Guide Grid */
 .guideGrid
 {
-    width: 100%;
-    clear: both;
+    width: calc(100% - 20px); /* Need to subtract padding of parent */
+    float: left;
+    position:absolute;
+    padding:0px;
     /*overflow: visible;*/
 }
 
@@ -68,10 +70,11 @@
 .guideGrid .timeBar
 {
     clear:both;
-    width: 100%;
     margin: 5px 0px 5px 0px;
     font-size: 1.1em;
     font-weight: bold;
+    vertical-align: middle;
+    position: relative;
 }
 
 .guideGrid .timeBarDate
@@ -106,7 +109,7 @@
     clear: both;
     width: 100%;
     height: 80px;
-    margin: 2px;
+    margin: 2px 0px 2px 0px;
     overflow: visible;
 }
 
@@ -124,7 +127,7 @@
 
 .guideGrid .channelIcon
 {
-    margin: 5px 5px 1px 5px;
+    margin: 5px 4px 1px 4px;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -134,16 +137,26 @@
     font-weight: bold;
 }
 
+.guideGrid .programsBox
+{
+    float:left;
+    width:90%;
+    height:100%;
+    position:relative;
+    overflow:visible;
+    padding: 0px 0px 0px 2px;
+}
+
 .guideGrid .programBox
 {
     float: left;
     height: 100%;
     overflow: visible;
+    padding: 0px 2px 0px 0px;
 }
 
 .guideGrid .programBoxInner
 {
-    margin:0px 1px 0px 1px;
     height: 100%;
     background-color: #666666;
     border-radius: 10px;
@@ -201,8 +214,8 @@
     position:relative;
     font-weight: bold;
     font-size: 0.8em;
-    margin-right:5px;
-    z-index:1;
+    margin-right: 5px;
+    z-index: 1;
 }
 
 .guideGrid .programArrow
@@ -213,35 +226,35 @@
 
 .guideGrid .programWillRecord .programHeader
 {
-    background-color:#37912F;
+    background-color: #37912F;
 }
 
 .guideGrid .programRecording .programHeader
 {
-    background-color:#00CC00;
+    background-color: #00CC00;
 }
 
 .guideGrid .programEarlierShowing .programHeader,
 .guideGrid .programLaterShowing .programHeader,
 .guideGrid .programOtherShowing .programHeader
 {
-    border:2px #37912F dashed;
+    border: 2px #37912F dashed;
 }
 
 .guideGrid .programConflicting .programHeader,
-.guideGrid .programRecorderFailed .programHeader,
+.guideGrid .programRecorderFailed .programHeader
 {
-    background-color:#CC0000;
+    background-color: #CC0000;
 }
 
 .guideGrid .programScheduling .programHeader
 {
-    background-color:#045FB4;
+    background-color: #045FB4;
 }
 
 .guideGrid .programSelected
 {
-    border:2px #045FB4 solid;
+    border: 2px #045FB4 solid;
 }
 
 .guideGrid .programSchedPopup
@@ -268,7 +281,6 @@
     border-radius: 10px;
     z-index: 5;
     height: 80px;
-    margin-left:2px;
 }
 
 /* Recording Menu */

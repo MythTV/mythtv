@@ -6,6 +6,8 @@
 // It can however be used clientside as well so long as it complies with the
 // above stipulation
 
+"use strict";
+
 function toCapitalCase(str)
 {
     return str.charAt(0).toUpperCase() + str.slice(1);
