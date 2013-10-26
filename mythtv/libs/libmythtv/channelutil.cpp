@@ -2270,6 +2270,37 @@ void ChannelUtil::SortChannels(ChannelInfoList &list, const QString &order,
     }
 }
 
+// Return the array index of the best matching channel.  An exact
+// match is the best match.  Otherwise, find the closest numerical
+// value greater than channum.  E.g., if the channel list is {2_1,
+// 2_2, 4_1, 4_2, 300} then input 3 returns 2_2, input 4 returns 2_2,
+// and input 5 returns 4_2.
+//
+// The list does not need to be sorted.
+int ChannelUtil::GetNearestChannel(const ChannelInfoList &list,
+                                   const QString &channum)
+{
+    ChannelInfo target;
+    target.channum = channum;
+    int b = -1; // index of best seen so far
+    for (int i = 0; i < (int)list.size(); ++i)
+    {
+        // Index i is a better result if any of the following hold:
+        //   i is the first element seen
+        //   i < target < best (i.e., i is the first one less than the target)
+        //   best < i < target
+        //   target < i < best
+        if ((b < 0) ||
+            (lt_smart(list[i], target) && lt_smart(target,  list[b])) ||
+            (lt_smart(list[b], list[i]) && lt_smart(list[i], target)) ||
+            (lt_smart(target,  list[i]) && lt_smart(list[i], list[b])))
+        {
+            b = i;
+        }
+    }
+    return b;
+}
+
 uint ChannelUtil::GetNextChannel(
     const ChannelInfoList &sorted,
     uint              old_chanid,

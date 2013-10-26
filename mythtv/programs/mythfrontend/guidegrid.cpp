@@ -934,7 +934,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
 
     if (gotostartchannel)
     {
-        int ch = FindChannel(m_startChanID, m_startChanNum);
+        int ch = FindChannel(m_startChanID, m_startChanNum, false);
         m_currentStartChannel = (uint) max(0, ch);
     }
 
@@ -993,52 +993,20 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     if (exact || channum.isEmpty())
         return -1;
 
-    // then check partial channum, first only
-    for (i = 0; i < GetChannelCount(); ++i)
-    {
-        if (m_channelInfos[i][0].channum.left(channum.length()) == channum)
-            return i;
-    }
-
-    // then check all partial channum
+    ChannelInfoList list;
+    QVector<int> idxList;
     for (i = 0; i < GetChannelCount(); ++i)
     {
         for (uint j = 0; j < m_channelInfos[i].size(); ++j)
         {
-            if (m_channelInfos[i][j].channum.left(channum.length()) == channum)
-                return i;
+            list.push_back(m_channelInfos[i][j]);
+            idxList.push_back(i);
         }
     }
-
-    // then check all channum with "_" for subchannels
-    QMutexLocker locker(&chanSepRegExpLock);
-    QString tmpchannum = channum;
-    if (tmpchannum.contains(chanSepRegExp))
-    {
-        tmpchannum.replace(chanSepRegExp, "_");
-    }
-    else if (channum.length() >= 2)
-    {
-        tmpchannum = channum.left(channum.length() - 1) + '_' +
-            channum.right(1);
-    }
-    else
-    {
-        return -1;
-    }
-
-    for (i = 0; i < GetChannelCount(); ++i)
-    {
-        for (uint j = 0; j < m_channelInfos[i].size(); ++j)
-        {
-            QString tmp = m_channelInfos[i][j].channum;
-            tmp.replace(chanSepRegExp, "_");
-            if (tmp == tmpchannum)
-                return i;
-        }
-    }
-
-    return -1;
+    int result = ChannelUtil::GetNearestChannel(list, channum);
+    if (result >= 0)
+        result = idxList[result];
+    return result;
 }
 
 void GuideGrid::fillTimeInfos()

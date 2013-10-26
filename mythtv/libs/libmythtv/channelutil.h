@@ -202,6 +202,8 @@ class MTV_PUBLIC ChannelUtil
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(ChannelInfoList &list, const QString &order,
                                 bool eliminate_duplicates = false);
+    static int     GetNearestChannel(const ChannelInfoList &list,
+                                     const QString &channum);
 
     static uint    GetNextChannel(const ChannelInfoList &sorted,
                                   uint old_chanid,
