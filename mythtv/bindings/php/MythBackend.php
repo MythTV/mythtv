@@ -20,7 +20,7 @@ class MythBackend {
 // NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 // the number of items in a ProgramInfo QStringList group used by
 // ProgramInfo::ToSringList and ProgramInfo::FromStringList.
-    static $program_line_number     = 47;
+    static $program_line_number     = 48;
 
     private $fp                     = null;
     private $connected              = false;
