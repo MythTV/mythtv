@@ -229,7 +229,7 @@ import "/js/utility.js"
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
                 <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showRecMenu(this);">
-                    <div class="programHeader"><%=escapeHTML(program.Title)%> <!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
+                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%><!-- <div style="display:<%=showArrow%>;" class="programArrow">&rsaquo;</div> --></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                         <span class="programDescription"><%=escapeHTML(program.Description)%></span>
