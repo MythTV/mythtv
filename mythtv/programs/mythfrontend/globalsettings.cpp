@@ -4133,7 +4133,7 @@ EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
 
-    epg->setLabel(tr("Program Guide %1/%2").arg("1").arg("2"));
+    epg->setLabel(tr("Program Guide %1/%2").arg("1").arg("1"));
 
     epg->addChild(WatchTVGuide());
     epg->addChild(DefaultTVChannel());
