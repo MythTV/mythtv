@@ -248,6 +248,21 @@
         text-align: center;
     }
 
+    #debug {
+        background: rgba(26, 26, 26, 0.6);
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        top: 50%;
+        left: 50%;
+        margin-top: -200px;
+        margin-left: -200px;
+        border-radius: 10px;
+        display: none;
+        z-index: 99;
+        overflow: scroll;
+    }
+
     .config {
         display: none;
     }

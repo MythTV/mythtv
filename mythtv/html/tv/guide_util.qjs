@@ -1,0 +1,73 @@
+<%
+// This file is used SERVER SIDE only, it MUST comply to ECMA Script 5.1 and not
+// use jQuery or any other client side extensions.
+//
+// e.g. ECMA Script 5.1 cannot parse ISO DateTime strings
+
+"use strict";
+
+import "/js/utility.js"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var myth = new Myth();
+
+    // Why, you ask, don't we call GetProgramDetails() directly via ajax and
+    // parse the JSON into html on the client side since it would be smaller?
+    //
+    // Simply because the raw values from the services API aren't ready for
+    // display to the user, they need formatting or converting
+    // (enum integers to strings, dates to the users preferred format etc)
+    // That means calling yet more services API methods to get the values we
+    // want to display and would easily negate the benefits of using the JSON.
+    //
+    // Besides, the the backend is going to be powerful enough to build the HTML
+    // faster than the average mobile/tablet can do it client-side
+    //
+    function getProgramDetailHTML(chanID, startTime)
+    {
+        var guide = new Guide();
+        var dvr = new Dvr();
+        var program = guide.GetProgramDetails(chanID, startTime);
+        var html = "";
+
+        if (program.Recording.Status != 0)
+        {
+            html += '<label for="progRecStatus">Recording Status: </label><span id="progRecStatus">' + dvr.RecStatusToString(program.Recording.Status) + '</span><br />';
+        }
+        html += '<label for="progStartTime">Duration: </label><span id="progStartTime">' + myth.GetFormatTime(program.StartTime) + ' - ' + myth.GetFormatTime(program.EndTime) + '</span><br />';
+        html += '<label for="progCategory">Category: </label><span id="progCategory">' + escapeHTML(toCapitalCase(program.Category)) + '</span><br />';
+        if (program.Season > 0)
+        {
+            html += '<label for="progSeason">Season: </label><span id="progSeason">' + program.Season + '</span><br />';
+        }
+        if (program.Episode > 0)
+        {
+            html += '<label for="progEpisode">Episode: </label><span id="progEpisode">' + program.Episode;
+            if (program.TotalEpisodes > 0)
+            {
+                html += '/' + program.TotalEpisodes;
+            }
+            html += '</span>';
+        }
+
+        return html;
+    }
+
+    var ret;
+    switch (args.action)
+    {
+        case "getProgramDetailHTML":
+            var validDate = myth.ParseISODateString(getArg("StartTime"));
+            ret = getProgramDetailHTML(getArg("ChanID"), validDate);
+            break;
+        default:
+            break;
+    }
+%>
+<%=ret%>

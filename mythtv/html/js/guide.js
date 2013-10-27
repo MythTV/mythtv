@@ -95,7 +95,14 @@ var timer;
 function startDetailTimer(parent)
 {
     var parentID = parent.id;
-    timer = setTimeout(function(){showDetail(parentID)}, 1500);
+    timer = setTimeout(function(){showDetail(parentID)}, 1200);
+}
+
+// This can be much improved by iterating through Program and further automating
+// the creation of the html
+function buildProgDetailHtml(parentID, data)
+{
+
 }
 
 function showDetail(parentID)
@@ -106,13 +113,24 @@ function showDetail(parentID)
     if (checkVisibility(menu))
         return;
 
-    var parent = document.getElementById(parentID);
-    var content = document.getElementById(parentID + '_detail');
-    var layer = document.getElementById('programDetails');
+    var values = parentID.split("_", 2);
+    chanID = values[0];
+    startTime = values[1];
 
-    layer.innerHTML = content.innerHTML;
-    toggleVisibility(layer, true);
-    moveToPosition(layer, parent);
+    var url = "/tv/guide_util.qjs?action=getProgramDetailHTML&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url )
+                            .done(function()
+                        {
+                            var parent = document.getElementById(parentID);
+                            var layer = document.getElementById('programDetails');
+
+                            layer.innerHTML = ajaxRequest.responseText;
+                            toggleVisibility(layer, true);
+                            moveToPosition(layer, parent);
+
+//                             $("#debug").html( ajaxRequest.responseText );
+//                             $("#debug").show();
+                        });
 }
 
 function hideDetail(parent)
@@ -180,7 +198,7 @@ function hideMenu(menuName)
 function recordProgram(chanID, startTime, type)
 {
     hideMenu("recMenu");
-    var url = "/tv/dvr.qsp?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
+    var url = "/tv/dvr_util.qjs?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -191,7 +209,7 @@ function recordProgram(chanID, startTime, type)
 
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/dvr.qsp?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/dvr_util.qjs?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url ).done(function()
                             {
                                 var response = ajaxRequest.responseText.split("#");
@@ -204,7 +222,7 @@ function checkRecordingStatus(chanID, startTime)
                                 // HACK: Easiest way to ensure that everything
                                 //       on the page is correctly updated for now
                                 //       is to reload
-                                reloadContent();
+                                reloadGuideContent();
                             });
 }
 
@@ -223,29 +241,13 @@ function deleteRecRule(chandID, startTime)
     var layer = document.getElementById(chanID + "_" + startTime);
     var recRuleID = getChildValue(layer, "recordid");
     hideMenu("editRecMenu");
-    var url = "/tv/dvr.qsp?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/dvr_util.qjs?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
                                 var response = ajaxRequest.responseText.split("#");
                                 recRuleChanged( response[0], response[1] );
                             });
-}
-
-function funkyAnimation()
-{
-    var guideDivID = "guideGrid";
-    var newDivID = "newGuideGrid";
-    var guideDiv = document.getElementById(guideDivID);
-    var newDiv = document.createElement('div');
-    newDiv.style = "left: 100%";
-    newDiv.id = newDivID;
-    document.getElementById("content").insertBefore(newDiv, null);
-
-    newDiv.innerHTML = guideDiv.innerHTML;
-    newDiv.className = "guideGrid";
-    leftSlideLoad(guideDivID, newDivID);
-    newDiv.id = "guideGrid";
 }
 
 function leftSlideTransition(oldDivID, newDivID)
@@ -290,6 +292,7 @@ function dissolveTransition(oldDivID, newDivID)
 
 function loadGuideContent(url, transition)
 {
+    currentContentURL = url;   // currentContentURL is defined in util.qjs
     if (!transition)
         transition = "dissolve";
 
@@ -327,4 +330,9 @@ function loadGuideContent(url, transition)
     newDiv.id = "guideGrid";
 
     $("#busyPopup").hide();
+}
+
+function reloadGuideContent()
+{
+    loadGuideContent(currentContentURL, "dissolve");  // currentContentURL is defined in util.qjs
 }
