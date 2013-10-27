@@ -1876,6 +1876,8 @@ void VideoOutput::CropToDisplay(VideoFrame *frame)
     // TODO: support cropping in the horizontal dimension
     if (!frame)
         return;
+    if (FMT_YV12 != frame->codec)
+        return;
     if (frame->pitches[1] != frame->pitches[2])
         return;
     int crop = window.GetVideoDim().height() -
@@ -1883,7 +1885,6 @@ void VideoOutput::CropToDisplay(VideoFrame *frame)
     if (crop <= 0 || crop >= 16)
         return; // something may be amiss, so don't crop
 
-    // assume input and output formats are FMT_YV12
     uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
     uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);
     uint64_t *vbuf = (uint64_t*) (frame->buf + frame->offsets[2]);
