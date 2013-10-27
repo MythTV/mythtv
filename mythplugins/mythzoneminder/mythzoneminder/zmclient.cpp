@@ -18,7 +18,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "8"
+#define ZM_PROTOCOL_VERSION "9"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -784,29 +784,16 @@ void ZMClient::getMonitorList(vector<Monitor*> *monitorList)
         item->name = strList[x * 5 + 3];
         item->width = strList[x * 5 + 4].toInt();
         item->height = strList[x * 5 + 5].toInt();
-        item->palette = strList[x * 5 + 6].toInt();
+        item->bytes_per_pixel = strList[x * 5 + 6].toInt();
         item->zmcStatus = "";
         item->zmaStatus = "";
         item->events = 0;
         item->status = "";
-        item->isV4L2 = (item->palette > 255);
         monitorList->push_back(item);
-        if (item->isV4L2)
-        {
-            QString pallete;
-            pallete  = (char) (item->palette & 0xff);
-            pallete += (char) ((item->palette >> 8) & 0xff);
-            pallete += (char) ((item->palette >> 16) & 0xff);
-            pallete += (char) ((item->palette >> 24) & 0xff);
-            LOG(VB_GENERAL, LOG_NOTICE,
-                QString("Monitor: %1 (%2) is using palette: %3 (%4)")
-                    .arg(item->name).arg(item->id).arg(item->palette)
-                    .arg(pallete));
-        }
-        else
-            LOG(VB_GENERAL, LOG_NOTICE,
-                QString("Monitor: %1 (%2) is using palette: %3")
-                    .arg(item->name).arg(item->id).arg(item->palette));
+
+        LOG(VB_GENERAL, LOG_NOTICE,
+                QString("Monitor: %1 (%2) is using %3 bytes per pixel")
+                    .arg(item->name).arg(item->id).arg(item->bytes_per_pixel));
     }
 }
 
