@@ -12,7 +12,7 @@
 
 	var oDvr = new Dvr();
 
-	var list = oDvr.GetRecordedList( true, 0, -1);
+	var list = oDvr.GetRecordedList( true, 0, -1, "", "", "" );
 
 	for (var nIdx=0; nIdx < list.Programs.length; nIdx++)
 	{
