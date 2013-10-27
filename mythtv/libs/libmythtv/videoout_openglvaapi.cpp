@@ -127,6 +127,18 @@ bool VideoOutputOpenGLVAAPI::CreateVAAPIContext(QSize size)
     // access to the OpenGL context. There is no obvious fix however - if we
     // don't delete and re-create the VAAPI decoder context immediately then
     // the decoder fails and playback exits.
+
+    // lvr 27-oct-13
+    // in 0.27 if m_ctx->CreateDisplay is called outside of the UI thread then
+    // it fails, which then causes subsequent unbalanced calls to doneCurrent
+    // which results in Qt aborting.  So just fail if non-UI.
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "CreateVAAPIContext called from non-UI thread");
+        return false;
+    }
+
     OpenGLLocker ctx_lock(gl_context);
 
     if (m_ctx)
