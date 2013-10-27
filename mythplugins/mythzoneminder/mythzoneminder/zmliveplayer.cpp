@@ -98,6 +98,22 @@ bool ZMLivePlayer::hideAll(void)
             GetMythUIType(QString("status3-%1").arg(x))->SetVisible(false);
             GetMythUIType(QString("frame3-%1").arg(x))->SetVisible(false);
         }
+
+        // six player layout
+        for (int x = 1; x < 7; x++)
+        {
+            GetMythUIType(QString("name4-%1").arg(x))->SetVisible(false);
+            GetMythUIType(QString("status4-%1").arg(x))->SetVisible(false);
+            GetMythUIType(QString("frame4-%1").arg(x))->SetVisible(false);
+        }
+
+        // eight player layout
+        for (int x = 1; x < 9; x++)
+        {
+            GetMythUIType(QString("name5-%1").arg(x))->SetVisible(false);
+            GetMythUIType(QString("status5-%1").arg(x))->SetVisible(false);
+            GetMythUIType(QString("frame5-%1").arg(x))->SetVisible(false);
+        }
     }
     catch (const QString &name)
     {
@@ -189,7 +205,7 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
         else if (action == "INFO")
         {
             m_monitorLayout++;
-            if (m_monitorLayout > 3)
+            if (m_monitorLayout > 5)
                 m_monitorLayout = 1;
             setMonitorLayout(m_monitorLayout);
         }
@@ -319,7 +335,9 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
     else if (layout == 3)
         m_monitorCount = 4;
     else if (layout == 4)
-        m_monitorCount = 9;
+        m_monitorCount = 6;
+    else if (layout == 5)
+        m_monitorCount = 8;
 
     hideAll();
 
