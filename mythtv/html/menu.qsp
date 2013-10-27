@@ -8,7 +8,6 @@
     <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
     </ul>
 </li>
-<!--
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
@@ -44,7 +43,6 @@
         <li><a href='#' onClick="javascript:loadSetupPage('password')"><i18n>Change Password</i18n></a></li>
       </ul>
     </li>
--->
     <li><a href='#'><i18n>Information</i18n></a>
       <ul class="acitem collapsible">
 <!--
