@@ -253,6 +253,7 @@ function leftSlideTransition(oldDivID, newDivID)
     // Transition works much better with a fixed width, so temporarily set
     // the width based on the parent,
     $("#" + newDivID).css("width", $("#" + oldDivID).width());
+    $("#" + newDivID).css("left", "100%");
     $("#" + oldDivID).css("z-index", "-20");
     $("#" + newDivID).css("z-index", "-10");
     var oldLeft = $("#" + oldDivID).position().left;
