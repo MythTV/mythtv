@@ -45,14 +45,17 @@ import "/js/utility.js"
     var nextGuideStartTime = new Date(guideStartTime);
     nextGuideStartTime.setHours(nextGuideStartTime.getHours() + guideRange);
 
+    // Calculate guide end time
     var guideEndTime = new Date(guideStartTime);
     guideEndTime.setHours(guideStartTime.getHours() + guideRange);
-    // Hack because GetProgramGuide will include programs with a starttime matching our endtime
-    guideEndTime.setSeconds(guideEndTime.getSeconds() - 1);
     var guidePeriod = new Date(guideEndTime - guideStartTime);
 
+    // Hack because GetProgramGuide will include programs with a starttime matching our endtime
+    var fetchEndTime = new Date(guideEndTime);
+    fetchEndTime.setSeconds(fetchEndTime.getSeconds() - 1);
+
     // Actually fetch the guide data
-    var guideResult = guide.GetProgramGuide(guideStartTime, guideEndTime, 0, 0, true);
+    var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, 0, 0, true);
     var channelList = guideResult.Channels;
 
     // Indicator of time in past
@@ -99,7 +102,7 @@ import "/js/utility.js"
     <div class="button" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
-    <div class="button" onClick="loadContent('/tv/schedule.qsp')">
+    <div class="button" onClick="loadGuideContent('/tv/schedule.qsp', "dissolve")">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -109,7 +112,7 @@ import "/js/utility.js"
     <div class="button" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button" onClick="loadContent('/tv/schedule.qsp')">
+    <div class="button" onClick="loadGuideContent('/tv/schedule.qsp', "dissolve")">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -212,7 +215,6 @@ import "/js/utility.js"
         </div>
         <div class="programsBox">
 
-            <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
 <%
         var programNum = 0;
         var cumulativeWidth = 0;
@@ -223,11 +225,20 @@ import "/js/utility.js"
                 continue;
             if (program.StartTime >= (guideEndTime))
                 continue;
-            var altClass = "";
+
+            // To allow us to indicate in some way that the program continues
+            // from an earlier time, or runs to a later time somewhere
+            // off-screen we assign one or both a class. This could do a number
+            // of things including displaying an arrow image or a special
+            // coloured border at the appropriate edge of the box
+            var startClass = "";
+            var endClass = "";
+
             if (program.StartTime < guideStartTime)
-                altClass = "programStartsOffScreen";
-            else if (program.EndTime > guideEndTime)
-                altClass = "programEndsOffScreen";
+                startClass = "programStartsOffScreen";
+
+            if (program.EndTime > guideEndTime)
+                endClass = "programEndsOffScreen";
 
             programNum++;
             var windowStart = (program.StartTime > guideStartTime ? program.StartTime : guideStartTime);
@@ -257,7 +268,7 @@ import "/js/utility.js"
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
-                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=altClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                     <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
@@ -274,6 +285,8 @@ import "/js/utility.js"
 <%
         }
 %>
+            <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
+
         </div>
     </div>
 <%
