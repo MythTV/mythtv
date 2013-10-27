@@ -257,9 +257,9 @@ function leftSlideTransition(oldDivID, newDivID)
     $("#" + oldDivID).css("z-index", "-20");
     $("#" + newDivID).css("z-index", "-10");
     var oldLeft = $("#" + oldDivID).position().left;
-    $("#" + oldDivID).animate({opacity: "0.3"}, 1000, function() {
+    $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
                    $("#" + oldDivID).remove(); });
-    $("#" + newDivID).animate({left: oldLeft}, 1000, function() {
+    $("#" + newDivID).animate({left: oldLeft}, 800, function() {
                    $("#" + newDivID).css("width", '');
                    $("#" + newDivID).css("z-index", "0"); });
 }
@@ -271,9 +271,9 @@ function rightSlideTransition(oldDivID, newDivID)
     $("#" + oldDivID).css("z-index", "-20");
     $("#" + newDivID).css("z-index", "-10");
     var oldLeft = $("#" + oldDivID).position().left;
-    $("#" + oldDivID).animate({opacity: "0.3"}, 1000, function() {
+    $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
                    $("#" + oldDivID).remove(); });
-    $("#" + newDivID).animate({left: oldLeft}, 1000, function() {
+    $("#" + newDivID).animate({left: oldLeft}, 800, function() {
                    $("#" + newDivID).css("width", '');
                    $("#" + newDivID).css("z-index", "0"); });
 }
@@ -283,9 +283,9 @@ function dissolveTransition(oldDivID, newDivID)
     $("#" + newDivID).css("opacity", "0.0");
     var oldLeft = $("#" + oldDivID).position().left;
     $("#" + newDivID).css("left", oldLeft);
-    $("#" + oldDivID).animate({opacity: "0.0"}, 1000, function() {
+    $("#" + oldDivID).animate({opacity: "0.0"}, 800, function() {
                    $("#" + oldDivID).remove(); });
-    $("#" + newDivID).animate({opacity: "1.0"}, 1000);
+    $("#" + newDivID).animate({opacity: "1.0"}, 800);
 }
 
 function loadGuideContent(url, transition)
