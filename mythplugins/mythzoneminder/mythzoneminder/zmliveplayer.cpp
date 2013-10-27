@@ -425,11 +425,11 @@ void Player::updateFrame(const unsigned char* buffer)
 {
     unsigned int pos_data;
     unsigned int pos_rgba = 0;
-    unsigned char r,g,b;
+    unsigned char a,r,g,b;
 
-    if (m_monitor.palette == MP_GREY)
+    if (m_monitor.bytes_per_pixel == 1)
     {
-        // grey palette
+        // 8 bit grey scale
         for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height); )
         {
             m_rgba[pos_rgba++] = buffer[pos_data];   //b
@@ -438,9 +438,9 @@ void Player::updateFrame(const unsigned char* buffer)
             m_rgba[pos_rgba++] = 0xff;               //a
         }
     }
-    else
+    else if (m_monitor.bytes_per_pixel == 3)
     {
-        // all other color palettes
+        // 24 bits per pixel
         for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 3); )
         {
             r = buffer[pos_data++];
@@ -451,6 +451,22 @@ void Player::updateFrame(const unsigned char* buffer)
             m_rgba[pos_rgba++] = g;
             m_rgba[pos_rgba++] = r;
             m_rgba[pos_rgba++] = 0xff;
+        }
+    }
+    else
+    {
+        // must be 32 bits per pixel
+        for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 4); )
+        {
+            r = buffer[pos_data++];
+            g = buffer[pos_data++];
+            b = buffer[pos_data++];
+            a = buffer[pos_data++];
+
+            m_rgba[pos_rgba++] = b;
+            m_rgba[pos_rgba++] = g;
+            m_rgba[pos_rgba++] = r;
+            m_rgba[pos_rgba++] = a;
         }
     }
 

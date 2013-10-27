@@ -49,7 +49,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "8"
+#define ZM_PROTOCOL_VERSION "9"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -75,8 +75,20 @@ string  g_webPath = "";
 string  g_user = "";
 string  g_webUser = "";
 string  g_binPath = "";
+int     g_majorVersion = 0;
+int     g_minorVersion = 0;
+int     g_revisionVersion = 0;
 
 time_t  g_lastDBKick = 0;
+
+// returns true if the ZM version >= the requested version
+bool checkVersion(int major, int minor, int revision)
+{
+    if (g_majorVersion >= major && g_minorVersion >= minor && g_revisionVersion >= revision)
+        return true;
+
+    return false;
+}
 
 void loadZMConfig(const string &configfile)
 {
@@ -197,6 +209,184 @@ void kickDatabase(bool debug)
     mysql_close(&g_dbConn);
     connectToDatabase();
 }
+
+///////////////////////////////////////////////////////////////////////
+
+MONITOR::MONITOR(void) :
+    name(""), type(""), function(""), enabled(0), device(""), host(""),
+    image_buffer_count(0),  width(0), height(0), bytes_per_pixel(3), mon_id(0),
+    shared_images(NULL), last_read(0), status(""), frame_size(0), palette(0),
+    controllable(0), trackMotion(0), mapFile(-1), shm_ptr(NULL),
+    shared_data(NULL), shared_data26(NULL), id("")
+{
+}
+
+void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
+{
+    frame_size = width * height * bytes_per_pixel;
+
+    int shared_data_size;
+
+    if (checkVersion(1, 26, 0))
+    {
+        shared_data_size = sizeof(SharedData26) +
+            sizeof(TriggerData26) +
+            ((image_buffer_count) * (sizeof(struct timeval))) +
+            ((image_buffer_count) * frame_size) + 64;
+    }
+    else
+    {
+        shared_data_size = sizeof(SharedData) +
+            sizeof(TriggerData) +
+            ((image_buffer_count) * (sizeof(struct timeval))) +
+            ((image_buffer_count) * frame_size);
+    }
+
+#if _POSIX_MAPPED_FILES > 0L
+    /*
+     * Try to open the mmap file first if the architecture supports it.
+     * Otherwise, legacy shared memory will be used below.
+     */
+    stringstream mmap_filename;
+    mmap_filename << mmapPath << "/zm.mmap." << mon_id;
+
+    mapFile = open(mmap_filename.str().c_str(), O_RDONLY, 0x0);
+    if (mapFile >= 0)
+    {
+        if (debug)
+            cout << "Opened mmap file: " << mmap_filename << endl;
+
+        shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
+                       MAP_SHARED, mapFile, 0x0);
+        if (shm_ptr == MAP_FAILED)
+        {
+            cout << "Failed to map shared memory from file ["
+                 << mmap_filename << "] " << "for monitor: "
+                 << mon_id << endl;
+            status = "Error";
+
+            if (close(mapFile) == -1)
+                cout << "Failed to close mmap file" << endl;
+
+            mapFile = -1;
+            shm_ptr = NULL;
+
+            return;
+        }
+    }
+    else
+    {
+        // this is not necessarily a problem, maybe the user is still
+        // using the legacy shared memory support
+        if (debug)
+        {
+            cout << "Failed to open mmap file [" << mmap_filename << "] "
+                 << "for monitor: " << mon_id
+                 << " : " << strerror(errno) << endl;
+            cout << "Falling back to the legacy shared memory method" << endl;
+        }
+    }
+#endif
+
+    if (shm_ptr == NULL)
+    {
+        // fail back to shmget() functionality if mapping memory above failed.
+        int shmid;
+
+        if ((shmid = shmget((shmKey & 0xffffff00) | mon_id,
+             shared_data_size, SHM_R)) == -1)
+        {
+            cout << "Failed to shmget for monitor: " << mon_id << endl;
+            status = "Error";
+            switch(errno)
+            {
+                case EACCES: cout << "EACCES - no rights to access segment\n"; break;
+                case EEXIST: cout << "EEXIST - segment already exists\n"; break;
+                case EINVAL: cout << "EINVAL - size < SHMMIN or size > SHMMAX\n"; break;
+                case ENFILE: cout << "ENFILE - limit on open files has been reached\n"; break;
+                case ENOENT: cout << "ENOENT - no segment exists for the given key\n"; break;
+                case ENOMEM: cout << "ENOMEM - couldn't reserve memory for segment\n"; break;
+                case ENOSPC: cout << "ENOSPC - shmmni or shmall limit reached\n"; break;
+            }
+
+            return;
+        }
+
+        shm_ptr = shmat(shmid, 0, SHM_RDONLY);
+
+
+        if (shm_ptr == NULL)
+        {
+            cout << "Failed to shmat for monitor: " << mon_id << endl;
+            status = "Error";
+            return;
+        }
+    }
+
+    if (checkVersion(1, 26, 0))
+    {
+        shared_data = NULL;
+        shared_data26 = (SharedData26*)shm_ptr;
+
+        shared_images = (unsigned char*) shm_ptr +
+            sizeof(SharedData26) + sizeof(TriggerData26) +
+            ((image_buffer_count) * sizeof(struct timeval));
+
+        if (((unsigned long)shared_images % 16) != 0)
+        {
+            // align images buffer to nearest 16 byte boundary
+            shared_images = (unsigned char*)((unsigned long)shared_images + (16 - ((unsigned long)shared_images % 16)));
+        }
+    }
+    else
+    {
+        shared_data26 = NULL;
+        shared_data = (SharedData*)shm_ptr;
+
+        shared_images = (unsigned char*) shm_ptr +
+            sizeof(SharedData) + sizeof(TriggerData) +
+            ((image_buffer_count) * sizeof(struct timeval));
+    }
+}
+
+bool MONITOR::isValid(void)
+{
+    if (checkVersion(1, 26, 0))
+        return shared_data26 != NULL && shared_images != NULL;
+
+    // must be version >= 1.24.0 and < 1.26.0
+    return  shared_data != NULL && shared_images != NULL;
+}
+
+
+string MONITOR::getIdStr(void)
+{
+    if (id == "")
+    {
+        std::stringstream out;
+        out << mon_id;
+        id = out.str();
+    }
+    return id;
+}
+
+int MONITOR::getLastWriteIndex(void)
+{
+    if (shared_data)
+        return shared_data->last_write_index;
+
+    return shared_data26->last_write_index;
+}
+
+int MONITOR::getState(void)
+{
+    if (shared_data)
+        return shared_data->state;
+
+    return shared_data26->state;
+}
+
+///////////////////////////////////////////////////////////////////////
 
 ZMServer::ZMServer(int sock, bool debug)
 {
@@ -1014,7 +1204,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     }
 
     // are the data pointers valid?
-    if (monitor->shared_data == NULL ||  monitor->shared_images == NULL)
+    if (!monitor->isValid())
     {
         sendError(ERROR_INVALID_POINTERS);
         return;
@@ -1166,7 +1356,12 @@ void ZMServer::handleGetMonitorList(void)
     MYSQL_ROW row;
 
     string sql("");
-    sql += "SELECT Id, Name, Width, Height, Palette FROM Monitors ORDER BY Id";
+    sql += "SELECT Id, Name, Width, Height, Palette";
+
+    if (checkVersion(1, 26, 0))
+        sql += ", Colours";
+
+    sql += " FROM Monitors ORDER BY Id";
 
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
@@ -1194,15 +1389,34 @@ void ZMServer::handleGetMonitorList(void)
             ADD_STR(outStr, row[1]) // Name
             ADD_STR(outStr, row[2]) // Width
             ADD_STR(outStr, row[3]) // Height
-            ADD_STR(outStr, row[4]) // Palette
+
+            if (checkVersion(1, 26, 0))
+            {
+                ADD_STR(outStr, row[5]) // Colours (bytes per pixel)
+            }
+            else
+            {
+                if (atoi(row[4]) == 1)
+                {
+                    ADD_STR(outStr, "1")
+                }
+                else
+                {
+                    ADD_STR(outStr, "3")
+                }
+            }
 
             if (m_debug)
             {
-                cout << "id:      " << row[0] << endl;
-                cout << "name:    " << row[1] << endl;
-                cout << "width:   " << row[2] << endl;
-                cout << "height:  " << row[3] << endl;
-                cout << "palette: " << row[4] << endl;
+                cout << "id:             " << row[0] << endl;
+                cout << "name:           " << row[1] << endl;
+                cout << "width:          " << row[2] << endl;
+                cout << "height:         " << row[3] << endl;
+                cout << "palette:        " << row[4] << endl;
+
+                if (checkVersion(1, 26, 0))
+                    cout << "byte per pixel: " << row[5] << endl;
+
                 cout << "-------------------" << endl;
             }
         }
@@ -1314,8 +1528,12 @@ void ZMServer::getMonitorList(void)
     m_monitors.clear();
 
     string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette, ");
-    sql += " Type, Function, Enabled, Device, Host, Controllable, TrackMotion ";
-    sql += "FROM Monitors";
+    sql += " Type, Function, Enabled, Device, Host, Controllable, TrackMotion";
+
+    if (checkVersion(1, 26, 0))
+        sql += ", Colours";
+
+    sql += " FROM Monitors";
 
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -1351,9 +1569,20 @@ void ZMServer::getMonitorList(void)
             m->host = row[11];
             m->controllable = atoi(row[12]);
             m->trackMotion = atoi(row[13]);
+
+            // from version 1.26.0 ZM can have 1, 3 or 4 bytes per pixel
+            // older versions can be 1 or 3
+            if (checkVersion(1, 26, 0))
+                m->bytes_per_pixel = atoi(row[14]);
+            else
+                if (m->palette == 1)
+                    m->bytes_per_pixel = 1;
+                else
+                    m->bytes_per_pixel = 3;
+
             m_monitors[m->mon_id] = m;
 
-            initMonitor(m);
+            m->initMonitor(m_debug, m_mmapPath, m_shmKey);
         }
         else
         {
@@ -1365,137 +1594,22 @@ void ZMServer::getMonitorList(void)
     mysql_free_result(res);
 }
 
-void ZMServer::initMonitor(MONITOR *monitor)
-{
-    monitor->shm_ptr = NULL;
-    monitor->mapFile = -1;
-    monitor->shared_data = NULL;
-    monitor->shared_images = NULL;
-
-    if (monitor->palette == 1)
-        monitor->frame_size = monitor->width * monitor->height;
-    else
-        monitor->frame_size = monitor->width * monitor->height * 3;
-
-    int shared_data_size;
-
-    shared_data_size = sizeof(SharedData) +
-            sizeof(TriggerData) +
-            ((monitor->image_buffer_count) * (sizeof(struct timeval))) +
-            ((monitor->image_buffer_count) * monitor->frame_size);
-
-
-#if _POSIX_MAPPED_FILES > 0L
-    /*
-     * Try to open the mmap file first if the architecture supports it.
-     * Otherwise, legacy shared memory will be used below.
-     */
-    stringstream mmap_filename;
-    mmap_filename << m_mmapPath << "/zm.mmap." << monitor->mon_id;
-
-    monitor->mapFile = open(mmap_filename.str().c_str(), O_RDONLY, 0x0);
-    if (monitor->mapFile >= 0)
-    {
-        if (m_debug)
-            cout << "Opened mmap file: " << mmap_filename << endl;
-
-        monitor->shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
-                                MAP_SHARED, monitor->mapFile, 0x0);
-        if (monitor->shm_ptr == MAP_FAILED)
-        {
-            cout << "Failed to map shared memory from file ["
-                 << mmap_filename << "] " << "for monitor: "
-                 << monitor->mon_id << endl;
-            monitor->status = "Error";
-
-            if (close(monitor->mapFile) == -1)
-                cout << "Failed to close mmap file" << endl;
-
-            monitor->mapFile = -1;
-            monitor->shm_ptr = NULL;
-
-            return;
-        }
-    }
-    else
-    {
-        // this is not necessarily a problem, maybe the user is still
-        // using the legacy shared memory support
-        if (m_debug)
-        {
-            cout << "Failed to open mmap file [" << mmap_filename << "] "
-                 << "for monitor: " << monitor->mon_id
-                 << " : " << strerror(errno) << endl;
-            cout << "Falling back to the legacy shared memory method" << endl;
-        }
-    }
-#endif
-
-    if (monitor->shm_ptr == NULL)
-    {
-        // fail back to shmget() functionality if mapping memory above failed.
-        int shmid;
-
-        if ((shmid = shmget((m_shmKey & 0xffffff00) | monitor->mon_id,
-             shared_data_size, SHM_R)) == -1)
-        {
-            cout << "Failed to shmget for monitor: " << monitor->mon_id << endl;
-            monitor->status = "Error";
-            switch(errno)
-            {
-                case EACCES: cout << "EACCES - no rights to access segment\n"; break;
-                case EEXIST: cout << "EEXIST - segment already exists\n"; break;
-                case EINVAL: cout << "EINVAL - size < SHMMIN or size > SHMMAX\n"; break;
-                case ENFILE: cout << "ENFILE - limit on open files has been reached\n"; break;
-                case ENOENT: cout << "ENOENT - no segment exists for the given key\n"; break;
-                case ENOMEM: cout << "ENOMEM - couldn't reserve memory for segment\n"; break;
-                case ENOSPC: cout << "ENOSPC - shmmni or shmall limit reached\n"; break;
-            }
-
-            return;
-        }
-
-        monitor->shm_ptr = shmat(shmid, 0, SHM_RDONLY);
-
-
-        if (monitor->shm_ptr == NULL)
-        {
-            cout << "Failed to shmat for monitor: " << monitor->mon_id << endl;
-            monitor->status = "Error";
-            return;
-        }
-    }
-
-    monitor->shared_data = (SharedData*)monitor->shm_ptr;
-
-    monitor->shared_images = (unsigned char*) monitor->shm_ptr +
-            sizeof(SharedData) +
-            sizeof(TriggerData) +
-            ((monitor->image_buffer_count) * sizeof(struct timeval));
-
-#if 0
-    // if this a v4l2 source align the buffer to 16 bytes
-    if (monitor->palette > 255)
-        monitor->shared_images = (unsigned char*) ((size_t(monitor->shared_images) + 15) & ~0x0f);
-#endif
-}
-
 int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
 {
     (void) bufferSize;
 
     // is there a new frame available?
-    if (monitor->shared_data->last_write_index == monitor->last_read)
+    if (monitor->getLastWriteIndex() == monitor->last_read)
         return 0;
 
     // sanity check last_read
-    if (monitor->shared_data->last_write_index < 0 ||
-            monitor->shared_data->last_write_index >= monitor->image_buffer_count)
+    if (monitor->getLastWriteIndex() < 0 ||
+            monitor->getLastWriteIndex() >= monitor->image_buffer_count)
         return 0;
 
-    monitor->last_read = monitor->shared_data->last_write_index;
+    monitor->last_read = monitor->getLastWriteIndex();
 
-    switch (monitor->shared_data->state)
+    switch (monitor->getState())
     {
         case IDLE:
             monitor->status = "Idle";

@@ -86,18 +86,12 @@ typedef struct
     double delta;
 } Frame;
 
-enum MonitorPalette
-{
-    MP_GREY = 1,
-    MP_RGB24 = 4
-};
-
 class Monitor
 {
   public:
     Monitor() :
         id(0), enabled(0), events(0),
-        width(0), height(0), palette(0), isV4L2(false)
+        width(0), height(0), bytes_per_pixel(0)
     {
     }
 
@@ -116,8 +110,7 @@ class Monitor
     QString status;
     int width;
     int height;
-    int palette;
-    bool isV4L2;
+    int bytes_per_pixel;
 };
 
 #endif

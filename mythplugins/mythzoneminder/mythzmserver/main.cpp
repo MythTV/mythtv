@@ -209,9 +209,8 @@ int main(int argc, char **argv)
     loadZMConfig(zmconfig);
 
     // we support version 1.24.0 or later
-    int major, minor, revision;
-    sscanf(g_zmversion.c_str(), "%d.%d.%d", &major, &minor, &revision);
-    if (major >= 1 && minor >= 24 && revision >= 0)
+    sscanf(g_zmversion.c_str(), "%d.%d.%d", &g_majorVersion, &g_minorVersion, &g_revisionVersion);
+    if (checkVersion(1, 24, 0))
     {
         cout << "ZM is version '" << g_zmversion << "'" << endl;
     }
