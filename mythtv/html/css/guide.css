@@ -13,7 +13,8 @@
 {
     float: right;
     margin: 5px 5px 10px 5px;
-    background: linear-gradient(to bottom, #555555, #222222);
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
     border-radius: 8px;
     padding: 10px;
     font-weight: bold;
@@ -81,7 +82,9 @@
 .guideGrid .timeBarDate
 {
     float: left;
-    background: linear-gradient(to bottom right, #555555, #222222);
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%),
+                linear-gradient(to right, #555555 1%, transparent 10%);
     border-top-left-radius: 10px;
     font-size: 1em;
     width: 10%;
@@ -100,7 +103,8 @@
 
 .guideGrid .timeBarTime
 {
-    background: linear-gradient(to bottom, #555555, #222222);
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
     padding: 6px 4px; /* Vertical Horizontal */
     height: 100%;
 }
@@ -121,7 +125,13 @@
     height: 100%;
     text-align: center;
     vertical-align: middle;
-    background: linear-gradient(to right, #505050, #222222);
+/*    background-color: #000000;
+    background-image: radial-gradient(circle, #151515 2px, transparent 3px),
+                      radial-gradient(circle, #151515 2px, transparent 3px);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;*/
+    background: #2A2A2A;
+    background-image: linear-gradient(to right, #555555 1%, transparent 10%);
     color: #FFFFFF;
 /*    border-radius: 10px;*/
 }
@@ -130,6 +140,7 @@
 {
     margin: 5px 4px 1px; /* Top Horizontal Bottom */
     border-radius: 5px;
+    border:1px solid #1A1A1A;
     overflow: hidden;
 }
 
@@ -175,7 +186,7 @@
 .guideGrid .programBoxInner
 {
     height: 100%;
-    background-color: #666666;
+    background-color: #555555;
     border-radius: 10px;
     position: relative;
     overflow: visible;
@@ -202,7 +213,7 @@
     height: 30px;
     font-weight: bold;
 /*     background-color: #444444; */
-    background: linear-gradient(to bottom, #666666, #333333);
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
     border-radius: inherit;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -245,13 +256,13 @@
 .guideGrid .programWillRecord .programHeader
 {
 /*    background-color: #37912F;*/
-    background: linear-gradient(to bottom, #6FC462, #156F0D);
+    background: linear-gradient(to bottom, #6FC462, #156F0D 40%);
 }
 
 .guideGrid .programRecording .programHeader
 {
 /*    background-color: #00CC00;*/
-    background: linear-gradient(to bottom, #00EE00, #00AA00);
+    background: linear-gradient(to bottom, #00EE00, #00AA00 40%);
 }
 
 .guideGrid .programEarlierShowing .programHeader,
@@ -265,13 +276,13 @@
 .guideGrid .programRecorderFailed .programHeader
 {
 /*    background-color: #CC0000;*/
-    background: linear-gradient(to bottom, #EE0000, #AA0000);
+    background: linear-gradient(to bottom, #EE0000, #AA0000 40%);
 }
 
 .guideGrid .programScheduling .programHeader
 {
 /*    background-color: #045FB4;*/
-    background: linear-gradient(to bottom, #2681D6, #003D92);
+    background: linear-gradient(to bottom, #2681D6, #003D92 40%);
 }
 
 .guideGrid .programSelected
