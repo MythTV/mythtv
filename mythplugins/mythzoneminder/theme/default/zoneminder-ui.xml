@@ -930,6 +930,209 @@
             <filename>mz_testcard.png</filename>
         </imagetype>
 
+         <!-- six monitor view -->
+        <textarea name="name4-1" from="name1-1">
+            <area>10,50,253,30</area>
+            <align>allcenter</align>
+            <value>Monitor 1</value>
+        </textarea>
+
+        <textarea name="status4-1" from="status1-1">
+            <area>10,270,253,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <imagetype name="frame4-1">
+            <area>10,80,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-2" from="name4-1">
+            <area>273,50,253,30</area>
+            <font>monitor</font>
+            <value>Monitor 2</value>
+        </textarea>
+
+        <textarea name="status4-2" from="status4-1">
+            <area>273,270,253,30</area>
+        </textarea>
+
+        <imagetype name="frame4-2">
+            <area>273,80,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-3" from="name4-1">
+            <area>536,50,253,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status4-3" from="status4-1">
+            <area>536,270,253,30</area>
+        </textarea>
+
+        <imagetype name="frame4-3">
+            <area>536,80,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-4" from="name4-1">
+            <area>10,340,253,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status4-4" from="status4-1">
+            <area>10,560,253,30</area>
+        </textarea>
+
+        <imagetype name="frame4-4">
+            <area>10,370,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-5" from="name4-1">
+            <area>273,340,253,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status4-5" from="status4-1">
+            <area>273,560,253,30</area>
+        </textarea>
+
+        <imagetype name="frame4-5">
+            <area>273,370,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-6" from="name4-1">
+            <area>536,340,253,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status4-6" from="status4-1">
+            <area>536,560,253,30</area>
+        </textarea>
+
+        <imagetype name="frame4-6">
+            <area>536,370,253,190</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <!-- eight monitor view -->
+        <textarea name="name5-1" from="name1-1">
+            <area>10,110,187,30</area>
+            <align>allcenter</align>
+            <value>Monitor 1</value>
+        </textarea>
+
+        <textarea name="status5-1" from="status1-1">
+            <area>10,280,187,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <imagetype name="frame5-1">
+            <area>10,140,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-2" from="name5-1">
+            <area>207,110,187,30</area>
+            <value>Monitor 2</value>
+        </textarea>
+
+        <textarea name="status5-2" from="status5-1">
+            <area>207,280,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-2">
+            <area>207,140,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-3" from="name5-1">
+            <area>404,110,187,30</area>
+            <value>Monitor 3</value>
+        </textarea>
+
+        <textarea name="status5-3" from="status5-1">
+            <area>404,280,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-3">
+            <area>404,140,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-4" from="name5-1">
+            <area>601,110,187,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status5-4" from="status5-1">
+            <area>601,280,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-4">
+            <area>601,140,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-5" from="name5-1">
+            <area>10,395,187,30</area>
+            <value>Monitor 5</value>
+        </textarea>
+
+        <textarea name="status5-5" from="status5-1">
+            <area>10,565,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-5">
+            <area>10,425,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-6" from="name5-1">
+            <area>207,395,187,30</area>
+            <value>Monitor 6</value>
+        </textarea>
+
+        <textarea name="status5-6" from="status5-1">
+            <area>207,565,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-6">
+            <area>207,425,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-7" from="name5-1">
+            <area>404,395,187,30</area>
+            <value>Monitor 7</value>
+        </textarea>
+
+        <textarea name="status5-7" from="status5-1">
+            <area>404,565,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-7">
+            <area>404,425,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-8" from="name5-1">
+            <area>601,395,187,30</area>
+            <value>Monitor 8</value>
+        </textarea>
+
+        <textarea name="status5-8" from="status5-1">
+            <area>601,565,187,30</area>
+        </textarea>
+
+        <imagetype name="frame5-8">
+            <area>601,425,187,140</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
     </window>
 
 </mythuitheme>
