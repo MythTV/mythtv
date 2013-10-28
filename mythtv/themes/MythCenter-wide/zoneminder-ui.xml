@@ -823,9 +823,8 @@
         </imagetype>
 
         <!-- two monitor view -->
-        <textarea name="name2-1" from="basetextarea">
+        <textarea name="name2-1" from="name1-1">
             <area>60,125,280,30</area>
-            <font>monitor</font>
             <value>Monitor 1</value>
         </textarea>
 
@@ -838,9 +837,8 @@
             <filename>mz_testcard.png</filename>
         </imagetype>
 
-        <textarea name="name2-2" from="basetextarea">
+        <textarea name="name2-2" from="name1-1">
             <area>660,125,280,30</area>
-            <font>monitor</font>
             <value>Monitor 2</value>
         </textarea>
 
@@ -854,65 +852,257 @@
         </imagetype>
 
         <!-- four monitor view -->
-
-        <textarea name="name3-1" from="basetextarea">
-            <area>280,110,160,30</area>
-            <font>monitor</font>
-            <multiline>no</multiline>
+        <textarea name="name3-1" from="name1-1">
+            <area>235,50,215,30</area>
             <value>Monitor 1</value>
         </textarea>
 
         <textarea name="status3-1" from="status1-1">
-            <area>440,110,160,30</area>
+            <area>455,50,160,30</area>
         </textarea>
 
         <imagetype name="frame3-1">
-            <area>280,140,320,240</area>
+            <area>235,80,380,285</area>
             <filename>mz_testcard.png</filename>
         </imagetype>
 
-        <textarea name="name3-2" from="basetextarea">
-            <area>680,110,160,30</area>
-            <font>monitor</font>
+        <textarea name="name3-2" from="name1-1">
+            <area>650,50,215,30</area>
             <value>Monitor 2</value>
         </textarea>
 
         <textarea name="status3-2" from="status1-1">
-            <area>840,110,160,30</area>
+            <area>870,50,160,30</area>
         </textarea>
 
         <imagetype name="frame3-2">
-            <area>680,140,320,240</area>
+            <area>650,80,380,285</area>
             <filename>mz_testcard.png</filename>
         </imagetype>
 
-        <textarea name="name3-3" from="basetextarea">
-            <area>280,395,160,30</area>
-            <font>monitor</font>
+        <textarea name="name3-3" from="name1-1">
+            <area>235,370,215,30</area>
             <value>Monitor 3</value>
         </textarea>
 
         <textarea name="status3-3" from="status1-1">
-            <area>440,395,160,30</area>
+            <area>455,370,160,30</area>
         </textarea>
 
         <imagetype name="frame3-3">
-            <area>280,425,320,240</area>
+            <area>235,400,380,285</area>
             <filename>mz_testcard.png</filename>
         </imagetype>
 
-        <textarea name="name3-4" from="basetextarea">
-            <area>680,395,160,30</area>
-            <font>monitor</font>
+        <textarea name="name3-4" from="name1-1">
+            <area>650,370,215,30</area>
             <value>Monitor 4</value>
         </textarea>
 
         <textarea name="status3-4" from="status1-1">
-            <area>840,395,160,30</area>
+            <area>870,370,160,30</area>
         </textarea>
 
         <imagetype name="frame3-4">
-            <area>680,425,320,240</area>
+            <area>650,400,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <!-- six monitor view -->
+        <textarea name="name4-1" from="name1-1">
+            <area>35,50,215,30</area>
+            <value>Monitor 1</value>
+        </textarea>
+
+        <textarea name="status4-1" from="status1-1">
+            <area>255,50,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-1">
+            <area>35,80,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-2" from="name1-1">
+            <area>450,50,215,30</area>
+            <value>Monitor 2</value>
+        </textarea>
+
+        <textarea name="status4-2" from="status1-1">
+            <area>670,50,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-2">
+            <area>450,80,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-3" from="name1-1">
+            <area>865,50,215,30</area>
+            <value>Monitor 3</value>
+        </textarea>
+
+        <textarea name="status4-3" from="status1-1">
+            <area>1085,50,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-3">
+            <area>865,80,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-4" from="name1-1">
+            <area>35,370,215,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status4-4" from="status1-1">
+            <area>255,370,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-4">
+            <area>35,400,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-5" from="name1-1">
+            <area>450,370,215,30</area>
+            <value>Monitor 5</value>
+        </textarea>
+
+        <textarea name="status4-5" from="status1-1">
+            <area>670,370,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-5">
+            <area>450,400,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name4-6" from="name1-1">
+            <area>865,370,215,30</area>
+            <value>Monitor 6</value>
+        </textarea>
+
+        <textarea name="status4-6" from="status1-1">
+            <area>1085,370,160,30</area>
+        </textarea>
+
+        <imagetype name="frame4-6">
+            <area>865,400,380,285</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <!-- eight monitor view -->
+        <textarea name="name5-1" from="name1-1">
+            <area>20,110,160,30</area>
+            <value>Monitor 1</value>
+        </textarea>
+
+        <textarea name="status5-1" from="status1-1">
+            <area>185,110,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-1">
+            <area>20,140,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-2" from="name1-1">
+            <area>335,110,160,30</area>
+            <value>Monitor 2</value>
+        </textarea>
+
+        <textarea name="status5-2" from="status1-1">
+            <area>500,110,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-2">
+            <area>335,140,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-3" from="name1-1">
+            <area>650,110,160,30</area>
+            <value>Monitor 3</value>
+        </textarea>
+
+        <textarea name="status5-3" from="status1-1">
+            <area>815,110,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-3">
+            <area>650,140,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-4" from="name1-1">
+            <area>965,110,160,30</area>
+            <value>Monitor 4</value>
+        </textarea>
+
+        <textarea name="status5-4" from="status1-1">
+            <area>1130,110,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-4">
+            <area>965,140,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-5" from="name1-1">
+            <area>20,395,160,30</area>
+            <value>Monitor 5</value>
+        </textarea>
+
+        <textarea name="status5-5" from="status1-1">
+            <area>185,395,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-5">
+            <area>20,425,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-6" from="name1-1">
+            <area>335,395,160,30</area>
+            <value>Monitor 6</value>
+        </textarea>
+
+        <textarea name="status5-6" from="status1-1">
+            <area>500,395,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-6">
+            <area>335,425,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-7" from="name1-1">
+            <area>650,395,160,30</area>
+            <value>Monitor 7</value>
+        </textarea>
+
+        <textarea name="status5-7" from="status1-1">
+            <area>815,395,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-7">
+            <area>650,425,295,220</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
+
+        <textarea name="name5-8" from="name1-1">
+            <area>965,395,160,30</area>
+            <value>Monitor 8</value>
+        </textarea>
+
+        <textarea name="status5-8" from="status1-1">
+            <area>1130,395,130,30</area>
+        </textarea>
+
+        <imagetype name="frame5-8">
+            <area>965,425,295,220</area>
             <filename>mz_testcard.png</filename>
         </imagetype>
 
