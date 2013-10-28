@@ -1785,7 +1785,7 @@ void GuideGrid::cursorLeft()
     }
     else
     {
-        fillProgramRowInfos(m_currentRow);
+        fillProgramRowInfos(m_currentRow, true);
         m_guideGrid->SetRedraw();
         updateInfo();
     }
@@ -1813,7 +1813,7 @@ void GuideGrid::cursorRight()
     }
     else
     {
-        fillProgramRowInfos(m_currentRow);
+        fillProgramRowInfos(m_currentRow, true);
         m_guideGrid->SetRedraw();
         updateInfo();
     }
@@ -1830,7 +1830,7 @@ void GuideGrid::cursorDown()
     }
     else
     {
-        fillProgramRowInfos(m_currentRow);
+        fillProgramRowInfos(m_currentRow, true);
         m_guideGrid->SetRedraw();
         updateInfo();
         updateChannels();
@@ -1848,7 +1848,7 @@ void GuideGrid::cursorUp()
     }
     else
     {
-        fillProgramRowInfos(m_currentRow);
+        fillProgramRowInfos(m_currentRow, true);
         m_guideGrid->SetRedraw();
         updateInfo();
         updateChannels();
