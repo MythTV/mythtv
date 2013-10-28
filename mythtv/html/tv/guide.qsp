@@ -76,13 +76,11 @@ import "/js/utility.js"
 <title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
        <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
-<link rel="stylesheet" type="text/css" href="/css/guide.css">
-<link rel="stylesheet" type="text/css" href="/css/category_colors.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script type="text/javascript" src="/js/util.qjs"></script>
-<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="/js/inspect.js"></script>
-<script type="text/javascript" src="/js/guide.js"></script>
+<script type="text/javascript" src="/tv/js/guide.js"></script>
 </head>
 <body>
 
