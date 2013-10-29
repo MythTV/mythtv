@@ -904,8 +904,8 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         VID_1080 | VID_720 | VID_DAMAGED | VID_WIDESCREEN,
         ((avg_height > 1000) ? VID_1080 : ((avg_height > 700) ? VID_720 : 0)) |
         ((is_good) ? 0 : VID_DAMAGED) |
-            ((aspectRatio == MARK_ASPECT_16_9) ||
-             (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0);
+        (((aspectRatio == MARK_ASPECT_16_9) ||
+          (aspectRatio == MARK_ASPECT_2_21_1)) ? VID_WIDESCREEN : 0));
 
     // Make sure really short recordings have positive run time.
     if (curRec->GetRecordingEndTime() <= curRec->GetRecordingStartTime())
