@@ -1256,11 +1256,11 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
     MYSQL_RES *res;
     MYSQL_ROW row;
-
     string sql("");
-    sql += "SELECT Type, Delta FROM Frames ";
-    sql += "WHERE EventID = " + eventID + " ";
-    sql += "ORDER BY FrameID";
+
+    // check to see what type of event this is
+    sql += "SELECT Cause, Length, Frames FROM Events ";
+    sql += "WHERE Id = " + eventID + " ";
 
     if (mysql_query(&g_dbConn, sql.c_str()))
     {
@@ -1270,32 +1270,79 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
     }
 
     res = mysql_store_result(&g_dbConn);
-    int frameCount = mysql_num_rows(res);
+    row = mysql_fetch_row(res);
 
-    if (m_debug)
-        cout << "Got " << frameCount << " frames" << endl;
-
+    string cause = row[0];
+    double length = atof(row[1]);
+    int frameCount = atoi(row[2]);
     char str[10];
-    sprintf(str, "%d\n", frameCount);
-    ADD_STR(outStr, str)
-
-    for (int x = 0; x < frameCount; x++)
-    {
-        row = mysql_fetch_row(res);
-        if (row)
-        {
-            ADD_STR(outStr, row[0]) // Type
-            ADD_STR(outStr, row[1]) // Delta
-        }
-        else
-        {
-            cout << "handleGetFrameList: Failed to get mysql row " << x << endl;
-            sendError(ERROR_MYSQL_ROW);
-            return;
-        }
-    }
 
     mysql_free_result(res);
+
+    if (cause == "Continuous")
+    {
+        // event is a continuous recording so guess the frame delta's
+
+        if (m_debug)
+            cout << "Got " << frameCount << " frames (continuous event)" << endl;
+
+        sprintf(str, "%d\n", frameCount);
+        ADD_STR(outStr, str)
+
+        double delta = length / frameCount;
+        double time = 0;
+
+        for (int x = 0; x < frameCount; x++)
+        {
+            char str[10];
+            sprintf(str, "%f", delta);
+
+            ADD_STR(outStr, "Normal") // Type
+            ADD_STR(outStr, str)      // Delta
+
+            time += delta;
+        }
+    }
+    else
+    {
+        sql  = "SELECT Type, Delta FROM Frames ";
+        sql += "WHERE EventID = " + eventID + " ";
+        sql += "ORDER BY FrameID";
+
+        if (mysql_query(&g_dbConn, sql.c_str()))
+        {
+            fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+            sendError(ERROR_MYSQL_QUERY);
+            return;
+        }
+
+        res = mysql_store_result(&g_dbConn);
+        frameCount = mysql_num_rows(res);
+
+        if (m_debug)
+            cout << "Got " << frameCount << " frames" << endl;
+
+        sprintf(str, "%d\n", frameCount);
+        ADD_STR(outStr, str)
+
+        for (int x = 0; x < frameCount; x++)
+        {
+            row = mysql_fetch_row(res);
+            if (row)
+            {
+                ADD_STR(outStr, row[0]) // Type
+                ADD_STR(outStr, row[1]) // Delta
+            }
+            else
+            {
+                cout << "handleGetFrameList: Failed to get mysql row " << x << endl;
+                sendError(ERROR_MYSQL_ROW);
+                return;
+            }
+        }
+
+        mysql_free_result(res);
+    }
 
     send(outStr);
 }
