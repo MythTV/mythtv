@@ -611,8 +611,8 @@ bool MythFillDatabaseTask::DoRun(void)
     uint opts = kMSRunShell | kMSAutoCleanup;
     if (mfpath == "mythfilldatabase")
     {
-        opts |= kMSPropagateLogs;
         mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
+        mfarg = QString("%1 %2").arg(logPropagateArgs).arg(mfarg);
     }
 
     QString cmd = QString("%1 %2").arg(mfpath).arg(mfarg);
