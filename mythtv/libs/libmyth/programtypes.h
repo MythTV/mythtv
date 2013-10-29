@@ -191,7 +191,7 @@ typedef enum VideoProps {
 } VideoProperty; // has 7 bits in ProgramInfo::properties
 #define kVideoPropertyBits 7
 #define kVideoPropertyOffset kAudioPropertyBits
-#define kVideoPropertyMask (0x3f<<kVideoPropertyOffset)
+#define kVideoPropertyMask (0x7f<<kVideoPropertyOffset)
 
 /// if SubtitleTypes changes, the subtitletypes column in program and
 /// recordedprogram has to changed accordingly
