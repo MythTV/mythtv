@@ -6,6 +6,7 @@
     <li><a href='#'><i18n>TV</i18n></a>
     <ul class="acitem collapsible">
     <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
+    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
     </ul>
 </li>
     <li><a href='#'><i18n>Setup</i18n></a>

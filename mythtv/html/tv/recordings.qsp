@@ -1,0 +1,106 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+import "/tv/js/constants.js"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var myth = new Myth();
+
+    var sortDescending = true;
+    if (getArg("SortAsc"))
+        sortDescending = false;
+
+    var dvr = new Dvr();
+    var recordings = dvr.GetRecordedList( sortDescending, 0, -1, "", "Default", "" );
+    var programs = recordings.Programs;
+
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%=qsTr("Recordings")%></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/recordings.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script type="text/javascript" src="/js/util.qjs"></script>
+<script type="text/javascript" src="/tv/js/recordings.js"></script>
+</head>
+<body id="content">
+
+<h2 class="pageTitle" id="title"><%=qsTr("Recordings")%></h2>
+
+<!-- Sort order, grouping etc -->
+<div class="navigateBox">
+
+    <label for="listSortOrder"><%=qsTr("Sort")%>:</label>
+    <select id="listSortOrder" onChange="loadContent('/tv/recordings.qsp?SortAsc=' + this.options[this.options.selectedIndex].value);">
+        <option label="Ascending" value="1">Ascending</option>
+        <option label="Descending" value="0">Descending</option>
+    </select>
+
+</div>
+
+<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+
+<div id="recordingList" class="recordingList">
+
+<div class="topBar">
+    &nbsp;
+</div>
+
+<%
+for (var progIdx = 0; progIdx < programs.length; progIdx++)
+{
+    var program = programs[progIdx];
+%>
+    <div class="recordingRow">
+        <div class="previewBox">
+            <img alt="Preview Image" height="60" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=60" />
+            <span class="watchRecordingLink"><%=qsTr("Watch")%></span>
+        </div>
+        <div class="recordingBox">
+            <div class="recordingInnerBox">
+                <div class="recordingHeader">
+                    <span class="recordingTitle"><%=escapeHTML(program.Title)%></span>
+                    <span class="recordingStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
+                </div>
+                <div class="recordingBody">
+                    <div class="recordingIcons" style="overflow:visible">
+                    <% if (program.VideoProps & VID_1080) {%><img src="/tv/images/hd_1080.svg" width="35" />
+                    <% } else if (program.VideoProps & VID_720) {%><img src="/tv/images/hd_720.svg" width="35" />
+                    <% } else if (program.VideoProps & VID_HDTV) {%><img src="/tv/images/hd_tv.svg" width="35" /><%}%>
+                    <% if (program.ProgramFlags & FL_AUTOEXP) {%><img src="/tv/images/fl_autoexp.svg" width="35" /><%}%>
+                    </div>
+                    <span class="recordingSubtitle"><%=escapeHTML(program.SubTitle)%></span>
+                    <% if (program.Episode > 0) { %>
+                        <span class="recordingSeasonEpisode">
+                            (<%=qsTr("S %1", "Season x").arg(program.Season)%>
+                             <%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
+                        </span>
+                    <%}%>
+                    <span class="recordingDescription"><%=escapeHTML(program.Description)%></span>
+                </div>
+            </div>
+        </div>
+    </div>
+<%
+}
+%>
+
+
+</div>
+
+</div>
+
+</body>
+</html>

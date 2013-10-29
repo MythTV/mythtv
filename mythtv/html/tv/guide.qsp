@@ -84,7 +84,7 @@ import "/js/utility.js"
 </head>
 <body>
 
-<h2 class="pageTitle" id="title" onClick="funkyAnimation()"><%=qsTr("Program Guide")%></h2>
+<h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
 
 <!-- Popup Recording Menu -->
 <div id="recMenu" class="guideMenu">

@@ -190,6 +190,7 @@
     border-radius: 10px;
     position: relative;
     overflow: visible;
+    cursor: pointer;
 }
 
 .guideGrid .programStartsOffScreen

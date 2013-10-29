@@ -1,0 +1,193 @@
+
+#content
+{
+    padding: 10px;
+}
+
+.pageTitle
+{
+    float:left;
+}
+
+/* Ordering, sorting etc */
+.navigateBox
+{
+    float: right;
+    margin: 5px 5px 10px 5px;
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.recordingList
+{
+    width: calc(100% - 20px); /* Need to subtract padding of parent */
+    float: left;
+    position: absolute;
+    padding: 0px;
+    margin-right: 10px;
+    /*overflow: visible;*/
+}
+
+.recordingList div
+{
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.recordingList .topBar
+{
+    clear:both;
+    margin: 5px 0px 2px;  /* Top Horizontal Bottom */
+    height: 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    vertical-align: middle;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%),
+                linear-gradient(to right, #555555 1px, transparent 6px);
+    border-top-left-radius: 10px;
+    padding: 6px 4px; /* Vertical Horizontal */
+}
+
+.recordingList .recordingRow
+{
+    clear: both;
+    width: 100%;
+    height: 100px;
+    margin: 2px 0px; /* Vertical Horizontal */
+    overflow: hidden;
+}
+
+.recordingList .previewBox
+{
+    float: left;
+    height: 100%;
+    background: #2A2A2A;
+    background-image: linear-gradient(to right, #555555 1px, transparent 6px);
+    padding: 5px;
+    padding-left: 10px;
+    z-index: -5;
+    width: 124px;
+    text-align:center;
+}
+
+.recordingList .previewImage
+{
+    border-radius: 10px;
+    border: 1px solid #1A1A1A;
+    overflow: hidden;
+    float: right;
+}
+
+.recordingList .watchRecordingLink
+{
+    clear: both;
+    float: left;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 2px 0px 0px 23px; /* Top Right Bottom Left */
+    height: 22px;
+    background-image: url('/tv/images/play_arrow.svg');
+    background-size: 21px 20px;
+    background-repeat: no-repeat;
+    margin: 5px 0px 0px 15px;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.recordingList .watchRecordingLink:hover
+{
+    opacity: 1.0;
+}
+
+.recordingList .recordingBox
+{
+    height: 100%;
+    padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
+    cursor: pointer;
+}
+
+.recordingList .recordingInnerBox
+{
+    height: 100%;
+    background-color: #555555;
+    border-radius: 10px;
+}
+
+.recordingList .recordingHeader
+{
+    padding: 6px 8px 6px 8px;
+    color: #FFFFFF;
+    height: 30px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    z-index: 4;
+}
+
+.recordingList .recordingTitle
+{
+    width: 60%;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.recordingList .recordingStartTime
+{
+    width: 30%;
+    float:right;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.recordingList .recordingBody
+{
+    padding: 4px 5px; /* Vertical Horizontal */
+    color: #DDDDDD;
+    height: 70px;
+    z-index:5;
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.recordingList .recordingDescription
+{
+    position:relative;
+    z-index:1;
+}
+
+.recordingList .recordingSubtitle
+{
+    position:relative;
+    font-weight: bold;
+    font-size: 1.0em;
+    margin-right: 5px;
+    z-index: 1;
+}
+
+.recordingList .recordingSeasonEpisode
+{
+    font-size: 0.9em;
+    margin-right: 3px;
+}
+
+.recordingList .recordingIcons
+{
+    float: right;
+    width: 20%;
+    height: 100%;
+}
