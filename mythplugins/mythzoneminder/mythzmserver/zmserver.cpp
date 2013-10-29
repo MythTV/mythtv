@@ -429,11 +429,11 @@ ZMServer::ZMServer(int sock, bool debug)
     if (m_debug)
         cout << "Event file format is: " << m_eventFileFormat << endl;
 
-    // get the analyse filename format
+    // get the analysis filename format
     snprintf(buf, sizeof(buf), "%%0%dd-analyse.jpg", eventDigits);
-    m_analyseFileFormat = buf;
+    m_analysisFileFormat = buf;
     if (m_debug)
-        cout << "Analyse file format is: " << m_analyseFileFormat << endl;
+        cout << "Analysis file format is: " << m_analysisFileFormat << endl;
 
     // is ZM using the deep storage directory format?
     m_useDeepStorage = (getZMSetting("ZM_USE_DEEP_STORAGE") == "1");
@@ -443,6 +443,16 @@ ZMServer::ZMServer(int sock, bool debug)
             cout << "using deep storage directory structure" << endl;
         else
             cout << "using flat directory structure" << endl;
+    }
+
+    // is ZM creating analysis images?
+    m_useAnalysisImages = (getZMSetting("ZM_CREATE_ANALYSIS_IMAGES") == "1");
+    if (m_debug)
+    {
+        if (m_useAnalysisImages)
+            cout << "using analysis images" << endl;
+        else
+            cout << "not using analysis images" << endl;
     }
 
     getMonitorList();
@@ -530,7 +540,7 @@ bool ZMServer::processRequest(char* buf, int nbytes)
     else if (tokens[0] == "GET_EVENT_FRAME")
         handleGetEventFrame(tokens);
     else if (tokens[0] == "GET_ANALYSE_FRAME")
-        handleGetAnalyseFrame(tokens);
+        handleGetAnalysisFrame(tokens);
     else if (tokens[0] == "GET_LIVE_FRAME")
         handleGetLiveFrame(tokens);
     else if (tokens[0] == "GET_FRAME_LIST")
@@ -1057,7 +1067,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
     send(outStr, buffer, fileSize);
 }
 
-void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
+void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 {
     static unsigned char buffer[MAX_IMAGE_SIZE];
     char str[100];
@@ -1074,7 +1084,7 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     string eventTime(tokens[4]);
 
     if (m_debug)
-        cout << "Getting anaylse frame " << frameNo << " for event " << eventID
+        cout << "Getting analysis frame " << frameNo << " for event " << eventID
              << " on monitor " << monitorID << " event time is " << eventTime << endl;
 
     // get the 'alarm' frames from the Frames table for this event
@@ -1097,6 +1107,29 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     res = mysql_store_result(&g_dbConn);
     int frameCount = mysql_num_rows(res);
     int frameID;
+    string fileFormat = m_analysisFileFormat;
+
+    // if we didn't find any analysis frames look for a normal frame instead
+    if (frameCount == 0 || m_useAnalysisImages == false)
+    {
+        mysql_free_result(res);
+
+        frameNo = 0;
+        fileFormat = m_eventFileFormat;
+        sql  = "SELECT FrameId FROM Frames ";
+        sql += "WHERE EventID = " + eventID + " ";
+        sql += "ORDER BY FrameID";
+
+        if (mysql_query(&g_dbConn, sql.c_str()))
+        {
+            fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
+            sendError(ERROR_MYSQL_QUERY);
+            return;
+        }
+
+        res = mysql_store_result(&g_dbConn);
+        frameCount = mysql_num_rows(res);
+    }
 
     // if the required frame mumber is 0 or out of bounds then use the middle frame
     if (frameNo == 0 || frameNo < 0 || frameNo > frameCount)
@@ -1119,6 +1152,8 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
         return;
     }
 
+    mysql_free_result(res);
+
     string outStr("");
 
     ADD_STR(outStr, "OK")
@@ -1128,13 +1163,13 @@ void ZMServer::handleGetAnalyseFrame(vector<string> tokens)
     if (m_useDeepStorage)
     {
         filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
-        sprintf(str, m_analyseFileFormat.c_str(), frameID);
+        sprintf(str, fileFormat.c_str(), frameID);
         filepath += str;
     }
     else
     {
         filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-        sprintf(str, m_analyseFileFormat.c_str(), frameID);
+        sprintf(str, fileFormat.c_str(), frameID);
         filepath += str;
     }
 
