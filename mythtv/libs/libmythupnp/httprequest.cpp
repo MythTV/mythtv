@@ -58,6 +58,8 @@ static MIMETypes g_MIMETypes[] =
     { "jpg" , "image/jpeg"                 },
     { "jpeg", "image/jpeg"                 },
     { "png" , "image/png"                  },
+    { "svg" , "image/svg+xml"              },
+    { "svgz", "image/svg+xml"              },
     { "htm" , "text/html"                  },
     { "html", "text/html"                  },
     { "qsp" , "text/html"                  },
