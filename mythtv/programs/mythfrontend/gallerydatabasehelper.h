@@ -10,7 +10,7 @@
 #include "gallerytypedefs.h"
 
 
-
+// TODO: Merge this into libmythmetadata/imageutils.h and remove
 class GalleryDatabaseHelper
 {
 public:

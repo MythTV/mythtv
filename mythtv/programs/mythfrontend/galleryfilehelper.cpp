@@ -30,10 +30,6 @@ GalleryFileHelper::GalleryFileHelper()
     m_backendPort   = gCoreContext->GetNumSetting("BackendStatusPort", 6544);
 
     m_manager = new QNetworkAccessManager();
-
-    // Set the proxy for the manager to be the application
-    // default proxy, which has already been setup
-    m_manager->setProxy(QNetworkProxy::applicationProxy());
 }
 
 
@@ -44,11 +40,8 @@ GalleryFileHelper::GalleryFileHelper()
  */
 GalleryFileHelper::~GalleryFileHelper()
 {
-    if (m_manager)
-    {
-        delete m_manager;
-        m_manager = NULL;
-    }
+    delete m_manager;
+    m_manager = NULL;
 }
 
 
@@ -69,7 +62,7 @@ void GalleryFileHelper::StartSyncImages()
 
 
 /** \fn     GalleryFileHelper::StopSyncImages()
- *  \brief  Starts the image syncronization from the backend
+ *  \brief  Stops the image syncronization from the backend
  *  \return void
  */
 void GalleryFileHelper::StopSyncImages()
@@ -80,8 +73,6 @@ void GalleryFileHelper::StopSyncImages()
 
     SendRequest(url, QNetworkAccessManager::PostOperation);
 }
-
-
 
 /** \fn     GalleryFileHelper::GetSyncStatus()
  *  \brief  Reads the current image syncronization status
@@ -125,6 +116,77 @@ GallerySyncStatus GalleryFileHelper::GetSyncStatus()
     return status;
 }
 
+
+
+/**
+ *  \brief  Starts the thumbnail generation thread on the backend
+ *  \return void
+ */
+void GalleryFileHelper::StartThumbGen()
+{
+    QUrl url(QString("http://%1:%2/Image/StartThumbnailGeneration")
+             .arg(m_backendHost)
+             .arg(m_backendPort));
+
+    SendRequest(url, QNetworkAccessManager::PostOperation);
+}
+
+
+
+/**
+ *  \brief  Stops the thumbnail generation thread on the backend
+ *  \return void
+ */
+void GalleryFileHelper::StopThumbGen()
+{
+    QUrl url(QString("http://%1:%2/Image/StopThumbnailGeneration")
+             .arg(m_backendHost)
+             .arg(m_backendPort));
+
+    SendRequest(url, QNetworkAccessManager::PostOperation);
+}
+
+
+void GalleryFileHelper::AddToThumbnailList(ImageMetadata* im)
+{
+    if (!im)
+        return;
+
+    int id = im->m_id;
+    QUrl url(QString("http://%1:%2/Image/CreateThumbnail?Id=%3")
+             .arg(m_backendHost)
+             .arg(m_backendPort)
+             .arg(id));
+
+    SendRequest(url, QNetworkAccessManager::PostOperation);
+}
+
+
+void GalleryFileHelper::RecreateThumbnail(ImageMetadata* im)
+{
+    if (!im)
+        return;
+
+    int id = im->m_id;
+    QUrl url(QString("http://%1:%2/Image/RecreateThumbnail?Id=%3")
+             .arg(m_backendHost)
+             .arg(m_backendPort)
+             .arg(id));
+
+    SendRequest(url, QNetworkAccessManager::PostOperation);
+}
+
+
+void GalleryFileHelper::SetThumbnailSize(int width, int height)
+{
+    QUrl url(QString("http://%1:%2/Image/SetThumbnailSize?Width=%3&Height=%4")
+             .arg(m_backendHost)
+             .arg(m_backendPort)
+             .arg(width)
+             .arg(height));
+
+    SendRequest(url, QNetworkAccessManager::PostOperation);
+}
 
 
 /** \fn     GalleryFileHelper::RenameFile(const int &, const QString &)

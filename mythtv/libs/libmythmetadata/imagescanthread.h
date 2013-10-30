@@ -10,8 +10,6 @@
 #include "mthread.h"
 #include "imagemetadata.h"
 
-
-
 class ImageScanThread : public MThread
 {
 public:

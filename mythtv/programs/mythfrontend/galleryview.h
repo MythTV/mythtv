@@ -49,7 +49,7 @@ private slots:
     void ItemSelected(MythUIButtonListItem *);
     void UpdateImageItem(MythUIButtonListItem *);
     void UpdateText(MythUIButtonListItem *);
-    void UpdateThumbnail(MythUIButtonListItem *);
+    void UpdateThumbnail(MythUIButtonListItem *, bool forceReload = false);
 
     void MenuMain();
     void MenuInformation();

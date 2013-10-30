@@ -382,6 +382,8 @@ void ImageUtils::LoadDirectoryValues(MSqlQuery &query, ImageMetadata *dm)
 
     // preset all directories as subfolders
     dm->m_type          = kSubDirectory;
+
+    LoadDirectoryThumbnailValues(dm);
 }
 
 
@@ -408,6 +410,8 @@ void ImageUtils::LoadFileValues(MSqlQuery &query, ImageMetadata *dm)
     dm->SetZoom(          query.value(11).toInt());
     dm->m_isHidden      = query.value(12).toInt();
     dm->SetOrientation(   query.value(13).toInt(), true);
+
+    LoadFileThumbnailValues(dm);
 }
 
 
@@ -829,3 +833,72 @@ bool ImageUtils::HasExifKey(Exiv2::ExifData exifData,
     // list then the key has not been found
     return !(it == exifData.end());
 }
+
+/**
+ *  \brief  Gets four images from the directory from the
+ *          database which will be used as a folder thumbnail
+ *  \param  im Holds the loaded information
+ *  \return void
+ */
+void ImageUtils::LoadDirectoryThumbnailValues(ImageMetadata *im)
+{
+    // Try to get four new thumbnail filenames
+    // from the available images in this folder
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT CONCAT_WS('/', path, filename), path FROM gallery_files "
+                          "WHERE path = :PATH "
+                          "AND type = '4' "
+                          "AND hidden = '0' LIMIT :LIMIT");
+    query.bindValue(":PATH", im->m_path);
+    query.bindValue(":LIMIT", kMaxFolderThumbnails);
+
+    if (!query.exec())
+        LOG(VB_GENERAL, LOG_ERR, MythDB::DBErrorMessage(query.lastError()));
+
+    int i = 0;
+    while (query.next())
+    {
+        QString thumbFileName = QString("%1%2")
+                .arg(GetConfDir().append("/tmp/MythImage/"))
+                .arg(query.value(0).toString());
+
+        if (i >= im->m_thumbFileNameList->size())
+            break;
+
+        im->m_thumbFileNameList->replace(i, thumbFileName);
+        im->m_thumbPath = query.value(1).toString();
+        ++i;
+    }
+
+    // Set the path to the thumbnail files. As a default this will be
+    // the path ".mythtv/MythGallery" in the users home directory
+    im->m_thumbPath.prepend(GetConfDir().append("/tmp/MythImage/"));
+}
+
+
+
+/**
+ *  \brief  Sets the thumbnail information for a file
+ *  \param  im Holds the loaded information
+ *  \return void
+ */
+void ImageUtils::LoadFileThumbnailValues(ImageMetadata *im)
+{
+    // Set the path to the thumbnail files. As a default this will be
+    // the path ".mythtv/MythGallery" in the users home directory
+    im->m_thumbPath = im->m_path;
+    im->m_thumbPath.prepend(GetConfDir().append("/tmp/MythImage/"));
+
+    // Create the full path and filename to the thumbnail image
+    QString thumbFileName = QString("%1%2")
+                                .arg(GetConfDir().append("/tmp/MythImage/"))
+                                .arg(im->m_fileName);
+
+    // If the file is a video then append a png, otherwise the preview
+    // image would not be readable due to the video file extension
+    if (im->m_type == kVideoFile)
+        thumbFileName.append(".png");
+
+    im->m_thumbFileNameList->replace(0, thumbFileName);
+}
+

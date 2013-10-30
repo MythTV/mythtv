@@ -30,6 +30,11 @@ public:
 
     void        StartSyncImages();
     void        StopSyncImages();
+    void        StartThumbGen();
+    void        StopThumbGen();
+    void        AddToThumbnailList(ImageMetadata *);
+    void        RecreateThumbnail(ImageMetadata *);
+    void        SetThumbnailSize(int width, int height);
     bool        RemoveFile(ImageMetadata *);
     bool        RenameFile(ImageMetadata *, const QString &);
     bool        SetImageOrientation(ImageMetadata *);

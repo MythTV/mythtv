@@ -16,7 +16,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -29,6 +29,7 @@
 #include "storagegroup.h"
 
 #include "imagescan.h"
+#include "imagethumbgenthread.h"
 #include "imageutils.h"
 #include "image.h"
 
@@ -236,11 +237,11 @@ DTC::ImageMetadataInfoList* Image::GetImageInfoListByFileName( const QString &fi
     imInfoList->setSize(fi.size());
     imInfoList->setExtension(fi.suffix());
 
-    // The resturned stringlist contents are
+    // The returned stringlist contents are
     // <familyname>, <groupname>, <tagname>, <taglabel>, <value>
     // Go through all list items and build the response. Create
     // a new tag and add the tagnames below it. Each tagname
-    // has these childs: family, group, name, label, value.
+    // has these children: family, group, name, label, value.
     for (int i = 0; i < valueList.size(); ++i)
     {
         QStringList values = valueList.at(i);
@@ -315,18 +316,18 @@ bool Image::RemoveImage( int id )
 
 
 /** \fn     Image::StartSync(void)
- *  \brief  Starts the syncronization of the images with the database
+ *  \brief  Starts the synchronization of the images with the database
  *  \return bool True if the sync has started, otherwise false
  */
 bool Image::StartSync( void )
 {
     // Check that the required image tables exist to avoid
-    // syncing against non existend tables in the database.
-    if (gCoreContext->GetNumSetting("DBSchemaVer") < 1311)
+    // syncing against non existent tables in the database.
+    if (gCoreContext->GetNumSetting("DBSchemaVer") < 1318)
     {
         LOG(VB_GENERAL, LOG_INFO,
             "Sync cannot start, the required database tables are missing."
-            "Please upgrade your database schema to at least 1308.");
+            "Please upgrade your database schema to at least 1318.");
         return false;
     }
 
@@ -340,7 +341,7 @@ bool Image::StartSync( void )
 
 
 /** \fn     Image::StopSync(void)
- *  \brief  Stops the image syncronization if its running
+ *  \brief  Stops the image synchronization if its running
  *  \return bool True if the sync has stopped, otherwise false
  */
 bool Image::StopSync( void )
@@ -355,9 +356,9 @@ bool Image::StopSync( void )
 
 
 /** \fn     Image::GetSyncStatus(void)
- *  \brief  Returns a list with information if the syncronization is
-            currently running, the already syncronized images and
-            the total amount of images that shall be syncronized.
+ *  \brief  Returns a list with information if the synchronization is
+            currently running, the already synchronized images and
+            the total amount of images that shall be synchronized.
  *  \return DTC::ImageSyncInfo The status information
  */
 DTC::ImageSyncInfo* Image::GetSyncStatus( void )
@@ -377,4 +378,82 @@ DTC::ImageSyncInfo* Image::GetSyncStatus( void )
     syncInfo->setTotal(is->GetTotal());
 
     return syncInfo;
+}
+
+/**
+ *  \brief  Starts thumbnail generation thread for images
+ *  \return bool True if the generation thread has started, otherwise false
+ */
+bool Image::StartThumbnailGeneration(void )
+{
+    // Check that the required image tables exist to avoid
+    // syncing against non existent tables in the database.
+    if (gCoreContext->GetNumSetting("DBSchemaVer") < 1318)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            "Thumbnail generation cannot start, the required database tables "
+            "are missing. "
+            "Please upgrade your database schema to at least 1318.");
+        return false;
+    }
+
+    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
+    if (!thumbGen->ThumbGenIsRunning())
+        thumbGen->StartThumbGen();
+
+    return thumbGen->ThumbGenIsRunning();
+}
+
+
+/**
+ *  \brief  Stops the thumbnail generation if it's running
+ *  \return bool True if the generation has stopped, otherwise false
+ */
+bool Image::StopThumbnailGeneration(void )
+{
+    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
+    if (thumbGen->ThumbGenIsRunning())
+        thumbGen->StopThumbGen();
+
+    return !thumbGen->ThumbGenIsRunning();
+}
+
+bool Image::CreateThumbnail(int id)
+{
+    ImageMetadata *im = new ImageMetadata();
+    ImageUtils *iu = ImageUtils::getInstance();
+    iu->LoadFileFromDB(im, id);
+
+    if (im->m_fileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "QueueCreateThumbnail - File not found");
+        delete im;
+        return false;
+    }
+
+    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
+    return thumbGen->AddToThumbnailList(im);
+}
+
+bool Image::RecreateThumbnail(int id)
+{
+    ImageMetadata *im = new ImageMetadata();
+    ImageUtils *iu = ImageUtils::getInstance();
+    iu->LoadFileFromDB(im, id);
+
+    if (im->m_fileName.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "QueueCreateThumbnail - File not found");
+        delete im;
+        return false;
+    }
+
+    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
+    return thumbGen->RecreateThumbnail(im);
+}
+
+bool Image::SetThumbnailSize(int Width, int Height)
+{
+    ImageThumbGen *thumbGen = ImageThumbGen::getInstance();
+    return thumbGen->SetThumbnailSize(Width, Height);
 }

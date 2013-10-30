@@ -21,17 +21,7 @@ GalleryViewHelper::GalleryViewHelper(MythScreenType *parent)
     m_sgDirList = StorageGroup::getGroupDirs(m_sgName, "");
 
     m_dbHelper = new GalleryDatabaseHelper();
-    m_thumbGenThread = new ImageThumbGenThread();
     m_fileHelper  = new GalleryFileHelper();
-
-    connect(m_thumbGenThread,  SIGNAL(ThumbnailCreated(ImageMetadata *, int)),
-            m_parent, SLOT(UpdateThumbnail(ImageMetadata *, int)));
-
-    connect(m_thumbGenThread,  SIGNAL(UpdateThumbnailProgress(int, int)),
-            m_parent, SLOT(UpdateThumbnailProgress(int, int)));
-
-    connect(m_thumbGenThread,  SIGNAL(finished()),
-            m_parent, SLOT(ResetThumbnailProgress()));
 
     // these are the node trees that hold the data and
     // are used for navigating and finding files
@@ -59,15 +49,10 @@ GalleryViewHelper::~GalleryViewHelper()
         m_currentNode = NULL;
     }
 
-    if (m_thumbGenThread)
-    {
-        m_thumbGenThread->cancel();
-        delete m_thumbGenThread;
-        m_thumbGenThread = NULL;
-    }
-
     if (m_fileHelper)
     {
+        // FIXME Triggers segfault
+        // m_fileHelper->StopThumbGen();
         delete m_fileHelper;
         m_fileHelper = NULL;
     }
@@ -112,7 +97,7 @@ void GalleryViewHelper::LoadTreeData()
 
     // Stop generating thumbnails
     // when a new directory is loaded
-    m_thumbGenThread->cancel();
+    m_fileHelper->StopThumbGen();
 
     // The parent id is the database index of the
     // directories which subdirectories and files shall be loaded
@@ -153,7 +138,7 @@ void GalleryViewHelper::LoadTreeData()
     LoadTreeNodeData(fileList, m_currentNode);
 
     // Start generating thumbnails if required
-    m_thumbGenThread->start();
+    m_fileHelper->StartThumbGen();
 
     // clean up
     delete dirList;
@@ -177,7 +162,7 @@ void GalleryViewHelper::LoadTreeNodeData(QList<ImageMetadata *> *list,
         ImageMetadata *im = list->at(i);
         if (im)
         {
-            m_thumbGenThread->AddToThumbnailList(im);
+            m_fileHelper->AddToThumbnailList(im);
 
             // Create a new tree node that will hold the data
             MythGenericTree *treeItem =
@@ -404,8 +389,8 @@ void GalleryViewHelper::SetFileOrientation(int fileOrientation)
     if (m_fileHelper->SetImageOrientation(im))
     {
         m_dbHelper->UpdateData(im);
-        m_thumbGenThread->RecreateThumbnail(im);
-        m_thumbGenThread->start();
+        m_fileHelper->RecreateThumbnail(im);
+        m_fileHelper->StartThumbGen();
     }
     else
     {
@@ -514,11 +499,10 @@ ImageMetadata *GalleryViewHelper::GetImageMetadataFromNode(int i)
  */
 void GalleryViewHelper::SetPreviewImageSize(MythUIButtonList *imageList)
 {
-    float width  = (float)imageList->GetArea().width();
-    float height = width / ((float)imageList->ItemWidth() /
-                            (float)imageList->ItemHeight());
+    float width  = (float)imageList->ItemWidth();
+    float height = (float)imageList->ItemHeight();
 
-    m_thumbGenThread->SetThumbnailSize((int)width, (int)height);
+    m_fileHelper->SetThumbnailSize((int)width, (int)height);
 }
 
 

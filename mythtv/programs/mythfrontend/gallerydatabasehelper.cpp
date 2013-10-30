@@ -489,7 +489,7 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
     // Try to get four new thumbnail filenames
     // from the available images in this folder
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT CONCAT_WS('/', path, filename), path FROM gallery_files "
+    query.prepare("SELECT CONCAT_WS('/', path, filename) FROM gallery_files "
                           "WHERE path = :PATH "
                           "AND type = '4' "
                           "AND hidden = '0' LIMIT :LIMIT");
@@ -503,20 +503,19 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
     while (query.next())
     {
         QString thumbFileName = QString("%1%2")
-                .arg(GetConfDir().append("/MythImage/"))
+                .arg("/MythImage/")
                 .arg(query.value(0).toString());
+
+        thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                                 gCoreContext->GetNumSetting("MasterServerPort"),
+                                                 thumbFileName, "Temp");
 
         if (i >= im->m_thumbFileNameList->size())
             break;
 
         im->m_thumbFileNameList->replace(i, thumbFileName);
-        im->m_thumbPath = query.value(1).toString();
         ++i;
     }
-
-    // Set the path to the thumbnail files. As a default this will be
-    // the path ".mythtv/MythGallery" in the users home directory
-    im->m_thumbPath.prepend(GetConfDir().append("/MythImage/"));
 }
 
 
@@ -528,20 +527,21 @@ void GalleryDatabaseHelper::LoadDirectoryThumbnailValues(ImageMetadata *im)
  */
 void GalleryDatabaseHelper::LoadFileThumbnailValues(ImageMetadata *im)
 {
-    // Set the path to the thumbnail files. As a default this will be
-    // the path ".mythtv/MythGallery" in the users home directory
-    im->m_thumbPath = im->m_path;
-    im->m_thumbPath.prepend(GetConfDir().append("/MythImage/"));
 
-    // Create the full path and filename to the thumbnail image
+
+    // Create the relative path and filename to the thumbnail image
     QString thumbFileName = QString("%1%2")
-            .arg(GetConfDir().append("/MythImage/"))
+            .arg("/MythImage/")
             .arg(im->m_fileName);
 
     // If the file is a video then append a png, otherwise the preview
     // image would not be readable due to the video file extension
     if (im->m_type == kVideoFile)
         thumbFileName.append(".png");
+
+    thumbFileName = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
+                                             gCoreContext->GetNumSetting("MasterServerPort"),
+                                             thumbFileName, "Temp");
 
     im->m_thumbFileNameList->replace(0, thumbFileName);
 }

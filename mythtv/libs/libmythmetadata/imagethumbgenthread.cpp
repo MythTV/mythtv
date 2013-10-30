@@ -13,14 +13,13 @@
 #include "imageutils.h"
 #include "imagethumbgenthread.h"
 
-// FIXME: This should be on the backend only, not the frontend!
-
 /** \fn     ImageThumbGenThread::ImageThumbGenThread()
  *  \brief  Constructor
  *  \return void
  */
 ImageThumbGenThread::ImageThumbGenThread()
-        :   m_width(0), m_height(0),
+        :   m_progressCount(0), m_progressTotalCount(0),
+            m_width(0), m_height(0),
             m_pause(false), m_fileListSize(0)
 {
     QString sgName = IMAGE_STORAGE_GROUP;
@@ -87,6 +86,8 @@ void ImageThumbGenThread::run()
             }
         }
 
+        delete im;
+
         m_mutex.lock();
         exit = m_fileList.isEmpty();
         m_mutex.unlock();
@@ -117,7 +118,6 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
         dir.mkpath(im->m_thumbPath);
 
     QString imageFileName = m_storageGroup.FindFile(im->m_fileName);
-    LOG(VB_GENERAL, LOG_NOTICE, QString("Creating thumbnail for %1").arg(imageFileName));
 
     // If a folder thumbnail shall be created we need to get
     // the real filename from the thumbnail filename by removing
@@ -182,7 +182,10 @@ void ImageThumbGenThread::CreateImageThumbnail(ImageMetadata *im, int id)
 
     // save the image in the thumbnail directory
     if (image.save(im->m_thumbFileNameList->at(id)))
-        emit ThumbnailCreated(im, id);
+    {
+        QString msg = "IMAGE_THUMB_CREATED %1";
+        gCoreContext->SendMessage(msg.arg(im->m_id));
+    }
 }
 
 
@@ -225,7 +228,11 @@ void ImageThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
 
         // save the default image in the thumbnail directory
         if (image.save(im->m_thumbFileNameList->at(0)))
+        {
             emit ThumbnailCreated(im, 0);
+            QString msg = "IMAGE_THUMB_CREATED %1";
+            gCoreContext->SendMessage(msg.arg(im->m_id));
+        }
     }
 }
 
@@ -239,31 +246,9 @@ void ImageThumbGenThread::CreateVideoThumbnail(ImageMetadata *im)
  */
 void ImageThumbGenThread::Resize(QImage &image)
 {
-    // If the factor of the width to height of the image is smaller
-    // than of the widget stretch the image horizontally. The image
-    // will be higher then the widgets height, so it needs to be cropped.
-    if ((image.width() / image.height()) < (m_width / m_height))
-    {
-        image = image.scaledToWidth(m_width, Qt::SmoothTransformation);
+    QSize size = QSize(m_width, m_height);
 
-        // Copy a part of the image so that
-        // the copied area has the size of the widget.
-        if (image.height() > m_height)
-        {
-            int offset = (image.height() - m_height) / 2;
-            image = image.copy(0, offset, m_width, m_height);
-        }
-    }
-    else
-    {
-        image = image.scaledToHeight(m_height, Qt::SmoothTransformation);
-
-        if (image.width() > m_width)
-        {
-            int offset = (image.width() - m_width) / 2;
-            image = image.copy(offset, 0, m_width, m_height);
-        }
-    }
+    image = image.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 
@@ -314,7 +299,8 @@ void ImageThumbGenThread::RecreateThumbnail(ImageMetadata *im)
 void ImageThumbGenThread::cancel()
 {
     m_mutex.lock();
-    m_fileList.clear();
+    while (!m_fileList.isEmpty())
+        delete m_fileList.takeFirst();
     m_fileListSize = 0;
     m_mutex.unlock();
 
@@ -357,4 +343,115 @@ void ImageThumbGenThread::SetThumbnailSize(int width, int height)
 
     if (height > 0)
         m_height = height;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+ImageThumbGen* ImageThumbGen::m_instance = NULL;
+
+ImageThumbGen::ImageThumbGen()
+{
+    m_imageThumbGenThread = new ImageThumbGenThread();
+}
+
+
+
+ImageThumbGen::~ImageThumbGen()
+{
+    delete m_imageThumbGenThread;
+    m_imageThumbGenThread = NULL;
+}
+
+
+
+ImageThumbGen* ImageThumbGen::getInstance()
+{
+    if (!m_instance)
+        m_instance = new ImageThumbGen();
+
+    return m_instance;
+}
+
+
+
+void ImageThumbGen::StartThumbGen()
+{
+    if (m_imageThumbGenThread && !m_imageThumbGenThread->isRunning())
+        m_imageThumbGenThread->start();
+}
+
+
+
+void ImageThumbGen::StopThumbGen()
+{
+    if (m_imageThumbGenThread && m_imageThumbGenThread->isRunning())
+        m_imageThumbGenThread->cancel();
+}
+
+
+
+bool ImageThumbGen::ThumbGenIsRunning()
+{
+    if (m_imageThumbGenThread)
+        return m_imageThumbGenThread->isRunning();
+
+    return false;
+}
+
+
+
+int ImageThumbGen::GetCurrent()
+{
+    if (m_imageThumbGenThread)
+        return m_imageThumbGenThread->m_progressCount;
+
+    return 0;
+}
+
+
+
+int ImageThumbGen::GetTotal()
+{
+    if (m_imageThumbGenThread)
+        return m_imageThumbGenThread->m_progressTotalCount;
+
+    return 0;
+}
+
+
+
+bool ImageThumbGen::AddToThumbnailList(ImageMetadata *im)
+{
+    if (!m_imageThumbGenThread)
+        return false;
+
+    m_imageThumbGenThread->AddToThumbnailList(im);
+
+    return true;
+}
+
+
+
+bool ImageThumbGen::RecreateThumbnail(ImageMetadata *im)
+{
+    if (!m_imageThumbGenThread)
+        return false;
+
+    m_imageThumbGenThread->RecreateThumbnail(im);
+
+    return true;
+}
+
+
+
+bool ImageThumbGen::SetThumbnailSize(int width, int height)
+{
+    if (!m_imageThumbGenThread)
+        return false;
+
+    m_imageThumbGenThread->SetThumbnailSize(width, height);
+
+    return true;
 }

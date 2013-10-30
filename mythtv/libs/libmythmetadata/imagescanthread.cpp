@@ -7,7 +7,6 @@
 #include "imageutils.h"
 
 
-
 /** \fn     ImageScanThread::ImageScanThread()
  *  \brief  Constructor
  *  \return void

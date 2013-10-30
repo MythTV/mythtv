@@ -67,6 +67,9 @@ private:
     void LoadDirectoryValues(MSqlQuery &, ImageMetadata *);
     void LoadFileValues(MSqlQuery &, ImageMetadata *);
 
+    void LoadDirectoryThumbnailValues(ImageMetadata *);
+    void LoadFileThumbnailValues(ImageMetadata *);
+
     bool HasExifKey(Exiv2::ExifData, const QString &);
 };
 

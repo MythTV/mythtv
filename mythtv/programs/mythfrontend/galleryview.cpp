@@ -32,6 +32,8 @@ GalleryView::GalleryView(MythScreenStack *parent, const char *name)
       m_syncProgressText(NULL),
       m_thumbProgressText(NULL)
 {
+    gCoreContext->addListener(this);
+
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -61,6 +63,8 @@ GalleryView::GalleryView(MythScreenStack *parent, const char *name)
  */
 GalleryView::~GalleryView()
 {
+    gCoreContext->removeListener(this);
+
     if (m_syncStatusThread)
     {
         m_syncStatusThread->quit();
@@ -149,39 +153,6 @@ bool GalleryView::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             MenuMain();
-        else if (action == "HOME")
-        {
-            // get through the entire list of image items and find
-            // the filename that matches the created thumbnail filename
-            for (int i = 0; i < m_imageList->GetCount(); i++)
-            {
-                MythUIButtonListItem *item = m_imageList->GetItemAt(i);
-                if (!item)
-                    continue;
-
-                ImageMetadata *im = GetImageMetadataFromButton(item);
-                if (!im)
-                    continue;
-
-                if (im->m_type != kImageFile &&
-                    im->m_type != kVideoFile)
-                {
-                    m_galleryViewHelper->m_currentNode->setSelectedChild(m_galleryViewHelper->m_currentNode->getChildAt(i));
-                    UpdateImageItem(item);
-                    break;
-                }
-            }
-        }
-        else if (action == "END")
-        {
-            int count = m_imageList->GetCount();
-            MythUIButtonListItem *item = m_imageList->GetItemAt(count);
-            if (item)
-            {
-                m_galleryViewHelper->m_currentNode->setSelectedChild(m_galleryViewHelper->m_currentNode->getChildAt(count));
-                UpdateImageItem(item);
-            }
-        }
         else if (action == "INFO")
             MenuInformation();
         else if (action == "ROTRIGHT")
@@ -245,7 +216,43 @@ bool GalleryView::keyPressEvent(QKeyEvent *event)
  */
 void GalleryView::customEvent(QEvent *event)
 {
-    if (event->type() == DialogCompletionEvent::kEventType)
+    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)event;
+        QString message = me->Message();
+
+        if (message.startsWith("IMAGE_THUMB_CREATED"))
+        {
+            QStringList tokens = message.simplified().split(" ");
+            int fileid = 0;
+            if (tokens.size() >= 2)
+            {
+                fileid = tokens[1].toUInt();
+
+                // FIXME: This sucks, must be a better way to do this
+                //
+                // get through the entire list of image items and find
+                // the fileid that matches the created thumbnail filename
+                for (int i = 0; i < m_imageList->GetCount(); i++)
+                {
+                    MythUIButtonListItem *item = m_imageList->GetItemAt(i);
+                    if (!item)
+                        continue;
+
+                    ImageMetadata *im = GetImageMetadataFromButton(item);
+                    if (!im)
+                        continue;
+
+                    if (im->m_id == fileid)
+                    {
+                        UpdateThumbnail(item, true);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else if (event->type() == DialogCompletionEvent::kEventType)
     {
         DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
@@ -515,11 +522,11 @@ void GalleryView::UpdateImageItem(MythUIButtonListItem *item)
 
 
 /** \fn     GalleryView::UpdateThumbnail(MythUIButtonListItem *)
- *  \brief  Updates the thumbnail image of the current item
+ *  \brief  Updates the thumbnail image of the given item
  *  \param  item The item that shall be updated
  *  \return void
  */
-void GalleryView::UpdateThumbnail(MythUIButtonListItem *item)
+void GalleryView::UpdateThumbnail(MythUIButtonListItem *item, bool forceReload)
 {
     if (!item)
         return;
@@ -533,12 +540,12 @@ void GalleryView::UpdateThumbnail(MythUIButtonListItem *item)
         for (int i = 0; i < im->m_thumbFileNameList->size(); ++i)
         {
             item->SetImage(im->m_thumbFileNameList->at(i),
-                           QString("thumbimage%1").arg(i+1));
+                           QString("thumbimage%1").arg(i+1), forceReload);
         }
     }
     else
     {
-        item->SetImage(im->m_thumbFileNameList->at(0));
+        item->SetImage(im->m_thumbFileNameList->at(0), "", forceReload);
     }
 }
 
@@ -577,11 +584,11 @@ void GalleryView::UpdateThumbnail(ImageMetadata *thumbImageMetadata, int id)
                 im->m_type == kSubDirectory)
             {
                 item->SetImage(thumbImageMetadata->m_thumbFileNameList->at(id),
-                               QString("thumbimage%1").arg(id+1));
+                               QString("thumbimage%1").arg(id+1), true);
             }
             else
             {
-                item->SetImage(thumbImageMetadata->m_thumbFileNameList->at(0));
+                item->SetImage(thumbImageMetadata->m_thumbFileNameList->at(0), "", true);
             }
             break;
         }

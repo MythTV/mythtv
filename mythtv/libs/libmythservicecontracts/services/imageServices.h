@@ -56,6 +56,13 @@ class SERVICE_PUBLIC ImageServices : public Service
         virtual bool                        StartSync          ( void ) = 0;
         virtual bool                        StopSync           ( void ) = 0;
         virtual DTC::ImageSyncInfo*         GetSyncStatus      ( void ) = 0;
+
+        virtual bool                        StartThumbnailGeneration ( void ) = 0;
+        virtual bool                        StopThumbnailGeneration  ( void ) = 0;
+        virtual bool                        CreateThumbnail    ( int   Id ) = 0;
+        virtual bool                        RecreateThumbnail  ( int   Id ) = 0;
+        virtual bool                        SetThumbnailSize   ( int   Width,
+                                                                 int   Height) = 0;
 };
 
 #endif

@@ -59,6 +59,13 @@ public:
     bool                        StartSync          ( void );
     bool                        StopSync           ( void );
     DTC::ImageSyncInfo*         GetSyncStatus      ( void );
+
+    bool                        StartThumbnailGeneration ( void );
+    bool                        StopThumbnailGeneration  ( void );
+    bool                        CreateThumbnail    ( int   Id );
+    bool                        RecreateThumbnail  ( int   Id );
+    bool                        SetThumbnailSize   ( int   Width,
+                                                     int   Height);
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( Image, QObject*)

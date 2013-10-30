@@ -11,12 +11,11 @@
 #include "storagegroup.h"
 #include "mythmetaexp.h"
 
-
 class META_PUBLIC ImageThumbGenThread : public QThread
 {
     Q_OBJECT
 
-public:
+  public:
     ImageThumbGenThread();
     ~ImageThumbGenThread();
 
@@ -27,14 +26,17 @@ public:
     void RecreateThumbnail(ImageMetadata *);
     void SetThumbnailSize(int, int);
 
-signals:
+    int m_progressCount;
+    int m_progressTotalCount;
+
+  signals:
     void ThumbnailCreated(ImageMetadata *, int);
     void UpdateThumbnailProgress(int, int);
 
-protected:
+  protected:
     void run();
 
-private:
+  private:
     void CreateImageThumbnail(ImageMetadata *, int);
     void CreateVideoThumbnail(ImageMetadata *);
 
@@ -53,6 +55,31 @@ private:
 
     QWaitCondition      m_condition;
     StorageGroup        m_storageGroup;
+};
+
+class META_PUBLIC ImageThumbGen
+{
+  public:
+    static ImageThumbGen*    getInstance();
+
+    void StartThumbGen();
+    void StopThumbGen();
+    bool ThumbGenIsRunning();
+
+    bool AddToThumbnailList(ImageMetadata *);
+    bool RecreateThumbnail(ImageMetadata *);
+
+    bool SetThumbnailSize(int width, int height);
+
+    int  GetCurrent();
+    int  GetTotal();
+
+  private:
+    ImageThumbGen();
+    ~ImageThumbGen();
+    static ImageThumbGen    *m_instance;
+
+    ImageThumbGenThread     *m_imageThumbGenThread;
 };
 
 #endif // GALLERYTHUMBGENTHREAD_H
