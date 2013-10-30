@@ -596,7 +596,7 @@ void H264Parser::processRBSP(bool rbsp_complete)
          * determine if it is a keyframe or just a frame
          */
         AU_pending = false;
-        state_changed = true;
+        state_changed = seen_sps;
 
         on_frame = true;
         frame_start_offset = AU_offset;
