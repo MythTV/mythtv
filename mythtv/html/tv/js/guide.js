@@ -98,5 +98,15 @@ function loadGuideContent(url, transition)
 
 function reloadGuideContent()
 {
-    loadGuideContent(currentContentURL, "dissolve");  // currentContentURL is defined in util.qjs
+    var url = currentContentURL;
+    // HACK: This is a hacky approach and will be changed soon
+    if (currentContentURL.indexOf("GuideOnly") === -1)
+    {
+        if (currentContentURL.indexOf("?") !== -1)
+            url += "&amp;GuideOnly=1";
+        else
+            url += "?GuideOnly=1";
+    }
+    loadGuideContent(url, "dissolve");  // currentContentURL is defined in util.qjs
 }
+
