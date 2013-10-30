@@ -8085,7 +8085,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
             ber = it->GetValue();
         else if ("pos" == it->GetShortName())
             pos = it->GetValue();
-        else if ("tuned" == it->GetShortName())
+        else if ("script" == it->GetShortName())
             tuned = it->GetValue();
         else if ("seen_pat" == it->GetShortName())
             pat = it->IsGood() ? "a" : "_";

@@ -413,8 +413,7 @@ void SignalMonitor::SendMessage(
 void SignalMonitor::UpdateValues(void)
 {
     QMutexLocker locker(&statusLock);
-    if (channel->IsExternalChannelChangeInUse() &&
-        (scriptStatus.GetValue() < 2))
+    if (scriptStatus.GetValue() < 2)
     {
         scriptStatus.SetValue(channel->GetScriptStatus());
     }
