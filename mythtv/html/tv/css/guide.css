@@ -1,12 +1,3 @@
-#content
-{
-    padding: 10px;
-}
-
-.pageTitle
-{
-    float:left;
-}
 
 /* Guide Navigation */
 .navigateBox
@@ -286,11 +277,6 @@
     background: linear-gradient(to bottom, #2681D6, #003D92 40%);
 }
 
-.guideGrid .programSelected
-{
-    border: 2px #045FB4 solid;
-}
-
 .guideGrid .programSchedPopup
 {
     display: none;
@@ -346,14 +332,3 @@
     border-style:inset;
 }
 
-#programDetails
-{
-    background-color: rgba(51, 51, 51, 0.85);
-    border: 2px #045FB4 solid;
-    box-shadow: 6px 6px 4px #222222;
-    width: 30%;
-    display: none;
-    z-index: 50;
-    position: absolute;
-    padding: 10px;
-}

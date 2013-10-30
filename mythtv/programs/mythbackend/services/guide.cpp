@@ -226,7 +226,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
     DTC::Program *pProgram = new DTC::Program();
     ProgramInfo  *pInfo    = progList[ 0 ];
 
-    FillProgramInfo( pProgram, pInfo, true );
+    FillProgramInfo( pProgram, pInfo, true, true );
 
     return pProgram;
 }

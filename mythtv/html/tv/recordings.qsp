@@ -18,9 +18,8 @@ import "/tv/js/constants.js"
         sortDescending = false;
 
     var dvr = new Dvr();
-    var recordings = dvr.GetRecordedList( sortDescending, 0, -1, "", "Default", "" );
+    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, "", "Default", "" );
     var programs = recordings.Programs;
-
 %>
 
 <!DOCTYPE html>
@@ -29,15 +28,21 @@ import "/tv/js/constants.js"
 <meta charset="UTF-8">
 <title><%=qsTr("Recordings")%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/recordings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script type="text/javascript" src="/js/util.qjs"></script>
-<script type="text/javascript" src="/tv/js/recordings.js"></script>
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script src="/js/util.qjs"></script>
+<script src="/tv/js/common.js"></script>
+<script src="/tv/js/recordings.js"></script>
 </head>
 <body id="content">
 
 <h2 class="pageTitle" id="title"><%=qsTr("Recordings")%></h2>
+
+<!-- Popup Program Details Box -->
+<div id="programDetails" class="programExDetail">
+</div>
 
 <!-- Sort order, grouping etc -->
 <div class="navigateBox">
@@ -62,24 +67,38 @@ import "/tv/js/constants.js"
 for (var progIdx = 0; progIdx < programs.length; progIdx++)
 {
     var program = programs[progIdx];
+    var channel = program.Channel;
+
+    var menu = "editRecMenu";
+    if (program.Recording.Status == 0)
+        menu = "recMenu";
+
+    // Used as a unique identifier and also to access the chanid
+    // and starttime for the AJAX scheduling stuff
+    // NOTE: DVR methods require recording start time, not scheduled start time
+    var programIdentifier = channel.ChanId + "_" + program.Recording.StartTs.toISOString();
 %>
     <div class="recordingRow">
         <div class="previewBox">
             <img alt="Preview Image" height="60" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=60" />
             <span class="watchRecordingLink"><%=qsTr("Watch")%></span>
         </div>
-        <div class="recordingBox">
+        <div class="recordingBox" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
             <div class="recordingInnerBox">
                 <div class="recordingHeader">
                     <span class="recordingTitle"><%=escapeHTML(program.Title)%></span>
                     <span class="recordingStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
                 </div>
                 <div class="recordingBody">
-                    <div class="recordingIcons" style="overflow:visible">
-                    <% if (program.VideoProps & VID_1080) {%><img src="/tv/images/hd_1080.svg" width="35" />
-                    <% } else if (program.VideoProps & VID_720) {%><img src="/tv/images/hd_720.svg" width="35" />
-                    <% } else if (program.VideoProps & VID_HDTV) {%><img src="/tv/images/hd_tv.svg" width="35" /><%}%>
-                    <% if (program.ProgramFlags & FL_AUTOEXP) {%><img src="/tv/images/fl_autoexp.svg" width="35" /><%}%>
+                    <div class="recordingIcons">
+                    <!-- Icons all a 4:3 aspect -->
+                    <% if (program.VideoProps & VID_1080) {%><img src="/tv/images/hd_1080.svg" width="36" height="27" alt="<%=qsTr("HD 1080")%>" />
+                    <% } else if (program.VideoProps & VID_720) {%><img src="/tv/images/hd_720.svg" width="36" height="27" alt="<%=qsTr("HD 720")%>" />
+                    <% } else if (program.VideoProps & VID_HDTV) {%><img src="/tv/images/hd_tv.svg" width="36" height="27" alt="<%=qsTr("HD")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_AUTOEXP) {%><img src="/tv/images/fl_autoexp.svg" width="36" height="27" alt="<%=qsTr("Auto-Expire")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_WATCHED) {%><img src="/tv/images/fl_watched.svg" width="36" height="27" alt="<%=qsTr("Watched")%>" />
+                    <% } else if (program.ProgramFlags & FL_BOOKMARK) {%><img src="/tv/images/fl_bookmark.svg" width="36" height="27" alt="<%=qsTr("Bookmark")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_COMMFLAG) {%><img src="/tv/images/fl_commflag.svg" width="36" height="27" alt="<%=qsTr("Commercial Flagged")%>" /><%}%>
                     </div>
                     <span class="recordingSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                     <% if (program.Episode > 0) { %>

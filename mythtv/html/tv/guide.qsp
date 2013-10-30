@@ -76,11 +76,13 @@ import "/js/utility.js"
 <title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
        <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<script type="text/javascript" src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script type="text/javascript" src="/js/util.qjs"></script>
-<script type="text/javascript" src="/tv/js/guide.js"></script>
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script src="/js/util.qjs"></script>
+<script src="/tv/js/common.js"></script>
+<script src="/tv/js/guide.js"></script>
 </head>
 <body>
 
@@ -266,7 +268,7 @@ import "/js/utility.js"
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
-                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this);" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                     <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
