@@ -817,7 +817,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
         HandleScriptEnd(m_system_status == GENERIC_EXIT_OK);
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1")
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("GetScriptStatus() %1")
         .arg(m_system_status));
 
     uint ret;
@@ -835,7 +835,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
             break;
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetScriptStatus() %1 -> %2")
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("GetScriptStatus() %1 -> %2")
             .arg(m_system_status). arg(ret));
 
     m_system_status = ret;
