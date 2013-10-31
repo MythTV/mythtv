@@ -156,6 +156,21 @@ class MovieSearchResult(SearchRepr, PagedRequest):
                     request.new(language=locale.language),
                     lambda x: Movie(raw=x, locale=locale))
 
+def searchSeries(query, first_air_date_year=None, search_type=None, locale=None):
+    return SeriesSearchResult(
+        Request('search/tv', query=query, first_air_date_year=first_air_date_year, search_type=search_type),
+        locale=locale)
+
+
+class SeriesSearchResult(SearchRepr, PagedRequest):
+    """Stores a list of search matches."""
+    _name = None
+    def __init__(self, request, locale=None):
+        if locale is None:
+            locale = get_locale()
+        super(SeriesSearchResult, self).__init__(
+                    request.new(language=locale.language),
+                    lambda x: Series(raw=x, locale=locale))
 
 def searchPerson(query, adult=False):
     return PeopleSearchResult(Request('search/person', query=query,
@@ -231,15 +246,21 @@ class Image(Element):
 
     # sort preferring locale's language, but keep remaining ordering consistent
     def __lt__(self, other):
+        if not isinstance(other, Image):
+            return False
         return (self.language == self._locale.language) \
                 and (self.language != other.language)
 
     def __gt__(self, other):
+        if not isinstance(other, Image):
+            return True
         return (self.language != other.language) \
                 and (other.language == self._locale.language)
 
     # direct match for comparison
     def __eq__(self, other):
+        if not isinstance(other, Image):
+            return False
         return self.filename == other.filename
 
     # special handling for boolean to see if exists
@@ -747,3 +768,147 @@ class List(NameRepr, Element):
 
     def _populate(self):
         return Request('list/{0}'.format(self.id))
+
+class Network(NameRepr,Element):
+    id = Datapoint('id', initarg=1)
+    name = Datapoint('name')
+
+class SeriesCast(Person):
+    character = Datapoint('character')
+    order = Datapoint('sort_order')
+
+    def __repr__(self):
+        return u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
+               .format(self).encode('utf-8')
+
+class Episode(NameRepr, Element):
+    episode_number = Datapoint('episode_number', initarg=1)
+    season_number = Datapoint('season_number', initarg=1)
+    series_id = Datapoint('series_id', initarg=1)
+    air_date = Datapoint('air_date', handler=process_date)
+    overview = Datapoint('overview')
+    name = Datapoint('name')
+    vote_average = Datapoint('vote_average')
+    vote_count = Datapoint('vote_count')
+    id = Datapoint('id')
+    production_code = Datapoint('production_code')
+    still = Datapoint('still_path', handler=Backdrop, raw=False, default=None)
+
+    def _populate(self):
+        return Request('tv/{0}/season/{1}/episode/{2}'.format(self.series_id, self.season_number, self.episode_number),
+                       language=self._locale.language)
+
+    def _populate_cast(self):
+        return Request('tv/{0}/season/{1}/episode/{2}/credits'.format(
+            self.series_id, self.season_number, self.episode_number),
+                       language=self._locale.language)
+
+    def _populate_external_ids(self):
+        return Request('tv/{0}/season/{1}/episode/{2}/external_ids'.format(
+            self.series_id, self.season_number, self.episode_number))
+
+    def _populate_images(self):
+        kwargs = {}
+        if not self._locale.fallthrough:
+            kwargs['language'] = self._locale.language
+        return Request('tv/{0}/season/{1}/episode/{2}/images'.format(
+            self.series_id, self.season_number, self.episode_number), **kwargs)
+
+    cast = Datalist('cast', handler=SeriesCast,
+                    poller=_populate_cast, sort='order')
+    guest_stars = Datalist('guest_stars', handler=SeriesCast,
+                    poller=_populate_cast, sort='order')
+    crew = Datalist('crew', handler=Crew, poller=_populate_cast)
+    imdb_id = Datapoint('imdb_id', poller=_populate_external_ids)
+    freebase_id = Datapoint('freebase_id', poller=_populate_external_ids)
+    freebase_mid = Datapoint('freebase_mid', poller=_populate_external_ids)
+    tvdb_id = Datapoint('tvdb_id', poller=_populate_external_ids)
+    tvrage_id = Datapoint('tvrage_id', poller=_populate_external_ids)
+    stills = Datalist('stills', handler=Backdrop, poller=_populate_images, sort=True)
+
+class Season(NameRepr, Element):
+    season_number = Datapoint('season_number', initarg=1)
+    series_id = Datapoint('series_id', initarg=1)
+    id = Datapoint('id')
+    air_date = Datapoint('air_date', handler=process_date)
+    poster = Datapoint('poster_path', handler=Poster, raw=False, default=None)
+    overview = Datapoint('overview')
+    name = Datapoint('name')
+    episodes = Datadict('episodes', attr='episode_number', handler=Episode,
+                        passtrough={'series_id': 'series_id', 'season_number': 'season_number'})
+
+    def _populate(self):
+        return Request('tv/{0}/season/{1}'.format(self.series_id, self.season_number),
+                       language=self._locale.language)
+
+    def _populate_images(self):
+        kwargs = {}
+        if not self._locale.fallthrough:
+            kwargs['language'] = self._locale.language
+        return Request('tv/{0}/season/{1}/images'.format(self.series_id, self.season_number), **kwargs)
+
+    def _populate_external_ids(self):
+        return Request('tv/{0}/season/{1}/external_ids'.format(self.series_id, self.season_number))
+
+    posters = Datalist('posters', handler=Poster,
+                       poller=_populate_images, sort=True)
+
+    freebase_id = Datapoint('freebase_id', poller=_populate_external_ids)
+    freebase_mid = Datapoint('freebase_mid', poller=_populate_external_ids)
+    tvdb_id = Datapoint('tvdb_id', poller=_populate_external_ids)
+    tvrage_id = Datapoint('tvrage_id', poller=_populate_external_ids)
+
+class Series(NameRepr, Element):
+    id = Datapoint('id', initarg=1)
+    backdrop = Datapoint('backdrop_path', handler=Backdrop, raw=False, default=None)
+    authors = Datalist('created_by', handler=Person)
+    episode_run_times = Datalist('episode_run_time')
+    first_air_date = Datapoint('first_air_date', handler=process_date)
+    last_air_date = Datapoint('last_air_date', handler=process_date)
+    genres = Datalist('genres', handler=Genre)
+    homepage = Datapoint('homepage')
+    in_production = Datapoint('in_production')
+    languages = Datalist('languages')
+    origin_countries = Datalist('origin_country')
+    name = Datapoint('name')
+    original_name = Datapoint('original_name')
+    number_of_episodes = Datapoint('number_of_episodes')
+    number_of_seasons = Datapoint('number_of_seasons')
+    overview = Datapoint('overview')
+    popularity = Datapoint('popularity')
+    status = Datapoint('status')
+    vote_average = Datapoint('vote_average')
+    vote_count = Datapoint('vote_count')
+    poster = Datapoint('poster_path', handler=Poster, raw=False, default=None)
+    networks = Datalist('networks', handler=Network)
+    seasons = Datadict('seasons', attr='season_number', handler=Season, passtrough={'id': 'series_id'})
+
+    def _populate(self):
+        return Request('tv/{0}'.format(self.id),
+                       language=self._locale.language)
+
+    def _populate_cast(self):
+        return Request('tv/{0}/credits'.format(self.id))
+
+    def _populate_images(self):
+        kwargs = {}
+        if not self._locale.fallthrough:
+            kwargs['language'] = self._locale.language
+        return Request('tv/{0}/images'.format(self.id), **kwargs)
+
+    def _populate_external_ids(self):
+        return Request('tv/{0}/external_ids'.format(self.id))
+
+    cast = Datalist('cast', handler=SeriesCast,
+                    poller=_populate_cast, sort='order')
+    crew = Datalist('crew', handler=Crew, poller=_populate_cast)
+    backdrops = Datalist('backdrops', handler=Backdrop,
+                         poller=_populate_images, sort=True)
+    posters = Datalist('posters', handler=Poster,
+                       poller=_populate_images, sort=True)
+
+    imdb_id = Datapoint('imdb_id', poller=_populate_external_ids)
+    freebase_id = Datapoint('freebase_id', poller=_populate_external_ids)
+    freebase_mid = Datapoint('freebase_mid', poller=_populate_external_ids)
+    tvdb_id = Datapoint('tvdb_id', poller=_populate_external_ids)
+    tvrage_id = Datapoint('tvrage_id', poller=_populate_external_ids)
