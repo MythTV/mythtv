@@ -1522,6 +1522,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         QString cachefilepath = GetThemeCacheDir() + '/' + label;
         QFileInfo cacheFileInfo(cachefilepath);
 
+        // If the file isn't in the disk cache, then we don't want to bother
+        // checking the last modified times of the original
+        if (!cacheFileInfo.exists())
+            return NULL;
+
         // Now compare the time on the source versus our cached copy
         QDateTime srcLastModified;
 

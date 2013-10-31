@@ -318,19 +318,30 @@ bool MythImage::Load(MythImageReader *reader)
 
 bool MythImage::Load(const QString &filename)
 {
+    if (filename.isEmpty())
+        return false;
+
     QImage *im = NULL;
     if (filename.startsWith("myth://"))
     {
-        im = new QImage();
-        RemoteFile *rf = new RemoteFile(filename, false, false, 0);
+        // Attempting a file transfer on a file that doesn't exist throws
+        // a lot of noisy warnings on the backend and frontend, so to avoid
+        // that first check it's there
+        if (RemoteFile::Exists(filename))
+        {
+            RemoteFile *rf = new RemoteFile(filename, false, false, 0);
 
-        QByteArray data;
-        bool ret = rf->SaveAs(data);
+            QByteArray data;
+            bool ret = rf->SaveAs(data);
 
-        delete rf;
+            delete rf;
 
-        if (ret)
-            im->loadFromData(data);
+            if (ret)
+            {
+                im = new QImage();
+                im->loadFromData(data);
+            }
+        }
 #if 0
         else
             LOG(VB_GENERAL, LOG_ERR,
@@ -343,10 +354,12 @@ bool MythImage::Load(const QString &filename)
                 (filename.startsWith("https://")) ||
                 (filename.startsWith("ftp://")))
     {
-        im = new QImage();
         QByteArray data;
         if (GetMythDownloadManager()->download(filename, &data))
+        {
+            im = new QImage();
             im->loadFromData(data);
+        }
     }
     else
     {
@@ -356,6 +369,12 @@ bool MythImage::Load(const QString &filename)
         im = new QImage(absoluteUrl);
     }
 
+    if (im && im->isNull())
+    {
+        delete im;
+        im = NULL;
+    }
+
     SetFileName(filename);
     if (im)
     {
@@ -363,6 +382,8 @@ bool MythImage::Load(const QString &filename)
         delete im;
         return true;
     }
+    else
+        LOG(VB_GUI, LOG_WARNING, QString("MythImage::Load(%1) failed").arg(filename));
 
     return false;
 }

@@ -6200,7 +6200,7 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, QString("ERROR: LocalFilePath "
-                    "unable to find local path for '%1'.") .arg(opath));
+                    "unable to find local path for '%1'.") .arg(url.toString()));
                 lpath = "";
             }
 
