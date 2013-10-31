@@ -3861,7 +3861,14 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             if (!antadj)
             {
                 SetFlags(kFlagWaitingForSignal);
-                signalMonitorDeadline = curRecording->GetScheduledEndTime();
+                if (curRecording)
+                    signalMonitorDeadline = curRecording->GetScheduledEndTime();
+                else
+                {
+                    QDateTime expire = MythDate::current();
+                    signalMonitorDeadline =
+                        expire.addMSecs(genOpt.channel_timeout * 2);
+                }
                 signalMonitorCheckCnt = 0;
             }
         }
@@ -3925,7 +3932,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     }
     else
     {
-        if (signalMonitorCheckCnt)
+        if (signalMonitorCheckCnt) // Don't flood log file
             --signalMonitorCheckCnt;
         else
         {
