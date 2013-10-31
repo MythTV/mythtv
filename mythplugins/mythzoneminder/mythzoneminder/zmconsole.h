@@ -74,8 +74,6 @@ class ZMConsole : public MythScreenType
     void updateMonitorList();
     void setMonitorFunction(const QString &function, int enabled);
 
-    int                m_currentMonitor;
-    int                m_monitorListSize;
     std::vector<Monitor *> *m_monitorList;
 
     MythUIButtonList  *m_monitor_list;
