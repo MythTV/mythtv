@@ -115,7 +115,7 @@ void FunctionDialog::setMonitorFunction(void)
 
 ZMConsole::ZMConsole(MythScreenStack *parent)
           :MythScreenType(parent, "zmconsole"),
-           m_currentMonitor(0),  m_monitorListSize(0), m_monitorList(NULL),
+           m_monitorList(NULL),
            m_monitor_list(NULL), m_running_text(NULL), m_status_text(NULL),
            m_time_text(NULL), m_date_text(NULL), m_load_text(NULL),
            m_disk_text(NULL), m_functionDialog(NULL),
@@ -262,8 +262,10 @@ void ZMConsole::showEditFunctionPopup()
 {
     Monitor *currentMonitor = NULL;
 
-    if (m_currentMonitor < (int) m_monitorList->size())
-        currentMonitor = m_monitorList->at(m_currentMonitor);
+    int pos = m_monitor_list->GetCurrentPos();
+
+    if (pos >= 0 && pos < (int) m_monitorList->size())
+        currentMonitor = m_monitorList->at(pos);
 
     if (!currentMonitor)
         return;
