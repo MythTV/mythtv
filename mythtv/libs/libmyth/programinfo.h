@@ -88,6 +88,7 @@ class MPUBLIC ProgramInfo
                 const QString &description,
                 uint season,
                 uint episode,
+                uint totalepisodes,
                 const QString &syndicatedepisode,
                 const QString &category,
 

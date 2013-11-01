@@ -64,7 +64,8 @@ const QString ProgramInfo::kFromRecordedQuery =
     "       r.editing,          r.bookmark,     r.watched,         "//39-41
     "       p.audioprop+0,      p.videoprop+0,  p.subtitletypes+0, "//42-44
     "       r.findid,           rec.dupin,      rec.dupmethod,     "//45-47
-    "       p.syndicatedepisodenumber, p.partnumber, p.parttotal   "//48-50
+    "       p.syndicatedepisodenumber, p.partnumber, p.parttotal,  "//48-50
+    "       p.season,           p.episode,      p.totalepisodes    "//51-53
     "FROM recorded AS r "
     "LEFT JOIN channel AS c "
     "ON (r.chanid    = c.chanid) "
@@ -291,6 +292,7 @@ ProgramInfo::ProgramInfo(
     const QString &_description,
     uint  _season,
     uint  _episode,
+    uint  _totalepisodes,
     const QString &_syndicatedepisode,
     const QString &_category,
 
@@ -347,6 +349,7 @@ ProgramInfo::ProgramInfo(
     description(_description),
     season(_season),
     episode(_episode),
+    totalepisodes(_totalepisodes),
     syndicatedepisode(_syndicatedepisode),
     category(_category),
     director(),
@@ -465,6 +468,7 @@ ProgramInfo::ProgramInfo(
     description(_description),
     season(_season),
     episode(_episode),
+    totalepisodes(0),
     category(_category),
     director(),
 
@@ -1886,8 +1890,12 @@ bool ProgramInfo::LoadProgramFromRecorded(
     subtitle     = query.value(1).toString();
     description  = query.value(2).toString();
     season       = query.value(3).toUInt();
+    if (season == 0)
+        season   = query.value(51).toUInt();
     episode      = query.value(4).toUInt();
-    totalepisodes = 0;
+    if (episode == 0)
+        episode  = query.value(52).toUInt();
+    totalepisodes = query.value(53).toUInt();
     syndicatedepisode = query.value(48).toString();
     category     = query.value(5).toString();
 
@@ -5257,13 +5265,27 @@ bool LoadFromRecorded(
                  (flags & FL_REALLYEDITING) ||
                  (flags & COMM_FLAG_PROCESSING));
 
+        // User/metadata defined season from recorded
+        uint season = query.value(3).toUInt();
+        if (season == 0)
+            season = query.value(51).toUInt(); // Guide defined season from recordedprogram
+
+        // User/metadata defined episode from recorded
+        uint episode = query.value(4).toUInt();
+        if (episode == 0)
+            episode  = query.value(52).toUInt();  // Guide defined episode from recordedprogram
+
+        // Guide defined total episodes from recordedprogram
+        uint totalepisodes = query.value(53).toUInt();
+
         destination.push_back(
             new ProgramInfo(
                 query.value(0).toString(),
                 query.value(1).toString(),
                 query.value(2).toString(),
-                query.value(3).toUInt(),
-                query.value(4).toUInt(),
+                season,
+                episode,
+                totalepisodes,
                 query.value(48).toString(), // syndicatedepisode
                 query.value(5).toString(),
 
