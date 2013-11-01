@@ -2,7 +2,7 @@
 function recordProgram(chanID, startTime, type)
 {
     hideMenu("recMenu");
-    var url = "/tv/dvr_util.qjs?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
+    var url = "/tv/qjs/dvr_util.qjs?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -13,7 +13,7 @@ function recordProgram(chanID, startTime, type)
 
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/dvr_util.qjs?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/qjs/dvr_util.qjs?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url ).done(function()
                             {
                                 var response = ajaxRequest.responseText.split("#");
@@ -38,20 +38,6 @@ function recRuleChanged(chandID, startTime)
     toggleVisibility(popup);
 
     setTimeout(function(){checkRecordingStatus(chanID, startTime)}, 2500);
-}
-
-function deleteRecRule(chandID, startTime)
-{
-    var layer = document.getElementById(chanID + "_" + startTime);
-    var recRuleID = getChildValue(layer, "recordid");
-    hideMenu("editRecMenu");
-    var url = "/tv/dvr_util.qjs?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
-    var ajaxRequest = $.ajax( url )
-                            .done(function()
-                            {
-                                var response = ajaxRequest.responseText.split("#");
-                                recRuleChanged( response[0], response[1] );
-                            });
 }
 
 function loadGuideContent(url, transition)

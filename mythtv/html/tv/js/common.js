@@ -179,7 +179,7 @@ function showDetail(parentID, type)
     if (type == "recording")
         method = "getRecordingDetailHTML";
 
-    var url = "/tv/program_util.qjs?action=" + method + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/qjs/program_util.qjs?action=" + method + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                         {
@@ -208,6 +208,25 @@ function hideDetail(parent)
     toggleVisibility(layer, false);
 }
 
+function loadScheduler(chanID, startTime, from)
+{
+    hideMenu(from);
+    loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime);
+}
+
+function deleteRecRule(chandID, startTime)
+{
+    var layer = document.getElementById(chanID + "_" + startTime);
+    var recRuleID = getChildValue(layer, "recordid");
+    hideMenu("editRecMenu");
+    var url = "/tv/qjs/dvr_util.qjs?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url )
+                            .done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                recRuleChanged( response[0], response[1] );
+                            });
+}
 
 function leftSlideTransition(oldDivID, newDivID)
 {

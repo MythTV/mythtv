@@ -69,12 +69,21 @@
     text-align:center;
 }
 
+.recordingList .previewImageBackground
+{
+    float: right;
+    border-radius: 10px;
+    background: #000000;
+    padding-left: 0px;
+    width: 107px;
+    height: 60px;
+    overflow: hidden;
+}
+
 .recordingList .previewImage
 {
-    border-radius: 10px;
-    border: 1px solid #1A1A1A;
+    margin: auto;
     overflow: hidden;
-    float: right;
 }
 
 .recordingList .watchRecordingLink

@@ -89,7 +89,7 @@ import "/js/utility.js"
 <h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
 
 <!-- Popup Recording Menu -->
-<div id="recMenu" class="guideMenu">
+<div id="recMenu" class="contextMenu">
     <div class="button" onClick="recordProgram(chanID, startTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
@@ -102,17 +102,17 @@ import "/js/utility.js"
     <div class="button" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
-    <div class="button" onClick="loadGuideContent('/tv/schedule.qsp', "dissolve")">
+    <div class="button" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
 
 <!-- Popup Edit Recording Menu -->
-<div id="editRecMenu" class="guideMenu">
+<div id="editRecMenu" class="contextMenu">
     <div class="button" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button" onClick="loadGuideContent('/tv/schedule.qsp', "dissolve")">
+    <div class="button" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>

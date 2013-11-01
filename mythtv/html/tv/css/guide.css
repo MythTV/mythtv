@@ -245,32 +245,6 @@
     font-weight: bold;
 }
 
-.guideGrid .programWillRecord .programHeader
-{
-/*    background-color: #37912F;*/
-    background: linear-gradient(to bottom, #6FC462, #156F0D 40%);
-}
-
-.guideGrid .programRecording .programHeader
-{
-/*    background-color: #00CC00;*/
-    background: linear-gradient(to bottom, #00EE00, #00AA00 40%);
-}
-
-.guideGrid .programEarlierShowing .programHeader,
-.guideGrid .programLaterShowing .programHeader,
-.guideGrid .programOtherShowing .programHeader
-{
-    border: 2px #37912F dashed;
-}
-
-.guideGrid .programConflicting .programHeader,
-.guideGrid .programRecorderFailed .programHeader
-{
-/*    background-color: #CC0000;*/
-    background: linear-gradient(to bottom, #EE0000, #AA0000 40%);
-}
-
 .guideGrid .programScheduling .programHeader
 {
 /*    background-color: #045FB4;*/
@@ -293,42 +267,5 @@
     position: absolute;
     z-index: 10;
     white-space: nowrap;
-}
-
-/* Recording Menu */
-.guideMenu
-{
-    background-color: rgba(51, 51, 51, 0.85);
-    border: 2px #045FB4 solid;
-    box-shadow: 6px 6px 4px #222222;
-    display: none;
-    z-index: 99;
-    position: absolute;
-}
-
-.guideMenu .button
-{
-    background-color:#444444;
-    border:3px #FFFFFF outset;
-    color: #DDDDDD;
-    margin: 7px;
-    font-weight: bold;
-    font-size: 1.1em;
-    padding: 4px;
-    vertical-align: middle;
-    text-align: center;
-    white-space: nowrap;
-    border-radius: 8px;
-}
-
-.guideMenu .button:hover
-{
-    background-color:#555555;
-    color: #FFFFFF;
-}
-
-.guideMenu .button:active
-{
-    border-style:inset;
 }
 

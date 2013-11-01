@@ -62,6 +62,13 @@ import "/js/utility.js"
         return chanID + "#" + startTime.toISOString()  + "#" + recRuleID;
     }
 
+    function deleteRecording(chanID, startTime, allowReRecord)
+    {
+        var dvr = new Dvr();
+        dvr.RemoveRecorded(chanID, startTime, false, allowReRecord);
+        return chanID + "#" + startTime.toISOString();
+    }
+
     var ret;
     switch (args.action)
     {
@@ -77,6 +84,9 @@ import "/js/utility.js"
             var validDate = myth.ParseISODateString(getArg("StartTime"));
             ret = deleteRecRule(args.recruleid, getArg("ChanID"), validDate);
             break;
+        case "deleteRecording":
+            var validDate = myth.ParseISODateString(getArg("StartTime"));
+            ret = deleteRecording(getArg("ChanID"), validDate, getArg("AllowRerecord") == 1);
         default:
             break;
     }

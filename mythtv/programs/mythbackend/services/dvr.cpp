@@ -160,9 +160,9 @@ bool Dvr::RemoveRecorded(int chanid, const QDateTime &recstarttsRaw,
     {
         QString cmd = QString("DELETE_RECORDING %1 %2 %3 %4")
             .arg(pi.GetChanID())
-            .arg(pi.GetRecordingStartTime(MythDate::ISODate)
-            .arg(forceDelete ? 1 : 0)
-            .arg(allowRerecord ? 1 : 0));
+            .arg(pi.GetRecordingStartTime(MythDate::ISODate))
+            .arg(forceDelete ? "FORCE" : "NO_FORCE")
+            .arg(allowRerecord ? "FORGET" : "NO_FORGET");
         MythEvent me(cmd);
 
         gCoreContext->dispatch(me);

@@ -49,33 +49,41 @@ import "/js/utility.js"
 
         if (type == "program" && program.Recording.Status != 0) // Don't show status for recordings
         {
-            html += '<label for="detailRecStatus">Recording Status: </label><span id="detailRecStatus">' + dvr.RecStatusToString(program.Recording.Status) + '</span><br />';
+            html += '<label for="detailRecStatus">' + qsTr("Recording Status:") + ' </label><span id="detailRecStatus">' + dvr.RecStatusToString(program.Recording.Status) + '</span><br />';
         }
         if (program.FileSize > 0)
         {
-            html += '<label for="detailSize">Size: </label><span id="detailSize">' + filesizeToString(program.FileSize) + '</span><br />';
+            html += '<label for="detailSize">' + qsTr("Size:") + ' </label><span id="detailSize">' + filesizeToString(program.FileSize) + '</span><br />';
         }
         if (type == "program")
         {
-            html += '<label for="detailStartEnd">Start/End Times: </label><span id="detailStartEnd">' + myth.GetFormatTime(program.StartTime) + ' - ' + myth.GetFormatTime(program.EndTime) + '</span><br />';
+            html += '<label for="detailStartEnd">' + qsTr("Start/End Times:") + ' </label><span id="detailStartEnd">' + myth.GetFormatTime(program.StartTime) + ' - ' + myth.GetFormatTime(program.EndTime) + '</span><br />';
         }
-        html += '<label for="detailDuration">Duration: </label><span id="detailDuration">' + durationStr + '</span><br />';
+        html += '<label for="detailDuration">' + qsTr("Duration:") + ' </label><span id="detailDuration">' + durationStr + '</span><br />';
         if (program.Category != "")
         {
-            html += '<label for="detailCategory">Category: </label><span id="detailCategory">' + escapeHTML(toCapitalCase(program.Category)) + '</span><br />';
+            html += '<label for="detailCategory">' + qsTr("Category:") + ' </label><span id="detailCategory">' + escapeHTML(toCapitalCase(program.Category)) + '</span><br />';
         }
         if (program.Season > 0)
         {
-            html += '<label for="detailSeason">Season: </label><span id="detailSeason">' + program.Season + '</span><br />';
+            html += '<label for="detailSeason">' + qsTr("Season:") + ' </label><span id="detailSeason">' + program.Season + '</span> ';
         }
         if (program.Episode > 0)
         {
-            html += '<label for="detailEpisode">Episode: </label><span id="detailEpisode">' + program.Episode;
+            html += '<label for="detailEpisode">' + qsTr("Episode:") + ' </label><span id="detailEpisode">' + program.Episode;
             if (program.TotalEpisodes > 0)
             {
                 html += '/' + program.TotalEpisodes;
             }
-            html += '</span>';
+            html += '</span><br />';
+        }
+        else if (program.Season > 0)
+        {
+            html += '<br />';
+        }
+        if (program.Recording.RecGroup != "")
+        {
+            html += '<label for="detailRecGroup">' + qsTr("Recording Group:") + ' </label><span id="detailRecGroup">' + program.Recording.RecGroup + '</span>';
         }
 
         return html;

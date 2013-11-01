@@ -1054,12 +1054,16 @@ void MainServer::customEvent(QEvent *e)
             QStringList tokens = me->Message()
                 .split(" ", QString::SkipEmptyParts);
 
-            if (tokens.size() != 3)
+
+            if (tokens.size() < 3 || tokens.size() > 5)
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Bad %1 message").arg(tokens[0]));
                 return;
             }
+
+            bool force = (tokens.size() >= 4) && (tokens[3] == "FORCE");
+            bool forget = (tokens.size() >= 5) && (tokens[4] == "FORGET");
 
             QDateTime startts = MythDate::fromString(tokens[2]);
             RecordingInfo recInfo(tokens[1].toUInt(), startts);
@@ -1067,9 +1071,9 @@ void MainServer::customEvent(QEvent *e)
             if (recInfo.GetChanID())
             {
                 if (tokens[0] == "FORCE_DELETE_RECORDING")
-                    DoHandleDeleteRecording(recInfo, NULL, true, false, false);
+                    DoHandleDeleteRecording(recInfo, NULL, true, false, forget);
                 else
-                    DoHandleDeleteRecording(recInfo, NULL, false, false, false);
+                    DoHandleDeleteRecording(recInfo, NULL, false, force, forget);
             }
             else
             {
