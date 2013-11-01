@@ -40,7 +40,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.9" );
+    Q_CLASSINFO( "version"    , "2.0" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -77,7 +77,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                             const QDateTime &StartTime  ) = 0;
 
         virtual bool               RemoveRecorded        ( int              ChanId,
-                                                           const QDateTime &StartTime  ) = 0;
+                                                           const QDateTime &StartTime,
+                                                           bool             ForceDelete,
+                                                           bool             AllowRerecord ) = 0;
 
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count      ) = 0;

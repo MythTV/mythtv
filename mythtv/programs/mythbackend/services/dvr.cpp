@@ -148,7 +148,8 @@ DTC::Program* Dvr::GetRecorded(int chanid, const QDateTime &recstarttsRaw)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::RemoveRecorded(int chanid, const QDateTime &recstarttsRaw)
+bool Dvr::RemoveRecorded(int chanid, const QDateTime &recstarttsRaw,
+                         bool forceDelete, bool allowRerecord)
 {
     if (chanid <= 0 || !recstarttsRaw.isValid())
         throw QString("Channel ID or StartTime appears invalid.");
@@ -157,9 +158,11 @@ bool Dvr::RemoveRecorded(int chanid, const QDateTime &recstarttsRaw)
 
     if (pi.GetChanID() && pi.HasPathname())
     {
-        QString cmd = QString("DELETE_RECORDING %1 %2")
+        QString cmd = QString("DELETE_RECORDING %1 %2 %3 %4")
             .arg(pi.GetChanID())
-            .arg(pi.GetRecordingStartTime(MythDate::ISODate));
+            .arg(pi.GetRecordingStartTime(MythDate::ISODate)
+            .arg(forceDelete ? 1 : 0)
+            .arg(allowRerecord ? 1 : 0));
         MythEvent me(cmd);
 
         gCoreContext->dispatch(me);
