@@ -66,7 +66,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     ProgramList progList;
 
-    int desc = 0;
+    int desc = 1;
     if (bDescending)
         desc = -1;
 
