@@ -20,7 +20,7 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "ChannelInfos", "type=DTC::ChannelInfo");
-	Q_CLASSINFO( "AsOf"		   , "transient=true"       );
+    Q_CLASSINFO( "AsOf"        , "transient=true"       );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

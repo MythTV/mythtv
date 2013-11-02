@@ -41,7 +41,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "Channels", "type=DTC::ChannelInfo");
-    Q_CLASSINFO( "AsOf"	   , "transient=true"       );
+    Q_CLASSINFO( "AsOf"    , "transient=true"       );
 
     Q_PROPERTY( QDateTime     StartTime      READ StartTime      WRITE setStartTime      )
     Q_PROPERTY( QDateTime     EndTime        READ EndTime        WRITE setEndTime        )

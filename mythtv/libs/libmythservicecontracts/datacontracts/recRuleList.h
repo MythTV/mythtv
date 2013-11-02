@@ -21,7 +21,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "RecRules", "type=DTC::RecRule");
-    Q_CLASSINFO( "AsOf"	   , "transient=true"   );
+    Q_CLASSINFO( "AsOf"    , "transient=true"   );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

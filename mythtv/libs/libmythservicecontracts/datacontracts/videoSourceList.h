@@ -21,7 +21,7 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "VideoSources", "type=DTC::VideoSource");
-	Q_CLASSINFO( "AsOf"	       , "transient=true"       );
+    Q_CLASSINFO( "AsOf"        , "transient=true"       );
 
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )
     Q_PROPERTY( QString      Version        READ Version         WRITE setVersion        )

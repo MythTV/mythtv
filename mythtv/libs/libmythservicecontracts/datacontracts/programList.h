@@ -32,7 +32,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "Programs", "type=DTC::Program");
-	Q_CLASSINFO( "AsOf"	   , "transient=true"   );
+    Q_CLASSINFO( "AsOf"    , "transient=true"   );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

@@ -30,7 +30,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "VideoLookups", "type=DTC::VideoLookup");
-	Q_CLASSINFO( "AsOf"	       , "transient=true"       );
+    Q_CLASSINFO( "AsOf"        , "transient=true"       );
 
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
     Q_PROPERTY( QDateTime    AsOf           READ AsOf            WRITE setAsOf           )

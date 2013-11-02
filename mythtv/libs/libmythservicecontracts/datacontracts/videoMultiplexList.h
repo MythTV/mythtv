@@ -21,7 +21,7 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "VideoMultiplexes", "type=DTC::VideoMultiplex");
-	Q_CLASSINFO( "AsOf"	           , "transient=true"          );
+    Q_CLASSINFO( "AsOf"            , "transient=true"          );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )

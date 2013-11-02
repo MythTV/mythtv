@@ -30,7 +30,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     // See datacontracthelper.h for details
 
     Q_CLASSINFO( "VideoMetadataInfos", "type=DTC::VideoMetadataInfo");
-	Q_CLASSINFO( "AsOf"	             , "transient=true" );
+    Q_CLASSINFO( "AsOf"              , "transient=true" );
 
     Q_PROPERTY( int          StartIndex     READ StartIndex      WRITE setStartIndex     )
     Q_PROPERTY( int          Count          READ Count           WRITE setCount          )
