@@ -92,8 +92,13 @@ void FillProgramInfo( DTC::Program *pProgram,
     if ( bIncChannel )
     {
         // Build Channel Child Element
-
-        FillChannelInfo( pProgram->Channel(), pInfo->GetChanID(), bDetails );
+        if (!FillChannelInfo( pProgram->Channel(), pInfo->GetChanID(), bDetails ))
+        {
+            // The channel associated with a given recording may no longer exist
+            // however the ChanID is one half of the unique identifier for the
+            // recording and therefore MUST be included in the return data
+            pProgram->Channel()->setChanId(pInfo->GetChanID());
+        }
     }
 
     // Build Recording Child Element
