@@ -139,14 +139,11 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
                     <% if (program.ProgramFlags & FL_COMMFLAG) {%><img src="/tv/images/fl_commflag.svg" width="36" height="27" alt="<%=qsTr("Commercial Flagged")%>" /><%}%>
                     </div>
                     <span class="recordingSubtitle"><%=escapeHTML(program.SubTitle)%></span>
-                    <% if (program.Episode > 0) { %>
+                    <% if (program.Season > 0 || program.Episode > 0) { %>
                         <span class="recordingSeasonEpisode">
-                            (<%=qsTr("S %1", "Season x").arg(program.Season)%>
-                            <% if (program.TotalEpisodes > 0) { %>
-                            <%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
-                            <%} else {%>
-                            <%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)
-                            <%}%>
+                            <% if (program.Season > 0) { %>(<%=qsTr("S %1", "Season x").arg(program.Season)%>
+                            <%} else {%>(<% } if (program.TotalEpisodes > 0) { %><%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
+                            <%} else if (program.Episode > 0) {%><%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)<%}%>
                         </span>
                     <%}%>
                     <span class="recordingDescription"><%=escapeHTML(program.Description)%></span>

@@ -1,6 +1,4 @@
-<div id="menu-title" align=center>
-    MythBackend
-</div>
+
 <div id="menu">
   <ul class="menu collapsible">
     <li><a href='#'><i18n>TV</i18n></a>
@@ -8,7 +6,7 @@
     <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
     <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
     </ul>
-</li>
+    </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
@@ -82,7 +80,7 @@
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
             <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li>
+            <!-- <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li> -->
 <%
     if (devMode)
     {
@@ -100,5 +98,6 @@
     </li>
   </ul>
   <br>
-  <center><a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a></center>
+  <a class='menuitem' href='http://www.mythtv.org'>www.mythtv.org</a>
 </div>
+

@@ -116,13 +116,13 @@
         top:                0px;
         right:              0px;
         left:               0px;
-        height:             38px;
+        height:             34px;
         border-bottom:      4px solid #004570;
         z-index:            50;
     }
     #header_text {
         color:              #cdcccc;
-        padding-left:       200px;
+        padding-left:       190px;
         line-height:        2.75em;
         font-weight:        bold;
     }
@@ -130,7 +130,7 @@
     #header_logo {
         position:           absolute;
         display:            inline;
-        left:               10px;
+        left:               4px;
         top:                100%;
         height:             64px;
         margin-top:         -29px;
@@ -142,15 +142,15 @@
 
     #header_end {
         background-repeat:  repeat-x;
-        margin-top:         40px;
+        margin-top:         36px;
         height:             36px;
     }
 
     #content {
         position:           absolute;
-        top:                40px;
+        top:                36px;
         right:              0px;
-        left:               200px;
+        left:               190px;
         padding:            10px;
     }
 
@@ -158,29 +158,20 @@
         font-size:          12px;
         font-family:        sans-serif;
         position:           fixed;
-        top:                90px;
-        left:               10px;
-        width:              180px;
+        top:                70px;
+        left:               5px;
+        width:              170px;
         color:              #26c;
         text-align:         center;
     }
 
     #menu-bg {
         position:           fixed;
-        top:                40px;
+        top:                36px;
         left:               0px;
-        width:              200px;
+        width:              187px;
         height:             2500px;
         background-color:   black; 
-    }
-
-    #menu-title {
-        color:              #E4D6CD;
-        position:           fixed;
-        top:                72px;
-        left:               10px;
-        width:              180px;
-        text-align:         center;
     }
 
     #menu a, a:visited {
@@ -189,16 +180,18 @@
 
     #menu {
         position:           fixed;
-        top:                110px;
-        left:               10px;
-        width:              180px;
+        top:                90px;
+        left:               7px;
+        width:              173px;
         color:              #E4D6CD;
+        text-align:         center;
     }
 
     #menu ul {
         list-style: none;
         margin: 0;
         padding: 0;
+        text-align: left;
     }
 
     #menu li a {
