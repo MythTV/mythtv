@@ -13,12 +13,17 @@ import "/tv/js/constants.js"
 
     var myth = new Myth();
 
+    // Default is to sort recordings from most recent through to the oldest
     var sortDescending = true;
-    if (getArg("SortAsc"))
+    if (getArg("SortAsc") == 1)
         sortDescending = false;
 
+    var recGroup = "Default";
+    if (getArg("RecordingGroup") != "")
+        recGroup = getArg("RecordingGroup");
+
     var dvr = new Dvr();
-    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, "", "Default", "" );
+    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, "", recGroup, "" );
     var programs = recordings.Programs;
 %>
 
@@ -60,10 +65,25 @@ import "/tv/js/constants.js"
 <!-- Sort order, grouping etc -->
 <div class="navigateBox">
 
+    <label for="listGroup"><%=qsTr("Recording Group")%>:</label>
+    <select id="listGroup" onChange="loadContent('/tv/recordings.qsp?RecordingGroup=' + this.options[this.options.selectedIndex].value);">
+<%
+    var groupList = dvr.GetRecGroupList();
+
+
+    for (var grpIdx = 0; grpIdx < groupList.length; grpIdx++)
+    {
+%>
+        <option value="<%=groupList[grpIdx]%>" <%if (getArg("RecordingGroup") == groupList[grpIdx]) {%>selected<%}%>><%=groupList[grpIdx]%></option>
+<%
+    }
+%>
+    </select>
+
     <label for="listSortOrder"><%=qsTr("Sort")%>:</label>
     <select id="listSortOrder" onChange="loadContent('/tv/recordings.qsp?SortAsc=' + this.options[this.options.selectedIndex].value);">
-        <option label="Ascending" value="1">Ascending</option>
         <option label="Descending" value="0">Descending</option>
+        <option label="Ascending" value="1" <%if (getArg("SortAsc") == 1) {%>selected<%}%>>Ascending</option>
     </select>
 
 </div>
