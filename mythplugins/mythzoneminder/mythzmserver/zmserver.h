@@ -160,6 +160,7 @@ class MONITOR
 
     string getIdStr(void);
     int getLastWriteIndex(void);
+    int getSubpixelOrder(void);
     int getState(void);
 
     string name;
