@@ -254,7 +254,7 @@ void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
     if (mapFile >= 0)
     {
         if (debug)
-            cout << "Opened mmap file: " << mmap_filename << endl;
+            cout << "Opened mmap file: " << mmap_filename.str() << endl;
 
         shm_ptr = mmap(NULL, shared_data_size, PROT_READ,
                        MAP_SHARED, mapFile, 0x0);
