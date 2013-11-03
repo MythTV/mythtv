@@ -29,7 +29,7 @@ bool IPTVRecorder::Open(void)
 {
     if (IsOpen())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Stream already open");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Stream already open");
         return true;
     }
 

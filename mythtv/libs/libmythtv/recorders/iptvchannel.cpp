@@ -93,7 +93,7 @@ void IPTVChannel::Close(void)
 
 bool IPTVChannel::EnterPowerSavingMode(void)
 {
-    Close();
+    CloseStreamHandler();
     return true;
 }
 
@@ -138,9 +138,12 @@ void IPTVChannel::CloseStreamHandler(void)
 bool IPTVChannel::IsOpen(void) const
 {
     QMutexLocker locker(&m_lock);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen(%1)")
-        .arg(m_last_tuning.GetDeviceName()));
-    return (m_stream_handler && !m_stream_handler->HasError());
+    bool ret = (m_stream_handler && !m_stream_handler->HasError() &&
+                m_stream_handler->IsRunning());
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen(%1) %2")
+        .arg(m_last_tuning.GetDeviceName())
+        .arg(ret ? "true" : "false"));
+    return ret;
 }
 
 bool IPTVChannel::Tune(const IPTVTuningData &tuning)

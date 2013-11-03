@@ -31,6 +31,7 @@ DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
+DEPENDPATH  += ./recorders/HLS
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -668,7 +669,20 @@ using_backend {
     HEADERS += recorders/hlsstreamhandler.h
     SOURCES += recorders/hlsstreamhandler.cpp
 
+    HEADERS += recorders/HLS/HLSPlaylistWorker.h
+    HEADERS += recorders/HLS/HLSReader.h
+    HEADERS += recorders/HLS/HLSSegment.h
+    HEADERS += recorders/HLS/HLSStream.h
+    HEADERS += recorders/HLS/HLSStreamWorker.h
+
+    SOURCES += recorders/HLS/HLSPlaylistWorker.cpp
+    SOURCES += recorders/HLS/HLSReader.cpp
+    SOURCES += recorders/HLS/HLSSegment.cpp
+    SOURCES += recorders/HLS/HLSStream.cpp
+    SOURCES += recorders/HLS/HLSStreamWorker.cpp
+
     DEFINES += USING_IPTV
+
 
     # Support for HDHomeRun box
     using_hdhomerun {
