@@ -32,8 +32,8 @@
 
 class HLSReader
 {
-    friend HLSStreamWorker;
-    friend HLSPlaylistWorker;
+    friend class HLSStreamWorker;
+    friend class HLSPlaylistWorker;
 
   public:
     typedef QMap<QString, HLSRecStream* > StreamContainer;
