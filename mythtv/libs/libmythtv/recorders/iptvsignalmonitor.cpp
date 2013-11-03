@@ -26,16 +26,11 @@ IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
                                      uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    m_streamHandlerStarted(false)
+    m_streamHandlerStarted(false), m_locked(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-
-    // TODO init isLocked
-    // bool isLocked = true;
-
-    QMutexLocker locker(&statusLock);
-    signalLock.SetValue(1 /*(isLocked) ? 1 : 0*/);
-    signalStrength.SetValue(100 /*(isLocked) ? 100 : 0*/);
+    signalLock.SetValue(0);
+    signalStrength.SetValue(0);
 }
 
 /** \fn IPTVSignalMonitor::~IPTVSignalMonitor()
@@ -47,7 +42,7 @@ IPTVSignalMonitor::~IPTVSignalMonitor()
     Stop();
 }
 
-IPTVChannel *IPTVSignalMonitor::GetChannel(void)
+IPTVChannel *IPTVSignalMonitor::GetIPTVChannel(void)
 {
     return dynamic_cast<IPTVChannel*>(channel);
 }
@@ -59,7 +54,7 @@ void IPTVSignalMonitor::Stop(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    GetChannel()->SetStreamData(NULL);
+    GetIPTVChannel()->SetStreamData(NULL);
     m_streamHandlerStarted = false;
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
@@ -67,7 +62,7 @@ void IPTVSignalMonitor::Stop(void)
 void IPTVSignalMonitor::SetStreamData(MPEGStreamData *data)
 {
     DTVSignalMonitor::SetStreamData(data);
-    GetChannel()->SetStreamData(GetStreamData());
+    GetIPTVChannel()->SetStreamData(GetStreamData());
 }
 
 void IPTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
@@ -88,37 +83,32 @@ void IPTVSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
-    if (m_streamHandlerStarted)
-    {
-        EmitStatus();
-        if (IsAllGood())
-            SendMessageAllGood();
-        // TODO dtv signals...
-
-        update_done = true;
-        return;
-    }
-
-    bool isLocked = false;
+    if (!m_locked && GetIPTVChannel()->IsOpen())
     {
         QMutexLocker locker(&statusLock);
-        isLocked = signalLock.IsGood();
+        signalLock.SetValue(1);
+        signalStrength.SetValue(100);
+        m_locked = true;
     }
 
     EmitStatus();
     if (IsAllGood())
         SendMessageAllGood();
 
+    update_done = true;
+
+    if (m_streamHandlerStarted)
+        return;
+
     // Start table monitoring if we are waiting on any table
     // and we have a lock.
-    if (isLocked && GetStreamData() &&
+    if (GetStreamData() &&
         HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        GetChannel()->SetStreamData(GetStreamData());
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues: start sigmon");
+        GetIPTVChannel()->SetStreamData(GetStreamData());
         m_streamHandlerStarted = true;
     }
-
-    update_done = true;
 }

@@ -185,6 +185,13 @@ class MTV_PUBLIC CardUtil
             (rawtype == "CETON");
     }
 
+    static bool         IsChannelReusable(const QString &rawtype)
+    {
+        return !(rawtype == "FREEBOX");
+    }
+
+
+
     // Card creation and deletion
 
     static int          CreateCaptureCard(const QString &videodevice,

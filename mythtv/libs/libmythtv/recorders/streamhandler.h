@@ -59,6 +59,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
                              QString output_file       = QString());
     virtual void RemoveListener(MPEGStreamData *data);
     bool IsRunning(void) const;
+    bool HasError(void) const { return _error; }
 
   protected:
     StreamHandler(const QString &device);

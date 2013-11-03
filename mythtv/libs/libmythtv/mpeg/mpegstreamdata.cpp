@@ -20,7 +20,7 @@ using namespace std;
 #include "atsctables.h"
 
 //#define DEBUG_MPEG_RADIO // uncomment to strip video streams from TS stream
-#define LOC QString("MPEGStream[%1]: ").arg(_cardid)
+#define LOC QString("MPEGStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16)
 
 void init_sections(sections_t &sect, uint last_section)
 {

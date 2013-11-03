@@ -29,10 +29,11 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     IPTVSignalMonitor(const IPTVSignalMonitor&);
 
     virtual void UpdateValues(void);
-    IPTVChannel *GetChannel(void);
+    IPTVChannel *GetIPTVChannel(void);
 
   protected:
     bool m_streamHandlerStarted;
+    bool m_locked;
 };
 
 #endif // _IPTVSIGNALMONITOR_H_

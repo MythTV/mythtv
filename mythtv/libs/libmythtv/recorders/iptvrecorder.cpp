@@ -15,7 +15,7 @@
 #define LOC QString("IPTVRec: ")
 
 IPTVRecorder::IPTVRecorder(TVRec *rec, IPTVChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_open(false)
+    DTVRecorder(rec), m_channel(channel)
 {
 }
 
@@ -29,11 +29,14 @@ bool IPTVRecorder::Open(void)
 {
     if (IsOpen())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Card already open");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Stream already open");
         return true;
     }
 
     ResetForNewFile();
+
+    LOG(VB_RECORD, LOG_INFO, LOC + "Open:  open channel");
+    m_channel->Open();
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
@@ -45,22 +48,22 @@ bool IPTVRecorder::Open(void)
 
 bool IPTVRecorder::IsOpen(void) const
 {
-    return m_open;
+    if (!m_channel)
+        return false;
+    return m_channel->IsOpen();
 }
 
 void IPTVRecorder::Close(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Close()");
 
-    m_channel->SetStreamData(NULL);
-
-    m_open = false;
+    m_channel->Close();
 }
 
 void IPTVRecorder::SetStreamData(MPEGStreamData *data)
 {
     DTVRecorder::SetStreamData(data);
-    if (m_open && !IsPaused())
+    if (IsOpen() && !IsPaused())
         m_channel->SetStreamData(_stream_data);
 }
 
