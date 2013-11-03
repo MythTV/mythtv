@@ -15,8 +15,8 @@
 
 // MythTV headers
 #include "dtvchannel.h"
+#include "iptvstreamhandler.h"
 
-class IPTVStreamHandler;
 class IPTVTuningData;
 class IPTVRecorder;
 class MPEGStreamData;
@@ -24,6 +24,7 @@ class MPEGStreamData;
 class IPTVChannel : QObject, public DTVChannel
 {
     Q_OBJECT
+    friend class IPTVRecorder;
 
   public:
     IPTVChannel(TVRec*, const QString&);
@@ -31,7 +32,6 @@ class IPTVChannel : QObject, public DTVChannel
 
     // Commands
     virtual bool Open(void);
-    virtual void Close(void);
 
     using DTVChannel::Tune;
     virtual bool Tune(const IPTVTuningData&);
@@ -42,26 +42,24 @@ class IPTVChannel : QObject, public DTVChannel
 
     // Gets
     bool IsOpen(void) const;
+    IPTVStreamHandler *GetStreamHandler(void) const { return m_stream_handler; }
     virtual bool IsIPTV(void) const { return true; } // DTVChannel
 
   protected:
-    void timerEvent(QTimerEvent*);
+    virtual void Close(void);
+    bool EnterPowerSavingMode(void);
     virtual bool IsExternalChannelChangeSupported(void) { return true; }
 
   private:
-    void SetStreamDataInternal(MPEGStreamData*, bool closeimmediately);
     void OpenStreamHandler(void);
     void CloseStreamHandler(void);
 
   private:
-    mutable QMutex m_lock;
-    volatile bool m_open, m_firsttune;
-    IPTVTuningData m_last_tuning;
+    mutable QMutex     m_lock;
+    volatile bool      m_firsttune;
+    IPTVTuningData     m_last_tuning;
     IPTVStreamHandler *m_stream_handler;
-    MPEGStreamData *m_stream_data;
-    int  m_timer;
-    int  m_keepalive;
-    bool m_wantdeletion;
+    MPEGStreamData    *m_stream_data;
 };
 
 #endif // _IPTV_CHANNEL_H_

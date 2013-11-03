@@ -104,6 +104,7 @@ HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning) :
 
 HLSStreamHandler::~HLSStreamHandler(void)
 {
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
     m_hls->Interrupt();
     delete m_hls;
@@ -114,22 +115,28 @@ void HLSStreamHandler::run(void)
 {
     RunProlog();
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + "run()");
+    LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- begin");
 
     SetRunning(true, false, false);
 
     // TODO Error handling..
 
-    if (!m_hls->IsOpen())
-    {
-        m_hls->OpenFile(m_tuning.GetURL(0).toString());
-    }
-
     uint64_t startup    = MythDate::current().toMSecsSinceEpoch();
     uint64_t expected   = 0;
 
-    while (m_hls->IsOpen() && _running_desired)
+    while (_running_desired)
     {
+        if (!m_hls->IsOpen())
+        {
+            if (!m_hls->OpenFile(m_tuning.GetURL(0).toString()))
+            {
+                LOG(VB_CHANNEL, LOG_INFO, LOC +
+                    "run: HLS OpenFile() failed");
+                usleep(100000);
+                continue;
+            }
+        }
+
         int size = m_hls->Read((void*)m_buffer, BUFFER_SIZE);
 
         if (size < 0)
@@ -153,7 +160,7 @@ void HLSStreamHandler::run(void)
                 remainder = sit.key()->ProcessData(m_buffer, size);
             }
         }
-        
+
         if (remainder != 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -167,19 +174,24 @@ void HLSStreamHandler::run(void)
         if (expected > actual)
         {
             waiting = expected-actual;
+
+            /* The HLS Stream Handler feeds data to the
+             MPEGStreamData, however it feeds data as fast as the
+             MPEGStream can accept it, which quickly exhausts the HLS
+             buffer.  The data fed however is lost by the time the
+             recorder starts, forcing the HLS ringbuffer to wait for
+             new data to arrive.  The frontend will usually timeout by
+             then.  So we simulate a live mechanism by pausing before
+             feeding new data to the MPEGStreamData */
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("waiting %1ms (actual:%2, expected:%3)")
+                .arg(waiting).arg(actual).arg(expected));
+            usleep(waiting * 1000);
         }
-        // The HLS Stream Handler feeds data to the MPEGStreamData, however it feeds
-        // data as fast as the MPEGStream can accept it, which quickly exhausts the HLS buffer.
-        // The data fed however is lost by the time the recorder starts,
-        // forcing the HLS ringbuffer to wait for new data to arrive.
-        // The frontend will usually timeout by then.
-        // So we simulate a live mechanism by pausing before feeding new data
-        // to the MPEGStreamData
-        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("waiting %1ms (actual:%2, expected:%3)")
-            .arg(waiting).arg(actual).arg(expected));
-        usleep(waiting * 1000);
     }
 
     SetRunning(false, false, false);
     RunEpilog();
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- done");
 }

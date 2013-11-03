@@ -179,8 +179,10 @@ void StreamHandler::Start(void)
 
 void StreamHandler::Stop(void)
 {
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Stopping");
     SetRunningDesired(false);
     wait();
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Stopped");
 }
 
 bool StreamHandler::IsRunning(void) const

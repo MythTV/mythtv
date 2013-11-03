@@ -33,7 +33,6 @@ class IPTVRecorder : public DTVRecorder
 
   private:
     IPTVChannel *m_channel;
-    bool m_open;
 };
 
 #endif // _IPTV_RECORDER_H_
