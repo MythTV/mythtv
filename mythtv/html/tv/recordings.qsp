@@ -19,11 +19,15 @@ import "/tv/js/constants.js"
         sortDescending = false;
 
     var recGroup = "Default";
-    if (getArg("RecordingGroup") != "")
+    if (getArg("RecordingGroup"))
         recGroup = getArg("RecordingGroup");
 
+    var displayGroup = "";
+    if (getArg("DisplayGroup"))
+        displayGroup = getArg("DisplayGroup");
+
     var dvr = new Dvr();
-    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, "", recGroup, "" );
+    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, displayGroup, recGroup, "" );
     var programs = recordings.Programs;
 %>
 
@@ -65,26 +69,44 @@ import "/tv/js/constants.js"
 <!-- Sort order, grouping etc -->
 <div class="navigateBox">
 
-    <label for="listGroup"><%=qsTr("Recording Group")%>:</label>
-    <select id="listGroup" onChange="loadContent('/tv/recordings.qsp?RecordingGroup=' + this.options[this.options.selectedIndex].value);">
+    <form action="/tv/recordings.qsp">
+    <label for="listRecGroup"><%=qsTr("Recording Group")%>:</label>
+    <select id="listRecGroup" name="RecordingGroup" onChange="submitForm(this.parentNode)">
 <%
-    var groupList = dvr.GetRecGroupList();
+    var recGroupList = dvr.GetRecGroupList();
 
-
-    for (var grpIdx = 0; grpIdx < groupList.length; grpIdx++)
+    for (var grpIdx = 0; grpIdx < recGroupList.length; grpIdx++)
     {
 %>
-        <option value="<%=groupList[grpIdx]%>" <%if (getArg("RecordingGroup") == groupList[grpIdx]) {%>selected<%}%>><%=groupList[grpIdx]%></option>
+        <option value="<%=recGroupList[grpIdx]%>" <%if (recGroup == recGroupList[grpIdx]) {%>selected<%}%>><%=recGroupList[grpIdx]%></option>
 <%
     }
 %>
     </select>
 
     <label for="listSortOrder"><%=qsTr("Sort")%>:</label>
-    <select id="listSortOrder" onChange="loadContent('/tv/recordings.qsp?SortAsc=' + this.options[this.options.selectedIndex].value);">
+    <select id="listSortOrder" name="SortAsc" onChange="submitForm(this.parentNode)">
         <option label="Descending" value="0">Descending</option>
         <option label="Ascending" value="1" <%if (getArg("SortAsc") == 1) {%>selected<%}%>>Ascending</option>
     </select>
+    <br />
+    <label for="listDisplayOrder"><%=qsTr("Filter")%>:</label>
+    <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.parentNode)">
+
+<%
+    var displayGroupList = dvr.GetTitleList();
+%>
+        <option value="" <%if (displayGroup == displayGroupList[grpIdx]) {%>selected<%}%>>All</option>
+<%
+    for (var grpIdx = 0; grpIdx < displayGroupList.length; grpIdx++)
+    {
+%>
+        <option value="<%=displayGroupList[grpIdx]%>" <%if (displayGroup == displayGroupList[grpIdx]) {%>selected<%}%>><%=displayGroupList[grpIdx]%></option>
+<%
+    }
+%>
+    </select>
+    </form>
 
 </div>
 

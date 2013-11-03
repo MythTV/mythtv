@@ -228,6 +228,19 @@ function deleteRecRule(chandID, startTime)
                             });
 }
 
+function submitForm(formElement)
+{
+    var url = formElement.action;
+    var queryString = new Array();
+    for (var i = 0; i < formElement.elements.length; i++)
+    {
+        var input = formElement.elements[i];
+        queryString.push(input.name + "=" + input.value);
+    }
+    url += "?" + queryString.join('&');
+    loadContent(url);
+}
+
 function leftSlideTransition(oldDivID, newDivID)
 {
     // Transition works much better with a fixed width, so temporarily set

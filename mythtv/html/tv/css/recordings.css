@@ -11,6 +11,11 @@
     font-weight: bold;
 }
 
+.navigateBox SELECT
+{
+    margin: 3px;
+}
+
 .recordingList
 {
     width: calc(100% - 20px); /* Need to subtract padding of parent */
