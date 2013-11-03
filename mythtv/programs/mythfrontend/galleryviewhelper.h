@@ -5,11 +5,11 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QThread>
 
 // MythTV headers
 #include "mythgenerictree.h"
 #include "imagemetadata.h"
-#include "imagethumbgenthread.h"
 
 #include "galleryfilehelper.h"
 #include "gallerydatabasehelper.h"
@@ -24,7 +24,6 @@ public:
     ~GalleryViewHelper();
 
     MythGenericTree         *m_currentNode;
-    ImageThumbGenThread   *m_thumbGenThread;
 
     QStringList m_sgDirList;
     QString     m_sgName;

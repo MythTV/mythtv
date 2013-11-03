@@ -9,9 +9,6 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 
-#include "imagethumbgenthread.h"
-
-
 ImageLoadingThread::ImageLoadingThread() :
     m_image(NULL),
     m_imageData(NULL),
@@ -97,8 +94,6 @@ GalleryWidget::GalleryWidget(MythScreenStack *parent,
 
     m_infoVisible = false;
     m_index = 0;
-
-    m_gvh->m_thumbGenThread->Pause();
 }
 
 
@@ -132,8 +127,6 @@ GalleryWidget::~GalleryWidget()
     // Set the selected image in the gallery view to the saved one
     // so that the initially selected image is the correct one again.
     m_gvh->m_currentNode->setSelectedChild(m_selectedNode);
-
-    m_gvh->m_thumbGenThread->Resume();
 }
 
 
