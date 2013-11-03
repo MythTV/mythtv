@@ -18,7 +18,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "9"
+#define ZM_PROTOCOL_VERSION "10"
 
 #define BUFFER_SIZE  (2048*1536*3)
 

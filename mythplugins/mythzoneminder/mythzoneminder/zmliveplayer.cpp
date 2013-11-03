@@ -441,54 +441,7 @@ void Player::setWidgets(MythUIImage *image, MythUIText *status, MythUIText  *cam
 
 void Player::updateFrame(const unsigned char* buffer)
 {
-    unsigned int pos_data;
-    unsigned int pos_rgba = 0;
-    unsigned char a,r,g,b;
-
-    if (m_monitor.bytes_per_pixel == 1)
-    {
-        // 8 bit grey scale
-        for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height); )
-        {
-            m_rgba[pos_rgba++] = buffer[pos_data];   //b
-            m_rgba[pos_rgba++] = buffer[pos_data];   //g
-            m_rgba[pos_rgba++] = buffer[pos_data++]; //r
-            m_rgba[pos_rgba++] = 0xff;               //a
-        }
-    }
-    else if (m_monitor.bytes_per_pixel == 3)
-    {
-        // 24 bits per pixel
-        for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 3); )
-        {
-            r = buffer[pos_data++];
-            g = buffer[pos_data++];
-            b = buffer[pos_data++];
-
-            m_rgba[pos_rgba++] = b;
-            m_rgba[pos_rgba++] = g;
-            m_rgba[pos_rgba++] = r;
-            m_rgba[pos_rgba++] = 0xff;
-        }
-    }
-    else
-    {
-        // must be 32 bits per pixel
-        for (pos_data = 0; pos_data < (unsigned int) (m_monitor.width * m_monitor.height * 4); )
-        {
-            r = buffer[pos_data++];
-            g = buffer[pos_data++];
-            b = buffer[pos_data++];
-            a = buffer[pos_data++];
-
-            m_rgba[pos_rgba++] = b;
-            m_rgba[pos_rgba++] = g;
-            m_rgba[pos_rgba++] = r;
-            m_rgba[pos_rgba++] = a;
-        }
-    }
-
-    QImage image(m_rgba, m_monitor.width, m_monitor.height, QImage::Format_ARGB32);
+    QImage image(buffer, m_monitor.width, m_monitor.height, QImage::Format_RGB888);
 
     MythImage *img = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
     img->Assign(image);
