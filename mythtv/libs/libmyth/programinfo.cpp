@@ -65,7 +65,8 @@ const QString ProgramInfo::kFromRecordedQuery =
     "       p.audioprop+0,      p.videoprop+0,  p.subtitletypes+0, "//42-44
     "       r.findid,           rec.dupin,      rec.dupmethod,     "//45-47
     "       p.syndicatedepisodenumber, p.partnumber, p.parttotal,  "//48-50
-    "       p.season,           p.episode,      p.totalepisodes    "//51-53
+    "       p.season,           p.episode,      p.totalepisodes,   "//51-53
+    "       p.category_type                                        "//54
     "FROM recorded AS r "
     "LEFT JOIN channel AS c "
     "ON (r.chanid    = c.chanid) "
@@ -313,6 +314,7 @@ ProgramInfo::ProgramInfo(
     const QString &_seriesid,
     const QString &_programid,
     const QString &_inetref,
+    CategoryType  _catType,
 
     int _recpriority,
 
@@ -373,7 +375,7 @@ ProgramInfo::ProgramInfo(
     seriesid(_seriesid),
     programid(_programid),
     inetref(_inetref),
-    catType(kCategoryNone),
+    catType(_catType),
 
     filesize(_filesize),
 
@@ -1936,7 +1938,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     seriesid     = query.value(17).toString();
     programid    = query.value(18).toString();
     inetref      = query.value(19).toString();
-    /**///catType;
+    catType      = string_to_myth_category_type(query.value(54).toString());
 
     recpriority  = query.value(16).toInt();
 
@@ -5287,7 +5289,7 @@ bool LoadFromRecorded(
                 episode,
                 totalepisodes,
                 query.value(48).toString(), // syndicatedepisode
-                query.value(5).toString(),
+                query.value(5).toString(), // category
 
                 chanid, channum, chansign, channame, chanfilt,
 
@@ -5299,6 +5301,7 @@ bool LoadFromRecorded(
 
                 query.value(17).toString(), query.value(18).toString(),
                 query.value(19).toString(), // inetref
+                string_to_myth_category_type(query.value(54).toString()), // category_type
 
                 query.value(16).toInt(),  // recpriority
 

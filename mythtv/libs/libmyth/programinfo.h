@@ -109,6 +109,7 @@ class MPUBLIC ProgramInfo
                 const QString &seriesid,
                 const QString &programid,
                 const QString &inetref,
+                CategoryType  catType,
 
                 int recpriority,
 
