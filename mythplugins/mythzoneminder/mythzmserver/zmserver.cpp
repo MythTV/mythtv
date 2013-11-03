@@ -1765,7 +1765,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
             {
                 buffer[wpos + 0] = data[rpos + 0]; // r
                 buffer[wpos + 1] = data[rpos + 1]; // g
-                buffer[wpos + 2] = data[rpos = 2]; // b
+                buffer[wpos + 2] = data[rpos + 2]; // b
             }
 
             break;
