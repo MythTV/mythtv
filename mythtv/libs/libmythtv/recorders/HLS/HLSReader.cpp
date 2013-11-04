@@ -180,7 +180,7 @@ int HLSReader::Read(uint8_t* buffer, int maxlen)
     QMutexLocker lock(&m_buflock);
 
     int len = m_buffer.size() < maxlen ? m_buffer.size() : maxlen;
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("Reading %1 of %2 bytes")
+    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Reading %1 of %2 bytes")
         .arg(len).arg(m_buffer.size()));
 
     memcpy(buffer, m_buffer.constData(), len);
@@ -1117,7 +1117,7 @@ void HLSReader::IncreaseBitrate(int progid)
 
 bool HLSReader::LoadSegments(MythSingleDownload& downloader)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "LoadSegment -- start");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "LoadSegment -- start");
 
     if (!m_curstream)
     {
@@ -1144,7 +1144,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         int64_t offset = m_seq_next - m_seq_begin;
         seg = m_segments[offset];
         ++m_seq_next;
-        LOG(VB_RECORD, LOG_INFO, LOC +
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
             QString("Downloading segment %1, begin: %2 "
                     "first %3: next: %4 end: %5")
             .arg(seg.Sequence()).arg(m_seq_begin).arg(m_seq_first)
@@ -1181,7 +1181,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             --m_prebuffer_cnt;
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "LoadSegment -- end");
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "LoadSegment -- end");
     return true;
 }
 
@@ -1309,7 +1309,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
                             ((static_cast<double>(buffer.size()) /
                               static_cast<double>(segment.Duration()))));
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("%1 took %3ms for %4 bytes: "
                 "bandwidth:%5kiB/s")
         .arg(segment.Sequence())
