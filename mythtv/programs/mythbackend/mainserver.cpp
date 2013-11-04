@@ -1085,6 +1085,37 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
+        if (me->Message().startsWith("UNDELETE_RECORDING"))
+        {
+            QStringList tokens = me->Message().split(" ",
+                                                     QString::SkipEmptyParts);
+
+
+            if (tokens.size() < 3 || tokens.size() > 3)
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Bad UNDELETE_RECORDING message: %1")
+                        .arg(me->Message()));
+                return;
+            }
+
+            QDateTime startts = MythDate::fromString(tokens[2]);
+            RecordingInfo recInfo(tokens[1].toUInt(), startts);
+
+            if (recInfo.GetChanID())
+            {
+                DoHandleUndeleteRecording(recInfo, NULL);
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Cannot find program info for '%1' while "
+                            "attempting to undelete.").arg(me->Message()));
+            }
+
+            return;
+        }
+
         if (me->Message().startsWith("RESCHEDULE_RECORDINGS") && m_sched)
         {
             QStringList request = me->ExtraDataList();

@@ -59,6 +59,14 @@ class Dvr : public DvrServices
                                                 bool             ForceDelete,
                                                 bool             AllowRerecord  );
 
+        bool              DeleteRecording     ( int              ChanId,
+                                                const QDateTime &StartTime,
+                                                bool             ForceDelete,
+                                                bool             AllowRerecord  );
+
+        bool              UnDeleteRecording   ( int              ChanId,
+                                                const QDateTime &StartTime );
+
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count      );
 
@@ -238,6 +246,21 @@ class ScriptableDvr : public QObject
         {
             return m_obj.RemoveRecorded( ChanId, StartTime,
                                          ForceDelete, AllowRerecord);
+        }
+
+        bool DeleteRecording          ( int              ChanId,
+                                        const QDateTime &StartTime,
+                                        bool             ForceDelete,
+                                        bool             AllowRerecord  )
+        {
+            return m_obj.DeleteRecording(ChanId, StartTime,
+                                         ForceDelete, AllowRerecord);
+        }
+
+        bool UnDeleteRecording        ( int              ChanId,
+                                        const QDateTime &StartTime )
+        {
+            return m_obj.UnDeleteRecording(ChanId, StartTime);
         }
 
         QObject* GetConflictList    ( int              StartIndex,
