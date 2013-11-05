@@ -80,6 +80,7 @@
     text-align: center;
     white-space: nowrap;
     border-radius: 8px;
+    display: none;
 }
 
 .contextMenu .button:hover

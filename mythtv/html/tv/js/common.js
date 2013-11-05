@@ -128,7 +128,7 @@ function showMenu(parent, typeStr)
         var children = menu.getElementsByClassName(types[i]);
         for (var j = 0; j < children.length; j++)
         {
-            children[j].style = "display: block;";
+            children[j].style.display = "block";
         }
     }
 
@@ -153,7 +153,7 @@ function hideMenu(menuName)
     var children = menu.getElementsByClassName("button");
     for (var i = 0; i < children.length; i++)
     {
-        children[i].style = "display: none;";
+        children[i].style.display = "none";
     }
     // Reset visibility
     if (checkVisibility(menu))
