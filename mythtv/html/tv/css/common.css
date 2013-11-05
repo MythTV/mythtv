@@ -6,7 +6,8 @@
 
 .pageTitle
 {
-    float:left;
+    float: left;
+    font-size: 1.6em;
 }
 
 .itemSelected
@@ -90,5 +91,28 @@
 .contextMenu .button:active
 {
     border-style:inset;
+}
+
+/* Navigation, Ordering, sorting etc */
+.navigateBox
+{
+    float: right;
+    margin: 3px 5px 10px 5px;
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
+    border-radius: 8px;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.navigateBox SELECT
+{
+    margin: 2px;
+}
+
+.navigateBox LABEL
+{
+    margin: 3px;
+    float: left;
 }
 

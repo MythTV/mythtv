@@ -24,8 +24,18 @@ import "/js/utility.js"
     var now = new Date();
     var guideStartTime;
 
-    // Use the StartTime argument if it was defined
-    if (typeof getArg("StartTime") !== "undefined")
+
+    if (getArg("GuideDate") && getArg("GuideTime"))
+    {
+        var tmpDate = myth.ParseISODateString(getArg("GuideDate"));
+        var tmpTime = myth.ParseISODateString(getArg("GuideTime"));
+        // get/setTime don't work as expected here, so set hours/minutes
+        // individually
+        tmpDate.setHours(tmpTime.getHours());
+        tmpDate.setMinutes(tmpTime.getMinutes());
+        guideStartTime = new Date(tmpDate);
+    }
+    else if (getArg("StartTime"))// Use the StartTime argument if it was defined
         guideStartTime = myth.ParseISODateString(getArg("StartTime"));
 
     // If the StartTime wasn't valid or wasn't defined then use the current time
@@ -79,53 +89,52 @@ import "/js/utility.js"
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<script src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script src="/js/util.qjs"></script>
-<script src="/tv/js/common.js"></script>
-<script src="/tv/js/guide.js"></script>
+<script src="/js/utility.js" /> <!-- ECMA not JS -->
+<script src="/js/util.qjs" />
+<script src="/tv/js/common.js" />
+<script src="/tv/js/guide.js" />
 </head>
 <body>
 
-<h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2>
+<!-- <h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2> -->
 
-<!-- Popup Recording Menu -->
-<div id="recMenu" class="contextMenu">
-    <div class="button" onClick="recordProgram(chanID, startTime, 'Single Record')">
+<!-- Popup Option Menu -->
+<!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
+     an indirect if/else. It might seem convoluted but the alternatives are
+     generating this bit of HTML client side with JS (bad), generating it server
+     side (harder to maintain/template) or keeping in together inline with the
+     other related html, with as little non-html markup as possible -->
+<div id="optMenu" class="contextMenu" style="display:none;">
+    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
-    <div class="button" onClick="recordProgram(chanID, startTime, 'Record All')">
+    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record All')">
         <%=qsTr("Record all showings")%>
     </div>
-    <div class="button" onClick="recordProgram(chanID, startTime, 'Record One')">
+    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record One')">
         <%=qsTr("Record one showing")%>
     </div>
-    <div class="button" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
+    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
-    <div class="button" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
-        <%=qsTr("Edit recording rule")%>
-    </div>
-</div>
-
-<!-- Popup Edit Recording Menu -->
-<div id="editRecMenu" class="contextMenu">
-    <div class="button" onClick="deleteRecRule(chanID, startTime)">
+    <div class="button delSchedMenu" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
 
 <!-- Popup Program Details Box -->
-<div id="programDetails" class="programExDetail">
+<div id="programDetails" class="programExDetail" style="display:none;">
 </div>
 
 <!-- Navigation by day or time -->
 <div class="navigateBox">
 
-    <label for="guideStartDate"><%=qsTr("Date")%>:</label>
-    <select id="guideStartDate" onChange="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=' + this.options[this.options.selectedIndex].value);">
+    <form action="/tv/guide.qsp">
+    <label for="guideStartDate"><%=qsTr("Date")%>:
+    <select id="guideStartDate" name="GuideDate" onChange="submitForm(this.form, 'guideGrid', 'dissolve')">
 <%
     var startDay = new Date(now);
     startDay.setDate(now.getDate() - 14); // We keep old guide date for 14 days
@@ -140,9 +149,9 @@ import "/js/utility.js"
     }
 %>
     </select>
-
-    <label for="guideStartTime"><%=qsTr("Time")%>:</label>
-    <select id="guideStartTime" onChange="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=' + this.options[this.options.selectedIndex].value);">
+    </label>
+    <label for="guideStartTime"><%=qsTr("Time")%>:
+    <select id="guideStartTime" name="GuideTime" onChange="submitForm(this.form, 'guideGrid', 'dissolve')">
 <%
     var startTime = new Date(guideStartTime);
     startTime.setHours(0);
@@ -158,7 +167,9 @@ import "/js/utility.js"
     }
 %>
     </select>
-
+    <input type="hidden" name="GuideOnly" value="1" />
+    </label>
+    </form>
 </div>
 
 <div id="foo" style="overflow:hidden;clear:both;width:100%;">
@@ -166,11 +177,11 @@ import "/js/utility.js"
 <div id="guideGrid" class="guideGrid">
 <%} // End of the header %>
 
-<div class="pageLeft" onClick="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=prevGuideStartTime.toISOString()%>', 'right')">
+<div class="pageLeft" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=prevGuideStartTime.toISOString()%>', 'guideGrid', 'right')">
     &lt;
 </div>
 
-<div class="pageRight" onClick="loadGuideContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=nextGuideStartTime.toISOString()%>', 'left')">
+<div class="pageRight" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=nextGuideStartTime.toISOString()%>', 'guideGrid', 'left')">
     &gt;
 </div>
 
@@ -199,7 +210,17 @@ import "/js/utility.js"
         </div>
     </div>
 
+
 <%
+    if (!isValidObject(channelList) || channelList.length === 0)
+    {
+    %>
+        <div id="noChannelsRow" class="noChannelsRow">
+            <%=qsTr("There are no channels to display.")%>
+        </div>
+    <%
+    }
+
     for (var chanIdx=0; chanIdx < channelList.length; chanIdx++)
     {
         var channel = channelList[chanIdx];
@@ -259,9 +280,9 @@ import "/js/utility.js"
             var statusStr = dvr.RecStatusToString(program.Recording.Status);
             var statusClass = "program" + statusStr.replace(/ /g, '');
 
-            var menu = "editRecMenu";
-            if (program.Recording.Status == 0)
-                menu = "recMenu";
+            var menu = "normalMenu scheduleMenu";
+            if (program.Recording.Status != 0)
+                menu = "normalMenu delSchedMenu";
 
             // Used as a unique identifier and also to access the chanid
             // and starttime for the AJAX scheduling stuff
@@ -269,7 +290,7 @@ import "/js/utility.js"
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
                 <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
-                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() != 0 && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
+                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                         <span class="programDescription"><%=escapeHTML(program.Description)%></span>

@@ -105,10 +105,10 @@ function isClassSet(element, className)
 var selectedElement;
 var chanID = "";
 var startTime = "";
-function showMenu(parent, menuName)
+function showMenu(parent, typeStr)
 {
     hideDetail(parent);
-    hideMenu(menuName);
+    hideMenu("optMenu");
 
     if (selectedElement === parent)
     {
@@ -121,7 +121,17 @@ function showMenu(parent, menuName)
     chanID = values[0];
     startTime = values[1];
 
-    var menu = document.getElementById(menuName);
+    var menu = document.getElementById("optMenu");
+    var types = typeStr.split(' ');
+    for (var i = 0; i < types.length; i++)
+    {
+        var children = menu.getElementsByClassName(types[i]);
+        for (var j = 0; j < children.length; j++)
+        {
+            children[j].style = "display: block;";
+        }
+    }
+
 
     // Toggle the "itemSelected" class on the program div, this gives the
     // user visual feedback on which one the menu relates to
@@ -140,6 +150,11 @@ function showMenu(parent, menuName)
 function hideMenu(menuName)
 {
     var menu = document.getElementById(menuName);
+    var children = menu.getElementsByClassName("button");
+    for (var i = 0; i < children.length; i++)
+    {
+        children[i].style = "display: none;";
+    }
     // Reset visibility
     if (checkVisibility(menu))
     {
@@ -218,7 +233,7 @@ function deleteRecRule(chandID, startTime)
 {
     var layer = document.getElementById(chanID + "_" + startTime);
     var recRuleID = getChildValue(layer, "recordid");
-    hideMenu("editRecMenu");
+    hideMenu("optMenu");
     var url = "/tv/qjs/dvr_util.qjs?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
@@ -228,7 +243,57 @@ function deleteRecRule(chandID, startTime)
                             });
 }
 
-function submitForm(formElement)
+function loadTVContent(url, targetDivID, transition)
+{
+    currentContentURL = url;   // currentContentURL is defined in util.qjs
+
+    if (!targetDivID)
+        targetDivID = "content";
+    if (!transition)
+        transition = "none"; // dissolve
+
+    if (transition === "none")
+    {
+        loadContent(url);
+        return;
+    }
+
+    $("#busyPopup").show();
+
+    var targetDiv = document.getElementById(targetDivID);
+    var newDiv = document.createElement('div');
+    newDiv.style = "left: 100%";
+    document.getElementById("content").insertBefore(newDiv, null);
+
+    var html = $.ajax({
+      url: url,
+        async: false
+     }).responseText;
+
+    newDiv.innerHTML = html;
+    newDiv.className = targetDiv.className;
+
+    // Need to assign the id to the new div
+    newDiv.id = targetDivID;
+    targetDiv.id = "old" + targetDivID;
+    switch (transition)
+    {
+        case 'left':
+            leftSlideTransition(targetDiv.id, newDiv.id);
+            break;
+        case 'right':
+            rightSlideTransition(targetDiv.id, newDiv.id);
+            break;
+        case 'dissolve':
+            dissolveTransition(targetDiv.id, newDiv.id);
+            break;
+    }
+    newDiv.id = targetDivID;
+
+    $("#busyPopup").hide();
+}
+
+function submitForm(formElement, target, transition)
 {
     var url = formElement.action;
     var queryString = new Array();
@@ -238,7 +303,7 @@ function submitForm(formElement)
         queryString.push(input.name + "=" + input.value);
     }
     url += "?" + queryString.join('&');
-    loadContent(url);
+    loadTVContent(url, target, transition);
 }
 
 function leftSlideTransition(oldDivID, newDivID)

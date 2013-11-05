@@ -112,7 +112,9 @@ import "/js/utility.js"
     {
         var dvr = new Dvr();
         var program = dvr.GetRecorded(chanID, startTime);
-        return buildDetailHTML(program, "recording");;
+        if (!isValidObject(program) || program.Title === "")
+            return qsTr("No matching program found");
+        return buildDetailHTML(program, "recording");
     }
 
     var ret;

@@ -27,6 +27,9 @@ import "/tv/js/constants.js"
         displayGroup = getArg("DisplayGroup");
 
     var dvr = new Dvr();
+    var recGroupList = dvr.GetRecGroupList();
+    var showDeletedLink = (recGroupList.indexOf("Deleted") === -1) ? false : true;
+
     var recordings = dvr.GetRecordedList( sortDescending, 0, 50, displayGroup, recGroup, "" );
     var programs = recordings.Programs;
 %>
@@ -40,24 +43,36 @@ import "/tv/js/constants.js"
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/recordings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
-<script src="/js/utility.js"></script> <!-- ECMA not JS -->
-<script src="/js/util.qjs"></script>
-<script src="/tv/js/common.js"></script>
-<script src="/tv/js/recordings.js"></script>
+<script src="/js/utility.js" /> <!-- ECMA not JS -->
+<script src="/js/util.qjs" />
+<script src="/tv/js/common.js" />
+<script src="/tv/js/recordings.js" />
 </head>
 <body id="content">
 
-<h2 class="pageTitle" id="title"><%=qsTr("Recordings")%></h2>
-
 <!-- Popup Option Menu -->
-<div id="recMenu" class="contextMenu">
-    <div class="button" onClick="deleteRecording(chanID, startTime, false)">
+<!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
+     an indirect if/else. It might seem convoluted but the alternatives are
+     generating this bit of HTML client side with JS (bad), generating it server
+     side (harder to maintain/template) or keeping in together inline with the
+     other related html, with as little non-html markup as possible -->
+<div id="optMenu" class="contextMenu" style="display:none;">
+    <div class="button normalMenu" onClick="deleteRecording(chanID, startTime, false, false)">
         <%=qsTr("Delete")%>
     </div>
-    <div class="button" onClick="deleteRecording(chanID, startTime, true)">
+    <div class="button normalMenu" onClick="deleteRecording(chanID, startTime, true, false)">
         <%=qsTr("Delete and Re-Record")%>
     </div>
-    <div class="button" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+    <div class="button deletedMenu" onClick="unDeleteRecording(chanID, startTime)">
+        <%=qsTr("Undelete")%>
+    </div>
+    <div class="button deletedMenu" onClick="deleteRecording(chanID, startTime, false, true)">
+        <%=qsTr("Delete Forever")%>
+    </div>
+    <div class="button recordingMenu" onClick="stopRecording(chanID, startTime)">
+        <%=qsTr("Stop Recording")%>
+    </div>
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -66,32 +81,39 @@ import "/tv/js/constants.js"
 <div id="programDetails" class="programExDetail">
 </div>
 
+<!-- Wastebin - indicator of deleted recordings and link to deleted recording list -->
+<div id="wastebin" class="wastebin" <% if (!showDeletedLink) {%>style="display:none;"<%}%> onclick="loadTVContent('/tv/recordings.qsp?RecordingGroup=Deleted')">
+    <img src="/tv/images/wastebin.svg" height="32" />
+</div>
+
 <!-- Sort order, grouping etc -->
 <div class="navigateBox">
 
     <form action="/tv/recordings.qsp">
-    <label for="listRecGroup"><%=qsTr("Recording Group")%>:</label>
-    <select id="listRecGroup" name="RecordingGroup" onChange="submitForm(this.parentNode)">
+    <label for="listRecGroup"><%=qsTr("Recording Group")%>:
+    <select id="listRecGroup" name="RecordingGroup" onChange="submitForm(this.form)">
 <%
-    var recGroupList = dvr.GetRecGroupList();
-
     for (var grpIdx = 0; grpIdx < recGroupList.length; grpIdx++)
     {
+        // Do not include the deleted recgroup, instead we have a direct link on the page
+        if (recGroupList[grpIdx] == "Deleted")
+            continue;
 %>
         <option value="<%=recGroupList[grpIdx]%>" <%if (recGroup == recGroupList[grpIdx]) {%>selected<%}%>><%=recGroupList[grpIdx]%></option>
 <%
     }
 %>
     </select>
+    </label>
 
-    <label for="listSortOrder"><%=qsTr("Sort")%>:</label>
-    <select id="listSortOrder" name="SortAsc" onChange="submitForm(this.parentNode)">
+    <label for="listSortOrder"><%=qsTr("Sort")%>:
+    <select id="listSortOrder" name="SortAsc" onChange="submitForm(this.form)">
         <option label="Descending" value="0">Descending</option>
         <option label="Ascending" value="1" <%if (getArg("SortAsc") == 1) {%>selected<%}%>>Ascending</option>
     </select>
-    <br />
-    <label for="listDisplayOrder"><%=qsTr("Filter")%>:</label>
-    <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.parentNode)">
+    </label>
+    <label for="listDisplayOrder"><%=qsTr("Filter")%>:
+    <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.form)">
 
 <%
     var displayGroupList = dvr.GetTitleList();
@@ -106,6 +128,7 @@ import "/tv/js/constants.js"
     }
 %>
     </select>
+    </label>
     </form>
 
 </div>
@@ -115,18 +138,37 @@ import "/tv/js/constants.js"
 <div id="recordingList" class="recordingList">
 
 <div class="topBar">
-    &nbsp;
+    <%=qsTr("Recordings")%>
 </div>
 
 <%
+if (!isValidObject(programs) || programs.length === 0)
+{
+    var message = "";
+
+    if (recGroup == "Default")
+        message = qsTr("There are no recordings available.");
+    else if (recGroup == "Deleted")
+        message = qsTr("There are no deleted recordings.");
+    else
+        message = qsTr("There are no recordings matching the given filters.")
+%>
+    <div id="noRecordingsRow" class="noRecordingsRow">
+        <%=message%>
+    </div>
+<%
+}
+
 for (var progIdx = 0; progIdx < programs.length; progIdx++)
 {
     var program = programs[progIdx];
     var channel = program.Channel;
 
-    var menu = "recMenu";
-    if (program.Recording.Status == RS_RECORDING)
-        menu = "recMenu"; // stopRecMenu
+    var menu = "normalMenu";
+    if (recGroup === "Deleted")
+        menu = "deletedMenu";
+    else if (program.Recording.Status == RS_RECORDING)
+        menu = "normalMenu recordingMenu"; // stopRecMenu
 
     // Used as a unique identifier and also to access the chanid
     // and starttime for the AJAX scheduling stuff
@@ -146,7 +188,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
         <div class="recordingBox">
             <div class="recordingInnerBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                 <div class="recordingHeader">
-                    <span class="recordingTitle"><%=escapeHTML(program.Title)%></span>
+                    <span class="recordingTitle"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
                     <span class="recordingStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
                 </div>
                 <div class="recordingBody">

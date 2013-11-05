@@ -1,16 +1,4 @@
 
-/* Guide Navigation */
-.navigateBox
-{
-    float: right;
-    margin: 5px 5px 10px 5px;
-    background: #2A2A2A;
-    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: bold;
-}
-
 .pageLeft, .pageRight
 {
     background-color: rgba(26, 26, 26, 0.5);
@@ -45,8 +33,12 @@
 /* Guide Grid */
 .guideGrid
 {
+    /* BEGIN HACK Most modern browsers support calc, but some like Opera 12 on
+     * linux don't, so we have trust this will work for now */
+    width: 98%;
+    /* END HACK */
+
     width: calc(100% - 20px); /* Need to subtract padding of parent */
-    float: left;
     position: absolute;
     padding: 0px;
     /*overflow: visible;*/
@@ -107,6 +99,22 @@
     height: 80px;
     margin: 2px 0px; /* Vertical Horizontal */
     overflow: visible;
+}
+
+.guideGrid .noChannelsRow
+{
+    clear: both;
+    width: 100%;
+    height: 50px;
+    margin: 2px 0px; /* Vertical Horizontal */
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #555555;
+    border-radius: 10px;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-top: 15px;
 }
 
 .guideGrid .channelBox

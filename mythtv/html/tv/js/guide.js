@@ -1,7 +1,7 @@
 
 function recordProgram(chanID, startTime, type)
 {
-    hideMenu("recMenu");
+    hideMenu("optMenu");
     var url = "/tv/qjs/dvr_util.qjs?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
     var ajaxRequest = $.ajax( url )
                             .done(function()
@@ -40,48 +40,6 @@ function recRuleChanged(chandID, startTime)
     setTimeout(function(){checkRecordingStatus(chanID, startTime)}, 2500);
 }
 
-function loadGuideContent(url, transition)
-{
-    currentContentURL = url;   // currentContentURL is defined in util.qjs
-    if (!transition)
-        transition = "dissolve";
-
-    $("#busyPopup").show();
-
-    var guideDivID = "guideGrid";
-    var guideDiv = document.getElementById(guideDivID);
-    var newDiv = document.createElement('div');
-    newDiv.style = "left: 100%";
-    document.getElementById("content").insertBefore(newDiv, null);
-
-    var html = $.ajax({
-      url: url,
-        async: false
-     }).responseText;
-
-    newDiv.innerHTML = html;
-    newDiv.className = "guideGrid";
-
-    // Need to assign the id to the new div
-    newDiv.id = guideDivID;
-    guideDiv.id = "old" + guideDivID;
-    switch (transition)
-    {
-        case 'left':
-            leftSlideTransition(guideDiv.id, newDiv.id);
-            break;
-        case 'right':
-            rightSlideTransition(guideDiv.id, newDiv.id);
-            break;
-        case 'dissolve':
-            dissolveTransition(guideDiv.id, newDiv.id);
-            break;
-    }
-    newDiv.id = "guideGrid";
-
-    $("#busyPopup").hide();
-}
-
 function reloadGuideContent()
 {
     var url = currentContentURL;
@@ -93,6 +51,7 @@ function reloadGuideContent()
         else
             url += "?GuideOnly=1";
     }
-    loadGuideContent(url, "dissolve");  // currentContentURL is defined in util.qjs
+
+    loadTVContent(url, "guideGrid", "dissolve");  // currentContentURL is defined in util.qjs
 }
 
