@@ -688,7 +688,9 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
     if (path.startsWith("/"))
         seperator = "";
 
-    ret = QString("myth://%1%2%3%4%5").arg(m_storageGroup).arg(m_host).arg(m_port).arg(seperator).arg(path);
+    // IPv6 addresses may contain % followed by a digit which causes .arg()
+    // to fail, so use append instead.
+    ret = QString("myth://").append(m_storageGroup).append(m_host).append(m_port).append(seperator).append(path);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
