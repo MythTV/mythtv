@@ -1071,6 +1071,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     AVFrame *picture;
     AVCodecContext *c = NULL;
     AVCodec *out_codec;
+    int64_t savedPts = pkt->pts; // save the original pts
 
     info = mpeg2_info(img_decoder);
     if (!info->display_fbuf)
@@ -1193,6 +1194,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     int delta = FindMPEG2Header(pkt->data, pkt->size, 0x00);
     //  out_size=avcodec_encode_video(c, outbuf, outbuf_size, picture);
     pkt->size -= delta; // a hack to get to the picture frame
+    pkt->pts = savedPts; // restore the original pts
     memmove(pkt->data, pkt->data + delta, pkt->size);
     SetRepeat(pkt->data, pkt->size, info->display_picture->nb_fields,
                !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST));
