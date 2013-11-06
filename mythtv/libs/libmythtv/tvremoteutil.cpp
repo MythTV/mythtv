@@ -144,10 +144,10 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
     return new RemoteEncoder(num, hostname, port);
 }
 
-/**
- * Given a list of recorder numbers, return the first available.
- */
-vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
+static void
+RemoteRequestFreeRecorderInputList(const vector<uint> &excluded_cardids,
+                                   vector<uint> &cardids,
+                                   vector<uint> &inputids)
 {
 #if 0
     vector<uint> list;
@@ -163,7 +163,6 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
 
     return list;
 #endif
-    vector<uint> result;
     vector<uint> cards = CardUtil::GetLiveTVCardList();
     for (uint i = 0; i < cards.size(); i++)
     {
@@ -171,18 +170,37 @@ vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
             RemoteRequestFreeInputList(cards[i], excluded_cardids);
         for (uint j = 0; j < inputs.size(); j++)
         {
-            if (find(result.begin(),
-                     result.end(),
-                     inputs[j].cardid) == result.end())
-                result.push_back(inputs[j].cardid);
+            if (find(cardids.begin(),
+                     cardids.end(),
+                     inputs[j].cardid) == cardids.end())
+            {
+                cardids.push_back(inputs[j].cardid);
+                inputids.push_back(inputs[j].inputid);
+            }
         }
     }
-    QString msg("RemoteRequestFreeRecorderList returned {");
-    for (uint k = 0; k < result.size(); k++)
-        msg += QString(" %1").arg(result[k]);
+    QString msg("RemoteRequestFreeRecorderInputList returned {");
+    for (uint k = 0; k < cardids.size(); k++)
+        msg += QString(" %1:%2").arg(cardids[k]).arg(inputids[k]);
     msg += "}";
     LOG(VB_CHANNEL, LOG_INFO, msg);
-    return result;
+}
+
+/**
+ * Given a list of recorder numbers, return the first available.
+ */
+vector<uint> RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids)
+{
+    vector<uint> cardids, inputids;
+    RemoteRequestFreeRecorderInputList(excluded_cardids, cardids, inputids);
+    return cardids;
+}
+
+vector<uint> RemoteRequestFreeInputList(const vector<uint> &excluded_cardids)
+{
+    vector<uint> cardids, inputids;
+    RemoteRequestFreeRecorderInputList(excluded_cardids, cardids, inputids);
+    return inputids;
 }
 
 RemoteEncoder *RemoteRequestFreeRecorderFromList

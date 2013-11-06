@@ -43,6 +43,8 @@ MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo);
 MTV_PUBLIC RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 MTV_PUBLIC vector<uint>
 RemoteRequestFreeRecorderList(const vector<uint> &excluded_cardids);
+MTV_PUBLIC vector<uint>
+RemoteRequestFreeInputList(const vector<uint> &excluded_cardids);
 MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, const vector<uint> &excluded_cardids);
 MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);

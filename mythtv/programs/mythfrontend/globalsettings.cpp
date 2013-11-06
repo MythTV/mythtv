@@ -2895,7 +2895,8 @@ static HostLineEdit *DefaultTVChannel()
 
     ge->setHelpText(EPGSettings::tr("The program guide starts on this channel "
                                     "if it is run from outside of Live TV "
-                                    "mode."));
+                                    "mode. Leave blank to enable Live TV "
+                                    "automatic start channel."));
 
     return ge;
 }
