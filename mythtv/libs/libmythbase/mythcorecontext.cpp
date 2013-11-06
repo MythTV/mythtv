@@ -703,34 +703,10 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,
                                              const QString &path)
 {
-    QString ret;
-
-    if (IsMasterHost())
-    {
-        return GenMythURL(GetSetting("MasterServerIP"),
-                          GetNumSetting("MasterServerPort", 6543),
-                          path,
-                          storageGroup);
-    }
-
-    QMutexLocker locker(&d->m_sockLock);
-    if (!d->m_serverSock || !d->m_serverSock->IsConnected() ||
-        !d->m_eventSock || !d->m_eventSock->IsConnected())
-    {
-        bool blockingClient = GetNumSetting("idleTimeoutSecs",0) > 0;
-        ConnectToMasterServer(blockingClient);
-    }
-
-    if (d->m_serverSock)
-    {
-
-         ret = GenMythURL(d->m_serverSock->GetPeerAddress().toString(),
-                          d->m_serverSock->GetPeerPort(),
-                          path,
-                          storageGroup);
-    }
-    
-    return ret;
+    return GenMythURL(GetSetting("MasterServerIP"),
+                        GetNumSetting("MasterServerPort", 6543),
+                        path,
+                        storageGroup);
 }
 
 QString MythCoreContext::GetMasterHostName(void)
