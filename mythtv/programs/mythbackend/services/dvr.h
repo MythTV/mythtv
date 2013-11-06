@@ -264,9 +264,16 @@ class ScriptableDvr : public QObject
         }
 
         QObject* GetConflictList    ( int              StartIndex,
-                                       int              Count      )
+                                      int              Count      )
         {
             return m_obj.GetConflictList( StartIndex, Count );
+        }
+
+        QObject* GetUpcomingList    ( int              StartIndex,
+                                      int              Count,
+                                      bool             ShowAll )
+        {
+            return m_obj.GetUpcomingList( StartIndex, Count, ShowAll );
         }
 
         QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }
