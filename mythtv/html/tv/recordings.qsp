@@ -181,7 +181,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
     <div class="recordingRow" id="<%=programIdentifier%>_row">
         <div class="previewBox">
             <div class="previewImageBackground">
-                <img alt="Preview Image" height="60" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=60" />
+                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=67" />
             </div>
             <span class="watchRecordingLink"><%=qsTr("Watch")%></span>
         </div>
