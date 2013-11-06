@@ -406,8 +406,6 @@ void ProgFinder::showGuide()
     if (m_allowEPG)
     {
         QString startchannel = gCoreContext->GetSetting("DefaultTVChannel");
-        if (startchannel.isEmpty())
-            startchannel = '3';
         uint startchanid = 0;
         QDateTime starttime;
 

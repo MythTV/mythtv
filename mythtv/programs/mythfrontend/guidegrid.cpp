@@ -27,6 +27,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "channelutil.h"
 #include "cardutil.h"
+#include "tvremoteutil.h"
 #include "mythuibuttonlist.h"
 #include "mythuiguidegrid.h"
 #include "mythdialogbox.h"
@@ -439,9 +440,22 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
         return;
     }
 
+    // If chanid/channum are unset, find the channel that would
+    // naturally be selected when Live TV is started.  This depends on
+    // the available tuners, their cardinput.livetvorder values, and
+    // their cardinput.startchan values.
+    QString actualChannum = channum;
+    if (chanid == 0 && channum.isEmpty())
+    {
+        vector<uint> excluded_cardids;
+        vector<uint> inputIDs = RemoteRequestFreeInputList(excluded_cardids);
+        if (!inputIDs.empty())
+            actualChannum = CardUtil::GetStartingChannel(inputIDs[0]);
+    }
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GuideGrid *gg = new GuideGrid(mainStack,
-                                  chanid, channum, startTime,
+                                  chanid, actualChannum, startTime,
                                   player, embedVideo, allowFinder,
                                   changrpid);
 
