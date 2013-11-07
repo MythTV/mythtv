@@ -854,6 +854,17 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
+static bool SelectionIsTunable(const ChannelInfoList &selection)
+{
+    bool isTunable = false;
+    for (int i = 0; i < selection.size(); ++i)
+    {
+        if (TV::IsTunable(selection[i].chanid))
+            return true;
+    }
+    return false;
+}
+
 void GuideGrid::ShowMenu(void)
 {
     QString label = tr("Guide Options");
@@ -868,8 +879,7 @@ void GuideGrid::ShowMenu(void)
 
         if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             menuPopup->AddButton(tr("Change to Channel"));
-        else
-            // XXX Make sure this channel/program is watchable
+        else if (SelectionIsTunable(GetSelection()))
             menuPopup->AddButton(tr("Watch This Channel"));
 
         menuPopup->AddButton(tr("Record This"));
@@ -1688,8 +1698,9 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Watch This Channel"))
             {
-                // XXX Do another check that this channel/program is watchable
-                TV::StartTV(NULL, kStartTVNoFlags, GetSelection());
+                ChannelInfoList selection = GetSelection();
+                if (SelectionIsTunable(selection))
+                    TV::StartTV(NULL, kStartTVNoFlags, selection);
             }
             else if (resulttext == tr("Program Details"))
             {
