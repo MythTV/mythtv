@@ -1,0 +1,170 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var myth  = new Myth();
+    var dvr = new Dvr();
+
+    var filter = getArg("ViewFilter");
+
+    var programList;
+    if (filter == "conflicting")
+        programList = dvr.GetConflictList(0, 200);
+    else
+        programList = dvr.GetUpcomingList(0, 200, false);
+
+    var programs = programList.Programs;
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%=qsTr("Upcoming Recordings")%></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/upcoming.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<script src="/js/utility.js" /> <!-- ECMA not JS -->
+<script src="/js/util.qjs" />
+<script src="/tv/js/common.js" />
+<script src="/tv/js/upcoming.js" />
+</head>
+<body>
+
+<!-- Popup Option Menu -->
+<!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
+     an indirect if/else. It might seem convoluted but the alternatives are
+     generating this bit of HTML client side with JS (bad), generating it server
+     side (harder to maintain/template) or keeping in together inline with the
+     other related html, with as little non-html markup as possible -->
+<div id="optMenu" class="contextMenu" style="display:none;">
+    <!-- <div class="button normalMenu" onClick="dontRecord(chanID, startTime)">
+        <%=qsTr("Don't Record")%>
+    </div>
+    <div class="button normalMenu" onClick="neverRecord(chanID, startTime)">
+        <%=qsTr("Never Record")%>
+    </div> -->
+    <div class="button normalMenu" onClick="deleteRecRule(chanID, startTime)">
+        <%=qsTr("Delete Recording Rule")%>
+    </div>
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+        <%=qsTr("Edit recording rule")%>
+    </div>
+</div>
+
+<!-- Popup Program Details Box -->
+<div id="programDetails" class="programExDetail" style="display:none;">
+</div>
+
+<!-- Navigation by day or time -->
+<div class="navigateBox">
+
+    <form action="/tv/upcoming.qsp">
+    <label for="upcomingFilter"><%=qsTr("Filter")%>:
+    <select id="upcomingFilter" name="ViewFilter" onChange="submitForm(this.form)">
+        <option value="all">Default</option>
+        <option value="conflicting" <% if (filter === "conflicting") {%>selected<%}%>>Conflicting or Failed Schedules</option>
+    </select>
+    </label>
+    </form>
+</div>
+
+<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+
+<div id="upcomingList" class="upcomingList">
+
+<%
+// The nothing to display message
+if (!isValidObject(programs) || programs.length === 0)
+{
+    var message = "";
+
+    if (filter == "conflicting")
+        message = qsTr("There are no conflicting or errored recordings.");
+    else
+        message = qsTr("There are no upcoming recordings.")
+%>
+    <div class="topBar">
+        <%=qsTr("Upcoming Records")%>
+    </div>
+    <div id="noProgramsRow" class="noProgramsRow">
+        <%=message%>
+    </div>
+<%
+}
+
+var prevDate = "";
+
+for (var listIdx = 0; listIdx < programs.length; listIdx++)
+{
+    program = programs[listIdx];
+    channel = program.Channel;
+
+    var menu = "normalMenu";
+
+    //
+    var statusStr = dvr.RecStatusToString(program.Recording.Status);
+    var statusClass = "program" + statusStr.replace(/ /g, '');
+
+    // Used as a unique identifier and also to access the chanid
+    // and starttime for the AJAX scheduling stuff
+    var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
+
+    var date = myth.GetFormatDate(program.StartTime);
+
+    if (date != prevDate)
+    {
+        prevDate = date;
+%>
+        <div class="topBar">
+            <%=date%>
+        </div>
+<%
+    }
+
+%>
+
+    <div class="programRow" id="<%=programIdentifier%>_row">
+        <div class="channelBox">
+            <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+            <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
+        </div>
+        <div class="programBox">
+            <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                <div class="programHeader">
+                    <span class="programTitle"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
+                    <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
+                </div>
+                <div class="programBody">
+                    <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
+                    <% if (program.Season > 0 || program.Episode > 0) { %>
+                        <span class="programSeasonEpisode">
+                            <% if (program.Season > 0) { %>(<%=qsTr("S %1", "Season x").arg(program.Season)%>
+                            <%} else {%>(<% } if (program.TotalEpisodes > 0) { %><%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
+                            <%} else if (program.Episode > 0) {%><%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)<%}%>
+                        </span>
+                    <%}%>
+                    <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                </div>
+            </div>
+        </div>
+    </div>
+<%
+
+}
+%>
+</div> <!-- End upcomingList -->
+
+</div>
+
+</body>
+</html>

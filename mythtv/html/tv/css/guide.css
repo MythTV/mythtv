@@ -111,7 +111,6 @@
     text-align: center;
     vertical-align: middle;
     background-color: #555555;
-    border-radius: 10px;
     font-size: 1.0em;
     font-weight: bold;
     padding-top: 15px;
@@ -132,15 +131,17 @@
     background: #2A2A2A;
     background-image: linear-gradient(to right, #555555 1%, transparent 10%);
     color: #FFFFFF;
+    padding-left: 6px;
 /*    border-radius: 10px;*/
 }
 
 .guideGrid .channelIcon
 {
-    margin: 5px 4px 1px; /* Top Horizontal Bottom */
-    border-radius: 5px;
-    border:1px solid #1A1A1A;
+    height: 57px;
+    margin-left: 4px;
+    margin-bottom: 3px;
     overflow: hidden;
+    float: right;
 }
 
 .guideGrid .channelText
@@ -149,7 +150,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 0px 2px 0px; /* Top Horizontal Bottom */
+    padding: 0px 3px; /* Vertical Horizontal */
 }
 
 .guideGrid .programsBox

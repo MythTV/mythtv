@@ -1,5 +1,5 @@
 
-.recordingList
+.upcomingList
 {
     /* BEGIN HACK Most modern browsers support calc, but some like Opera 12 on
      * linux don't, so we have trust this will work for now */
@@ -12,16 +12,16 @@
     /*overflow: visible;*/
 }
 
-.recordingList div
+.upcomingList div
 {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     overflow: hidden;
 }
 
-.recordingList .topBar
+.upcomingList .topBar
 {
-    clear: both;
+    clear:both;
     margin: 5px 0px 2px;  /* Top Horizontal Bottom */
     height: 30px;
     font-size: 1.1em;
@@ -38,16 +38,16 @@
     padding: 6px 4px; /* Vertical Horizontal */
 }
 
-.recordingList .recordingRow
+.upcomingList .programRow
 {
     clear: both;
     width: 100%;
-    height: 100px;
+    height: 80px;
     margin: 2px 0px; /* Vertical Horizontal */
     overflow: hidden;
 }
 
-.recordingList .noRecordingsRow
+.upcomingList .noProgramsRow
 {
     clear: both;
     width: 100%;
@@ -62,71 +62,52 @@
     padding-top: 15px;
 }
 
-.recordingList .previewBox
+.upcomingList .channelBox
 {
     float: left;
+    width: 10%;
     height: 100%;
+    text-align: center;
+    vertical-align: middle;
     background: #2A2A2A;
-    background-image: linear-gradient(to right, #555555 1px, transparent 6px);
+    background-image: linear-gradient(to right, #555555 1%, transparent 10%);
+    color: #FFFFFF;
     padding-left: 6px;
-    z-index: -5;
-    width: 124px;
-    text-align:center;
 }
 
-.recordingList .previewImageBackground
+.upcomingList .channelIcon
 {
+    height: 57px;
+    margin-left: 4px;
+    margin-bottom: 3px;
+    overflow: hidden;
     float: right;
-    /*border-radius: 10px;*/
-    background: #000000;
-    padding-left: 0px;
-    width: 119px;
-    height: 67px;
-    overflow: hidden;
 }
 
-.recordingList .previewImage
+.upcomingList .channelText
 {
-    margin: auto;
-    overflow: hidden;
-}
-
-.recordingList .watchRecordingLink
-{
-    clear: both;
-    float: left;
     font-weight: bold;
-    font-size: 1.1em;
-    padding: 2px 0px 0px 23px; /* Top Right Bottom Left */
-    height: 22px;
-    background-image: url('/tv/images/play_arrow.svg');
-    background-size: 21px 20px;
-    background-repeat: no-repeat;
-    margin: 5px 0px 0px 15px;
-    opacity: 0.5;
-    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px 3px; /* Vertical Horizontal */
 }
 
-.recordingList .watchRecordingLink:hover
-{
-    opacity: 1.0;
-}
-
-.recordingList .recordingBox
+.upcomingList .programBox
 {
     height: 100%;
     padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
     cursor: pointer;
 }
 
-.recordingList .recordingInnerBox
+.upcomingList .programInnerBox
 {
     height: 100%;
     background-color: #555555;
     /*border-radius: 10px;*/
 }
 
-.recordingList .recordingHeader
+.upcomingList .programHeader
 {
     padding: 6px 8px 6px 8px;
     color: #FFFFFF;
@@ -140,7 +121,7 @@
     z-index: 4;
 }
 
-.recordingList .recordingTitle
+.upcomingList .programTitle
 {
     float: left;
     width: 50%;
@@ -148,7 +129,7 @@
     font-weight: bold;
 }
 
-.recordingList .recordingStartTime
+.upcomingList .programStartTime
 {
     width: 30%;
     float: right;
@@ -158,60 +139,35 @@
     margin-top: 3px;
 }
 
-.recordingList .recordingBody
+.upcomingList .programBody
 {
-    padding: 4px 5px; /* Vertical Horizontal */
+    padding: 1px 5px 4px 5px; /* Top Right Bottom Left */
     color: #DDDDDD;
-    height: 70px;
+    height: 50px;
     z-index: 5;
     overflow: hidden;
     text-overflow: clip;
 }
 
-.recordingList .recordingDescription
+.upcomingList .programDescription
 {
     position: relative;
     z-index: 1;
     text-overflow: clip;
+    font-size: 0.9em;
 }
 
-.recordingList .recordingSubtitle
+.upcomingList .programSubtitle
 {
     position:relative;
     font-weight: bold;
-    font-size: 1.0em;
+    font-size: 0.9em;
     margin-right: 5px;
     z-index: 1;
 }
 
-.recordingList .recordingSeasonEpisode
+.upcomingList .programSeasonEpisode
 {
     font-size: 0.9em;
     margin-right: 3px;
-}
-
-.recordingList .recordingIcons
-{
-    float: right;
-    width: 110px;
-    height: 100%;
-    position: relative;
-    margin-left: 10px;
-    padding: 0px;
-}
-
-.recordingList .recordingIcons IMG
-{
-    float: left;
-    margin: 2px 0px; /* Vertical Horizontal */
-}
-
-.wastebin
-{
-    margin: 3px 5px 10px 5px;
-    float: right;
-    padding: 5px 5px 2px 5px;
-    background: #2A2A2A;
-    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
-    border-radius: 8px;
 }

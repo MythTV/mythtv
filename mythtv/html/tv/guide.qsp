@@ -177,13 +177,13 @@ import "/js/utility.js"
 <div id="guideGrid" class="guideGrid">
 <%} // End of the header %>
 
-<div class="pageLeft" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=prevGuideStartTime.toISOString()%>', 'guideGrid', 'right')">
-    &lt;
-</div>
+    <div class="pageLeft" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=prevGuideStartTime.toISOString()%>', 'guideGrid', 'right')">
+        &lt;
+    </div>
 
-<div class="pageRight" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=nextGuideStartTime.toISOString()%>', 'guideGrid', 'left')">
-    &gt;
-</div>
+    <div class="pageRight" onClick="loadTVContent('/tv/guide.qsp?GuideOnly=1&amp;StartTime=<%=nextGuideStartTime.toISOString()%>', 'guideGrid', 'left')">
+        &gt;
+    </div>
 
     <div class="timeBar">
         <div class="timeBarDate">
@@ -212,6 +212,7 @@ import "/js/utility.js"
 
 
 <%
+    // The nothing to display message
     if (!isValidObject(channelList) || channelList.length === 0)
     {
     %>
@@ -231,8 +232,8 @@ import "/js/utility.js"
 
     <div class="channelRow">
         <div class="channelBox">
-            <img class="channelIcon" height="50" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=50" />
-            <div class="channelText"><%=escapeHTML(channel.ChannelName)%></div>
+            <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+            <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
         </div>
         <div class="programsBox">
 

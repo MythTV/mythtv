@@ -142,6 +142,7 @@ import "/tv/js/constants.js"
 </div>
 
 <%
+// The nothing to display message
 if (!isValidObject(programs) || programs.length === 0)
 {
     var message = "";
