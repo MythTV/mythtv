@@ -10,6 +10,7 @@ using namespace std;
 #include <QString>
 #include <QDateTime>
 #include <QEvent>
+#include <QLinkedList>
 
 // myth
 #include "mythscreentype.h"
@@ -17,6 +18,7 @@ using namespace std;
 #include "channelgroup.h"
 #include "channelutil.h"
 #include "mythuiguidegrid.h"
+#include "mthreadpool.h"
 
 // mythfrontend
 #include "schedulecommon.h"
@@ -33,6 +35,7 @@ class MythUIGuideGrid;
 
 typedef vector<ChannelInfo>   db_chan_list_t;
 typedef vector<db_chan_list_t> db_chan_list_list_t;
+typedef ProgramInfo *ProgInfoGuideArray[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
 
 class JumpToChannel;
 class JumpToChannelListener
@@ -76,6 +79,29 @@ class JumpToChannel : public QObject
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
+// GuideUIElement encapsulates the arguments to
+// MythUIGuideGrid::SetProgramInfo().  The elements are prepared in a
+// background thread and then sent via an event to the UI thread for
+// rendering.
+class GuideUIElement {
+public:
+    GuideUIElement(int row, int col, const QRect &area,
+                   const QString &title, const QString &category,
+                   int arrow, int recType, int recStat, bool selected)
+        : m_row(row), m_col(col), m_area(area), m_title(title),
+          m_category(category), m_arrow(arrow), m_recType(recType),
+          m_recStat(recStat), m_selected(selected) {}
+    const int m_row;
+    const int m_col;
+    const QRect m_area;
+    const QString m_title;
+    const QString m_category;
+    const int m_arrow;
+    const int m_recType;
+    const int m_recStat;
+    const bool m_selected;
+};
+
 class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 {
     Q_OBJECT
@@ -102,6 +128,11 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     virtual void aboutToShow();
     virtual void aboutToHide();
+    // Allow class GuideUpdateProgramRow to figure out whether the
+    // current start time/channel coordinates are the same, so that it can
+    // skip the work if not.
+    uint GetCurrentStartChannel(void) const { return m_currentStartChannel; }
+    QDateTime GetCurrentStartTime(void) const { return m_currentStartTime; }
 
   protected slots:
     void cursorLeft();
@@ -179,8 +210,21 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void fillChannelInfos(bool gotostartchannel = true);
     void fillTimeInfos(void);
     void fillProgramInfos(bool useExistingData = false);
-    void fillProgramRowInfos(unsigned int row, bool useExistingData = false);
+    // Set row=-1 to fill all rows.
+    void fillProgramRowInfos(int row, bool useExistingData);
+public:
+    // These need to be public so that the helper classes can operate.
     ProgramList *getProgramListFromProgram(int chanNum);
+    void updateProgramsUI(unsigned int firstRow, unsigned int numRows,
+                          int progPast,
+                          const QVector<ProgramList*> &proglists,
+                          const ProgInfoGuideArray &programInfos,
+                          const QLinkedList<GuideUIElement> &elements);
+    void updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
+                             QVector<bool> &unavailables);
+    void updateChannelsUI(const QVector<ChannelInfo *> &chinfos,
+                          const QVector<bool> &unavailables);
+private:
 
     void setStartChannel(int newStartChannel);
 
@@ -201,7 +245,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QMap<uint,uint>      m_channelInfoIdx;
 
     vector<ProgramList*> m_programs;
-    ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
+    ProgInfoGuideArray m_programInfos;
     ProgramList  m_recList;
 
     QDateTime m_originalStartTime;
@@ -234,6 +278,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QString m_channelOrdering;
 
     QTimer *m_updateTimer; // audited ref #5318
+
+    MThreadPool       m_threadPool;
 
     int               m_changrpid;
     ChannelGroupList  m_changrplist;
