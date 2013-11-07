@@ -62,7 +62,6 @@ NetworkControl::NetworkControl() :
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";
     jumpMap["livetv"]                = "Live TV";
-    jumpMap["livetvinguide"]         = "Live TV In Guide";
     jumpMap["mainmenu"]              = "Main Menu";
     jumpMap["managerecordings"]      = "Manage Recordings / Fix Conflicts";
     jumpMap["mythgallery"]           = "MythGallery";

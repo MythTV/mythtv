@@ -318,7 +318,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "StartTV() -- begin");
-    bool startInGuide = flags & kStartTVInGuide;
     bool inPlaylist = flags & kStartTVInPlayList;
     bool initByNetworkCommand = flags & kStartTVByNetworkCommand;
     bool quitAll = false;
@@ -387,9 +386,6 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
                 startSysEventSent = true;
                 gCoreContext->SendSystemEvent("LIVETV_STARTED");
             }
-
-            if (!quitAll && (startInGuide || tv->StartLiveTVInGuide()))
-                tv->DoEditSchedule();
 
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "tv->LiveTV() -- end");
         }
@@ -982,7 +978,7 @@ TV::TV(void)
       db_playback_exit_prompt(0),   db_autoexpire_default(0),
       db_auto_set_watched(false),   db_end_of_rec_exit_prompt(false),
       db_jump_prefer_osd(true),     db_use_gui_size_for_tv(false),
-      db_start_in_guide(false),     db_toggle_bookmark(false),
+      db_toggle_bookmark(false),
       db_run_jobs_on_remote(false), db_continue_embedded(false),
       db_use_fixed_size(true),      db_browse_always(false),
       db_browse_all_tuners(false),
@@ -1088,7 +1084,6 @@ void TV::InitFromDB(void)
     kv["EndOfRecordingExitPrompt"] = "0";
     kv["JumpToProgramOSD"]         = "1";
     kv["GuiSizeForTV"]             = "0";
-    kv["WatchTVGuide"]             = "0";
     kv["AltClearSavedPosition"]    = "1";
     kv["JobsRunOnRecordHost"]      = "0";
     kv["ContinueEmbeddedTVPlay"]   = "0";
@@ -1132,7 +1127,6 @@ void TV::InitFromDB(void)
     db_end_of_rec_exit_prompt = kv["EndOfRecordingExitPrompt"].toInt();
     db_jump_prefer_osd     = kv["JumpToProgramOSD"].toInt();
     db_use_gui_size_for_tv = kv["GuiSizeForTV"].toInt();
-    db_start_in_guide      = kv["WatchTVGuide"].toInt();
     db_toggle_bookmark     = kv["AltClearSavedPosition"].toInt();
     db_run_jobs_on_remote  = kv["JobsRunOnRecordHost"].toInt();
     db_continue_embedded   = kv["ContinueEmbeddedTVPlay"].toInt();

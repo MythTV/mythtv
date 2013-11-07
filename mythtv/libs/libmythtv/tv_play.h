@@ -114,7 +114,6 @@ typedef enum
 
 enum {
     kStartTVNoFlags          = 0x00,
-    kStartTVInGuide          = 0x01,
     kStartTVInPlayList       = 0x02,
     kStartTVByNetworkCommand = 0x04,
     kStartTVIgnoreBookmark   = 0x08,
@@ -369,7 +368,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // Top level playback methods
     bool LiveTV(bool showDialogs, const ChannelInfoList &selection);
-    bool StartLiveTVInGuide(void) { return db_start_in_guide; }
     int  Playback(const ProgramInfo &rcinfo);
     void PlaybackLoop(void);
 

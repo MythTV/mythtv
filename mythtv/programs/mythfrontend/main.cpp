@@ -591,12 +591,6 @@ static bool isLiveTVAvailable(void)
     return false;
 }
 
-static void startTVInGuide(void)
-{
-    if (isLiveTVAvailable())
-        TV::StartTV(NULL, kStartTVInGuide);
-}
-
 static void startTVNormal(void)
 {
     if (isLiveTVAvailable())
@@ -821,8 +815,6 @@ static void TVMenuCallback(void *data, QString &selection)
 
     if (sel == "tv_watch_live")
         startTVNormal();
-    else if (sel == "tv_watch_live_epg")
-        startTVInGuide();
     else if (sel.startsWith("tv_watch_recording"))
     {
         // use selection here because its case is untouched
@@ -1332,8 +1324,6 @@ static void InitJumpPoints(void)
          "", "", startPlayback, "JUMPREC");
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV"),
          "", "", startTVNormal);
-     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV In Guide"),
-         "", "", startTVInGuide);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Status Screen"),
          "", "", showStatus);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),

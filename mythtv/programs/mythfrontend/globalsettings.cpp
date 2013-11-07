@@ -3798,21 +3798,6 @@ MacDesktopSettings::MacDesktopSettings() : TriggeredConfigurationGroup(false)
 };
 #endif
 
-static HostCheckBox *WatchTVGuide()
-{
-    HostCheckBox *gc = new HostCheckBox("WatchTVGuide");
-
-    gc->setLabel(EPGSettings::tr("Show the program guide when starting "
-                                 "Live TV"));
-
-    gc->setHelpText(EPGSettings::tr("This starts the program guide immediately "
-                                    "upon starting to watch Live TV."));
-
-    gc->setValue(false);
-
-    return gc;
-}
-
 MainGeneralSettings::MainGeneralSettings()
 {
     DatabaseSettings::addDatabaseSettings(this);
@@ -4136,7 +4121,6 @@ EPGSettings::EPGSettings()
 
     epg->setLabel(tr("Program Guide %1/%2").arg("1").arg("1"));
 
-    epg->addChild(WatchTVGuide());
     epg->addChild(DefaultTVChannel());
     epg->addChild(EPGRecThreshold());
 
