@@ -34,6 +34,7 @@
 #include "channelinfo.h"
 #include "videoutils.h"
 #include "metadataimagehelper.h"
+#include <cardutil.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -126,6 +127,12 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setDupInType   ( pInfo->GetDuplicateCheckSource() );
             pRecording->setDupMethod   ( pInfo->GetDuplicateCheckMethod() );
             pRecording->setEncoderId   ( pInfo->GetCardID()               );
+            if (pProgram->Channel())
+            {
+                QString encoderName = CardUtil::GetDisplayName(pInfo->GetCardID(),
+                                                               pProgram->Channel()->SourceId());
+                pRecording->setEncoderName( encoderName );
+            }
 
             const RecordingInfo ri(*pInfo);
             pRecording->setProfile( ri.GetProgramRecordingProfile() );

@@ -24,7 +24,7 @@ namespace DTC
 class SERVICE_PUBLIC RecordingInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.01" );
+    Q_CLASSINFO( "version", "1.02" );
 
     Q_PROPERTY( int                     Status     READ Status     WRITE setStatus    )
     Q_PROPERTY( int                     Priority   READ Priority   WRITE setPriority  )
@@ -39,6 +39,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     Q_PROPERTY( int                     DupInType    READ DupInType    WRITE setDupInType    DESIGNABLE SerializeDetails )
     Q_PROPERTY( int                     DupMethod    READ DupMethod    WRITE setDupMethod    DESIGNABLE SerializeDetails )
     Q_PROPERTY( int                     EncoderId    READ EncoderId    WRITE setEncoderId    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString                 EncoderName  READ EncoderName  WRITE setEncoderName  DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString                 Profile      READ Profile      WRITE setProfile      DESIGNABLE SerializeDetails )
 
     /*
@@ -63,6 +64,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     PROPERTYIMP_ENUM( RecordingDupInType     , DupInType   )
     PROPERTYIMP_ENUM( RecordingDupMethodType , DupMethod   )
     PROPERTYIMP     ( int                    , EncoderId   )
+    PROPERTYIMP     ( QString                , EncoderName )
     PROPERTYIMP     ( QString                , Profile     )
 
     // Used only by Serializer
