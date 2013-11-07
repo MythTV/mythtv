@@ -39,6 +39,8 @@
 #include "remoteutil.h"
 #include "mythdate.h"
 #include "recordinginfo.h"
+#include "programtypes.h"
+#include "recordingtypes.h"
 
 #include "serviceUtil.h"
 #include <mythscheduler.h>
@@ -976,5 +978,21 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
 QString Dvr::RecStatusToString(int RecStatus)
 {
     RecStatusType type = static_cast<RecStatusType>(RecStatus);
+    return toString(type);
+}
+
+QString Dvr::RecStatusToDescription(int RecStatus, int recType,
+                                    const QDateTime &StartTime)
+{
+    //if (!StartTime.isValid())
+    //    throw QString("StartTime appears invalid.");
+    RecStatusType rsType = static_cast<RecStatusType>(RecStatus);
+    RecordingType recordingType = static_cast<RecordingType>(recType);
+    return toDescription(rsType, recordingType, StartTime);
+}
+
+QString Dvr::RecTypeToString(int recType)
+{
+    RecordingType type = static_cast<RecordingType>(recType);
     return toString(type);
 }

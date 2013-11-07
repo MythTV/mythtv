@@ -40,7 +40,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.1" );
+    Q_CLASSINFO( "version"    , "2.2" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -207,6 +207,11 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual QString            RecStatusToString     ( int              RecStatus  ) = 0;
 
+        virtual QString            RecStatusToDescription ( int            RecStatus,
+                                                            int            RecType,
+                                                            const QDateTime &StartTime ) = 0;
+
+        virtual QString            RecTypeToString       ( int              RecType   ) = 0;
 };
 
 #endif

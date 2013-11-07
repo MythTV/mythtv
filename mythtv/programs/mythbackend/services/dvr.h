@@ -184,6 +184,12 @@ class Dvr : public DvrServices
         bool              DisableRecordSchedule( uint             RecordId   );
 
         QString           RecStatusToString    ( int              RecStatus );
+
+        QString           RecStatusToDescription ( int            RecStatus,
+                                                   int            RecType,
+                                                   const QDateTime &StartTime );
+
+        QString           RecTypeToString      ( int              RecType   );
 };
 
 // --------------------------------------------------------------------------
@@ -375,6 +381,19 @@ class ScriptableDvr : public QObject
             return m_obj.RecStatusToString(RecStatus);
         }
 
+        QString RecStatusToDescription( int RecStatus,
+                                        int RecType,
+                                        const QDateTime &StartTime )
+        {
+            return m_obj.RecStatusToDescription(RecStatus,
+                                                RecType,
+                                                StartTime );
+        }
+
+        QString RecTypeToString( int RecType )
+        {
+            return m_obj.RecTypeToString( RecType );
+        }
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT( ScriptableDvr, QObject*);
