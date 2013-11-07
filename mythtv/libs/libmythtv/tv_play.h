@@ -327,6 +327,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static void ReloadKeys(void);
     static void SetFuncPtr(const char *, void *);
     static int  ConfiguredTunerCards(void);
+    static bool IsTunable(uint chanid);
 
     /// \brief Helper class for Sleep Timer code.
     class SleepTimerInfo
@@ -418,9 +419,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                       int editType = kScheduleProgramGuide);
     bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
-    bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
+    bool IsTunable(const PlayerContext*, uint chanid,
+                   bool use_cache = false);
     QSet<uint> IsTunableOn(const PlayerContext*, uint chanid,
                            bool use_cache, bool early_exit);
+    static QSet<uint> IsTunableOn(TV *tv, const PlayerContext*, uint chanid,
+                                  bool use_cache, bool early_exit);
     void ClearTunableCache(void);
     void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);

@@ -447,7 +447,13 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     // the available tuners, their cardinput.livetvorder values, and
     // their cardinput.startchan values.
     QString actualChannum = channum;
-    if (chanid == 0 && channum.isEmpty())
+    if (chanid == 0 && actualChannum.isEmpty())
+    {
+        uint defaultChanid = gCoreContext->GetNumSetting("DefaultChanid", 0);
+        if (defaultChanid && TV::IsTunable(defaultChanid))
+            chanid = defaultChanid;
+    }
+    if (chanid == 0 && actualChannum.isEmpty())
     {
         vector<uint> excluded_cardids;
         vector<uint> inputIDs = RemoteRequestFreeInputList(excluded_cardids);

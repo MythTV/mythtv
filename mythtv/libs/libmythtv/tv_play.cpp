@@ -8383,7 +8383,12 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
 {
-    return !IsTunableOn(ctx,chanid,use_cache,true).empty();
+    return !IsTunableOn(this, ctx,chanid,use_cache,true).empty();
+}
+
+bool TV::IsTunable(uint chanid)
+{
+    return !IsTunableOn(NULL, NULL, chanid, false, true).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -8401,7 +8406,16 @@ static QString toCommaList(const QSet<uint> &list)
 QSet<uint> TV::IsTunableOn(
     const PlayerContext *ctx, uint chanid, bool use_cache, bool early_exit)
 {
+    return IsTunableOn(this, ctx, chanid, use_cache, early_exit);
+}
+
+QSet<uint> TV::IsTunableOn(TV *tv,
+    const PlayerContext *ctx, uint chanid, bool use_cache, bool early_exit)
+{
     QSet<uint> tunable_cards;
+
+    if (tv == NULL)
+        use_cache = false;
 
     if (!chanid)
     {
@@ -8415,7 +8429,7 @@ QSet<uint> TV::IsTunableOn(
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
     vector<uint> excluded_cards;
-    if (ctx->recorder && ctx->pseudoLiveTVState == kPseudoNormalLiveTV)
+    if (ctx && ctx->recorder && ctx->pseudoLiveTVState == kPseudoNormalLiveTV)
         excluded_cards.push_back(ctx->GetCardID());
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
@@ -8452,10 +8466,10 @@ QSet<uint> TV::IsTunableOn(
         bool used_cache = false;
         if (use_cache)
         {
-            QMutexLocker locker(&is_tunable_cache_lock);
-            if (is_tunable_cache_inputs.contains(cardids[i]))
+            QMutexLocker locker(&tv->is_tunable_cache_lock);
+            if (tv->is_tunable_cache_inputs.contains(cardids[i]))
             {
-                inputs = is_tunable_cache_inputs[cardids[i]];
+                inputs = tv->is_tunable_cache_inputs[cardids[i]];
                 used_cache = true;
             }
         }
@@ -8463,8 +8477,11 @@ QSet<uint> TV::IsTunableOn(
         if (!used_cache)
         {
             inputs = RemoteRequestFreeInputList(cardids[i], excluded_cards);
-            QMutexLocker locker(&is_tunable_cache_lock);
-            is_tunable_cache_inputs[cardids[i]] = inputs;
+            if (tv)
+            {
+                QMutexLocker locker(&tv->is_tunable_cache_lock);
+                tv->is_tunable_cache_inputs[cardids[i]] = inputs;
+            }
         }
 
 #if 0
