@@ -37,6 +37,13 @@
     </button>
 
     <button>
+        <type>TV_PROGRAM_GUIDE</type>
+        <text>Program Guide</text>
+        <description>Choose programs from a grid-style list</description>
+        <action>TV_SCHEDULE</action>
+    </button>
+
+    <button>
         <type>MENU_UTILITIES_SETUP</type>
         <text>Setup</text>
         <description>Configure MythTV and plugins</description>

@@ -30,6 +30,13 @@
     </button>
 
     <button>
+        <type>TV_PROGRAM_GUIDE</type>
+        <text>Program Guide</text>
+        <description>Choose programs from a grid-style list</description>
+        <action>TV_SCHEDULE</action>
+    </button>
+
+    <button>
         <type>NET_VIDEO_SEARCH</type>
         <text>Search Internet Video</text>
         <description>Search popular video sites</description>
