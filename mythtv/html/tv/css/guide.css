@@ -207,11 +207,11 @@
 
 .guideGrid .programHeader
 {
-    padding: 6px 8px 6px 8px;
+    padding: 5px 8px 4px 8px;
     color: #FFFFFF;
     font-size: 1.1em;
     width: 100%;
-    height: 30px;
+    height: 28px;
     font-weight: bold;
 /*     background-color: #444444; */
     background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
@@ -226,25 +226,28 @@
 
 .guideGrid .programBody
 {
-    padding: 5px 5px 5px 5px;
+    margin: 3px 5px 4px 5px;
     color: #DDDDDD;
     height: 45px;
     z-index: 5;
     font-size: 0.8em;
+
 }
 
 .guideGrid .programDescription
 {
-    position:relative;
-    z-index:1;
+    position: relative;
+    z-index: 1;
+    line-height: 15px;
 }
 
 .guideGrid .programSubtitle
 {
-    position:relative;
+    position: relative;
     font-weight: bold;
     margin-right: 5px;
     z-index: 1;
+    line-height: 15px;
 }
 
 .guideGrid .programArrow

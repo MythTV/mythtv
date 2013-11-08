@@ -31,14 +31,14 @@
 .programWillRecord .programHeader
 {
 /*    background-color: #37912F;*/
-    background: linear-gradient(to bottom, #6FC462, #156F0D 40%);
+    background: linear-gradient(to bottom, #44AA44, #006600 40%);
 }
 
 .programRecording .programHeader,
 .programRecording .recordingHeader
 {
 /*    background-color: #00CC00;*/
-    background: linear-gradient(to bottom, #00EE00, #00AA00 40%);
+    background: linear-gradient(to bottom, #00DD00, #009900 40%);
 }
 
 .programEarlierShowing .programHeader,
