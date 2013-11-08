@@ -634,7 +634,8 @@ int main(int argc, char *argv[])
         if (useCutlist)
         {
             LOG(VB_GENERAL, LOG_INFO, "Honoring the cutlist while transcoding");
-            pginfo->QueryCutList(deleteMap);
+            if (!deleteMap.isEmpty())
+                pginfo->QueryCutList(deleteMap);
         }
         if (jobID >= 0)
         {
