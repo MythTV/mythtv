@@ -13,6 +13,7 @@
 #include "mythlogging.h"
 #include "htmlserver.h"
 #include "storagegroup.h"
+#include "httprequest.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -109,15 +110,26 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
 
                     QString sSuffix = oInfo.suffix().toLower();
 
+                    QString sMimeType = HTTPRequest::GetMimeType(sSuffix);
+
+                    if (sMimeType == "text/html")
+                        pRequest->m_eResponseType = ResponseTypeHTML;
+                    else if (sMimeType == "text/xml")
+                        pRequest->m_eResponseType = ResponseTypeXML;
+                    else if (sMimeType == "application/javascript")
+                        pRequest->m_eResponseType = ResponseTypeJS;
+                    else if (sMimeType == "text/css")
+                        pRequest->m_eResponseType = ResponseTypeCSS;
+                    else if (sMimeType == "text/plain")
+                        pRequest->m_eResponseType = ResponseTypeText;
+                    else if (sMimeType == "image/svg+xml" &&
+                              sSuffix != "svgz") // svgz are pre-compressed
+                        pRequest->m_eResponseType = ResponseTypeSVG;
+
                     if ((sSuffix == "qsp") ||
                         (sSuffix == "qxml") ||
                         (sSuffix == "qjs" )) 
                     {
-                        if (sSuffix == "qxml")
-                          pRequest->m_eResponseType = ResponseTypeXML;
-                        else
-                          pRequest->m_eResponseType = ResponseTypeHTML;
-
                         QTextStream stream( &pRequest->m_response );
                         
                         m_Scripting.EvaluatePage( &stream, sResName, pRequest->m_mapParams );

@@ -63,8 +63,12 @@ typedef enum
     ResponseTypeUnknown  =  0,
     ResponseTypeXML      =  1,
     ResponseTypeHTML     =  2,
-    ResponseTypeFile     =  3,
-    ResponseTypeOther    =  4
+    ResponseTypeJS       =  3,
+    ResponseTypeCSS      =  4,
+    ResponseTypeText     =  5,
+    ResponseTypeSVG      =  6,
+    ResponseTypeFile     =  7,
+    ResponseTypeOther    =  8
 
 } ResponseType;
 
