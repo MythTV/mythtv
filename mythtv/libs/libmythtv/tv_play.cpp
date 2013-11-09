@@ -11656,7 +11656,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     {
         if (ctx->recorder)
         {
-            vector<uint> cardids = CardUtil::GetCardList();
+            vector<uint> cardids = CardUtil::GetLiveTVCardList();
             uint cardid  = ctx->GetCardID();
             vector<uint> excluded_cardids;
             stable_sort(cardids.begin(), cardids.end());
@@ -11706,7 +11706,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             uint cardid = 0;
             vector<uint> excluded_cardids;
             uint sourceid = 0;
-            cardids = CardUtil::GetCardList();
+            cardids = CardUtil::GetLiveTVCardList();
             cardid  = ctx->GetCardID();
             excluded_cardids.push_back(cardid);
             InfoMap info;
