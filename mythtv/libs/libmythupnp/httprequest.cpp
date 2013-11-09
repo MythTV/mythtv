@@ -242,7 +242,7 @@ long HTTPRequest::SendResponse( void )
             {
                 QByteArray fileBuffer;
                 QFile file(m_sFileName);
-                if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stablity, limit size of files read into buffer to 2MiB
+                if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 
@@ -335,6 +335,11 @@ long HTTPRequest::SendResponse( void )
             LOG(VB_UPNP, LOG_DEBUG, QString("Reponse Compressed Content Length: %1").arg(compBuffer.buffer().length()));
         }
     }
+
+    // ----------------------------------------------------------------------
+    // Force IE into 'standards' mode
+    // ----------------------------------------------------------------------
+    m_mapRespHeaders[ "X-UA-Compatible" ] = "IE=Edge";
 
     // ----------------------------------------------------------------------
     // Write out Header.
