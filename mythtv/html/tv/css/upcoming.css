@@ -86,11 +86,12 @@
 
 .upcomingList .channelText
 {
+    clear: both;
     font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 0px 3px; /* Vertical Horizontal */
+    padding: 0px 2px; /* Vertical Horizontal */
 }
 
 .upcomingList .programBox
@@ -105,6 +106,8 @@
     height: 100%;
     background-color: #555555;
     /*border-radius: 10px;*/
+    position: relative; /* Required for programSchedPopup to be centred */
+    cursor: pointer;
 }
 
 .upcomingList .programHeader
@@ -141,12 +144,13 @@
 
 .upcomingList .programBody
 {
-    padding: 1px 5px 4px 5px; /* Top Right Bottom Left */
+    padding: 3px 5px 4px 5px; /* Top Right Bottom Left */
     color: #DDDDDD;
     height: 52px;
     z-index: 5;
     overflow: hidden;
     text-overflow: clip;
+    font-size: 0.9em;
 }
 
 .upcomingList .programDescription
@@ -157,17 +161,50 @@
     font-size: 0.9em;
 }
 
+.upcomingList .programRecStatus
+{
+    clear: left;
+    width: 100%;
+    float: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.upcomingList .programInput
+{
+    clear: left;
+    width: 70%;
+    float: left;
+}
+
+.upcomingList .programChannel
+{
+    width: 30%;
+    float: right;
+}
+
+.upcomingList .programRecType
+{
+    width: 30%;
+    float: right;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.upcomingList .label
+{
+    font-weight: bold;
+}
+
 .upcomingList .programSubtitle
 {
-    position:relative;
-    font-weight: bold;
-    font-size: 0.9em;
-    margin-right: 5px;
-    z-index: 1;
+    float: left;
+    width: 70%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .upcomingList .programSeasonEpisode
 {
-    font-size: 0.9em;
-    margin-right: 3px;
+    float: left;
 }

@@ -56,6 +56,30 @@
     background: linear-gradient(to bottom, #EE0000, #AA0000 40%);
 }
 
+.programScheduling .programHeader
+{
+/*    background-color: #045FB4;*/
+    background: linear-gradient(to bottom, #2681D6, #003D92 40%);
+}
+
+.programSchedPopup
+{
+    display: none;
+    background-color: rgba(26, 26, 26, 0.9);
+    border-radius: 8px;
+    width: 110px;
+    height: 30px;
+    padding: 8px;
+    top: 50%;
+    left: 50%;
+    margin-top: -15px;
+    margin-left: -50px;
+    font-weight: bold;
+    position: absolute;
+    z-index: 10;
+    white-space: nowrap;
+}
+
 /* OnClick Context Menus */
 .contextMenu
 {

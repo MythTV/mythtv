@@ -2,7 +2,7 @@
 function recordProgram(chanID, startTime, type)
 {
     hideMenu("optMenu");
-    var url = "/tv/qjs/dvr_util.qjs?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -11,9 +11,10 @@ function recordProgram(chanID, startTime, type)
                             });
 }
 
+// Override the one in common.js for now
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/qjs/dvr_util.qjs?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url ).done(function()
                             {
                                 var response = ajaxRequest.responseText.split("#");
@@ -30,28 +31,8 @@ function checkRecordingStatus(chanID, startTime)
                             });
 }
 
-function recRuleChanged(chandID, startTime)
-{
-    var layer = document.getElementById(chanID + "_" + startTime);
-    toggleClass(layer, "programScheduling");
-    var popup = document.getElementById(chanID + "_" + startTime + "_schedpopup");
-    toggleVisibility(popup);
-
-    setTimeout(function(){checkRecordingStatus(chanID, startTime)}, 2500);
-}
-
 function reloadGuideContent()
 {
-    var url = currentContentURL;
-    // HACK: This is a hacky approach and will be changed soon
-    if (currentContentURL.indexOf("GuideOnly") === -1)
-    {
-        if (currentContentURL.indexOf("?") !== -1)
-            url += "&amp;GuideOnly=1";
-        else
-            url += "?GuideOnly=1";
-    }
-
-    loadTVContent(url, "guideGrid", "dissolve");  // currentContentURL is defined in util.qjs
+    loadTVContent(currentContentURL, "guideGrid", "dissolve", {"GuideOnly": "1"});  // currentContentURL is defined in util.qjs
 }
 

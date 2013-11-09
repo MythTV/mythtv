@@ -123,7 +123,8 @@
 {
     height: 100%;
     background-color: #555555;
-    /*border-radius: 10px;*/
+    position: relative; /* Required for programSchedPopup to be centred */
+    cursor: pointer;
 }
 
 .recordingList .recordingHeader
@@ -160,7 +161,7 @@
 
 .recordingList .recordingBody
 {
-    padding: 4px 5px; /* Vertical Horizontal */
+    padding: 3px 5px; /* Vertical Horizontal */
     color: #DDDDDD;
     height: 70px;
     z-index: 5;
@@ -173,6 +174,7 @@
     position: relative;
     z-index: 1;
     text-overflow: clip;
+    line-height: 15px;
 }
 
 .recordingList .recordingSubtitle
@@ -182,6 +184,7 @@
     font-size: 1.0em;
     margin-right: 5px;
     z-index: 1;
+    line-height: 15px;
 }
 
 .recordingList .recordingSeasonEpisode

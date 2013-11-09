@@ -146,6 +146,7 @@
 
 .guideGrid .channelText
 {
+    clear: both;
     font-weight: bold;
     overflow: hidden;
     white-space: nowrap;
@@ -188,8 +189,7 @@
     height: 100%;
     background-color: #555555;
     border-radius: 10px;
-    position: relative;
-    overflow: visible;
+    position: relative; /* Required for programSchedPopup to be centred */
     cursor: pointer;
 }
 
@@ -209,19 +209,25 @@
 {
     padding: 5px 8px 4px 8px;
     color: #FFFFFF;
-    font-size: 1.1em;
     width: 100%;
     height: 28px;
-    font-weight: bold;
 /*     background-color: #444444; */
     background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
     border-radius: inherit;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+    z-index: 4;
+    position: relative;
+}
+
+.guideGrid .programTitle
+{
+    color: #FFFFFF;
+    font-size: 1.1em;
+    width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
-    z-index: 4;
-    position:relative;
+    font-weight: bold;
 }
 
 .guideGrid .programBody
@@ -256,27 +262,4 @@
     font-weight: bold;
 }
 
-.guideGrid .programScheduling .programHeader
-{
-/*    background-color: #045FB4;*/
-    background: linear-gradient(to bottom, #2681D6, #003D92 40%);
-}
-
-.guideGrid .programSchedPopup
-{
-    display: none;
-    background-color: rgba(26, 26, 26, 0.9);
-    border-radius: 8px;
-    width:110px;
-    height:30px;
-    padding:8px;
-    top: 50%;
-    left: 50%;
-    margin-top: -15px;
-    margin-left: -50px;
-    font-weight: bold;
-    position: absolute;
-    z-index: 10;
-    white-space: nowrap;
-}
 

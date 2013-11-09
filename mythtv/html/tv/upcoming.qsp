@@ -18,6 +18,8 @@ import "/js/utility.js"
     var programList;
     if (filter == "conflicting")
         programList = dvr.GetConflictList(0, 200);
+    else if (filter == "all")
+        programList = dvr.GetUpcomingList(0, 200, true);
     else
         programList = dvr.GetUpcomingList(0, 200, false);
 
@@ -69,10 +71,11 @@ import "/js/utility.js"
 <div class="navigateBox">
 
     <form action="/tv/upcoming.qsp">
-    <label for="upcomingFilter"><%=qsTr("Filter")%>:
+    <label for="upcomingFilter"><%=qsTr("Show")%>:
     <select id="upcomingFilter" name="ViewFilter" onChange="submitForm(this.form)">
-        <option value="all">Default</option>
+        <option value="important">Important</option>
         <option value="conflicting" <% if (filter === "conflicting") {%>selected<%}%>>Conflicting or Failed Schedules</option>
+        <option value="all" <% if (filter === "all") {%>selected<%}%>>All scheduler matches</option>
     </select>
     </label>
     </form>
@@ -89,7 +92,7 @@ if (!isValidObject(programs) || programs.length === 0)
     var message = "";
 
     if (filter == "conflicting")
-        message = qsTr("There are no conflicting or errored recordings.");
+        message = qsTr("There are no conflicting or errored recordings.")
     else
         message = qsTr("There are no upcoming recordings.")
 %>
@@ -115,6 +118,11 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
     var statusStr = dvr.RecStatusToString(program.Recording.Status);
     var statusClass = "program" + statusStr.replace(/ /g, '');
 
+    var recStatusDesc = dvr.RecStatusToDescription(program.Recording.Status,
+                                                   program.Recording.RecType,
+                                                   program.Recording.StartTs);
+    var recTypeStr = dvr.RecTypeToString(program.Recording.RecType);
+
     // Used as a unique identifier and also to access the chanid
     // and starttime for the AJAX scheduling stuff
     var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
@@ -130,7 +138,6 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
         </div>
 <%
     }
-
 %>
 
     <div class="programRow" id="<%=programIdentifier%>_row">
@@ -145,16 +152,37 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
                     <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
                 </div>
                 <div class="programBody">
-                    <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
-                    <% if (program.Season > 0 || program.Episode > 0) { %>
-                        <span class="programSeasonEpisode">
-                            <% if (program.Season > 0) { %>(<%=qsTr("S %1", "Season x").arg(program.Season)%>
-                            <%} else {%>(<% } if (program.TotalEpisodes > 0) { %><%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
-                            <%} else if (program.Episode > 0) {%><%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)<%}%>
-                        </span>
+                    <span class="programSubtitle">
+                    <% if (program.SubTitle) {%>
+                        <span class="label">Episode: </span><%=escapeHTML(program.SubTitle)%>
+                        <% if (program.Season > 0 || program.Episode > 0) { %>
+                            <span class="programSeasonEpisode">
+                                <% if (program.Season > 0) { %>(<%=qsTr("S %1", "Season x").arg(program.Season)%>
+                                <%} else {%>(<% } if (program.TotalEpisodes > 0) { %><%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
+                                <%} else if (program.Episode > 0) {%><%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)<%}%>
+                            </span>
+                        <%}%>
+                    <%} else {%>
+                        &nbsp;
                     <%}%>
-                    <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                    </span>
+                    <span class="programRecType"><span class="label">Rule Type: </span><%=escapeHTML(recTypeStr)%></span>
+                    <span class="programInput">
+                    <% if (program.Recording.EncoderName) {%>
+                        <span class="label">Input: </span><%=escapeHTML(program.Recording.EncoderName)%>
+                    <%} else {%>
+                        &nbsp;
+                    <%}%>
+                    </span>
+                    <span class="programChannel"><span class="label">Channel: </span><%=escapeHTML(channel.ChanNum)%> <%=escapeHTML(channel.ChannelName)%></span>
+                    <span class="programRecStatus"><span class="label">Status: </span><%=escapeHTML(recStatusDesc)%></span>
                 </div>
+                <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
+                    <%=qsTr("Scheduling")%> ...
+                </div>
+                <input type="hidden" name="chanid" value="<%=channel.ChanId%>" />
+                <input type="hidden" name="starttime" value="<%=program.StartTime.toISOString()%>" />
+                <input type="hidden" name="recordid" value="<%=program.Recording.RecordId%>" />
             </div>
         </div>
     </div>

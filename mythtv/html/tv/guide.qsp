@@ -86,8 +86,8 @@ import "/js/utility.js"
 <title><%=qsTr("Program Guide")%> - <%=myth.GetFormatDate(guideStartTime)%>,
        <%=myth.GetFormatTime(guideStartTime)%> - <%=myth.GetFormatTime(guideEndTime)%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
-<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
 <script src="/js/utility.js" /> <!-- ECMA not JS -->
 <script src="/js/util.qjs" />
@@ -291,7 +291,11 @@ import "/js/utility.js"
 %>
             <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
                 <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
-                    <div class="programHeader"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></div>
+                    <div class="programHeader">
+                        <div class="programTitle">
+                            <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                        </div>
+                    </div>
                     <div class="programBody">
                         <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                         <span class="programDescription"><%=escapeHTML(program.Description)%></span>

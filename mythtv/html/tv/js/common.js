@@ -1,4 +1,9 @@
 
+function jq(id) // F*%$ jQuery
+{
+    return "#" + id.replace( /(:|\.|\[|\])/g, "\\$1" );
+}
+
 function getChild(element, name)
 {
     if (!isValidObject(element))
@@ -194,7 +199,7 @@ function showDetail(parentID, type)
     if (type == "recording")
         method = "getRecordingDetailHTML";
 
-    var url = "/tv/qjs/program_util.qjs?action=" + method + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/program_util.qsp?action=" + method + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                         {
@@ -229,12 +234,41 @@ function loadScheduler(chanID, startTime, from)
     loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime);
 }
 
+function checkRecordingStatus(chanID, startTime)
+{
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url ).done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                var id = response[0] + "_" + response[1];
+                                var layer = document.getElementById(id);
+                                toggleClass(layer, "programScheduling");
+                                // toggleClass(layer, response[2]);
+                                var popup = document.getElementById(id + "_schedpopup");
+                                toggleVisibility(popup);
+                                // HACK: Easiest way to ensure that everything
+                                //       on the page is correctly updated for now
+                                //       is to reload
+                                reloadTVContent();
+                            });
+}
+
+function recRuleChanged(chandID, startTime)
+{
+    var layer = document.getElementById(chanID + "_" + startTime);
+    toggleClass(layer, "programScheduling");
+    var popup = document.getElementById(chanID + "_" + startTime + "_schedpopup");
+    toggleVisibility(popup);
+
+    setTimeout(function(){checkRecordingStatus(chanID, startTime)}, 2500);
+}
+
 function deleteRecRule(chandID, startTime)
 {
     var layer = document.getElementById(chanID + "_" + startTime);
     var recRuleID = getChildValue(layer, "recordid");
     hideMenu("optMenu");
-    var url = "/tv/qjs/dvr_util.qjs?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -243,7 +277,7 @@ function deleteRecRule(chandID, startTime)
                             });
 }
 
-function loadTVContent(url, targetDivID, transition)
+function loadTVContent(url, targetDivID, transition, args)
 {
     currentContentURL = url;   // currentContentURL is defined in util.qjs
 
@@ -264,6 +298,22 @@ function loadTVContent(url, targetDivID, transition)
     var newDiv = document.createElement('div');
     newDiv.style = "left: 100%";
     document.getElementById("content").insertBefore(newDiv, null);
+
+    for (var key in args)
+    {
+        // Check that this arg hasn't already been appended
+        // we don't currently support altering of existing args
+        if (url.indexOf(key) === -1)
+        {
+            // Check if any args presently exist
+            if (url.indexOf("?") !== -1)
+                url += "&amp;";
+            else
+                url += "?";
+
+            url += key + "=" + args[key];
+        }
+    }
 
     var html = $.ajax({
       url: url,
@@ -291,6 +341,11 @@ function loadTVContent(url, targetDivID, transition)
     newDiv.id = targetDivID;
 
     $("#busyPopup").hide();
+}
+
+function reloadTVContent()
+{
+    loadTVContent(currentContentURL);  // currentContentURL is defined in util.qjs
 }
 
 function submitForm(formElement, target, transition)
