@@ -58,6 +58,7 @@ static MIMETypes g_MIMETypes[] =
     { "jpg" , "image/jpeg"                 },
     { "jpeg", "image/jpeg"                 },
     { "png" , "image/png"                  },
+    { "ico",  "image/x-icon"               },
     { "svg" , "image/svg+xml"              },
     { "svgz", "image/svg+xml"              },
     { "htm" , "text/html"                  },
@@ -222,7 +223,6 @@ long HTTPRequest::SendResponse( void )
 
     switch( m_eResponseType )
     {
-        case ResponseTypeUnknown:
         // The following are all eligable for gzip compression
         case ResponseTypeJS:
         case ResponseTypeCSS:
@@ -247,6 +247,7 @@ long HTTPRequest::SendResponse( void )
             }
             else
                 break;
+        case ResponseTypeUnknown:
         case ResponseTypeNone:
             LOG(VB_UPNP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
