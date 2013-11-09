@@ -31,7 +31,7 @@ function loadScript(url, callback){
 function listFiles() {
 
     if (typeof jQuery == 'undefined') {  
-        loadScript("/js/jquery.min.js", realListFiles);
+        loadScript("/3rdParty/jquery/jquery-2.0.3.js", realListFiles);
     } else {
         realListFiles();
     }

@@ -4,7 +4,7 @@
 </head>
 <body>
 <script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
-<script language="JavaScript" type="text/javascript" src="/js/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="/3rdParty/jquery/jquery-2.0.3.js"></script>
 <%
     var content = new Content();
     var jwpExists = 0;

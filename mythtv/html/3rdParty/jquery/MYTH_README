@@ -1,0 +1,32 @@
+
+We are using the following jQuery components from the following locations:
+
+1. jQuery 2.0.3 - http://jquery.com/download/
+
+    js/jquery-2.0.3.js
+
+2. jQuery-UI 1.10.3 - http://jqueryui.com/ (No Themes)
+
+    js/jquery-ui-1.10.3.js
+    css/jquery-ui-1.10.3.css
+
+3. jQuery Grid Plugin 4.5.4 - http://www.trirand.com
+
+    jqueryGrid/
+
+4. jQuery FileTree Plugin 1.01 (with modifications) - http://www.abeautifulsite.net/blog/2008/03/jquery-file-tree/
+
+    jqueryFileTree/
+
+5. jQuery ContextMenu Plugin (Unknown) - Unknown Source! There is more than one with this name and neither look like this copy
+
+    jqueryContextMenu/
+
+6. jQuery MultiSelect Plugin 1.13 - http://www.quasipartikel.at/multiselect/
+
+    jqueryMultiSelect/
+
+7. jQuery Galleria Plugin 1.2.3 - http://galleria.io/
+
+    galleria
+

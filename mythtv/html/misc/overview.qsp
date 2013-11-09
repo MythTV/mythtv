@@ -12,7 +12,7 @@
         <div style="padding: 10px 0px;" id="lasttencontent">
 <%
             var oDvr = new Dvr();
-            var list = oDvr.GetRecordedList( true, 0, 10 );
+            var list = oDvr.GetRecordedList( true, 0, 10, "", "", "" );
             for (var nIdx=0; nIdx < list.Programs.length; nIdx++)
             {
                 var program = list.Programs[ nIdx ];
@@ -148,11 +148,11 @@ function UTCDateString(d)
 }
 %>
 
-<script src="/js/galleria/galleria-1.2.3.min.js"></script>
+<script src="/3rdParty/jquery/galleria/galleria-1.2.3.min.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function($){
-        Galleria.loadTheme('/js/galleria/themes/classic/galleria.classic.min.js');
+        Galleria.loadTheme('/3rdParty/jquery/galleria/themes/classic/galleria.classic.min.js');
         $("#lasttencontent").galleria({
             width: 700,
             height: 350,

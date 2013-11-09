@@ -286,7 +286,7 @@ function openFileBrowserWindow(title, dirs, saveCallback, onlyDirs, storageGroup
     $('#fileBrowserWindow').dialog("open");
     $.ajaxSetup({ async: false });
     if (typeof jQuery.fileTree == 'undefined') {
-        $.getScript("/js/jqueryFileTree/jqueryFileTree.js");
+        $.getScript("/3rdParty/jquery/jqueryFileTree/jqueryFileTree.js");
     }
     $.ajaxSetup({ async: true });
     fileBrowserCallback = saveCallback;
