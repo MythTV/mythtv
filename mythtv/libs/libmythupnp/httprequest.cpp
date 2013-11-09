@@ -224,6 +224,12 @@ long HTTPRequest::SendResponse( void )
     switch( m_eResponseType )
     {
         // The following are all eligable for gzip compression
+        case ResponseTypeUnknown:
+        case ResponseTypeNone:
+            LOG(VB_UPNP, LOG_INFO,
+                QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
+                    .arg(GetResponseStatus()) .arg(GetPeerAddress()));
+            return( -1 );
         case ResponseTypeJS:
         case ResponseTypeCSS:
         case ResponseTypeText:
@@ -236,7 +242,8 @@ long HTTPRequest::SendResponse( void )
             {
                 QByteArray fileBuffer;
                 QFile file(m_sFileName);
-                if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+                if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stablity, limit size of files read into buffer to 2MiB
+                    file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 
                 if (m_response.buffer().length() > 0)
@@ -247,13 +254,6 @@ long HTTPRequest::SendResponse( void )
             }
             else
                 break;
-        case ResponseTypeUnknown:
-        case ResponseTypeNone:
-            LOG(VB_UPNP, LOG_INFO,
-                QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
-                    .arg(GetResponseStatus()) .arg(GetPeerAddress()));
-            return( -1 );
-
         case ResponseTypeFile: // Binary files
             LOG(VB_UPNP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
