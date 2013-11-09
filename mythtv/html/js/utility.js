@@ -6,7 +6,7 @@
 // It can however be used clientside as well so long as it complies with the
 // above stipulation
 
-"use strict";
+// "use strict";
 
 function toCapitalCase(str)
 {
@@ -30,4 +30,3 @@ function isValidObject(variable)
             && typeof variable !== "undefined"
             && (variable != null));
 }
-
