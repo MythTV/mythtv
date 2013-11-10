@@ -100,29 +100,32 @@
 
 .contextMenu .button
 {
-    background-color:#444444;
-    border:3px #FFFFFF outset;
-    color: #DDDDDD;
+    background-color:#333333;
+    border:1px #444444 solid;
+    color: #FFFFFF;
+    background-image: linear-gradient(to bottom, #4A4A4A, #222222 60%);
     margin: 7px;
-    font-weight: bold;
     font-size: 1.1em;
-    padding: 4px;
+    padding: 0.4em 1em;
     vertical-align: middle;
     text-align: center;
     white-space: nowrap;
-    border-radius: 8px;
+    border-radius: 6px;
     display: none;
 }
 
 .contextMenu .button:hover
 {
-    background-color:#555555;
-    color: #FFFFFF;
+    background-color: #003147;
+    background-image: linear-gradient(to bottom, #225369, #003147 60%);
+    border-color: #0B93D5;
 }
 
 .contextMenu .button:active
 {
-    border-style:inset;
+    background-color: #0B93D5;
+    background-image: linear-gradient(to bottom, #2DB5F7, #0B93D5 60%);
+    border-color: #0B93D5;
 }
 
 /* Navigation, Ordering, sorting etc */
