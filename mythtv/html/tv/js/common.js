@@ -71,16 +71,16 @@ function moveToPosition(layer, customer)
     var pageWidth = document.body.clientWidth; //window.innerHeight;
 
     //alert("Page Width: " + pageWidth + " Customer Left: " + customerLeft + " Layer Width: " + layerWidth + " Parent Offset: " + parentXOffset);
-    //alert("Page Height: " + pageHeight + " Customer Bottom: " + customerBottom + " Layer Height: " + layerHeight + " Parent Offset: " + parentYOffset);
+    //alert("Page Bottom: " + pageBottom + " Page Scroll Offset: " +  window.pageYOffset + " Customer Bottom: " + customerBottom + " Layer Height: " + layerHeight + " Parent Offset: " + parentYOffset);
 
-    if ((customerLeft + layerWidth + 10) < pageWidth + window.pageXOffset)
+    if ((customerLeft + layerWidth + 10) < (pageWidth + window.pageXOffset))
     {
         layer.style.left = (customerLeft + 10 - parentXOffset) + "px";
     }
     else
         layer.style.left = (pageWidth - layerWidth - 5 - parentXOffset) + "px";
 
-    if ((customerBottom + layerHeight) < pageBottom + window.pageYOffset)
+    if ((customerBottom + layerHeight) < pageBottom)
     {
         layer.style.top = (customerBottom - parentYOffset) + "px";
     }
