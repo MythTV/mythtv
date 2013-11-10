@@ -112,14 +112,14 @@
     opacity: 1.0;
 }
 
-.recordingList .recordingBox
+.recordingList .programBox
 {
     height: 100%;
     padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
     cursor: pointer;
 }
 
-.recordingList .recordingInnerBox
+.recordingList .programInnerBox
 {
     height: 100%;
     background-color: #555555;
@@ -127,7 +127,7 @@
     cursor: pointer;
 }
 
-.recordingList .recordingHeader
+.recordingList .programHeader
 {
     padding: 6px 8px 6px 8px;
     color: #FFFFFF;
@@ -141,7 +141,7 @@
     z-index: 4;
 }
 
-.recordingList .recordingTitle
+.recordingList .programTitle
 {
     float: left;
     width: 50%;
@@ -149,7 +149,7 @@
     font-weight: bold;
 }
 
-.recordingList .recordingStartTime
+.recordingList .programStartTime
 {
     width: 30%;
     float: right;
@@ -159,7 +159,7 @@
     margin-top: 3px;
 }
 
-.recordingList .recordingBody
+.recordingList .programBody
 {
     padding: 3px 5px; /* Vertical Horizontal */
     color: #DDDDDD;
@@ -169,7 +169,7 @@
     text-overflow: clip;
 }
 
-.recordingList .recordingDescription
+.recordingList .programDescription
 {
     position: relative;
     z-index: 1;
@@ -177,7 +177,7 @@
     line-height: 15px;
 }
 
-.recordingList .recordingSubtitle
+.recordingList .programSubtitle
 {
     position:relative;
     font-weight: bold;
@@ -187,13 +187,13 @@
     line-height: 15px;
 }
 
-.recordingList .recordingSeasonEpisode
+.recordingList .programSeasonEpisode
 {
     font-size: 0.9em;
     margin-right: 3px;
 }
 
-.recordingList .recordingIcons
+.recordingList .programIcons
 {
     float: right;
     width: 110px;
@@ -203,7 +203,7 @@
     padding: 0px;
 }
 
-.recordingList .recordingIcons IMG
+.recordingList .programIcons IMG
 {
     float: left;
     margin: 2px 0px; /* Vertical Horizontal */

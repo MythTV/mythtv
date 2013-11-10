@@ -15,6 +15,17 @@ import "/js/utility.js"
         return args[name];
     }
 
+    function getIntArg(name)
+    {
+        return Number(getArg(name));
+    }
+
+    function getBoolArg(name)
+    {
+        // Should check for string types here such as 'true' and 'false'
+        return Boolean(getIntArg(name));
+    }
+
     var myth = new Myth();
 
     // FIXME: This should use a new services method so that we can use QLocale::toString() instead
@@ -24,8 +35,11 @@ import "/js/utility.js"
         return size.toFixed(2) + " GB";
     }
 
-    function buildDetailHTML(program, type)
+    function buildDetailHTML(program, type, showTitle, showSubtitle, showDescription)
     {
+        if (!isValidObject(program) || program.Title === "")
+            return qsTr("No matching program found");
+
         var dvr = new Dvr();
 
         var durationStr = "";
@@ -47,23 +61,21 @@ import "/js/utility.js"
 
         var html = "";
 
-        if (type == "program" && program.Recording.Status != 0) // Don't show status for recordings
+        if (showTitle)
         {
-            html += '<label for="detailRecStatus">' + qsTr("Recording Status:") + ' </label><span id="detailRecStatus">' + dvr.RecStatusToString(program.Recording.Status) + '</span><br />';
+            html += '<label for="detailTileitle">' + qsTr("Title:") + ' </label><span id="detailTitle">' + escapeHTML(program.Title) + '</span><br />';
         }
-        if (program.FileSize > 0)
+
+        if (showSubtitle)
         {
-            html += '<label for="detailSize">' + qsTr("Size:") + ' </label><span id="detailSize">' + filesizeToString(program.FileSize) + '</span><br />';
+            html += '<label for="detailSubtitle">' + qsTr("Subtitle:") + ' </label><span id="detailSubtitle">' + escapeHTML(program.SubTitle) + '</span><br />';
         }
-        if (type == "program")
+
+        if (showDescription)
         {
-            html += '<label for="detailStartEnd">' + qsTr("Start/End Times:") + ' </label><span id="detailStartEnd">' + myth.GetFormatTime(program.StartTime) + ' - ' + myth.GetFormatTime(program.EndTime) + '</span><br />';
+            html += '<label for="detailDescription">' + qsTr("Description:") + ' </label><span id="detailDescription">' + escapeHTML(program.Description) + '</span><br /><br />';
         }
-        html += '<label for="detailDuration">' + qsTr("Duration:") + ' </label><span id="detailDuration">' + durationStr + '</span><br />';
-        if (program.Category != "")
-        {
-            html += '<label for="detailCategory">' + qsTr("Category:") + ' </label><span id="detailCategory">' + escapeHTML(toCapitalCase(program.Category)) + '</span><br />';
-        }
+
         if (program.Season > 0)
         {
             html += '<label for="detailSeason">' + qsTr("Season:") + ' </label><span id="detailSeason">' + program.Season + '</span> ';
@@ -81,9 +93,26 @@ import "/js/utility.js"
         {
             html += '<br />';
         }
+        if (type == "program" && program.Recording.Status != 0) // Don't show status for recordings
+        {
+            html += '<label for="detailRecStatus">' + qsTr("Recording Status:") + ' </label><span id="detailRecStatus">' + dvr.RecStatusToString(program.Recording.Status) + '</span><br />';
+        }
+        if (program.FileSize > 0)
+        {
+            html += '<label for="detailSize">' + qsTr("Size:") + ' </label><span id="detailSize">' + filesizeToString(program.FileSize) + '</span><br />';
+        }
+        if (type == "program")
+        {
+            html += '<label for="detailStartEnd">' + qsTr("Start/End Times:") + ' </label><span id="detailStartEnd">' + escapeHTML(myth.GetFormatTime(program.StartTime)) + ' - ' + escapeHTML(myth.GetFormatTime(program.EndTime)) + '</span><br />';
+        }
+        html += '<label for="detailDuration">' + qsTr("Duration:") + ' </label><span id="detailDuration">' + durationStr + '</span><br />';
+        if (program.Category != "")
+        {
+            html += '<label for="detailCategory">' + qsTr("Category:") + ' </label><span id="detailCategory">' + escapeHTML(toCapitalCase(program.Category)) + '</span><br />';
+        }
         if (program.Recording.RecGroup != "")
         {
-            html += '<label for="detailRecGroup">' + qsTr("Recording Group:") + ' </label><span id="detailRecGroup">' + program.Recording.RecGroup + '</span>';
+            html += '<label for="detailRecGroup">' + qsTr("Recording Group:") + ' </label><span id="detailRecGroup">' + escapeHTML(program.Recording.RecGroup) + '</span>';
         }
 
         return html;
@@ -101,32 +130,38 @@ import "/js/utility.js"
     // Besides, the the backend is going to be powerful enough to build the HTML
     // faster than the average mobile/tablet can do it client-side
     //
-    function getProgramDetailHTML(chanID, startTime)
+    function getProgramDetailHTML(args)
     {
+        var startTime = myth.ParseISODateString(getArg("StartTime"));
+
         var guide = new Guide();
-        var program = guide.GetProgramDetails(chanID, startTime);
-        return buildDetailHTML(program, "program");;
+        var program = guide.GetProgramDetails(getArg("ChanID"), startTime);
+        return buildDetailHTML(program, "program",
+                               getBoolArg("showTitle"),
+                               getBoolArg("showSubtitle"),
+                               getBoolArg("showDescription"));
     }
 
-    function getRecordingDetailHTML(chanID, startTime)
+    function getRecordingDetailHTML(args)
     {
+        var startTime = myth.ParseISODateString(getArg("StartTime"));
+
         var dvr = new Dvr();
-        var program = dvr.GetRecorded(chanID, startTime);
-        if (!isValidObject(program) || program.Title === "")
-            return qsTr("No matching program found");
-        return buildDetailHTML(program, "recording");
+        var program = dvr.GetRecorded(getArg("ChanID"), startTime);
+        return buildDetailHTML(program, "recording",
+                               getBoolArg("showTitle"),
+                               getBoolArg("showSubtitle"),
+                               getBoolArg("showDescription"));
     }
 
     var ret;
-    switch (args.action)
+    switch (getArg("action"))
     {
         case "getProgramDetailHTML":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = getProgramDetailHTML(getArg("ChanID"), validDate);
+            ret = getProgramDetailHTML(args);
             break;
         case "getRecordingDetailHTML":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = getRecordingDetailHTML(getArg("ChanID"), validDate);
+            ret = getRecordingDetailHTML(args);
             break;
         default:
             break;
