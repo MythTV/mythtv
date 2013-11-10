@@ -3726,6 +3726,34 @@ static bool has_action(QString action, const QStringList &actions)
     return false;
 }
 
+// Make a special check for global system-related events.
+//
+// This check needs to be done early in the keypress event processing,
+// because FF/REW processing causes unknown events to stop FF/REW, and
+// manual zoom mode processing consumes all but a few event types.
+// Ideally, we would just call MythScreenType::keyPressEvent()
+// unconditionally, but we only want certain keypresses handled by
+// that method.
+//
+// As a result, some of the MythScreenType::keyPressEvent() string
+// compare logic is copied here.
+static bool SysEventHandleAction(QKeyEvent *e, const QStringList &actions)
+{
+    QStringList::const_iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it)
+    {
+        if ((*it).startsWith("SYSEVENT") ||
+            *it == ACTION_SCREENSHOT ||
+            *it == ACTION_TVPOWERON ||
+            *it == ACTION_TVPOWEROFF)
+        {
+            return GetMythMainWindow()->GetMainStack()->GetTopScreen()->
+                keyPressEvent(e);
+        }
+    }
+    return false;
+}
+
 bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
 {
     bool ignoreKeys = actx->IsPlayerChangingBuffers();
@@ -3888,6 +3916,7 @@ bool TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     bool isDVD = actx->buffer && actx->buffer->IsDVD();
     bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
 
+    handled = handled || SysEventHandleAction(e, actions);
     handled = handled || BrowseHandleAction(actx, actions);
     handled = handled || ManualZoomHandleAction(actx, actions);
     handled = handled || PictureAttributeHandleAction(actx, actions);
