@@ -15,7 +15,6 @@
     border: 2px #0B6A98 solid;
 }
 
-
 .programExDetail
 {
     background-color: rgba(21, 21, 21, 0.85);
@@ -107,10 +106,10 @@
     margin: 7px;
     font-size: 1.1em;
     padding: 0.4em 1em;
+    border-radius: 6px;
     vertical-align: middle;
     text-align: center;
     white-space: nowrap;
-    border-radius: 6px;
     display: none;
 }
 
@@ -143,6 +142,24 @@
 .navigateBox SELECT
 {
     margin: 2px;
+    background-color: #151515;
+    border: 1px #444444 solid;
+    color: #FFFFFF;
+    padding: 3px;
+    text-align: center;
+}
+
+
+.navigateBox SELECT:hover
+{
+    background-color: #003147;
+    border-color: #0B93D5;
+}
+
+.navigateBox SELECT:active
+{
+    background-color: #003147;
+    border-color: #0B93D5;
 }
 
 .navigateBox LABEL

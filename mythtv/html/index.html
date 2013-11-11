@@ -7,7 +7,6 @@ MythTV Web Server
 </title>
 <link rel="stylesheet"    href="/css/site.css"         type="text/css">
 <link rel="stylesheet"    href="/3rdParty/jquery/jqueryUI/css/jquery-ui.css" type="text/css">
-<link rel="stylesheet"    href="/css/menustyle.css"    type="text/css">
 <link rel="stylesheet"    href="/css/setup.css"        type="text/css">
 <link rel="stylesheet"    href="/3rdParty/jquery/jqueryFileTree/jqueryFileTree.css" type="text/css" media="screen">
 <link rel="stylesheet"    href="/3rdParty/jquery/jqueryMultiSelect/css/jquery.multiselect.css" type="text/css">
@@ -32,7 +31,7 @@ $(document).ready(function() {
     loadDiv("menu-bg", "/menu.qsp");
     $('.menu').initMenu();
     showHostName();
-    loadContent('/Status/GetStatusHTML');
+    loadContent('/misc/overview.qsp');
 });
 
 </script>

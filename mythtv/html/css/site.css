@@ -194,29 +194,39 @@
         text-align: left;
     }
 
+    #menu li ul li
+    {
+        padding-left: 1em;
+    }
+
     #menu li a {
         height: 32px;
         voice-family: "\"}\""; 
         voice-family: inherit;
         height: 24px;
         text-decoration: none;
+        background-color: #333333;
+        border: 1px #444444 solid;
+        color: #FFFFFF;
+        background-image: linear-gradient(to bottom, #4A4A4A, #222222 60%);
+        padding: 8px 0 0 10px;
+    }
+
+    #menu li a:link, #menu li a:visited {
+        display: block;
+    }
+
+    #menu li a:hover {
+        background-color: #003147;
+        background-image: linear-gradient(to bottom, #225369, #003147 60%);
+        border-color: #0B93D5;
     }
 
     #menu li a:active, #menu li a:focus {
         outline: none;
-    }
-
-    #menu li a:link, #menu li a:visited {
-        color: #E4D6CD;
-        display: block;
-        background:  url(/images/menu-button-bg.gif);
-        padding: 8px 0 0 10px;
-    }
-
-    #menu li a:hover {
-        color: #FFF;
-        background:  url(/images/menu-button-bg.gif) 0 -32px;
-        padding: 8px 0 0 10px;
+        background-color: #0B93D5;
+        background-image: linear-gradient(to bottom, #2DB5F7, #0B93D5 60%);
+        border-color: #0B93D5;
     }
 
     #busyPopup {

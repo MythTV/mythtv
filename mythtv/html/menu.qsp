@@ -2,29 +2,29 @@
 <div id="menu">
   <ul class="menu collapsible">
     <li><a href='#'><i18n>TV</i18n></a>
-    <ul class="acitem collapsible">
-    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
-    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
-    <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
-    </ul>
+        <ul class="acitem collapsible">
+            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
+            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
+            <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>
+        </ul>
     </li>
     <li><a href='#'><i18n>Setup</i18n></a>
       <ul class="acitem collapsible">
         <li><a href='#' onClick="javascript:clearContent(); loadEditWindow('/setup/wizard.html', '/setup/js/wizard.js')"><i18n>Setup Wizard</i18n></a></li>
         <li><a href='#'><i18n>Advanced Setup</i18n></a>
           <ul class="acitem collapsible">
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('database')"><i18n>Database</i18n></a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('general')"><i18n>General</i18n></a></li>
-            <li class="indent1"><a href='#'><i18n>Guide Data</i18n></a>
+            <li><a href='#' onClick="javascript:loadSetupPage('database')"><i18n>Database</i18n></a></li>
+            <li><a href='#' onClick="javascript:loadSetupPage('general')"><i18n>General</i18n></a></li>
+            <li><a href='#'><i18n>Guide Data</i18n></a>
               <ul class="acitem collapsible">
-                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('guidedatasources')"><i18n>Guide Data Sources</i18n></a></li>
-                <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
+                <li><a href='#' onClick="javascript:loadSetupPage('guidedatasources')"><i18n>Data Sources</i18n></a></li>
+                <li><a href='#' onClick="javascript:loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
               </ul>
             </li>
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
-            <li class="indent1"><a href='#' onClick="javascript:loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
+            <li><a href='#' onClick="javascript:loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
+            <li><a href='#' onClick="javascript:loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
+            <li><a href='#' onClick="javascript:loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
+            <li><a href='#' onClick="javascript:loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
           </ul>
         </li>
 <%
@@ -62,28 +62,28 @@
       <ul class="acitem collapsible">
         <li><a href='#'><i18n>WSDL Links</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='/Capture/wsdl'><i18n>Capture Card Service</i18n></a></li>
-            <li class="indent1"><a href='/Channel/wsdl'><i18n>Channel Service</i18n></a></li>
-            <li class="indent1"><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
-            <li class="indent1"><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
-            <li class="indent1"><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
-            <li class="indent1"><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
-            <li class="indent1"><a href='/Video/wsdl'><i18n>Video Library Service</i18n></a></li>
+            <li><a href='/Capture/wsdl'><i18n>Capture Card Service</i18n></a></li>
+            <li><a href='/Channel/wsdl'><i18n>Channel Service</i18n></a></li>
+            <li><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
+            <li><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
+            <li><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
+            <li><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
+            <li><a href='/Video/wsdl'><i18n>Video Library Service</i18n></a></li>
           </ul>
         </li>
         <li><a href='#'><i18n>Examples</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='javascript:void(0);' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+            <li><a href='javascript:void(0);' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
           </ul>
         </li>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
-            <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
-            <!-- <li class="indent1"><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li> -->
+            <li><a href='#' onClick="javascript:loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
+            <!-- <li><a href='#' onClick="javascript:loadContent('/samples/recorded.qsp', '/samples/js/samples.js')"><i18n>GetRecorded() Example</i18n></a></li> -->
 <%
     if (devMode)
     {
-        os.write("<li class='indent1'><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
+        os.write("<li><a href='#' onClick=\"javascript:loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')\"><i18n>GetStorageGroups()</i18n></a></li>");
     }
 %>
           </ul>

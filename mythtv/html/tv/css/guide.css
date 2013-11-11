@@ -1,6 +1,7 @@
 
 .pageLeft, .pageRight
 {
+    border:1px #444444 solid;
     background-color: rgba(26, 26, 26, 0.5);
     color: rgba(255, 255, 255, 0.5);
     width: 30px;
@@ -26,7 +27,15 @@
 
 .pageLeft:hover, .pageRight:hover
 {
-    background-color: rgba(26, 26, 26, 1.0);
+    background-color: #003147;
+    border-color: #0B93D5;
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.pageLeft:active, .pageRight:active
+{
+    background-color: #0B93D5;
+    border-color: #0B93D5;
     color: rgba(255, 255, 255, 1.0);
 }
 
