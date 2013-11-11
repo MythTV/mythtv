@@ -112,7 +112,7 @@
 
 .upcomingList .programHeader
 {
-    padding: 5px 8px 4px 8px;
+    padding: 5px 8px 4px 7px;
     color: #FFFFFF;
     height: 28px;
     background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
@@ -122,6 +122,14 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     z-index: 4;
+}
+
+.guideGrid .programHeader IMG
+{
+    float: left;
+    margin-top: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
 }
 
 .upcomingList .programTitle

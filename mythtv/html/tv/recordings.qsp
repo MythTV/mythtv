@@ -195,13 +195,14 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
                 <div class="programBody">
                     <div class="programIcons">
                     <!-- Icons all a 4:3 aspect -->
-                    <% if (program.VideoProps & VID_1080) {%><img src="/tv/images/hd_1080.svg" width="36" height="27" alt="<%=qsTr("HD 1080")%>" />
-                    <% } else if (program.VideoProps & VID_720) {%><img src="/tv/images/hd_720.svg" width="36" height="27" alt="<%=qsTr("HD 720")%>" />
-                    <% } else if (program.VideoProps & VID_HDTV) {%><img src="/tv/images/hd_tv.svg" width="36" height="27" alt="<%=qsTr("HD")%>" /><%}%>
-                    <% if (program.ProgramFlags & FL_AUTOEXP) {%><img src="/tv/images/fl_autoexp.svg" width="36" height="27" alt="<%=qsTr("Auto-Expire")%>" /><%}%>
-                    <% if (program.ProgramFlags & FL_WATCHED) {%><img src="/tv/images/fl_watched.svg" width="36" height="27" alt="<%=qsTr("Watched")%>" />
-                    <% } else if (program.ProgramFlags & FL_BOOKMARK) {%><img src="/tv/images/fl_bookmark.svg" width="36" height="27" alt="<%=qsTr("Bookmark")%>" /><%}%>
-                    <% if (program.ProgramFlags & FL_COMMFLAG) {%><img src="/tv/images/fl_commflag.svg" width="36" height="27" alt="<%=qsTr("Commercial Flagged")%>" /><%}%>
+                    <% if (program.VideoProps & VID_1080) {%><img src="/tv/images/hd_1080.svg" width="36" height="27" alt="<%=qsTr("HD 1080")%>" title="<%=qsTr("HD 1080")%>" />
+                    <% } else if (program.VideoProps & VID_720) {%><img src="/tv/images/hd_720.svg" width="36" height="27" alt="<%=qsTr("HD 720")%>" title="<%=qsTr("HD 720")%>" />
+                    <% } else if (program.VideoProps & VID_HDTV) {%><img src="/tv/images/hd_tv.svg" width="36" height="27" alt="<%=qsTr("HD")%>" title="<%=qsTr("HD")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_AUTOEXP) {%><img src="/tv/images/fl_autoexp.svg" width="36" height="27" alt="<%=qsTr("Auto-Expire")%>" title="<%=qsTr("Auto-Expire")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_WATCHED) {%><img src="/tv/images/fl_watched.svg" width="36" height="27" alt="<%=qsTr("Watched")%>" title="<%=qsTr("Watched")%>" />
+                    <% } else if (program.ProgramFlags & FL_BOOKMARK) {%><img src="/tv/images/fl_bookmark.svg" width="36" height="27" alt="<%=qsTr("Bookmark")%>" title="<%=qsTr("Bookmark")%>" /><%}%>
+                    <% if (program.ProgramFlags & FL_COMMFLAG) {%><img src="/tv/images/fl_commflag.svg" width="36" height="27" alt="<%=qsTr("Commercial Flagged")%>" title="<%=qsTr("Commercial Flagged")%>" /><%}%>
+                    <% if (program.CatType == CAT_MOVIE) {%><img src="/tv/images/cat_movie.svg" width="36" height="27" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%>
                     </div>
                     <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                     <% if (program.Season > 0 || program.Episode > 0) { %>

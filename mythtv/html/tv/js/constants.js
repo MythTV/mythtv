@@ -72,3 +72,10 @@ var RS_INACTIVE = 10;
 var RS_NEVERRECORD = 11;
 var RS_OFFLINE = 12;
 var RS_OTHERSHOWING = 13;
+
+// Category Types
+var CAT_NONE = "";
+var CAT_MOVIE = "movie";
+var CAT_SERIES = "series";
+var CAT_TVSHOW = "tvshow";
+var CAT_SPORTS = "sports";

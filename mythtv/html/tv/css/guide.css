@@ -207,7 +207,7 @@
 
 .guideGrid .programHeader
 {
-    padding: 5px 8px 4px 8px;
+    padding: 5px 8px 4px 7px;
     color: #FFFFFF;
     width: 100%;
     height: 28px;
@@ -218,16 +218,27 @@
     border-bottom-right-radius: 0px;
     z-index: 4;
     position: relative;
+
+}
+
+.guideGrid .programHeader IMG
+{
+    float: left;
+    margin-top: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
 }
 
 .guideGrid .programTitle
 {
+    float: left;
     color: #FFFFFF;
     font-size: 1.1em;
     width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
     font-weight: bold;
+    vertical-align: middle;
 }
 
 .guideGrid .programBody

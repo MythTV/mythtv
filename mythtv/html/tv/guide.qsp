@@ -2,6 +2,7 @@
 "use strict";
 
 import "/js/utility.js"
+import "/tv/js/constants.js"
 
     var args = arguments[1];
     function getArg(name)
@@ -289,11 +290,11 @@ import "/js/utility.js"
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
-            <div class="programBox" style="width:<%=width%>%;" title="<%=escapeHTML(program.Title)%>">
+            <div class="programBox" style="width:<%=width%>%;">
                 <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                     <div class="programHeader">
                         <div class="programTitle">
-                            <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                            <% if (program.CatType == CAT_MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
                         </div>
                     </div>
                     <div class="programBody">
