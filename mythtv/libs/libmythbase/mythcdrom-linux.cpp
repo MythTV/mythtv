@@ -512,7 +512,9 @@ MythMediaStatus MythCDROMLinux::checkMedia()
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
 
-    if (mediaChanged())
+    // NB must call mediaChanged before testing m_Status otherwise will get
+    // an unwanted mediaChanged on next pass
+    if (mediaChanged() && m_Status != MEDIASTAT_UNKNOWN)
     {
         LOG(VB_MEDIA, LOG_INFO, m_DevicePath + " Media changed");
         // Regardless of the actual status lie here and say
