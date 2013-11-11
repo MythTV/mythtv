@@ -92,6 +92,7 @@ package MythTV::Program;
         $self->{'year'}              = $_[45]; # Production year
         $self->{'partnumber'}        = $_[46]; # part number
         $self->{'parttotal'}         = $_[47]; # part total
+        $self->{'categorytype'}      = $_[48]; # category type (enum)
 
     # Load the channel data
         if ($self->{'chanid'}) {

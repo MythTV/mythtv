@@ -1310,6 +1310,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(year);              // 45
     INT_TO_LIST(partnumber);   // 46
     INT_TO_LIST(parttotal);    // 47
+    INT_TO_LIST(catType);      // 48
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -1413,6 +1414,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(year);              // 45
     INT_FROM_LIST(partnumber);        // 46
     INT_FROM_LIST(parttotal);         // 47
+    ENUM_FROM_LIST(catType, CategoryType); // 48
 
     if (!origChanid || !origRecstartts.isValid() ||
         (origChanid != chanid) || (origRecstartts != recstartts))
