@@ -62,6 +62,20 @@ import "/js/utility.js"
         return chanID + "#" + startTime.toISOString()  + "#" + recRuleID;
     }
 
+    function dontRecord(chanID, startTime)
+    {
+        var dvr = new Dvr();
+        dvr.AddDontRecordSchedule(chanID, startTime, false);
+        return chanID + "#" + startTime.toISOString();
+    }
+
+    function neverRecord(chanID, startTime)
+    {
+        var dvr = new Dvr();
+        dvr.AddDontRecordSchedule(chanID, startTime, true);
+        return chanID + "#" + startTime.toISOString();
+    }
+
     function deleteRecording(chanID, startTime, allowReRecord, forceDelete)
     {
         var dvr = new Dvr();
@@ -90,6 +104,14 @@ import "/js/utility.js"
         case "deleteRecRule":
             var validDate = myth.ParseISODateString(getArg("StartTime"));
             ret = deleteRecRule(args.recruleid, getArg("ChanID"), validDate);
+            break;
+        case "dontRecord":
+            var validDate = myth.ParseISODateString(getArg("StartTime"));
+            ret = dontRecord(getArg("ChanID"), validDate);
+            break;
+        case "neverRecord":
+            var validDate = myth.ParseISODateString(getArg("StartTime"));
+            ret = neverRecord(getArg("ChanID"), validDate);
             break;
         case "deleteRecording":
             var validDate = myth.ParseISODateString(getArg("StartTime"));

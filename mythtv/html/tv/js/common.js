@@ -312,6 +312,34 @@ function deleteRecRule(chandID, startTime)
                             });
 }
 
+function dontRecord(chandID, startTime)
+{
+    var layer = document.getElementById(chanID + "_" + startTime);
+    var recRuleID = getChildValueByName(layer, "recordid");
+    hideMenu("optMenu");
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=dontRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url )
+                            .done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                recRuleChanged( response[0], response[1] );
+                            });
+}
+
+function neverRecord(chandID, startTime)
+{
+    var layer = document.getElementById(chanID + "_" + startTime);
+    var recRuleID = getChildValueByName(layer, "recordid");
+    hideMenu("optMenu");
+    var url = "/tv/ajax_backends/dvr_util.qsp?action=neverRecord&chanID=" + chanID + "&startTime=" + startTime;
+    var ajaxRequest = $.ajax( url )
+                            .done(function()
+                            {
+                                var response = ajaxRequest.responseText.split("#");
+                                recRuleChanged( response[0], response[1] );
+                            });
+}
+
 function loadTVContent(url, targetDivID, transition, args)
 {
     currentContentURL = url;   // currentContentURL is defined in util.qjs

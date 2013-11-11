@@ -118,6 +118,12 @@ import "/tv/js/constants.js"
     <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
+    <div class="button delSchedMenu" onClick="dontRecord(chanID, startTime)">
+        <%=qsTr("Don't Record")%>
+    </div>
+    <div class="button delSchedMenu" onClick="neverRecord(chanID, startTime)">
+        <%=qsTr("Never Record")%>
+    </div>
     <div class="button delSchedMenu" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>

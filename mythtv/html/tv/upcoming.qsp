@@ -50,12 +50,12 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <!-- <div class="button normalMenu" onClick="dontRecord(chanID, startTime)">
+    <div class="button normalMenu" onClick="dontRecord(chanID, startTime)">
         <%=qsTr("Don't Record")%>
     </div>
     <div class="button normalMenu" onClick="neverRecord(chanID, startTime)">
         <%=qsTr("Never Record")%>
-    </div> -->
+    </div>
     <div class="button normalMenu" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
