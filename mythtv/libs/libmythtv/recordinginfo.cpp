@@ -781,6 +781,18 @@ void RecordingInfo::ApplyTranscoderProfileChange(const QString &profile) const
     }
 }
 
+/**
+ *  \brief Set this program to never be recorded by inserting 'history' for
+ *         it into the database with a status of rsNeverRecord
+ */
+void RecordingInfo::ApplyNeverRecord(void)
+{
+    SetRecordingStatus(rsNeverRecord);
+    SetScheduledStartTime(MythDate::current());
+    SetScheduledEndTime(GetRecordingStartTime());
+    AddHistory(true, true);
+}
+
 /** \fn RecordingInfo::QuickRecord(void)
  *  \brief Create a kSingleRecord if not already scheduled.
  */

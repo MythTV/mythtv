@@ -5083,6 +5083,42 @@ bool LoadFromProgram(
     return true;
 }
 
+ProgramInfo* LoadProgramFromProgram(const uint chanid,
+                                   const QDateTime& starttime)
+{
+    ProgramInfo *progInfo = NULL;
+
+    // Build add'l SQL statement for Program Listing
+
+    MSqlBindings bindings;
+    QString      sSQL = "WHERE program.chanid = :ChanId "
+                          "AND program.starttime = :StartTime ";
+
+    bindings[":ChanId"   ] = chanid;
+    bindings[":StartTime"] = starttime;
+
+    // Get all Pending Scheduled Programs
+
+    ProgramList  schedList;
+    bool hasConflicts;
+    LoadFromScheduler(schedList, hasConflicts);
+
+    // ----------------------------------------------------------------------
+
+    ProgramList progList;
+
+    LoadFromProgram( progList, sSQL, bindings, schedList );
+
+    if (progList.size() == 0)
+        return progInfo;
+
+    // progList is an Auto-delete deque, the object will be deleted with the
+    // list, so we need to make a copy
+    progInfo = new ProgramInfo(*(progList[0]));
+
+    return progInfo;
+}
+
 bool LoadFromOldRecorded(
     ProgramList &destination, const QString &sql, const MSqlBindings &bindings)
 {

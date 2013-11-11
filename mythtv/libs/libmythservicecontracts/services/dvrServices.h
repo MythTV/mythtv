@@ -192,6 +192,10 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               RemoveRecordSchedule  ( uint             RecordId   ) = 0;
 
+        virtual bool               AddDontRecordSchedule ( int              ChanId,
+                                                           const QDateTime &StartTime,
+                                                           bool             NeverRecord ) = 0;
+
         virtual DTC::RecRuleList*  GetRecordScheduleList ( int              StartIndex,
                                                            int              Count      ) = 0;
 

@@ -844,6 +844,34 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
     return bResult;
 }
 
+bool Dvr::AddDontRecordSchedule(int nChanId, const QDateTime &dStartTime,
+                                bool bNeverRecord)
+{
+    bool bResult = true;
+
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw QString("Program does not exist.");
+
+    ProgramInfo *pi = LoadProgramFromProgram(nChanId, dStartTime.toUTC());
+
+    if (!pi)
+        throw QString("Program does not exist.");
+
+    // Why RecordingInfo instead of ProgramInfo? Good question ...
+    RecordingInfo recInfo = RecordingInfo(*pi);
+
+    delete pi;
+
+    if (bNeverRecord)
+    {
+        recInfo.ApplyNeverRecord();
+    }
+    else
+        recInfo.ApplyRecordStateChange(kDontRecord);
+
+    return bResult;
+}
+
 DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
                                               int nCount      )
 {

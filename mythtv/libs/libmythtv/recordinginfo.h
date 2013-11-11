@@ -262,6 +262,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
                                    const QString &newDescription);
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
     void ApplyTranscoderProfileChangeById(int);
+    void ApplyNeverRecord(void);
 
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;

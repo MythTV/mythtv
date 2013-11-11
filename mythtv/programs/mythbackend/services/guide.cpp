@@ -197,36 +197,14 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
     // -=>TODO: Add support for getting Recorded Program Info
     // ----------------------------------------------------------------------
 
-    // Build add'l SQL statement for Program Listing
-
-    MSqlBindings bindings;
-    QString      sSQL = "WHERE program.chanid = :ChanId "
-                          "AND program.starttime = :StartTime ";
-
-    bindings[":ChanId"   ] = nChanId;
-    bindings[":StartTime"] = dtStartTime;
-
-    // Get all Pending Scheduled Programs
-
-    ProgramList  schedList;
-    bool hasConflicts;
-    LoadFromScheduler(schedList, hasConflicts);
-
-    // ----------------------------------------------------------------------
-
-    ProgramList progList;
-
-    LoadFromProgram( progList, sSQL, bindings, schedList );
-
-    if ( progList.size() == 0)
-        throw( "Error Reading Program Info" );
-
     // Build Response
 
     DTC::Program *pProgram = new DTC::Program();
-    ProgramInfo  *pInfo    = progList[ 0 ];
+    ProgramInfo  *pInfo    = LoadProgramFromProgram(nChanId, dtStartTime);
 
     FillProgramInfo( pProgram, pInfo, true, true );
+
+    delete pInfo;
 
     return pProgram;
 }

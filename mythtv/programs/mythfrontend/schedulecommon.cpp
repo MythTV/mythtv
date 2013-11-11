@@ -475,10 +475,7 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ApplyRecordStateChange(kDontRecord);
             else if (resulttext == tr("Never record this episode"))
             {
-                recInfo.SetRecordingStatus(rsNeverRecord);
-                recInfo.SetScheduledStartTime(MythDate::current());
-                recInfo.SetScheduledEndTime(recInfo.GetRecordingStartTime());
-                recInfo.AddHistory(true, true);
+                recInfo.ApplyNeverRecord();
             }
             else if (resulttext == tr("Edit recording rule") ||
                      resulttext == tr("Edit override rule"))

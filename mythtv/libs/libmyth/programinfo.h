@@ -770,6 +770,9 @@ MPUBLIC bool LoadFromProgram(
     const MSqlBindings &bindings,
     const ProgramList  &schedList);
 
+MPUBLIC ProgramInfo*  LoadProgramFromProgram(
+        const uint chanid, const QDateTime &starttime);
+
 MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,

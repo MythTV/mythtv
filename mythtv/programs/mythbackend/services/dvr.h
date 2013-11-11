@@ -170,6 +170,10 @@ class Dvr : public DvrServices
 
         bool              RemoveRecordSchedule ( uint             RecordId   );
 
+        bool              AddDontRecordSchedule( int              ChanId,
+                                                 const QDateTime &StartTime,
+                                                 bool             NeverRecord );
+
         DTC::RecRuleList* GetRecordScheduleList( int              StartIndex,
                                                  int              Count      );
 
@@ -349,6 +353,13 @@ class ScriptableDvr : public QObject
         bool RemoveRecordSchedule ( uint RecordId )
         {
             return m_obj.RemoveRecordSchedule(RecordId);
+        }
+
+        bool AddDontRecordSchedule( int              ChanId,
+                                    const QDateTime &StartTime,
+                                    bool             NeverRecord )
+        {
+            return m_obj.AddDontRecordSchedule(ChanId, StartTime, NeverRecord);
         }
 
         QObject* GetRecordScheduleList( int StartIndex, int Count )
