@@ -12,13 +12,13 @@ if __name__ == '__main__':
             print '{0:<30}{1}'.format(name, ver)
 
         import MythTV.ttvdb.tvdb_api
-        import MythTV.tmdb.tmdb_api
+        import MythTV.tmdb3
         import lxml.etree
         print 'MythTV Python Bindings'
         print '  local versions'
         print_version('bindings version', j=static.OWN_VERSION)
         print_version('ttvdb version', MythTV.ttvdb.tvdb_api.__version__)
-        print_version('tmdb version', MythTV.tmdb.tmdb_api.__version__)
+        print_version('tmdb version', MythTV.tmdb3.__version__)
         print '  external versions'
         print_version('lxml version', lxml.etree.__version__)
         print_version('{0} version'.format(static.dbmodule[0]), j=static.dbmodule[1:])
