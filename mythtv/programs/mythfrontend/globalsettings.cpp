@@ -2662,7 +2662,7 @@ static HostComboBox *ChannelGroupDefault()
        gc->addSelection(it->name, QString("%1").arg(it->grpid));
 
     gc->setHelpText(ChannelGroupSettings::tr("Default channel group to be "
-                                             "shown in the the EPGPressing "
+                                             "shown in the EPG.  Pressing "
                                              "GUIDE key will toggle channel "
                                              "group."));
     gc->setValue(false);
