@@ -97,7 +97,7 @@
 {
     background: #2A2A2A;
     background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
-    padding: 6px 4px; /* Vertical Horizontal */
+    padding: 7px 3px 6px 3px; /* Vertical Horizontal */
     height: 100%;
 }
 
