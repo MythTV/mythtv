@@ -110,8 +110,7 @@
 
     #header {
         background-color:       black;
-        background-position:    left -4px;
-        background-repeat:      repeat-x;
+        background-image: linear-gradient(to bottom, #222222, #000000 60%);
         position:           fixed;
         top:                0px;
         right:              0px;
@@ -171,7 +170,11 @@
         left:               0px;
         width:              187px;
         height:             2500px;
-        background-color:   black; 
+        background-color:   #000000;
+        background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
+                            radial-gradient(circle, #151515 2px, transparent 2px);
+        background-size:    6px 6px;
+        background-position: 0 0, 3px 3px;
     }
 
     #menu a, a:visited {
