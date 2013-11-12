@@ -4361,7 +4361,7 @@ QString ProgramInfo::QueryRecordingGroupPassword(const QString &group)
     QString result;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT password FROM recgrouppassword "
+    query.prepare("SELECT password FROM recgroups "
                     "WHERE recgroup = :GROUP");
     query.bindValue(":GROUP", group);
 

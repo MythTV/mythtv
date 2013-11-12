@@ -589,7 +589,8 @@ void ScheduleEditor::customEvent(QEvent *event)
         }
         else if (resultid == "newrecgroup")
         {
-            StoreOptMixin::SetRecGroup(resulttext);
+            int groupID = CreateRecordingGroup(resulttext);
+            StoreOptMixin::SetRecGroup(groupID, resulttext);
         }
     }
 }
@@ -1226,7 +1227,8 @@ void StoreOptEditor::customEvent(QEvent *event)
 
         if (resultid == "newrecgroup")
         {
-            StoreOptMixin::SetRecGroup(resulttext);
+            int groupID = CreateRecordingGroup(resulttext);
+            StoreOptMixin::SetRecGroup(groupID, resulttext);
         }
     }
 }
@@ -2333,39 +2335,27 @@ void StoreOptMixin::Load(void)
             new MythUIButtonListItem(m_recgroupList,
                                   QObject::tr("Create a new recording group"),
                                   qVariantFromValue(QString("__NEW_GROUP__")));
-            new MythUIButtonListItem(m_recgroupList,
-                                     label.arg(QObject::tr("Default")),
-                                     qVariantFromValue(QString("Default")));
 
-            groups.clear();
-            if (m_rule->m_recGroup != "Default" &&
-                m_rule->m_recGroup != "__NEW_GROUP__")
-                groups << m_rule->m_recGroup;
-            query.prepare("SELECT DISTINCT recgroup FROM recorded "
-                          "WHERE recgroup <> 'Default' AND "
-                          "      recgroup <> 'Deleted'");
+            query.prepare("SELECT recgroupid, recgroup FROM recgroups "
+                          "WHERE recgroup <> 'Deleted' AND "
+                          "      recgroup <> 'LiveTV' "
+                          "ORDER BY special DESC, recgroup ASC"); // Special groups first
             if (query.exec())
             {
                 while (query.next())
-                    groups += query.value(0).toString();
-            }
-            query.prepare("SELECT DISTINCT recgroup FROM record "
-                          "WHERE recgroup <> 'Default'");
-            if (query.exec())
-            {
-                while (query.next())
-                    groups += query.value(0).toString();
+                {
+                    int id = query.value(0).toInt();
+                    QString name = query.value(1).toString();
+
+                    if (name == "Default")
+                        name = QObject::tr("Default");
+                    new MythUIButtonListItem(m_recgroupList, label.arg(name),
+                                             qVariantFromValue(id));
+                }
             }
 
-            groups.sort();
-            groups.removeDuplicates();
-            for (it = groups.begin(); it != groups.end(); ++it)
-            {
-                new MythUIButtonListItem(m_recgroupList, label.arg(*it),
-                                         qVariantFromValue(*it));
-            }
         }
-        m_recgroupList->SetValueByData(m_rule->m_recGroup);
+        m_recgroupList->SetValueByData(m_rule->m_recGroupID);
     }
 
     // Storage Group
@@ -2529,7 +2519,7 @@ void StoreOptMixin::PromptForRecGroup(void)
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     QString label =
-        QObject::tr("Create New Recording Group. Enter group name: ");
+        QObject::tr("New Recording group name: ");
 
     MythTextInputDialog *textDialog =
         new MythTextInputDialog(popupStack, label,
@@ -2541,9 +2531,9 @@ void StoreOptMixin::PromptForRecGroup(void)
         popupStack->AddScreen(textDialog, false);
 }
 
-void StoreOptMixin::SetRecGroup(QString recgroup)
+void StoreOptMixin::SetRecGroup(int recgroupID, QString recgroup)
 {
-    if (!m_rule)
+    if (!m_rule || recgroupID <= 0)
         return;
 
     if (m_recgroupList)
@@ -2561,10 +2551,30 @@ void StoreOptMixin::SetRecGroup(QString recgroup)
         if (m_other && m_other->m_recgroupList)
         {
             item = new MythUIButtonListItem(m_other->m_recgroupList,
-                             label.arg(recgroup), qVariantFromValue(recgroup));
+                             label.arg(recgroup), qVariantFromValue(recgroupID));
             m_other->m_recgroupList->SetItemCurrent(item);
         }
     }
+}
+
+int StoreOptMixin::CreateRecordingGroup(const QString& groupName)
+{
+    int groupID = -1;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recgroups SET recgroup = :NAME, "
+                  "displayname = :DISPLAYNAME");
+    query.bindValue(":NAME", groupName);
+    query.bindValue(":DISPLAYNAME", groupName);
+
+    if (query.exec())
+        groupID = query.lastInsertId().toInt();
+
+    if (groupID <= 0)
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not create recording group (%1). "
+                                         "Does it already exist?").arg(groupName));
+
+    return groupID;
 }
 
 ////////////////////////////////////////////////////////

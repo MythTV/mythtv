@@ -1628,7 +1628,7 @@ EOF
                                            'program',
                                            'programgenres',
                                            'programrating',
-                                           'recgrouppassword',
+                                           'recgroups',
                                            'recordedcredits',
                                            'recordedfile',
                                            'recordedprogram',

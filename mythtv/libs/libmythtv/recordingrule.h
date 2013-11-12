@@ -110,6 +110,7 @@ class MTV_PUBLIC RecordingRule
     // TODO: These should all be converted to integer IDs instead
     QString m_recProfile;
     QString m_recGroup;
+    int     m_recGroupID;
     QString m_storageGroup;
     QString m_playGroup;
 

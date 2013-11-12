@@ -70,7 +70,9 @@ class StoreOptMixin
     void RuleChanged(void);
     void MaxEpisodesChanged(MythUIButtonListItem *);
     void PromptForRecGroup(void);
-    void SetRecGroup(QString recgroup);
+    void SetRecGroup(int recgroupID, QString recgroup);
+
+    int CreateRecordingGroup(const QString &groupName);
 
     MythUIButtonList *m_recprofileList;
     MythUIButtonList *m_recgroupList;

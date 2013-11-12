@@ -2553,6 +2553,43 @@ NULL
             return false;
     }
 
+    if (dbver == "1320")
+    {
+        const char *updates[] = {
+            "CREATE TABLE IF NOT EXISTS recgroups ("
+                "recgroupid  SMALLINT(4) NOT NULL AUTO_INCREMENT, "
+                "recgroup    VARCHAR(64) NOT NULL DEFAULT '', "
+                "displayname VARCHAR(64) NOT NULL DEFAULT '', "
+                "password    VARCHAR(40) NOT NULL DEFAULT '', "
+                "special     TINYINT(1) NOT NULL DEFAULT '0',"
+                "PRIMARY KEY (recgroupid), "
+                "UNIQUE KEY recgroup ( recgroup )"
+                ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+            // Create the built-in, 'special', groups
+            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'Default', '1' );",
+            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'LiveTV', '1' );",
+            "INSERT INTO recgroups ( recgroup, special ) VALUES ( 'Deleted', '1' );",
+            // Copy in the passwords for the built-in groups
+            "DELETE FROM recgrouppassword WHERE password = '';",
+            "UPDATE recgroups r, recgrouppassword p SET r.password = p.password WHERE r.recgroup = p.recgroup;",
+            // Copy over all existing recording groups, this information may be split over three tables!
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname, password ) SELECT DISTINCT recgroup, recgroup, password FROM recgrouppassword;",
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM record;",
+            "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
+            // Create recgroupid columns in record and recorded tables
+            "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '0', ADD INDEX ( recgroupid );",
+            "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '0', ADD INDEX ( recgroupid );",
+            // Populate those columns with the corresponding recgroupid from the new recgroups table
+            "UPDATE recorded, recgroups SET recorded.recgroupid = recgroups.recgroupid WHERE recorded.recgroup = recgroups.recgroup;",
+            "UPDATE record, recgroups SET record.recgroupid = recgroups.recgroupid WHERE record.recgroup = recgroups.recgroup;",
+            NULL
+        };
+
+
+
+        if (!performActualUpdate(&updates[0], "1321", dbver))
+            return false;
+    }
 
     return true;
 }
