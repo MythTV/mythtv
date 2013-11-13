@@ -205,8 +205,8 @@ QString MythSetting::ToHTML(uint level) const
                         " value='%3' step='1' size='%4'/>\r\n")
                 .arg(value).arg(value).arg(data).arg(size);
             ret += indent(level) +
-                QString("<a class=\"setting_helplink\" href=\"javascript:showSettingHelp('%1')"
-                        "\">[?]</a></label></p>\r\n").arg(value);
+                QString("<a class=\"setting_helplink ui-icon ui-icon-help\" href=\"javascript:showSettingHelp('%1')"
+                        "\"></a></label></p>\r\n").arg(value);
             ret += indent(level) +
                 QString("<div class=\"form_error\""
                         "id=\"%1_error\"></div><div style=\"display:none;"
@@ -224,8 +224,8 @@ QString MythSetting::ToHTML(uint level) const
                         " value='%3' min='%4' max='%5' step='1' size='%6'/>\r\n")
                 .arg(value).arg(value).arg(data).arg(range_min).arg(range_max).arg(size);
             ret += indent(level) +
-                QString("<a class=\"setting_helplink\" href=\"javascript:showSettingHelp('%1')"
-                        "\">[?]</a></label></p>\r\n").arg(value);
+                QString("<a class=\"setting_helplink ui-icon ui-icon-help\" href=\"javascript:showSettingHelp('%1')"
+                        "\"></a></label></p>\r\n").arg(value);
             ret += indent(level) +
                 QString("<div class=\"form_error\""
                         "id=\"%1_error\"></div><div style=\"display:none;"
@@ -248,8 +248,8 @@ QString MythSetting::ToHTML(uint level) const
                         " value=\"%3\" size='%4' placeholder=\"%5\"/>\r\n")
                 .arg(value).arg(value).arg(data).arg(size).arg(placeholder_text);
             ret += indent(level) +
-                QString("<a class=\"setting_helplink\" href=\"javascript:showSettingHelp('%1')"
-                        "\">[?]</a></label></p>\r\n").arg(value);
+                QString("<a class=\"setting_helplink ui-icon ui-icon-help\" href=\"javascript:showSettingHelp('%1')"
+                        "\"></a></label></p>\r\n").arg(value);
             ret += indent(level) +
                 QString("<div class=\"form_error\""
                         "id=\"%1_error\"></div><div style=\"display:none;"
@@ -264,8 +264,8 @@ QString MythSetting::ToHTML(uint level) const
                         " value=\"1\" %3/><label class=\"setting_label_checkbox\" for=\"%5\">%6</label>")
                 .arg(value).arg(value).arg((data.toUInt()) ? "checked" : "").arg(value).arg(label);
             ret += indent(level) +
-                QString("<a class=\"setting_helplink\" href=\"javascript:showSettingHelp('%1'"
-                        ")\">[?]</a></p><div class=\"form_error\""
+                QString("<a class=\"setting_helplink ui-icon ui-icon-help\" href=\"javascript:showSettingHelp('%1'"
+                        ")\"></a></p><div class=\"form_error\""
                         " id=\"%2_error\"></div>").arg(value).arg(value);
             ret += indent(level) +
                 QString("<div style=\"display:none;"
@@ -295,8 +295,8 @@ QString MythSetting::ToHTML(uint level) const
                     .arg(display_list[i]);
             }
             ret += indent(level) + "</select>" +
-                QString("<a class=\"setting_helplink\" href=\"javascript:showSettingHelp('%1')"
-                        "\">[?]</a></p>\r\n").arg(value);
+                QString("<a class=\"setting_helplink ui-icon ui-icon-help\" href=\"javascript:showSettingHelp('%1')"
+                        "\"></a></p>\r\n").arg(value);
             ret += indent(level) +
                 QString("<div class=\"form_error\""
                         "id=\"%1_error\"></div><div style=\"display:none;"
