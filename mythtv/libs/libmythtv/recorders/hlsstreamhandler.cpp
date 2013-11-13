@@ -186,7 +186,7 @@ void HLSStreamHandler::run(void)
         }
 
         if (m_hls->IsThrottled())
-            usleep(1000000);
+            usleep(999999);
         else if (size < BUFFER_SIZE)
             usleep(100000); // tenth of a second.
         else
