@@ -273,7 +273,8 @@ import "/tv/js/constants.js"
             var windowStart = (program.StartTime > guideStartTime ? program.StartTime : guideStartTime);
             var windowEnd = (program.EndTime > guideEndTime ? guideEndTime : program.EndTime);
             var windowLength = (windowEnd - windowStart);
-            var width = Math.round(((windowLength / guidePeriod) * 100));
+            var width = ((windowLength / guidePeriod) * 100);
+            width = width.toFixed(2);
             cumulativeWidth += width;
 
             // Due to rounding issues we can end up a percentage point or two over
