@@ -96,3 +96,19 @@ jQuery.fn.initMenu = function() {
 });
 };
 
+var showing = false;
+function hideMainMenu()
+{
+    if (showing)
+        return;
+
+    $("#content").animate({left: '30px'}, {duration: 600, queue: false});
+    $("#menu-bg").hide('slide',{direction:'left'}, {duration: 700, queue: false});
+}
+
+function showMainMenu()
+{
+    showing = true;
+    $("#content").animate({left: '190px'}, {duration:600, queue: false});
+    $("#menu-bg").show('slide',{direction:'left'}, {duration: 700, queue: false}, function () { showing = false; });
+}

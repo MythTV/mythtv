@@ -164,17 +164,50 @@
         text-align:         center;
     }
 
-    #menu-bg {
+    #menu-tab {
         position:           fixed;
         top:                36px;
         left:               0px;
-        width:              187px;
-        height:             2500px;
+        width:              25px;
+        height:             100%;
         background-color:   #000000;
         background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
                             radial-gradient(circle, #151515 2px, transparent 2px);
         background-size:    6px 6px;
         background-position: 0 0, 3px 3px;
+        border-right:       2px #444444 solid;
+
+        text-align:         center;
+        vertical-align:     middle;
+        z-index:            5;
+    }
+
+    #menu-tab DIV {
+        top:                50%;
+        position:           relative;
+        transform:          rotate(-90deg);
+        -webkit-transform:  rotate(-90deg);
+        white-space:         nowrap;
+    }
+
+    #menu-tab DIV SPAN {
+        margin-left:        30px;
+        margin-right:       30px;
+        font-weight:        bold;
+    }
+
+    #menu-bg {
+        position:           fixed;
+        top:                36px;
+        left:               0px;
+        width:              187px;
+        height:             100%;
+        background-color:   #000000;
+        background-image:   radial-gradient(circle, #151515 2px, transparent 2px),
+                            radial-gradient(circle, #151515 2px, transparent 2px);
+        background-size:    6px 6px;
+        background-position: 0 0, 3px 3px;
+        z-index:            10;
     }
 
     #menu a, a:visited {
@@ -182,12 +215,13 @@
     }
 
     #menu {
-        position:           fixed;
-        top:                90px;
+        position:           relative;
+        top:                54px;
         left:               7px;
         width:              173px;
         color:              #E4D6CD;
         text-align:         center;
+        z-index:            15;
     }
 
     #menu ul {

@@ -15,7 +15,8 @@
 
 .pageLeft
 {
-    left: 187px;
+/*    left: 0px;*/
+    margin-left:-13px;
     border-radius: 0px 10px 10px 0px;
 }
 
