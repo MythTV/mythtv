@@ -115,6 +115,7 @@
 .recordingList .programBox
 {
     height: 100%;
+    width: calc(100% - 124px);
     padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
     cursor: pointer;
 }

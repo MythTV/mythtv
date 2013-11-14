@@ -81,6 +81,7 @@
     border-top-left-radius: 10px;
     font-size: 1em;
     width: 10%;
+    width: calc(91px - 1px);
     height: 100%;
     text-align: center;
     padding: 8px 4px; /* Vertical Horizontal */
@@ -91,6 +92,7 @@
 {
     float: left;
     width: 90%;
+    width: calc(100% - 91px);
     height: 100%;
 }
 
@@ -130,6 +132,7 @@
 {
     float: left;
     width: 10%;
+    width: calc(91px - 1px); /* Opera still doesn't support calc() on linux, so use that to force a fixed size on browsers that do */
     height: 100%;
     text-align: center;
     vertical-align: middle;
@@ -168,6 +171,7 @@
 {
     float: left;
     width: 90%;
+    width: calc(100% - 91px);
     height: 100%;
     position: relative;
     overflow: visible;
