@@ -361,13 +361,22 @@ QStringList Dvr::GetRecGroupList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QStringList Dvr::GetTitleList()
+// TODO: Needs converting to use RecGroupID
+QStringList Dvr::GetTitleList(const QString& RecGroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString querystr = QString("SELECT DISTINCT title FROM recorded");
+    QString querystr = "SELECT DISTINCT title FROM recorded";
+
+    if (!RecGroup.isEmpty())
+        querystr += " WHERE recgroup = :RECGROUP";
+
+    querystr += " ORDER BY title";
 
     query.prepare(querystr);
+
+    if (!RecGroup.isEmpty())
+        query.bindValue(":RECGROUP", RecGroup);
 
     QStringList result;
     if (!query.exec())
@@ -378,8 +387,6 @@ QStringList Dvr::GetTitleList()
 
     while (query.next())
         result << query.value(0).toString();
-
-    result.sort();
 
     return result;
 }

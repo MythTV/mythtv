@@ -40,7 +40,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.2" );
+    Q_CLASSINFO( "version"    , "2.3" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -100,7 +100,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual QStringList        GetRecGroupList       ( ) = 0;
 
-        virtual QStringList        GetTitleList          ( ) = 0;
+        virtual QStringList        GetTitleList          ( const QString   &RecGroup ) = 0;
 
         virtual DTC::TitleInfoList* GetTitleInfoList     ( ) = 0;
 

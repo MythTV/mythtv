@@ -116,7 +116,7 @@ import "/tv/js/constants.js"
     <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.form)">
 
 <%
-    var displayGroupList = dvr.GetTitleList();
+    var displayGroupList = dvr.GetTitleList(recGroup);
 %>
         <option value="" <%if (displayGroup == displayGroupList[grpIdx]) {%>selected<%}%>>All</option>
 <%
