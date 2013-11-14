@@ -27,8 +27,18 @@ import "/tv/js/constants.js"
         displayGroup = getArg("DisplayGroup");
 
     var dvr = new Dvr();
+
+    // Get Recording Group List
     var recGroupList = dvr.GetRecGroupList();
     var showDeletedLink = (recGroupList.indexOf("Deleted") === -1) ? false : true;
+
+    // Get Display Group List (Titles Only currently)
+    var displayGroupList = dvr.GetTitleList(recGroup);
+    // If the Display Group (Title) given as an argument is not actually present
+    // in the list - true if we've just switched recording groups - then clear
+    // this filter
+    if (displayGroupList.indexOf(displayGroup) === -1)
+        displayGroup = "";
 
     var recordings = dvr.GetRecordedList( sortDescending, 0, 50, displayGroup, recGroup, "" );
     var programs = recordings.Programs;
@@ -115,9 +125,6 @@ import "/tv/js/constants.js"
     <label for="listDisplayOrder"><%=qsTr("Filter")%>:
     <select id="listDisplayGroup" name="DisplayGroup" onChange="submitForm(this.form)">
 
-<%
-    var displayGroupList = dvr.GetTitleList(recGroup);
-%>
         <option value="" <%if (displayGroup == displayGroupList[grpIdx]) {%>selected<%}%>>All</option>
 <%
     for (var grpIdx = 0; grpIdx < displayGroupList.length; grpIdx++)
