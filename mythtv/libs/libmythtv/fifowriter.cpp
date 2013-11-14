@@ -35,6 +35,7 @@ FIFOWriter::FIFOWriter(int count, bool sync) :
     maxblksize(NULL),
     killwr(NULL),
     fbcount(NULL),
+    fbmaxcount( NULL),
     num_fifos(count),
     usesync(sync)
 {
@@ -53,6 +54,7 @@ FIFOWriter::FIFOWriter(int count, bool sync) :
     maxblksize = new long[count];
     killwr = new int[count];
     fbcount = new int[count];
+    fbmaxcount = new int[count];
 }
 
 FIFOWriter::~FIFOWriter()
@@ -86,6 +88,7 @@ FIFOWriter::~FIFOWriter()
     delete [] fbdesc;
     delete [] killwr;
     delete [] fbcount;
+    delete [] fbmaxcount;
 }
 
 int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
@@ -109,6 +112,7 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
     fbdesc[id] = desc;
     killwr[id] = 0;
     fbcount[id] = (usesync) ? 2 : num_bufs;
+    fbmaxcount[id] = 512;
     fifo_buf[id] = new struct fifo_buf;
     struct fifo_buf *fifoptr = fifo_buf[id];
     for (int i = 0; i < fbcount[id]; i++)
@@ -217,7 +221,7 @@ void FIFOWriter::FIFOWrite(int id, void *buffer, long blksize)
             }
         }
 
-        if (blocking)
+        if (blocking && fbcount[id] < fbmaxcount[id])
         {
             struct fifo_buf *tmpfifo;
             tmpfifo = fb_inptr[id]->next;

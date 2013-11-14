@@ -57,7 +57,7 @@ class MTV_PUBLIC FIFOWriter
      QString *filename, *fbdesc;
 
      long *maxblksize;
-     int *killwr, *fbcount;
+     int *killwr, *fbcount, *fbmaxcount;
      int num_fifos;
      bool usesync;
 };
