@@ -43,21 +43,13 @@ import "/js/utility.js"
         var dvr = new Dvr();
 
         var durationStr = "";
+        var duration = program.EndTime - program.StartTime;
+
         if (type == "recording")
-        {
-            // Use Recording Start/End Times
-            var duration = new Date(program.Recording.EndTs - program.Recording.StartTs);
+            duration = program.Recording.EndTs - program.Recording.StartTs; // Use Recording Start/End Times
 
-            durationStr += duration.getHours(duration) > 0 ? duration.getHours(duration) + "hr " : "";
-            durationStr += duration.getMinutes(duration) > 0 ? duration.getMinutes(duration) + "m" : "";
-        }
-        else if (type == "program")
-        {
-            var duration = new Date(program.EndTime - program.StartTime);
-
-            durationStr += duration.getHours(duration) > 0 ? duration.getHours(duration) + "hr " : "";
-            durationStr += duration.getMinutes(duration) > 0 ? duration.getMinutes(duration) + "m" : "";
-        }
+        durationStr += Math.floor(duration / 1000 / 60 / 60) > 0 ? Math.floor(duration / 1000 / 60 / 60) + "hr " : "";
+        durationStr += (Math.floor(duration / 1000 / 60) % 60) > 0 ? (Math.floor(duration / 1000 / 60) % 60) + "m" : "";
 
         var html = "";
 
