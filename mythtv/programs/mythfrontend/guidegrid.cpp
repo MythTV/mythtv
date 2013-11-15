@@ -207,6 +207,7 @@ class GuideUpdaterBase
 {
 public:
     GuideUpdaterBase(GuideGrid *guide) : m_guide(guide) {}
+    virtual ~GuideUpdaterBase() {}
 
     // Execute the initial non-UI part (in a separate thread).  Return
     // true if ExecuteUI() should be run later, or false if the work
@@ -249,6 +250,7 @@ public:
             for (int j = 0; j < MAX_DISPLAY_TIMES; ++j)
                 m_programInfos[i][j] = NULL;
     }
+    virtual ~GuideUpdateProgramRow() {}
     virtual bool ExecuteNonUI(void)
     {
         // Don't bother to do any work if the starting coordinates of
