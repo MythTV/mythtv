@@ -111,7 +111,7 @@ class ScriptableGuide : public QObject
             return m_obj.GetChannelIcon( ChanId, Width, Height );
         }
 
-        DTC::ChannelGroupList* GetChannelGroupList( bool IncludeEmpty )
+        QObject* GetChannelGroupList( bool IncludeEmpty )
         {
             return m_obj.GetChannelGroupList( IncludeEmpty );
         }
