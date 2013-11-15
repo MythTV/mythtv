@@ -606,8 +606,14 @@ static int mpegps_read_packet(AVFormatContext *s,
         st->codec->bit_rate = st->codec->channels *
                               st->codec->sample_rate *
                               st->codec->bits_per_coded_sample;
-        if (st->codec->bits_per_coded_sample == 16)
-            st->codec->codec_id = AV_CODEC_ID_PCM_S16BE;
+        if (st->codec->bits_per_coded_sample == 16) {
+            if (st->codec->codec_id != AV_CODEC_ID_PCM_S16BE) {
+                st->codec->codec_id = AV_CODEC_ID_PCM_S16BE;
+                /* notify the callback of the change in streams */
+                if(s->streams_changed)
+                    s->streams_changed(s->stream_change_data);
+            }
+        }
         else if (st->codec->bits_per_coded_sample == 28)
             return AVERROR(EINVAL);
       }
