@@ -51,7 +51,8 @@ class Guide : public GuideServices
                                                   const QDateTime &EndTime    ,
                                                   int              StartChanId,
                                                   int              NumChannels,
-                                                  bool             Details     );
+                                                  bool             Details,
+                                                  int              ChannelGroupId );
 
         DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                   const QDateTime &StartTime );
@@ -96,9 +97,10 @@ class ScriptableGuide : public QObject
                                   const QDateTime &EndTime    ,
                                   int              StartChanId,
                                   int              NumChannels,
-                                  bool             Details     )
+                                  bool             Details,
+                                  int              ChannelGroupId )
         {
-            return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId, NumChannels, Details );
+            return m_obj.GetProgramGuide( StartTime, EndTime, StartChanId, NumChannels, Details, ChannelGroupId );
         }
 
         QObject* GetProgramDetails( int ChanId, const QDateTime &StartTime )

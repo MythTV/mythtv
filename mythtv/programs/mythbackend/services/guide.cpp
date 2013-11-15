@@ -48,7 +48,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                                            const QDateTime &rawEndTime   ,
                                            int              nStartChanId,
                                            int              nNumChannels,
-                                           bool             bDetails      )
+                                           bool             bDetails,
+                                           int              nChannelGroupId )
 {     
     if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
@@ -94,15 +95,26 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     MSqlBindings bindings;
 
     // lpad is to allow natural sorting of numbers
-    QString      sSQL = "WHERE program.chanid >= :StartChanId "
-                         "AND program.chanid <= :EndChanId "
-                         "AND program.endtime >= :StartDate "
-                         "AND program.starttime <= :EndDate "
-                         "GROUP BY program.starttime, channel.chanid "
-                         "ORDER BY lpad(channel.channum, 10, 0), "
-                         "         callsign,                     "
-                         "         lpad(program.chanid, 10, 0),  "
-                         "         program.starttime ";
+    QString      sSQL;
+
+    if (nChannelGroupId > 0)
+    {
+        sSQL = "LEFT JOIN channelgroup ON program.chanid = channelgroup.chanid "
+                         "WHERE channelgroup.grpid = :CHANGRPID AND ";
+        bindings[":CHANGRPID"  ] = nChannelGroupId;
+    }
+    else
+        sSQL = "WHERE ";
+
+    sSQL +=     "program.chanid >= :StartChanId "
+                "AND program.chanid <= :EndChanId "
+                "AND program.endtime >= :StartDate "
+                "AND program.starttime <= :EndDate "
+                "GROUP BY program.starttime, channel.chanid "
+                "ORDER BY lpad(channel.channum, 10, 0), "
+                "         callsign,                     "
+                "         lpad(program.chanid, 10, 0),  "
+                "         program.starttime ";
 
     bindings[":StartChanId"] = nStartChanId;
     bindings[":EndChanId"  ] = nEndChanId;

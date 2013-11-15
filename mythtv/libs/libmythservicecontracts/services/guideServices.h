@@ -39,7 +39,7 @@
 class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.0" );
+    Q_CLASSINFO( "version"    , "2.1" );
 
     public:
 
@@ -60,7 +60,8 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
                                                           const QDateTime &EndTime    ,
                                                           int              StartChanId,
                                                           int              NumChannels,
-                                                          bool             Details     ) = 0;
+                                                          bool             Details,
+                                                          int              ChannelGroupId ) = 0;
 
         virtual DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;
@@ -68,7 +69,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         virtual QFileInfo           GetChannelIcon      ( int              ChanId,
                                                           int              Width ,
                                                           int              Height ) = 0;
-        virtual DTC::ChannelGroupList* GetChannelGroupList ( bool             IncludeEmpty ) = 0;
+        virtual DTC::ChannelGroupList* GetChannelGroupList ( bool          IncludeEmpty ) = 0;
 };
 
 #endif
