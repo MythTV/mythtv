@@ -34,7 +34,7 @@
 #include "channelinfo.h"
 #include "videoutils.h"
 #include "metadataimagehelper.h"
-#include <cardutil.h>
+#include "cardutil.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -212,6 +212,19 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
     }
 
     return false;
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillChannelGroup(DTC::ChannelGroup* pGroup, ChannelGroupItem pGroupItem)
+{
+    if (!pGroup)
+        return;
+
+    pGroup->setGroupId(pGroupItem.grpid);
+    pGroup->setName(pGroupItem.name);
+    pGroup->setPassword(""); // Not currently supported
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -30,10 +30,12 @@
 #include "datacontracts/recRule.h"
 #include "datacontracts/artworkInfoList.h"
 #include "datacontracts/videoMetadataInfo.h"
+#include "datacontracts/channelGroup.h"
 
 #include "programinfo.h"
 #include "recordingrule.h"
 #include "videometadatalistmanager.h"
+#include "channelgroup.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -43,6 +45,8 @@ void FillProgramInfo( DTC::Program *pProgram,
 bool FillChannelInfo( DTC::ChannelInfo *pChannel,
                       uint              nChanID,
                       bool              bDetails = true );
+
+void FillChannelGroup( DTC::ChannelGroup *pGroup, ChannelGroupItem pGroupItem);
 
 void FillRecRuleInfo( DTC::RecRule  *pRecRule,
                       RecordingRule *pRule              );
@@ -55,4 +59,5 @@ void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,
                       VideoMetadataListManager::VideoMetadataPtr pMetadata,
                       bool          bDetails);
+
 #endif

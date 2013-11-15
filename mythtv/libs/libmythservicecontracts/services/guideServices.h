@@ -18,6 +18,7 @@
 #include "service.h"
 #include "datacontracts/programGuide.h"
 #include "datacontracts/programAndChannel.h"
+#include "datacontracts/channelGroupList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@
 class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "2.0" );
 
     public:
 
@@ -49,6 +50,8 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         {
             DTC::ProgramGuide::InitializeCustomTypes();
             DTC::Program     ::InitializeCustomTypes();
+            DTC::ChannelGroup::InitializeCustomTypes();
+            DTC::ChannelGroupList::InitializeCustomTypes();
         }
 
     public slots:
@@ -65,6 +68,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         virtual QFileInfo           GetChannelIcon      ( int              ChanId,
                                                           int              Width ,
                                                           int              Height ) = 0;
+        virtual DTC::ChannelGroupList* GetChannelGroupList ( bool             IncludeEmpty ) = 0;
 };
 
 #endif

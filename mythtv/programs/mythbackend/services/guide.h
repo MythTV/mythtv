@@ -33,6 +33,7 @@
 #include "services/guideServices.h"
 
 #include "datacontracts/programAndChannel.h"
+#include "datacontracts/channelGroupList.h"
 #include "programinfo.h"
 
 class Guide : public GuideServices
@@ -58,6 +59,8 @@ class Guide : public GuideServices
         QFileInfo           GetChannelIcon      ( int              ChanId,
                                                   int              Width ,
                                                   int              Height );
+
+        DTC::ChannelGroupList*  GetChannelGroupList ( bool IncludeEmpty );
 };
 
 // --------------------------------------------------------------------------
@@ -106,6 +109,11 @@ class ScriptableGuide : public QObject
         QFileInfo GetChannelIcon( int ChanId, int Width, int Height )
         {
             return m_obj.GetChannelIcon( ChanId, Width, Height );
+        }
+
+        DTC::ChannelGroupList* GetChannelGroupList( bool IncludeEmpty )
+        {
+            return m_obj.GetChannelGroupList( IncludeEmpty );
         }
 };
 

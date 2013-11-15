@@ -33,6 +33,9 @@
 #include "scheduler.h"
 #include "autoexpire.h"
 #include "channelutil.h"
+#include "channelgroup.h"
+
+#include "logging.h"
 
 extern AutoExpire  *expirer;
 extern Scheduler   *sched;
@@ -305,3 +308,17 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     return QFileInfo( sNewFileName );
 }
 
+DTC::ChannelGroupList* Guide::GetChannelGroupList( bool IncludeEmpty )
+{
+    ChannelGroupList list = ChannelGroup::GetChannelGroups(IncludeEmpty);
+    DTC::ChannelGroupList *pGroupList = new DTC::ChannelGroupList();
+
+    ChannelGroupList::iterator it;
+    for (it = list.begin(); it < list.end(); ++it)
+    {
+        DTC::ChannelGroup *pGroup = pGroupList->AddNewChannelGroup();
+        FillChannelGroup(pGroup, (*it));
+    }
+
+    return pGroupList;
+}
