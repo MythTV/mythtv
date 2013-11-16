@@ -22,9 +22,12 @@ import "/tv/js/constants.js"
     var guide = new Guide();
     var dvr = new Dvr();
 
+    var channelGroup = 0; // All
+    if (parseInt(getArg("ChannelGroup"), 10))
+        channelGroup = parseInt(getArg("ChannelGroup"), 10);
+
     var now = new Date();
     var guideStartTime;
-
 
     if (getArg("GuideDate") && getArg("GuideTime"))
     {
@@ -66,8 +69,11 @@ import "/tv/js/constants.js"
     fetchEndTime.setSeconds(fetchEndTime.getSeconds() - 1);
 
     // Actually fetch the guide data
-    var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, 0, 0, true);
+    var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, 0, 0, true, channelGroup);
     var channelList = guideResult.Channels;
+
+    // Load the channel groups
+    var chanGroups = guide.GetChannelGroupList(false).ChannelGroups;
 
     // Indicator of time in past
     var darkVeilWidth = 0;
@@ -140,6 +146,29 @@ import "/tv/js/constants.js"
 <div class="navigateBox">
 
     <form action="/tv/guide.qsp">
+<%
+if (chanGroups.length)
+{
+%>
+    <label for="ChannelGroup"><%=qsTr("Group")%>:
+    <select id="ChannelGroup" name="ChannelGroup" onChange="submitForm(this.form, 'guideGrid', 'dissolve')">
+        <option label="<%=qsTr("All Channels")%>" value="0"><%=qsTr("All Channels")%></option>
+<%
+    for (var grpIdx = 0; grpIdx < chanGroups.length; grpIdx++)
+    {
+        var name = chanGroups[grpIdx].Name;
+        var id = chanGroups[grpIdx].GroupId;
+        var selected = (channelGroup == id) ? "selected" : "";
+%>
+        <option label="<%=escapeHTML(name)%>" value="<%=id%>" <%=selected%>><%=escapeHTML(name)%></option>
+<%
+    }
+%>
+    </select>
+    </label>
+<%
+}
+%>
     <label for="guideStartDate"><%=qsTr("Date")%>:
     <select id="guideStartDate" name="GuideDate" onChange="submitForm(this.form, 'guideGrid', 'dissolve')">
 <%
