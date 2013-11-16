@@ -301,7 +301,7 @@ function recRuleChanged(chandID, startTime)
 function deleteRecRule(chandID, startTime)
 {
     var layer = document.getElementById(chanID + "_" + startTime);
-    var recRuleID = getChildValueByName(layer, "recordid");
+    var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
     var url = "/tv/ajax_backends/dvr_util.qsp?action=deleteRecRule&recRuleID=" + recRuleID + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
@@ -315,7 +315,7 @@ function deleteRecRule(chandID, startTime)
 function dontRecord(chandID, startTime)
 {
     var layer = document.getElementById(chanID + "_" + startTime);
-    var recRuleID = getChildValueByName(layer, "recordid");
+    var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
     var url = "/tv/ajax_backends/dvr_util.qsp?action=dontRecord&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
@@ -329,7 +329,7 @@ function dontRecord(chandID, startTime)
 function neverRecord(chandID, startTime)
 {
     var layer = document.getElementById(chanID + "_" + startTime);
-    var recRuleID = getChildValueByName(layer, "recordid");
+    var recRuleID = layer.getAttribute("data-recordid");
     hideMenu("optMenu");
     var url = "/tv/ajax_backends/dvr_util.qsp?action=neverRecord&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )

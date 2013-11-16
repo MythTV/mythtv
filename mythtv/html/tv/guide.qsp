@@ -328,7 +328,7 @@ if (chanGroups.length)
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
             <div class="programBox" style="width:<%=width%>%;">
-                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                     <div class="programHeader">
                         <div class="programTitle">
                             <% if (program.CatType == CAT_MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
@@ -341,9 +341,6 @@ if (chanGroups.length)
                     <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
                         <%=qsTr("Scheduling")%> ...
                     </div>
-                    <input type="hidden" name="chanid" value="<%=channel.ChanId%>" />
-                    <input type="hidden" name="starttime" value="<%=program.StartTime.toISOString()%>" />
-                    <input type="hidden" name="recordid" value="<%=program.Recording.RecordId%>" />
                 </div>
             </div>
 <%
