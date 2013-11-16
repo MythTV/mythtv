@@ -4,37 +4,6 @@ function jq(id) // F*%$ jQuery
     return "#" + id.replace( /(:|\.|\[|\])/g, "\\$1" );
 }
 
-function isTruncated(strDiv, parentDiv)
-{
-    return (!isValidObject(strDiv) ||
-            ((strDiv.scrollHeight > jQuery(parentDiv).innerHeight()) ||
-             (strDiv.scrollWidth > jQuery(parentDiv).innerWidth())));
-}
-
-function getChildByName(element, name)
-{
-    if (!isValidObject(element))
-        return;
-
-    var children = element.children;
-    for (var i = 0; i < children.length; i++)
-    {
-        if (children[i].name == name)
-            return children[i];
-
-        getChildByName(children[i], name)
-    }
-}
-
-function getChildValueByName(element, name)
-{
-    var child = getChildByName(element, name);
-    if (isValidObject(child))
-        return child.value;
-
-    return "";
-}
-
 function toggleVisibility(layer, show)
 {
     // We can override the toggle behaviour with the show arg
@@ -201,26 +170,6 @@ function showDetail(parentID, type)
     chanID = values[0];
     startTime = values[1];
 
-    // Show Title, Subtitle & Description if they aren't already displayed,
-    // or they have been truncated
-
-    var showDescription = 0;
-    var descriptionDiv = (parent.getElementsByClassName("programDescription"))[0];
-    var bodyDiv = (parent.getElementsByClassName("programBody"))[0];
-    if (isTruncated(descriptionDiv, bodyDiv))
-        showDescription = 1;
-
-    var showSubtitle = 0;
-    var subtitleDiv = (parent.getElementsByClassName("programSubtitle"))[0];
-    if (isTruncated(subtitleDiv, bodyDiv))
-        showSubtitle = 1;
-
-    var showTitle = 0;
-    var titleDiv = (parent.getElementsByClassName("programTitle"))[0];
-    var headerDiv = (parent.getElementsByClassName("programHeader"))[0];
-    if (isTruncated(titleDiv, headerDiv))
-        showTitle = 1;
-
     // FIXME: We should be able to get a Program object back from
     // from the Services API that contains all the information available
     // whether it's a recording or not
@@ -228,13 +177,7 @@ function showDetail(parentID, type)
     if (type == "recording")
         method = "getRecordingDetailHTML";
 
-    var url = "/tv/ajax_backends/program_util.qsp?action=" + method +
-              "&showTitle=" + showTitle +
-              "&showSubtitle=" + showSubtitle +
-              "&showDescription=" + showDescription +
-              "&chanID=" + chanID +
-              "&startTime=" + startTime;
-
+    var url = "/tv/ajax_backends/program_util.qsp?action=" + method + "&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                         {

@@ -35,7 +35,7 @@ import "/js/utility.js"
         return size.toFixed(2) + " GB";
     }
 
-    function buildDetailHTML(program, type, showTitle, showSubtitle, showDescription)
+    function buildDetailHTML(program, type)
     {
         if (!isValidObject(program) || program.Title === "")
             return qsTr("No matching program found");
@@ -52,21 +52,6 @@ import "/js/utility.js"
         durationStr += (Math.floor(duration / 1000 / 60) % 60) > 0 ? (Math.floor(duration / 1000 / 60) % 60) + "m" : "";
 
         var html = "";
-
-        if (showTitle)
-        {
-            html += '<label for="detailTileitle">' + qsTr("Title:") + ' </label><span id="detailTitle">' + escapeHTML(program.Title) + '</span><br />';
-        }
-
-        if (showSubtitle)
-        {
-            html += '<label for="detailSubtitle">' + qsTr("Subtitle:") + ' </label><span id="detailSubtitle">' + escapeHTML(program.SubTitle) + '</span><br />';
-        }
-
-        if (showDescription)
-        {
-            html += '<label for="detailDescription">' + qsTr("Description:") + ' </label><span id="detailDescription">' + escapeHTML(program.Description) + '</span><br /><br />';
-        }
 
         if (program.Season > 0)
         {
@@ -128,10 +113,7 @@ import "/js/utility.js"
 
         var guide = new Guide();
         var program = guide.GetProgramDetails(getArg("ChanID"), startTime);
-        return buildDetailHTML(program, "program",
-                               getBoolArg("showTitle"),
-                               getBoolArg("showSubtitle"),
-                               getBoolArg("showDescription"));
+        return buildDetailHTML(program, "program");
     }
 
     function getRecordingDetailHTML(args)
@@ -140,10 +122,7 @@ import "/js/utility.js"
 
         var dvr = new Dvr();
         var program = dvr.GetRecorded(getArg("ChanID"), startTime);
-        return buildDetailHTML(program, "recording",
-                               getBoolArg("showTitle"),
-                               getBoolArg("showSubtitle"),
-                               getBoolArg("showDescription"));
+        return buildDetailHTML(program, "recording");
     }
 
     var ret;
