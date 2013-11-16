@@ -411,6 +411,17 @@ function reloadTVContent()
     loadTVContent(currentContentURL);  // currentContentURL is defined in util.qjs
 }
 
+function formOnLoad(form)
+{
+    // Prepopulate some user-attributes to save time later
+    var elements = form.elements;
+    for (var idx = 0; idx < elements.length; idx++)
+    {
+        if (elements[idx].tagName == "SELECT")
+            elements[idx].setAttribute('data-oldIndex', elements[idx].selectedIndex);
+    }
+}
+
 function submitForm(formElement, target, transition)
 {
     var url = formElement.action;
