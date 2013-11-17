@@ -71,8 +71,9 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
     : MThread("PreviewGenerator"),
       m_programInfo(*pginfo), m_mode(_mode), m_listener(NULL),
       m_pathname(pginfo->GetPathname()),
-      m_timeInSeconds(true),  m_captureTime(-1),  m_outFileName(QString::null),
-      m_outSize(0,0), m_token(_token), m_gotReply(false), m_pixmapOk(false)
+      m_timeInSeconds(true),  m_captureTime(-1),
+      m_outSize(0,0),  m_outFormat("PNG"),
+      m_token(_token), m_gotReply(false), m_pixmapOk(false)
 {
 }
 
@@ -84,7 +85,11 @@ PreviewGenerator::~PreviewGenerator()
 
 void PreviewGenerator::SetOutputFilename(const QString &fileName)
 {
+    if (fileName.isEmpty())
+        return;
+    QFileInfo fileinfo = QFileInfo(fileName);
     m_outFileName = fileName;
+    m_outFormat = fileinfo.suffix().toUpper();
 }
 
 void PreviewGenerator::TeardownAll(void)
@@ -261,8 +266,8 @@ bool PreviewGenerator::Run(void)
         if (ret != GENERIC_EXIT_OK)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + 
-                QString("Encountered problems running '%1' (%2)")
-                    .arg(command) .arg(ret));
+                QString("Encountered problems running '%1 %2' - (%3)")
+                    .arg(command).arg(cmdargs.join(" ")).arg(ret));
         }
         else
         {
@@ -324,8 +329,7 @@ bool PreviewGenerator::Run(void)
     {
         QStringList list;
         list.push_back(m_programInfo.MakeUniqueKey());
-        list.push_back(m_outFileName.isEmpty() ?
-                       (m_programInfo.GetPathname()+".png") : m_outFileName);
+        list.push_back(output_fn);
         list.push_back(msg);
         list.push_back(dt.isValid()?dt.toUTC().toString(Qt::ISODate):"");
         list.push_back(m_token);
@@ -494,7 +498,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
         }
 
         QString filename = m_programInfo.GetBasename() + ".png";
-        m_outFileName = QString("%1/%2").arg(remotecachedirname).arg(filename);
+        SetOutputFilename(QString("%1/%2").arg(remotecachedirname).arg(filename));
     }
 
     QFile file(m_outFileName);
@@ -539,10 +543,11 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
     return ok;
 }
 
-bool PreviewGenerator::SavePreview(QString filename,
+bool PreviewGenerator::SavePreview(const QString &filename,
                                    const unsigned char *data,
                                    uint width, uint height, float aspect,
-                                   int desired_width, int desired_height)
+                                   int desired_width, int desired_height,
+                                   const QString &format)
 {
     if (!data || !width || !height)
         return false;
@@ -580,7 +585,7 @@ bool PreviewGenerator::SavePreview(QString filename,
 
     QTemporaryFile f(QFileInfo(filename).absoluteFilePath()+".XXXXXX");
     f.setAutoRemove(false);
-    if (f.open() && small_img.save(&f, "PNG"))
+    if (f.open() && small_img.save(&f, format.toLocal8Bit().constData()))
     {
         // Let anybody update it
         bool ret = makeFileAccessible(f.fileName().toLocal8Bit().constData());
@@ -672,10 +677,13 @@ bool PreviewGenerator::LocalPreviewRun(void)
 
     QString outname = CreateAccessibleFilename(m_pathname, m_outFileName);
 
+    QString format = (m_outFormat.isEmpty()) ? "PNG" : m_outFormat;
+
     int dw = (m_outSize.width()  < 0) ? width  : m_outSize.width();
     int dh = (m_outSize.height() < 0) ? height : m_outSize.height();
 
-    bool ok = SavePreview(outname, data, width, height, aspect, dw, dh);
+    bool ok = SavePreview(outname, data, width, height, aspect, dw, dh,
+                          format);
 
     if (ok)
     {

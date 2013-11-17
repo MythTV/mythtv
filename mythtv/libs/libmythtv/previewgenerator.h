@@ -89,10 +89,11 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
                                int               &video_height,
                                float             &video_aspect);
 
-    static bool SavePreview(QString filename,
+    static bool SavePreview(const QString &filename,
                             const unsigned char *data,
                             uint width, uint height, float aspect,
-                            int desired_width, int desired_height);
+                            int desired_width, int desired_height,
+                            const QString &format);
 
 
     static QString CreateAccessibleFilename(
@@ -116,6 +117,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     long long          m_captureTime;
     QString            m_outFileName;
     QSize              m_outSize;
+    QString            m_outFormat;
 
     QString            m_token;
     bool               m_gotReply;
