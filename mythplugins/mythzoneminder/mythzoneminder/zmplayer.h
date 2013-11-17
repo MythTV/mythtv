@@ -74,8 +74,7 @@ class ZMPlayer : public MythScreenType
 
     std::vector<Frame *>  *m_frameList;
     QTimer           *m_frameTimer;
-    int               m_curFrame;
-    int               m_lastFrame;
+    uint              m_curFrame;
 
     bool              m_paused;
     bool              m_fullScreen;

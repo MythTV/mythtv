@@ -43,7 +43,7 @@ ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
           m_playButton(NULL), m_deleteButton(NULL), m_nextButton(NULL),
           m_prevButton(NULL), m_currentEvent(currentEvent),
           m_eventList(eventList), m_frameList(new vector<Frame*>),
-          m_frameTimer(new QTimer(this)), m_curFrame(0),  m_lastFrame(0),
+          m_frameTimer(new QTimer(this)), m_curFrame(0),
           m_paused(false), m_fullScreen(false), m_image(NULL)
 {
     connect(m_frameTimer, SIGNAL(timeout()), this,
@@ -165,8 +165,7 @@ void ZMPlayer::getEventInfo()
     if (!event)
         return;
 
-    m_curFrame = 0;
-    m_lastFrame = 0;
+    m_curFrame = 1;
 
     m_eventText->SetText(QString(event->eventName() + " (%1/%2)")
             .arg((*m_currentEvent) + 1)
@@ -182,9 +181,7 @@ void ZMPlayer::getEventInfo()
     if (class ZMClient *zm = ZMClient::get())
     {
         zm->getFrameList(event->eventID(), m_frameList);
-        m_curFrame = 1;
-        m_lastFrame = m_frameList->size();
-        m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
+        m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_frameList->size()));
         getFrame();
     }
 }
@@ -226,7 +223,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
         {
             if (m_paused)
             {
-                if (m_curFrame < m_lastFrame)
+                if (m_curFrame < m_frameList->size())
                     m_curFrame++;
                 getFrame();
             }
@@ -362,16 +359,16 @@ void ZMPlayer::prevPressed()
 
 void ZMPlayer::updateFrame(void)
 {
-    if (!m_lastFrame)
+    if (!m_frameList->size())
         return;
 
     m_frameTimer->stop();
 
     m_curFrame++;
-    if (m_curFrame > m_lastFrame)
+    if (m_curFrame > m_frameList->size())
     {
         m_paused = true;
-        m_curFrame = 0;
+        m_curFrame = 1;
         if (m_playButton)
             m_playButton->SetText(tr("Play"));
         return;
@@ -394,12 +391,12 @@ void ZMPlayer::getFrame(void)
         if (m_image)
         {
             m_activeFrameImage->SetImage(m_image);
-            m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_lastFrame));
+            m_frameText->SetText(QString("%1/%2").arg(m_curFrame).arg(m_frameList->size()));
         }
 
         if (!m_paused)
         {
-            if (m_curFrame < (int) m_frameList->size())
+            if (m_curFrame < m_frameList->size())
             {
                 double delta = m_frameList->at(m_curFrame)->delta -
                                m_frameList->at(m_curFrame - 1)->delta;
