@@ -196,7 +196,7 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         const TagLib::List<Picture *>& picList = flacfile->pictureList();
 
         for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
-             it != picList.end(); it++)
+                it != picList.end(); it++)
         {
             pic = *it;
             if (pic->type() == artType)
@@ -335,6 +335,7 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
 bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
                               const AlbumArtImage *albumart)
 {
+#if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION >= 8
     using TagLib::FLAC::Picture;
     if (filename.isEmpty() || !albumart)
         return false;
@@ -390,6 +391,11 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
     }
 
     return retval;
+#else
+    LOG(VB_GENERAL, LOG_WARNING,
+        "TagLib 1.8.0 or later is required to write albumart to flac xiphComment tags");
+    return false;
+#endif
 }
 
 /*!
@@ -402,6 +408,8 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
 bool MetaIOFLACVorbis::removeAlbumArt(const QString &filename,
                                const AlbumArtImage *albumart)
 {
+#if TAGLIB_MAJOR_VERSION == 1 && TAGLIB_MINOR_VERSION >= 8
+
     if (filename.isEmpty() || !albumart)
         return false;
 
@@ -435,6 +443,11 @@ bool MetaIOFLACVorbis::removeAlbumArt(const QString &filename,
     }
 
     return retval;
+#else
+    LOG(VB_GENERAL, LOG_WARNING,
+        "TagLib 1.8.0 or later is required to remove albumart from flac xiphComment tags");
+    return false;
+#endif
 }
 
 bool MetaIOFLACVorbis::changeImageType(const QString &filename,
