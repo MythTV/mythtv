@@ -46,6 +46,7 @@ public:
     void doDeleteAll(bool doDelete);
     void changeView(void);
     void eventChanged(MythUIButtonListItem *item);
+    void eventVisible(MythUIButtonListItem *item);
     void cameraChanged(void);
     void dateChanged(void);
     void playerExited(void);

@@ -29,6 +29,8 @@
 #include "zmplayer.h"
 #include "zmclient.h"
 
+Q_DECLARE_METATYPE(Event*);
+
 ZMEvents::ZMEvents(MythScreenStack *parent) :
     MythScreenType(parent, "zmevents"),
     m_oldestFirst(false),
@@ -171,7 +173,7 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
 
 void ZMEvents::getEventList(void)
 {
-    if (class ZMClient *zm = ZMClient::get())
+    if (ZMClient *zm = ZMClient::get())
     {
         QString monitorName = "<ANY>";
         QString date = "<ANY>";
@@ -199,8 +201,7 @@ void ZMEvents::updateUIList()
     {
         Event *event = m_eventList->at(i);
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(m_eventGrid,
-                "", NULL, true, MythUIButtonListItem::NotChecked);
+        MythUIButtonListItem *item = new MythUIButtonListItem(m_eventGrid, "", qVariantFromValue(event));
 
         item->SetText(event->eventName());
         item->SetText(event->monitorName(), "camera" );
@@ -247,36 +248,31 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
         else
             m_eventNoText->SetText("0/0");
     }
+}
 
-    // update the images for all the visible items
-    for (int x = m_eventGrid->GetCurrentPos() - m_eventGrid->GetVisibleCount();
-         x < m_eventGrid->GetCurrentPos() + (int)m_eventGrid->GetVisibleCount(); x++)
+void ZMEvents::eventVisible(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    if (item->HasImage())
+        return;
+
+    Event *event = qVariantValue<Event*> (item->GetData());
+
+    if (event)
     {
-        if (x < 0 || x > (int)m_eventGrid->GetCount() - 1)
-            continue;
-
-        MythUIButtonListItem *gridItem = m_eventGrid->GetItemAt(x);
-        if (gridItem && !gridItem->HasImage())
+        QImage image;
+        if (ZMClient *zm = ZMClient::get())
         {
-            if (x < 0 || x > (int)m_eventList->size() - 1)
-                continue;
-
-            Event *event = m_eventList->at(x);
-            if (event)
+            zm->getAnalyseFrame(event, 0, image);
+            if (!image.isNull())
             {
-                QImage image;
-                if (class ZMClient *zm = ZMClient::get())
-                {
-                    zm->getAnalyseFrame(event, 0, image);
-                    if (!image.isNull())
-                    {
-                        MythImage *mimage = GetMythPainter()->GetFormatImage();
-                        mimage->Assign(image);
-                        gridItem->SetImage(mimage);
-                        mimage->SetChanged();
-                        mimage->DecrRef();
-                    }
-                }
+                MythImage *mimage = GetMythPainter()->GetFormatImage();
+                mimage->Assign(image);
+                item->SetImage(mimage);
+                mimage->SetChanged();
+                mimage->DecrRef();
             }
         }
     }
@@ -323,7 +319,7 @@ void ZMEvents::deletePressed(void)
     Event *event = m_eventList->at(m_savedPosition);
     if (event)
     {
-        if (class ZMClient *zm = ZMClient::get())
+        if (ZMClient *zm = ZMClient::get())
             zm->deleteEvent(event->eventID());
 
         MythUIButtonListItem *item = m_eventGrid->GetItemCurrent();
@@ -344,7 +340,7 @@ void ZMEvents::deletePressed(void)
 
 void ZMEvents::getCameraList(void)
 {
-    if (class ZMClient *zm = ZMClient::get())
+    if (ZMClient *zm = ZMClient::get())
     {
         QStringList cameraList;
         zm->getCameraList(cameraList);
@@ -362,7 +358,7 @@ void ZMEvents::getCameraList(void)
 
 void ZMEvents::getDateList(void)
 {
-    if (class ZMClient *zm = ZMClient::get())
+    if (ZMClient *zm = ZMClient::get())
     {
         QString monitorName = "<ANY>";
 
@@ -425,6 +421,8 @@ void ZMEvents::setGridLayout(int layout)
                 this, SLOT(eventChanged(MythUIButtonListItem*)));
         connect(m_eventGrid, SIGNAL(itemClicked( MythUIButtonListItem*)),
                 this, SLOT(playPressed()));
+        connect(m_eventGrid, SIGNAL(itemVisible(MythUIButtonListItem*)),
+             this, SLOT(eventVisible(MythUIButtonListItem*)));
 
         updateUIList();
 
@@ -484,7 +482,7 @@ void ZMEvents::doDeleteAll(bool doDelete)
         return;
 
     //delete all events
-    if (class ZMClient *zm = ZMClient::get())
+    if (ZMClient *zm = ZMClient::get())
     {
         zm->deleteEventList(m_eventList);
 
