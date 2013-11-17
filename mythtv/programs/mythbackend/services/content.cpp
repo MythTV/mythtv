@@ -479,8 +479,8 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
         throw sMsg;
     }
 
-    if (!sFormat.isEmpty() &&
-        !QImageWriter::supportedImageFormats().contains(sFormat.toAscii()))
+    if (!sFormat.isEmpty()
+        && !QImageWriter::supportedImageFormats().contains(sFormat.toLower().toLocal8Bit()))
     {
         throw "GetPreviewImage: Specified 'Format' is not supported.";
     }
@@ -528,11 +528,11 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
     if (nSecsIn <= 0)
     {
         nSecsIn = -1;
-        sPreviewFileName = QString("%1.%2").arg(sFileName).arg(sImageFormat.toLower());
+        sPreviewFileName = QString("%1.png").arg(sFileName);
     }
     else
     {
-        sPreviewFileName = QString("%1.%2.%3").arg(sFileName).arg(nSecsIn).arg(sImageFormat.toLower());
+        sPreviewFileName = QString("%1.%2.png").arg(sFileName).arg(nSecsIn);
     }
 
     if (!QFile::exists( sPreviewFileName ))
@@ -560,51 +560,62 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
             return QFileInfo();
     }
 
-    float fAspect = 0.0;
-
-    QImage *pImage = new QImage(sPreviewFileName);
-
-    if (!pImage)
-        return QFileInfo();
-
-    if (fAspect <= 0)
-        fAspect = (float)(pImage->width()) / pImage->height();
-
-    if (fAspect == 0)
-    {
-        delete pImage;
-        return QFileInfo();
-    }
-
     bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0);
-
-    if ( nWidth == 0 )
-        nWidth = (int)rint(nHeight * fAspect);
-
-    if ( nHeight == 0 )
-        nHeight = (int)rint(nWidth / fAspect);
 
     QString sNewFileName;
 
     if (bDefaultPixmap)
         sNewFileName = sPreviewFileName;
     else
+    {
         sNewFileName = QString( "%1.%2.%3x%4.%5" )
                           .arg( sFileName )
                           .arg( nSecsIn   )
-                          .arg( nWidth    )
-                          .arg( nHeight   )
+                          .arg( nWidth == 0 ? -1 : nWidth )
+                          .arg( nHeight == 0 ? -1 : nHeight )
                           .arg( sImageFormat.toLower() );
 
-    // ----------------------------------------------------------------------
-    // check to see if scaled preview image is already created.
-    // ----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
+        // check to see if scaled preview image is already created and isn't
+        // out of date
+        // ----------------------------------------------------------------------
+        if (QFile::exists( sNewFileName ))
+        {
+            if (QFileInfo(sPreviewFileName).lastModified() <=
+                QFileInfo(sNewFileName).lastModified())
+                return QFileInfo( sNewFileName );
+        }
+
+        QImage image = QImage(sPreviewFileName);
+
+        if (image.isNull())
+            return QFileInfo();
+
+        // We can just re-scale the default (full-size version) to avoid
+        // a preview generator run
+        if ( nWidth <= 0 )
+            image = image.scaledToHeight(nHeight, Qt::SmoothTransformation);
+        else if ( nHeight <= 0 )
+            image = image.scaledToWidth(nWidth, Qt::SmoothTransformation);
+        else
+            image = image.scaled(nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                        Qt::SmoothTransformation);
+
+        image.save(sNewFileName, sImageFormat.toUpper().toLocal8Bit());
+
+        // Let anybody update it
+        bool ret = makeFileAccessible(sNewFileName.toLocal8Bit().constData());
+        if (!ret)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Unable to change permissions on "
+                                     "preview image. Backends and frontends "
+                                     "running under different users will be "
+                                     "unable to access it");
+        }
+    }
 
     if (QFile::exists( sNewFileName ))
-    {
-        delete pImage;
         return QFileInfo( sNewFileName );
-    }
 
     PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
                                                          QString(),
@@ -619,8 +630,6 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 
     if (!ok)
         return QFileInfo();
-
-    delete pImage;
 
     return QFileInfo( sNewFileName );
 }
