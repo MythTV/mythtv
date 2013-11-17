@@ -41,13 +41,13 @@ MetaIO* MetaIO::createTagger(const QString& filename)
         return new MetaIOOggVorbis;
     else if (extension == "flac")
     {
-        MetaIOID3 *tagger = new MetaIOID3;
+        MetaIOFLACVorbis *tagger = new MetaIOFLACVorbis;
         if (tagger->TagExists(filename))
             return tagger;
         else
         {
             delete tagger;
-            return new MetaIOFLACVorbis;
+            return new MetaIOID3;
         }
     }
     else if (extension == "m4a")
