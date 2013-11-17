@@ -52,15 +52,15 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
                      Mode               mode = kLocal);
 
     void SetPreviewTime(long long time, bool in_seconds)
-        { captureTime = time; timeInSeconds = in_seconds; }
+        { m_captureTime = time; m_timeInSeconds = in_seconds; }
     void SetPreviewTimeAsSeconds(long long seconds_in)
         { SetPreviewTime(seconds_in, true); }
     void SetPreviewTimeAsFrameNumber(long long frame_number)
         { SetPreviewTime(frame_number, false); }
     void SetOutputFilename(const QString&);
-    void SetOutputSize(const QSize &size) { outSize = size; }
+    void SetOutputSize(const QSize &size) { m_outSize = size; }
 
-    QString GetToken(void) const { return token; }
+    QString GetToken(void) const { return m_token; }
 
     void run(void); // MThread
     bool Run(void);
@@ -102,24 +102,24 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     bool SaveOutFile(const QByteArray &data, const QDateTime &dt);
 
   protected:
-    QWaitCondition     previewWaitCondition;
-    QMutex             previewLock;
-    ProgramInfo        programInfo;
+    QWaitCondition     m_previewWaitCondition;
+    QMutex             m_previewLock;
+    ProgramInfo        m_programInfo;
 
-    Mode               mode;
-    QObject           *listener;
-    QString            pathname;
+    Mode               m_mode;
+    QObject           *m_listener;
+    QString            m_pathname;
 
     /// tells us whether to use time as seconds or frame number
-    bool               timeInSeconds;
+    bool               m_timeInSeconds;
     /// snapshot time in seconds or frame number, depending on timeInSeconds
-    long long          captureTime;
-    QString            outFileName;
-    QSize              outSize;
+    long long          m_captureTime;
+    QString            m_outFileName;
+    QSize              m_outSize;
 
-    QString            token;
-    bool               gotReply;
-    bool               pixmapOk;
+    QString            m_token;
+    bool               m_gotReply;
+    bool               m_pixmapOk;
 };
 
 #endif // PREVIEW_GENERATOR_H_
