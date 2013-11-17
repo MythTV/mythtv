@@ -204,10 +204,55 @@
     padding: 0px;
 }
 
+
+/* Icons all a 4:3 aspect */
 .recordingList .programIcons IMG
 {
     float: left;
+    width: 36px;
+    height: 27px;
     margin: 2px 0px; /* Vertical Horizontal */
+    background-image: url("/tv/images/recording_icons_sprite.svg");
+}
+
+.icon_catmovie
+{
+    background-position: 0px 0px;
+}
+
+.icon_flautoexpire
+{
+    background-position: 108px 0px;
+}
+
+.icon_flbookmark
+{
+    background-position: 72px 0px;
+}
+
+.icon_flcommflag
+{
+    background-position: 108px 0px;
+}
+
+.icon_flwatched
+{
+    background-position: 0px 27px;
+}
+
+.icon_hd720
+{
+    background-position: 36px 27px;
+}
+
+.icon_hd1080
+{
+    background-position: 72px 27px;
+}
+
+.icon_hdtv
+{
+    background-position: 108px 27px;
 }
 
 .wastebin
