@@ -92,7 +92,8 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
                                                           const QDateTime &StartTime,
                                                           int              Width,    
                                                           int              Height,   
-                                                          int              SecsIn ) = 0;
+                                                          int              SecsIn,
+                                                          const QString   &Format) = 0;
 
         virtual QFileInfo           GetRecording        ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;

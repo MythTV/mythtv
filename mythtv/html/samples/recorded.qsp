@@ -21,7 +21,7 @@
   <tr>
 <!-- These image loads are slow when you have a lot of recordings, so comment
      them out, but leave them in for reference for users.
-	<td><img src="/Content/GetPreviewImage?ChanId=<%= program.Channel.ChanId%>&StartTime=<%= UTCDateString( program.StartTime ) %>" ></img></td>
+	<td><img src="/Content/GetPreviewImage?ChanId=<%= program.Channel.ChanId%>&StartTime=<%= UTCDateString( program.StartTime ) %>&Format=JPG" ></img></td>
 -->
 	
 	<td><%= program.Title %><% if (program.SubTitle.length) os.write(" - " + program.SubTitle); %></td>

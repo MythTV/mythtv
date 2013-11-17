@@ -59,7 +59,7 @@
                     month_names[program.StartTime.getMonth()],
                     program.StartTime.getDate(), startTime);
 %>
-                <img title="<%= title %>" alt="<%= desc %>" height="300" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=300&StartTime=<%=UTCDateString( program.Recording.StartTs ) %>"/>
+                <img title="<%= title %>" alt="<%= desc %>" height="300" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId %>&Height=300&StartTime=<%=UTCDateString( program.Recording.StartTs ) %>&Format=JPG"/>
 <%
             } 
 %>

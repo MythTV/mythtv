@@ -27,8 +27,9 @@
 
 #include <QDir>
 #include <QImage>
-#include <math.h>
+#include <QImageWriter>
 
+#include <math.h>
 #include <compat.h>
 
 #include "mythcorecontext.h"
@@ -465,7 +466,8 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
                                      const QDateTime &recstarttsRaw,
                                            int        nWidth,
                                            int        nHeight,
-                                           int        nSecsIn )
+                                           int        nSecsIn,
+                                     const QString   &sFormat )
 {
     if (!recstarttsRaw.isValid())
     {
@@ -476,6 +478,16 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
 
         throw sMsg;
     }
+
+    if (!sFormat.isEmpty() &&
+        !QImageWriter::supportedImageFormats().contains(sFormat.toAscii()))
+    {
+        throw "GetPreviewImage: Specified 'Format' is not supported.";
+    }
+
+    QString sImageFormat = sFormat;
+    if (sImageFormat.isEmpty())
+        sImageFormat = "PNG";
 
     QDateTime recstartts = recstarttsRaw.toUTC();
 
@@ -516,11 +528,11 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
     if (nSecsIn <= 0)
     {
         nSecsIn = -1;
-        sPreviewFileName = sFileName + ".png";
+        sPreviewFileName = QString("%1.%2").arg(sFileName).arg(sImageFormat.toLower());
     }
     else
     {
-        sPreviewFileName = QString("%1.%2.png").arg(sFileName).arg(nSecsIn);
+        sPreviewFileName = QString("%1.%2.%3").arg(sFileName).arg(nSecsIn).arg(sImageFormat.toLower());
     }
 
     if (!QFile::exists( sPreviewFileName ))
@@ -577,11 +589,12 @@ QFileInfo Content::GetPreviewImage(        int        nChanId,
     if (bDefaultPixmap)
         sNewFileName = sPreviewFileName;
     else
-        sNewFileName = QString( "%1.%2.%3x%4.png" )
+        sNewFileName = QString( "%1.%2.%3x%4.%5" )
                           .arg( sFileName )
                           .arg( nSecsIn   )
                           .arg( nWidth    )
-                          .arg( nHeight   );
+                          .arg( nHeight   )
+                          .arg( sImageFormat.toLower() );
 
     // ----------------------------------------------------------------------
     // check to see if scaled preview image is already created.

@@ -73,7 +73,8 @@ class Content : public ContentServices
                                                   const QDateTime &StartTime,
                                                   int              Width,
                                                   int              Height,
-                                                  int              SecsIn );
+                                                  int              SecsIn,
+                                                  const QString   &Format);
 
         QFileInfo           GetRecording        ( int              ChanId,
                                                   const QDateTime &StartTime );

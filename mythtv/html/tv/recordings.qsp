@@ -40,7 +40,7 @@ import "/tv/js/constants.js"
     if (displayGroupList.indexOf(displayGroup) === -1)
         displayGroup = "";
 
-    var recordings = dvr.GetRecordedList( sortDescending, 0, 50, displayGroup, recGroup, "" );
+    var recordings = dvr.GetRecordedList( sortDescending, 0, 0, displayGroup, recGroup, "" );
     var programs = recordings.Programs;
 %>
 
@@ -189,7 +189,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
     <div class="recordingRow" id="<%=programIdentifier%>_row">
         <div class="previewBox">
             <div class="previewImageBackground">
-                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=67" />
+                <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=67&amp;format=JPG" />
             </div>
             <span class="watchRecordingLink"><%=qsTr("Watch")%></span>
         </div>
