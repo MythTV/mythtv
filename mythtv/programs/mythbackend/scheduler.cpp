@@ -1856,6 +1856,8 @@ void Scheduler::run(void)
         QDateTime curtime = MythDate::current();
         int secs_to_next = curtime.secsTo(nextStartTime);
         int sched_sleep = max(curtime.msecsTo(nextWakeTime), qint64(0));
+        if (idleTimeoutSecs > 0)
+            sched_sleep = min(sched_sleep, 15000);
         bool haveRequests = HaveQueuedRequests();
         bool checkSlaves = lastSleepCheck.secsTo(curtime) >= 300;
 
