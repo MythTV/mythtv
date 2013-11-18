@@ -37,6 +37,7 @@ class HLSStreamHandler : public IPTVStreamHandler
     IPTVTuningData m_tuning;
     HLSReader*     m_hls;
     uint8_t*       m_buffer;
+    bool           m_throttle;
 
     // for implementing Get & Return
     static QMutex                            s_handlers_lock;

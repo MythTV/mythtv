@@ -54,6 +54,7 @@ class HLSReader
     bool UpdateSegment(int64_t sequence_num, int duration,
 		       const QString& title, const QString& uri);
     void HadError(void) { m_error = true; }
+    void ResetStream(void) { m_curstream = NULL; }
 
     QString StreamURL(void) const
     { return QString("%1").arg(m_curstream ? m_curstream->Url() : ""); }

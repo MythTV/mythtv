@@ -36,6 +36,7 @@ bool HLSReader::Open(const QString & m3u)
     }
     if (m_curstream)
         Close();
+    m_cancel = false;
 
     QByteArray buffer;
 
@@ -67,6 +68,10 @@ bool HLSReader::Open(const QString & m3u)
     }
 
     m_m3u8 = m3u;
+
+    QMutexLocker lock(&m_stream_lock);
+    m_streams.clear();
+    m_curstream = NULL;
 
     if (!ParseM3U8(buffer))
         return false;
@@ -169,7 +174,7 @@ int HLSReader::Read(uint8_t* buffer, int maxlen)
     if (!m_curstream)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Read: no stream selected");
-        return -1;
+        return 0;
     }
     if (m_cancel)
     {
