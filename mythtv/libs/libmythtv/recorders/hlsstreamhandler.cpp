@@ -100,6 +100,7 @@ HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning) :
 {
     m_hls       = new HLSReader();
     m_buffer    = new uint8_t[BUFFER_SIZE];
+    m_throttle  = true;
 }
 
 HLSStreamHandler::~HLSStreamHandler(void)
@@ -114,6 +115,7 @@ void HLSStreamHandler::run(void)
 {
     RunProlog();
 
+    QString url = m_tuning.GetURL(0).toString();
     int cnt = 0;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- begin");
@@ -126,16 +128,17 @@ void HLSStreamHandler::run(void)
 
     while (_running_desired)
     {
-        if (!m_hls->IsOpen(m_tuning.GetURL(0).toString()))
+        if (!m_hls->IsOpen(url))
         {
-            if (!m_hls->Open(m_tuning.GetURL(0).toString()))
+            if (!m_hls->Open(url))
             {
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
                     "run: HLS OpenFile() failed");
                 usleep(500000);
                 continue;
             }
-            m_hls->Throttle(true);
+            m_hls->Throttle(m_throttle);
+            m_throttle = false;
         }
 
         int size = m_hls->Read(m_buffer, BUFFER_SIZE);

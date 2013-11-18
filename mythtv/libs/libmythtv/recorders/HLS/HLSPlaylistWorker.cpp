@@ -80,6 +80,9 @@ void HLSPlaylistWorker::run(void)
                         "Buffered: %2%")
                 .arg(retries).arg((m_parent->PercentBuffered())));
 
+            if (retries == 1)
+                m_parent->ResetStream();
+
             if (retries > PLAYLIST_FAILURE)
             {
                 LOG(VB_RECORD, LOG_ERR, LOC +
