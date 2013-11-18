@@ -11,22 +11,36 @@ import "/tv/js/constants.js"
         return args[name];
     }
 
+    var filter = getArg("ViewFilter");
+
+    var listOnly = 0;
+    if (getArg("ListOnly"))
+        listOnly = 1;
+
+    var startIndex = 0;
+    if (getArg("Start"))
+        startIndex = Number(getArg("Start"));
+
     var myth  = new Myth();
     var dvr = new Dvr();
 
-    var filter = getArg("ViewFilter");
-
+    var PAGEINTERVAL = 10;
     var programList;
     if (filter == "conflicting")
-        programList = dvr.GetConflictList(0, 200);
+        programList = dvr.GetConflictList(startIndex, PAGEINTERVAL);
     else if (filter == "all")
-        programList = dvr.GetUpcomingList(0, 200, true);
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, true);
     else
-        programList = dvr.GetUpcomingList(0, 200, false);
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, false);
+
+    var nextStartIndex = (startIndex + PAGEINTERVAL);
+    if (nextStartIndex > programList.TotalAvailable)
+        nextStartIndex = 0;
 
     var programs = programList.Programs;
 %>
 
+<% if (!listOnly) {%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -82,9 +96,10 @@ import "/tv/js/constants.js"
     </form>
 </div>
 
-<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+<div id="upcomingList-container" style="overflow:hidden;clear:both;width:100%;">
+<div id="upcomingList" class="upcomingList jscroll">
 
-<div id="upcomingList" class="upcomingList">
+<%} // End of the header %>
 
 <%
 // The nothing to display message
@@ -192,9 +207,19 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 
 }
 %>
-</div> <!-- End upcomingList -->
 
-</div>
+<% if (nextStartIndex) { %>
+<a class="jscroll-next" href="/tv/upcoming.qsp?ViewFilter=<%=filter%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<%}%>
+
+<% if (!listOnly) {%>
+</div> <!-- End upcomingList -->
+</div> <!-- End upcomingList-container -->
+
+<script>
+    loadJScroll();
+</script>
 
 </body>
 </html>
+<%}%>

@@ -15,16 +15,24 @@ import "/tv/js/constants.js"
     if (getArg("GuideOnly"))
         guideOnly = 1;
 
+    var channelGroup = 0; // All
+    if (parseInt(getArg("ChannelGroup"), 10))
+        channelGroup = parseInt(getArg("ChannelGroup"), 10);
+
+    var startIndex = 0;
+    if (getArg("Start"))
+        startIndex = Number(getArg("Start"));
+
+    var numPages = 1;
+    if (getArg("NumPages"))
+        numPages = Number(getArg("NumPages"));
+
     var timeBarInterval = 30; // Display time markers every X minutes
     var guideRange = 2; // Show X hours from the start time
 
     var myth  = new Myth();
     var guide = new Guide();
     var dvr = new Dvr();
-
-    var channelGroup = 0; // All
-    if (parseInt(getArg("ChannelGroup"), 10))
-        channelGroup = parseInt(getArg("ChannelGroup"), 10);
 
     var now = new Date();
     var guideStartTime;
@@ -69,8 +77,18 @@ import "/tv/js/constants.js"
     fetchEndTime.setSeconds(fetchEndTime.getSeconds() - 1);
 
     // Actually fetch the guide data
+    //var PAGEINTERVAL = 10 * numPages;
     var guideResult = guide.GetProgramGuide(guideStartTime, fetchEndTime, 0, 0, true, channelGroup);
     var channelList = guideResult.Channels;
+
+    //var nextStartIndex = (startIndex + PAGEINTERVAL);
+    //if (nextStartIndex > guideResult.TotalAvailable)
+    //    nextStartIndex = 0;
+
+    //var nextStartIndex = guideResult.EndChanId;
+    //if (nextStartIndex > guideResult.TotalAvailable)
+    //    nextStartIndex = 0;
+    var nextStartIndex = 0;
 
     // Load the channel groups
     var chanGroups = guide.GetChannelGroupList(false).ChannelGroups;
@@ -102,8 +120,6 @@ import "/tv/js/constants.js"
 <script src="/tv/js/guide.js"></script>
 </head>
 <body>
-
-<!-- <h2 class="pageTitle" id="title"><%=qsTr("Program Guide")%></h2> -->
 
 <!-- Popup Option Menu -->
 <!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
@@ -203,14 +219,15 @@ if (chanGroups.length)
     }
 %>
     </select>
-    <input type="hidden" name="GuideOnly" value="1" />
     </label>
+    <input type="hidden" name="GuideOnly" value="1" />
+    <input type="hidden" name="NumPages" id="NumPages" value="<%=numPages%>" />
     </form>
 </div>
 
-<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+<div id="guide-container" style="overflow:hidden;clear:both;width:100%;">
 
-<div id="guideGrid" class="guideGrid">
+<div id="guideGrid" class="guideGrid jscroll">
 <%} // End of the header %>
 
     <div class="pageLeft" onClick="pageLeft();">
@@ -353,11 +370,18 @@ if (chanGroups.length)
 <%
     }
 %>
+
+<% if (nextStartIndex) { %>
+<a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;GuideOnly=1" />
+<%}%>
+
 <% if (!guideOnly) {%>
-</div> <!-- End ProgramGuide -->
+</div> <!-- End guideGrid -->
+</div> <!-- End guideGrid-container -->
 
-
-</div>
+<!--<script>
+    loadJScroll();
+</script>-->
 
 </body>
 </html>

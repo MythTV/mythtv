@@ -303,7 +303,7 @@ function loadTVContent(url, targetDivID, transition, args)
     var targetDiv = document.getElementById(targetDivID);
     var newDiv = document.createElement('div');
     newDiv.style = "left: 100%";
-    document.getElementById("content").insertBefore(newDiv, null);
+    targetDiv.parentNode.insertBefore(newDiv, null);
 
     for (var key in args)
     {
@@ -378,6 +378,21 @@ function submitForm(formElement, target, transition)
     loadTVContent(url, target, transition);
 }
 
+function loadJScroll()
+{
+    // Always have at least one window heights worth loaded off-screen
+    $('.jscroll').jscroll({
+    padding: $(window).height(),
+    nextSelector: 'a.jscroll-next:last',
+    callback: function() { scrollCallback(); }
+    });
+}
+
+function postLoad()
+{
+    //loadJScroll();
+}
+
 function leftSlideTransition(oldDivID, newDivID)
 {
     // Transition works much better with a fixed width, so temporarily set
@@ -388,7 +403,7 @@ function leftSlideTransition(oldDivID, newDivID)
     $("#" + newDivID).css("z-index", "-10");
     var oldLeft = $("#" + oldDivID).position().left;
     $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
-                   $("#" + oldDivID).remove(); });
+                   $("#" + oldDivID).remove(); postLoad(); });
     $("#" + newDivID).animate({left: oldLeft}, 800, function() {
                    $("#" + newDivID).css("width", '');
                    $("#" + newDivID).css("z-index", "0"); });
@@ -402,7 +417,7 @@ function rightSlideTransition(oldDivID, newDivID)
     $("#" + newDivID).css("z-index", "-10");
     var oldLeft = $("#" + oldDivID).position().left;
     $("#" + oldDivID).animate({opacity: "0.3"}, 800, function() {
-                   $("#" + oldDivID).remove(); });
+                   $("#" + oldDivID).remove(); postLoad(); });
     $("#" + newDivID).animate({left: oldLeft}, 800, function() {
                    $("#" + newDivID).css("width", '');
                    $("#" + newDivID).css("z-index", "0"); });
@@ -414,6 +429,6 @@ function dissolveTransition(oldDivID, newDivID)
     var oldLeft = $("#" + oldDivID).position().left;
     $("#" + newDivID).css("left", oldLeft);
     $("#" + oldDivID).animate({opacity: "0.0"}, 800, function() {
-                   $("#" + oldDivID).remove(); });
+                   $("#" + oldDivID).remove(); postLoad(); });
     $("#" + newDivID).animate({opacity: "1.0"}, 800);
 }

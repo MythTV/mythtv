@@ -11,6 +11,10 @@ import "/tv/js/constants.js"
         return args[name];
     }
 
+    var listOnly = 0;
+    if (getArg("ListOnly"))
+        listOnly = 1;
+
     var myth = new Myth();
 
     // Default is to sort recordings from most recent through to the oldest
@@ -26,6 +30,14 @@ import "/tv/js/constants.js"
     if (getArg("DisplayGroup"))
         displayGroup = getArg("DisplayGroup");
 
+    var sortOrder = "";
+    if (getArg("SortAsc"))
+        sortOrder = getArg("SortAsc");
+
+    var startIndex = 0;
+    if (getArg("Start"))
+        startIndex = Number(getArg("Start"));
+
     var dvr = new Dvr();
 
     // Get Recording Group List
@@ -40,10 +52,17 @@ import "/tv/js/constants.js"
     if (displayGroupList.indexOf(displayGroup) === -1)
         displayGroup = "";
 
-    var recordings = dvr.GetRecordedList( sortDescending, 0, 0, displayGroup, recGroup, "" );
-    var programs = recordings.Programs;
+    var PAGEINTERVAL = 10;
+    var recordingList = dvr.GetRecordedList( sortDescending, startIndex, PAGEINTERVAL, displayGroup, recGroup, "" );
+
+    var nextStartIndex = (startIndex + PAGEINTERVAL);
+    if (nextStartIndex > recordingList.TotalAvailable)
+        nextStartIndex = 0;
+
+    var programs = recordingList.Programs;
 %>
 
+<% if (!listOnly) {%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,6 +76,7 @@ import "/tv/js/constants.js"
 <script src="/js/util.qjs"></script>
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/recordings.js"></script>
+<script src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"></script>
 </head>
 <body id="content">
 
@@ -119,7 +139,7 @@ import "/tv/js/constants.js"
     <label for="listSortOrder"><%=qsTr("Sort")%>:
     <select id="listSortOrder" name="SortAsc" onChange="submitForm(this.form)">
         <option label="Descending" value="0">Descending</option>
-        <option label="Ascending" value="1" <%if (getArg("SortAsc") == 1) {%>selected<%}%>>Ascending</option>
+        <option label="Ascending" value="1" <%if (sortOrder == 1) {%>selected<%}%>>Ascending</option>
     </select>
     </label>
     <label for="listDisplayOrder"><%=qsTr("Filter")%>:
@@ -140,13 +160,15 @@ import "/tv/js/constants.js"
 
 </div>
 
-<div id="foo" style="overflow:hidden;clear:both;width:100%;">
+<div id="recordingList-container" style="overflow:hidden;clear:both;width:100%;">
 
-<div id="recordingList" class="recordingList">
+<div id="recordingList" class="recordingList jscroll">
 
 <div class="topBar">
     <%=qsTr("Recordings")%>
 </div>
+
+<%} // End of the header %>
 
 <%
 // The nothing to display message
@@ -227,9 +249,18 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
 }
 %>
 
-</div>
+<% if (nextStartIndex) { %>
+<a class="jscroll-next" href="/tv/recordings.qsp?RecordingGroup=<%=recGroup%>&amp;DisplayGroup=<%=displayGroup%>&amp;SortAsc=<%=sortOrder%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<%}%>
 
-</div>
+<% if (!listOnly) {%>
+</div> <!-- End recordingList -->
+</div> <!-- End recordingList-container -->
+
+<script>
+    loadJScroll();
+</script>
 
 </body>
 </html>
+<%}%>

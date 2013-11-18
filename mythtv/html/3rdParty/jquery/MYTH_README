@@ -28,5 +28,9 @@ We are using the following jQuery components from the following locations:
 
 7. jQuery Galleria Plugin 1.2.3 - http://galleria.io/
 
-    galleria
+    galleria/
+
+8. jQuery JScroll Plugin [76816b2c96] (with local bug fixes) - https://github.com/pklauzinski/jscroll (see also https://github.com/stuartm/jscroll)
+
+    jqueryJScroll/
 

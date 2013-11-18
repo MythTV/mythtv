@@ -111,3 +111,7 @@ function changeGuideStartTime(selectBox)
     submitForm(selectBox.form, 'guideGrid', transition);
 }
 
+function scrollCallback()
+{
+    $("#NumPages").val(Number($("#NumPages").val())+1);
+}
