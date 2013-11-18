@@ -17,7 +17,7 @@ class HLSStreamWorker : public MThread
 
     void Cancel(void);
     void CancelCurrentDownload(void);
-    void Wakeup(void) { m_waitcond.wakeAll(); }
+    void Wakeup(void) { QMutexLocker lock(&m_lock); m_waitcond.wakeAll(); }
 
   protected:
     void run(void);

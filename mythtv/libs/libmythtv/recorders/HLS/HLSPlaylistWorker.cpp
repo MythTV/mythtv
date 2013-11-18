@@ -1,8 +1,8 @@
 #include "HLSPlaylistWorker.h"
 #include "HLSReader.h"
 
-const int PLAYLIST_FAILURE = 60;  // number of consecutive failures after which
-                                  // recording will abort
+const int PLAYLIST_FAILURE = 20;  // number of consecutive failures after which
+                                  // an error will be propagated.
 
 #define LOC QString("%1 playlist: ").arg(m_parent->StreamURL().isEmpty() ? "Worker" : m_parent->StreamURL())
 
@@ -35,7 +35,7 @@ void HLSPlaylistWorker::run(void)
     int         retries = 0;
     double      delay = 0;
 
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "run -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
     RunProlog();
 
@@ -63,12 +63,24 @@ void HLSPlaylistWorker::run(void)
 
         if (m_parent->LoadMetaPlaylists(downloader))
         {
+            if (retries > 0)
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString("Playlist successfully downloaded.  Buffered: %1%")
+                    .arg(m_parent->PercentBuffered()));
+            }
             retries = 0;
             delay = 0.5;
         }
         else
         {
-            if (++retries > PLAYLIST_FAILURE)
+            ++retries;
+            LOG(VB_RECORD, LOG_WARNING, LOC +
+                QString("Playlist download failed -- contiguous cnt: %1, "
+                        "Buffered: %2%")
+                .arg(retries).arg((m_parent->PercentBuffered())));
+
+            if (retries > PLAYLIST_FAILURE)
             {
                 LOG(VB_RECORD, LOG_ERR, LOC +
                     QString("Reloading failed %1 times."
@@ -78,10 +90,9 @@ void HLSPlaylistWorker::run(void)
 
             if (m_parent->PercentBuffered() > 85)
             {
-                // Can't wait
+                // Don't wait, we need more segments to work on.
                 if (retries == 1)
                     continue; // restart immediately if it's the first try
-                retries = 0;
                 delay = 0.5;
             }
             else if (retries == 1)
@@ -107,5 +118,5 @@ void HLSPlaylistWorker::run(void)
 
     RunEpilog();
 
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "run -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }

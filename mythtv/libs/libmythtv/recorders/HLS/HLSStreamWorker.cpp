@@ -19,10 +19,8 @@ HLSStreamWorker::~HLSStreamWorker(void)
 void HLSStreamWorker::Cancel(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Cancel -- begin");
-    m_lock.lock();
     m_cancel = true;
     Wakeup();
-    m_lock.unlock();
     wait();
     LOG(VB_RECORD, LOG_INFO, LOC + "Cancel -- end");
 }
@@ -35,7 +33,7 @@ void HLSStreamWorker::CancelCurrentDownload(void)
 
 void HLSStreamWorker::run(void)
 {
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "run -- begin");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
     RunProlog();
 
     m_downloader = new MythSingleDownload;
@@ -72,6 +70,6 @@ void HLSStreamWorker::run(void)
     delete m_downloader;
     m_downloader = NULL;
 
-    LOG(VB_RECORD, LOG_DEBUG, LOC + "run -- end");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
     RunEpilog();
 }

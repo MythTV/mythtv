@@ -136,6 +136,7 @@ class HLSReader
     QMutex     m_stream_lock;
     QMutex     m_throttle_lock;
     QWaitCondition  m_throttle_cond;
+    bool       m_debug;
 
     // Downloading
     int         m_slow_cnt;
