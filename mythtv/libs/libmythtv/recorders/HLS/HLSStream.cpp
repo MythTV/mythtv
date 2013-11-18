@@ -141,9 +141,12 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
 
 void HLSRecStream::AverageBandwidth(int64_t bandwidth)
 {
+    // Average the last 20 segments
+    if (m_bandwidth_segs.size() > 19)
+        m_sumbandwidth -= m_bandwidth_segs.dequeue();
+    m_bandwidth_segs.enqueue(bandwidth);
     m_sumbandwidth += bandwidth;
-    ++m_countbandwidth;
-    m_bandwidth = m_sumbandwidth / m_countbandwidth;
+    m_bandwidth = m_sumbandwidth / m_bandwidth_segs.size();
 }
 
 uint HLSRecStream::Duration(void) const

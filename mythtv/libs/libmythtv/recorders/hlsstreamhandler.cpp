@@ -145,6 +145,7 @@ void HLSStreamHandler::run(void)
             // error
             if (++cnt > 10)
             {
+                LOG(VB_RECORD, LOG_ERR, LOC + "HLSReader failed");
                 Stop();
                 break;
             }

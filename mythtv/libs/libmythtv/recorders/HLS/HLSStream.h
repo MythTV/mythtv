@@ -8,6 +8,7 @@
 #endif // USING_LIBCRYPTO
 
 #include <QMap>
+#include <QQueue>
 
 #include "mythsingledownload.h"
 #include "HLSSegment.h"
@@ -79,7 +80,7 @@ class HLSRecStream
     bool        m_live;
     int64_t     m_bandwidth; // measured average download bandwidth (bits/second)
     double      m_sumbandwidth;
-    int         m_countbandwidth;
+    QQueue<int64_t> m_bandwidth_segs;
 
     QString     m_url;             // uri to m3u8
     mutable QMutex  m_lock;
