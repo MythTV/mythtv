@@ -1509,7 +1509,12 @@ def getFileInformation(file, folder):
 def WriteXMLToFile(myDOM, filename):
     #Save the XML file to disk for use later on
     f=open(filename, 'w')
-    f.write(myDOM.toprettyxml(indent="    ", encoding="UTF-8"))
+
+    if sys.hexversion >= 0x020703F0:
+        f.write(myDOM.toprettyxml(indent="    ", encoding="UTF-8"))
+    else:
+        f.write(myDOM.toxml(encoding="UTF-8"))
+
     f.close()
 
 
