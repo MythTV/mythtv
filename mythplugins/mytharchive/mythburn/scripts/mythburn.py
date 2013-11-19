@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 
 
 # version of script - change after each update
-VERSION="0.1.20130911-5"
+VERSION="0.1.20131119-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1426,7 +1426,7 @@ def getFileInformation(file, folder):
         data.description    = rec.description
         data.rating         = str(rec.stars)
         data.chanid         = rec.chanid
-        data.starttime      = rec.starttime.isoformat()
+        data.starttime      = rec.starttime.utcisoformat()
 
         cutlist = rec.markup.getcutlist()
         if len(cutlist):
