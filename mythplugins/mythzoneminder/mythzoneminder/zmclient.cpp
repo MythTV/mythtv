@@ -732,9 +732,10 @@ void ZMClient::getCameraList(QStringList &cameraList)
     // sanity check
     if (strList.size() < cameraCount + 2)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "ZMClient got a mismatch between the number of cameras and "
-            "the expected number of stringlist items in getCameraList()");
+        LOG(VB_GENERAL, LOG_ERR, QString(
+            "ZMClient got a mismatch between the number of cameras (%1) and "
+            "the expected number of stringlist items (%2) in getCameraList()")
+            .arg(cameraCount).arg(strList.size()));
         return;
     }
 
