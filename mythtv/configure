@@ -4963,16 +4963,16 @@ if enabled taglib; then
     if test x`which taglib-config` != x"" ; then
         taglib_minor=`taglib-config --version | cut -d. -f2`
         if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.6 or later."
-            taglib_minor="6"
+            echo "Can't find taglib-config. Assuming 1.7 or later."
+            taglib_minor="7"
         fi
         tagprefix=`taglib-config --prefix`
         tagincludes="-I${tagprefix}/include"
         taglibs=`taglib-config --libs`
     fi
 
-    if test $taglib_minor -lt 6 || ! check_class_headers_cpp taglib/fileref.h TagLib::FileRef $tagincludes $taglibs -lstdc++; then
-        die "ERROR: cannot find taglib 1.6 or later."
+    if test $taglib_minor -lt 7 || ! check_class_headers_cpp taglib/fileref.h TagLib::FileRef $tagincludes $taglibs -lstdc++; then
+        die "ERROR: cannot find taglib 1.7 or later."
     fi
 fi
 
