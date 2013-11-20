@@ -16,7 +16,7 @@
 #ifndef ZMSERVER_H
 #define ZMSERVER_H
 
-
+#include <stdint.h>
 #include <unistd.h>
 #include <string>
 #include <sstream>
@@ -60,7 +60,7 @@ const string RELOAD           = "reload";
 const string RUNNING          = "running";
 
 typedef enum 
-{ 
+{
     IDLE,
     PREALARM,
     ALARM,
@@ -230,7 +230,8 @@ class ZMServer
 
     bool                 m_debug;
     int                  m_sock;
-    map<int, MONITOR *>  m_monitors;
+    vector<MONITOR *>    m_monitors;
+    map<int, MONITOR *>  m_monitorMap;
     bool                 m_useDeepStorage;
     bool                 m_useAnalysisImages;
     string               m_eventFileFormat;

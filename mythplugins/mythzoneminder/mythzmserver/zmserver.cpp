@@ -484,9 +484,9 @@ ZMServer::ZMServer(int sock, bool debug)
 
 ZMServer::~ZMServer()
 {
-    for (std::map<int, MONITOR*>::iterator it = m_monitors.begin(); it != m_monitors.end(); ++it)
+    for (uint x = 0; x < m_monitors.size(); x++)
     {
-        MONITOR *mon = it->second;
+        MONITOR *mon = m_monitors.at(x);
         if (mon->mapFile != -1)
         {
             if (close(mon->mapFile) == -1)
@@ -500,6 +500,7 @@ ZMServer::~ZMServer()
     }
 
     m_monitors.clear();
+    m_monitorMap.clear();
 
     if (m_debug)
         cout << "ZMServer destroyed\n";
@@ -1254,8 +1255,8 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
 
     // try to find the correct MONITOR
     MONITOR *monitor;
-    if (m_monitors.find(monitorID) != m_monitors.end())
-        monitor = m_monitors[monitorID];
+    if (m_monitorMap.find(monitorID) != m_monitorMap.end())
+        monitor = m_monitorMap[monitorID];
     else
     {
         sendError(ERROR_INVALID_MONITOR);
@@ -1412,42 +1413,14 @@ void ZMServer::handleGetCameraList(void)
 
     ADD_STR(outStr, "OK")
 
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-
-    string sql("");
-    sql += "SELECT DISTINCT M.Name FROM Events AS E ";
-    sql += "INNER JOIN Monitors AS M ON E.MonitorId = M.Id;";
-
-    if (mysql_query(&g_dbConn, sql.c_str()))
-    {
-        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
-        sendError(ERROR_MYSQL_QUERY);
-        return;
-    }
-
-    res = mysql_store_result(&g_dbConn);
-    int monitorCount = mysql_num_rows(res);
     char str[10];
-    sprintf(str, "%d", monitorCount);
+    sprintf(str, "%d", (int) m_monitors.size());
     ADD_STR(outStr, str)
 
-    for (int x = 0; x < monitorCount; x++)
+    for (uint x = 0; x < m_monitors.size(); x++)
     {
-        row = mysql_fetch_row(res);
-        if (row)
-        {
-            ADD_STR(outStr, row[0]) // Name
-        }
-        else
-        {
-            cout << "handleGetCameraList: Failed to get mysql row " << x << endl;
-            sendError(ERROR_MYSQL_ROW);
-            return;
-        }
+        ADD_STR(outStr, m_monitors.at(x)->name)
     }
-
-    mysql_free_result(res);
 
     send(outStr);
 }
@@ -1632,6 +1605,7 @@ void ZMServer::handleRunZMAudit(void)
 void ZMServer::getMonitorList(void)
 {
     m_monitors.clear();
+    m_monitorMap.clear();
 
     string sql("SELECT Id, Name, Width, Height, ImageBufferCount, MaxFPS, Palette, ");
     sql += " Type, Function, Enabled, Device, Host, Controllable, TrackMotion";
@@ -1640,6 +1614,7 @@ void ZMServer::getMonitorList(void)
         sql += ", Colours";
 
     sql += " FROM Monitors";
+    sql += " ORDER BY Sequence";
 
     MYSQL_RES *res;
     MYSQL_ROW row;
@@ -1686,7 +1661,8 @@ void ZMServer::getMonitorList(void)
                 else
                     m->bytes_per_pixel = 3;
 
-            m_monitors[m->mon_id] = m;
+            m_monitors.push_back(m);
+            m_monitorMap[m->mon_id] = m;
 
             m->initMonitor(m_debug, m_mmapPath, m_shmKey);
         }
@@ -1884,7 +1860,7 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
     string enabled(tokens[3]);
 
     // Check validity of input passed to server. Does monitor exist && is function ok
-    if (m_monitors.find(atoi(monitorID.c_str())) == m_monitors.end())
+    if (m_monitorMap.find(atoi(monitorID.c_str())) == m_monitorMap.end())
     {
         sendError(ERROR_INVALID_MONITOR);
         return;
@@ -1909,7 +1885,7 @@ void ZMServer::handleSetMonitorFunction(vector<string> tokens)
 
 
     // Now perform db update && (re)start/stop daemons as required.
-    MONITOR *monitor = m_monitors[atoi(monitorID.c_str())];
+    MONITOR *monitor = m_monitorMap[atoi(monitorID.c_str())];
     string oldFunction = monitor->function;
     string newFunction = function;
     int oldEnabled  = monitor->enabled;
