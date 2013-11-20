@@ -195,7 +195,17 @@ class Dvr : public DvrServices
                                                    int            RecType,
                                                    const QDateTime &StartTime );
 
-        QString           RecTypeToString      ( int              RecType   );
+        QString           RecTypeToString      ( QString          RecType   );
+
+        QString           RecTypeToDescription ( QString          RecType   );
+
+        QString           DupMethodToString    ( QString          DupMethod );
+
+        QString           DupMethodToDescription ( QString        DupMethod );
+
+        QString           DupInToString        ( QString          DupIn     );
+
+        QString           DupInToDescription   ( QString          DupIn     );
 };
 
 // --------------------------------------------------------------------------
@@ -408,9 +418,34 @@ class ScriptableDvr : public QObject
                                                 StartTime );
         }
 
-        QString RecTypeToString( int RecType )
+        QString RecTypeToString( QString RecType )
         {
             return m_obj.RecTypeToString( RecType );
+        }
+
+        QString RecTypeToDescription( QString RecType )
+        {
+            return m_obj.RecTypeToDescription( RecType );
+        }
+
+        QString DupMethodToString( QString DupMethod )
+        {
+            return m_obj.DupMethodToString( DupMethod );
+        }
+
+        QString DupMethodToDescription( QString DupMethod )
+        {
+            return m_obj.DupMethodToDescription( DupMethod );
+        }
+
+        QString DupInToString( QString DupIn )
+        {
+            return m_obj.DupInToString( DupIn );
+        }
+
+        QString DupInToDescription( QString DupIn )
+        {
+            return m_obj.DupInToDescription( DupIn );
         }
 };
 

@@ -21,7 +21,7 @@ int RecTypePrecedence(RecordingType rectype)
      }
 }
 
-/// \brief Converts "rectype" into a human readable description.
+/// \brief Converts "rectype" into a human readable string.
 QString toString(RecordingType rectype)
 {
     switch (rectype)
@@ -46,7 +46,33 @@ QString toString(RecordingType rectype)
     }
 }
 
-/// \brief Converts "rectype" into an untranslated description.
+/// \brief Converts "rectype" into a human readable description.
+QString toDescription(RecordingType rectype)
+{
+    switch (rectype)
+    {
+        case kSingleRecord:
+            return QObject::tr("Record only this showing");
+        case kAllRecord:
+            return QObject::tr("Record all showings");
+        case kOneRecord:
+            return QObject::tr("Record only one showing");
+        case kDailyRecord:
+            return QObject::tr("Record one showing every day");
+        case kWeeklyRecord:
+            return QObject::tr("Record one showing every week");
+        case kOverrideRecord:
+            return QObject::tr("Record this showing with override options");
+        case kDontRecord:
+            return QObject::tr("Do not record this showing");
+        case kTemplateRecord:
+            return QObject::tr("Modify this recording rule template");
+        default:
+            return QObject::tr("Do not record this program");
+    }
+}
+
+/// \brief Converts "rectype" into an untranslated string.
 QString toRawString(RecordingType rectype)
 {
     switch (rectype)
@@ -62,8 +88,11 @@ QString toRawString(RecordingType rectype)
         case kWeeklyRecord:
             return QString("Record Weekly");
         case kOverrideRecord:
-        case kDontRecord:
             return QString("Override Recording");
+        case kDontRecord:
+            return QString("Do not Record");
+        case kTemplateRecord:
+            return QString("Recording Template");
         default:
             return QString("Not Recording");
     }
@@ -123,6 +152,41 @@ QChar toQChar(RecordingType rectype)
     return (ret.isEmpty()) ? QChar(' ') : ret[0];
 }
 
+QString toString(RecordingDupInType recdupin)
+{
+    switch (recdupin)
+    {
+        case kDupsInRecorded:
+            return QObject::tr("Current Recordings");
+        case kDupsInOldRecorded:
+            return QObject::tr("Previous Recordings");
+        case kDupsInAll:
+            return QObject::tr("All Recordings");
+        case kDupsNewEpi:
+            return QObject::tr("New Episodes Only");
+        default:
+            return QString();
+    }
+}
+
+QString toDescription(RecordingDupInType recdupin)
+{
+    switch (recdupin)
+    {
+        case kDupsInRecorded:
+            return QObject::tr("Look for duplicates in current recordings only");
+        case kDupsInOldRecorded:
+            return QObject::tr("Look for duplicates in previous recordings only");
+        case kDupsInAll:
+            return QObject::tr("Look for duplicates in current and previous "
+                               "recordings");
+        case kDupsNewEpi:
+            return QObject::tr("Record new episodes only");
+        default:
+            return QString();
+    }
+}
+
 QString toRawString(RecordingDupInType recdupin)
 {
     switch (recdupin)
@@ -152,6 +216,44 @@ RecordingDupInType dupInFromString(QString type)
         return kDupsNewEpi;
     else
         return kDupsInAll;
+}
+
+QString toString(RecordingDupMethodType duptype)
+{
+    switch (duptype)
+    {
+        case kDupCheckNone:
+            return QObject::tr("None");
+        case kDupCheckSub:
+            return QObject::tr("Subtitle");
+        case kDupCheckDesc:
+            return QObject::tr("Description");
+        case kDupCheckSubDesc:
+            return QObject::tr("Subtitle and Description");
+        case kDupCheckSubThenDesc:
+            return QObject::tr("Subtitle then Description");
+        default:
+            return QString();
+    }
+}
+
+QString toDescription(RecordingDupMethodType duptype)
+{
+    switch (duptype)
+    {
+        case kDupCheckNone:
+            return QObject::tr("Don't match duplicates");
+        case kDupCheckSub:
+            return QObject::tr("Match duplicates using subtitle");
+        case kDupCheckDesc:
+            return QObject::tr("Match duplicates using description");
+        case kDupCheckSubDesc:
+            return QObject::tr("Match duplicates using subtitle & description");
+        case kDupCheckSubThenDesc:
+            return QObject::tr("Match duplicates using subtitle then description");
+        default:
+            return QString();
+    }
 }
 
 QString toRawString(RecordingDupMethodType duptype)

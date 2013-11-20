@@ -10,6 +10,7 @@
 #include "mythcorecontext.h"
 #include "storagegroup.h"
 #include "programtypes.h"
+#include "recordingtypes.h"
 
 // Libmythtv
 #include "playgroup.h"
@@ -261,19 +262,19 @@ void ScheduleEditor::Load()
                                          ENUM_TO_QVARIANT(kNotRecording));
             }
             new MythUIButtonListItem(m_rulesList,
-                                     tr("Modify this recording rule template"),
+                                     toDescription(kTemplateRecord),
                                      ENUM_TO_QVARIANT(kTemplateRecord));
         }
         else if (m_recordingRule->m_isOverride)
         {
             new MythUIButtonListItem(m_rulesList,
-                                 tr("Record this showing with normal options"),
+                                     tr("Record this showing with normal options"),
                                      ENUM_TO_QVARIANT(kNotRecording));
             new MythUIButtonListItem(m_rulesList,
-                               tr("Record this showing with override options"),
+                                     toDescription(kOverrideRecord),
                                      ENUM_TO_QVARIANT(kOverrideRecord));
             new MythUIButtonListItem(m_rulesList,
-                                tr("Do not record this showing"),
+                                     toDescription(kDontRecord),
                                      ENUM_TO_QVARIANT(kDontRecord));
         }
         else
@@ -282,27 +283,27 @@ void ScheduleEditor::Load()
             bool isManual = (m_recordingRule->m_searchType == kManualSearch);
 
             new MythUIButtonListItem(m_rulesList,
-                                     tr("Do not record this program"),
+                                     toDescription(kNotRecording),
                                      ENUM_TO_QVARIANT(kNotRecording));
             if (hasChannel)
                 new MythUIButtonListItem(m_rulesList,
-                                         tr("Record only this showing"),
+                                         toDescription(kSingleRecord),
                                          ENUM_TO_QVARIANT(kSingleRecord));
             if (!isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         tr("Record only one showing"),
+                                         toDescription(kOneRecord),
                                          ENUM_TO_QVARIANT(kOneRecord));
             if (!hasChannel || isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         tr("Record one showing every week"),
+                                         toDescription(kWeeklyRecord),
                                          ENUM_TO_QVARIANT(kWeeklyRecord));
             if (!hasChannel || isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         tr("Record one showing every day"),
+                                         toDescription(kDailyRecord),
                                          ENUM_TO_QVARIANT(kDailyRecord));
             if (!isManual)
                 new MythUIButtonListItem(m_rulesList,
-                                         tr("Record all showings"),
+                                         toDescription(kAllRecord),
                                          ENUM_TO_QVARIANT(kAllRecord));
         }
 
@@ -2074,19 +2075,19 @@ void SchedOptMixin::Load(void)
             RecordingDupMethodType dupMethod = m_rule->m_dupMethod;
 
             new MythUIButtonListItem(m_dupmethodList,
-               QObject::tr("Match duplicates using subtitle & description"),
+                                     toDescription(kDupCheckSubDesc),
                                      ENUM_TO_QVARIANT(kDupCheckSubDesc));
             new MythUIButtonListItem(m_dupmethodList,
-               QObject::tr("Match duplicates using subtitle then description"),
+                                     toDescription(kDupCheckSubThenDesc),
                                      ENUM_TO_QVARIANT(kDupCheckSubThenDesc));
             new MythUIButtonListItem(m_dupmethodList,
-               QObject::tr("Match duplicates using subtitle"),
+                                     toDescription(kDupCheckSub),
                                      ENUM_TO_QVARIANT(kDupCheckSub));
             new MythUIButtonListItem(m_dupmethodList,
-               QObject::tr("Match duplicates using description"),
+                                     toDescription(kDupCheckDesc),
                                      ENUM_TO_QVARIANT(kDupCheckDesc));
             new MythUIButtonListItem(m_dupmethodList,
-               QObject::tr("Don't match duplicates"),
+                                     toDescription(kDupCheckNone),
                                      ENUM_TO_QVARIANT(kDupCheckNone));
 
             m_rule->m_dupMethod = dupMethod;
@@ -2100,19 +2101,19 @@ void SchedOptMixin::Load(void)
         if (!m_loaded)
         {
             new MythUIButtonListItem(m_dupscopeList,
-                QObject::tr("Look for duplicates in current and previous "
-                            "recordings"), ENUM_TO_QVARIANT(kDupsInAll));
+                                     toDescription(kDupsInAll),
+                                     ENUM_TO_QVARIANT(kDupsInAll));
             new MythUIButtonListItem(m_dupscopeList,
-                QObject::tr("Look for duplicates in current recordings only"),
+                                     toDescription(kDupsInRecorded),
                                      ENUM_TO_QVARIANT(kDupsInRecorded));
             new MythUIButtonListItem(m_dupscopeList,
-                QObject::tr("Look for duplicates in previous recordings only"),
+                                     toDescription(kDupsInOldRecorded),
                                      ENUM_TO_QVARIANT(kDupsInOldRecorded));
             if (m_haveRepeats && !m_newrepeatList &&
                 (!m_other || !m_other->m_newrepeatList))
             {
                 new MythUIButtonListItem(m_dupscopeList,
-                    QObject::tr("Record new episodes only"),
+                                 toDescription(kDupsNewEpi),
                                  ENUM_TO_QVARIANT(kDupsNewEpi|kDupsInAll));
             }
         }

@@ -32,6 +32,7 @@ typedef enum RecordingTypes
     kTemplateRecord = 11
 } RecordingType; // note stored in uint8_t in ProgramInfo
 MPUBLIC QString toString(RecordingType);
+MPUBLIC QString toDescription(RecordingType);
 MPUBLIC QString toRawString(RecordingType);
 MPUBLIC QChar   toQChar( RecordingType);
 MPUBLIC RecordingType recTypeFromString(QString);
@@ -45,6 +46,8 @@ typedef enum RecordingDupInTypes
     kDupsInAll          = 0x0F,
     kDupsNewEpi         = 0x10
 } RecordingDupInType; // note stored in uint8_t in ProgramInfo
+MPUBLIC QString toString(RecordingDupInType);
+MPUBLIC QString toDescription(RecordingDupInType);
 MPUBLIC QString toRawString(RecordingDupInType);
 MPUBLIC RecordingDupInType dupInFromString(QString);
 
@@ -56,6 +59,8 @@ typedef enum RecordingDupMethodType
     kDupCheckSubDesc  = 0x06,
     kDupCheckSubThenDesc = 0x08
 } RecordingDupMethodType; // note stored in uint8_t in ProgramInfo
+MPUBLIC QString toString(RecordingDupMethodType);
+MPUBLIC QString toDescription(RecordingDupMethodType);
 MPUBLIC QString toRawString(RecordingDupMethodType);
 MPUBLIC RecordingDupMethodType dupMethodFromString(QString);
 
@@ -68,6 +73,7 @@ typedef enum RecSearchTypes
     kPeopleSearch,
     kManualSearch
 } RecSearchType;
+MPUBLIC QString toString(RecSearchType);
 MPUBLIC QString toRawString(RecSearchType);
 MPUBLIC RecSearchType searchTypeFromString(QString);
 
