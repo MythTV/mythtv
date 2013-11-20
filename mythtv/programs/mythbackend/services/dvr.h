@@ -76,6 +76,8 @@ class Dvr : public DvrServices
 
         DTC::EncoderList* GetEncoderList      ( );
 
+        DTC::InputList*   GetInputList        ( );
+
         QStringList       GetRecGroupList     ( );
 
         QStringList       GetTitleList        ( const QString   &RecGroup );
@@ -287,6 +289,8 @@ class ScriptableDvr : public QObject
         }
 
         QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }
+
+        QObject* GetInputList       () { return m_obj.GetInputList();   }
 
         QStringList GetRecGroupList () { return m_obj.GetRecGroupList(); }
 

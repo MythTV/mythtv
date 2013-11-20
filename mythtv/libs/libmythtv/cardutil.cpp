@@ -1165,7 +1165,9 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname, sourceid, cardid, livetvorder "
+    query.prepare("SELECT "
+                  "inputname, sourceid, cardid, livetvorder, "
+                  "schedorder, displayname, recpriority, quicktune "
                   "FROM cardinput "
                   "WHERE cardinputid = :INPUTID");
     query.bindValue(":INPUTID", input.inputid);
@@ -1183,11 +1185,50 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
     input.sourceid = query.value(1).toUInt();
     input.cardid   = query.value(2).toUInt();
     input.livetvorder = query.value(3).toUInt();
+    input.scheduleOrder = query.value(4).toUInt();
+    input.displayName = query.value(5).toString();
+    input.recPriority = query.value(6).toInt();
+    input.quickTune = query.value(7).toBool();
 
     if (groupids)
         *groupids = GetInputGroups(input.inputid);
 
     return true;
+}
+
+QList<InputInfo> CardUtil::GetAllInputInfo()
+{
+    QList<InputInfo> infoInputList;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardinputid, "
+                  "inputname, sourceid, cardid, livetvorder, "
+                  "schedorder, displayname, recpriority, quicktune "
+                  "FROM cardinput");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::GetAllInputInfo()", query);
+        return infoInputList;
+    }
+
+    while (query.next())
+    {
+        InputInfo input;
+        input.inputid  = query.value(0).toUInt();
+        input.name     = query.value(1).toString();
+        input.sourceid = query.value(2).toUInt();
+        input.cardid   = query.value(3).toUInt();
+        input.livetvorder = query.value(4).toUInt();
+        input.scheduleOrder = query.value(5).toUInt();
+        input.displayName = query.value(6).toString();
+        input.recPriority = query.value(7).toInt();
+        input.quickTune = query.value(8).toBool();
+
+        infoInputList.push_back(input);
+    }
+
+    return infoInputList;
 }
 
 uint CardUtil::GetCardID(uint inputid)

@@ -17,29 +17,6 @@ InputInfo::InputInfo(
     name.detach();
 }
 
-InputInfo::InputInfo(const InputInfo &other) :
-    name(other.name),
-    sourceid(other.sourceid),
-    inputid(other.inputid),
-    cardid(other.cardid),
-    mplexid(other.mplexid),
-    livetvorder(other.livetvorder)
-{
-    name.detach();
-}
-
-InputInfo &InputInfo::operator=(const InputInfo &other)
-{
-    name     = other.name;
-    name.detach();
-    sourceid = other.sourceid;
-    inputid  = other.inputid;
-    cardid   = other.cardid;
-    mplexid  = other.mplexid;
-    livetvorder = other.livetvorder;
-    return *this;
-}
-
 void InputInfo::Clear(void)
 {
     InputInfo blank;
@@ -62,7 +39,16 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     inputid  = (*it).toUInt(); NEXT();
     cardid   = (*it).toUInt(); NEXT();
     mplexid  = (*it).toUInt(); NEXT();
-    livetvorder = (*it).toUInt(); ++it;
+    livetvorder = (*it).toUInt(); NEXT();
+
+    displayName = *it;
+    displayName.detach();
+    displayName = (displayName == "<EMPTY>") ? QString::null : displayName;
+    NEXT();
+
+    recPriority = (*it).toInt(); NEXT();
+    scheduleOrder = (*it).toUInt(); NEXT();
+    quickTune = (*it).toUInt(); ++it;
 
     return true;
 }
@@ -76,6 +62,10 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(cardid));
     list.push_back(QString::number(mplexid));
     list.push_back(QString::number(livetvorder));
+    list.push_back(displayName.isEmpty() ? "<EMPTY>" : displayName);
+    list.push_back(QString::number(recPriority));
+    list.push_back(QString::number(scheduleOrder));
+    list.push_back(QString::number(quickTune));
 }
 
 TunedInputInfo::TunedInputInfo(

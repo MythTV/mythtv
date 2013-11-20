@@ -3,7 +3,7 @@
 // Created     : Jan. 15, 2010
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,7 @@
 #include "serviceexp.h" 
 #include "datacontracthelper.h"
 
+#include "input.h"
 #include "programAndChannel.h"
 
 namespace DTC
@@ -28,6 +29,8 @@ class SERVICE_PUBLIC Encoder : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
 
+    Q_CLASSINFO( "Inputs", "type=DTC::Input");
+
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         HostName        READ HostName         WRITE setHostName       )
     Q_PROPERTY( bool            Local           READ Local            WRITE setLocal          )
@@ -36,6 +39,7 @@ class SERVICE_PUBLIC Encoder : public QObject
     Q_PROPERTY( int             SleepStatus     READ SleepStatus      WRITE setSleepStatus    )
     Q_PROPERTY( bool            LowOnFreeSpace  READ LowOnFreeSpace   WRITE setLowOnFreeSpace )
 
+    Q_PROPERTY( QVariantList    Inputs          READ Inputs    DESIGNABLE true )
     Q_PROPERTY( QObject*        Recording       READ Recording  )
 
     PROPERTYIMP    ( int        , Id             )
@@ -47,6 +51,8 @@ class SERVICE_PUBLIC Encoder : public QObject
     PROPERTYIMP    ( bool       , LowOnFreeSpace )
 
     PROPERTYIMP_PTR( Program    , Recording      )
+
+    PROPERTYIMP_RO_REF( QVariantList, Inputs     )
 
     public:
 
@@ -85,7 +91,21 @@ class SERVICE_PUBLIC Encoder : public QObject
             if ( src.m_Recording != NULL)
                 Recording()->Copy( *(src.m_Recording) );
 
+            CopyListContents< Input >( this, m_Inputs, src.m_Inputs );
         }
+
+        Input *AddNewInput()
+        {
+            // We must make sure the object added to the QVariantList has
+            // a parent of 'this'
+
+            Input *pObject = new Input( this );
+            Inputs().append( QVariant::fromValue<QObject *>( pObject ));
+
+            return pObject;
+        }
+
+
 };
 
 } // namespace DTC

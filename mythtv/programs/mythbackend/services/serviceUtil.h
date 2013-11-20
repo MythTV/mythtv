@@ -31,11 +31,13 @@
 #include "datacontracts/artworkInfoList.h"
 #include "datacontracts/videoMetadataInfo.h"
 #include "datacontracts/channelGroup.h"
+#include "datacontracts/input.h"
 
 #include "programinfo.h"
 #include "recordingrule.h"
 #include "videometadatalistmanager.h"
 #include "channelgroup.h"
+#include "inputinfo.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -60,4 +62,5 @@ void FillVideoMetadataInfo (
                       VideoMetadataListManager::VideoMetadataPtr pMetadata,
                       bool          bDetails);
 
+void FillInputInfo( DTC::Input *input, InputInfo inputInfo);
 #endif

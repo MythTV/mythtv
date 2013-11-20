@@ -39,11 +39,13 @@
 #include "remoteutil.h"
 #include "mythdate.h"
 #include "recordinginfo.h"
+#include "cardutil.h"
+#include "inputinfo.h"
 #include "programtypes.h"
 #include "recordingtypes.h"
 
 #include "serviceUtil.h"
-#include <mythscheduler.h>
+#include "mythscheduler.h"
 #include "scheduler.h"
 
 extern QMap<int, EncoderLink *> tvList;
@@ -264,8 +266,10 @@ DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
 
 DTC::EncoderList* Dvr::GetEncoderList()
 {
+
     DTC::EncoderList* pList = new DTC::EncoderList();
 
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
     QMap<int, EncoderLink *>::Iterator iter = tvList.begin();
 
     for (; iter != tvList.end(); ++iter)
@@ -287,6 +291,17 @@ DTC::EncoderList* Dvr::GetEncoderList()
                 pEncoder->setHostName( gCoreContext->GetHostName() );
             else
                 pEncoder->setHostName( elink->GetHostName() );
+
+            QList<InputInfo>::iterator it = inputInfoList.begin();
+            for (; it < inputInfoList.end(); ++it)
+            {
+                InputInfo inputInfo = *it;
+                if (inputInfo.cardid == static_cast<uint>(elink->GetCardID()))
+                {
+                    DTC::Input *input = pEncoder->AddNewInput();
+                    FillInputInfo(input, inputInfo);
+                }
+            }
 
             switch ( pEncoder->State() )
             {
@@ -313,6 +328,26 @@ DTC::EncoderList* Dvr::GetEncoderList()
             }
         }
     }
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::InputList* Dvr::GetInputList()
+{
+    DTC::InputList *pList = new DTC::InputList();
+
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    QList<InputInfo>::iterator it = inputInfoList.begin();
+    for (; it < inputInfoList.end(); ++it)
+    {
+        InputInfo inputInfo = *it;
+        DTC::Input *input = pList->AddNewInput();
+        FillInputInfo(input, inputInfo);
+    }
+
     return pList;
 }
 

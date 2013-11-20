@@ -46,7 +46,8 @@ HEADERS += datacontracts/labelValue.h
 HEADERS += datacontracts/logMessage.h            datacontracts/logMessageList.h
 HEADERS += datacontracts/imageMetadataInfoList.h datacontracts/imageMetadataInfo.h
 HEADERS += datacontracts/imageSyncInfo.h         datacontracts/channelGroup.h
-HEADERS += datacontracts/channelGroupList.h
+HEADERS += datacontracts/channelGroupList.h      datacontracts/input.h
+HEADERS += datacontracts/inputList.h
 
 SOURCES += service.cpp
 
@@ -89,7 +90,8 @@ incDatacontracts.files += datacontracts/labelValue.h
 incDatacontracts.files += datacontracts/logMessage.h          datacontracts/logMessageList.h
 incDatacontracts.files += datacontracts/imageMetadataInfoList.h datacontracts/imageMetadataInfo.h
 incDatacontracts.files += datacontracts/imageSyncInfo.h       datacontracts/channelGroup.h
-incDatacontracts.files += datacontracts/channelGroupList.h
+incDatacontracts.files += datacontracts/channelGroupList.h    datacontracts/input.h
+incDatacontracts.files += datacontracts/inputList.h
 
 INSTALLS += inc incServices incDatacontracts
 

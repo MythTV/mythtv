@@ -421,3 +421,20 @@ void FillVideoMetadataInfo (
         }
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
+{
+    input->setId(inputInfo.inputid);
+    input->setInputName(inputInfo.name);
+    input->setCardId(inputInfo.cardid);
+    input->setSourceId(inputInfo.sourceid);
+    input->setDisplayName(inputInfo.displayName);
+    input->setLiveTVOrder(inputInfo.livetvorder);
+    input->setScheduleOrder(inputInfo.scheduleOrder);
+    input->setRecPriority(inputInfo.recPriority);
+    input->setQuickTune(inputInfo.quickTune);
+}

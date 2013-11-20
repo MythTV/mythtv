@@ -10,6 +10,7 @@
 using namespace std;
 
 // Qt headers
+#include <QList>
 #include <QStringList>
 #include <QMap>
 
@@ -293,6 +294,7 @@ class MTV_PUBLIC CardUtil
     static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
+    static QList<InputInfo> GetAllInputInfo();
     static uint         GetCardID(uint inputid);
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);

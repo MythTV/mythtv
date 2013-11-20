@@ -13,13 +13,50 @@ class MTV_PUBLIC InputInfo
 {
   public:
     InputInfo() : name(QString::null),
-                  sourceid(0), inputid(0), cardid(0), mplexid(0), 
-                  livetvorder(0) {}
+                  sourceid(0), inputid(0), cardid(0), mplexid(0),
+                  recPriority(0), scheduleOrder(0),
+                  livetvorder(0), quickTune(false) {}
     InputInfo(const QString &name,
               uint sourceid, uint inputid, uint cardid, uint mplexid, 
               uint livetvorder);
-    InputInfo(const InputInfo &other);
-    InputInfo &operator=(const InputInfo &other);
+
+    InputInfo(const InputInfo &other) :
+        name(other.name),
+        sourceid(other.sourceid),
+        inputid(other.inputid),
+        cardid(other.cardid),
+        mplexid(other.mplexid),
+        displayName(other.displayName),
+        recPriority(other.recPriority),
+        scheduleOrder(other.scheduleOrder),
+        livetvorder(other.livetvorder),
+        quickTune(other.quickTune)
+    {
+        name.detach();
+    }
+
+    InputInfo &operator=(const InputInfo &other)
+    {
+        name     = other.name;
+        name.detach();
+        sourceid = other.sourceid;
+        inputid  = other.inputid;
+        cardid   = other.cardid;
+        mplexid  = other.mplexid;
+        displayName = other.displayName;
+        recPriority = other.recPriority;
+        scheduleOrder = other.scheduleOrder;
+        livetvorder = other.livetvorder;
+        quickTune = other.quickTune;
+        return *this;
+    }
+
+    bool operator == (uint _inputid) const
+        { return inputid == _inputid; }
+
+    bool operator == (const QString &_name) const
+        { return name == _name; }
+
     virtual ~InputInfo() {}
 
     virtual bool FromStringList(QStringList::const_iterator &it,
@@ -29,19 +66,17 @@ class MTV_PUBLIC InputInfo
     virtual void Clear(void);
     virtual bool IsEmpty(void) const { return name.isEmpty(); }
 
-    bool operator == (uint _inputid) const
-        { return inputid == _inputid; }
-
-    bool operator == (const QString &_name) const
-        { return name == _name; }
-
   public:
     QString name;     ///< input name
     uint    sourceid; ///< associated channel listings source
     uint    inputid;  ///< unique key in DB for this input
     uint    cardid;   ///< card id associated with input
     uint    mplexid;  ///< mplexid restriction if applicable
+    QString displayName;
+    int     recPriority;
+    uint    scheduleOrder;
     uint    livetvorder; ///< order for live TV use
+    bool    quickTune;
 };
 
 class MTV_PUBLIC TunedInputInfo : public InputInfo
