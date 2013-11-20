@@ -558,6 +558,8 @@ bool ZMServer::processRequest(char* buf, int nbytes)
         handleGetServerStatus();
     else if (tokens[0] == "GET_MONITOR_STATUS")
         handleGetMonitorStatus();
+    else if (tokens[0] == "GET_ALARM_STATES")
+        handleGetAlarmStates();
     else if (tokens[0] == "GET_EVENT_LIST")
         handleGetEventList(tokens);
     else if (tokens[0] == "GET_EVENT_DATES")
@@ -705,6 +707,32 @@ void ZMServer::handleGetServerStatus(void)
     getDiskSpace(eventsDir, total, used);
     sprintf(buf, "%d%%", (int) ((100.0 / ((float) total / used))));
     ADD_STR(outStr, buf)
+
+    send(outStr);
+}
+
+void ZMServer::handleGetAlarmStates(void)
+{
+    string outStr("");
+    ADD_STR(outStr, "OK")
+
+    // add the monitor count
+    char buf[15];
+    sprintf(buf, "%d", (int)m_monitors.size());
+    ADD_STR(outStr, buf)
+
+    for (int x = 0; x < (int)m_monitors.size(); x++)
+    {
+        MONITOR *monitor = m_monitors.at(x);
+
+        // add monitor ID
+        sprintf(buf, "%d", monitor->mon_id);
+        ADD_STR(outStr, buf)
+
+        // add monitor status
+        sprintf(buf, "%d", monitor->getState());
+        ADD_STR(outStr, buf)
+    }
 
     send(outStr);
 }

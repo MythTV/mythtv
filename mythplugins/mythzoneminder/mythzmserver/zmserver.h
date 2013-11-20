@@ -213,6 +213,7 @@ class ZMServer
                           string enabled);
     void handleGetServerStatus(void);
     void handleGetMonitorStatus(void);
+    void handleGetAlarmStates(void);
     void handleGetMonitorList(void);
     void handleGetCameraList(void);
     void handleGetEventList(vector<string> tokens);
