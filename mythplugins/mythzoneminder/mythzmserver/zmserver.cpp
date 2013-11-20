@@ -65,6 +65,7 @@
 #define ERROR_INVALID_POINTERS "Cannot get shared memory pointers"
 #define ERROR_INVALID_MONITOR_FUNCTION  "Invalid Monitor Function"
 #define ERROR_INVALID_MONITOR_ENABLE_VALUE "Invalid Monitor Enable Value"
+#define ERROR_NO_FRAMES         "No frames found for event"
 
 // Subpixel ordering (from zm_rgb.h)
 // Based on byte order naming. For example, for ARGB (on both little endian or big endian)
@@ -1330,6 +1331,13 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
     res = mysql_store_result(&g_dbConn);
     row = mysql_fetch_row(res);
+
+    // make sure we have some frames to display
+    if (row[1] == NULL || row[2] == NULL)
+    {
+        sendError(ERROR_NO_FRAMES);
+        return;
+    }
 
     string cause = row[0];
     double length = atof(row[1]);
