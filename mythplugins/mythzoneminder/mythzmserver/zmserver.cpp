@@ -718,21 +718,17 @@ void ZMServer::handleGetAlarmStates(void)
     ADD_STR(outStr, "OK")
 
     // add the monitor count
-    char buf[15];
-    sprintf(buf, "%d", (int)m_monitors.size());
-    ADD_STR(outStr, buf)
+    ADD_INT(outStr, m_monitors.size())
 
     for (int x = 0; x < (int)m_monitors.size(); x++)
     {
         MONITOR *monitor = m_monitors.at(x);
 
         // add monitor ID
-        sprintf(buf, "%d", monitor->mon_id);
-        ADD_STR(outStr, buf)
+        ADD_INT(outStr, monitor->mon_id)
 
         // add monitor status
-        sprintf(buf, "%d", monitor->getState());
-        ADD_STR(outStr, buf)
+        ADD_INT(outStr, monitor->getState())
     }
 
     send(outStr);
@@ -795,9 +791,7 @@ void ZMServer::handleGetEventList(vector<string> tokens)
     if (m_debug)
         cout << "Got " << eventCount << " events" << endl;
 
-    char str[10];
-    sprintf(str, "%d", eventCount);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, eventCount)
 
     for (int x = 0; x < eventCount; x++)
     {
@@ -870,9 +864,7 @@ void ZMServer::handleGetEventDates(vector<string> tokens)
     if (m_debug)
         cout << "Got " << dateCount << " dates" << endl;
 
-    char str[10];
-    sprintf(str, "%d", dateCount);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, dateCount)
 
     for (int x = 0; x < dateCount; x++)
     {
@@ -920,9 +912,7 @@ void ZMServer::handleGetMonitorStatus(void)
     if (m_debug)
         cout << "Got " << monitorCount << " monitors" << endl;
 
-    char str[10];
-    sprintf(str, "%d", monitorCount);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, monitorCount)
 
     for (int x = 0; x < monitorCount; x++)
     {
@@ -1114,8 +1104,7 @@ void ZMServer::handleGetEventFrame(vector<string> tokens)
         cout << "Frame size: " <<  fileSize << endl;
 
     // get the file size
-    sprintf(str, "%d", fileSize);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, fileSize)
 
     // send the data
     send(outStr, buffer, fileSize);
@@ -1245,8 +1234,7 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
         cout << "Frame size: " <<  fileSize << endl;
 
     // get the file size
-    sprintf(str, "%d", fileSize);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, fileSize)
 
     // send the data
     send(outStr, buffer, fileSize);
@@ -1255,7 +1243,6 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 void ZMServer::handleGetLiveFrame(vector<string> tokens)
 {
     static unsigned char buffer[MAX_IMAGE_SIZE];
-    char str[100];
 
     // we need to periodically kick the DB connection here to make sure it
     // stays alive because the user may have left the frontend on the live
@@ -1279,8 +1266,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     ADD_STR(outStr, "OK")
 
     // echo the monitor id
-    sprintf(str, "%d", monitorID);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, monitorID)
 
     // try to find the correct MONITOR
     MONITOR *monitor;
@@ -1318,8 +1304,7 @@ void ZMServer::handleGetLiveFrame(vector<string> tokens)
     ADD_STR(outStr, monitor->status)
 
     // send the data size
-    sprintf(str, "%d", dataSize);
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, dataSize)
 
     // send the data
     send(outStr, buffer, dataSize);
@@ -1364,7 +1349,6 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
     string cause = row[0];
     double length = atof(row[1]);
     int frameCount = atoi(row[2]);
-    char str[10];
 
     mysql_free_result(res);
 
@@ -1375,8 +1359,7 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
         if (m_debug)
             cout << "Got " << frameCount << " frames (continuous event)" << endl;
 
-        sprintf(str, "%d\n", frameCount);
-        ADD_STR(outStr, str)
+        ADD_INT(outStr, frameCount)
 
         double delta = length / frameCount;
         double time = 0;
@@ -1411,8 +1394,7 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
         if (m_debug)
             cout << "Got " << frameCount << " frames" << endl;
 
-        sprintf(str, "%d\n", frameCount);
-        ADD_STR(outStr, str)
+        ADD_INT(outStr, frameCount)
 
         for (int x = 0; x < frameCount; x++)
         {
@@ -1442,9 +1424,7 @@ void ZMServer::handleGetCameraList(void)
 
     ADD_STR(outStr, "OK")
 
-    char str[10];
-    sprintf(str, "%d", (int) m_monitors.size());
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, m_monitors.size())
 
     for (uint x = 0; x < m_monitors.size(); x++)
     {
@@ -1463,9 +1443,7 @@ void ZMServer::handleGetMonitorList(void)
     if (m_debug)
         cout << "We have " << m_monitors.size() << " monitors" << endl;
 
-    char str[10];
-    sprintf(str, "%d", (int) m_monitors.size());
-    ADD_STR(outStr, str)
+    ADD_INT(outStr, m_monitors.size())
 
     for (uint x = 0; x < m_monitors.size(); x++)
     {
