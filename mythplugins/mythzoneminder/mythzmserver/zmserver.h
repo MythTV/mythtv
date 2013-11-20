@@ -239,6 +239,7 @@ class ZMServer
     string               m_analysisFileFormat;
     key_t                m_shmKey;
     string               m_mmapPath;
+    char                 m_buf[10];
 };
 
 

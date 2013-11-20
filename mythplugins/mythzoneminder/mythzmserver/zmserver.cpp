@@ -55,6 +55,7 @@
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 
 #define ADD_STR(list,s)  list += s; list += "[]:[]";
+#define ADD_INT(list,n)  sprintf(m_buf, "%d", (int)n); list += m_buf; list += "[]:[]";
 
 // error messages
 #define ERROR_TOKEN_COUNT      "Invalid token count"
@@ -1459,83 +1460,34 @@ void ZMServer::handleGetMonitorList(void)
 
     ADD_STR(outStr, "OK")
 
-    MYSQL_RES *res;
-    MYSQL_ROW row;
-
-    string sql("");
-    sql += "SELECT Id, Name, Width, Height, Palette";
-
-    if (checkVersion(1, 26, 0))
-        sql += ", Colours";
-
-    sql += " FROM Monitors ORDER BY Id";
-
-    if (mysql_query(&g_dbConn, sql.c_str()))
-    {
-        fprintf(stderr, "%s\n", mysql_error(&g_dbConn));
-        sendError(ERROR_MYSQL_QUERY);
-        return;
-    }
-
-    res = mysql_store_result(&g_dbConn);
-    int monitorCount = mysql_num_rows(res);
-
     if (m_debug)
-        cout << "Got " << monitorCount << " monitors" << endl;
+        cout << "We have " << m_monitors.size() << " monitors" << endl;
 
     char str[10];
-    sprintf(str, "%d", monitorCount);
+    sprintf(str, "%d", (int) m_monitors.size());
     ADD_STR(outStr, str)
 
-    for (int x = 0; x < monitorCount; x++)
+    for (uint x = 0; x < m_monitors.size(); x++)
     {
-        row = mysql_fetch_row(res);
-        if (row)
+        MONITOR *mon = m_monitors.at(x);
+
+        ADD_INT(outStr, mon->mon_id)
+        ADD_STR(outStr, mon->name)
+        ADD_INT(outStr, mon->width)
+        ADD_INT(outStr, mon->height)
+        ADD_INT(outStr, mon->bytes_per_pixel)
+
+        if (m_debug)
         {
-            ADD_STR(outStr, row[0]) // Id
-            ADD_STR(outStr, row[1]) // Name
-            ADD_STR(outStr, row[2]) // Width
-            ADD_STR(outStr, row[3]) // Height
-
-            if (checkVersion(1, 26, 0))
-            {
-                ADD_STR(outStr, row[5]) // Colours (bytes per pixel)
-            }
-            else
-            {
-                if (atoi(row[4]) == 1)
-                {
-                    ADD_STR(outStr, "1")
-                }
-                else
-                {
-                    ADD_STR(outStr, "3")
-                }
-            }
-
-            if (m_debug)
-            {
-                cout << "id:             " << row[0] << endl;
-                cout << "name:           " << row[1] << endl;
-                cout << "width:          " << row[2] << endl;
-                cout << "height:         " << row[3] << endl;
-                cout << "palette:        " << row[4] << endl;
-
-                if (checkVersion(1, 26, 0))
-                    cout << "byte per pixel: " << row[5] << endl;
-
-                cout << "-------------------" << endl;
-            }
-        }
-        else
-        {
-            cout << "Failed to get mysql row" << endl;
-            sendError(ERROR_MYSQL_ROW);
-            return;
+            cout << "id:             " << mon->mon_id          << endl;
+            cout << "name:           " << mon->name            << endl;
+            cout << "width:          " << mon->width           << endl;
+            cout << "height:         " << mon->height          << endl;
+            cout << "palette:        " << mon->palette         << endl;
+            cout << "byte per pixel: " << mon->bytes_per_pixel << endl;
+            cout << "-------------------" << endl;
         }
     }
-
-    mysql_free_result(res);
 
     send(outStr);
 }
