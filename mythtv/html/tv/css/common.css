@@ -99,7 +99,7 @@
 
 .contextMenu .button
 {
-    background-color:#333333;
+    background-color:#222222;
     border:1px #444444 solid;
     color: #FFFFFF;
     background-image: linear-gradient(to bottom, #4A4A4A, #222222 60%);
@@ -139,32 +139,30 @@
     font-weight: bold;
 }
 
-.navigateBox SELECT
-{
-    margin: 2px;
-    background-color: #151515;
-    border: 1px #444444 solid;
-    color: #FFFFFF;
-    padding: 3px;
-    text-align: center;
-}
-
-
-.navigateBox SELECT:hover
-{
-    background-color: #003147;
-    border-color: #0B93D5;
-}
-
-.navigateBox SELECT:active
-{
-    background-color: #003147;
-    border-color: #0B93D5;
-}
-
 .navigateBox LABEL
 {
     margin: 3px;
     float: left;
+}
+
+.topBar
+{
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    clear:both;
+    margin: 5px 0px 2px;  /* Top Horizontal Bottom */
+    height: 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    vertical-align: middle;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+
+    background: #2A2A2A;
+    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%),
+                linear-gradient(to right, #555555 1px, transparent 6px);
+    border-top-left-radius: 10px;
+    padding: 6px 4px; /* Vertical Horizontal */
 }
 

@@ -102,7 +102,7 @@ import "/tv/js/constants.js"
     <div class="button recordingMenu" onClick="stopRecording(chanID, startTime)">
         <%=qsTr("Stop Recording")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -197,7 +197,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
     var menu = "normalMenu";
     if (recGroup === "Deleted")
         menu = "deletedMenu";
-    else if (program.Recording.Status == RS_RECORDING)
+    else if (program.Recording.Status == RecordingStatus.RECORDING)
         menu = "normalMenu recordingMenu"; // stopRecMenu
 
     // Used as a unique identifier and also to access the chanid
@@ -223,14 +223,14 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
                 </div>
                 <div class="programBody">
                     <div class="programIcons">
-                        <% if (program.VideoProps & VID_1080) {%><img class="icon_hd1080" src="/tv/images/blank.png" alt="<%=qsTr("HD 1080")%>" title="<%=qsTr("HD 1080")%>" />
-                        <% } else if (program.VideoProps & VID_720) {%><img class="icon_hd720" src="/tv/images/blank.png" alt="<%=qsTr("HD 720")%>" title="<%=qsTr("HD 720")%>" />
-                        <% } else if (program.VideoProps & VID_HDTV) {%><img class="icon_hdtv" src="/tv/images/blank.png" alt="<%=qsTr("HD")%>" title="<%=qsTr("HD")%>" /><%}%>
-                        <% if (program.ProgramFlags & FL_AUTOEXP) {%><img class="icon_flautoexpire" src="/tv/images/blank.png" alt="<%=qsTr("Auto-Expire")%>" title="<%=qsTr("Auto-Expire")%>" /><%}%>
-                        <% if (program.ProgramFlags & FL_WATCHED) {%><img class="icon_flwatched" src="/tv/images/blank.png" alt="<%=qsTr("Watched")%>" title="<%=qsTr("Watched")%>" />
-                        <% } else if (program.ProgramFlags & FL_BOOKMARK) {%><img class="icon_flbookmark" src="/tv/images/blank.png" alt="<%=qsTr("Bookmark")%>" title="<%=qsTr("Bookmark")%>" /><%}%>
-                        <% if (program.ProgramFlags & FL_COMMFLAG) {%><img class="icon_flcommflag" src="/tv/images/blank.png" alt="<%=qsTr("Commercial Flagged")%>" title="<%=qsTr("Commercial Flagged")%>" /><%}%>
-                        <% if (program.CatType == CAT_MOVIE) {%><img class="icon_catmovie" src="/tv/images/blank.png" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%>
+                        <% if (program.VideoProps & VideoProperty.HD1080) {%><img class="icon_hd1080" src="/tv/images/blank.png" alt="<%=qsTr("HD 1080")%>" title="<%=qsTr("HD 1080")%>" />
+                        <% } else if (program.VideoProps & VideoProperty.HD720) {%><img class="icon_hd720" src="/tv/images/blank.png" alt="<%=qsTr("HD 720")%>" title="<%=qsTr("HD 720")%>" />
+                        <% } else if (program.VideoProps & VideoProperty.HDTV) {%><img class="icon_hdtv" src="/tv/images/blank.png" alt="<%=qsTr("HD")%>" title="<%=qsTr("HD")%>" /><%}%>
+                        <% if (program.ProgramFlags & ProgramFlag.AUTOEXP) {%><img class="icon_flautoexpire" src="/tv/images/blank.png" alt="<%=qsTr("Auto-Expire")%>" title="<%=qsTr("Auto-Expire")%>" /><%}%>
+                        <% if (program.ProgramFlags & ProgramFlag.WATCHED) {%><img class="icon_flwatched" src="/tv/images/blank.png" alt="<%=qsTr("Watched")%>" title="<%=qsTr("Watched")%>" />
+                        <% } else if (program.ProgramFlags & ProgramFlag.BOOKMARK) {%><img class="icon_flbookmark" src="/tv/images/blank.png" alt="<%=qsTr("Bookmark")%>" title="<%=qsTr("Bookmark")%>" /><%}%>
+                        <% if (program.ProgramFlags & ProgramFlag.COMMFLAG) {%><img class="icon_flcommflag" src="/tv/images/blank.png" alt="<%=qsTr("Commercial Flagged")%>" title="<%=qsTr("Commercial Flagged")%>" /><%}%>
+                        <% if (program.CatType == CategoryType.MOVIE) {%><img class="icon_catmovie" src="/tv/images/blank.png" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%>
                     </div>
                     <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
                     <% if (program.Season > 0 || program.Episode > 0) { %>

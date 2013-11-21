@@ -19,25 +19,6 @@
     overflow: hidden;
 }
 
-.recordingList .topBar
-{
-    clear: both;
-    margin: 5px 0px 2px;  /* Top Horizontal Bottom */
-    height: 30px;
-    font-size: 1.1em;
-    font-weight: bold;
-    vertical-align: middle;
-    position: relative;
-    text-align: center;
-    overflow: hidden;
-
-    background: #2A2A2A;
-    background-image: linear-gradient(to bottom, #555555 4%, transparent 25%),
-                linear-gradient(to right, #555555 1px, transparent 6px);
-    border-top-left-radius: 10px;
-    padding: 6px 4px; /* Vertical Horizontal */
-}
-
 .recordingList .recordingRow
 {
     clear: both;
@@ -263,4 +244,5 @@
     background: #2A2A2A;
     background-image: linear-gradient(to bottom, #555555 4%, transparent 25%);
     border-radius: 8px;
+    width: 42px;
 }

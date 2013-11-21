@@ -73,7 +73,7 @@ import "/tv/js/constants.js"
     <div class="button normalMenu" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -164,7 +164,7 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
         <div class="programBox">
             <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                 <div class="programHeader">
-                    <span class="programTitle"><% if (program.CatType == CAT_MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%>
+                    <span class="programTitle"><% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%>
                                                <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
                     <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
                 </div>

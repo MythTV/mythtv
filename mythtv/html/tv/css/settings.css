@@ -1,0 +1,106 @@
+
+fieldset
+{
+    border: none;
+}
+
+.setting
+{
+    margin-bottom: 20px;
+}
+
+.setting label
+{
+    width: 15%;
+    margin-right: 7px;
+    font-weight: bold;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+input[type=range]
+{
+    -webkit-appearance: none;
+    position: relative;
+    background-color: #303030;
+    border: none;
+    border-bottom: 2px #444444 solid;
+    border-radius: 15px;
+    height: 21px;
+    padding: 0px;
+}
+
+input[type=range]::-webkit-slider-thumb
+{
+    -webkit-appearance: none;
+    position: relative;
+    top: 0px;
+    z-index: 1;
+    width: 17px;
+    height: 17px;
+    background-color: #444444;
+    border-radius: 10px;
+    border: 1px #4A4A4A solid;
+    background-image: linear-gradient(to bottom, #4A4A4A, #222222 60%);
+}
+
+input[type=range]::-webkit-slider-thumb:hover
+{
+    background-color: #003147;
+    border-color: #0B93D5;
+    background-image: linear-gradient(to bottom, #225369, #003147 60%);
+}
+
+input[type=range]::-webkit-slider-thumb:focus
+{
+    background-color: #0B93D5;
+    background-image: linear-gradient(to bottom, #2DB5F7, #0B93D5 60%);
+    border-color: #0B93D5;
+}
+
+.setting-toggle .setting-toggle-background
+{
+    width: 55px;
+    height: 24px;
+    position: relative;
+    text-align: center;
+    display: inline-block;
+}
+
+.setting-range input[type=range]
+{
+    width: 60%;
+    vertical-align: middle;
+}
+
+.setting-toggle input[type=range]
+{
+    width: 40px;
+    vertical-align: middle;
+}
+
+.setting-range > input:hover ~ output
+{
+    background-color: #003147;
+    border-color: #0B93D5;
+}
+
+.setting-range > input:focus ~ output
+{
+    background-color: #151515;
+    border-color: #0B93D5;
+    color: #FFFFFF;
+}
+
+.setting-range output
+{
+    width: 20%;
+}
+
+.setting-range span,
+.setting-toggle span
+{
+    padding: 0px 2px;
+    font-size: 0.8em;
+}
+

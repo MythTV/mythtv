@@ -149,7 +149,7 @@ import "/tv/js/constants.js"
     <div class="button delSchedMenu" onClick="deleteRecRule(chanID, startTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime, this.parentNode.id)">
+    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>
@@ -348,7 +348,7 @@ if (chanGroups.length)
                 <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
                     <div class="programHeader">
                         <div class="programTitle">
-                            <% if (program.CatType == CAT_MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                            <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
                         </div>
                     </div>
                     <div class="programBody">

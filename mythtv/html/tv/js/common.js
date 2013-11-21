@@ -206,10 +206,12 @@ function hideDetail(parent)
     toggleVisibility(layer, false);
 }
 
-function loadScheduler(chanID, startTime, from)
+function loadScheduler(chanID, startTime)
 {
-    hideMenu(from);
-    loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime);
+    hideMenu("optMenu");
+    var layer = document.getElementById(chanID + "_" + startTime);
+    var recRuleID = layer.getAttribute("data-recordid");
+    loadContent('/tv/schedule.qsp?chanId=' + chanID + '&amp;startTime=' + startTime + '&amp;recRuleId' + recRuleID);
 }
 
 function checkRecordingStatus(chanID, startTime)

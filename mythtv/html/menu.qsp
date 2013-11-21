@@ -3,6 +3,7 @@
   <ul class="menu collapsible">
     <li><a href='#'><i18n>TV</i18n></a>
         <ul class="acitem collapsible">
+            <!-- <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/schedule.qsp?chanId=13941&startTime=2013-11-22T21:00:00.000Z&recRuleId=0')"><%=qsTr("Schedule Editor")%></a></li> -->
             <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/guide.qsp')"><%=qsTr("Program Guide")%></a></li>
             <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/recordings.qsp')"><%=qsTr("Recordings")%></a></li>
             <li><a class='menuitem' href='#' onClick="javascript:loadContent('/tv/upcoming.qsp')"><%=qsTr("Upcoming Recordings")%></a></li>

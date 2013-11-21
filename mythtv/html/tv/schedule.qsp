@@ -1,12 +1,203 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Schedule Editor</title>
-<link rel="stylesheet" type="text/css" href="/css/site.css">
-</head>
-<body>
-<h2>Schedule Editor</h2>
-<p>Sorry Folks, this has yet to be written. Please check back soon.</p>
-</body>
-</html>
+<%
+"use strict";
+
+import "/js/utility.js"
+import "/tv/js/constants.js"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var myth = new Myth();
+    var dvr = new Dvr();
+
+    var startTime;
+    if (getArg("StartTime"))
+        startTime = myth.ParseISODateString(getArg("StartTime"));
+
+    var chanId = 0;
+    if (getArg("ChanId"))
+        chanId = Number(getArg("ChanId"));
+
+    var recRuleId = 0;
+    if (getArg("RecRuleId"))
+        recRuleId = Number(getArg("recRuleId"));
+
+    var recRule = dvr.GetRecordSchedule(recRuleId, "", chanId, startTime, false);
+
+    var inputList = dvr.GetInputList().Inputs;
+%>
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/settings.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/scheduler.css">
+<script src="/tv/js/settings.js"></script>
+
+<div class="topBar">
+    <%=escapeHTML(recRule.Title)%>
+</div>
+
+<div class="programBody">
+    <div class="programDescription">
+        <%=escapeHTML(recRule.Description)%>
+    </div>
+</div>
+
+<div id="editor-form">
+  <ul>
+    <li><a href="#page-1"><%=qsTr("Schedule Options")%></a></li>
+    <li><a href="#page-2"><%=qsTr("Storage Options")%></a></li>
+    <li><a href="#page-3"><%=qsTr("Post Processing")%></a></li>
+    <li><a href="#page-4"><%=qsTr("Metadata Options")%></a></li>
+    <li><a href="#page-5"><%=qsTr("Filters")%></a></li>
+  </ul>
+  <form autocomplete="on">
+    <input type="hidden" name="Id" id="rule-Id" />
+    <div id="page-1"> <!-- Schedule Options -->
+        <fieldset>
+
+        <div style="border:1px #CC0000 solid;background-color:#660000;padding:7px;margin:5px;">
+            This feature is incomplete, any modifications made will not be saved!
+        </div>
+
+        <div class="setting setting-select">
+            <label for="Type"><%=qsTr("Rule Type")%>:</label>
+            <select name="Type" id="rule-Type" autofocus required>
+            <% for (var name in RecordingType)
+               {
+                    if (RecordingType[name] == RecordingType.OVERRIDERECORD)
+                        break;
+
+                    var selected = (RecordingType[name] == recRule.Type) ? "selected" : "";
+            %>
+                <option value="<%=RecordingType[name]%>" <%=selected%>><%=dvr.RecTypeToDescription(RecordingType[name])%></option>
+            <% } %>
+            </select>
+        </div>
+
+        <div class="setting setting-select">
+            <label for="PreferredInput"><%=qsTr("Input")%>:</label>
+            <select name="PreferredInput" id="rule-PreferredInput" required>
+                <option value="0"><%=qsTr("Use any available Input")%></option>
+            <% for (var idx = 0; idx < inputList.length; idx++)
+               {
+                   var selected = (inputList[idx].id == recRule.PreferredInput) ? "selected" : "";
+            %>
+                <option value="<%=inputList[idx].id%>" <%=selected%>>Prefer input <%=inputList[idx].DisplayName%></option>
+            <% } %>
+            </select>
+        </div>
+
+        <div class="setting setting-range">
+            <label for="RecPriority"><%=qsTr("Priority")%>:</label>
+            <span>-99</span>
+            <input type="range" name="RecPriority" id="rule-RecPriority" value="<%=recRule.RecPriority%>" min="-99" max="99" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <span>99</span>
+            <output name="RecPriority-Value" id="rule-RecPriority-Value" for="range"><%=recRule.RecPriority%></output>
+        </div>
+
+        <div class="setting setting-range">
+            <label for="StartOffset"><%=qsTr("Start Early/Late")%>:</label>
+            <span>-240</span>
+            <input type="range" name="StartOffset" id="rule-StartOffset" value="<%=recRule.StartOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <span>240</span>
+            <output name="rangeValue" id="rule-StartOffset-Value" for="range"><%=recRule.StartOffset%></output> <%=qsTr("Minutes")%>
+        </div>
+
+        <div class="setting setting-range">
+            <label for="EndOffset"><%=qsTr("End Early/Late")%>:</label>
+            <span>-240</span>
+            <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.EndOffset%>" min="-240" max="240" onmousemove="updateRangeValue(this)" onChange="updateRangeValue(this)" required>
+            <span>240</span>
+            <output name="EndOffset-Value" id="rule-EndOffset-Value" for="range"><%=recRule.EndOffset%></output> <%=qsTr("Minutes")%>
+        </div>
+
+        <div class="setting setting-select">
+            <label for="DupMethod"><%=qsTr("Duplicate Matching")%>:</label>
+            <select name="DupMethod" id="rule-DupMethod" required>
+            <% for (var name in RecordingDupMethodType)
+               {
+                   var selected = (RecordingDupMethodType[name] == recRule.DupMethod) ? "selected" : "";
+            %>
+                <option value="<%=RecordingDupMethodType[name]%>" <%=selected%>><%=dvr.DupMethodToDescription(RecordingDupMethodType[name])%></option>
+            <% } %>
+            </select>
+        </div>
+
+        <div class="setting setting-select">
+            <label for="DupIn">&nbsp;</label>
+            <select name="DupIn" id="rule-DupIn" required>
+            <% for (var name in RecordingDupInType)
+               {
+                   var selected = (RecordingDupInType[name] == recRule.DupIn) ? "selected" : "";
+            %>
+                <option value="<%=RecordingDupInType[name]%>" <%=selected%>><%=dvr.DupInToDescription(RecordingDupInType[name])%></option>
+            <% } %>
+            </select>
+        </div>
+
+        <div class="setting setting-toggle">
+            <span>Enabled</span>
+            <div class="setting-toggle-background">
+                <input type="range" name="EndOffset" id="rule-EndOffset" value="<%=recRule.Inactive ? "1" : "0"%>" min="0" max="1" required>
+            </div>
+            <span>Disabled</span>
+        </div>
+
+        <div class="setting setting-button">
+            <button type="submit" name="Save"><%=qsTr("Save Changes")%></button>
+        </div>
+
+        </fieldset>
+    </div>  <!-- End Schedule Options -->
+    <div id="page-2"> <!-- Storage Options -->
+
+    <!-- Profile -->
+        <div class="setting setting-select">
+            <label for="RecProfile"><%=qsTr("Recording Profile")%>:</label>
+            <select name="RecProfile" id="rule-RecProfile" required>
+            <% for (var name in RecordingDupInType)
+               {
+                   var selected = (RecordingDupInType[name] == recRule.DupIn) ? "selected" : "";
+            %>
+                <option value="<%=RecordingDupInType[name]%>" <%=selected%>><%=dvr.DupInToDescription(RecordingDupInType[name])%></option>
+            <% } %>
+            </select>
+        </div>
+    <!-- Rec Group -->
+    <!-- Storage Group -->
+    <!-- Playback Group -->
+    <!-- Episode Limit -->
+    <!-- What to do in event of hitting limit -->
+    <!-- Auto-Expire -->
+        <div class="setting setting-toggle">
+            <label for="AutoExpire"><%=qsTr("Allow Auto-Expire")%>:</label>
+            <span>No</span>
+            <div class="setting-toggle-background">
+                <input type="range" name="AutoExpire" id="rule-AutoExpire" value="<%=recRule.AutoExpire ? "1" : "0"%>" min="0" max="1" required>
+            </div>
+            <span>Yes</span>
+        </div>
+
+        <div class="setting setting-button">
+            <button type="submit" name="Save"><%=qsTr("Save Changes")%></button>
+        </div>
+
+    </div> <!-- End Storage Options -->
+    <div id="page-3"> <!-- Post Processing -->
+    </div> <!-- End Post Processing -->
+    <div id="page-4"> <!-- Metadata Options -->
+    </div> <!-- End Metadata Options -->
+    <div id="page-5"> <!-- Filters -->
+    </div> <!-- Filters -->
+  </form>
+</div>
+
+<script>
+    //$("#rule-DupMethod option[value='<%=recRule.DupMethod%>']").prop("selected", true);
+    //$( "#rule-DupMethod" ).val("<%=recRule.DupMethod%>");
+
+    $( "#editor-form" ).tabs({ active: 0 });
+</script>

@@ -1,81 +1,154 @@
 
+// This should be frozen with Object.freeze(), but it seems QtScript is
+// based on the 3rd or 4th edition of ECMA-262 and doesn't support it
+
 // AudioProp
-AUD_STEREO          =  1;
-AUD_MONO            =  2;
-AUD_SURROUND        =  4;
-AUD_DOLBY           =  8;
-AUD_HARDHEAR        = 16;
-AUD_VISUALIMPAIR    = 32;
+var AudioProperty = {
+STEREO          :  1,
+MONO            :  2,
+SURROUND        :  4,
+DOLBY           :  8,
+HARDHEAR        : 16,
+VISUALIMPAIR    : 32
+};
 
 // VideoProp
-var VID_HDTV        =  1;
-var VID_WIDESCREEN  =  2;
-var VID_AVC         =  4;
-var VID_720         =  8;
-var VID_1080        = 16;
-var VID_DAMAGED     = 32;
-var VID_3DTV        = 64;
+var VideoProperty = {
+HDTV        :  1,
+WIDESCREEN  :  2,
+AVC         :  4,
+HD720         :  8,
+HD1080        : 16,
+DAMAGED     : 32,
+_3DTV        : 64 // Object names can't start with numbers
+};
 
 // Subtitles
-var SUB_HARDHEAR    =  1;
-var SUB_NORMAL      =  2;
-var SUB_ONSCREEN    =  4;
-var SUB_SIGNED      =  8;
+var SubtitleType = {
+HARDHEAR    :  1,
+NORMAL      :  2,
+ONSCREEN    :  4,
+SIGNED      :  8
+};
 
 // Program Flags
-var FL_COMMFLAG       =  1;
-var FL_CUTLIST        =  2;
-var FL_AUTOEXP        =  4;
-var FL_EDITING        =  8;
-var FL_BOOKMARK       = 16;
-var FL_REALLYEDITING  = 32;
-var FL_COMMPROCESSING = 64;
-var FL_DELETEPENDING  = 128;
-var FL_TRANSCODED     = 256;
-var FL_WATCHED        = 512;
-var FL_PRESERVED      = 1024;
-var FL_CHANCOMMFREE   = 2048;
-var FL_REPEAT         = 4096;
-var FL_DUPLICATE      = 8192;
-var FL_REACTIVATE     = 16384;
-var FL_IGNOREBOOKMARK = 32768;
-var FL_TYPEMASK       = 983040;
-var FL_INUSERECORDING = 1048576;
-var FL_INUSEPLAYING   = 2097152;
-var FL_INUSEOTHER     = 4194304;
+var ProgramFlag = {
+COMMFLAG       :  1,
+CUTLIST        :  2,
+AUTOEXP        :  4,
+EDITING        :  8,
+BOOKMARK       : 16,
+REALLYEDITING  : 32,
+COMMPROCESSING : 64,
+DELETEPENDING  : 128,
+TRANSCODED     : 256,
+WATCHED        : 512,
+PRESERVED      : 1024,
+CHANCOMMFREE   : 2048,
+REPEAT         : 4096,
+DUPLICATE      : 8192,
+REACTIVATE     : 16384,
+IGNOREBOOKMARK : 32768,
+TYPEMASK       : 983040,
+INUSERECORDING : 1048576,
+INUSEPLAYING   : 2097152,
+INUSEOTHER     : 4194304
+};
 
 // Recording Status
-var RS_OTHERRECORDING = -13;
-var RS_OTHERTUNING = -12;
-var RS_MISSEDFUTURE = -11;
-var RS_TUNING = -10;
-var RS_FAILED = -9;
-var RS_TUNERBUSY = -8;
-var RS_LOWDISKSPACE = -7;
-var RS_CANCELLED = -6;
-var RS_MISSED = -5;
-var RS_ABORTED = -4;
-var RS_RECORDED = -3;
-var RS_RECORDING = -2;
-var RS_WILLRECORD = -1;
-var RS_UNKNOWN = 0;
-var RS_DONTRECORD = 1;
-var RS_PREVIOUSRECORDING = 2;
-var RS_CURRENTRECORDING = 3;
-var RS_EARLIERSHOWING = 4;
-var RS_TOOMANYRECORDINGS = 5;
-var RS_NOTLISTED = 6;
-var RS_CONFLICT = 7;
-var RS_LATERSHOWING = 8;
-var RS_REPEAT = 9;
-var RS_INACTIVE = 10;
-var RS_NEVERRECORD = 11;
-var RS_OFFLINE = 12;
-var RS_OTHERSHOWING = 13;
+var RecordingStatus = {
+OTHERRECORDING    : -13,
+OTHERTUNING       : -12,
+MISSEDFUTURE      : -11,
+TUNING            : -10,
+FAILED            : -9,
+TUNERBUSY         : -8,
+LOWDISKSPACE      : -7,
+CANCELLED         : -6,
+MISSED            : -5,
+ABORTED           : -4,
+RECORDED          : -3,
+RECORDING         : -2,
+WILLRECORD        : -1,
+UNKNOWN           : 0,
+DONTRECORD        : 1,
+PREVIOUSRECORDING : 2,
+CURRENTRECORDING  : 3,
+EARLIERSHOWING    : 4,
+TOOMANYRECORDINGS : 5,
+NOTLISTED         : 6,
+CONFLICT          : 7,
+LATERSHOWING      : 8,
+REPEAT            : 9,
+INACTIVE          : 10,
+NEVERRECORD       : 11,
+OFFLINE           : 12,
+OTHERSHOWING      : 13
+};
+
+// Recording Schedule Types
+// var RecordingType = {
+// NOTRECORDING     : 0,
+// SINGLERECORD     : 1,
+// DAILYRECORD      : 2,
+// ALLRECORD        : 4,
+// WEEKLYRECORD     : 5,
+// ONERECORD        : 6,
+// OVERRIDERECORD   : 7,
+// DONTRECORD       : 8,
+// TEMPLATERECORD   : 11
+// };
+
+//F**king 'ell
+var RecordingType = {
+NOTRECORDING     : "Not Recording",
+SINGLERECORD     : "Single Record",
+ONERECORD        : "Record One",
+ALLRECORD        : "Record All",
+DAILYRECORD      : "Record Daily",
+WEEKLYRECORD     : "Record Weekly",
+OVERRIDERECORD   : "Override Recording",
+DONTRECORD       : "Do not Record",
+TEMPLATERECORD   : "Recording Template",
+};
+
+// Schedule Duplicate Methods
+// var RecordingDupMethodType = {
+// CHECKNONE        : 1,
+// CHECKSUB         : 2,
+// CHECKDESC        : 4,
+// CHECKSUBDESC     : 6,
+// CHECKSUBTHENDESC : 8
+// };
+
+var RecordingDupMethodType = {
+CHECKNONE        : "None",
+CHECKSUB         : "Subtitle",
+CHECKDESC        : "Description",
+CHECKSUBDESC     : "Subtitle and Description",
+CHECKSUBTHENDESC : "Subtitle then Description"
+};
+
+// Schedule Duplicate-In Type
+// var RecordingDupInType = {
+// INRECORDED     : 1,
+// INOLDRECORDED  : 2,
+// INALL          : 15,
+// NEWEPISODES    : 16
+// };
+
+var RecordingDupInType = {
+INRECORDED     : "Current Recordings",
+INOLDRECORDED  : "Previous Recordings",
+INALL          : "All Recordings",
+NEWEPISODES    : "New Episodes Only"
+};
 
 // Category Types
-var CAT_NONE = "";
-var CAT_MOVIE = "movie";
-var CAT_SERIES = "series";
-var CAT_TVSHOW = "tvshow";
-var CAT_SPORTS = "sports";
+var CategoryType = {
+NONE : "",
+MOVIE : "movie",
+SERIES : "series",
+TVSHOW : "tvshow",
+SPORTS : "sports"
+};
