@@ -227,7 +227,7 @@ void kickDatabase(bool debug)
 MONITOR::MONITOR(void) :
     name(""), type(""), function(""), enabled(0), device(""), host(""),
     image_buffer_count(0),  width(0), height(0), bytes_per_pixel(3), mon_id(0),
-    shared_images(NULL), last_read(0), status(""), frame_size(0), palette(0),
+    shared_images(NULL), last_read(0), status(""), palette(0),
     controllable(0), trackMotion(0), mapFile(-1), shm_ptr(NULL),
     shared_data(NULL), shared_data26(NULL), id("")
 {
@@ -235,9 +235,8 @@ MONITOR::MONITOR(void) :
 
 void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
 {
-    frame_size = width * height * bytes_per_pixel;
-
     int shared_data_size;
+    int frame_size = width * height * bytes_per_pixel;
 
     if (checkVersion(1, 26, 0))
     {
@@ -409,6 +408,14 @@ int MONITOR::getSubpixelOrder(void)
     }
 
     return shared_data26->format;
+}
+
+int MONITOR::getFrameSize(void)
+{
+    if (shared_data)
+        return width * height * bytes_per_pixel;
+
+    return shared_data26->imagesize;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1749,7 +1756,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
     // just copy the data to our buffer for now
 
     // fixup the colours if necessary we aim to always send RGB24 images
-    unsigned char *data = monitor->shared_images + monitor->frame_size * monitor->last_read;
+    unsigned char *data = monitor->shared_images + monitor->getFrameSize() * monitor->last_read;
     unsigned int rpos = 0;
     unsigned int wpos = 0;
 
@@ -1839,7 +1846,7 @@ int ZMServer::getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor)
         }
     }
 
-    return monitor->frame_size;
+    return monitor->width * monitor->height * 3;
 }
 
 string ZMServer::getZMSetting(const string &setting)
