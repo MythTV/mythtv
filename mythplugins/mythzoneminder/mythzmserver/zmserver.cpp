@@ -1465,12 +1465,13 @@ void ZMServer::handleGetMonitorList(void)
 
         if (m_debug)
         {
-            cout << "id:             " << mon->mon_id          << endl;
-            cout << "name:           " << mon->name            << endl;
-            cout << "width:          " << mon->width           << endl;
-            cout << "height:         " << mon->height          << endl;
-            cout << "palette:        " << mon->palette         << endl;
-            cout << "byte per pixel: " << mon->bytes_per_pixel << endl;
+            cout << "id:             " << mon->mon_id             << endl;
+            cout << "name:           " << mon->name               << endl;
+            cout << "width:          " << mon->width              << endl;
+            cout << "height:         " << mon->height             << endl;
+            cout << "palette:        " << mon->palette            << endl;
+            cout << "byte per pixel: " << mon->bytes_per_pixel    << endl;
+            cout << "sub pixel order:" << mon->getSubpixelOrder() << endl;
             cout << "-------------------" << endl;
         }
     }
