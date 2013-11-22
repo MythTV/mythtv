@@ -4630,8 +4630,10 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT recgroup, COUNT(title) FROM recorded "
-        "WHERE deletepending = 0 GROUP BY recgroup ORDER BY recgroup");
+        "SELECT g.recgroup, COUNT(r.title) FROM recgroups g "
+        "LEFT JOIN recorded r ON g.recgroupid=r.recgroupid AND r.deletepending = 0 "
+        "WHERE g.recgroupid != 2 AND g.recgroupid != 3 "
+        "GROUP BY g.recgroupid ORDER BY g.recgroup");
 
     QStringList displayNames(tr("Add New"));
     QStringList groupNames("addnewgroup");

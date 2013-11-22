@@ -599,20 +599,84 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
+    int newrecgroupid = GetRecgroupID(newrecgroup);
+
+    // Catchall - in the event that the group doesn't exist, then to avoid
+    // breakage, we need to create it
+    if (newrecgroupid == 0)
+    {
+        query.prepare("INSERT INTO recgroups SET recgroup = :NAME, "
+                      "displayname = :DISPLAYNAME");
+        query.bindValue(":NAME", newrecgroup);
+        query.bindValue(":DISPLAYNAME", newrecgroup);
+
+        if (query.exec())
+            newrecgroupid = query.lastInsertId().toInt();
+
+        if (newrecgroupid <= 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Could not create recording group (%1). "
+                                            "Does it already exist?").arg(newrecgroup));
+            return;
+        }
+    }
+
+    LOG(VB_GENERAL, LOG_NOTICE,
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(recgroup)
+                                                               .arg(newrecgroup)
+                                                               .arg(newrecgroupid));
+
     query.prepare("UPDATE recorded"
-                  " SET recgroup = :RECGROUP"
+                  " SET recgroup = :RECGROUP, "
+                  "     recgroupid = :RECGROUPID "
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
     query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
+    query.bindValue(":RECGROUPID", newrecgroupid);
     query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec())
         MythDB::DBError("RecGroup update", query);
 
-    recgroup = newrecgroup;
+    recgroup = newrecgroup; // Deprecate in favour of recgroupid
+    //recgroupid = newrecgroupid;
 
     SendUpdateEvent();
+}
+
+void RecordingInfo::ApplyRecordRecGroupChange(int newrecgroupid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString newrecgroup;
+    if (newrecgroupid > 0)
+    {
+        newrecgroup = GetRecgroupString(newrecgroupid);
+
+        query.prepare("UPDATE recorded"
+                    " SET recgroup = :RECGROUP, "
+                    "     recgroupid = :RECGROUPID "
+                    " WHERE chanid = :CHANID"
+                    " AND starttime = :START ;");
+        query.bindValue(":RECGROUP", null_to_empty(newrecgroup));
+        query.bindValue(":RECGROUPID", newrecgroupid);
+        query.bindValue(":START", recstartts);
+        query.bindValue(":CHANID", chanid);
+
+        if (!query.exec())
+            MythDB::DBError("RecGroup update", query);
+
+        recgroup = newrecgroup; // Deprecate in favour of recgroupid
+        //recgroupid = newrecgroupid;
+
+        SendUpdateEvent();
+    }
+
+    LOG(VB_GENERAL, LOG_NOTICE,
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(recgroup)
+                                                               .arg(newrecgroup)
+                                                               .arg(newrecgroupid));
 }
 
 /** \fn RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
@@ -1458,6 +1522,42 @@ void RecordingInfo::SubstituteMatches(QString &str)
     str.replace("%REACTIVATE%", IsReactivated() ? "1" : "0");
 
     ProgramInfo::SubstituteMatches(str);
+}
+
+/**
+ *  \brief Temporary helper during transition from string to ID
+ */
+uint RecordingInfo::GetRecgroupID(const QString& recGroup)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT recgroupid FROM recgroups WHERE recgroup = :RECGROUP");
+    query.bindValue(":RECGROUP", null_to_empty(recGroup));
+
+    if (!query.exec())
+        MythDB::DBError("RecGroup update", query);
+
+    if (!query.next())
+        return 0;
+
+    return query.value(0).toUInt();
+}
+
+/**
+ *  \brief Temporary helper during transition from string to ID
+ */
+QString RecordingInfo::GetRecgroupString(uint recGroupID)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT recgroup FROM recgroups WHERE recgroupid = :RECGROUPID");
+    query.bindValue(":RECGROUPID", recGroupID);
+    if (!query.exec() || !query.next())
+    {
+        MythDB::DBError("GetRecgroupString()", query);
+        return QString();
+    }
+    return query.value(0).toString();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -267,7 +267,7 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
     pRecRule->setDupIn          (  toRawString(pRule->m_dupIn)     );
     pRecRule->setFilter         (  pRule->m_filter                 );
     pRecRule->setRecProfile     (  pRule->m_recProfile             );
-    pRecRule->setRecGroup       (  pRule->m_recGroup               );
+    pRecRule->setRecGroup       (  RecordingInfo::GetRecgroupString(pRule->m_recGroupID) );
     pRecRule->setStorageGroup   (  pRule->m_storageGroup           );
     pRecRule->setPlayGroup      (  pRule->m_playGroup              );
     pRecRule->setAutoExpire     (  pRule->m_autoExpire             );

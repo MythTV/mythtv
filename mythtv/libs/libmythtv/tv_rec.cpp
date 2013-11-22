@@ -4298,8 +4298,7 @@ void TVRec::TuningRestartRecorder(void)
         curRecording->SaveAutoExpire(
             curRecording->GetRecordingRule()->GetAutoExpire());
 
-        curRecording->ApplyRecordRecGroupChange(
-            curRecording->GetRecordingRule()->m_recGroup);
+        curRecording->ApplyRecordRecGroupChange(curRecording->GetRecordingRule()->m_recGroupID);
 
         InitAutoRunJobs(curRecording, kAutoRunProfile, NULL, __LINE__);
     }
@@ -4506,7 +4505,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     }
 
     if (!pseudoLiveTVRecording)
-        prog->ApplyRecordRecGroupChange("LiveTV");
+        prog->ApplyRecordRecGroupChange(RecordingInfo::kLiveTVRecGroup);
 
     StartedRecording(prog);
 
@@ -4559,7 +4558,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
 
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     if (!pseudoLiveTVRecording)
-        pginfo->ApplyRecordRecGroupChange("LiveTV");
+        pginfo->ApplyRecordRecGroupChange(RecordingInfo::kLiveTVRecGroup);
 
     bool discont = (tvchain->TotalSize() > 0);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
@@ -4617,7 +4616,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SaveAutoExpire(kLiveTVAutoExpire);
     if (!pseudoLiveTVRecording)
-        pginfo->ApplyRecordRecGroupChange("LiveTV");
+        pginfo->ApplyRecordRecGroupChange(RecordingInfo::kLiveTVRecGroup);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
 

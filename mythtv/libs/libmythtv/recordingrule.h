@@ -109,8 +109,7 @@ class MTV_PUBLIC RecordingRule
     // Storage Options
     // TODO: These should all be converted to integer IDs instead
     QString m_recProfile;
-    QString m_recGroup;
-    int     m_recGroupID;
+    uint    m_recGroupID;
     QString m_storageGroup;
     QString m_playGroup;
 

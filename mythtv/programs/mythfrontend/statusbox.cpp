@@ -490,7 +490,7 @@ void StatusBox::customEvent(QEvent *event)
                     if ((rec)->GetRecordingGroup() == "LiveTV")
                     {
                         RecordingInfo ri(*rec);
-                        ri.ApplyRecordRecGroupChange("Default");
+                        ri.ApplyRecordRecGroupChange(RecordingInfo::kDefaultRecGroup);
                         *rec = ri;
                     }
                 }

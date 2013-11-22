@@ -49,8 +49,7 @@ RecordingRule::RecordingRule()
     m_dupIn(kDupsInAll),
     m_filter(GetDefaultFilter()),
     m_recProfile(tr("Default")),
-    m_recGroup("Default"),
-    m_recGroupID(1), // Default group should have ID of 1 in a an unbroken DB
+    m_recGroupID(RecordingInfo::kDefaultRecGroup),
     m_storageGroup("Default"),
     m_playGroup("Default"),
     m_autoExpire(gCoreContext->GetNumSetting("AutoExpireDefault", 0)),
@@ -128,7 +127,6 @@ bool RecordingRule::Load(bool asTemplate)
 
     // Storage
     m_recProfile = query.value(9).toString();
-    m_recGroup = query.value(10).toString();
     m_recGroupID = query.value(48).toUInt();
     m_storageGroup = query.value(11).toString();
     m_playGroup = query.value(12).toString();
@@ -393,7 +391,8 @@ bool RecordingRule::Save(bool sendSig)
                     "dupmethod = :DUPMETHOD, dupin = :DUPIN, "
                     "filter = :FILTER, "
                     "inactive = :INACTIVE, profile = :RECPROFILE, "
-                    "recgroup = :RECGROUP, recgroupid = :RECGROUPID, "
+                    "recgroup = :RECGROUP, "
+                    "recgroupid = :RECGROUPID, "
                     "storagegroup = :STORAGEGROUP, "
                     "playgroup = :PLAYGROUP, autoexpire = :AUTOEXPIRE, "
                     "maxepisodes = :MAXEPISODES, maxnewest = :MAXNEWEST, "
@@ -435,7 +434,8 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":FILTER", m_filter);
     query.bindValue(":INACTIVE", m_isInactive);
     query.bindValue(":RECPROFILE", null_to_empty(m_recProfile));
-    query.bindValue(":RECGROUP", null_to_empty(m_recGroup));
+    // Temporary, remove once transition to recgroupid is complete
+    query.bindValue(":RECGROUP", null_to_empty(RecordingInfo::GetRecgroupString(m_recGroupID)));
     query.bindValue(":RECGROUPID", m_recGroupID);
     query.bindValue(":STORAGEGROUP", null_to_empty(m_storageGroup));
     query.bindValue(":PLAYGROUP", null_to_empty(m_playGroup));
@@ -989,8 +989,7 @@ bool RecordingRule::IsValid(QString &msg)
         return false;
     }
 
-    if (m_recProfile.isEmpty() || m_recGroup.isEmpty() ||
-        m_recGroupID <= 0 ||
+    if (m_recProfile.isEmpty() || (m_recGroupID == 0) ||
         m_storageGroup.isEmpty() || m_playGroup.isEmpty())
     {
         msg = QString("Invalid group value.");

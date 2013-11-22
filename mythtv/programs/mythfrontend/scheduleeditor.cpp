@@ -2451,8 +2451,8 @@ void StoreOptMixin::Save(void)
         // If the user selected 'Create a new regroup' but failed to enter a
         // name when prompted, restore the original value
         if (m_recgroupList->GetDataValue().toString() == "__NEW_GROUP__")
-            m_recgroupList->SetValueByData(m_rule->m_recGroup);
-        m_rule->m_recGroup = m_recgroupList->GetDataValue().toString();
+            m_recgroupList->SetValueByData(m_rule->m_recGroupID);
+        m_rule->m_recGroupID = m_recgroupList->GetDataValue().toInt();
     }
 
     if (m_storagegroupList)
