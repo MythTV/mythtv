@@ -45,6 +45,7 @@ public:
     void deleteAll(void);
     void doDeleteAll(bool doDelete);
     void changeView(void);
+    void toggleShowContinuous(void);
     void eventChanged(MythUIButtonListItem *item);
     void eventVisible(MythUIButtonListItem *item);
     void cameraChanged(void);
@@ -59,6 +60,7 @@ public:
     void showMenu(void);
 
     bool                 m_oldestFirst;
+    bool                 m_showContinuous;
     int                  m_layout;
 
     std::vector<Event *>     *m_eventList;

@@ -42,7 +42,7 @@ class MPUBLIC ZMClient : public QObject
     void getServerStatus(QString &status, QString &cpuStat, QString &diskStat);
     void getMonitorStatus(vector<Monitor*> *monitorList);
     void getEventList(const QString &monitorName, bool oldestFirst,
-                      QString date, vector<Event*> *eventList);
+                      const QString &date, bool includeContinuous, vector<Event*> *eventList);
     void getEventFrame(Event *event, int frameNo, MythImage **image);
     void getAnalyseFrame(Event *event, int frameNo, QImage &image);
     int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);

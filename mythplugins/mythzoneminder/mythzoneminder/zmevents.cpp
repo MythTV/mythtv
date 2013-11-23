@@ -34,6 +34,7 @@ Q_DECLARE_METATYPE(Event*);
 ZMEvents::ZMEvents(MythScreenStack *parent) :
     MythScreenType(parent, "zmevents"),
     m_oldestFirst(false),
+    m_showContinuous(false),
     m_layout(-1),
     m_eventList(new vector<Event*>),
     m_savedPosition(0),
@@ -56,6 +57,7 @@ ZMEvents::~ZMEvents()
 
     // remember how the user wants to display the event list
     gCoreContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
+    gCoreContext->SaveSetting("ZoneMinderShowContinuous", (m_showContinuous ? "1" : "0"));
     gCoreContext->SaveSetting("ZoneMinderGridLayout",  m_layout);
 }
 
@@ -106,9 +108,11 @@ bool ZMEvents::Create(void)
         connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deletePressed()));
     }
 
+    m_oldestFirst = (gCoreContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
+    m_showContinuous = (gCoreContext->GetNumSetting("ZoneMinderShowContinuous", 0) == 1);
+
     getEventList();
 
-    m_oldestFirst = (gCoreContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
     setGridLayout(gCoreContext->GetNumSetting("ZoneMinderGridLayout", 1));
 
     return true;
@@ -184,7 +188,7 @@ void ZMEvents::getEventList(void)
         if (m_dateSelector->GetValue() != tr("All Dates"))
             date = m_dateList[m_dateSelector->GetCurrentPos() - 1];
 
-        zm->getEventList(monitorName, m_oldestFirst, date, m_eventList);
+        zm->getEventList(monitorName, m_oldestFirst, date, m_showContinuous, m_eventList);
 
         updateUIList();
     }
@@ -450,6 +454,12 @@ void ZMEvents::showMenu()
     m_menuPopup->SetReturnEvent(this, "action");
 
     m_menuPopup->AddButton(tr("Refresh"), SLOT(getEventList()));
+
+    if (m_showContinuous)
+        m_menuPopup->AddButton(tr("Don't Show Continuous Events"), SLOT(toggleShowContinuous()));
+    else
+        m_menuPopup->AddButton(tr("Show Continuous Events"), SLOT(toggleShowContinuous()));
+
     m_menuPopup->AddButton(tr("Change View"), SLOT(changeView()));
     m_menuPopup->AddButton(tr("Delete All"), SLOT(deleteAll()));
 }
@@ -457,6 +467,12 @@ void ZMEvents::showMenu()
 void ZMEvents::changeView(void)
 {
     setGridLayout(m_layout + 1);
+}
+
+void ZMEvents::toggleShowContinuous(void)
+{
+    m_showContinuous = !m_showContinuous;
+    getEventList();
 }
 
 void ZMEvents::deleteAll(void)

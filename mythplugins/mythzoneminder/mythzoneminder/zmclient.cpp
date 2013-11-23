@@ -18,7 +18,7 @@
 #include "zmclient.h"
 
 // the protocol version we understand
-#define ZM_PROTOCOL_VERSION "10"
+#define ZM_PROTOCOL_VERSION "11"
 
 #define BUFFER_SIZE  (2048*1536*3)
 
@@ -322,13 +322,15 @@ void ZMClient::getMonitorStatus(vector<Monitor*> *monitorList)
 }
 
 void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
-                            QString date, vector<Event*> *eventList)
+                            const QString &date, bool includeContinuous,
+                            vector<Event*> *eventList)
 {
     eventList->clear();
 
     QStringList strList("GET_EVENT_LIST");
     strList << monitorName << (oldestFirst ? "1" : "0") ;
     strList << date;
+    strList << (includeContinuous ? "1" : "0") ;
 
     if (!sendReceiveStringList(strList))
         return;

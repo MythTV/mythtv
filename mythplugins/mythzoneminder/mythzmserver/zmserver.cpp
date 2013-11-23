@@ -49,7 +49,7 @@
 #include "zmserver.h"
 
 // the version of the protocol we understand
-#define ZM_PROTOCOL_VERSION "10"
+#define ZM_PROTOCOL_VERSION "11"
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -746,7 +746,7 @@ void ZMServer::handleGetEventList(vector<string> tokens)
 {
     string outStr("");
 
-    if (tokens.size() != 4)
+    if (tokens.size() != 5)
     {
         sendError(ERROR_TOKEN_COUNT);
         return;
@@ -755,6 +755,7 @@ void ZMServer::handleGetEventList(vector<string> tokens)
     string monitor = tokens[1];
     bool oldestFirst = (tokens[2] == "1");
     string date = tokens[3];
+    bool includeContinuous = (tokens[4] == "1");
 
     if (m_debug)
         cout << "Loading events for monitor: " << monitor << ", date: " << date << endl;
@@ -778,7 +779,15 @@ void ZMServer::handleGetEventList(vector<string> tokens)
     else
     {
         if (date != "<ANY>")
+        {
             sql += "WHERE DATE(E.StartTime) = DATE('" + date + "') ";
+
+            if (!includeContinuous)
+                sql += "AND Cause != 'Continuous' ";
+        }
+        else
+            if (!includeContinuous)
+                sql += "WHERE Cause != 'Continuous' ";
     }
 
     if (oldestFirst)
