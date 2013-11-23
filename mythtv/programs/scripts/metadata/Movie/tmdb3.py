@@ -92,10 +92,14 @@ def buildSingle(inetref, opts):
         m.people.append(d)
     for backdrop in movie.backdrops:
         m.images.append({'type':'fanart', 'url':backdrop.geturl(),
-                        'thumb':backdrop.geturl(backdrop.sizes()[0])})
+                        'thumb':backdrop.geturl(backdrop.sizes()[0]),
+                        'height':str(backdrop.height),
+                        'width':str(backdrop.width)})
     for poster in movie.posters:
         m.images.append({'type':'coverart', 'url':poster.geturl(),
-                        'thumb':poster.geturl(poster.sizes()[0])})
+                        'thumb':poster.geturl(poster.sizes()[0]),
+                        'height':str(poster.height),
+                        'width':str(poster.width)})
     tree.append(m.toXML())
     sys.stdout.write(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
