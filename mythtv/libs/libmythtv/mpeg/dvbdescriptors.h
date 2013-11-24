@@ -2006,6 +2006,8 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
         size_t count  = 0;
         uint8_t position = 2; /// position points to the first byte of the "sub"descriptor
 
+        memset ((void *) m_crid, 0, sizeof(m_crid));
+
         while (_data[1] >= position)
         {
            length = _data[position+1];
