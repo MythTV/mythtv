@@ -239,7 +239,7 @@ class MTV_PUBLIC CC708Window
  public:
     uint priority;
  private:
-    uint m_visible;
+    bool m_visible;
  public:
     enum {
         kAnchorUpperLeft  = 0, kAnchorUpperCenter, kAnchorUpperRight,
