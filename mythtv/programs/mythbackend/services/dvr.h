@@ -80,6 +80,10 @@ class Dvr : public DvrServices
 
         QStringList       GetRecGroupList     ( );
 
+        QStringList       GetRecStorageGroupList ( );
+
+        QStringList       GetPlayGroupList    ( );
+
         QStringList       GetTitleList        ( const QString   &RecGroup );
 
         DTC::TitleInfoList* GetTitleInfoList  ( );
@@ -302,7 +306,11 @@ class ScriptableDvr : public QObject
 
         QObject* GetInputList       () { return m_obj.GetInputList();   }
 
-        QStringList GetRecGroupList () { return m_obj.GetRecGroupList(); }
+        QStringList GetRecGroupList        () { return m_obj.GetRecGroupList(); }
+
+        QStringList GetRecStorageGroupList () { return m_obj.GetRecStorageGroupList(); }
+
+        QStringList GetPlayGroupList       () { return m_obj.GetPlayGroupList(); }
 
         QStringList GetTitleList    ( const QString   &RecGroup )
         {

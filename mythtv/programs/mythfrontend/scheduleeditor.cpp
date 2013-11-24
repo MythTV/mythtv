@@ -2315,14 +2315,20 @@ void StoreOptMixin::Load(void)
         if (!m_loaded)
         {
             label = QObject::tr("Record using the %1 profile");
-            QMap<int, QString> profiles = RecordingProfile::listProfiles(0);
-            QMap<int, QString>::iterator pit;
-            for (pit = profiles.begin(); pit != profiles.end(); ++pit)
-            {
-                new MythUIButtonListItem(m_recprofileList,
-                                         label.arg(pit.value()),
-                                         qVariantFromValue(pit.value()));
-            }
+
+            new MythUIButtonListItem(m_recprofileList,
+                                        label.arg(QObject::tr("Default")),
+                                        qVariantFromValue(QString("Default")));
+            // LiveTV profile - it's for LiveTV not scheduled recordings??
+            new MythUIButtonListItem(m_recprofileList,
+                                        label.arg(QObject::tr("LiveTV")),
+                                        qVariantFromValue(QString("LiveTV")));
+            new MythUIButtonListItem(m_recprofileList,
+                                        label.arg(QObject::tr("High Quality")),
+                                        qVariantFromValue(QString("High Quality")));
+            new MythUIButtonListItem(m_recprofileList,
+                                        label.arg(QObject::tr("Low Quality")),
+                                        qVariantFromValue(QString("Low Quality")));
         }
         m_recprofileList->SetValueByData(m_rule->m_recProfile);
     }
@@ -2660,14 +2666,13 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        QMap<int, QString> profiles =
-            RecordingProfile::listProfiles(RecordingProfile::TranscoderGroup);
-        QMap<int, QString>::iterator it;
-        for (it = profiles.begin(); it != profiles.end(); ++it)
-        {
-            new MythUIButtonListItem(m_transcodeprofileList, it.value(),
-                                     qVariantFromValue(it.key()));
-        }
+            QMap<int, QString> profiles = RecordingProfile::GetTranscodingProfiles();
+            QMap<int, QString>::iterator it;
+            for (it = profiles.begin(); it != profiles.end(); ++it)
+            {
+                new MythUIButtonListItem(m_transcodeprofileList, it.value(),
+                                        qVariantFromValue(it.key()));
+            }
         }
         m_transcodeprofileList->SetValueByData(m_rule->m_transcoder);
     }

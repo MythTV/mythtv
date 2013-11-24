@@ -46,7 +46,9 @@
 
 #include "serviceUtil.h"
 #include "mythscheduler.h"
-#include "scheduler.h"
+#include "storagegroup.h"
+#include "playgroup.h"
+#include "recordingprofile.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
@@ -358,40 +360,18 @@ DTC::InputList* Dvr::GetInputList()
 QStringList Dvr::GetRecGroupList()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-
-    QString querystr = QString("SELECT DISTINCT recgroup FROM record");
-
-    query.prepare(querystr);
+    query.prepare("SELECT recgroup FROM recgroups WHERE recgroup <> 'Deleted' "
+                  "ORDER BY recgroup");
 
     QStringList result;
     if (!query.exec())
     {
-        MythDB::DBError("GetRecGroupList record", query);
+        MythDB::DBError("GetRecGroupList", query);
         return result;
     }
 
     while (query.next())
         result << query.value(0).toString();
-
-    querystr = QString("SELECT DISTINCT recgroup FROM recorded");
-
-    query.prepare(querystr);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("GetRecGroupList recorded", query);
-        return result;
-    }
-
-    while (query.next())
-    {
-        QString value = query.value(0).toString();
-
-        if (!result.contains(value))
-            result << value;
-    }
-
-    result.sort();
 
     return result;
 }
@@ -400,7 +380,24 @@ QStringList Dvr::GetRecGroupList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-// TODO: Needs converting to use RecGroupID
+QStringList Dvr::GetRecStorageGroupList()
+{
+    return StorageGroup::getRecordingsGroups();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Dvr::GetPlayGroupList()
+{
+    return PlayGroup::GetNames();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QStringList Dvr::GetTitleList(const QString& RecGroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -106,13 +106,34 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 
     // static functions
     static QString getName(int id);
-    static QMap<int, QString> listProfiles(int group);
+
+    // Hardcoded DB group values
+    typedef enum RecProfileGroups
+    {
+        AllGroups            =  0,
+        SoftwareEncoderGroup =  1,
+        HardwareMPEG2Group   =  2,
+        HardwareMJPEGGroup   =  3,
+        HardwareHDTVGroup    =  4,
+        DVBGroup             =  5,
+        TranscoderGroup      =  6,
+        FireWireGroup        =  7,
+        USBMPEG4Group        =  8,
+        FreeboxGroup         = 12,
+        HDHomeRunGroup       = 13,
+        CRCIGroup            = 14,
+        ASIGroup             = 15,
+        OCURGroup            = 16,
+        CetonGroup           = 17
+    } RecProfileGroup;
+
+    static QMap<int, QString> GetProfiles(RecProfileGroup group = AllGroups);
+    static QMap<int, QString> GetTranscodingProfiles();
     static void fillSelections(SelectSetting* setting,
                                int group, bool foldautodetect = false);
 
     // constants
     static const uint TranscoderAutodetect = 0; ///< sentinel value
-    static const int TranscoderGroup = 6;       ///< hard-coded DB value
 
   private slots:
     void ResizeTranscode(bool resize);

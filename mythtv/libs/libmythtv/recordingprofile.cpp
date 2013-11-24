@@ -1600,7 +1600,7 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
     while (result.next());
 }
 
-QMap<int, QString> RecordingProfile::listProfiles(int group)
+QMap< int, QString > RecordingProfile::GetProfiles(RecProfileGroup group)
 {
     QMap<int, QString> profiles;
 
@@ -1611,20 +1611,20 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
         return profiles;
     }
 
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare(
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
         "SELECT name, id "
         "FROM recordingprofiles "
-        "WHERE profilegroup = :GROUP "
+        "WHERE profilegroup = :GROUPID "
         "ORDER BY id");
-    result.bindValue(":GROUP", group);
+    query.bindValue(":GROUPID", group);
 
-    if (!result.exec())
+    if (!query.exec())
     {
-        MythDB::DBError("RecordingProfile::fillSelections 2", result);
+        MythDB::DBError("RecordingProfile::GetProfileMap()", query);
         return profiles;
     }
-    else if (!result.next())
+    else if (!query.next())
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "RecordingProfile::fillselections, Warning: "
@@ -1640,8 +1640,8 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
 
     do
     {
-        QString name = result.value(0).toString();
-        int id = result.value(1).toInt();
+        QString name = query.value(0).toString();
+        int id = query.value(1).toInt();
 
         if (group == RecordingProfile::TranscoderGroup)
         {
@@ -1656,9 +1656,14 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
 
         QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
         profiles[id] = lbl;
-    } while (result.next());
+    } while (query.next());
 
     return profiles;
+}
+
+QMap< int, QString > RecordingProfile::GetTranscodingProfiles()
+{
+    return GetProfiles(RecordingProfile::TranscoderGroup);
 }
 
 QString RecordingProfile::groupType(void) const
