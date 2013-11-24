@@ -228,7 +228,6 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
     uint bytes_read = 0;
     if (IsOpen())
     {
-        unsigned char* bufptr = (unsigned char*)buffer;
         int this_read;
         int retries = 0;
         while (bytes_read < num_bytes && retries < 3)
@@ -242,7 +241,6 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
             else
             {
                 bytes_read += this_read;
-                bufptr += this_read;
             }
             ++retries;
         }
