@@ -2577,8 +2577,8 @@ NULL
             "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM record;",
             "INSERT IGNORE INTO recgroups ( recgroup, displayname ) SELECT DISTINCT recgroup, recgroup FROM recorded;",
             // Create recgroupid columns in record and recorded tables
-            "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '0', ADD INDEX ( recgroupid );",
-            "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '0', ADD INDEX ( recgroupid );",
+            "ALTER TABLE record ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
+            "ALTER TABLE recorded ADD COLUMN recgroupid SMALLINT(4) NOT NULL DEFAULT '1', ADD INDEX ( recgroupid );",
             // Populate those columns with the corresponding recgroupid from the new recgroups table
             "UPDATE recorded, recgroups SET recorded.recgroupid = recgroups.recgroupid WHERE recorded.recgroup = recgroups.recgroup;",
             "UPDATE record, recgroups SET record.recgroupid = recgroups.recgroupid WHERE record.recgroup = recgroups.recgroup;",
