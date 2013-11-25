@@ -142,14 +142,13 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 {
     try
     {
-        bool       bFound;( false );
         ScriptInfo *pInfo = NULL;
 
         // ------------------------------------------------------------------
         // See if page has already been loaded
         // ------------------------------------------------------------------
 
-        bFound = (pInfo = GetLoadedScript( sFileName )) != NULL;
+        pInfo = GetLoadedScript( sFileName );
 
         // ------------------------------------------------------------------
         // Load Script File and Create Function
