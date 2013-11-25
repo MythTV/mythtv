@@ -238,7 +238,7 @@ long HTTPRequest::SendResponse( void )
         case ResponseTypeHTML:
             // If the reponse isn't already in the buffer, then load it
             if (!m_sFileName.isEmpty() &&
-                !m_response.buffer().length() > 0)
+                m_response.buffer().isEmpty())
             {
                 QByteArray fileBuffer;
                 QFile file(m_sFileName);
