@@ -48,6 +48,7 @@ HEADERS += datacontracts/imageMetadataInfoList.h datacontracts/imageMetadataInfo
 HEADERS += datacontracts/imageSyncInfo.h         datacontracts/channelGroup.h
 HEADERS += datacontracts/channelGroupList.h      datacontracts/input.h
 HEADERS += datacontracts/inputList.h
+HEADERS += datacontracts/recRuleFilter.h         datacontracts/recRuleFilterList.h
 
 SOURCES += service.cpp
 
@@ -92,6 +93,7 @@ incDatacontracts.files += datacontracts/imageMetadataInfoList.h datacontracts/im
 incDatacontracts.files += datacontracts/imageSyncInfo.h       datacontracts/channelGroup.h
 incDatacontracts.files += datacontracts/channelGroupList.h    datacontracts/input.h
 incDatacontracts.files += datacontracts/inputList.h
+incDatacontracts.files += datacontracts/recRuleFilter.h       datacontracts/recRuleFilterList.h
 
 INSTALLS += inc incServices incDatacontracts
 

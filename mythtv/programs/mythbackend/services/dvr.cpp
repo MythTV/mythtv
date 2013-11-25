@@ -398,6 +398,33 @@ QStringList Dvr::GetPlayGroupList()
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::RecRuleFilterList* Dvr::GetRecRuleFilterList()
+{
+    DTC::RecRuleFilterList* filterList = new DTC::RecRuleFilterList();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filterid, description, newruledefault "
+                    "FROM recordfilter ORDER BY filterid");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            DTC::RecRuleFilter* ruleFilter = filterList->AddNewRecRuleFilter();
+            ruleFilter->setId(query.value(0).toInt());
+            ruleFilter->setDescription(QObject::tr(query.value(1).toString()
+                                         .toUtf8().constData()));
+        }
+    }
+
+    return filterList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QStringList Dvr::GetTitleList(const QString& RecGroup)
 {
     MSqlQuery query(MSqlQuery::InitCon());

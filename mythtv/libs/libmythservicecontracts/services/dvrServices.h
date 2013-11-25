@@ -19,6 +19,8 @@
 #include "datacontracts/encoderList.h"
 #include "datacontracts/recRule.h"
 #include "datacontracts/recRuleList.h"
+#include "datacontracts/recRuleFilter.h"
+#include "datacontracts/recRuleFilterList.h"
 #include "datacontracts/titleInfoList.h"
 #include "datacontracts/input.h"
 #include "datacontracts/inputList.h"
@@ -42,7 +44,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "3.2" );
+    Q_CLASSINFO( "version"    , "3.3" );
     Q_CLASSINFO( "RemoveRecordedItem_Method",                   "POST" )
     Q_CLASSINFO( "AddRecordSchedule_Method",                    "POST" )
     Q_CLASSINFO( "RemoveRecordSchedule_Method",                 "POST" )
@@ -62,6 +64,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::InputList::InitializeCustomTypes();
             DTC::RecRuleList::InitializeCustomTypes();
             DTC::TitleInfoList::InitializeCustomTypes();
+            DTC::RecRuleFilterList::InitializeCustomTypes();
         }
 
     public slots:
@@ -108,6 +111,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual QStringList        GetRecStorageGroupList ( ) = 0;
 
         virtual QStringList        GetPlayGroupList      ( ) = 0;
+
+        virtual DTC::RecRuleFilterList* GetRecRuleFilterList ( ) = 0;
 
         virtual QStringList        GetTitleList          ( const QString   &RecGroup ) = 0;
 
