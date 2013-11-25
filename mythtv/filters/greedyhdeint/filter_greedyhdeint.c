@@ -121,7 +121,6 @@ static void AllocFilter(ThisFilter* filter, int width, int height)
 static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     ThisFilter *filter = (ThisFilter *) f;
-    TF_VARS;
 
     int last_frame = 0;
     int cur_frame = 0;

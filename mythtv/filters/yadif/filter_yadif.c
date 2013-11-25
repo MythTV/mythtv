@@ -496,7 +496,6 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
 static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     ThisFilter *filter = (ThisFilter *) f;
-    TF_VARS;
 
     AllocFilter(filter, frame->width, frame->height);
 

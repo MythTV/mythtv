@@ -154,7 +154,6 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst,
 static int FieldorderDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     ThisFilter *filter = (ThisFilter *) f;
-    TF_VARS;
 
     AllocFilter(filter, frame->width, frame->height);
 
