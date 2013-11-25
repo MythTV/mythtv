@@ -19,6 +19,7 @@
 
 #include "recording.h"
 #include "artworkInfoList.h"
+#include "castMemberList.h"
 
 namespace DTC
 {
@@ -185,6 +186,7 @@ class SERVICE_PUBLIC Program : public QObject
     Q_PROPERTY( QObject*    Channel      READ Channel   DESIGNABLE SerializeChannel )
     Q_PROPERTY( QObject*    Recording    READ Recording DESIGNABLE SerializeRecording )
     Q_PROPERTY( QObject*    Artwork      READ Artwork   DESIGNABLE SerializeArtwork )
+    Q_PROPERTY( QObject*    Cast         READ Cast      DESIGNABLE SerializeCast )
 
     PROPERTYIMP    ( QDateTime   , StartTime    )
     PROPERTYIMP    ( QDateTime   , EndTime      )
@@ -215,12 +217,14 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP_PTR( ChannelInfo    , Channel     )
     PROPERTYIMP_PTR( RecordingInfo  , Recording   )
     PROPERTYIMP_PTR( ArtworkInfoList, Artwork     )
+    PROPERTYIMP_PTR( CastMemberList , Cast        )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )
     PROPERTYIMP( bool, SerializeChannel )
     PROPERTYIMP( bool, SerializeRecording )
     PROPERTYIMP( bool, SerializeArtwork )
+    PROPERTYIMP( bool, SerializeCast )
 
     public:
 
@@ -243,10 +247,12 @@ class SERVICE_PUBLIC Program : public QObject
               m_Channel             ( NULL   ),
               m_Recording           ( NULL   ),
               m_Artwork             ( NULL   ),
+              m_Cast                ( NULL   ),
               m_SerializeDetails    ( true   ),
               m_SerializeChannel    ( true   ),
               m_SerializeRecording  ( true   ),
-              m_SerializeArtwork    ( true   )
+              m_SerializeArtwork    ( true   ),
+              m_SerializeCast       ( true   )
         {
         }
         
@@ -285,6 +291,7 @@ class SERVICE_PUBLIC Program : public QObject
             m_SerializeChannel  = src.m_SerializeChannel;    
             m_SerializeRecording= src.m_SerializeRecording;  
             m_SerializeArtwork  = src.m_SerializeArtwork;
+            m_SerializeCast     = src.m_SerializeCast;
 
             if ( src.m_Channel != NULL)
                 Channel()->Copy( src.m_Channel );
@@ -294,6 +301,9 @@ class SERVICE_PUBLIC Program : public QObject
 
             if ( src.m_Artwork != NULL)
                 Artwork()->Copy( src.m_Artwork );
+
+            if (src.m_Cast != NULL)
+                Cast()->Copy( src.m_Cast );
         }
 
 };
@@ -341,6 +351,9 @@ inline void Program::InitializeCustomTypes()
 
     if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
         ArtworkInfoList::InitializeCustomTypes();
+
+     if (QMetaType::type( "DTC::CastMemberList" ) == 0)
+        CastMemberList::InitializeCustomTypes();
 }
 }
 

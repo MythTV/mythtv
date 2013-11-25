@@ -43,7 +43,8 @@
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
                       bool          bIncChannel /* = true */,
-                      bool          bDetails    /* = true */)
+                      bool          bDetails    /* = true */,
+                      bool          bIncCast    /* = true */)
 {
     if ((pProgram == NULL) || (pInfo == NULL))
         return;
@@ -86,6 +87,12 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setSeason     ( pInfo->GetSeason()      );
         pProgram->setEpisode    ( pInfo->GetEpisode()     );
         pProgram->setTotalEpisodes( pInfo->GetEpisodeTotal() );
+    }
+
+    pProgram->setSerializeCast(bIncCast);
+    if (bIncCast)
+    {
+        FillCastMemberList( pProgram->Cast(), pInfo );
     }
 
     pProgram->setSerializeChannel( bIncChannel );
@@ -437,4 +444,77 @@ void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
     input->setScheduleOrder(inputInfo.scheduleOrder);
     input->setRecPriority(inputInfo.recPriority);
     input->setQuickTune(inputInfo.quickTune);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
+                        ProgramInfo* pInfo)
+{
+    if (!pCastMemberList || !pInfo)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (pInfo->IsRecording())
+        query.prepare("SELECT role,people.name FROM recordedcredits"
+                        " AS credits"
+                        " LEFT JOIN people ON credits.person = people.person"
+                        " WHERE credits.chanid = :CHANID"
+                        " AND credits.starttime = :STARTTIME"
+                        " ORDER BY role;");
+    else
+        query.prepare("SELECT role, people.name FROM credits"
+                        " LEFT JOIN people ON credits.person = people.person"
+                        " WHERE credits.chanid = :CHANID"
+                        " AND credits.starttime = :STARTTIME"
+                        " ORDER BY role;");
+    query.bindValue(":CHANID",    pInfo->GetChanID());
+    query.bindValue(":STARTTIME", pInfo->GetScheduledStartTime());
+
+    if (query.exec() && query.size() > 0)
+    {
+        QMap<QString, QString> translations;
+        translations["ACTORS"] = QObject::tr("Actors");
+        translations["DIRECTOR"] = QObject::tr("Director");
+        translations["PRODUCER"] = QObject::tr("Producer");
+        translations["EXECUTIVE_PRODUCER"] = QObject::tr("Executive Producer");
+        translations["WRITER"] = QObject::tr("Writer");
+        translations["GUEST_STAR"] = QObject::tr("Guest Star");
+        translations["HOST"] = QObject::tr("Host");
+        translations["ADAPTER"] = QObject::tr("Adapter");
+        translations["PRESENTER"] = QObject::tr("Presenter");
+        translations["COMMENTATOR"] = QObject::tr("Commentator");
+        translations["GUEST"] = QObject::tr("Guest");
+
+        while (query.next())
+        {
+            DTC::CastMember *pCastMember = pCastMemberList->AddNewCastMember();
+
+            pCastMember->setRole(query.value(0).toString());
+            pCastMember->setTranslatedRole(translations[query.value(0).toString().toUpper()]);
+            /* The people.name column uses utf8_bin collation.
+                * Qt-MySQL drivers use QVariant::ByteArray for string-type
+                * MySQL fields marked with the BINARY attribute (those using a
+                * *_bin collation) and QVariant::String for all others.
+                * Since QVariant::toString() uses QString::fromAscii()
+                * (through QVariant::convert()) when the QVariant's type is
+                * QVariant::ByteArray, we have to use QString::fromUtf8()
+                * explicitly to prevent corrupting characters.
+                * The following code should be changed to use the simpler
+                * toString() approach, as above, if we do a DB update to
+                * coalesce the people.name values that differ only in case and
+                * change the collation to utf8_general_ci, to match the
+                * majority of other columns, or we'll have the same problem in
+                * reverse.
+                */
+            pCastMember->setName(QString::fromUtf8(query.value(1)
+                                        .toByteArray().constData()));
+
+        }
+    }
+
+    //pCastMemberList->setCount(query.size());
+    //pCastMemberList->setTotalAvailable(query.size());
 }

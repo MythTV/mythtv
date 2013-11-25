@@ -61,7 +61,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
                                                           int              StartChanId,
                                                           int              NumChannels,
                                                           bool             Details,
-                                                          int              ChannelGroupId ) = 0;
+                                                          int              ChannelGroupId) = 0;
 
         virtual DTC::Program*       GetProgramDetails   ( int              ChanId,
                                                           const QDateTime &StartTime ) = 0;

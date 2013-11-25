@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Program Name: program.h
+// Program Name: channelGroup.h
 // Created     : Nov. 15, 2013
 //
 // Copyright (c) 2013 Stuart Morgan <smorgan@mythtv.org>

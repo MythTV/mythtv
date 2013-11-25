@@ -3,6 +3,7 @@
 // Created     : Apr. 21, 2011
 //
 // Copyright (c) 2010 Robert McNamara <rmcnamara@mythtv.org>
+// Copyright (c) 2013 Stuart Morgan   <smorgan@mythtv.org>
 //
 // Licensed under the GPL v2 or later, see COPYING for details
 //
@@ -17,6 +18,7 @@
 #include "serviceexp.h"
 #include "datacontracthelper.h"
 #include "artworkInfoList.h"
+#include "castMemberList.h"
 
 namespace DTC
 {
@@ -26,7 +28,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.20" );
+    Q_CLASSINFO( "version"    , "2.0" );
 
     Q_PROPERTY( int             Id              READ Id               WRITE setId             )
     Q_PROPERTY( QString         Title           READ Title            WRITE setTitle          )
@@ -61,6 +63,7 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     Q_PROPERTY( QString         Trailer         READ Trailer          WRITE setTrailer        )
 
     Q_PROPERTY( QObject*        Artwork         READ Artwork     DESIGNABLE SerializeArtwork  )
+    Q_PROPERTY( QObject*        Cast            READ Cast        DESIGNABLE SerializeCast     )
 
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP    ( QString    , Title          )
@@ -95,7 +98,10 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     PROPERTYIMP    ( QString    , Trailer        )
 
     PROPERTYIMP_PTR( ArtworkInfoList, Artwork    )
+    PROPERTYIMP_PTR( CastMemberList , Cast       )
+
     PROPERTYIMP    ( bool      , SerializeArtwork)
+    PROPERTYIMP    ( bool      , SerializeCast   )
 
     public:
 
@@ -117,7 +123,9 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
                           m_Watched       ( false  ),
                           m_Processed     ( false  ),
                           m_Artwork       ( NULL   ),
-                          m_SerializeArtwork( true )
+                          m_Cast          ( NULL   ),
+                          m_SerializeArtwork( true ),
+                          m_SerializeCast   ( true )
         {
         }
 
@@ -130,9 +138,13 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
         {
             m_Id               = src.m_Id;
             m_SerializeArtwork = src.m_SerializeArtwork;
+            m_SerializeCast    = src.m_SerializeCast;
 
             if ( src.m_Artwork != NULL)
                 Artwork()->Copy( src.m_Artwork );
+
+            if (src.m_Cast != NULL)
+                Cast()->Copy( src.m_Cast );
         }
 };
 
@@ -150,6 +162,9 @@ inline void VideoMetadataInfo::InitializeCustomTypes()
 
     if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
         ArtworkInfoList::InitializeCustomTypes();
+
+    if (QMetaType::type( "DTC::CastMemberList" ) == 0)
+        CastMemberList::InitializeCustomTypes();
 }
 }
 

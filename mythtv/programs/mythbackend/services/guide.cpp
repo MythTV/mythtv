@@ -174,7 +174,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
         
         DTC::Program *pProgram = pChannel->AddNewProgram();
 
-        FillProgramInfo( pProgram, pInfo, false, bDetails );
+        FillProgramInfo( pProgram, pInfo, false, bDetails, false ); // No cast info
     }
 
     // ----------------------------------------------------------------------

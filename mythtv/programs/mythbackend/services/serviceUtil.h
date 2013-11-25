@@ -32,6 +32,7 @@
 #include "datacontracts/videoMetadataInfo.h"
 #include "datacontracts/channelGroup.h"
 #include "datacontracts/input.h"
+#include "datacontracts/castMemberList.h"
 
 #include "programinfo.h"
 #include "recordingrule.h"
@@ -42,7 +43,8 @@
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
                       bool          bIncChannel = true,
-                      bool          bDetails    = true );
+                      bool          bDetails    = true,
+                      bool          bIncCast    = true);
 
 bool FillChannelInfo( DTC::ChannelInfo *pChannel,
                       uint              nChanID,
@@ -63,4 +65,7 @@ void FillVideoMetadataInfo (
                       bool          bDetails);
 
 void FillInputInfo( DTC::Input *input, InputInfo inputInfo);
+
+void FillCastMemberList( DTC::CastMemberList *pCastMemberList,
+                         ProgramInfo  *pInfo);
 #endif
