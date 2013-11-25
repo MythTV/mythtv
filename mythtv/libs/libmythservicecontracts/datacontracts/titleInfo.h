@@ -24,13 +24,15 @@ namespace DTC
 class SERVICE_PUBLIC TitleInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "version"    , "1.1" );
 
     Q_PROPERTY( QString         Title            READ Title             WRITE setTitle            )
     Q_PROPERTY( QString         Inetref          READ Inetref           WRITE setInetref          )
+    Q_PROPERTY( int             Count            READ Count             WRITE setCount          )
 
     PROPERTYIMP    ( QString    , Title            )
     PROPERTYIMP    ( QString    , Inetref          )
+    PROPERTYIMP    ( int        , Count            )
 
     public:
 
@@ -50,6 +52,7 @@ class SERVICE_PUBLIC TitleInfo : public QObject
         {
             m_Title             = src.m_Title             ;
             m_Inetref           = src.m_Inetref           ;
+            m_Count             = src.m_Count             ;
         }
 };
 

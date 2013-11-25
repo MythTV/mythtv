@@ -480,9 +480,10 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString querystr = QString(
-        "SELECT DISTINCT title, inetref "
+        "SELECT title, inetref, count(title) as count "
         "    FROM recorded "
         "    WHERE inetref <> '' "
+        "    GROUP BY title, inetref "
         "    ORDER BY title");
 
     query.prepare(querystr);
@@ -500,6 +501,7 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
 
         pTitleInfo->setTitle(query.value(0).toString());
         pTitleInfo->setInetref(query.value(1).toString());
+        pTitleInfo->setCount(query.value(2).toInt());
     }
 
     return pTitleInfos;
