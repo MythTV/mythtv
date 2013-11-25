@@ -11,11 +11,9 @@ class Bookmark
 {
   public:
     Bookmark(void)
+        : category(""), name(""), url(""), selected(false)
     {
-        category = "";
-        name = "";
-        url = "";
-        selected = false;
+        ;
     }
 
     QString category;
