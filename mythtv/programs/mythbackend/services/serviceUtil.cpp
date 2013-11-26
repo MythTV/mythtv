@@ -457,7 +457,7 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (pInfo->IsRecording())
+    if (pInfo->GetFilesize() > 0) // FIXME: This shouldn't be the way to determine what is or isn't a recording!
         query.prepare("SELECT role, people.name FROM recordedcredits"
                         " AS credits"
                         " LEFT JOIN people ON credits.person = people.person"
