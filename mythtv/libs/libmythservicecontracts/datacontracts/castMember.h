@@ -54,10 +54,10 @@ class SERVICE_PUBLIC CastMember : public QObject
 
         void Copy( const CastMember &src )
         {
-            m_Name          = src.m_Name         ;
-            m_CharacterName = src.m_CharacterName;
-            m_Role          = src.m_Role         ;
-            m_Role          = src.m_TranslatedRole;
+            m_Name           = src.m_Name          ;
+            m_CharacterName  = src.m_CharacterName ;
+            m_Role           = src.m_Role          ;
+            m_TranslatedRole = src.m_TranslatedRole;
         }
 
 };

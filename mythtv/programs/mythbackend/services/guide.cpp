@@ -217,7 +217,7 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
     DTC::Program *pProgram = new DTC::Program();
     ProgramInfo  *pInfo    = LoadProgramFromProgram(nChanId, dtStartTime);
 
-    FillProgramInfo( pProgram, pInfo, true, true );
+    FillProgramInfo( pProgram, pInfo, true, true, true );
 
     delete pInfo;
 

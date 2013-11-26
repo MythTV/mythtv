@@ -458,7 +458,7 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (pInfo->IsRecording())
-        query.prepare("SELECT role,people.name FROM recordedcredits"
+        query.prepare("SELECT role, people.name FROM recordedcredits"
                         " AS credits"
                         " LEFT JOIN people ON credits.person = people.person"
                         " WHERE credits.chanid = :CHANID"
@@ -476,7 +476,7 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
     if (query.exec() && query.size() > 0)
     {
         QMap<QString, QString> translations;
-        translations["ACTORS"] = QObject::tr("Actors");
+        translations["ACTOR"] = QObject::tr("Actors");
         translations["DIRECTOR"] = QObject::tr("Director");
         translations["PRODUCER"] = QObject::tr("Producer");
         translations["EXECUTIVE_PRODUCER"] = QObject::tr("Executive Producer");
@@ -492,8 +492,9 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
         {
             DTC::CastMember *pCastMember = pCastMemberList->AddNewCastMember();
 
-            pCastMember->setRole(query.value(0).toString());
-            pCastMember->setTranslatedRole(translations[query.value(0).toString().toUpper()]);
+            QString role = query.value(0).toString();
+            pCastMember->setRole(role);
+            pCastMember->setTranslatedRole(translations.value(role.toUpper()));
             /* The people.name column uses utf8_bin collation.
                 * Qt-MySQL drivers use QVariant::ByteArray for string-type
                 * MySQL fields marked with the BINARY attribute (those using a
