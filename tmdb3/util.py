@@ -110,7 +110,7 @@ class Data(object):
     This maps to a single key in a JSON dictionary received from the API
     """
     def __init__(self, field, initarg=None, handler=None, poller=None,
-                 raw=True, default=u'', lang=None, passtrough={}):
+                 raw=True, default=u'', lang=None, passthrough={}):
         """
         This defines how the dictionary value is to be processed by the
         poller
@@ -142,7 +142,7 @@ class Data(object):
         self.raw = raw
         self.default = default
         self.sethandler(handler)
-        self.passtrough = passtrough
+        self.passthrough = passthrough
 
     def __get__(self, inst, owner):
         if inst is None:
@@ -162,7 +162,7 @@ class Data(object):
             value._locale = inst._locale
             value._session = inst._session
 
-            for source, dest in self.passtrough:
+            for source, dest in self.passthrough:
                 setattr(value, dest, getattr(inst, source))
         inst._data[self.field] = value
 
@@ -185,7 +185,7 @@ class Datalist(Data):
     Response definition class for list data
     This maps to a key in a JSON dictionary storing a list of data
     """
-    def __init__(self, field, handler=None, poller=None, sort=None, raw=True, passtrough={}):
+    def __init__(self, field, handler=None, poller=None, sort=None, raw=True, passthrough={}):
         """
         This defines how the dictionary value is to be processed by the
         poller
@@ -210,7 +210,7 @@ class Datalist(Data):
                        force the data to instead be passed in as the first
                        argument
         """
-        super(Datalist, self).__init__(field, None, handler, poller, raw, passtrough=passtrough)
+        super(Datalist, self).__init__(field, None, handler, poller, raw, passthrough=passthrough)
         self.sort = sort
 
     def __set__(self, inst, value):
@@ -222,7 +222,7 @@ class Datalist(Data):
                     val._locale = inst._locale
                     val._session = inst._session
 
-                    for source, dest in self.passtrough.items():
+                    for source, dest in self.passthrough.items():
                         setattr(val, dest, getattr(inst, source))
 
                 data.append(val)
@@ -240,7 +240,7 @@ class Datadict(Data):
     This maps to a key in a JSON dictionary storing a dictionary of data
     """
     def __init__(self, field, handler=None, poller=None, raw=True,
-                       key=None, attr=None, passtrough={}):
+                       key=None, attr=None, passthrough={}):
         """
         This defines how the dictionary value is to be processed by the
         poller
@@ -270,7 +270,7 @@ class Datadict(Data):
         """
         if key and attr:
             raise TypeError("`key` and `attr` cannot both be defined")
-        super(Datadict, self).__init__(field, None, handler, poller, raw, passtrough=passtrough)
+        super(Datadict, self).__init__(field, None, handler, poller, raw, passthrough=passthrough)
         if key:
             self.getkey = lambda x: x[key]
         elif attr:
@@ -288,7 +288,7 @@ class Datadict(Data):
                     val._locale = inst._locale
                     val._session = inst._session
 
-                    for source, dest in self.passtrough.items():
+                    for source, dest in self.passthrough.items():
                         setattr(val, dest, getattr(inst, source))
 
                 data[self.getkey(val)] = val

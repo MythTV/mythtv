@@ -22,7 +22,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__ = "v0.6.17"
+__version__ = "v0.7.0"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -61,6 +61,7 @@ __version__ = "v0.6.17"
 # 0.6.16 Make absent primary images return None (previously u'')
 # 0.6.17 Add userrating/votes to Image, add overview to Collection, remove 
 #           releasedate sorting from Collection Movies
+# 0.7.0  Add support for television series data
 
 from request import set_key, Request
 from util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
@@ -636,8 +637,11 @@ class Movie(Element):
 
     alternate_titles = Datalist('titles', handler=AlternateTitle, \
                                 poller=_populate_titles, sort=True)
+
+    # FIXME: this data point will need to be changed to 'credits' at some point
     cast = Datalist('cast', handler=Cast,
                     poller=_populate_cast, sort='order')
+
     crew = Datalist('crew', handler=Crew, poller=_populate_cast)
     backdrops = Datalist('backdrops', handler=Backdrop,
                          poller=_populate_images, sort=True)
@@ -715,7 +719,7 @@ class Movie(Element):
 
 
 class ReverseCast( Movie ):
-    character   = Datapoint('character')
+    character = Datapoint('character')
 
     def __repr__(self):
         return (u"<{0.__class__.__name__} '{0.character}' on {1}>"
@@ -773,23 +777,15 @@ class Network(NameRepr,Element):
     id = Datapoint('id', initarg=1)
     name = Datapoint('name')
 
-class SeriesCast(Person):
-    character = Datapoint('character')
-    order = Datapoint('sort_order')
-
-    def __repr__(self):
-        return u"<{0.__class__.__name__} '{0.name}' as '{0.character}'>"\
-               .format(self).encode('utf-8')
-
 class Episode(NameRepr, Element):
-    episode_number = Datapoint('episode_number', initarg=1)
-    season_number = Datapoint('season_number', initarg=1)
+    episode_number = Datapoint('episode_number', initarg=3)
+    season_number = Datapoint('season_number', initarg=2)
     series_id = Datapoint('series_id', initarg=1)
     air_date = Datapoint('air_date', handler=process_date)
     overview = Datapoint('overview')
     name = Datapoint('name')
-    vote_average = Datapoint('vote_average')
-    vote_count = Datapoint('vote_count')
+    userrating = Datapoint('vote_average')
+    votes = Datapoint('vote_count')
     id = Datapoint('id')
     production_code = Datapoint('production_code')
     still = Datapoint('still_path', handler=Backdrop, raw=False, default=None)
@@ -814,9 +810,9 @@ class Episode(NameRepr, Element):
         return Request('tv/{0}/season/{1}/episode/{2}/images'.format(
             self.series_id, self.season_number, self.episode_number), **kwargs)
 
-    cast = Datalist('cast', handler=SeriesCast,
+    cast = Datalist('cast', handler=Cast,
                     poller=_populate_cast, sort='order')
-    guest_stars = Datalist('guest_stars', handler=SeriesCast,
+    guest_stars = Datalist('guest_stars', handler=Cast,
                     poller=_populate_cast, sort='order')
     crew = Datalist('crew', handler=Crew, poller=_populate_cast)
     imdb_id = Datapoint('imdb_id', poller=_populate_external_ids)
@@ -827,7 +823,7 @@ class Episode(NameRepr, Element):
     stills = Datalist('stills', handler=Backdrop, poller=_populate_images, sort=True)
 
 class Season(NameRepr, Element):
-    season_number = Datapoint('season_number', initarg=1)
+    season_number = Datapoint('season_number', initarg=2)
     series_id = Datapoint('series_id', initarg=1)
     id = Datapoint('id')
     air_date = Datapoint('air_date', handler=process_date)
@@ -835,7 +831,7 @@ class Season(NameRepr, Element):
     overview = Datapoint('overview')
     name = Datapoint('name')
     episodes = Datadict('episodes', attr='episode_number', handler=Episode,
-                        passtrough={'series_id': 'series_id', 'season_number': 'season_number'})
+                        passthrough={'series_id': 'series_id', 'season_number': 'season_number'})
 
     def _populate(self):
         return Request('tv/{0}/season/{1}'.format(self.series_id, self.season_number),
@@ -877,11 +873,11 @@ class Series(NameRepr, Element):
     overview = Datapoint('overview')
     popularity = Datapoint('popularity')
     status = Datapoint('status')
-    vote_average = Datapoint('vote_average')
-    vote_count = Datapoint('vote_count')
+    userrating = Datapoint('vote_average')
+    votes = Datapoint('vote_count')
     poster = Datapoint('poster_path', handler=Poster, raw=False, default=None)
     networks = Datalist('networks', handler=Network)
-    seasons = Datadict('seasons', attr='season_number', handler=Season, passtrough={'id': 'series_id'})
+    seasons = Datadict('seasons', attr='season_number', handler=Season, passthrough={'id': 'series_id'})
 
     def _populate(self):
         return Request('tv/{0}'.format(self.id),
@@ -899,7 +895,7 @@ class Series(NameRepr, Element):
     def _populate_external_ids(self):
         return Request('tv/{0}/external_ids'.format(self.id))
 
-    cast = Datalist('cast', handler=SeriesCast,
+    cast = Datalist('cast', handler=Cast,
                     poller=_populate_cast, sort='order')
     crew = Datalist('crew', handler=Crew, poller=_populate_cast)
     backdrops = Datalist('backdrops', handler=Backdrop,
