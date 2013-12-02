@@ -129,7 +129,7 @@ void WelcomeDialog::checkAutoStart(void)
     //                                1 for manual startup
     QString command = m_appBinDir + "mythshutdown --startup";
     command += logPropagateArgs;
-    uint state = myth_system(command);
+    uint state = myth_system(command, kMSDontBlockInputDevs);
 
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("mythshutdown --startup returned: %1").arg(state));
@@ -212,7 +212,7 @@ void WelcomeDialog::customEvent(QEvent *e)
                          "MythWelcome is shutting this computer down now");
                      QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
                      if (!poweroff_cmd.isEmpty())
-                         myth_system(poweroff_cmd);
+                         myth_system(poweroff_cmd, kMSDontBlockInputDevs);
                 }
             }
         }
@@ -274,16 +274,16 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
                 m_appBinDir + "mythshutdown --lock";
 
             uint statusCode;
-            statusCode = myth_system(mythshutdown_status + logPropagateArgs);
+            statusCode = myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
 
             // is shutdown locked by a user
             if (!(statusCode & 0xFF00) && statusCode & 16)
             {
-                myth_system(mythshutdown_unlock + logPropagateArgs);
+                myth_system(mythshutdown_unlock + logPropagateArgs, kMSDontBlockInputDevs);
             }
             else
             {
-                myth_system(mythshutdown_lock + logPropagateArgs);
+                myth_system(mythshutdown_lock + logPropagateArgs, kMSDontBlockInputDevs);
             }
 
             updateStatusMessage();
@@ -293,7 +293,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         {
             QString cmd = gCoreContext->GetSetting("MythShutdownXTermCmd", "");
             if (!cmd.isEmpty())
-                myth_system(cmd);
+                myth_system(cmd, kMSDontBlockInputDevs);
         }
         else if (action == "STARTSETUP")
         {
@@ -455,7 +455,7 @@ void WelcomeDialog::runMythFillDatabase()
     LOG(VB_GENERAL, LOG_INFO, QString("Grabbing EPG data using command: %1\n")
             .arg(command));
 
-    myth_system(command);
+    myth_system(command, kMSDontBlockInputDevs);
 }
 
 void WelcomeDialog::updateAll(void)
@@ -531,7 +531,7 @@ void WelcomeDialog::updateStatusMessage(void)
     }
 
     QString mythshutdown_status = m_appBinDir + "mythshutdown --status 0";
-    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
+    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
 
     if (!(statusCode & 0xFF00))
     {
@@ -602,7 +602,7 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_appBinDir + "mythshutdown --status 0";
-    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs);
+    uint statusCode = myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
         m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
@@ -619,7 +619,7 @@ void WelcomeDialog::lockShutdown(void)
 {
     QString command = m_appBinDir + "mythshutdown --lock";
     command += logPropagateArgs;
-    myth_system(command);
+    myth_system(command, kMSDontBlockInputDevs);
     updateStatusMessage();
     updateScreen();
 }
@@ -628,7 +628,7 @@ void WelcomeDialog::unlockShutdown(void)
 {
     QString command = m_appBinDir + "mythshutdown --unlock";
     command += logPropagateArgs;
-    myth_system(command);
+    myth_system(command, kMSDontBlockInputDevs);
     updateStatusMessage();
     updateScreen();
 }
@@ -650,7 +650,7 @@ void WelcomeDialog::shutdownNow(void)
             "MythWelcome is shutting this computer down now");
         QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
         if (!poweroff_cmd.isEmpty())
-            myth_system(poweroff_cmd);
+            myth_system(poweroff_cmd, kMSDontBlockInputDevs);
         return;
     }
 
@@ -676,7 +676,7 @@ void WelcomeDialog::shutdownNow(void)
     QString command = m_appBinDir + "mythshutdown --status 0";
     command += logPropagateArgs;
 
-    uint statusCode = myth_system(command);
+    uint statusCode = myth_system(command, kMSDontBlockInputDevs);
     if (!(statusCode & 0xFF00) && statusCode & 128)
     {
         ShowOkPopup(tr("Cannot shutdown because MythTV is about to start "
@@ -712,7 +712,7 @@ void WelcomeDialog::shutdownNow(void)
 
         if (!setwakeup_cmd.isEmpty())
         {
-            myth_system(setwakeup_cmd);
+            myth_system(setwakeup_cmd, kMSDontBlockInputDevs);
         }
     }
 
@@ -725,6 +725,6 @@ void WelcomeDialog::shutdownNow(void)
 
     command += m_appBinDir + "mythshutdown --shutdown" + logPropagateArgs;
 
-    myth_system(command);
+    myth_system(command, kMSDontBlockInputDevs);
 }
 
