@@ -12,7 +12,7 @@ function deleteRecording(chanID, startTime, allowRerecord, forceDelete)
 
     var reRecord = allowRerecord ? 1 : 0;
     var force = forceDelete ? 1 : 0;
-    var url = "/tv/ajax_backends/dvr_util.qsp?action=deleteRecording&chanID=" + chanID + "&startTime=" + startTime +
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=deleteRecording&chanID=" + chanID + "&startTime=" + startTime +
               "&allowRerecord=" + reRecord + "&forceDelete=" + force;
     var ajaxRequest = $.ajax( url )
                             .done(function()
@@ -26,7 +26,7 @@ function unDeleteRecording(chanID, startTime)
 {
     hideMenu("optMenu");
 
-    var url = "/tv/ajax_backends/dvr_util.qsp?action=unDeleteRecording&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=unDeleteRecording&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {

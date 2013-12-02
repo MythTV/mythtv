@@ -1,0 +1,87 @@
+
+
+.header
+{
+    background-color: #2A2A2A;
+    border-radius: 10px;
+    overflow: auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.headerChannel
+{
+    float: left;
+}
+
+.headerChannel IMG
+{
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.headerTitle
+{
+    float: left;
+    padding: 5px;
+    vertical-align: middle;
+    margin-top: 8px;
+    margin-left: 15px;
+}
+
+.headerTitle .recRuleTitle
+{
+    font-size: 1.3em;
+    font-weight: bold;
+    display: block;
+}
+
+.headerTitle .recRuleSubTitle
+{
+    font-size: 1.0em;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+}
+
+.recRuleStartTime
+{
+    font-size: 0.9em;
+    display: block;
+    margin-top: 2px;
+}
+
+#editor-form
+{
+    clear: both;
+}
+
+.recRuleDetails DIV
+{
+    margin-bottom: 10px;
+}
+
+.recRuleDetails .recRuleDescription
+{
+    clear: both;
+    margin-bottom: 15px;
+}
+
+.recRuleDetails .label
+{
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.recRuleDetails .value
+{
+    font-size: 0.9em;
+    margin-right: 15px;
+}
+
+.recRuleDetails .programDetails
+{
+    clear: both;
+}
+

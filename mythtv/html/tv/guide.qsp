@@ -128,28 +128,28 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Single Record')">
+    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Single Record')">
         <%=qsTr("Record this showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record All')">
+    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All')">
         <%=qsTr("Record all showings")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record One')">
+    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record One')">
         <%=qsTr("Record one showing")%>
     </div>
-    <div class="button scheduleMenu" onClick="recordProgram(chanID, startTime, 'Record All (Channel)')">
+    <div class="button scheduleMenu" onClick="recordProgram(gChanID, gStartTime, 'Record All (Channel)')">
         <%=qsTr("Record all showings (this channel)")%>
     </div>
-    <div class="button delSchedMenu" onClick="dontRecord(chanID, startTime)">
+    <div class="button delSchedMenu" onClick="dontRecord(gChanID, gStartTime)">
         <%=qsTr("Don't Record")%>
     </div>
-    <div class="button delSchedMenu" onClick="neverRecord(chanID, startTime)">
+    <div class="button delSchedMenu" onClick="neverRecord(gChanID, gStartTime)">
         <%=qsTr("Never Record")%>
     </div>
-    <div class="button delSchedMenu" onClick="deleteRecRule(chanID, startTime)">
+    <div class="button delSchedMenu" onClick="deleteRecRule(gChanID, gStartTime)">
         <%=qsTr("Delete Recording Rule")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime)">
+    <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>

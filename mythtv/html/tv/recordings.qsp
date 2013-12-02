@@ -87,22 +87,22 @@ import "/tv/js/constants.js"
      side (harder to maintain/template) or keeping in together inline with the
      other related html, with as little non-html markup as possible -->
 <div id="optMenu" class="contextMenu" style="display:none;">
-    <div class="button normalMenu" onClick="deleteRecording(chanID, startTime, false, false)">
+    <div class="button normalMenu" onClick="deleteRecording(gChanID, gStartTime, false, false)">
         <%=qsTr("Delete")%>
     </div>
-    <div class="button normalMenu" onClick="deleteRecording(chanID, startTime, true, false)">
+    <div class="button normalMenu" onClick="deleteRecording(gChanID, gStartTime, true, false)">
         <%=qsTr("Delete and Re-Record")%>
     </div>
-    <div class="button deletedMenu" onClick="unDeleteRecording(chanID, startTime)">
+    <div class="button deletedMenu" onClick="unDeleteRecording(gChanID, gStartTime)">
         <%=qsTr("Undelete")%>
     </div>
-    <div class="button deletedMenu" onClick="deleteRecording(chanID, startTime, false, true)">
+    <div class="button deletedMenu" onClick="deleteRecording(gChanID, gStartTime, false, true)">
         <%=qsTr("Delete Forever")%>
     </div>
-    <div class="button recordingMenu" onClick="stopRecording(chanID, startTime)">
+    <div class="button recordingMenu" onClick="stopRecording(gChanID, gStartTime)">
         <%=qsTr("Stop Recording")%>
     </div>
-    <div class="button normalMenu" onClick="loadScheduler(chanID, startTime)">
+    <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
         <%=qsTr("Edit recording rule")%>
     </div>
 </div>

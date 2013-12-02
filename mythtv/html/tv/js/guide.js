@@ -2,7 +2,7 @@
 function recordProgram(chanID, startTime, type)
 {
     hideMenu("optMenu");
-    var url = "/tv/ajax_backends/dvr_util.qsp?action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=simpleRecord&chanID=" + chanID + "&startTime=" + startTime + "&type=" + type;
     var ajaxRequest = $.ajax( url )
                             .done(function()
                             {
@@ -14,12 +14,17 @@ function recordProgram(chanID, startTime, type)
 // Override the one in common.js for now
 function checkRecordingStatus(chanID, startTime)
 {
-    var url = "/tv/ajax_backends/dvr_util.qsp?action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
+    var url = "/tv/ajax_backends/dvr_util.qsp?_action=checkRecStatus&chanID=" + chanID + "&startTime=" + startTime;
     var ajaxRequest = $.ajax( url ).done(function()
                             {
                                 var response = ajaxRequest.responseText.split("#");
                                 var id = response[0] + "_" + response[1];
                                 var layer = document.getElementById(id);
+                                if (!isValidObject(layer))
+                                {
+                                    setErrorMessage("Guide::checkRecordingStatus() invalid program ID (" + id + ")");
+                                    return;
+                                }
                                 toggleClass(layer, "programScheduling");
                                 // toggleClass(layer, response[2]);
                                 var popup = document.getElementById(id + "_schedpopup");

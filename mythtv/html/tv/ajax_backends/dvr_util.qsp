@@ -8,123 +8,211 @@
 
 import "/js/utility.js"
 
-    var args = arguments[1];
-    function getArg(name)
+var args = arguments[1];
+function getArg(name)
+{
+    name = name.toLowerCase();
+    return args[name];
+}
+
+var myth = new Myth();
+
+function recStatusToClass(statusInt)
+{
+    var dvr = new Dvr();
+    var statusStr = dvr.RecStatusToString(statusInt);
+    var statusClass = "program" + statusStr.replace(/ /g, '');
+    return statusClass;
+}
+
+function scheduleSimpleRecording(chanID, startTime, type)
+{
+    var dvr = new Dvr();
+
+    var recRule = dvr.GetRecordSchedule(0, "", chanID, startTime, false);
+
+    // Prevent duplicate recording rules being created
+    if (recRule.Id > 0 && recRule.Type == type)
+        return chanID + "#" + startTime.toISOString() + "#" + recRule.Id;
+
+    if (type == "Record All (Channel)")
     {
-        name = name.toLowerCase();
-        return args[name];
+        type = "Record All";
+        recRule.Filter |= 1024;
     }
 
-    var myth = new Myth();
+    recRule.Type = type;
 
-    function recStatusToClass(statusInt)
+    var recRuleId = dvr.AddRecordSchedule(recRule);
+
+    return chanID + "#" + startTime.toISOString() + "#" + recRuleId;
+}
+
+function checkRecordingStatus(chanID, startTime)
+{
+    var guide = new Guide();
+    var program = guide.GetProgramDetails(chanID, startTime);
+    return chanID + "#" + startTime.toISOString()  + "#" + recStatusToClass(program.Recording.Status);
+}
+
+function deleteRecRule(recRuleID, chanID, startTime)
+{
+    var dvr = new Dvr();
+    dvr.RemoveRecordSchedule(Number(recRuleID));
+    return chanID + "#" + startTime.toISOString()  + "#" + recRuleID;
+}
+
+function dontRecord(chanID, startTime)
+{
+    var dvr = new Dvr();
+    dvr.AddDontRecordSchedule(chanID, startTime, false);
+    return chanID + "#" + startTime.toISOString();
+}
+
+function neverRecord(chanID, startTime)
+{
+    var dvr = new Dvr();
+    dvr.AddDontRecordSchedule(chanID, startTime, true);
+    return chanID + "#" + startTime.toISOString();
+}
+
+function deleteRecording(chanID, startTime, allowReRecord, forceDelete)
+{
+    var dvr = new Dvr();
+    dvr.DeleteRecording(chanID, startTime, forceDelete, allowReRecord);
+    return chanID + "#" + startTime.toISOString();
+}
+
+function unDeleteRecording(chanID, startTime)
+{
+    var dvr = new Dvr();
+    dvr.UnDeleteRecording(chanID, startTime);
+    return chanID + "#" + startTime.toISOString();
+}
+
+function saveRecordingRule(recRuleId, chanId, startTime)
+{
+    var dvr = new Dvr();
+
+    var recRule = dvr.GetRecordSchedule(recRuleId, "",
+                                        chanId,
+                                        startTime,
+                                        false);
+
+    // Program Data
+    if (recRule.Id == 0)
     {
-        var dvr = new Dvr();
-        var statusStr = dvr.RecStatusToString(statusInt);
-        var statusClass = "program" + statusStr.replace(/ /g, '');
-        return statusClass;
+        recRule.Title       = getArg("Title");
+        recRule.SubTitle    = getArg("SubTitle");
+        recRule.Description = getArg("Description");
+        recRule.Category    = getArg("Category");
+        recRule.ProgramId   = getArg("ProgramId");
+        recRule.SeriesId    = getArg("SeriesId");
+        recRule.ChanId      = Number(getArg("ChanId"));
+        recRule.CallSign    = getArg("CallSign");
+        recRule.StartTime   = getArg("StartTime");
+        recRule.EndTime     = getArg("EndTime");
     }
 
-    function scheduleSimpleRecording(chanID, startTime, type)
+    // Schedule Options
+    recRule.Type            = getArg("Type");
+    recRule.RecPriority     = Number(getArg("RecPriority"));
+    recRule.StartOffset     = Number(getArg("StartOffset"));
+    recRule.EndOffset       = Number(getArg("EndOffset"));
+    recRule.DupMethod       = getArg("DupMethod");
+    recRule.DupIn           = getArg("DupIn");
+    recRule.PreferredInput  = Number(getArg("PreferredInput"));
+    recRule.Inactive        = Boolean(Number(getArg("Inactive")));
+
+    // Filters
+    var filters = getArg("Filter");
+    for (var filterkey in filters)
     {
-        var dvr = new Dvr();
-
-        var recRule = dvr.GetRecordSchedule(0, "", chanID, startTime, false);
-
-        // Prevent duplicate recording rules being created
-        if (recRule.Id > 0 && recRule.Type == type)
-            return chanID + "#" + startTime.toISOString() + "#" + recRule.Id;
-
-        if (type == "Record All (Channel)")
+        if (filters[filterkey] > 0)
         {
-            type = "Record All";
-            recRule.Filter |= 1024;
+            var filterValue = Number(filterkey.slice(1));
+            recRule.Filter |= (1 << filterValue);
         }
-
-        recRule.Type = type;
-
-        var recRuleId = dvr.AddRecordSchedule(recRule);
-
-        return chanID + "#" + startTime.toISOString() + "#" + recRuleId;
     }
 
-    function checkRecordingStatus(chanID, startTime)
+    // Storage Options
+    recRule.RecGroup        = getArg("RecGroup");
+    recRule.StorageGroup    = getArg("StorageGroup");
+    recRule.PlayGroup       = getArg("PlayGroup");
+    recRule.MaxEpisodes     = Number(getArg("MaxEpisodes"));
+    recRule.MaxNewest       = Boolean(Number(getArg("MaxNewest")));
+    recRule.AutoExpire      = Boolean(Number(getArg("AutoExpire")));
+
+    // Post-Processing
+    recRule.AutoMetaLookup  = Boolean(Number(getArg("AutoMetaLookup")));
+    recRule.AutoCommflag    = Boolean(Number(getArg("AutoCommflag")));
+    recRule.AutoTranscode   = Boolean(Number(getArg("AutoTranscode")));
+    recRule.Transcoder      = getArg("Transcoder");
+    recRule.AutoUserJob1    = Boolean(Number(getArg("AutoUserJob1")));
+    recRule.AutoUserJob2    = Boolean(Number( getArg("AutoUserJob2")));
+    recRule.AutoUserJob3    = Boolean(Number(getArg("AutoUserJob3")));
+    recRule.AutoUserJob4    = Boolean(Number(getArg("AutoUserJob4")));
+
+    // Metadata Options
+    recRule.Inetref         = getArg("Inetref");
+    recRule.Season          = Number(getArg("Season"));
+    recRule.Episode         = Number(getArg("Episode"));
+
+    var ruleId = 0;
+    if (recRule.Id == 0)
     {
-        var guide = new Guide();
-        var program = guide.GetProgramDetails(chanID, startTime);
-        return chanID + "#" + startTime.toISOString()  + "#" + recStatusToClass(program.Recording.Status);
+        print("Add Record Schedule");
+        ruleId = dvr.AddRecordSchedule(recRule);
+    }
+    else
+    {
+        ruleId = recRule.Id;
+        print("Update Record Schedule: " + ruleId);
+        dvr.UpdateRecordSchedule(recRule);
     }
 
-    function deleteRecRule(recRuleID, chanID, startTime)
-    {
-        var dvr = new Dvr();
-        dvr.RemoveRecordSchedule(recRuleID);
-        return chanID + "#" + startTime.toISOString()  + "#" + recRuleID;
-    }
+    return ruleId;
+}
 
-    function dontRecord(chanID, startTime)
-    {
-        var dvr = new Dvr();
-        dvr.AddDontRecordSchedule(chanID, startTime, false);
-        return chanID + "#" + startTime.toISOString();
-    }
-
-    function neverRecord(chanID, startTime)
-    {
-        var dvr = new Dvr();
-        dvr.AddDontRecordSchedule(chanID, startTime, true);
-        return chanID + "#" + startTime.toISOString();
-    }
-
-    function deleteRecording(chanID, startTime, allowReRecord, forceDelete)
-    {
-        var dvr = new Dvr();
-        dvr.DeleteRecording(chanID, startTime, forceDelete, allowReRecord);
-        return chanID + "#" + startTime.toISOString();
-    }
-
-    function unDeleteRecording(chanID, startTime)
-    {
-        var dvr = new Dvr();
-        dvr.UnDeleteRecording(chanID, startTime);
-        return chanID + "#" + startTime.toISOString();
-    }
-
-    var ret;
-    switch (args.action)
-    {
-        case "simpleRecord":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = scheduleSimpleRecording(getArg("ChanID"), validDate, getArg("Type"));
-            break;
-        case "checkRecStatus":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = checkRecordingStatus(getArg("ChanID"), validDate);
-            break;
-        case "deleteRecRule":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = deleteRecRule(args.recruleid, getArg("ChanID"), validDate);
-            break;
-        case "dontRecord":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = dontRecord(getArg("ChanID"), validDate);
-            break;
-        case "neverRecord":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = neverRecord(getArg("ChanID"), validDate);
-            break;
-        case "deleteRecording":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = deleteRecording(getArg("ChanID"), validDate,
-                                  getArg("AllowRerecord") == 1,
-                                  getArg("ForceDelete") == 1);
-            break;
-        case "unDeleteRecording":
-            var validDate = myth.ParseISODateString(getArg("StartTime"));
-            ret = unDeleteRecording(getArg("ChanID"), validDate);
-            break;
-        default:
-            break;
-    }
+var ret = "ERROR";
+switch (getArg("_action")) // _action to avoid conflicts with http form's "action"
+{
+    case "simpleRecord":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = scheduleSimpleRecording(getArg("ChanID"), validDate, getArg("Type"));
+        break;
+    case "checkRecStatus":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = checkRecordingStatus(getArg("ChanID"), validDate);
+        break;
+    case "deleteRecRule":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = deleteRecRule(getArg("RecRuleId"), getArg("ChanID"), validDate);
+        break;
+    case "dontRecord":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = dontRecord(getArg("ChanID"), validDate);
+        break;
+    case "neverRecord":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = neverRecord(getArg("ChanID"), validDate);
+        break;
+    case "deleteRecording":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = deleteRecording(getArg("ChanID"), validDate,
+                                getArg("AllowRerecord") == 1,
+                                getArg("ForceDelete") == 1);
+        break;
+    case "unDeleteRecording":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = unDeleteRecording(getArg("ChanID"), validDate);
+        break;
+    case "saveRecordingRule":
+        var validDate = myth.ParseISODateString(getArg("StartTime"));
+        ret = saveRecordingRule(getArg("id"), getArg("ChanID"), validDate);
+        break;
+    default:
+        break;
+}
 %>
 <%=ret%>

@@ -166,3 +166,34 @@
     padding: 6px 4px; /* Vertical Horizontal */
 }
 
+.notifyPopup
+{
+    color: #FFFFFF;
+    display: none;
+    background-color: rgba(26, 26, 26, 0.95);
+    border-radius: 8px;
+    width: 130px;
+    height: 18px;
+    padding: 8px;
+    top: 50%;
+    left: 50%;
+    margin-top: -9px;
+    margin-left: -65px;
+    font-size: 1.0em;
+    font-weight: bold;
+    position: absolute;
+    z-index: 10;
+    white-space: nowrap;
+    text-align: center;
+}
+
+#saveFormDataSuccess.notifyPopup
+{
+    color: #009900;
+}
+
+#saveFormDataError.notifyPopup
+{
+    color: #990000;
+}
+

@@ -30,3 +30,43 @@ function isValidObject(variable)
             && typeof variable !== "undefined"
             && (variable != null));
 }
+
+// For debugging only, this isn't JSON
+function objectDump(arr,level)
+{
+    var objectString = "<br/>\n";
+    if (!level)
+        level = 0;
+
+    var indentation = "";
+    for (var j = 0; j < (level + 1); j++)
+    {
+        indentation += "    ";
+    }
+
+    var count = 1;
+    if (typeof(arr) == 'object')
+    {
+        for (var item in arr)
+        {
+            var value = arr[item];
+
+            objectString += count + ". ";
+            if (typeof(value) == 'object')
+            {
+                objectString += indentation + "'" + item + "' ...<br/>\n";
+                objectString += objectDump(value, level+1);
+            }
+            else
+            {
+                objectString += indentation + "'" + item + "' => \"" + value + "\"<br/>\n";
+            }
+            count++;
+        }
+    }
+    else
+    {
+        objectString = "===>"+arr+"<===("+typeof(arr)+")";
+    }
+    return objectString;
+}

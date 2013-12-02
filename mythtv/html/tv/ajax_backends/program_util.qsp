@@ -126,7 +126,7 @@ import "/js/utility.js"
     }
 
     var ret;
-    switch (getArg("action"))
+    switch (getArg("_action"))
     {
         case "getProgramDetailHTML":
             ret = getProgramDetailHTML(args);
