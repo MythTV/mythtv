@@ -192,14 +192,28 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         // Build array of arguments passed to script
         // ------------------------------------------------------------------
 
+        // FIXME: Even with the added escaping, this probably isn't very safe
+        //        and should be done differently
         QString params = "ARGS = { ";
         if (mapParams.size())
         {
             QMap<QString, QString>::const_iterator it = mapParams.begin();
 
+            // Valid characters for object property names must contain only
+            // word characters and numbers, _ and $
+            // They must not start with a number - to simplify the regexp, we
+            // restrict the first character to the English alphabet
+            QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
             for (; it != mapParams.end(); ++it)
             {
-                params += QString("%1: '%2', ").arg(it.key()).arg(it.value());
+                if (!validChars.exactMatch(it.key()))
+                    continue;
+
+                QString value = it.value();
+                value.replace("'", "\\'");
+                value.replace("}", "\\}");
+                value.replace("{", "\\{");
+                params += QString("%1: '%2', ").arg(it.key()).arg(value);
             }
         }
 
