@@ -400,7 +400,17 @@ QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
 ArtworkList MetadataLookup::GetArtwork(VideoArtworkType type) const
 {
     ArtworkList ret;
-    ret = m_artwork.values(type);
+
+    // QMultiMap::values() returns items in reverse order which we need to
+    // correct by iterating back over the list
+    // See http://qt-project.org/doc/qt-4.8/qmultimap.html#details
+    // Specifically "The items that share the same key are available from "
+    //              "most recently to least recently inserted."
+    QListIterator<ArtworkInfo> it(m_artwork.values(type));
+    it.toBack();
+    while (it.hasPrevious())
+        ret.append(it.previous());
+
     return ret;
 }
 
