@@ -117,7 +117,7 @@ function saveRecordingRule(recRuleId, chanId, startTime)
     // Schedule Options
     recRule.Type            = getArg("Type");
     recRule.RecPriority     = Number(getArg("RecPriority"));
-    recRule.StartOffset     = Number(getArg("StartOffset"));
+    recRule.StartOffset     = Number(getArg("StartOffset")) * -1; // StartOffset treats a negative X value as start 'X minutes late', which is confusing from a UI perspective
     recRule.EndOffset       = Number(getArg("EndOffset"));
     recRule.DupMethod       = getArg("DupMethod");
     recRule.DupIn           = getArg("DupIn");
