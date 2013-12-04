@@ -482,16 +482,8 @@ function saveFormData(formElement, callback)
         setErrorMessage("submitForm() invalid form element");
         return;
     }
-    var url = formElement.action;
-//     if (event.preventDefault)
-//     {
-//         event.preventDefault();
-//     }
-//     else
-//     {
-//        event.returnValue = false;
-//     }
 
+    var url = formElement.action;
     var postData = $(formElement).serializeArray();
 
     $.ajax(
