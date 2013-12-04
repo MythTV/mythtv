@@ -204,20 +204,51 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
             // They must not start with a number - to simplify the regexp, we
             // restrict the first character to the English alphabet
             QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
+            QString paramStr = QString("%1: '%2', ");
+            QString prevArrayName = "";
             for (; it != mapParams.end(); ++it)
             {
-                if (!validChars.exactMatch(it.key()))
-                    continue;
-
                 QString value = it.value();
                 value.replace("'", "\\'");
                 value.replace("}", "\\}");
                 value.replace("{", "\\{");
-                params += QString("%1: '%2', ").arg(it.key()).arg(value);
+
+                // Array
+                if (it.key().contains("["))
+                {
+                    QString arrayName = it.key().section('[',0,0);
+                    QString arrayKey = it.key().section('[',1,1);
+                    arrayKey.chop(1); // Remove trailing ]
+                    if (prevArrayName != arrayName) // Different array
+                    {
+                        if (!prevArrayName.isEmpty())
+                            params += " }, ";
+
+                        prevArrayName = arrayName;
+
+                        params += arrayName + " : { ";
+                    }
+
+                    params += paramStr.arg(arrayKey).arg(value);
+                }
+                else
+                {
+                    if (!prevArrayName.isEmpty())
+                    {
+                        params += " }, ";
+                        prevArrayName = "";
+                    }
+                }
+
+                if (!validChars.exactMatch(it.key()))
+                    continue;
+
+                params += paramStr.arg(it.key()).arg(value);
             }
         }
 
         params += " }";
+        LOG(VB_UPNP, LOG_DEBUG, QString("Called with parameters (%1)").arg(params));
         m_engine.evaluate(params);
 
         // ------------------------------------------------------------------
