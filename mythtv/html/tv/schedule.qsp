@@ -69,11 +69,11 @@ import "/tv/js/constants.js"
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/schedule.js"></script>
 
-<div class="notifyPopup" id="saveRecordingScheduleSuccess">
+<div class="notifyPopup" id="saveFormDataSuccess">
     <%=qsTr("Changes Saved")%>
 </div>
 
-<div class="notifyPopup" id="saveRecordingScheduleError">
+<div class="notifyPopup" id="saveFormDataError">
     <%=qsTr("Save Failed!")%>
 </div>
 
