@@ -161,6 +161,8 @@ import "/tv/js/constants.js"
             <select name="Type" id="rule-Type" autofocus required>
             <% for (var name in RecordingType)
                {
+                    if (RecordingType[name] == RecordingType.NOTRECORDING)
+                        continue;
                     if (RecordingType[name] == RecordingType.OVERRIDERECORD)
                         break;
 
