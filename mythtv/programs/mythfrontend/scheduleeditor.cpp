@@ -1459,11 +1459,12 @@ void MetadataOptions::PerformQuery()
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
-    if (m_seasonSpin->GetIntValue() > 0 ||
-           m_episodeSpin->GetIntValue() > 0)
-        lookup->SetSubtype(kProbableTelevision);
+    if ((m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
+        (m_seasonSpin->GetIntValue() == 0 &&
+         m_episodeSpin->GetIntValue() == 0))
+         lookup->SetSubtype(kProbableMovie);
     else
-        lookup->SetSubtype(kProbableMovie);
+        lookup->SetSubtype(kProbableTelevision);
     lookup->SetAllowGeneric(true);
     lookup->SetAutomatic(false);
     lookup->SetHandleImages(false);
@@ -1658,11 +1659,12 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     lookup->SetType(kMetadataVideo);
     lookup->SetAutomatic(true);
     lookup->SetHandleImages(false);
-    if (m_seasonSpin->GetIntValue() > 0 ||
-           m_episodeSpin->GetIntValue() > 0)
-        lookup->SetSubtype(kProbableTelevision);
+    if ((m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
+        (m_seasonSpin->GetIntValue() == 0 &&
+         m_episodeSpin->GetIntValue() == 0))
+         lookup->SetSubtype(kProbableMovie);
     else
-        lookup->SetSubtype(kProbableMovie);
+        lookup->SetSubtype(kProbableTelevision);
     lookup->SetAllowGeneric(true);
     lookup->SetData(qVariantFromValue<VideoArtworkType>(type));
     lookup->SetHost(gCoreContext->GetMasterHostName());
