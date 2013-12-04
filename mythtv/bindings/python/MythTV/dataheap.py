@@ -888,6 +888,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         self.cast.commit()
         self.genre.commit()
         self.country.commit()
+        self.markup.commit()
 
     def __repr__(self):
         if self._wheredat is None:
