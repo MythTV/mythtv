@@ -494,12 +494,17 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
 
 DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
-                                        bool bShowAll )
+                                        bool bShowAll,
+                                        int  nRecordId )
 {
     RecordingList  recordingList;
     RecordingList  tmpList;
     bool hasConflicts;
-    LoadFromScheduler(tmpList, hasConflicts);
+
+    if (nRecordId <= 0)
+        nRecordId = -1;
+
+    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
 
     // Sort the upcoming into only those which will record
     RecordingList::iterator it = tmpList.begin();

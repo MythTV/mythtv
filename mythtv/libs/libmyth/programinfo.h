@@ -803,18 +803,26 @@ bool LoadFromScheduler(
     hasConflicts = slist[0].toInt();
 
     QStringList::const_iterator sit = slist.begin()+2;
+    int programCount = 0;
     while (sit != slist.end())
     {
         TYPE *p = new TYPE(sit, slist.end());
-        destination.push_back(p);
+
         if (!p->HasPathname() && !p->GetChanID())
         {
             destination.clear();
             return false;
         }
+
+        programCount++;
+
+        if (recordid > 0 && p->GetRecordingRuleID() != recordid)
+            continue;
+
+        destination.push_back(p);
     }
 
-    if (destination.size() != slist[1].toUInt())
+    if (programCount != slist[1].toUInt())
     {
         destination.clear();
         return false;
