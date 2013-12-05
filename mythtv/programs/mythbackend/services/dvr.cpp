@@ -558,12 +558,17 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::ProgramList* Dvr::GetConflictList( int  nStartIndex,
-                                        int  nCount       )
+                                        int  nCount,
+                                        int  nRecordId       )
 {
     RecordingList  recordingList;
     RecordingList  tmpList;
     bool hasConflicts;
-    LoadFromScheduler(tmpList, hasConflicts);
+
+    if (nRecordId <= 0)
+        nRecordId = -1;
+
+    LoadFromScheduler(tmpList, hasConflicts, "", nRecordId);
 
     // Sort the upcoming into only those which are conflicts
     RecordingList::iterator it = tmpList.begin();

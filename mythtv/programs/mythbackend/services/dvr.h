@@ -67,7 +67,8 @@ class Dvr : public DvrServices
                                                 const QDateTime &StartTime );
 
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
-                                                int              Count      );
+                                                int              Count,
+                                                int              RecordId );
 
         DTC::ProgramList* GetUpcomingList     ( int              StartIndex,
                                                 int              Count,
@@ -292,9 +293,10 @@ class ScriptableDvr : public QObject
         }
 
         QObject* GetConflictList    ( int              StartIndex,
-                                      int              Count      )
+                                      int              Count,
+                                      int              RecordId )
         {
-            return m_obj.GetConflictList( StartIndex, Count );
+            return m_obj.GetConflictList( StartIndex, Count, RecordId );
         }
 
         QObject* GetUpcomingList    ( int              StartIndex,

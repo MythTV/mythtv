@@ -27,11 +27,11 @@ import "/tv/js/constants.js"
     var PAGEINTERVAL = 10;
     var programList;
     if (filter == "conflicting")
-        programList = dvr.GetConflictList(startIndex, PAGEINTERVAL);
+        programList = dvr.GetConflictList(startIndex, PAGEINTERVAL, 0);
     else if (filter == "all")
-        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, true);
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, true, 0);
     else
-        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, false);
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, false, 0);
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
     if (nextStartIndex > programList.TotalAvailable)
