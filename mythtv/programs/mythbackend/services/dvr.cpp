@@ -510,7 +510,8 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     RecordingList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
-        if (!bShowAll && ((*it)->GetRecordingStatus() <= rsWillRecord) &&
+        if (!bShowAll && (((*it)->GetRecordingStatus() <= rsWillRecord) ||
+                          ((*it)->GetRecordingStatus() == rsConflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
         {
             recordingList.push_back(new RecordingInfo(**it));
