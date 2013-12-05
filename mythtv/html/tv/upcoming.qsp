@@ -3,6 +3,7 @@
 
 import "/js/utility.js"
 import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
 
     var args = arguments[1];
     function getArg(name)
@@ -130,9 +131,8 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 
     var menu = "normalMenu";
 
-    //
-    var statusStr = dvr.RecStatusToString(program.Recording.Status);
-    var statusClass = "program" + statusStr.replace(/ /g, '');
+    // RecStatusToClass() - /tv/js/tvutil.qjs
+    var statusClass = RecStatusToClass(program.Recording.Status);
 
     var recStatusDesc = dvr.RecStatusToDescription(program.Recording.Status,
                                                    program.Recording.RecType,

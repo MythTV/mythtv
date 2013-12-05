@@ -1,5 +1,4 @@
 
-
 .header
 {
     background-color: #2A2A2A;
@@ -51,12 +50,19 @@
     margin-top: 2px;
 }
 
-#editor-form
+#scheduleEditor
 {
     clear: both;
 }
 
-.recRuleDetails DIV
+#scheduleEditor div
+{
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+/*    overflow: hidden;*/
+}
+
+.recRuleDetails>DIV
 {
     margin-bottom: 10px;
 }
@@ -83,5 +89,123 @@
 .recRuleDetails .programDetails
 {
     clear: both;
+}
+
+.upcomingShowings
+{
+    clear: both;
+    float: left;
+    width: 46%;
+}
+
+.upcomingConflicts
+{
+    margin-left: 5%;
+    float: left;
+    width: 46%;
+}
+
+.upcomingShowings .label,
+.upcomingConflicts .label
+{
+    margin-bottom: 10px;
+    display: block;
+}
+
+.upcomingShowing, .upcomingConflict
+{
+    margin: 0px;
+    margin-top: 5px;
+    height: 55px;
+}
+
+.channelIconBox
+{
+    clear: both;
+    float: left;
+    background-color: #2A2A2A;
+    padding: 4px;
+    height: 100%;
+}
+
+.channelIconBox IMG
+{
+    border-radius: 6px;
+}
+
+.programBox
+{
+    background-color: #444444;
+    border-radius: 0px 6px 6px 0px;
+    overflow: hidden;
+    height: 100%;
+    right: 0px;
+}
+
+.programHeader
+{
+    padding: 5px 8px 4px 7px;
+    color: #FFFFFF;
+    height: 25px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-bottom-right-radius: 6px;
+}
+
+.programHeader IMG
+{
+    float: left;
+    margin-top: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+.programTitle
+{
+    float: left;
+    display: block;
+    font-size: 1.0em;
+    font-weight: bold;
+}
+
+.programDateTime
+{
+    font-size: 0.8em;
+    text-align: right;
+    float: right;
+    display: block;
+}
+
+.programBody
+{
+    padding: 3px 5px 4px 5px; /* Top Right Bottom Left */
+    color: #DDDDDD;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+.programSubtitle
+{
+    font-weight: bold;
+    width: 50%;
+    display: block;
+    float: left;
+}
+
+.programDescription
+{
+}
+
+.programRecordingStatus
+{
+    width: 50%;
+    text-align: right;
+    float: right;
+    display: block;
 }
 

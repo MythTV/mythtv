@@ -51,7 +51,7 @@
 .programLaterShowing .programHeader,
 .programOtherShowing .programHeader
 {
-    border: 2px #37912F dashed;
+    background: linear-gradient(to bottom, #66BB66, #339933 40%);
 }
 
 .programConflicting .programHeader,

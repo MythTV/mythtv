@@ -3,6 +3,7 @@
 
 import "/js/utility.js"
 import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
 
     var args = arguments[1];
     function getArg(name)
@@ -38,6 +39,14 @@ import "/tv/js/constants.js"
 
     var program = guide.GetProgramDetails(chanId, startTime);
     var channel = program.Channel;
+
+    var upcomingShowings = [];
+    var upcomingConflicts = [];
+    if (recRule.Id > 0)
+    {
+        upcomingShowings = dvr.GetUpcomingList(0, 5, true, recRule.Id).Programs; // Next 5 showings
+        upcomingConflicts = dvr.GetConflictList(0, 5, recRule.Id).Programs; // Next 5 conflicts
+    }
 
     var cast = new Object;
     if (isValidObject(program))
@@ -95,7 +104,7 @@ import "/tv/js/constants.js"
 
 </div>
 
-<div id="editor-form">
+<div id="scheduleEditor">
   <ul>
     <li><a href="#page-1"><%=qsTr("Details")%></a></li>
     <li><a href="#page-2"><%=qsTr("Schedule Options")%></a></li>
@@ -125,17 +134,21 @@ import "/tv/js/constants.js"
             </div>
 
             <% if (isValidObject(program)) { %>
-            <div class="programDetails">
+            <!-- <div class="programDetails"> -->
                 <div class="programSeasonEpisode">
-                    <span class="label"><%=qsTr("Season")%>:</span> <span class="value"><%=program.Season%></span>
-                    <span class="label"><%=qsTr("Episode")%>:</span> <span class="value"><%=program.Episode%>
-                    <% if (program.TotalEpisodes > 0) { %> / <%=program.TotalEpisodes%> <% } %>
+                    <% if (program.Season > 0) { %>
+                        <span class="label"><%=qsTr("Season")%>:</span> <span class="value"><%=program.Season%></span>
+                    <% } %>
+                    <% if (program.Episode > 0) { %>
+                        <span class="label"><%=qsTr("Episode")%>:</span> <span class="value"><%=program.Episode%>
+                        <% if (program.TotalEpisodes > 0) { %> / <%=program.TotalEpisodes%> <% } %>
+                    <% } %>
                     </span>
                 </div>
 
                 <div class="programCast">
                 <% for (var role in cast)
-                    {
+                   {
                 %>
                     <p><span class="label"><%=role%>:</span> <span class="value"><%=cast[role]%></span></p>
                 <% } %>
@@ -146,10 +159,67 @@ import "/tv/js/constants.js"
                 </div>
 
                 <div class="programCategory">
-                    <span class="label"><%=qsTr("Category")%>:</span> <span class="value"><%=program.Category%></span>
+                    <span class="label"><%=qsTr("Category")%>:</span> <span class="value"><%=toCapitalCase(program.Category)%></span>
+                </div>
+            <!-- </div> -->
+            <%}%>
+
+            <div class="upcomingShowings" id="upcomingShowings">
+                <span class="label"><%=qsTr("Next 5 Showings")%>:</span>
+                <div id="upcomingShowingsList">
+                <%  if (upcomingShowings.length == 0)
+                    {
+                %>
+                        <div><%=qsTr("No Conflicts")%></div>
+                <%  }
+
+                    for (var listIdx = 0; listIdx < upcomingShowings.length; listIdx++)
+                    {
+                        showing = upcomingShowings[listIdx];
+                        // RecStatusToClass() - /tv/js/tvutil.qjs
+                        var statusClass = RecStatusToClass(showing.Recording.Status);
+                %>
+                        <div class="upcomingShowing">
+                            <div class="channelIconBox">
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=showing.Channel.ChanId%>&amp;Height=45" />
+                            </div>
+                            <div class="programBox <%=statusClass%>">
+                                <div class="programHeader"><span class="programTitle"><%=showing.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(showing.StartTime)%>, <%=myth.GetFormatTime(showing.StartTime)%> - <%=myth.GetFormatTime(showing.EndTime)%></span></div>
+                                <div class="programBody"><span class="programSubtitle"><%=showing.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(showing.Recording.Status)%></span></div>
+                            </div>
+                        </div>
+                <%  } %>
                 </div>
             </div>
-            <%}%>
+
+            <div class="upcomingConflicts" id="upcomingConflicts">
+                <span class="label"><%=qsTr("Next 5 Conflicts")%>:</span>
+                <div id="upcomingConflictsList">
+                <%  if (upcomingConflicts.length == 0)
+                    {
+                %>
+                        <div><%=qsTr("No Conflicts")%></div>
+                <%  }
+
+                    for (var listIdx = 0; listIdx < upcomingConflicts.length; listIdx++)
+                    {
+                        conflict = upcomingConflicts[listIdx];
+                        // RecStatusToClass() - /tv/js/tvutil.qjs
+                        var statusClass = RecStatusToClass(conflict.Recording.Status);
+                %>
+                        <div class="upcomingConflict">
+                            <div class="channelIconBox">
+                                <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=conflict.Channel.ChanId%>&amp;Height=45" />
+                            </div>
+                            <div class="programBox <%=statusClass%>">
+                                <div class="programHeader"><span class="programTitle"><%=conflict.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(conflict.StartTime)%>, <%=myth.GetFormatTime(conflict.StartTime)%> - <%=myth.GetFormatTime(conflict.EndTime)%></span></div>
+                                <div class="programBody"><span class="programSubtitle"><%=conflict.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(conflict.Recording.Status)%></span></div>
+                            </div>
+                        </div>
+                <%  } %>
+                </div>
+            </div>
+            <div style="clear:both;"> <!-- Prevent parent collapsing because of floats --> </div>
         </div>
     </div> <!-- End Program/Rule Details -->
     <div id="page-2"> <!-- Schedule Options -->
@@ -510,5 +580,10 @@ import "/tv/js/constants.js"
     //$("#rule-DupMethod option[value='<%=recRule.DupMethod%>']").prop("selected", true);
     //$( "#rule-DupMethod" ).val("<%=recRule.DupMethod%>");
 
-    $( "#editor-form" ).tabs({ active: 1 });
+    $( "#scheduleEditor" ).tabs({ active: 1 });
+    if ($("#rule-Id").val() <= 0)
+    {
+        $("#upcomingShowings").hide();
+        $("#upcomingConflicts").hide();
+    }
 </script>
