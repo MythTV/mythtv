@@ -363,10 +363,10 @@ bool MythImage::Load(const QString &filename)
     }
     else
     {
-        QString absoluteUrl = filename;
-        if (!absoluteUrl.startsWith('/'))
-            GetMythUI()->FindThemeFile(absoluteUrl);
-        im = new QImage(absoluteUrl);
+        QString path = filename;
+        if (!path.startsWith('/') &&
+            GetMythUI()->FindThemeFile(path))
+            im = new QImage(path);
     }
 
     if (im && im->isNull())
