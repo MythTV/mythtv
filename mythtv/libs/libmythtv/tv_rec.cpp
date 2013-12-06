@@ -84,6 +84,7 @@ TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
+      signalMonitorCheckCnt(0),
       // Various threads
       eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
