@@ -12,7 +12,9 @@ import "/tv/js/tvutil.qjs"
         return args[name];
     }
 
-    var filter = getArg("ViewFilter");
+    var filter = "";
+    if (getArg("ViewFilter"))
+        filter = getArg("ViewFilter");
 
     var listOnly = 0;
     if (getArg("ListOnly"))
@@ -29,10 +31,16 @@ import "/tv/js/tvutil.qjs"
     var programList;
     if (filter == "conflicting")
         programList = dvr.GetConflictList(startIndex, PAGEINTERVAL, 0);
-    else if (filter == "all")
-        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, true, 0);
+    else if (filter == "important" || filter == "")
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, false, 0, 0);
     else
-        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, false, 0);
+    {
+        var status = 0;
+        if (filter == "inactive")
+            status = RecordingStatus.INACTIVE;
+
+        programList = dvr.GetUpcomingList(startIndex, PAGEINTERVAL, true, 0, status);
+    }
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
     if (nextStartIndex > programList.TotalAvailable)
@@ -89,9 +97,10 @@ import "/tv/js/tvutil.qjs"
     <form action="/tv/upcoming.qsp">
     <label for="upcomingFilter"><%=qsTr("Show")%>:
     <select id="upcomingFilter" name="ViewFilter" onChange="submitForm(this.form)">
-        <option value="important">Important</option>
-        <option value="conflicting" <% if (filter === "conflicting") {%>selected<%}%>>Conflicting or Failed Schedules</option>
-        <option value="all" <% if (filter === "all") {%>selected<%}%>>All scheduler matches</option>
+        <option value="important"><%=qsTr("Important")%></option>
+        <option value="conflicting" <% if (filter === "conflicting") {%>selected<%}%>><%=qsTr("Conflicting or Failed Schedules")%></option>
+        <option value="inactive" <% if (filter === "inactive") {%>selected<%}%>><%=qsTr("Inactive rule matches")%></option>
+        <option value="all" <% if (filter === "all") {%>selected<%}%>><%=qsTr("All scheduler matches")%></option>
     </select>
     </label>
     </form>
@@ -155,7 +164,6 @@ for (var listIdx = 0; listIdx < programs.length; listIdx++)
 <%
     }
 %>
-
     <div class="programRow" id="<%=programIdentifier%>_row">
         <div class="channelBox">
             <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />

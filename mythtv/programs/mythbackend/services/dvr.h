@@ -73,7 +73,8 @@ class Dvr : public DvrServices
         DTC::ProgramList* GetUpcomingList     ( int              StartIndex,
                                                 int              Count,
                                                 bool             ShowAll,
-                                                int              RecordId );
+                                                int              RecordId,
+                                                int              RecStatus );
 
         DTC::EncoderList* GetEncoderList      ( );
 
@@ -302,9 +303,11 @@ class ScriptableDvr : public QObject
         QObject* GetUpcomingList    ( int              StartIndex,
                                       int              Count,
                                       bool             ShowAll,
-                                      int              RecordId )
+                                      int              RecordId,
+                                      int              RecStatus )
         {
-            return m_obj.GetUpcomingList( StartIndex, Count, ShowAll, RecordId );
+            return m_obj.GetUpcomingList( StartIndex, Count, ShowAll,
+                                          RecordId, RecStatus );
         }
 
         QObject* GetEncoderList     () { return m_obj.GetEncoderList(); }

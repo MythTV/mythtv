@@ -44,7 +44,7 @@ import "/tv/js/tvutil.qjs"
     var upcomingConflicts = [];
     if (recRule.Id > 0)
     {
-        upcomingShowings = dvr.GetUpcomingList(0, 5, true, recRule.Id).Programs; // Next 5 showings
+        upcomingShowings = dvr.GetUpcomingList(0, 5, true, recRule.Id, 0).Programs; // Next 5 showings
         upcomingConflicts = dvr.GetConflictList(0, 5, recRule.Id).Programs; // Next 5 conflicts
     }
 

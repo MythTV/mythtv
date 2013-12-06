@@ -102,7 +102,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::ProgramList*  GetUpcomingList       ( int              StartIndex,
                                                            int              Count,
                                                            bool             ShowAll,
-                                                           int              RecordId ) = 0;
+                                                           int              RecordId,
+                                                           int              RecStatus ) = 0;
 
         virtual DTC::EncoderList*  GetEncoderList        ( ) = 0;
 

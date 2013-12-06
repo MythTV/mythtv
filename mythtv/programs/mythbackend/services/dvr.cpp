@@ -495,7 +495,8 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
 DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nCount,
                                         bool bShowAll,
-                                        int  nRecordId )
+                                        int  nRecordId,
+                                        int  nRecStatus )
 {
     RecordingList  recordingList;
     RecordingList  tmpList;
@@ -510,6 +511,10 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     RecordingList::iterator it = tmpList.begin();
     for(; it < tmpList.end(); ++it)
     {
+        if ((nRecStatus != 0) &&
+            ((*it)->GetRecordingStatus() != nRecStatus))
+            continue;
+
         if (!bShowAll && (((*it)->GetRecordingStatus() <= rsWillRecord) ||
                           ((*it)->GetRecordingStatus() == rsConflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
