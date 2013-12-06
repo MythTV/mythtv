@@ -6280,4 +6280,140 @@
         <genre>Hits, Coldwave, Disco</genre>
         <metadataformat>%a - %t</metadataformat>
     </item>
+    <item>
+        <station>Radioseven</station>
+        <channel>radioseven.se</channel>
+        <url>http://play.radioseven.se/128.pls</url>
+        <logourl>http://www.radioseven.se/objects/radisoevenlogo.png</logourl>
+        <genre>Dance Floor</genre>
+        <metadataformat>%a - %t</metadataformat>
+    </item>
+    <item>
+        <station>technobase.fm</station>
+        <channel>technobase.fm</channel>
+        <url>http://listen.technobase.fm/aacplus.pls</url>
+        <logourl></logourl>
+        <genre>Techno</genre>
+        <metadataformat>%a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Hit Radio FFH</channel>
+        <url>http://streams.ffh.de/radioffh/aac/hqlivestream.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/ffh600_ed8ac8f665.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Top 40</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqtop40.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/top40600_a4ac1ea7ca.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Die 80er</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hq80er.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/die80er600_dfea72042e.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Rock</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqrock.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/rockgerm600_14bd31bbe8.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Electro Beats</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqelectrobeatz.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/ebeats600_0a200d351d.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Eurodance</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqeurodance.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/eurodanc600_327886983c.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Deutsch Pur</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqdeutsch.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/deutpur600_c3b23fbb80.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Soundtrack</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqsoundtrack.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/soundtck600_7b1a9146cf.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Hits für Kids</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqhits4kids.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/hitskids600_6027711702.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Schlagerkult</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqschlager.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/schlagerk600_c8f4427fa1.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Jazz</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqjazz.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/jazzffh600_12ad478f60.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Die 90er</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqspezial.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/die90er600_1bae57fd42.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Lounge</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqlounge.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/lounge600_3dd1c4a115.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Dolce Vita</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqspezial1.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/dolce_vita_c04d7d187e.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
+    <item>
+        <station>Hit Radio FFH</station>
+        <channel>Alternative</channel>
+        <url>http://streams.ffh.de/ffhchannels/aac/hqalternative.m3u</url>
+        <logourl>http://webradio.ffh.de/typo3temp/pics/alternative600_64acfae9b8.jpg</logourl>
+        <genre></genre>
+        <metadataformat>%r: %a - %t</metadataformat>
+    </item>
 </streams>
