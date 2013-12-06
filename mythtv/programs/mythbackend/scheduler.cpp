@@ -627,7 +627,7 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
     for (; dreciter != reclist.end(); ++dreciter)
     {
         RecordingInfo *p = *dreciter;
-        if (p->IsSameProgramTimeslot(*pginfo))
+        if (p->IsSameTitleTimeslotAndChannel(*pginfo))
         {
             // FIXME!  If we are passed an rsUnknown recstatus, an
             // in-progress recording might be being stopped.  Try
@@ -775,7 +775,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
         for (; i != reclist.end(); ++i)
         {
             RecordingInfo *recp = *i;
-            if (recp->IsSameTimeslot(*oldp))
+            if (recp->IsSameTitleStartTimeAndChannel(*oldp))
             {
                 *recp = *oldp;
                 break;
@@ -953,7 +953,7 @@ void Scheduler::PruneOverlaps(void)
     {
         RecordingInfo *p = *dreciter;
         if (!lastp || lastp->GetRecordingRuleID() == p->GetRecordingRuleID() ||
-            !lastp->IsSameTimeslot(*p))
+            !lastp->IsSameTitleStartTimeAndChannel(*p))
         {
             lastp = p;
             ++dreciter;
@@ -1154,7 +1154,7 @@ void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
             q->GetRecordingStatus() != rsEarlierShowing &&
             q->GetRecordingStatus() != rsLaterShowing)
             continue;
-        if (q->IsSameTimeslot(*p))
+        if (q->IsSameTitleStartTimeAndChannel(*p))
             q->SetRecordingStatus(rsLaterShowing);
         else if (q->GetRecordingRuleType() != kSingleRecord &&
                  q->GetRecordingRuleType() != kOverrideRecord &&
@@ -1224,7 +1224,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
             continue;
         }
 
-        if (!p->IsSameTimeslot(*q))
+        if (!p->IsSameTitleStartTimeAndChannel(*q))
         {
             if (!IsSameProgram(p,q))
                 continue;
@@ -1465,7 +1465,7 @@ void Scheduler::PruneRedundants(void)
 
         // Check for redundant against last non-deleted
         if (!lastp || lastp->GetRecordingRuleID() != p->GetRecordingRuleID() ||
-            !lastp->IsSameTimeslot(*p))
+            !lastp->IsSameTitleStartTimeAndChannel(*p))
         {
             lastp = p;
             lastrecpri2 = lastp->GetRecordingPriority2();
@@ -1687,7 +1687,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     {
         RecordingInfo *p = *it;
         if (p->GetRecordingStatus() == rsRecording &&
-            p->IsSameProgramTimeslot(pi))
+            p->IsSameTitleTimeslotAndChannel(pi))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Not adding recording, " +
                 QString("'%1' is already in reclist.")
@@ -4137,7 +4137,7 @@ void Scheduler::AddNewRecords(void)
         for ( ; rec != worklist.end(); ++rec)
         {
             RecordingInfo *r = *rec;
-            if (p->IsSameTimeslot(*r))
+            if (p->IsSameTitleStartTimeAndChannel(*r))
             {
                 if (r->GetInputID() == p->GetInputID() &&
                     r->GetRecordingEndTime() != p->GetRecordingEndTime() &&

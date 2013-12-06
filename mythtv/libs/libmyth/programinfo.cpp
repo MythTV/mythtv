@@ -679,7 +679,7 @@ ProgramInfo::ProgramInfo(
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
     {
-        if (!IsSameTimeslot(**it))
+        if (!IsSameProgramAndStartTime(**it))
             continue;
 
         const ProgramInfo &s = **it;
@@ -2030,7 +2030,7 @@ bool ProgramInfo::IsSameProgramWeakCheck(const ProgramInfo &other) const
             startts == other.startts);
 }
 
-/** \fn ProgramInfo::IsSameProgram(const ProgramInfo&) const
+/**
  *  \brief Checks for duplicates according to dupmethod.
  *  \param other ProgramInfo to compare this one with.
  */
@@ -2097,12 +2097,27 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     return true;
 }
 
-/** \fn ProgramInfo::IsSameTimeslot(const ProgramInfo&) const
- *  \brief Checks chanid, start/end times for equality.
+/**
+ *  \brief Match same program, with same starttime (channel may be different)
+ *  \param other ProgramInfo to compare this one with.
+ *  \return true if this program is the same and shares same start time as "other" program.
+ */
+bool ProgramInfo::IsSameProgramAndStartTime(const ProgramInfo& other) const
+{
+    if (!IsSameProgram(other))
+        return false;
+    if (startts == other.startts)
+        return true;
+
+    return false;
+}
+
+/**
+ *  \brief Checks title, chanid or callsign and start times for equality.
  *  \param other ProgramInfo to compare this one with.
  *  \return true if this program shares same time slot as "other" program.
  */
-bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
+bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
 {
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
@@ -2115,13 +2130,13 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
     return false;
 }
 
-/** \fn ProgramInfo::IsSameProgramTimeslot(const ProgramInfo&) const
- *  \brief Checks chanid or chansign, start/end times,
+/**
+ *  \brief Checks title, chanid or chansign, start/end times,
  *         cardid, inputid for fully inclusive overlap.
  *  \param other ProgramInfo to compare this one with.
  *  \return true if this program is contained in time slot of "other" program.
  */
-bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
+bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
 {
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;

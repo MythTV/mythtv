@@ -1050,7 +1050,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         bool isAlt = true;
         for (uint j = 0; j < proglist.size(); ++j)
         {
-            isAlt &= proglist[j]->IsSameProgramTimeslot(*ch_proglist[j]);
+            isAlt &= proglist[j]->IsSameTitleTimeslotAndChannel(*ch_proglist[j]);
         }
 
         if (isAlt)
@@ -1133,7 +1133,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
         bool isAlt = true;
         for (uint j = 0; j < proglist.size(); ++j)
         {
-            isAlt &= proglist[j]->IsSameProgramTimeslot(*ch_proglist[j]);
+            isAlt &= proglist[j]->IsSameTitleTimeslotAndChannel(*ch_proglist[j]);
         }
 
         if (isAlt)

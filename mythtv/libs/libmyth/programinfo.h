@@ -299,8 +299,9 @@ class MPUBLIC ProgramInfo
 
     // Used for scheduling recordings
     bool IsSameProgram(const ProgramInfo &other) const;
-    bool IsSameTimeslot(const ProgramInfo &other) const;
-    bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
+    bool IsSameProgramAndStartTime(const ProgramInfo &other) const; // Exact same program and same starttime, Any channel
+    bool IsSameTitleStartTimeAndChannel(const ProgramInfo &other) const; // Same title, starttime and channel
+    bool IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const;//sched only - Same title, starttime, endtime and channel
     static bool UsingProgramIDAuthority(void)
     {
         return usingProgIDAuth;
