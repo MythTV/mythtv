@@ -1576,7 +1576,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                     ret = painter->GetFormatImage();
 
                 // Load file from disk cache to memory cache
-                if (ret && ret->Load(cachefilepath))
+                if (ret->Load(cachefilepath))
                 {
                     // Add to ram cache, and skip saving to disk since that is
                     // where we found this in the first place.
