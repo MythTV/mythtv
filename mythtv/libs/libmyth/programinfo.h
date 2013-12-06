@@ -811,6 +811,7 @@ bool LoadFromScheduler(
 
         if (!p->HasPathname() && !p->GetChanID())
         {
+            delete p;
             destination.clear();
             return false;
         }
@@ -818,7 +819,10 @@ bool LoadFromScheduler(
         programCount++;
 
         if (recordid > 0 && p->GetRecordingRuleID() != recordid)
+        {
+            delete p;
             continue;
+        }
 
         destination.push_back(p);
     }
