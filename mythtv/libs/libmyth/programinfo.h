@@ -795,6 +795,7 @@ bool LoadFromScheduler(
     int                 recordid = -1)
 {
     destination.clear();
+    QList<TYPE> tmpList;
     hasConflicts = false;
 
     QStringList slist = ProgramInfo::LoadFromScheduler(altTable, recordid);
@@ -804,7 +805,7 @@ bool LoadFromScheduler(
     hasConflicts = slist[0].toInt();
 
     QStringList::const_iterator sit = slist.begin()+2;
-    int programCount = 0;
+    uint programCount = 0;
     while (sit != slist.end())
     {
         TYPE *p = new TYPE(sit, slist.end());
@@ -816,15 +817,38 @@ bool LoadFromScheduler(
             return false;
         }
 
+        tmpList.push_back(*p);
         programCount++;
 
-        if (recordid > 0 && p->GetRecordingRuleID() != recordid)
+        if (recordid > 0 && p->GetRecordingRuleID() != static_cast<uint>(recordid))
         {
             delete p;
             continue;
         }
 
         destination.push_back(p);
+    }
+
+    typename AutoDeleteDeque<TYPE*>::const_iterator dit = destination.begin();
+    for (; dit != destination.end(); ++dit)
+    {
+        typename QList<TYPE>::const_iterator it = tmpList.begin();
+        for (; it != tmpList.end(); ++it)
+        {
+            const ProgramInfo &other = *it;
+            if (!(*dit)->IsSameProgramAndStartTime(other))
+                continue;
+
+            if ((*dit)->GetChanNum() != other.GetChanNum())
+            {
+                if (other.GetRecordingStatus() == rsWillRecord)
+                    (*dit)->SetRecordingStatus(rsOtherShowing);
+                else if (other.GetRecordingStatus() == rsRecording)
+                    (*dit)->SetRecordingStatus(rsOtherRecording);
+                else if (other.GetRecordingStatus() == rsTuning)
+                    (*dit)->SetRecordingStatus(rsOtherTuning);
+            }
+        }
     }
 
     if (programCount != slist[1].toUInt())

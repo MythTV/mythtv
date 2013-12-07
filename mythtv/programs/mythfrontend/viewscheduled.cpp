@@ -284,13 +284,15 @@ void ViewScheduled::LoadList(bool useExistingData)
         if ((pginfo->GetRecordingEndTime() >= now ||
              pginfo->GetScheduledEndTime() >= now) &&
             (m_showAll ||
-             recstatus <= rsWillRecord ||
+             (recstatus >= rsTuning &&
+              recstatus <= rsWillRecord) ||
              recstatus == rsDontRecord ||
              (recstatus == rsTooManyRecordings &&
               ++toomanycounts[pginfo->GetRecordingRuleID()] <= 1) ||
              (recstatus > rsTooManyRecordings &&
               recstatus != rsRepeat &&
-              recstatus != rsNeverRecord)))
+              recstatus != rsNeverRecord &&
+              recstatus != rsOtherShowing)))
         {
             m_cardref[pginfo->GetCardID()]++;
             if (pginfo->GetCardID() > m_maxcard)
