@@ -41,7 +41,8 @@
 }
 
 .programRecording .programHeader,
-.programRecording .recordingHeader
+.programRecording .recordingHeader,
+.programTuning .programHeader,
 {
 /*    background-color: #00CC00;*/
     background: linear-gradient(to bottom, #00DD00, #009900 40%);
@@ -49,9 +50,29 @@
 
 .programEarlierShowing .programHeader,
 .programLaterShowing .programHeader,
-.programOtherShowing .programHeader
+.programOtherShowing .programHeader,
+.programOtherRecording .programHeader,
+.programOtherTuning .programHeader
 {
     background: linear-gradient(to bottom, #66BB66, #339933 40%);
+}
+
+.programPreviouslyRecorded .programHeader,
+.programCurrentlyRecorded .programHeader
+{
+    background: linear-gradient(to bottom, #6666EE, #3333CC 40%);
+}
+
+.programNeverRecord .programHeader,
+.programDontRecorded .programHeader
+{
+    background: linear-gradient(to bottom, #DDCC00, #AA9900 40%);
+}
+
+.programInactive .programHeader,
+.programRepeat .programHeader
+{
+    background: linear-gradient(to bottom, #666699, #333366 40%);
 }
 
 .programConflicting .programHeader,
