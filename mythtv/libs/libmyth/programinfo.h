@@ -801,10 +801,10 @@ bool LoadFromScheduler(
     if (slist.empty())
         return false;
 
-    hasConflicts = slist[0].toInt(); // FIXME int to bool?
+    hasConflicts = slist[0].toInt();
 
     QStringList::const_iterator sit = slist.begin()+2;
-    unsigned int programCount = 0;
+    int programCount = 0;
     while (sit != slist.end())
     {
         TYPE *p = new TYPE(sit, slist.end());
@@ -818,7 +818,7 @@ bool LoadFromScheduler(
 
         programCount++;
 
-        if (recordid > 0 && p->GetRecordingRuleID() != (unsigned int) recordid)
+        if (recordid > 0 && p->GetRecordingRuleID() != recordid)
         {
             delete p;
             continue;
