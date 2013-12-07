@@ -364,7 +364,7 @@ bool MythImage::Load(const QString &filename)
     else
     {
         QString path = filename;
-        if (!path.startsWith('/') &&
+        if (path.startsWith('/') ||
             GetMythUI()->FindThemeFile(path))
             im = new QImage(path);
     }
