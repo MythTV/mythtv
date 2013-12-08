@@ -43,7 +43,7 @@ import "/tv/js/tvutil.qjs"
     }
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
-    if (nextStartIndex > programList.TotalAvailable)
+    if (nextStartIndex >= programList.TotalAvailable)
         nextStartIndex = 0;
 
     var programs = programList.Programs;

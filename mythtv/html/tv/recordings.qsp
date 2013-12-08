@@ -57,7 +57,7 @@ import "/tv/js/tvutil.qjs"
     var recordingList = dvr.GetRecordedList( sortDescending, startIndex, PAGEINTERVAL, displayGroup, recGroup, "" );
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
-    if (nextStartIndex > recordingList.TotalAvailable)
+    if (nextStartIndex >= recordingList.TotalAvailable)
         nextStartIndex = 0;
 
     var programs = recordingList.Programs;
