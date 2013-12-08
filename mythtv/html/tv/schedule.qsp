@@ -78,6 +78,10 @@ import "/tv/js/tvutil.qjs"
 <script src="/tv/js/common.js"></script>
 <script src="/tv/js/schedule.js"></script>
 
+<!-- Popup Program Details Box -->
+<div id="programDetails" class="programExDetail" style="display:none;">
+</div>
+
 <div class="notifyPopup" id="saveFormDataSuccess">
     <%=qsTr("Changes Saved")%>
 </div>
@@ -87,7 +91,7 @@ import "/tv/js/tvutil.qjs"
 </div>
 
 <div style="border:1px #CC0000 solid;background-color: rgba(102, 0, 0, 0.7);padding:7px;margin:5px;text-align:center;">
-    This feature is in beta, it may eat small children and be missing some functionality. The management asssumes no liability ...
+    This feature is in beta and is missing some functionality. Please report any bugs you encounter ...
 </div>
 
 <div class="header">
@@ -178,12 +182,13 @@ import "/tv/js/tvutil.qjs"
                         showing = upcomingShowings[listIdx];
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(showing.Recording.Status);
+                        var programIdentifier = showing.Channel.ChanId + "_" + showing.StartTime.toISOString();
                 %>
                         <div class="upcomingShowing">
                             <div class="channelIconBox">
                                 <img class="channelIcon" height="45" alt="<%=escapeHTML(showing.Channel.ChannelName)%> Icon" title="<%=escapeHTML(showing.Channel.ChanNum)%> <%=escapeHTML(showing.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=showing.Channel.ChanId%>&amp;Height=45" />
                             </div>
-                            <div class="programBox <%=statusClass%>">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=showing.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(showing.StartTime)%>, <%=myth.GetFormatTime(showing.StartTime)%> - <%=myth.GetFormatTime(showing.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=showing.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(showing.Recording.Status)%></span></div>
                             </div>
@@ -206,12 +211,13 @@ import "/tv/js/tvutil.qjs"
                         conflict = upcomingConflicts[listIdx];
                         // RecStatusToClass() - /tv/js/tvutil.qjs
                         var statusClass = RecStatusToClass(conflict.Recording.Status);
+                        var programIdentifier = conflict.Channel.ChanId + "_" + conflict.StartTime.toISOString();
                 %>
                         <div class="upcomingConflict">
                             <div class="channelIconBox">
                                 <img class="channelIcon" height="45" alt="<%=escapeHTML(conflict.Channel.ChannelName)%> Icon" title="<%=escapeHTML(conflict.Channel.ChanNum)%> <%=escapeHTML(conflict.Channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=conflict.Channel.ChanId%>&amp;Height=45" />
                             </div>
-                            <div class="programBox <%=statusClass%>">
+                            <div class="programBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);">
                                 <div class="programHeader"><span class="programTitle"><%=conflict.Title%></span><span class="programDateTime"><%=myth.GetFormatDate(conflict.StartTime)%>, <%=myth.GetFormatTime(conflict.StartTime)%> - <%=myth.GetFormatTime(conflict.EndTime)%></span></div>
                                 <div class="programBody"><span class="programSubtitle"><%=conflict.SubTitle%></span><span class="programRecordingStatus"><%=dvr.RecStatusToString(conflict.Recording.Status)%></span></div>
                             </div>
