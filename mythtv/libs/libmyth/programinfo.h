@@ -839,7 +839,7 @@ bool LoadFromScheduler(
             if (!(*dit)->IsSameProgramAndStartTime(other))
                 continue;
 
-            if ((*dit)->GetChanNum() != other.GetChanNum())
+            if ((*dit)->GetChannelSchedulingID() != other.GetChannelSchedulingID())
             {
                 if (other.GetRecordingStatus() == rsWillRecord)
                     (*dit)->SetRecordingStatus(rsOtherShowing);

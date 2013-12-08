@@ -695,7 +695,7 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
 
-        if (chanstr != s.chanstr)
+        if (chansign != s.chansign)
         {
             if (s.recstatus == rsWillRecord)
                 recstatus = rsOtherShowing;
