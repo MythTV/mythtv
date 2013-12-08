@@ -205,7 +205,7 @@ function showDetail(parentID, type)
     var parent = document.getElementById(parentID);
     if (!isValidObject(parent))
     {
-        setErrorMessage("showDetail() called with invalid parent ID: (" + parentID + ")");
+        //setErrorMessage("showDetail() called with invalid parent ID: (" + parentID + ")");
         return;
     }
 
