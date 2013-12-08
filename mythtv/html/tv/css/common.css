@@ -42,7 +42,7 @@
 
 .programRecording .programHeader,
 .programRecording .recordingHeader,
-.programTuning .programHeader,
+.programTuning .programHeader
 {
 /*    background-color: #00CC00;*/
     background: linear-gradient(to bottom, #00DD00, #009900 40%);
