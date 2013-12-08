@@ -49,7 +49,6 @@
 #include <signal.h>
 #include <time.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 
 #if defined(DLL_IMPORT)
 #define LIBTYPE __declspec( dllimport )
