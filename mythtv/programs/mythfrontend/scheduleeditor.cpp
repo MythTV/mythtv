@@ -1405,11 +1405,11 @@ bool MetadataOptions::Create()
 
     // Season
     m_seasonSpin->SetRange(0,9999,1,5);
-    m_seasonSpin->SetValue(m_recordingRule->m_season != 0 ? m_recordingRule->m_season : m_recInfo->GetSeason());
+    m_seasonSpin->SetValue(m_recordingRule->m_season != 0 ? m_recordingRule->m_season : m_recInfo ? m_recInfo->GetSeason() : 0);
 
     // Episode
     m_episodeSpin->SetRange(0,9999,1,10);
-    m_episodeSpin->SetValue(m_recordingRule->m_episode != 0 ? m_recordingRule->m_episode : m_recInfo->GetEpisode());
+    m_episodeSpin->SetValue(m_recordingRule->m_episode != 0 ? m_recordingRule->m_episode : m_recInfo ? m_recInfo->GetEpisode() : 0);
 
     if (m_coverart)
     {
@@ -1462,7 +1462,7 @@ void MetadataOptions::PerformQuery()
 
     lookup->SetStep(kLookupSearch);
     lookup->SetType(kMetadataRecording);
-    if ((m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
+    if ((m_recInfo && m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
         (m_seasonSpin->GetIntValue() == 0 &&
          m_episodeSpin->GetIntValue() == 0))
         lookup->SetSubtype(kProbableMovie);
@@ -1662,7 +1662,7 @@ void MetadataOptions::FindNetArt(VideoArtworkType type)
     lookup->SetType(kMetadataVideo);
     lookup->SetAutomatic(true);
     lookup->SetHandleImages(false);
-    if ((m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
+    if ((m_recInfo && m_recInfo->GetCategoryType() == ProgramInfo::kCategoryMovie) ||
         (m_seasonSpin->GetIntValue() == 0 &&
          m_episodeSpin->GetIntValue() == 0))
         lookup->SetSubtype(kProbableMovie);
