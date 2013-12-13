@@ -10,6 +10,8 @@
 #include "importicons.h"
 #include "mythdate.h"
 #include "mythdownloadmanager.h"
+#include "remotefile.h"
+#include "mythcorecontext.h"
 
 // MythUI
 #include "mythuitext.h"
@@ -330,7 +332,9 @@ bool ImportIconsWizard::initialLoad(QString name)
 
             if (m_fRefresh)
             {
-                if (QFile(query.value(11).toString()).exists())
+                QString url = QString("%1%2").arg(m_strChannelDir)
+                                              .arg(query.value(11).toString());
+                if (QFile(url).exists())
                     continue;
             }
 
