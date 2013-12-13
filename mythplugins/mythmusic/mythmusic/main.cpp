@@ -440,9 +440,9 @@ static void handleMedia(MythMediaDevice *cd)
         .arg(MythMediaDevice::MediaTypeString(cd->getMediaType())));
 }
 
+#ifdef HAVE_CDIO
 static void handleCDMedia(MythMediaDevice *cd)
 {
-#ifdef HAVE_CDIO
 
     if (!cd)
         return;
@@ -583,11 +583,14 @@ static void handleCDMedia(MythMediaDevice *cd)
 
         runMusicPlayback();
     }
+}
 #else
+static void handleCDMedia(MythMediaDevice *)
+{
     LOG(VB_GENERAL, LOG_NOTICE, "MythMusic got a media changed event"
                                 "but cdio support is not compiled in");
-#endif
 }
+#endif
 
 static void setupKeys(void)
 {
