@@ -165,6 +165,7 @@ void IPTVStreamHandler::run(void)
             "", 0);
     }
 
+    bool error = false;
     for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
         QUrl url = tuning.GetURL(i);
@@ -208,9 +209,13 @@ void IPTVStreamHandler::run(void)
         m_sockets[i]->setSocketDescriptor(
             fd, QAbstractSocket::UnconnectedState, QIODevice::ReadOnly);
 
-        m_sockets[i]->bind(QHostAddress::Any, url.port());
-
         QHostAddress dest_addr(tuning.GetURL(i).host());
+
+        if (!m_sockets[i]->bind(dest_addr, url.port()))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Binding to port failed.");
+            error = true;
+        }
 
         if (dest_addr != QHostAddress::Any)
         {
@@ -233,15 +238,18 @@ void IPTVStreamHandler::run(void)
         if (!url.userInfo().isEmpty())
             m_sender[i] = QHostAddress(url.userInfo());
     }
-    if (m_use_rtp_streaming)
-        m_buffer = new RTPPacketBuffer(tuning.GetBitrate(0));
-    else
-        m_buffer = new UDPPacketBuffer(tuning.GetBitrate(0));
-    m_write_helper = new IPTVStreamHandlerWriteHelper(this);
-    m_write_helper->Start();
 
-    bool error = false;
-    if (rtsp)
+    if (!error)
+    {
+        if (m_use_rtp_streaming)
+            m_buffer = new RTPPacketBuffer(tuning.GetBitrate(0));
+        else
+            m_buffer = new UDPPacketBuffer(tuning.GetBitrate(0));
+        m_write_helper = new IPTVStreamHandlerWriteHelper(this);
+        m_write_helper->Start();
+    }
+
+    if (!error && rtsp)
     {
         // Start Streaming
         if (!rtsp->Setup(m_sockets[0]->localPort(),
