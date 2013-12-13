@@ -473,7 +473,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 
                     if (!totalepisodes.isEmpty())
                     {
-                        pginfo->totalepisodes = totalepisodes.toUInt() + 1;
+                        pginfo->totalepisodes = totalepisodes.toUInt();
                     }
 
                     uint partno = 0;
