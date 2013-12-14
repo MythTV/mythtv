@@ -1205,7 +1205,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
                                    HLSRecSegment& segment, int playlist_size)
 {
     uint64_t bandwidth = hls->AverageBandwidth();
-    int estimated_time;
+    int estimated_time = 0;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Downloading %1 bandwidth %2 bitrate %3")
