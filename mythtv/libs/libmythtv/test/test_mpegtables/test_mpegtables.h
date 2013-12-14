@@ -204,4 +204,28 @@ class TestMPEGTables: public QObject
         QCOMPARE (descriptor2.ContentId(), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
         QCOMPARE (descriptor.ContentId(1), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
     }
+
+    /* test for coverity 1047220: Incorrect deallocator used:
+     * Calling "PSIPTable::~PSIPTable()" frees "(&psip)->_fullbuffer"
+     * using "free" but it should have been freed using "operator delete[]".
+     *
+     * _allocSize should be 0 thus we are not freeing something we didn't
+     * allocate in the first place (false positive)
+     */
+    void clone_test(void)
+    {
+        unsigned char *si_data = new unsigned char[8];
+        si_data[0] = 0x70; /* pp....37 */
+        si_data[1] = 0x70;
+        si_data[2] = 0x05;
+        si_data[3] = 0xdc;
+        si_data[4] = 0xa9;
+        si_data[5] = 0x12;
+        si_data[6] = 0x33;
+        si_data[7] = 0x37;
+
+        const PSIPTable si_table(si_data);
+
+        QVERIFY (!si_table.IsClone());
+    }
 };
