@@ -1385,18 +1385,21 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
         ADD_INT(outStr, frameCount)
 
-        double delta = length / frameCount;
-        double time = 0;
-
-        for (int x = 0; x < frameCount; x++)
+        if (frameCount > 0)
         {
-            char str[10];
-            sprintf(str, "%f", delta);
+            double delta = length / frameCount;
+            double time = 0;
 
-            ADD_STR(outStr, "Normal") // Type
-            ADD_STR(outStr, str)      // Delta
+            for (int x = 0; x < frameCount; x++)
+            {
+                char str[10];
+                sprintf(str, "%f", delta);
 
-            time += delta;
+                ADD_STR(outStr, "Normal") // Type
+                ADD_STR(outStr, str)      // Delta
+
+                time += delta;
+            }
         }
     }
     else
