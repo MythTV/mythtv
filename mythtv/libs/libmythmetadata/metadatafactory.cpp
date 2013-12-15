@@ -287,7 +287,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (coverartlist.size())
         {
             ArtworkInfo info;
-            info.url = coverartlist.takeLast().url;
+            info.url = coverartlist.takeFirst().url;
             map.insert(kArtworkCoverart, info);
         }
 
@@ -309,7 +309,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
         if (bannerlist.size())
         {
             ArtworkInfo info;
-            info.url = bannerlist.takeLast().url;
+            info.url = bannerlist.takeFirst().url;
             map.insert(kArtworkBanner, info);
         }
 
@@ -319,7 +319,7 @@ void MetadataFactory::OnSingleResult(MetadataLookup *lookup)
             if (screenshotlist.size())
             {
                 ArtworkInfo info;
-                info.url = screenshotlist.takeLast().url;
+                info.url = screenshotlist.takeFirst().url;
                 map.insert(kArtworkScreenshot, info);
             }
         }
