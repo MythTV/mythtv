@@ -398,7 +398,7 @@ QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
     // See http://qt-project.org/doc/qt-4.8/qmultimap.html#details
     // Specifically "The items that share the same key are available from "
     //              "most recently to least recently inserted."
-    QListIterator<ArtworkInfo> it(m_people.values(type));
+    QListIterator<PersonInfo> it(m_people.values(type));
     it.toBack();
     while (it.hasPrevious())
         ret.append(it.previous());
