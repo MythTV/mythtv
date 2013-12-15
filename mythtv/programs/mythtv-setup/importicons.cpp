@@ -326,13 +326,17 @@ bool ImportIconsWizard::initialLoad(QString name)
         while(query.next())
         {
             CSVEntry entry;
+            QString relativeIconPath = query.value(11).toString();
+            QString absoluteIconPath = QString("%1%2").arg(m_strChannelDir)
+                                                      .arg(relativeIconPath);
 
-            if (m_fRefresh)
+            if (m_fRefresh && !relativeIconPath.isEmpty())
             {
-                QString url = QString("%1%2").arg(m_strChannelDir)
-                                              .arg(query.value(11).toString());
-                if (QFile(url).exists())
+                if (QFile(absoluteIconPath).exists())
+                {
+                    LOG(VB_GENERAL, LOG_NOTICE, QString("Icon already exists, skipping (%1)").arg(absoluteIconPath));
                     continue;
+                }
             }
 
             entry.strChanId=query.value(0).toString();
