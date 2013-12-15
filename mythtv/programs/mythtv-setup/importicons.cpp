@@ -338,7 +338,8 @@ bool ImportIconsWizard::initialLoad(QString name)
                                                       .arg(relativeIconPath);
 
             if (m_fRefresh && !relativeIconPath.isEmpty() &&
-                QFile(absoluteIconPath).exists())
+                QFile(absoluteIconPath).exists() &&
+                !QImage(absoluteIconPath).isNull())
             {
                 LOG(VB_GENERAL, LOG_NOTICE, QString("Icon already exists, skipping (%1)").arg(absoluteIconPath));
             }
@@ -565,11 +566,10 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
     QString filename = url.section('/', -1);
     QFileInfo file(m_strChannelDir+filename);
 
-    bool fRet;
-    if (!file.exists())
-        fRet = GetMythDownloadManager()->download(iconUrl, file.absoluteFilePath());
-    else
-        fRet = true;
+    // If we get to this point we've already checked whether the icon already
+    // exist locally, we want to download anyway to fix a broken image or
+    // get the latest version of the icon
+    bool fRet = GetMythDownloadManager()->download(iconUrl, file.absoluteFilePath());
 
     if (fRet)
     {
@@ -586,7 +586,6 @@ bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& loca
             MythDB::DBError("Error inserting channel icon", query);
             return false;
         }
-
     }
 
     return fRet;
