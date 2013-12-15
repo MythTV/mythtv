@@ -469,7 +469,7 @@ void UPnpCDSTv::AddItem( const UPnpCDSRequest    *pRequest,
 
     // TODO: Must be JPG for minimal compliance
     sProtocol = QString( "http-get:*:image/png:DLNA.ORG_PN=PNG_TN");
-    pRes = pItem->AddResource( sProtocol, sURI );
+    pItem->AddResource( sProtocol, sURI );
 
     // ----------------------------------------------------------------------
     // Add Artwork URI as albumArt
