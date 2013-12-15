@@ -35,6 +35,7 @@ class ImportIconsWizard : public MythScreenType
    ~ImportIconsWizard();
 
     bool Create(void);
+    void Load(void);
 //    bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent *event);
 
