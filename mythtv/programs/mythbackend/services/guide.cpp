@@ -111,9 +111,10 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                 "AND program.endtime >= :StartDate "
                 "AND program.starttime <= :EndDate "
                 "GROUP BY program.starttime, channel.chanid "
-                "ORDER BY lpad(channel.channum, 10, 0), "
-                "         callsign,                     "
-                "         lpad(program.chanid, 10, 0),  "
+                "ORDER BY LPAD(CAST(channum AS INT), 10, 0), "
+                "         LPAD(channum,  10, 0),             "
+                "         callsign,                          "
+                "         LPAD(program.chanid, 10, 0),       "
                 "         program.starttime ";
 
     bindings[":StartChanId"] = nStartChanId;
