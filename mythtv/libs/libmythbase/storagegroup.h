@@ -11,11 +11,11 @@
 class MBASE_PUBLIC StorageGroup
 {
   public:
-    StorageGroup(const QString group = "", const QString hostname = "",
+    StorageGroup(const QString &group = "", const QString &hostname = "",
                  const bool allowFallback = true);
 
-    void    Init(const QString group = "Default",
-                 const QString hostname = "",
+    void    Init(const QString &group = "Default",
+                 const QString &hostname = "",
                  const bool allowFallback = true);
 
     QString getName(void) const
@@ -25,20 +25,20 @@ class MBASE_PUBLIC StorageGroup
         { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
     QString GetFirstDir(bool appendSlash = false) const;
 
-    QStringList GetDirFileList(QString dir, QString base,
+    QStringList GetDirFileList(const QString &dir, const QString &base,
                                bool recursive = false, bool onlyDirs = false);
-    QStringList GetDirList(QString Path, bool recursive = false);
-    QStringList GetFileList(QString Path, bool recursive = false);
-    QStringList GetFileInfoList(QString Path);
-    bool FileExists(QString filename);
-    QStringList GetFileInfo(QString filename);
+    QStringList GetDirList(const QString &Path, bool recursive = false);
+    QStringList GetFileList(const QString &Path, bool recursive = false);
+    QStringList GetFileInfoList(const QString &Path);
+    bool FileExists(const QString &filename);
+    QStringList GetFileInfo(const QString &filename);
     static QString GetRelativePathname(const QString &filename);
-    static bool FindDirs(const QString group = "Default",
-                         const QString hostname = "",
+    static bool FindDirs(const QString &group = "Default",
+                         const QString &hostname = "",
                          QStringList *dirlist = NULL);
 
-    QString FindFile(QString filename);
-    QString FindFileDir(QString filename);
+    QString FindFile(const QString &filename);
+    QString FindFileDir(const QString &filename);
 
     QString FindNextDirMostFree(void);
 
@@ -48,7 +48,8 @@ class MBASE_PUBLIC StorageGroup
     static const QStringList kSpecialGroups;
 
     static QStringList getRecordingsGroups(void);
-    static QStringList getGroupDirs(QString groupname, QString host);
+    static QStringList getGroupDirs(const QString &groupname,
+                                    const QString &host);
 
     static void ClearGroupToUseCache(void);
     static QString GetGroupToUse(
