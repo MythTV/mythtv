@@ -559,3 +559,8 @@ function dissolveTransition(oldDivID, newDivID)
                    $("#" + oldDivID).remove(); postLoad(); });
     $("#" + newDivID).animate({opacity: "1.0"}, 800);
 }
+
+function handleKeyboardShortcutsTV(key) {
+    if (key.keyCode == 27)
+        hideMenu("optMenu");
+}

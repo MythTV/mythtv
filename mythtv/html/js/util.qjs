@@ -283,3 +283,8 @@ function formatStr() {
     return result;
 };
 
+
+function handleKeyPress(key) {
+    if (currentContentURL == "/tv/guide.qsp")
+        handleKeyboardShortcutsTV(key);
+}
