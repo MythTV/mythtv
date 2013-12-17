@@ -4981,7 +4981,7 @@ static bool FromProgramQuery(
     const QString &sql, const MSqlBindings &bindings, MSqlQuery &query)
 {
     QString querystr = QString(
-        "SELECT DISTINCT program.chanid, program.starttime, program.endtime, "
+        "SELECT program.chanid, program.starttime, program.endtime, "
         "    program.title, program.subtitle, program.description, "
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commmethod, "
