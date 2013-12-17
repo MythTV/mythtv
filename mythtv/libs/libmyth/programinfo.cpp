@@ -5002,10 +5002,12 @@ static bool FromProgramQuery(
         "    program.starttime = oldrecstatus.starttime "
         ) + sql;
 
-    if (!sql.contains(" GROUP BY "))
+    if (!sql.contains("WHERE"))
+        querystr += " WHERE visible != 0 ";
+    if (!sql.contains("GROUP BY"))
         querystr += " GROUP BY program.starttime, channel.channum, "
             "  channel.callsign, program.title ";
-    if (!sql.contains(" ORDER BY "))
+    if (!sql.contains("ORDER BY"))
     {
         querystr += " ORDER BY program.starttime, ";
         QString chanorder =
@@ -5015,7 +5017,7 @@ static bool FromProgramQuery(
         else // approximation which the DB can handle
             querystr += "atsc_major_chan,atsc_minor_chan,channum,callsign ";
     }
-    if (!sql.contains(" LIMIT "))
+    if (!sql.contains("LIMIT"))
         querystr += " LIMIT 20000 ";
 
     query.prepare(querystr);

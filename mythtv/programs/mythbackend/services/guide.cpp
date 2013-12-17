@@ -106,7 +106,8 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     else
         sSQL = "WHERE ";
 
-    sSQL +=     "program.chanid >= :StartChanId "
+    sSQL +=     "visible != 0 "
+                "AND program.chanid >= :StartChanId "
                 "AND program.chanid <= :EndChanId "
                 "AND program.endtime >= :StartDate "
                 "AND program.starttime <= :EndDate "
