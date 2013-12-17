@@ -166,9 +166,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
-    bool Tune(const transport_scan_items_it_t transport);
-    uint InsertMultiplex(const transport_scan_items_it_t transport);
-    void ScanTransport(const transport_scan_items_it_t transport);
+    bool Tune(const transport_scan_items_it_t &transport);
+    void ScanTransport(const transport_scan_items_it_t &transport);
     DTVTunerType GuessDTVTunerType(DTVTunerType) const;
 
     /// \brief Updates Transport Scan progress bar

@@ -341,7 +341,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
     extend_scan_list = follow_nit;
     waitingForTables  = false;
     transportsScanned = 0;
-    if (scanTransports.size())
+    if (!scanTransports.empty())
     {
         nextIt   = scanTransports.begin();
         scanning = true;
@@ -1641,7 +1641,7 @@ tuning.toString());
     }
 }
 
-bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
+bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
 {
     const TransportScanItem &item = *transport;
 
@@ -1666,7 +1666,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
     return GetDTVChannel()->Tune(tuning, inputname);
 }
 
-void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
+void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
 {
     QString offset_str = (transport.offset()) ?
         QObject::tr(" offset %2").arg(transport.offset()) : "";
@@ -2007,7 +2007,7 @@ bool ChannelScanSM::ScanTransport(uint mplexid, bool follow_nit)
 
     extend_scan_list = follow_nit;
     transportsScanned = 0;
-    if (scanTransports.size())
+    if (!scanTransports.empty())
     {
         nextIt   = scanTransports.begin();
         scanning = true;
