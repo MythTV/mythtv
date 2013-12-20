@@ -5226,6 +5226,7 @@ fi
 # JACK probe
 ! disabled audio_jack &&
     check_lib jack/jack.h jack_client_new -ljack &&
+    check_func jack_port_get_latency_range -ljack &&
     enable  audio_jack ||
     disable audio_jack
 
