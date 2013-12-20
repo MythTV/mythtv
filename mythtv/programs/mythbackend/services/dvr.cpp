@@ -101,9 +101,6 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 
     for( unsigned int n = 0; n < progList.size(); n++)
     {
-        if (nCount >= nMax)
-            break;
-
         ProgramInfo *pInfo = progList[ n ];
 
         if ((!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
@@ -111,7 +108,8 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
             (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
             continue;
 
-        if (nAvailable < nStartIndex)
+        if ((nAvailable < nStartIndex) ||
+            (nCount >= nMax))
         {
             ++nAvailable;
             continue;
