@@ -576,7 +576,12 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         return false;
 
     if (m_deinterlacing == interlaced)
-        return m_deinterlacing;
+    {
+        if (!m_deinterlacing)
+            return false;
+        if (overridefilter.isEmpty() || overridefilter == m_deintfiltername)
+            return true;
+    }
 
     if (m_deintFiltMan)
     {
