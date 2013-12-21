@@ -131,7 +131,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_UIThread(QThread::currentThread()),
       m_locale(NULL),
       m_scheduler(NULL),
-      m_blockingClient(false),
+      m_blockingClient(true),
       m_inwanting(false),
       m_intvwanting(false),
       m_announcedProtocol(false),
@@ -1265,7 +1265,8 @@ bool MythCoreContext::SendReceiveStringList(
     QMutexLocker locker(&d->m_sockLock);
     if (!d->m_serverSock)
     {
-        bool blockingClient = GetNumSetting("idleTimeoutSecs",0) > 0;
+        bool blockingClient = d->m_blockingClient &&
+                             (GetNumSetting("idleTimeoutSecs",0) > 0);
         ConnectToMasterServer(blockingClient);
     }
 
