@@ -661,6 +661,7 @@ class MTV_PUBLIC TV : public QObject
     bool    db_use_gui_size_for_tv;
     bool    db_start_in_guide;
     bool    db_toggle_bookmark;
+    bool    db_clear_saved_position;
     bool    db_run_jobs_on_remote;
     bool    db_continue_embedded;
     bool    db_use_fixed_size;
