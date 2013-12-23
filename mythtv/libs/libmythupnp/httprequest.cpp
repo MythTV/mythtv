@@ -1506,7 +1506,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                     sName  = QUrl::fromPercentEncoding(sName.toUtf8());
                     sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
 
-                    m_mapParams.insert( sName.trimmed(), sValue );
+                    m_mapParams.insert( sName.trimmed().toLower(), sValue );
                 }
             }
 
