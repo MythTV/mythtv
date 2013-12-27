@@ -112,7 +112,7 @@ VideoMetadataListManager::loadOneFromDatabase(uint id)
     QString sql = QString("WHERE intid = %1 LIMIT 1").arg(id);
     metadata_list item;
     loadAllFromDatabase(item, sql);
-    if (item.size() > 0)
+    if (!item.empty())
     {
         return item.front();
     }
