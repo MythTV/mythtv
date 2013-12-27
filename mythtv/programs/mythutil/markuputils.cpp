@@ -13,7 +13,7 @@
 #include "markuputils.h"
 
 static int GetMarkupList(const MythUtilCommandLineParser &cmdline,
-                         const QString type)
+                         const QString &type)
 {
     ProgramInfo pginfo;
     if (!GetProgramInfo(cmdline, pginfo))
