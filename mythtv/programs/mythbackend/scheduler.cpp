@@ -3484,7 +3484,7 @@ static QString progfindid = QString(
         .arg(kOverrideRecord);
 
 void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
-                              const QDateTime maxstarttime)
+                              const QDateTime &maxstarttime)
 {
     struct timeval dbstart, dbend;
 
