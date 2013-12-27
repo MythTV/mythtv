@@ -37,7 +37,7 @@ bool LookerUpper::StillWorking()
 }
 
 void LookerUpper::HandleSingleRecording(const uint chanid,
-                                        const QDateTime starttime,
+                                        const QDateTime &starttime,
                                         bool updaterules)
 {
     ProgramInfo *pginfo = new ProgramInfo(chanid, starttime);
