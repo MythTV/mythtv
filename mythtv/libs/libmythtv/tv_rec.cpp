@@ -3695,6 +3695,15 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     if (request.IsOnSameMultiplex())
     {
+        // Update the channel number for SwitchLiveTVRingBuffer (called from
+        // TuningRestartRecorder).  This ensures that the livetvchain will be
+        // updated with the new channel number
+        if (channel)
+        {
+            channel->Renumber( CardUtil::GetSourceID(channel->GetInputID()),
+                               channel->GetChannelName(), request.channel );
+        }
+
         QStringList slist;
         slist<<"message"<<QObject::tr("On known multiplex...");
         MythEvent me(QString("SIGNAL %1").arg(inputid), slist);
