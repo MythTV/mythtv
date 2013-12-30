@@ -391,6 +391,8 @@ ShoutCastIODevice::ShoutCastIODevice(void)
     switchToState(NOT_CONNECTED);
 
     setOpenMode(ReadWrite);
+
+    m_socket->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
 }
 
 ShoutCastIODevice::~ShoutCastIODevice(void)
@@ -540,7 +542,7 @@ void ShoutCastIODevice::socketReadyRead(void)
 
     if (!m_started && m_bytesDownloaded > DecoderIOFactory::DefaultPrebufferSize)
     {
-        m_socket->setReadBufferSize(DecoderIOFactory::DefaultPrebufferSize);
+        m_socket->setReadBufferSize(DecoderIOFactory::DefaultBufferSize);
         m_started = true;
     }
 
