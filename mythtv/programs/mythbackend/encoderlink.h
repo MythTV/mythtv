@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QMutex>
 
 #include "tv.h"
 #include "programinfo.h"
@@ -82,7 +83,7 @@ class EncoderLink
     bool IsBusyRecording(void);
 
     TVState GetState();
-    uint GetFlags(void) const;
+    uint GetFlags(void);
     bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
     bool MatchesRecording(const ProgramInfo *rec);
@@ -109,7 +110,7 @@ class EncoderLink
     void PauseRecorder(void);
     void SetLiveRecording(int);
     void SetNextLiveTVDir(QString dir);
-    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
+    vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards);
     QString GetInput(void) const;
     QString SetInput(QString);
     void ToggleChannelFavorite(QString);
@@ -137,9 +138,13 @@ class EncoderLink
                         QString channame, QString xmltv);
 
   private:
+    bool HasSockAndIncrRef();
+    bool HasSockAndDecrRef();
+
     int m_capturecardnum;
 
     PlaybackSock *sock;
+    QMutex sockLock;
     QString hostname;
 
     TVRec *tv;
