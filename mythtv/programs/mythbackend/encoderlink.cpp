@@ -15,6 +15,7 @@ using namespace std;
 #include "storagegroup.h"
 #include "backendutil.h"
 #include "compat.h"
+#include "referencecounter.h"
 
 #define LOC QString("EncoderLink(%1): ").arg(m_capturecardnum)
 #define LOC_ERR QString("EncoderLink(%1) Error: ").arg(m_capturecardnum)
@@ -50,8 +51,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
     lastSleepTime   = MythDate::current();
     lastWakeTime    = MythDate::current();
 
-    if (sock)
-        sock->IncrRef();
+    HasSockAndIncrRef();
 }
 
 /** \fn EncoderLink::EncoderLink(int, TVRec *)
@@ -84,6 +84,34 @@ EncoderLink::~EncoderLink(void)
     SetSocket(NULL);
 }
 
+/** \fn Encoder::HasSockAndIncrRef()
+ *  \brief Atomicly checks if sock is not null and increases its refcount.
+ */
+bool EncoderLink::HasSockAndIncrRef()
+{
+    QMutexLocker locker(&sockLock);
+    if (sock)
+    {
+        sock->IncrRef();
+        return true;
+    }
+    return false;
+}
+
+/** \fn Encoder::HasSockAndDecrRef()
+ *  \brief Atomicly checks if sock is not null and decreases its refcount.
+ */
+bool EncoderLink::HasSockAndDecrRef()
+{
+    QMutexLocker locker(&sockLock);
+    if (sock)
+    {
+        sock->DecrRef();
+        return true;
+    }
+    return false;
+}
+
 /** \fn EncoderLink::SetSocket(PlaybackSock *lsock)
  *  \brief Used to set the socket for a non-local EncoderLink
  *
@@ -108,8 +136,7 @@ void EncoderLink::SetSocket(PlaybackSock *lsock)
             SetSleepStatus(sStatus_Undefined);
     }
 
-    if (sock)
-        sock->DecrRef();
+    HasSockAndDecrRef();
     sock = lsock;
 }
 
@@ -132,8 +159,11 @@ bool EncoderLink::IsBusy(TunedInputInfo *busy_input, int time_buffer)
     if (local)
         return tv->IsBusy(busy_input, time_buffer);
 
-    if (sock)
+    if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         return sock->IsBusy(m_capturecardnum, busy_input, time_buffer);
+    }
 
     return false;
 }
@@ -174,8 +204,11 @@ TVState EncoderLink::GetState(void)
 
     if (local)
         retval = tv->GetState();
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR, QString("Broken for card: %1")
             .arg(m_capturecardnum));
@@ -187,7 +220,7 @@ TVState EncoderLink::GetState(void)
  *  \brief Returns the flag state of the recorder.
  *  \sa TVRec::GetFlags(void) const, \ref recorder_subsystem
  */
-uint EncoderLink::GetFlags(void) const
+uint EncoderLink::GetFlags(void)
 {
     uint retval = 0;
 
@@ -196,8 +229,11 @@ uint EncoderLink::GetFlags(void) const
 
     if (local)
         retval = tv->GetFlags();
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         retval = sock->GetEncoderState(m_capturecardnum);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "GetFlags failed");
 
@@ -244,8 +280,11 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     }
     else
     {
-        if (sock)
+        if (HasSockAndIncrRef())
+        {
+            ReferenceLocker rlocker(sock);
             retval = sock->EncoderIsRecording(m_capturecardnum, rec);
+        }
     }
 
     return retval;
@@ -264,8 +303,11 @@ void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft,
 {
     if (local)
         tv->RecordPending(rec, secsleft, hasLater);
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         sock->RecordPending(m_capturecardnum, rec, secsleft, hasLater);
+    }
 }
 
 /** \fn EncoderLink::WouldConflict(const ProgramInfo*)
@@ -287,8 +329,11 @@ bool EncoderLink::WouldConflict(const ProgramInfo *rec)
 /// Checks if program is stored locally
 bool EncoderLink::CheckFile(ProgramInfo *pginfo)
 {
-    if (sock)
+    if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         return sock->CheckFile(pginfo);
+    }
 
     pginfo->SetPathname(GetPlaybackURL(pginfo));
     return pginfo->IsLocal();
@@ -301,8 +346,11 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
  */
 void EncoderLink::GetDiskSpace(QStringList &o_strlist)
 {
-    if (sock)
+    if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         sock->GetDiskSpace(o_strlist);
+    }
 }
 
 /** \fn EncoderLink::GetMaxBitrate()
@@ -315,8 +363,11 @@ long long EncoderLink::GetMaxBitrate()
 {
     if (local)
         return tv->GetMaxBitrate();
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         return sock->GetMaxBitrate(m_capturecardnum);
+    }
 
     return -1;
 }
@@ -339,9 +390,12 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
     if (local)
         return tv->SetSignalMonitoringRate(rate, notifyFrontend);
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         return sock->SetSignalMonitoringRate(m_capturecardnum, rate,
                                              notifyFrontend);
+    }
     return -1;
 }
 
@@ -349,8 +403,9 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
  */
 bool EncoderLink::GoToSleep(void)
 {
-    if (IsLocal() || !sock)
+    if (IsLocal() || !HasSockAndIncrRef())
         return false;
+    ReferenceLocker rlocker(sock);
 
     lastSleepTime = MythDate::current();
 
@@ -387,8 +442,11 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
 
     if (local)
         retval = tv->StartRecording(rec);
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         retval = sock->StartRecording(m_capturecardnum, rec);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to start recording on recorder %1,\n\t\t\t"
@@ -411,8 +469,11 @@ RecStatusType EncoderLink::GetRecordingStatus(void)
 
     if (local)
         retval = tv->GetRecordingStatus();
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         retval = sock->GetRecordingStatus(m_capturecardnum);
+    }
     else
         LOG(VB_GENERAL, LOG_ERR,
             QString("Wanted to get status on recorder %1,\n\t\t\t"
@@ -441,8 +502,11 @@ ProgramInfo *EncoderLink::GetRecording(void)
 
     if (local)
         info = tv->GetRecording();
-    else if (sock)
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         info = sock->GetRecording(m_capturecardnum);
+    }
 
     return info;
 }
@@ -610,8 +674,11 @@ void EncoderLink::CancelNextRecording(bool cancel)
 {
     if (local)
         tv->CancelNextRecording(cancel);
-    else
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         sock->CancelNextRecording(m_capturecardnum, cancel);
+    }
 }
 
 /** \fn EncoderLink::SpawnLiveTV(LiveTVChain*, bool, QString)
@@ -693,8 +760,11 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
 {
     if (local)
         tv->SetNextLiveTVDir(dir);
-    else
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         sock->SetNextLiveTVDir(m_capturecardnum, dir);
+    }
 }
 
 /** \fn EncoderLink::GetFreeInputs(const vector<uint>&) const
@@ -703,14 +773,17 @@ void EncoderLink::SetNextLiveTVDir(QString dir)
  *  \sa TVRec::GetFreeInputs(const vector<uint>&) const
  */
 vector<InputInfo> EncoderLink::GetFreeInputs(
-    const vector<uint> &excluded_cardids) const
+    const vector<uint> &excluded_cardids)
 {
     vector<InputInfo> list;
 
     if (local)
         list = tv->GetFreeInputs(excluded_cardids);
-    else
+    else if (HasSockAndIncrRef())
+    {
+        ReferenceLocker rlocker(sock);
         list = sock->GetFreeInputs(m_capturecardnum, excluded_cardids);
+    }
 
     return list;
 }
