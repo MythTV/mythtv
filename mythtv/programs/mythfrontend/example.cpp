@@ -142,6 +142,7 @@ void SomeClass::AirPlayPictureEventHandler(blah ...)
 // See http://www.mythtv.org/wiki/MythUI_Theme_Development for more, this is a
 // bare minimum example, the wiki explains everything in detail
 
+/* Comment out the XML to make cppcheck happy
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
 <mythuitheme>
@@ -166,4 +167,4 @@ void SomeClass::AirPlayPictureEventHandler(blah ...)
 
 </mythuitheme>
 
-
+*/
