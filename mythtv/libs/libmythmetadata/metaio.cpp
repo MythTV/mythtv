@@ -14,6 +14,8 @@
 // Libmyth
 #include <mythcontext.h>
 
+const QString MetaIO::ValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
+                                          ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
 /*!
  * \brief Constructor
  */
@@ -34,6 +36,12 @@ MetaIO* MetaIO::createTagger(const QString& filename)
 {
     QFileInfo fi(filename);
     QString extension = fi.suffix().toLower();
+
+    if (extension.isEmpty() || !MetaIO::ValidFileExtensions.contains(extension))
+    {
+        LOG(VB_FILE, LOG_WARNING, QString("MetaIO: unknown extension: '%1'").arg(extension));
+        return NULL;
+    }
 
     if (extension == "mp3" || extension == "mp2")
         return new MetaIOID3;
