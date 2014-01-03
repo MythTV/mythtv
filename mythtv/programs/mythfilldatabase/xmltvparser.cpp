@@ -495,11 +495,13 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                         }
                     }
                 }
-                else if (info.attribute("system") == "onscreen" &&
-                        pginfo->subtitle.isEmpty())
+                else if (info.attribute("system") == "onscreen")
                 {
                     pginfo->categoryType = ProgramInfo::kCategorySeries;
-                    pginfo->subtitle = getFirstText(info);
+                    if (pginfo->subtitle.isEmpty())
+                    {
+                        pginfo->subtitle = getFirstText(info);
+                    }
                 }
             }
         }
