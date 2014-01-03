@@ -450,8 +450,10 @@ void ImportMusicDialog::addPressed()
             AlbumArtList artList = tagger->getAlbumArtList(meta->Filename(true));
             meta->setEmbeddedAlbumArt(artList);
             meta->getAlbumArtImages()->dumpToDatabase();
-            delete tagger;
         }
+
+        if (tagger)
+            delete tagger;
 
         m_somethingWasImported = true;
 
