@@ -205,7 +205,10 @@ void EditMetadataCommon::saveAll()
         MetaIO *tagger = m_metadata->getTagger();
 
         if (tagger)
+        {
             tagger->write(m_metadata);
+            delete tagger;
+        }
     }
 
     saveToDatabase();
@@ -289,7 +292,7 @@ void EditMetadataCommon::scanForImages(void)
     // scan the tracks tag for any images
     MetaIO *tagger = m_metadata->getTagger();
 
-    if (tagger->supportsEmbeddedImages())
+    if (tagger && tagger->supportsEmbeddedImages())
     {
         AlbumArtList art = tagger->getAlbumArtList(m_metadata->Filename());
         for (int x = 0; x < art.count(); x++)
@@ -298,6 +301,9 @@ void EditMetadataCommon::scanForImages(void)
             m_metadata->getAlbumArtImages()->addImage(image);
         }
     }
+
+    if (tagger)
+        delete tagger;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1080,6 +1086,8 @@ void EditAlbumartDialog::showMenu(void )
     menu->AddButton(tr("Rescan For Images"));
     menu->AddButton(tr("Search Internet For Images"));
 
+    MetaIO *tagger = m_metadata->getTagger();
+
     if (m_coverartList->GetItemCurrent())
     {
         menu->AddButton(tr("Change Image Type"), NULL, true);
@@ -1094,12 +1102,12 @@ void EditAlbumartDialog::showMenu(void )
                 {
                     if (!image->embedded)
                     {
-                        if (m_metadata->getTagger()->supportsEmbeddedImages())
+                        if (tagger && tagger->supportsEmbeddedImages())
                             menu->AddButton(tr("Copy Selected Image To Tag"));
                     }
                     else
                     {
-                        if (m_metadata->getTagger()->supportsEmbeddedImages())
+                        if (tagger && tagger->supportsEmbeddedImages())
                             menu->AddButton(tr("Remove Selected Image From Tag"));
                     }
                 }
@@ -1109,9 +1117,12 @@ void EditAlbumartDialog::showMenu(void )
 
     if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
     {
-        if (m_metadata->getTagger()->supportsEmbeddedImages())
+        if (tagger && tagger->supportsEmbeddedImages())
             menu->AddButton(tr("Copy Image To Tag"));
     }
+
+    if (tagger)
+        delete tagger;
 
     popupStack->AddScreen(menu);
 }
@@ -1177,6 +1188,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                                 if (!tagger->changeImageType(m_metadata->Filename(), &oldImage, image->imageType))
                                     LOG(VB_GENERAL, LOG_INFO, "EditAlbumartDialog: failed to change image type");
                             }
+
+                            if (tagger)
+                                delete tagger;
                         }
                         else
                         {
@@ -1334,10 +1348,11 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
         {
             MetaIO *tagger = m_metadata->getTagger();
 
-            if (!tagger->supportsEmbeddedImages())
+            if (tagger && !tagger->supportsEmbeddedImages())
             {
                 LOG(VB_GENERAL, LOG_ERR, "EditAlbumartDialog: asked to remove an image from the tag "
                                          "but the tagger doesn't support it!");
+                delete tagger;
                 return;
             }
 
@@ -1348,6 +1363,9 @@ void EditAlbumartDialog::doRemoveImageFromTag(bool doIt)
 
             removeCachedImage(image);
             rescanForImages();
+
+            if (tagger)
+                delete tagger;
         }
     }
 }
@@ -1356,10 +1374,11 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
 {
     MetaIO *tagger = m_metadata->getTagger();
 
-    if (!tagger->supportsEmbeddedImages())
+    if (tagger && !tagger->supportsEmbeddedImages())
     {
         LOG(VB_GENERAL, LOG_ERR, "EditAlbumartDialog: asked to write album art to the tag "
                               "but the tagger does't support it!");
+        delete tagger;
         return;
     }
 
@@ -1371,6 +1390,9 @@ void EditAlbumartDialog::doCopyImageToTag(const AlbumArtImage *image)
     removeCachedImage(image);
 
     rescanForImages();
+
+    if (tagger)
+        delete tagger;
 }
 
 void EditAlbumartDialog::removeCachedImage(const AlbumArtImage *image)
