@@ -272,8 +272,9 @@ bool MusicCommon::CreateCommon(void)
     updateShuffleMode();
     updateRepeatMode();
 
-    gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                      m_currentTrack, &m_playlistPlayedTime);
+    if (gPlayer->getCurrentPlaylist())
+        gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                 m_currentTrack, &m_playlistPlayedTime);
 
     if (m_playlistProgress)
     {
@@ -364,8 +365,9 @@ void MusicCommon::updateShuffleMode(bool updateUIList)
     {
         updateUIPlaylist();
 
-        gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                         gPlayer->getCurrentTrackPos(), &m_playlistPlayedTime);
+        if (gPlayer->getCurrentPlaylist())
+            gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                     gPlayer->getCurrentTrackPos(), &m_playlistPlayedTime);
         updatePlaylistStats();
 
         // need this to update the next track info
@@ -517,8 +519,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                 gPlayer->moveTrackUpDown(true, m_currentPlaylist->GetCurrentPos());
                 item->MoveUpDown(true);
                 m_currentTrack = gPlayer->getCurrentTrackPos();
-                gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                         m_currentTrack, &m_playlistPlayedTime);
+                if (gPlayer->getCurrentPlaylist())
+                    gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                             m_currentTrack, &m_playlistPlayedTime);
                 updatePlaylistStats();
                 updateTrackInfo(gPlayer->getCurrentMetadata());
             }
@@ -527,8 +530,9 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                 gPlayer->moveTrackUpDown(false, m_currentPlaylist->GetCurrentPos());
                 item->MoveUpDown(false);
                 m_currentTrack = gPlayer->getCurrentTrackPos();
-                gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                         m_currentTrack, &m_playlistPlayedTime);
+                if (gPlayer->getCurrentPlaylist())
+                    gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                             m_currentTrack, &m_playlistPlayedTime);
                 updatePlaylistStats();
                 updateTrackInfo(gPlayer->getCurrentMetadata());
             }
@@ -1266,8 +1270,11 @@ void MusicCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Remove All Tracks"))
             {
-                gPlayer->getPlaylist()->removeAllTracks();
-                gPlayer->activePlaylistChanged(-1, true);
+                if (gPlayer->getCurrentPlaylist())
+                {
+                    gPlayer->getCurrentPlaylist()->removeAllTracks();
+                    gPlayer->activePlaylistChanged(-1, true);
+                }
             }
             else if (resulttext == tr("Save To New Playlist"))
             {
@@ -1419,12 +1426,15 @@ void MusicCommon::customEvent(QEvent *event)
         }
         else if (resultid == "updateplaylist")
         {
-            Playlist *playlist = gMusicData->all_playlists->getPlaylist(resulttext);
-            QString songList = gPlayer->getPlaylist()->toRawSonglist();
-            playlist->removeAllTracks();
-            playlist->fillSongsFromSonglist(songList);
-            playlist->changed();
-            gPlayer->playlistChanged(playlist->getID());
+            if (gPlayer->getCurrentPlaylist())
+            {
+                Playlist *playlist = gMusicData->all_playlists->getPlaylist(resulttext);
+                QString songList = gPlayer->getCurrentPlaylist()->toRawSonglist();
+                playlist->removeAllTracks();
+                playlist->fillSongsFromSonglist(songList);
+                playlist->changed();
+                gPlayer->playlistChanged(playlist->getID());
+            }
         }
     }
     else if (event->type() == MusicPlayerEvent::TrackChangeEvent)
@@ -1464,8 +1474,9 @@ void MusicCommon::customEvent(QEvent *event)
 
         m_currentTrack = trackNo;
 
-        gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                         m_currentTrack, &m_playlistPlayedTime);
+        if (gPlayer->getCurrentPlaylist())
+            gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                     m_currentTrack, &m_playlistPlayedTime);
         if (m_playlistProgress)
         {
             m_playlistProgress->SetTotal(m_playlistMaxTime);
@@ -1513,13 +1524,14 @@ void MusicCommon::customEvent(QEvent *event)
                 gPlayer->next();
         }
 
-        gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                          m_currentTrack, &m_playlistPlayedTime);
+        if (gPlayer->getCurrentPlaylist())
+            gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                     m_currentTrack, &m_playlistPlayedTime);
         updatePlaylistStats();
         updateTrackInfo(gPlayer->getCurrentMetadata());
 
-        if (m_noTracksText)
-            m_noTracksText->SetVisible((gPlayer->getPlaylist()->getSongs().count() == 0));
+        if (m_noTracksText && gPlayer->getCurrentPlaylist())
+            m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
     }
     else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
@@ -1568,13 +1580,14 @@ void MusicCommon::customEvent(QEvent *event)
                         gPlayer->changeCurrentTrack(0);
                 }
 
-                if (m_noTracksText)
-                    m_noTracksText->SetVisible((gPlayer->getPlaylist()->getSongs().count() == 0));
+                if (m_noTracksText && gPlayer->getCurrentPlaylist())
+                    m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
             }
         }
 
-        gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                          m_currentTrack, &m_playlistPlayedTime);
+        if (gPlayer->getCurrentPlaylist())
+            gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                     m_currentTrack, &m_playlistPlayedTime);
 
         updatePlaylistStats();
         updateTrackInfo(gPlayer->getCurrentMetadata());
@@ -1859,8 +1872,8 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
 
 void MusicCommon::updateUIPlaylist(void)
 {
-    if (m_noTracksText)
-        m_noTracksText->SetVisible((gPlayer->getPlaylist()->getSongs().count() == 0));
+    if (m_noTracksText && gPlayer->getCurrentPlaylist())
+        m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
 
     if (!m_currentPlaylist)
         return;
@@ -1869,7 +1882,10 @@ void MusicCommon::updateUIPlaylist(void)
 
     m_currentTrack = -1;
 
-    Playlist *playlist = gPlayer->getPlaylist();
+    Playlist *playlist = gPlayer->getCurrentPlaylist();
+
+    if (!playlist)
+        return;
 
     QList<MusicMetadata*> songlist = playlist->getSongs();
     QList<MusicMetadata*>::iterator it = songlist.begin();
@@ -1940,7 +1956,10 @@ void MusicCommon::updateUIPlayedList(void)
 
 void MusicCommon::updatePlaylistStats(void)
 {
-    int trackCount = gPlayer->getPlaylist()->getSongs().size();
+    int trackCount = 0;
+
+    if (gPlayer->getCurrentPlaylist())
+        trackCount = gPlayer->getCurrentPlaylist()->getSongs().size();
 
     InfoMap map;
     if (gPlayer->isPlaying() && trackCount > 0)
@@ -1955,7 +1974,7 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
-        QString playlistName = gPlayer->getPlaylist()->getName();
+        QString playlistName = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->getName() : "";
         if (playlistName == "default_playlist_storage")
             playlistName = tr("Default Playlist");
         else if (playlistName ==  "stream_playlist")
@@ -2338,10 +2357,13 @@ void MusicCommon::byTitle(void)
 
 void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 {
+    if (!gPlayer->getCurrentPlaylist())
+        return;
+
     m_playlistOptions.playPLOption = PL_CURRENT;
 
     // Don't bother showing the dialog if the current playlist is empty
-    if (gPlayer->getPlaylist()->getSongs().count() == 0)
+    if (gPlayer->getCurrentPlaylist()->getSongs().count() == 0)
     {
         m_playlistOptions.insertPLOption = PL_REPLACE;
         doUpdatePlaylist(true);
@@ -2365,10 +2387,11 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
 
 void MusicCommon::doUpdatePlaylist(bool startPlayback)
 {
-    int curTrackID, trackCount;
+    int curTrackID, trackCount = 0;
     int curPos = gPlayer->getCurrentTrackPos();
 
-    trackCount = gPlayer->getPlaylist()->getSongs().count();
+    if (gPlayer->getCurrentPlaylist())
+        trackCount = gPlayer->getCurrentPlaylist()->getSongs().count();
 
     // store id of current track
     if (gPlayer->getCurrentMetadata())
@@ -2482,8 +2505,9 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
         gPlayer->changeCurrentTrack(m_currentTrack);
     }
 
-    gPlayer->getPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
-                                      m_currentTrack, &m_playlistPlayedTime);
+    if (gPlayer->getCurrentPlaylist())
+        gPlayer->getCurrentPlaylist()->getStats(&m_playlistTrackCount, &m_playlistMaxTime,
+                                                 m_currentTrack, &m_playlistPlayedTime);
     updatePlaylistStats();
     updateTrackInfo(gPlayer->getCurrentMetadata());
 }
@@ -2493,11 +2517,11 @@ bool MusicCommon::restorePosition(int trackID)
     // try to move to the current track
     bool foundTrack = false;
 
-    if (trackID != -1)
+    if (trackID != -1 && gPlayer->getCurrentPlaylist())
     {
-        for (int x = 0; x < gPlayer->getPlaylist()->getSongs().size(); x++)
+        for (int x = 0; x < gPlayer->getCurrentPlaylist()->getSongs().size(); x++)
         {
-            MusicMetadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
+            MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongs().at(x);
             if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
             {
                 m_currentTrack = x;

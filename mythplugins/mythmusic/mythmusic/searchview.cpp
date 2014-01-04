@@ -105,7 +105,7 @@ void SearchView::customEvent(QEvent *event)
             MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
             if (mdata && (mdata->ID() == (MusicMetadata::IdType) trackID || trackID == -1))
             {
-                if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
+                if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
                     item->DisplayState("on", "selectedstate");
                 else
                     item->DisplayState("off", "selectedstate");
@@ -280,7 +280,7 @@ void SearchView::ShowMenu(void)
             MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
             if (mdata)
             {
-                if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
+                if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
                     menu->AddItem(tr("Remove From Playlist"));
                 else
                 {
@@ -425,7 +425,7 @@ void SearchView::updateTracksList(void)
             mdata->toMap(metadataMap);
             newitem->SetTextFromMap(metadataMap);
 
-            if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
+            if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
                 newitem->DisplayState("on", "selectedstate");
             else
                 newitem->DisplayState("off", "selectedstate");
@@ -442,13 +442,16 @@ void SearchView::updateTracksList(void)
 
 void SearchView::trackClicked(MythUIButtonListItem *item)
 {
+    if (!gPlayer->getCurrentPlaylist())
+        return;
+
     MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
     if (mdata)
     {
-        if (gPlayer->getPlaylist()->checkTrack(mdata->ID()))
-            gPlayer->getPlaylist()->removeTrack(mdata->ID());
+        if (gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
+            gPlayer->getCurrentPlaylist()->removeTrack(mdata->ID());
         else
-            gPlayer->getPlaylist()->addTrack(mdata->ID(), true);
+            gPlayer->getCurrentPlaylist()->addTrack(mdata->ID(), true);
     }
 }
 

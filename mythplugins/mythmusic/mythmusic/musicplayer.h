@@ -113,7 +113,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     void         loadPlaylist(void);
     void         loadStreamPlaylist(void);
-    Playlist    *getPlaylist(void) { return m_currentPlaylist; }
+    Playlist    *getCurrentPlaylist(void);
     StreamList  *getStreamList(void);
 
     // these add and remove tracks from the active playlist
@@ -198,7 +198,6 @@ class MusicPlayer : public QObject, public MythObservable
     void setupDecoderHandler(void);
     void decoderHandlerReady(void);
 
-    Playlist    *m_currentPlaylist;
     int          m_currentTrack;
     int          m_currentTime;
 

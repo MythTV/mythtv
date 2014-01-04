@@ -680,7 +680,7 @@ void Playlist::fillSongsFromSonglist(QString songList)
         }
     }
 
-    if (this == gPlayer->getPlaylist())
+    if (this == gPlayer->getCurrentPlaylist())
         shuffleTracks(gPlayer->getShuffleMode());
     else
         shuffleTracks(MusicPlayer::SHUFFLE_OFF);
