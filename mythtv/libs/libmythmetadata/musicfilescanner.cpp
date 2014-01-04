@@ -14,11 +14,9 @@
 #include <mythprogressdialog.h>
 #include <musicmetadata.h>
 #include <metaio.h>
+#include <musicfilescanner.h>
 
-// MythMusic headers
-#include "filescanner.h"
-
-FileScanner::FileScanner()
+MusicFileScanner::MusicFileScanner()
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -63,7 +61,7 @@ FileScanner::FileScanner()
     }
 }
 
-FileScanner::~FileScanner ()
+MusicFileScanner::~MusicFileScanner ()
 {
 
 }
@@ -79,7 +77,7 @@ FileScanner::~FileScanner ()
  *
  * \returns Nothing.
  */
-void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files, int parentid)
+void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files, int parentid)
 {
     QDir d(directory);
 
@@ -140,7 +138,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
                 update_interval = 0;
             }
 
-            music_files[filename] = FileScanner::kFileSystem;
+            music_files[filename] = MusicFileScanner::kFileSystem;
         }
     }
 }
@@ -155,7 +153,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
  *
  * \returns Directory id
  */
-int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
+int MusicFileScanner::GetDirectoryId(const QString &directory, const int &parentid)
 {
     if (directory.isEmpty())
         return 0;
@@ -202,7 +200,7 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
  *
  * \returns True if file has been modified, otherwise false
  */
-bool FileScanner::HasFileChanged(
+bool MusicFileScanner::HasFileChanged(
     const QString &filename, const QString &date_modified)
 {
     QFileInfo fi(filename);
@@ -232,7 +230,7 @@ bool FileScanner::HasFileChanged(
  *
  * \returns Nothing.
  */
-void FileScanner::AddFileToDB(const QString &filename)
+void MusicFileScanner::AddFileToDB(const QString &filename)
 {
     QString extension = filename.section( '.', -1 ) ;
     QString directory = filename;
@@ -329,7 +327,7 @@ void FileScanner::AddFileToDB(const QString &filename)
  *
  * \returns Nothing.
  */
-void FileScanner::cleanDB()
+void MusicFileScanner::cleanDB()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -357,7 +355,7 @@ void FileScanner::cleanDB()
     if (!query.exec("SELECT g.genre_id FROM music_genres g "
                     "LEFT JOIN music_songs s ON g.genre_id=s.genre_id "
                     "WHERE s.genre_id IS NULL;"))
-        MythDB::DBError("FileScanner::cleanDB - select music_genres", query);
+        MythDB::DBError("MusicFileScanner::cleanDB - select music_genres", query);
 
     deletequery.prepare("DELETE FROM music_genres WHERE genre_id=:GENREID");
     while (query.next())
@@ -365,7 +363,7 @@ void FileScanner::cleanDB()
         int genreid = query.value(0).toInt();
         deletequery.bindValue(":GENREID", genreid);
         if (!deletequery.exec())
-            MythDB::DBError("FileScanner::cleanDB - delete music_genres",
+            MythDB::DBError("MusicFileScanner::cleanDB - delete music_genres",
                             deletequery);
     }
 
@@ -375,7 +373,7 @@ void FileScanner::cleanDB()
     if (!query.exec("SELECT a.album_id FROM music_albums a "
                     "LEFT JOIN music_songs s ON a.album_id=s.album_id "
                     "WHERE s.album_id IS NULL;"))
-        MythDB::DBError("FileScanner::cleanDB - select music_albums", query);
+        MythDB::DBError("MusicFileScanner::cleanDB - select music_albums", query);
 
     deletequery.prepare("DELETE FROM music_albums WHERE album_id=:ALBUMID");
     while (query.next())
@@ -383,7 +381,7 @@ void FileScanner::cleanDB()
         int albumid = query.value(0).toInt();
         deletequery.bindValue(":ALBUMID", albumid);
         if (!deletequery.exec())
-            MythDB::DBError("FileScanner::cleanDB - delete music_albums",
+            MythDB::DBError("MusicFileScanner::cleanDB - delete music_albums",
                             deletequery);
     }
 
@@ -394,7 +392,7 @@ void FileScanner::cleanDB()
                     "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
                     "LEFT JOIN music_albums l ON a.artist_id=l.artist_id "
                     "WHERE s.artist_id IS NULL AND l.artist_id IS NULL"))
-        MythDB::DBError("FileScanner::cleanDB - select music_artists", query);
+        MythDB::DBError("MusicFileScanner::cleanDB - select music_artists", query);
 
 
     deletequery.prepare("DELETE FROM music_artists WHERE artist_id=:ARTISTID");
@@ -403,7 +401,7 @@ void FileScanner::cleanDB()
         int artistid = query.value(0).toInt();
         deletequery.bindValue(":ARTISTID", artistid);
         if (!deletequery.exec())
-            MythDB::DBError("FileScanner::cleanDB - delete music_artists",
+            MythDB::DBError("MusicFileScanner::cleanDB - delete music_artists",
                             deletequery);
     }
 
@@ -413,7 +411,7 @@ void FileScanner::cleanDB()
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
                     "music_songs s ON a.song_id=s.song_id WHERE "
                     "embedded='1' AND s.song_id IS NULL;"))
-        MythDB::DBError("FileScanner::cleanDB - select music_albumart", query);
+        MythDB::DBError("MusicFileScanner::cleanDB - select music_albumart", query);
 
     deletequery.prepare("DELETE FROM music_albumart WHERE albumart_id=:ALBUMARTID");
     while (query.next())
@@ -421,7 +419,7 @@ void FileScanner::cleanDB()
         int albumartid = query.value(0).toInt();
         deletequery.bindValue(":ALBUMARTID", albumartid);
         if (!deletequery.exec())
-            MythDB::DBError("FileScanner::cleanDB - delete music_albumart",
+            MythDB::DBError("MusicFileScanner::cleanDB - delete music_albumart",
                             deletequery);
     }
 
@@ -439,7 +437,7 @@ void FileScanner::cleanDB()
  *
  * \returns Nothing.
  */
-void FileScanner::RemoveFileFromDB (const QString &filename)
+void MusicFileScanner::RemoveFileFromDB (const QString &filename)
 {
     QString sqlfilename(filename);
     sqlfilename.remove(0, m_startdir.length());
@@ -471,7 +469,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
     query.prepare("DELETE FROM music_songs WHERE filename = :NAME ;");
     query.bindValue(":NAME", sqlfilename);
     if (!query.exec())
-        MythDB::DBError("FileScanner::RemoveFileFromDB - deleting music_songs",
+        MythDB::DBError("MusicFileScanner::RemoveFileFromDB - deleting music_songs",
                         query);
 }
 
@@ -482,7 +480,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
  *
  * \returns Nothing.
  */
-void FileScanner::UpdateFileInDB(const QString &filename)
+void MusicFileScanner::UpdateFileInDB(const QString &filename)
 {
     QString directory = filename;
     directory.remove(0, m_startdir.length());
@@ -563,7 +561,7 @@ void FileScanner::UpdateFileInDB(const QString &filename)
  *
  * \returns Nothing.
  */
-void FileScanner::SearchDir(QString &directory)
+void MusicFileScanner::SearchDir(QString &directory)
 {
 
     m_startdir = directory;
@@ -623,11 +621,11 @@ void FileScanner::SearchDir(QString &directory)
     uint counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
-        if (*iter == FileScanner::kFileSystem)
+        if (*iter == MusicFileScanner::kFileSystem)
             AddFileToDB(iter.key());
-        else if (*iter == FileScanner::kDatabase)
+        else if (*iter == MusicFileScanner::kDatabase)
             RemoveFileFromDB(iter.key ());
-        else if (*iter == FileScanner::kNeedUpdate)
+        else if (*iter == MusicFileScanner::kNeedUpdate)
             UpdateFileInDB(iter.key());
 
         if (file_checking)
@@ -650,7 +648,7 @@ void FileScanner::SearchDir(QString &directory)
  *
  * \returns Nothing.
  */
-void FileScanner::ScanMusic(MusicLoadedMap &music_files)
+void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
 {
     MusicLoadedMap::Iterator iter;
 
@@ -659,7 +657,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                     "FROM music_songs LEFT JOIN music_directories ON "
                     "music_songs.directory_id=music_directories.directory_id "
                     "WHERE filename NOT LIKE ('%://%')"))
-        MythDB::DBError("FileScanner::ScanMusic", query);
+        MythDB::DBError("MusicFileScanner::ScanMusic", query);
 
     uint counter = 0;
 
@@ -693,7 +691,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == FileScanner::kDatabase)
+                    if (music_files[name] == MusicFileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -703,13 +701,13 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
-                        music_files[name] = FileScanner::kNeedUpdate;
+                        music_files[name] = MusicFileScanner::kNeedUpdate;
                     else
                         music_files.erase(iter);
                 }
                 else
                 {
-                    music_files[name] = FileScanner::kDatabase;
+                    music_files[name] = MusicFileScanner::kDatabase;
                 }
             }
 
@@ -732,7 +730,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
  *
  * \returns Nothing.
  */
-void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
+void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
 {
     MusicLoadedMap::Iterator iter;
 
@@ -741,7 +739,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                     "FROM music_albumart LEFT JOIN music_directories ON "
                     "music_albumart.directory_id=music_directories.directory_id"
                     " WHERE music_albumart.embedded=0"))
-        MythDB::DBError("FileScanner::ScanArtwork", query);
+        MythDB::DBError("MusicFileScanner::ScanArtwork", query);
 
     uint counter = 0;
 
@@ -775,7 +773,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
-                    if (music_files[name] == FileScanner::kDatabase)
+                    if (music_files[name] == MusicFileScanner::kDatabase)
                     {
                         if (file_checking)
                         {
@@ -789,7 +787,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 }
                 else
                 {
-                    music_files[name] = FileScanner::kDatabase;
+                    music_files[name] = MusicFileScanner::kDatabase;
                 }
             }
             if (file_checking)

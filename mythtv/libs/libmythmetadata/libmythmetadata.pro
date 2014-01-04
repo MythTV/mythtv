@@ -26,7 +26,7 @@ HEADERS += musicmetadata.h musicutils.h metaio.h metaiotaglib.h
 HEADERS += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
 HEADERS += metaiowavpack.h metaioid3.h metaiooggvorbis.h
 HEADERS += imagemetadata.h imageutils.h imagescan.h imagescanthread.h
-HEADERS += imagethumbgenthread.h
+HEADERS += imagethumbgenthread.h musicfilescanner.h
 
 SOURCES += cleanup.cpp  dbaccess.cpp  dirscan.cpp  globals.cpp
 SOURCES += parentalcontrols.cpp  videoscan.cpp  videoutils.cpp
@@ -38,7 +38,7 @@ SOURCES += musicmetadata.cpp musicutils.cpp metaio.cpp metaiotaglib.cpp
 SOURCES += metaioflacvorbis.cpp metaioavfcomment.cpp metaiomp4.cpp
 SOURCES += metaiowavpack.cpp metaioid3.cpp metaiooggvorbis.cpp
 SOURCES += imagemetadata.cpp imageutils.cpp imagescan.cpp imagescanthread.cpp
-SOURCES += imagethumbgenthread.cpp
+SOURCES += imagethumbgenthread.cpp musicfilescanner.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
@@ -99,7 +99,7 @@ inc.files += metaio.h metaiotaglib.h
 inc.files += metaioflacvorbis.h metaioavfcomment.h metaiomp4.h
 inc.files += metaiowavpack.h metaioid3.h metaiooggvorbis.h
 inc.files += imagemetadata.h imageutils.h imagescan.h imagescanthread.h
-inc.files += imagethumbgenthread.h
+inc.files += imagethumbgenthread.h musicfilescanner.h
 
 INSTALLS += inc
 

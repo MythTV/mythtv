@@ -1,14 +1,17 @@
-#ifndef _FILESCANNER_H_
-#define _FILESCANNER_H_
+#ifndef _MUSICFILESCANNER_H_
+#define _MUSICFILESCANNER_H_
+
+// MythTV
+#include "mythmetaexp.h"
 
 // Qt headers
 #include <QCoreApplication>
 
 typedef QMap<QString, int> IdCache;
 
-class FileScanner
+class META_PUBLIC MusicFileScanner
 {
-    Q_DECLARE_TR_FUNCTIONS(FileScanner)
+    Q_DECLARE_TR_FUNCTIONS(MusicFileScanner)
 
     enum MusicFileLocation
     {
@@ -20,8 +23,8 @@ class FileScanner
 
     typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
     public:
-        FileScanner ();
-        ~FileScanner ();
+        MusicFileScanner(void);
+        ~MusicFileScanner(void);
 
         void SearchDir(QString &directory);
 
@@ -43,4 +46,4 @@ class FileScanner
         IdCache  m_albumid;
 };
 
-#endif // _FILESCANNER_H_
+#endif // _MUSICFILESCANNER_H_
