@@ -780,12 +780,12 @@ void PlaylistEditorView::treeItemClicked(MythUIButtonListItem *item)
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
     MusicGenericTree *mnode = dynamic_cast<MusicGenericTree*>(node);
 
-    if (!mnode)
+    if (!mnode || !gPlayer->getCurrentPlaylist())
         return;
 
     if (mnode->getAction() == "trackid")
     {
-        if (gPlayer->getPlaylist()->checkTrack(mnode->getInt()))
+        if (gPlayer->getCurrentPlaylist()->checkTrack(mnode->getInt()))
         {
             // remove track from the current playlist
             gPlayer->removeTrack(mnode->getInt());
@@ -1009,7 +1009,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             MusicGenericTree *newnode = new MusicGenericTree(node, i.key(), "trackid");
             newnode->setInt(i.value());
             newnode->setDrawArrow(false);
-            bool hasTrack = gPlayer->getPlaylist()->checkTrack(newnode->getInt());
+            bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(newnode->getInt()) : false;
             newnode->setCheck( hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
             ++i;
         }
@@ -1288,7 +1288,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
                 MusicGenericTree *newnode = new MusicGenericTree(node, i.key().mid(7), "trackid");
                 newnode->setInt(i.value()->at(0)->ID());
                 newnode->setDrawArrow(false);
-                bool hasTrack = gPlayer->getPlaylist()->checkTrack(newnode->getInt());
+                bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(newnode->getInt()) : false;
                 newnode->setCheck( hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
             }
             ++i;
@@ -1544,7 +1544,7 @@ void PlaylistEditorView::getSmartPlaylistTracks(MusicGenericTree *node, int play
                 new MusicGenericTree(node, query.value(1).toString(), "trackid");
         newnode->setInt(query.value(0).toInt());
         newnode->setDrawArrow(false);
-        bool hasTrack = gPlayer->getPlaylist()->checkTrack(newnode->getInt());
+        bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(newnode->getInt()) : false;
         newnode->setCheck( hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
     }
 
@@ -1581,7 +1581,7 @@ void PlaylistEditorView::getCDTracks(MusicGenericTree *node)
         MusicGenericTree *newnode = new MusicGenericTree(node, title, "trackid");
         newnode->setInt(mdata->ID());
         newnode->setDrawArrow(false);
-        bool hasTrack = gPlayer->getPlaylist()->checkTrack(mdata->ID());
+        bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()) : false;
         newnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
     }
 }
@@ -1599,7 +1599,7 @@ void PlaylistEditorView::getPlaylistTracks(MusicGenericTree *node, int playlistI
             MusicGenericTree *newnode = new MusicGenericTree(node, mdata->Title(), "trackid");
             newnode->setInt(mdata->ID());
             newnode->setDrawArrow(false);
-            bool hasTrack = gPlayer->getPlaylist()->checkTrack(mdata->ID());
+            bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()) : false;
             newnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }
     }
@@ -1627,7 +1627,7 @@ void PlaylistEditorView::updateSelectedTracks(MusicGenericTree *node)
         {
             if (mnode->getAction() == "trackid")
             {
-                bool hasTrack = gPlayer->getPlaylist()->checkTrack(mnode->getInt());
+                bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(mnode->getInt()) : false;
                 mnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
             }
             else

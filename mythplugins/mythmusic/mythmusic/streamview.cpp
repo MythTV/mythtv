@@ -411,13 +411,16 @@ void StreamView::doRemoveStream(bool ok)
 
 void StreamView::updateStreamList(void)
 {
+    if (!gPlayer->getCurrentPlaylist())
+        return;
+
     m_streamList->Reset();
 
     bool foundActiveStream = false;
 
-    for (int x = 0; x < gPlayer->getPlaylist()->getSongs().count(); x++)
+    for (int x = 0; x < gPlayer->getCurrentPlaylist()->getSongs().count(); x++)
     {
-        MusicMetadata *mdata = gPlayer->getPlaylist()->getSongs().at(x);
+        MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongs().at(x);
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
         InfoMap metadataMap;
         if (mdata)
