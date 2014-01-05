@@ -144,6 +144,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--print-notification-template", "printntemplate", false,
                 "Print the template to be sent to the frontend", "")
                 ->SetGroup("Messaging")
+
+        // musicmetautils.cpp
+        << add("--updatemeta", "updatemeta", false,
+                "Update a music tracks database record and tag with new metadata", "")
+                ->SetGroup("Metadata Reading/Writing")
         );
 
     // mpegutils.cpp
@@ -193,6 +198,28 @@ void MythUtilCommandLineParser::LoadArguments(void)
     ->SetChildOf("notification");
     add("--type", "type", "type", "(optional) type of notification (normal, error, warning, check, busy", "")
     ->SetChildOf("notification");
+
+    // musicmetautils.cpp
+    add("--songid", "songid", "", "ID of track to update", "")
+            ->SetChildOf("updatemeta");
+    add("--title", "title", "", "(optional) Title of track", "")
+            ->SetChildOf("updatemeta");
+    add("--artist", "artist", "", "(optional) Artist of track", "")
+            ->SetChildOf("updatemeta");
+    add("--album", "album", "", "(optional) Album of track", "")
+            ->SetChildOf("updatemeta");
+    add("--genre", "genre", "", "(optional) Genre of track", "")
+            ->SetChildOf("updatemeta");
+    add("--trackno", "trackno", "", "(optional) Track No. of track", "")
+            ->SetChildOf("updatemeta");
+    add("--year", "year", "", "(optional) Year of track", "")
+            ->SetChildOf("updatemeta");
+    add("--rating", "rating", "", "(optional) Rating of track", "")
+            ->SetChildOf("updatemeta");
+    add("--playcount", "playcount", "", "(optional) Playcount of track", "")
+            ->SetChildOf("updatemeta");
+    add("--lastplayed", "lastplayed", "", "(optional) Last played of track", "")
+            ->SetChildOf("updatemeta");
 
     // Generic Options used by more than one utility
     addRecording();

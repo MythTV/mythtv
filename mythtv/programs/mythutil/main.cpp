@@ -21,6 +21,7 @@
 #include "jobutils.h"
 #include "markuputils.h"
 #include "messageutils.h"
+#include "musicmetautils.h"
 #include "signalhandling.h"
 
 
@@ -105,6 +106,7 @@ int main(int argc, char *argv[])
     registerJobUtils(utilMap);
     registerMarkupUtils(utilMap);
     registerMessageUtils(utilMap);
+    registerMusicUtils(utilMap);
 
     bool cmdFound = false;
     int cmdResult = GENERIC_EXIT_OK;
