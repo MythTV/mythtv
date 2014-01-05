@@ -4521,7 +4521,7 @@ void MythPlayer::GetCodecDescription(InfoMap &infoMap)
     bool interlaced = is_interlaced(m_scan);
     if (width == 1920 || height == 1080 || height == 1088)
         infoMap["videodescrip"] = interlaced ? "HD_1080_I" : "HD_1080_P";
-    else if (height == 720 && !interlaced)
+    else if ((width == 1280 || height == 720) && !interlaced)
         infoMap["videodescrip"] = "HD_720_P";
     else if (height >= 720)
         infoMap["videodescrip"] = "HD";
