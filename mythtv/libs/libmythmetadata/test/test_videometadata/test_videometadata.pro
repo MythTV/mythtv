@@ -13,7 +13,8 @@ TEMPLATE = app
 TARGET = test_videometadata
 DEPENDPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
 INCLUDEPATH += . ../.. ../../../libmythbase ../../../libmythtv ../../../libmyth
-LIBS += -L../.. -lmythbase-$$LIBVERSION -lmythmetadata-$$LIBVERSION
+LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
+LIBS += -L../.. -lmythmetadata-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage
