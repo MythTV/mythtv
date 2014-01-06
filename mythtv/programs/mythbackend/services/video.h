@@ -45,6 +45,7 @@ class Video : public VideoServices
         /* Video Metadata Methods */
 
         DTC::VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
+                                                       const QString  &Sort,
                                                        bool           Descending,
                                                        int            StartIndex,
                                                        int            Count      );
@@ -102,11 +103,12 @@ class ScriptableVideo : public QObject
     public slots:
 
         QObject* GetVideoList(       const QString    &Folder,
+                                     const QString    &Sort,
                                      bool             Descending,
                                      int              StartIndex,
                                      int              Count      )
         {
-            return m_obj.GetVideoList(Folder, Descending, StartIndex, Count );
+            return m_obj.GetVideoList(Folder, Sort, Descending, StartIndex, Count );
         }
 
         QObject* GetVideo(       int              Id         )
