@@ -49,12 +49,18 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
+DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
+                                                 bool bDescending,
                                                  int nStartIndex,
                                                  int nCount       )
 {
     VideoMetadataListManager::metadata_list videolist;
-    QString sql = "ORDER BY intid";
+
+    QString sql = "";
+    if (!Folder.isEmpty())
+        sql += " WHERE filename LIKE '" + Folder + "%'";
+
+    sql += " ORDER BY intid";
     if (bDescending)
         sql += " DESC";
     VideoMetadataListManager::loadAllFromDatabase(videolist, sql);
