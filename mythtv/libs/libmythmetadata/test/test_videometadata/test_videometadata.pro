@@ -21,10 +21,28 @@ contains(QMAKE_CXX, "g++") {
   QMAKE_LFLAGS += -fprofile-arcs
 }
 
-# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/zeromq/src/.libs/
-# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/nzmqt/src/
+contains(CONFIG_MYTHLOGSERVER, "yes") {
+  LIBS += -L../../../../external/zeromq/src/.libs -lmythzmq
+  LIBS += -L../../../../external/nzmqt/src -lmythnzmqt
+  QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/zeromq/src/.libs/
+  QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/nzmqt/src/
+}
+
 # QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/qjson/lib/
-# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavformat
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
+# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
+# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libhdhomerun
+# QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythservicecontracts
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythtv
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
 HEADERS += test_videometadata.h
