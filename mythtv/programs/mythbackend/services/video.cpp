@@ -49,12 +49,27 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::VideoMetadataInfoList* Video::GetVideoList( bool bDescending,
+DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
+                                                 const QString &Sort,
+                                                 bool bDescending,
                                                  int nStartIndex,
                                                  int nCount       )
 {
     VideoMetadataListManager::metadata_list videolist;
-    QString sql = "ORDER BY intid";
+
+    QString sql = "";
+    if (!Folder.isEmpty())
+        sql.append(" WHERE filename LIKE '" + Folder + "%'");
+
+    sql.append(" ORDER BY ");
+    QString sort = QString(Sort.toLower());
+    if (sort == "added")
+        sql.append("insertdate");
+    else if (sort == "released")
+        sql.append("releasedate");
+    else
+        sql.append("intid");
+
     if (bDescending)
         sql += " DESC";
     VideoMetadataListManager::loadAllFromDatabase(videolist, sql);

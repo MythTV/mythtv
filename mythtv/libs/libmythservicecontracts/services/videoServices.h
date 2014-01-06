@@ -61,7 +61,9 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         // Video Metadata
 
-        virtual DTC::VideoMetadataInfoList* GetVideoList       ( bool             Descending,
+        virtual DTC::VideoMetadataInfoList* GetVideoList       ( const QString    &Folder,
+                                                                 const QString    &Sort,
+                                                                 bool             Descending,
                                                                  int              StartIndex,
                                                                  int              Count      ) = 0;
 
