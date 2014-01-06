@@ -50,6 +50,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
+                                                 const QString &Sort,
                                                  bool bDescending,
                                                  int nStartIndex,
                                                  int nCount       )
@@ -58,9 +59,17 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
 
     QString sql = "";
     if (!Folder.isEmpty())
-        sql += " WHERE filename LIKE '" + Folder + "%'";
+        sql.append(" WHERE filename LIKE '" + Folder + "%'");
 
-    sql += " ORDER BY intid";
+    sql.append(" ORDER BY ");
+    QString sort = QString(Sort.toLower());
+    if (sort == "added")
+        sql.append("insertdate");
+    else if (sort == "released")
+        sql.append("releasedate");
+    else
+        sql.append("intid");
+
     if (bDescending)
         sql += " DESC";
     VideoMetadataListManager::loadAllFromDatabase(videolist, sql);
