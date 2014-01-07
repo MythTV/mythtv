@@ -2637,6 +2637,20 @@ NULL
             return false;
     }
 
+    if (dbver == "1322")
+    {
+        const char *updates[] = {
+        // add inetref to (recorded)program before season/episode
+            "ALTER TABLE program "
+            " ADD COLUMN inetref varchar(40) DEFAULT '' AFTER videoprop;",
+            "ALTER TABLE recordedprogram "
+            " ADD COLUMN inetref varchar(40) DEFAULT '' AFTER videoprop;",
+            NULL
+        };
+        if (!performActualUpdate(updates, "1323", dbver))
+            return false;
+    }
+
     return true;
 }
 
