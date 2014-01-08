@@ -33,16 +33,49 @@ class TestIPTVRecorder: public QObject
     Q_OBJECT
 
   private slots:
+    /**
+     * Test if supported Urls really are considered valid.
+     */
     void TuningData(void)
     {
         IPTVTuningData tuning;
 
-        /* test url from #11949 without port */
+        /* test url from #11949 without port, free.fr */
         tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
         QVERIFY (tuning.IsValid());
 
-        /* test url from #11949 with port */
+        /* test url from #11949 with port, free.fr */
         tuning.m_data_url = QUrl (QString("rtsp://mafreebox.freebox.fr:554/fbxtv_pub/stream?namespace=1&service=203&flavour=sd"));
+        QVERIFY (tuning.IsValid());
+
+        /* test url from #11852 with port, telekom.de */
+        tuning.m_data_url = QUrl (QString("rtp://@239.35.10.1:10000"));
+        QVERIFY (tuning.IsValid());
+        /* test url from das-erste.de with port, telekom.de */
+        tuning.m_data_url = QUrl (QString("rtp://239.35.10.4:10000"));
+        QVERIFY (tuning.IsValid());
+
+        /* test url from #11847 with port, Dreambox */
+        tuning.m_data_url = QUrl (QString("http://yourdreambox:8001/1:0:1:488:3FE:22F1:EEEE0000:0:0:0:"));
+        QVERIFY (tuning.IsValid());
+    }
+
+
+    /**
+     * Test if the expectation "if the Url works with VLC it should work with MythTV" is being met.
+     */
+    void TuningDataVLCStyle(void)
+    {
+        IPTVTuningData tuning;
+
+        /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x549.html */
+        tuning.m_data_url = QUrl (QString("udp:@239.255.12.42"));
+        QVERIFY (tuning.IsValid());
+        /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x1245.html */
+        tuning.m_data_url = QUrl (QString("udp:@[ff08::1]"));
+        QVERIFY (tuning.IsValid());
+        /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x1245.html */
+        tuning.m_data_url = QUrl (QString("udp:[ff08::1%eth0]"));
         QVERIFY (tuning.IsValid());
     }
 };

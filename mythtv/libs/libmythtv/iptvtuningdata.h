@@ -140,7 +140,11 @@ class MTV_PUBLIC IPTVTuningData
 
     bool IsValid(void) const
     {
-        return IsHLS() || m_data_url.port() != -1;
+        return m_data_url.isValid() &&
+               (IsHLS() ||
+                ((m_data_url.scheme() == "rtp" || m_data_url.scheme() == "udp") && m_data_url.port() != -1) ||
+                m_data_url.scheme() == "rtsp"
+               );
     }
 
   public:
