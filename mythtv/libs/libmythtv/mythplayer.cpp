@@ -551,6 +551,13 @@ void MythPlayer::ReinitOSD(void)
                 ToggleCaptions(old);
                 osd->Reinit(visible, aspect);
                 EnableCaptions(old, false);
+                if (deleteMap.IsEditing())
+                {
+                    bool const changed = deleteMap.IsChanged();
+                    deleteMap.SetChanged(true);
+                    deleteMap.UpdateOSD(framesPlayed, video_frame_rate, osd);
+                    deleteMap.SetChanged(changed);
+                }
             }
         }
 
