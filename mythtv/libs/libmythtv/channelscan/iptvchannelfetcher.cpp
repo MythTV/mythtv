@@ -140,6 +140,7 @@ void IPTVChannelFetcher::run(void)
         QString channum = it.key();
         QString name    = (*it).m_name;
         QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
+        uint programnumber = (*it).m_programnumber;
         //: %1 is the channel number, %2 is the channel name
         QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
 
@@ -157,7 +158,7 @@ void IPTVChannelFetcher::run(void)
             chanid = ChannelUtil::CreateChanID(_sourceid, channum);
             ChannelUtil::CreateChannel(
                 0, _sourceid, chanid, name, name, channum,
-                0, 0, 0, false, false, false, QString::null,
+                programnumber, 0, 0, false, false, false, QString::null,
                 QString::null, "Default", xmltvid);
             ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
         }
@@ -170,7 +171,7 @@ void IPTVChannelFetcher::run(void)
             }
             ChannelUtil::UpdateChannel(
                 0, _sourceid, chanid, name, name, channum,
-                0, 0, 0, false, false, false, QString::null,
+                programnumber, 0, 0, false, false, false, QString::null,
                 QString::null, "Default", xmltvid);
             ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
         }
@@ -350,6 +351,7 @@ static bool parse_chan_info(const QString   &rawdata,
     // #EXTMYTHTV:fecurl1=URL                <-- optional line (myth specific)
     // #EXTMYTHTV:fecbitrate0=BITRATE        <-- optional line (myth specific)
     // #EXTMYTHTV:fecbitrate1=BITRATE        <-- optional line (myth specific)
+    // #EXTVLCOPT:program=program_number     <-- optional line (used by MythTV and VLC)
     // #...                                  <-- ignored comments
     // rtsp://maiptv.iptv.fr/iptvtv/201 <-- url
 
@@ -376,6 +378,10 @@ static bool parse_chan_info(const QString   &rawdata,
                 if (!key.isEmpty())
                     values[key] = data.mid(data.indexOf('=')+1);
             }
+            else if (line.startsWith("#EXTVLCOPT:program="))
+            {
+                values["programnumber"] = line.mid(line.indexOf('=')+1);
+            }
             continue;
         }
 
@@ -394,7 +400,8 @@ static bool parse_chan_info(const QString   &rawdata,
             line, values["bitrate"].toUInt(),
             values["fectype"],
             values["fecurl0"], values["fecbitrate0"].toUInt(),
-            values["fecurl1"], values["fecbitrate1"].toUInt());
+            values["fecurl1"], values["fecbitrate1"].toUInt(),
+            values["programnumber"].toUInt());
         return true;
     }
 }
