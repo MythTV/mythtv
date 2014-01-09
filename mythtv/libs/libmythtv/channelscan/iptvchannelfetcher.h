@@ -35,8 +35,9 @@ class IPTVChannelInfo
                     const QString &fec_url0,
                     uint fec_bitrate0,
                     const QString &fec_url1,
-                    uint fec_bitrate1) :
-        m_name(name), m_xmltvid(xmltvid),
+                    uint fec_bitrate1,
+                    uint programnumber) :
+        m_name(name), m_xmltvid(xmltvid), m_programnumber(programnumber),
         m_tuning(data_url, data_bitrate,
                  fec_type, fec_url0, fec_bitrate0, fec_url1, fec_bitrate1)
     {
@@ -50,6 +51,7 @@ class IPTVChannelInfo
   public:
     QString m_name;
     QString m_xmltvid;
+    uint m_programnumber;
     IPTVTuningData m_tuning;
 };
 typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
