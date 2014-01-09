@@ -34,7 +34,7 @@ class CetonRTSP
     QString     _ip;
     ushort      _port;
     uint        _sequenceNumber;
-    uint        _sessionNumber;
+    QString     _sessionId;
     QString     _requestUrl;
 
     int                     _responseCode;

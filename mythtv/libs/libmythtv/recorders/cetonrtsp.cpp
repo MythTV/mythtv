@@ -21,7 +21,7 @@ CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
     _ip(ip),
     _port(port),
     _sequenceNumber(0),
-    _sessionNumber(0),
+    _sessionId("0"),
     _responseCode(-1)
 {
     _requestUrl = QString("rtsp://%1:%2/cetonmpeg%3")
@@ -32,7 +32,7 @@ CetonRTSP::CetonRTSP(const QUrl &url) :
     _ip(url.host()),
     _port((url.port() >= 0) ? url.port() : 554),
     _sequenceNumber(0),
-    _sessionNumber(0),
+    _sessionId("0"),
     _responseCode(-1)
 {
     _requestUrl = url.toString();
@@ -49,8 +49,8 @@ bool CetonRTSP::ProcessRequest(
     requestHeaders.append(QString("%1 %2 RTSP/1.0").arg(method, _requestUrl));
     requestHeaders.append(QString("User-Agent: MythTV Ceton Recorder"));
     requestHeaders.append(QString("CSeq: %1").arg(++_sequenceNumber));
-    if (_sessionNumber > 0)
-        requestHeaders.append(QString("Session: %1").arg(_sessionNumber));
+    if (_sessionId != "0")
+        requestHeaders.append(QString("Session: %1").arg(_sessionId));
     if (headers != NULL)
     {
         for(int i = 0; i < headers->count(); i++)
@@ -197,11 +197,11 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2)
     if (!ProcessRequest("SETUP", &extraHeaders))
         return false;
 
-    _sessionNumber = _responseHeaders.value("Session").toInt();
-    if (_sessionNumber == 0)
+    _sessionId = _responseHeaders.value("Session");
+    if (_sessionId.size() < 8)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
-            "session number not found in SETUP response");
+            "session id not found in SETUP response");
         return false;
     }
 
@@ -216,6 +216,6 @@ bool CetonRTSP::Play(void)
 bool CetonRTSP::Teardown(void)
 {
     bool result = ProcessRequest("TEARDOWN");
-    _sessionNumber = 0;
+    _sessionId = "0";
     return result;
 }
