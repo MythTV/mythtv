@@ -162,7 +162,7 @@ bool CetonRTSP::GetOptions(QStringList &options)
 {
     if (ProcessRequest("OPTIONS"))
     {
-        options = _responseHeaders.value("Public").split(",");
+        options = _responseHeaders.value("Public").split(QRegExp(",\\s*"));
         return true;
     }
     return false;
