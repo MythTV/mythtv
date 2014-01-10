@@ -308,8 +308,19 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         // If the MusicBrainz ID is the special "Various Artists" ID
         // then compilation is TRUE
         if (!compilation && !musicbrainz->fieldList().isEmpty())
-            compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
-            == TStringToQString(musicbrainz->fieldList().front()));
+        {
+            TagLib::StringList l = musicbrainz->fieldList();
+            for (TagLib::StringList::ConstIterator it = l.begin(); it != l.end(); it++)
+            {
+                QString ID = TStringToQString((*it));
+
+                if (ID == MYTH_MUSICBRAINZ_ALBUMARTIST_UUID)
+                {
+                    compilation = true;
+                    break;
+                }
+            }
+        }
     }
 
     // TLEN - Ignored intentionally, some encoders write bad values
