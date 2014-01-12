@@ -36,7 +36,7 @@ struct PlaylistOptions
     PlayPLOption playPLOption;
 };
 
-typedef QList<MusicMetadata*> SongList;
+typedef QList<MusicMetadata::IdType> SongList;
 
 class Playlist : public QObject
 {
@@ -72,20 +72,20 @@ class Playlist : public QObject
                               int currentTrackID);
     QString toRawSonglist(bool shuffled = false, bool tracksOnly = false);
 
-    const SongList &getSongs(void) { return m_shuffledSongs; }
-    MusicMetadata* getSongAt(int pos);
 
-    int getCount(void) { return m_songs.count(); }
+    MusicMetadata* getSongAt(int pos) const;
+
+    int getTrackCount(void) { return m_songs.count(); }
 
     void moveTrackUpDown(bool flag, int where_its_at);
-    void moveTrackUpDown(bool flag, MusicMetadata *the_track);
 
-    bool checkTrack(int a_track_id) const;
+    bool checkTrack(MusicMetadata::IdType trackID) const;
 
-    void addTrack(int trackID, bool update_display);
-    void addTrack(MusicMetadata *mdata, bool update_display);
+    void addTrack(MusicMetadata::IdType trackID, bool update_display);
 
-    void removeTrack(int the_track_id);
+    int getTrackPosition(MusicMetadata::IdType trackID) { return m_shuffledSongs.indexOf(trackID); }
+
+    void removeTrack(MusicMetadata::IdType trackID);
     void removeAllTracks(void);
     void removeAllCDTracks(void);
 
@@ -117,19 +117,20 @@ class Playlist : public QObject
     void processExit(uint retval = 0);
 
   private:
-
+    MusicMetadata* getRawSongAt(int pos) const;
     QString removeDuplicateTracks(const QString &orig_songlist, const QString &new_songlist);
 
     int                   m_playlistid;
     QString               m_name;
+
     SongList              m_songs;
     SongList              m_shuffledSongs;
-    QMap<int, MusicMetadata*>  m_songMap;
+
     PlaylistContainer    *m_parent;
     bool                  m_changed;
     bool                  m_doSave;
     MythProgressDialog   *m_progress;
-    MythSystemLegacy           *m_proc;
+    MythSystemLegacy     *m_proc;
     uint                  m_procExitVal;
 };
 

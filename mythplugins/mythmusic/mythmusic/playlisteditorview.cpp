@@ -570,11 +570,11 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
 
         if (playlist)
         {
-            SongList songlist = playlist->getSongs();
-
-            for (int x = 0; x < songlist.count(); x++)
+            for (int x = 0; x < playlist->getTrackCount(); x++)
             {
-                m_songList.append(songlist.at(x)->ID());
+                MusicMetadata *mdata = playlist->getSongAt(x);
+                if (mdata)
+                    m_songList.append((int) mdata->ID());
             }
         }
     }
@@ -1589,11 +1589,10 @@ void PlaylistEditorView::getCDTracks(MusicGenericTree *node)
 void PlaylistEditorView::getPlaylistTracks(MusicGenericTree *node, int playlistID)
 {
     Playlist *playlist = gMusicData->all_playlists->getPlaylist(playlistID);
-    QList<MusicMetadata*> songs = playlist->getSongs();
 
-    for (int x = 0; x < songs.count(); x++)
+    for (int x = 0; x < playlist->getTrackCount(); x++)
     {
-        MusicMetadata *mdata = songs.at(x);
+        MusicMetadata *mdata = playlist->getSongAt(x);
         if (mdata)
         {
             MusicGenericTree *newnode = new MusicGenericTree(node, mdata->Title(), "trackid");

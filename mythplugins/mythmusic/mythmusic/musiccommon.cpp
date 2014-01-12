@@ -1531,7 +1531,7 @@ void MusicCommon::customEvent(QEvent *event)
         updateTrackInfo(gPlayer->getCurrentMetadata());
 
         if (m_noTracksText && gPlayer->getCurrentPlaylist())
-            m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
+            m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getTrackCount() == 0));
     }
     else if (event->type() == MusicPlayerEvent::TrackAddedEvent)
     {
@@ -1581,7 +1581,7 @@ void MusicCommon::customEvent(QEvent *event)
                 }
 
                 if (m_noTracksText && gPlayer->getCurrentPlaylist())
-                    m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
+                    m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getTrackCount() == 0));
             }
         }
 
@@ -1873,7 +1873,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
 void MusicCommon::updateUIPlaylist(void)
 {
     if (m_noTracksText && gPlayer->getCurrentPlaylist())
-        m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getSongs().count() == 0));
+        m_noTracksText->SetVisible((gPlayer->getCurrentPlaylist()->getTrackCount() == 0));
 
     if (!m_currentPlaylist)
         return;
@@ -1887,12 +1887,9 @@ void MusicCommon::updateUIPlaylist(void)
     if (!playlist)
         return;
 
-    QList<MusicMetadata*> songlist = playlist->getSongs();
-    QList<MusicMetadata*>::iterator it = songlist.begin();
-
-    for (; it != songlist.end(); ++it)
+    for (int x = 0; x < playlist->getTrackCount(); x++)
     {
-        MusicMetadata *mdata = (*it);
+        MusicMetadata *mdata = playlist->getSongAt(x);
         if (mdata)
         {
             MythUIButtonListItem *item =
@@ -1959,7 +1956,7 @@ void MusicCommon::updatePlaylistStats(void)
     int trackCount = 0;
 
     if (gPlayer->getCurrentPlaylist())
-        trackCount = gPlayer->getCurrentPlaylist()->getSongs().size();
+        trackCount = gPlayer->getCurrentPlaylist()->getTrackCount();
 
     InfoMap map;
     if (gPlayer->isPlaying() && trackCount > 0)
@@ -2363,7 +2360,7 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
     m_playlistOptions.playPLOption = PL_CURRENT;
 
     // Don't bother showing the dialog if the current playlist is empty
-    if (gPlayer->getCurrentPlaylist()->getSongs().count() == 0)
+    if (gPlayer->getCurrentPlaylist()->getTrackCount() == 0)
     {
         m_playlistOptions.insertPLOption = PL_REPLACE;
         doUpdatePlaylist(true);
@@ -2391,7 +2388,7 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
     int curPos = gPlayer->getCurrentTrackPos();
 
     if (gPlayer->getCurrentPlaylist())
-        trackCount = gPlayer->getCurrentPlaylist()->getSongs().count();
+        trackCount = gPlayer->getCurrentPlaylist()->getTrackCount();
 
     // store id of current track
     if (gPlayer->getCurrentMetadata())
@@ -2519,9 +2516,9 @@ bool MusicCommon::restorePosition(int trackID)
 
     if (trackID != -1 && gPlayer->getCurrentPlaylist())
     {
-        for (int x = 0; x < gPlayer->getCurrentPlaylist()->getSongs().size(); x++)
+        for (int x = 0; x < gPlayer->getCurrentPlaylist()->getTrackCount(); x++)
         {
-            MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongs().at(x);
+            MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongAt(x);
             if (mdata && mdata->ID() == (MusicMetadata::IdType) trackID)
             {
                 m_currentTrack = x;

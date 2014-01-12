@@ -418,9 +418,9 @@ void StreamView::updateStreamList(void)
 
     bool foundActiveStream = false;
 
-    for (int x = 0; x < gPlayer->getCurrentPlaylist()->getSongs().count(); x++)
+    for (int x = 0; x < gPlayer->getCurrentPlaylist()->getTrackCount(); x++)
     {
-        MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongs().at(x);
+        MusicMetadata *mdata = gPlayer->getCurrentPlaylist()->getSongAt(x);
         MythUIButtonListItem *item = new MythUIButtonListItem(m_streamList, "", qVariantFromValue(mdata));
         InfoMap metadataMap;
         if (mdata)

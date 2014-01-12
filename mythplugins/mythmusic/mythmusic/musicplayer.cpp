@@ -418,7 +418,7 @@ void MusicPlayer::next(void)
     else
         currentTrack++;
 
-    if (currentTrack >= getCurrentPlaylist()->getSongs().size())
+    if (currentTrack >= getCurrentPlaylist()->getTrackCount())
     {
         if (m_repeatMode == REPEAT_ALL)
         {
@@ -888,7 +888,7 @@ void MusicPlayer::loadPlaylist(void)
         if (getResumeMode() > MusicPlayer::RESUME_OFF)
         {
             int bookmark = gCoreContext->GetNumSetting("MusicRadioBookmark", 0);
-            if (bookmark < 0 || bookmark >= getCurrentPlaylist()->getSongs().size())
+            if (bookmark < 0 || bookmark >= getCurrentPlaylist()->getTrackCount())
                 bookmark = 0;
 
             m_currentTrack = bookmark;
@@ -903,7 +903,7 @@ void MusicPlayer::loadPlaylist(void)
         if (getResumeMode() > MusicPlayer::RESUME_OFF)
         {
             int bookmark = gCoreContext->GetNumSetting("MusicBookmark", 0);
-            if (bookmark < 0 || bookmark >= getCurrentPlaylist()->getSongs().size())
+            if (bookmark < 0 || bookmark >= getCurrentPlaylist()->getTrackCount())
                 bookmark = 0;
 
             m_currentTrack = bookmark;
@@ -937,14 +937,14 @@ void MusicPlayer::moveTrackUpDown(bool moveUp, int whichTrack)
     if (moveUp && whichTrack <= 0)
         return;
 
-    if (!moveUp && whichTrack >=  getCurrentPlaylist()->getSongs().size() - 1)
+    if (!moveUp && whichTrack >=  getCurrentPlaylist()->getTrackCount() - 1)
         return;
 
-    MusicMetadata *currTrack = getCurrentPlaylist()->getSongs().at(m_currentTrack);
+    MusicMetadata *currTrack = getCurrentPlaylist()->getSongAt(m_currentTrack);
 
     getCurrentPlaylist()->moveTrackUpDown(moveUp, whichTrack);
 
-    m_currentTrack = getCurrentPlaylist()->getSongs().indexOf(currTrack);
+    m_currentTrack = getCurrentPlaylist()->getTrackPosition(currTrack->ID());
 }
 
 bool MusicPlayer::setCurrentTrackPos(int pos)
@@ -998,9 +998,9 @@ void MusicPlayer::restorePosition(void)
 
     if (getCurrentPlaylist())
     {
-        for (int x = 0; x < getCurrentPlaylist()->getSongs().size(); x++)
+        for (int x = 0; x < getCurrentPlaylist()->getTrackCount(); x++)
         {
-            if (getCurrentPlaylist()->getSongs().at(x)->ID() == id)
+            if (getCurrentPlaylist()->getSongAt(x)->ID() == id)
             {
                 m_currentTrack = x;
                 break;
@@ -1056,7 +1056,7 @@ void MusicPlayer::changeCurrentTrack(int trackNo)
     m_currentTrack = trackNo;
 
     // sanity check the current track
-    if (m_currentTrack < 0 || m_currentTrack >= getCurrentPlaylist()->getSongs().size())
+    if (m_currentTrack < 0 || m_currentTrack >= getCurrentPlaylist()->getTrackCount())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MusicPlayer: asked to set the current track to an invalid track no. %1")
@@ -1094,7 +1094,7 @@ MusicMetadata *MusicPlayer::getNextMetadata(void)
         return getCurrentMetadata();
 
     // if we are not playing the last track then just return the next track
-    if (m_currentTrack < getCurrentPlaylist()->getSongs().size() - 1)
+    if (m_currentTrack < getCurrentPlaylist()->getTrackCount() - 1)
         return getCurrentPlaylist()->getSongAt(m_currentTrack + 1);
     else
     {
@@ -1176,9 +1176,9 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
 
     if (curTrackID != -1)
     {
-        for (int x = 0; x < getCurrentPlaylist()->getSongs().size(); x++)
+        for (int x = 0; x < getCurrentPlaylist()->getTrackCount(); x++)
         {
-            MusicMetadata *mdata = getCurrentPlaylist()->getSongs().at(x);
+            MusicMetadata *mdata = getCurrentPlaylist()->getSongAt(x);
             if (mdata && mdata->ID() == (MusicMetadata::IdType) curTrackID)
             {
                 m_currentTrack = x;
@@ -1364,7 +1364,7 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
     }
 
     // if we don't have any tracks to play stop here
-    if (!getCurrentPlaylist() || getCurrentPlaylist()->getSongs().count() == 0)
+    if (!getCurrentPlaylist() || getCurrentPlaylist()->getTrackCount() == 0)
     {
         m_currentTrack = -1;
         if (isPlaying())
@@ -1377,9 +1377,9 @@ void MusicPlayer::activePlaylistChanged(int trackID, bool deleted)
     // make sure the current playing track is still valid
     if (isPlaying() && getDecoderHandler())
     {
-        for (int x = 0; x < getCurrentPlaylist()->getSongs().size(); x++)
+        for (int x = 0; x < getCurrentPlaylist()->getTrackCount(); x++)
         {
-            if (getCurrentPlaylist()->getSongs().at(x)->ID() == getDecoderHandler()->getMetadata().ID())
+            if (getCurrentPlaylist()->getSongAt(x)->ID() == getDecoderHandler()->getMetadata().ID())
             {
                 trackPos = x;
                 break;
@@ -1496,7 +1496,7 @@ void MusicPlayer::removeTrack(int trackID)
     MusicMetadata *mdata = gMusicData->all_music->getMetadata(trackID);
     if (mdata)
     {
-        int trackPos = getCurrentPlaylist()->getSongs().indexOf(mdata);
+        int trackPos = getCurrentPlaylist()->getTrackPosition(mdata->ID());
         if (m_currentTrack > 0 && m_currentTrack >= trackPos)
             m_currentTrack--;
 
