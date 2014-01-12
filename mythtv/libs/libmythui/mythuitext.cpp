@@ -765,8 +765,8 @@ void MythUIText::FillCutMessage(void)
                                            QCoreApplication::UnicodeUTF8,
                                            qAbs(value));
 #else
-			m_CutMessage = qApp->translate("ThemeUI",
-				m_TemplateText.toUtf8(), NULL, qAbs(value));
+                        m_CutMessage = qApp->translate("ThemeUI",
+                                m_TemplateText.toUtf8(), NULL, qAbs(value));
 #endif
 
         }
@@ -900,7 +900,7 @@ void MythUIText::FillCutMessage(void)
         }
     }
 
-    // If any of hcenter|vcenter|Justify, center it all, then adjust later
+    // If any of hcenter|vcenter|Justify, center it all, then adjust
     if (m_Justification & (Qt::AlignCenter|Qt::AlignJustify))
     {
         m_drawRect.moveCenter(m_Area.center());
