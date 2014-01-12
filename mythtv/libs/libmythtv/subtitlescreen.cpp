@@ -1743,6 +1743,7 @@ void SubtitleScreen::Pulse(void)
         fsub->Layout();
         fsub->PreRender();
         fsub->Draw();
+        delete fsub;
         SetElementAdded();
     }
 
