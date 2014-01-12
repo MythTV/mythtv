@@ -9,8 +9,15 @@ GCOV=`which gcov`
 GREP=`which grep`
 TEST_FAILED=0
 
+SEARCH=""
+if [ $1 != "" ]; then
+    SEARCH="test_"$1".pro"
+else
+    SEARCH="test_*.pro"
+fi
 
-TESTS=`find . -name "test_*.pro"`
+TESTS=`find . -name $SEARCH`
+
 
 for TEST in $TESTS
 do
