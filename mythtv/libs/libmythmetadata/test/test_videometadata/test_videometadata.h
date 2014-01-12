@@ -207,6 +207,33 @@ class Testvideometadata: public QObject
                      3);
     }
 
+    void NameWithSingleCharacters(void)
+    {
+        TestMetadata(QString("Title T.I.T.L.E.mpg"),
+                     QString("Title T.I.T.L.E"),
+                     QString(""),
+                     0,
+                     0);
+    }
+
+    void NameWithSingleCharactersAtStart(void)
+    {
+        TestMetadata(QString("T.I.T.L.E.Title.mpg"),
+                     QString("T.I.T.L.E Title"),
+                     QString(""),
+                     0,
+                     0);
+    }
+
+    void LongnameWithCombinationsOfSingleCharacter(void)
+    {
+        TestMetadata(QString("A.Very.Long.M.O.V.I.E.title.I.believe.will.fail.mpg"),
+                     QString("A Very Long M.O.V.I.E title I believe will fail"),
+                     QString(""),
+                     0,
+                     0);
+    }
+
     static void TestMetadata(const QString &filename,
                              const QString &expectedTitle,
                              const QString &expectedSubtitle,
