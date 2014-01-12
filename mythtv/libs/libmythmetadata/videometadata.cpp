@@ -1091,6 +1091,24 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     cleanFilename.replace(QRegExp("_"), " ");
     cleanFilename.replace(QRegExp("\\."), " ");
 
+    // Fix the filename so that any single spaced characters are treated as abbreviations
+    // and therefore have a dot inbetween them.
+    QStringList splitFilename = cleanFilename.split(QString(" "));
+    cleanFilename = QString("");
+    for (int i = 0; i < splitFilename.size(); i++)
+    {
+        cleanFilename.append(splitFilename.at(i));
+
+        if (i == (splitFilename.size() - 1))
+            break;
+
+        if (splitFilename.at(i).length() == 1 &&
+            splitFilename.at(i+1).length() == 1)
+            cleanFilename.append(".");
+        else
+            cleanFilename.append(" ");
+    }
+
     /*: Word(s) which should be recognized as "season" when parsing a video
      * file name. To list more than one word, separate them with a '|'.
      */
