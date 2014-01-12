@@ -1011,7 +1011,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             SetMinArea(MythRect());
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("Load(), spawning thread to load '%1'").arg(filename));
-                
+
             m_runningThreads++;
             ImageLoadThread *bImgThread;
             bImgThread = new ImageLoadThread(this, GetPainter(),

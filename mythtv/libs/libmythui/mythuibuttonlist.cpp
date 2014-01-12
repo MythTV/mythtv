@@ -39,6 +39,9 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
     m_showArrow = showArrow;
     m_showScrollBar = showScrollBar;
 
+    m_Initiator = true;
+    m_EnableInitiator = true;
+
     Const();
 }
 
@@ -929,6 +932,7 @@ bool MythUIButtonList::DistributeButtons(void)
     int total, row, col;
     int left_spacing, right_spacing, top_spacing, bottom_spacing;
     int x, y, x_init, x_adj, y_adj;
+    MythRect   min_rect;
     QString status_msg;
 
     /*
@@ -1043,6 +1047,7 @@ bool MythUIButtonList::DistributeButtons(void)
         y += qMax(m_contentsRect.height() -
                   (top_height + bottom_height), 0);
     }
+    min_rect.setY(y);
 
     status_msg += QString(" spacing top %1 bottom %2 fixed %3 offset %4")
                   .arg(top_spacing).arg(bottom_spacing)
@@ -1164,6 +1169,7 @@ bool MythUIButtonList::DistributeButtons(void)
         x_init += qMax(m_contentsRect.width() -
                        (left_width + right_width), 0);
     }
+    min_rect.setX(x_init);
 
     status_msg += QString(" spacing left %1 right %2 fixed %3 offset %4")
                   .arg(left_spacing).arg(right_spacing)
@@ -1241,6 +1247,8 @@ bool MythUIButtonList::DistributeButtons(void)
 
         y += row_heights[row] + vertical_spacing;
     }
+    min_rect.setWidth(x - min_rect.x());
+    min_rect.setHeight(y - min_rect.y());
 
     m_itemsVisible = m_columns * m_rows;
 
@@ -1257,6 +1265,13 @@ bool MythUIButtonList::DistributeButtons(void)
         m_topPosition = static_cast<int>(m_itemsVisible) < m_itemCount;
     else
         m_topPosition = first_item;
+
+    m_Initiator = m_EnableInitiator;
+    if (m_MinSize.isValid())
+    {
+        // Record the minimal area needed for the button list
+        SetMinArea(min_rect);
+    }
 
     delete[] col_widths;
     return true;
