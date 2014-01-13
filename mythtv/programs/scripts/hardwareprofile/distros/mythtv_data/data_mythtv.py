@@ -140,8 +140,10 @@ class _Mythtv_data:
         oldest = recs[0]
         shows = []
 
+        maxage = MythTV.utility.datetime(2001,1,1,0,0)
+
         for rec in recs:
-            if rec.starttime < oldest.starttime:
+            if (rec.starttime < oldest.starttime) and (rec.starttime > maxage):
                 oldest = rec
             data.rectime += self.td_to_secs(rec.endtime - rec.starttime)
             if rec.recstatus == -3:
