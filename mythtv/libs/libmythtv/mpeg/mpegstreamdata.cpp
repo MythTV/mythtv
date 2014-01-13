@@ -357,21 +357,23 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         return 0;
     }
 
-    const int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
-    if (offset>181)
+    // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
+    // pointer_field (+8 bits), since payload start is true if we are here.
+    const unsigned int extra_offset = 4;
+
+    const unsigned int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
+    if (offset + extra_offset > TSPacket::kSize)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Error: offset>181, pes length & "
-                "current cannot be queried");
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error: "
+                "AFCOffset(%1)+StartOfFieldPointer(%2)>184, "
+                "pes length & current cannot be queried")
+                .arg(tspacket->AFCOffset()).arg(tspacket->StartOfFieldPointer()));
         return 0;
     }
 
-    // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
-    // pointer_field (+8 bits), since payload start is true if we are here.
-    const int extra_offset = 4;
-
     const unsigned char* pesdata = tspacket->data() + offset;
-    const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
-    if ((pes_length + offset + extra_offset) > 188)
+    const unsigned int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
+    if ((pes_length + offset + extra_offset) > TSPacket::kSize)
     {
         SavePartialPSIP(tspacket->PID(), new PSIPTable(*tspacket));
         moreTablePackets = false;
