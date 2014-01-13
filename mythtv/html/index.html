@@ -23,16 +23,19 @@ MythTV Web Server
 <script type="text/javascript"  src="/3rdParty/jquery/jqueryGrid/js/jquery.jqGrid.js"></script>
 <script type="text/javascript"  src="/3rdParty/jquery/jqueryJScroll/jquery.jscroll.js"/></script>
 <script type="text/javascript"  src="/js/menu.js"></script>
+<script type="text/javascript"  src="/js/contentmap.js"></script>
 
 <script type="text/javascript">
 
 $(document).ready(function() {
+    InitContentDictionary();
     $('#header_status').hide();
     $('#header_error').hide();
     loadDiv("menu-bg", "/menu.qsp");
     $('.menu').initMenu();
     showHostName();
-    loadContent('/misc/overview.qsp');
+    var contentRef = getContentRefFromUrl() || "Overview";
+    loadBookmarkableContent(contentRef);
 });
 
 $(document).keyup(function(e) {

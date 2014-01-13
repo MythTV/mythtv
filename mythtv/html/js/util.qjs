@@ -110,9 +110,24 @@ function clearDiv(divName) {
 
 var currentContentURL;
 var currentJsUrl;
-function loadContent(contentURL, jsURL) {
+function setCurrentContent(contentURL, jsURL) {
     currentContentURL = contentURL;
     currentJsUrl = jsURL;
+}
+
+function loadBookmarkableContent(contentRef) {
+    var content = ContentDictionary[contentRef.toLowerCase()];
+
+    setCurrentContent(content.ContentURL, content.jsURL);
+    window.document.title = "MythTV: " + content.Title;
+    history.replaceState(null, "", "?content=" + contentRef);
+    loadDiv("content", content.ContentURL, content.jsURL);
+}
+
+function loadContent(contentURL, jsURL) {
+    setCurrentContent(contentURL, jsURL);
+    window.document.title = "MythTV WebServer";
+    history.replaceState(null, "", "/");
     loadDiv("content", contentURL, jsURL);
 }
 
@@ -283,8 +298,23 @@ function formatStr() {
     return result;
 };
 
-
 function handleKeyPress(key) {
     if (currentContentURL == "/tv/guide.qsp")
         handleKeyboardShortcutsTV(key);
+}
+
+function getContentRefFromUrl() {
+    var parts = window.location.href.split('?');
+    if (parts.length > 1)
+    {
+        var queryString = parts[1].split('#')[0];
+        var params = queryString.split('&');
+        for(q in params)
+        {
+            var p = params[q].split('=');
+            if (p[0].toLowerCase() == "content")
+                return p[1];
+        }
+    }
+    return;
 }
