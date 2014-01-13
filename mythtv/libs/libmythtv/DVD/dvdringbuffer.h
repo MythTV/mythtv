@@ -67,6 +67,7 @@ class MythDVDPlayer;
 
 class MTV_PUBLIC DVDInfo
 {
+    friend class DVDRingBuffer;
     Q_DECLARE_TR_FUNCTIONS(DVDInfo)
 
   public:
@@ -77,9 +78,16 @@ class MTV_PUBLIC DVDInfo
     QString GetLastError(void) const { return m_lastError; }
 
   protected:
+    static void GetNameAndSerialNum(dvdnav_t* nav,
+                                    QString &name,
+                                    QString &serialnum,
+                                    const QString &filename,
+                                    const QString &logPrefix);
+
+  protected:
     dvdnav_t   *m_nav;
-    const char *m_name;
-    const char *m_serialnumber;
+    QString     m_name;
+    QString     m_serialnumber;
     QString     m_lastError;
 };
 
@@ -246,8 +254,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
     bool           m_autoselectsubtitle;
-    const char    *m_dvdname;
-    const char    *m_serialnumber;
+    QString        m_dvdname;
+    QString        m_serialnumber;
     bool           m_seeking;
     int64_t        m_seektime;
     int64_t        m_currentTime;
