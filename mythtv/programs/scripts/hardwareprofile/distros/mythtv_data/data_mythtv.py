@@ -55,7 +55,7 @@ class _Mythtv_data:
                                     'bin', executable)
             try:
                 cmd = MythTV.System(execpath)
-                res = mbe.command('--version')
+                res = cmd.command('--version')
                 break
             except:
                 continue
