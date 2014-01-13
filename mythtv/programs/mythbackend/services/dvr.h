@@ -66,6 +66,10 @@ class Dvr : public DvrServices
         bool              UnDeleteRecording   ( int              ChanId,
                                                 const QDateTime &StartTime );
 
+        bool              UpdateRecordedWatchedStatus ( int   ChanId,
+                                                        const QDateTime &StartTime,
+                                                        bool  Watched);
+
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count,
                                                 int              RecordId );

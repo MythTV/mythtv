@@ -365,6 +365,27 @@ bool Video::AddVideo( const QString &sFileName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool Video::UpdateVideoWatchedStatus ( int  nId,
+                                       bool bWatched )
+{
+    bool bResut = false;
+    VideoMetadataListManager::VideoMetadataPtr metadata =
+                          VideoMetadataListManager::loadOneFromDatabase(nId);
+
+    if ( metadata )
+    {
+        metadata->SetWatched(bWatched);
+        metadata->UpdateDatabase();
+        bResut = true;
+    }
+
+    return bResut;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
 {
     QString path = sPath;

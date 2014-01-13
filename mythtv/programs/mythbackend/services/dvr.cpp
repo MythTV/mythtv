@@ -216,6 +216,23 @@ bool Dvr::UnDeleteRecording(int chanid, const QDateTime &recstarttsRaw)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool Dvr::UpdateRecordedWatchedStatus ( int   chanid,
+                                        const QDateTime &recstarttsRaw,
+                                        bool  watched)
+{
+    if (chanid <= 0 || !recstarttsRaw.isValid())
+        return false;
+
+    ProgramInfo pi(chanid, recstarttsRaw.toUTC());
+    pi.SaveWatched(watched);
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex, 
                                         int nCount      )
 {
