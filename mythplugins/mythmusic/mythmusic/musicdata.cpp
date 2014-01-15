@@ -98,8 +98,7 @@ void MusicData::reloadMusic(void)
         usleep(50000);
     }
 
-    //FIXME should resync the playlist here
-    //all_playlists->resync();
+    all_playlists->resync();
 
     if (busy)
         busy->Close();

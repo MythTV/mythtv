@@ -122,6 +122,18 @@ void PlaylistContainer::load()
     m_doneLoading = true;
 }
 
+// resync all the playlists after a rescan just in case some tracks were removed
+void PlaylistContainer::resync(void)
+{
+    QList<Playlist*>::const_iterator it = m_allPlaylists->begin();
+    for (; it != m_allPlaylists->end(); ++it)
+    {
+        (*it)->resync();
+    }
+
+    m_activePlaylist->resync();
+}
+
 void PlaylistContainer::describeYourself(void) const
 {
     //    Debugging

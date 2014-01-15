@@ -36,6 +36,7 @@ class PlaylistContainer
    ~PlaylistContainer();
 
     void            load();
+    void            resync(void);
     void            describeYourself(void) const;    // debugging
 
     Playlist*       getActive(void) { return m_activePlaylist; }

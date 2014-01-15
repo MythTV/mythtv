@@ -608,6 +608,35 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     fillSongsFromSonglist(rawSonglist);
 }
 
+/// make sure all tracks are still valid after a scan
+void Playlist::resync(void)
+{
+    bool needUpdate = false;
+
+    for (int x = 0; x < m_songs.count(); x++)
+    {
+        MusicMetadata::IdType id = m_songs.at(x);
+        MusicMetadata *mdata = getRawSongAt(x);
+        if (!mdata)
+        {
+            m_songs.removeAll(id);
+            m_shuffledSongs.removeAll(id);
+            needUpdate = true;
+        }
+    }
+
+    if (needUpdate)
+    {
+        changed();
+
+        gPlayer->playlistChanged(m_playlistid);
+
+        // TODO check we actually need this
+        if (isActivePlaylist())
+            gPlayer->activePlaylistChanged(-1, false);
+    }
+}
+
 void Playlist::fillSongsFromSonglist(QString songList)
 {
     MusicMetadata::IdType id;
@@ -1083,7 +1112,6 @@ MusicMetadata* Playlist::getRawSongAt(int pos) const
 
     return mdata;
 }
-
 
 // Here begins CD Writing things. ComputeSize, CreateCDMP3 & CreateCDAudio
 // FIXME non of this is currently used

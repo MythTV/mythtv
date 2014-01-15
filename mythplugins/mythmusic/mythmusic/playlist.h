@@ -105,10 +105,12 @@ class Playlist : public QObject
 
     bool isActivePlaylist(void) { return m_name == DEFAULT_PLAYLIST_NAME; }
 
-    int     getID(void) { return m_playlistid; }
-    void    setID(int x) { m_playlistid = x; }
+    int  getID(void) { return m_playlistid; }
+    void setID(int x) { m_playlistid = x; }
 
-    void    getStats(uint *trackCount, uint *totalLength, uint currentTrack = 0, uint *playedLength = NULL) const;
+    void getStats(uint *trackCount, uint *totalLength, uint currentTrack = 0, uint *playedLength = NULL) const;
+
+    void resync(void);
 
     void computeSize(double &size_in_MB, double &size_in_sec);
     int CreateCDMP3(void);
