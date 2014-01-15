@@ -179,31 +179,6 @@ void MusicMetadata::UpdateModTime() const
                         query);
 }
 
-int MusicMetadata::compare(const MusicMetadata *other) const
-{
-    if (m_format == "cast")
-    {
-        int artist_cmp = Artist().toLower().localeAwareCompare(
-            other->Artist().toLower());
-
-        if (artist_cmp == 0)
-            return Title().toLower().localeAwareCompare(
-                other->Title().toLower());
-
-        return artist_cmp;
-    }
-    else
-    {
-        int track_cmp = Track() - other->Track();
-
-        if (track_cmp == 0)
-            return Title().toLower().localeAwareCompare(
-                other->Title().toLower());
-
-        return track_cmp;
-    }
-}
-
 // static
 MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
 {
