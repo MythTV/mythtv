@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <complex>
 
 #include <QMutex>
 #include <QMap>

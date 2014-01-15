@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <algorithm>
+#include <complex>
 
 // QT headers
 #include <QRect>

@@ -13,6 +13,10 @@
 #ifndef _MULTICAST_SOCKET_DEVICE_H_
 #define _MULTICAST_SOCKET_DEVICE_H_
 
+#ifdef __FreeBSD__
+#  include <sys/types.h>
+#endif
+
 #ifdef _WIN32
 # include <ws2tcpip.h>
 #else

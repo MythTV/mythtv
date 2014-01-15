@@ -2,6 +2,7 @@
 #define MYTHMISCUTIL_H_
 
 #include <stdint.h>
+#include <time.h>
 
 #include <algorithm>
 using namespace std;
