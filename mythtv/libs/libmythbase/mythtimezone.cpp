@@ -1,6 +1,7 @@
 #include "mythtimezone.h"
 
 #include <stdlib.h> // for malloc, getenv
+#include <time.h>
 
 #include <QDataStream>
 #include <QTextStream>

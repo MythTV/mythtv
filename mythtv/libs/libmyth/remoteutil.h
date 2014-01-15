@@ -1,6 +1,8 @@
 #ifndef REMOTEUTIL_H_
 #define REMOTEUTIL_H_
 
+#include <time.h>
+
 #include <QStringList>
 #include <QDateTime>
 

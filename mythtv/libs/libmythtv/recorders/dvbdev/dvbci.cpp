@@ -28,7 +28,11 @@
 #include <errno.h>
 #include <ctype.h>
 #include <linux/dvb/ca.h>
-#include <malloc.h>
+#ifdef __FreeBSD__
+#  include <stdlib.h>
+#else
+#  include <malloc.h>
+#endif
 #include <netinet/in.h>
 #include <poll.h>
 #include <string.h>
