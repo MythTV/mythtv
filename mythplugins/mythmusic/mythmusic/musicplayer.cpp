@@ -77,6 +77,9 @@ MusicPlayer::MusicPlayer(QObject *parent)
 
     m_playSpeed = 1.0;
 
+    m_showScannerNotifications = true;
+    m_notificationID = GetNotificationCenter()->Register(this);
+
     m_errorCount = 0;
 
     QString playmode = gCoreContext->GetSetting("PlayMode", "none");
@@ -114,6 +117,9 @@ MusicPlayer::~MusicPlayer()
 
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
+
+    if (m_notificationID > 0)
+        GetNotificationCenter()->UnRegister(this, m_notificationID);
 
     stop(true);
 
@@ -713,6 +719,55 @@ void MusicPlayer::customEvent(QEvent *event)
                         sendMetadataChangedEvent(songID);
                     }
                 }
+            }
+        }
+        else if (me->Message().startsWith("MUSIC_SCANNER_STARTED"))
+        {
+            QStringList list = me->Message().simplified().split(' ');
+            if (list.size() == 2)
+            {
+                QString host = list[1];
+                sendNotification(tr("A music file scan has started on %1").arg(host),
+                                 tr("Music File Scanner"),
+                                 "This may take a while I'll give a shout when finished");
+            }
+        }
+        else if (me->Message().startsWith("MUSIC_SCANNER_FINISHED"))
+        {
+            QStringList list = me->Message().simplified().split(' ');
+            if (list.size() == 6)
+            {
+                QString host = list[1];
+                int totalTracks = list[2].toInt();
+                int newTracks = list[3].toInt();
+                int totalCoverart = list[4].toInt();
+                int newCoverart = list[5].toInt();
+
+                QString summary = QString("Total Tracks: %2, new tracks: %3,\nTotal Coverart: %4, New CoverArt %5")
+                                          .arg(totalTracks).arg(newTracks).arg(totalCoverart).arg(newCoverart);
+                sendNotification(tr("A music file scan has finished on %1").arg(host),
+                                 tr("Music File Scanner"), summary);
+
+                gMusicData->reloadMusic();
+            }
+        }
+        else if (me->Message().startsWith("MUSIC_SCANNER_ERROR"))
+        {
+            QStringList list = me->Message().simplified().split(' ');
+            if (list.size() == 3)
+            {
+                QString host = list[1];
+                QString error = list[2];
+
+                if (error == "Already_Running")
+                    sendNotification(tr(""),
+                                     tr("Music File Scanner"),
+                                     tr("Can't run the music file scanner because it is already running on %1").arg(host));
+                else if (error == "Stalled")
+                    sendNotification(tr(""),
+                                     tr("Music File Scanner"),
+                                     tr("The music file scanner has been running for more than 60 minutes on %1.\nResetting and trying again")
+                                         .arg(host));
             }
         }
     }
@@ -1529,4 +1584,24 @@ Playlist* MusicPlayer::getCurrentPlaylist ( void )
 StreamList  *MusicPlayer::getStreamList(void) 
 {
     return gMusicData->all_streams->getStreams();
+}
+
+void MusicPlayer::sendNotification(const QString &title, const QString &author, const QString &desc)
+{
+    QString image = "musicscanner.png";
+    GetMythUI()->FindThemeFile(image);
+
+    DMAP map;
+    map["asar"] = title;
+    map["minm"] = author;
+    map["asal"] = desc;
+
+    MythImageNotification *n = new MythImageNotification(MythNotification::Info, image, map);
+
+    n->SetId(m_notificationID);
+    n->SetParent(this);
+    n->SetDuration(5);
+    n->SetFullScreen(false);
+    GetNotificationCenter()->Queue(*n);
+    delete n;
 }

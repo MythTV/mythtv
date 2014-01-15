@@ -194,6 +194,7 @@ class MusicPlayer : public QObject, public MythObservable
     void updateLastplay(void);
     void updateVolatileMetadata(void);
     void sendVolumeChangedEvent(void);
+    void sendNotification(const QString &title, const QString &author, const QString &desc);
 
     void setupDecoderHandler(void);
     void decoderHandlerReady(void);
@@ -224,6 +225,10 @@ class MusicPlayer : public QObject, public MythObservable
     ResumeMode   m_resumeMode;
 
     float        m_playSpeed;
+
+    // notification
+    bool m_showScannerNotifications;
+    int  m_notificationID;
 
     // radio stuff
     QList<MusicMetadata*>  m_playedList;
