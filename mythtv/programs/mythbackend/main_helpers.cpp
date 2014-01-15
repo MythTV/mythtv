@@ -219,13 +219,14 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
-    if (gCoreContext)
+    if (mainServer)
     {
-        gCoreContext->SetExiting();
+        mainServer->Stop();
+        qApp->processEvents();
     }
 
-    if (mainServer)
-        mainServer->Stop();
+    if (gCoreContext)
+        gCoreContext->SetExiting();
 
     delete housekeeping;
     housekeeping = NULL;
