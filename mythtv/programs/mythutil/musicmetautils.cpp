@@ -4,6 +4,8 @@
 #include "musicmetadata.h"
 #include "metaio.h"
 #include "mythcontext.h"
+#include "musicfilescanner.h"
+#include "musicutils.h"
 
 // mythutils headers
 #include "commandlineparser.h"
@@ -75,7 +77,18 @@ static int UpdateMeta(const MythUtilCommandLineParser &cmdline)
     return result;
 }
 
+static int ScanMusic(const MythUtilCommandLineParser &cmdline)
+{
+    MusicFileScanner *fscan = new MusicFileScanner();
+    QString musicDir = getMusicDirectory();
+    fscan->SearchDir(musicDir);
+    delete fscan;
+
+    return GENERIC_EXIT_OK;
+}
+
 void registerMusicUtils(UtilMap &utilMap)
 {
     utilMap["updatemeta"] = &UpdateMeta;
+    utilMap["scanmusic"] = &ScanMusic;
 }

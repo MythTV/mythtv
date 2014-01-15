@@ -146,6 +146,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 ->SetGroup("Messaging")
 
         // musicmetautils.cpp
+        << add("--scanmusic", "scanmusic", false,
+                "Scan the 'Music' Storage Group for music files", "")
+                ->SetGroup("Music Scanning")
+
         << add("--updatemeta", "updatemeta", false,
                 "Update a music tracks database record and tag with new metadata", "")
                 ->SetGroup("Metadata Reading/Writing")
