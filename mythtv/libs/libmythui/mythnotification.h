@@ -188,6 +188,7 @@ protected:
         m_id(o.m_id),      m_parent(o.m_parent),   m_fullScreen(o.m_fullScreen),
         m_description(o.m_description),
         m_duration(o.m_duration),                  m_metadata(o.m_metadata),
+        m_style(o.m_style),
         m_visibility(o.m_visibility),              m_priority(o.m_priority)
     {
     }
