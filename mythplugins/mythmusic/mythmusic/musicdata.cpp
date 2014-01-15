@@ -6,12 +6,20 @@
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
 #include <musicmetadata.h>
+#include <musicfilescanner.h>
+#include <musicutils.h>
+#include "mythsystemlegacy.h"
 
 // mythmusic
 #include "musicdata.h"
+#include "musicplayer.h"
 
 // this is the global MusicData object shared thoughout MythMusic
 MusicData  *gMusicData = NULL;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 MusicData::MusicData(void)
 {
@@ -42,6 +50,20 @@ MusicData::~MusicData(void)
     }
 }
 
+void MusicData::scanMusic (void)
+{
+    // TODO once we switch to storage groups we should use the myth protocol
+    // to ask the master BE to run the scan on all hosts with a valid directory
+    // set for the 'Music' storage group
+    //
+    // for the moment we just run mythutil --scanmusic on this host
+
+    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                      kMSAutoCleanup | kMSRunBackground |
+                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                      kMSDontBlockInputDevs));
+}
+
 /// reload music after a scan, rip or import
 void MusicData::reloadMusic(void)
 {
@@ -59,12 +81,84 @@ void MusicData::reloadMusic(void)
     else
         busy = NULL;
 
+    // TODO make it so the player isn't interupted
+    // for the moment stop playing and try to resume after reloading
+    bool wasPlaying = false;
+    if (gPlayer->isPlaying())
+    {
+        gPlayer->savePosition();
+        gPlayer->stop(true);
+        wasPlaying = true;
+    }
+
     all_music->startLoading();
     while (!all_music->doneLoading())
     {
         qApp->processEvents();
         usleep(50000);
     }
+
+    //FIXME should resync the playlist here
+    //all_playlists->resync();
+
+    if (busy)
+        busy->Close();
+
+    if (wasPlaying)
+        gPlayer->restorePosition();
+}
+
+void MusicData::loadMusic(void)
+{
+    // only do this once
+    if (initialized)
+        return;
+
+    MSqlQuery count_query(MSqlQuery::InitCon());
+
+    bool musicdata_exists = false;
+    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
+    {
+        if(count_query.next() &&
+            0 != count_query.value(0).toInt())
+        {
+            musicdata_exists = true;
+        }
+    }
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    QString message = qApp->translate("(MythMusicMain)",
+                                      "Loading Music. Please wait ...");
+
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
+
+    // Set the various track formatting modes
+    MusicMetadata::setArtistAndTrackFormats();
+
+    AllMusic *all_music = new AllMusic();
+
+    //  Load all playlists into RAM (once!)
+    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
+
+    gMusicData->all_music = all_music;
+    gMusicData->all_streams = new AllStream();
+    gMusicData->all_playlists = all_playlists;
+
+    gMusicData->initialized = true;
+
+    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    {
+        qApp->processEvents();
+        usleep(50000);
+    }
+
+    gPlayer->loadStreamPlaylist();
+    gPlayer->loadPlaylist();
 
     if (busy)
         busy->Close();

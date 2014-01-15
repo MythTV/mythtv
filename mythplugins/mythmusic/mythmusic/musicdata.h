@@ -21,11 +21,13 @@ class MusicData : public QObject
     MusicData();
     ~MusicData();
 
+    void scanMusic(void);
+    void loadMusic(void);
+
   public slots:
     void reloadMusic(void);
 
   public:
-    //QString             musicDir;
     PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
     AllStream          *all_streams;

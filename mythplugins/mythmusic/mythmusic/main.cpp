@@ -66,78 +66,10 @@ static QString chooseCD(void)
 }
 #endif
 
-static void loadMusic()
-{
-    // only do this once
-    if (gMusicData->initialized)
-        return;
-
-    MSqlQuery count_query(MSqlQuery::InitCon());
-
-    bool musicdata_exists = false;
-    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
-    {
-        if(count_query.next() &&
-            0 != count_query.value(0).toInt())
-        {
-            musicdata_exists = true;
-        }
-    }
-
-    QString musicDir = getMusicDirectory();
-
-    // Only search music files if a directory was specified & there
-    // is no data in the database yet (first run).  Otherwise, user
-    // can choose "Setup" option from the menu to force it.
-    if (!musicDir.isEmpty() && !musicdata_exists)
-    {
-        MusicFileScanner *fscan = new MusicFileScanner();
-        fscan->SearchDir(musicDir);
-        delete fscan;
-    }
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    QString message = qApp->translate("(MythMusicMain)", 
-                                      "Loading Music. Please wait ...");
-
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
-    if (busy->Create())
-        popupStack->AddScreen(busy, false);
-    else
-        busy = NULL;
-
-    // Set the various track formatting modes
-    MusicMetadata::setArtistAndTrackFormats();
-
-    AllMusic *all_music = new AllMusic();
-
-    //  Load all playlists into RAM (once!)
-    PlaylistContainer *all_playlists = new PlaylistContainer(all_music);
-
-    gMusicData->all_music = all_music;
-    gMusicData->all_streams = new AllStream();
-    gMusicData->all_playlists = all_playlists;
-
-    gMusicData->initialized = true;
-
-    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
-    {
-        qApp->processEvents();
-        usleep(50000);
-    }
-
-    gPlayer->loadStreamPlaylist();
-    gPlayer->loadPlaylist();
-
-    if (busy)
-        busy->Close();
-
-}
 
 static void startPlayback(void)
 {
-    loadMusic();
+    gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -151,7 +83,7 @@ static void startPlayback(void)
 
 static void startStreamPlayback(void)
 {
-    loadMusic();
+    gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -165,7 +97,7 @@ static void startStreamPlayback(void)
 
 static void startDatabaseTree(void)
 {
-    loadMusic();
+    gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -181,7 +113,7 @@ static void startDatabaseTree(void)
 static void startRipper(void)
 {
 #if defined HAVE_CDIO
-    loadMusic();
+    gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -228,32 +160,12 @@ static void runScan(void)
 
     LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(getMusicDirectory()));
 
-    MusicFileScanner *fscan = new MusicFileScanner();
-    QString musicDir = getMusicDirectory();
-    fscan->SearchDir(musicDir);
-
-    // save anything that may have changed
-    if (gMusicData->all_music && gMusicData->all_music->cleanOutThreads())
-        gMusicData->all_music->save();
-
-    if (gMusicData->all_playlists && gMusicData->all_playlists->cleanOutThreads())
-    {
-        gMusicData->all_playlists->save();
-    }
-
-    // force a complete reload of the tracks and playlists
-    gPlayer->stop(true);
-    delete gMusicData;
-
-    gMusicData = new MusicData;
-    loadMusic();
-
-    delete fscan;
+    gMusicData->scanMusic();
 }
 
 static void startImport(void)
 {
-    loadMusic();
+    gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -398,7 +310,7 @@ static void runMusicSelection(void)
 
 static void runRipCD(void)
 {
-    loadMusic();
+    gMusicData->loadMusic();
 
 #if defined HAVE_CDIO
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -489,7 +401,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     }
 
     if (!gMusicData->initialized)
-        loadMusic();
+        gMusicData->loadMusic();
 
     // remove any existing CD tracks
     if (gMusicData->all_music)
