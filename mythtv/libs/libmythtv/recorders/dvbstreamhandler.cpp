@@ -640,7 +640,7 @@ bool DVBPIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
     {
         struct dmx_sct_filter_params sctFilterParams;
         memset(&sctFilterParams, 0, sizeof(struct dmx_sct_filter_params));
-        switch ( (uint16_t) _pid )
+        switch ( _pid )
         {
             case 0x0: // PAT
                 sctFilterParams.filter.filter[0] = 0;
