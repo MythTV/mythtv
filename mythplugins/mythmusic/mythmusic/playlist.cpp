@@ -81,7 +81,7 @@ void Playlist::addTrack(MusicMetadata::IdType trackID, bool update_display)
 
         changed();
 
-        if (update_display)
+        if (update_display && isActivePlaylist())
             gPlayer->activePlaylistChanged(trackID, false);
     }
     else
@@ -125,7 +125,8 @@ void Playlist::removeTrack(MusicMetadata::IdType trackID)
 
     changed();
 
-    gPlayer->activePlaylistChanged(trackID, true);
+    if (isActivePlaylist())
+        gPlayer->activePlaylistChanged(trackID, true);
 }
 
 void Playlist::moveTrackUpDown(bool flag, int where_its_at)
@@ -650,7 +651,8 @@ void Playlist::fillSongsFromSonglist(QString songList)
     if (badTrack)
         changed();
 
-    gPlayer->activePlaylistChanged(-1, false);
+    if (isActivePlaylist())
+        gPlayer->activePlaylistChanged(-1, false);
 }
 
 void Playlist::fillSonglistFromQuery(QString whereClause,

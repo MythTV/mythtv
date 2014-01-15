@@ -1,11 +1,19 @@
 #ifndef _PLAYLIST_CONTAINER_H_
 #define _PLAYLIST_CONTAINER_H_
 
+// qt
 #include <QCoreApplication>
 
+// MythTV
 #include "mthread.h"
 
-#include "playlist.h"
+
+#define DEFAULT_PLAYLIST_NAME     "default_playlist_storage"
+#define DEFAULT_STREAMLIST_NAME   "stream_playlist"
+
+class PlaylistContainer;
+class Playlist;
+class AllMusic;
 
 class PlaylistLoadingThread : public MThread
 {
