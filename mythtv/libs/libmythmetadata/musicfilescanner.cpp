@@ -1,17 +1,14 @@
 // POSIX headers
 #include <sys/stat.h>
+#include <unistd.h>
 
 // Qt headers
-#include <QApplication>
 #include <QDir>
 
 // MythTV headers
 #include <mythdate.h>
 #include <mythdb.h>
 #include <mythcontext.h>
-#include <mythdialogs.h>
-#include <mythscreenstack.h>
-#include <mythprogressdialog.h>
 #include <musicmetadata.h>
 #include <metaio.h>
 #include <musicfilescanner.h>
@@ -77,7 +74,7 @@ MusicFileScanner::~MusicFileScanner ()
  *
  * \returns Nothing.
  */
-void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files, int parentid)
+void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid)
 {
     QDir d(directory);
 
@@ -85,6 +82,7 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
         return;
 
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+
     QFileInfoList list = d.entryInfoList();
     if (list.isEmpty())
         return;
@@ -92,9 +90,7 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
 
-    /* Recursively traverse directory, calling QApplication::processEvents()
-       every now and then to ensure the UI updates */
-    int update_interval = 0;
+    // Recursively traverse directory
     int newparentid = 0;
     while (it != list.end())
     {
@@ -126,21 +122,45 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
                 }
             }
 
-            BuildFileList(filename, music_files, newparentid);
-
-            qApp->processEvents ();
+            BuildFileList(filename, music_files, art_files, newparentid);
         }
         else
         {
-            if (++update_interval > 100)
-            {
-                qApp->processEvents();
-                update_interval = 0;
-            }
-
-            music_files[filename] = MusicFileScanner::kFileSystem;
+            if (IsArtFile(filename))
+                art_files[filename] = MusicFileScanner::kFileSystem;
+            else if (IsMusicFile(filename))
+                music_files[filename] = MusicFileScanner::kFileSystem;
+            else
+                LOG(VB_GENERAL, LOG_INFO,
+                        QString("Found file with unsupported extension %1")
+                            .arg(filename));
         }
     }
+}
+
+bool MusicFileScanner::IsArtFile(const QString &filename)
+{
+    QFileInfo fi(filename);
+    QString extension = fi.suffix().toLower();
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+
+
+    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
+        return true;
+
+    return false;
+}
+
+bool MusicFileScanner::IsMusicFile(const QString &filename)
+{
+    QFileInfo fi(filename);
+    QString extension = fi.suffix().toLower();
+    QString nameFilter = MetaIO::ValidFileExtensions;
+
+    if (!extension.isEmpty() && nameFilter.indexOf(extension.toLower()) > -1)
+        return true;
+
+    return false;
 }
 
 /*!
@@ -255,11 +275,19 @@ void MusicFileScanner::AddFileToDB(const QString &filename)
         {
             MythDB::DBError("music insert artwork", query);
         }
+
+        ++m_coverartAdded;
+
         return;
     }
 
-    LOG(VB_FILE, LOG_INFO,
-        QString("Reading metadata from %1").arg(filename));
+    if (extension.isEmpty() || !MetaIO::ValidFileExtensions.contains(extension.toLower()))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, QString("Ignoring filename with unsupported filename: '%1'").arg(filename));
+        return;
+    }
+
+    LOG(VB_FILE, LOG_INFO, QString("Reading metadata from %1").arg(filename));
     MusicMetadata *data = MetaIO::readMetadata(filename);
     if (data)
     {
@@ -318,6 +346,8 @@ void MusicFileScanner::AddFileToDB(const QString &filename)
         }
 
         delete data;
+
+        ++m_tracksAdded;
     }
 }
 
@@ -329,25 +359,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename)
  */
 void MusicFileScanner::cleanDB()
 {
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    QString message = tr("Cleaning music database");
-    MythUIProgressDialog *clean_progress = new MythUIProgressDialog(message,
-                                                    popupStack,
-                                                    "cleaningprogressdialog");
-
-    if (clean_progress->Create())
-    {
-        popupStack->AddScreen(clean_progress, false);
-        clean_progress->SetTotal(4);
-    }
-    else
-    {
-        delete clean_progress;
-        clean_progress = NULL;
-    }
-
-    uint counter = 0;
+    LOG(VB_GENERAL, LOG_INFO, "Cleaning old entries from music database");
 
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deletequery(MSqlQuery::InitCon());
@@ -367,9 +379,6 @@ void MusicFileScanner::cleanDB()
                             deletequery);
     }
 
-    if (clean_progress)
-        clean_progress->SetProgress(++counter);
-
     if (!query.exec("SELECT a.album_id FROM music_albums a "
                     "LEFT JOIN music_songs s ON a.album_id=s.album_id "
                     "WHERE s.album_id IS NULL;"))
@@ -384,9 +393,6 @@ void MusicFileScanner::cleanDB()
             MythDB::DBError("MusicFileScanner::cleanDB - delete music_albums",
                             deletequery);
     }
-
-    if (clean_progress)
-        clean_progress->SetProgress(++counter);
 
     if (!query.exec("SELECT a.artist_id FROM music_artists a "
                     "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
@@ -405,9 +411,6 @@ void MusicFileScanner::cleanDB()
                             deletequery);
     }
 
-    if (clean_progress)
-        clean_progress->SetProgress(++counter);
-
     if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
                     "music_songs s ON a.song_id=s.song_id WHERE "
                     "embedded='1' AND s.song_id IS NULL;"))
@@ -421,12 +424,6 @@ void MusicFileScanner::cleanDB()
         if (!deletequery.exec())
             MythDB::DBError("MusicFileScanner::cleanDB - delete music_albumart",
                             deletequery);
-    }
-
-    if (clean_progress)
-    {
-        clean_progress->SetProgress(++counter);
-        clean_progress->Close();
     }
 }
 
@@ -450,7 +447,7 @@ void MusicFileScanner::RemoveFileFromDB (const QString &filename)
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
-    if (nameFilter.indexOf(extension) > -1)
+    if (nameFilter.indexOf(extension.toLower()) > -1)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
@@ -462,6 +459,9 @@ void MusicFileScanner::RemoveFileFromDB (const QString &filename)
         {
             MythDB::DBError("music delete artwork", query);
         }
+
+        ++m_coverartRemoved;
+
         return;
     }
 
@@ -471,6 +471,8 @@ void MusicFileScanner::RemoveFileFromDB (const QString &filename)
     if (!query.exec())
         MythDB::DBError("MusicFileScanner::RemoveFileFromDB - deleting music_songs",
                         query);
+
+    ++m_tracksRemoved;
 }
 
 /*!
@@ -563,47 +565,65 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename)
  */
 void MusicFileScanner::SearchDir(QString &directory)
 {
+    QString host = gCoreContext->GetHostName();
+
+    if (IsRunning())
+    {
+        // check how long the scanner has been running
+        // if it's more than 60 minutes assume something went wrong
+        QString lastRun =  gCoreContext->GetSetting("MusicScannerLastRunStart", "");
+        if (!lastRun.isEmpty())
+        {
+            QDateTime dtLastRun = QDateTime::fromString(lastRun, Qt::ISODate);
+            if (dtLastRun.isValid())
+            {
+                if (MythDate::current() > dtLastRun.addSecs(60*1))
+                {
+                    LOG(VB_GENERAL, LOG_INFO, "Music file scanner has been running for more than 60 minutes. Lets reset and try again");
+                    gCoreContext->SendMessage(QString("MUSIC_SCANNER_ERROR %1 %2").arg(host).arg("Stalled"));
+
+                    // give the user time to read the notification before restarting the scan
+                    sleep(5);
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_INFO, "Music file scanner is already running");
+                    gCoreContext->SendMessage(QString("MUSIC_SCANNER_ERROR %1 %2").arg(host).arg("Already_Running"));
+                    return;
+                }
+            }
+        }
+    }
+
+    //TODO: could sanity check the directory exists and is readable here?
+
+    LOG(VB_GENERAL, LOG_INFO, "Music file scanner started");
+    gCoreContext->SendMessage(QString("MUSIC_SCANNER_STARTED %1").arg(host));
+
+    updateLastRunStart();
+    QString status = QString("running");
+    updateLastRunStatus(status);
 
     m_startdir = directory;
 
+    m_tracksTotal = m_tracksAdded = m_tracksUnchanged = m_tracksRemoved = m_tracksUpdated = 0;
+    m_coverartTotal = m_coverartAdded = m_coverartUnchanged = m_coverartRemoved = m_coverartUpdated = 0;
+
     MusicLoadedMap music_files;
+    MusicLoadedMap art_files;
     MusicLoadedMap::Iterator iter;
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    LOG(VB_GENERAL, LOG_INFO, "Searching filesystem for music files");
 
-    QString message = tr("Searching for music files");
+    BuildFileList(m_startdir, music_files, art_files, 0);
 
-    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
-                                                  "musicscanbusydialog");
-
-    if (busy->Create())
-        popupStack->AddScreen(busy, false);
-    else
-        busy = NULL;
-
-    BuildFileList(m_startdir, music_files, 0);
-
-    if (busy)
-        busy->Close();
+    m_tracksTotal = music_files.count();
+    m_coverartTotal = art_files.count();
 
     ScanMusic(music_files);
-    ScanArtwork(music_files);
+    ScanArtwork(art_files);
 
-    message = tr("Updating music database");
-    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
-                                                    popupStack,
-                                                    "scalingprogressdialog");
-
-    if (file_checking->Create())
-    {
-        popupStack->AddScreen(file_checking, false);
-        file_checking->SetTotal(music_files.size());
-    }
-    else
-    {
-        delete file_checking;
-        file_checking = NULL;
-    }
+    LOG(VB_GENERAL, LOG_INFO, "Updating database");
 
      /*
        This can be optimised quite a bit by consolidating all commands
@@ -618,27 +638,54 @@ void MusicFileScanner::SearchDir(QString &directory)
        3) UpdateFileInDB, same as 1.
      */
 
-    uint counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if (*iter == MusicFileScanner::kFileSystem)
             AddFileToDB(iter.key());
         else if (*iter == MusicFileScanner::kDatabase)
-            RemoveFileFromDB(iter.key ());
+            RemoveFileFromDB(iter.key());
         else if (*iter == MusicFileScanner::kNeedUpdate)
-            UpdateFileInDB(iter.key());
-
-        if (file_checking)
         {
-            file_checking->SetProgress(++counter);
-            qApp->processEvents();
+            UpdateFileInDB(iter.key());
+            ++m_tracksUpdated;
         }
     }
-    if (file_checking)
-        file_checking->Close();
+
+    for (iter = art_files.begin(); iter != art_files.end(); iter++)
+    {
+        if (*iter == MusicFileScanner::kFileSystem)
+            AddFileToDB(iter.key());
+        else if (*iter == MusicFileScanner::kDatabase)
+            RemoveFileFromDB(iter.key());
+        else if (*iter == MusicFileScanner::kNeedUpdate)
+        {
+            UpdateFileInDB(iter.key());
+            ++m_coverartUpdated;
+        }
+    }
 
     // Cleanup orphaned entries from the database
     cleanDB();
+
+    QString trackStatus = QString("total tracks found: %1 (unchanged: %2, added: %3, removed: %4, updated %5)")
+                                  .arg(m_tracksTotal).arg(m_tracksUnchanged).arg(m_tracksAdded)
+                                  .arg(m_tracksRemoved).arg(m_tracksUpdated);
+    QString coverartStatus = QString("total coverart found: %1 (unchanged: %2, added: %3, removed: %4, updated %5)")
+                                     .arg(m_coverartTotal).arg(m_coverartUnchanged).arg(m_coverartAdded)
+                                     .arg(m_coverartRemoved).arg(m_coverartUpdated);
+
+
+    LOG(VB_GENERAL, LOG_INFO, "Music file scanner finished ");
+    LOG(VB_GENERAL, LOG_INFO, trackStatus);
+    LOG(VB_GENERAL, LOG_INFO, coverartStatus);
+
+    gCoreContext->SendMessage(QString("MUSIC_SCANNER_FINISHED %1 %2 %3 %4 %5")
+                                      .arg(host).arg(m_tracksTotal).arg(m_tracksAdded)
+                                      .arg(m_coverartTotal).arg(m_coverartAdded));
+
+    updateLastRunEnd();
+    status = QString("success - %1 - %2").arg(trackStatus).arg(coverartStatus);
+    updateLastRunStatus(status);
 }
 
 /*!
@@ -659,25 +706,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
                     "WHERE filename NOT LIKE ('%://%')"))
         MythDB::DBError("MusicFileScanner::ScanMusic", query);
 
-    uint counter = 0;
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    QString message = tr("Scanning music files");
-    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
-                                                    popupStack,
-                                                    "scalingprogressdialog");
-
-    if (file_checking->Create())
-    {
-        popupStack->AddScreen(file_checking, false);
-        file_checking->SetTotal(query.size());
-    }
-    else
-    {
-        delete file_checking;
-        file_checking = NULL;
-    }
+    LOG(VB_GENERAL, LOG_INFO, "Checking tracks");
 
     QString name;
 
@@ -692,35 +721,20 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
                     if (music_files[name] == MusicFileScanner::kDatabase)
-                    {
-                        if (file_checking)
-                        {
-                            file_checking->SetProgress(++counter);
-                            qApp->processEvents();
-                        }
                         continue;
-                    }
                     else if (HasFileChanged(name, query.value(1).toString()))
                         music_files[name] = MusicFileScanner::kNeedUpdate;
                     else
+                    {
+                        ++m_tracksUnchanged;
                         music_files.erase(iter);
+                    }
                 }
                 else
-                {
                     music_files[name] = MusicFileScanner::kDatabase;
-                }
-            }
-
-            if (file_checking)
-            {
-                file_checking->SetProgress(++counter);
-                qApp->processEvents();
             }
         }
     }
-
-    if (file_checking)
-        file_checking->Close();
 }
 
 /*!
@@ -741,25 +755,7 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
                     " WHERE music_albumart.embedded=0"))
         MythDB::DBError("MusicFileScanner::ScanArtwork", query);
 
-    uint counter = 0;
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    QString message = tr("Scanning Album Artwork");
-    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
-                                                    popupStack,
-                                                    "albumprogressdialog");
-
-    if (file_checking->Create())
-    {
-        popupStack->AddScreen(file_checking, false);
-        file_checking->SetTotal(query.size());
-    }
-    else
-    {
-        delete file_checking;
-        file_checking = NULL;
-    }
+    LOG(VB_GENERAL, LOG_INFO, "Checking artwork");
 
     if (query.isActive() && query.size() > 0)
     {
@@ -774,30 +770,44 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 if ((iter = music_files.find(name)) != music_files.end())
                 {
                     if (music_files[name] == MusicFileScanner::kDatabase)
-                    {
-                        if (file_checking)
-                        {
-                            file_checking->SetProgress(++counter);
-                            qApp->processEvents();
-                        }
                         continue;
-                    }
                     else
+                    {
+                        ++m_coverartUnchanged;
                         music_files.erase(iter);
+                    }
                 }
                 else
                 {
                     music_files[name] = MusicFileScanner::kDatabase;
                 }
             }
-            if (file_checking)
-            {
-                file_checking->SetProgress(++counter);
-                qApp->processEvents();
-            }
         }
     }
+}
 
-    if (file_checking)
-        file_checking->Close();
+// static
+bool MusicFileScanner::IsRunning(void)
+{
+   if (gCoreContext->GetSetting("MusicScannerLastRunStatus", "") == "running")
+       return true;
+
+   return false;
+}
+
+void MusicFileScanner::updateLastRunEnd(void)
+{
+    QDateTime qdtNow = MythDate::current();
+    gCoreContext->SaveSetting("MusicScannerLastRunEnd", qdtNow.toString(Qt::ISODate));
+}
+
+void MusicFileScanner::updateLastRunStart(void)
+{
+    QDateTime qdtNow = MythDate::current();
+    gCoreContext->SaveSetting("MusicScannerLastRunStart", qdtNow.toString(Qt::ISODate));
+}
+
+void MusicFileScanner::updateLastRunStatus(QString &status)
+{
+    gCoreContext->SaveSetting("MusicScannerLastRunStatus", status);
 }
