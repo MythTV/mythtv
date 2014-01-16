@@ -131,9 +131,10 @@ static void setupKeys(void)
         "Mark image"), "T");
     REG_KEY("Gallery", "FULLSCREEN", QT_TRANSLATE_NOOP("MythControls",
         "Toggle scale to fullscreen/scale to fit"), "W");
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythGallery Media Handler 1/3"), "", "", handleMedia,
-        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 1/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery mixed data"),
+        "", handleMedia, MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
     QString filt;
     Q_FOREACH(QString format, GalleryUtil::GetImageFilter())
     {
@@ -143,9 +144,10 @@ static void setupKeys(void)
         else
             filt += "," + format;
     }
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythGallery Media Handler 2/3"), "", "", handleMedia,
-        MEDIATYPE_MGALLERY, filt);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 2/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery images"),
+        "", handleMedia, MEDIATYPE_MGALLERY, filt);
     filt.clear();
     Q_FOREACH(QString format, GalleryUtil::GetMovieFilter())
     {
@@ -155,9 +157,10 @@ static void setupKeys(void)
         else
             filt += "," + format;
     }
-    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythGallery Media Handler 3/3"), "", "", handleMedia,
-        MEDIATYPE_MVIDEO, filt);
+    REG_MEDIA_HANDLER(
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery Media Handler 3/3"),
+        QT_TRANSLATE_NOOP("MythControls", "MythGallery movies"),
+        "", handleMedia, MEDIATYPE_MVIDEO, filt);
 }
 
 int mythplugin_init(const char *libversion)
