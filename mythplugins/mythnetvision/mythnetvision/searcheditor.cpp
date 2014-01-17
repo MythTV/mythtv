@@ -23,7 +23,7 @@
  *  \param name The name of the window
  */
 SearchEditor::SearchEditor(MythScreenStack *parent,
-                          const QString name) :
+                          const QString &name) :
     MythScreenType(parent, name),
     m_grabbers(NULL),
     m_busyPopup(NULL),

@@ -26,7 +26,7 @@
  *  \param name The name of the window
  */
 TreeEditor::TreeEditor(MythScreenStack *parent,
-                          const QString name) :
+                          const QString &name) :
     MythScreenType(parent, name),
     m_lock(QMutex::Recursive),
     m_grabbers(NULL),

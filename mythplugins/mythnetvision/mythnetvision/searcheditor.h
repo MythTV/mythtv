@@ -23,7 +23,7 @@ class SearchEditor : public MythScreenType
 
   public:
     SearchEditor(MythScreenStack *parent,
-               const QString name = "SearchEditor");
+               const QString &name = "SearchEditor");
    ~SearchEditor();
 
     bool Create(void);

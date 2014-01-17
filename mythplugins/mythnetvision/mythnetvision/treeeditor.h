@@ -26,7 +26,7 @@ class TreeEditor : public MythScreenType
 
   public:
     TreeEditor(MythScreenStack *parent,
-               const QString name = "TreeEditor");
+               const QString &name = "TreeEditor");
    ~TreeEditor();
 
     bool Create(void);
