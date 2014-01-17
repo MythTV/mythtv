@@ -175,9 +175,9 @@ class UPNP_PUBLIC CDSObject
 
     public:
 
-        explicit      CDSObject( const QString sId = "-1",
-                                 const QString sTitle = "",
-                                 const QString sParentId = "-1" );
+        explicit      CDSObject( const QString &sId = "-1",
+                                 const QString &sTitle = "",
+                                 const QString &sParentId = "-1" );
         virtual      ~CDSObject();
 
         Property         *AddProperty( Property *pProp  );

@@ -284,7 +284,7 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
     public:
                  Eventing      ( const QString &sExtensionName,
                                  const QString &sEventMethodName,
-                                 const QString sSharePath );
+                                 const QString &sSharePath );
         virtual ~Eventing      ( );
 
         virtual QStringList GetBasePaths();

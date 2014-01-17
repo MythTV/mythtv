@@ -27,9 +27,9 @@ inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-CDSObject::CDSObject( const QString sId, 
-                      const QString sTitle, 
-                      const QString sParentId )
+CDSObject::CDSObject( const QString &sId, 
+                      const QString &sTitle, 
+                      const QString &sParentId )
     : m_nUpdateId(1), m_eType(OT_Container),
       m_sId(HTTPRequest::Encode(sId)),
       m_sParentId(HTTPRequest::Encode(sParentId)),

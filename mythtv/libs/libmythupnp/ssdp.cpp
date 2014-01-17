@@ -674,7 +674,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPExtension::SSDPExtension( int nServicePort , const QString sSharePath)
+SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
   : HttpServerExtension( "SSDP" , sSharePath),
     m_nServicePort(nServicePort)
 {

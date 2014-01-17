@@ -23,8 +23,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HtmlServerExtension::HtmlServerExtension( const QString sSharePath,
-                                          const QString sApplicationPrefix)
+HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
+                                          const QString &sApplicationPrefix)
   : HttpServerExtension( "Html" , sSharePath),
     m_IndexFilename(sApplicationPrefix + "index")
 {

@@ -98,7 +98,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     static QString          s_platform;
 
   public:
-    HttpServer(const QString sApplicationPrefix = QString(""));
+    HttpServer(const QString &sApplicationPrefix = QString(""));
     virtual ~HttpServer();
 
     void RegisterExtension(HttpServerExtension*);
