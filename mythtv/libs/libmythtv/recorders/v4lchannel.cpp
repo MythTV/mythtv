@@ -689,7 +689,7 @@ static int get_v4l2_attribute(const QString &db_col_name)
     return -1;
 }
 
-bool V4LChannel::InitPictureAttribute(const QString db_col_name)
+bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
 {
     if (!m_pParent)
         return false;

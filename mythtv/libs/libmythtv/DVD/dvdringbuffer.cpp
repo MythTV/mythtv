@@ -1432,7 +1432,7 @@ void DVDRingBuffer::WaitSkip(void)
 
 /** \brief jump to a dvd root or chapter menu
  */
-bool DVDRingBuffer::GoToMenu(const QString str)
+bool DVDRingBuffer::GoToMenu(const QString &str)
 {
     DVDMenuID_t menuid;
     QMutexLocker locker(&m_seekLock);

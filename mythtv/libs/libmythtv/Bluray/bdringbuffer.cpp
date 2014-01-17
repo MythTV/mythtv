@@ -893,7 +893,7 @@ void BDRingBuffer::ClickButton(int64_t pts, uint16_t x, uint16_t y)
 
 /** \brief jump to a Blu-ray root or popup menu
  */
-bool BDRingBuffer::GoToMenu(const QString str, int64_t pts)
+bool BDRingBuffer::GoToMenu(const QString &str, int64_t pts)
 {
     if (!m_isHDMVNavigation || pts < 0)
         return false;

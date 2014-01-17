@@ -9,9 +9,9 @@
 #include "rawsettingseditor.h"
 
 // Helper commands for formatting and sending a MythSystemEvent
-MTV_PUBLIC void SendMythSystemRecEvent(const QString msg,
+MTV_PUBLIC void SendMythSystemRecEvent(const QString &msg,
                                     const RecordingInfo *pginfo);
-MTV_PUBLIC void SendMythSystemPlayEvent(const QString msg,
+MTV_PUBLIC void SendMythSystemPlayEvent(const QString &msg,
                                      const ProgramInfo *pginfo);
 
 /** \class MythSystemEventHandler

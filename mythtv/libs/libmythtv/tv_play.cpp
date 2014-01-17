@@ -12437,8 +12437,8 @@ void TV::ShowOSDMenu(const PlayerContext *ctx, bool isCompact)
                          QDomNode());
 }
 
-void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString category,
-                            int level, const QString selected)
+void TV::FillOSDMenuJumpRec(PlayerContext* ctx, const QString &category,
+                            int level, const QString &selected)
 {
     // bool in_recgroup = !category.isEmpty() && level > 0;
     if (level < 0 || level > 1)

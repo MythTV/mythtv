@@ -43,7 +43,7 @@ class MTV_PUBLIC ChannelInfo
     void ToMap(InfoMap &infoMap);
 
     QString GetSourceName();
-    void SetSourceName(const QString lname) { m_sourcename = lname; }
+    void SetSourceName(const QString &lname) { m_sourcename = lname; }
 
     
     const QList<uint> GetGroupIds() const { return m_groupIdList; }

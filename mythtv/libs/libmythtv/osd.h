@@ -144,7 +144,7 @@ class OSD
     void    RevertUIScale(void);
     bool    Reinit(const QRect &rect, float font_aspect);
     void    DisableFade(void) { m_Effects = false; }
-    void    SetFunctionalWindow(const QString window,
+    void    SetFunctionalWindow(const QString &window,
                                 enum OSDFunctionalType type);
     void    SetTimeouts(int _short, int _medium, int _long);
 

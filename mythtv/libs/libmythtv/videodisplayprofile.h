@@ -89,7 +89,7 @@ class MTV_PUBLIC VideoDisplayProfile
     float GetOutput(void) const { return last_rate; }
 
     void SetVideoRenderer(const QString &video_renderer);
-    bool CheckVideoRendererGroup(const QString renderer);
+    bool CheckVideoRendererGroup(const QString &renderer);
 
     QString GetDecoder(void) const
         { return GetPreference("pref_decoder"); }
@@ -158,7 +158,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QString     GetVideoRendererHelp(const QString &renderer);
     static QString     GetPreferredVideoRenderer(const QString &decoder);
     static QStringList GetDeinterlacers(const QString &video_renderer);
-    static QString     GetDeinterlacerName(const QString short_name);
+    static QString     GetDeinterlacerName(const QString &short_name);
     static QString     GetDeinterlacerHelp(const QString &deint);
     static QStringList GetOSDs(const QString &video_renderer);
     static QString     GetOSDHelp(const QString &osd);

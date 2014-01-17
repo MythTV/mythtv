@@ -106,7 +106,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
                           uint retry_ms = kDefaultOpenTimeout);
     void close(void);
 
-    bool GoToMenu(const QString str, int64_t pts);
+    bool GoToMenu(const QString &str, int64_t pts);
     bool SwitchTitle(uint32_t index);
     bool SwitchPlaylist(uint32_t index);
     bool SwitchAngle(uint angle);

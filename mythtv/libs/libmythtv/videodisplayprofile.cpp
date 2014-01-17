@@ -311,7 +311,7 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
 }
 
-bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
+bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &renderer)
 {
     if (last_video_renderer == renderer ||
         last_video_renderer == "null")
@@ -698,7 +698,7 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
     return msg;
 }
 
-QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
+QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
 {
     if ("none" == short_name)
         return QObject::tr("None");

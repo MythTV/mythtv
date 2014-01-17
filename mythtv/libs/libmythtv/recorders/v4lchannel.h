@@ -78,7 +78,7 @@ class V4LChannel : public DTVChannel
                                 QString inputname);
 
     // Helper Commands
-    bool InitPictureAttribute(const QString db_col_name);
+    bool InitPictureAttribute(const QString &db_col_name);
     bool InitializeInputs(void);
 
   private:

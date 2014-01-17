@@ -541,7 +541,7 @@ QString get_on_cardid(const QString &to_get, uint cardid)
 }
 
 bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
-                   const QString value)
+                   const QString &value)
 {
     QString tmp = get_on_cardid("capturecard.cardid", cardid);
     if (tmp.isEmpty())
@@ -583,7 +583,7 @@ QString get_on_inputid(const QString &to_get, uint inputid)
     return QString::null;
 }
 
-bool set_on_input(const QString &to_set, uint inputid, const QString value)
+bool set_on_input(const QString &to_set, uint inputid, const QString &value)
 {
     QString tmp = get_on_inputid("cardinput.cardinputid", inputid);
     if (tmp.isEmpty())

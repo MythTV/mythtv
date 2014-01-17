@@ -182,7 +182,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void SkipDVDWaitingForPlayer(void)    { m_playerWait = false;           }
     void UnblockReading(void)             { m_processState = PROCESS_REPROCESS; }
     bool IsReadingBlocked(void)           { return (m_processState == PROCESS_WAIT); }
-    bool GoToMenu(const QString str);
+    bool GoToMenu(const QString &str);
     void GoToNextProgram(void);
     void GoToPreviousProgram(void);
     bool GoBack(void);

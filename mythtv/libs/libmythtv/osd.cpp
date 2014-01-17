@@ -1036,7 +1036,7 @@ MythScreenType *OSD::GetWindow(const QString &window)
     return NULL;
 }
 
-void OSD::SetFunctionalWindow(const QString window, enum OSDFunctionalType type)
+void OSD::SetFunctionalWindow(const QString &window, enum OSDFunctionalType type)
 {
     if (m_FunctionalType != kOSDFunctionalType_Default &&
         m_FunctionalType != type)
