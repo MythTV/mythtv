@@ -215,7 +215,7 @@ class SchedEditChild : public MythScreenType
 {
   Q_OBJECT
   protected:
-    SchedEditChild(MythScreenStack *parent, const QString name,
+    SchedEditChild(MythScreenStack *parent, const QString &name,
                    ScheduleEditor &editor, RecordingRule &rule,
                    RecordingInfo *recinfo);
    ~SchedEditChild();

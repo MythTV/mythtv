@@ -127,7 +127,7 @@ namespace
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
                              QString title, int season,
-                             const QString host, QString sgroup,
+                             const QString &host, QString sgroup,
                              int episode = 0, bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);

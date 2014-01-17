@@ -30,7 +30,7 @@ class ThemeChooser : public MythScreenType
 
   public:
     ThemeChooser(MythScreenStack *parent,
-               const QString name = "ThemeChooser");
+               const QString &name = "ThemeChooser");
    ~ThemeChooser();
 
     bool Create(void);

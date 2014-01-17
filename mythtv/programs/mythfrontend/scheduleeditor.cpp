@@ -868,7 +868,7 @@ void ScheduleEditor::showTemplateMenu(void)
  *
  */
 
-SchedEditChild::SchedEditChild(MythScreenStack *parent, const QString name,
+SchedEditChild::SchedEditChild(MythScreenStack *parent, const QString &name,
                                ScheduleEditor &editor, RecordingRule &rule,
                                RecordingInfo *recInfo)
     : MythScreenType(parent, name),

@@ -70,7 +70,7 @@ class ThemeExtractThread : public QRunnable
  *  \param name The name of the window
  */
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
-                           const QString name) :
+                           const QString &name) :
     MythScreenType(parent, name),
     m_themes(NULL),
     m_preview(NULL),
