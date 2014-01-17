@@ -57,8 +57,8 @@ public:
     virtual bool IsSeekingAllowed(void)     { return !m_error; }
     virtual bool IsBookmarkAllowed(void)    { return true; }
     static bool IsHTTPLiveStreaming(QByteArray *s);
-    static bool TestForHTTPLiveStreaming(const QString filename);
-    bool SaveToDisk(const QString filename, int segstart = 0, int segend = -1);
+    static bool TestForHTTPLiveStreaming(const QString &filename);
+    bool SaveToDisk(const QString &filename, int segstart = 0, int segend = -1);
     int NumStreams(void) const;
     int Read(void *data, uint i_read) { return safe_read(data, i_read); }
     void Interrupt(void);
@@ -76,19 +76,19 @@ private:
     HLSStream *GetLastStream(const StreamsList *streams = NULL) const;
     HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = NULL) const;
     HLSStream *GetCurrentStream(void) const;
-    QString ParseAttributes(const QString line, const char *attr) const;
-    int ParseDecimalValue(const QString line, int &target) const;
-    int ParseSegmentInformation(const HLSStream *hls, const QString line,
+    QString ParseAttributes(const QString &line, const char *attr) const;
+    int ParseDecimalValue(const QString &line, int &target) const;
+    int ParseSegmentInformation(const HLSStream *hls, const QString &line,
                                 int &duration, QString &title) const;
-    int ParseTargetDuration(HLSStream *hls, const QString line) const;
-    HLSStream *ParseStreamInformation(const QString line, const QString uri) const;
-    int ParseMediaSequence(HLSStream *hls, const QString line) const;
-    int ParseKey(HLSStream *hls, const QString line);
-    int ParseProgramDateTime(HLSStream *hls, const QString line) const;
-    int ParseAllowCache(HLSStream *hls, const QString line) const;
-    int ParseVersion(const QString line, int &version) const;
+    int ParseTargetDuration(HLSStream *hls, const QString &line) const;
+    HLSStream *ParseStreamInformation(const QString &line, const QString &uri) const;
+    int ParseMediaSequence(HLSStream *hls, const QString &line) const;
+    int ParseKey(HLSStream *hls, const QString &line);
+    int ParseProgramDateTime(HLSStream *hls, const QString &line) const;
+    int ParseAllowCache(HLSStream *hls, const QString &line) const;
+    int ParseVersion(const QString &line, int &version) const;
     int ParseEndList(HLSStream *hls) const;
-    int ParseDiscontinuity(HLSStream *hls, const QString line) const;
+    int ParseDiscontinuity(HLSStream *hls, const QString &line) const;
     int ParseM3U8(const QByteArray *buffer, StreamsList *streams = NULL);
     int Prefetch(int count);
     void SanityCheck(const HLSStream *hls, const HLSSegment *segment) const;
