@@ -336,7 +336,7 @@ void MythSocketManager::ProcessRequestWork(MythSocket *sock)
 }
 
 void MythSocketManager::HandleVersion(MythSocket *socket,
-                                      const QStringList slist)
+                                      const QStringList &slist)
 {
     QStringList retlist;
     QString version = slist[1];

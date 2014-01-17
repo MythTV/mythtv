@@ -58,7 +58,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
 
   private:
     void ProcessRequestWork(MythSocket *socket);
-    void HandleVersion(MythSocket *socket, const QStringList slist);
+    void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleDone(MythSocket *socket);
 
     QMap<MythSocket*, SocketHandler*>   m_socketMap;
