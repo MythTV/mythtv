@@ -291,7 +291,7 @@ bool getFileDetails(ArchiveItem *a)
     return true;
 }
 
-void showWarningDialog(const QString msg)
+void showWarningDialog(const QString &msg)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, msg, false);
