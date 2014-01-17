@@ -25,8 +25,8 @@ class MythBrowser : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void setDefaultSaveDirectory(const QString saveDir) { m_defaultSaveDir = saveDir; }
-    void setDefaultSaveFilename(const QString saveFile) { m_defaultSaveFilename = saveFile; }
+    void setDefaultSaveDirectory(const QString &saveDir) { m_defaultSaveDir = saveDir; }
+    void setDefaultSaveFilename(const QString &saveFile) { m_defaultSaveFilename = saveFile; }
 
     MythImage *GetDefaultFavIcon(void)
     {
