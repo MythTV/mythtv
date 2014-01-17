@@ -96,7 +96,7 @@ static void fstabError(const QString &methodName)
              " for reading, " + ENO);
 }
 
-static void statError(const QString &methodName, const QString devPath)
+static void statError(const QString &methodName, const QString &devPath)
 {
     LOG(VB_GENERAL, LOG_ALERT, 
              LOC + methodName + " Error: failed to stat " + devPath + 

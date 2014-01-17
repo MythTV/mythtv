@@ -164,7 +164,7 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted,
  *
  * prevent drawing a list if there is only one drive, et cetera
  */
-MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
+MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
                                                  bool showMounted,
                                                  bool showUsable)
 {
@@ -796,8 +796,8 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
  * Ideally, these would return a MythMediaDevice * instead of a QString
  */
 
-QString MediaMonitor::defaultDevice(QString dbSetting,
-                                    QString label,
+QString MediaMonitor::defaultDevice(const QString &dbSetting,
+                                    const QString &label,
                                     const char *hardCodedDefault)
 {
     QString device = gCoreContext->GetSetting(dbSetting);
