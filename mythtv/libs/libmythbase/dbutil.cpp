@@ -289,7 +289,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
  *          returns true if those tables were repaired successfully
  *  \sa DBUtil::RepairTables(const QStringList)
  */
-bool DBUtil::CheckTables(const bool repair, const QString options)
+bool DBUtil::CheckTables(const bool repair, const QString &options)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())

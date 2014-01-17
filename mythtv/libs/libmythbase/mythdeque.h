@@ -65,7 +65,7 @@ class MythDeque : public deque<T>
     }
 
     /// \brief Returns true if item is in list. O(n).
-    bool contains(T const item) const
+    bool contains(T const &item) const
         { return find(item) != deque<T>::end(); }
 
     /// \brief Returns size of list. O(1).

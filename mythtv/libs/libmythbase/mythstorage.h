@@ -80,7 +80,7 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
         keycolumn(_keycolumn), keyvalue(_keyvalue) {}
     virtual ~GenericDBStorage() { }
 
-    void SetKeyValue(const QString val) { keyvalue = val; }
+    void SetKeyValue(const QString &val) { keyvalue = val; }
     void SetKeyValue(long long val) { keyvalue = QString::number(val); }
 
   protected:
