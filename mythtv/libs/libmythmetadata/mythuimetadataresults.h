@@ -16,7 +16,7 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
 
   public:
     MetadataResultsDialog(MythScreenStack *lparent,
-                          const MetadataLookupList results);
+                          const MetadataLookupList &results);
     ~MetadataResultsDialog();
 
     bool Create();

@@ -18,7 +18,7 @@ class META_PUBLIC BlurayMetadata : public QObject
     Q_DECLARE_TR_FUNCTIONS(BlurayMetadata)
 
   public:
-    BlurayMetadata(const QString path);
+    BlurayMetadata(const QString &path);
     ~BlurayMetadata();
 
     void toMap(InfoMap &metadataMap);

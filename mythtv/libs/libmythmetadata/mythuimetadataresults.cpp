@@ -10,7 +10,7 @@
 
 MetadataResultsDialog::MetadataResultsDialog(
     MythScreenStack *lparent,
-    const MetadataLookupList results) :
+    const MetadataLookupList &results) :
 
     MythScreenType(lparent, "metadataresultspopup"),
     m_results(results),
