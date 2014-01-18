@@ -31,6 +31,8 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
     <<  QT_TRANSLATE_NOOP("(StorageGroups)", "Screenshots")
     <<  QT_TRANSLATE_NOOP("(StorageGroups)", "Banners")
     <<  QT_TRANSLATE_NOOP("(StorageGroups)", "Photographs")
+    <<  QT_TRANSLATE_NOOP("(StorageGroups)", "Music")
+    <<  QT_TRANSLATE_NOOP("(StorageGroups)", "MusicArt")
     ;
 
 /****************************************************************************/
