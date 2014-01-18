@@ -66,6 +66,7 @@ class TestIPTVRecorder: public QObject
      */
     void TuningDataVLCStyle(void)
     {
+        MSKIP ("Do we want to support non-conformant urls that happen to work with VLC?");
         IPTVTuningData tuning;
 
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x549.html */
