@@ -86,27 +86,12 @@ static inline bool modified(uint64_t sig)
     return sig >> 63;
 }
 
-static void replace_in_db(uint chanid, uint eventid, uint64_t sig)
+static void replace_in_db(QStringList &value_clauses,
+                          uint chanid, uint eventid, uint64_t sig)
 {
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString qstr =
-        "REPLACE INTO eit_cache "
-        "       ( chanid,  eventid,  tableid,  version,  endtime) "
-        "VALUES (:CHANID, :EVENTID, :TABLEID, :VERSION, :ENDTIME)";
-
-    query.prepare(qstr);
-    query.bindValue(":CHANID",   chanid);
-    query.bindValue(":EVENTID",  eventid);
-    query.bindValue(":TABLEID",  extract_table_id(sig));
-    query.bindValue(":VERSION",  extract_version(sig));
-    query.bindValue(":ENDTIME",  extract_endtime(sig));
-
-    if (!query.exec())
-        MythDB::DBError("Error updating eitcache", query);
-
-    return;
+    value_clauses << QString("(%1,%2,%3,%4,%5)")
+        .arg(chanid).arg(eventid).arg(extract_table_id(sig))
+        .arg(extract_version(sig)).arg(extract_endtime(sig));
 }
 
 static void delete_in_db(uint endtime)
@@ -264,7 +249,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     return eventMap;
 }
 
-void EITCache::WriteChannelToDB(uint chanid)
+void EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
 {
     event_map_t * eventMap = channelMap[chanid];
 
@@ -285,7 +270,7 @@ void EITCache::WriteChannelToDB(uint chanid)
         {
             if (modified(*it))
             {
-                replace_in_db(chanid, it.key(), *it);
+                replace_in_db(value_clauses, chanid, it.key(), *it);
                 updated++;
                 *it &= ~(uint64_t)0 >> 1; // mark as synced
             }
@@ -301,7 +286,7 @@ void EITCache::WriteChannelToDB(uint chanid)
     unlock_channel(chanid, updated);
 
     if (updated)
-        LOG(VB_EIT, LOG_INFO, LOC + QString("Wrote %1 modified entries of %2 "
+        LOG(VB_EIT, LOG_INFO, LOC + QString("Writing %1 modified entries of %2 "
                                       "for channel %3 to database.")
                 .arg(updated).arg(size).arg(chanid));
     if (removed)
@@ -315,11 +300,26 @@ void EITCache::WriteToDB(void)
 {
     QMutexLocker locker(&eventMapLock);
 
+    QStringList value_clauses;
     key_map_t::iterator it = channelMap.begin();
     while (it != channelMap.end())
     {
-        WriteChannelToDB(it.key());
+        WriteChannelToDB(value_clauses, it.key());
         ++it;
+    }
+
+    if(value_clauses.isEmpty())
+    {
+        return;
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("REPLACE INTO eit_cache "
+                          "(chanid, eventid, tableid, version, endtime) "
+                          "VALUES %1").arg(value_clauses.join(",")));
+    if (!query.exec())
+    {
+        MythDB::DBError("Error updating eitcache", query);
     }
 }
 
