@@ -793,6 +793,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleScanVideos(pbs);
     }
+    else if (command == "SCAN_MUSIC")
+    {
+        HandleScanMusic(pbs);
+    }
     else if (command == "ALLOW_SHUTDOWN")
     {
         if (tokens.size() != 1)
@@ -5147,6 +5151,22 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
     }
     else
         retlist << "ERROR";
+
+    if (pbssock)
+        SendResponse(pbssock, retlist);
+}
+
+void MainServer::HandleScanMusic(PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+
+    QStringList retlist;
+
+    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                      kMSAutoCleanup | kMSRunBackground |
+                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                      kMSDontBlockInputDevs));
+    retlist << "OK";
 
     if (pbssock)
         SendResponse(pbssock, retlist);
