@@ -1,6 +1,5 @@
 
 // POSIX C headers
-#include <sys/stat.h>
 #include <utime.h>
 
 // Qt
