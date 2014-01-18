@@ -3683,25 +3683,28 @@ void ProgramInfo::SavePositionMap(
     if (!query.exec())
         MythDB::DBError("position map clear", query);
 
+    // Use the multi-value insert syntax to reduce database I/O
+    QStringList q("INSERT INTO ");
+    QString qfields;
     if (IsVideo())
     {
-        query.prepare(
-            "INSERT INTO "
-            "filemarkup (filename, mark, type, offset) "
-            "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
-        query.bindValue(":PATH", videoPath);
+        q << "filemarkup (filename, type, mark, offset)";
+        qfields = QString("('%1',%2,") .
+            // ideally, this should be escaped
+            arg(videoPath) .
+            arg(type);
     }
     else // if (IsRecording())
     {
-        query.prepare(
-            "INSERT INTO "
-            "recordedseek (chanid, starttime, mark, type, offset) "
-            " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
-        query.bindValue(":CHANID",    chanid);
-        query.bindValue(":STARTTIME", recstartts);
+        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        qfields = QString("(%1,'%2',%3,") .
+            arg(chanid) .
+            arg(recstartts.toString(Qt::ISODate)) .
+            arg(type);
     }
-    query.bindValue(":TYPE", type);
+    q << " VALUES ";
 
+    bool add_comma = false;
     frm_pos_map_t::iterator it;
     for (it = posMap.begin(); it != posMap.end(); ++it)
     {
@@ -3715,14 +3718,20 @@ void ProgramInfo::SavePositionMap(
 
         uint64_t offset = *it;
 
-        query.bindValue(":MARK",   (quint64)frame);
-        query.bindValue(":OFFSET", (quint64)offset);
-
-        if (!query.exec())
+        if (add_comma)
         {
-            MythDB::DBError("position map insert", query);
-            break;
+            q << ",";
         }
+        else
+        {
+            add_comma = true;
+        }
+        q << qfields << QString("%1,%2)").arg(frame).arg(offset);
+    }
+    query.prepare(q.join(""));
+    if (!query.exec())
+    {
+        MythDB::DBError("position map insert", query);
     }
 }
 
@@ -3741,45 +3750,54 @@ void ProgramInfo::SavePositionMapDelta(
         return;
     }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
+    // Use the multi-value insert syntax to reduce database I/O
+    QStringList q("INSERT INTO ");
+    QString qfields;
     if (IsVideo())
     {
-        query.prepare(
-            "INSERT INTO "
-            "filemarkup (filename, mark, type, offset) "
-            "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
-        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
+        q << "filemarkup (filename, type, mark, offset)";
+        qfields = QString("('%1',%2,") .
+            // ideally, this should be escaped
+            arg(StorageGroup::GetRelativePathname(pathname)) .
+            arg(type);
     }
     else if (IsRecording())
     {
-        query.prepare(
-            "INSERT INTO "
-            "recordedseek (chanid, starttime, mark, type, offset) "
-            " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
-        query.bindValue(":CHANID",    chanid);
-        query.bindValue(":STARTTIME", recstartts);
+        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        qfields = QString("(%1,'%2',%3,") .
+            arg(chanid) .
+            arg(recstartts.toString(Qt::ISODate)) .
+            arg(type);
     }
     else
     {
         return;
     }
-    query.bindValue(":TYPE", type);
+    q << " VALUES ";
 
+    bool add_comma = false;
     frm_pos_map_t::iterator it;
     for (it = posMap.begin(); it != posMap.end(); ++it)
     {
         uint64_t frame  = it.key();
         uint64_t offset = *it;
 
-        query.bindValue(":MARK",   (quint64)frame);
-        query.bindValue(":OFFSET", (quint64)offset);
-
-        if (!query.exec())
+        if (add_comma)
         {
-            MythDB::DBError("delta position map insert", query);
-            break;
+            q << ",";
         }
+        else
+        {
+            add_comma = true;
+        }
+        q << qfields << QString("%1,%2)").arg(frame).arg(offset);
+    }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(q.join(""));
+    if (!query.exec())
+    {
+        MythDB::DBError("delta position map insert", query);
     }
 }
 
