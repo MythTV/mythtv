@@ -132,6 +132,33 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     return *this;
 }
 
+// return true if this == mdata
+bool MusicMetadata::compare(MusicMetadata *mdata) const
+{
+    return (
+        m_artist == mdata->m_artist &&
+        m_compilation_artist == mdata->m_compilation_artist &&
+        m_album == mdata->m_album &&
+        m_title == mdata->m_title &&
+        m_year == mdata->m_year &&
+        m_tracknum == mdata->m_tracknum &&
+        m_trackCount == mdata->m_trackCount &&
+        //m_length == mdata->m_length &&
+        m_rating == mdata->m_rating &&
+        m_lastplay == mdata->m_lastplay &&
+        m_playcount == mdata->m_playcount &&
+        m_compilation == mdata->m_compilation &&
+        m_filename == mdata->m_filename &&
+        m_directoryid == mdata->m_directoryid &&
+        m_artistid == mdata->m_artistid &&
+        m_compartistid == mdata->m_compartistid &&
+        m_albumid == mdata->m_albumid &&
+        m_genreid == mdata->m_genreid &&
+        m_format == mdata->m_format &&
+        m_fileSize == mdata->m_fileSize
+    );
+}
+
 void MusicMetadata::persist()
 {
     if (m_id < 1)
@@ -158,25 +185,6 @@ void MusicMetadata::persist()
         MythDB::DBError("music persist", query);
 
     m_changed = false;
-}
-
-
-void MusicMetadata::UpdateModTime() const
-{
-    if (m_id < 1)
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("UPDATE music_songs SET date_modified = :DATE_MOD "
-                  "WHERE song_id= :ID ;");
-
-    query.bindValue(":DATE_MOD", MythDate::current());
-    query.bindValue(":ID", m_id);
-
-    if (!query.exec())
-        MythDB::DBError("MusicMetadata::UpdateModTime",
-                        query);
 }
 
 // static
@@ -1159,10 +1167,11 @@ bool AllMusic::startLoading(void)
     return true;
 }
 
-// NOTE we don't clear the existing tracks just load any new ones found in the DB
-// maybe we should also check for any removed tracks?
+/// resync our cache with the database
 void AllMusic::resync()
 {
+    uint added = 0, removed = 0, changed = 0;
+
     m_done_loading = false;
 
     QString aquery = "SELECT music_songs.song_id, music_artists.artist_id, music_artists.artist_name, "
@@ -1189,45 +1198,64 @@ void AllMusic::resync()
 
     m_numPcs = query.size() * 2;
     m_numLoaded = 0;
+    QList<MusicMetadata::IdType> idList;
 
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            int id = query.value(0).toInt();
+            MusicMetadata::IdType id = query.value(0).toInt();
+
+            idList.append(id);
+
+            MusicMetadata *dbMeta = new MusicMetadata(
+                query.value(12).toString(),    // filename
+                query.value(2).toString(),     // artist
+                query.value(3).toString(),     // compilation artist
+                query.value(5).toString(),     // album
+                query.value(6).toString(),     // title
+                query.value(7).toString(),     // genre
+                query.value(8).toInt(),        // year
+                query.value(9).toInt(),        // track no.
+                query.value(10).toInt(),       // length
+                query.value(0).toInt(),        // id
+                query.value(13).toInt(),       // rating
+                query.value(14).toInt(),       // playcount
+                query.value(15).toDateTime(),  // lastplay
+                query.value(16).toDateTime(),  // date_entered
+                (query.value(17).toInt() > 0), // compilation
+                query.value(18).toString());   // format
+
+            dbMeta->setDirectoryId(query.value(11).toInt());
+            dbMeta->setArtistId(query.value(1).toInt());
+            dbMeta->setAlbumId(query.value(4).toInt());
+            dbMeta->setTrackCount(query.value(19).toInt());
+            dbMeta->setFileSize((quint64)query.value(20).toULongLong());
 
             if (!music_map.contains(id))
             {
-                filename = query.value(12).toString();
+                // new track
 
-                MusicMetadata *mdata = new MusicMetadata(
-                    filename,
-                    query.value(2).toString(),     // artist
-                    query.value(3).toString(),     // compilation artist
-                    query.value(5).toString(),     // album
-                    query.value(6).toString(),     // title
-                    query.value(7).toString(),     // genre
-                    query.value(8).toInt(),        // year
-                    query.value(9).toInt(),        // track no.
-                    query.value(10).toInt(),       // length
-                    query.value(0).toInt(),        // id
-                    query.value(13).toInt(),       // rating
-                    query.value(14).toInt(),       // playcount
-                    query.value(15).toDateTime(),  // lastplay
-                    query.value(16).toDateTime(),  // date_entered
-                    (query.value(17).toInt() > 0), // compilation
-                    query.value(18).toString());   // format
+                //  Don't delete dbMeta, as the MetadataPtrList now owns it
+                m_all_music.append(dbMeta);
 
-                mdata->setDirectoryId(query.value(11).toInt());
-                mdata->setArtistId(query.value(1).toInt());
-                mdata->setAlbumId(query.value(4).toInt());
-                mdata->setTrackCount(query.value(19).toInt());
-                mdata->setFileSize((quint64)query.value(20).toULongLong());
+                music_map[id] = dbMeta;
 
-                //  Don't delete mdata, as PtrList now owns it
-                m_all_music.append(mdata);
+                added++;
+            }
+            else
+            {
+                // existing track, check for any changes
+                MusicMetadata *cacheMeta = music_map[id];
 
-                music_map[id] = mdata;
+                if (cacheMeta && !cacheMeta->compare(dbMeta))
+                {
+                    cacheMeta->reloadMetadata();
+                    changed++;
+                }
+
+                // we already have this track in the cache so don't need dbMeta anymore
+                delete dbMeta;
             }
 
             // compute max/min playcount,lastplay for all music
@@ -1252,9 +1280,34 @@ void AllMusic::resync()
     }
     else
     {
-         LOG(VB_GENERAL, LOG_ERR, "MythMusic hasn't found any tracks! "
-                                  "That's ok with me if it's ok with you.");
+         LOG(VB_GENERAL, LOG_ERR, "MythMusic hasn't found any tracks!");
     }
+
+    // get a list of tracks in our cache that's now not in the database
+    QList<MusicMetadata::IdType> deleteList;
+    for (int x = 0; x < m_all_music.size(); x++)
+    {
+        if (!idList.contains(m_all_music.at(x)->ID()))
+        {
+            deleteList.append(m_all_music.at(x)->ID());
+        }
+    }
+
+    // remove the no longer available tracks
+    for (int x = 0; x < deleteList.size(); x++)
+    {
+        MusicMetadata::IdType id = deleteList.at(x);
+        MusicMetadata *mdata = music_map[id];
+        m_all_music.removeAll(mdata);
+        music_map.remove(id);
+        removed++;
+        delete mdata;
+    }
+
+    // tell any listeners a resync has just finished and they may need to reload/resync
+    LOG(VB_GENERAL, LOG_DEBUG, QString("AllMusic::resync sending MUSIC_RESYNC_FINISHED added: %1, removed: %2, changed: %3")
+                                      .arg(added).arg(removed).arg(changed));
+    gCoreContext->SendMessage(QString("MUSIC_RESYNC_FINISHED %1 %2 %3").arg(added).arg(removed).arg(changed));
 
     m_done_loading = true;
 }

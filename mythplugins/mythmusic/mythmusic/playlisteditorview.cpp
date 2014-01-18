@@ -96,11 +96,14 @@ PlaylistEditorView::PlaylistEditorView(MythScreenStack *parent, const QString &l
             m_rootNode(NULL), m_playlistTree(NULL), m_breadcrumbsText(NULL),
             m_positionText(NULL)
 {
+    gCoreContext->addListener(this);
     gCoreContext->SaveSetting("MusicPlaylistEditorView", layout);
 }
 
 PlaylistEditorView::~PlaylistEditorView()
 {
+    gCoreContext->removeListener(this);
+
     saveTreePosition();
 
     for (int x = 0; x < m_deleteList.count(); x++)
@@ -209,6 +212,28 @@ void PlaylistEditorView::customEvent(QEvent *event)
     {
         //TODO should just update the cd node
         reloadTree();
+    }
+    else if (event->type() == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = dynamic_cast<MythEvent*>(event);
+
+        if (!me)
+            return;
+
+        if (me->Message().startsWith("MUSIC_RESYNC_FINISHED"))
+        {
+            QStringList list = me->Message().simplified().split(' ');
+            if (list.size() == 4)
+            {
+                int added = list[1].toInt();
+                int removed = list[2].toInt();
+                int changed = list[3].toInt();
+
+                // if something changed reload the tree
+                if (added || removed || changed)
+                    reloadTree();
+            }
+        }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
