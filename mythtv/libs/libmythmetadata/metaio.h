@@ -1,6 +1,10 @@
 #ifndef METAIO_H_
 #define METAIO_H_
 
+// POSIX C headers
+#include <unistd.h>
+#include <fcntl.h>
+
 // QT
 #include <QString>
 
@@ -159,12 +163,15 @@ class META_PUBLIC MetaIO
     static const QString ValidFileExtensions;
 
   protected:
+    void saveTimeStamps(void);
+    void restoreTimeStamps(void);
 
-  private:
     virtual int getTrackLength(const QString &filename) = 0;
 
-    QString mFilename;
-    QString mFilenameFormat;
+    QString m_filename;
+    QString m_filenameFormat;
+
+    struct stat m_fileinfo;
 };
 
 #endif

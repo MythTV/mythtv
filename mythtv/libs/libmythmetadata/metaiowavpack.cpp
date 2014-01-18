@@ -48,7 +48,9 @@ bool MetaIOWavPack::write(const MusicMetadata* mdata)
     if (!mdata)
         return false;
 
-    TagLib::WavPack::File *wpfile = OpenFile(mdata->Filename());
+    m_filename = mdata->Filename();
+
+    TagLib::WavPack::File *wpfile = OpenFile(m_filename);
 
     if (!wpfile)
         return false;
@@ -74,7 +76,9 @@ bool MetaIOWavPack::write(const MusicMetadata* mdata)
     else
         tag->removeItem("Album artist");
 
+    saveTimeStamps();
     bool result = wpfile->save();
+    restoreTimeStamps();
 
     if (wpfile)
         delete wpfile;

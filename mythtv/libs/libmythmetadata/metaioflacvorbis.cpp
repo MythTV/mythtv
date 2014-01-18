@@ -52,7 +52,9 @@ bool MetaIOFLACVorbis::write(const MusicMetadata* mdata)
     if (!mdata)
         return false;
 
-    TagLib::FLAC::File *flacfile = OpenFile(mdata->Filename());
+    m_filename = mdata->Filename(true);
+
+    TagLib::FLAC::File *flacfile = OpenFile(m_filename);
 
     if (!flacfile)
         return false;
@@ -87,7 +89,9 @@ bool MetaIOFLACVorbis::write(const MusicMetadata* mdata)
         tag->removeField("COMPILATION_ARTIST");
     }
 
+    saveTimeStamps();
     bool result = flacfile->save();
+    restoreTimeStamps();
 
     if (flacfile)
         delete flacfile;
@@ -340,6 +344,8 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
     if (filename.isEmpty() || !albumart)
         return false;
 
+    m_filename = filename;
+
     bool retval = false;
 
     // load the image into a QByteArray
@@ -381,7 +387,9 @@ bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
 
         flacfile->addPicture(pic);
 
+        saveTimeStamps();
         retval = flacfile->save();
+        restoreTimeStamps();
 
         delete flacfile;
     }

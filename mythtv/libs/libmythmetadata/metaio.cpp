@@ -1,3 +1,8 @@
+
+// POSIX C headers
+#include <sys/stat.h>
+#include <utime.h>
+
 // Qt
 #include <QFileInfo>
 
@@ -21,7 +26,7 @@ const QString MetaIO::ValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.
  */
 MetaIO::MetaIO()
 {
-    mFilenameFormat = gCoreContext->GetSetting("NonID3FileNameFormat").toUpper();
+    m_filenameFormat = gCoreContext->GetSetting("NonID3FileNameFormat").toUpper();
 }
 
 /*!
@@ -121,7 +126,7 @@ void MetaIO::readFromFilename(const QString &filename,
     // Replace 
     lfilename.replace('_', ' ');
     lfilename = lfilename.section('.', 0, -2);
-    QStringList fmt_list = mFilenameFormat.split("/");
+    QStringList fmt_list = m_filenameFormat.split("/");
     QStringList::iterator fmt_it = fmt_list.begin();
 
     // go through loop once to get minimum part number
@@ -201,21 +206,44 @@ void MetaIO::readFromFilename(MusicMetadata* metadata)
 
     if (filename.isEmpty())
         return;
-    
+
     readFromFilename(filename, artist, album, title, genre, tracknum);
 
     if (metadata->Artist().isEmpty())
         metadata->setArtist(artist);
-    
+
     if (metadata->Album().isEmpty())
         metadata->setAlbum(album);
-    
+
     if (metadata->Title().isEmpty())
         metadata->setTitle(title);
-    
+
     if (metadata->Genre().isEmpty())
         metadata->setGenre(genre);
-    
+
     if (metadata->Track() <= 0)
         metadata->setTrack(tracknum);
+}
+
+void MetaIO::saveTimeStamps(void)
+{
+    if (stat(m_filename.toLocal8Bit().constData(), &m_fileinfo) == -1)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIO::saveTimeStamps: failed to stat file: %1").arg(m_filename) + ENO);
+    }
+}
+
+void MetaIO::restoreTimeStamps(void)
+{
+    struct utimbuf new_times;
+
+    new_times.actime = m_fileinfo.st_atime;
+    new_times.modtime = m_fileinfo.st_mtime;
+
+    if (utime(m_filename.toLocal8Bit().constData(), &new_times) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("MetaIO::restoreTimeStamps: failed to utime file: %1").arg(m_filename) + ENO);
+    }
 }

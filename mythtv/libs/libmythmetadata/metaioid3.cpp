@@ -99,7 +99,9 @@ bool MetaIOID3::SaveFile()
     if (!m_file)
         return false;
 
+    saveTimeStamps();
     bool retval = m_file->save();
+    restoreTimeStamps();
 
     return retval;
 }

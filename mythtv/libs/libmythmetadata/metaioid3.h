@@ -74,7 +74,6 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
     QString getExtFromMimeType(const QString &mimeType);
 
     TagLib::File *m_file;
-    QString m_filename;
 
     typedef enum { kMPEG, kFLAC } TagType;
     TagType m_fileType;
