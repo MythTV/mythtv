@@ -26,7 +26,7 @@ class META_PUBLIC MusicFileScanner
         MusicFileScanner(void);
         ~MusicFileScanner(void);
 
-        void SearchDir(QString &directory);
+        void SearchDirs(const QStringList &directory);
 
         static bool IsRunning(void);
 

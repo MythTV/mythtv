@@ -555,15 +555,15 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename)
 }
 
 /*!
- * \brief Scan a directory recursively for music and albumart.
+ * \brief Scan a list of directories recursively for music and albumart.
  *        Inserts, updates and removes any files any files found in the
  *        database.
  *
- * \param directory Directory to scan
+ * \param dirList List of directories to scan
  *
  * \returns Nothing.
  */
-void MusicFileScanner::SearchDir(QString &directory)
+void MusicFileScanner::SearchDirs(const QStringList &dirList)
 {
     QString host = gCoreContext->GetHostName();
 
@@ -604,8 +604,6 @@ void MusicFileScanner::SearchDir(QString &directory)
     QString status = QString("running");
     updateLastRunStatus(status);
 
-    m_startdir = directory;
-
     m_tracksTotal = m_tracksAdded = m_tracksUnchanged = m_tracksRemoved = m_tracksUpdated = 0;
     m_coverartTotal = m_coverartAdded = m_coverartUnchanged = m_coverartRemoved = m_coverartUpdated = 0;
 
@@ -613,54 +611,59 @@ void MusicFileScanner::SearchDir(QString &directory)
     MusicLoadedMap art_files;
     MusicLoadedMap::Iterator iter;
 
-    LOG(VB_GENERAL, LOG_INFO, "Searching filesystem for music files");
-
-    BuildFileList(m_startdir, music_files, art_files, 0);
-
-    m_tracksTotal = music_files.count();
-    m_coverartTotal = art_files.count();
-
-    ScanMusic(music_files);
-    ScanArtwork(art_files);
-
-    LOG(VB_GENERAL, LOG_INFO, "Updating database");
-
-     /*
-       This can be optimised quite a bit by consolidating all commands
-       via a lot of refactoring.
-
-       1) group all files of the same decoder type, and don't
-       create/delete a Decoder pr. AddFileToDB. Or make Decoders be
-       singletons, it should be a fairly simple change.
-
-       2) RemoveFileFromDB should group the remove into one big SQL.
-
-       3) UpdateFileInDB, same as 1.
-     */
-
-    for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    for (int x = 0; x < dirList.count(); x++)
     {
-        if (*iter == MusicFileScanner::kFileSystem)
-            AddFileToDB(iter.key());
-        else if (*iter == MusicFileScanner::kDatabase)
-            RemoveFileFromDB(iter.key());
-        else if (*iter == MusicFileScanner::kNeedUpdate)
+        m_startdir = dirList[x];
+
+        LOG(VB_GENERAL, LOG_INFO, QString("Searching '%1' for music files").arg(m_startdir));
+
+        BuildFileList(m_startdir, music_files, art_files, 0);
+
+        m_tracksTotal = music_files.count();
+        m_coverartTotal = art_files.count();
+
+        ScanMusic(music_files);
+        ScanArtwork(art_files);
+
+        LOG(VB_GENERAL, LOG_INFO, "Updating database");
+
+            /*
+            This can be optimised quite a bit by consolidating all commands
+            via a lot of refactoring.
+
+            1) group all files of the same decoder type, and don't
+            create/delete a Decoder pr. AddFileToDB. Or make Decoders be
+            singletons, it should be a fairly simple change.
+
+            2) RemoveFileFromDB should group the remove into one big SQL.
+
+            3) UpdateFileInDB, same as 1.
+            */
+
+        for (iter = music_files.begin(); iter != music_files.end(); iter++)
         {
-            UpdateFileInDB(iter.key());
-            ++m_tracksUpdated;
+            if (*iter == MusicFileScanner::kFileSystem)
+                AddFileToDB(iter.key());
+            else if (*iter == MusicFileScanner::kDatabase)
+                RemoveFileFromDB(iter.key());
+            else if (*iter == MusicFileScanner::kNeedUpdate)
+            {
+                UpdateFileInDB(iter.key());
+                ++m_tracksUpdated;
+            }
         }
-    }
 
-    for (iter = art_files.begin(); iter != art_files.end(); iter++)
-    {
-        if (*iter == MusicFileScanner::kFileSystem)
-            AddFileToDB(iter.key());
-        else if (*iter == MusicFileScanner::kDatabase)
-            RemoveFileFromDB(iter.key());
-        else if (*iter == MusicFileScanner::kNeedUpdate)
+        for (iter = art_files.begin(); iter != art_files.end(); iter++)
         {
-            UpdateFileInDB(iter.key());
-            ++m_coverartUpdated;
+            if (*iter == MusicFileScanner::kFileSystem)
+                AddFileToDB(iter.key());
+            else if (*iter == MusicFileScanner::kDatabase)
+                RemoveFileFromDB(iter.key());
+            else if (*iter == MusicFileScanner::kNeedUpdate)
+            {
+                UpdateFileInDB(iter.key());
+                ++m_coverartUpdated;
+            }
         }
     }
 
