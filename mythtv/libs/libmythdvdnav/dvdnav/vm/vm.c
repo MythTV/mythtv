@@ -62,7 +62,7 @@
 #include "mythiowrapper.h"
 
 /*
-#define STRICT
+#define DVDNAV_STRICT
 */
 
 /* Local prototypes */
@@ -266,7 +266,7 @@ static int ifoOpenNewVTSI(vm_t *vm, dvd_reader_t *dvd, int vtsN) {
 /* Initialisation & Destruction */
 
 vm_t* vm_new_vm() {
-  return (vm_t*)calloc(sizeof(vm_t), sizeof(char));
+  return (vm_t*)calloc(1, sizeof(vm_t));
 }
 
 void vm_free_vm(vm_t *vm) {
@@ -1154,7 +1154,7 @@ static link_t play_Cell(vm_t *vm) {
     case 1: /*  Angle block */
       /* Loop and check each cell instead? So we don't get outside the block? */
       (vm->state).cellN += (vm->state).AGL_REG - 1;
-#ifdef STRICT
+#ifdef DVDNAV_STRICT
       assert((vm->state).cellN <= (vm->state).pgc->nr_of_cells);
       assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_mode != 0);
       assert((vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_type == 1);
