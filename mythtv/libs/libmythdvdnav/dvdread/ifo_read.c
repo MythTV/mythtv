@@ -568,6 +568,8 @@ static int ifoRead_VMG(ifo_handle_t *ifofile) {
 
   CHECK_ZERO(vmgi_mat->zero_1);
   CHECK_ZERO(vmgi_mat->zero_2);
+  /* DVDs created by VDR-to-DVD device LG RC590M violate the following check with
+   * vmgi_mat->zero_3 = 0x00000000010000000000000000000000000000. */
   CHECK_ZERO(vmgi_mat->zero_3);
   CHECK_ZERO(vmgi_mat->zero_4);
   CHECK_ZERO(vmgi_mat->zero_5);
@@ -1184,8 +1186,22 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
     fprintf(stderr, "libdvdread: PTT search table too small.\n");
     goto fail;
   }
+
+  if(vts_ptt_srpt->nr_of_srpts == 0) {
+    fprintf(stderr, "libdvdread: Zero entries in PTT search table.\n");
+    goto fail;
+  }
+
   for(i = 0; i < vts_ptt_srpt->nr_of_srpts; i++) {
-    B2N_32(data[i]);
+    /* Transformers 3 has PTT start bytes that point outside the SRPT PTT */
+    uint32_t start = data[i];
+    B2N_32(start);
+    if(start + sizeof(ptt_info_t) > vts_ptt_srpt->last_byte + 1) {
+      /* don't mess with any bytes beyond the end of the allocation */
+      vts_ptt_srpt->nr_of_srpts = i;
+      break;
+    }
+    data[i] = start;
     /* assert(data[i] + sizeof(ptt_info_t) <= vts_ptt_srpt->last_byte + 1);
        Magic Knight Rayearth Daybreak is mastered very strange and has
        Titles with 0 PTTs. They all have a data[i] offsets beyond the end of
@@ -1211,6 +1227,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
        Titles with 0 PTTs. */
     if(n < 0) n = 0;
 
+    /* DVDs created by the VDR-to-DVD device LG RC590M violate the following requirement */
     CHECK_VALUE(n % 4 == 0);
 
     vts_ptt_srpt->title[i].nr_of_ptts = n / 4;
@@ -1293,7 +1310,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
   if(!ifofile->vmgi_mat)
     return 0;
 
-  if(ifofile->vmgi_mat->ptl_mait == NULL)
+  if(ifofile->vmgi_mat->ptl_mait == 0)
     return 1;
 
   if(!DVDFileSeek_(ifofile->file, ifofile->vmgi_mat->ptl_mait * DVD_BLOCK_LEN))
@@ -1374,6 +1391,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *ifofile) {
       ifofile->ptl_mait = NULL;
       return 0;
     }
+    memset(pf_temp, 0, info_length);
     if(!(DVDReadBytes(ifofile->file, pf_temp, info_length))) {
       fprintf(stderr, "libdvdread: Unable to read PTL_MAIT table at index %d.\n",i);
       free(pf_temp);
@@ -1436,6 +1454,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *ifofile) {
 
   if(ifofile->vtsi_mat->vts_tmapt == 0) { /* optional(?) */
     ifofile->vts_tmapt = NULL;
+    fprintf(stderr,"libdvdread: No VTS_TMAPT available - skipping.\n");
     return 1;
   }
 
