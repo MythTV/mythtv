@@ -43,21 +43,18 @@
 
 static void vm_serialize_int(int *stored, char **buf, size_t *remaining, int value)
 {
-  if(stored && buf && remaining && *stored > 0)
-  {
+  if (stored && buf && remaining && *stored > 0) {
     *stored = snprintf(*buf, *remaining, "%d,", value);
-    if(*stored > 0)
-    {
+    if (*stored > 0) {
       *remaining -= (size_t)(*stored);
       *buf += (*stored);
     }
   }
 }
 
-static void vm_deserialize_int(int *consumed, char **buf, int* value)
+static void vm_deserialize_int(int *consumed, const char **buf, int* value)
 {
-  if(consumed && buf && *consumed > 0)
-  {
+  if (consumed && buf && *consumed > 0) {
     sscanf( *buf, "%d,%n", value, consumed);
 
     if(*consumed > 0)
@@ -70,44 +67,37 @@ char *vm_serialize_dvd_state(const dvd_state_t *state)
   char   *str_state = 0;
   char   *buf;
   int    stored;
-  int    tmp;
   int    idx;
   size_t remaining = BUFFER_SIZE;
 
-  if(state)
-  {
+  if (state) {
     str_state = malloc(BUFFER_SIZE);
     buf = str_state;
 
     stored = snprintf(buf, remaining, "navstat,%d,", FORMAT_VERSION);
 
-    if(stored > 0)
-    {
+    if (stored > 0) {
       remaining -= (size_t)stored;
       buf += stored;
     }
 
-    // SPRM
-    for(idx = 0; idx < 24 && stored > 0; idx++)
-    {
+    /* SPRM */
+    for (idx = 0; idx < 24 && stored > 0; idx++) {
       stored = snprintf(buf, remaining, "0x%hx,", state->registers.SPRM[idx]);
-      if(stored > 0)
-      {
+      if (stored > 0) {
         remaining -= (size_t)stored;
         buf += stored;
       }
     }
 
-    // GPRM
-    for(idx = 0; idx < 16 && stored > 0; idx++)
-    {
+    /* GPRM */
+    for (idx = 0; idx < 16 && stored > 0; idx++) {
       stored = snprintf(buf, remaining,
                         "[0x%hx;%d;0x%x;0x%x],", state->registers.GPRM[idx],
                                                  state->registers.GPRM_mode[idx],
-                                                 state->registers.GPRM_time[idx].tv_sec,
-                                                 state->registers.GPRM_time[idx].tv_usec);
-      if(stored > 0)
-      {
+                                                 (unsigned int)state->registers.GPRM_time[idx].tv_sec,
+                                                 (unsigned int)state->registers.GPRM_time[idx].tv_usec);
+      if (stored > 0) {
         remaining -= (size_t)stored;
         buf += stored;
       }
@@ -125,25 +115,20 @@ char *vm_serialize_dvd_state(const dvd_state_t *state)
     vm_serialize_int(&stored, &buf, &remaining, state->rsm_pgcN);
     vm_serialize_int(&stored, &buf, &remaining, state->rsm_cellN);
 
-    // Resume SPRM
-    for(idx = 0; idx < 5 && stored > 0; idx++)
-    {
+    /* Resume SPRM */
+    for (idx = 0; idx < 5 && stored > 0; idx++) {
       stored = snprintf(buf, remaining, "0x%hx,", state->rsm_regs[idx]);
-      if(stored > 0)
-      {
+      if (stored > 0) {
         remaining -= (size_t)stored;
         buf += stored;
       }
     }
 
-    if(stored > 0 && remaining >= 4)
-    {
-      // Done.  Terminating the string.
+    if (stored > 0 && remaining >= 4) {
+      /* Done.  Terminating the string. */
       strcpy(buf, "end");
-    }
-    else
-    {
-      // Error
+    } else {
+      /* Error */
       free(str_state);
       str_state = 0;
     }
@@ -153,7 +138,7 @@ char *vm_serialize_dvd_state(const dvd_state_t *state)
 
 int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
 {
-  char        *buf = serialized;
+  const char *buf = serialized;
   int         consumed;
   int         version;
   int         tmp;
@@ -162,21 +147,18 @@ int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
   dvd_state_t new_state;
 
   sscanf( buf, "navstat,%d,%n", &version, &consumed);
-  if(version == 1)
-  {
+  if(version == 1) {
     buf += consumed;
 
-    // SPRM
-    for(idx = 0; idx < 24 && consumed > 0; idx++)
-    {
+    /* SPRM */
+    for (idx = 0; idx < 24 && consumed > 0; idx++) {
       sscanf(buf, "0x%hx,%n", &new_state.registers.SPRM[idx], &consumed);
       buf += consumed;
     }
 
-    // GPRM
-    for(idx = 0; idx < 16 && consumed > 0; idx++)
-    {
-      sscanf(buf, "[0x%hx;%d;0x%x;0x%x],%n", &new_state.registers.GPRM[idx],
+    /* GPRM */
+    for (idx = 0; idx < 16 && consumed > 0; idx++) {
+      sscanf(buf, "[0x%hx;%hhu;0x%lx;0x%lx],%n", &new_state.registers.GPRM[idx],
                                              &new_state.registers.GPRM_mode[idx],
                                              &new_state.registers.GPRM_time[idx].tv_sec,
                                              &new_state.registers.GPRM_time[idx].tv_usec,
@@ -184,7 +166,8 @@ int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
       buf += consumed;
     }
 
-    vm_deserialize_int(&consumed, &buf, &new_state.domain);
+    vm_deserialize_int(&consumed, &buf, &tmp);
+    new_state.domain = tmp;
     vm_deserialize_int(&consumed, &buf, &new_state.vtsN);
     vm_deserialize_int(&consumed, &buf, &new_state.pgcN);
     vm_deserialize_int(&consumed, &buf, &new_state.pgN);
@@ -197,15 +180,13 @@ int vm_deserialize_dvd_state(const char* serialized, dvd_state_t *state)
     vm_deserialize_int(&consumed, &buf, &new_state.rsm_pgcN);
     vm_deserialize_int(&consumed, &buf, &new_state.rsm_cellN);
 
-    // Resume SPRM
-    for(idx = 0; idx < 5 && consumed > 0; idx++)
-    {
+    /* Resume SPRM */
+    for(idx = 0; idx < 5 && consumed > 0; idx++) {
       sscanf(buf, "0x%hx,%n", &new_state.rsm_regs[idx], &consumed);
       buf += consumed;
     }
 
-    if(strcmp(buf,"end") == 0)
-    {
+    if(strcmp(buf,"end") == 0) {
       /* Success! */
       *state = new_state;
       state->pgc = NULL;

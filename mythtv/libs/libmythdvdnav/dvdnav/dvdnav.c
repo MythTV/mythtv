@@ -1243,8 +1243,7 @@ char* dvdnav_get_state(dvdnav_t *this)
 
 dvdnav_status_t dvdnav_set_state(dvdnav_t *this, const char *state_str)
 {
-  if(!this || !this->vm)
-  {
+  if (!this || !this->vm) {
     printerr("Passed a NULL pointer.");
     return DVDNAV_STATUS_ERR;
   }
@@ -1268,12 +1267,10 @@ dvdnav_status_t dvdnav_set_state(dvdnav_t *this, const char *state_str)
   this->sync_wait_skip = 0;
   this->spu_clut_changed = 0;
 
-
-  /* set the state. this will also start the vm on that state */
-  /* means the next read block should be comming from that new */
+  /* set the state. This will also start the vm in that state */
+  /* which means the next read block should come from that new */
   /* state */
-  if( !vm_set_state(this->vm, state_str) )
-  {
+  if (!vm_set_state(this->vm, state_str)) {
     printerr("Failed to set vm state.");
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_ERR;
