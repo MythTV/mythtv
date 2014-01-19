@@ -7,7 +7,7 @@ CONFIG -= qt
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
-INCLUDEPATH += ./dvdnav
+INCLUDEPATH += ./dvdnav ./dvdread
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../libmythtv
 

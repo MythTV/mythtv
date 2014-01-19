@@ -258,6 +258,7 @@ INSTALLS += inc
 DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ../libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
 INCLUDEPATH += ../libmythdvdnav/dvdnav
+INCLUDEPATH += ../libmythdvdnav/dvdread
 
 !win32-msvc*:POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
