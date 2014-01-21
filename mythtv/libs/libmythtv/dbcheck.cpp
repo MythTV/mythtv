@@ -2111,7 +2111,11 @@ NULL
             "SET record.startdate = DATE(recordupdate.starttime), "
             "    record.starttime = TIME(recordupdate.starttime), "
             "    record.enddate = DATE(recordupdate.endtime), "
-            "    record.endtime = TIME(recordupdate.endtime) "
+            "    record.endtime = TIME(recordupdate.endtime), "
+            "    record.last_record = "
+            "        CONVERT_TZ(last_record, 'SYSTEM', 'Etc/UTC'), "
+            "    record.last_delete = "
+            "        CONVERT_TZ(last_delete, 'SYSTEM', 'Etc/UTC') "
             "WHERE recordid = recid",
             "DROP TABLE recordupdate",
         };
