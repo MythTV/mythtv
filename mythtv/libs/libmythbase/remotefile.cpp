@@ -914,6 +914,71 @@ QDateTime RemoteFile::LastModified(const QString &url)
     return result;
 }
 
+/** \fn RemoteFile::FindFile(const QString& filename, const QString& host, const QString& storageGroup)
+ *  \brief Search all BE's for a file in the give storage group
+ *  \param filename the partial path and filename to look for
+ *  \param host search this host first if given or default to the master BE if empty
+ *  \param storageGroup the name of the storage group to search
+ *  \return a myth URL pointing to the file or empty string if not found
+ */
+QString RemoteFile::FindFile(const QString& filename, const QString& host, const QString& storageGroup)
+{
+    LOG(VB_FILE, LOG_INFO, QString("RemoteFile::FindFile(): looking for '%1' on '%2' in group '%3'")
+                                   .arg(filename).arg(host).arg(storageGroup));
+
+    if (filename.isEmpty() || storageGroup.isEmpty())
+        return QString();
+
+    QStringList strList;
+    QString hostName = host;
+
+    if (hostName.isEmpty())
+        hostName = gCoreContext->GetMasterHostName();
+
+    // first check the given host
+    strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename;
+    if (gCoreContext->SendReceiveStringList(strList))
+    {
+        if (strList.size() > 0 && strList[0] != "EMPTY LIST")
+            return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
+    }
+
+    // not found so search all hosts that has a directory defined for the give storage group
+
+    // get a list of hosts
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString sql = "SELECT DISTINCT hostname "
+                  "FROM storagegroup "
+                  "WHERE groupname = :GROUP "
+                  "AND hostname != :HOSTNAME";
+    query.prepare(sql);
+    query.bindValue(":GROUP", storageGroup);
+    query.bindValue(":HOSTNAME", hostName);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("RemoteFile::FindFile() get host list", query);
+        return QString();
+    }
+
+    while(query.next())
+    {
+        hostName = query.value(0).toString();
+
+        strList.clear();
+        strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename;
+
+        if (gCoreContext->SendReceiveStringList(strList))
+        {
+            if (strList.size() > 0 && strList[0] != "EMPTY LIST")
+                return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
+        }
+    }
+
+    return QString();
+}
+
 /** \fn RemoteFile::SetBlocking(void)
  *  \brief Set write blocking mode for the ThreadedFileWriter instance
  *  \return old mode value
