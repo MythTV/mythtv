@@ -43,7 +43,7 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 /*!
 * \copydoc MetaIO::write()
 */
-bool MetaIOWavPack::write(const MusicMetadata* mdata)
+bool MetaIOWavPack::write(MusicMetadata* mdata)
 {
     if (!mdata)
         return false;

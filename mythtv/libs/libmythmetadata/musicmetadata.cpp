@@ -29,14 +29,14 @@
 
 static QString thePrefix = "the ";
 
-bool operator==(const MusicMetadata& a, const MusicMetadata& b)
+bool operator==(MusicMetadata& a, MusicMetadata& b)
 {
     if (a.Filename() == b.Filename())
         return true;
     return false;
 }
 
-bool operator!=(const MusicMetadata& a, const MusicMetadata& b)
+bool operator!=(MusicMetadata& a, MusicMetadata& b)
 {
     if (a.Filename() != b.Filename())
         return true;
@@ -695,35 +695,50 @@ QString MusicMetadata::FormatTitle()
     return m_formattedtitle;
 }
 
-QString MusicMetadata::Filename(bool find) const
+QString MusicMetadata::Filename(bool find)
 {
     // if not asked to find the file just return the raw filename from the DB
     if (find == false)
         return m_filename;
 
+    if (!m_actualFilename.isEmpty())
+        return m_actualFilename;
+
     // check for a cd track
     if (m_filename.endsWith(".cda"))
+    {
+        m_actualFilename = m_filename;
         return m_filename;
+    }
 
     // check for http urls etc
     if (m_filename.contains("://"))
+    {
+        m_actualFilename = m_filename;
         return m_filename;
+    }
 
     // first check to see if the filename is complete
     if (QFile::exists(m_filename))
+    {
+        m_actualFilename = m_filename;
         return m_filename;
+    }
 
     // next try appending the start directory
     if (QFile::exists(getMusicDirectory() + m_filename))
-        return getMusicDirectory() + m_filename;
+    {
+        m_actualFilename = getMusicDirectory() + m_filename;
+        return m_actualFilename;
+    }
 
     // maybe it's in our 'Music' storage group
-    //FIXME: this is just looking on the master BE
-    QString filename = gCoreContext->GenMythURL(gCoreContext->GetSetting("MasterServerIP"),
-                                                gCoreContext->GetNumSetting("MasterServerPort"),
-                                                m_filename, "Music");
-    if (RemoteFile::Exists(filename))
+    QString filename = RemoteFile::FindFile(m_filename, "", "Music");
+    if (!filename.isEmpty())
+    {
+        m_actualFilename = filename;
         return filename;
+    }
 
     // not found
     LOG(VB_GENERAL, LOG_ERR, QString("MusicMetadata: Asked to get the filename for a track but no file found: %1")

@@ -156,7 +156,7 @@ TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOID3::write(const MusicMetadata* mdata)
+bool MetaIOID3::write(MusicMetadata* mdata)
 {
     if (!OpenFile(mdata->Filename(), true))
         return false;
@@ -842,7 +842,7 @@ bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)
     return true;
 }
 
-bool MetaIOID3::writeVolatileMetadata(const MusicMetadata* mdata)
+bool MetaIOID3::writeVolatileMetadata(MusicMetadata* mdata)
 {
     QString filename = mdata->Filename();
     int rating = mdata->Rating();

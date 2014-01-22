@@ -24,7 +24,7 @@ class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
     MetaIOOggVorbis(void);
     ~MetaIOOggVorbis(void);
 
-    bool write(const MusicMetadata* mdata);
+    bool write(MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);
 
   private:

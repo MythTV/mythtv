@@ -27,7 +27,7 @@ MetaIOMP4::~MetaIOMP4(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOMP4::write(const MusicMetadata* mdata)
+bool MetaIOMP4::write(MusicMetadata* mdata)
 {
     if (!mdata)
         return false;

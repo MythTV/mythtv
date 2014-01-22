@@ -26,7 +26,7 @@ class META_PUBLIC MetaIO
     * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool write(const MusicMetadata* mdata) = 0;
+    virtual bool write(MusicMetadata* mdata) = 0;
 
     /*!
     * \brief Writes rating and playcount back to a file
@@ -34,7 +34,7 @@ class META_PUBLIC MetaIO
     * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool writeVolatileMetadata(const MusicMetadata* mdata)
+    virtual bool writeVolatileMetadata(MusicMetadata* mdata)
     {
         (void)mdata;
         return false;

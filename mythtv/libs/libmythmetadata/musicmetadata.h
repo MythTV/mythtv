@@ -195,7 +195,7 @@ class META_PUBLIC MusicMetadata
     bool isDBTrack(void) const { return ID_TO_REPO(m_id) == RT_Database; }
     bool isRadio(void) const { return ID_TO_REPO(m_id) == RT_Radio; }
 
-    QString Filename(bool find = true) const;
+    QString Filename(bool find = true);
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
     uint64_t FileSize() const;
@@ -304,7 +304,8 @@ class META_PUBLIC MusicMetadata
     AlbumArtImages *m_albumArt;
 
     IdType   m_id;
-    QString  m_filename;
+    QString  m_filename;       // file name as stored in the DB
+    QString  m_actualFilename; // actual URL of the file if found
     uint64_t m_fileSize;
     bool     m_changed;
 
@@ -326,8 +327,8 @@ class META_PUBLIC MusicMetadata
     static QString m_formatcompilationcdtrack;
 };
 
-bool operator==(const MusicMetadata& a, const MusicMetadata& b);
-bool operator!=(const MusicMetadata& a, const MusicMetadata& b);
+bool operator==(MusicMetadata& a, MusicMetadata& b);
+bool operator!=(MusicMetadata& a, MusicMetadata& b);
 
 Q_DECLARE_METATYPE(MusicMetadata *)
 

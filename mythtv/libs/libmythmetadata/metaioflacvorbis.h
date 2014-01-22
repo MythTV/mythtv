@@ -24,7 +24,7 @@ public:
     MetaIOFLACVorbis(void);
     virtual ~MetaIOFLACVorbis(void);
 
-    bool write(const MusicMetadata* mdata);
+    bool write(MusicMetadata* mdata);
     bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
     bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
 

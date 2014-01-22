@@ -23,7 +23,7 @@ class META_PUBLIC MetaIOTagLib : public MetaIO
     MetaIOTagLib(void);
     virtual ~MetaIOTagLib(void);
 
-    virtual bool write(const MusicMetadata* mdata) = 0;
+    virtual bool write(MusicMetadata* mdata) = 0;
     virtual MusicMetadata* read(const QString &filename) = 0;
 
   protected:
