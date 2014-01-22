@@ -502,7 +502,7 @@ void MusicMetadata::dumpToDatabase()
                    " :ARTIST,   :ALBUM,      :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM,   :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,     :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE         :HOSTNAME );";
+                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE,        :HOSTNAME );";
     }
     else
     {
