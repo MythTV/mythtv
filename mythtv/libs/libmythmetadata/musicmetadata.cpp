@@ -761,7 +761,10 @@ QString MusicMetadata::Filename(bool find)
 
         QUrl url(mythUrl);
         if (url.host() != m_hostname)
+        {
+            m_hostname = url.host();
             saveHostname();
+        }
 
         return mythUrl;
     }
