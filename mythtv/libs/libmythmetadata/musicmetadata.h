@@ -198,6 +198,9 @@ class META_PUBLIC MusicMetadata
     QString Filename(bool find = true);
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
 
+    QString Hostname(void) { return m_hostname; }
+    void setHostname(const QString &host) { m_hostname = host; }
+
     uint64_t FileSize() const;
     void setFileSize(uint64_t lfilesize) { m_fileSize = lfilesize; }
 
@@ -275,6 +278,7 @@ class META_PUBLIC MusicMetadata
     void setCompilationFormatting(bool cd = false);
     QString formatReplaceSymbols(const QString &format);
     void checkEmptyFields(void);
+    void saveHostname(void);
 
     QString m_artist;
     QString m_compilation_artist;
@@ -305,6 +309,7 @@ class META_PUBLIC MusicMetadata
 
     IdType   m_id;
     QString  m_filename;       // file name as stored in the DB
+    QString  m_hostname;       // host where file is located as stored in the DB
     QString  m_actualFilename; // actual URL of the file if found
     uint64_t m_fileSize;
     bool     m_changed;

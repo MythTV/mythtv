@@ -12,7 +12,7 @@ using namespace std;
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1020";
+const QString currentDatabaseVersion = "1021";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -875,6 +875,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1020", dbver))
+            return false;
+    }
+
+    if (dbver == "1020")
+    {
+        const QString updates[] = {
+"ALTER TABLE music_songs ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
+QString("UPDATE music_songs SET hostname = '%1';").arg(gCoreContext->GetMasterHostName()),
+""
+};
+
+        if (!performActualUpdate(updates, "1021", dbver))
             return false;
     }
 

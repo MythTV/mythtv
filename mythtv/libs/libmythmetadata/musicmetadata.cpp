@@ -44,7 +44,7 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b)
 }
 
 // this ctor is for radio streams
-MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QString lurl, 
+MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QString lurl,
                    QString llogourl, QString lgenre, QString lmetaformat, QString lformat)
          :  m_artist(""),
             m_compilation_artist(""),
@@ -73,6 +73,7 @@ MusicMetadata::MusicMetadata(int lid, QString lstation, QString lchannel, QStrin
             m_albumArt(NULL),
             m_id(lid),
             m_filename(lurl),
+            m_hostname(""),
             m_fileSize(0),
             m_changed(false),
             m_station(lstation),
@@ -115,6 +116,7 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_compilation = rhs.m_compilation;
     m_id = rhs.m_id;
     m_filename = rhs.m_filename;
+    m_hostname = rhs.m_hostname;
     m_directoryid = rhs.m_directoryid;
     m_artistid = rhs.m_artistid;
     m_compartistid = rhs.m_compartistid;
@@ -187,6 +189,21 @@ void MusicMetadata::persist()
     m_changed = false;
 }
 
+void MusicMetadata::saveHostname(void)
+{
+    if (m_id < 1)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE music_songs SET hostname = :HOSTNAME "
+                  "WHERE song_id = :ID ;");
+    query.bindValue(":HOSTNAME", m_hostname);
+    query.bindValue(":ID", m_id);
+
+    if (!query.exec())
+        MythDB::DBError("music save hostname", query);
+}
+
 // static
 MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
 {
@@ -239,7 +256,8 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
     "music_songs.song_id, music_songs.rating, music_songs.numplays, "
     "music_songs.lastplay, music_albums.compilation, music_songs.format, "
     "music_songs.track_count, music_songs.size, music_songs.date_entered, "
-    "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename "
+    "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
+    "music_songs.hostname "
     "FROM music_songs "
     "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
     "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -270,6 +288,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_fileSize = (quint64)query.value(15).toULongLong();
         mdata->m_dateadded = query.value(16).toDateTime();
         mdata->m_filename = query.value(17).toString();
+        mdata->m_hostname = query.value(18).toString();
 
         return mdata;
     }
@@ -477,13 +496,13 @@ void MusicMetadata::dumpToDatabase()
                    " artist_id, album_id,    name,         genre_id,"
                    " year,      track,       length,       filename,"
                    " rating,    format,      date_entered, date_modified,"
-                   " numplays,  track_count, size) "
+                   " numplays,  track_count, size,         hostname) "
                    "VALUES ( "
                    " :DIRECTORY, "
                    " :ARTIST,   :ALBUM,      :TITLE,       :GENRE,"
                    " :YEAR,     :TRACKNUM,   :LENGTH,      :FILENAME,"
                    " :RATING,   :FORMAT,     :DATE_ADD,    :DATE_MOD,"
-                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE );";
+                   " :PLAYCOUNT,:TRACKCOUNT, :SIZE         :HOSTNAME );";
     }
     else
     {
@@ -503,6 +522,7 @@ void MusicMetadata::dumpToDatabase()
                    ", numplays = :PLAYCOUNT "
                    ", track_count = :TRACKCOUNT "
                    ", size = :SIZE "
+                   ", hostname = :HOSTNAME "
                    "WHERE song_id= :ID ;";
     }
 
@@ -529,6 +549,7 @@ void MusicMetadata::dumpToDatabase()
 
     query.bindValue(":TRACKCOUNT", m_trackCount);
     query.bindValue(":SIZE", (quint64)m_fileSize);
+    query.bindValue(":HOSTNAME", m_hostname);
 
     if (!query.exec())
         MythDB::DBError("MusicMetadata::dumpToDatabase - updating music_songs",
@@ -733,11 +754,16 @@ QString MusicMetadata::Filename(bool find)
     }
 
     // maybe it's in our 'Music' storage group
-    QString filename = RemoteFile::FindFile(m_filename, "", "Music");
-    if (!filename.isEmpty())
+    QString mythUrl = RemoteFile::FindFile(m_filename, m_hostname, "Music");
+    if (!mythUrl.isEmpty())
     {
-        m_actualFilename = filename;
-        return filename;
+        m_actualFilename = mythUrl;
+
+        QUrl url(mythUrl);
+        if (url.host() != m_hostname)
+            saveHostname();
+
+        return mythUrl;
     }
 
     // not found
@@ -1196,7 +1222,7 @@ void AllMusic::resync()
                      "CONCAT_WS('/', music_directories.path, music_songs.filename) AS filename, "
                      "music_songs.rating, music_songs.numplays, music_songs.lastplay, music_songs.date_entered, "
                      "music_albums.compilation, music_songs.format, music_songs.track_count, "
-                     "music_songs.size "
+                     "music_songs.size, music_songs.hostname "
                      "FROM music_songs "
                      "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
                      "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
@@ -1246,6 +1272,7 @@ void AllMusic::resync()
             dbMeta->setAlbumId(query.value(4).toInt());
             dbMeta->setTrackCount(query.value(19).toInt());
             dbMeta->setFileSize((quint64)query.value(20).toULongLong());
+            dbMeta->setHostname(query.value(21).toString());
 
             if (!music_map.contains(id))
             {
