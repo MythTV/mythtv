@@ -939,7 +939,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
     strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename;
     if (gCoreContext->SendReceiveStringList(strList))
     {
-        if (strList.size() > 0 && strList[0] != "EMPTY LIST")
+        if (strList.size() > 0 && strList[0] != "EMPTY LIST" && !strList[0].startsWith("SLAVE UNREACHABLE"))
             return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
     }
 
@@ -971,7 +971,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
 
         if (gCoreContext->SendReceiveStringList(strList))
         {
-            if (strList.size() > 0 && strList[0] != "EMPTY LIST")
+            if (strList.size() > 0 && strList[0] != "EMPTY LIST" && !strList[0].startsWith("SLAVE UNREACHABLE"))
                 return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
         }
     }
