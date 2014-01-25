@@ -5386,7 +5386,7 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 
 enabled exiv2 && $(pkg-config --exists exiv2) ||
     die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
-    
+
 # Qt dependency checks
 if test $target_os = mingw32 ; then
     qt_inc="-I`cd $(${qmake} -query QT_INSTALL_HEADERS); pwd`"
@@ -6499,6 +6499,9 @@ if ! disabled hdhomerun ; then
 fi
 echo "Configuring libmythbluray..."
 (cd external/libmythbluray ; \
+       ${qmakeconf} -o Makefile)
+echo "Configuring libmythdvdnav..."
+(cd external/libmythdvdnav ; \
        ${qmakeconf} -o Makefile)
 echo "Configuring libsamplerate..."
 (cd external/libsamplerate ; \

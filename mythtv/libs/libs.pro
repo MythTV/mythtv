@@ -3,7 +3,7 @@ include (../settings.pro)
 TEMPLATE = subdirs
 
 # Libraries without dependencies
-SUBDIRS += libmythsoundtouch libmythdvdnav
+SUBDIRS += libmythsoundtouch
 SUBDIRS += libmythfreesurround libmythbase
 SUBDIRS += libmythservicecontracts
 

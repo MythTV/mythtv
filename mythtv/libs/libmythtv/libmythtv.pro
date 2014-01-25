@@ -25,7 +25,6 @@ contains(INCLUDEPATH, /usr/local/include) {
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
-DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ./mpeg ./channelscan ./visualisations
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
@@ -255,12 +254,12 @@ inc.files += mythtvexp.h            metadataimagehelper.h
 INSTALLS += inc
 
 #DVD stuff
-DEPENDPATH  += ../libmythdvdnav/
-DEPENDPATH  += ../libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
-INCLUDEPATH += ../libmythdvdnav/dvdnav
-INCLUDEPATH += ../libmythdvdnav/dvdread
+DEPENDPATH  += ../../external/libmythdvdnav/
+DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
+INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
+INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 
-!win32-msvc*:POST_TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+!win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 
 HEADERS += DVD/dvdringbuffer.h
 SOURCES += DVD/dvdringbuffer.cpp
@@ -270,7 +269,7 @@ using_frontend {
     HEADERS += DVD/avformatdecoderdvd.h
     SOURCES += DVD/avformatdecoderdvd.cpp
 }
-LIBS += -L../libmythdvdnav
+LIBS += -L../../external/libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff

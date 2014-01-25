@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg qjson libmythbluray libsamplerate
+SUBDIRS = FFmpeg qjson libmythbluray libmythdvdnav libsamplerate
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
@@ -24,7 +24,7 @@ distclean:	${SUBDIRS_DISTCLEAN}
 
 
 FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
-	${MAKE} -C FFmpeg ${@:FFmpeg-%=%} 
+	${MAKE} -C FFmpeg ${@:FFmpeg-%=%}
 
 zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all
@@ -40,7 +40,7 @@ nzmqt-all:	zeromq-all
 	${MAKE} -C nzmqt/src all
 
 nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
-	${MAKE} -C nzmqt/src ${@:nzmqt-%=%} 
+	${MAKE} -C nzmqt/src ${@:nzmqt-%=%}
 
 qjson-all:
 	(cd qjson ; ${QMAKE} -o Makefile)
@@ -49,7 +49,7 @@ qjson-all:
 	${MAKE} -C qjson all
 
 qjson-install qjson-uninstall qjson-clean qjson-distclean:
-	${MAKE} -C qjson ${@:qjson-%=%} 
+	${MAKE} -C qjson ${@:qjson-%=%}
 
 libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
 	${MAKE} -C libhdhomerun -f Makefile.lib ${@:libhdhomerun-%=%}
@@ -57,6 +57,9 @@ libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install 
 
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}
+
+libmythdvdnav-all libmythdvdnav-clean libmythdvdnav-distclean libmythdvdnav-install libmythdvdnav-uninstall:
+	${MAKE} -C libmythdvdnav ${@:libmythdvdnav-%=%}
 
 libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-install libsamplerate-uninstall:
 	${MAKE} -C libsamplerate ${@:libsamplerate-%=%}

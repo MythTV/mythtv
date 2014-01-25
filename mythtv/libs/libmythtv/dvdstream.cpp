@@ -11,7 +11,7 @@
 #include "dvdread/dvd_reader.h"
 #include "dvdread/dvd_udf.h"    // for UDFFindFile
 extern "C" {
-#include "dvdread/dvd_input.h"  // for DVDINPUT_READ_DECRYPT & DVDCSS_SEEK_KEY
+#include "dvd_input.h"          // for DVDINPUT_READ_DECRYPT & DVDCSS_SEEK_KEY
 }
 
 #include "mythlogging.h"
