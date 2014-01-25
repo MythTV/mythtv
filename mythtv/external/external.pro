@@ -8,6 +8,7 @@ win32-msvc* {
 
 SUBDIRS += libhdhomerun
 SUBDIRS += libmythbluray
+SUBDIRS += libmythdvdnav
 SUBDIRS += libsamplerate
 SUBDIRS += qjson/src
 SUBDIRS += nzmqt/src/nzmqt.pro

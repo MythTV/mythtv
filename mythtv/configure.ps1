@@ -44,7 +44,7 @@ Function Invoke-Environment( [string] $Command )
         }
     }}
 
-    if ($LASTEXITCODE) 
+    if ($LASTEXITCODE)
     {
         throw "Command '$Command': exit code: $LASTEXITCODE"
     }
@@ -847,13 +847,13 @@ if ($OutputType -eq "nmake")
 
         if ($Force)
         {
-            # we actually want to perform a 'nmake distclean' to force all 
+            # we actually want to perform a 'nmake distclean' to force all
             # projects to be re-compiled.  This is used by the BuildBot
 
             Write-Host "Force requested: nmake distclean" -foregroundcolor cyan
 
             & nmake distclean
-    
+
             # the above deletes the makefile, so need to re-create it again.
 
             RunQMake
@@ -912,6 +912,7 @@ else
         Get-ChildItem external\FFmpeg\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libhdhomerun\*.vcxproj*  -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libmythbluray\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
+        Get-ChildItem external\libmythdvdnav\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libsamplerate\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\nzmqt\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\qjson\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
