@@ -498,7 +498,10 @@ class _Mythtv_data:
                 pass
         
         self._data.theme          = _SETTINGS.Theme
-        self._data.country          = _SETTINGS.Country
+        if _DB.settings.NULL.country is not None:
+            self._data.country          = _DB.settings.NULL.country
+        else:
+            self._data.country          = _SETTINGS.Country
         self._data.channel_count  = len([c for c in MythTV.Channel.getAllEntries() if c.visible])
         if _DB.settings.NULL.Language is not None:
             self._data.language       = _DB.settings.NULL.Language.lower()
