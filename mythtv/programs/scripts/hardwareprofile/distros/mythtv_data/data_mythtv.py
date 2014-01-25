@@ -498,7 +498,13 @@ class _Mythtv_data:
         self._data.theme          = _SETTINGS.Theme
         self._data.country          = _SETTINGS.Country
         self._data.channel_count  = len([c for c in MythTV.Channel.getAllEntries() if c.visible])
-        self._data.language       = _SETTINGS.Language.lower()
+        if _DB.settings.NULL.Language is not None:
+            self._data.language       = _DB.settings.NULL.Language.lower()
+        elif _SETTINGS.Language is not None:
+            self._data.language       = _SETTINGS.Language.lower()
+        else:
+            # something is wrong when you have no language set at all
+            self._data.language       = 'not set'
         self._data.mythtype, self._data.remote = self.ProcessSmoltInfo()
 
         if _DB.settings.NULL.SystemUUID is None:
