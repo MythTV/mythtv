@@ -78,7 +78,6 @@ MusicPlayer::MusicPlayer(QObject *parent)
     m_playSpeed = 1.0;
 
     m_showScannerNotifications = true;
-    m_notificationID = GetNotificationCenter()->Register(this);
 
     m_errorCount = 0;
 
@@ -118,8 +117,11 @@ MusicPlayer::~MusicPlayer()
     gCoreContext->removeListener(this);
     gCoreContext->UnregisterForPlayback(this);
 
-    if (m_notificationID > 0)
-        GetNotificationCenter()->UnRegister(this, m_notificationID);
+    QMap<QString, int>::Iterator i;
+    for (i = m_notificationMap.begin(); i != m_notificationMap.end(); i++)
+        GetNotificationCenter()->UnRegister(this, (*i));
+
+    m_notificationMap.clear();
 
     stop(true);
 
@@ -727,9 +729,11 @@ void MusicPlayer::customEvent(QEvent *event)
             if (list.size() == 2)
             {
                 QString host = list[1];
-                sendNotification(tr("A music file scan has started on %1").arg(host),
+                int id = getNotificationID(host);
+                sendNotification(id,
+                                 tr("A music file scan has started on %1").arg(host),
                                  tr("Music File Scanner"),
-                                 "This may take a while I'll give a shout when finished");
+                                 tr("This may take a while I'll give a shout when finished"));
             }
         }
         else if (me->Message().startsWith("MUSIC_SCANNER_FINISHED"))
@@ -738,6 +742,7 @@ void MusicPlayer::customEvent(QEvent *event)
             if (list.size() == 6)
             {
                 QString host = list[1];
+                int id = getNotificationID(host);
                 int totalTracks = list[2].toInt();
                 int newTracks = list[3].toInt();
                 int totalCoverart = list[4].toInt();
@@ -745,7 +750,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                 QString summary = QString("Total Tracks: %2, new tracks: %3,\nTotal Coverart: %4, New CoverArt %5")
                                           .arg(totalTracks).arg(newTracks).arg(totalCoverart).arg(newCoverart);
-                sendNotification(tr("A music file scan has finished on %1").arg(host),
+                sendNotification(id,
+                                 tr("A music file scan has finished on %1").arg(host),
                                  tr("Music File Scanner"), summary);
 
                 gMusicData->reloadMusic();
@@ -758,13 +764,14 @@ void MusicPlayer::customEvent(QEvent *event)
             {
                 QString host = list[1];
                 QString error = list[2];
+                int id = getNotificationID(host);
 
                 if (error == "Already_Running")
-                    sendNotification(tr(""),
+                    sendNotification(id, tr(""),
                                      tr("Music File Scanner"),
                                      tr("Can't run the music file scanner because it is already running on %1").arg(host));
                 else if (error == "Stalled")
-                    sendNotification(tr(""),
+                    sendNotification(id, tr(""),
                                      tr("Music File Scanner"),
                                      tr("The music file scanner has been running for more than 60 minutes on %1.\nResetting and trying again")
                                          .arg(host));
@@ -1586,7 +1593,15 @@ StreamList  *MusicPlayer::getStreamList(void)
     return gMusicData->all_streams->getStreams();
 }
 
-void MusicPlayer::sendNotification(const QString &title, const QString &author, const QString &desc)
+int MusicPlayer::getNotificationID (const QString& hostname)
+{
+    if (m_notificationMap.find(hostname) == m_notificationMap.end())
+        m_notificationMap.insert(hostname, GetNotificationCenter()->Register(this));
+
+    return m_notificationMap[hostname];
+}
+
+void MusicPlayer::sendNotification(int notificationID, const QString &title, const QString &author, const QString &desc)
 {
     QString image = "musicscanner.png";
     GetMythUI()->FindThemeFile(image);
@@ -1598,7 +1613,7 @@ void MusicPlayer::sendNotification(const QString &title, const QString &author, 
 
     MythImageNotification *n = new MythImageNotification(MythNotification::Info, image, map);
 
-    n->SetId(m_notificationID);
+    n->SetId(notificationID);
     n->SetParent(this);
     n->SetDuration(5);
     n->SetFullScreen(false);
