@@ -795,7 +795,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "SCAN_MUSIC")
     {
-        HandleScanMusic(pbs);
+        HandleScanMusic(tokens, pbs);
     }
     else if (command == "ALLOW_SHUTDOWN")
     {
@@ -5156,20 +5156,69 @@ void MainServer::HandleScanVideos(PlaybackSock *pbs)
         SendResponse(pbssock, retlist);
 }
 
-void MainServer::HandleScanMusic(PlaybackSock *pbs)
+void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
-    QStringList retlist;
+    QStringList strlist;
 
-    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
-                                                      kMSAutoCleanup | kMSRunBackground |
-                                                      kMSDontDisableDrawing | kMSProcessEvents |
-                                                      kMSDontBlockInputDevs));
-    retlist << "OK";
+    if (ismaster)
+    {
+        // get a list of hosts with a directory defined for the 'Music' storage group
+        MSqlQuery query(MSqlQuery::InitCon());
+        QString sql = "SELECT DISTINCT hostname "
+                      "FROM storagegroup "
+                      "WHERE groupname = 'Music'";
+        if (!query.exec(sql) || !query.isActive())
+            MythDB::DBError("MainServer::HandleScanMusic get host list", query);
+        else
+        {
+            while(query.next())
+            {
+                QString hostname = query.value(0).toString();
+
+                if (hostname == gCoreContext->GetHostName())
+                {
+                    // this is the master BE with a music storage group directory defined so run the file scanner
+                    LOG(VB_GENERAL, LOG_INFO, QString("HandleScanMusic: running filescanner on master BE '%1'").arg(hostname));
+                    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                                      kMSAutoCleanup | kMSRunBackground |
+                                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                                      kMSDontBlockInputDevs));
+                }
+                else
+                {
+                    // found a slave BE so ask it to run the file scanner
+                    PlaybackSock *slave = GetMediaServerByHostname(hostname);
+                    if (slave)
+                    {
+                        LOG(VB_GENERAL, LOG_INFO, QString("HandleScanMusic: asking slave '%1' to run file scanner").arg(hostname));
+                        slave->ForwardRequest(slist);
+                        slave->DecrRef();
+                    }
+                    else
+                    {
+                        LOG(VB_GENERAL, LOG_INFO,
+                            QString("HandleScanMusic: Failed to grab slave socket on '%1'").arg(hostname));
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        // must be a slave with a music storage group directory defined so run the file scanner
+        LOG(VB_GENERAL, LOG_INFO, QString("HandleScanMusic: running filescanner on slave BE '%1'").arg(gCoreContext->GetHostName()));
+        QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                          kMSAutoCleanup | kMSRunBackground |
+                                                          kMSDontDisableDrawing | kMSProcessEvents |
+                                                          kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
 
     if (pbssock)
-        SendResponse(pbssock, retlist);
+        SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleFileTransferQuery(QStringList &slist,

@@ -216,7 +216,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSettingQuery(QStringList &tokens, PlaybackSock *pbs);
     void HandleSetSetting(QStringList &tokens, PlaybackSock *pbs);
     void HandleScanVideos(PlaybackSock *pbs);
-    void HandleScanMusic(PlaybackSock *pbs);
+    void HandleScanMusic(const QStringList &slist, PlaybackSock *pbs);
     void HandleVersion(MythSocket *socket, const QStringList &slist);
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
