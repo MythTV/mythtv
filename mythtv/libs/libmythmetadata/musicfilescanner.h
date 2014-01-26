@@ -21,7 +21,13 @@ class META_PUBLIC MusicFileScanner
         kBoth
     };
 
-    typedef QMap <QString, MusicFileLocation> MusicLoadedMap;
+    struct MusicFileData
+    {
+        QString startDir;
+        MusicFileLocation location;
+    };
+
+    typedef QMap <QString, MusicFileData> MusicLoadedMap;
     public:
         MusicFileScanner(void);
         ~MusicFileScanner(void);
@@ -34,9 +40,9 @@ class META_PUBLIC MusicFileScanner
         void BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid);
         int  GetDirectoryId(const QString &directory, const int &parentid);
         bool HasFileChanged(const QString &filename, const QString &date_modified);
-        void AddFileToDB(const QString &filename);
-        void RemoveFileFromDB (const QString &filename);
-        void UpdateFileInDB(const QString &filename);
+        void AddFileToDB(const QString &filename, const QString &startDir);
+        void RemoveFileFromDB (const QString &filename, const QString &startDir);
+        void UpdateFileInDB(const QString &filename, const QString &startDir);
         void ScanMusic(MusicLoadedMap &music_files);
         void ScanArtwork(MusicLoadedMap &music_files);
         void cleanDB();
@@ -47,7 +53,7 @@ class META_PUBLIC MusicFileScanner
         void updateLastRunStart(void);
         void updateLastRunStatus(QString &status);
 
-        QString  m_startdir;
+        QStringList  m_startDirs;
         IdCache  m_directoryid;
         IdCache  m_artistid;
         IdCache  m_genreid;

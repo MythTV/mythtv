@@ -101,7 +101,7 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
         {
 
             QString dir(filename);
-            dir.remove(0, m_startdir.length());
+            dir.remove(0, m_startDirs.last().length());
 
             newparentid = m_directoryid[dir];
 
@@ -127,9 +127,19 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
         else
         {
             if (IsArtFile(filename))
-                art_files[filename] = MusicFileScanner::kFileSystem;
+            {
+                MusicFileData fdata;
+                fdata.startDir = m_startDirs.last();
+                fdata.location = MusicFileScanner::kFileSystem;
+                art_files[filename] = fdata;
+            }
             else if (IsMusicFile(filename))
-                music_files[filename] = MusicFileScanner::kFileSystem;
+            {
+                MusicFileData fdata;
+                fdata.startDir = m_startDirs.last();
+                fdata.location = MusicFileScanner::kFileSystem;
+                music_files[filename] = fdata;
+            }
             else
                 LOG(VB_GENERAL, LOG_INFO,
                         QString("Found file with unsupported extension %1")
@@ -250,11 +260,11 @@ bool MusicFileScanner::HasFileChanged(
  *
  * \returns Nothing.
  */
-void MusicFileScanner::AddFileToDB(const QString &filename)
+void MusicFileScanner::AddFileToDB(const QString &filename, const QString &startDir)
 {
     QString extension = filename.section( '.', -1 ) ;
     QString directory = filename;
-    directory.remove(0, m_startdir.length());
+    directory.remove(0, startDir.length());
     directory = directory.section( '/', 0, -2);
 
     QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter", "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
@@ -265,11 +275,14 @@ void MusicFileScanner::AddFileToDB(const QString &filename)
         QString name = filename.section( '/', -1);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
-                      "directory_id = :DIRID, imagetype = :TYPE;");
+        query.prepare("INSERT INTO music_albumart "
+                       "SET filename = :FILE, directory_id = :DIRID, "
+                       "imagetype = :TYPE, hostname = :HOSTNAME;");
+
         query.bindValue(":FILE", name);
         query.bindValue(":DIRID", m_directoryid[directory]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
@@ -292,6 +305,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename)
     if (data)
     {
         data->setFileSize((quint64)QFileInfo(filename).size());
+        data->setHostname(gCoreContext->GetHostName());
 
         QString album_cache_string;
 
@@ -434,10 +448,10 @@ void MusicFileScanner::cleanDB()
  *
  * \returns Nothing.
  */
-void MusicFileScanner::RemoveFileFromDB (const QString &filename)
+void MusicFileScanner::RemoveFileFromDB(const QString &filename, const QString &startDir)
 {
     QString sqlfilename(filename);
-    sqlfilename.remove(0, m_startdir.length());
+    sqlfilename.remove(0, startDir.length());
     // We know that the filename will not contain :// as the SQL limits this
     QString directory = sqlfilename.section( '/', 0, -2 ) ;
     sqlfilename = sqlfilename.section( '/', -1 ) ;
@@ -482,10 +496,10 @@ void MusicFileScanner::RemoveFileFromDB (const QString &filename)
  *
  * \returns Nothing.
  */
-void MusicFileScanner::UpdateFileInDB(const QString &filename)
+void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &startDir)
 {
     QString directory = filename;
-    directory.remove(0, m_startdir.length());
+    directory.remove(0, startDir.length());
     directory = directory.section( '/', 0, -2);
 
     MusicMetadata *db_meta   = MetaIO::getMetadata(filename);
@@ -533,6 +547,8 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename)
             disk_meta->setGenreId(gid);
 
         disk_meta->setFileSize((quint64)QFileInfo(filename).size());
+
+        disk_meta->setHostname(gCoreContext->GetHostName());
 
         // Commit track info to database
         disk_meta->dumpToDatabase();
@@ -613,57 +629,57 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
 
     for (int x = 0; x < dirList.count(); x++)
     {
-        m_startdir = dirList[x];
+        QString startDir = dirList[x];
+        m_startDirs.append(startDir + '/');
+        LOG(VB_GENERAL, LOG_INFO, QString("Searching '%1' for music files").arg(startDir));
 
-        LOG(VB_GENERAL, LOG_INFO, QString("Searching '%1' for music files").arg(m_startdir));
+        BuildFileList(startDir, music_files, art_files, 0);
+    }
 
-        BuildFileList(m_startdir, music_files, art_files, 0);
+    m_tracksTotal = music_files.count();
+    m_coverartTotal = art_files.count();
 
-        m_tracksTotal = music_files.count();
-        m_coverartTotal = art_files.count();
+    ScanMusic(music_files);
+    ScanArtwork(art_files);
 
-        ScanMusic(music_files);
-        ScanArtwork(art_files);
+    LOG(VB_GENERAL, LOG_INFO, "Updating database");
 
-        LOG(VB_GENERAL, LOG_INFO, "Updating database");
+        /*
+        This can be optimised quite a bit by consolidating all commands
+        via a lot of refactoring.
 
-            /*
-            This can be optimised quite a bit by consolidating all commands
-            via a lot of refactoring.
+        1) group all files of the same decoder type, and don't
+        create/delete a Decoder pr. AddFileToDB. Or make Decoders be
+        singletons, it should be a fairly simple change.
 
-            1) group all files of the same decoder type, and don't
-            create/delete a Decoder pr. AddFileToDB. Or make Decoders be
-            singletons, it should be a fairly simple change.
+        2) RemoveFileFromDB should group the remove into one big SQL.
 
-            2) RemoveFileFromDB should group the remove into one big SQL.
+        3) UpdateFileInDB, same as 1.
+        */
 
-            3) UpdateFileInDB, same as 1.
-            */
-
-        for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    for (iter = music_files.begin(); iter != music_files.end(); iter++)
+    {
+        if ((*iter).location == MusicFileScanner::kFileSystem)
+            AddFileToDB(iter.key(), (*iter).startDir);
+        else if ((*iter).location == MusicFileScanner::kDatabase)
+            RemoveFileFromDB(iter.key(), (*iter).startDir);
+        else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
-            if (*iter == MusicFileScanner::kFileSystem)
-                AddFileToDB(iter.key());
-            else if (*iter == MusicFileScanner::kDatabase)
-                RemoveFileFromDB(iter.key());
-            else if (*iter == MusicFileScanner::kNeedUpdate)
-            {
-                UpdateFileInDB(iter.key());
-                ++m_tracksUpdated;
-            }
+            UpdateFileInDB(iter.key(), (*iter).startDir);
+            ++m_tracksUpdated;
         }
+    }
 
-        for (iter = art_files.begin(); iter != art_files.end(); iter++)
+    for (iter = art_files.begin(); iter != art_files.end(); iter++)
+    {
+        if ((*iter).location == MusicFileScanner::kFileSystem)
+            AddFileToDB(iter.key(), (*iter).startDir);
+        else if ((*iter).location == MusicFileScanner::kDatabase)
+            RemoveFileFromDB(iter.key(), (*iter).startDir);
+        else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
-            if (*iter == MusicFileScanner::kFileSystem)
-                AddFileToDB(iter.key());
-            else if (*iter == MusicFileScanner::kDatabase)
-                RemoveFileFromDB(iter.key());
-            else if (*iter == MusicFileScanner::kNeedUpdate)
-            {
-                UpdateFileInDB(iter.key());
-                ++m_coverartUpdated;
-            }
+            UpdateFileInDB(iter.key(), (*iter).startDir);
+            ++m_coverartUpdated;
         }
     }
 
@@ -703,10 +719,15 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
     MusicLoadedMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.exec("SELECT CONCAT_WS('/', path, filename), date_modified "
-                    "FROM music_songs LEFT JOIN music_directories ON "
-                    "music_songs.directory_id=music_directories.directory_id "
-                    "WHERE filename NOT LIKE ('%://%')"))
+    query.prepare("SELECT CONCAT_WS('/', path, filename), date_modified "
+                  "FROM music_songs LEFT JOIN music_directories ON "
+                  "music_songs.directory_id=music_directories.directory_id "
+                  "WHERE filename NOT LIKE ('%://%') "
+                  "AND hostname = :HOSTNAME");
+
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+
+    if (!query.exec())
         MythDB::DBError("MusicFileScanner::ScanMusic", query);
 
     LOG(VB_GENERAL, LOG_INFO, "Checking tracks");
@@ -717,25 +738,27 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
     {
         while (query.next())
         {
-            name = m_startdir + query.value(0).toString();
-
-            if (name != QString::null)
+            for (int x = 0; x < m_startDirs.count(); x++)
             {
+                name = m_startDirs[x] + query.value(0).toString();
                 if ((iter = music_files.find(name)) != music_files.end())
-                {
-                    if (music_files[name] == MusicFileScanner::kDatabase)
-                        continue;
-                    else if (HasFileChanged(name, query.value(1).toString()))
-                        music_files[name] = MusicFileScanner::kNeedUpdate;
-                    else
-                    {
-                        ++m_tracksUnchanged;
-                        music_files.erase(iter);
-                    }
-                }
-                else
-                    music_files[name] = MusicFileScanner::kDatabase;
+                    break;
             }
+
+            if (iter != music_files.end())
+            {
+                if (music_files[name].location == MusicFileScanner::kDatabase)
+                    continue;
+                else if (HasFileChanged(name, query.value(1).toString()))
+                    music_files[name].location = MusicFileScanner::kNeedUpdate;
+                else
+                {
+                    ++m_tracksUnchanged;
+                    music_files.erase(iter);
+                }
+            }
+            else
+                music_files[name].location = MusicFileScanner::kDatabase;
         }
     }
 }
@@ -752,38 +775,45 @@ void MusicFileScanner::ScanArtwork(MusicLoadedMap &music_files)
     MusicLoadedMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.exec("SELECT CONCAT_WS('/', path, filename) "
-                    "FROM music_albumart LEFT JOIN music_directories ON "
-                    "music_albumart.directory_id=music_directories.directory_id"
-                    " WHERE music_albumart.embedded=0"))
+    query.prepare("SELECT CONCAT_WS('/', path, filename) "
+                  "FROM music_albumart "
+                  "LEFT JOIN music_directories ON music_albumart.directory_id=music_directories.directory_id "
+                  "WHERE music_albumart.embedded = 0 "
+                  "AND music_albumart.hostname = :HOSTNAME");
+
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
+
+    if (!query.exec())
         MythDB::DBError("MusicFileScanner::ScanArtwork", query);
 
     LOG(VB_GENERAL, LOG_INFO, "Checking artwork");
+
+    QString name;
 
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            QString name;
-
-            name = m_startdir + query.value(0).toString();
-
-            if (name != QString::null)
+            for (int x = 0; x < m_startDirs.count(); x++)
             {
+                name = m_startDirs[x] + query.value(0).toString();
                 if ((iter = music_files.find(name)) != music_files.end())
-                {
-                    if (music_files[name] == MusicFileScanner::kDatabase)
-                        continue;
-                    else
-                    {
-                        ++m_coverartUnchanged;
-                        music_files.erase(iter);
-                    }
-                }
+                    break;
+            }
+
+            if (iter != music_files.end())
+            {
+                if (music_files[name].location == MusicFileScanner::kDatabase)
+                    continue;
                 else
                 {
-                    music_files[name] = MusicFileScanner::kDatabase;
+                    ++m_coverartUnchanged;
+                    music_files.erase(iter);
                 }
+            }
+            else
+            {
+                music_files[name].location = MusicFileScanner::kDatabase;
             }
         }
     }
