@@ -12,7 +12,7 @@ using namespace std;
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1021";
+const QString currentDatabaseVersion = "1022";
 
 static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
@@ -887,6 +887,18 @@ QString("UPDATE music_songs SET hostname = '%1';").arg(gCoreContext->GetMasterHo
 };
 
         if (!performActualUpdate(updates, "1021", dbver))
+            return false;
+    }
+
+    if (dbver == "1021")
+    {
+        const QString updates[] = {
+"ALTER TABLE music_albumart ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
+QString("UPDATE music_albumart SET hostname = '%1';").arg(gCoreContext->GetMasterHostName()),
+""
+};
+
+        if (!performActualUpdate(updates, "1022", dbver))
             return false;
     }
 
