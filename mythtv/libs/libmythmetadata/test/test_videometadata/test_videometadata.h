@@ -207,6 +207,122 @@ class Testvideometadata: public QObject
                      3);
     }
 
+    void MovieWithMinus ()
+    {
+        MSKIP ("Minus is handled between parts of the title, but not as part of the title itself.");
+        TestMetadata (QString ("A-Movie-Title.ts"),
+                      QString ("A Movie Title"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("A-Movie-Title-2000.ts"),
+                      QString ("A Movie Title 2000"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("Titan-A.E..ts"),
+                      QString ("Titan A E"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("I-do-&-I-don't.ts"),
+                      QString ("I do & I don't"),
+                      QString (""),
+                      0,
+                      0);
+    }
+
+    void MovieWithUnderscore ()
+    {
+        TestMetadata (QString ("A_Movie_Title.ts"),
+                      QString ("A Movie Title"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("A_Movie_Title_2000.ts"),
+                      QString ("A Movie Title 2000"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("Titan_A.E..ts"),
+                      QString ("Titan A E"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("I_do_&_I_don't.ts"),
+                      QString ("I do & I don't"),
+                      QString (""),
+                      0,
+                      0);
+    }
+
+    void MovieWithPeriod ()
+    {
+        TestMetadata (QString ("A.Movie.Title.ts"),
+                      QString ("A Movie Title"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("A.Movie.Title.2000.ts"),
+                      QString ("A Movie Title 2000"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("Titan.A.E..ts"),
+                      QString ("Titan A E"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("I.do.&.I.don't.ts"),
+                      QString ("I do & I don't"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("A.Movie.Title.2000.ts.orig"),
+                      QString ("A Movie Title 2000 ts"),
+                      QString (""),
+                      0,
+                      0);
+    }
+
+    void MovieWithAMix ()
+    {
+        TestMetadata (QString ("A_Movie.Title.ts"),
+                      QString ("A Movie Title"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("A.Movie_Title: 2000.ts"),
+                      QString ("A Movie Title: 2000"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("Titan  A.E. .ts"),
+                      QString ("Titan  A E"),
+                      QString (""),
+                      0,
+                      0);
+        TestMetadata (QString ("I_do_-_I_don't.ts"),
+                      QString ("I do - I don't"),
+                      QString (""),
+                      0,
+                      0);
+    }
+
+    void SeriesWithAMix ()
+    {
+        TestMetadata (QString ("Series Title/Season 1/Season Title 02x03 Episode Title.mp4"),
+                      QString ("Season Title"),
+                      QString ("Episode Title"),
+                      2,
+                      3);
+        TestMetadata (QString ("Series.Title/Season.1/Season.Title_-_02x03_-_Episode_Title.mp4"),
+                      QString ("Season Title"),
+                      QString ("Episode Title"),
+                      2,
+                      3);
+    }
+
     static void TestMetadata(const QString &filename,
                              const QString &expectedTitle,
                              const QString &expectedSubtitle,
