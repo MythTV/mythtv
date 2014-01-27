@@ -66,8 +66,13 @@ class Scheduler : public MThread, public MythScheduler
     virtual void GetAllPending(QStringList &strList) const;
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
 
-    static void GetAllScheduled(QStringList &strList);
-    static void GetAllScheduled(RecList &proglist);
+    enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortPriority, kSortType };
+    static void GetAllScheduled(QStringList &strList,
+                                SchedSortColumn sortBy = kSortTitle,
+                                bool ascending = true);
+    static void GetAllScheduled(RecList &proglist,
+                                SchedSortColumn sortBy = kSortTitle,
+                                bool ascending = true);
 
     void getConflicting(RecordingInfo *pginfo, QStringList &strlist);
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);

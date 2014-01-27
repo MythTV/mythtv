@@ -1652,11 +1652,12 @@ void Scheduler::GetAllPending(QStringList &strList) const
 }
 
 /// Returns all scheduled programs serialized into a QStringList
-void Scheduler::GetAllScheduled(QStringList &strList)
+void Scheduler::GetAllScheduled(QStringList &strList, SchedSortColumn sortBy,
+                                bool ascending)
 {
     RecList schedlist;
 
-    GetAllScheduled(schedlist);
+    GetAllScheduled(schedlist, sortBy, ascending);
 
     strList << QString::number(schedlist.size());
 
@@ -4352,8 +4353,34 @@ void Scheduler::AddNotListed(void) {
  *
  *  \note Caller is responsible for deleting the RecordingInfo's returned.
  */
-void Scheduler::GetAllScheduled(RecList &proglist)
+void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
+                                bool ascending)
 {
+    QString sortColumn = "title";
+    // Q: Why don't we use a string containing the column name instead?
+    // A: It's too fragile, we'll refuse to compile if an invalid enum name is
+    //    used but not if an invalid column is specified. It also means that if
+    //    the column names change we only need to update one place not several
+    switch (sortBy)
+    {
+        case kSortTitle:
+            sortColumn = "record.title";
+            break;
+        case kSortPriority:
+            sortColumn = "record.recpriority";
+            break;
+        case kSortLastRecorded:
+            sortColumn = "record.last_record";
+            break;
+        case kSortType:
+            sortColumn = "record.type";
+            break;
+    }
+
+    QString order = "ASC";
+    if (!ascending)
+        order = "DESC";
+
     QString query = QString(
         "SELECT record.title,       record.subtitle,    " //  0,1
         "       record.description, record.season,      " //  2,3
@@ -4372,7 +4399,9 @@ void Scheduler::GetAllScheduled(RecList &proglist)
         "FROM record "
         "LEFT JOIN channel ON channel.callsign = record.station "
         "GROUP BY recordid "
-        "ORDER BY title ASC");
+        "ORDER BY %1 %2");
+
+    query = query.arg(sortColumn).arg(order);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
