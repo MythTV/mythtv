@@ -50,6 +50,8 @@
 #include "playgroup.h"
 #include "recordingprofile.h"
 
+#include "scheduler.h"
+
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
 
@@ -977,10 +979,22 @@ bool Dvr::AddDontRecordSchedule(int nChanId, const QDateTime &dStartTime,
 }
 
 DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
-                                              int nCount      )
+                                              int nCount,
+                                              const QString  &Sort,
+                                              bool Descending )
 {
+    Scheduler::SchedSortColumn sortingColumn;
+    if (Sort.toLower() == "lastrecorded")
+        sortingColumn = Scheduler::kSortLastRecorded;
+    else if (Sort.toLower() == "title")
+        sortingColumn = Scheduler::kSortTitle;
+    else if (Sort.toLower() == "priority")
+        sortingColumn = Scheduler::kSortPriority;
+    else if (Sort.toLower() == "type")
+        sortingColumn = Scheduler::kSortType;
+
     RecList recList;
-    Scheduler::GetAllScheduled(recList);
+    Scheduler::GetAllScheduled(recList, sortingColumn, !Descending);
 
     // ----------------------------------------------------------------------
     // Build Response

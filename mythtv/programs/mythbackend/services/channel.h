@@ -208,7 +208,7 @@ class ScriptableChannel : public QObject
                                    uint          ATSCMajorChannel,
                                    uint          ATSCMinorChannel,
                                    bool          UseEIT,
-                                   bool          visible,
+                                   bool          Visible,
                                    const QString &FrequencyID,
                                    const QString &Icon,
                                    const QString &Format,
@@ -218,7 +218,7 @@ class ScriptableChannel : public QObject
             return m_obj.AddDBChannel(MplexID, SourceID, ChannelID,
                                       CallSign, ChannelName, ChannelNumber,
                                       ServiceID, ATSCMajorChannel, ATSCMinorChannel,
-                                      UseEIT, visible, FrequencyID, Icon, Format,
+                                      UseEIT, Visible, FrequencyID, Icon, Format,
                                       XMLTVID, DefaultAuthority);
         }
 

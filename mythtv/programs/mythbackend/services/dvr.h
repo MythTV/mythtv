@@ -189,7 +189,9 @@ class Dvr : public DvrServices
                                                  bool             NeverRecord );
 
         DTC::RecRuleList* GetRecordScheduleList( int              StartIndex,
-                                                 int              Count      );
+                                                 int              Count,
+                                                 const            QString  &Sort,
+                                                 bool             Descending );
 
         DTC::RecRule*     GetRecordSchedule    ( uint             RecordId,
                                                  QString          Template,
@@ -401,9 +403,12 @@ class ScriptableDvr : public QObject
             return m_obj.AddDontRecordSchedule(ChanId, StartTime, NeverRecord);
         }
 
-        QObject* GetRecordScheduleList( int StartIndex, int Count )
+        QObject* GetRecordScheduleList( int             StartIndex,
+                                        int             Count,
+                                        const QString  &Sort,
+                                        bool            Descending  )
         {
-            return m_obj.GetRecordScheduleList(StartIndex, Count);
+            return m_obj.GetRecordScheduleList(StartIndex, Count, Sort, Descending);
         }
 
         QObject* GetRecordSchedule ( uint      RecordId,
