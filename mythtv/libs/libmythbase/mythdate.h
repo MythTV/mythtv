@@ -21,7 +21,8 @@ typedef enum Formats
     kAddYear       = 0x001000,      ///< Add year to string if not included
     kSimplify      = 0x002000,      ///< Do Today/Yesterday/Tomorrow transform
     kDatabase      = 0x004000,      ///< Default UTC, database format
-    kScreenShotFilename = 0x8000,   ///< "yyyy-MM-ddThh-mm-ss.zzz"
+    kAutoYear      = 0x008000,      ///< Add year only if different from current year
+    kScreenShotFilename = 0x010000,   ///< "yyyy-MM-ddThh-mm-ss.zzz"
     kOverrideUTC   = 0x100000,      ///< Present date/time in UTC
     kOverrideLocal = 0x200000,      ///< Present date/time in localtime
 } Format;
