@@ -383,13 +383,13 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 
 QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 {
-    QString dateFormat;
+    uint dateFormat;
     if (ShortDate)
-        dateFormat = gCoreContext->GetSetting("ShortDateFormat", "ddd d");
+        dateFormat = MythDate::kDateShort | MythDate::kSimplify | MythDate::kAutoYear;
     else
-        dateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMMM");
+        dateFormat = MythDate::kDateFull | MythDate::kSimplify | MythDate::kAutoYear;
 
-    return gCoreContext->GetQLocale().toString(Date, dateFormat);
+    return MythDate::toString(Date, dateFormat);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -398,9 +398,7 @@ QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 
 QString Myth::GetFormatTime(const QDateTime Time)
 {
-    QString timeFormat = GetMythDB()->GetSetting("TimeFormat", "hh:mm");
-
-    return gCoreContext->GetQLocale().toString(Time, timeFormat);
+    return MythDate::toString(Time, MythDate::kTime);
 }
 
 /////////////////////////////////////////////////////////////////////////////
