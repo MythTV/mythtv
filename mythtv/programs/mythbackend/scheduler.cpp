@@ -5122,6 +5122,7 @@ void Scheduler::SchedLiveTV(void)
             dummy->SetRecordingEndTime(schedTime.addSecs(1800));
         dummy->SetCardID(enc->GetCardID());
         dummy->SetInputID(in.inputid);
+        dummy->mplexid = dummy->QueryMplexID();
         dummy->SetRecordingStatus(rsUnknown);
 
         retrylist.push_front(dummy);
