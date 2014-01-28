@@ -256,7 +256,7 @@ class FileEngine( CacheEngine ):
                     else:
                         # let the unhandled error continue through
                         raise
-            elif e.errno == errno.EACCESS:
+            elif e.errno == errno.EACCES:
                 # file exists, but we do not have permission to access it
                 raise TMDBCacheReadError(self.cachefile)
             else:
