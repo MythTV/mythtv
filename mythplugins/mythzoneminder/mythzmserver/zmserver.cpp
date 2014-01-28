@@ -1392,7 +1392,6 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
         if (frameCount > 0)
         {
             double delta = length / frameCount;
-            double time = 0;
 
             for (int x = 0; x < frameCount; x++)
             {
@@ -1401,8 +1400,6 @@ void ZMServer::handleGetFrameList(vector<string> tokens)
 
                 ADD_STR(outStr, "Normal") // Type
                 ADD_STR(outStr, str)      // Delta
-
-                time += delta;
             }
         }
     }
