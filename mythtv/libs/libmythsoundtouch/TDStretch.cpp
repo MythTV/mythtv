@@ -149,6 +149,7 @@ void TDStretch::setParameters(uint aSampleRate, uint aSequenceMS,
 
     maxOffset = seekLength;
 
+    tempo = 1.0f;
     calculateOverlapLength(overlapMs);
 
     // set tempo to recalculate 'sampleReq'
