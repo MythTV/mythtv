@@ -320,7 +320,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
             data->setArtistId(aid);
 
             // The album cache depends on the artist id
-            album_cache_string = data->getArtistId() + "#"
+            album_cache_string = QString::number(data->getArtistId()) + "#"
                 + data->Album().toLower();
 
             if (m_albumid[album_cache_string] > 0)
@@ -341,7 +341,7 @@ void MusicFileScanner::AddFileToDB(const QString &filename, const QString &start
         m_genreid[data->Genre().toLower()] =
             data->getGenreId();
 
-        album_cache_string = data->getArtistId() + "#"
+        album_cache_string = QString::number(data->getArtistId()) + "#"
             + data->Album().toLower();
         m_albumid[album_cache_string] = data->getAlbumId();
 
@@ -538,7 +538,7 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
             disk_meta->setArtistId(aid);
 
             // The album cache depends on the artist id
-            album_cache_string = disk_meta->getArtistId() + "#" +
+            album_cache_string = QString::number(disk_meta->getArtistId()) + "#" +
                 disk_meta->Album().toLower();
 
             if (m_albumid[album_cache_string] > 0)
@@ -561,7 +561,7 @@ void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &st
             = disk_meta->getArtistId();
         m_genreid[disk_meta->Genre().toLower()]
             = disk_meta->getGenreId();
-        album_cache_string = disk_meta->getArtistId() + "#" +
+        album_cache_string = QString::number(disk_meta->getArtistId()) + "#" +
             disk_meta->Album().toLower();
         m_albumid[album_cache_string] = disk_meta->getAlbumId();
     }
