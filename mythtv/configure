@@ -6483,7 +6483,8 @@ if enabled mythlogserver; then
     echo "Configuring zeromq..."
     (cd external/zeromq ; \
              ./configure --quiet --without-documentation --prefix=${prefix} \
-                         --includedir=${prefix}/include/mythtv/zeromq)
+                         --includedir=${prefix}/include/mythtv/zeromq \
+                         --libdir=${libdir-name})
     echo "Configuring nzmqt..."
     (cd external/nzmqt/src ; \
            ${qmakeconf} -o Makefile)
