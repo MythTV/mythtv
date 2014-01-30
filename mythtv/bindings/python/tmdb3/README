@@ -79,11 +79,11 @@ This is not yet supported.
 
 ## Searching
 
-There are currently three search methods available for use: movies, people, 
-studios, lists, and collections. Search results from TheMovieDb are sent
-iteratively, twenty results per page. The search methods provided by the
-PyTMDB3 module return list-like structures that will automatically grab new
-pages as needed.
+There are currently six search methods available for use: movies, people, 
+studios, lists, collections, and series. Search results from TheMovieDb are
+sent iteratively, twenty results per page. The search methods provided by
+the PyTMDB3 module return list-like structures that will automatically grab
+new pages as needed.
 
   >>> from tmdb3 import searchMovie
   >>> res = searchMovie('A New Hope')
@@ -243,7 +243,7 @@ Movie:
   None                  setRating(int)      rate movie by current user
   None                  setWatchlist(bool)  mark watchlist status for current user
 
-Movie classmethods:
+Movie classmethod
   Movie                 fromIMDB(imdbid)    special constructor for use with IMDb codes
   Movie                 latest()            gets latest movie added to database
   list(Movie)           nowplaying()        content currently in theater
@@ -253,6 +253,76 @@ Movie classmethods:
   list(Movie)           favorites()         current user's favorite movies
   list(Movie)           ratedmovies()       movies rated by current user
   list(Movie)           watchlist()         movies marked to watch by current user
+
+Series:
+  integer               id
+  string                name
+  string                original_name
+  string                overview
+  string                homepage
+  integer               number_of_seasons
+  integer               number_of_episodes
+  float                 popularity
+  float                 userrating
+  integer               votes
+  datetime              first_air_date
+  datetime              last_air_date
+  bool                  inproduction
+  string                status
+  Backdrop              backdrop
+  Poster                poster
+  string                imdb_id
+  string                freebase_id
+  string                freebase_mid
+  string                tvdb_id
+  string                tvrage_id
+  list(Person)          authors
+  list(datetime)        episode_run_time
+  list(Genre)           genres
+  list(string)          languages
+  list(string)          origin_countries
+  list(Network)         networks
+  list(Season)          seasons
+  list(Cast)            cast
+  list(Crew)            crew
+  list(Backdrop)        backdrops
+  list(Poster)          posters
+
+Season:
+  integer               id
+  string                name
+  datetime              air_date
+  string                overview
+  integer               series_id
+  integer               season_number
+  Poster                poster
+  string                freebase_id
+  string                freebase_mid
+  string                tvdb_id
+  string                tvrage_id
+  list(Poster)          posters
+  list(Episode)         episodes
+
+Episode:
+  integer               id
+  integer               series_id
+  integer               season_number
+  integer               episode_number
+  string                name
+  string                overview
+  float                 userrating
+  integer               votes
+  datetime              air_date
+  string                production_code
+  Backdrop              still
+  string                freebase_id
+  string                freebase_mid
+  string                tvdb_id
+  string                tvrage_id
+  list(Backdrop)        stills
+  list(Cast)            cast
+  list(Cast)            guest_stars
+  list(Crew)            crew
 
 List:
   hex string            id
@@ -340,6 +410,10 @@ Studio:
   Logo                  logo
   Studio                parent
   list(Movie)           movies
+
+Network:
+  integer               id
+  string                name
 
 Country:
   string                code
