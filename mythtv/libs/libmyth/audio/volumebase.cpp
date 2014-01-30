@@ -5,9 +5,97 @@
 using namespace std;
 
 #include <QString>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include "volumebase.h"
 #include "mythcorecontext.h"
+#include "mthread.h"
+
+
+namespace {
+class VolumeWriteBackThread : public MThread
+{
+    VolumeWriteBackThread(const VolumeWriteBackThread &);
+    VolumeWriteBackThread & operator =(const VolumeWriteBackThread &);
+    VolumeWriteBackThread() : MThread("VolumeWriteBack"),
+        m_state(kStopped), m_volume(-1)
+    { }
+
+  public:
+    // Singleton
+    static VolumeWriteBackThread *Instance()
+    {
+        QMutexLocker lock(&s_mutex);
+        static VolumeWriteBackThread *s_instance = new VolumeWriteBackThread;
+        return s_instance;
+    }
+
+    void SetVolume(int value)
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (m_volume == value)
+            return;
+        m_volume = value;
+
+        switch (m_state)
+        {
+        case kRunning:
+            break;
+        case kFinished:
+            wait();
+            // fall thru
+        case kStopped:
+            m_state = kRunning;
+            start();
+            break;
+        }
+    }
+
+  protected:
+    virtual void run(void)
+    {
+        m_state = kRunning;
+        RunProlog();
+
+        const int holdoff = 500; // min ms between Db writes
+        QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
+        controlLabel += "MixerVolume";
+
+        QMutexLocker lock(&m_mutex);
+        while (gCoreContext && !gCoreContext->IsExiting())
+        {
+            int volume = m_volume;
+            lock.unlock();
+
+            // Update the dbase with the new volume
+            gCoreContext->SaveSetting(controlLabel, volume);
+
+            // Ignore further volume changes for the holdoff period
+            setTerminationEnabled(true);
+            msleep(holdoff);
+            setTerminationEnabled(false);
+
+            lock.relock();
+            if (volume == m_volume)
+                break;
+        }
+
+        m_state = kFinished;
+        RunEpilog();
+    }
+
+  private:
+    static QMutex s_mutex;
+    QMutex mutable m_mutex;
+    enum { kStopped, kRunning, kFinished } m_state;
+    int m_volume;
+};
+
+QMutex VolumeWriteBackThread::s_mutex;
+} // namespace
+
 
 VolumeBase::VolumeBase() :
     volume(80), current_mute_state(kMuteOff), channels(0)
@@ -38,10 +126,9 @@ void VolumeBase::SetCurrentVolume(int value)
 {
     volume = max(min(value, 100), 0);
     UpdateVolume();
-
-    QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
-    controlLabel += "MixerVolume";
-    gCoreContext->SaveSetting(controlLabel, volume);    
+    
+    // Throttle Db writes
+    VolumeWriteBackThread::Instance()->SetVolume(volume);
 }
 
 void VolumeBase::AdjustCurrentVolume(int change)
