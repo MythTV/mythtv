@@ -498,11 +498,14 @@ void MusicFileScanner::RemoveFileFromDB(const QString &filename, const QString &
  */
 void MusicFileScanner::UpdateFileInDB(const QString &filename, const QString &startDir)
 {
+    QString dbFilename = filename;
+    dbFilename.remove(0, startDir.length());
+
     QString directory = filename;
     directory.remove(0, startDir.length());
     directory = directory.section( '/', 0, -2);
 
-    MusicMetadata *db_meta   = MetaIO::getMetadata(filename);
+    MusicMetadata *db_meta   = MetaIO::getMetadata(dbFilename);
     MusicMetadata *disk_meta = MetaIO::readMetadata(filename);
 
     if (db_meta && disk_meta)
