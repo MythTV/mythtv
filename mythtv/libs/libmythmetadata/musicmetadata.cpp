@@ -1825,6 +1825,27 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
     return type;
 }
 
+// static method to get image type from the type name
+ImageType AlbumArtImages::getImageTypeFromName(const QString &name)
+{
+    ImageType type = IT_UNKNOWN;
+
+    if (name.toLower() == "front")
+        type = IT_FRONTCOVER;
+    else if (name.toLower() == "back")
+        type = IT_BACKCOVER;
+    else if (name.toLower() == "inlay")
+        type = IT_INLAY;
+    else if (name.toLower() == "cd")
+        type = IT_CD;
+    else if (name.toLower() == "artist")
+        type = IT_ARTIST;
+    else if (name.toLower() == "unknown")
+        type = IT_UNKNOWN;
+
+    return type;
+}
+
 void AlbumArtImages::addImage(const AlbumArtImage &newImage)
 {
     // do we already have an image of this type?

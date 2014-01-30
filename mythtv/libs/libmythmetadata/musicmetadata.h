@@ -462,6 +462,7 @@ class META_PUBLIC AlbumArtImages
     static ImageType guessImageType(const QString &filename);
     static QString   getTypeName(ImageType type);
     static QString   getTypeFilename(ImageType type);
+    static ImageType getImageTypeFromName(const QString &name);
 
   private:
     void findImages(void);

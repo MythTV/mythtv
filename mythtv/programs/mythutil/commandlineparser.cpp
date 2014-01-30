@@ -149,9 +149,11 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--scanmusic", "scanmusic", false,
                 "Scan the 'Music' Storage Group for music files", "")
                 ->SetGroup("Music Scanning")
-
         << add("--updatemeta", "updatemeta", false,
                 "Update a music tracks database record and tag with new metadata", "")
+                ->SetGroup("Metadata Reading/Writing")
+        << add("--extractimage", "extractimage", false,
+                "Extract an embedded image from a tracks tag and cache it in the AlbumArt storage group", "")
                 ->SetGroup("Metadata Reading/Writing")
         );
 
@@ -224,6 +226,10 @@ void MythUtilCommandLineParser::LoadArguments(void)
             ->SetChildOf("updatemeta");
     add("--lastplayed", "lastplayed", "", "(optional) Last played of track", "")
             ->SetChildOf("updatemeta");
+    add("--songid", "songid", "", "ID of track from which to get the image", "")
+            ->SetChildOf("extractimage");
+    add("--imagetype", "imagetype", "", "Type of image to extract (front, back, cd, inlay, unknown)", "")
+            ->SetChildOf("extractimage");
 
     // Generic Options used by more than one utility
     addRecording();

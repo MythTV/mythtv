@@ -1,3 +1,6 @@
+// qt
+#include <QDir>
+
 // libmyth* headers
 #include "exitcodes.h"
 #include "mythlogging.h"
@@ -78,6 +81,94 @@ static int UpdateMeta(const MythUtilCommandLineParser &cmdline)
     return result;
 }
 
+static int ExtractImage(const MythUtilCommandLineParser &cmdline)
+{
+    if (cmdline.toString("songid").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Missing --songid option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    if (cmdline.toString("imagetype").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Missing --imagetype option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+
+    int songID = cmdline.toInt("songid");
+    ImageType type = AlbumArtImages::getImageTypeFromName(cmdline.toString("imagetype"));
+
+    MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+    if (!mdata)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find metadata for trackid: %1").arg(songID));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    AlbumArtImage *image = mdata->getAlbumArtImages()->getImage(type);
+    if (!image)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find image of type: %1").arg(type));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    MetaIO *tagger = mdata->getTagger();
+    if (!tagger)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Cannot find a tagger for this file: %1").arg(mdata->Filename(false)));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+
+    if (!image->embedded || !tagger->supportsEmbeddedImages())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Either the image isn't embedded or the tagger doesn't support embedded images"));
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    // find the tracks actual filename
+    StorageGroup musicGroup("Music", gCoreContext->GetHostName(), false);
+    QString trackFilename =  musicGroup.FindFile(mdata->Filename(false));
+
+    // where are we going to save the image
+    QString path;
+    StorageGroup artGroup("MusicArt", gCoreContext->GetHostName());
+    QStringList dirList = artGroup.GetDirList();
+    if (dirList.size())
+        path = artGroup.FindNextDirMostFree();
+
+    if (!QDir(path).exists())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot find a directory in the 'MusicArt' storage group to save to");
+        return GENERIC_EXIT_NOT_OK;
+    }
+
+    path += "/AlbumArt/";
+    QDir dir(path);
+
+    QString filename = QString("%1-%2.jpg").arg(mdata->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
+    if (!QFile::exists(path + filename))
+    {
+        if (!dir.exists())
+            dir.mkpath(path);
+
+        QImage *saveImage = tagger->getAlbumArt(trackFilename, image->imageType);
+        if (saveImage)
+        {
+            saveImage->save(path + filename, "JPEG");
+            delete saveImage;
+        }
+    }
+
+    delete tagger;
+
+    // tell any clients that the metadata for this track has changed
+    // TODO check we need this
+    gCoreContext->SendMessage(QString("MUSIC_METADATA_CHANGED %1").arg(songID));
+
+    return GENERIC_EXIT_OK;
+}
+
 static int ScanMusic(const MythUtilCommandLineParser &cmdline)
 {
     MusicFileScanner *fscan = new MusicFileScanner();
@@ -102,5 +193,6 @@ static int ScanMusic(const MythUtilCommandLineParser &cmdline)
 void registerMusicUtils(UtilMap &utilMap)
 {
     utilMap["updatemeta"] = &UpdateMeta;
+    utilMap["extractimage"] = &ExtractImage;
     utilMap["scanmusic"] = &ScanMusic;
 }
