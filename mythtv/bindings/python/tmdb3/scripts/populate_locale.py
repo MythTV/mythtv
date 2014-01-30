@@ -10,12 +10,14 @@ import lxml.html
 import sys
 import os
 
+
 def sanitize(name):
     name = ' '.join(name.split())
     return name
 
+
 fpath = os.path.join(os.getcwd(), __file__) if not __file__.startswith('/') else __file__
-fpath = os.path.join(fpath.rsplit('/',2)[0], 'tmdb3/locales.py')
+fpath = os.path.join(fpath.rsplit('/', 2)[0], 'tmdb3/locales.py')
 
 fd = open(fpath, 'r')
 while True:
@@ -52,4 +54,3 @@ for row in root.get_element_by_id('tc_list'):
         continue
     name, _, alpha2 = [t.text if t.text else t.getchildren()[0].tail for t in row]
     fd.write('Country("{0}", u"{1}")\n'.format(alpha2, sanitize(name).encode('utf8')))
-
