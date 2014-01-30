@@ -1,3 +1,4 @@
+#include <iostream>
 
 // Own header
 #include "mythimage.h"
@@ -327,9 +328,11 @@ bool MythImage::Load(const QString &filename)
         // Attempting a file transfer on a file that doesn't exist throws
         // a lot of noisy warnings on the backend and frontend, so to avoid
         // that first check it's there
-        if (RemoteFile::Exists(filename))
+        QUrl url(filename);
+        QString mythUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
+        if (!mythUrl.isEmpty())
         {
-            RemoteFile *rf = new RemoteFile(filename, false, false, 0);
+            RemoteFile *rf = new RemoteFile(mythUrl, false, false, 0);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);
