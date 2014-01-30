@@ -797,6 +797,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleScanMusic(tokens, pbs);
     }
+     else if (command == "MUSIC_TAG_GETIMAGE")
+    {
+        if (tokens.size() < 4)
+            LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_TAG_GETIMAGE");
+        else
+            HandleMusicTagGetImage(tokens, pbs);
+    }
     else if (command == "ALLOW_SHUTDOWN")
     {
         if (tokens.size() != 1)
@@ -5210,6 +5217,71 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
         // must be a slave with a music storage group directory defined so run the file scanner
         LOG(VB_GENERAL, LOG_INFO, QString("HandleScanMusic: running filescanner on slave BE '%1'").arg(gCoreContext->GetHostName()));
         QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                          kMSAutoCleanup | kMSRunBackground |
+                                                          kMSDontDisableDrawing | kMSProcessEvents |
+                                                          kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_TAG_GETIMAGE <hostname> <songid> <imagetype>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+    QString songid = slist[2];
+    QString imagetype = slist[3];
+
+    QStringList paramList;
+    paramList.append(QString("--songid='%1'").arg(songid));
+    paramList.append(QString("--imagetype='%1'").arg(imagetype));
+
+    QString command = "mythutil --extractimage " + paramList.join(" ");
+
+    if (ismaster)
+    {
+
+        if (hostname == gCoreContext->GetHostName())
+        {
+            // this is the master BE
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagGetImage: running %1 on master BE '%2'").arg(command).arg(hostname));
+
+            QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                              kMSAutoCleanup | kMSRunBackground |
+                                                              kMSDontDisableDrawing | kMSProcessEvents |
+                                                              kMSDontBlockInputDevs));
+        }
+        else
+        {
+            // forward the request to the slave BE
+            PlaybackSock *slave = GetMediaServerByHostname(hostname);
+            if (slave)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagGetImage: asking slave '%1' to extract the image").arg(hostname));
+                strlist << slist.join(" ");
+                slave->ForwardRequest(strlist);
+                slave->DecrRef();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("HandleMusicTagGetImage: Failed to grab slave socket on '%1'").arg(hostname));
+            }
+        }
+    }
+    else
+    {
+        // must be a slave run mythutil to extract the image
+        LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagGetImage: running %1 on slave BE '%2'").arg(command).arg(gCoreContext->GetHostName()));
+        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
                                                           kMSDontBlockInputDevs));
