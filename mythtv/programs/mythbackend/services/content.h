@@ -176,14 +176,66 @@ class ScriptableContent : public QObject
             return m_obj.GetHash( StorageGroup, FileName );
         }
 
-        QObject* GetLiveStream(      int              Id )
+        // HTTP Live Streaming
+        QObject* AddLiveStream ( const QString   &StorageGroup,
+                                 const QString   &FileName,
+                                 const QString   &HostName,
+                                 int              MaxSegments,
+                                 int              Width,
+                                 int              Height,
+                                 int              Bitrate,
+                                 int              AudioBitrate,
+                                 int              SampleRate )
+        {
+            return m_obj.AddLiveStream(StorageGroup, FileName, HostName,
+                                       MaxSegments, Width, Height, Bitrate,
+                                       AudioBitrate, SampleRate);
+        }
+
+        QObject* AddRecordingLiveStream ( int              ChanId,
+                                         const QDateTime &StartTime,
+                                         int              MaxSegments,
+                                         int              Width,
+                                         int              Height,
+                                         int              Bitrate,
+                                         int              AudioBitrate,
+                                         int              SampleRate )
+        {
+            return m_obj.AddRecordingLiveStream(ChanId, StartTime, MaxSegments,
+                                                Width, Height, Bitrate,
+                                                AudioBitrate, SampleRate);
+        }
+
+        QObject* AddVideoLiveStream( int              Id,
+                                     int              MaxSegments,
+                                     int              Width,
+                                     int              Height,
+                                     int              Bitrate,
+                                     int              AudioBitrate,
+                                     int              SampleRate )
+        {
+            return m_obj.AddVideoLiveStream(Id, MaxSegments, Width, Height,
+                                            Bitrate, AudioBitrate, SampleRate);
+        }
+
+        QObject* GetLiveStream( int Id )
         {
             return m_obj.GetLiveStream( Id );
         }
 
-        QObject* GetLiveStreamList(  const QString &FileName )
+        QObject* GetLiveStreamList( const QString &FileName )
         {
             return m_obj.GetLiveStreamList( FileName );
+        }
+
+        QObject* StopLiveStream( int Id )
+        {
+            return m_obj.StopLiveStream(Id);
+        }
+
+        bool RemoveLiveStream( int Id )
+        {
+            return m_obj.RemoveLiveStream(Id);
         }
 };
 
