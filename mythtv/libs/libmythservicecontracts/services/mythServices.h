@@ -42,7 +42,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.0" );
+    Q_CLASSINFO( "version"    , "3.0" );
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
@@ -90,6 +90,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual DTC::TimeZoneInfo*  GetTimeZone         ( ) = 0;
 
         virtual QString             GetFormatDate       ( const QDateTime Date,
+                                                          bool            ShortDate ) = 0;
+        virtual QString             GetFormatDateTime   ( const QDateTime DateTime,
                                                           bool            ShortDate ) = 0;
         virtual QString             GetFormatTime       ( const QDateTime Time ) = 0;
         virtual QDateTime           ParseISODateString  ( const QString   &DateTime ) = 0;

@@ -61,6 +61,8 @@ class Myth : public MythServices
 
         QString             GetFormatDate       ( const QDateTime Date,
                                                   bool            ShortDate );
+        QString             GetFormatDateTime   ( const QDateTime DateTime,
+                                                  bool            ShortDate );
         QString             GetFormatTime       ( const QDateTime Time );
         QDateTime           ParseISODateString  ( const QString   &DateTime );
 
@@ -196,6 +198,12 @@ class ScriptableMyth : public QObject
                                  bool            ShortDate = false )
         {
             return m_obj.GetFormatDate( Date, ShortDate );
+        }
+
+        QString   GetFormatDateTime( const QDateTime DateTime,
+                                     bool            ShortDate = false )
+        {
+            return m_obj.GetFormatDateTime( DateTime, ShortDate );
         }
 
         QString   GetFormatTime( const QDateTime Time )

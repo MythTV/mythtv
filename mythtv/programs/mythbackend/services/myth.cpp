@@ -396,6 +396,21 @@ QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
+QString Myth::GetFormatDateTime(const QDateTime DateTime, bool ShortDate)
+{
+    uint dateFormat;
+    if (ShortDate)
+        dateFormat = MythDate::kDateTimeShort | MythDate::kSimplify | MythDate::kAutoYear;
+    else
+        dateFormat = MythDate::kDateTimeFull | MythDate::kSimplify | MythDate::kAutoYear;
+
+    return MythDate::toString(DateTime, dateFormat);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 QString Myth::GetFormatTime(const QDateTime Time)
 {
     return MythDate::toString(Time, MythDate::kTime);
