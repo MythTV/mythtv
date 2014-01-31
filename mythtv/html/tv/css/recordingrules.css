@@ -1,0 +1,135 @@
+
+.recRulesList div
+{
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.recRulesList .recRuleBox
+{
+    height: 100%;
+    padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
+    cursor: pointer;
+}
+
+.recRulesList .recRuleInnerBox
+{
+    height: 100%;
+    background-color: #555555;
+    /*border-radius: 10px;*/
+    position: relative; /* Required for recRuleSchedPopup to be centred */
+    cursor: pointer;
+}
+
+.recRulesList .recRuleHeader
+{
+    padding: 5px 8px 4px 7px;
+    color: #FFFFFF;
+    height: 28px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    z-index: 4;
+}
+
+.guideGrid .recRuleHeader IMG
+{
+    float: left;
+    margin-top: 2px;
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+.recRulesList .recRuleTitle
+{
+    float: left;
+    width: 50%;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.recRulesList .recRuleRecType
+{
+    width: 30%;
+    float: right;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.recRulesList .recRuleBody
+{
+    padding: 3px 5px 4px 5px; /* Top Right Bottom Left */
+    color: #DDDDDD;
+    height: 52px;
+    z-index: 5;
+    overflow: hidden;
+    text-overflow: clip;
+    font-size: 0.9em;
+}
+
+.recRulesList .recRuleDescription
+{
+    position: relative;
+    z-index: 1;
+    text-overflow: clip;
+    font-size: 0.9em;
+}
+
+.recRulesList .recRuleRecStatus
+{
+    clear: left;
+    width: 100%;
+    float: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.recRulesList .recRuleInput
+{
+    clear: left;
+    width: 70%;
+    float: left;
+}
+
+.recRulesList .recRuleChannel
+{
+    width: 30%;
+    float: right;
+}
+
+.recRulesList .recRulePriority
+{
+    width: 30%;
+    float: right;
+}
+
+.recRulesList .recRuleLastRecorded
+{
+    clear: left;
+    width: 70%;
+    float: left;
+}
+
+.recRulesList .label
+{
+    font-weight: bold;
+}
+
+.recRulesList .recRuleSubtitle
+{
+    float: left;
+    width: 70%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.recRulesList .recRuleSeasonEpisode
+{
+    float: left;
+}

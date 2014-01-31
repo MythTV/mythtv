@@ -1,0 +1,196 @@
+<%
+"use strict";
+
+import "/js/utility.js"
+import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var sort = "";
+    if (getArg("ViewFilter"))
+        sort = getArg("ViewFilter");
+
+    var descending = false;
+    if (getArg("Order") == "descending")
+        descending = true;
+
+    var listOnly = 0;
+    if (getArg("ListOnly"))
+        listOnly = 1;
+
+    var startIndex = 0;
+    if (getArg("Start"))
+        startIndex = Number(getArg("Start"));
+
+    var myth  = new Myth();
+    var dvr = new Dvr();
+
+    var PAGEINTERVAL = 10;
+    var ruleList = dvr.GetRecordScheduleList(startIndex, PAGEINTERVAL, sort, descending);
+
+    var nextStartIndex = (startIndex + PAGEINTERVAL);
+    if (nextStartIndex >= ruleList.TotalAvailable)
+        nextStartIndex = 0;
+
+    var recRules = ruleList.RecRules;
+
+    var inputs = {};
+    inputs["0"] = qsTr("Any");
+    var inputList = dvr.GetInputList().Inputs;
+    for (var idx = 0; idx < inputList.length; idx++)
+    {
+        inputs[inputList[idx].Id] = inputList[idx].DisplayName;
+    }
+%>
+
+<% if (!listOnly) {%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%=qsTr("Recording Rules")%></title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/recordingrules.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script src="/js/util.qjs"></script>
+<script src="/tv/js/common.js"></script>
+<script src="/tv/js/recordingrules.js"></script>
+</head>
+<body>
+
+<!-- Popup Option Menu -->
+<!-- To avoid the need to define multiple overlapping menus, we use JS+CSS as
+     an indirect if/else. It might seem convoluted but the alternatives are
+     generating this bit of HTML client side with JS (bad), generating it server
+     side (harder to maintain/template) or keeping in together inline with the
+     other related html, with as little non-html markup as possible -->
+<div id="optMenu" class="contextMenu" style="display:none;">
+    <div class="button normalMenu" onClick="disableRecRule(gChanID, gStartTime)">
+        <%=qsTr("Disable Rule")%>
+    </div>
+    <div class="button normalMenu" onClick="enableRecRule(gChanID, gStartTime)">
+        <%=qsTr("Enable Rule")%>
+    </div>
+    <div class="button normalMenu" onClick="deleteRecRule(gChanID, gStartTime)">
+        <%=qsTr("Delete Recording Rule")%>
+    </div>
+    <div class="button normalMenu" onClick="loadScheduler(gChanID, gStartTime)">
+        <%=qsTr("Edit recording rule")%>
+    </div>
+</div>
+
+<!-- Popup Program Details Box -->
+<div id="programDetails" class="programExDetail" style="display:none;">
+</div>
+
+<!-- Navigation by day or time -->
+<div class="navigateBox">
+
+    <form action="/tv/recordingrules.qsp">
+    <label for="recRulesFilter"><%=qsTr("Sort By")%>:
+    <select id="recRulesFilter" name="ViewFilter" onChange="submitForm(this.form)">
+        <option value="title" <% if (sort === "title") {%>selected<%}%>><%=qsTr("Title")%></option>
+        <option value="lastrecorded" <% if (sort === "lastrecorded") {%>selected<%}%>><%=qsTr("Last Recorded")%></option>
+        <option value="type" <% if (sort === "type") {%>selected<%}%>><%=qsTr("Type")%></option>
+        <option value="priority" <% if (sort === "priority") {%>selected<%}%>><%=qsTr("Priority")%></option>
+    </select>
+    </label>
+
+    <label for="recRulesOrder"><%=qsTr("Order")%>:
+    <select id="recRulesOrder" name="Order" onChange="submitForm(this.form)">
+        <option value="ascending" <% if (!descending) {%>selected<%}%>><%=qsTr("Ascending")%></option>
+        <option value="descending" <% if (descending) {%>selected<%}%>><%=qsTr("Descending")%></option>
+    </select>
+    </label>
+    </form>
+</div>
+
+<div id="recRulesList-container" style="overflow:hidden;clear:both;width:100%;">
+<div id="recRulesList" class="recRulesList jscroll">
+
+<div class="topBar">
+    <%=qsTr("Recording Rules")%>
+</div>
+
+<%} // End of the header %>
+
+<%
+// The nothing to display message
+if (!isValidObject(recRules) || recRules.length === 0)
+{
+    var message = "";
+
+    if (sort == "conflicting")
+        message = qsTr("There are no conflicting or errored recordings.")
+    else
+        message = qsTr("There are no recording rules defined.")
+%>
+
+    <div id="noProgramsRow" class="noProgramsRow">
+        <%=message%>
+    </div>
+<%
+}
+
+for (var listIdx = 0; listIdx < recRules.length; listIdx++)
+{
+    recRule = recRules[listIdx];
+
+    var menu = "normalMenu";
+
+    var recTypeStr = dvr.RecTypeToDescription(recRule.Type);
+
+    var date = myth.GetFormatDate(recRule.StartTime);
+    var programIdentifier = recRule.ChanId + "_" + recRule.StartTime.toISOString();
+
+    var lastRecorded = myth.GetFormatDateTime(recRule.LastRecorded);
+    var nextRecording = myth.GetFormatDateTime(recRule.NextRecording);
+%>
+    <div class="recRuleRow" id="<%=recRule.Id%>_row">
+        <div class="recRuleBox">
+            <div class="recRuleInnerBox" id="<%=programIdentifier%>" data-recordid="<%=recRule.Id%>" onClick="showMenu(this, '<%=menu%>');">
+                <div class="recRuleHeader">
+                    <span class="recRuleTitle"><%=escapeHTML(recRule.Title)%></span>
+                    <span class="recRuleRecType"><%=escapeHTML(recTypeStr)%></span>
+                </div>
+                <div class="recRuleBody">
+                    <span class="recRulePriority"><span class="label">Priority: </span><%=recRule.RecPriority%></span>
+                    <span class="recRuleInput"><span class="label">Preferred Input: </span><%=inputs[recRule.PreferredInput]%></span>
+                    <span class="recRuleChannel"><span class="label">Channel: </span> <%=recRule.CallSign%></span>
+                    <span class="recRuleLastRecorded"><span class="label">Last Recorded: </span><%=lastRecorded == "" ? qsTr("Unknown") : lastRecorded%></span>
+                    <span class="recRuleRecStatus"><span class="label">Next Recording: </span><%=nextRecording == "" ? qsTr("Unknown") : nextRecording%></span>
+                </div>
+                <input type="hidden" name="chanid" value="<%=recRule.ChanId%>" />
+                <input type="hidden" name="starttime" value="<%=recRule.StartTime.toISOString()%>" />
+                <input type="hidden" name="recordid" value="<%=recRule.Id%>" />
+            </div>
+        </div>
+    </div>
+<%
+
+}
+%>
+
+<% if (nextStartIndex) { %>
+<a class="jscroll-next" href="/tv/recordingrules.qsp?ViewFilter=<%=sort%>&amp;Order=<%=getArg("Order")%>&amp;Start=<%=nextStartIndex%>&amp;ListOnly=1" />
+<%}%>
+
+<% if (!listOnly) {%>
+</div> <!-- End recordingrulesList -->
+</div> <!-- End recordingrulesList-container -->
+
+<script>
+    loadJScroll();
+</script>
+
+</body>
+</html>
+<%}%>
