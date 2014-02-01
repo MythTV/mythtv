@@ -66,9 +66,41 @@ static QString chooseCD(void)
 }
 #endif
 
+/// checks we have at least one music directory in the 'Music' storage group
+static bool checkStorageGroup(void)
+{
+    // get a list of hosts with a directory defined for the 'Music' storage group
+    QStringList hostList;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString sql = "SELECT DISTINCT hostname "
+                  "FROM storagegroup "
+                  "WHERE groupname = 'Music'";
+    if (!query.exec(sql) || !query.isActive())
+        MythDB::DBError("checkStorageGroup get host list", query);
+    else
+    {
+        while(query.next())
+        {
+            hostList.append(query.value(0).toString());
+        }
+    }
+
+    if (hostList.isEmpty())
+    {
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "No directories found in the 'Music' storage group. "
+                                    "Please run mythtv-setup on the backend machine to add one."));
+       return false;
+    }
+
+    return true;
+}
 
 static void startPlayback(void)
 {
+    if (!checkStorageGroup())
+        return;
+
     gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -97,6 +129,9 @@ static void startStreamPlayback(void)
 
 static void startDatabaseTree(void)
 {
+    if (!checkStorageGroup())
+        return;
+
     gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -113,6 +148,9 @@ static void startDatabaseTree(void)
 static void startRipper(void)
 {
 #if defined HAVE_CDIO
+    if (!checkStorageGroup())
+        return;
+
     gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -138,33 +176,19 @@ static void startRipper(void)
 
 static void runScan(void)
 {
-    // if we don't have a valid start dir warn the user and give up
-    if (getMusicDirectory().isEmpty())
-    {
-        ShowOkPopup(qApp->translate("(MythMusicMain)",
-                                    "You need to tell me where to find your "
-                                    "music on the 'General Settings' page of "
-                                    "MythMusic's settings pages."));
-       return;
-    }
+    if (!checkStorageGroup())
+        return;
 
-    if (!QFile::exists(getMusicDirectory()))
-    {
-        ShowOkPopup(qApp->translate("(MythMusicMain)",
-                                    "Can't find your music directory. Have "
-                                    "you set it correctly on the 'General "
-                                    "Settings' page of MythMusic's settings "
-                                    "pages?"));
-       return;
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, QString("Scanning '%1' for music files").arg(getMusicDirectory()));
+    LOG(VB_GENERAL, LOG_INFO, "Scanning for music files");
 
     gMusicData->scanMusic();
 }
 
 static void startImport(void)
 {
+    if (!checkStorageGroup())
+        return;
+
     gMusicData->loadMusic();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
