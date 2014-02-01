@@ -826,11 +826,11 @@ bool MythUIButtonList::DistributeButtons(void)
                 else if (!m_ButtonList.empty())
                 {
                     if (m_itemCount - m_selPosition - 1 <
-                        static_cast<int>(m_ButtonList.size()) / 2)
+                        (static_cast<int>(m_ButtonList.size()) / 2))
                         start_button = m_ButtonList.size() -
                                        (m_itemCount - m_selPosition) + 1;
                     else if (m_selPosition >
-                             static_cast<int>(m_ButtonList.size()) / 2)
+                             (static_cast<int>(m_ButtonList.size()) / 2))
                         start_button = (m_ButtonList.size() / 2);
                     else
                         start_button = m_selPosition;
@@ -1576,7 +1576,7 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
 
 MythUIButtonListItem *MythUIButtonList::GetItemCurrent() const
 {
-    if (m_itemList.isEmpty() || m_selPosition > m_itemList.size() ||
+    if (m_itemList.isEmpty() || m_selPosition >= m_itemList.size() ||
         m_selPosition < 0)
         return NULL;
 
@@ -2081,7 +2081,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                      > (pos / m_columns))
             {
                 m_selPosition += m_columns;
-                if (m_selPosition > m_itemList.size() - 1)
+                if (m_selPosition >= m_itemList.size())
                     m_selPosition = m_itemList.size() - 1;
             }
             else if (m_wrapStyle > WrapNone)
