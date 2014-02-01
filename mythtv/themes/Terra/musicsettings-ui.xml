@@ -10,15 +10,6 @@
             <value>General Settings</value>
         </textarea>
 
-        <textarea name="musiclocation_label" from="basetextarea">
-            <area>140,100,500,50</area>
-            <align>right,vcenter</align>
-            <value>Directory to hold music:</value>
-        </textarea> 
-        <textedit name="musiclocation" from="basetextedit">
-            <area>650,100,550,50</area>
-        </textedit>
-
         <textarea name="musiccddevice_label" from="basetextarea">
             <area>140,160,500,50</area>
             <align>right,vcenter</align>

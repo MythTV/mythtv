@@ -20,7 +20,6 @@ class GeneralSettings : public MythScreenType
     bool Create(void);
 
   private:
-    MythUITextEdit     *m_musicLocation;
     MythUITextEdit     *m_musicAudioDevice;
     MythUICheckBox     *m_musicDefaultUpmix;
     MythUITextEdit     *m_musicCDDevice;

@@ -9,7 +9,7 @@
 
 GeneralSettings::GeneralSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_musicLocation(NULL), m_musicAudioDevice(NULL),
+        m_musicAudioDevice(NULL),
         m_musicDefaultUpmix(NULL), m_musicCDDevice(NULL),
         m_nonID3FileNameFormat(NULL), m_ignoreID3Tags(NULL),
         m_allowTagWriting(NULL), m_saveButton(NULL),
@@ -30,7 +30,6 @@ bool GeneralSettings::Create()
     if (!LoadWindowFromXML("musicsettings-ui.xml", "generalsettings", this))
         return false;
 
-    UIUtilE::Assign(this, m_musicLocation, "musiclocation", &err);
     UIUtilE::Assign(this, m_musicAudioDevice, "musicaudiodevice", &err);
     UIUtilE::Assign(this, m_musicDefaultUpmix, "musicdefaultupmix", &err);
     UIUtilE::Assign(this, m_musicCDDevice, "musiccddevice", &err);
@@ -46,7 +45,6 @@ bool GeneralSettings::Create()
         return false;
     }
 
-    m_musicLocation->SetText(gCoreContext->GetSetting("MusicLocation"));
     m_musicAudioDevice->SetText(gCoreContext->GetSetting("MusicAudioDevice"));
 
     int loadMusicDefaultUpmix = gCoreContext->GetNumSetting("MusicDefaultUpmix", 0);
@@ -68,9 +66,6 @@ bool GeneralSettings::Create()
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
-    m_musicLocation->SetHelpText(tr("This directory must exist, and the user "
-                 "running MythMusic needs to have write permission "
-                 "to the directory."));
     m_musicAudioDevice->SetHelpText(tr("Audio Device used for playback. 'default' "
                  "will use the device specified in MythTV"));
     m_musicDefaultUpmix->SetHelpText(tr("MythTV can upconvert stereo tracks to 5.1 audio. "
@@ -97,25 +92,13 @@ bool GeneralSettings::Create()
 
     BuildFocusList();
 
-    SetFocusWidget(m_musicLocation);
+    SetFocusWidget(m_musicCDDevice);
 
     return true;
 }
 
 void GeneralSettings::slotSave(void)
 {
-    // get the starting directory from the settings and remove all multiple
-    // directory separators "/" and resolves any "." or ".." in the path.
-    QString dir = m_musicLocation->GetText();
-
-    if (!dir.isEmpty())
-    {
-        dir = QDir::cleanPath(dir);
-        if (!dir.endsWith("/"))
-            dir += "/";
-    }
-
-    gCoreContext->SaveSetting("MusicLocation", dir);
     gCoreContext->SaveSetting("CDDevice", m_musicCDDevice->GetText());
     gCoreContext->SaveSetting("MusicAudioDevice", m_musicAudioDevice->GetText());
     gCoreContext->SaveSetting("NonID3FileNameFormat", m_nonID3FileNameFormat->GetText());
