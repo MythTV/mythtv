@@ -520,6 +520,13 @@ QString RemoteFile::GetFileHash(const QString &url)
 
 bool RemoteFile::CopyFile (const QString& src, const QString& dst)
 {
+    // sanity check
+    if (src == dst)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: Cannot copy a file to itself");
+        return false;
+    }
+
     const int readSize = 16 * 1024;
     char *buf = new char[readSize];
     if (!buf)
