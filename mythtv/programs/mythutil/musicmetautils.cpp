@@ -174,15 +174,11 @@ static int ScanMusic(const MythUtilCommandLineParser &cmdline)
     MusicFileScanner *fscan = new MusicFileScanner();
     QStringList dirList;
 
-#if 0
     if (!StorageGroup::FindDirs("Music", gCoreContext->GetHostName(), &dirList))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to find any directories in the 'Music' storage group");
         return GENERIC_EXIT_NOT_OK;
     }
-#else
-    dirList << getMusicDirectory();
-#endif
 
     fscan->SearchDirs(dirList);
     delete fscan;
