@@ -21,26 +21,6 @@ extern "C" {
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-static QString musicDirectory;
-
-QString getMusicDirectory(void)
-{
-    if (musicDirectory.isEmpty())
-    {
-        musicDirectory = gCoreContext->GetSetting("MusicLocation");
-        musicDirectory = QDir::cleanPath(musicDirectory);
-        if (!musicDirectory.isEmpty() && !musicDirectory.endsWith("/"))
-            musicDirectory += "/";
-    }
-
-    return musicDirectory;
-}
-
-void setMusicDirectory(const QString &musicDir)
-{
-    musicDirectory = musicDir;
-}
-
 static QRegExp badChars = QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)");
 
 QString fixFilename(const QString &filename)
@@ -182,9 +162,8 @@ inline QString fixFileToken_sl(QString token)
     return token;
 }
 
-QString filenameFromMetadata(MusicMetadata *track, bool createDir)
+QString filenameFromMetadata(MusicMetadata *track)
 {
-    QDir directoryQD(getMusicDirectory());
     QString filename;
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
@@ -240,14 +219,6 @@ QString filenameFromMetadata(MusicMetadata *track, bool createDir)
         tempstr += " - " + track->FormatTitle();
         filename = fixFilename(tempstr);
         LOG(VB_GENERAL, LOG_ERR, "Invalid file storage definition.");
-    }
-
-    if (createDir)
-    {
-        QFileInfo fi(filename);
-        if (!directoryQD.mkpath(getMusicDirectory() + fi.path()))
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("filenameFromMetadata: Failed to create directory path: '%1'").arg(getMusicDirectory() + filename));
     }
 
     return filename;

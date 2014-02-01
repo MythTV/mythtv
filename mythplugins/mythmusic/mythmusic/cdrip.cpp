@@ -303,20 +303,20 @@ void CDRipperThread::run(void)
                     if (encodertype == "mp3")
                     {
                         outfile += ".mp3";
-                        encoder.reset(new LameEncoder(getMusicDirectory() + outfile, m_quality,
+                        encoder.reset(new LameEncoder(/*getMusicDirectory() + */outfile, m_quality,
                                                       titleTrack, mp3usevbr));
                     }
                     else // ogg
                     {
                         outfile += ".ogg";
-                        encoder.reset(new VorbisEncoder(getMusicDirectory() + outfile, m_quality,
+                        encoder.reset(new VorbisEncoder(/*getMusicDirectory() + */outfile, m_quality,
                                                         titleTrack));
                     }
                 }
                 else
                 {
                     outfile += ".flac";
-                    encoder.reset(new FlacEncoder(getMusicDirectory() + outfile, m_quality,
+                    encoder.reset(new FlacEncoder(/*getMusicDirectory() + */outfile, m_quality,
                                                   titleTrack));
                 }
 
@@ -823,7 +823,7 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
     if (query.next())
     {
         int trackID = query.value(0).toInt();
-        QString filename = getMusicDirectory() + query.value(1).toString();
+        QString filename = /*getMusicDirectory() +*/ query.value(1).toString();
 
         // delete file
         if (!QFile::remove(filename))

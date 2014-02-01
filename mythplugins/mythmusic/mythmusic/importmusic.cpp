@@ -404,7 +404,7 @@ void ImportMusicDialog::addPressed()
 
         // get the save filename
         QString origFilename = meta->Filename();
-        QString saveFilename = filenameFromMetadata(meta, false);
+        QString saveFilename = filenameFromMetadata(meta);
         QString fullFilename;
 
         QUrl url(m_musicStorageDir);
@@ -1164,7 +1164,7 @@ void ImportCoverArtDialog::updateStatus()
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();
 
-        QString saveFilename = /*getMusicDirectory() + */filenameFromMetadata(m_metadata, false);
+        QString saveFilename = /*getMusicDirectory() + */filenameFromMetadata(m_metadata);
         QFileInfo fi(saveFilename);
         QString saveDir = fi.absolutePath();
 
