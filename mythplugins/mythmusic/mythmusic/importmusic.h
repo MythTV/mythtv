@@ -38,6 +38,20 @@ class FileScannerThread: public MThread
         ImportMusicDialog *m_parent;
 };
 
+class FileCopyThread: public MThread
+{
+    public:
+        FileCopyThread(const QString &src, const QString &dst);
+        virtual void run();
+
+        bool GetResult(void) { return m_result; }
+
+    private:
+        QString m_srcFile;
+        QString m_dstFile;
+        bool m_result;
+};
+
 class ImportMusicDialog : public MythScreenType
 {
 
@@ -53,6 +67,7 @@ class ImportMusicDialog : public MythScreenType
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
+    void doFileCopy(const QString &src, const QString &dst);
 
   public slots:
     void addAllNewPressed(void);
@@ -82,6 +97,8 @@ class ImportMusicDialog : public MythScreenType
     void setTitleWordCaps(void);
     void setTitleInitialCap(void);
     void metadataChanged(void);
+    void chooseBackend(void);
+    void setSaveHost(QString host);
 
   signals:
     void importFinished(void);
@@ -90,7 +107,9 @@ class ImportMusicDialog : public MythScreenType
     void fillWidgets();
     void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);
     void showImportCoverArtDialog();
+    bool copyFile(const QString &src, const QString &dst);
 
+    QString              m_musicStorageDir;
     bool                 m_somethingWasImported;
     vector<TrackInfo*>  *m_tracks;
     QStringList          m_sourceFiles;
