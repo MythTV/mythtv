@@ -694,13 +694,6 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else if (me->Message().startsWith("MUSIC_SETTINGS_CHANGED"))
         {
-            QString startdir = gCoreContext->GetSetting("MusicLocation");
-            startdir = QDir::cleanPath(startdir);
-            if (!startdir.isEmpty() && !startdir.endsWith("/"))
-                startdir += "/";
-
-            setMusicDirectory(startdir);
-
             loadSettings();
         }
         else if (me->Message().startsWith("MUSIC_METADATA_CHANGED"))
