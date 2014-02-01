@@ -187,6 +187,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     unsigned char _tspayload[184];
 };
 
+#if 0 /* not used yet */
 /** \class TSDVBEmissionPacket
  *  \brief Adds DVB forward error correction data to size of packet.
  */
@@ -213,5 +214,6 @@ class MTV_PUBLIC TS8VSBEmissionPacket : public TSPacket
   private:
     unsigned char _tsfec[20];
 };
+#endif
 
 #endif // _TS_PACKET_H_
