@@ -8,7 +8,6 @@
 #include <musicmetadata.h>
 #include <musicfilescanner.h>
 #include <musicutils.h>
-#include "mythsystemlegacy.h"
 
 // mythmusic
 #include "musicdata.h"
@@ -52,16 +51,8 @@ MusicData::~MusicData(void)
 
 void MusicData::scanMusic (void)
 {
-    // TODO once we switch to storage groups we should use the myth protocol
-    // to ask the master BE to run the scan on all hosts with a valid directory
-    // set for the 'Music' storage group
-    //
-    // for the moment we just run mythutil --scanmusic on this host
-
-    QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
-                                                      kMSAutoCleanup | kMSRunBackground |
-                                                      kMSDontDisableDrawing | kMSProcessEvents |
-                                                      kMSDontBlockInputDevs));
+    gCoreContext->SendReceiveStringList(QStringList() << "SCAN_MUSIC");
+    LOG(VB_GENERAL, LOG_INFO, "Requested a music file scan");
 }
 
 /// reload music after a scan, rip or import
