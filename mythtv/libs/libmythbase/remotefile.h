@@ -33,6 +33,7 @@ class MBASE_PUBLIC RemoteFile
     static QString GetFileHash(const QString &url);
     static QDateTime LastModified(const QString &url);
     static QString FindFile(const QString &filename, const QString &host, const QString &storageGroup);
+    static bool CopyFile(const QString &src, const QString &dest);
 
     int Write(const void *data, int size);
     int Read(void *data, int size);

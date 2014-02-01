@@ -518,6 +518,59 @@ QString RemoteFile::GetFileHash(const QString &url)
     return result;
 }
 
+bool RemoteFile::CopyFile (const QString& src, const QString& dst)
+{
+    const int readSize = 16 * 1024;
+    char *buf = new char[readSize];
+    if (!buf)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "RemoteFile::CopyFile: ERROR, unable to allocate copy buffer");
+        return false;
+    }
+
+    RemoteFile srcFile(src, false);
+    if (!srcFile.isOpen())
+    {
+         LOG(VB_GENERAL, LOG_ERR,
+             QString("RemoteFile::CopyFile: Failed to open file (%1) for reading.").arg(src));
+         delete[] buf;
+         return false;
+    }
+
+    RemoteFile dstFile(dst, true);
+    if (!dstFile.isOpen())
+    {
+         LOG(VB_GENERAL, LOG_ERR,
+             QString("RemoteFile::CopyFile: Failed to open file (%1) for writing.").arg(dst));
+         srcFile.Close();
+         delete[] buf;
+         return false;
+    }
+
+    int srcLen, dstLen;
+
+    while ((srcLen = srcFile.Read(buf, sizeof(buf))) > 0)
+    {
+        dstLen = dstFile.Write(buf, srcLen);
+
+        if (dstLen == -1 || srcLen != dstLen)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                "RemoteFile::CopyFile:: Error while trying to write to destination file.");
+            srcFile.Close();
+            dstFile.Close();
+            delete[] buf;
+            return false;
+        }
+    }
+
+    srcFile.Close();
+    dstFile.Close();
+    delete[] buf;
+
+    return true;
+}
+
 void RemoteFile::Reset(void)
 {
     if (isLocal())
