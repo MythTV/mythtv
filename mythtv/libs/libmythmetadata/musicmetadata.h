@@ -39,13 +39,14 @@ class META_PUBLIC AlbumArtImage
 {
   public:
     AlbumArtImage(void) :
-            id(0), filename(""), imageType(IT_UNKNOWN),
+            id(0), filename(""), hostname(""), imageType(IT_UNKNOWN),
             description(""), embedded(false) {}
     AlbumArtImage(AlbumArtImage *image) :
-            id(image->id), filename(image->filename), imageType(image->imageType),
+            id(image->id), filename(image->filename), hostname(image->hostname), imageType(image->imageType),
             description(image->description), embedded(image->embedded) {}
      int       id;
      QString   filename;
+     QString   hostname;
      ImageType imageType;
      QString   description;
      bool      embedded;

@@ -1660,7 +1660,7 @@ void AlbumArtImages::findImages(void)
                 image->filename = logoUrl;
                 image->imageType = IT_FRONTCOVER;
                 image->embedded = false;
-
+                image->hostname = "";
                 m_imageList.push_back(image);
             }
         }
@@ -1676,7 +1676,7 @@ void AlbumArtImages::findImages(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT albumart_id, CONCAT_WS('/', music_directories.path, "
                 "music_albumart.filename), music_albumart.filename, music_albumart.imagetype, "
-                "music_albumart.embedded "
+                "music_albumart.embedded, music_albumart.hostname "
                 "FROM music_albumart "
                 "LEFT JOIN music_directories ON "
                 "music_directories.directory_id = music_albumart.directory_id "
