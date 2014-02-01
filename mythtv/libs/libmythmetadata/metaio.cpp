@@ -101,7 +101,8 @@ MusicMetadata* MetaIO::readMetadata(const QString &filename)
 // static
 MusicMetadata* MetaIO::getMetadata(const QString &filename)
 {
-
+    //FIXME: we need a relative path for createFromFilename()
+    //       but readMetadata() needs an absolute path
     MusicMetadata *mdata = MusicMetadata::createFromFilename(filename);
     if (mdata)
         return mdata;
