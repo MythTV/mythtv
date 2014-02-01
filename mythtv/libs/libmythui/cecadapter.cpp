@@ -264,6 +264,8 @@ class CECAdapterPriv
                 default:
                     break;
             }
+            gCoreContext->SendSystemEvent(QString("CEC_COMMAND_RECEIVED COMMAND %1")
+                                          .arg(command.opcode));
         }
 
         LogMessages();

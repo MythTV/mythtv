@@ -130,6 +130,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
         // Check for some token names that we substitute one for one as
         // %MATCH% type variables.
         if ((*it == "CARDID") ||
+            (*it == "COMMAND") ||
             (*it == "RECSTATUS") ||
             (*it == "HOSTNAME") ||
             (*it == "SECS") ||
@@ -446,6 +447,8 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
         tr("Keystroke event #9");
     m_settings["EventCmdKey10"]                = // KEY_%1
         tr("Keystroke event #10");
+    m_settings["EventCmdCecCommandReceived"]   = // CEC_COMMAND_RECEIVED
+        tr("CEC command received");
     m_settings["EventCmdAll"]                  = // EventCmdAll
         tr("Any event");
 }
