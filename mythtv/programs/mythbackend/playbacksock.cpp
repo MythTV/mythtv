@@ -10,6 +10,7 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythdate.h"
 #include "inputinfo.h"
+#include "referencecounter.h"
 
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")
@@ -69,6 +70,20 @@ bool PlaybackSock::wantsOnlySystemEvents(void) const
 PlaybackSockEventsMode PlaybackSock::eventsMode(void) const
 {
     return m_eventsMode;
+}
+
+bool PlaybackSock::ReadStringList(QStringList &list)
+{
+    sock->IncrRef();
+    ReferenceLocker rlocker(sock);
+    QMutexLocker locker(&sockLock);
+    if (!sock->IsDataAvailable())
+    {
+        LOG(VB_GENERAL, LOG_DEBUG,
+            "PlaybackSock::ReadStringList(): Data vanished !!!");
+        return false;
+    }
+    return sock->ReadStringList(list);
 }
 
 bool PlaybackSock::SendReceiveStringList(

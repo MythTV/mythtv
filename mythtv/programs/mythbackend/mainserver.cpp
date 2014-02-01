@@ -449,8 +449,24 @@ void MainServer::ProcessRequest(MythSocket *sock)
 
 void MainServer::ProcessRequestWork(MythSocket *sock)
 {
+    sockListLock.lockForRead();
+    PlaybackSock *pbs = GetPlaybackBySock(sock);
+    if (pbs)
+        pbs->IncrRef();
+    sockListLock.unlock();
+
     QStringList listline;
-    if (!sock->ReadStringList(listline) || listline.empty())
+    if (pbs)
+    {
+        if (!pbs->ReadStringList(listline) || listline.empty())
+        {
+            pbs->DecrRef();
+            LOG(VB_GENERAL, LOG_INFO, "No data in ProcessRequestWork()");
+            return;
+        }
+        pbs->DecrRef();
+    }
+    else if (!sock->ReadStringList(listline) || listline.empty())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "No data in ProcessRequestWork()");
         return;
@@ -481,7 +497,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
 
     sockListLock.lockForRead();
-    PlaybackSock *pbs = GetPlaybackBySock(sock);
+    pbs = GetPlaybackBySock(sock);
     if (!pbs)
     {
         sockListLock.unlock();
