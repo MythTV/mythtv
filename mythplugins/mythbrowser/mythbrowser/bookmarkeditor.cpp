@@ -23,6 +23,7 @@ BookmarkEditor::BookmarkEditor(Bookmark *site, bool edit,
       m_siteCategory(),           m_editing(edit),
       m_titleText(NULL),          m_categoryEdit(NULL),
       m_nameEdit(NULL),           m_urlEdit(NULL),
+      m_isHomepage(NULL),
       m_okButton(NULL),           m_cancelButton(NULL),
       m_findCategoryButton(NULL), m_searchDialog(NULL)
 {
@@ -39,7 +40,6 @@ BookmarkEditor::~BookmarkEditor()
 
 bool BookmarkEditor::Create()
 {
-
     bool foundtheme = false;
 
     // Load the theme for this screen
@@ -61,13 +61,14 @@ bool BookmarkEditor::Create()
     m_categoryEdit = dynamic_cast<MythUITextEdit *> (GetChild("category"));
     m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
     m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
+    m_isHomepage = dynamic_cast<MythUICheckBox *> (GetChild("homepage"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     m_findCategoryButton = dynamic_cast<MythUIButton *> (GetChild("findcategory"));
 
-    if (!m_categoryEdit || !m_nameEdit || !m_urlEdit ||  !m_okButton
+    if (!m_categoryEdit || !m_nameEdit || !m_urlEdit || !m_isHomepage ||  !m_okButton
         || !m_cancelButton || !m_findCategoryButton)
     {
         LOG(VB_GENERAL, LOG_ERR, "Theme is missing critical theme elements.");
@@ -83,6 +84,9 @@ bool BookmarkEditor::Create()
         m_categoryEdit->SetText(m_site->category);
         m_nameEdit->SetText(m_site->name);
         m_urlEdit->SetText(m_site->url);
+
+        if (m_site->isHomepage)
+            m_isHomepage->SetCheckState(MythUIStateType::Full);
     }
 
     BuildFocusList();
@@ -117,13 +121,17 @@ void BookmarkEditor::Save()
     if (m_editing && m_siteCategory != "" && m_siteName != "")
         RemoveFromDB(m_siteCategory, m_siteName);
 
-    InsertInDB(m_categoryEdit->GetText(), m_nameEdit->GetText(), m_urlEdit->GetText());
+    ResetHomepageFromDB();
 
+    bool isHomepage = (m_isHomepage->GetCheckState() == MythUIStateType::Full) ? true : false;
+    InsertInDB(m_categoryEdit->GetText(), m_nameEdit->GetText(), m_urlEdit->GetText(), isHomepage );
+    
     if (m_site)
     {
         m_site->category = m_categoryEdit->GetText();
         m_site->name = m_nameEdit->GetText();
         m_site->url = m_urlEdit->GetText();
+        m_site->isHomepage = isHomepage;
     }
 
     Exit();

@@ -9,7 +9,7 @@
 #include "browserdbutil.h"
 #include "bookmarkmanager.h"
 
-const QString currentDatabaseVersion = "1002";
+const QString currentDatabaseVersion = "1003";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -111,6 +111,17 @@ bool UpgradeBrowserDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1002")
+    {
+        const QString updates[] =
+        {
+            "ALTER TABLE `websites` ADD `homepage` BOOL NOT NULL;",
+            ""
+        };
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -130,16 +141,38 @@ bool FindInDB(const QString &category, const QString& name)
     return (query.size() > 0);
 }
 
+bool ResetHomepageFromDB()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE `websites` SET `homepage` = '0' WHERE `homepage` = '1';");
+
+    return query.exec();
+}
+
+bool UpdateHomepageInDB(Bookmark* site)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE `websites` SET `homepage` = '1' "
+                  "WHERE `category` = :CATEGORY "
+                  "AND `name` = :NAME;");
+    query.bindValue(":CATEGORY", site->category);
+    query.bindValue(":NAME", site->name);
+
+    return query.exec();
+}
+
 bool InsertInDB(Bookmark* site)
 {
     if (!site)
         return false;
 
-    return InsertInDB(site->category, site->name, site->url);
+    return InsertInDB(site->category, site->name, site->url, site->isHomepage);
 }
 
 bool InsertInDB(const QString &category,
-                const QString &name, const QString &url)
+                const QString &name,
+                const QString &url,
+                const bool &isHomepage)
 {
     if (category.isEmpty() || name.isEmpty() || url.isEmpty())
         return false;
@@ -155,11 +188,12 @@ bool InsertInDB(const QString &category,
     _url.replace("&amp;","&");
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO websites (category, name, url) "
-                  "VALUES(:CATEGORY, :NAME, :URL);");
+    query.prepare("INSERT INTO websites (category, name, url, homepage) "
+                  "VALUES(:CATEGORY, :NAME, :URL, :HOMEPAGE);");
     query.bindValue(":CATEGORY", category);
     query.bindValue(":NAME", name);
     query.bindValue(":URL", _url);
+    query.bindValue(":HOMEPAGE", isHomepage);
     if (!query.exec())
     {
         MythDB::DBError("mythbrowser: inserting in DB", query);
@@ -222,7 +256,7 @@ int GetSiteList(QList<Bookmark*>  &siteList)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (!query.exec("SELECT category, name, url FROM websites "
+    if (!query.exec("SELECT category, name, url, homepage FROM websites "
                "ORDER BY category, name"))
     {
         LOG(VB_GENERAL, LOG_ERR, "BookmarkManager: Error in loading from DB");
@@ -235,6 +269,7 @@ int GetSiteList(QList<Bookmark*>  &siteList)
             site->category = query.value(0).toString();
             site->name = query.value(1).toString();
             site->url = query.value(2).toString();
+            site->isHomepage = query.value(3).toBool();
             site->selected = false;
             siteList.append(site);
         }
