@@ -96,9 +96,34 @@ static bool checkStorageGroup(void)
     return true;
 }
 
+/// checks we have some tracks available
+static bool checkMusicAvailable(void)
+{
+    MSqlQuery count_query(MSqlQuery::InitCon());
+    bool foundMusic = false;
+    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
+    {
+        if(count_query.next() &&
+            0 != count_query.value(0).toInt())
+        {
+            foundMusic = true;
+        }
+    }
+
+    if (!foundMusic)
+    {
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "No music has been found.\n"
+                                    "Please select 'Scan For New Music' "
+                                    "to perform a scan for music."));
+    }
+
+    return foundMusic;
+}
+
 static void startPlayback(void)
 {
-    if (!checkStorageGroup())
+    if (!checkStorageGroup() || !checkMusicAvailable())
         return;
 
     gMusicData->loadMusic();
@@ -129,7 +154,7 @@ static void startStreamPlayback(void)
 
 static void startDatabaseTree(void)
 {
-    if (!checkStorageGroup())
+    if (!checkStorageGroup() || !checkMusicAvailable())
         return;
 
     gMusicData->loadMusic();

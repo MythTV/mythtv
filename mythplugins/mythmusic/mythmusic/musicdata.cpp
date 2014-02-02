@@ -104,18 +104,6 @@ void MusicData::loadMusic(void)
     if (initialized)
         return;
 
-    MSqlQuery count_query(MSqlQuery::InitCon());
-
-    bool musicdata_exists = false;
-    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
-    {
-        if(count_query.next() &&
-            0 != count_query.value(0).toInt())
-        {
-            musicdata_exists = true;
-        }
-    }
-
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     QString message = qApp->translate("(MythMusicMain)",
                                       "Loading Music. Please wait ...");
