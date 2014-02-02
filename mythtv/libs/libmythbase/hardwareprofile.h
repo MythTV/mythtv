@@ -56,6 +56,7 @@ class MBASE_PUBLIC HardwareProfileTask : public PeriodicHouseKeeperTask
                                             2592000,  // 30 days in seconds
                                             0.96667f, // up to one day early
                                             1.03333f, // up to one day late
+                                            86400, // retry daily on error
                                             kHKLocal, kHKRunOnStartup) {}
     virtual bool DoCheckRun(QDateTime now);
     virtual bool DoRun(void);

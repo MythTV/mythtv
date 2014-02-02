@@ -53,13 +53,14 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
 
     QString         GetTag(void)                    { return m_dbTag;       }
     QDateTime       GetLastRun(void)                { return m_lastRun;     }
+    QDateTime       GetLastSuccess(void)            { return m_lastSuccess; }
     HouseKeeperScope    GetScope(void)              { return m_scope;       }
     QDateTime       QueryLastRun(void);
-    QDateTime       UpdateLastRun(void)
-                           { return UpdateLastRun(MythDate::current());     }
-    virtual QDateTime UpdateLastRun(QDateTime last);
-    virtual void    SetLastRun(QDateTime last)      { m_lastRun = last;
-                                                      m_confirm = false;    }
+    QDateTime       QueryLastSuccess(void);
+    QDateTime       UpdateLastRun(bool successful=true)
+                   { return UpdateLastRun(MythDate::current(), successful); }
+    virtual QDateTime UpdateLastRun(QDateTime last, bool successful=true);
+    virtual void    SetLastRun(QDateTime last, bool successful=true);
 
     virtual bool    DoCheckRun(QDateTime now)       { return false;         }
     virtual bool    DoRun(void)                     { return false;         }
@@ -67,6 +68,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     virtual void    Terminate(void)                 {}
 
   private:
+    void            QueryLast(void);
 
     QString             m_dbTag;
     bool                m_confirm;
@@ -75,25 +77,28 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     bool                m_running;
 
     QDateTime   m_lastRun;
+    QDateTime   m_lastSuccess;
+    QDateTime   m_lastUpdate;
 };
 
 class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
 {
   public:
     PeriodicHouseKeeperTask(const QString &dbTag, int period, float min=0.5,
-                            float max=1.1, HouseKeeperScope scope=kHKGlobal,
+                            float max=1.1, int retry=0, HouseKeeperScope scope=kHKGlobal,
                             HouseKeeperStartup startup=kHKNormal);
     virtual bool DoCheckRun(QDateTime now);
     virtual bool InWindow(QDateTime now);
     virtual bool PastWindow(QDateTime now);
-    virtual QDateTime UpdateLastRun(QDateTime last);
-    virtual void SetLastRun(QDateTime last);
+    virtual QDateTime UpdateLastRun(QDateTime last, bool successful=true);
+    virtual void SetLastRun(QDateTime last, bool successful=true);
     virtual void SetWindow(float min, float max);
 
   protected:
     virtual void CalculateWindow(void);
 
     int                         m_period;
+    int                         m_retry;
     QPair<float,float>          m_windowPercent;
     QPair<int,int>              m_windowElapsed;
     float                       m_currentProb;

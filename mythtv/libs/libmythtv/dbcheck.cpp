@@ -2595,6 +2595,18 @@ NULL
             return false;
     }
 
+    if (dbver == "1321")
+    {
+        const char *updates[] = {
+            "ALTER TABLE `housekeeping` ADD COLUMN `lastsuccess` DATETIME;",
+            "UPDATE `housekeeping` SET `lastsuccess`=`lastrun`;",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1322", dbver))
+            return false;
+    }
+
     return true;
 }
 

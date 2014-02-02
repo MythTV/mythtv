@@ -96,7 +96,9 @@
 HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
                                  HouseKeeperStartup startup):
     ReferenceCounter(dbTag), m_dbTag(dbTag), m_confirm(false), m_scope(scope),
-    m_startup(startup), m_running(false), m_lastRun(MythDate::fromTime_t(0))
+    m_startup(startup), m_running(false), m_lastRun(MythDate::fromTime_t(0)),
+    m_lastSuccess(MythDate::fromTime_t(0)),
+    m_lastUpdate(MythDate::fromTime_t(0))
 {
 }
 
@@ -154,21 +156,38 @@ bool HouseKeeperTask::Run(void)
 
 QDateTime HouseKeeperTask::QueryLastRun(void)
 {
+    QueryLast();
+    return m_lastRun;
+}
+
+QDateTime HouseKeeperTask::QueryLastSuccess(void)
+{
+    QueryLast();
+    return m_lastRun;
+}
+
+void HouseKeeperTask::QueryLast(void)
+{
     if (m_scope != kHKInst)
     {
+        if (m_lastUpdate.addSecs(30) > MythDate::current())
+            // just to cut down on unnecessary queries
+            return;
+
         MSqlQuery query(MSqlQuery::InitCon());
 
         m_lastRun = MythDate::fromTime_t(0);
+        m_lastSuccess = MythDate::fromTime_t(0);
 
         if (m_scope == kHKGlobal)
         {
-            query.prepare("SELECT lastrun FROM housekeeping"
+            query.prepare("SELECT lastrun,lastsuccess FROM housekeeping"
                           " WHERE tag = :TAG"
                           "   AND hostname IS NULL");
         }
         else
         {
-            query.prepare("SELECT lastrun FROM housekeeping"
+            query.prepare("SELECT lastrun,lastsuccess FROM housekeeping"
                           " WHERE tag = :TAG"
                           "   AND hostname = :HOST");
             query.bindValue(":HOST", gCoreContext->GetHostName());
@@ -179,14 +198,20 @@ QDateTime HouseKeeperTask::QueryLastRun(void)
         if (query.exec() && query.next())
         {
             m_lastRun = MythDate::as_utc(query.value(0).toDateTime());
+            m_lastSuccess = MythDate::as_utc(query.value(1).toDateTime());
         }
     }
 
-    return m_lastRun;
+    m_lastUpdate = MythDate::current();
 }
 
-QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
+QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last, bool successful)
 {
+    m_lastRun = last;
+    if (successful)
+        m_lastSuccess = last;
+    m_confirm = false;
+
     if (m_scope != kHKInst)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -198,23 +223,26 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
             // not previously set, perform insert
 
             if (m_scope == kHKGlobal)
-                query.prepare("INSERT INTO housekeeping (tag, lastrun)"
-                              "     VALUES (:TAG, :TIME)");
+                query.prepare("INSERT INTO housekeeping"
+                              "         (tag, lastrun, lastsuccess)"
+                              "     VALUES (:TAG, :TIME, :STIME)");
             else
                 query.prepare("INSERT INTO housekeeping"
-                              "            ( tag,  hostname, lastrun)"
-                              "     VALUES (:TAG, :HOST,    :TIME)");
+                              "         (tag, hostname, lastrun, lastsuccess)"
+                              "     VALUES (:TAG, :HOST, :TIME, :STIME)");
         }
         else
         {
             // previously set, perform update
 
             if (m_scope == kHKGlobal)
-                query.prepare("UPDATE housekeeping SET lastrun=:TIME"
+                query.prepare("UPDATE housekeeping SET lastrun=:TIME,"
+                              "                        lastsuccess=:STIME"
                               " WHERE tag = :TAG"
                               "   AND hostname IS NULL");
             else
                 query.prepare("UPDATE housekeeping SET lastrun=:TIME"
+                              "                        lastsuccess=:STIME"
                               " WHERE tag = :TAG"
                               "   AND hostname = :HOST");
         }
@@ -229,21 +257,34 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
         if (m_scope == kHKLocal)
             query.bindValue(":HOST", gCoreContext->GetHostName());
         query.bindValue(":TAG", m_dbTag);
-        query.bindValue(":TIME", MythDate::as_utc(last));
+        query.bindValue(":TIME", MythDate::as_utc(m_lastRun));
+        query.bindValue(":STIME", MythDate::as_utc(m_lastSuccess));
 
         if (!query.exec())
             MythDB::DBError("HouseKeeperTask::updateLastRun", query);
     }
 
-    m_lastRun = last;
-    m_confirm = false;
-
-    QString msg = QString("HOUSE_KEEPER_RUNNING %1 %2 %3")
-                .arg(gCoreContext->GetHostName()).arg(m_dbTag)
-                .arg(MythDate::toString(last, MythDate::ISODate));
+    QString msg;
+    if (successful)
+        msg = QString("HOUSE_KEEPER_SUCCESSFUL %1 %2 %3");
+    else
+        msg = QString("HOUSE_KEEPER_RUNNING %1 %2 %3");
+    msg = msg.arg(gCoreContext->GetHostName())
+             .arg(m_dbTag)
+             .arg(MythDate::toString(last, MythDate::ISODate));
     gCoreContext->SendEvent(MythEvent(msg));
+    m_lastUpdate = MythDate::current();
 
     return last;
+}
+
+void HouseKeeperTask::SetLastRun(QDateTime last, bool successful)
+{
+    m_lastRun = last;
+    if (successful)
+        m_lastSuccess = last;
+
+    m_lastUpdate = MythDate::current();
 }
 
 /** \class PeriodicHouseKeeperTask
@@ -260,20 +301,28 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last)
  *
  */
 PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
-            int period, float min, float max, HouseKeeperScope scope,
-            HouseKeeperStartup startup) :
-    HouseKeeperTask(dbTag, scope, startup), m_period(period),
+            int period, float min, float max, int retry,
+            HouseKeeperScope scope, HouseKeeperStartup startup) :
+    HouseKeeperTask(dbTag, scope, startup), m_period(period), m_retry(retry),
     m_windowPercent(min, max), m_currentProb(1.0)
 {
     CalculateWindow();
+    if (m_retry == 0)
+        m_retry = m_period;
 }
 
 void PeriodicHouseKeeperTask::CalculateWindow(void)
 {
+    int period = m_period;
+    if (GetLastRun() > GetLastSuccess())
+        // last attempt was not successful
+        // try shortened period
+        period = m_retry;
+
     m_windowElapsed.first =
-                    (uint32_t)((float)m_period * m_windowPercent.first);
+                    (uint32_t)((float)period * m_windowPercent.first);
     m_windowElapsed.second =
-                    (uint32_t)((float)m_period * m_windowPercent.second);
+                    (uint32_t)((float)period * m_windowPercent.second);
 }
 
 void PeriodicHouseKeeperTask::SetWindow(float min, float max)
@@ -283,17 +332,18 @@ void PeriodicHouseKeeperTask::SetWindow(float min, float max)
     CalculateWindow();
 }
 
-QDateTime PeriodicHouseKeeperTask::UpdateLastRun(QDateTime last)
+QDateTime PeriodicHouseKeeperTask::UpdateLastRun(QDateTime last,
+                                                 bool successful)
 {
-    QDateTime res = HouseKeeperTask::UpdateLastRun(last);
+    QDateTime res = HouseKeeperTask::UpdateLastRun(last, successful);
     CalculateWindow();
     m_currentProb = 1.0;
     return res;
 }
 
-void PeriodicHouseKeeperTask::SetLastRun(QDateTime last)
+void PeriodicHouseKeeperTask::SetLastRun(QDateTime last, bool successful)
 {
-    HouseKeeperTask::SetLastRun(last);
+    HouseKeeperTask::SetLastRun(last, successful);
     CalculateWindow();
     m_currentProb = 1.0;
 }
@@ -376,7 +426,7 @@ bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
  */
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
         HouseKeeperScope scope, HouseKeeperStartup startup) :
-    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, scope, startup),
+    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(0, 23)
 {
     CalculateWindow();
@@ -384,7 +434,7 @@ DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
 
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
         int maxhour, HouseKeeperScope scope, HouseKeeperStartup startup) :
-    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, scope, startup),
+    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
     m_windowHour(minhour, maxhour)
 {
     CalculateWindow();
@@ -464,8 +514,9 @@ void HouseKeepingThread::run(void)
                 continue;
             }
 
-            task->UpdateLastRun();
-            task->Run();
+            task->UpdateLastRun(false);
+            if (task->Run())
+                task->UpdateLastRun(task->GetLastRun(), true);
             task = NULL;
 
             if (!m_keepRunning)
@@ -768,7 +819,8 @@ void HouseKeeper::customEvent(QEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent*)e;
-        if (me->Message().left(20) == "HOUSE_KEEPER_RUNNING")
+        if ((me->Message().left(20) == "HOUSE_KEEPER_RUNNING") ||
+            (me->Message().left(23) == "HOUSE_KEEPER_SUCCESSFUL"))
         {
             QStringList tokens = me->Message()
                                     .split(" ", QString::SkipEmptyParts);
@@ -778,6 +830,7 @@ void HouseKeeper::customEvent(QEvent *e)
             QString hostname = tokens[1];
             QString tag = tokens[2];
             QDateTime last = MythDate::fromString(tokens[3]);
+            bool successful = me->Message().contains("SUCCESSFUL");
 
             QMutexLocker mapLock(&m_mapLock);
             if (m_taskMap.contains(tag))
@@ -788,7 +841,7 @@ void HouseKeeper::customEvent(QEvent *e)
                     // task being run in the same scope as us.
                     // update the run time so we don't attempt to run
                     //      it ourselves
-                    m_taskMap[tag]->SetLastRun(last);
+                    m_taskMap[tag]->SetLastRun(last, successful);
             }
         }
     }
