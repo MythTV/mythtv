@@ -1028,7 +1028,6 @@ QString MusicMetadata::getAlbumArtFile(void)
                             .arg(Hostname())
                             .arg(ID())
                             .arg(AlbumArtImages::getTypeFilename(albumart_image->imageType));
-                    LOG(VB_GENERAL, LOG_INFO, QString("MusicMetadata::getAlbumArtFile: Sending '%1'").arg(slist.join(" ")));
                     gCoreContext->SendReceiveStringList(slist);
                 }
             }
