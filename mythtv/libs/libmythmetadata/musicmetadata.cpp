@@ -1882,15 +1882,15 @@ void AlbumArtImages::dumpToDatabase(void)
         {
             // re-use the same id this image had before
             query.prepare("INSERT INTO music_albumart ( albumart_id, "
-                          "filename, imagetype, song_id, directory_id, embedded ) "
-                          "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");
+                          "filename, imagetype, song_id, directory_id, embedded, hostname ) "
+                          "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
             query.bindValue(":ID", image->id);
         }
         else
         {
             query.prepare("INSERT INTO music_albumart ( filename, "
-                        "imagetype, song_id, directory_id, embedded ) VALUES ( "
-                        ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");
+                        "imagetype, song_id, directory_id, embedded, hostname ) VALUES ( "
+                        ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
         }
 
         QFileInfo fi(image->filename);
@@ -1900,6 +1900,7 @@ void AlbumArtImages::dumpToDatabase(void)
         query.bindValue(":SONGID", image->embedded ? trackID : 0);
         query.bindValue(":DIRECTORYID", image->embedded ? 0 : directoryID);
         query.bindValue(":EMBED", image->embedded);
+        query.bindValue(":HOSTNAME", image->hostname);
 
         if (!query.exec())
             MythDB::DBError("AlbumArtImages::dumpToDatabase - "
