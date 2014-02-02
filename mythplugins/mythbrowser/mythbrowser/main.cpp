@@ -65,11 +65,11 @@ void runBookmarkManager()
     mythplugin_run();
 }
 
-+/** \fn runHomepage()
-+ *  \brief Loads the specified homepage from the database (the name starts
-+           with an underscore) and calls handleMedia() if it exists.
-+ *  \return void.
-+ */
+/** \fn runHomepage()
+ *  \brief Loads the specified homepage from the database (the name starts
+ *         with an underscore) and calls handleMedia() if it exists.
+ *  \return void.
+ */
 void runHomepage()
 {
     // Get the homepage from the database. The url
@@ -77,12 +77,12 @@ void runHomepage()
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.exec("SELECT url FROM `websites` WHERE `homepage` = true;"))
-        VERBOSE(VB_IMPORTANT, "Error loading homepage from DB");
+        LOG(VB_GENERAL, LOG_ERR, "Error loading homepage from DB");
 
     if (query.size() > 0)
     {
         query.next();
-        handleMedia( query.value(0).toString(), "", "", "", "", 0, 0, 0, "");
+        handleMedia( query.value(0).toString(), "", "", "", "", 0, 0, "", 0, "", "", false);
     }
     else
     {
