@@ -1015,52 +1015,21 @@ QString MusicMetadata::getAlbumArtFile(void)
         }
         else
         {
-            if (res.startsWith("myth://"))
+            // check for the image in the storage group
+            QUrl url(res);
+            QString sUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
+
+            if (sUrl.isEmpty())
             {
-                // check for the image in the storage group
-                if (!RemoteFile::Exists(res))
+                if (albumart_image->embedded)
                 {
-                    if (albumart_image->embedded)
-                    {
-                        // image is embedded try to extract it from the tag and cache it for latter
-                        //TODO need to update this to work with storage groups
-
-                        return QString("");
-                    }
-
-                    // image couldn't be found!
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return QString("");
-                }
-            }
-            else
-            {
-                // check for the image in the local filesystem
-                if (!QFile::exists(res))
-                {
-                    if (albumart_image->embedded)
-                    {
-                        // image is embedded try to extract it from the tag and cache it for latter
-                        MetaIO *tagger = getTagger();
-                        if (tagger && tagger->supportsEmbeddedImages())
-                        {
-                            QImage *image = tagger->getAlbumArt(Filename(), albumart_image->imageType);
-                            if (image)
-                            {
-                                image->save(res);
-                                delete image;
-                                delete tagger;
-                                return res;
-                            }
-                        }
-
-                        if (tagger)
-                            delete tagger;
-                    }
-
-                    // image couldn't be found!
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return QString("");
+                    QStringList slist;
+                    slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
+                            .arg(Hostname())
+                            .arg(ID())
+                            .arg(AlbumArtImages::getTypeFilename(albumart_image->imageType));
+                    LOG(VB_GENERAL, LOG_INFO, QString("MusicMetadata::getAlbumArtFile: Sending '%1'").arg(slist.join(" ")));
+                    gCoreContext->SendReceiveStringList(slist);
                 }
             }
         }
@@ -1861,34 +1830,12 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
     }
 
     // if this is an embedded image copy it to disc to speed up its display
-    MetaIO *tagger = m_parent->getTagger();
-
-    if (tagger)
-    {
-        if (image->embedded && tagger->supportsEmbeddedImages())
-        {
-            QString path = GetConfDir() + "/MythMusic/AlbumArt/";
-            QDir dir(path);
-
-            QString filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
-            if (!QFile::exists(path + filename))
-            {
-                if (!dir.exists())
-                    dir.mkpath(path);
-
-                QImage *saveImage = tagger->getAlbumArt(m_parent->Filename(), image->imageType);
-                if (saveImage)
-                {
-                    saveImage->save(path + filename, "JPEG");
-                    delete saveImage;
-                }
-            }
-
-            image->filename = path + filename;
-        }
-
-        delete tagger;
-    }
+    QStringList slist;
+    slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
+          .arg(m_parent->Hostname())
+          .arg(m_parent->ID())
+          .arg(AlbumArtImages::getTypeFilename(image->imageType));
+    gCoreContext->SendReceiveStringList(slist);
 }
 
 /// saves or updates the image details in the DB
