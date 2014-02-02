@@ -5,6 +5,7 @@
 
 // Libmythbase
 #include <mythlogging.h>
+#include <mythcorecontext.h>
 
 // Taglib
 #include <flacfile.h>
@@ -485,6 +486,7 @@ AlbumArtList MetaIOID3::readAlbumArt(TagLib::ID3v2::Tag *tag)
                 art->description = TStringToQString(frame->description());
 
             art->embedded = true;
+            art->hostname = gCoreContext->GetHostName();
 
             QString ext = getExtFromMimeType(
                                 TStringToQString(frame->mimeType()).toLower());
