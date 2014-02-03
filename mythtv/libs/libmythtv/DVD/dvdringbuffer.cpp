@@ -593,7 +593,6 @@ bool DVDRingBuffer::StartFromBeginning(void)
         dvdnav_menu_language_select(m_dvdnav, lang.toLatin1().data());
         dvdnav_audio_language_select(m_dvdnav, lang.toLatin1().data());
         dvdnav_spu_language_select(m_dvdnav, lang.toLatin1().data());
-        dvdnav_first_play(m_dvdnav);
         m_audioStreamsChanged = true;
     }
 

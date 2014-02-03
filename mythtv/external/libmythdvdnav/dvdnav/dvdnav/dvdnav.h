@@ -262,11 +262,6 @@ dvdnav_status_t dvdnav_stop(dvdnav_t *self);
  *********************************************************************/
 
 /*
- * Play DVD from the Beginning
- */
-void dvdnav_first_play(dvdnav_t *self);
-
-/*
  * Returns the number of titles on the disk.
  */
 dvdnav_status_t dvdnav_get_number_of_titles(dvdnav_t *self, int32_t *titles);
