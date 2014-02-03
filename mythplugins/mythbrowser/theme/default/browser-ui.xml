@@ -274,13 +274,23 @@
             <position>195,340</position>
         </textedit>
 
+        <textarea name="homepagelabel" from="basetextarea">
+            <area>80,450,100,30</area>
+            <align>right,vcenter</align>
+            <value>Homepage:</value>
+        </textarea>
+
+        <checkbox name="homepage" from="basecheckbox">
+            <position>195,440</position>
+        </checkbox>
+
         <button name="cancel" from="basebutton">
-            <position>60,480</position>
+            <position>60,530</position>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <position>590,480</position>
+            <position>590,530</position>
             <value>OK</value>
         </button>
 

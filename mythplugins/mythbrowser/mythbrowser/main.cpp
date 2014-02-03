@@ -60,12 +60,58 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
     return 0;
 }
 
+void runBookmarkManager()
+{
+    mythplugin_run();
+}
+
+/** \fn runHomepage()
+ *  \brief Loads the specified homepage from the database (the name starts
+ *         with an underscore) and calls handleMedia() if it exists.
+ *  \return void.
+ */
+void runHomepage()
+{
+    // Get the homepage from the database. The url
+    // that is set as a homepage starts with a space.
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!query.exec("SELECT url FROM `websites` WHERE `homepage` = true;"))
+        LOG(VB_GENERAL, LOG_ERR, "Error loading homepage from DB");
+
+    if (query.size() > 0)
+    {
+        query.next();
+        handleMedia( query.value(0).toString(), "", "", "", "", 0, 0, "", 0, "", "", false);
+    }
+    else
+    {
+        // show a dialog that no homepage is specified
+        QString message = "No homepage was specified.\n"
+                          "If required you can do this in the bookmark manager";
+
+        MythScreenStack *m_popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+
+        MythConfirmationDialog *okPopup =
+                new MythConfirmationDialog(m_popupStack, message, false);
+
+        if (okPopup->Create())
+            m_popupStack->AddScreen(okPopup);
+    }
+}
+
 static void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB", QT_TRANSLATE_NOOP("MythControls",
         "Move to next browser tab"), "P");
     REG_KEY("Browser", "PREVTAB", QT_TRANSLATE_NOOP("MythControls",
         "Move to previous browser tab"), "");
+
+    REG_JUMP("Bookmarks", QT_TRANSLATE_NOOP("MythControls",
+        "Show the bookmark manager"), "", runBookmarkManager);
+    REG_JUMP("Homepage", QT_TRANSLATE_NOOP("MythControls",
+        "Show the webbrowser homepage"), "", runHomepage);
 
     REG_MEDIAPLAYER("WebBrowser", QT_TRANSLATE_NOOP("MythControls",
         "Internal Web Browser"), handleMedia);

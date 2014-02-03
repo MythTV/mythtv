@@ -1015,52 +1015,20 @@ QString MusicMetadata::getAlbumArtFile(void)
         }
         else
         {
-            if (res.startsWith("myth://"))
+            // check for the image in the storage group
+            QUrl url(res);
+            QString sUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
+
+            if (sUrl.isEmpty())
             {
-                // check for the image in the storage group
-                if (!RemoteFile::Exists(res))
+                if (albumart_image->embedded)
                 {
-                    if (albumart_image->embedded)
-                    {
-                        // image is embedded try to extract it from the tag and cache it for latter
-                        //TODO need to update this to work with storage groups
-
-                        return QString("");
-                    }
-
-                    // image couldn't be found!
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return QString("");
-                }
-            }
-            else
-            {
-                // check for the image in the local filesystem
-                if (!QFile::exists(res))
-                {
-                    if (albumart_image->embedded)
-                    {
-                        // image is embedded try to extract it from the tag and cache it for latter
-                        MetaIO *tagger = getTagger();
-                        if (tagger && tagger->supportsEmbeddedImages())
-                        {
-                            QImage *image = tagger->getAlbumArt(Filename(), albumart_image->imageType);
-                            if (image)
-                            {
-                                image->save(res);
-                                delete image;
-                                delete tagger;
-                                return res;
-                            }
-                        }
-
-                        if (tagger)
-                            delete tagger;
-                    }
-
-                    // image couldn't be found!
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return QString("");
+                    QStringList slist;
+                    slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
+                            .arg(Hostname())
+                            .arg(ID())
+                            .arg(AlbumArtImages::getTypeFilename(albumart_image->imageType));
+                    gCoreContext->SendReceiveStringList(slist);
                 }
             }
         }
@@ -1700,6 +1668,7 @@ void AlbumArtImages::findImages(void)
 
                 image->imageType = (ImageType) query.value(3).toInt();
                 image->embedded = embedded;
+                image->hostname = query.value(5).toString();
 
                 m_imageList.push_back(image);
             }
@@ -1858,36 +1827,20 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
         image->imageType = newImage.imageType;
         image->embedded = newImage.embedded;
         image->description = newImage.description;
+        image->hostname = newImage.hostname;
     }
 
     // if this is an embedded image copy it to disc to speed up its display
-    MetaIO *tagger = m_parent->getTagger();
-
-    if (tagger)
+    if (image->embedded)
     {
-        if (image->embedded && tagger->supportsEmbeddedImages())
-        {
-            QString path = GetConfDir() + "/MythMusic/AlbumArt/";
-            QDir dir(path);
+        image->filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
 
-            QString filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
-            if (!QFile::exists(path + filename))
-            {
-                if (!dir.exists())
-                    dir.mkpath(path);
-
-                QImage *saveImage = tagger->getAlbumArt(m_parent->Filename(), image->imageType);
-                if (saveImage)
-                {
-                    saveImage->save(path + filename, "JPEG");
-                    delete saveImage;
-                }
-            }
-
-            image->filename = path + filename;
-        }
-
-        delete tagger;
+        QStringList slist;
+        slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
+            .arg(m_parent->Hostname())
+            .arg(m_parent->ID())
+            .arg(AlbumArtImages::getTypeFilename(image->imageType));
+        gCoreContext->SendReceiveStringList(slist);
     }
 }
 
@@ -1935,15 +1888,15 @@ void AlbumArtImages::dumpToDatabase(void)
         {
             // re-use the same id this image had before
             query.prepare("INSERT INTO music_albumart ( albumart_id, "
-                          "filename, imagetype, song_id, directory_id, embedded ) "
-                          "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");
+                          "filename, imagetype, song_id, directory_id, embedded, hostname ) "
+                          "VALUES ( :ID, :FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
             query.bindValue(":ID", image->id);
         }
         else
         {
             query.prepare("INSERT INTO music_albumart ( filename, "
-                        "imagetype, song_id, directory_id, embedded ) VALUES ( "
-                        ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED );");
+                        "imagetype, song_id, directory_id, embedded, hostname ) VALUES ( "
+                        ":FILENAME, :TYPE, :SONGID, :DIRECTORYID, :EMBED, :HOSTNAME );");
         }
 
         QFileInfo fi(image->filename);
@@ -1953,6 +1906,7 @@ void AlbumArtImages::dumpToDatabase(void)
         query.bindValue(":SONGID", image->embedded ? trackID : 0);
         query.bindValue(":DIRECTORYID", image->embedded ? 0 : directoryID);
         query.bindValue(":EMBED", image->embedded);
+        query.bindValue(":HOSTNAME", image->hostname);
 
         if (!query.exec())
             MythDB::DBError("AlbumArtImages::dumpToDatabase - "

@@ -282,6 +282,7 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
                 art->description = TStringToQString(pic->description());
 
             art->embedded = true;
+            art->hostname = gCoreContext->GetHostName();
 
             QString ext = getExtFromMimeType(
                                 TStringToQString(pic->mimeType()).toLower());
