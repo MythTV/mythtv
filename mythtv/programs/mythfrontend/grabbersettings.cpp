@@ -250,7 +250,8 @@ void GrabberSettings::slotSave(void)
     int dailyupdatestate = 0;
     if (m_dailyUpdatesCheck->GetCheckState() == MythUIStateType::Full)
         dailyupdatestate = 1;
-    gCoreContext->SaveSettingOnHost("DailyArtworkUpdates", QString(dailyupdatestate), "");
+    gCoreContext->SaveSettingOnHost("DailyArtworkUpdates",
+                                    QString::number(dailyupdatestate), "");
 
     Close();
 }
