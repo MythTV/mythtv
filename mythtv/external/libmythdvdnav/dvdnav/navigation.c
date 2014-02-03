@@ -169,14 +169,6 @@ dvdnav_status_t dvdnav_current_title_program(dvdnav_t *this, int32_t *title, int
   return DVDNAV_STATUS_ERR;
 }
 
-void dvdnav_first_play(dvdnav_t *this) {
-  pthread_mutex_lock(&this->vm_lock);
-  this->started = 0;
-  vm_start(this->vm);
-  this->started = 1;
-  pthread_mutex_unlock(&this->vm_lock);
-}
-
 dvdnav_status_t dvdnav_title_play(dvdnav_t *this, int32_t title) {
   return dvdnav_part_play(this, title, 1);
 }
