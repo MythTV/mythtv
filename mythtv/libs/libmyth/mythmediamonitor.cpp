@@ -407,6 +407,8 @@ void MediaMonitor::CheckDevices(void)
     /* check if new devices have been plugged in */
     CheckDeviceNotifications();
 
+    QMutexLocker locker(&m_DevicesLock);
+
     QList<MythMediaDevice*>::iterator itr = m_Devices.begin();
     MythMediaDevice* pDev;
     while (itr != m_Devices.end())
