@@ -527,7 +527,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
         return false;
     }
 
-    const int readSize = 16 * 1024;
+    const int readSize = 2 * 1024 * 1024;
     char *buf = new char[readSize];
     if (!buf)
     {
@@ -556,7 +556,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst)
 
     int srcLen, dstLen;
 
-    while ((srcLen = srcFile.Read(buf, sizeof(buf))) > 0)
+    while ((srcLen = srcFile.Read(buf, readSize)) > 0)
     {
         dstLen = dstFile.Write(buf, srcLen);
 
