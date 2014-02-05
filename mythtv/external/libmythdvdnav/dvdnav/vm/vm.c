@@ -340,6 +340,7 @@ int vm_reset(vm_t *vm, const char *dvdroot) {
   (vm->state).registers.SPRM[18] = ('e'<<8)|'n'; /* Initial Language Code for Spu */
   (vm->state).registers.SPRM[20] = 0x1;          /* Player Regional Code Mask. Region free! */
   (vm->state).registers.SPRM[14] = 0x100;        /* Try Pan&Scan */
+  (vm->state).registers.SPRM[15] = 0x7CFC;       /* Audio capabilities - All defined audio types */
 
   (vm->state).pgN                = 0;
   (vm->state).cellN              = 0;
