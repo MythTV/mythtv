@@ -24,12 +24,14 @@ using namespace std;
 #include <QKeyEvent>
 #include <QEvent>
 #include <QFile>
+#include <QUrl>
 
 // MythTV plugin includes
 #include <mythcontext.h>
 #include <mythdb.h>
 #include <lcddevice.h>
 #include <mythmediamonitor.h>
+#include <mythdirs.h>
 
 // MythUI
 #include <mythdialogbox.h>
@@ -40,6 +42,8 @@ using namespace std;
 #include <mythuiprogressbar.h>
 #include <mythuibuttonlist.h>
 #include <mythsystemlegacy.h>
+#include <storagegroup.h>
+#include <remotefile.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>
@@ -87,6 +91,10 @@ QEvent::Type RipStatusEvent::kOverallProgressEvent =
 QEvent::Type RipStatusEvent::kOverallPercentEvent =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type RipStatusEvent::kOverallStartEvent =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type RipStatusEvent::kCopyStartEvent =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type RipStatusEvent::kCopyEndEvent =
     (QEvent::Type) QEvent::registerEventType();
 QEvent::Type RipStatusEvent::kFinishedEvent =
     (QEvent::Type) QEvent::registerEventType();
@@ -176,12 +184,18 @@ CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
     m_CDdevice(device), m_quality(quality),
     m_tracks(tracks), m_totalSectors(0),
     m_totalSectorsDone(0), m_lastTrackPct(0),
-    m_lastOverallPct(0)
+    m_lastOverallPct(0), m_musicStorageDir("")
+
 {
 #ifdef WIN32 // libcdio needs the drive letter with no path
     if (m_CDdevice.endsWith('\\'))
         m_CDdevice.chop(1);
 #endif // WIN32
+
+    QString lastHost = gCoreContext->GetSetting("MythMusicLastRipHost", gCoreContext->GetMasterHostName());
+    QStringList dirs = StorageGroup::getGroupDirs("Music", lastHost);
+    if (dirs.count() > 0)
+        m_musicStorageDir = StorageGroup::getGroupDirs("Music", lastHost).at(0);
 }
 
 CDRipperThread::~CDRipperThread(void)
@@ -255,6 +269,7 @@ void CDRipperThread::run(void)
     }
 
     MusicMetadata *titleTrack = NULL;
+    QString saveDir = GetConfDir() + "/MythMusic/RipTemp/";
     QString outfile;
 
     std::auto_ptr<Encoder> encoder;
@@ -296,27 +311,25 @@ void CDRipperThread::run(void)
                 titleTrack = track;
                 titleTrack->setLength(m_tracks->at(trackno)->length);
 
-                outfile = filenameFromMetadata(track);
-
                 if (m_quality < 3)
                 {
                     if (encodertype == "mp3")
                     {
-                        outfile += ".mp3";
-                        encoder.reset(new LameEncoder(/*getMusicDirectory() + */outfile, m_quality,
+                        outfile = QString("track%1.mp3").arg(trackno);
+                        encoder.reset(new LameEncoder(saveDir + outfile, m_quality,
                                                       titleTrack, mp3usevbr));
                     }
                     else // ogg
                     {
-                        outfile += ".ogg";
-                        encoder.reset(new VorbisEncoder(/*getMusicDirectory() + */outfile, m_quality,
+                        outfile = QString("track%1.ogg").arg(trackno);
+                        encoder.reset(new VorbisEncoder(saveDir + outfile, m_quality,
                                                         titleTrack));
                     }
                 }
                 else
                 {
-                    outfile += ".flac";
-                    encoder.reset(new FlacEncoder(/*getMusicDirectory() + */outfile, m_quality,
+                    outfile = QString("track%1.flac").arg(trackno);
+                    encoder.reset(new FlacEncoder(saveDir + outfile, m_quality,
                                                   titleTrack));
                 }
 
@@ -354,12 +367,24 @@ void CDRipperThread::run(void)
                 return;
             }
 
-            // save the metadata to the DB
             if (m_tracks->at(trackno)->active)
             {
-                titleTrack->setFilename(outfile);
+                QString ext = QFileInfo(outfile).suffix();
+                QString destFile = filenameFromMetadata(titleTrack) + '.' + ext;
+                QUrl url(m_musicStorageDir);
+
+                // save the metadata to the DB
+                titleTrack->setFilename(destFile);
+                titleTrack->setHostname(url.host());
                 titleTrack->setFileSize((quint64)QFileInfo(outfile).size());
                 titleTrack->dumpToDatabase();
+
+                // copy track to the BE
+                destFile = gCoreContext->GenMythURL(url.host(), 0, destFile, "Music");
+
+                QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyStartEvent, 0));
+                RemoteFile::CopyFile(saveDir + outfile, destFile);
+                QApplication::postEvent(m_parent, new RipStatusEvent(RipStatusEvent::kCopyEndEvent, 0));
             }
         }
     }
@@ -500,6 +525,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 
 Ripper::Ripper(MythScreenStack *parent, QString device) :
     MythScreenType(parent, "ripcd"),
+    m_musicStorageDir(""),
+
     m_decoder(NULL),
 
     m_artistEdit(NULL),
@@ -538,10 +565,28 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
         mon->StopMonitoring();
     }
 #endif // _WIN32
+
+    // make sure the directory where we temporarily save the rips is present
+    QDir dir;
+    dir.mkpath(GetConfDir() + "/MythMusic/RipTemp/");
+
+    // remove any ripped tracks from the temp rip directory
+    QString command = "rm -f " + GetConfDir() + "/MythMusic/RipTemp/*";
+    myth_system(command);
+
+    // get last host and directory we ripped to
+    QString lastHost = gCoreContext->GetSetting("MythMusicLastRipHost", gCoreContext->GetMasterHostName());
+    QStringList dirs = StorageGroup::getGroupDirs("Music", lastHost);
+    if (dirs.count() > 0)
+        m_musicStorageDir = StorageGroup::getGroupDirs("Music", lastHost).at(0);
 }
 
 Ripper::~Ripper(void)
 {
+    // remove any ripped tracks from the temp rip directory
+    QString command = "rm -f " + GetConfDir() + "/MythMusic/RipTemp/*";
+    myth_system(command);
+
     if (m_decoder)
         delete m_decoder;
 
@@ -636,9 +681,9 @@ bool Ripper::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "EDIT" || action == "INFO") // INFO purely for historical reasons
-        {
             showEditMetadataDialog(m_trackList->GetItemCurrent());
-        }
+        else if (action == "MENU")
+            ShowMenu();
         else
             handled = false;
     }
@@ -647,6 +692,83 @@ bool Ripper::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+void Ripper::ShowMenu()
+{
+    if (m_tracks->empty())
+        return;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menu = new MythDialogBox("", popupStack, "ripmusicmenu");
+
+    if (menu->Create())
+        popupStack->AddScreen(menu);
+    else
+    {
+        delete menu;
+        return;
+    }
+
+    menu->SetReturnEvent(this, "menu");
+    menu->AddButton(tr("Select Where To Save Tracks"), SLOT(chooseBackend()));
+    menu->AddButton(tr("Edit Track Metadata"), SLOT(showEditMetadataDialog()));
+}
+
+void Ripper::showEditMetadataDialog(void)
+{
+    showEditMetadataDialog(m_trackList->GetItemCurrent());
+}
+
+void Ripper::chooseBackend(void)
+{
+    QStringList hostList;
+
+    // get a list of hosts with a directory defined for the 'Music' storage group
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString sql = "SELECT DISTINCT hostname "
+                  "FROM storagegroup "
+                  "WHERE groupname = 'Music'";
+    if (!query.exec(sql) || !query.isActive())
+        MythDB::DBError("Ripper::chooseBackend get host list", query);
+    else
+    {
+        while(query.next())
+        {
+            hostList.append(query.value(0).toString());
+        }
+    }
+
+    if (hostList.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Ripper::chooseBackend: No backends found");
+        return;
+    }
+
+    QString msg = tr("Select where to save tracks");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUISearchDialog *searchDlg = new MythUISearchDialog(popupStack, msg, hostList, false, "");
+
+    if (!searchDlg->Create())
+    {
+        delete searchDlg;
+        return;
+    }
+
+    connect(searchDlg, SIGNAL(haveResult(QString)), SLOT(setSaveHost(QString)));
+
+    popupStack->AddScreen(searchDlg);
+}
+
+void Ripper::setSaveHost(QString host)
+{
+    gCoreContext->SaveSetting("MythMusicLastRipHost", host);
+
+    QStringList dirs = StorageGroup::getGroupDirs("Music", host);
+    if (dirs.count() > 0)
+        m_musicStorageDir = StorageGroup::getGroupDirs("Music", host).at(0);
 }
 
 void Ripper::startScanCD(void)
@@ -823,10 +945,13 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
     if (query.next())
     {
         int trackID = query.value(0).toInt();
-        QString filename = /*getMusicDirectory() +*/ query.value(1).toString();
+        QString filename = query.value(1).toString();
+        QUrl url(m_musicStorageDir);
+        filename = gCoreContext->GenMythURL(url.host(), 0, filename, "Music");
 
         // delete file
-        if (!QFile::remove(filename))
+        // FIXME: RemoteFile::DeleteFile will only work with files on the master BE
+        if (!RemoteFile::DeleteFile(filename))
         {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Ripper::deleteExistingTrack() "
                                                 "Could not delete %1")
@@ -1528,6 +1653,16 @@ void RipStatus::customEvent(QEvent *event)
     {
         if (m_trackProgress)
             m_trackProgress->SetTotal(rse->value);
+    }
+    else if (event->type() == RipStatusEvent::kCopyStartEvent)
+    {
+        if (m_trackPctText)
+            m_trackPctText->SetText(tr("Copying Track ..."));
+    }
+    else if (event->type() == RipStatusEvent::kCopyEndEvent)
+    {
+        if (m_trackPctText)
+            m_trackPctText->SetText("");
     }
     else if (event->type() == RipStatusEvent::kOverallProgressEvent)
     {

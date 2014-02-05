@@ -83,6 +83,9 @@ class CDRipperThread: public MThread
 
         int                m_lastTrackPct;
         int                m_lastOverallPct;
+
+        QString            m_musicStorageDir;
+
 };
 
 class Ripper : public MythScreenType
@@ -99,6 +102,8 @@ class Ripper : public MythScreenType
     bool somethingWasRipped();
     void scanCD(void);
     void ejectCD(void);
+
+    virtual void ShowMenu(void);
 
   protected slots:
     void startRipper(void);
@@ -122,6 +127,9 @@ class Ripper : public MythScreenType
     void EjectFinished(void);
     void ScanFinished(void);
     void metadataChanged(void);
+    void showEditMetadataDialog(void);
+    void chooseBackend(void);
+    void setSaveHost(QString host);
 
   signals:
     void ripFinished(void);
@@ -134,17 +142,19 @@ class Ripper : public MythScreenType
     void toggleTrackActive(RipTrack *);
     void ShowConflictMenu(RipTrack *);
 
-    CdDecoder           *m_decoder;
+    QString    m_musicStorageDir;
 
-    MythUITextEdit      *m_artistEdit;
-    MythUITextEdit      *m_albumEdit;
-    MythUITextEdit      *m_genreEdit;
-    MythUITextEdit      *m_yearEdit;
+    CdDecoder *m_decoder;
 
-    MythUICheckBox      *m_compilationCheck;
+    MythUITextEdit   *m_artistEdit;
+    MythUITextEdit   *m_albumEdit;
+    MythUITextEdit   *m_genreEdit;
+    MythUITextEdit   *m_yearEdit;
 
-    MythUIButtonList    *m_trackList;
-    MythUIButtonList    *m_qualityList;
+    MythUICheckBox   *m_compilationCheck;
+
+    MythUIButtonList *m_trackList;
+    MythUIButtonList *m_qualityList;
 
     MythUIButton  *m_switchTitleArtist;
     MythUIButton  *m_scanButton;
@@ -188,6 +198,8 @@ class RipStatusEvent : public QEvent
     static Type kOverallProgressEvent;
     static Type kOverallPercentEvent;
     static Type kOverallStartEvent;
+    static Type kCopyStartEvent;
+    static Type kCopyEndEvent;
     static Type kFinishedEvent;
     static Type kEncoderErrorEvent;
 };
@@ -221,8 +233,8 @@ class RipStatus : public MythScreenType
     MythUIText        *m_statusText;
     MythUIText        *m_overallPctText;
     MythUIText        *m_trackPctText;
-    MythUIProgressBar   *m_overallProgress;
-    MythUIProgressBar   *m_trackProgress;
+    MythUIProgressBar *m_overallProgress;
+    MythUIProgressBar *m_trackProgress;
 
     CDRipperThread    *m_ripperThread;
 };
