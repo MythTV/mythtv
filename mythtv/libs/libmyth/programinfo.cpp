@@ -891,6 +891,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     director = _director;
     programid = _programid;
     inetref = _inetref;
+    year = _year;
 
     QDateTime cur = MythDate::current();
     recstartts = cur.addSecs(((int)_length_in_minutes + 1) * -60);
@@ -1687,7 +1688,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["inetref"] = inetref;
     progMap["catType"] = myth_category_type_to_string(catType);
 
-    progMap["year"] = year ? QString::number(year) : "";
+    progMap["year"] = year > 1895 ? QString::number(year) : "";
 
     progMap["partnumber"] = partnumber ? QString::number(partnumber) : "";
     progMap["parttotal"] = parttotal ? QString::number(parttotal) : "";
