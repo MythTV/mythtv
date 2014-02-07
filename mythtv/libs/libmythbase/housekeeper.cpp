@@ -241,7 +241,7 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last, bool successful)
                               " WHERE tag = :TAG"
                               "   AND hostname IS NULL");
             else
-                query.prepare("UPDATE housekeeping SET lastrun=:TIME"
+                query.prepare("UPDATE housekeeping SET lastrun=:TIME,"
                               "                        lastsuccess=:STIME"
                               " WHERE tag = :TAG"
                               "   AND hostname = :HOST");
