@@ -66,7 +66,7 @@ static int UpdateMeta(const MythUtilCommandLineParser &cmdline)
     MetaIO *tagger = mdata->getTagger();
     if (tagger)
     {
-        ok = tagger->write(mdata);
+        ok = tagger->write(mdata->getLocalFilename(), mdata);
 
         if (!ok)
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to write to tag for trackid: %1").arg(songID));
