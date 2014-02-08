@@ -198,6 +198,7 @@ class META_PUBLIC MusicMetadata
 
     QString Filename(bool find = true);
     void setFilename(const QString &lfilename) { m_filename = lfilename; }
+    QString getLocalFilename(void);
 
     QString Hostname(void) { return m_hostname; }
     void setHostname(const QString &host) { m_hostname = host; }

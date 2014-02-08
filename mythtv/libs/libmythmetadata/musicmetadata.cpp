@@ -15,6 +15,7 @@
 #include <mythlogging.h>
 #include <mythdate.h>
 #include <remotefile.h>
+#include <storagegroup.h>
 
 // libmythmetadata
 #include "musicmetadata.h"
@@ -763,6 +764,18 @@ QString MusicMetadata::Filename(bool find)
     return QString();
 }
 
+/// try to find the track on the local file system
+QString MusicMetadata::getLocalFilename(void)
+{
+    // try the file name as is first
+    if (QFile::exists(m_filename))
+        return m_filename;
+
+    // not found so now try to find the file in the local 'Music' storage group
+    StorageGroup storageGroup("Music", gCoreContext->GetHostName(), false);
+    return storageGroup.FindFile(m_filename);
+}
+
 void MusicMetadata::setField(const QString &field, const QString &data)
 {
     if (field == "artist")
@@ -1070,7 +1083,19 @@ void MusicMetadata::reloadAlbumArtImages(void)
 // NOTE the caller is responsible for deleting it
 MetaIO* MusicMetadata::getTagger(void)
 {
-    return MetaIO::createTagger(Filename(true));
+    // the taggers require direct file access so try to find
+    // the file on the local filesystem
+
+    QString filename = getLocalFilename();
+
+    if (!filename.isEmpty())
+    {
+        LOG(VB_FILE, LOG_INFO, QString("MusicMetadata::getTagger - creating tagger for %1").arg(filename));
+        return MetaIO::createTagger(filename);
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, QString("MusicMetadata::getTagger - failed to find %1 on the local filesystem").arg(Filename(false)));
+    return NULL;
 }
 
 //--------------------------------------------------------------------------
