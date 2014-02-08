@@ -85,7 +85,7 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MetaIOTagLib: Failed to read metadata from '%1'")
-                .arg(metadata->Filename()));
+                .arg(metadata->Filename(false)));
     }
 }
 

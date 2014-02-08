@@ -23,20 +23,20 @@ class META_PUBLIC MetaIO
     /*!
     * \brief Writes all metadata back to a file
     *
+    * \param filename The filename to write metadata to
     * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool write(MusicMetadata* mdata) = 0;
+    virtual bool write(const QString &filename, MusicMetadata* mdata) = 0;
 
     /*!
     * \brief Writes rating and playcount back to a file
-    *
+    * \param filename The filename to write metadata to
     * \param mdata A pointer to a MusicMetadata object
     * \returns Boolean to indicate success/failure.
     */
-    virtual bool writeVolatileMetadata(MusicMetadata* mdata)
+    virtual bool writeVolatileMetadata(const QString & /*filename*/, MusicMetadata* /*mdata*/)
     {
-        (void)mdata;
         return false;
     }
 

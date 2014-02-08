@@ -47,12 +47,15 @@ TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOFLACVorbis::write(MusicMetadata* mdata)
+bool MetaIOFLACVorbis::write(const QString &filename, MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
 
-    m_filename = mdata->Filename(true);
+    if (filename.isEmpty())
+        return false;
+
+    m_filename = filename;
 
     TagLib::FLAC::File *flacfile = OpenFile(m_filename);
 

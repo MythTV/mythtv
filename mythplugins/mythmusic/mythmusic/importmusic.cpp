@@ -397,7 +397,7 @@ void ImportMusicDialog::addPressed()
             MetaIO *tagger = MetaIO::createTagger(meta->Filename());
             if (tagger)
             {
-                tagger->write(meta);
+                tagger->write(meta->Filename(), meta);
                 delete tagger;
             }
         }

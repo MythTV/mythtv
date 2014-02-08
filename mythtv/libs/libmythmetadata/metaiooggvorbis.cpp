@@ -41,12 +41,15 @@ TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOOggVorbis::write(MusicMetadata* mdata)
+bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
 
-    m_filename = mdata->Filename();
+    m_filename = filename;
+
+    if (m_filename.isEmpty())
+        return false;
 
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(m_filename);
 

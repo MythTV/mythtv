@@ -206,7 +206,7 @@ void EditMetadataCommon::saveAll()
 
         if (tagger)
         {
-            tagger->write(m_metadata);
+            tagger->write(m_metadata->Filename(), m_metadata);
             delete tagger;
         }
     }

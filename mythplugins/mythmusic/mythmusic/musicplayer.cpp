@@ -1269,7 +1269,7 @@ void MusicPlayer::updateVolatileMetadata(void)
 
                 if (tagger)
                 {
-                    tagger->writeVolatileMetadata(getCurrentMetadata());
+                    tagger->writeVolatileMetadata(getCurrentMetadata()->Filename(), getCurrentMetadata());
                     delete tagger;
                 }
             }

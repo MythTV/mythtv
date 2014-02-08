@@ -26,7 +26,7 @@ MetaIOAVFComment::~MetaIOAVFComment(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOAVFComment::write(MusicMetadata* /*mdata*/)
+bool MetaIOAVFComment::write(const QString & /*filename*/, MusicMetadata* /*mdata*/)
 {
     // Wont implement....
     return false;

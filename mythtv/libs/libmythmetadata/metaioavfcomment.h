@@ -22,7 +22,7 @@ public:
     MetaIOAVFComment(void);
     virtual ~MetaIOAVFComment(void);
 
-    bool write(MusicMetadata* mdata);
+    bool write(const QString &filename, MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);
 
 private:

@@ -92,12 +92,7 @@ FlacEncoder::~FlacEncoder()
     }
 
     if (m_metadata)
-    {
-        QString filename = m_metadata->Filename();
-        m_metadata->setFilename(m_outfile);
-        MetaIOFLACVorbis().write(m_metadata);
-        m_metadata->setFilename(filename);
-    }
+        MetaIOFLACVorbis().write(m_outfile, m_metadata);
 }
 
 int FlacEncoder::addSamples(int16_t *bytes, unsigned int length)

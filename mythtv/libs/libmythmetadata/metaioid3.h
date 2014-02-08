@@ -36,8 +36,8 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
     MetaIOID3(void);
     virtual ~MetaIOID3(void);
 
-    virtual bool write(MusicMetadata* mdata);
-    bool writeVolatileMetadata(MusicMetadata* mdata);
+    virtual bool write(const QString &filename, MusicMetadata* mdata);
+    bool writeVolatileMetadata(const QString &filename, MusicMetadata* mdata);
 
     bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
     bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);

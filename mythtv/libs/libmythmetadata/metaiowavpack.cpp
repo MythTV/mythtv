@@ -43,12 +43,15 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 /*!
 * \copydoc MetaIO::write()
 */
-bool MetaIOWavPack::write(MusicMetadata* mdata)
+bool MetaIOWavPack::write(const QString &filename, MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
 
-    m_filename = mdata->Filename();
+    if (filename.isEmpty())
+        return false;
+
+    m_filename = filename;
 
     TagLib::WavPack::File *wpfile = OpenFile(m_filename);
 

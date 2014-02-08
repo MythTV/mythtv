@@ -27,9 +27,12 @@ MetaIOMP4::~MetaIOMP4(void)
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOMP4::write(MusicMetadata* mdata)
+bool MetaIOMP4::write(const QString &filename, MusicMetadata* mdata)
 {
     if (!mdata)
+        return false;
+
+    if (filename.isEmpty())
         return false;
 
 // Disabled because it doesn't actually work. Better implemented with Taglib
@@ -38,8 +41,6 @@ bool MetaIOMP4::write(MusicMetadata* mdata)
 //     AVFormatContext* p_context = NULL;
 //     AVFormatParameters* p_params = NULL;
 //     AVInputFormat* p_inputformat = NULL;
-//
-//     QString filename = mdata->Filename();
 //
 //     QByteArray local8bit = filename.toLocal8Bit();
 //     if ((av_open_input_file(&p_context, local8bit.constData(),

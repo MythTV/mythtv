@@ -145,12 +145,7 @@ LameEncoder::~LameEncoder()
 
     // Now write the Metadata
     if (m_metadata)
-    {
-        QString filename = m_metadata->Filename();
-        m_metadata->setFilename(m_outfile);
-        MetaIOID3().write(m_metadata);
-        m_metadata->setFilename(filename);
-    }
+        MetaIOID3().write(m_outfile, m_metadata);
 }
 
 int LameEncoder::addSamples(int16_t * bytes, unsigned int length)

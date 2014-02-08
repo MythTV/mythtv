@@ -202,7 +202,7 @@ void MetaIO::readFromFilename(MusicMetadata* metadata)
     QString artist, album, title, genre;
     int tracknum = 0;
 
-    const QString filename = metadata->Filename();
+    const QString filename = metadata->Filename(false);
 
     if (filename.isEmpty())
         return;

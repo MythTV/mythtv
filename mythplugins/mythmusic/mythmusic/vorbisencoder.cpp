@@ -104,12 +104,7 @@ VorbisEncoder::~VorbisEncoder()
 
     // Now write the Metadata
     if (m_metadata)
-    {
-        QString filename = m_metadata->Filename();
-        m_metadata->setFilename(m_outfile);
-        MetaIOOggVorbis().write(m_metadata);
-        m_metadata->setFilename(filename);
-    }
+        MetaIOOggVorbis().write(m_outfile, m_metadata);
 }
 
 int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)

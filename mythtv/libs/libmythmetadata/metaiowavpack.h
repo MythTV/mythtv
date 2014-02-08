@@ -26,7 +26,7 @@ public:
     MetaIOWavPack(void);
     virtual ~MetaIOWavPack(void);
 
-    bool write(MusicMetadata* mdata);
+    bool write(const QString &filename, MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);
 
 private:
