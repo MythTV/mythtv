@@ -33,7 +33,7 @@ SOURCES += dvdnav/vm/vmcmd.c
 
 # dvdread
 HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
-HEADERS += dvdread//dvd_udf.h dvdread/md5.h
+HEADERS += dvdread/dvd_udf.h dvdread/md5.h
 HEADERS += dvdread/bitreader.h
 
 SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
@@ -41,10 +41,10 @@ SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c
 SOURCES += dvdread/nav_print.c dvdread/ifo_print.c dvdread/bitreader.c
 
 inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
-inc_dvdnav.files = dvdnav/dvdnav.h dvdnav/dvdnav_events.h dvdnav/dvd_types.h
+inc_dvdnav.files = dvdnav/dvdnav/dvdnav.h dvdnav/dvdnav/dvdnav_events.h dvdnav/dvdnav/dvd_types.h
 inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
-inc_dvdread.files = dvdread/dvd_reader.h dvdread/nav_types.h dvdread/ifo_types.h
-inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
+inc_dvdread.files = dvdread/dvdread/dvd_reader.h dvdread/dvdread/nav_types.h dvdread/dvdread/ifo_types.h
+inc_dvdread.files += dvdread/dvdread/nav_read.h dvdread/dvdread/ifo_read.h
 
 INSTALLS += inc_dvdnav inc_dvdread
 
