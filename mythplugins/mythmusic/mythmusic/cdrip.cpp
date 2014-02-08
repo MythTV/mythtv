@@ -379,6 +379,9 @@ void CDRipperThread::run(void)
                 titleTrack->setFileSize((quint64)QFileInfo(outfile).size());
                 titleTrack->dumpToDatabase();
 
+                // this will delete the encoder which will write the metadata in it's dtor
+                encoder.reset();
+
                 // copy track to the BE
                 destFile = gCoreContext->GenMythURL(url.host(), 0, destFile, "Music");
 
