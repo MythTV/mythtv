@@ -1262,16 +1262,18 @@ void MusicPlayer::updateVolatileMetadata(void)
         {
             getCurrentMetadata()->persist();
 
-            // only write the playcount & rating to the tag if it's enabled by the user
+            // only write the last played, playcount & rating to the tag if it's enabled by the user
             if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
             {
-                MetaIO *tagger = MetaIO::createTagger(getCurrentMetadata()->Filename(true));
-
-                if (tagger)
-                {
-                    tagger->writeVolatileMetadata(getCurrentMetadata()->Filename(), getCurrentMetadata());
-                    delete tagger;
-                }
+                // TODO: should move this to it's own thread
+                QStringList strList;
+                strList << QString("MUSIC_TAG_UPDATE_VOLATILE %1 %2 %3 %4 %5")
+                                   .arg(getCurrentMetadata()->Hostname())
+                                   .arg(getCurrentMetadata()->ID())
+                                   .arg(getCurrentMetadata()->Rating())
+                                   .arg(getCurrentMetadata()->Playcount())
+                                   .arg(getCurrentMetadata()->LastPlay().toString(Qt::ISODate));
+                gCoreContext->SendReceiveStringList(strList);
             }
 
             sendTrackStatsChangedEvent(getCurrentMetadata()->ID());
