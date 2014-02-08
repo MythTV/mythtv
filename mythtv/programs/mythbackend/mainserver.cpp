@@ -797,7 +797,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleScanMusic(tokens, pbs);
     }
-     else if (command == "MUSIC_TAG_GETIMAGE")
+    else if (command == "MUSIC_TAG_UPDATE_VOLATILE")
+    {
+        if (tokens.size() < 6)
+            LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_TAG_UPDATE_VOLATILE");
+        else
+            HandleMusicTagUpdateVolatile(tokens, pbs);
+    }
+    else if (command == "MUSIC_TAG_GETIMAGE")
     {
         if (tokens.size() < 4)
             LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_TAG_GETIMAGE");
@@ -5217,6 +5224,69 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
         // must be a slave with a music storage group directory defined so run the file scanner
         LOG(VB_GENERAL, LOG_INFO, QString("HandleScanMusic: running filescanner on slave BE '%1'").arg(gCoreContext->GetHostName()));
         QScopedPointer<MythSystem> cmd(MythSystem::Create("mythutil --scanmusic",
+                                                          kMSAutoCleanup | kMSRunBackground |
+                                                          kMSDontDisableDrawing | kMSProcessEvents |
+                                                          kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_TAG_UPDATE_VOLATILE <hostname> <songid> <rating> <playcount> <lastplayed>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagUpdateVolatile: asking slave '%1' to update the metadata").arg(hostname));
+            strlist << slist.join(" ");
+            strlist = slave->ForwardRequest(strlist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("HandleMusicTagUpdateVolatile: Failed to grab slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        //  run mythutil to update the metadata
+        QStringList paramList;
+        paramList.append(QString("--songid='%1'").arg(slist[2]));
+        paramList.append(QString("--rating='%1'").arg(slist[3]));
+        paramList.append(QString("--playcount='%1'").arg(slist[4]));
+        paramList.append(QString("--lastplayed='%1'").arg(slist[5]));
+
+        QString command = "mythutil --updatemeta " + paramList.join(" ");
+
+        LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagUpdateVolatile: running %1'").arg(command));
+        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
                                                           kMSDontBlockInputDevs));
