@@ -1140,10 +1140,7 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
                 LOG(VB_GENERAL, LOG_ERR, "Computing track lengths. "
                                          "One track <=0");
 
-            // Check tmpdata->Filename
-            QFileInfo finfo(mdata->Filename());
-
-            size_in_MB += finfo.size() / 1000000;
+            size_in_MB += mdata->FileSize() / 1000000;
         }
     }
 }
@@ -1232,6 +1229,7 @@ void Playlist::processExit(uint retval)
     m_procExitVal = retval;
 }
 
+// FIXME: this needs updating to work with storage groups
 int Playlist::CreateCDMP3(void)
 {
     // Check & get global settings

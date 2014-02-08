@@ -202,7 +202,7 @@ class META_PUBLIC MusicMetadata
     QString Hostname(void) { return m_hostname; }
     void setHostname(const QString &host) { m_hostname = host; }
 
-    uint64_t FileSize() const;
+    uint64_t FileSize() const { return m_fileSize; }
     void setFileSize(uint64_t lfilesize) { m_fileSize = lfilesize; }
 
     QString Format() const { return m_format; }
