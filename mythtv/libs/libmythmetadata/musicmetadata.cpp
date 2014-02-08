@@ -712,6 +712,12 @@ QString MusicMetadata::FormatTitle()
     return m_formattedtitle;
 }
 
+void MusicMetadata::setFilename(const QString& lfilename)
+{
+    m_filename = lfilename;
+    m_actualFilename.clear();
+}
+
 QString MusicMetadata::Filename(bool find)
 {
     // if not asked to find the file just return the raw filename from the DB
