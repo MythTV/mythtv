@@ -1980,6 +1980,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     dupmethod    = RecordingDupMethodType(query.value(47).toInt());
 
     // ancillary data -- begin
+    programflags = FL_NONE;
     set_flag(programflags, FL_CHANCOMMFREE,
              query.value(30).toInt() == COMM_DETECT_COMMFREE);
     set_flag(programflags, FL_COMMFLAG,
