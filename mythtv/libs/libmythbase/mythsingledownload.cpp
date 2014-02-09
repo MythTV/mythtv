@@ -22,6 +22,9 @@ bool MythSingleDownload::DownloadURL(const QString &url, QByteArray *buffer,
     m_reply = m_mgr.get(req);
     m_replylock.unlock();
 
+    req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                     QNetworkRequest::AlwaysNetwork);
+
     // "quit()" the event-loop, when the network request "finished()"
     connect(m_reply, SIGNAL(finished()), &event_loop, SLOT(quit()));
     connect(&m_timer, SIGNAL(timeout()), &event_loop, SLOT(quit()));
@@ -44,17 +47,18 @@ bool MythSingleDownload::DownloadURL(const QString &url, QByteArray *buffer,
     if (m_timer.isActive())
     {
         m_timer.stop();
-        if (m_reply->error() == QNetworkReply::NoError)
+        m_errorcode = m_reply->error();
+        if (m_errorcode == QNetworkReply::NoError)
         {
             *buffer += m_reply->readAll();
             delete m_reply;
             m_reply = NULL;
+            m_errorstring.clear();
             return true;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_WARNING, QString("MythSingleDownload: %1")
-                .arg(m_reply->errorString()));
+            m_errorstring = m_reply->errorString();
             delete m_reply;
             m_reply = NULL;
             return false;
@@ -62,7 +66,7 @@ bool MythSingleDownload::DownloadURL(const QString &url, QByteArray *buffer,
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, "MythSingleDownload: timed-out");
+        m_errorstring = "timed-out";
         m_timer.stop();
         m_reply->abort();
         delete m_reply;

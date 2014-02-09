@@ -116,7 +116,9 @@ void HLSStreamHandler::run(void)
     RunProlog();
 
     QString url = m_tuning.GetURL(0).toString();
-    int cnt = 0;
+    int err_cnt = 0;
+    int nil_cnt = 0;
+    int open_sleep = 500000;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- begin");
 
@@ -132,11 +134,12 @@ void HLSStreamHandler::run(void)
         {
             if (!m_hls->Open(url))
             {
-                LOG(VB_CHANNEL, LOG_INFO, LOC +
-                    "run: HLS OpenFile() failed");
-                usleep(500000);
+                usleep(open_sleep);
+                if (open_sleep < 20000000)
+                    open_sleep += 500000;
                 continue;
             }
+            open_sleep = 500000;
             m_hls->Throttle(m_throttle);
             m_throttle = false;
         }
@@ -146,7 +149,7 @@ void HLSStreamHandler::run(void)
         if (size < 0)
         {
             // error
-            if (++cnt > 10)
+            if (++err_cnt > 10)
             {
                 LOG(VB_RECORD, LOG_ERR, LOC + "HLSReader failed");
                 Stop();
@@ -154,14 +157,16 @@ void HLSStreamHandler::run(void)
             }
             continue;
         }
-        else
-            cnt = 0;
+        err_cnt = 0;
 
         if (size == 0)
         {
-            usleep(250000);  // .25 second
+            if (nil_cnt < 4)
+                ++nil_cnt;
+            usleep(250000 * nil_cnt - 1);  // range .25 to 1 second, minus 1
             continue;
         }
+        nil_cnt = 0;
 
         if (m_buffer[0] != 0x47)
         {

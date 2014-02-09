@@ -62,3 +62,9 @@ HLSRecSegment::~HLSRecSegment(void)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "dtor");
 }
+
+QString HLSRecSegment::toString(void) const
+{
+    return QString("[%1] '%2' @ '%3' for %4")
+        .arg(m_sequence).arg(m_title).arg(m_url).arg(m_duration);
+}

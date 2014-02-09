@@ -49,6 +49,10 @@ class HLSRecStream
     uint NumReleasedSegments(void) const;
     uint NumTotalSegments(void) const;
 
+    void Good(void) { m_retries = 0; }
+    void Retrying(void) { ++m_retries; }
+    int  RetryCount(void) const { return m_retries; }
+
     static bool IsGreater(const HLSRecStream *s1, const HLSRecStream *s2);
     bool operator<(const HLSRecStream &b) const;
     bool operator>(const HLSRecStream &b) const;
@@ -85,6 +89,7 @@ class HLSRecStream
     QString     m_url;             // uri to m3u8
     mutable QMutex  m_lock;
     bool        m_cache;           // allow caching
+    int         m_retries;
 
 #ifdef USING_LIBCRYPTO
   private:

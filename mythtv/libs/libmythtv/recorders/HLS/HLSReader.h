@@ -43,7 +43,7 @@ class HLSReader
     ~HLSReader(void);
 
     bool Open(const QString & uri);
-    void Close(void);
+    void Close(bool quiet = false);
     int Read(uint8_t* buffer, int len);
     void Throttle(bool val);
     bool IsThrottled(void) const { return m_throttle; }
@@ -51,10 +51,9 @@ class HLSReader
     { return m_curstream && m_m3u8 == url; }
 
     bool LoadMetaPlaylists(MythSingleDownload& downloader);
-    bool UpdateSegment(int64_t sequence_num, int duration,
-		       const QString& title, const QString& uri);
-    void HadError(void) { m_error = true; }
-    void ResetStream(void) { m_curstream = NULL; }
+    void ResetStream(void)
+      { QMutexLocker lock(&m_stream_lock); m_curstream = NULL; }
+    void ResetSequence(void) { m_cur_seq = -1; }
 
     QString StreamURL(void) const
     { return QString("%1").arg(m_curstream ? m_curstream->Url() : ""); }
@@ -67,11 +66,18 @@ class HLSReader
     static QString RelativeURI(const QString surl, const QString spath);
 
   protected:
-    void Cancel(void);
+    bool FatalError(void) const { return m_fatal; }
+    void Cancel(bool quiet = false);
     bool LoadSegments(MythSingleDownload& downloader);
     uint PercentBuffered(void) const;
-    uint TargetDuration(void) const
+    int  TargetDuration(void) const
     { return (m_curstream ? m_curstream->TargetDuration() : 0); }
+
+    void AllowPlaylistSwitch(void) { m_bandwidthcheck = true; }
+
+    void PlaylistGood(void);
+    void PlaylistRetrying(void);
+    int  PlaylistRetryCount(void) const;
 
   private:
     static QString DecodedURI(const QString uri);
@@ -113,13 +119,17 @@ class HLSReader
     int DownloadSegmentData(MythSingleDownload& downloader, HLSRecStream* hls,
 			    HLSRecSegment& segment, int playlist_size);
 
+    // Debug
+    void EnableDebugging(void);
+
   private:
     QString          m_m3u8;
     StreamContainer  m_streams;
     SegmentContainer m_segments;
     HLSRecStream    *m_curstream;
+    int64_t          m_cur_seq;
 
-    bool m_error;
+    bool m_fatal;
     bool m_cancel;
     bool m_throttle;
     bool m_aesmsg;   // only print one time that the media is encrypted
@@ -127,17 +137,21 @@ class HLSReader
     HLSPlaylistWorker *m_playlistworker;
     HLSStreamWorker   *m_streamworker;
 
+#if 0
     int64_t    m_seq_begin;
     int64_t    m_seq_first;
     int64_t    m_seq_next;
     int64_t    m_seq_end;
+#endif
+    int        m_playlist_size;
     bool       m_bandwidthcheck;
     uint       m_prebuffer_cnt;
     QMutex     m_seq_lock;
-    QMutex     m_stream_lock;
+    mutable QMutex m_stream_lock;
     QMutex     m_throttle_lock;
     QWaitCondition  m_throttle_cond;
     bool       m_debug;
+    int        m_debug_cnt;
 
     // Downloading
     int         m_slow_cnt;
