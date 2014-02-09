@@ -32,6 +32,7 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
             else
             {
                 laststats = new unsigned long long[MAX_CORES * 9];
+                memset(laststats, 0, sizeof(unsigned long long) * MAX_CORES * 9);
             }
         }
     }
