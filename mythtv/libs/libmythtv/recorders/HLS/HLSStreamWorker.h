@@ -31,6 +31,7 @@ class HLSStreamWorker : public MThread
     bool            m_cancel;
     bool            m_wokenup;
     mutable QMutex  m_lock;
+    QMutex          m_downloader_lock;
     QWaitCondition  m_waitcond;
 };
 

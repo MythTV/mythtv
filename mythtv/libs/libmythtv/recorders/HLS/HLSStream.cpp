@@ -15,7 +15,8 @@ HLSRecStream::HLSRecStream(int seq, uint64_t bitrate, const QString& url)
       m_duration(0LL),
       m_live(true),
       m_url(url),
-      m_cache(false)
+      m_cache(false),
+      m_retries(0)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 #ifdef USING_LIBCRYPTO
@@ -63,7 +64,8 @@ bool HLSRecStream::DownloadKey(MythSingleDownload& downloader,
         }
         else
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to download AES key");
+            LOG(VB_RECORD, LOG_ERR, LOC + "Failed to download AES key: " +
+                downloader.ErrorString());
         }
         return false;
     }

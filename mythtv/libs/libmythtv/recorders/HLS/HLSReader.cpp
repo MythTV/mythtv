@@ -13,16 +13,19 @@ static uint64_t MDate(void)
 }
 
 HLSReader::HLSReader(void)
-    : m_curstream(NULL), m_error(false), m_cancel(false), m_throttle(true),
-      m_aesmsg(false), m_playlistworker(NULL), m_streamworker(NULL),
-      m_seq_begin(-1), m_seq_first(-1), m_seq_next(-1), m_seq_end(-1),
-      m_bandwidthcheck(false), m_prebuffer_cnt(10), m_debug(false), m_slow_cnt(0)
+    : m_curstream(NULL), m_cur_seq(-1), m_fatal(false), m_cancel(false),
+      m_throttle(true), m_aesmsg(false),
+      m_playlistworker(NULL), m_streamworker(NULL),
+      m_playlist_size(0), m_bandwidthcheck(false), m_prebuffer_cnt(10),
+      m_debug(false), m_debug_cnt(0), m_slow_cnt(0)
 {
 }
 
 HLSReader::~HLSReader(void)
 {
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- start");
     Close();
+    LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- end");
 }
 
 bool HLSReader::Open(const QString & m3u)
@@ -34,8 +37,7 @@ bool HLSReader::Open(const QString & m3u)
         LOG(VB_RECORD, LOG_ERR, LOC + "Already open");
         return true;
     }
-    if (m_curstream)
-        Close();
+    Close(true);
     m_cancel = false;
 
     QByteArray buffer;
@@ -44,15 +46,14 @@ bool HLSReader::Open(const QString & m3u)
     if (!DownloadURL(m3u, &buffer))
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Open failed.");
-        m_error = true;
         return false;   // can't download file
     }
 #else
     MythSingleDownload downloader;
     if (!downloader.DownloadURL(m3u, &buffer))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "Open failed.");
-        m_error = true;
+        LOG(VB_GENERAL, LOG_ERR,
+            LOC + "Open failed: " + downloader.ErrorString());
         return false;   // can't download file
     }
 #endif
@@ -104,13 +105,13 @@ bool HLSReader::Open(const QString & m3u)
     return true;
 }
 
-void HLSReader::Close(void)
+void HLSReader::Close(bool quiet)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "Close -- start");
+    LOG(VB_RECORD, (quiet ? LOG_DEBUG : LOG_INFO), LOC + "Close -- start");
 
-    Cancel();
+    Cancel(quiet);
 
-    QMutexLocker lock(&m_stream_lock);
+    QMutexLocker stream_lock(&m_stream_lock);
     m_curstream = NULL;
 
     StreamContainer::iterator Istream;
@@ -123,11 +124,13 @@ void HLSReader::Close(void)
     delete m_playlistworker;
     m_playlistworker = NULL;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "Close -- end");
+    LOG(VB_RECORD, (quiet ? LOG_DEBUG : LOG_INFO), LOC + "Close -- end");
 }
 
-void HLSReader::Cancel(void)
+void HLSReader::Cancel(bool quiet)
 {
+    LOG(VB_RECORD, (quiet ? LOG_DEBUG : LOG_INFO), LOC + "Cancel -- start");
+
     m_cancel = true;
 
     m_throttle_lock.lock();
@@ -144,10 +147,11 @@ void HLSReader::Cancel(void)
     if (m_streamworker)
         m_streamworker->Cancel();
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
-    uint offset = m_seq_next - m_seq_begin - 1;
-    if (m_segments.size() < static_cast<int>(offset))
-        CancelURL(m_segments[offset].Url());
+    if (!m_sements.empty())
+        CancelURL(m_segments.front().Url());
 #endif
+
+    LOG(VB_RECORD, (quiet ? LOG_DEBUG : LOG_INFO), LOC + "Cancel -- done");
 }
 
 void HLSReader::Throttle(bool val)
@@ -166,11 +170,6 @@ void HLSReader::Throttle(bool val)
 
 int HLSReader::Read(uint8_t* buffer, int maxlen)
 {
-    if (m_error)
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC + "Read: in error state");
-        return -1;
-    }
     if (!m_curstream)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "Read: no stream selected");
@@ -724,7 +723,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             if (line.isNull())
                 break;
 
-            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("|%1").arg(line));
+            LOG(VB_RECORD, LOG_INFO, LOC + QString("|%1").arg(line));
             if (line.startsWith(QLatin1String("#EXT-X-STREAM-INF")))
             {
                 QString uri = text.readLine();
@@ -810,6 +809,9 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         uint    segment_duration = -1;
         int64_t first_sequence   = -1;
         int64_t sequence_num     = 0;
+        int     skipped = 0;
+
+        SegmentContainer new_segments;
 
         QMutexLocker lock(&m_seq_lock);
         while (!m_cancel)
@@ -818,7 +820,8 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             line = text.readLine();
             if (line.isNull())
                 break;
-            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("|%1").arg(line));
+            LOG(VB_RECORD, (m_debug ? LOG_INFO : LOG_DEBUG),
+                LOC + QString("|%1").arg(line));
 
             if (line.startsWith(QLatin1String("#EXTINF")))
             {
@@ -836,30 +839,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 if (!ParseMediaSequence(sequence_num, line, StreamURL()))
                     return false;
                 if (first_sequence < 0)
-                {
-                    if (m_seq_end >= 0 && m_seq_end + 3 < sequence_num)
-                    {
-                        // Sequence range has jumpted to a much higher number
-                        LOG(VB_RECORD, LOG_WARNING, LOC +
-                            QString("Resetting sequence from %1 to %2")
-                            .arg(m_seq_next).arg(sequence_num));
-                        m_seq_next = sequence_num;
-                    }
-
-                    m_seq_first = first_sequence = sequence_num;
-                    if (m_seq_next < 0)
-                        m_seq_next = sequence_num;
-                    if (m_seq_next < first_sequence)
-                    {
-                        m_seq_begin = m_seq_next;
-                        m_segments.erase(m_segments.begin(),
-                                         m_segments.begin() +
-                                         (m_seq_begin -
-                                          m_segments.front().Sequence()));
-                    }
-                    else
-                        m_seq_begin = first_sequence;
-                }
+                    first_sequence = sequence_num;
             }
             else if (line.startsWith(QLatin1String("#EXT-X-KEY")))
             {
@@ -880,6 +860,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             {
                 if (!ParseDiscontinuity(hls, line, StreamURL()))
                     return false;
+                ResetSequence();
             }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
@@ -895,38 +876,103 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (!line.startsWith(QLatin1String("#")) && !line.isEmpty())
             {
-                UpdateSegment(sequence_num++, segment_duration,
-                              title, RelativeURI(hls->Url(), DecodedURI(line)));
+                if (m_cur_seq < 0 || sequence_num > m_cur_seq)
+                {
+                    new_segments.push_back
+                        (HLSRecSegment(sequence_num, segment_duration, title,
+                                       RelativeURI(hls->Url(),
+                                                   DecodedURI(line))));
+                }
+                else
+                    ++skipped;
+
+                ++sequence_num;
                 segment_duration = -1; /* reset duration */
                 title.clear();
             }
         }
 
-        m_seq_end = sequence_num;
-        if (m_seq_next > m_seq_end)
+        if (sequence_num < m_cur_seq)
         {
-            // Sequence range has jumpted to a lower number
+            // Sequence has been reset
             LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("Resetting sequence from %1 to %2")
-                .arg(m_seq_next).arg(m_seq_begin));
-            m_seq_next = m_seq_first;
+                QString("Sequence number has been reset from %1 to %2")
+                .arg(m_cur_seq).arg(first_sequence));
+            ResetSequence();
+            return false;
         }
 
-        if (m_seq_next < m_seq_first)
+        SegmentContainer::iterator Inew = new_segments.begin();
+        SegmentContainer::iterator Iseg = m_segments.end() - 1;
+
+        // Does this playlist overlap?
+        if (!m_segments.empty() && !new_segments.empty())
         {
-            int max_behind = (m_seq_end - m_seq_first) / 2;
-            int behind = m_seq_first - m_seq_next;
-            if (max_behind < behind)
+            if ((*Iseg).Sequence() >= first_sequence &&
+                (*Iseg).Sequence() < sequence_num)
             {
-                LOG(VB_RECORD, LOG_WARNING, LOC +
-                    QString("Not downloading fast enough! "
-                            "%1 segments behind, skipping %2 segments")
-                    .arg(behind).arg(behind - max_behind));
-                m_seq_next = m_seq_first - max_behind;
-                m_streamworker->CancelCurrentDownload();
-                m_debug = true;
+                // Find the beginning of the overlap
+                while (Iseg != m_segments.begin() &&
+                       (*Iseg).Sequence() > first_sequence &&
+                       (*Iseg).Sequence() < sequence_num)
+                    --Iseg;
+
+                int64_t diff = (*Iseg).Sequence() - (*Inew).Sequence();
+                if (new_segments.size() > diff)
+                {
+                    Inew += diff;
+
+                    // Update overlapping segment info
+                    for ( ; Iseg != m_segments.end(); ++Iseg, ++Inew)
+                    {
+                        if (Inew == new_segments.end())
+                        {
+                            LOG(VB_RECORD, LOG_ERR, LOC +
+                                QString("Went off the end with %1 left")
+                                .arg(m_segments.end() - Iseg));
+                            break;
+                        }
+                        if ((*Iseg).Sequence() != (*Inew).Sequence())
+                        {
+                            LOG(VB_RECORD, LOG_ERR, LOC +
+                                QString("Sequence non-sequential?  %1 != %2")
+                                .arg((*Iseg).Sequence())
+                                .arg((*Inew).Sequence()));
+                            break;
+                        }
+
+                        (*Iseg).m_duration = (*Inew).Duration();
+                        (*Iseg).m_title    = (*Inew).Title();
+                        (*Iseg).m_url      = (*Inew).Url();
+                    }
+                }
             }
         }
+
+        for ( ; Inew != new_segments.end(); ++Inew)
+            m_segments.push_back(*Inew);
+
+        m_playlist_size = new_segments.size() + skipped;
+        int behind     = m_segments.size() - m_playlist_size;
+        int max_behind = m_playlist_size / 2;
+        if (behind > max_behind)
+        {
+            LOG(VB_RECORD, LOG_WARNING, LOC +
+                QString("Not downloading fast enough! "
+                        "%1 segments behind, skipping %2 segments. "
+                        "playlist size: %3, queued: %4")
+                .arg(behind).arg(behind - max_behind)
+                .arg(m_playlist_size).arg(m_segments.size()));
+            m_streamworker->CancelCurrentDownload();
+            EnableDebugging();
+            Iseg = m_segments.begin() + (behind - max_behind);
+            m_segments.erase(m_segments.begin(), Iseg);
+            m_bandwidthcheck = true;
+        }
+        else if (m_debug_cnt > 0)
+            --m_debug_cnt;
+        else
+            m_debug = false;
     }
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ParseM3U8 -- end");
@@ -945,14 +991,19 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
     StreamContainer::iterator   Istream;
 
     m_stream_lock.lock();
-    if (m_bandwidthcheck && m_seq_end > -1)
+    if (m_bandwidthcheck /* && !m_segments.empty() */)
     {
         int buffered = PercentBuffered();
+
         if (buffered < 15)
         {
             // It is taking too long to download the segments
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Falling behind: only %1% buffered").arg(buffered));
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("playlist size %1, queued %2")
+                .arg(m_playlist_size).arg(m_segments.size()));
+            EnableDebugging();
             DecreaseBitrate(m_curstream->Id());
             m_bandwidthcheck = false;
         }
@@ -960,8 +1011,12 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
         {
             // Keeping up easily, raise the bitrate.
             LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("Plenty of bandwidth, downloading %1 in range %2 - %3")
-                .arg(m_seq_next - 1).arg(m_seq_first).arg(m_seq_end - 1));
+                QString("Plenty of bandwidth, downloading %1 of %2")
+                .arg(m_playlist_size - m_segments.size())
+                .arg(m_playlist_size));
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("playlist size %1, queued %2")
+                .arg(m_playlist_size).arg(m_segments.size()));
             IncreaseBitrate(m_curstream->Id());
             m_bandwidthcheck = false;
         }
@@ -975,7 +1030,11 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
         return false;
 #else
     if (!downloader.DownloadURL(m_curstream->Url(), &buffer))
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            LOC + "Download failed: " + downloader.ErrorString());
         return false;
+    }
 #endif
 
     if (m_cancel || !ParseM3U8(buffer, m_curstream))
@@ -983,66 +1042,6 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
 
     // Signal SegmentWorker that there is work to do...
     m_streamworker->Wakeup();
-
-    return true;
-}
-
-bool HLSReader::UpdateSegment(int64_t sequence_num, int duration,
-                              const QString& title, const QString& url)
-{
-    int64_t offset = sequence_num - m_seq_begin;
-
-    if (m_segments.size() == offset)
-    {
-        if (m_seq_end < 0)
-        {
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("UpdateSegment appending new segment [%1] %2 secs %3 %4")
-                .arg(sequence_num).arg(duration).arg(title).arg(url));
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                QString("%1 buffer segments").arg(m_segments.size()));
-        }
-        else
-        {
-            LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("UpdateSegment appending new segment [%1] %2 secs %3 %4")
-                .arg(sequence_num).arg(duration).arg(title).arg(url));
-            LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("%1 buffer segments, %2 in use")
-                .arg(m_segments.size()).arg(m_seq_end - m_seq_begin));
-        }
-
-        if (m_seq_end > 0)
-        {
-            // Sanity check
-            if (m_segments.last().Sequence() + 1 != sequence_num)
-            {
-                LOG(VB_RECORD, LOG_WARNING, LOC +
-                    QString("Sequence number gap %1 - %2")
-                    .arg(m_segments[m_seq_end - 1].Sequence())
-                    .arg(sequence_num));
-            }
-        }
-        m_segments.push_back(HLSRecSegment(sequence_num, duration,
-                                           title, url));
-    }
-    else if (m_segments.size() < offset)
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("UpdateSegment invalid offset %1 for "
-                    "%1 begin: %2 first: %3 next: %4 end: %5")
-            .arg(offset).arg(sequence_num).arg(m_seq_begin).arg(m_seq_first)
-            .arg(m_seq_next).arg(m_seq_end));
-    }
-    else
-    {
-        m_segments[offset].m_sequence = sequence_num;
-        m_segments[offset].m_duration = duration;
-        m_segments[offset].m_title = title;
-        m_segments[offset].m_url = url;
-        if (sequence_num > m_seq_next)
-            m_segments[offset].m_bitrate = 0;
-    }
 
     return true;
 }
@@ -1074,7 +1073,6 @@ void HLSReader::DecreaseBitrate(int progid)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Switching to a lower bitrate stream %1 -> %2")
             .arg(bitrate).arg(candidate));
-        QMutexLocker lock(&m_stream_lock);
         m_curstream = hls;
     }
     else
@@ -1111,7 +1109,6 @@ void HLSReader::IncreaseBitrate(int progid)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Switching to a higher bitrate stream %1 -> %2")
             .arg(bitrate).arg(candidate));
-        QMutexLocker lock(&m_stream_lock);
         m_curstream = hls;
     }
     else
@@ -1132,52 +1129,87 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         return false;
     }
 
-    if (m_seq_end < 0)
-        return true;
-
     HLSRecStream *hls;
     HLSRecSegment seg;
-    int           throttle;
-    int           playlist_size = m_seq_end - m_seq_begin;
+    long          throttle;
     for (;;)
     {
         m_seq_lock.lock();
-        if (m_cancel || m_seq_next == m_seq_end)
+        if (m_cancel || m_segments.empty())
         {
             m_seq_lock.unlock();
             break;
         }
 
-        int64_t offset = m_seq_next - m_seq_begin;
-        seg = m_segments[offset];
-        ++m_seq_next;
-        LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("Downloading segment %1, begin: %2 "
-                    "first %3: next: %4 end: %5")
-            .arg(seg.Sequence()).arg(m_seq_begin).arg(m_seq_first)
-            .arg(m_seq_next).arg(m_seq_end));
+        seg = m_segments.front();
+        if (m_segments.size() > m_playlist_size)
+        {
+            LOG(VB_RECORD, (m_debug ? LOG_INFO : LOG_DEBUG), LOC +
+                QString("Downloading segment %1 (1 of %2) with %3 behind")
+                .arg(seg.Sequence())
+                .arg(m_segments.size() + m_playlist_size)
+                .arg(m_segments.size() - m_playlist_size));
+        }
+        else
+        {
+            LOG(VB_RECORD, (m_debug ? LOG_INFO : LOG_DEBUG), LOC +
+                QString("Downloading segment %1 (%2 of %3)")
+                .arg(seg.Sequence())
+                .arg(m_playlist_size - m_segments.size() + 1)
+                .arg(m_playlist_size));
+        }
         m_seq_lock.unlock();
 
         m_stream_lock.lock();
         hls = m_curstream;
         m_stream_lock.unlock();
+        if (!hls)
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC + "LoadSegment -- no current stream");
+            return false;
+        }
 
         throttle = DownloadSegmentData(downloader, hls,
-                                       seg, playlist_size);
+                                       seg, m_playlist_size);
+
+        m_seq_lock.lock();
+        if (throttle < 0)
+        {
+            if (m_segments.size() > m_playlist_size)
+            {
+                SegmentContainer::iterator Iseg = m_segments.begin() +
+                                          (m_segments.size() - m_playlist_size);
+                m_segments.erase(m_segments.begin(), Iseg);
+            }
+            m_seq_lock.unlock();
+            return false;
+        }
+        else
+        {
+            m_cur_seq = m_segments.front().Sequence();
+            m_segments.pop_front();
+        }
+
+        m_seq_lock.unlock();
 
         if (m_throttle && throttle == 0)
-            throttle = 5;
+            throttle = 2;
+        else if (throttle > 8)
+            throttle = 8;
         if (throttle > 0)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("Throttling -- sleeping %1 secs.")
                 .arg(throttle));
+            throttle *= 1000;
             m_throttle_lock.lock();
-            m_throttle_cond.wait(&m_throttle_lock, 1000000 * throttle);
+            if (m_throttle_cond.wait(&m_throttle_lock, throttle))
+                LOG(VB_RECORD, LOG_INFO, LOC + "Throttle aborted");
             m_throttle_lock.unlock();
+            LOG(VB_RECORD, LOG_INFO, LOC + "Throttle done");
         }
         else
-            usleep(500);
+            usleep(5000);
 
         if (m_prebuffer_cnt == 0)
         {
@@ -1194,10 +1226,10 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
 
 uint HLSReader::PercentBuffered(void) const
 {
-    if (m_seq_next < m_seq_first)
+    if (m_playlist_size == 0 || m_segments.size() > m_playlist_size)
         return 0;
-    return (static_cast<float>(m_seq_next - m_seq_first) /
-            static_cast<float>(m_seq_end - m_seq_first) * 100.0);
+    return (static_cast<float>(m_playlist_size - m_segments.size()) /
+            static_cast<float>(m_playlist_size)) * 100.0;
 }
 
 int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
@@ -1218,7 +1250,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         estimated_time = (int)(size / bandwidth);
         if (estimated_time > segment.Duration())
         {
-            LOG(VB_RECORD, LOG_INFO, LOC +
+            LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("downloading of %1 will take %2s, "
                         "which is longer than its playback (%3s) at %4kiB/s")
                 .arg(segment.Sequence())
@@ -1229,7 +1261,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     }
 
     QByteArray buffer;
-    uint64_t start = MDate();
+    uint64_t   start = MDate();
 
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
                                    // and can only handle six download at a time
@@ -1240,7 +1272,11 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         if (estimated_time * 2 < segment.Duration())
         {
             if (!HLSReader::DownloadURL(segment.Url(), &buffer))
-                return 0;
+            {
+                LOG(VB_RECORD, LOG_ERR, LOC + QString("%1 failed")
+                    .arg(segment.Sequence()));
+                return -1;
+            }
         }
         else
             return 0;
@@ -1248,15 +1284,9 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
 #else
     if (!downloader.DownloadURL(segment.Url(), &buffer))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + QString("%1 failed")
-            .arg(segment.Sequence()));
-        if (estimated_time * 2 < segment.Duration())
-        {
-            if (!downloader.DownloadURL(segment.Url(), &buffer))
-                return 0;
-        }
-        else
-            return 0;
+        LOG(VB_RECORD, LOG_ERR, LOC + QString("%1 failed: %2")
+            .arg(segment.Sequence()).arg(downloader.ErrorString()));
+        return -1;
     }
 #endif
 
@@ -1281,8 +1311,13 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         LOG(VB_RECORD, LOG_WARNING, LOC +
             QString("streambuffer is not reading fast enough. "
                     "buffer size %1").arg(m_buffer.size()));
-        if (++m_slow_cnt > 10)
-            m_slow_cnt = 10;
+        EnableDebugging();
+        if (++m_slow_cnt > 15)
+        {
+            m_slow_cnt = 15;
+            m_fatal = true;
+            return -1;
+        }
     }
     else if (m_slow_cnt > 0)
         --m_slow_cnt;
@@ -1325,4 +1360,33 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         .arg(bandwidth / 8192.0));
 
     return m_slow_cnt;
+}
+
+void HLSReader::PlaylistGood(void)
+{
+    QMutexLocker lock(&m_stream_lock);
+    if (m_curstream)
+        m_curstream->Good();
+}
+
+void HLSReader::PlaylistRetrying(void)
+{
+    QMutexLocker lock(&m_stream_lock);
+    if (m_curstream)
+        m_curstream->Retrying();
+}
+
+int  HLSReader::PlaylistRetryCount(void) const
+{
+    QMutexLocker lock(&m_stream_lock);
+    if (m_curstream)
+        return m_curstream->RetryCount();
+    return 0;
+}
+
+void HLSReader::EnableDebugging(void)
+{
+    m_debug = true;
+    m_debug_cnt = 5;
+    LOG(VB_RECORD, LOG_INFO, LOC + "Debugging enabled");
 }

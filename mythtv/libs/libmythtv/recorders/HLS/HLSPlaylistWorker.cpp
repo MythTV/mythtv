@@ -32,14 +32,13 @@ void HLSPlaylistWorker::Cancel(void)
 void HLSPlaylistWorker::run(void)
 {
     int64_t     wakeup = 1000;
-    int         retries = 0;
     double      delay = 0;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- begin");
 
     RunProlog();
 
-    MythSingleDownload downloader;
+    MythSingleDownload *downloader = new MythSingleDownload;
 
     while (!m_cancel)
     {
@@ -47,7 +46,7 @@ void HLSPlaylistWorker::run(void)
         if (!m_wokenup)
         {
             unsigned long waittime = wakeup < 1000 ? 1000 : wakeup;
-            LOG(VB_RECORD, LOG_DEBUG, LOC +
+            LOG(VB_RECORD, (waittime > 12000 ? LOG_INFO : LOG_DEBUG), LOC +
                 QString("refreshing in %2s")
                 .arg(waittime / 1000.0));
             m_waitcond.wait(&m_lock, waittime);
@@ -55,69 +54,85 @@ void HLSPlaylistWorker::run(void)
         m_wokenup = false;
         m_lock.unlock();
 
+        if (m_parent->FatalError())
+        {
+            LOG(VB_GENERAL, LOG_CRIT, LOC + "Fatal error detected");
+            break;
+        }
         if (m_cancel)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "canceled");
             break;
         }
 
-        if (m_parent->LoadMetaPlaylists(downloader))
+        if (m_parent->LoadMetaPlaylists(*downloader))
         {
-            if (retries > 0)
+            if (m_parent->PlaylistRetryCount() > 0)
             {
                 LOG(VB_RECORD, LOG_INFO, LOC +
                     QString("Playlist successfully downloaded.  Buffered: %1%")
                     .arg(m_parent->PercentBuffered()));
             }
-            retries = 0;
+            m_parent->PlaylistGood();
             delay = 0.5;
         }
         else
         {
-            ++retries;
+            m_parent->PlaylistRetrying();
             LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("Playlist download failed -- contiguous cnt: %1, "
+                QString("Playlist download failed -- Retry #%1, "
                         "Buffered: %2%")
-                .arg(retries).arg((m_parent->PercentBuffered())));
+                .arg(m_parent->PlaylistRetryCount())
+                .arg((m_parent->PercentBuffered())));
 
-            if (retries == 1)
-                m_parent->ResetStream();
-
-            if (retries > PLAYLIST_FAILURE)
+            if (m_parent->PlaylistRetryCount() > 1)
             {
-                LOG(VB_RECORD, LOG_ERR, LOC +
-                    QString("Reloading failed %1 times."
-                                "aborting.").arg(PLAYLIST_FAILURE));
-                m_parent->HadError();
+                // Asking QNetworkAccessManager to redownload after a
+                // failure seems to result in another failure, even if the
+                // playlist is now available.  So, create a new instance.
+                delete downloader;
+                downloader = new MythSingleDownload;
+
+                if (m_parent->PlaylistRetryCount() == 3)
+                    m_parent->AllowPlaylistSwitch();
+                if (m_parent->PlaylistRetryCount() < 4)
+                    m_parent->EnableDebugging();
+                if (m_parent->PlaylistRetryCount() == PLAYLIST_FAILURE)
+                {
+                    LOG(VB_RECORD, LOG_ERR, LOC + "Loading playlist failed. "
+                        "Perform a complete reset.");
+                    m_parent->ResetStream();
+                }
             }
 
             if (m_parent->PercentBuffered() > 85)
             {
                 // Don't wait, we need more segments to work on.
-                if (retries == 1)
+                if (m_parent->PlaylistRetryCount() == 1)
                     continue; // restart immediately if it's the first try
                 delay = 0.5;
             }
-            else if (retries == 1)
+            else if (m_parent->PlaylistRetryCount() == 1)
                 delay = 0.5;
-            else if (retries == 2)
+            else if (m_parent->PlaylistRetryCount() == 2)
                 delay = 1;
             else
                 delay = 2;
         }
 
         // When should the playlist be reloaded
-        wakeup = m_parent->TargetDuration() * delay * (int64_t)1000;
-        if (wakeup < 0)
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC + "Reader in bad state.  Aborting");
-            m_parent->HadError();
-            m_cancel = true;
-            break;
-        }
+        wakeup = m_parent->TargetDuration() > 0 ?
+                 m_parent->TargetDuration() : 10;
+        wakeup *= (delay * (int64_t)1000);
+        if (wakeup > 60000)
+            wakeup = 60000;
     }
 
-    downloader.Cancel();
+    if (downloader)
+    {
+        downloader->Cancel();
+        delete downloader;
+    }
 
     RunEpilog();
 
