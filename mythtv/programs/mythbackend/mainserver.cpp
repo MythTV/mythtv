@@ -71,6 +71,8 @@ using namespace std;
 #include "videoutils.h"
 #include "mythlogging.h"
 #include "filesysteminfo.h"
+#include "metaio.h"
+#include "musicmetadata.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -799,10 +801,17 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MUSIC_TAG_UPDATE_VOLATILE")
     {
-        if (tokens.size() < 6)
+        if (tokens.size() != 6)
             LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_TAG_UPDATE_VOLATILE");
         else
             HandleMusicTagUpdateVolatile(tokens, pbs);
+    }
+    else if (command == "MUSIC_TAG_UPDATE_METADATA")
+    {
+        if (tokens.size() != 3)
+            LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_TAG_UPDATE_METADATA");
+        else
+            HandleMusicTagUpdateMetadata(tokens, pbs);
     }
     else if (command == "MUSIC_TAG_GETIMAGE")
     {
@@ -5290,6 +5299,93 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
                                                           kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_TAG_UPDATE_METADATA <hostname> <songid>
+// this assumes the new metadata has already been saved to the database for this track
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagUpdateMetadata: asking slave '%1' "
+                                              "to update the metadata").arg(hostname));
+            strlist << slist.join(" ");
+            strlist = slave->ForwardRequest(strlist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagUpdateMetadata: Failed to grab "
+                                              "slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        // load the new metadata from the database
+        int songID = slist[2].toInt();
+
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HandleMusicTagUpdateMetadata: "
+                                             "Cannot find metadata for trackid: %1")
+                                             .arg(songID));
+
+            strlist << "ERROR: track not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+
+        MetaIO *tagger = mdata->getTagger();
+        if (tagger)
+        {
+            if (!tagger->write(mdata->getLocalFilename(), mdata))
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("HandleMusicTagUpdateMetadata: "
+                                                 "Failed to write to tag for trackid: %1")
+                                                 .arg(songID));
+
+                strlist << "ERROR: write to tag failed";
+
+                if (pbssock)
+                    SendResponse(pbssock, strlist);
+
+                return;
+            }
+        }
     }
 
     strlist << "OK";
