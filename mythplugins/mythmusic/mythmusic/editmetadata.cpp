@@ -200,18 +200,19 @@ void EditMetadataCommon::saveToDatabase()
 
 void EditMetadataCommon::saveAll()
 {
+    saveToDatabase();
+
+    // only write to the tag if it's enabled by the user
     if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
     {
-        MetaIO *tagger = m_metadata->getTagger();
+        QStringList strList;
+        strList << QString("MUSIC_TAG_UPDATE_METADATA %1 %2")
+                            .arg(m_metadata->Hostname())
+                            .arg(m_metadata->ID());
 
-        if (tagger)
-        {
-            tagger->write(m_metadata->Filename(), m_metadata);
-            delete tagger;
-        }
+        SendStringListThread *thread = new SendStringListThread(strList);
+        MThreadPool::globalInstance()->start(thread, "UpdateMetadata");
     }
-
-    saveToDatabase();
 
     cleanupAndClose();
 }
