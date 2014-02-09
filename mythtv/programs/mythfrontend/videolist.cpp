@@ -415,7 +415,8 @@ class VideoListImp
             if (ret)
             {
                 ret = m_metadata.purgeByID(video_id);
-                InvalidateCache();
+                // Force refresh
+                m_metadata_list_type = VideoListImp::ltNone;
             }
         }
 
