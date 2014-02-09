@@ -51,7 +51,10 @@ MusicData::~MusicData(void)
 
 void MusicData::scanMusic (void)
 {
-    gCoreContext->SendReceiveStringList(QStringList() << "SCAN_MUSIC");
+    QStringList strList("SCAN_MUSIC");
+    SendStringListThread *thread = new SendStringListThread(strList);
+    MThreadPool::globalInstance()->start(thread, "Send SCAN_MUSIC");
+
     LOG(VB_GENERAL, LOG_INFO, "Requested a music file scan");
 }
 

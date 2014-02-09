@@ -1265,7 +1265,6 @@ void MusicPlayer::updateVolatileMetadata(void)
             // only write the last played, playcount & rating to the tag if it's enabled by the user
             if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
             {
-                // TODO: should move this to it's own thread
                 QStringList strList;
                 strList << QString("MUSIC_TAG_UPDATE_VOLATILE %1 %2 %3 %4 %5")
                                    .arg(getCurrentMetadata()->Hostname())
@@ -1273,7 +1272,8 @@ void MusicPlayer::updateVolatileMetadata(void)
                                    .arg(getCurrentMetadata()->Rating())
                                    .arg(getCurrentMetadata()->Playcount())
                                    .arg(getCurrentMetadata()->LastPlay().toString(Qt::ISODate));
-                gCoreContext->SendReceiveStringList(strList);
+                SendStringListThread *thread = new SendStringListThread(strList);
+                MThreadPool::globalInstance()->start(thread, "UpdateVolatile");
             }
 
             sendTrackStatsChangedEvent(getCurrentMetadata()->ID());

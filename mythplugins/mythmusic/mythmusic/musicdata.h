@@ -1,14 +1,38 @@
 #ifndef MUSICDATA_H_
 #define MUSICDATA_H_
 
-//#include <musicmetadata.h>
-#include <mythexp.h>
 
+// qt
+#include <QRunnable>
+
+// myth
+#include <mythexp.h>
+#include <mythcorecontext.h>
+
+// mythmusic
 #include "playlistcontainer.h"
 
 class PlaylistContainer;
 class AllMusic;
 class AllStream;
+
+/// send a message to the master BE without blocking the UI thread
+class SendStringListThread : public QRunnable
+{
+  public:
+    SendStringListThread(const QStringList &strList)
+    {
+        m_strList = strList;
+    }
+
+    void run()
+    {
+        gCoreContext->SendReceiveStringList(m_strList);
+    }
+
+  private:
+    QStringList m_strList;
+};
 
 //----------------------------------------------------------------------------
 
