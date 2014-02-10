@@ -705,9 +705,6 @@ void HouseKeeper::Start(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Starting HouseKeeper.");
 
-    if (!m_taskQueue.isEmpty())
-        StartThread();
-
     m_timer->start();
 }
 
