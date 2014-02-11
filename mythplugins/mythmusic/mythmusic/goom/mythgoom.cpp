@@ -26,16 +26,17 @@ Goom::Goom()
 
     goom_init(800, 600, 0);
 
-    m_scalew = 1; //gCoreContext->GetNumSetting("VisualScaleWidth", 2);
-    m_scaleh = 1; //gCoreContext->GetNumSetting("VisualScaleHeight", 2);
+    m_scalew = gCoreContext->GetNumSetting("VisualScaleWidth", 2);
+    m_scaleh = gCoreContext->GetNumSetting("VisualScaleHeight", 2);
 
-    if (m_scaleh > 2)
-        m_scaleh = 2;
+    // we allow 1, 2 or 4 for the scale since goom likes its resolution to be a multiple of 2
+    if (m_scaleh == 3 || m_scaleh > 4)
+        m_scaleh = 4;
     if (m_scaleh < 1)
         m_scaleh = 1;
 
-    if (m_scalew > 2)
-        m_scalew = 2;
+    if (m_scalew == 3 || m_scalew > 4)
+        m_scalew = 4;
     if (m_scalew < 1)
         m_scalew = 1;
 }
@@ -52,7 +53,12 @@ void Goom::resize(const QSize &newsize)
     m_size.setHeight((m_size.height() / 2) * 2);
     m_size.setWidth((m_size.width() / 2) * 2);
 
-    goom_set_resolution(m_size.width() / m_scalew, m_size.height() / m_scaleh, 0);
+    // only scale the resolution if it is > 256
+    // this ensures the small visualisers don't look too blocky
+    if (m_size.width() > 256)
+        goom_set_resolution(m_size.width() / m_scalew, m_size.height() / m_scaleh, 0);
+    else
+        goom_set_resolution(m_size.width(), m_size.height(), 0);
 }
 
 bool Goom::process(VisualNode *node)
@@ -94,9 +100,18 @@ bool Goom::draw(QPainter *p, const QColor &back)
     if (!m_buffer)
         return true;
 
-    QImage *image = new QImage((uchar*) m_buffer,  m_size.width(), m_size.height(), m_size.width() * 4, QImage::Format_ARGB32);
+    int width = m_size.width();
+    int height = m_size.height();
 
-    p->drawImage(0, 0, *image);
+    if (m_size.width() > 256)
+    {
+        width /= m_scalew;
+        height /= m_scaleh;
+    }
+
+    QImage *image = new QImage((uchar*) m_buffer, width, height, width * 4, QImage::Format_RGB32);
+
+    p->drawImage(QRect(0, 0, m_size.width(), m_size.height()), *image);
 
     delete image;
 

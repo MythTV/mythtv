@@ -50,9 +50,9 @@ bool VisualizationSettings::Create()
     if (randomizeorder == 1)
         m_randomizeOrder->SetCheckState(MythUIStateType::Full);
 
-    m_scaleWidth->SetRange(1,2,1);
+    m_scaleWidth->SetRange(1,4,1);
     m_scaleWidth->SetValue(gCoreContext->GetNumSetting("VisualScaleWidth"));
-    m_scaleHeight->SetRange(1,2,1);
+    m_scaleHeight->SetRange(1,4,1);
     m_scaleHeight->SetValue(gCoreContext->GetNumSetting("VisualScaleHeight"));
 
     m_changeOnSongChange->SetHelpText(tr("Change the visualizer when the song changes."));
