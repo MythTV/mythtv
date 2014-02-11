@@ -449,7 +449,7 @@ class META_PUBLIC AlbumArtImages
     Q_DECLARE_TR_FUNCTIONS(AlbumArtImages)
 
   public:
-    AlbumArtImages(MusicMetadata *metadata);
+    AlbumArtImages(MusicMetadata *metadata, bool loadFromDB = true);
     ~AlbumArtImages();
 
     void           addImage(const AlbumArtImage &newImage);

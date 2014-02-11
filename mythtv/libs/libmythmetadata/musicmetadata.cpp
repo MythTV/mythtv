@@ -1647,10 +1647,11 @@ void AllStream::createPlaylist(void)
 
 /**************************************************************************/
 
-AlbumArtImages::AlbumArtImages(MusicMetadata *metadata)
+AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, bool loadFromDB)
     : m_parent(metadata)
 {
-    findImages();
+    if (loadFromDB)
+        findImages();
 }
 
 AlbumArtImages::~AlbumArtImages()
