@@ -813,6 +813,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleMusicTagUpdateMetadata(tokens, pbs);
     }
+    else if (command == "MUSIC_FIND_ALBUMART")
+    {
+        if (tokens.size() != 4)
+            LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_FIND_ALBUMART");
+        else
+            HandleMusicFindAlbumArt(tokens, pbs);
+    }
     else if (command == "MUSIC_TAG_GETIMAGE")
     {
         if (tokens.size() < 4)
@@ -5389,6 +5396,142 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
     }
 
     strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+
+void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_FIND_ALBUMART <hostname> <songid> <update_database>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicFindAlbumArt: asking slave '%1' "
+                                              "to update the albumart").arg(hostname));
+            strlist << slist.join(" ");
+            strlist = slave->ForwardRequest(strlist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicFindAlbumArt: Failed to grab "
+                                              "slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        // find the track in the database
+        int songID = slist[2].toInt();
+        bool updateDatabase = (slist[3].toInt() == 1);
+
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HandleMusicFindAlbumArt: "
+                                             "Cannot find metadata for trackid: %1")
+                                             .arg(songID));
+
+            strlist << "ERROR: track not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+
+        // find any directory images
+        QFileInfo fi(mdata->getLocalFilename());
+        QDir dir = fi.absoluteDir();
+
+        QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
+                                                    "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+        dir.setNameFilters(nameFilter.split(";"));
+
+        QStringList files = dir.entryList();
+
+        // create an empty image list
+        AlbumArtImages *images = new AlbumArtImages(mdata, false);
+
+        for (int x = 0; x < files.size(); x++)
+        {
+            AlbumArtImage *image = new AlbumArtImage();
+            image->filename = dir.absolutePath() + '/' + files.at(x);
+            image->hostname = gCoreContext->GetHostName();
+            image->embedded = false;
+            image->imageType = AlbumArtImages::guessImageType(image->filename);
+            image->description = "";
+            images->addImage(image);
+            delete image;
+        }
+
+        // find any embedded albumart in the the tracks tag
+        MetaIO *tagger = mdata->getTagger();
+        if (tagger)
+        {
+            if (tagger->supportsEmbeddedImages())
+            {
+                AlbumArtList artList = tagger->getAlbumArtList(mdata->getLocalFilename());
+
+                for (int x = 0; x < artList.count(); x++)
+                {
+                    AlbumArtImage *image = artList.at(x);
+                    image->filename = QString("%1-%2").arg(mdata->ID()).arg(image->filename);
+                    images->addImage(image);
+                }
+            }
+
+            delete tagger;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("HandleMusicFindAlbumArt: "
+                                             "Failed to find a tagger for trackid: %1")
+                                             .arg(songID));
+        }
+
+        // finally save the result to the database
+        if (updateDatabase)
+            images->dumpToDatabase();
+
+        strlist << "OK";
+        strlist.append(QString("%1").arg(images->getImageCount()));
+
+        for (uint x = 0; x < images->getImageCount(); x++)
+        {
+            AlbumArtImage *image = images->getImageAt(x);
+            strlist.append(QString("%1").arg(image->id));
+            strlist.append(QString("%1").arg((int)image->imageType));
+            strlist.append(QString("%1").arg(image->embedded));
+            strlist.append(image->description);
+            strlist.append(image->filename);
+            strlist.append(image->hostname);
+        }
+    }
 
     if (pbssock)
         SendResponse(pbssock, strlist);
