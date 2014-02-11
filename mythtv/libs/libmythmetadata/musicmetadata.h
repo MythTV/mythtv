@@ -162,16 +162,16 @@ class META_PUBLIC MusicMetadata
     void setGenre(const QString &lgenre) { m_genre = lgenre; }
 
     void setDirectoryId(int ldirectoryid) { m_directoryid = ldirectoryid; }
-    int getDirectoryId() const { return m_directoryid; }
+    int getDirectoryId();
 
     void setArtistId(int lartistid) { m_artistid = lartistid; }
-    int getArtistId() const { return m_artistid; }
+    int getArtistId();
 
     void setAlbumId(int lalbumid) { m_albumid = lalbumid; }
-    int getAlbumId() const { return m_albumid; }
+    int getAlbumId();
 
     void setGenreId(int lgenreid) { m_genreid = lgenreid; }
-    int getGenreId() const { return m_genreid; }
+    int getGenreId();
 
     int Year() const { return m_year; }
     void setYear(int lyear) { m_year = lyear; }

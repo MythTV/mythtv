@@ -315,51 +315,61 @@ void MusicMetadata::reloadMetadata(void)
     m_genreid = -1;
 }
 
-void MusicMetadata::dumpToDatabase()
+int MusicMetadata::getDirectoryId()
 {
-    QString sqldir = m_filename.section('/', 0, -2);
-    QString sqlfilename = m_filename.section('/', -1);
-
-    checkEmptyFields();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (sqldir.isEmpty())
+    if (m_directoryid < 0)
     {
-        m_directoryid = 0;
-    }
-    else if (m_directoryid < 0)
-    {
-        // Load the directory id
-        query.prepare("SELECT directory_id FROM music_directories "
-                    "WHERE path = :DIRECTORY ;");
-        query.bindValue(":DIRECTORY", sqldir);
+        QString sqldir = m_filename.section('/', 0, -2);
+        QString sqlfilename = m_filename.section('/', -1);
 
-        if (!query.exec() || !query.isActive())
+        checkEmptyFields();
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        if (sqldir.isEmpty())
         {
-            MythDB::DBError("music select directory id", query);
-            return;
+            m_directoryid = 0;
         }
-        if (query.next())
+        else if (m_directoryid < 0)
         {
-            m_directoryid = query.value(0).toInt();
-        }
-        else
-        {
-            query.prepare("INSERT INTO music_directories (path) VALUES (:DIRECTORY);");
+            // Load the directory id
+            query.prepare("SELECT directory_id FROM music_directories "
+                        "WHERE path = :DIRECTORY ;");
             query.bindValue(":DIRECTORY", sqldir);
 
-            if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+            if (!query.exec() || !query.isActive())
             {
-                MythDB::DBError("music insert directory", query);
-                return;
+                MythDB::DBError("music select directory id", query);
+                return -1;
             }
-            m_directoryid = query.lastInsertId().toInt();
+            if (query.next())
+            {
+                m_directoryid = query.value(0).toInt();
+            }
+            else
+            {
+                query.prepare("INSERT INTO music_directories (path) VALUES (:DIRECTORY);");
+                query.bindValue(":DIRECTORY", sqldir);
+
+                if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+                {
+                    MythDB::DBError("music insert directory", query);
+                    return -1;
+                }
+                m_directoryid = query.lastInsertId().toInt();
+            }
         }
     }
 
+    return m_directoryid;
+}
+
+int MusicMetadata::getArtistId()
+{
     if (m_artistid < 0)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
+
         // Load the artist id
         query.prepare("SELECT artist_id FROM music_artists "
                     "WHERE artist_name = :ARTIST ;");
@@ -368,7 +378,7 @@ void MusicMetadata::dumpToDatabase()
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("music select artist id", query);
-            return;
+            return -1;
         }
         if (query.next())
         {
@@ -382,48 +392,54 @@ void MusicMetadata::dumpToDatabase()
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
                 MythDB::DBError("music insert artist", query);
-                return;
+                return -1;
             }
             m_artistid = query.lastInsertId().toInt();
         }
-    }
 
-    // Compilation Artist
-    if (m_artist == m_compilation_artist)
-    {
-        m_compartistid = m_artistid;
-    }
-    else
-    {
-        query.prepare("SELECT artist_id FROM music_artists "
-                    "WHERE artist_name = :ARTIST ;");
-        query.bindValue(":ARTIST", m_compilation_artist);
-        if (!query.exec() || !query.isActive())
+        // Compilation Artist
+        if (m_artist == m_compilation_artist)
         {
-            MythDB::DBError("music select compilation artist id", query);
-            return;
-        }
-        if (query.next())
-        {
-            m_compartistid = query.value(0).toInt();
+            m_compartistid = m_artistid;
         }
         else
         {
-            query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+            query.prepare("SELECT artist_id FROM music_artists "
+                        "WHERE artist_name = :ARTIST ;");
             query.bindValue(":ARTIST", m_compilation_artist);
-
-            if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+            if (!query.exec() || !query.isActive())
             {
-                MythDB::DBError("music insert compilation artist", query);
-                return;
+                MythDB::DBError("music select compilation artist id", query);
+                return -1;
             }
-            m_compartistid = query.lastInsertId().toInt();
+            if (query.next())
+            {
+                m_compartistid = query.value(0).toInt();
+            }
+            else
+            {
+                query.prepare("INSERT INTO music_artists (artist_name) VALUES (:ARTIST);");
+                query.bindValue(":ARTIST", m_compilation_artist);
+
+                if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
+                {
+                    MythDB::DBError("music insert compilation artist", query);
+                    return -1 ;
+                }
+                m_compartistid = query.lastInsertId().toInt();
+            }
         }
     }
 
-    // Album
+    return m_artistid;
+}
+
+int MusicMetadata::getAlbumId()
+{
     if (m_albumid < 0)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
+
         query.prepare("SELECT album_id FROM music_albums "
                     "WHERE artist_id = :COMP_ARTIST_ID "
                     " AND album_name = :ALBUM ;");
@@ -432,7 +448,7 @@ void MusicMetadata::dumpToDatabase()
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("music select album id", query);
-            return;
+            return -1;
         }
         if (query.next())
         {
@@ -440,7 +456,8 @@ void MusicMetadata::dumpToDatabase()
         }
         else
         {
-            query.prepare("INSERT INTO music_albums (artist_id, album_name, compilation, year) VALUES (:COMP_ARTIST_ID, :ALBUM, :COMPILATION, :YEAR);");
+            query.prepare("INSERT INTO music_albums (artist_id, album_name, compilation, year) "
+                          "VALUES (:COMP_ARTIST_ID, :ALBUM, :COMPILATION, :YEAR);");
             query.bindValue(":COMP_ARTIST_ID", m_compartistid);
             query.bindValue(":ALBUM", m_album);
             query.bindValue(":COMPILATION", m_compilation);
@@ -449,22 +466,28 @@ void MusicMetadata::dumpToDatabase()
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
                 MythDB::DBError("music insert album", query);
-                return;
+                return -1;
             }
             m_albumid = query.lastInsertId().toInt();
         }
     }
 
+    return m_albumid;
+}
+
+int MusicMetadata::getGenreId()
+{
     if (m_genreid < 0)
     {
-        // Genres
+        MSqlQuery query(MSqlQuery::InitCon());
+
         query.prepare("SELECT genre_id FROM music_genres "
                     "WHERE genre = :GENRE ;");
         query.bindValue(":GENRE", m_genre);
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("music select genre id", query);
-            return;
+            return -1;
         }
         if (query.next())
         {
@@ -478,11 +501,28 @@ void MusicMetadata::dumpToDatabase()
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
                 MythDB::DBError("music insert genre", query);
-                return;
+                return -1;
             }
             m_genreid = query.lastInsertId().toInt();
         }
     }
+
+    return m_genreid;
+}
+
+void MusicMetadata::dumpToDatabase()
+{
+    if (m_directoryid < 0)
+        getDirectoryId();
+
+    if (m_artistid < 0)
+        getArtistId();
+
+    if (m_albumid < 0)
+        getAlbumId();
+
+    if (m_genreid < 0)
+        getGenreId();
 
     // We have all the id's now. We can insert it.
     QString strQuery;
@@ -521,6 +561,11 @@ void MusicMetadata::dumpToDatabase()
                    ", hostname = :HOSTNAME "
                    "WHERE song_id= :ID ;";
     }
+
+    QString sqldir = m_filename.section('/', 0, -2);
+    QString sqlfilename = m_filename.section('/', -1);
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare(strQuery);
 
