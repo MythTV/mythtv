@@ -1766,6 +1766,61 @@ void AlbumArtImages::findImages(void)
     }
 }
 
+void AlbumArtImages::scanForImages()
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUIBusyDialog *busy = new MythUIBusyDialog(tr("Scanning for music album art..."),
+                                                  popupStack, "scanbusydialog");
+
+    if (busy->Create())
+    {
+        popupStack->AddScreen(busy, false);
+    }
+    else
+    {
+        delete busy;
+        busy = NULL;
+    }
+
+    QStringList strList(QString("MUSIC_FIND_ALBUMART %1 %2 0")
+                                .arg(m_parent->Hostname())
+                                .arg(m_parent->ID()));
+
+    AlbumArtScannerThread *scanThread = new AlbumArtScannerThread(strList);
+    scanThread->start();
+
+    while (scanThread->isRunning())
+    {
+        qApp->processEvents();
+        usleep(1000);
+    }
+
+    strList = scanThread->getResult();
+
+    delete scanThread;
+
+    if (busy)
+        busy->Close();
+
+    while (!m_imageList.empty())
+    {
+        delete m_imageList.back();
+        m_imageList.pop_back();
+    }
+
+    for (int x = 2; (x < strList.count() - 2) / 6; x += 6)
+    {
+        AlbumArtImage *image = new AlbumArtImage;
+        image->id = strList[x].toInt();
+        image->imageType = (ImageType) strList[x + 1].toInt();
+        image->embedded = (strList[x + 2].toInt() == 1);
+        image->description = strList[x + 3];
+        image->filename = strList[x + 4];
+        image->hostname = strList[x + 5];
+        addImage(image);
+    }
+}
+
 AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 {
     AlbumArtList::iterator it = m_imageList.begin();
