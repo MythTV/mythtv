@@ -18,6 +18,7 @@
 #include <mythuiwebbrowser.h>
 #include <mythuifilebrowser.h>
 #include <musicutils.h>
+#include <mythprogressdialog.h>
 
 // mythmusic
 #include "musicdata.h"
@@ -37,7 +38,7 @@ MusicMetadata *EditMetadataCommon::m_sourceMetadata = NULL;
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
                                        MusicMetadata *source_metadata,
                                        const QString &name) :
-    MythScreenType(parent, name), m_doneButton(NULL)
+    MythScreenType(parent, name), m_albumArtChanged(false), m_doneButton(NULL)
 {
     // make a copy so we can abandon changes
     m_metadata = new MusicMetadata(*source_metadata);
@@ -48,12 +49,29 @@ EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
 
 EditMetadataCommon::EditMetadataCommon(MythScreenStack *parent,
                                        const QString &name) :
-    MythScreenType(parent, name), m_doneButton(NULL)
+    MythScreenType(parent, name), m_albumArtChanged(false), m_doneButton(NULL)
 {
 }
 
 EditMetadataCommon::~EditMetadataCommon()
 {
+        // do we need to save anything?
+    if (m_albumArtChanged)
+    {
+        m_metadata->getAlbumArtImages()->dumpToDatabase();
+
+        // force a reload of the images for any tracks affected
+        MetadataPtrList *allMusic =  gMusicData->all_music->getAllMetadata();
+        for (int x = 0; x < allMusic->count(); x++)
+        {
+            if ((allMusic->at(x)->ID() == m_sourceMetadata->ID()) ||
+                (allMusic->at(x)->getDirectoryId() == m_sourceMetadata->getDirectoryId()))
+            {
+                allMusic->at(x)->reloadAlbumArtImages();
+                gPlayer->sendAlbumArtChangedEvent(allMusic->at(x)->ID());
+            }
+        }
+    }
 }
 
 bool EditMetadataCommon::CreateCommon(void)
@@ -261,50 +279,7 @@ void EditMetadataCommon::searchForAlbumImages(void)
 
 void EditMetadataCommon::scanForImages(void)
 {
-    // clear the original images
-    AlbumArtList *imageList = m_metadata->getAlbumArtImages()->getImageList();
-    while (!imageList->isEmpty())
-    {
-        delete imageList->back();
-        imageList->pop_back();
-    }
-
-    // scan the directory for images
-    QFileInfo fi(m_metadata->Filename());
-    QDir dir = fi.absoluteDir();
-
-    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
-                                                  "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
-    dir.setNameFilters(nameFilter.split(";"));
-
-    QStringList files = dir.entryList();
-
-    for (int x = 0; x < files.size(); x++)
-    {
-        AlbumArtImage *image = new AlbumArtImage();
-        image->filename = dir.absolutePath() + '/' + files.at(x);
-        image->embedded = false;
-        image->imageType = AlbumArtImages::guessImageType(image->filename);
-        image->description = "";
-        m_metadata->getAlbumArtImages()->addImage(image);
-        delete image;
-    }
-
-    // scan the tracks tag for any images
-    MetaIO *tagger = m_metadata->getTagger();
-
-    if (tagger && tagger->supportsEmbeddedImages())
-    {
-        AlbumArtList art = tagger->getAlbumArtList(m_metadata->Filename());
-        for (int x = 0; x < art.count(); x++)
-        {
-            AlbumArtImage image = art.at(x);
-            m_metadata->getAlbumArtImages()->addImage(image);
-        }
-    }
-
-    if (tagger)
-        delete tagger;
+    m_metadata->getAlbumArtImages()->scanForImages();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -877,8 +852,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
 
 EditAlbumartDialog::EditAlbumartDialog(MythScreenStack *parent)
                   : EditMetadataCommon(parent, "EditAlbumartDialog"),
-    m_albumArt(m_metadata->getAlbumArtImages()),
-    m_albumArtChanged(false),    m_metadataButton(NULL),
+    m_metadataButton(NULL),
     m_doneButton(NULL),          m_coverartImage(NULL),
     m_coverartList(NULL),        m_imagetypeText(NULL),
     m_imagefilenameText(NULL)
@@ -888,24 +862,6 @@ EditAlbumartDialog::EditAlbumartDialog(MythScreenStack *parent)
 
 EditAlbumartDialog::~EditAlbumartDialog()
 {
-    // do we need to save anything?
-    if (m_albumArtChanged)
-    {
-        m_albumArt->dumpToDatabase();
-
-        // force a reload of the images for any tracks affected
-        MetadataPtrList *allMusic =  gMusicData->all_music->getAllMetadata();
-        for (int x = 0; x < allMusic->count(); x++)
-        {
-            if ((allMusic->at(x)->ID() == m_sourceMetadata->ID()) ||
-                (allMusic->at(x)->getDirectoryId() == m_sourceMetadata->getDirectoryId()))
-            {
-                allMusic->at(x)->reloadAlbumArtImages();
-                gPlayer->sendAlbumArtChangedEvent(allMusic->at(x)->ID());
-            }
-        }
-    }
-
     gCoreContext->removeListener(this);
 }
 
@@ -966,7 +922,7 @@ void EditAlbumartDialog::gridItemChanged(MythUIButtonListItem *item)
 
 void EditAlbumartDialog::updateImageGrid(void)
 {
-    AlbumArtList *albumArtList = m_albumArt->getImageList();
+    AlbumArtList *albumArtList = m_metadata->getAlbumArtImages()->getImageList();
 
     m_coverartList->Reset();
 
@@ -1060,12 +1016,14 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
         imageType = AlbumArtImages::guessImageType(m_imageFilename);
     }
 
-    menu->AddButton(m_albumArt->getTypeName(IT_UNKNOWN),    qVariantFromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
-    menu->AddButton(m_albumArt->getTypeName(IT_FRONTCOVER), qVariantFromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
-    menu->AddButton(m_albumArt->getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
-    menu->AddButton(m_albumArt->getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
-    menu->AddButton(m_albumArt->getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
-    menu->AddButton(m_albumArt->getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
+    AlbumArtImages *albumArt = m_metadata->getAlbumArtImages();
+
+    menu->AddButton(albumArt->getTypeName(IT_UNKNOWN),    qVariantFromValue((int)IT_UNKNOWN),    false, (imageType == IT_UNKNOWN));
+    menu->AddButton(albumArt->getTypeName(IT_FRONTCOVER), qVariantFromValue((int)IT_FRONTCOVER), false, (imageType == IT_FRONTCOVER));
+    menu->AddButton(albumArt->getTypeName(IT_BACKCOVER),  qVariantFromValue((int)IT_BACKCOVER),  false, (imageType == IT_BACKCOVER));
+    menu->AddButton(albumArt->getTypeName(IT_CD),         qVariantFromValue((int)IT_CD),         false, (imageType == IT_CD));
+    menu->AddButton(albumArt->getTypeName(IT_INLAY),      qVariantFromValue((int)IT_INLAY),      false, (imageType == IT_INLAY));
+    menu->AddButton(albumArt->getTypeName(IT_ARTIST),     qVariantFromValue((int)IT_ARTIST),     false, (imageType == IT_ARTIST));
 
     popupStack->AddScreen(menu);
 }
@@ -1088,6 +1046,10 @@ void EditAlbumartDialog::showMenu(void )
 
     menu->AddButton(tr("Edit Metadata"));
     menu->AddButton(tr("Rescan For Images"));
+
+// FIXME this needs updating to work with storage groups
+#if 0
+
     menu->AddButton(tr("Search Internet For Images"));
 
     MetaIO *tagger = m_metadata->getTagger();
@@ -1127,7 +1089,7 @@ void EditAlbumartDialog::showMenu(void )
 
     if (tagger)
         delete tagger;
-
+#endif
     popupStack->AddScreen(menu);
 }
 
@@ -1154,7 +1116,8 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                 MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
                 if (item)
                 {
-                    item->SetText(m_albumArt->getTypeName((ImageType) type));
+                    AlbumArtImages *albumArt = m_metadata->getAlbumArtImages();
+                    item->SetText(albumArt->getTypeName((ImageType) type));
                     AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
                     if (image)
                     {
@@ -1279,7 +1242,8 @@ void EditAlbumartDialog::rescanForImages(void)
 
     updateImageGrid();
 
-    if (m_albumArt->getImageCount() > 0)
+    AlbumArtImages *albumArt = m_metadata->getAlbumArtImages();
+    if (albumArt->getImageCount() > 0)
         m_albumArtChanged = true;
 }
 
