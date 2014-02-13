@@ -647,13 +647,14 @@ void ImportMusicDialog::showEditMetadataDialog()
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     EditMetadataDialog *editDialog = new EditMetadataDialog(mainStack, editMeta);
-    editDialog->setSaveMetadataOnly();
 
     if (!editDialog->Create())
     {
         delete editDialog;
         return;
     }
+
+    editDialog->setSaveMetadataOnly();
 
     connect(editDialog, SIGNAL(metadataChanged()), this, SLOT(metadataChanged()));
 

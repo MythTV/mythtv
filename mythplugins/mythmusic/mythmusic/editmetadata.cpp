@@ -221,7 +221,7 @@ void EditMetadataCommon::setSaveMetadataOnly(void)
 {
     metadataOnly = true;
 
-    MythUIButton *albumartButton = dynamic_cast<MythUIButton *>(GetChild("albumart_button"));
+    MythUIButton *albumartButton = dynamic_cast<MythUIButton *>(GetChild("albumartbutton"));
     if (albumartButton)
         albumartButton->Hide();
 }
@@ -508,6 +508,9 @@ bool EditMetadataDialog::keyPressEvent(QKeyEvent *event)
 
 void EditMetadataDialog::showMenu(void )
 {
+    if (metadataOnly)
+        return;
+
     QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
