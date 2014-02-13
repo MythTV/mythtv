@@ -342,6 +342,7 @@ Q_DECLARE_METATYPE(MusicMetadata *)
 
 typedef QList<MusicMetadata*> MetadataPtrList;
 Q_DECLARE_METATYPE(MetadataPtrList *)
+Q_DECLARE_METATYPE(ImageType)
 
 //---------------------------------------------------------------------------
 

@@ -144,8 +144,6 @@ class ImportMusicDialog : public MythScreenType
 
     MythUICheckBox  *m_compilationCheck;
 
-    MythDialogBox   *m_popupMenu;
-
     // default metadata values
     bool             m_defaultCompilation;
     QString          m_defaultCompArtist;
@@ -167,7 +165,7 @@ class ImportCoverArtDialog : public MythScreenType
   public:
 
     ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
-                         MusicMetadata *metadata);
+                         MusicMetadata *metadata, const QString &storageDir);
     ~ImportCoverArtDialog();
 
     bool Create(void);
@@ -186,6 +184,7 @@ class ImportCoverArtDialog : public MythScreenType
 
     QStringList    m_filelist;
     QString        m_sourceDir;
+    QString        m_musicStorageDir;
     MusicMetadata *m_metadata;
     int            m_currentFile;
     QString        m_saveFilename;

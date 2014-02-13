@@ -90,7 +90,6 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
     m_addallnewButton(NULL),
     m_nextnewButton(NULL),
     m_compilationCheck(NULL),
-    m_popupMenu(NULL),
     // default metadata values
     m_defaultCompilation(false),
     m_defaultYear(0),
@@ -428,23 +427,15 @@ void ImportMusicDialog::addPressed()
 
         meta->setFilename(saveFilename);
         meta->setHostname(url.host());
-        meta->setFileSize((quint64)QFileInfo(saveFilename).size());
+        meta->setFileSize((quint64)QFileInfo(origFilename).size());
 
         // update the database
         meta->dumpToDatabase();
-#if 0
-        // read any embedded images from the tag
-        MetaIO *tagger = MetaIO::createTagger(meta->Filename(true));
-        if (tagger && tagger->supportsEmbeddedImages())
-        {
-            AlbumArtList artList = tagger->getAlbumArtList(meta->Filename(true));
-            meta->setEmbeddedAlbumArt(artList);
-            meta->getAlbumArtImages()->dumpToDatabase();
-        }
 
-        if (tagger)
-            delete tagger;
-#endif
+        // find any albumart for this track
+        meta->getAlbumArtImages()->scanForImages();
+        meta->getAlbumArtImages()->dumpToDatabase();
+
         m_somethingWasImported = true;
 
         m_tracks->at(m_currentTrack)->isNewTune = 
@@ -672,9 +663,6 @@ void ImportMusicDialog::metadataChanged(void)
 
 void ImportMusicDialog::showMenu()
 {
-    if (m_popupMenu)
-        return;
-
     if (m_tracks->empty())
         return;
 
@@ -935,7 +923,8 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
     ImportCoverArtDialog *import = new ImportCoverArtDialog(mainStack,
                                         fi.absolutePath(),
-                                        m_tracks->at(m_currentTrack)->metadata);
+                                        m_tracks->at(m_currentTrack)->metadata,
+                                        m_musicStorageDir);
 
     if (import->Create())
         mainStack->AddScreen(import);
@@ -960,9 +949,11 @@ void ImportMusicDialog::customEvent(QEvent *event)
 
 ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
                                            const QString &sourceDir,
-                                           MusicMetadata *metadata) :
+                                           MusicMetadata *metadata,
+                                           const QString &storageDir) :
     MythScreenType(parent, "import_coverart"),
     m_sourceDir(sourceDir),
+    m_musicStorageDir(storageDir),
     m_metadata(metadata),
     m_currentFile(0),
     //  GUI stuff
@@ -1042,15 +1033,15 @@ bool ImportCoverArtDialog::Create()
     if (m_typeList)
     {
         new MythUIButtonListItem(m_typeList, tr("Front Cover"),
-                                 qVariantFromValue(0));
+                                 qVariantFromValue((int)IT_FRONTCOVER));
         new MythUIButtonListItem(m_typeList, tr("Back Cover"),
-                                 qVariantFromValue(1));
+                                 qVariantFromValue((int)IT_BACKCOVER));
         new MythUIButtonListItem(m_typeList, tr("CD"),
-                                 qVariantFromValue(2));
+                                 qVariantFromValue((int)IT_CD));
         new MythUIButtonListItem(m_typeList, tr("Inlay"),
-                                 qVariantFromValue(3));
+                                 qVariantFromValue((int)IT_INLAY));
         new MythUIButtonListItem(m_typeList, tr("<Unknown>"),
-                                 qVariantFromValue(4));
+                                 qVariantFromValue((int)IT_UNKNOWN));
 
         connect(m_typeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(selectorChanged()));
@@ -1087,10 +1078,21 @@ void ImportCoverArtDialog::copyPressed()
         if (!RemoteFile::CopyFile(m_filelist[m_currentFile], m_saveFilename))
         {
             //: %1 is the filename
-            ShowOkPopup(tr("Copy CoverArt Failed.\nCopying to %1")
-                    .arg(m_saveFilename));
+            ShowOkPopup(tr("Copy CoverArt Failed.\nCopying to %1").arg(m_saveFilename));
             return;
         }
+
+        // add the file to the database
+        QString filename = m_saveFilename.section( '/', -1, -1);
+        AlbumArtImage *image = new AlbumArtImage;
+        image->description = "";
+        image->embedded = false;
+        image->filename = filename;
+        image->hostname = m_metadata->Hostname();
+        image->imageType = (ImageType)m_typeList->GetItemCurrent()->GetData().toInt();
+
+        m_metadata->getAlbumArtImages()->addImage(image);
+        m_metadata->getAlbumArtImages()->dumpToDatabase();
 
         updateStatus();
     }
@@ -1165,33 +1167,41 @@ void ImportCoverArtDialog::updateStatus()
         m_coverartImage->SetFilename(m_filelist[m_currentFile]);
         m_coverartImage->Load();
 
-        QString saveFilename = /*getMusicDirectory() + */filenameFromMetadata(m_metadata);
-        QFileInfo fi(saveFilename);
-        QString saveDir = fi.absolutePath();
+        QString saveFilename = filenameFromMetadata(m_metadata);
+        QString fullFilename;
 
-        fi.setFile(m_filelist[m_currentFile]);
+        QUrl url(m_musicStorageDir);
+        fullFilename = gCoreContext->GenMythURL(url.host(), 0, saveFilename, "Music");
+        QString dir = fullFilename.section( '/', 0, -2);
+
+        QFileInfo fi(m_filelist[m_currentFile]);
         switch (m_typeList->GetItemCurrent()->GetData().toInt())
         {
-            case 0:
+            case IT_FRONTCOVER:
                 saveFilename = "front." + fi.suffix();
                 break;
-            case 1:
+            case IT_BACKCOVER:
                 saveFilename = "back." + fi.suffix();
                 break;
-            case 2:
+            case IT_CD:
                 saveFilename = "cd." + fi.suffix();
                 break;
-            case 3:
+            case IT_INLAY:
                 saveFilename = "inlay." + fi.suffix();
+                break;
+            case IT_UNKNOWN:
+                saveFilename = "unknown." + fi.suffix();
                 break;
             default:
                 saveFilename = fi.fileName();
         }
 
-        m_saveFilename = saveDir + "/" + saveFilename;
+        m_saveFilename = dir + "/" + saveFilename;
         m_destinationText->SetText(m_saveFilename);
 
-        if (QFile::exists(m_saveFilename))
+        url.setUrl(m_saveFilename);
+
+        if (!RemoteFile::FindFile(url.path(), "" , "Music").isEmpty())
             m_statusText->SetText(tr("File Already Exists"));
         else
             m_statusText->SetText(tr("New File"));

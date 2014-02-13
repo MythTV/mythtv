@@ -981,7 +981,7 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
     // add the images found in the tag to the ones we got from the DB
 
     if (!m_albumArt)
-        m_albumArt = new AlbumArtImages(this);
+        m_albumArt = new AlbumArtImages(this, false);
 
     for (int x = 0; x < albumart.size(); x++)
     {
@@ -1808,7 +1808,7 @@ void AlbumArtImages::scanForImages()
         m_imageList.pop_back();
     }
 
-    for (int x = 2; (x < strList.count() - 2) / 6; x += 6)
+    for (int x = 2; x < strList.count(); x += 6)
     {
         AlbumArtImage *image = new AlbumArtImage;
         image->id = strList[x].toInt();
@@ -1960,19 +1960,6 @@ void AlbumArtImages::addImage(const AlbumArtImage &newImage)
         image->embedded = newImage.embedded;
         image->description = newImage.description;
         image->hostname = newImage.hostname;
-    }
-
-    // if this is an embedded image copy it to disc to speed up its display
-    if (image->embedded)
-    {
-        image->filename = QString("%1-%2.jpg").arg(m_parent->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
-
-        QStringList slist;
-        slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
-            .arg(m_parent->Hostname())
-            .arg(m_parent->ID())
-            .arg(AlbumArtImages::getTypeFilename(image->imageType));
-        gCoreContext->SendReceiveStringList(slist);
     }
 }
 
