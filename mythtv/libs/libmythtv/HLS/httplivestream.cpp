@@ -224,54 +224,83 @@ int HTTPLiveStream::AddStream(void)
         tmpRelURL = m_relativeURL;
     }
 
+    // Check that this stream has not already been created.
+    // We want to avoid creating multiple identical streams and transcode
+    // jobs
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "INSERT INTO livestream "
-        "    ( width, height, bitrate, audiobitrate, segmentsize, "
-        "      maxsegments, startsegment, currentsegment, segmentcount, "
-        "      percentcomplete, created, lastmodified, relativeurl, "
-        "      fullurl, status, statusmessage, sourcefile, sourcehost, "
-        "      sourcewidth, sourceheight, outdir, outbase, "
-        "      audioonlybitrate, samplerate ) "
-        "VALUES "
-        "    ( :WIDTH, :HEIGHT, :BITRATE, :AUDIOBITRATE, :SEGMENTSIZE, "
-        "      :MAXSEGMENTS, 0, 0, 0, "
-        "      0, :CREATED, :LASTMODIFIED, :RELATIVEURL, "
-        "      :FULLURL, :STATUS, :STATUSMESSAGE, :SOURCEFILE, :SOURCEHOST, "
-        "      :SOURCEWIDTH, :SOURCEHEIGHT, :OUTDIR, :OUTBASE, "
-        "      :AUDIOONLYBITRATE, :SAMPLERATE ) ");
+        "SELECT id FROM livestream "
+        "WHERE "
+        "(width = :WIDTH OR height = :HEIGHT) AND bitrate = :BITRATE AND "
+        "audioonlybitrate = :AUDIOONLYBITRATE AND samplerate = :SAMPLERATE AND "
+        "audiobitrate = :AUDIOBITRATE AND segmentsize = :SEGMENTSIZE AND "
+        "sourcefile = :SOURCEFILE AND status <= :STATUS ");
     query.bindValue(":WIDTH", m_width);
     query.bindValue(":HEIGHT", m_height);
     query.bindValue(":BITRATE", m_bitrate);
     query.bindValue(":AUDIOBITRATE", m_audioBitrate);
     query.bindValue(":SEGMENTSIZE", m_segmentSize);
-    query.bindValue(":MAXSEGMENTS", m_maxSegments);
-    query.bindValue(":CREATED", m_created);
-    query.bindValue(":LASTMODIFIED", m_lastModified);
-    query.bindValue(":RELATIVEURL", tmpRelURL);
-    query.bindValue(":FULLURL", tmpFullURL);
-    query.bindValue(":STATUS", (int)m_status);
-    query.bindValue(":STATUSMESSAGE",
-        QString("Waiting for mythtranscode startup."));
+    query.bindValue(":STATUS", (int)kHLSStatusCompleted);
     query.bindValue(":SOURCEFILE", m_sourceFile);
-    query.bindValue(":SOURCEHOST", gCoreContext->GetHostName());
-    query.bindValue(":SOURCEWIDTH", 0);
-    query.bindValue(":SOURCEHEIGHT", 0);
-    query.bindValue(":OUTDIR", m_outDir);
-    query.bindValue(":OUTBASE", tmpBase);
     query.bindValue(":AUDIOONLYBITRATE", m_audioOnlyBitrate);
-    query.bindValue(":SAMPLERATE", m_sampleRate);
+    query.bindValue(":SAMPLERATE", (m_sampleRate == -1) ? 0 : m_sampleRate); // samplerate column is unsigned, -1 becomes 0
 
     if (!query.exec())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "LiveStream insert failed.");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "LiveStream existing stream check failed.");
         return -1;
     }
 
-    if (!query.exec("SELECT LAST_INSERT_ID()") || !query.next())
+    if (!query.next())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to query LiveStream streamid.");
-        return -1;
+        query.prepare(
+            "INSERT INTO livestream "
+            "    ( width, height, bitrate, audiobitrate, segmentsize, "
+            "      maxsegments, startsegment, currentsegment, segmentcount, "
+            "      percentcomplete, created, lastmodified, relativeurl, "
+            "      fullurl, status, statusmessage, sourcefile, sourcehost, "
+            "      sourcewidth, sourceheight, outdir, outbase, "
+            "      audioonlybitrate, samplerate ) "
+            "VALUES "
+            "    ( :WIDTH, :HEIGHT, :BITRATE, :AUDIOBITRATE, :SEGMENTSIZE, "
+            "      :MAXSEGMENTS, 0, 0, 0, "
+            "      0, :CREATED, :LASTMODIFIED, :RELATIVEURL, "
+            "      :FULLURL, :STATUS, :STATUSMESSAGE, :SOURCEFILE, :SOURCEHOST, "
+            "      :SOURCEWIDTH, :SOURCEHEIGHT, :OUTDIR, :OUTBASE, "
+            "      :AUDIOONLYBITRATE, :SAMPLERATE ) ");
+        query.bindValue(":WIDTH", m_width);
+        query.bindValue(":HEIGHT", m_height);
+        query.bindValue(":BITRATE", m_bitrate);
+        query.bindValue(":AUDIOBITRATE", m_audioBitrate);
+        query.bindValue(":SEGMENTSIZE", m_segmentSize);
+        query.bindValue(":MAXSEGMENTS", m_maxSegments);
+        query.bindValue(":CREATED", m_created);
+        query.bindValue(":LASTMODIFIED", m_lastModified);
+        query.bindValue(":RELATIVEURL", tmpRelURL);
+        query.bindValue(":FULLURL", tmpFullURL);
+        query.bindValue(":STATUS", (int)m_status);
+        query.bindValue(":STATUSMESSAGE",
+            QString("Waiting for mythtranscode startup."));
+        query.bindValue(":SOURCEFILE", m_sourceFile);
+        query.bindValue(":SOURCEHOST", gCoreContext->GetHostName());
+        query.bindValue(":SOURCEWIDTH", 0);
+        query.bindValue(":SOURCEHEIGHT", 0);
+        query.bindValue(":OUTDIR", m_outDir);
+        query.bindValue(":OUTBASE", tmpBase);
+        query.bindValue(":AUDIOONLYBITRATE", m_audioOnlyBitrate);
+        query.bindValue(":SAMPLERATE", (m_sampleRate == -1) ? 0 : m_sampleRate); // samplerate column is unsigned, -1 becomes 0
+
+        if (!query.exec())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "LiveStream insert failed.");
+            return -1;
+        }
+
+        if (!query.exec("SELECT LAST_INSERT_ID()") || !query.next())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to query LiveStream streamid.");
+            return -1;
+        }
     }
 
     m_streamid = query.value(0).toUInt();
@@ -786,6 +815,9 @@ bool HTTPLiveStream::CheckStop(void)
 
 DTC::LiveStreamInfo *HTTPLiveStream::StartStream(void)
 {
+    if (GetDBStatus() != kHLSStatusQueued)
+        return GetLiveStreamInfo();
+
     HTTPLiveStreamThread *streamThread =
         new HTTPLiveStreamThread(GetStreamID());
     MThreadPool::globalInstance()->startReserved(streamThread,
