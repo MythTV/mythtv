@@ -16,7 +16,7 @@ class MusicMetadata;
 META_PUBLIC QString fixFilename(const QString &filename);
 
 /// find an image for a artist or genre
-META_PUBLIC QString findIcon(const QString &type, const QString &name);
+META_PUBLIC QString findIcon(const QString &type, const QString &name, bool ignoreCache = false);
 
 /// calculate a tracks length by parsing the frames
 META_PUBLIC uint calcTrackLength(const QString &musicFile);

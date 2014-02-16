@@ -31,11 +31,14 @@ QString fixFilename(const QString &filename)
 }
 
 static QMap<QString, QString> iconMap;
-QString findIcon(const QString &type, const QString &name)
+QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 {
-    QMap<QString, QString>::iterator i = iconMap.find(type + name);
-    if (i != iconMap.end())
-        return i.value();
+    if (!ignoreCache)
+    {
+        QMap<QString, QString>::iterator i = iconMap.find(type + name);
+        if (i != iconMap.end())
+            return i.value();
+    }
 
     QString cleanName = fixFilename(name);
     QString file = QString("Icons/%1/%2").arg(type).arg(cleanName);
