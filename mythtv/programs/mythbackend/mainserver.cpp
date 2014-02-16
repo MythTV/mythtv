@@ -5479,8 +5479,9 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
 
         for (int x = 0; x < files.size(); x++)
         {
+            fi.setFile(files.at(x));
             AlbumArtImage *image = new AlbumArtImage();
-            image->filename = dir.absolutePath() + '/' + files.at(x);
+            image->filename = fi.fileName();
             image->hostname = gCoreContext->GetHostName();
             image->embedded = false;
             image->imageType = AlbumArtImages::guessImageType(image->filename);
