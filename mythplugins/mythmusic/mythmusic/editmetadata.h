@@ -52,6 +52,8 @@ class EditMetadataCommon : public MythScreenType
 
     bool m_albumArtChanged;
 
+    QString m_searchType;
+
     MythUIButton *m_doneButton;
 };
 

@@ -19,6 +19,7 @@
 #include <mythuifilebrowser.h>
 #include <musicutils.h>
 #include <mythprogressdialog.h>
+#include <remotefile.h>
 
 // mythmusic
 #include "musicdata.h"
@@ -272,9 +273,9 @@ void EditMetadataCommon::searchForAlbumImages(void)
 
     QUrl url("http://www.google.co.uk/images?q=" + artist + "+" + album, QUrl::TolerantMode);
 
-    QFileInfo  fi(m_metadata->Filename());
+    m_searchType = "album";
 
-    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), fi.canonicalPath() + '/', "front.jpg");
+    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), GetConfDir() + "/MythMusic/", "front.jpg");
 }
 
 void EditMetadataCommon::scanForImages(void)
@@ -578,7 +579,7 @@ void EditMetadataDialog::updateArtistImage(void)
 
     if (m_artistIcon)
     {
-        file = findIcon("artist", artist.toLower());
+        file = findIcon("artist", artist.toLower(), true);
         if (!file.isEmpty())
         {
             m_artistIcon->SetFilename(file);
@@ -698,7 +699,7 @@ void EditMetadataDialog::updateGenreImage(void)
 
     if (m_genreIcon)
     {
-        file = findIcon("genre", genre.toLower());
+        file = findIcon("genre", genre.toLower(), true);
         if (!file.isEmpty())
         {
             m_genreIcon->SetFilename(file);
@@ -732,11 +733,8 @@ void EditMetadataDialog::searchForGenreImages(void)
 
     QUrl url("http://www.flickr.com/search/groups/?w=908425%40N22&m=pool&q=" + genre, QUrl::TolerantMode);
 
-    QString cleanName = fixFilename(m_metadata->Genre().toLower());
-    QString file = GetConfDir() + QString("/MythMusic/Icons/%1/%2.jpg").arg("genre").arg(cleanName);
-
-    QFileInfo fi(file);
-    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), fi.absolutePath() + '/', fi.fileName());
+    m_searchType = "genre";
+    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), GetConfDir() + "/MythMusic/", "genre.jpg");
 }
 
 /// search google for artist images
@@ -747,11 +745,8 @@ void EditMetadataDialog::searchForArtistImages(void)
 
     QUrl url("http://www.google.co.uk/images?q=" + artist, QUrl::TolerantMode);
 
-    QString cleanName = fixFilename(m_metadata->Artist().toLower());
-    QString file = GetConfDir() + QString("/MythMusic/Icons/%1/%2.jpg").arg("artist").arg(cleanName);
-
-    QFileInfo fi(file);
-    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), fi.absolutePath() + '/', fi.fileName());
+    m_searchType = "artist";
+    GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), GetConfDir() + "/MythMusic/", "artist.jpg");
 }
 
 void EditMetadataDialog::customEvent(QEvent *event)
@@ -823,7 +818,51 @@ void EditMetadataDialog::customEvent(QEvent *event)
         {
             if (tokens[0] == "BROWSER_DOWNLOAD_FINISHED")
             {
-                scanForImages();
+                QStringList args = me->ExtraDataList();
+                QString oldFilename = args[1];
+                int fileSize  = args[2].toInt();
+                int errorCode = args[4].toInt();
+
+                if ((errorCode != 0) || (fileSize == 0))
+                    return;
+
+                QString newFilename;
+
+                if (m_searchType == "artist")
+                {
+                    QString cleanName = fixFilename(m_metadata->Artist().toLower());
+                    QString file = QString("Icons/%1/%2.jpg").arg("artist").arg(cleanName);
+                    newFilename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
+                                                           0, file, "MusicArt");
+                }
+                else if (m_searchType == "genre")
+                {
+                    QString cleanName = fixFilename(m_metadata->Genre().toLower());
+                    QString file = QString("Icons/%1/%2.jpg").arg("genre").arg(cleanName);
+                    newFilename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
+                                                           0, file, "MusicArt");
+                }
+                else if (m_searchType == "album")
+                {
+                    // move the image from the MythMusic config dir to the tracks
+                    // dir in the 'Music' storage group
+                    newFilename = m_metadata->Filename();
+                    newFilename = newFilename.section( '/', 0, -2);
+                    newFilename = newFilename + '/' +  oldFilename.section( '/', -1, -1);
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR, QString("Got unknown search type '%1' "
+                                                     "in BROWSER_DOWNLOAD_FINISHED event")
+                                                     .arg(m_searchType));
+                    return;
+                }
+
+                RemoteFile::CopyFile(oldFilename, newFilename);
+                QFile::remove(oldFilename);
+
+                if (m_searchType == "album")
+                    scanForImages();
 
                 // force the icons to update
                 updateAlbumImage();
@@ -1047,10 +1086,11 @@ void EditAlbumartDialog::showMenu(void )
     menu->AddButton(tr("Edit Metadata"));
     menu->AddButton(tr("Rescan For Images"));
 
-// FIXME this needs updating to work with storage groups
-#if 0
 
     menu->AddButton(tr("Search Internet For Images"));
+
+// FIXME this needs updating to work with storage groups
+#if 0
 
     MetaIO *tagger = m_metadata->getTagger();
 
