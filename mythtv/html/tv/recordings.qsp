@@ -70,6 +70,7 @@ import "/tv/js/tvutil.qjs"
 <meta charset="UTF-8">
 <title><%=qsTr("Recordings")%></title>
 <link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/icons.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/recordings.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
@@ -214,7 +215,7 @@ for (var progIdx = 0; progIdx < programs.length; progIdx++)
             <div class="previewImageBackground">
                 <img alt="Preview Image" height="67" class="previewImage" src="/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>&amp;height=67&amp;format=JPG" />
             </div>
-            <span class="watchRecordingLink"><%=qsTr("Watch")%></span>
+            <span class="watchRecordingLink"><a onClick="javascript:loadContent('/tv/tvplayer.qsp?ChanId=<%=program.Channel.ChanId%>&amp;StartTime=<%=program.Recording.StartTs.toISOString()%>')"><%=qsTr("Watch")%></a></span>
         </div>
         <div class="programBox">
             <div class="programInnerBox <%=statusClass%>" id="<%=programIdentifier%>" onMouseOver="startDetailTimer(this, 'recording');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">

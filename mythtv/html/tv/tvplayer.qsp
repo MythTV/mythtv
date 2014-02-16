@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Video Player</title>
+<link rel="stylesheet" type="text/css" href="/css/site.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/icons.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/tvplayer.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/common.css">
+<link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script src="/js/util.qjs"></script>
+<script src="/tv/js/common.js"></script>
+<script src="/tv/js/recordingrules.js"></script>
+</head>
+<body>
+
+<%
+"use strict";
+
+import "/js/utility.js"
+import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
+
+    var args = arguments[1];
+    function getArg(name)
+    {
+        name = name.toLowerCase();
+        return args[name];
+    }
+
+    var myth = new Myth();
+    var dvr = new Dvr();
+    var content = new Content();
+
+    var chanID = getArg("ChanID");
+    var startTime = myth.ParseISODateString(getArg("StartTime"));
+
+    var program = dvr.GetRecorded(chanID, startTime);
+
+    var streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 800, 450, 800000, 64000, -1);
+
+    var streamID = 0;
+    if (isValidObject(streamInfo))
+        streamID = streamInfo.Id;
+
+    // The stream info can change after it has been 'Added', in particular
+    // the height/width can change because the requested dimensions don't
+    // match the aspect ratio of the source.
+    //
+    // This is a bug in the services API which we're temporarily working around
+    streamInfo = content.GetLiveStream(streamInfo.Id);
+%>
+
+<div id="playerContainer" class="playerContainer">
+
+<div class="topBar">
+    <%=qsTr("Playing")%>: <%=program.Title%> <% if (program.SubTitle != "") {%> - "<%=program.SubTitle%>"<%}%>
+</div>
+
+<div id="playerBackground">
+<div id="player"> <!-- Automatically replaced with the video (swf or HTML) -->
+</div>
+</div>
+
+<div id="playerControlBar">
+    <div id="playerControls">
+    <button id="playButton" class="playbackControl" onClick="jwplayer('player').play()">Play</button>&nbsp;
+    <button id="pauseButton" class="playbackControl" onClick="jwplayer('player').pause()">Pause</button>&nbsp;
+    <button id="stopButton" class="playbackControl" onClick="jwplayer('player').stop()">Stop</button>&nbsp;
+    <button id="muteButton" class="playbackControl" onClick="jwplayer('player').setMute()">Mute</button>&nbsp;
+    <!--<button onClick="jwplayer('player').setControls(false)">Disable Controls</button>-->
+    </div>
+</div>
+
+<div class="programBox">
+    <div class="programInnerBox">
+        <div class="programHeader">
+            <span class="programTitle"><%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%></span>
+            <span class="programStartTime"><%=myth.GetFormatDate(program.StartTime)%>, <%=myth.GetFormatTime(program.StartTime)%></span>
+        </div>
+        <div class="programBody">
+            <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
+            <% if (program.Season > 0 || program.Episode > 0) { %>
+                <span class="programSeasonEpisode">
+                    <% if (program.Season > 0) { %>(<%=qsTr("S %1", "Season x").arg(program.Season)%>
+                    <%} else {%>(<% } if (program.TotalEpisodes > 0) { %><%=qsTr("Ep %1/%2", "Episode x of y").arg(program.Episode).arg(program.TotalEpisodes)%>)
+                    <%} else if (program.Episode > 0) {%><%=qsTr("Ep %1", "Episode x").arg(program.Episode)%>)<%}%>
+                </span>
+            <%}%>
+            <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
+<%
+    var content = new Content();
+    var jwpExists = 0;
+
+    var hash = content.GetHash("3rdParty", "JW_Player/player.swf");
+
+    if (hash != "")
+    {
+        jwpExists = 1;
+%>
+<script language="JavaScript" type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
+<script language="JavaScript" type="text/javascript">
+
+    var playlist = "<%=streamInfo.RelativeURL%>";
+    var width = <%=streamInfo.Width%>;
+    var height = <%=streamInfo.Height%>;
+
+    jwplayer('player').setup({
+        file: playlist,
+        width: width,
+        height: height,
+        modes: [
+        {
+            type: "flash",
+            src: "/StorageGroup/3rdParty/JW_Player/player.swf",
+            config: {
+                file: playlist,
+                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+// This is far from complete
+//                skin: "/3rdParty/jwplayer/mythtv_skin/MythTV.zip",
+                backcolor: "2A2A2A",
+                frontcolor: "FFFFFF",
+                image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
+                smoothing: true,
+                autostart: false
+            }
+        },
+        {
+            type: "html5",
+            config: {
+                file: playlist,
+                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+                backcolor: "2A2A2A",
+                frontcolor: "FFFFFF",
+                image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
+                autostart: false
+            }
+        },
+        { type: "download" }
+        ]
+    });
+
+</script>
+<%
+    }
+    else
+    {
+%>
+
+<b>Your browser does not support adaptive streaming with HTML 5 Video, you will need to&nbsp;
+<a href='javascript:void(0);' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp');"><i18n>install JW Player&trade;</i18n></a>&nbsp;
+to use this HLS test page</b><hr><br>
+<%
+    }
+%>
+
+</body>
+</html>

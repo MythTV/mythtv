@@ -1,0 +1,114 @@
+
+#playerContainer
+{
+
+}
+
+#playerBackground
+{
+    background-color: #000000;
+}
+
+#player_wrapper /* div created automatically by JW Player JavaScript */
+{
+    background-color: #000000;
+    margin: 0px auto;
+    overflow: hidden;
+    padding: 0px;
+}
+
+#playerControlBar
+{
+    background-color: #2A2A2A;
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+#playerControls
+{
+    margin: 0px auto;
+    overflow: hidden;
+    display: inline-block;
+    padding-top: 2px;
+}
+
+.playerContainer .programBox
+{
+    height: 100%;
+    width: calc(100% - 124px);
+    padding: 0px 0px 0px 2px; /* Top Right Bottom Left */
+    cursor: pointer;
+}
+
+.playerContainer .programInnerBox
+{
+    height: 100%;
+    background-color: #555555;
+    position: relative; /* Required for programSchedPopup to be centred */
+    cursor: pointer;
+}
+
+.playerContainer .programHeader
+{
+    padding: 6px 8px 6px 8px;
+    color: #FFFFFF;
+    height: 20px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    z-index: 4;
+}
+
+.playerContainer .programTitle
+{
+    float: left;
+    width: 50%;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.playerContainer .programStartTime
+{
+    width: 30%;
+    float: right;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.playerContainer .programBody
+{
+    padding: 3px 5px; /* Vertical Horizontal */
+    color: #DDDDDD;
+    z-index: 5;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+.playerContainer .programDescription
+{
+    position: relative;
+    z-index: 1;
+    text-overflow: clip;
+    line-height: 15px;
+}
+
+.playerContainer .programSubtitle
+{
+    position:relative;
+    font-weight: bold;
+    font-size: 1.0em;
+    margin-right: 5px;
+    z-index: 1;
+    line-height: 15px;
+}
+
+.playerContainer .programSeasonEpisode
+{
+    font-size: 0.9em;
+    margin-right: 3px;
+}

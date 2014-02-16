@@ -74,7 +74,7 @@
         </li>
         <li><a href='#'><i18n>Examples</i18n></a>
           <ul class="acitem">
-            <li><a href='javascript:void(0);' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
+            <li><a href='#' onClick="loadContent('/samples/hlstest.qsp');"><i18n>HTTP Live Streaming</i18n></a></li>
           </ul>
         </li>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
