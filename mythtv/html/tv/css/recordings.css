@@ -86,7 +86,12 @@
     margin: 5px 0px 0px 15px;
     opacity: 0.5;
     cursor: pointer;
+}
+
+.recordingList .watchRecordingLink A
+{
     color: #FFFFFF;
+    text-decoration: none;
 }
 
 .recordingList .watchRecordingLink:hover

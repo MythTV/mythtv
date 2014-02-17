@@ -112,6 +112,7 @@ import "/tv/js/tvutil.qjs"
     var playlist = "<%=streamInfo.RelativeURL%>";
     var width = <%=streamInfo.Width%>;
     var height = <%=streamInfo.Height%>;
+    var duration = <%=(program.Recording.EndTs - program.Recording.StartTs) / 1000%>;
 
     jwplayer('player').setup({
         file: playlist,
@@ -130,7 +131,8 @@ import "/tv/js/tvutil.qjs"
                 frontcolor: "FFFFFF",
                 image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
                 smoothing: true,
-                autostart: false
+                autostart: false,
+                duration: duration
             }
         },
         {
@@ -141,7 +143,8 @@ import "/tv/js/tvutil.qjs"
                 backcolor: "2A2A2A",
                 frontcolor: "FFFFFF",
                 image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
-                autostart: false
+                autostart: false,
+                duration: duration
             }
         },
         { type: "download" }
