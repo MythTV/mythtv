@@ -38,7 +38,7 @@ import "/tv/js/tvutil.qjs"
 
     var program = dvr.GetRecorded(chanID, startTime);
 
-    var streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 800, 450, 800000, 64000, -1);
+    var streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 720, 405, 800000, 64000, -1);
 
     var streamID = 0;
     if (isValidObject(streamInfo))
@@ -67,8 +67,8 @@ import "/tv/js/tvutil.qjs"
 <div id="player"> <!-- Automatically replaced with the swf by JW Player (swf or HTML) -->
     <div id="player_wrapper" style="width: <%=streamInfo.Width%>px; height: <%=streamInfo.Height%>px;">
         <video width="<%=streamInfo.Width%>" height="<%=streamInfo.Height%>" controls
-               poster="<%=previewImage%>">
-        <source src="<%=streamInfo.RelativeURL%>" type="video/mp4">
+               poster="<%=previewImage%>" preload="metadata">
+        <source src="<%=streamInfo.RelativeURL%>">
         Your browser does not support the &lt;video&gt; tag, please upgrade your browser.
         </video>
     </div>
