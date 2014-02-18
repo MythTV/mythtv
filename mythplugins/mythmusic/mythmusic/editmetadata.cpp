@@ -784,28 +784,13 @@ void EditMetadataDialog::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Check Track Length"))
             {
-                int length = calcTrackLength(m_metadata->Filename());
+                QString command = QString("MUSIC_CALC_TRACK_LENGTH %1 %2")
+                                          .arg(m_metadata->Hostname()).arg(m_metadata->ID());
+                QStringList strList(command);
+                SendStringListThread *thread = new SendStringListThread(strList);
+                MThreadPool::globalInstance()->start(thread, "Send MUSIC_CALC_TRACK_LENGTH");
 
-                if (length != m_metadata->Length() / 1000)
-                {
-                    int oldLength = m_metadata->Length() / 1000;
-
-                    // save the new length to our working copy of the metadata
-                    m_metadata->setLength(length * 1000);
-
-                    // save the new length to the source copy of the metadata
-                    m_sourceMetadata->setLength(length * 1000);
-                    m_sourceMetadata->dumpToDatabase();
-
-                    // this will update any track lengths displayed on screen
-                    gPlayer->sendMetadataChangedEvent(m_sourceMetadata->ID());
-
-                    // this will force the playlist stats to update
-                    MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, gPlayer->getCurrentTrackPos());
-                    gPlayer->dispatch(me);
-
-                    ShowOkPopup(QString("Updated track length to %1 seconds\nwas %2 seconds").arg(length).arg(oldLength));
-                }
+                ShowOkPopup(tr("Asked the backend to check the tracks length"));
             }
         }
     }
