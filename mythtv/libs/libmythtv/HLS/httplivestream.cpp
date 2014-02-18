@@ -412,6 +412,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
 
     file.write(QString(
         "#EXTM3U\n"
+        "#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID=\"AV\",NAME=\"Main\",DEFAULT=YES,URI=\"%2.m3u8\"\n"
         "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
         "%2.m3u8\n"
         ).arg((int)((m_bitrate + m_audioBitrate) * 1.1))
@@ -420,6 +421,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
     if (m_audioOnlyBitrate)
     {
         file.write(QString(
+            "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"AO\",NAME=\"Main\",DEFAULT=NO,URI=\"%2.m3u8\"\n"
             "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
             "%2.m3u8\n"
             ).arg((int)((m_audioOnlyBitrate) * 1.1))
