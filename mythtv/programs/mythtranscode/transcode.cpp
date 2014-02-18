@@ -442,7 +442,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (!hlsDisableAudioOnly)
             {
-                audioOnlyBitrate = 48000;
+                audioOnlyBitrate = 64000;
 
                 avfw2 = new AVFormatWriter();
 
