@@ -282,7 +282,9 @@ void ViewScheduled::LoadList(bool useExistingData)
         ProgramInfo *pginfo = *pit;
         const RecStatusType recstatus = pginfo->GetRecordingStatus();
         if ((pginfo->GetRecordingEndTime() >= now ||
-             pginfo->GetScheduledEndTime() >= now) &&
+             pginfo->GetScheduledEndTime() >= now ||
+             recstatus == rsRecording ||
+             recstatus == rsTuning) &&
             (m_showAll ||
              (recstatus >= rsTuning &&
               recstatus <= rsWillRecord) ||
