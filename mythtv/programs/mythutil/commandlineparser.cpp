@@ -155,6 +155,9 @@ void MythUtilCommandLineParser::LoadArguments(void)
         << add("--extractimage", "extractimage", false,
                 "Extract an embedded image from a tracks tag and cache it in the AlbumArt storage group", "")
                 ->SetGroup("Metadata Reading/Writing")
+        << add("--calctracklen", "calctracklen", false,
+                "Decode a track to determine its exact length", "")
+                ->SetGroup("Metadata Reading/Writing")
         );
 
     // mpegutils.cpp
@@ -230,6 +233,8 @@ void MythUtilCommandLineParser::LoadArguments(void)
             ->SetChildOf("extractimage");
     add("--imagetype", "imagetype", "", "Type of image to extract (front, back, cd, inlay, unknown)", "")
             ->SetChildOf("extractimage");
+    add("--songid", "songid", "", "ID of track to determine the length", "")
+            ->SetChildOf("calctracklen");
 
     // Generic Options used by more than one utility
     addRecording();
