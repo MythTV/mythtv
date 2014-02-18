@@ -50,6 +50,11 @@ import "/tv/js/tvutil.qjs"
     //
     // This is a bug in the services API which we're temporarily working around
     streamInfo = content.GetLiveStream(streamInfo.Id);
+
+    var previewImage = "/Content/GetPreviewImage?ChanId=" + program.Channel.ChanId +
+                        "&amp;StartTime=" + program.Recording.StartTs.toISOString() +
+                        "&amp;height=" + streamInfo.Height +
+                        "&amp;format=JPG";
 %>
 
 <div id="playerContainer" class="playerContainer">
@@ -59,7 +64,14 @@ import "/tv/js/tvutil.qjs"
 </div>
 
 <div id="playerBackground">
-<div id="player"> <!-- Automatically replaced with the video (swf or HTML) -->
+<div id="player"> <!-- Automatically replaced with the swf by JW Player (swf or HTML) -->
+    <div id="player_wrapper" style="width: <%=streamInfo.Width%>px; height: <%=streamInfo.Height%>px;">
+        <video width="<%=streamInfo.Width%>" height="<%=streamInfo.Height%>" controls
+               poster="<%=previewImage%>">
+        <source src="<%=streamInfo.RelativeURL%>" type="video/mp4">
+        Your browser does not support the &lt;video&gt; tag, please upgrade your browser.
+        </video>
+    </div>
 </div>
 </div>
 
@@ -113,43 +125,56 @@ import "/tv/js/tvutil.qjs"
     var width = <%=streamInfo.Width%>;
     var height = <%=streamInfo.Height%>;
     var duration = <%=(program.Recording.EndTs - program.Recording.StartTs) / 1000%>;
+    var previewImage = "<%=previewImage%>";
 
-    jwplayer('player').setup({
-        file: playlist,
-        width: width,
-        height: height,
-        modes: [
-        {
-            type: "flash",
-            src: "/StorageGroup/3rdParty/JW_Player/player.swf",
-            config: {
-                file: playlist,
-                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
-// This is far from complete
-//                skin: "/3rdParty/jwplayer/mythtv_skin/MythTV.zip",
-                backcolor: "2A2A2A",
-                frontcolor: "FFFFFF",
-                image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
-                smoothing: true,
-                autostart: false,
-                duration: duration
+    var ua = navigator.userAgent.toLowerCase();
+
+    // iOS and Android (Browser, Opera but not Firefox) supports HLS
+    // with HTML 5 but JW Player 5 doesn't fallback as it should
+    var useHTML5Video = (ua.match(/android/g) || ua.match(/(iPhone|iPad)/g)) ? true : false;
+
+    if (useHTML5Video)
+    {
+        // Do nothing, we
+    }
+    else
+    {
+        jwplayer('player').setup({
+            file: playlist,
+            width: width,
+            height: height,
+            modes: [
+            {
+                type: "flash",
+                src: "/StorageGroup/3rdParty/JW_Player/player.swf",
+                config: {
+                    file: playlist,
+                    provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+    // This is far from complete
+    //                skin: "/3rdParty/jwplayer/mythtv_skin/MythTV.zip",
+                    backcolor: "2A2A2A",
+                    frontcolor: "FFFFFF",
+                    image: previewImage,
+                    smoothing: true,
+                    autostart: false,
+                    duration: duration
+                }
+            },
+            {
+                type: "html5",
+                config: {
+                    file: playlist,
+                    provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+                    backcolor: "2A2A2A",
+                    frontcolor: "FFFFFF",
+                    image: previewImage,
+                    autostart: false,
+                    duration: duration
+                }
             }
-        },
-        {
-            type: "html5",
-            config: {
-                file: playlist,
-                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
-                backcolor: "2A2A2A",
-                frontcolor: "FFFFFF",
-                image: "/Content/GetPreviewImage?ChanId=<%=program.Channel.ChanId%>&StartTime=<%=program.Recording.StartTs.toISOString()%>&height=<%=streamInfo.Height%>&format=JPG",
-                autostart: false,
-                duration: duration
-            }
-        },
-        { type: "download" }
-        ]
-    });
+            ]
+        });
+    }
 
 </script>
 <%

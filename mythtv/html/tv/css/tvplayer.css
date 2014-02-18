@@ -15,6 +15,7 @@
     margin: 0px auto;
     overflow: hidden;
     padding: 0px;
+    position: relative;
 }
 
 #playerControlBar
