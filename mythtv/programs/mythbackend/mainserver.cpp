@@ -806,6 +806,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleMusicTagUpdateVolatile(tokens, pbs);
     }
+    else if (command == "MUSIC_CALC_TRACK_LENGTH")
+    {
+        if (tokens.size() != 3)
+            LOG(VB_GENERAL, LOG_ERR, "Bad MUSIC_CALC_TRACK_LENGTH");
+        else
+            HandleMusicCalcTrackLen(tokens, pbs);
+    }
     else if (command == "MUSIC_TAG_UPDATE_METADATA")
     {
         if (tokens.size() != 3)
@@ -5302,6 +5309,66 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
         QString command = "mythutil --updatemeta " + paramList.join(" ");
 
         LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicTagUpdateVolatile: running %1'").arg(command));
+        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                          kMSAutoCleanup | kMSRunBackground |
+                                                          kMSDontDisableDrawing | kMSProcessEvents |
+                                                          kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_CALC_TRACK_LENGTH <hostname> <songid>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicCalcTrackLen: asking slave '%1' to update the track length").arg(hostname));
+            strlist << slist.join(" ");
+            strlist = slave->ForwardRequest(strlist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("HandleMusicCalcTrackLen: Failed to grab slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        //  run mythutil to calc the tracks length
+        QStringList paramList;
+        paramList.append(QString("--songid='%1'").arg(slist[2]));
+
+        QString command = "mythutil --calctracklen " + paramList.join(" ");
+
+        LOG(VB_GENERAL, LOG_INFO, QString("HandleMusicCalcTrackLen: running %1'").arg(command));
         QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
