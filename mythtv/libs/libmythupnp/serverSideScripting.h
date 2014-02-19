@@ -64,7 +64,8 @@ class UPNP_PUBLIC ServerSideScripting
                                      QScriptEngine::FunctionSignature  pFunction);
 
         bool EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                           const QStringMap &mapParams );
+                           const QStringMap &mapParams,
+                           const QStringMap &mapHeaders );
 
     protected:
 

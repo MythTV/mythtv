@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
+#include <QVariant>
 
 #include "serverSideScripting.h"
 #include "mythlogging.h"
@@ -138,7 +139,8 @@ ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
 //////////////////////////////////////////////////////////////////////////////
 
 bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                                        const QStringMap &mapParams )
+                                        const QStringMap &mapParams,
+                                        const QStringMap &mapHeaders )
 {
     try
     {
@@ -192,64 +194,86 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         // Build array of arguments passed to script
         // ------------------------------------------------------------------
 
-        // FIXME: Even with the added escaping, this probably isn't very safe
-        //        and should be done differently
-        QString params = "ARGS = { ";
+        // Valid characters for object property names must contain only
+        // word characters and numbers, _ and $
+        // They must not start with a number - to simplify the regexp, we
+        // restrict the first character to the English alphabet
+        QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
+
+        QVariantMap params;
         if (mapParams.size())
         {
             QMap<QString, QString>::const_iterator it = mapParams.begin();
 
-            // Valid characters for object property names must contain only
-            // word characters and numbers, _ and $
-            // They must not start with a number - to simplify the regexp, we
-            // restrict the first character to the English alphabet
-            QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
-            QString paramStr = QString("%1: '%2', ");
             QString prevArrayName = "";
+            QVariantMap array;
             for (; it != mapParams.end(); ++it)
             {
-                QString value = it.value();
-                value.replace("'", "\\'");
-                value.replace("}", "\\}");
-                value.replace("{", "\\{");
+                QString key = it.key();
+                QVariant value = QVariant(it.value());
 
-                // Array
-                if (it.key().contains("["))
+                // PHP Style parameter array
+                if (key.contains("["))
                 {
-                    QString arrayName = it.key().section('[',0,0);
-                    QString arrayKey = it.key().section('[',1,1);
+                    QString arrayName = key.section('[',0,0);
+                    QString arrayKey = key.section('[',1,1);
                     arrayKey.chop(1); // Remove trailing ]
-                    if (prevArrayName != arrayName) // Different array
+                    if (prevArrayName != arrayName) // New or different array
                     {
-                        if (!prevArrayName.isEmpty())
-                            params += " }, ";
-
+                        if (!array.isEmpty())
+                        {
+                            params.insert(prevArrayName, QVariant(array));
+                            array.clear();
+                        }
                         prevArrayName = arrayName;
-
-                        params += arrayName + " : { ";
                     }
 
-                    params += paramStr.arg(arrayKey).arg(value);
+                    if (!validChars.exactMatch(arrayKey)) // Discard anything that isn't valid for now
+                        continue;
+
+                    array.insert(arrayKey, value);
+
+                    if ((it + 1) != mapParams.end())
+                        continue;
                 }
-                else
+
+                if (!array.isEmpty())
                 {
-                    if (!prevArrayName.isEmpty())
-                    {
-                        params += " }, ";
-                        prevArrayName = "";
-                    }
+                    params.insert(prevArrayName, QVariant(array));
+                    array.clear();
                 }
+                // End Array handling
 
-                if (!validChars.exactMatch(it.key()))
+                if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
                     continue;
 
-                params += paramStr.arg(it.key()).arg(value);
+                params.insert(key, value);
+
             }
         }
 
-        params += " }";
-        LOG(VB_UPNP, LOG_DEBUG, QString("Called with parameters (%1)").arg(params));
-        m_engine.evaluate(params);
+        // ------------------------------------------------------------------
+        // Build array of request headers
+        // ------------------------------------------------------------------
+
+        QVariantMap requestHeaders;
+        if (mapHeaders.size())
+        {
+            QMap<QString, QString>::const_iterator it = mapHeaders.begin();
+
+            QVariantMap array;
+            for (; it != mapHeaders.end(); ++it)
+            {
+                QString key = it.key();
+                key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace
+                QVariant value = QVariant(it.value());
+
+                if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
+                    continue;
+
+                requestHeaders.insert(key, value);
+            }
+        }
 
         // ------------------------------------------------------------------
         // Execute function to render output
@@ -259,7 +283,8 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
 
         QScriptValueList args;
         args << m_engine.newQObject( &outStream );
-        args << m_engine.globalObject().property("ARGS");
+        args << m_engine.toScriptValue(params);
+        args << m_engine.toScriptValue(requestHeaders);
 
         pInfo->m_oFunc.call( QScriptValue(), args );
 
