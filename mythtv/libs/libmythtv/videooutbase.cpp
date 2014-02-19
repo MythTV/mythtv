@@ -12,9 +12,9 @@
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-#include "mythxdisplay.h"
 #include "mythpainter_yuva.h"
 #include "util-osd.h"
+#include "mythxdisplay.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"

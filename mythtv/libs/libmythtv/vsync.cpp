@@ -35,12 +35,12 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 
-#ifdef USING_XV
-#include "videoout_xv.h"
-#endif
-
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
+#endif
+
+#ifdef USING_XV
+#include "videoout_xv.h"
 #endif
 
 #ifdef __linux__
