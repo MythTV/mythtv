@@ -16,6 +16,7 @@ Useful project links
      fork at https://github.com/MythTV  For other forks, please send bug
      reports to the owners of the fork where the code was committed.
 
+ - `Forums <https://forum.mythtv.org>`_
  - `Documentation wiki <http://www.mythtv.org/wiki>`_
  - `Mailing lists <http://www.mythtv.org/mailman/listinfo>`_
  - `IRC <irc://freenode.net/mythtv-users>`_ at Freenode.net, #mythtv-users
