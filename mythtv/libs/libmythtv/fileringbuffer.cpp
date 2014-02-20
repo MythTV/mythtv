@@ -4,6 +4,7 @@
 // POSIX C headers
 #include <sys/types.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -454,9 +455,49 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
     if (stopreads)
         return 0;
 
+    struct stat sb;
+
     while (tot < sz)
     {
-        ret = read(fd2, (char *)data + tot, sz - tot);
+        uint toread     = sz - tot;
+        bool read_ok    = true;
+        bool eof        = false;
+
+        // check that we have some data to read,
+        // so we never attempt to read past the end of file
+        // if fstat errored or isn't a regular file, default to previous behavior
+        ret = fstat(fd2, &sb);
+        if (ret == 0 && S_ISREG(sb.st_mode))
+        {
+            if ((internalreadpos + tot) >= sb.st_size)
+            {
+                // We're at the end, don't attempt to read
+                read_ok = false;
+                eof     = true;
+                LOG(VB_FILE, LOG_DEBUG, LOC + "not reading, reached EOF");
+            }
+            else
+            {
+                toread  =
+                    min(sb.st_size - (internalreadpos + tot), (long long)toread);
+                if (toread < (sz-tot))
+                {
+                    eof = true;
+                    LOG(VB_FILE, LOG_DEBUG,
+                        LOC + QString("About to reach EOF, reading %1 wanted %2")
+                        .arg(toread).arg(sz-tot));
+                }
+            }
+        }
+
+        if (read_ok)
+        {
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("read(%1) -- begin").arg(toread));
+            ret = read(fd2, (char *)data + tot, toread);
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("read(%1) -> %2 end").arg(toread).arg(ret));
+        }
         if (ret < 0)
         {
             if (errno == EAGAIN)
@@ -478,7 +519,7 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
         if (oldfile)
             break;
 
-        if (ret == 0) // EOF returns 0
+        if (ret == 0 || eof) // EOF returns 0
         {
             if (tot > 0)
                 break;

@@ -781,6 +781,8 @@ void RingBuffer::run(void)
         if (PauseAndWait())
         {
             ignore_for_read_timing = true;
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                "run: PauseAndWait Not reading continuing");
             continue;
         }
 
@@ -795,6 +797,12 @@ void RingBuffer::run(void)
             ignore_for_read_timing |=
                 (ignorereadpos >= 0) || commserror || stopreads;
             generalWait.wait(&rwlock, (stopreads) ? 50 : 1000);
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("run: Not reading continuing: totfree(%1) "
+                        "readsallowed(%2) ignorereadpos(%3) commserror(%4) "
+                        "stopreads(%5)")
+                .arg(totfree).arg(readsallowed).arg(ignorereadpos)
+                .arg(commserror).arg(stopreads));
             continue;
         }
 
@@ -910,7 +918,19 @@ void RingBuffer::run(void)
                 }
                 rbwlock.unlock();
                 poslock.unlock();
+
+                LOG(VB_FILE, LOG_DEBUG, LOC +
+                    QString("total read so far: %1 bytes")
+                    .arg(internalreadpos));
             }
+        }
+        else
+        {
+            LOG(VB_FILE, LOG_DEBUG, LOC +
+                QString("We are not reading anything "
+                        "(totfree: %1 commserror:%2 ateof:%3 "
+                        "setswitchtonext:%4")
+                .arg(totfree).arg(commserror).arg(ateof).arg(setswitchtonext));
         }
 
         int used = bufferSize - ReadBufFree();
@@ -1096,14 +1116,15 @@ bool RingBuffer::WaitForAvail(int count)
             int elapsed = t.elapsed();
             if (elapsed > 500 && low_buffers && avail >= fill_min)
                 count = avail;
-            else if  (((elapsed > 250) && (elapsed < 500))  ||
-                     ((elapsed >  500) && (elapsed < 750))  ||
+            else if  (((elapsed > 500) && (elapsed < 750))  ||
                      ((elapsed > 1000) && (elapsed < 1250)) ||
                      ((elapsed > 2000) && (elapsed < 2250)) ||
                      ((elapsed > 4000) && (elapsed < 4250)) ||
                      ((elapsed > 8000) && (elapsed < 8250)) ||
                      ((elapsed > 9000)))
             {
+                LOG(VB_FILE, LOG_DEBUG, LOC +
+                    QString("used = %1").arg(bufferSize - ReadBufFree()));
                 LOG(VB_GENERAL, LOG_INFO, LOC + "Waited " +
                     QString("%1").arg((elapsed / 250) * 0.25f, 3, 'f', 1) +
                     " seconds for data \n\t\t\tto become available..." +
