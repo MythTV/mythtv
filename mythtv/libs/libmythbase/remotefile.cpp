@@ -974,6 +974,11 @@ QDateTime RemoteFile::LastModified(const QString &url)
     return result;
 }
 
+QDateTime RemoteFile::LastModified(void) const
+{
+    return LastModified(path);
+}
+
 /** \fn RemoteFile::FindFile(const QString& filename, const QString& host, const QString& storageGroup)
  *  \brief Search all BE's for a file in the give storage group
  *  \param filename the partial path and filename to look for
