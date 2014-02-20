@@ -246,7 +246,7 @@ long HTTPRequest::SendResponse( void )
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 
-                if (m_response.buffer().length() > 0)
+                if (m_response.buffer().isEmpty())
                     break;
 
                 // Let SendResponseFile try or send a 404
@@ -327,7 +327,7 @@ long HTTPRequest::SendResponse( void )
         QByteArray compressed = gzipCompress( m_response.buffer() );
         compBuffer.setData( compressed );
 
-        if (compBuffer.buffer().length() > 0)
+        if (!compBuffer.buffer().isEmpty())
         {
             pBuffer = &compBuffer;
 
@@ -441,7 +441,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         bool    bRange = false;
         QString sRange = GetHeaderValue( "range", "" );
 
-        if (sRange.length() > 0)
+        if (!sRange.isEmpty())
         {
             bRange = ParseRange( sRange, llSize, &llStart, &llEnd );
 
@@ -679,7 +679,7 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
                << "<faultstring>" << sFaultString << "</faultstring>";
     }
 
-    if (sDetails.length() > 0)
+    if (!sDetails.isEmpty())
     {
         stream << "<detail>" << sDetails << "</detail>";
     }
@@ -980,7 +980,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     // breaks anything that is trying to pass & as part of a name or value.
     sParams.replace( "&amp;", "&" );
 
-    if (sParams.length() > 0)
+    if (!sParams.isEmpty())
     {
         QStringList params = sParams.split('&', QString::SkipEmptyParts);
 
@@ -991,7 +991,8 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
             QString sValue = (*it).section( '=', 1 );
             sValue.replace("+"," ");
 
-            if ((sName.length() != 0) && (sValue.length() !=0))
+            if (!sName.isEmpty() &&
+                !sValue.isEmpty())
             {
                 sName  = QUrl::fromPercentEncoding(sName.toUtf8());
                 sValue = QUrl::fromPercentEncoding(sValue.toUtf8());
@@ -1084,7 +1085,7 @@ bool HTTPRequest::ParseRequest()
         // Read first line to determin requestType
         QString sRequestLine = ReadLine( 2000 );
 
-        if ( sRequestLine.length() == 0)
+        if ( sRequestLine.isEmpty() )
         {
             LOG(VB_GENERAL, LOG_ERR, "Timeout reading first line of request." );
             return false;
@@ -1104,7 +1105,7 @@ bool HTTPRequest::ParseRequest()
         bool    bDone = false;
         QString sLine = ReadLine( 2000 );
 
-        while (( sLine.length() > 0 ) && !bDone )
+        while (( !sLine.isEmpty() ) && !bDone )
         {
             if (sLine != "\r\n")
             {
@@ -1113,7 +1114,8 @@ bool HTTPRequest::ParseRequest()
 
                 sValue.truncate( sValue.length() - 2 );
 
-                if ((sName.length() != 0) && (sValue.length() !=0))
+                if (!sName.isEmpty() &&
+                    !sValue.isEmpty())
                 {
                     m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
 
@@ -1193,7 +1195,7 @@ bool HTTPRequest::ParseRequest()
 
         QString sSOAPAction = GetHeaderValue( "SOAPACTION", "" );
 
-        if (sSOAPAction.length() > 0)
+        if (!sSOAPAction.isEmpty())
             bSuccess = ProcessSOAPPayload( sSOAPAction );
         else
             ExtractMethodFromURL();
@@ -1262,7 +1264,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
             // Process any Query String Parameters
             QString sQueryStr = tokens[1].section( '?', 1, 1 );
 
-            if (sQueryStr.length() > 0)
+            if (!sQueryStr.isEmpty())
                 GetParameters( sQueryStr, m_mapParams );
         }
 
@@ -1296,7 +1298,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     //          should make work with full spec.
     // ----------------------------------------------------------------------
 
-    if (sRange.length() == 0)
+    if (sRange.isEmpty())
         return false;
 
     // ----------------------------------------------------------------------
@@ -1400,7 +1402,7 @@ void HTTPRequest::ExtractMethodFromURL()
 
     m_sMethod = "";
 
-    if (sList.size() > 0)
+    if (!sList.isEmpty())
     {
         m_sMethod = sList.last();
         sList.pop_back();
