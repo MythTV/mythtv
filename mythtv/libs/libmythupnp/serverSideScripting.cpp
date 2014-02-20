@@ -17,6 +17,7 @@
 
 #include "serverSideScripting.h"
 #include "mythlogging.h"
+#include "httpserver.h"
 
 QScriptValue formatStr(QScriptContext *context, QScriptEngine *interpreter);
 
@@ -139,8 +140,7 @@ ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
 //////////////////////////////////////////////////////////////////////////////
 
 bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                                        const QStringMap &mapParams,
-                                        const QStringMap &mapHeaders )
+                                        HTTPRequest *pRequest)
 {
     try
     {
@@ -194,6 +194,8 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         // Build array of arguments passed to script
         // ------------------------------------------------------------------
 
+        QStringMap mapParams = pRequest->m_mapParams;
+
         // Valid characters for object property names must contain only
         // word characters and numbers, _ and $
         // They must not start with a number - to simplify the regexp, we
@@ -201,79 +203,82 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QRegExp validChars = QRegExp("^([a-zA-Z]|_|\\$)(\\w|\\$)+$");
 
         QVariantMap params;
-        if (mapParams.size())
+        QMap<QString, QString>::const_iterator it = mapParams.begin();
+        QString prevArrayName = "";
+        QVariantMap array;
+        for (; it != mapParams.end(); ++it)
         {
-            QMap<QString, QString>::const_iterator it = mapParams.begin();
+            QString key = it.key();
+            QVariant value = QVariant(it.value());
 
-            QString prevArrayName = "";
-            QVariantMap array;
-            for (; it != mapParams.end(); ++it)
+            // PHP Style parameter array
+            if (key.contains("["))
             {
-                QString key = it.key();
-                QVariant value = QVariant(it.value());
-
-                // PHP Style parameter array
-                if (key.contains("["))
+                QString arrayName = key.section('[',0,0);
+                QString arrayKey = key.section('[',1,1);
+                arrayKey.chop(1); // Remove trailing ]
+                if (prevArrayName != arrayName) // New or different array
                 {
-                    QString arrayName = key.section('[',0,0);
-                    QString arrayKey = key.section('[',1,1);
-                    arrayKey.chop(1); // Remove trailing ]
-                    if (prevArrayName != arrayName) // New or different array
+                    if (!array.isEmpty())
                     {
-                        if (!array.isEmpty())
-                        {
-                            params.insert(prevArrayName, QVariant(array));
-                            array.clear();
-                        }
-                        prevArrayName = arrayName;
+                        params.insert(prevArrayName, QVariant(array));
+                        array.clear();
                     }
-
-                    if (!validChars.exactMatch(arrayKey)) // Discard anything that isn't valid for now
-                        continue;
-
-                    array.insert(arrayKey, value);
-
-                    if ((it + 1) != mapParams.end())
-                        continue;
+                    prevArrayName = arrayName;
                 }
 
-                if (!array.isEmpty())
-                {
-                    params.insert(prevArrayName, QVariant(array));
-                    array.clear();
-                }
-                // End Array handling
-
-                if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
+                if (!validChars.exactMatch(arrayKey)) // Discard anything that isn't valid for now
                     continue;
 
-                params.insert(key, value);
+                array.insert(arrayKey, value);
 
+                if ((it + 1) != mapParams.end())
+                    continue;
             }
+
+            if (!array.isEmpty())
+            {
+                params.insert(prevArrayName, QVariant(array));
+                array.clear();
+            }
+            // End Array handling
+
+            if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
+                continue;
+
+            params.insert(key, value);
+
         }
 
         // ------------------------------------------------------------------
         // Build array of request headers
         // ------------------------------------------------------------------
 
+        QStringMap mapHeaders = pRequest->m_mapHeaders;
+
         QVariantMap requestHeaders;
-        if (mapHeaders.size())
+        for (it = mapHeaders.begin(); it != mapHeaders.end(); ++it)
         {
-            QMap<QString, QString>::const_iterator it = mapHeaders.begin();
+            QString key = it.key();
+            key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace
+            QVariant value = QVariant(it.value());
 
-            QVariantMap array;
-            for (; it != mapHeaders.end(); ++it)
-            {
-                QString key = it.key();
-                key = key.replace('-', '_'); // May be other valid chars in a request header that we need to replace
-                QVariant value = QVariant(it.value());
+            if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
+                continue;
 
-                if (!validChars.exactMatch(key)) // Discard anything that isn't valid for now
-                    continue;
-
-                requestHeaders.insert(key, value);
-            }
+            requestHeaders.insert(key, value);
         }
+
+        // ------------------------------------------------------------------
+        // Build array of information from the server e.g. client IP
+        // See RFC 3875 - The Common Gateway Interface
+        // ------------------------------------------------------------------
+
+        QVariantMap serverVars;
+        serverVars.insert("REMOTE_ADDR", QVariant(pRequest->GetPeerAddress()));
+        serverVars.insert("SERVER_ADDR", QVariant(pRequest->GetHostAddress()));
+        serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->m_sProtocol));
+        serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 
         // ------------------------------------------------------------------
         // Execute function to render output
@@ -285,6 +290,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         args << m_engine.newQObject( &outStream );
         args << m_engine.toScriptValue(params);
         args << m_engine.toScriptValue(requestHeaders);
+        args << m_engine.toScriptValue(serverVars);
 
         pInfo->m_oFunc.call( QScriptValue(), args );
 

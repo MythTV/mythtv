@@ -15,6 +15,7 @@
 
 #include "upnpexp.h"
 #include "upnputil.h"
+#include "httprequest.h"
 
 #include <QString> 
 #include <QMap>
@@ -64,8 +65,7 @@ class UPNP_PUBLIC ServerSideScripting
                                      QScriptEngine::FunctionSignature  pFunction);
 
         bool EvaluatePage( QTextStream *pOutStream, const QString &sFileName,
-                           const QStringMap &mapParams,
-                           const QStringMap &mapHeaders );
+                           HTTPRequest *pRequest);
 
     protected:
 
