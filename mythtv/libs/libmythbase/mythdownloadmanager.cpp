@@ -700,7 +700,12 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
     else
         request.setUrl(qurl);
 
-    if (!dlInfo->m_reload)
+    if (dlInfo->m_reload)
+    {
+        request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                             QNetworkRequest::AlwaysNetwork);
+    }
+    else
     {
         // Prefer the in-cache item if one exists and it is less than 5 minutes
         // old and it will not expire in the next 10 seconds
@@ -1108,9 +1113,18 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
         dlInfo->m_bytesTotal    = 0;
 
         QNetworkRequest request(dlInfo->m_redirectedTo);
-        if (dlInfo->m_preferCache)
+
+        if (dlInfo->m_reload)
+        {
+            request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                                 QNetworkRequest::AlwaysNetwork);
+        }
+        else if (dlInfo->m_preferCache)
+        {
             request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                                  QNetworkRequest::PreferCache);
+        }
+
         request.setRawHeader("User-Agent",
                              "MythDownloadManager v" MYTH_BINARY_VERSION);
 
