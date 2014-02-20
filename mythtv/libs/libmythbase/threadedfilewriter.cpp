@@ -425,6 +425,8 @@ void ThreadedFileWriter::DiskLoop(void)
     MythTimer minWriteTimer;
     minWriteTimer.start();
 
+    uint64_t total_written = 0LL;
+
     while (!in_dtor)
     {
         if (ignore_writes)
@@ -518,6 +520,10 @@ void ThreadedFileWriter::DiskLoop(void)
             else
             {
                 tot += ret;
+                total_written += ret;
+                LOG(VB_FILE, LOG_DEBUG, LOC +
+                    QString("total written so far: %1 bytes")
+                    .arg(total_written));
             }
 
             locker.relock();
