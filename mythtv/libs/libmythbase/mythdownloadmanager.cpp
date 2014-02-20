@@ -594,7 +594,11 @@ void MythDownloadManager::queuePost(QNetworkRequest *req,
     }
 
     queueItem(req->url().toString(), req, QString(), data, caller,
-              kRequestPost);
+              kRequestPost,
+              (QNetworkRequest::AlwaysNetwork == req->attribute(
+               QNetworkRequest::CacheLoadControlAttribute,
+               QNetworkRequest::PreferNetwork).toInt()));
+
 }
 
 /** \brief Posts data to a url via the QNetworkAccessManager
@@ -633,7 +637,11 @@ bool MythDownloadManager::post(QNetworkRequest *req, QByteArray *data)
     }
 
     return processItem(req->url().toString(), req, QString(), data,
-                       kRequestPost);
+                       kRequestPost,
+                       (QNetworkRequest::AlwaysNetwork == req->attribute(
+                        QNetworkRequest::CacheLoadControlAttribute,
+                        QNetworkRequest::PreferNetwork).toInt()));
+
 }
 
 /** \brief Posts data to a url via the QNetworkAccessManager
