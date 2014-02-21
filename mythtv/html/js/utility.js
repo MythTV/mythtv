@@ -8,6 +8,16 @@
 
 // "use strict";
 
+function getArg(name)
+{
+    name = name.toLowerCase();
+
+    if (isValidObject(this.Parameters))
+        return this.Parameters[name];
+    else
+        return "";
+}
+
 function toCapitalCase(str)
 {
     return str.charAt(0).toUpperCase() + str.slice(1);

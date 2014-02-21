@@ -8,13 +8,6 @@
 
 import "/js/utility.js"
 
-var args = arguments[1];
-function getArg(name)
-{
-    name = name.toLowerCase();
-    return args[name];
-}
-
 var myth = new Myth();
 
 function recStatusToClass(statusInt)

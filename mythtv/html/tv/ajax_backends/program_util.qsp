@@ -8,13 +8,6 @@
 
 import "/js/utility.js"
 
-    var args = arguments[1];
-    function getArg(name)
-    {
-        name = name.toLowerCase();
-        return args[name];
-    }
-
     function getIntArg(name)
     {
         return Number(getArg(name));
@@ -107,7 +100,7 @@ import "/js/utility.js"
     // Besides, the the backend is going to be powerful enough to build the HTML
     // faster than the average mobile/tablet can do it client-side
     //
-    function getProgramDetailHTML(args)
+    function getProgramDetailHTML()
     {
         var startTime = myth.ParseISODateString(getArg("StartTime"));
 
@@ -116,7 +109,7 @@ import "/js/utility.js"
         return buildDetailHTML(program, "program");
     }
 
-    function getRecordingDetailHTML(args)
+    function getRecordingDetailHTML()
     {
         var startTime = myth.ParseISODateString(getArg("StartTime"));
 
@@ -129,10 +122,10 @@ import "/js/utility.js"
     switch (getArg("_action"))
     {
         case "getProgramDetailHTML":
-            ret = getProgramDetailHTML(args);
+            ret = getProgramDetailHTML();
             break;
         case "getRecordingDetailHTML":
-            ret = getRecordingDetailHTML(args);
+            ret = getRecordingDetailHTML();
             break;
         default:
             break;

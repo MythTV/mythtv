@@ -5,13 +5,6 @@ import "/js/utility.js"
 import "/tv/js/constants.js"
 import "/tv/js/tvutil.qjs"
 
-    var args = arguments[1];
-    function getArg(name)
-    {
-        name = name.toLowerCase();
-        return args[name];
-    }
-
     var myth = new Myth();
     var dvr = new Dvr();
     var guide = new Guide();
