@@ -14,14 +14,17 @@ import "/tv/js/tvutil.qjs"
         startTime = myth.ParseISODateString(getArg("StartTime"));
 
     var chanId = 0;
-    if (getArg("ChanId"))
-        chanId = Number(getArg("ChanId"));
+    if (getIntegerArg("ChanId"))
+        chanId = getIntegerArg("ChanId");
 
     var recRuleId = 0;
-    if (getArg("RecRuleId"))
-        recRuleId = Number(getArg("recRuleId"));
+    if (getIntegerArg("RecRuleId"))
+        recRuleId = getIntegerArg("recRuleId");
 
     var recRule = dvr.GetRecordSchedule(recRuleId, "", chanId, startTime, false);
+
+    if (chanId <= 0)
+        chanId = recRule.ChanId;
 
     var inputList = dvr.GetInputList().Inputs;
     var storageGroupList = dvr.GetRecStorageGroupList();
@@ -32,6 +35,12 @@ import "/tv/js/tvutil.qjs"
 
     var program = guide.GetProgramDetails(chanId, startTime);
     var channel = program.Channel;
+
+    if (channel.ChanId == 0 && chanId > 0)
+    {
+        var channelService = new Channel();
+        channel = channelService.GetChannelInfo(chanId);
+    }
 
     var upcomingShowings = [];
     var upcomingConflicts = [];
@@ -89,8 +98,9 @@ import "/tv/js/tvutil.qjs"
 
 <div class="header">
     <div class="headerChannel">
-        <img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=70" />
+        <%if (channel.ChanId > 0) {%><img class="channelIcon" height="70" alt="<%=escapeHTML(channel.ChannelName)%> Icon" title="<%=escapeHTML(channel.ChannelName)%>" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=70" /><%}%>
         <!-- <%=escapeHTML(recRule.CallSign)%> -->
+        <!-- <%=chanId%> <%=recRule.ChanId%> <%=channel.ChanId%> -->
     </div>
 
     <div class="headerTitle">
