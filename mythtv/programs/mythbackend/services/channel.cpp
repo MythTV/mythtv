@@ -112,7 +112,11 @@ DTC::ChannelInfo* Channel::GetChannelInfo( uint nChanID )
     DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();
 
     if (!FillChannelInfo(pChannelInfo, nChanID, true))
-        throw( QString("Channel ID appears invalid."));
+    {
+        // throw causes a crash on linux and we can't know in advance
+        // that a channel id from an old recording rule is invalid
+        //throw( QString("Channel ID appears invalid."));
+    }
 
     return pChannelInfo;
 }
