@@ -121,10 +121,14 @@ function saveRecordingRule(recRuleId, chanId, startTime)
     var filters = getArg("Filter");
     for (var filterkey in filters)
     {
+        var filterValue = Number(filterkey.slice(1));
         if (filters[filterkey] > 0)
         {
-            var filterValue = Number(filterkey.slice(1));
             recRule.Filter |= (1 << filterValue);
+        }
+        else
+        {
+            recRule.Filter &= ~(1 << filterValue);
         }
     }
 
