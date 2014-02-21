@@ -123,6 +123,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     }
 
     static QString GetPlatform(void);
+    static QString GetServerVersion(void);
 };
 
 /////////////////////////////////////////////////////////////////////////////

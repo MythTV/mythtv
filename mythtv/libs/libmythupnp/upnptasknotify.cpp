@@ -69,14 +69,13 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
     else
         sUSN = sNT;
 
-    QString sData = QString ( "Server: %1, UPnP/1.0, MythTV %2\r\n"
+    QString sData = QString ( "Server: %1\r\n"
                               "NTS: %3\r\n"
                               "NT: %4\r\n"
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                            .arg( HttpServer::GetPlatform() )
-                            .arg( MYTH_BINARY_VERSION )
+                            .arg( HttpServer::GetServerVersion() )
                             .arg( GetNTSString()    )
                             .arg( sNT          )
                             .arg( sUSN         )

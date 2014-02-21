@@ -79,14 +79,13 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     QString sData = QString ( "CACHE-CONTROL: max-age=%1\r\n"
                               "DATE: %2\r\n"
                               "EXT:\r\n"
-                              "Server: %3, UPnP/1.0, MythTV %4\r\n"
-                              "ST: %5\r\n"
-                              "USN: %6\r\n"
+                              "Server: %3\r\n"
+                              "ST: %4\r\n"
+                              "USN: %5\r\n"
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge    )
                               .arg( sDate )
-                              .arg( HttpServer::GetPlatform() )
-                              .arg( MYTH_BINARY_VERSION )
+                              .arg( HttpServer::GetServerVersion() )
                               .arg( sST )
                               .arg( sUSN );
 
