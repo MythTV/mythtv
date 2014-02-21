@@ -186,6 +186,10 @@ class MTV_PUBLIC RingBuffer : protected MThread
     uint64_t UpdateDecoderRate(uint64_t latest = 0);
     uint64_t UpdateStorageRate(uint64_t latest = 0);
 
+    void RegisterFileForWrite(void);
+    void UnregisterFileForWrite(void);
+    bool IsRegisteredFileForWrite(void);
+
   protected:
     RingBufferType type;
     mutable QReadWriteLock poslock;
@@ -268,6 +272,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
 
   private:
     static bool gAVformat_net_initialised;
+    static QMap<QString, bool> m_fileswritten;
+    static QMutex m_fileslock;
 };
 
 #endif // _RINGBUFFER_H_

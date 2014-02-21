@@ -49,6 +49,9 @@ QMutex      RingBuffer::subExtLock;
 QStringList RingBuffer::subExt;
 QStringList RingBuffer::subExtNoCheck;
 
+QMap<QString, bool> RingBuffer::m_fileswritten;
+QMutex RingBuffer::m_fileslock;
+
 extern "C" {
 #include "libavformat/avformat.h"
 }
@@ -953,7 +956,8 @@ void RingBuffer::run(void)
             readsallowed = used >= fill_min || ateof ||
                 setswitchtonext || commserror;
 
-            if (0 == read_return && old_readpos == readpos)
+            if (0 == read_return && old_readpos == readpos &&
+                !IsRegisteredFileForWrite())
             {
                 if (livetvchain)
                 {
@@ -1670,7 +1674,7 @@ void RingBuffer::SetLiveMode(LiveTVChain *chain)
     rwlock.unlock();
 }
 
-/// Tells RingBuffer whether to igonre the end-of-file
+/// Tells RingBuffer whether to ignore the end-of-file
 void RingBuffer::IgnoreLiveEOF(bool ignore)
 {
     rwlock.lockForWrite();
@@ -1707,6 +1711,27 @@ void RingBuffer::AVFormatInitNetwork(void)
         avformat_network_init();
         gAVformat_net_initialised = true;
     }
+}
+
+void RingBuffer::RegisterFileForWrite(void)
+{
+    QMutexLocker lock(&m_fileslock);
+
+    m_fileswritten.insert(filename, true);
+}
+
+void RingBuffer::UnregisterFileForWrite(void)
+{
+    QMutexLocker lock(&m_fileslock);
+
+    m_fileswritten.remove(filename);
+}
+
+bool RingBuffer::IsRegisteredFileForWrite(void)
+{
+    QMutexLocker lock(&m_fileslock);
+
+    return m_fileswritten.contains(filename);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

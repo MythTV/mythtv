@@ -78,6 +78,10 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
             else
                 writemode = true;
         }
+        if (writemode)
+        {
+            RegisterFileForWrite();
+        }
     }
     else if (timeout_ms >= 0)
     {
@@ -88,6 +92,11 @@ FileRingBuffer::FileRingBuffer(const QString &lfilename,
 FileRingBuffer::~FileRingBuffer()
 {
     KillReadAheadThread();
+
+    if (writemode)
+    {
+        UnregisterFileForWrite();
+    }
 
     delete remotefile;
     remotefile = NULL;
@@ -402,6 +411,8 @@ bool FileRingBuffer::ReOpen(QString newFilename)
 
     rwlock.lockForWrite();
 
+    UnregisterFileForWrite();
+
     if (tfw && tfw->ReOpen(newFilename))
         result = true;
     else if (remotefile && remotefile->ReOpen(newFilename))
@@ -413,6 +424,7 @@ bool FileRingBuffer::ReOpen(QString newFilename)
         poslock.lockForWrite();
         writepos = 0;
         poslock.unlock();
+        RegisterFileForWrite();
     }
 
     rwlock.unlock();
@@ -519,7 +531,14 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
         if (oldfile)
             break;
 
-        if (ret == 0 || eof) // EOF returns 0
+        if (eof)
+        {
+            // we can exit now, if file is still open for writing in another
+            // instance, RingBuffer will retry
+            break;
+        }
+
+        if (ret == 0)
         {
             if (tot > 0)
                 break;
