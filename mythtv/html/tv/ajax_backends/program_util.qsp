@@ -8,17 +8,6 @@
 
 import "/js/utility.js"
 
-    function getIntArg(name)
-    {
-        return Number(getArg(name));
-    }
-
-    function getBoolArg(name)
-    {
-        // Should check for string types here such as 'true' and 'false'
-        return Boolean(getIntArg(name));
-    }
-
     var myth = new Myth();
 
     // FIXME: This should use a new services method so that we can use QLocale::toString() instead

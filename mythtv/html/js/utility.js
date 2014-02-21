@@ -18,6 +18,18 @@ function getArg(name)
         return "";
 }
 
+function getIntegerArg(name)
+{
+    var ret = Number(getArg(name));
+    return ret.NaN ? Number(0) : ret;
+}
+
+function getBoolArg(name)
+{
+    // Should check for string types here such as 'true' and 'false'
+    return Boolean(getIntArg(name));
+}
+
 function toCapitalCase(str)
 {
     return str.charAt(0).toUpperCase() + str.slice(1);

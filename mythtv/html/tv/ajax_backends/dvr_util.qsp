@@ -101,7 +101,7 @@ function saveRecordingRule(recRuleId, chanId, startTime)
         recRule.Category    = getArg("Category");
         recRule.ProgramId   = getArg("ProgramId");
         recRule.SeriesId    = getArg("SeriesId");
-        recRule.ChanId      = Number(getArg("ChanId"));
+        recRule.ChanId      = getIntegerArg("ChanId");
         recRule.CallSign    = getArg("CallSign");
         recRule.StartTime   = getArg("StartTime");
         recRule.EndTime     = getArg("EndTime");
@@ -109,13 +109,13 @@ function saveRecordingRule(recRuleId, chanId, startTime)
 
     // Schedule Options
     recRule.Type            = getArg("Type");
-    recRule.RecPriority     = Number(getArg("RecPriority"));
-    recRule.StartOffset     = Number(getArg("StartOffset")) * -1; // StartOffset treats a negative X value as start 'X minutes late', which is confusing from a UI perspective
-    recRule.EndOffset       = Number(getArg("EndOffset"));
+    recRule.RecPriority     = getIntegerArg("RecPriority");
+    recRule.StartOffset     = getIntegerArg("StartOffset") * -1; // StartOffset treats a negative X value as start 'X minutes late', which is confusing from a UI perspective
+    recRule.EndOffset       = getIntegerArg("EndOffset");
     recRule.DupMethod       = getArg("DupMethod");
     recRule.DupIn           = getArg("DupIn");
-    recRule.PreferredInput  = Number(getArg("PreferredInput"));
-    recRule.Inactive        = Boolean(Number(getArg("Inactive")));
+    recRule.PreferredInput  = getIntegerArg("PreferredInput");
+    recRule.Inactive        = Boolean(getIntegerArg("Inactive"));
 
     // Filters
     var filters = getArg("Filter");
@@ -132,24 +132,24 @@ function saveRecordingRule(recRuleId, chanId, startTime)
     recRule.RecGroup        = getArg("RecGroup");
     recRule.StorageGroup    = getArg("StorageGroup");
     recRule.PlayGroup       = getArg("PlayGroup");
-    recRule.MaxEpisodes     = Number(getArg("MaxEpisodes"));
-    recRule.MaxNewest       = Boolean(Number(getArg("MaxNewest")));
-    recRule.AutoExpire      = Boolean(Number(getArg("AutoExpire")));
+    recRule.MaxEpisodes     = getIntegerArg("MaxEpisodes");
+    recRule.MaxNewest       = Boolean(getIntegerArg("MaxNewest"));
+    recRule.AutoExpire      = Boolean(getIntegerArg("AutoExpire"));
 
     // Post-Processing
-    recRule.AutoMetaLookup  = Boolean(Number(getArg("AutoMetaLookup")));
-    recRule.AutoCommflag    = Boolean(Number(getArg("AutoCommflag")));
-    recRule.AutoTranscode   = Boolean(Number(getArg("AutoTranscode")));
+    recRule.AutoMetaLookup  = Boolean(getIntegerArg("AutoMetaLookup"));
+    recRule.AutoCommflag    = Boolean(getIntegerArg("AutoCommflag"));
+    recRule.AutoTranscode   = Boolean(getIntegerArg("AutoTranscode"));
     recRule.Transcoder      = getArg("Transcoder");
-    recRule.AutoUserJob1    = Boolean(Number(getArg("AutoUserJob1")));
+    recRule.AutoUserJob1    = Boolean(getIntegerArg("AutoUserJob1"));
     recRule.AutoUserJob2    = Boolean(Number( getArg("AutoUserJob2")));
-    recRule.AutoUserJob3    = Boolean(Number(getArg("AutoUserJob3")));
-    recRule.AutoUserJob4    = Boolean(Number(getArg("AutoUserJob4")));
+    recRule.AutoUserJob3    = Boolean(getIntegerArg("AutoUserJob3"));
+    recRule.AutoUserJob4    = Boolean(getIntegerArg("AutoUserJob4"));
 
     // Metadata Options
     recRule.Inetref         = getArg("Inetref");
-    recRule.Season          = Number(getArg("Season"));
-    recRule.Episode         = Number(getArg("Episode"));
+    recRule.Season          = getIntegerArg("Season");
+    recRule.Episode         = getIntegerArg("Episode");
 
     var ruleId = 0;
     if (recRule.Id == 0)

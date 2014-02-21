@@ -19,7 +19,7 @@ import "/tv/js/tvutil.qjs"
 
     var startIndex = 0;
     if (getArg("Start"))
-        startIndex = Number(getArg("Start"));
+        startIndex = getIntegerArg("Start");
 
     var myth  = new Myth();
     var dvr = new Dvr();

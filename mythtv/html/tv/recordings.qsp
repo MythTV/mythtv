@@ -29,8 +29,8 @@ import "/tv/js/tvutil.qjs"
         sortOrder = getArg("SortAsc");
 
     var startIndex = 0;
-    if (getArg("Start"))
-        startIndex = Number(getArg("Start"));
+    if (getIntegerArg("Start"))
+        startIndex = getIntegerArg("Start");
 
     var dvr = new Dvr();
 

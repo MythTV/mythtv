@@ -14,11 +14,11 @@ import "/tv/js/constants.js"
 
     var startIndex = 0;
     if (getArg("Start"))
-        startIndex = Number(getArg("Start"));
+        startIndex = getIntegerArg("Start");
 
     var numPages = 1;
     if (getArg("NumPages"))
-        numPages = Number(getArg("NumPages"));
+        numPages = getIntegerArg("NumPages");
 
     var timeBarInterval = 30; // Display time markers every X minutes
     var guideRange = 2; // Show X hours from the start time
