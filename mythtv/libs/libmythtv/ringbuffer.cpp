@@ -956,10 +956,15 @@ void RingBuffer::run(void)
             readsallowed = used >= fill_min || ateof ||
                 setswitchtonext || commserror;
 
-            if (0 == read_return && old_readpos == readpos &&
-                !IsRegisteredFileForWrite())
+            if (0 == read_return && old_readpos == readpos)
             {
-                if (livetvchain)
+                if (IsRegisteredFileForWrite())
+                {
+                    // We reached EOF, but file still open for writing
+                    // wait a little bit (60ms same wait as typical safe_read)
+                    generalWait.wait(&rwlock, 60);
+                }
+                else if (livetvchain)
                 {
                     if (!setswitchtonext && !ignoreliveeof &&
                         livetvchain->HasNext())
