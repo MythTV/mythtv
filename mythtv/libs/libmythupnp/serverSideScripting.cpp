@@ -280,6 +280,31 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->m_sProtocol));
         serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 
+        QHostAddress clientIP = QHostAddress(pRequest->GetPeerAddress());
+        QHostAddress serverIP = QHostAddress(pRequest->GetHostAddress());
+        if (clientIP.protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            serverVars.insert("IP_PROTOCOL", "IPv4");
+        }
+        else if (clientIP.protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            serverVars.insert("IP_PROTOCOL", "IPv6");
+        }
+
+        if (((clientIP.protocol() == QAbstractSocket::IPv4Protocol) &&
+             (clientIP.isInSubnet(QHostAddress("172.16.0.0"), 12) ||
+              clientIP.isInSubnet(QHostAddress("192.168.0.0"), 16) ||
+              clientIP.isInSubnet(QHostAddress("10.0.0.0"), 8))) ||
+            ((clientIP.protocol() == QAbstractSocket::IPv6Protocol) &&
+              clientIP.isInSubnet(serverIP, 64))) // default subnet size is assumed to be /64
+        {
+            serverVars.insert("CLIENT_NETWORK", "local");
+        }
+        else
+        {
+            serverVars.insert("CLIENT_NETWORK", "remote");
+        }
+
         // ------------------------------------------------------------------
         // Add the arrays (objects) we've just created to the global scope
         // They may be accessed as 'Server.REMOTE_ADDR'
