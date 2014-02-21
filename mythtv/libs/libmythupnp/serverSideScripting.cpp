@@ -281,6 +281,18 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 
         // ------------------------------------------------------------------
+        // Add the arrays (objects) we've just created to the global scope
+        // They may be accessed as 'Server.REMOTE_ADDR'
+        // ------------------------------------------------------------------
+
+        m_engine.globalObject().setProperty("Parameters",
+                                            m_engine.toScriptValue(params));
+        m_engine.globalObject().setProperty("RequestHeaders",
+                                            m_engine.toScriptValue(requestHeaders));
+        m_engine.globalObject().setProperty("Server",
+                                            m_engine.toScriptValue(serverVars));
+
+        // ------------------------------------------------------------------
         // Execute function to render output
         // ------------------------------------------------------------------
 
@@ -289,8 +301,6 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QScriptValueList args;
         args << m_engine.newQObject( &outStream );
         args << m_engine.toScriptValue(params);
-        args << m_engine.toScriptValue(requestHeaders);
-        args << m_engine.toScriptValue(serverVars);
 
         pInfo->m_oFunc.call( QScriptValue(), args );
 
