@@ -557,7 +557,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         int threads    = gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2);
-        QString preset = gCoreContext->GetSetting("HTTPLiveStreamPreset", "ultrafast");
+        QString preset = gCoreContext->GetSetting("HTTPLiveStreamPreset", "medium");
         QString tune   = gCoreContext->GetSetting("HTTPLiveStreamTune", "film");
 
         LOG(VB_GENERAL, LOG_NOTICE,
