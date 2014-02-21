@@ -93,6 +93,11 @@ FileRingBuffer::~FileRingBuffer()
 {
     KillReadAheadThread();
 
+    if (writemode)
+    {
+        UnregisterFileForWrite();
+    }
+
     delete remotefile;
     remotefile = NULL;
 
@@ -103,11 +108,6 @@ FileRingBuffer::~FileRingBuffer()
     {
         close(fd2);
         fd2 = -1;
-    }
-
-    if (writemode)
-    {
-        UnregisterFileForWrite();
     }
 }
 
@@ -411,12 +411,12 @@ bool FileRingBuffer::ReOpen(QString newFilename)
 
     rwlock.lockForWrite();
 
+    UnregisterFileForWrite();
+
     if (tfw && tfw->ReOpen(newFilename))
         result = true;
     else if (remotefile && remotefile->ReOpen(newFilename))
         result = true;
-
-    UnregisterFileForWrite();
 
     if (result)
     {
