@@ -246,7 +246,7 @@ long HTTPRequest::SendResponse( void )
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 
-                if (m_response.buffer().isEmpty())
+                if (!m_response.buffer().isEmpty())
                     break;
 
                 // Let SendResponseFile try or send a 404
