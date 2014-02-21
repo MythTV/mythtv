@@ -556,8 +556,17 @@ int Transcode::TranscodeFile(const QString &inputname,
             avfw->SetKeyFrameDist(30);
         }
 
-        avfw->SetThreadCount(
-            gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2));
+        int threads    = gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2);
+        QString preset = gCoreContext->GetSetting("HTTPLiveStreamPreset", "ultrafast");
+        QString tune   = gCoreContext->GetSetting("HTTPLiveStreamTune", "film");
+
+        LOG(VB_GENERAL, LOG_NOTICE,
+            QString("x264 HLS using: %1 threads, '%2' profile and '%3' tune")
+                .arg(threads).arg(preset).arg(tune));
+
+        avfw->SetThreadCount(threads);
+        avfw->SetEncodingPreset(preset);
+        avfw->SetEncodingTune(tune);
 
         if (avfw2)
             avfw2->SetThreadCount(1);

@@ -289,6 +289,7 @@ static av_cold int X264_init(AVCodecContext *avctx)
     x4->params.rc.f_pb_factor             = avctx->b_quant_factor;
     x4->params.analyse.i_chroma_qp_offset = avctx->chromaoffset;
     if (x4->preset || x4->tune)
+        av_log(avctx, AV_LOG_INFO, "x264 setting preset/tune to: %s/%s.\n", x4->preset, x4->tune);
         if (x264_param_default_preset(&x4->params, x4->preset, x4->tune) < 0) {
             int i;
             av_log(avctx, AV_LOG_ERROR, "Error setting preset/tune %s/%s.\n", x4->preset, x4->tune);

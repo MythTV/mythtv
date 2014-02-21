@@ -40,6 +40,8 @@ class MTV_PUBLIC FileWriterBase
     void SetAudioFormat(AudioFormat f)  { m_audioFormat = f; }
     void SetThreadCount(int count)      { m_encodingThreadCount = count; }
     void SetTimecodeOffset(long long o) { m_startingTimecodeOffset = o; }
+    void SetEncodingPreset(QString preset) { m_EncodingPreset = preset; }
+    void SetEncodingTune(QString tune)  { m_EncodingTune = tune; }
 
     long long GetFramesWritten(void)  const { return m_framesWritten; }
     long long GetTimecodeOffset(void) const { return m_startingTimecodeOffset; }
@@ -67,6 +69,8 @@ class MTV_PUBLIC FileWriterBase
     int         m_encodingThreadCount;
     long long   m_framesWritten;
     long long   m_startingTimecodeOffset;
+    QString     m_EncodingPreset;
+    QString     m_EncodingTune;
 };
 
 #endif

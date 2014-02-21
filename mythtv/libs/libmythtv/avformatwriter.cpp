@@ -545,6 +545,11 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         av_opt_set_int(c, "mixed-refs", 1, 0);
         av_opt_set_int(c, "8x8dct", 0, 0);
         av_opt_set_int(c, "weightb", 0, 0);
+
+        const char* preset = m_EncodingPreset.toStdString().c_str();
+        av_opt_set(c->priv_data, "preset", preset, 0);
+        const char* tune = m_EncodingTune.toStdString().c_str();
+        av_opt_set(c->priv_data, "tune", tune, 0);
     }
 
     if(m_ctx->oformat->flags & AVFMT_GLOBALHEADER)
