@@ -1,0 +1,22 @@
+<%
+import "/js/utility.js"
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Internal Webserver Debugging Information</title>
+</head>
+<body>
+
+<h2>Server Vars</h2>
+<%=objectDump(Server)%>
+
+<h2>Request headers</h2>
+<%=objectDump(RequestHeaders)%>
+
+<h2>Request Parameters</h2>
+<%=objectDump(Parameters)%>
+
+</body>
+</html>
