@@ -111,12 +111,21 @@ static MIMETypes g_MIMETypes[] =
     { "ts"  , "video/mp2t"                 },
 };
 
-static const char *Static401Error = 
-    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\""
-        "\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">"
+static const char *Static400Error =
+    "<!DOCTYPE html>"
     "<HTML>"
       "<HEAD>"
-        "<TITLE>Error</TITLE>"
+        "<TITLE>Error 400</TITLE>"
+        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
+      "</HEAD>"
+      "<BODY><H1>400 Bad Request.</H1></BODY>"
+    "</HTML>";
+
+static const char *Static401Error =
+    "<!DOCTYPE html>"
+    "<HTML>"
+      "<HEAD>"
+        "<TITLE>Error 401</TITLE>"
         "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
       "</HEAD>"
       "<BODY><H1>401 Unauthorized.</H1></BODY>"
@@ -1139,6 +1148,17 @@ bool HTTPRequest::ParseRequest()
         {
             LOG(VB_GENERAL, LOG_INFO, "Timeout waiting for request header." );
             return false;
+        }
+
+        // HTTP/1.1 requires that the Host header be present, even if empty
+        if ((m_nMinor == 1) && !m_mapHeaders.contains("host"))
+        {
+            m_eResponseType   = ResponseTypeHTML;
+            m_nResponseStatus = 400;
+
+            m_response.write( Static400Error );
+
+            return true;
         }
 
         m_bProtected = false;
