@@ -190,10 +190,10 @@ QString HTTPRequest::BuildHeader( long long nSize )
     QString sContentType = (m_eResponseType == ResponseTypeOther) ?
                             m_sResponseTypeText : GetResponseType();
 
-    sHeader = QString( "HTTP/%1.%2 %3\r\n"
-                       "Date: %4\r\n"
-                       "Server: %5\r\n" )
-        .arg(m_nMajor).arg(m_nMinor).arg(GetResponseStatus())
+    sHeader = QString( "%1 %2\r\n"
+                       "Date: %3\r\n"
+                       "Server: %4\r\n" )
+        .arg(GetRequestProtocol()).arg(GetResponseStatus())
         .arg(MythDate::current().toString("d MMM yyyy hh:mm:ss"))
         .arg(HttpServer::GetServerVersion());
 
@@ -826,6 +826,17 @@ void HTTPRequest::SetRequestProtocol( const QString &sLine )
 
     m_nMajor = sVersion.section( '.', 0, 0 ).toInt();
     m_nMinor = sVersion.section( '.', 1    ).toInt();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::GetRequestProtocol() const
+{
+    return QString("%1/%2.%3").arg(m_sProtocol)
+                              .arg(QString::number(m_nMajor))
+                              .arg(QString::number(m_nMinor));
 }
 
 /////////////////////////////////////////////////////////////////////////////

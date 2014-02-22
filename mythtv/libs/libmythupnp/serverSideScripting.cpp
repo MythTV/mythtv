@@ -277,7 +277,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QVariantMap serverVars;
         serverVars.insert("REMOTE_ADDR", QVariant(pRequest->GetPeerAddress()));
         serverVars.insert("SERVER_ADDR", QVariant(pRequest->GetHostAddress()));
-        serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->m_sProtocol));
+        serverVars.insert("SERVER_PROTOCOL", QVariant(pRequest->GetRequestProtocol()));
         serverVars.insert("SERVER_SOFTWARE", QVariant(HttpServer::GetServerVersion()));
 
         QHostAddress clientIP = QHostAddress(pRequest->GetPeerAddress());
