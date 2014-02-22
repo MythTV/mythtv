@@ -195,7 +195,8 @@ class UPNP_PUBLIC HTTPRequest
 
         Serializer *    GetSerializer   ();
 
-        QString         GetRequestProtocol  ( ) const;
+        QString         GetRequestProtocol  () const;
+        QString         GetResponseProtocol () const;
 
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QString  TestMimeType    ( const QString &sFileName );

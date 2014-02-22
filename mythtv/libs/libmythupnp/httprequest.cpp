@@ -193,7 +193,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
     sHeader = QString( "%1 %2\r\n"
                        "Date: %3\r\n"
                        "Server: %4\r\n" )
-        .arg(GetRequestProtocol()).arg(GetResponseStatus())
+        .arg(GetResponseProtocol()).arg(GetResponseStatus())
         .arg(MythDate::current().toString("d MMM yyyy hh:mm:ss"))
         .arg(HttpServer::GetServerVersion());
 
@@ -837,6 +837,27 @@ QString HTTPRequest::GetRequestProtocol() const
     return QString("%1/%2.%3").arg(m_sProtocol)
                               .arg(QString::number(m_nMajor))
                               .arg(QString::number(m_nMinor));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QString HTTPRequest::GetResponseProtocol() const
+{
+    // RFC 2145
+    //
+    // An HTTP server SHOULD send a response version equal to the highest
+    // version for which the server is at least conditionally compliant, and
+    // whose major version is less than or equal to the one received in the
+    // request.
+
+//     if (m_nMajor == 1)
+//         QString("HTTP/1.1");
+//     else if (m_nMajor == 2)
+//         QString("HTTP/2.0");
+
+    return QString("HTTP/1.1");
 }
 
 /////////////////////////////////////////////////////////////////////////////
