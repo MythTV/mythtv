@@ -54,62 +54,74 @@
 
 static MIMETypes g_MIMETypes[] =
 {
+    // Image Mime Types
     { "gif" , "image/gif"                  },
-    { "jpg" , "image/jpeg"                 },
+    { "ico" , "image/x-icon"               },
     { "jpeg", "image/jpeg"                 },
+    { "jpg" , "image/jpeg"                 },
+    { "mng" , "image/x-mng"                },
     { "png" , "image/png"                  },
-    { "ico",  "image/x-icon"               },
     { "svg" , "image/svg+xml"              },
     { "svgz", "image/svg+xml"              },
+    { "tif" , "image/tiff"                 },
+    { "tiff", "image/tiff"                 },
+    // Text Mime Types
     { "htm" , "text/html"                  },
     { "html", "text/html"                  },
     { "qsp" , "text/html"                  },
-    { "js"  , "application/javascript"     },
-    { "qjs" , "application/javascript"     },
     { "txt" , "text/plain"                 },
     { "xml" , "text/xml"                   },
     { "qxml", "text/xml"                   },
     { "xslt", "text/xml"                   },
-    { "pdf" , "application/pdf"            },
-    { "avi" , "video/avi"                  },
     { "css" , "text/css"                   },
+    // Application Mime Types
+    { "doc" , "application/vnd.ms-word"    },
+    { "gz"  , "application/x-tar"          },
+    { "js"  , "application/javascript"     },
+    { "m3u8", "application/x-mpegurl"      }, // HTTP Live Streaming
+    { "ogx" , "application/ogg"            }, // http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { "pdf" , "application/pdf"            },
+    { "qjs" , "application/javascript"     },
+    { "rm"  , "application/vnd.rn-realmedia" },
     { "swf" , "application/x-shockwave-flash" },
     { "xls" , "application/vnd.ms-excel"   },
-    { "doc" , "application/vnd.ms-word"    },
-    { "mid" , "audio/midi"                 },
-    { "mp3" , "audio/mpeg"                 },
-    { "rm"  , "application/vnd.rn-realmedia" },
-    { "wav" , "audio/wav"                  },
     { "zip" , "application/x-tar"          },
-    { "gz"  , "application/x-tar"          },
-    { "mpg" , "video/mpeg"                 },
-    { "mpg2", "video/mpeg"                 },
+    // Audio Mime Types:
+    { "aac" , "audio/mp4"                  },
+    { "ac3" , "audio/vnd.dolby.dd-raw"     }, // DLNA?
+    { "flac", "audio/x-flac"               }, // This could be audio/flac or application/flac
+    { "m4a" , "audio/x-m4a"                },
+    { "mid" , "audio/midi"                 },
+    { "mka" , "audio/x-matroska"           },
+    { "mp3" , "audio/mpeg"                 },
+    { "oga" , "audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { "ogg" , "audio/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { "wav" , "audio/wav"                  },
+    { "wma" , "audio/x-ms-wma"             },
+    // Video Mime Types
+    { "3gp" , "video/3gpp"                 }, // Also audio/3gpp
+    { "3g2" , "video/3gpp2"                }, // Also audio/3gpp2
+    { "asf" , "video/x-ms-asf"             },
+    { "avi" , "video/avi"                  },
     { "mpeg", "video/mpeg"                 },
     { "mpeg2","video/mpeg"                 },
-    { "vob" , "video/mpeg"                 },
-    { "asf" , "video/x-ms-asf"             },
-    { "nuv" , "video/nupplevideo"          },
+    { "mpg" , "video/mpeg"                 },
+    { "mpg2", "video/mpeg"                 },
     { "mov" , "video/quicktime"            },
     { "mp4" , "video/mp4"                  },
-    // This formerly was video/x-matroska, but got changed due to #8643
-    // This was reverted from video/x-mkv, due to #10980
-    // See http://matroska.org/technical/specs/notes.html#MIME
-    // If you can't please everyone, may as well be correct as you piss some off
-    { "mkv" , "video/x-matroska"           },
-    { "mka" , "audio/x-matroska"           },
-    { "wmv" , "video/x-ms-wmv"             },
-    // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-    { "ogg" , "audio/ogg"                  },
-    { "ogv" , "video/ogg"                  },
-    { "ogx" , "application/ogg"            },
-    { "oga" , "audio/ogg"                  },
-    // Similarly, this could be audio/flac or application/flac:
-    { "flac", "audio/x-flac"               },
-    { "m4a" , "audio/x-m4a"                },
-    // HTTP Live Streaming
-    { "m3u8", "application/x-mpegurl"      },
-    { "ts"  , "video/mp2t"                 },
+    { "mkv" , "video/x-matroska"           }, // See http://matroska.org/technical/specs/notes.html#MIME (See NOTE 1)
+    { "nuv" , "video/nupplevideo"          },
+    { "ogv" , "video/ogg"                  }, // Defined: http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+    { "ts"  , "video/mp2t"                 }, // HTTP Live Streaming
+    { "vob" , "video/mpeg"                 },
+    { "wmv" , "video/x-ms-wmv"             }
 };
+
+// NOTE 1
+// This formerly was video/x-matroska, but got changed due to #8643
+// This was reverted from video/x-mkv, due to #10980
+// See http://matroska.org/technical/specs/notes.html#MIME
+// If you can't please everyone, may as well be correct as you piss some off
 
 static const char *Static400Error =
     "<!DOCTYPE html>"
