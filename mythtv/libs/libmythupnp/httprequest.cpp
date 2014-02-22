@@ -131,6 +131,16 @@ static const char *Static401Error =
       "<BODY><H1>401 Unauthorized.</H1></BODY>"
     "</HTML>";
 
+static const char *Static505Error =
+    "<!DOCTYPE html>"
+    "<HTML>"
+      "<HEAD>"
+        "<TITLE>Error 505</TITLE>"
+        "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">"
+      "</HEAD>"
+      "<BODY><H1>505 HTTP Version Not Supported.</H1></BODY>"
+    "</HTML>";
+
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
 static const int g_on          = 1;
 static const int g_off         = 0;
@@ -1136,6 +1146,16 @@ bool HTTPRequest::ParseRequest()
 
         ProcessRequestLine( sRequestLine );
 
+        if (m_nMajor > 1 || m_nMajor < 0)
+        {
+            m_eResponseType   = ResponseTypeHTML;
+            m_nResponseStatus = 505;
+
+            m_response.write( Static505Error );
+
+            return true;
+        }
+
         // Make sure there are a few default values
 
         m_mapHeaders[ "content-length" ] = "0";
@@ -1334,6 +1354,8 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         if (nCount > 1)
             m_nResponseStatus = tokens[1].toInt();
     }
+
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
