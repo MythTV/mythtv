@@ -211,6 +211,12 @@
                             <filename>mm_stopicon.png</filename>
                         </imagetype>
                     </state>
+                    <state name="unavailable">
+                        <imagetype name="animation">
+                            <position>5,5</position>
+                            <filename>schedule_disabled.png</filename>
+                        </imagetype>
+                    </state>
                 </statetype>
 
                 <statetype name="movestate" from="basemovingtracksstate">
