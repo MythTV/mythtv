@@ -19,6 +19,7 @@
 #include "mythtimer.h"
 #include "mythdate.h"
 #include "compat.h"
+#include "mythcorecontext.h"
 
 #if HAVE_POSIX_FADVISE < 1
 static int posix_fadvise(int, off_t, off_t, int) { return 0; }
@@ -519,7 +520,14 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
         if (oldfile)
             break;
 
-        if (ret == 0 || eof) // EOF returns 0
+        if (eof)
+        {
+            // we can exit now, if file is still open for writing in another
+            // instance, RingBuffer will retry
+            break;
+        }
+
+        if (ret == 0)
         {
             if (tot > 0)
                 break;

@@ -960,9 +960,31 @@ void RingBuffer::run(void)
                     if (!setswitchtonext && !ignoreliveeof &&
                         livetvchain->HasNext())
                     {
+                        // we receive new livetv chain element event
+                        // before we receive file closed for writing event
+                        // so don't need to test if file is closed for writing
                         livetvchain->SwitchToNext(true);
                         setswitchtonext = true;
                     }
+                    else if (gCoreContext->IsRegisteredFileForWrite(filename))
+                    {
+                        LOG(VB_FILE, LOG_DEBUG, LOC +
+                            QString("EOF encountered, but %1 still being written to")
+                            .arg(filename));
+                        // We reached EOF, but file still open for writing and
+                        // no next program in livetvchain
+                        // wait a little bit (60ms same wait as typical safe_read)                        generalWait.wait(&rwlock, 60);
+                    }
+                }
+                else if (gCoreContext->IsRegisteredFileForWrite(filename))
+                {
+                    LOG(VB_FILE, LOG_DEBUG, LOC +
+                        QString("EOF encountered, but %1 still being written to")
+                        .arg(filename));
+                    // We reached EOF, but file still open for writing,
+                    // typically active in-progress recording
+                    // wait a little bit (60ms same wait as typical safe_read)
+                    generalWait.wait(&rwlock, 60);
                 }
                 else
                 {
@@ -1670,7 +1692,7 @@ void RingBuffer::SetLiveMode(LiveTVChain *chain)
     rwlock.unlock();
 }
 
-/// Tells RingBuffer whether to igonre the end-of-file
+/// Tells RingBuffer whether to ignore the end-of-file
 void RingBuffer::IgnoreLiveEOF(bool ignore)
 {
     rwlock.lockForWrite();
