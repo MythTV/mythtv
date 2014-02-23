@@ -1688,6 +1688,29 @@ void MusicCommon::customEvent(QEvent *event)
         if (gPlayer->getCurrentMetadata() && trackID == gPlayer->getCurrentMetadata()->ID())
             updateTrackInfo(gPlayer->getCurrentMetadata());
     }
+    else if (event->type() == MusicPlayerEvent::TrackUnavailableEvent)
+    {
+        MusicPlayerEvent *mpe = dynamic_cast<MusicPlayerEvent *>(event);
+
+        if (!mpe)
+            return;
+
+        uint trackID = mpe->TrackID;
+
+        if (m_currentPlaylist)
+        {
+            for (int x = 0; x < m_currentPlaylist->GetCount(); x++)
+            {
+                MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
+                MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
+                if (mdata && mdata->ID() == trackID)
+                {
+                    item->SetFontState("disabled");
+                    item->DisplayState("unavailable", "playstate");
+                }
+            }
+        }
+    }
 }
 
 void MusicCommon::updateVolume(void)
