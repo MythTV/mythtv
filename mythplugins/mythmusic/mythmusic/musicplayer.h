@@ -38,6 +38,7 @@ class MusicPlayerEvent : public MythEvent
         static Type VolumeChangeEvent;
         static Type TrackAddedEvent;
         static Type TrackRemovedEvent;
+        static Type TrackUnavailableEvent;
         static Type AllTracksRemovedEvent;
         static Type MetadataChangedEvent;
         static Type TrackStatsChangedEvent;
@@ -141,6 +142,7 @@ class MusicPlayer : public QObject, public MythObservable
     void         sendMetadataChangedEvent(int trackID);
     void         sendTrackStatsChangedEvent(int trackID);
     void         sendAlbumArtChangedEvent(int trackID);
+    void         sendTrackUnavailableEvent(int trackID);
     void         sendCDChangedEvent(void);
 
     void         toMap(InfoMap &infoMap);

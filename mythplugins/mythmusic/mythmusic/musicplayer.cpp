@@ -42,6 +42,7 @@ QEvent::Type MusicPlayerEvent::TrackChangeEvent = (QEvent::Type) QEvent::registe
 QEvent::Type MusicPlayerEvent::VolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::TrackUnavailableEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type MusicPlayerEvent::TrackStatsChangedEvent = (QEvent::Type) QEvent::registerEventType();
@@ -321,11 +322,35 @@ void MusicPlayer::pause(void)
 
 void MusicPlayer::play(void)
 {
+    stopDecoder();
+
     MusicMetadata *meta = getCurrentMetadata();
     if (!meta)
         return;
 
-    stopDecoder();
+    if (meta->Filename() == METADATA_INVALID_FILENAME)
+    {
+        // put an upper limit on the number of consecutive track unavailable errors
+        if (m_errorCount >= 1000)
+        {
+            ShowOkPopup(tr("Got to many track unavailable errors. Maybe the host with the music on is off-line?"));
+            stop(true);
+            m_errorCount = 0;
+            return;
+        }
+
+        if (m_errorCount < 5)
+        {
+            MythErrorNotification n(tr("Track Unavailable"), tr("MythMusic"), QString("Cannot find file '%1'").arg(meta->Filename(false)));
+            GetNotificationCenter()->Queue(n);
+        }
+
+        m_errorCount++;
+
+        sendTrackUnavailableEvent(meta->ID());
+        next();
+        return;
+    }
 
     // Notify others that we are about to play
     gCoreContext->WantingPlayback(this);
@@ -1326,6 +1351,12 @@ void MusicPlayer::sendAlbumArtChangedEvent(int trackID)
     dispatch(me);
 }
 
+void MusicPlayer::sendTrackUnavailableEvent(int trackID)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::TrackUnavailableEvent, trackID);
+    dispatch(me);
+}
+
 void MusicPlayer::sendCDChangedEvent(void)
 {
     MusicPlayerEvent me(MusicPlayerEvent::CDChangedEvent, -1);
@@ -1478,6 +1509,9 @@ void MusicPlayer::setupDecoderHandler(void)
 
 void MusicPlayer::decoderHandlerReady(void)
 {
+    if (!getDecoder())
+        return;
+
     LOG(VB_PLAYBACK, LOG_INFO, QString ("decoder handler is ready, decoding %1")
             .arg(getDecoder()->getFilename()));
 
