@@ -70,6 +70,8 @@ enum RepoType
 #define ID_TO_ID(x) x & METADATA_ID_MASK;
 #define ID_TO_REPO(x)  x >> METADATA_REPO_SHIFT
 
+#define METADATA_INVALID_FILENAME "**NOT FOUND**"
+
 class META_PUBLIC MusicMetadata
 {
     Q_DECLARE_TR_FUNCTIONS(MusicMetadata)

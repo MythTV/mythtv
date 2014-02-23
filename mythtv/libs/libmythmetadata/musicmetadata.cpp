@@ -812,7 +812,10 @@ QString MusicMetadata::Filename(bool find)
     // not found
     LOG(VB_GENERAL, LOG_ERR, QString("MusicMetadata: Asked to get the filename for a track but no file found: %1")
                                      .arg(m_filename));
-    return QString();
+
+    m_actualFilename = METADATA_INVALID_FILENAME;
+
+    return m_actualFilename;
 }
 
 /// try to find the track on the local file system
