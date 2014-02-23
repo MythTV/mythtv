@@ -271,7 +271,19 @@ def main():
         MythTV.tmdb3.request.DEBUG = True
         set_cache(engine='null')
     else:
-        set_cache(engine='file', filename='~/.mythtv/pytmdb3.cache')
+        import os
+        confdir = os.environ.get('MYTHCONFDIR', '')
+        if (not confdir) or (confdir == '/'):
+            confdir = os.environ.get('HOME', '')
+            if (not confdir) or (confdir == '/'):
+                print "Unable to find MythTV directory for metadata cache."
+                sys.exit(1)
+            confdir = os.path.join(confdir, '.mythtv')
+        confpath = os.path.join(confdir, 'pytmdb3.cache')
+        if not os.access(confpath, os.F_OK|os.W_OK|os.R_OK):
+            print "Unable to access cache file: "+confpath
+            sys.exit(1)
+        set_cache(engine='file', filename=confpath)
 
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)
