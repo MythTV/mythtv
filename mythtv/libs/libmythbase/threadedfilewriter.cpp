@@ -17,6 +17,7 @@
 // MythTV headers
 #include "threadedfilewriter.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
 
 #include "mythtimer.h"
 #include "compat.h"
@@ -69,7 +70,8 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     totalBufferUse(0),
     // threads
     writeThread(NULL),                   syncThread(NULL),
-    m_warned(false),                     m_blocking(false)
+    m_warned(false),                     m_blocking(false),
+    m_registered(false)
 {
     filename.detach();
 }
@@ -90,6 +92,11 @@ bool ThreadedFileWriter::ReOpen(QString newFilename)
     {
         close(fd);
         fd = -1;
+    }
+
+    if (m_registered)
+    {
+        gCoreContext->UnregisterFileForWrite(filename);
     }
 
     if (!newFilename.isEmpty())
@@ -122,27 +129,28 @@ bool ThreadedFileWriter::Open(void)
             QString("Opening file '%1'.").arg(filename) + ENO);
         return false;
     }
-    else
-    {
-        LOG(VB_FILE, LOG_INFO, LOC + "Open() successful");
+
+    gCoreContext->RegisterFileForWrite(filename);
+    m_registered = true;
+
+    LOG(VB_FILE, LOG_INFO, LOC + "Open() successful");
 
 #ifdef _WIN32
-        _setmode(fd, _O_BINARY);
+    _setmode(fd, _O_BINARY);
 #endif
-        if (!writeThread)
-        {
-            writeThread = new TFWWriteThread(this);
-            writeThread->start();
-        }
-
-        if (!syncThread)
-        {
-            syncThread = new TFWSyncThread(this);
-            syncThread->start();
-        }
-
-        return true;
+    if (!writeThread)
+    {
+        writeThread = new TFWWriteThread(this);
+        writeThread->start();
     }
+
+    if (!syncThread)
+    {
+        syncThread = new TFWSyncThread(this);
+        syncThread->start();
+    }
+
+    return true;
 }
 
 /** \fn ThreadedFileWriter::~ThreadedFileWriter()
@@ -190,6 +198,9 @@ ThreadedFileWriter::~ThreadedFileWriter()
         close(fd);
         fd = -1;
     }
+
+    gCoreContext->UnregisterFileForWrite(filename);
+    m_registered = false;
 }
 
 /** \fn ThreadedFileWriter::Write(const void*, uint)
@@ -403,6 +414,13 @@ void ThreadedFileWriter::SyncLoop(void)
         Sync();
 
         locker.relock();
+
+        if (ignore_writes && m_registered)
+        {
+            // we aren't going to write to the disk anymore, so can de-register
+            gCoreContext->UnregisterFileForWrite(filename);
+            m_registered = false;
+        }
         bufferSyncWait.wait(&buflock, 1000);
     }
 }
@@ -422,8 +440,9 @@ void ThreadedFileWriter::DiskLoop(void)
     // Even if the bytes buffered is less than the minimum write
     // size we do want to write to the OS buffers periodically.
     // This timer makes sure we do.
-    MythTimer minWriteTimer;
+    MythTimer minWriteTimer, lastRegisterTimer;
     minWriteTimer.start();
+    lastRegisterTimer.start();
 
     uint64_t total_written = 0LL;
 
@@ -533,6 +552,13 @@ void ThreadedFileWriter::DiskLoop(void)
         }
 
         //////////////////////////////////////////
+
+        if (lastRegisterTimer.elapsed() >= 10000)
+        {
+            gCoreContext->RegisterFileForWrite(filename, total_written);
+            m_registered = true;
+            lastRegisterTimer.restart(); 
+        }
 
         buf->lastUsed = MythDate::current();
         emptyBuffers.push_back(buf);

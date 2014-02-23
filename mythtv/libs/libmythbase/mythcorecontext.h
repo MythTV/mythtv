@@ -189,6 +189,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SetExiting(bool exiting = true);
     bool IsExiting(void);
 
+    void RegisterFileForWrite(const QString &file, uint64_t size = 0LL);
+    void UnregisterFileForWrite(const QString &file);
+    bool IsRegisteredFileForWrite(const QString &file);
+
     // signal related methods
     void WaitUntilSignals(const char *signal1, ...);
     void emitTVPlaybackStarted(void)            { emit TVPlaybackStarted(); }
