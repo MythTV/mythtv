@@ -12,6 +12,8 @@
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
 #include <QLocale>
+#include <QPair>
+#include <QDateTime>
 
 #include <cmath>
 #include <cstdarg>
@@ -99,6 +101,9 @@ class MythCoreContextPrivate : public QObject
     MythPluginManager *m_pluginmanager;
 
     bool m_isexiting;
+
+    QMap<QString, QPair<int64_t, uint64_t> >  m_fileswritten;
+    QMutex m_fileslock;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -1102,6 +1107,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
 
         QString prefix = strlist[0];
         QString message = strlist[1];
+        QStringList tokens = message.split(" ", QString::SkipEmptyParts);
 
         if (prefix == "OK")
         {
@@ -1118,6 +1124,56 @@ void MythCoreContext::readyRead(MythSocket *sock)
             // No need to dispatch this message to ourself, so handle it
             LOG(VB_GENERAL, LOG_INFO, "Received remote 'Clear Cache' request");
             ClearSettingsCache();
+        }
+        else if (message.startsWith("FILE_WRITTEN"))
+        {
+            QString file;
+            uint64_t size;
+            int NUMTOKENS = 3; // Number of tokens expected
+
+            if (tokens.size() == NUMTOKENS)
+            {
+                file = tokens[1];
+                size = tokens[2].toULongLong();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("FILE_WRITTEN event received "
+                            "with invalid number of arguments, "
+                            "%1 expected, %2 actual")
+                    .arg(NUMTOKENS-1)
+                    .arg(tokens.size()-1));
+                return;
+            }
+            // No need to dispatch this message to ourself, so handle it
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Received remote 'FILE_WRITTEN %1' request").arg(file));
+            RegisterFileForWrite(file, size);
+        }
+        else if (message.startsWith("FILE_CLOSED"))
+        {
+            QString file;
+            int NUMTOKENS = 2; // Number of tokens expected
+
+            if (tokens.size() == NUMTOKENS)
+            {
+                file = tokens[1];
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("FILE_CLOSED event received "
+                            "with invalid number of arguments, "
+                            "%1 expected, %2 actual")
+                    .arg(NUMTOKENS-1)
+                    .arg(tokens.size()-1));
+                return;
+            }
+            // No need to dispatch this message to ourself, so handle it
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Received remote 'FILE_CLOSED %1' request").arg(file));
+            UnregisterFileForWrite(file);
         }
         else
         {
@@ -1539,6 +1595,48 @@ void MythCoreContext::SetExiting(bool exiting)
 bool MythCoreContext::IsExiting(void)
 {
     return d->m_isexiting;
+}
+
+void MythCoreContext::RegisterFileForWrite(const QString& file, uint64_t size)
+{
+    QMutexLocker lock(&d->m_fileslock);
+
+    QPair<int64_t, uint64_t> pair(QDateTime::currentMSecsSinceEpoch(), size);
+    d->m_fileswritten.insert(file, pair);
+
+    if (IsBackend())
+    {
+        QString message = QString("FILE_WRITTEN %1 %2").arg(file).arg(size);
+        MythEvent me(message);
+        dispatch(me);
+    }
+
+    LOG(VB_FILE, LOG_DEBUG, LOC +
+        QString("Registering File %1 for write").arg(file));
+}
+
+void MythCoreContext::UnregisterFileForWrite(const QString& file)
+{
+    QMutexLocker lock(&d->m_fileslock);
+
+    d->m_fileswritten.remove(file);
+
+    if (IsBackend())
+    {
+        QString message = QString("FILE_CLOSED %1").arg(file);
+        MythEvent me(message);
+        dispatch(me);
+    }
+
+    LOG(VB_FILE, LOG_DEBUG, LOC +
+        QString("Unregistering File %1 for write").arg(file));
+}
+
+bool MythCoreContext::IsRegisteredFileForWrite(const QString& file)
+{
+    QMutexLocker lock(&d->m_fileslock);
+
+    return d->m_fileswritten.contains(file);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
