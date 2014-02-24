@@ -630,10 +630,16 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
     if (_ts_last[stream_id] >= 0)
     {
         int64_t diff = ts - _ts_last[stream_id];
-        if ((diff < 0) && (diff < (10 * -90000)))
+
+        // time jumped back more then 10 seconds, handle it as 33bit overflow
+        if (diff < (10 * -90000))
+            // MAX_PTS is 33bits all 1
             diff += 0x1ffffffffLL;
+
+        // FIXME why do we handle negative gaps (aka overlap) like a gap?
         if (diff < 0)
             diff = -diff;
+
         if (diff > gap_threshold)
         {
             QMutexLocker locker(&statisticsLock);
