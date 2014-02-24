@@ -961,7 +961,8 @@ void RingBuffer::run(void)
                             .arg(filename));
                         // We reached EOF, but file still open for writing and
                         // no next program in livetvchain
-                        // wait a little bit (60ms same wait as typical safe_read)                        generalWait.wait(&rwlock, 60);
+                        // wait a little bit (60ms same wait as typical safe_read)
+                        generalWait.wait(&rwlock, 60);
                     }
                 }
                 else if (gCoreContext->IsRegisteredFileForWrite(filename))
