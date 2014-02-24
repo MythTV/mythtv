@@ -2645,6 +2645,19 @@ NULL
             " ADD COLUMN inetref varchar(40) DEFAULT '' AFTER videoprop;",
             "ALTER TABLE recordedprogram "
             " ADD COLUMN inetref varchar(40) DEFAULT '' AFTER videoprop;",
+            "DELETE FROM settings WHERE value='DefaultStartOffset';",
+            "DELETE FROM settings WHERE value='DefaultEndOffset';",
+            "DELETE FROM settings WHERE value='AutoExpireDefault';",
+            "DELETE FROM settings WHERE value='AutoCommercialFlag';",
+            "DELETE FROM settings WHERE value='AutoTranscode';",
+            "DELETE FROM settings WHERE value='DefaultTranscoder';",
+            "DELETE FROM settings WHERE value='AutoRunUserJob1';",
+            "DELETE FROM settings WHERE value='AutoRunUserJob2';",
+            "DELETE FROM settings WHERE value='AutoRunUserJob3';",
+            "DELETE FROM settings WHERE value='AutoRunUserJob4';",
+            "DELETE FROM settings WHERE value='AutoMetadataLookup';",
+            "DELETE FROM housekeeping WHERE tag='DailyCleanup';",
+            "DELETE FROM housekeeping WHERE tag='ThemeChooserInfoCacheUpdate';",
             NULL
         };
         if (!performActualUpdate(updates, "1323", dbver))
