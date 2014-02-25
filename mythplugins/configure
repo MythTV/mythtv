@@ -572,7 +572,6 @@ if is_qmake5 $qmake || is_qmake5 qmake-qt5; then
     if is_qmake5 qmake-qt5; then
         qmake=qmake-qt5
     fi
-    check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE
 elif is_qmake4 $qmake || is_qmake4 qmake-qt4; then
     if is_qmake4 qmake-qt4; then
         qmake=qmake-qt4
