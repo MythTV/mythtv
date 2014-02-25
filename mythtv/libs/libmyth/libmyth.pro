@@ -74,12 +74,11 @@ SOURCES += programtypes.cpp       recordingtypes.cpp
 SOURCES += rssparse.cpp
 
 # This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+# Really? It builds under Qt5, so lets let it
 HEADERS += mythrssmanager.h             netutils.h
 HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
-}
 
 INCLUDEPATH += ../../external/libsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
@@ -132,10 +131,9 @@ inc.files += programtypes.h       recordingtypes.h
 inc.files += rssparse.h
 
 # This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+# Really? It builds under Qt5, so lets let it
 inc.files += mythrssmanager.h     netutils.h
 inc.files += netgrabbermanager.h
-}
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
