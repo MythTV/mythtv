@@ -159,17 +159,18 @@ void MythUDPListener::Process(const QByteArray &buf, QHostAddress sender,
         n = n.nextSibling();
     }
 
-    if (!msg.isEmpty())
+    if (!msg.isEmpty() || !image.isEmpty() || !extra.isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Received %1 '%2', timeout %3")
-            .arg(notification ? "notification" : "message").arg(msg).arg(timeout));
+            .arg(notification ? "notification" : "message")
+            .arg(msg).arg(timeout));
         if (timeout > 1000)
             timeout = notification ? 5 : 0;
         if (notification)
         {
             origin = origin.isNull() ? tr("UDP Listener") : origin;
             ShowNotification(error ? MythNotification::Error :
-                                     MythNotification::TypeFromString(type),
+                             MythNotification::TypeFromString(type),
                              msg, origin, description, image, extra,
                              progress_text, progress, timeout, fullscreen,
                              visibility);
