@@ -80,12 +80,11 @@ SOURCES += rssparse.cpp
 SOURCES += virtualkeyboard_qt.cpp uitypes.cpp xmlparse.cpp
 
 # This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+# Really? It builds under Qt5, so lets let it
 HEADERS += mythrssmanager.h             netutils.h
 HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
-}
 
 INCLUDEPATH += ../../external/libsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
@@ -136,10 +135,9 @@ inc.files += programtypes.h       recordingtypes.h
 inc.files += rssparse.h
 
 # This stuff is not Qt5 compatible..
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
+# Really? It builds under Qt5, so lets let it
 inc.files += mythrssmanager.h     netutils.h
 inc.files += netgrabbermanager.h
-}
 
 # remove when everything is switched to mythui
 inc.files += virtualkeyboard_qt.h xmlparse.h
