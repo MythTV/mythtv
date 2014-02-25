@@ -31,7 +31,17 @@ import "/tv/js/tvutil.qjs"
 
     var program = dvr.GetRecorded(chanID, startTime);
 
-    var streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 720, 405, 800000, 64000, -1);
+    var videoProfile = "360p";
+    if (Server.CLIENT_NETWORK == "local")
+        videoProfile = "720p";
+
+    var streamInfo = 0;
+    // Relative bitrates and resolutions taken from
+    // https://developer.apple.com/library/ios/technotes/tn2224/_index.html#//apple_ref/doc/uid/DTS40009745-CH1-SETTINGSFILES
+    if (videoProfile == "720p")
+        streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 1280, 720, 4500000, 64000, -1); // Local - 4.5Mbps 1280x720
+    else
+        streamInfo = content.AddRecordingLiveStream(chanID, startTime, 0, 640, 360, 800000, 64000, -1); // Remote - 800 Kbps 640x360
 
     var streamID = 0;
     if (isValidObject(streamInfo))
@@ -44,10 +54,26 @@ import "/tv/js/tvutil.qjs"
     // This is a bug in the services API which we're temporarily working around
     streamInfo = content.GetLiveStream(streamInfo.Id);
 
+    var aspectRatio = 1.777778; // Assume 16:9 as a default
+    var playerWidth = 640;
+    var playerHeight = 360;
+
+    if (streamInfo.Width > 0 && streamInfo.Height > 0)
+    {
+        aspectRatio = streamInfo.Width / streamInfo.Height;
+        playerHeight = playerWidth / aspectRatio;
+    }
+
     var previewImage = "/Content/GetPreviewImage?ChanId=" + program.Channel.ChanId +
                         "&amp;StartTime=" + program.Recording.StartTs.toISOString() +
-                        "&amp;height=" + streamInfo.Height +
+                        "&amp;height=" + playerHeight +
                         "&amp;format=JPG";
+
+    var ua = RequestHeaders.user_agent.toLowerCase();
+
+    // iOS and Android (Browser, Opera but not Firefox) supports HLS
+    // with HTML 5 but JW Player 5 doesn't fallback as it should
+    var useHTML5Video = (ua.match(/android/g) || ua.match(/(iPhone|iPad)/g)) ? true : false;
 %>
 
 <div id="playerContainer" class="playerContainer">
@@ -58,8 +84,10 @@ import "/tv/js/tvutil.qjs"
 
 <div id="playerBackground">
 <div id="player"> <!-- Automatically replaced with the swf by JW Player (swf or HTML) -->
-    <div id="player_wrapper" style="width: <%=streamInfo.Width%>px; height: <%=streamInfo.Height%>px;">
-        <video width="<%=streamInfo.Width%>" height="<%=streamInfo.Height%>" controls
+<!--    <div id="player_wrapper" style="width: <%=streamInfo.Width%>px; height: <%=streamInfo.Height%>px;">
+        <video width="<%=streamInfo.Width%>" height="<%=streamInfo.Height%>" controls -->
+    <div id="player_wrapper" style="width: <%=playerWidth%>px; height: <%=playerHeight%>px">
+        <video width="width: 100%; height: 100%;" controls
                poster="<%=previewImage%>" preload="metadata">
         <source src="<%=streamInfo.RelativeURL%>">
         Your browser does not support the &lt;video&gt; tag, please upgrade your browser.
@@ -74,7 +102,13 @@ import "/tv/js/tvutil.qjs"
     <button id="pauseButton" class="playbackControl" onClick="jwplayer('player').pause()">Pause</button>&nbsp;
     <button id="stopButton" class="playbackControl" onClick="jwplayer('player').stop()">Stop</button>&nbsp;
     <button id="muteButton" class="playbackControl" onClick="jwplayer('player').setMute()">Mute</button>&nbsp;
-    <!--<button onClick="jwplayer('player').setControls(false)">Disable Controls</button>-->
+    <label for="hlsProfileList">
+        <%=qsTr("Quality")%>:
+    <select name="profile" id="hlsProfileList">
+        <option value="360p"><%=qsTr("360p (Mobile)")%></option>
+        <option value="720p" <%if (videoProfile == "720p") {%>selected<%}%>><%=qsTr("720p (WiFi)")%></option>
+    </select>
+    </label>
     </div>
 </div>
 
@@ -102,84 +136,73 @@ import "/tv/js/tvutil.qjs"
 
 <script language="JavaScript" type="text/javascript" src="/js/fileutil.js"></script>
 <%
-    var content = new Content();
-    var jwpExists = 0;
-
-    var hash = content.GetHash("3rdParty", "JW_Player/player.swf");
-
-    if (hash != "")
+    if (!useHTML5Video)
     {
-        jwpExists = 1;
+        var jwpExists = 0;
+
+        var hash = content.GetHash("3rdParty", "JW_Player/player.swf");
+
+        if (hash != "")
+        {
+            jwpExists = 1;
 %>
 <script language="JavaScript" type="text/javascript" src="/StorageGroup/3rdParty/JW_Player/jwplayer.js"></script>
 <script language="JavaScript" type="text/javascript">
 
     var playlist = "<%=streamInfo.RelativeURL%>";
-    var width = <%=streamInfo.Width%>;
-    var height = <%=streamInfo.Height%>;
+    var width = <%=playerWidth%>; // Not the Video width, but the width of the embedded player
+    var height = <%=playerHeight%>; // Not the Video height, but the height of the embedded player
     var duration = <%=(program.Recording.EndTs - program.Recording.StartTs) / 1000%>;
     var previewImage = "<%=previewImage%>";
 
-    var ua = navigator.userAgent.toLowerCase();
-
-    // iOS and Android (Browser, Opera but not Firefox) supports HLS
-    // with HTML 5 but JW Player 5 doesn't fallback as it should
-    var useHTML5Video = (ua.match(/android/g) || ua.match(/(iPhone|iPad)/g)) ? true : false;
-
-    if (useHTML5Video)
-    {
-        // Do nothing, we
-    }
-    else
-    {
-        jwplayer('player').setup({
-            file: playlist,
-            width: width,
-            height: height,
-            modes: [
-            {
-                type: "flash",
-                src: "/StorageGroup/3rdParty/JW_Player/player.swf",
-                config: {
-                    file: playlist,
-                    provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
-    // This is far from complete
-    //                skin: "/3rdParty/jwplayer/mythtv_skin/MythTV.zip",
-                    backcolor: "2A2A2A",
-                    frontcolor: "FFFFFF",
-                    image: previewImage,
-                    smoothing: true,
-                    autostart: false,
-                    duration: duration
-                }
-            },
-            {
-                type: "html5",
-                config: {
-                    file: playlist,
-                    provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
-                    backcolor: "2A2A2A",
-                    frontcolor: "FFFFFF",
-                    image: previewImage,
-                    autostart: false,
-                    duration: duration
-                }
+    jwplayer('player').setup({
+        file: playlist,
+        width: width,
+        height: height,
+        modes: [
+        {
+            type: "flash",
+            src: "/StorageGroup/3rdParty/JW_Player/player.swf",
+            config: {
+                file: playlist,
+                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+// This is far from complete
+//                skin: "/3rdParty/jwplayer/mythtv_skin/MythTV.zip",
+                backcolor: "2A2A2A",
+                frontcolor: "FFFFFF",
+                image: previewImage,
+                smoothing: true,
+                autostart: false,
+                duration: duration
             }
-            ]
-        });
-    }
+        },
+        {
+            type: "html5",
+            config: {
+                file: playlist,
+                provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+                backcolor: "2A2A2A",
+                frontcolor: "FFFFFF",
+                image: previewImage,
+                autostart: false,
+                duration: duration
+            }
+        }
+        ]
+    });
 
 </script>
 <%
-    }
-    else
-    {
+        }
+        else
+        {
 %>
 
 <b>Your browser does not support adaptive streaming with HTML 5 Video, you will need to&nbsp;
 <a href='javascript:void(0);' onClick="javascript:loadContent('/3rdParty/jwplayer.qsp');"><i18n>install JW Player&trade;</i18n></a>&nbsp;
 to use this HLS test page</b><hr><br>
 <%
+        }
     }
 %>
 
