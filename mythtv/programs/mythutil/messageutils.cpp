@@ -55,7 +55,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     unsigned short port = 6948;
     QString name = cmdline.GetPassthrough();
     bool notification = cmdline.toBool("notification");
-    QString text = "message";
+    QString text /* = "message" */ ;
     QString timeout = "0";
     QString image = "";
     QString origin = "MythUtils";
@@ -152,7 +152,7 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     }
 
     sock->deleteLater();
-   
+
     return result;
 }
 
