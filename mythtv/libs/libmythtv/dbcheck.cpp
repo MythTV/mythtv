@@ -16,6 +16,7 @@ using namespace std;
 #include "videodbcheck.h" // for 1267
 #include "compat.h"
 #include "recordingrule.h"
+#include "recordingprofile.h"
 
 // TODO convert all dates to UTC
 
@@ -2025,6 +2026,35 @@ NULL
         RecordingRule record;
         record.MakeTemplate("Default");
         record.m_type = kTemplateRecord;
+        // Take some defaults from now obsoleted settings.
+        record.m_startOffset =
+            gCoreContext->GetNumSetting("DefaultStartOffset", 0);
+        record.m_endOffset =
+            gCoreContext->GetNumSetting("DefaultEndOffset", 0);
+        record.m_dupMethod =
+            static_cast<RecordingDupMethodType>(
+                gCoreContext->GetNumSetting(
+                    "prefDupMethod", kDupCheckSubDesc));
+        record.m_filter = RecordingRule::GetDefaultFilter();
+        record.m_autoExpire =
+            gCoreContext->GetNumSetting("AutoExpireDefault", 0);
+        record.m_autoCommFlag =
+            gCoreContext->GetNumSetting("AutoCommercialFlag", 1);
+        record.m_autoTranscode =
+            gCoreContext->GetNumSetting("AutoTranscode", 0);
+        record.m_transcoder =
+            gCoreContext->GetNumSetting(
+                "DefaultTranscoder", RecordingProfile::TranscoderAutodetect);
+        record.m_autoUserJob1 =
+            gCoreContext->GetNumSetting("AutoRunUserJob1", 0);
+        record.m_autoUserJob2 =
+            gCoreContext->GetNumSetting("AutoRunUserJob2", 0);
+        record.m_autoUserJob3 =
+            gCoreContext->GetNumSetting("AutoRunUserJob3", 0);
+        record.m_autoUserJob4 =
+            gCoreContext->GetNumSetting("AutoRunUserJob4", 0);
+        record.m_autoMetadataLookup =
+            gCoreContext->GetNumSetting("AutoMetadataLookup", 1);
         record.Save(false);
 
         if (!UpdateDBVersionNumber("1302", dbver))
