@@ -895,11 +895,11 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     int vidSize = 0;
 
-    // 1920x1080 video is actually 1920x1088 because of the 16x16 blocks so
+    // 1080i/p video is actually 1088 because of the 16x16 blocks so
     // we have to fudge the output size here.  nuvexport knows how to handle
     // this and as of right now it is the only app that uses the fifo ability.
-    if (video_height == 1080 && video_width == 1920)
-        vidSize = (1088 * 1920) * 3 / 2;
+    if (video_height == 1080)
+        vidSize = (1088 * video_width) * 3 / 2;
     else
         vidSize = (video_height * video_width) * 3 / 2;
 
