@@ -1755,6 +1755,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
         rctv = (*m_tvList)[cardids[i]];
         if (rctv->IsBusy(&busy_input, -1) &&
+            (busy_input.mplexid == 0 ||
+             busy_input.mplexid == 32767 ||
+             busy_input.mplexid != rcinfo->mplexid) &&
             igrp.GetSharedInputGroup(busy_input.inputid, inputid))
         {
             return true;
