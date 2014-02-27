@@ -26,7 +26,7 @@ static inline void clear(LiveTVChainEntry &entry)
 LiveTVChain::LiveTVChain() : ReferenceCounter("LiveTVChain"),
     m_id(""), m_maxpos(0), m_lock(QMutex::Recursive),
     m_curpos(0), m_cur_chanid(0),
-    m_switchid(-1), m_jumppos(0)
+    m_switchid(-1), m_jumppos(INT_MAX)
 {
     clear(m_switchentry);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "ctor");
@@ -252,9 +252,18 @@ void LiveTVChain::ReloadAll(const QStringList &data)
     if (m_switchid >= 0)
         m_switchid = ProgramIsAt(m_switchentry.chanid,m_switchentry.starttime);
 
-    if (prev_size!=m_chain.size())
+    if (prev_size > m_chain.size())
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "ReloadAll(): Added new recording");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("ReloadAll(): Removed %1 recording(s)")
+            .arg(prev_size - m_chain.size()));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + toString());
+    }
+    else if (prev_size < m_chain.size())
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("ReloadAll(): Added %1 recording(s)")
+            .arg(m_chain.size() - prev_size));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + toString());
     }
 }
@@ -344,18 +353,36 @@ int LiveTVChain::ProgramIsAt(const ProgramInfo &pginfo) const
 }
 
 /** \fn LiveTVChain::GetLengthAtCurPos(void)
- *  \returns length in seocnds of recording at m_curpos
+ *  \returns length in seocnds of recording at current position
  */
 int LiveTVChain::GetLengthAtCurPos(void)
 {
-    QMutexLocker lock(&m_lock);
-    LiveTVChainEntry entry;
+    return GetLengthAtPos(m_curpos);
+}
 
-    entry = m_chain[m_curpos];
-    if (m_curpos == ((int)m_chain.count() - 1))
+/** \fn LiveTVChain::GetLengthAtCurPos(void)
+ *  \returns length in seocnds of recording at m_curpos
+ */
+int LiveTVChain::GetLengthAtPos(int pos)
+{
+    QMutexLocker lock(&m_lock);
+    LiveTVChainEntry entry, nextentry;
+
+    entry = m_chain[pos];
+    if (pos == ((int)m_chain.count() - 1))
+    {
+        // We're on live program, it hasn't ended. Use current time as end time
         return entry.starttime.secsTo(MythDate::current());
+    }
     else
-        return entry.starttime.secsTo(entry.endtime);
+    {
+        // use begin time from the following program, as it's certain to be right
+        // the end time is set as per the EPG, but should playback be interrupted
+        // such as a channel change, the end value wouldn't have reflected the actual
+        // duration of the program
+        nextentry = m_chain[pos+1];
+        return entry.starttime.secsTo(nextentry.starttime);
+    }
 }
 
 int LiveTVChain::TotalSize(void) const
@@ -384,7 +411,7 @@ void LiveTVChain::ClearSwitch(void)
     QMutexLocker lock(&m_lock);
 
     m_switchid = -1;
-    m_jumppos = 0;
+    m_jumppos = INT_MAX;
 }
 
 /**
@@ -403,57 +430,109 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     ReloadAll();
     QMutexLocker lock(&m_lock);
 
-    if (m_switchid < 0 || m_curpos == m_switchid)
+    int id = m_switchid;
+    ProgramInfo *pginfo = DoGetNextProgram(m_switchid >= m_curpos, m_curpos, id,
+                                           discont, newtype);
+    if (pginfo)
     {
-        ClearSwitch();
-        return NULL;
+        newid = id;
     }
+    ClearSwitch();
 
+    return pginfo;
+}
+
+ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
+                                           bool &discont, bool &newtype)
+{
     LiveTVChainEntry oldentry, entry;
-    GetEntryAt(m_curpos, oldentry);
-
     ProgramInfo *pginfo = NULL;
-    while (!pginfo && m_switchid < (int)m_chain.count() && m_switchid >= 0)
+
+    GetEntryAt(curpos, oldentry);
+
+    if (newid < 0 || curpos == newid)
     {
-        GetEntryAt(m_switchid, entry);
-
-        bool at_last_entry = 
-            ((m_switchid > m_curpos) &&
-             (m_switchid == (int)(m_chain.count()-1))) ||
-            ((m_switchid <= m_curpos) && (m_switchid == 0));
-
-        // Skip dummy recordings, if possible.
-        if (at_last_entry || (entry.cardtype != "DUMMY"))
-            pginfo = EntryToProgram(entry);
-
-        // Skip empty recordings, if possible
-        if (pginfo && (0 == pginfo->GetFilesize()) &&
-            m_switchid < (int)(m_chain.count()-1))
+        // already on the program
+        entry = oldentry;
+        pginfo = EntryToProgram(entry);
+        newid = curpos;
+    }
+    else
+    {
+        // try to find recordings during first pass
+        // we'll skip dummy and empty recordings
+        while (!pginfo && newid < (int)m_chain.count() && newid >= 0)
         {
-            LOG(VB_GENERAL, LOG_WARNING,
-                QString("Skipping empty program %1")
-                .arg(pginfo->MakeUniqueKey()));
-            delete pginfo;
-            pginfo = NULL;
+            GetEntryAt(newid, entry);
+
+            bool at_last_entry =
+                ((newid > curpos) &&
+                 (newid == (int)(m_chain.count()-1))) ||
+                ((newid <= curpos) && (newid == 0));
+
+            // Skip dummy recordings, if possible.
+            if (at_last_entry || (entry.cardtype != "DUMMY"))
+                pginfo = EntryToProgram(entry);
+
+            // Skip empty recordings, if possible
+            if (pginfo && (0 == pginfo->GetFilesize()) &&
+                newid < (int)(m_chain.count()-1))
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("Skipping empty program %1")
+                    .arg(pginfo->MakeUniqueKey()));
+                delete pginfo;
+                pginfo = NULL;
+            }
+
+            if (!pginfo)
+            {
+                newid += up ? 1 : -1;
+            }
         }
 
         if (!pginfo)
         {
-            if (m_switchid > m_curpos)
-                m_switchid++;
-            else
-                m_switchid--;
+            // didn't find in first pass, now get back to the next good one
+            // as this is the one we will use
+            do
+            {
+                newid += up ? -1 : 1;
+
+                GetEntryAt(newid, entry);
+
+                bool at_last_entry =
+                    ((newid > curpos) &&
+                     (newid == (int)(m_chain.count()-1))) ||
+                    ((newid <= curpos) && (newid == 0));
+
+                // Skip dummy recordings, if possible.
+                if (at_last_entry || (entry.cardtype != "DUMMY"))
+                    pginfo = EntryToProgram(entry);
+
+                // Skip empty recordings, if possible
+                if (pginfo && (0 == pginfo->GetFilesize()) &&
+                    newid < (int)(m_chain.count()-1))
+                {
+                    LOG(VB_GENERAL, LOG_WARNING,
+                        QString("Skipping empty program %1")
+                        .arg(pginfo->MakeUniqueKey()));
+                    delete pginfo;
+                    pginfo = NULL;
+                }
+            }
+            while (!pginfo && newid < (int)m_chain.count() && newid >= 0);
+
+            if (!pginfo)
+            {
+                // still not found so abort (will never happen once playback has started)
+                return NULL;
+            }
         }
     }
 
-    if (!pginfo)
-    {
-        ClearSwitch();
-        return NULL;
-    }
-
     discont = true;
-    if (m_curpos == m_switchid - 1)
+    if (curpos == newid - 1)
         discont = entry.discontinuity;
 
     newtype = (oldentry.cardtype != entry.cardtype);
@@ -462,9 +541,8 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     if (discont)
         newtype |= CardUtil::IsChannelChangeDiscontinuous(entry.cardtype);
 
-    newid = m_switchid;
-
-    ClearSwitch();
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+        QString("DoGetNextProgram: %1 -> ").arg(newid) + pginfo->toString());
 
     return pginfo;
 }
@@ -525,14 +603,68 @@ void LiveTVChain::JumpTo(int num, int pos)
     SwitchTo(num);
 }
 
+/**
+ * JumpToNext(bool up, int pos)
+ * jump to the next (up == true) or previous (up == false) liveTV program
+ * If pos > 0: indicate the absolute position where to start the next program
+ * If pos < 0: indicate offset position; in which case the right liveTV program
+ * will be found accordingly.
+ * Offset is in reference to the beginning of the current recordings when going down
+ * and in reference to the end of the current recording when going up
+ */
 void LiveTVChain::JumpToNext(bool up, int pos)
 {
-    m_jumppos = pos;
-    SwitchToNext(up);
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("JumpToNext: %1 -> %2").arg(up).arg(pos));
+    if (pos >= 0)
+    {
+        m_jumppos = pos;
+        SwitchToNext(up);
+    }
+    else
+    {
+        QMutexLocker lock(&m_lock);
+
+        int current = m_curpos, switchto;
+        bool discont = false, newtype = false;
+
+        while (current >= 0 && current < m_chain.size())
+        {
+            switchto = current + (up ? 1 : -1);
+
+            ProgramInfo *pginfo = DoGetNextProgram(up, current, switchto,
+                                                   discont, newtype);
+            delete pginfo;
+
+            if (switchto == current)
+            {
+                // we've reached the end
+                pos = up ? GetLengthAtPos(switchto) : 0;
+                break;
+            }
+
+            int duration = GetLengthAtPos(switchto);
+
+            pos += duration;
+
+            if (pos >= 0)
+            {
+                if (up)
+                {
+                    pos = - (pos - duration);
+                }
+                break;
+            }
+
+            current = switchto;
+        }
+        m_switchid = switchto;
+        m_jumppos = pos;
+        GetEntryAt(m_switchid, m_switchentry);
+    }
 }
 
 /** \fn LiveTVChain::GetJumpPos(void)
- *  \brief Returns the jump position and clears it.
+ *  \brief Returns the jump position in seconds and clears it.
  */
 int LiveTVChain::GetJumpPos(void)
 {
