@@ -72,7 +72,8 @@ function playStreamInJWPlayer(playlist, width, height) {
             src: "/StorageGroup/3rdParty/JW_Player/player.swf", 
             config: {
               file: playlist,
-              provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf"
+              provider: "/StorageGroup/3rdParty/JW_Player/adaptiveProvider.swf",
+              smoothing: true,
             }
           },
           { type: "html5",
