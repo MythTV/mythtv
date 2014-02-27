@@ -788,8 +788,7 @@ void RingBuffer::run(void)
 
         long long totfree = ReadBufFree();
 
-        const uint KB32  = 32*1024;
-        const uint KB512 = 512*1024;
+        const uint KB32 = 32*1024;
         // These are conditions where we don't want to go through
         // the loop if they are true.
         if (((totfree < KB32) && readsallowed) ||
@@ -834,18 +833,13 @@ void RingBuffer::run(void)
                     (now.tv_usec - lastread.tv_usec) / 1000;
                 readtimeavg = (readtimeavg * 9 + readinterval) / 10;
 
-                if (readtimeavg < 100 &&
+                if (readtimeavg < 150 &&
                     (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2) &&
                     readblocksize >= CHUNK /* low_buffers */)
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
                     readblocksize = ((readblocksize+CHUNK-1) / CHUNK) * CHUNK;
-                    if (readblocksize > KB512)
-                    {
-                        // never read by more than 512kB blocks
-                        readblocksize = KB512;
-                    }
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Avg read interval was %1 msec. "
                                 "%2K -> %3K block size")
@@ -854,9 +848,8 @@ void RingBuffer::run(void)
                             .arg(readblocksize/1024));
                     readtimeavg = 225;
                 }
-                else if (readtimeavg > 200 && readblocksize > CHUNK)
+                else if (readtimeavg > 300 && readblocksize > CHUNK)
                 {
-                    
                     readblocksize -= CHUNK;
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Avg read interval was %1 msec. "
