@@ -638,7 +638,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         arb->m_audioFrameSize = avfw->GetAudioFrameSize() * arb->m_channels * 2;
 
         GetPlayer()->SetVideoFilters(
-            gCoreContext->GetSetting("HTTPLiveStreamFilters"));
+            gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
     }
     else if (fifodir.isEmpty())
     {
