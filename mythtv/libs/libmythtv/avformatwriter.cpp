@@ -506,15 +506,24 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     else if (c->codec_id == AV_CODEC_ID_H264)
     {
 
-        if ((c->width > 480) ||
-            (c->bit_rate > 600000))
+        // Try to provide the widest software/device support by automatically using
+        // the Baseline profile where the given bitrate and resolution permits
+
+        if ((c->height > 720) || // Approximate highest resolution supported by Baseline 3.1
+            (c->bit_rate > 1000000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
+        {
+            c->level = 40;
+            av_opt_set(c->priv_data, "profile", "main", 0);
+        }
+        else if ((c->height > 576) || // Approximate highest resolution supported by Baseline 3.0
+            (c->bit_rate > 1000000))  // 10,000 Kbps aka 10Mbps maximum permissable rate for Baseline 3.0
         {
             c->level = 31;
-            av_opt_set(c->priv_data, "profile", "main", 0);
+            av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
         else
         {
-            c->level = 30;
+            c->level = 30; // Baseline 3.0 is the most widely supported, but it's limited to SD
             av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
 
@@ -546,9 +555,9 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         av_opt_set_int(c, "8x8dct", 0, 0);
         av_opt_set_int(c, "weightb", 0, 0);
 
-        const char* preset = m_EncodingPreset.toStdString().c_str();
+        const char* preset = m_encodingPreset.toStdString().c_str();
         av_opt_set(c->priv_data, "preset", preset, 0);
-        const char* tune = m_EncodingTune.toStdString().c_str();
+        const char* tune = m_encodingTune.toStdString().c_str();
         av_opt_set(c->priv_data, "tune", tune, 0);
     }
 
