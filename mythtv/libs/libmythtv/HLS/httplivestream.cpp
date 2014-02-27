@@ -124,7 +124,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
         m_segmentSize = 10;
 
     if (m_audioOnlyBitrate == 0)
-        m_audioOnlyBitrate = 32000;
+        m_audioOnlyBitrate = 64000;
 
     m_sourceHost = gCoreContext->GetHostName();
 
