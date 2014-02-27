@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
+#include <limits.h>
 
 #include "mythtvexp.h"
 #include "referencecounter.h"
@@ -53,16 +54,18 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     int  ProgramIsAt(uint chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo &pginfo) const;
     int  GetLengthAtCurPos(void);
+    int  GetLengthAtPos(int pos);
     int  TotalSize(void) const;
     bool HasNext(void)   const;
     bool HasPrev(void)   const { return (m_curpos > 0); }
     ProgramInfo *GetProgramAt(int at) const;
     /// Returns true iff a switch is required but no jump is required
+    /// m_jumppos sets to INT_MAX means not set
     bool NeedsToSwitch(void) const
-        { return (m_switchid >= 0 && m_jumppos == 0); }
+        { return (m_switchid >= 0 && m_jumppos == INT_MAX); }
     /// Returns true iff a switch and jump are required
     bool NeedsToJump(void)   const
-        { return (m_switchid >= 0 && m_jumppos != 0); }
+        { return (m_switchid >= 0 && m_jumppos != INT_MAX); }
     QString GetChannelName(int pos = -1) const;
     QString GetInputName(int pos = -1) const;
     QString GetCardType(int pos = -1) const;
@@ -96,6 +99,8 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     void BroadcastUpdate();
     void GetEntryAt(int at, LiveTVChainEntry &entry) const;
     static ProgramInfo *EntryToProgram(const LiveTVChainEntry &entry);
+    ProgramInfo *DoGetNextProgram(bool up, int curpos, int &newid,
+                                  bool &discont, bool &newtype);
 
     QString m_id;
     QList<LiveTVChainEntry> m_chain;
