@@ -412,6 +412,7 @@ bool HTTPLiveStream::WriteMetaPlaylist(void)
 
     file.write(QString(
         "#EXTM3U\n"
+        "#EXT-X-VERSION:4\n"
         "#EXT-X-MEDIA:TYPE=VIDEO,GROUP-ID=\"AV\",NAME=\"Main\",DEFAULT=YES,URI=\"%2.m3u8\"\n"
         "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=%1\n"
         "%2.m3u8\n"
@@ -464,6 +465,7 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
 
     file.write(QString(
         "#EXTM3U\n"
+        "#EXT-X-ALLOW-CACHE:YES\n"
         "#EXT-X-TARGETDURATION:%1\n"
         "#EXT-X-MEDIA-SEQUENCE:%2\n"
         ).arg(m_segmentSize).arg(m_startSegment).toLatin1());
