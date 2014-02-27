@@ -575,7 +575,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         int threads    = gCoreContext->GetNumSetting("HTTPLiveStreamThreads", 2);
-        QString preset = gCoreContext->GetSetting("HTTPLiveStreamPreset", "medium");
+        QString preset = gCoreContext->GetSetting("HTTPLiveStreamPreset", "veryfast");
         QString tune   = gCoreContext->GetSetting("HTTPLiveStreamTune", "film");
 
         LOG(VB_GENERAL, LOG_NOTICE,
@@ -1028,7 +1028,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     int dropvideo = 0;
     // timecode of the last read video frame in input time
     long long lasttimecode = 0;
-    // timecode of the last writte video frame in input or output time
+    // timecode of the last write video frame in input or output time
     long long lastWrittenTime = 0;
     // delta between the same video frame in input and output due to applying the cut list
     long long timecodeOffset = 0;
