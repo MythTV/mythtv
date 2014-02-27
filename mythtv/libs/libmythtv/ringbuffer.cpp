@@ -740,6 +740,7 @@ void RingBuffer::run(void)
     struct timeval lastread, now;
     int readtimeavg = 300;
     bool ignore_for_read_timing = true;
+    int eofreads = 0;
 
     gettimeofday(&lastread, NULL); // this is just to keep gcc happy
 
@@ -776,7 +777,8 @@ void RingBuffer::run(void)
 
         long long totfree = ReadBufFree();
 
-        const uint KB32 = 32*1024;
+        const uint KB32  = 32*1024;
+        const uint KB512 = 512*1024;
         // These are conditions where we don't want to go through
         // the loop if they are true.
         if (((totfree < KB32) && readsallowed) ||
@@ -823,11 +825,16 @@ void RingBuffer::run(void)
 
                 if (readtimeavg < 150 &&
                     (uint)readblocksize < (BUFFER_SIZE_MINIMUM >>2) &&
-                    readblocksize >= CHUNK /* low_buffers */)
+                    readblocksize >= CHUNK /* low_buffers */ &&
+                    readblocksize <= KB512)
                 {
                     int old_block_size = readblocksize;
                     readblocksize = 3 * readblocksize / 2;
                     readblocksize = ((readblocksize+CHUNK-1) / CHUNK) * CHUNK;
+                    if (readblocksize > KB512)
+                    {
+                        readblocksize = KB512;
+                    }
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Avg read interval was %1 msec. "
                                 "%2K -> %3K block size")
@@ -848,7 +855,6 @@ void RingBuffer::run(void)
                     readtimeavg = 225;
                 }
             }
-            ignore_for_read_timing = (totfree < readblocksize) ? true : false;
             lastread = now;
 
             rbwlock.lockForRead();
@@ -886,10 +892,11 @@ void RingBuffer::run(void)
                            (uint64_t)(((double)read_return * 8000.0) /
                                       (double)sr_elapsed);
             LOG(VB_FILE, LOG_INFO, LOC +
-                QString("safe_read(...@%1, %2) -> %3, took %4 ms %5")
+                QString("safe_read(...@%1, %2) -> %3, took %4 ms %5 avg %6 ms")
                     .arg(rbwposcopy).arg(totfree).arg(read_return)
                     .arg(sr_elapsed)
-                    .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0)));
+                .arg(QString("(%1Mbps)").arg((double)bps / 1000000.0))
+                .arg(readtimeavg));
             UpdateStorageRate(bps);
 
             if (read_return >= 0)
@@ -925,6 +932,9 @@ void RingBuffer::run(void)
 
         bool reads_were_allowed = readsallowed;
 
+        ignore_for_read_timing =
+            ((totfree < readblocksize) || (read_return < totfree)) ? true : false;
+
         if ((0 == read_return) || (numfailures > 5) ||
             (readsallowed != (used >= fill_min || ateof ||
                               setswitchtonext || commserror)))
@@ -943,6 +953,14 @@ void RingBuffer::run(void)
 
             if (0 == read_return && old_readpos == readpos)
             {
+                eofreads++;
+                if (eofreads >= 3 && readblocksize >= KB512)
+                {
+                    // not reading anything 
+                    readblocksize = CHUNK;
+                    CalcReadAheadThresh();
+                }
+
                 if (livetvchain)
                 {
                     if (!setswitchtonext && !ignoreliveeof &&
@@ -986,6 +1004,10 @@ void RingBuffer::run(void)
             rwlock.unlock();
             rwlock.lockForRead();
             used = bufferSize - ReadBufFree();
+        }
+        else
+        {
+            eofreads = 0;
         }
 
         LOG(VB_FILE, LOG_DEBUG, LOC + "@ end of read ahead loop");
