@@ -986,7 +986,7 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
 
     HTTPLiveStream *hls = new
         HTTPLiveStream(sFullFileName, nWidth, nHeight, nBitrate, nAudioBitrate,
-                       nMaxSegments, 10, 32000, nSampleRate);
+                       nMaxSegments, 0, 0, nSampleRate);
 
     if (!hls)
     {

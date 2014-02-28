@@ -455,12 +455,36 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (hlsMode)
         {
-            int segmentSize = 10;
+
+            if (hlsStreamID == -1)
+            {
+                hls = new HTTPLiveStream(inputname, newWidth, newHeight,
+                                         cmdBitrate,
+                                         cmdAudioBitrate, hlsMaxSegments,
+                                         0, 0);
+
+                hlsStreamID = hls->GetStreamID();
+                if (!hls || hlsStreamID == -1)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
+                    SetPlayerContext(NULL);
+                    delete avfw;
+                    if (avfw2)
+                        delete avfw2;
+                    return REENCODE_ERROR;
+                }
+            }
+
+            int segmentSize = hls->GetSegmentSize();
             int audioOnlyBitrate = 0;
+
+            LOG(VB_GENERAL, LOG_NOTICE,
+                QString("HLS: Using segment size of %1 seconds")
+                    .arg(segmentSize));
 
             if (!hlsDisableAudioOnly)
             {
-                audioOnlyBitrate = 64000;
+                audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
                 avfw2 = new AVFormatWriter();
 
@@ -500,25 +524,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 avfw->SetAudioCodec("aac");
 # endif
 #endif
-
-            if (hlsStreamID == -1)
-            {
-                hls = new HTTPLiveStream(inputname, newWidth, newHeight,
-                                         cmdBitrate,
-                                         cmdAudioBitrate, hlsMaxSegments,
-                                         segmentSize, audioOnlyBitrate);
-
-                hlsStreamID = hls->GetStreamID();
-                if (!hls || hlsStreamID == -1)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
-                    SetPlayerContext(NULL);
-                    delete avfw;
-                    if (avfw2)
-                        delete avfw2;
-                    return REENCODE_ERROR;
-                }
-            }
 
             hls->UpdateStatus(kHLSStatusStarting);
             hls->UpdateStatusMessage("Transcoding Starting");

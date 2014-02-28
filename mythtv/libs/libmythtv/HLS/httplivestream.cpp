@@ -121,7 +121,7 @@ HTTPLiveStream::HTTPLiveStream(QString srcFile, uint16_t width, uint16_t height,
         m_audioBitrate = 64000;
 
     if (m_segmentSize == 0)
-        m_segmentSize = 10;
+        m_segmentSize = 4;
 
     if (m_audioOnlyBitrate == 0)
         m_audioOnlyBitrate = 64000;
