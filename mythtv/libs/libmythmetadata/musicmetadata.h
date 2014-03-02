@@ -478,6 +478,7 @@ class META_PUBLIC AlbumArtImages
     void           addImage(const AlbumArtImage &newImage);
     uint           getImageCount() { return m_imageList.size(); }
     AlbumArtImage *getImage(ImageType type);
+    AlbumArtImage *getImageByID(int imageID);
     QStringList    getImageFilenames(void) const;
     AlbumArtList  *getImageList(void) { return &m_imageList; }
     AlbumArtImage *getImageAt(uint index);
