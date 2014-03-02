@@ -1019,11 +1019,14 @@ int MythPlayer::OpenFile(uint retries)
     {
         gCoreContext->SaveSetting(
             "DefaultChanid", player_ctx->playingInfo->GetChanID());
-        int cardid = player_ctx->recorder->GetRecorderNumber();
-        QString channum = player_ctx->playingInfo->GetChanNum();
-        QString inputname;
-        int cardinputid = CardUtil::GetCardInputID(cardid, channum, inputname);
-        CardUtil::SetStartChannel(cardinputid, channum);
+        if (player_ctx->recorder && player_ctx->recorder->IsValidRecorder())
+        {
+            int cardid = player_ctx->recorder->GetRecorderNumber();
+            QString channum = player_ctx->playingInfo->GetChanNum();
+            QString inputname;
+            int cardinputid = CardUtil::GetCardInputID(cardid, channum, inputname);
+            CardUtil::SetStartChannel(cardinputid, channum);
+        }
     }
 
     return IsErrored() ? -1 : 0;
