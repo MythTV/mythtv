@@ -2033,5 +2033,10 @@ void AlbumArtImages::dumpToDatabase(void)
         if (!query.exec())
             MythDB::DBError("AlbumArtImages::dumpToDatabase - "
                             "add/update music_albumart", query);
+        else
+        {
+            if (image->id <= 0)
+                image->id = query.lastInsertId().toInt();
+        }
     }
 }
