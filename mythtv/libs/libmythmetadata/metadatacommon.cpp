@@ -1439,18 +1439,18 @@ QString nearestName(const QString& actual, const QStringList& candidates)
     QStringList::ConstIterator i = candidates.begin();
     while ( i != candidates.end() )
     {
-            QString candidate = *i;
-            int delta = editDistance( actual.toLower(), candidate.toLower() );
-            if ( delta < deltaBest )
-            {
-                deltaBest = delta;
-                numBest = 1;
-                best = *i;
-            }
-            else if ( delta == deltaBest )
-            {
-                numBest++;
-            }
+        QString candidate = *i;
+        int delta = editDistance( actual.toLower(), candidate.toLower() );
+        if ( delta < deltaBest )
+        {
+            deltaBest = delta;
+            numBest = 1;
+            best = *i;
+        }
+        else if ( delta == deltaBest )
+        {
+            numBest++;
+        }
         ++i;
     }
 
