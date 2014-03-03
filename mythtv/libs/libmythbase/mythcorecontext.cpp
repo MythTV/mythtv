@@ -1114,7 +1114,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
         }
         else if (prefix != "BACKEND_MESSAGE")
         {
-            LOG(VB_GENERAL, LOG_ERR,
+            LOG(VB_NETWORK, LOG_ERR,
                     QString("Received a: %1 message from the backend "
                             "but I don't know what to do with it.")
                         .arg(prefix));
@@ -1122,7 +1122,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
         else if (message == "CLEAR_SETTINGS_CACHE")
         {
             // No need to dispatch this message to ourself, so handle it
-            LOG(VB_GENERAL, LOG_INFO, "Received remote 'Clear Cache' request");
+            LOG(VB_NETWORK, LOG_INFO, "Received remote 'Clear Cache' request");
             ClearSettingsCache();
         }
         else if (message.startsWith("FILE_WRITTEN"))
@@ -1138,7 +1138,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_NETWORK, LOG_ERR, LOC +
                     QString("FILE_WRITTEN event received "
                             "with invalid number of arguments, "
                             "%1 expected, %2 actual")
@@ -1147,7 +1147,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
                 return;
             }
             // No need to dispatch this message to ourself, so handle it
-            LOG(VB_GENERAL, LOG_INFO, LOC +
+            LOG(VB_NETWORK, LOG_INFO, LOC +
                 QString("Received remote 'FILE_WRITTEN %1' request").arg(file));
             RegisterFileForWrite(file, size);
         }
@@ -1162,7 +1162,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
             }
             else
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_NETWORK, LOG_ERR, LOC +
                     QString("FILE_CLOSED event received "
                             "with invalid number of arguments, "
                             "%1 expected, %2 actual")
@@ -1171,7 +1171,7 @@ void MythCoreContext::readyRead(MythSocket *sock)
                 return;
             }
             // No need to dispatch this message to ourself, so handle it
-            LOG(VB_GENERAL, LOG_INFO, LOC +
+            LOG(VB_NETWORK, LOG_INFO, LOC +
                 QString("Received remote 'FILE_CLOSED %1' request").arg(file));
             UnregisterFileForWrite(file);
         }
