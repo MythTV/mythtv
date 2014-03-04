@@ -592,9 +592,24 @@ long long FileRingBuffer::GetRealFileSize(void) const
     rwlock.lockForRead();
     long long ret = -1;
     if (remotefile)
+    {
         ret = remotefile->GetFileSize();
+    }
     else
+    {
+        if (fd2 >= 0)
+        {
+            struct stat sb;
+
+            ret = fstat(fd2, &sb);
+            if (ret == 0 && S_ISREG(sb.st_mode))
+            {
+                rwlock.unlock();
+                return sb.st_size;
+            }
+        }
         ret = QFileInfo(filename).size();
+    }
     rwlock.unlock();
     return ret;
 }
