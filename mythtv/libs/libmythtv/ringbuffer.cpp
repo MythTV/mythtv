@@ -421,8 +421,13 @@ void RingBuffer::CalcReadAheadThresh(void)
 bool RingBuffer::IsNearEnd(double fps, uint vvf) const
 {
     rwlock.lockForRead();
-    int    sz  = ReadBufAvail();
-    uint   rbs = readblocksize;
+    long long sz2 = ReadBufAvail();
+    poslock.lockForRead();
+    long long rp  = readpos;
+    poslock.unlock();
+    long long sz  = GetRealFileSize() - rp;
+    sz = max(sz, sz2);
+
     // telecom kilobytes (i.e. 1000 per k not 1024)
     uint   tmp = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
     uint   kbits_per_sec = min(rawbitrate * 3, tmp);
@@ -434,11 +439,11 @@ bool RingBuffer::IsNearEnd(double fps, uint vvf) const
     double bytes_per_frame = kbits_per_sec * (1000.0/8.0) / fps;
     double readahead_frames = sz / bytes_per_frame;
 
-    bool near_end = ((vvf + readahead_frames) < 20.0) || (sz < rbs*1.5);
+    bool near_end = (vvf + readahead_frames) < 20.0;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "IsReallyNearEnd()" +
             QString(" br(%1KB)").arg(kbits_per_sec/8) +
-            QString(" sz(%1KB)").arg(sz / 1000) +
+            QString(" sz(%1KB)").arg(sz / 1000LL) +
             QString(" vfl(%1)").arg(vvf) +
             QString(" frh(%1)").arg(((uint)readahead_frames)) +
             QString(" ne:%1").arg(near_end));
@@ -926,7 +931,7 @@ void RingBuffer::run(void)
                 rbwlock.unlock();
                 poslock.unlock();
 
-                LOG(VB_FILE, LOG_DEBUG, LOC +
+                LOG(VB_FILE, LOG_INFO, LOC +
                     QString("total read so far: %1 bytes")
                     .arg(internalreadpos));
             }

@@ -2768,10 +2768,10 @@ void MythPlayer::JumpToProgram(void)
     ChangeSpeed();
 
     // check that we aren't too close to the end of program.
-    // and if so set it to 15s from the end if completed recordings
+    // and if so set it to 10s from the end if completed recordings
     // or 3s if live
     long long duration = player_ctx->tvchain->GetLengthAtCurPos();
-    int maxpos = player_ctx->tvchain->HasNext() ? 15 : 3;
+    int maxpos = player_ctx->tvchain->HasNext() ? 10 : 3;
 
     if (nextpos > (duration - maxpos))
     {
