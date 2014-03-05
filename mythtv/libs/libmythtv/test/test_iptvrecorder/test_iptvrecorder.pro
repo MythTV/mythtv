@@ -14,6 +14,9 @@ TARGET = test_iptvrecorder
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 
+LIBS += ../../iptvchannelfetcher.o
+LIBS += ../../scanmonitor.o
+LIBS += ../../moc_scanmonitor.o
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION

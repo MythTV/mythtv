@@ -21,6 +21,7 @@
 #include <QtTest/QtTest>
 
 #include "iptvtuningdata.h"
+#include "channelscan/iptvchannelfetcher.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #define MSKIP(MSG) QSKIP(MSG, SkipSingle)
@@ -78,5 +79,47 @@ class TestIPTVRecorder: public QObject
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x1245.html */
         tuning.m_data_url = QUrl (QString("udp:[ff08::1%eth0]"));
         QVERIFY (tuning.IsValid());
+    }
+
+    /**
+     * Test parsing a playlist
+     */
+    void ParseChanInfo(void)
+    {
+        /* #12077 - DVB with Neutrino - Sweden */
+        QString rawdataHTTP ("#EXTM3U\n"
+                             "#EXTINF:0,1 - SVT1 HD Mitt\n"
+                             "#EXTMYTHTV:xmltvid=svt1hd.svt.se\n"
+                             "#EXTVLCOPT:program=1330\n"
+                             "http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:\n");
+
+
+
+        /* # - FreeboxTV - France - Free */
+        QString rawdataRTSP ("");
+
+        /* #11963 - Movistar TV - Spain - Telefonica */
+        QString rawdataUDP ("#EXTM3U\n"
+                            "#EXTINF:0,001 - La 1\n"
+                            "udp://239.0.0.76:8208\n");
+
+        fbox_chan_map_t chanmap;
+
+        /* test plain old MPEG-2 TS over multicast playlist */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataUDP, NULL);
+        QCOMPARE (chanmap["001"].m_name, QString ("La 1"));
+        QVERIFY (chanmap["001"].IsValid ());
+        QVERIFY (chanmap["001"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["001"].m_tuning.m_data_url.toString(), QString ("udp://239.0.0.76:8208"));
+        QCOMPARE (chanmap["001"].m_tuning.GetDataURL().toString(), QString ("udp://239.0.0.76:8208"));
+
+        /* test playlist for Neutrino STBs */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataHTTP, NULL);
+        QVERIFY (chanmap["1"].IsValid ());
+        QVERIFY (chanmap["1"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["1"].m_name, QString ("SVT1 HD Mitt"));
+        QCOMPARE (chanmap["1"].m_xmltvid, QString ("svt1hd.svt.se"));
+        QCOMPARE (chanmap["1"].m_programnumber, (uint) 1330);
+        QCOMPARE (chanmap["1"].m_tuning.m_data_url.toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
     }
 };
