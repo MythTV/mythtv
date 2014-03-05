@@ -45,7 +45,7 @@ class IPTVChannelInfo
 
     bool IsValid(void) const
     {
-        return !m_name.isEmpty() && !m_tuning.IsValid();
+        return !m_name.isEmpty() && m_tuning.IsValid();
     }
 
   public:
