@@ -15,7 +15,7 @@
         <translation>Introducir detalles del marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="146"/>
         <source>Select a category</source>
         <translation>Seleccione una categoría</translation>
     </message>
@@ -32,52 +32,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcadores</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Actions</source>
         <translation>Acciones</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
+        <source>Set Homepage</source>
+        <translation>Establecer página de inicio</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
         <source>Add Bookmark</source>
         <translation>Añadir marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="308"/>
         <source>Edit Bookmark</source>
         <translation>Editar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="306"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="309"/>
         <source>Delete Bookmark</source>
         <translation>Eliminar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="307"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
         <source>Show Bookmark</source>
         <translation>Mostrar marcador</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
         <source>Delete Marked</source>
         <translation>Eliminar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="313"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="316"/>
         <source>Show Marked</source>
         <translation>Mostrar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="314"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
         <source>Clear Marked</source>
         <translation>Quitar marcados</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="320"/>
+        <source>Settings</source>
+        <translation>Configuración</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="526"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>¿Seguro que desea eliminar el marcador seleccionado?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="570"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>¿Seguro que desea eliminar los marcadores indicados?</translation>
     </message>
@@ -172,17 +182,27 @@ Use la opción &quot;Añadir marcador&quot; del menú para añadir nuevos marcad
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="65"/>
+        <location filename="../mythbrowser/main.cpp" line="106"/>
         <source>Move to next browser tab</source>
         <translation>Ir a la siguiente pestaña</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="67"/>
+        <location filename="../mythbrowser/main.cpp" line="108"/>
         <source>Move to previous browser tab</source>
         <translation>Ir a la pestaña anterior</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="70"/>
+        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <source>Show the bookmark manager</source>
+        <translation>Mostrar el gestor de favoritos</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="113"/>
+        <source>Show the webbrowser homepage</source>
+        <translation>Mostrar la página de inicio del navegador</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="116"/>
         <source>Internal Web Browser</source>
         <translation>Navegador web interno</translation>
     </message>
