@@ -5,6 +5,7 @@
 #include "ringbuffer.h"
 #include "programinfo.h"
 #include "mythsocket.h"
+#include "mythlogging.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent,
@@ -61,11 +62,23 @@ bool FileTransfer::isOpen(void)
     return false;
 }
 
+bool FileTransfer::ReOpen(QString newFilename)
+{
+    if (!writemode)
+        return false;
+
+    if (rbuffer)
+        return rbuffer->ReOpen(newFilename);
+
+    return false;
+}
+
 void FileTransfer::Stop(void)
 {
     if (readthreadlive)
     {
         readthreadlive = false;
+        LOG(VB_FILE, LOG_INFO, "calling StopReads()");
         rbuffer->StopReads();
         QMutexLocker locker(&lock);
         readsLocked = true;
@@ -80,6 +93,7 @@ void FileTransfer::Stop(void)
 
 void FileTransfer::Pause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StopReads()");
     rbuffer->StopReads();
     QMutexLocker locker(&lock);
     readsLocked = true;
@@ -90,6 +104,7 @@ void FileTransfer::Pause(void)
 
 void FileTransfer::Unpause(void)
 {
+    LOG(VB_FILE, LOG_INFO, "calling StartReads()");
     rbuffer->StartReads();
     {
         QMutexLocker locker(&lock);
@@ -153,19 +168,48 @@ int FileTransfer::WriteBlock(int size)
 
     requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
     char *buf = &requestBuffer[0];
+    int attempts = 0;
+
     while (tot < size)
     {
         int request = size - tot;
+        int received;
 
-        if (GetSocket()->Read(buf, (uint)request, 25 /*ms*/) != request)
-            break;
+        received = GetSocket()->Read(buf, (uint)request, 50 /*ms */);
 
-        ret = rbuffer->Write(buf, request);
-        
+        if (received != request)
+        {
+            LOG(VB_FILE, LOG_DEBUG,
+                QString("WriteBlock(): Read failed. Requested %1 got %2")
+                .arg(request).arg(received));
+            if (received < 0)
+            {
+                // An error occurred, abort immediately
+                break;
+            }
+            if (received == 0)
+            {
+                attempts++;
+                if (attempts >= 3)
+                {
+                    LOG(VB_FILE, LOG_ERR,
+                        "WriteBlock(): Read tried too many times, aborting "
+                        "(client or network too slow?)");
+                    break;
+                }
+                continue;
+            }
+        }
+        ret = rbuffer->Write(buf, received);
         if (ret <= 0)
+        {
+            LOG(VB_FILE, LOG_DEBUG,
+                QString("WriteBlock(): Write failed. Requested %1 got %2")
+                .arg(received).arg(ret));
             break;
+        }
 
-        tot += request;
+        tot += received;
     }
 
     if (pginfo)
@@ -211,7 +255,7 @@ uint64_t FileTransfer::GetFileSize(void)
     if (pginfo)
         pginfo->UpdateInUseMark();
 
-    return QFileInfo(rbuffer->GetFilename()).size();
+    return rbuffer->GetRealFileSize();
 }
 
 void FileTransfer::SetTimeout(bool fast)

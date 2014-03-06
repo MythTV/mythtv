@@ -28,6 +28,7 @@ class FileTransfer : public SocketHandler
                  MythSocketManager *parent, bool write);
 
     bool isOpen(void);
+    bool ReOpen(QString newFilename = "");
 
     void Stop(void);
 
