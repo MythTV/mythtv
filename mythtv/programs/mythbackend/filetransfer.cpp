@@ -137,7 +137,7 @@ int FileTransfer::RequestBlock(int size)
         int request = size - tot;
 
         ret = rbuffer->Read(buf, request);
-        
+
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
 
@@ -257,7 +257,7 @@ uint64_t FileTransfer::GetFileSize(void)
     if (pginfo)
         pginfo->UpdateInUseMark();
 
-    return QFileInfo(rbuffer->GetFilename()).size();
+    return rbuffer->GetRealFileSize();
 }
 
 void FileTransfer::SetTimeout(bool fast)
