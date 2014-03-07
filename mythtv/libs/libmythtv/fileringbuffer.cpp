@@ -476,7 +476,8 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
         ret = fstat(fd2, &sb);
         if (ret == 0 && S_ISREG(sb.st_mode))
         {
-            if ((internalreadpos + tot) >= sb.st_size)
+            long long llpos = (internalreadpos - readAdjust) + tot;
+            if (llpos >= sb.st_size)
             {
                 // We're at the end, don't attempt to read
                 read_ok = false;
@@ -486,7 +487,7 @@ int FileRingBuffer::safe_read(int fd, void *data, uint sz)
             else
             {
                 toread  =
-                    min(sb.st_size - (internalreadpos + tot), (long long)toread);
+                    min(sb.st_size - llpos, (long long)toread);
                 if (toread < (sz-tot))
                 {
                     eof = true;
