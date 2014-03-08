@@ -44,6 +44,7 @@ bool PlayerSettings::Create()
     }
 
     new MythUIButtonListItem(m_resumeMode, tr("Off"), qVariantFromValue(QString("off")));
+    new MythUIButtonListItem(m_resumeMode, tr("First"), qVariantFromValue(QString("first")));
     new MythUIButtonListItem(m_resumeMode, tr("Track"), qVariantFromValue(QString("track")));
     new MythUIButtonListItem(m_resumeMode, tr("Exact"), qVariantFromValue(QString("exact")));
     m_resumeMode->SetValueByData(gCoreContext->GetSetting("ResumeMode"));
