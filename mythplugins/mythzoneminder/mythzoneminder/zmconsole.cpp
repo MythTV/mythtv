@@ -86,7 +86,7 @@ bool FunctionDialog::Create()
 void FunctionDialog::setMonitorFunction(void)
 {
     QString function = m_functionList->GetValue();
-    bool enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
+    int enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
 
     LOG(VB_GENERAL, LOG_INFO,
         "Monitor id : " + QString::number(m_monitor->id) +
@@ -94,7 +94,7 @@ void FunctionDialog::setMonitorFunction(void)
         ", enable value " + QString::number(m_monitor->enabled) + " -> " +
         QString::number(enabled));
 
-    if (m_monitor->function == function && m_monitor->enabled == enabled)
+    if ((m_monitor->function == function) && (m_monitor->enabled == enabled))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             "Monitor Function/Enable values not changed so not updating.");
