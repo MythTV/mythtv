@@ -163,6 +163,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     enum ResumeMode
     { RESUME_OFF,
+      RESUME_FIRST,
       RESUME_TRACK,
       RESUME_EXACT,
       MAX_RESUME_MODES
