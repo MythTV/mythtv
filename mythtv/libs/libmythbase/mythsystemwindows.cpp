@@ -601,11 +601,6 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
-    // For use in the child
-    char locerr[MAX_BUFLEN];
-    strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
-    locerr[MAX_BUFLEN-1] = '\0';
-
     LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
 
     HANDLE p_stdin[2] = { NULL, NULL };
