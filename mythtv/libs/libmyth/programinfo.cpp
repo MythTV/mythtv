@@ -1029,6 +1029,7 @@ void ProgramInfo::clone(const ProgramInfo &other,
     lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
 
     recstatus = other.recstatus;
+    oldrecstatus = other.oldrecstatus;
 
     prefinput = other.prefinput;
     recpriority2 = other.recpriority2;
