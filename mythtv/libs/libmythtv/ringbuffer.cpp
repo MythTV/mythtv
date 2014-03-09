@@ -348,7 +348,6 @@ void RingBuffer::CalcReadAheadThresh(void)
     uint estbitrate = 0;
 
     readsallowed   = false;
-    readblocksize  = max(readblocksize, CHUNK);
 
     // loop without sleeping if the buffered data is less than this
     fill_threshold = 7 * bufferSize / 8;
@@ -356,6 +355,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     const uint KB2   =   2*1024;
     const uint KB4   =   4*1024;
     const uint KB8   =   8*1024;
+    const uint KB16  =  16*1024;
     const uint KB32  =  32*1024;
     const uint KB64  =  64*1024;
     const uint KB128 = 128*1024;
@@ -369,13 +369,11 @@ void RingBuffer::CalcReadAheadThresh(void)
                      (estbitrate >  9000) ? KB256 :
                      (estbitrate >  5000) ? KB128 :
                      (estbitrate >  2500) ? KB64  :
-                     (estbitrate >=  500) ? KB32  :
+                     (estbitrate >  1250) ? KB32  :
+                     (estbitrate >=  500) ? KB16  :
                      (estbitrate >   250) ? KB8   :
                      (estbitrate >   125) ? KB4   : KB2;
-    if (rbs < CHUNK)
-        readblocksize = rbs;
-    else
-        readblocksize = max(rbs,readblocksize);
+    readblocksize = rbs;
 
     // minumum seconds of buffering before allowing read
     float secs_min = 0.35;
