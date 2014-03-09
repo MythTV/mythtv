@@ -845,6 +845,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleMusicTagAddImage(listline, pbs);
     }
+    else if (command == "MUSIC_TAG_REMOVEIMAGE")
+    {
+        if (tokens.size() < 4)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_REMOVEIMAGE");
+        else
+            HandleMusicTagRemoveImage(listline, pbs);
+    }
     else if (command == "ALLOW_SHUTDOWN")
     {
         if (tokens.size() != 1)
@@ -5883,6 +5890,136 @@ void MainServer::HandleMusicTagAddImage(const QStringList& slist, PlaybackSock* 
         delete mdata;
     }
 
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicTagRemoveImage(const QStringList& slist, PlaybackSock* pbs)
+{
+// format: MUSIC_TAG_REMOVEIMAGE <hostname> <songid> <imageid>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicTagRemoveImage: asking slave '%1' "
+                        "to remove the image").arg(hostname));
+            strlist = slave->ForwardRequest(slist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicTagRemoveImage: Failed to grab "
+                        "slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        int songID = slist[2].toInt();
+        int imageID = slist[3].toInt();
+
+        // load the metadata from the database
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HandleMusicTagRemoveImage: Cannot find metadata for trackid: %1")
+                        .arg(songID));
+
+            strlist << "ERROR: track not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+
+        MetaIO *tagger = mdata->getTagger();
+
+        if (!tagger)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "HandleMusicTagRemoveImage: failed to find a tagger for track");
+
+            strlist << "ERROR: tagger not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            delete mdata;
+            return;
+        }
+
+        if (!tagger->supportsEmbeddedImages())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: asked to remove album art "
+                                           "from the tag but the tagger doesn't support it!");
+
+            strlist << "ERROR: embedded images not supported by tag";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            delete mdata;
+            delete tagger;
+            return;
+        }
+
+        AlbumArtImage *image = mdata->getAlbumArtImages()->getImageByID(imageID);
+        if (!image)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HandleMusicTagRemoveImage: Cannot find image for imageid: %1")
+                        .arg(imageID));
+
+            strlist << "ERROR: image not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            delete mdata;
+            delete tagger;
+            return;
+        }
+
+        if (!tagger->removeAlbumArt(mdata->getLocalFilename(), image))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "HandleMusicTagRemoveImage: failed to remove album art from tag");
+
+            strlist << "ERROR: failed to remove album art from tag";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
 
     strlist << "OK";
 
