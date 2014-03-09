@@ -591,7 +591,7 @@ long long FileRingBuffer::GetRealFileSize(void) const
     long long ret = -1;
     if (remotefile)
     {
-        ret = remotefile->GetFileSize();
+        ret = remotefile->GetRealFileSize();
     }
     else
     {
