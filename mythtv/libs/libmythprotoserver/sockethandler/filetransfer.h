@@ -40,6 +40,7 @@ class FileTransfer : public SocketHandler
     long long Seek(long long curpos, long long pos, int whence);
 
     uint64_t GetFileSize(void);
+    QString GetFileName(void);
 
     void SetTimeout(bool fast);
 

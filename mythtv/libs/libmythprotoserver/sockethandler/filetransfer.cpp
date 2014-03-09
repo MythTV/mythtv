@@ -258,6 +258,14 @@ uint64_t FileTransfer::GetFileSize(void)
     return rbuffer->GetRealFileSize();
 }
 
+QString FileTransfer::GetFileName(void)
+{
+    if (!rbuffer)
+        return QString();
+
+    return rbuffer->GetFilename();
+}
+
 void FileTransfer::SetTimeout(bool fast)
 {
     if (pginfo)
