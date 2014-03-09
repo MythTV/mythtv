@@ -765,6 +765,7 @@
     </group>
 
     <group name="baseplayliststatusgroup">
+        <area>0,0,1280,60</area>
         <textarea name="playlistposition" from="basetextarea">
             <area>40,0,170,30</area>
             <font>basesmall</font>
