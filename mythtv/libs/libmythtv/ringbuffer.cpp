@@ -420,32 +420,37 @@ void RingBuffer::CalcReadAheadThresh(void)
 
 bool RingBuffer::IsNearEnd(double fps, uint vvf) const
 {
-    rwlock.lockForRead();
-    long long sz2 = ReadBufAvail();
+    QReadLocker lock(&rwlock);
+
+    if (!ateof && !setswitchtonext)
+    {
+        // file is still being read, so can't be finished
+        return false;
+    }
+
     poslock.lockForRead();
-    long long rp  = readpos;
+    long long rp = readpos;
+    long long sz = internalreadpos - readpos;
     poslock.unlock();
-    long long sz  = GetRealFileSize() - rp;
-    sz = max(sz, sz2);
 
     // telecom kilobytes (i.e. 1000 per k not 1024)
     uint   tmp = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
     uint   kbits_per_sec = min(rawbitrate * 3, tmp);
-    rwlock.unlock();
 
-    // WARNING: readahead_frames can greatly overestimate or underestimate
-    //          the number of frames available in the read ahead buffer
-    //          when rh_frames is less than the keyframe distance.
-    double bytes_per_frame = kbits_per_sec * (1000.0/8.0) / fps;
-    double readahead_frames = sz / bytes_per_frame;
+    double readahead_time   = sz / (kbits_per_sec * (1000.0/8.0));
 
-    bool near_end = (vvf + readahead_frames) < 20.0;
-
+    bool near_end = readahead_time <= 1.5;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "IsReallyNearEnd()" +
             QString(" br(%1KB)").arg(kbits_per_sec/8) +
             QString(" sz(%1KB)").arg(sz / 1000LL) +
             QString(" vfl(%1)").arg(vvf) +
-            QString(" frh(%1)").arg(((uint)readahead_frames)) +
+            QString(" time(%1)").arg(readahead_time) +
+            QString(" rawbitrate(%1)").arg(rawbitrate) +
+            QString(" avail(%1)").arg(sz) +
+            QString(" internal_size(%1)").arg(internalreadpos) +
+            QString(" readposition(%1)").arg(rp) +
+            QString(" stopreads(%1)").arg(stopreads) +
+            QString(" paused(%1)").arg(paused) +
             QString(" ne:%1").arg(near_end));
 
     return near_end;
