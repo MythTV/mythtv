@@ -6,7 +6,6 @@
 #include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythuicheckbox.h>
 
-
 class PlayerSettings : public MythScreenType
 {
     Q_OBJECT
@@ -18,6 +17,8 @@ public:
 
 private:
     MythUIButtonList   *m_resumeMode;
+    MythUIButtonList   *m_resumeModeEditor;
+    MythUIButtonList   *m_resumeModeRadio;
     MythUIButtonList   *m_exitAction;
     MythUICheckBox     *m_autoLookupCD;
     MythUICheckBox     *m_autoPlayCD;

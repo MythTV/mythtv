@@ -58,7 +58,8 @@ class MusicPlayer : public QObject, public MythObservable
 
     enum PlayMode
     {
-      PLAYMODE_TRACKS = 0,
+      PLAYMODE_TRACKSPLAYLIST = 0,
+      PLAYMODE_TRACKSEDITOR,
       PLAYMODE_RADIO,
     };
 
@@ -179,7 +180,7 @@ class MusicPlayer : public QObject, public MythObservable
     void        setShuffleMode(ShuffleMode mode);
     ShuffleMode toggleShuffleMode(void);
 
-    ResumeMode  getResumeMode(void) { return m_resumeMode; }
+    ResumeMode  getResumeMode(void);
 
     void getBufferStatus(int *bufferAvailable, int *bufferSize);
 
@@ -226,7 +227,9 @@ class MusicPlayer : public QObject, public MythObservable
 
     ShuffleMode  m_shuffleMode;
     RepeatMode   m_repeatMode;
-    ResumeMode   m_resumeMode;
+    ResumeMode   m_resumeModePlayback;
+    ResumeMode   m_resumeModeEditor;
+    ResumeMode   m_resumeModeRadio;
 
     float        m_playSpeed;
 
@@ -243,6 +246,7 @@ class MusicPlayer : public QObject, public MythObservable
     int               m_errorCount;
 };
 
+Q_DECLARE_METATYPE(MusicPlayer::ResumeMode);
 Q_DECLARE_METATYPE(MusicPlayer::RepeatMode);
 Q_DECLARE_METATYPE(MusicPlayer::ShuffleMode);
 

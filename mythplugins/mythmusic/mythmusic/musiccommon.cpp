@@ -169,11 +169,12 @@ bool MusicCommon::CreateCommon(void)
 
     if (!gPlayer->isPlaying())
     {
-        bool isRadioView = (m_currentView == MV_RADIO);
-        if (isRadioView)
+        if (m_currentView == MV_RADIO)
             gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
+        else if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
+            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
         else
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKS);
+            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSPLAYLIST);
 
         gPlayer->restorePosition();
     }
@@ -187,14 +188,17 @@ bool MusicCommon::CreateCommon(void)
         }
         else if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO && m_currentView != MV_RADIO)
         {
-            //gPlayer->savePosition();
             gPlayer->stop(true);
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKS);
+
+            if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
+                gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
+            else
+                gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSPLAYLIST);
+
             gPlayer->restorePosition();
         }
-        else if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS && m_currentView == MV_RADIO)
+        else if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO && m_currentView == MV_RADIO)
         {
-            //gPlayer->savePosition();
             gPlayer->stop(true);
             gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
             gPlayer->restorePosition();
@@ -584,7 +588,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "FFWD")
         {
-            if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+            if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
             {
                 if (m_ffButton)
                     m_ffButton->Push();
@@ -594,7 +598,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "RWND")
         {
-            if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+            if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
             {
                 if (m_rewButton)
                     m_rewButton->Push();
@@ -775,7 +779,7 @@ void MusicCommon::changeVolume(bool up)
 
 void MusicCommon::changeSpeed(bool up)
 {
-    if (gPlayer->getOutput() && gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+    if (gPlayer->getOutput() && gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
     {
         if (up)
             gPlayer->incSpeed();
@@ -2087,7 +2091,7 @@ MythMenu* MusicCommon::createMainMenu(void)
 
     menu->AddItem(tr("Switch View"),      NULL, createViewMenu());
 
-    if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+    if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
     {
         menu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
         menu->AddItem(tr("Set Shuffle Mode"), NULL, createShuffleMenu());
@@ -2096,7 +2100,7 @@ MythMenu* MusicCommon::createMainMenu(void)
 
     menu->AddItem(tr("Player Options"),   NULL, createPlayerMenu());
 
-    if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+    if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
         menu->AddItem(tr("Quick Playlists"),  NULL, createQuickPlaylistsMenu());
 
     if (m_visualizerVideo)
@@ -2190,7 +2194,7 @@ MythMenu* MusicCommon::createPlayerMenu(void)
     menu->AddItem(tr("Previous Track"));
     menu->AddItem(tr("Next Track"));
 
-    if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+    if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
     {
         menu->AddItem(tr("Jump Back"));
         menu->AddItem(tr("Jump Forward"));
@@ -2199,7 +2203,7 @@ MythMenu* MusicCommon::createPlayerMenu(void)
     menu->AddItem(tr("Play"));
     menu->AddItem(tr("Stop"));
 
-    if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_TRACKS)
+    if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
         menu->AddItem(tr("Pause"));
 
     return menu;

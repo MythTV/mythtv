@@ -70,7 +70,7 @@ MusicPlayer::MusicPlayer(QObject *parent)
 
     m_isAutoplay = false;
     m_isPlaying = false;
-    m_playMode = PLAYMODE_TRACKS;
+    m_playMode = PLAYMODE_TRACKSPLAYLIST;
     m_canShowPlayer = true;
     m_wasPlaying = false;
     m_updatedLastplay = false;
@@ -227,20 +227,23 @@ void MusicPlayer::removeVisual(MainVisual *visual)
     }
 }
 
-void MusicPlayer::loadSettings(void )
+MusicPlayer::ResumeMode MusicPlayer::getResumeMode(void)
 {
-    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
-    if (resumestring.toLower() == "off")
-        m_resumeMode = RESUME_OFF;
-    else if (resumestring.toLower() == "first")
-        m_resumeMode = RESUME_FIRST;
-    else if (resumestring.toLower() == "track")
-        m_resumeMode = RESUME_TRACK;
+    if (m_playMode == PLAYMODE_RADIO)
+        return m_resumeModeRadio;
+    else if (m_playMode == PLAYMODE_TRACKSEDITOR)
+        return m_resumeModeEditor;
     else
-        m_resumeMode = RESUME_EXACT;
+        return m_resumeModePlayback;
+}
+
+void MusicPlayer::loadSettings(void)
+{
+    m_resumeModePlayback = (ResumeMode) gCoreContext->GetNumSetting("ResumeModePlayback", (ResumeMode) MusicPlayer::RESUME_EXACT);
+    m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", (ResumeMode) MusicPlayer::RESUME_OFF);
+    m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", (ResumeMode) MusicPlayer::RESUME_TRACK);
 
     m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
-
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
 }
 
@@ -872,12 +875,12 @@ void MusicPlayer::customEvent(QEvent *event)
         if (!oe)
             return;
 
-        if (m_playMode == PLAYMODE_TRACKS)
+        if (m_playMode != PLAYMODE_RADIO)
             m_currentTime = oe->elapsedSeconds();
         else
             m_currentTime = oe->elapsedSeconds() - m_lastTrackStart;
 
-        if (m_playMode == PLAYMODE_TRACKS && !m_updatedLastplay)
+        if (m_playMode != PLAYMODE_RADIO && !m_updatedLastplay)
         {
             // we update the lastplay and playcount after playing
             // for m_lastplayDelay seconds or half the total track time
@@ -910,7 +913,7 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else
         {
-            if (m_playMode == PLAYMODE_TRACKS && getCurrentMetadata() &&
+            if (m_playMode != PLAYMODE_RADIO && getCurrentMetadata() &&
                 m_currentTime != getCurrentMetadata()->Length() / 1000)
             {
                 LOG(VB_GENERAL, LOG_NOTICE, QString("MusicPlayer: Updating track length was %1s, should be %2s")
@@ -1095,7 +1098,7 @@ void MusicPlayer::restorePosition(void)
         if (gPlayer->getResumeMode() > MusicPlayer::RESUME_OFF)
             play();
 
-        if (gPlayer->getResumeMode() == MusicPlayer::RESUME_EXACT && m_playMode == PLAYMODE_TRACKS)
+        if (gPlayer->getResumeMode() == MusicPlayer::RESUME_EXACT && m_playMode != PLAYMODE_RADIO)
             seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
     }
 }
@@ -1249,7 +1252,7 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
         curTrackID = getCurrentMetadata()->ID();
 
     // only save the mode if we are playing tracks
-    if (m_playMode == PLAYMODE_TRACKS)
+    if (m_playMode != PLAYMODE_RADIO)
         m_shuffleMode = mode;
 
     if (!getCurrentPlaylist())
@@ -1273,7 +1276,7 @@ void MusicPlayer::setShuffleMode(ShuffleMode mode)
 
 void MusicPlayer::updateLastplay()
 {
-    if (m_playMode == PLAYMODE_TRACKS && getCurrentMetadata())
+    if (m_playMode != PLAYMODE_RADIO && getCurrentMetadata())
     {
         getCurrentMetadata()->incPlayCount();
         getCurrentMetadata()->setLastPlay();
@@ -1284,7 +1287,7 @@ void MusicPlayer::updateLastplay()
 
 void MusicPlayer::updateVolatileMetadata(void)
 {
-    if (m_playMode == PLAYMODE_TRACKS && getCurrentMetadata() && getDecoder())
+    if (m_playMode != PLAYMODE_RADIO && getCurrentMetadata() && getDecoder())
     {
         if (getCurrentMetadata()->hasChanged())
         {
@@ -1563,7 +1566,7 @@ void MusicPlayer::decoderHandlerReady(void)
 
         getDecoder()->start();
 
-        if (!m_oneshotMetadata && m_resumeMode == RESUME_EXACT &&
+        if (!m_oneshotMetadata && getResumeMode() == RESUME_EXACT &&
             gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
         {
             seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));

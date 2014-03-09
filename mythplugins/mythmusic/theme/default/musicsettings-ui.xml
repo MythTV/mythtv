@@ -91,39 +91,57 @@
         </textarea>
 
         <textarea name="resumemode_label" from="basetextarea">
-            <area>20,140,380,40</area>
+            <area>20,60,380,40</area>
             <align>right,vcenter</align>
-            <value>Resume mode:</value>
+            <value>Resume mode (Playlist):</value>
         </textarea>
         <buttonlist name="resumemode" from="baseselector">
-            <position>410,140</position>
+            <position>410,60</position>
+        </buttonlist>
+
+        <textarea name="resumemodeeditor_label" from="basetextarea">
+            <area>20,110,380,40</area>
+            <align>right,vcenter</align>
+            <value>Resume mode (Playlist Editor):</value>
+        </textarea>
+        <buttonlist name="resumemodeeditor" from="baseselector">
+            <position>410,110</position>
+        </buttonlist>
+
+        <textarea name="resumemoderadio_label" from="basetextarea">
+            <area>20,160,380,40</area>
+            <align>right,vcenter</align>
+            <value>Resume mode (Radio):</value>
+        </textarea>
+        <buttonlist name="resumemoderadio" from="baseselector">
+            <position>410,160</position>
         </buttonlist>
 
         <textarea name="exitaction_label" from="basetextarea">
-            <area>20,190,380,40</area>
+            <area>20,210,380,40</area>
             <align>right,vcenter</align>
             <value>Action on exit:</value>
         </textarea>
         <buttonlist name="exitaction" from="baseselector">
-            <position>410,190</position>
+            <position>410,210</position>
         </buttonlist>
 
         <textarea name="autolookupcd_label" from="basetextarea">
-            <area>20,255,380,40</area>
+            <area>20,275,380,40</area>
             <align>right,vcenter</align>
             <value>Automatically lookup CDs:</value>
         </textarea>
         <checkbox name="autolookupcd" from="basecheckbox">
-            <position>410,260</position>
+            <position>410,280</position>
         </checkbox>
 
         <textarea name="autoplaycd_label" from="basetextarea">
-            <area>20,305,380,40</area>
+            <area>20,325,380,40</area>
             <align>right,vcenter</align>
             <value>Automatically Play CDs:</value>
         </textarea>
         <checkbox name="autoplaycd" from="basecheckbox">
-            <position>410,310</position>
+            <position>410,330</position>
         </checkbox>
 
         <textarea name="helptext" from="basetextarea">
