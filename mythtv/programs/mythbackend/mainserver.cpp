@@ -847,7 +847,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MUSIC_TAG_REMOVEIMAGE")
     {
-        if (tokens.size() < 4)
+        if (listline.size() < 4)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_REMOVEIMAGE");
         else
             HandleMusicTagRemoveImage(listline, pbs);
