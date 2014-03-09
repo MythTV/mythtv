@@ -49,6 +49,7 @@ class MBASE_PUBLIC RemoteFile
     static bool isLocal(const QString &path);
     bool isLocal(void) const;
     long long GetFileSize(void) const;
+    long long GetRealFileSize(void);
 
     QStringList GetAuxiliaryFiles(void) const
         { return auxfiles; }
@@ -73,6 +74,7 @@ class MBASE_PUBLIC RemoteFile
     QString         query;
 
     bool            writemode;
+    bool            completed;
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;

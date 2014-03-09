@@ -43,7 +43,7 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     lock(QMutex::NonRecursive),
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1"),
-    writemode(write),
+    writemode(write),     completed(false),
     localFile(NULL),      fileWriter(NULL)
 {
     if (writemode)
@@ -873,6 +873,11 @@ int RemoteFile::Read(void *data, int size)
     return recv;
 }
 
+/**
+ * GetFileSize: returns the remote file's size at the time it was first opened
+ * Will query the server in order to get the size. If file isn't being modified
+ * by the server, that value will be cached
+ */
 long long RemoteFile::GetFileSize(void) const
 {
     if (isLocal())
@@ -894,12 +899,76 @@ long long RemoteFile::GetFileSize(void) const
         }
         return -1;
     }
+
+    QMutexLocker locker(&lock);
     return filesize;
+}
+
+/**
+ * GetRealFileSize: returns the current remote file's size.
+ * Will query the server in order to get the size. If file isn't being modified
+ * by the server, that value will be cached.
+ * A QUERY_SIZE myth request will be made. If the server doesn't support this command
+ * the size will be queried using a QUERY_FILE_EXISTS request
+ * Avoid using GetRealFileSize from the GUI thread
+ */
+long long RemoteFile::GetRealFileSize(void)
+{
+    if (isLocal())
+    {
+        return GetFileSize();
+    }
+
+    QMutexLocker locker(&lock);
+
+    if (completed)
+    {
+        return filesize;
+    }
+
+    if (!sock)
+    {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFileque(): Called with no socket");
+        return -1;
+    }
+
+    if (!sock->IsConnected() || !controlSock->IsConnected())
+    {
+        return -1;
+    }
+
+    QStringList strlist(QString(query).arg(recordernum));
+    strlist << "REQUEST_SIZE";
+
+    bool ok = controlSock->SendReceiveStringList(strlist);
+
+    if (ok && !strlist.isEmpty())
+    {
+        bool validate;
+        long long size = strlist[0].toLongLong(&validate);
+
+        if (validate)
+        {
+            if (strlist.count() >= 2)
+            {
+                completed = strlist[1].toInt();
+                filesize = size;
+            }
+            return size;
+        }
+        struct stat fileinfo;
+        if (Exists(path, &fileinfo))
+        {
+            return fileinfo.st_size;
+        }
+    }
+
+    return -1;
 }
 
 bool RemoteFile::SaveAs(QByteArray &data)
 {
-    long long fs = GetFileSize();
+    long long fs = GetRealFileSize();
 
     if (fs < 0)
         return false;
