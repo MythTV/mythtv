@@ -941,8 +941,8 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         case emShortLiveTVPrograms:
             msg = "Adding Short LiveTV programs in starttime order";
             where = "recgroup = 'LiveTV' "
-                    "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
-                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-1' MINUTE) ";
+                    "AND endtime < DATE_ADD(starttime, INTERVAL '30' SECOND) "
+                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-5' MINUTE) ";
             orderby = "starttime ASC";
             break;
         case emNormalLiveTVPrograms:
