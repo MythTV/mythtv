@@ -177,12 +177,7 @@ bool CdDecoder::initialize()
     if (output())
         output()->PauseUntilBuffered();
 
-    QFile* file = dynamic_cast< QFile* >(input()); // From QIODevice*
-    if (file)
-    {
-        setFilename(file->fileName());
-        m_tracknum = getFilename().section('.', 0, 0).toUInt();
-    }
+    m_tracknum = getFilename().section('.', 0, 0).toUInt();
 
     QMutexLocker lock(&getCdioMutex());
 
