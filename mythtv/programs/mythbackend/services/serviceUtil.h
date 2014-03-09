@@ -33,6 +33,7 @@
 #include "datacontracts/channelGroup.h"
 #include "datacontracts/input.h"
 #include "datacontracts/castMemberList.h"
+#include "datacontracts/cutList.h"
 
 #include "programinfo.h"
 #include "recordingrule.h"
@@ -73,4 +74,9 @@ void FillInputInfo( DTC::Input *input, InputInfo inputInfo);
 
 void FillCastMemberList( DTC::CastMemberList *pCastMemberList,
                          ProgramInfo  *pInfo);
+
+void FillCutList( DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype);
+
+void FillCommBreak( DTC::CutList* pCutList, ProgramInfo* pInfo, int marktype);
+
 #endif

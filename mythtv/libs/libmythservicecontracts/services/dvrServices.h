@@ -24,6 +24,7 @@
 #include "datacontracts/titleInfoList.h"
 #include "datacontracts/input.h"
 #include "datacontracts/inputList.h"
+#include "datacontracts/cutList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -70,6 +71,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::RecRuleList::InitializeCustomTypes();
             DTC::TitleInfoList::InitializeCustomTypes();
             DTC::RecRuleFilterList::InitializeCustomTypes();
+            DTC::CutList::InitializeCustomTypes();
         }
 
     public slots:
@@ -108,6 +110,16 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                                  int   ChanId,
                                                                  const QDateTime &StartTime,
                                                                  bool  Watched) = 0;
+
+        virtual DTC::CutList*      GetRecordedCutList    ( int              RecordedId,
+                                                           int              ChanId,
+                                                           const QDateTime &StartTime,
+                                                           const QString   &OffsetType ) = 0;
+
+        virtual DTC::CutList*      GetRecordedCommBreak  ( int              RecordedId,
+                                                           int              ChanId,
+                                                           const QDateTime &StartTime,
+                                                           const QString   &OffsetType ) = 0;
 
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count,

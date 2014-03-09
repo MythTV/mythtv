@@ -3815,6 +3815,175 @@ void ProgramInfo::SavePositionMapDelta(
     }
 }
 
+static const char *from_filemarkup_offset_asc =
+    "SELECT mark, offset FROM filemarkup"
+    " WHERE filename = :PATH"
+    " AND type = :TYPE"
+    " AND mark >= :MARK"
+    " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
+static const char *from_filemarkup_offset_desc =
+    "SELECT mark, offset FROM filemarkup"
+    " WHERE filename = :PATH"
+    " AND type = :TYPE"
+    " AND mark <= :MARK"
+    " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
+static const char *from_recordedseek_offset_asc =
+    "SELECT mark, offset FROM recordedseek"
+    " WHERE chanid = :CHANID"
+    " AND starttime = :STARTTIME"
+    " AND type = :TYPE"
+    " AND mark >= :MARK"
+    " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
+static const char *from_recordedseek_offset_desc =
+    "SELECT mark, offset FROM recordedseek"
+    " WHERE chanid = :CHANID"
+    " AND starttime = :STARTTIME"
+    " AND type = :TYPE"
+    " AND mark <= :MARK"
+    " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
+
+bool ProgramInfo::QueryKeyFramePosition(uint64_t *position, uint64_t keyframe, bool backwards) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (IsVideo())
+    {
+        if (backwards)
+            query.prepare(from_filemarkup_offset_desc);
+        else
+            query.prepare(from_filemarkup_offset_asc);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
+    }
+    else if (IsRecording())
+    {
+        if (backwards)
+            query.prepare(from_recordedseek_offset_desc);
+        else
+            query.prepare(from_recordedseek_offset_asc);
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", MARK_GOP_BYFRAME);
+    query.bindValue(":MARK", (unsigned long long)keyframe);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("QueryKeyFramePosition", query);
+        return false;
+    }
+
+    if (query.next())
+    {
+        *position = query.value(1).toULongLong();
+        return true;
+    }
+
+    if (IsVideo())
+    {
+        if (backwards)
+            query.prepare(from_filemarkup_offset_asc);
+        else
+            query.prepare(from_filemarkup_offset_desc);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
+    }
+    else if (IsRecording())
+    {
+        if (backwards)
+            query.prepare(from_recordedseek_offset_asc);
+        else
+            query.prepare(from_recordedseek_offset_desc);
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", MARK_GOP_BYFRAME);
+    query.bindValue(":MARK", (unsigned long long)keyframe);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("QueryKeyFramePosition", query);
+        return false;
+    }
+
+    if (query.next())
+    {
+        *position = query.value(1).toULongLong();
+        return true;
+    }
+
+    return false;
+}
+
+bool ProgramInfo::QueryKeyFrameDuration(uint64_t *duration, uint64_t keyframe, bool backwards) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (IsVideo())
+    {
+        if (backwards)
+            query.prepare(from_filemarkup_offset_desc);
+        else
+            query.prepare(from_filemarkup_offset_asc);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
+    }
+    else if (IsRecording())
+    {
+        if (backwards)
+            query.prepare(from_recordedseek_offset_desc);
+        else
+            query.prepare(from_recordedseek_offset_asc);
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+    query.bindValue(":MARK", (unsigned long long)keyframe);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("QueryKeyFrameDuration", query);
+        return false;
+    }
+
+    if (query.next())
+    {
+        *duration = query.value(1).toULongLong();
+        return true;
+    }
+
+    if (IsVideo())
+    {
+        if (backwards)
+            query.prepare(from_filemarkup_offset_asc);
+        else
+            query.prepare(from_filemarkup_offset_desc);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
+    }
+    else if (IsRecording())
+    {
+        if (backwards)
+            query.prepare(from_recordedseek_offset_asc);
+        else
+            query.prepare(from_recordedseek_offset_desc);
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", MARK_DURATION_MS);
+    query.bindValue(":MARK", (unsigned long long)keyframe);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("QueryKeyFrameDuration", query);
+        return false;
+    }
+
+    if (query.next())
+    {
+        *duration = query.value(1).toULongLong();
+        return true;
+    }
+
+    return false;
+}
+
 /// \brief Store aspect ratio of a frame in the recordedmark table
 /// \note  All frames until the next one with a stored aspect ratio
 ///        are assumed to have the same aspect ratio
