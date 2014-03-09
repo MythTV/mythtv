@@ -5192,10 +5192,17 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         ft->SetTimeout(fast);
         retlist << "OK";
     }
+    else if (command == "REQUEST_SIZE")
+    {
+        // return size and if the file is not opened for writing
+        retlist << QString::number(ft->GetFileSize());
+        retlist << QString::number(!gCoreContext->IsRegisteredFileForWrite(ft->GetFileName()));
+    }
     else
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Unknown command: %1").arg(command));
-        retlist << "OK";
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Unknown command: %1").arg(command));
+        retlist << "ERROR" << "invalid_call";
     }
 
     ft->DecrRef();

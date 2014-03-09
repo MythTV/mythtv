@@ -1038,6 +1038,12 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
             res << "OK";
         }
     }
+    else if (slist[1] == "REQUEST_SIZE")
+    {
+        // return size and if the file is not opened for writing
+        res << QString::number(ft->GetFileSize());
+        res << QString::number(!gCoreContext->IsRegisteredFileForWrite(ft->GetFileName()));
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid QUERY_FILETRANSFER call");
