@@ -206,7 +206,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     request_pause(false),     paused(false),
     ateof(false),             readsallowed(false),
     setswitchtonext(false),
-    rawbitrate(8000),         playspeed(1.0f),
+    rawbitrate(800),          playspeed(1.0f),
     fill_threshold(65536),    fill_min(-1),
     readblocksize(CHUNK),     wanttoread(0),
     numfailures(0),           commserror(false),
@@ -385,7 +385,14 @@ void RingBuffer::CalcReadAheadThresh(void)
                      (estbitrate >=  500) ? KB16  :
                      (estbitrate >   250) ? KB8   :
                      (estbitrate >   125) ? KB4   : KB2;
-    readblocksize = rbs;
+    if (rbs < CHUNK)
+    {
+        readblocksize = rbs;
+    }
+    else
+    {
+        readblocksize = max(rbs,readblocksize);
+    }
 
     // minumum seconds of buffering before allowing read
     float secs_min = 0.35;
