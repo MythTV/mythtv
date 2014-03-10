@@ -2664,6 +2664,22 @@ NULL
             return false;
     }
 
+    if (dbver == "1323")
+    {
+        const char *updates[] = {
+        // add columns for Unicable related configuration data, see #9726
+            "ALTER TABLE diseqc_tree "
+            " ADD COLUMN scr_userband INTEGER UNSIGNED NOT NULL DEFAULT 0 AFTER address, "
+            " ADD COLUMN scr_frequency INTEGER UNSIGNED NOT NULL DEFAULT 1400 AFTER scr_userband, "
+            " ADD COLUMN scr_pin INTEGER  NOT NULL DEFAULT '-1' AFTER scr_frequency;",
+            NULL
+        };
+
+        if (!performActualUpdate(updates, "1324", dbver))
+            return false;
+    }
+
+
     return true;
 }
 
