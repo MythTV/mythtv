@@ -116,7 +116,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
     MythEvent *me = (MythEvent*)e;
     if (me->Message() == "GET_PREVIEW")
     {
-        const QStringList list = me->ExtraDataList();
+        const QStringList &list = me->ExtraDataList();
         QStringList::const_iterator it = list.begin();
         ProgramInfo evinfo(it, list.end());
         QString token;
