@@ -274,8 +274,10 @@ bool PBHEventHandler::event(QEvent *e)
             QString                inetref   = me->ExtraData(0);
             uint                   season    = me->ExtraData(1).toUInt();
             const VideoArtworkType type      = (VideoArtworkType)me->ExtraData(2).toInt();
-            const QString          pikey     = me->ExtraData(3);
-            const QString          group     = me->ExtraData(4);
+#if 0 /* const ref for an unused variable doesn't make much sense either */
+            const QString          &pikey    = me->ExtraData(3);
+            const QString          &group    = me->ExtraData(4);
+#endif
             const QString          cacheKey = QString("%1:%2:%3")
                 .arg((int)type).arg(inetref).arg(season);
 
