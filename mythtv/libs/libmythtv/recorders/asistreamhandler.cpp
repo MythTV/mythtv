@@ -15,7 +15,6 @@
 // MythTV headers
 #include "asistreamhandler.h"
 #include "asichannel.h"
-#include "threadedfilewriter.h"
 #include "dtvsignalmonitor.h"
 #include "streamlisteners.h"
 #include "mpegstreamdata.h"
@@ -104,7 +103,7 @@ ASIStreamHandler::ASIStreamHandler(const QString &device) :
     StreamHandler(device),
     _device_num(-1), _buf_size(-1), _fd(-1),
     _packet_size(TSPacket::kSize), _clock_source(kASIInternalClock),
-    _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(NULL), _mpts(NULL)
+    _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(NULL)
 {
     setObjectName("ASISH");
 }
@@ -231,8 +230,7 @@ void ASIStreamHandler::run(void)
         for (; sit != _stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
-        if (_mpts != NULL)
-            _mpts->Write(buffer, len - remainder);
+        WriteMPTS(buffer, len - remainder);
 
         _listener_lock.unlock();
 
@@ -342,67 +340,6 @@ void ASIStreamHandler::Close(void)
     {
         close(_fd);
         _fd = -1;
-    }
-}
-
-typedef ThreadedFileWriter* ThreadedFileWriterP;
-static bool named_output_file_common(
-    const QString &_device, ThreadedFileWriterP &tfw, QMap<QString,int> &files)
-{
-    if (tfw)
-    {
-        delete tfw;
-        tfw = NULL;
-    }
-
-    QMap<QString,int>::iterator it = files.begin();
-    if (it == files.end())
-        return true;
-
-    for (it = files.begin(); it != files.end(); ++it)
-        (*it)++;
-
-    QString fn = QString("%1.%2.raw")
-        .arg(files.begin().key()).arg(*files.begin());
-
-    tfw = new ThreadedFileWriter(
-        fn, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
-    if (!tfw->Open())
-    {
-        delete tfw;
-        tfw = NULL;
-        return false;
-    }
-
-    bool ok = true;
-    const QByteArray ba = fn.toLocal8Bit();
-    for (; ok && it != files.end(); ++it)
-    {
-        int ret = link(ba.constData(), it.key().toLocal8Bit().constData());
-        if (ret < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to link '%1' to '%2'").arg(it.key()).arg(fn) +
-                ENO);
-        }
-        ok &= ret >= 0;
-    }
-
-    return ok;
-}
-void ASIStreamHandler::AddNamedOutputFile(const QString &file)
-{
-    _mpts_files[file] = -1;
-    named_output_file_common(_device, _mpts, _mpts_files);
-}
-
-void ASIStreamHandler::RemoveNamedOutputFile(const QString &file)
-{
-    QMap<QString,int>::iterator it = _mpts_files.find(file);
-    if (it != _mpts_files.end())
-    {
-        _mpts_files.erase(it);
-        named_output_file_common(_device, _mpts, _mpts_files);
     }
 }
 

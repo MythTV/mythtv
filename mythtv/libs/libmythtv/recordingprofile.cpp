@@ -1415,7 +1415,8 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
     {
         addChild(new RecordingType(*this));
     }
-    else if (type.toUpper() == "ASI")
+
+    if (CardUtil::IsTunerSharingCapable(type))
     {
         addChild(new RecordFullTSStream(*this));
     }

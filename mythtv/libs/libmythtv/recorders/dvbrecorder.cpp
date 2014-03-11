@@ -26,6 +26,7 @@
 #include "mpegstreamdata.h"
 #include "dvbrecorder.h"
 #include "dvbchannel.h"
+#include "ringbuffer.h"
 #include "tv_rec.h"
 #include "mythlogging.h"
 
@@ -103,7 +104,8 @@ void DVBRecorder::run(void)
 
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);
-    _stream_handler->AddListener(_stream_data, false, true);
+    _stream_handler->AddListener(_stream_data, false, true,
+                         (_record_mpts) ? ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {

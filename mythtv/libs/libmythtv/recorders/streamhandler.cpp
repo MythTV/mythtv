@@ -2,6 +2,7 @@
 
 // MythTV headers
 #include "streamhandler.h"
+#include "threadedfilewriter.h"
 
 #define LOC      QString("SH(%1): ").arg(_device)
 
@@ -19,6 +20,7 @@ StreamHandler::StreamHandler(const QString &device) :
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
+    _mpts(NULL),
 
     _listener_lock(QMutex::Recursive)
 {
@@ -375,4 +377,73 @@ PIDPriority StreamHandler::GetPIDPriority(uint pid) const
         tmp = max(tmp, it.key()->GetPIDPriority(pid));
 
     return tmp;
+}
+
+void StreamHandler::WriteMPTS(unsigned char * buffer, uint len)
+{
+    if (_mpts == NULL)
+        return;
+    _mpts->Write(buffer, len);
+}
+
+typedef ThreadedFileWriter* ThreadedFileWriterP;
+static bool named_output_file_common(
+    const QString &_device, ThreadedFileWriterP &tfw, QMap<QString,int> &files)
+{
+    if (tfw)
+    {
+        delete tfw;
+        tfw = NULL;
+    }
+
+    QMap<QString,int>::iterator it = files.begin();
+    if (it == files.end())
+        return true;
+
+    for (it = files.begin(); it != files.end(); ++it)
+        (*it)++;
+
+    QString fn = QString("%1.%2.raw")
+        .arg(files.begin().key()).arg(*files.begin());
+
+    tfw = new ThreadedFileWriter(
+        fn, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+    if (!tfw->Open())
+    {
+        delete tfw;
+        tfw = NULL;
+        return false;
+    }
+
+    bool ok = true;
+    const QByteArray ba = fn.toLocal8Bit();
+    for (; ok && it != files.end(); ++it)
+    {
+        int ret = link(ba.constData(), it.key().toLocal8Bit().constData());
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Failed to link '%1' to '%2'").arg(it.key()).arg(fn) +
+                ENO);
+        }
+        ok &= ret >= 0;
+    }
+
+    return ok;
+}
+
+void StreamHandler::AddNamedOutputFile(const QString &file)
+{
+    _mpts_files[file] = -1;
+    named_output_file_common(_device, _mpts, _mpts_files);
+}
+
+void StreamHandler::RemoveNamedOutputFile(const QString &file)
+{
+    QMap<QString,int>::iterator it = _mpts_files.find(file);
+    if (it != _mpts_files.end())
+    {
+        _mpts_files.erase(it);
+        named_output_file_common(_device, _mpts, _mpts_files);
+    }
 }

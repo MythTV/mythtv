@@ -16,6 +16,8 @@ using namespace std;
 #include "mthread.h"
 #include "mythdate.h"
 
+class ThreadedFileWriter;
+
 //#define DEBUG_PID_FILTERS
 
 class PIDInfo
@@ -91,10 +93,12 @@ class StreamHandler : protected MThread, public DeviceReaderCB
         { return new PIDInfo(pid, stream_type, pes_type); }
 
   protected:
+    /// Write out a copy of the raw MPTS
+    void WriteMPTS(unsigned char * buffer, uint len);
     /// Called with _listener_lock locked just after adding new output file.
-    virtual void AddNamedOutputFile(const QString &filename) {}
+    virtual void AddNamedOutputFile(const QString &filename);
     /// Called with _listener_lock locked just before removing old output file.
-    virtual void RemoveNamedOutputFile(const QString &filename) {}
+    virtual void RemoveNamedOutputFile(const QString &filename);
     /// At minimum this sets _running_desired, this may also send
     /// signals to anything that might be blocking the run() loop.
     /// \note: The _start_stop_lock must be held when this is called.
@@ -120,6 +124,9 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     PIDInfoMap        _pid_info;
     uint              _open_pid_filters;
     MythTimer         _cycle_timer;
+
+    ThreadedFileWriter                     *_mpts;
+    QMap<QString,int>                       _mpts_files;
 
     typedef QMap<MPEGStreamData*,QString> StreamDataList;
     mutable QMutex    _listener_lock;

@@ -61,8 +61,6 @@ class ASIRecorder : public DTVRecorder
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
-    using DTVRecorder::SetOption;
-    void SetOption(const QString &name, int value);
 
     void run(void);
 
@@ -74,7 +72,6 @@ class ASIRecorder : public DTVRecorder
   private:
     ASIChannel       *m_channel;
     ASIStreamHandler *m_stream_handler;
-    bool              m_record_mpts;
 };
 
 #endif // _ASI_RECORDER_H_

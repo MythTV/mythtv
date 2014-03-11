@@ -33,8 +33,7 @@
             .arg(m_channel->GetDevice())
 
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL),
-    m_record_mpts(false)
+    DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL)
 {
     SetStreamData(new MPEGStreamData(-1, rec ? rec->GetCaptureCardNum() : -1,
                                      false));
@@ -51,18 +50,6 @@ void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     // we do not have a "recordingtype" in our profile.
     DTVRecorder::SetOption("videodevice", videodev);
     DTVRecorder::SetOption("tvformat", gCoreContext->GetSetting("TVFormat"));
-    SetIntOption(profile, "recordmpts");
-}
-
-/** \fn ASIRecorder::SetOption(const QString&,int)
- *  \brief handles the "recordmpts" option.
- */
-void ASIRecorder::SetOption(const QString &name, int value)
-{
-    if (name == "recordmpts")
-        m_record_mpts = (value == 1);
-    else
-        DTVRecorder::SetOption(name, value);
 }
 
 void ASIRecorder::StartNewFile(void)
@@ -116,7 +103,7 @@ void ASIRecorder::run(void)
     _stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(
         _stream_data, false, true,
-        (m_record_mpts) ? ringBuffer->GetFilename() : QString());
+        (_record_mpts) ? ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {

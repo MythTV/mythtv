@@ -265,6 +265,8 @@ void DVBStreamHandler::RunTS(void)
         for (; sit != _stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(buffer, len);
 
+        WriteMPTS(buffer, len - remainder);
+
         _listener_lock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
@@ -794,4 +796,3 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     return fd_tmp;
 }
 #endif
-

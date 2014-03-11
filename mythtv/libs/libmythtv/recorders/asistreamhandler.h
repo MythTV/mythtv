@@ -17,7 +17,6 @@ class ASIStreamHandler;
 class DTVSignalMonitor;
 class ASIChannel;
 class DeviceReadBuffer;
-class ThreadedFileWriter;
 
 typedef enum ASIClockSource
 {
@@ -69,9 +68,6 @@ class ASIStreamHandler : public StreamHandler
 
     virtual void PriorityEvent(int fd); // DeviceReaderCB
 
-    virtual void AddNamedOutputFile(const QString &file); // StreamHandler
-    virtual void RemoveNamedOutputFile(const QString &file); // StreamHandler
-
     virtual void SetRunningDesired(bool desired); // StreamHandler
 
   private:
@@ -83,9 +79,6 @@ class ASIStreamHandler : public StreamHandler
     ASIClockSource                          _clock_source;
     ASIRXMode                               _rx_mode;
     DeviceReadBuffer                       *_drb;
-
-    ThreadedFileWriter                     *_mpts;
-    QMap<QString,int>                       _mpts_files;
 
     // for implementing Get & Return
     static QMutex                           _handlers_lock;

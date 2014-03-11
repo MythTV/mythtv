@@ -10,6 +10,7 @@
 #include "atscstreamdata.h"
 #include "hdhrrecorder.h"
 #include "hdhrchannel.h"
+#include "ringbuffer.h"
 #include "tv_rec.h"
 #include "mythlogging.h"
 
@@ -78,7 +79,8 @@ void HDHRRecorder::run(void)
 
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);
-    _stream_handler->AddListener(_stream_data);
+    _stream_handler->AddListener(_stream_data, false, false,
+                         (_record_mpts) ? ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {

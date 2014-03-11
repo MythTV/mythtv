@@ -165,6 +165,8 @@ void HDHRStreamHandler::run(void)
         for (; sit != _stream_data_list.end(); ++sit)
             remainder = sit.key()->ProcessData(data_buffer, data_length);
 
+        WriteMPTS(data_buffer, data_length - remainder);
+
         _listener_lock.unlock();
         if (remainder != 0)
         {
