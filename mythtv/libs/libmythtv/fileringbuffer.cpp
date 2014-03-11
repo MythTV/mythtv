@@ -381,7 +381,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     commserror = false;
     numfailures = 0;
 
-    rawbitrate = 8000;
+    rawbitrate = 800;
     CalcReadAheadThresh();
 
     bool ok = fd2 >= 0 || remotefile;
