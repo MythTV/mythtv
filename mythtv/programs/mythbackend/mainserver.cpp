@@ -5659,6 +5659,20 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
             strlist.append(image->description);
             strlist.append(image->filename);
             strlist.append(image->hostname);
+
+            // if this is an embedded image update the cached image
+            if (image->embedded)
+            {
+                QStringList paramList;
+                paramList.append(QString("--songid='%1'").arg(mdata->ID()));
+                paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+
+                QString command = "mythutil --extractimage " + paramList.join(" ");
+                QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                    kMSAutoCleanup | kMSRunBackground |
+                                                    kMSDontDisableDrawing | kMSProcessEvents |
+                                                    kMSDontBlockInputDevs));
+            }
         }
     }
 
