@@ -1094,7 +1094,7 @@ QString MusicMetadata::getAlbumArtFile(void)
                     slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
                             .arg(Hostname())
                             .arg(ID())
-                            .arg(AlbumArtImages::getTypeFilename(albumart_image->imageType));
+                            .arg(albumart_image->imageType);
                     gCoreContext->SendReceiveStringList(slist);
                 }
             }

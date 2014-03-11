@@ -101,7 +101,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     }
 
     int songID = cmdline.toInt("songid");
-    ImageType type = AlbumArtImages::getImageTypeFromName(cmdline.toString("imagetype"));
+    ImageType type = (ImageType)cmdline.toInt("imagetype");
 
     MusicMetadata *mdata = MusicMetadata::createFromID(songID);
     if (!mdata)
