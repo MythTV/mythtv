@@ -36,6 +36,7 @@
 // MythTV headers
 #include "mythtvexp.h"
 #include "dtvconfparser.h"
+#include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "channelscantypes.h"
 
@@ -80,7 +81,7 @@ class MTV_PUBLIC ChannelScanner
         uint sourceid, int cardtype, const QString &file);
 
     virtual bool ImportM3U(uint cardid, const QString &inputname,
-                           uint sourceid);
+                           uint sourceid, bool is_mpts);
 
   protected:
     virtual void Teardown(void);
@@ -107,6 +108,7 @@ class MTV_PUBLIC ChannelScanner
 
     /// imported channels
     DTVChannelList      channels;
+    fbox_chan_map_t     iptv_channels;
 
     /// Only fta channels desired post scan?
     bool                freeToAirOnly;

@@ -134,6 +134,22 @@ TransportScanItem::TransportScanItem(uint sourceid,
     mplexid = GetMultiplexIdFromDB();
 }
 
+TransportScanItem::TransportScanItem(uint _sourceid,
+                                     const QString &_name,
+                                     const IPTVTuningData &_tuning,
+                                     const QString &_channel,
+                                     uint _timeoutTune) :
+    mplexid(0),
+    FriendlyName(_name),  friendlyNum(0),
+    SourceID(_sourceid),  UseTimer(false),
+    scanning(false),      timeoutTune(_timeoutTune),
+    iptv_tuning(_tuning), iptv_channel(_channel)
+{
+    memset(freq_offsets, 0, sizeof(int)*3);
+    tuning.Clear();
+    tuning.sistandard = "MPEG";
+}
+
 /** \fn TransportScanItem::GetMultiplexIdFromDB(void) const
  *  \brief Fetches mplexid if it exists, based on the frequency and sourceid
  */
@@ -156,6 +172,11 @@ uint64_t TransportScanItem::freq_offset(uint i) const
 
 QString TransportScanItem::toString() const
 {
+    if (tuning.sistandard == "MPEG")
+    {
+        return iptv_channel + ": " + iptv_tuning.GetDeviceKey();
+    }
+
     QString str = QString("Transport Scan Item '%1' #%2\n")
         .arg(FriendlyName).arg(friendlyNum);
     str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
@@ -403,7 +424,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionModeAuto,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-65    
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-65
 
     // Czech Republic
     fmap["dvbt_ofdm_cz0"] = new FrequencyTable(

@@ -40,6 +40,7 @@ using namespace std;
 // MythTV includes - General
 #include "channelscan_sm.h"
 #include "frequencies.h"
+#include "scanwizardconfig.h"
 #include "mythdbcon.h"
 #include "channelutil.h"
 #include "cardutil.h"
@@ -134,11 +135,11 @@ class ScannedChannelInfo
  *
  */
 
-ChannelScanSM::ChannelScanSM(
-    ScanMonitor *_scan_monitor,
-    const QString &_cardtype, ChannelBase *_channel,
-    int _sourceID, uint signal_timeout, uint channel_timeout,
-    const QString &_inputname, bool test_decryption)
+ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
+                             const QString &_cardtype, ChannelBase *_channel,
+                             int _sourceID, uint signal_timeout,
+                             uint channel_timeout, const QString &_inputname,
+                             bool test_decryption)
     : // Set in constructor
       scan_monitor(_scan_monitor),
       channel(_channel),
@@ -1160,6 +1161,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     uint    mplexid   = (*trans_info).mplexid;
     int     freqid    = (*trans_info).friendlyNum;
     QString freqidStr = (freqid) ? QString::number(freqid) : QString::null;
+    QString iptv_channel = (*trans_info).iptv_channel;
 
     // channels.conf
     const DTVChannelInfoList &echan = (*trans_info).expectedChannels;
@@ -1320,7 +1322,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         }
     }
 
-    // Get UK channel numbers
+    // Get IPTV or UK channel numbers
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
     {
@@ -1329,11 +1331,23 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         if (!info.chan_num.isEmpty())
             continue;
 
-        QMap<qlonglong, uint>::const_iterator it = ukChanNums.find(
-            ((qlonglong)info.orig_netid<<32) | info.service_id);
+        if (iptv_channel.isEmpty()) // UK channel numbers
+        {
+            QMap<qlonglong, uint>::const_iterator it = ukChanNums.find
+                       (((qlonglong)info.orig_netid<<32) | info.service_id);
 
-        if (it != ukChanNums.end())
-            info.chan_num = QString::number(*it);
+            if (it != ukChanNums.end())
+                info.chan_num = QString::number(*it);
+        }
+        else // IPTV programs
+        {
+            info.chan_num = iptv_channel;
+            if (info.service_id)
+                info.chan_num += "-" + QString::number(info.service_id);
+        }
+
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            QString("GetChannelList: set chan_num '%1'").arg(info.chan_num));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
@@ -1380,6 +1394,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
             GetChannelList(it->first, it->second);
 
         ScanDTVTransport item((*it->first).tuning, tuner_type, cardid);
+        item.iptv_tuning = (*(it->first)).iptv_tuning;
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
         for (dbchan_it = pnum_to_dbchan.begin();
@@ -1387,6 +1402,7 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
         {
             item.channels.push_back(*dbchan_it);
         }
+
         if (item.channels.size())
             list.push_back(item);
     }
@@ -1622,8 +1638,7 @@ void ChannelScanSM::HandleActiveScan(void)
                 QString name = QString("TransportID %1").arg(it.key() & 0xffff);
                 TransportScanItem item(sourceID, name, *it, signalTimeout);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + name + " - " +
-                    item.
-tuning.toString());
+                    item.tuning.toString());
                 scanTransports.push_back(item);
                 ts_scanned.insert(it.key());
             }
@@ -1660,6 +1675,9 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     if (item.mplexid > 0 && transport.offset() == 0)
         return GetDTVChannel()->TuneMultiplex(item.mplexid, inputname);
 
+    if (item.tuning.sistandard == "MPEG")
+        return GetDTVChannel()->Tune(item.iptv_tuning, true);
+
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.tuning;
     tuning.frequency = freq;
@@ -1673,7 +1691,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
     QString cur_chan = QString("%1%2")
         .arg((*current).FriendlyName).arg(offset_str);
     QString tune_msg_str =
-        QObject::tr("Tuning to %1 mplexid(%2)")
+        QObject::tr("ScanTransport Tuning to %1 mplexid(%2)")
         .arg(cur_chan).arg((*current).mplexid);
 
     const TransportScanItem &item = *transport;
@@ -1795,7 +1813,8 @@ bool ChannelScanSM::ScanTransports(
                                        freq, ft, signalTimeout);
                 scanTransports.push_back(item);
 
-                LOG(VB_CHANSCAN, LOG_INFO, LOC + item.toString());
+                LOG(VB_CHANSCAN, LOG_INFO, LOC + "ScanTransports " +
+                    item.toString());
             }
 
             name_num++;
@@ -1846,7 +1865,7 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
 
         scanTransports.push_back(item);
 
-        LOG(VB_CHANSCAN, LOG_INFO, LOC + item.toString());
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "ScanForChannels " + item.toString());
     }
 
     if (scanTransports.empty())
@@ -1864,6 +1883,41 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
 
     return true;
 }
+
+bool ChannelScanSM::ScanIPTVChannels(uint sourceid,
+                                     const fbox_chan_map_t &iptv_channels)
+{
+    scanTransports.clear();
+    nextIt = scanTransports.end();
+
+    fbox_chan_map_t::const_iterator Ichan = iptv_channels.begin();
+    for (uint idx = 0; Ichan != iptv_channels.end(); ++Ichan, ++idx)
+    {
+        TransportScanItem item(sourceid, QString::number(idx),
+                               Ichan.value().m_tuning, Ichan.key(),
+                               signalTimeout);
+
+        scanTransports.push_back(item);
+
+        LOG(VB_CHANSCAN, LOG_INFO, LOC + "ScanIPTVChannels " + item.toString());
+    }
+
+    if (scanTransports.empty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "ScanIPTVChannels() no transports");
+        return false;
+    }
+
+    timer.start();
+    waitingForTables = false;
+
+    nextIt            = scanTransports.begin();
+    transportsScanned = 0;
+    scanning          = true;
+
+    return true;
+}
+
 
 /** \fn ChannelScanSM::ScanTransportsStartingOn(int,const QMap<QString,QString>&)
  *  \brief Generates a list of frequencies to scan and adds it to the

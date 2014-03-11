@@ -83,6 +83,8 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         CurrentTransportScan,
         // IPTV import of channels from M3U URL
         IPTVImport,
+        // IPTV import of channels from M3U URL, with MPTS
+        IPTVImportMPTS,
         // Imports lists from dvb-utils scanners
         DVBUtilsImport,
         // Imports lists from previous mythtv scan

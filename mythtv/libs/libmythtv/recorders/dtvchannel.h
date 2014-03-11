@@ -50,7 +50,7 @@ class DTVChannel : public ChannelBase
     /// will need to implement this when adding support for new hardware.
     virtual bool Tune(const DTVMultiplex &tuning, QString inputname) = 0;
     /// \brief Performs IPTV Tuning. Only implemented by IPTVChannel.
-    virtual bool Tune(const IPTVTuningData&) { return false; }
+    virtual bool Tune(const IPTVTuningData&, bool scanning) { return false; }
     /// \brief Enters power saving mode if the card supports it
     virtual bool EnterPowerSavingMode(void)
     {

@@ -34,7 +34,7 @@ class IPTVChannel : QObject, public DTVChannel
     virtual bool Open(void);
 
     using DTVChannel::Tune;
-    virtual bool Tune(const IPTVTuningData&);
+    virtual bool Tune(const IPTVTuningData&, bool scanning);
     virtual bool Tune(const DTVMultiplex&, QString) { return false; }
 
     // Sets
@@ -42,8 +42,11 @@ class IPTVChannel : QObject, public DTVChannel
 
     // Gets
     bool IsOpen(void) const;
+    virtual QString GetDevice(void) const
+        { return m_last_tuning.GetDeviceKey(); }
     IPTVStreamHandler *GetStreamHandler(void) const { return m_stream_handler; }
     virtual bool IsIPTV(void) const { return true; } // DTVChannel
+    virtual bool IsPIDTuningSupported(void) const { return true; }
 
   protected:
     virtual void Close(void);
@@ -55,9 +58,10 @@ class IPTVChannel : QObject, public DTVChannel
     void CloseStreamHandler(void);
 
   private:
-    mutable QMutex     m_lock;
+    mutable QMutex     m_tune_lock;
     volatile bool      m_firsttune;
     IPTVTuningData     m_last_tuning;
+    mutable QMutex     m_stream_lock;
     IPTVStreamHandler *m_stream_handler;
     MPEGStreamData    *m_stream_data;
 };

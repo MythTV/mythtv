@@ -22,7 +22,8 @@ DTVMultiplex::DTVMultiplex(const DTVMultiplex &other) :
     mod_sys(other.mod_sys),
     rolloff(other.rolloff),
     mplex(other.mplex),
-    sistandard(other.sistandard)
+    sistandard(other.sistandard),
+    iptv_tuning(other.iptv_tuning)
 {
 }
 
@@ -44,6 +45,7 @@ DTVMultiplex &DTVMultiplex::operator=(const DTVMultiplex &other)
     rolloff        = other.rolloff;
     mplex          = other.mplex;
     sistandard     = other.sistandard;
+    iptv_tuning    = other.iptv_tuning;
     return *this;
 }
 
@@ -61,7 +63,9 @@ bool DTVMultiplex::operator==(const DTVMultiplex &m) const
             (mod_sys  == m.mod_sys)  &&
             (rolloff  == m.rolloff)  &&
             (polarity == m.polarity) &&
-            (hierarchy == m.hierarchy));
+            (hierarchy == m.hierarchy) &&
+            (iptv_tuning == m.iptv_tuning)
+            );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,6 +158,11 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
             (inversion  == other.inversion)  &&
             (fec        == other.fec)        &&
             (rolloff    == other.rolloff);
+    }
+
+    if (DTVTunerType::kTunerTypeIPTV == type)
+    {
+        return (iptv_tuning == other.iptv_tuning);
     }
 
     return false;
@@ -268,10 +277,10 @@ bool DTVMultiplex::ParseDVB_S2(
     if (DTVModulationSystem::kModulationSystem_UNDEFINED == mod_sys)
     {
         mod_sys = (DTVModulation::kModulationQPSK == modulation) ?
-            DTVModulationSystem::kModulationSystem_DVBS : 
+            DTVModulationSystem::kModulationSystem_DVBS :
             DTVModulationSystem::kModulationSystem_DVBS2;
     }
-    
+
     if ((DTVModulationSystem::kModulationSystem_DVBS  != mod_sys) &&
         (DTVModulationSystem::kModulationSystem_DVBS2 != mod_sys))
     {
@@ -595,5 +604,3 @@ bool ScanDTVTransport::ParseTuningParams(
         _modulation,    _bandwidth,       _mod_sys,
         _rolloff);
 }
-
-

@@ -1583,19 +1583,25 @@ class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 class IPTVConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
-    IPTVConfigurationGroup(CaptureCard& a_parent):
+    IPTVConfigurationGroup(CaptureCard& a_parent) :
        VerticalConfigurationGroup(false, true, false, false),
-       parent(a_parent)
+       parent(a_parent),
+       instances(new InstanceCount(parent))
     {
         setUseLabel(false);
         addChild(new IPTVHost(parent));
         addChild(new ChannelTimeout(parent, 30000, 1750));
         addChild(new EmptyAudioDevice(parent));
         addChild(new EmptyVBIDevice(parent));
+        addChild(instances);
+
+        connect(instances, SIGNAL(valueChanged(int)),
+                &parent,   SLOT(  SetInstanceCount(int)));
     };
 
   private:
-    CaptureCard &parent;
+    CaptureCard   &parent;
+    InstanceCount *instances;
 };
 
 class ASIDevice : public ComboBoxSetting, public CaptureCardDBStorage

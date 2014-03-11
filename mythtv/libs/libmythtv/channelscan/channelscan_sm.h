@@ -40,6 +40,7 @@
 
 // MythTV includes
 #include "frequencytables.h"
+#include "iptvchannelfetcher.h"
 #include "streamlisteners.h"
 #include "scanmonitor.h"
 #include "signalmonitorlistener.h"
@@ -89,11 +90,10 @@ class ChannelScanSM : public MPEGStreamListener,
     friend class AnalogSignalHandler;
 
   public:
-    ChannelScanSM(
-        ScanMonitor *_scan_monitor,
-        const QString &_cardtype, ChannelBase* _channel, int _sourceID,
-        uint signal_timeout, uint channel_timeout,
-        const QString &_inputname, bool test_decryption);
+    ChannelScanSM(ScanMonitor *_scan_monitor,
+                  const QString &_cardtype, ChannelBase* _channel, int _sourceID,
+                  uint signal_timeout, uint channel_timeout,
+                  const QString &_inputname, bool test_decryption);
     ~ChannelScanSM();
 
     void StartScanner(void);
@@ -110,6 +110,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool ScanForChannels(
         uint sourceid, const QString &std, const QString &cardtype,
         const DTVChannelList&);
+    bool ScanIPTVChannels(uint sourceid, const fbox_chan_map_t &iptv_channels);
 
     bool ScanExistingTransports(uint sourceid, bool follow_nit);
 
@@ -203,6 +204,7 @@ class ChannelScanSM : public MPEGStreamListener,
     ScanMonitor      *scan_monitor;
     ChannelBase      *channel;
     SignalMonitor    *signalMonitor;
+    int               scantype;
     int               sourceID;
     uint              signalTimeout;
     uint              channelTimeout;

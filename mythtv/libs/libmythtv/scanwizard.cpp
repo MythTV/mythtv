@@ -115,7 +115,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::IPTVImport)
     {
         do_scan = false;
-        scannerPane->ImportM3U(cardid, inputname, sourceid);
+        scannerPane->ImportM3U(cardid, inputname, sourceid, false);
+    }
+    else if (scantype == ScanTypeSetting::IPTVImportMPTS)
+    {
+        scannerPane->ImportM3U(cardid, inputname, sourceid, true);
     }
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||

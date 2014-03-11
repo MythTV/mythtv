@@ -45,6 +45,7 @@ const int DTVTunerType::kTunerTypeDVBT    = 0x0002;
 const int DTVTunerType::kTunerTypeATSC    = 0x0003;
 const int DTVTunerType::kTunerTypeASI     = 0x1000;
 const int DTVTunerType::kTunerTypeOCUR    = 0x2000;
+const int DTVTunerType::kTunerTypeIPTV    = 0x4000;
 const int DTVTunerType::kTunerTypeUnknown = 0x80000000;
 
 static QMutex dtv_tt_canonical_str_lock;

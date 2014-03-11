@@ -41,6 +41,7 @@ using namespace std;
 #include "asichannel.h"
 #include "dvbchannel.h"
 #include "v4lchannel.h"
+#include "iptvchannel.h"
 #include "cardutil.h"
 
 #define LOC QString("ChScan: ")
@@ -198,7 +199,7 @@ void ChannelScanner::Scan(
         if (ok)
         {
             ok = sigmonScanner->ScanForChannels(sourceid, freq_std,
-                                          sub_type, channels);
+                                                sub_type, channels);
         }
         if (ok)
         {
@@ -208,6 +209,26 @@ void ChannelScanner::Scan(
         {
             InformUser(tr("Error tuning to transport"));
             Teardown();
+        }
+    }
+    else if (ScanTypeSetting::IPTVImportMPTS == scantype)
+    {
+        if (iptv_channels.empty())
+        {
+            LOG(VB_CHANSCAN, LOG_INFO, LOC + "IPTVImportMPTS: no channels");
+        }
+        else
+        {
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("ScanIPTVChannels(%1) IPTV MPTS").arg(sourceid));
+
+            if ((ok = sigmonScanner->ScanIPTVChannels(sourceid, iptv_channels)))
+                scanMonitor->ScanPercentComplete(0);
+            else
+            {
+                InformUser(tr("Error scanning MPTS in IPTV"));
+                Teardown();
+            }
         }
     }
     else if (ScanTypeSetting::TransportScan == scantype)
@@ -272,8 +293,8 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     return ret;
 }
 
-bool ChannelScanner::ImportM3U(
-    uint cardid, const QString &inputname, uint sourceid)
+bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
+                               uint sourceid, bool is_mpts)
 {
     (void) cardid;
     (void) inputname;
@@ -283,12 +304,15 @@ bool ChannelScanner::ImportM3U(
         scanMonitor = new ScanMonitor(this);
 
     // Create an IPTV scan object
-    iptvScanner = new IPTVChannelFetcher(
-        cardid, inputname, sourceid, scanMonitor);
+    iptvScanner = new IPTVChannelFetcher(cardid, inputname, sourceid,
+                                         is_mpts, scanMonitor);
 
     MonitorProgress(false, false, false, false);
 
     iptvScanner->Scan();
+
+    if (is_mpts)
+        iptv_channels = iptvScanner->GetChannels();
 
     return true;
 }
@@ -366,6 +390,13 @@ void ChannelScanner::PreScanCommon(
     }
 #endif // USING_ASI
 
+#ifdef USING_IPTV
+    if ("FREEBOX" == card_type)
+    {
+        channel = new IPTVChannel(NULL, device);
+    }
+#endif
+
     if (!channel)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Channel not created");
@@ -386,10 +417,9 @@ void ChannelScanner::PreScanCommon(
 
     ScanMonitor *lis = scanMonitor;
 
-    sigmonScanner = new ChannelScanSM(
-        lis, card_type, channel, sourceid,
-        signal_timeout, channel_timeout, inputname,
-        do_test_decryption);
+    sigmonScanner = new ChannelScanSM(lis, card_type, channel,
+                                      sourceid, signal_timeout, channel_timeout,
+                                      inputname, do_test_decryption);
 
     // If we know the channel types we can give the signal montior a hint.
     // Since we unfortunately do not record this info in the DB, we cannot

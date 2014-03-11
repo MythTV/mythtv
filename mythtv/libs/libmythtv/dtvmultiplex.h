@@ -16,6 +16,7 @@
 // MythTV headers
 #include "dtvconfparserhelpers.h"
 #include "channelinfo.h"
+#include "iptvtuningdata.h"
 
 class MPEGDescriptor;
 
@@ -90,6 +91,7 @@ class DTVMultiplex
     // Optional additional info
     uint             mplex;
     QString          sistandard;
+    IPTVTuningData   iptv_tuning;
 };
 
 class ScanDTVTransport : public DTVMultiplex

@@ -35,15 +35,15 @@ bool IPTVRecorder::Open(void)
 
     ResetForNewFile();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "Open:  open channel");
-    m_channel->Open();
+    if (!m_channel->Open())
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Open: Open channel failed");
 
     LOG(VB_RECORD, LOG_INFO, LOC + "opened successfully");
 
     if (_stream_data)
         m_channel->SetStreamData(_stream_data);
 
-    return true;
+    return _stream_data;
 }
 
 bool IPTVRecorder::IsOpen(void) const

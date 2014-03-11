@@ -30,10 +30,10 @@ static bool parse_extinf(const QString &data,
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid,
-    ScanMonitor *monitor) :
+    bool is_mpts, ScanMonitor *monitor) :
     _scan_monitor(monitor),
     _cardid(cardid),       _inputname(inputname),
-    _sourceid(sourceid),
+    _sourceid(sourceid),   _is_mpts(is_mpts),
     _chan_cnt(1),          _thread_running(false),
     _stop_now(false),      _thread(new MThread("IPTVChannelFetcher", this)),
     _lock()
@@ -69,6 +69,16 @@ void IPTVChannelFetcher::Stop(void)
     _thread->wait();
 }
 
+fbox_chan_map_t IPTVChannelFetcher::GetChannels(void)
+{
+    while (!_thread->isFinished())
+        _thread->wait(500);
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels")
+        .arg(_channels.size()));
+    return _channels;
+}
+
 /// \brief Scans the given frequency list.
 void IPTVChannelFetcher::Scan(void)
 {
@@ -79,20 +89,23 @@ void IPTVChannelFetcher::Scan(void)
 
 void IPTVChannelFetcher::run(void)
 {
+    _lock.lock();
     _thread_running = true;
+    _lock.unlock();
 
     // Step 1/4 : Get info from DB
     QString url = CardUtil::GetVideoDevice(_cardid);
 
     if (_stop_now || url.isEmpty())
     {
-        LOG(VB_CHANNEL, LOG_INFO, "Playlist URL was empty");
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Playlist URL was empty");
+        QMutexLocker locker(&_lock);
         _thread_running = false;
         _stop_now = true;
         return;
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, QString("Playlist URL: %1").arg(url));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Playlist URL: %1").arg(url));
 
     // Step 2/4 : Download
     if (_scan_monitor)
@@ -112,6 +125,7 @@ void IPTVChannelFetcher::run(void)
             _scan_monitor->ScanPercentComplete(100);
             _scan_monitor->ScanErrored(tr("Downloading Playlist Failed"));
         }
+        QMutexLocker locker(&_lock);
         _thread_running = false;
         _stop_now = true;
         return;
@@ -124,69 +138,74 @@ void IPTVChannelFetcher::run(void)
         _scan_monitor->ScanAppendTextToLog(tr("Processing Playlist"));
     }
 
-    const fbox_chan_map_t channels = ParsePlaylist(playlist, this);
+    _channels.clear();
+    _channels = ParsePlaylist(playlist, this);
 
     // Step 4/4 : Finish up
     if (_scan_monitor)
         _scan_monitor->ScanAppendTextToLog(tr("Adding Channels"));
-    SetTotalNumChannels(channels.size());
+    SetTotalNumChannels(_channels.size());
 
-    LOG(VB_CHANNEL, LOG_INFO, QString("Found %1 channels")
-        .arg(channels.size()));
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels")
+        .arg(_channels.size()));
 
-    fbox_chan_map_t::const_iterator it = channels.begin();
-    for (uint i = 1; it != channels.end(); ++it, ++i)
+    if (!_is_mpts)
     {
-        QString channum = it.key();
-        QString name    = (*it).m_name;
-        QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
-        uint programnumber = (*it).m_programnumber;
-        //: %1 is the channel number, %2 is the channel name
-        QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
-
-        LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
-            .arg(channum).arg(name));
-
-        int chanid = ChannelUtil::GetChanID(_sourceid, channum);
-        if (chanid <= 0)
+        fbox_chan_map_t::const_iterator it = _channels.begin();
+        for (uint i = 1; it != _channels.end(); ++it, ++i)
         {
-            if (_scan_monitor)
+            QString channum = it.key();
+            QString name    = (*it).m_name;
+            QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
+            uint programnumber = (*it).m_programnumber;
+            //: %1 is the channel number, %2 is the channel name
+            QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
+
+            LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
+                .arg(channum).arg(name));
+
+            int chanid = ChannelUtil::GetChanID(_sourceid, channum);
+            if (chanid <= 0)
             {
-                _scan_monitor->ScanAppendTextToLog(
-                    tr("Adding %1").arg(msg));
+                if (_scan_monitor)
+                {
+                    _scan_monitor->ScanAppendTextToLog(
+                                                       tr("Adding %1").arg(msg));
+                }
+                chanid = ChannelUtil::CreateChanID(_sourceid, channum);
+                ChannelUtil::CreateChannel(0, _sourceid, chanid, name, name,
+                                           channum, programnumber, 0, 0,
+                                           false, false, false, QString::null,
+                                           QString::null, "Default", xmltvid);
+                ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
             }
-            chanid = ChannelUtil::CreateChanID(_sourceid, channum);
-            ChannelUtil::CreateChannel(
-                0, _sourceid, chanid, name, name, channum,
-                programnumber, 0, 0, false, false, false, QString::null,
-                QString::null, "Default", xmltvid);
-            ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
-        }
-        else
-        {
-            if (_scan_monitor)
+            else
             {
-                _scan_monitor->ScanAppendTextToLog(
-                    tr("Updating %1").arg(msg));
+                if (_scan_monitor)
+                {
+                    _scan_monitor->ScanAppendTextToLog(
+                                               tr("Updating %1").arg(msg));
+                }
+                ChannelUtil::UpdateChannel(0, _sourceid, chanid, name, name,
+                                           channum, programnumber, 0, 0,
+                                           false, false, false, QString::null,
+                                           QString::null, "Default", xmltvid);
+                ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
             }
-            ChannelUtil::UpdateChannel(
-                0, _sourceid, chanid, name, name, channum,
-                programnumber, 0, 0, false, false, false, QString::null,
-                QString::null, "Default", xmltvid);
-            ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
+
+            SetNumChannelsInserted(i);
         }
 
-        SetNumChannelsInserted(i);
+        if (_scan_monitor)
+        {
+            _scan_monitor->ScanAppendTextToLog(tr("Done"));
+            _scan_monitor->ScanAppendTextToLog("");
+            _scan_monitor->ScanPercentComplete(100);
+            _scan_monitor->ScanComplete();
+        }
     }
 
-    if (_scan_monitor)
-    {
-        _scan_monitor->ScanAppendTextToLog(tr("Done"));
-        _scan_monitor->ScanAppendTextToLog("");
-        _scan_monitor->ScanPercentComplete(100);
-        _scan_monitor->ScanComplete();
-    }
-
+    QMutexLocker locker(&_lock);
     _thread_running = false;
     _stop_now = true;
 }
@@ -242,8 +261,8 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
 
     if (!GetMythDownloadManager()->download(url, &data))
     {
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("IPTVChannelFetcher::DownloadPlaylist failed to "
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("DownloadPlaylist failed to "
                     "download from %1").arg(url));
     }
     else
@@ -298,7 +317,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         uint num_channels = estimate_number_of_channels(rawdata);
         fetcher->SetTotalNumChannels(num_channels);
 
-        LOG(VB_CHANNEL, LOG_INFO,
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Estimating there are %1 channels in playlist")
                 .arg(num_channels));
     }
@@ -321,7 +340,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
             msg = QString("Parsing Channel #%1 : %2 : %3")
                 .arg(channum).arg(info.m_name)
                 .arg(info.m_tuning.GetDataURL().toString());
-            LOG(VB_CHANNEL, LOG_INFO, msg);
+            LOG(VB_CHANNEL, LOG_INFO, LOC + msg);
 
             msg = QString::null; // don't tell fetcher
         }
@@ -391,7 +410,7 @@ static bool parse_chan_info(const QString   &rawdata,
         QMap<QString,QString>::const_iterator it = values.begin();
         for (; it != values.end(); ++it)
         {
-            LOG(VB_GENERAL, LOG_INFO,
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("parse_chan_info [%1]='%2'")
                 .arg(it.key()).arg(*it));
         }

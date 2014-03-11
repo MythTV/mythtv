@@ -291,7 +291,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         {
             int chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
             IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid);
-            if (!Tune(tuning))
+            if (!Tune(tuning, false))
             {
                 LOG(VB_GENERAL, LOG_ERR, loc + "Tuning to IPTV URL");
                 ClearDTVInfo();

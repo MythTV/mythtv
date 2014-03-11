@@ -93,6 +93,7 @@ class DTVTunerType : public DTVParamHelper
                                       // QAM-16, QAM-64, QAM-256, QPSK
     static const int kTunerTypeASI;   // baseband
     static const int kTunerTypeOCUR;  // Virtual Channel tuning of QAM-64/256
+    static const int kTunerTypeIPTV;  // IPTV
     static const int kTunerTypeUnknown;
 
     // Note: Just because some cards sold in different regions support the same

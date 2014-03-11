@@ -40,19 +40,16 @@ bool IPTVChannel::Open(void)
     if (IsOpen())
         return true;
 
-    m_lock.lock();
+    QMutexLocker locker(&m_tune_lock);
 
     if (!InitializeInputs())
     {
-        m_lock.unlock();
         Close();
         return false;
     }
 
     if (m_stream_data)
         SetStreamData(m_stream_data);
-
-    m_lock.unlock();
 
     return true;
 }
@@ -63,9 +60,9 @@ void IPTVChannel::SetStreamData(MPEGStreamData *sd)
         QString("SetStreamData(0x%1) StreamHandler(0x%2)")
         .arg((intptr_t)sd,0,16).arg((intptr_t)m_stream_handler,0,16));
 
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_stream_lock);
 
-    if (m_stream_data == sd)
+    if (m_stream_data == sd && m_stream_handler)
         return;
 
     if (m_stream_handler)
@@ -113,7 +110,7 @@ void IPTVChannel::CloseStreamHandler(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "CloseStreamHandler()");
 
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_stream_lock);
 
     if (m_stream_handler)
     {
@@ -137,7 +134,7 @@ void IPTVChannel::CloseStreamHandler(void)
 
 bool IPTVChannel::IsOpen(void) const
 {
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_stream_lock);
     bool ret = (m_stream_handler && !m_stream_handler->HasError() &&
                 m_stream_handler->IsRunning());
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen(%1) %2")
@@ -146,9 +143,9 @@ bool IPTVChannel::IsOpen(void) const
     return ret;
 }
 
-bool IPTVChannel::Tune(const IPTVTuningData &tuning)
+bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
 {
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_tune_lock);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(%1)")
         .arg(tuning.GetDeviceName()));
@@ -174,10 +171,10 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning)
 
     m_last_tuning = tuning;
 
-    if (!m_firsttune) // for historical reason, an initial tune is
-                      // requested at startup so don't open the stream
-                      // handler just yet it will be opened after the
-                      // next Tune or SetStreamData)
+    if (!m_firsttune || scanning)
+        // for historical reason, an initial tune is requested at
+        // startup so don't open the stream handler just yet it will
+        // be opened after the next Tune or SetStreamData)
     {
         MPEGStreamData *tmp = m_stream_data;
 

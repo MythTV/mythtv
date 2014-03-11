@@ -16,6 +16,7 @@ using namespace std;
 #include "mythtvexp.h"
 #include "dtvconfparser.h"
 #include "dtvconfparserhelpers.h"
+#include "iptvtuningdata.h"
 
 class FrequencyTable;
 class TransportScanItem;
@@ -152,6 +153,12 @@ class TransportScanItem
                       const FrequencyTable&,  /* freq table to get info from */
                       uint                _timeoutTune);
 
+    TransportScanItem(uint                  _sourceid,
+                      const QString        &_name,
+                      const IPTVTuningData &_tuning,
+                      const QString        &_channel,
+                      uint                  _timeoutTune);
+
     uint offset_cnt() const
         { return (freq_offsets[2]) ? 3 : ((freq_offsets[1]) ? 2 : 1); }
 
@@ -176,6 +183,8 @@ class TransportScanItem
     unsigned  timeoutTune;      ///< Timeout to tune to a frequency
 
     DTVMultiplex tuning;        ///< Tuning info
+    IPTVTuningData iptv_tuning; ///< IPTV Tuning info
+    QString        iptv_channel;///< IPTV base channel
 
     DTVChannelInfoList expectedChannels;
 };
