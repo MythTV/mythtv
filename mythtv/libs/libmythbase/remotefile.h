@@ -8,6 +8,7 @@
 #include <QMutex>
 
 #include "mythbaseexp.h"
+#include "mythtimer.h"
 
 class MythSocket;
 class QFile;
@@ -75,6 +76,7 @@ class MBASE_PUBLIC RemoteFile
 
     bool            writemode;
     bool            completed;
+    MythTimer       lastSizeCheck;
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;

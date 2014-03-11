@@ -33,6 +33,8 @@ using namespace std;
 #include "mythmiscutil.h"
 #include "threadedfilewriter.h"
 
+#define MAX_FILE_CHECK 500  // in ms
+
 RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
                        int _timeout_ms,
                        const QStringList *possibleAuxiliaryFiles) :
@@ -921,7 +923,7 @@ long long RemoteFile::GetRealFileSize(void)
 
     QMutexLocker locker(&lock);
 
-    if (completed)
+    if (completed || lastSizeCheck.elapsed() < MAX_FILE_CHECK)
     {
         return filesize;
     }
@@ -952,15 +954,20 @@ long long RemoteFile::GetRealFileSize(void)
             if (strlist.count() >= 2)
             {
                 completed = strlist[1].toInt();
-                filesize = size;
             }
-            return size;
+            filesize = size;
         }
-        struct stat fileinfo;
-        if (Exists(path, &fileinfo))
+        else
         {
-            return fileinfo.st_size;
+            struct stat fileinfo;
+
+            if (Exists(path, &fileinfo))
+            {
+                filesize = fileinfo.st_size;
+            }
         }
+        lastSizeCheck.restart();
+        return filesize;
     }
 
     return -1;
