@@ -152,17 +152,18 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     QDir dir(path);
 
     QString filename = QString("%1-%2.jpg").arg(mdata->ID()).arg(AlbumArtImages::getTypeFilename(image->imageType));
-    if (!QFile::exists(path + filename))
-    {
-        if (!dir.exists())
-            dir.mkpath(path);
 
-        QImage *saveImage = tagger->getAlbumArt(trackFilename, image->imageType);
-        if (saveImage)
-        {
-            saveImage->save(path + filename, "JPEG");
-            delete saveImage;
-        }
+    if (QFile::exists(path + filename))
+        QFile::remove(path + filename);
+
+    if (!dir.exists())
+        dir.mkpath(path);
+
+    QImage *saveImage = tagger->getAlbumArt(trackFilename, image->imageType);
+    if (saveImage)
+    {
+        saveImage->save(path + filename, "JPEG");
+        delete saveImage;
     }
 
     delete tagger;
