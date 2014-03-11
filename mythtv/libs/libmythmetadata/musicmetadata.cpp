@@ -1785,7 +1785,7 @@ void AlbumArtImages::scanForImages()
         busy = NULL;
     }
 
-    QStringList strList(QString("MUSIC_FIND_ALBUMART %1 %2 0")
+    QStringList strList(QString("MUSIC_FIND_ALBUMART %1 %2 1")
                                 .arg(m_parent->Hostname())
                                 .arg(m_parent->ID()));
 
