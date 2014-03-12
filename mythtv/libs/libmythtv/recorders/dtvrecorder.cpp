@@ -841,10 +841,8 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
     bool hasFrame = false;
     bool hasKeyFrame = false;
 
-    // If payloadStart, account for Adaptation Field Control Offset
-    uint i = payloadStart ? tspacket->AFCOffset() : 0;
-
     // scan for PES packets and H.264 NAL units
+    uint i = tspacket->AFCOffset();
     for (; i < TSPacket::kSize; ++i)
     {
         // special handling required when a new PES packet begins
