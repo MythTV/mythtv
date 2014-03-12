@@ -4,6 +4,10 @@
 #include "streamhandler.h"
 #include "threadedfilewriter.h"
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 #define LOC      QString("SH(%1): ").arg(_device)
 
 StreamHandler::StreamHandler(const QString &device) :
