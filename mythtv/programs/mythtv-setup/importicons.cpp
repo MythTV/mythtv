@@ -42,7 +42,7 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    m_tmpDir = QDir(QString("%1/icontmp").arg(GetConfDir()));
+    m_tmpDir = QDir(QString("%1/tmp/icon").arg(GetConfDir()));
 
     if (!m_tmpDir.exists())
         m_tmpDir.mkpath(m_tmpDir.absolutePath());

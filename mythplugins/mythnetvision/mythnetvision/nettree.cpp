@@ -196,7 +196,7 @@ NetTree::~NetTree()
 
 void NetTree::cleanCacheDir()
 {
-    QString cache = QString("%1/thumbcache")
+    QString cache = QString("%1/cache/netvision-thumbcache")
                        .arg(GetConfDir());
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);

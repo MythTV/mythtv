@@ -295,7 +295,7 @@ void NetSearch::fillGrabberButtonList()
 
 void NetSearch::cleanCacheDir()
 {
-    QString cache = QString("%1/MythNetvision/thumbcache")
+    QString cache = QString("%1/cache/netvision-thumbcache")
                        .arg(GetConfDir());
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);

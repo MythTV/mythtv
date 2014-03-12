@@ -484,7 +484,7 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     // rename the file's thumbnail if it exists
     if (QFile::exists(currDir + "/.thumbcache/" + oldName))
     {
-        QDir d(currDir + "/.thumbcache/");
+        QDir d(currDir + "/cache/gallery-thumbcache/");
         d.rename(oldName, newName);
     }
 
@@ -656,7 +656,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     // rename the directory's thumbnail if it exists in the parent directory
     if (QFile::exists(currDir + "/.thumbcache/" + oldName))
     {
-        QDir d(currDir + "/.thumbcache/");
+        QDir d(currDir + "/cache/gallery-thumbcache/");
         d.rename(oldName, newName);
     }
 

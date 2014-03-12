@@ -483,7 +483,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
     if (m_outFileName.isEmpty())
     {
         QString remotecachedirname =
-            QString("%1/remotecache").arg(GetConfDir());
+            QString("%1/cache/remotecache").arg(GetConfDir());
         QDir remotecachedir(remotecachedirname);
 
         if (!remotecachedir.exists())

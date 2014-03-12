@@ -357,7 +357,7 @@ QString getDownloadFilename(QString title, QString url)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    fileprefix += "/thumbcache";
+    fileprefix += "/cache/metadata-thumbcache";
 
     dir = QDir(fileprefix);
     if (!dir.exists())
@@ -515,7 +515,7 @@ QString getLocalStorageGroupPath(VideoArtworkType type, QString host)
 
 void cleanThumbnailCacheDir()
 {
-    QString cache = QString("%1/thumbcache")
+    QString cache = QString("%1/cache/metadata-thumbcache")
                .arg(GetConfDir());
     QDir cacheDir(cache);
     QStringList thumbs = cacheDir.entryList(QDir::Files);

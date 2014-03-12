@@ -18,13 +18,7 @@ QString GetThumbnailFilename(QString url, QString title)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    fileprefix += "/MythNetvision";
-
-    dir = QDir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
-
-    fileprefix += "/thumbcache";
+    fileprefix += "/cache/netvision-thumbcache";
 
     dir = QDir(fileprefix);
     if (!dir.exists())

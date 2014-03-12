@@ -269,7 +269,7 @@ void CDRipperThread::run(void)
     }
 
     MusicMetadata *titleTrack = NULL;
-    QString saveDir = GetConfDir() + "/MythMusic/RipTemp/";
+    QString saveDir = GetConfDir() + "/tmp/RipTemp/";
     QString outfile;
 
     std::auto_ptr<Encoder> encoder;
@@ -571,10 +571,10 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
 
     // make sure the directory where we temporarily save the rips is present
     QDir dir;
-    dir.mkpath(GetConfDir() + "/MythMusic/RipTemp/");
+    dir.mkpath(GetConfDir() + "/tmp/RipTemp/");
 
     // remove any ripped tracks from the temp rip directory
-    QString command = "rm -f " + GetConfDir() + "/MythMusic/RipTemp/*";
+    QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
     // get last host and directory we ripped to
@@ -587,7 +587,7 @@ Ripper::Ripper(MythScreenStack *parent, QString device) :
 Ripper::~Ripper(void)
 {
     // remove any ripped tracks from the temp rip directory
-    QString command = "rm -f " + GetConfDir() + "/MythMusic/RipTemp/*";
+    QString command = "rm -f " + GetConfDir() + "/tmp/RipTemp/*";
     myth_system(command);
 
     if (m_decoder)
