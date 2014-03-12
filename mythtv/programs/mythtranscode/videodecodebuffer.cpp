@@ -1,11 +1,14 @@
 #include "videodecodebuffer.h"
 
+#include "mythplayer.h"
+#include "videooutbase.h"
+
 VideoDecodeBuffer::VideoDecodeBuffer(MythPlayer *player, VideoOutput *videoout,
                                      bool cutlist, int size)
   : m_player(player),         m_videoOutput(videoout),
-    m_honorCutlist(cutlist),
-    m_eof(false),             m_maxFrames(size),
-    m_runThread(true),        m_isRunning(false)
+    m_honorCutlist(cutlist),  m_maxFrames(size),
+    m_runThread(true),        m_isRunning(false),
+    m_eof(false)
 {
 
 }
@@ -35,8 +38,12 @@ void VideoDecodeBuffer::run()
     m_isRunning = true;
     while (m_runThread)
     {
+        QMutexLocker locker(&m_queueLock);
+
         if (m_frameList.size() < m_maxFrames && !m_eof)
         {
+            locker.unlock();
+
             DecodedFrameInfo tfInfo;
             tfInfo.frame = NULL;
             tfInfo.didFF = 0;
@@ -47,21 +54,22 @@ void VideoDecodeBuffer::run()
             {
                 tfInfo.frame = m_videoOutput->GetLastDecodedFrame();
 
-                QMutexLocker locker(&m_queueLock);
+                locker.relock();
                 m_frameList.append(tfInfo);
             }
-            else
+            else if (m_player->GetEof() != kEofStateNone)
             {
+                locker.relock();
                 m_eof = true;
             }
+            else
+                continue;
 
             m_frameWaitCond.wakeAll();
         }
         else
         {
-            m_frameWaitLock.lock();
-            m_frameWaitCond.wait(&m_frameWaitLock);
-            m_frameWaitLock.unlock();
+            m_frameWaitCond.wait(locker.mutex());
         }
     }
     m_isRunning = false;
@@ -69,27 +77,21 @@ void VideoDecodeBuffer::run()
 
 VideoFrame *VideoDecodeBuffer::GetFrame(int &didFF, bool &isKey)
 {
-    m_queueLock.lock();
+    QMutexLocker locker(&m_queueLock);
 
     if (m_frameList.isEmpty())
     {
-        m_queueLock.unlock();
-
         if (m_eof)
             return NULL;
 
-        m_frameWaitLock.lock();
-        m_frameWaitCond.wait(&m_frameWaitLock);
-        m_frameWaitLock.unlock();
+        m_frameWaitCond.wait(locker.mutex());
 
         if (m_frameList.isEmpty())
             return NULL;
-
-        m_queueLock.lock();
     }
 
     DecodedFrameInfo tfInfo = m_frameList.takeFirst();
-    m_queueLock.unlock();
+    locker.unlock();
     m_frameWaitCond.wakeAll();
 
     didFF = tfInfo.didFF;
