@@ -144,7 +144,14 @@ class MetaData(object):
         self.logger = logger
         self.simulation = simulation
         self.verbose = verbose
-        self.cache_dir="/tmp/tvdb_api_%s/" % os.geteuid()
+        confdir = os.environ.get('MYTHCONFDIR', '')
+        if (not confdir) or (confdir == '/'):
+            confdir = os.environ.get('HOME', '')
+            if (not confdir) or (confdir == '/'):
+                print "Unable to find MythTV directory for metadata cache."
+                sys.exit(1)
+            confdir = os.path.join(confdir, '.mythtv')
+        self.cache_dir=os.path.join(confdir, "cache/tvdb_api/")
         self.ttvdb = tvdb_api.Tvdb(banners=False, debug = False, cache = self.cache_dir, custom_ui=None, language = u'en', apikey="0BB856A59C51D607")
         self.makeRecordRule = {'chanid': channel_id, 'description': u'Mirobridge Record rule used to acquire ttvdb.com artwork',
                                'autometadata': 1, 'season': 1, 'episode': 1, 'category': u'Miro', 'station': u'Miro'  }
