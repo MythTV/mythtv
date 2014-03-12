@@ -6,18 +6,20 @@
 #include <QMutex>
 #include <QRunnable>
 
-#include "mythplayer.h"
 #include "videooutbase.h"
+
+class MythPlayer;
+class VideoOutput;
 
 class VideoDecodeBuffer : public QRunnable
 {
   public:
     VideoDecodeBuffer(MythPlayer *player, VideoOutput *videoout,
         bool cutlist, int size = 5);
-    ~VideoDecodeBuffer();
+    virtual ~VideoDecodeBuffer();
 
-    void        stop(void);
-    void        run();
+    void          stop(void);
+    virtual void run();
     VideoFrame *GetFrame(int &didFF, bool &isKey);
 
   private:
@@ -28,17 +30,16 @@ class VideoDecodeBuffer : public QRunnable
         bool        isKey;
     } DecodedFrameInfo;
 
-    MythPlayer             *m_player;
-    VideoOutput            *m_videoOutput;
-    bool                    m_honorCutlist;
+    MythPlayer * const      m_player;
+    VideoOutput * const     m_videoOutput;
+    bool const              m_honorCutlist;
+    int const               m_maxFrames;
+    bool volatile           m_runThread;
+    bool volatile           m_isRunning;
+    QMutex mutable          m_queueLock; // Guards the following...
     bool                    m_eof;
-    int                     m_maxFrames;
-    bool                    m_runThread;
-    bool                    m_isRunning;
-    QMutex                  m_queueLock;
     QList<DecodedFrameInfo> m_frameList;
     QWaitCondition          m_frameWaitCond;
-    QMutex                  m_frameWaitLock;
 };
 
 #endif

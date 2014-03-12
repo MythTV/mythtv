@@ -4675,7 +4675,10 @@ bool MythPlayer::TranscodeGetNextFrame(
                 QString("Fast-Forwarding from %1 to %2")
                     .arg(lastDecodedFrameNumber).arg(jumpto));
             if (jumpto >= totalFrames)
+            {
+                SetEof(kEofStateDelayed);
                 return false;
+            }
 
             // For 0.25, move this to DoJumpToFrame(jumpto)
             WaitForSeek(jumpto, 0);
