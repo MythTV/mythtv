@@ -117,6 +117,7 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_compilation = rhs.m_compilation;
     m_id = rhs.m_id;
     m_filename = rhs.m_filename;
+    m_actualFilename = rhs.m_actualFilename;
     m_hostname = rhs.m_hostname;
     m_directoryid = rhs.m_directoryid;
     m_artistid = rhs.m_artistid;
