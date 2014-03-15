@@ -567,7 +567,8 @@ void PlaylistEditorView::updateSonglist(MusicGenericTree *node)
         MusicGenericTree *allTracksNode = dynamic_cast<MusicGenericTree*>(node->getChildAt(0));
         if (allTracksNode)
         {
-            filterTracks(allTracksNode);
+            if (allTracksNode->childCount() == 0)
+                filterTracks(allTracksNode);
 
             for (int x = 0; x < allTracksNode->childCount(); x++)
             {
