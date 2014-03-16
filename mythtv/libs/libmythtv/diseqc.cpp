@@ -68,6 +68,8 @@
 #define DISEQC_CMD_WRITE_N0   0x38
 #define DISEQC_CMD_WRITE_N1   0x39
 #define DISEQC_CMD_WRITE_FREQ 0x58
+#define DISEQC_CMD_ODU        0x5A
+#define DISEQC_CMD_ODU_MDU    0x5C
 #define DISEQC_CMD_HALT       0x60
 #define DISEQC_CMD_LMT_OFF    0x63
 #define DISEQC_CMD_LMT_E      0x66
@@ -84,6 +86,8 @@
 #define EPS     1E-4
 
 #define LOC      QString("DiSEqCDevTree: ")
+
+bool diseqc_bus_already_reset = false;
 
 QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
 {
@@ -563,6 +567,29 @@ DiSEqCDevLNB *DiSEqCDevTree::FindLNB(const DiSEqCDevSettings &settings)
     return lnb;
 }
 
+/** \fn DiSEqCDevTree::FindSCR(const DiSEqCDevSettings&)
+ *  \brief Returns the SCR device object selected by the configuration chain.
+ *  \param settings Configuration chain in effect.
+ *  \return Pointer to SCR object if found, NULL otherwise.
+ */
+DiSEqCDevSCR *DiSEqCDevTree::FindSCR(const DiSEqCDevSettings &settings)
+{
+    DiSEqCDevDevice *node = m_root;
+    DiSEqCDevSCR    *scr  = NULL;
+
+    while (node)
+    {
+        scr = dynamic_cast<DiSEqCDevSCR*>(node);
+
+        if (scr)
+            break;
+
+        node = node->GetSelectedChild(settings);
+    }
+
+    return scr;
+}
+
 
 /** \fn DiSEqCDevTree::FindDevice(uint)
  *  \brief Returns a device by ID.
@@ -635,6 +662,8 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
         return false;
     }
 
+    bool resend_cmd = false;
+
 #ifndef USING_DVB
 
     (void) adr;
@@ -661,6 +690,12 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Sending DiSEqC Command: " + cmdstr);
 
+    if (repeats >= 10)
+    {
+        repeats = repeats - 10;
+        resend_cmd = true;
+    }
+
     // send the command
     for (uint i = 0; i <= repeats; i++)
     {
@@ -670,7 +705,9 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
             return false;
         }
 
-        mcmd.msg[0] |= DISEQC_FRM_REPEAT;
+        if (!resend_cmd)
+            mcmd.msg[0] |= DISEQC_FRM_REPEAT;
+
         usleep(DISEQC_SHORT_WAIT);
     }
 
@@ -684,7 +721,7 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
  *  \param hard_reset If true, the bus will be power cycled.
  *  \return True if successful.
  */
-bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
+bool DiSEqCDevTree::ResetDiseqc(bool hard_reset, bool is_SCR)
 {
     Reset();
 
@@ -696,20 +733,31 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
 
         SetVoltage(SEC_VOLTAGE_OFF);
         usleep(DISEQC_POWER_OFF_WAIT);
+        diseqc_bus_already_reset = false;
     }
 
-    // make sure the bus is powered
-    SetVoltage(SEC_VOLTAGE_18);
-    usleep(DISEQC_POWER_ON_WAIT);
-    // some DiSEqC devices need more time. see #8465
-    usleep(DISEQC_POWER_ON_WAIT);
-
-    // issue a global reset command
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Resetting DiSEqC Bus");
-    if (!SendCommand(DISEQC_ADR_ALL, DISEQC_CMD_RESET))
+    if (!diseqc_bus_already_reset || !is_SCR)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "DiSEqC reset failed" + ENO);
-        return false;
+        // make sure the bus is powered
+        SetVoltage(SEC_VOLTAGE_18);
+        usleep(DISEQC_POWER_ON_WAIT);
+        // some DiSEqC devices need more time. see #8465
+        usleep(DISEQC_POWER_ON_WAIT);
+
+        // issue a global reset command
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Resetting DiSEqC Bus");
+        if (!SendCommand(DISEQC_ADR_ALL, DISEQC_CMD_RESET))
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "DiSEqC reset failed" + ENO);
+            return false;
+        }
+        
+        if (is_SCR)
+            diseqc_bus_already_reset = true;
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Skiping reset: already done for this SCR bus");
     }
 
     usleep(DISEQC_LONG_WAIT);
@@ -717,12 +765,12 @@ bool DiSEqCDevTree::ResetDiseqc(bool hard_reset)
     return true;
 }
 
-void DiSEqCDevTree::Open(int fd_frontend)
+void DiSEqCDevTree::Open(int fd_frontend, bool is_SCR)
 {
     m_fd_frontend = fd_frontend;
 
     // issue reset command
-    ResetDiseqc(false /* do a soft reset */);
+    ResetDiseqc(false, is_SCR);
 }
 
 bool DiSEqCDevTree::SetVoltage(uint voltage)
@@ -784,10 +832,11 @@ bool DiSEqCDevTree::ApplyVoltage(const DiSEqCDevSettings &settings,
  *  \brief Represents a node in a DVB-S device network.
  */
 
-const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[4] =
+const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
 {
     { "switch",      kTypeSwitch },
     { "rotor",       kTypeRotor  },
+    { "scr",         kTypeSCR    },
     { "lnb",         kTypeLNB    },
     { QString::null, kTypeLNB    },
 };
@@ -891,6 +940,11 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
             if (node)
                 node->SetDescription("Rotor");
             break;
+        case kTypeSCR:
+            node = new DiSEqCDevSCR(tree, dev_id);
+            if (node)
+                node->SetDescription("Unicable");
+                break;
         case kTypeLNB:
             node = new DiSEqCDevLNB(tree, dev_id);
             if (node)
@@ -2049,6 +2103,300 @@ void DiSEqCDevRotor::RotationComplete(void) const
     m_move_time = 0.0;
     m_last_pos_known = true;
     m_last_azimuth = m_desired_azimuth;
+}
+
+////////////////////////////////////////
+
+/** \class DiSEqCDevSCR
+ *  \brief Unicable / SCR Class.
+ */
+
+const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
+{
+    { "A",            kTypeScrPosA },
+    { "B",            kTypeScrPosB },
+    { QString::null,  kTypeScrPosA },
+};
+
+DiSEqCDevSCR::DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
+    : DiSEqCDevDevice(tree, devid)
+    , m_scr_userband(0)
+    , m_scr_frequency(1400)
+    , m_scr_pin(-1)
+    , m_child(0)
+{
+    Reset();
+}
+
+DiSEqCDevSCR::~DiSEqCDevSCR()
+{
+    if (m_child)
+        delete m_child;
+}
+
+void DiSEqCDevSCR::Reset(void)
+{
+    if (m_child)
+        m_child->Reset();
+}
+
+bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex &tuning)
+{
+    // retrieve LNB info
+    DiSEqCDevLNB *lnb = m_tree.FindLNB(settings);
+    if (!lnb)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SCR: No LNB for this configuration!");
+        return false;
+    }
+
+    bool     high_band  = lnb->IsHighBand(tuning);
+    bool     horizontal = lnb->IsHorizontal(tuning);
+    uint32_t frequency  = lnb->GetIntermediateFrequency(settings, tuning);
+    uint t = (frequency / 1000 + m_scr_frequency + 2) / 4 - 350;
+
+    // retrieve position settings
+    dvbdev_pos_t scr_position = (dvbdev_pos_t) settings.GetValue(GetDeviceID());
+
+    // check parameters
+    if (m_scr_userband > 8)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("SCR: Userband ID=%1 is out of standard range!")
+        .arg(m_scr_userband));
+    }
+
+    if (t >= 1024)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SCR: T out of range!");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, QString("SCR: Tuning to %1kHz, %2, %3 using UB=%4, FREQ=%5MHz, POS=%6%7")
+            .arg(tuning.frequency)
+            .arg(high_band ? "HiBand" : "LoBand")
+            .arg(horizontal ? "H" : "V")
+            .arg(m_scr_userband)
+            .arg(m_scr_frequency)
+            .arg((scr_position) ? "B" : "A")
+            .arg((m_scr_pin >= 0 && m_scr_pin <= 255) ?
+                     QString(", PIN=%1").arg(m_scr_pin) : QString("")));
+
+    // build command
+    unsigned char data[3];
+    data[0] = t >> 8 | m_scr_userband << 5;
+    data[1] = t & 0x00FF;
+
+    if (high_band)
+        data[0] |= (1 << 2);
+
+    if (horizontal)
+        data[0] |= (1 << 3);
+
+    if (scr_position)
+        data[0] |= (1 << 4);
+
+    // send command
+    if (m_scr_pin >= 0 && m_scr_pin <= 255)
+    {
+        data[2] = m_scr_pin;
+        return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
+    } else {
+        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
+    }
+}
+
+bool DiSEqCDevSCR::PowerOff(void) const
+{
+    // check parameters
+    if (m_scr_userband > 8)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("SCR: Userband ID=%1 is out of standard range!")
+        .arg(m_scr_userband));
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SCR: Power off UB=%1%7")
+            .arg(m_scr_userband)
+            .arg((m_scr_pin >= 0 && m_scr_pin <= 255)
+                 ? QString(", PIN=%1").arg(m_scr_pin)
+                 : QString("")));
+
+    // build command
+    unsigned char data[3];
+    data[0] = (uint8_t) (m_scr_userband << 5);
+    data[1] = 0x00;
+
+    // send command
+    if (m_scr_pin >= 0 && m_scr_pin <= 255)
+    {
+        data[2] = m_scr_pin;
+        return SendCommand(DISEQC_CMD_ODU_MDU, m_repeat, 3, data);
+    } else {
+        return SendCommand(DISEQC_CMD_ODU, m_repeat, 2, data);
+    }
+}
+
+bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, uint data_len,
+                               unsigned char *data) const
+{
+    (void) repeats;
+
+    // power on bus
+    if (!m_tree.SetVoltage(SEC_VOLTAGE_18))
+        return false;
+    usleep(DISEQC_LONG_WAIT);
+
+    // send command
+    bool ret = m_tree.SendCommand(DISEQC_ADR_SW_ALL, cmd, repeats, data_len, data);
+
+    // power off bus
+    if (!m_tree.SetVoltage(SEC_VOLTAGE_13))
+        return false;
+
+    return ret;
+}
+
+uint DiSEqCDevSCR::GetVoltage(const DiSEqCDevSettings &settings,
+                              const DTVMultiplex      &tuning) const
+{
+    return SEC_VOLTAGE_13;
+}
+
+uint32_t DiSEqCDevSCR::GetIntermediateFrequency(const uint32_t frequency) const
+{
+    uint t = (frequency / 1000 + m_scr_frequency + 2) / 4 - 350;
+    return ((t + 350) * 4) * 1000 - frequency;
+}
+
+bool DiSEqCDevSCR::Load(void)
+{
+    // populate scr parameters from db
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT scr_userband,    scr_frequency, "
+        "       scr_pin,         cmd_repeat "
+        "FROM diseqc_tree "
+        "WHERE diseqcid = :DEVID");
+    query.bindValue(":DEVID", GetDeviceID());
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("DiSEqCDevSCR::Load 1", query);
+        return false;
+    }
+    else if (query.next())
+    {
+        m_scr_userband  = query.value(0).toUInt();
+        m_scr_frequency = query.value(1).toUInt();
+        m_scr_pin       = query.value(2).toInt();
+        m_repeat        = query.value(3).toUInt();
+    }
+
+    // load children from db
+    if (m_child)
+    {
+        delete m_child;
+        m_child = NULL;
+    }
+
+    query.prepare(
+        "SELECT diseqcid "
+        "FROM diseqc_tree "
+        "WHERE parentid = :DEVID");
+    query.bindValue(":DEVID", GetDeviceID());
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("DiSEqCDevSCR::Load 2", query);
+        return false;
+    }
+    else if (query.next())
+    {
+        uint child_dev_id = query.value(0).toUInt();
+        SetChild(0, CreateById(m_tree, child_dev_id));
+    }
+
+    return true;
+}
+
+bool DiSEqCDevSCR::Store(void) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    // insert new or update old
+    if (IsRealDeviceID())
+    {
+        query.prepare(
+            "UPDATE diseqc_tree "
+            "SET parentid        = :PARENT,  "
+            "    ordinal         = :ORDINAL, "
+            "    type            = 'scr',    "
+            "    description     = :DESC,    "
+            "    scr_userband    = :USERBAND, "
+            "    scr_frequency   = :FREQUENCY, "
+            "    scr_pin         = :PIN, "
+            "    cmd_repeat      = :REPEAT   "
+            "WHERE diseqcid = :DEVID");
+        query.bindValue(":DEVID",   GetDeviceID());
+    }
+    else
+    {
+        query.prepare(
+            "INSERT INTO diseqc_tree"
+            " ( parentid,      ordinal,         type, "
+            "   description,   scr_userband,    scr_frequency, "
+            "   scr_pin,       cmd_repeat) "
+            "VALUES "
+            " (:PARENT,       :ORDINAL,         'scr', "
+            "  :DESC,         :USERBAND,        :FREQUENCY,"
+            "  :PIN,          :REPEAT) ");
+    }
+
+    if (m_parent)
+        query.bindValue(":PARENT", m_parent->GetDeviceID());
+
+    query.bindValue(":ORDINAL",   m_ordinal);
+    query.bindValue(":DESC",      GetDescription());
+    query.bindValue(":USERBAND",  m_scr_userband);
+    query.bindValue(":FREQUENCY", m_scr_frequency);
+    query.bindValue(":PIN",       m_scr_pin);
+    query.bindValue(":REPEAT",    m_repeat);
+
+    // update dev_id
+    if (!query.exec())
+    {
+        MythDB::DBError("DiSEqCDevSCR::Store", query);
+        return false;
+    }
+
+    // figure out devid if we did an insert
+    if (!IsRealDeviceID())
+        SetDeviceID(query.lastInsertId().toUInt());
+
+    // chain to child
+    if (m_child)
+        return m_child->Store();
+
+    return true;
+}
+
+bool DiSEqCDevSCR::SetChild(uint ordinal, DiSEqCDevDevice *device)
+{
+    if (ordinal)
+        return false;
+
+    DiSEqCDevDevice *old_child = m_child;
+    m_child = NULL;
+    if (old_child)
+        delete old_child;
+
+    m_child = device;
+    if (m_child)
+    {
+        m_child->SetOrdinal(ordinal);
+        m_child->SetParent(this);
+    }
+
+    return true;
 }
 
 ////////////////////////////////////////

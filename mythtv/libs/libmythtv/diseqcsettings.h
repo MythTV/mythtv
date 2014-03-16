@@ -73,6 +73,17 @@ class RotorConfig : public QObject, public ConfigurationWizard
     TransButtonSetting *m_pos;
 };
 
+class SCRConfig : public QObject, public ConfigurationWizard
+{
+    Q_OBJECT
+
+  public:
+    SCRConfig(DiSEqCDevSCR &scr);
+
+  private:
+    DiSEqCDevSCR &m_scr;
+};
+
 class LNBTypeSetting;
 class LNBLOFSwitchSetting;
 class LNBLOFLowSetting;

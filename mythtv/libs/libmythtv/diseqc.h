@@ -27,6 +27,7 @@ class DiSEqCDevTree;
 class DiSEqCDevDevice;
 class DiSEqCDevRotor;
 class DiSEqCDevLNB;
+class DiSEqCDevSCR;
 
 typedef QMap<uint, double>         uint_to_dbl_t;
 typedef QMap<double, uint>         dbl_to_uint_t;
@@ -85,6 +86,7 @@ class DiSEqCDevTree
 
     DiSEqCDevRotor  *FindRotor(const DiSEqCDevSettings &settings, uint index = 0);
     DiSEqCDevLNB    *FindLNB(const DiSEqCDevSettings &settings);
+    DiSEqCDevSCR    *FindSCR(const DiSEqCDevSettings &settings);
     DiSEqCDevDevice *FindDevice(uint dev_id);
 
     /** \brief Retrieves the root node in the tree. */
@@ -94,10 +96,10 @@ class DiSEqCDevTree
     bool SendCommand(uint adr, uint cmd, uint repeats = 0,
                      uint data_len = 0, unsigned char *data = NULL);
 
-    bool ResetDiseqc(bool hard_reset);
+    bool ResetDiseqc(bool hard_reset, bool is_SCR);
 
     // frontend fd
-    void Open(int fd_frontend);
+    void Open(int fd_frontend, bool is_SCR);
     void Close(void) { m_fd_frontend = -1; }
     int  GetFD(void) const { return m_fd_frontend; }
 
@@ -142,7 +144,13 @@ class DiSEqCDevDevice
     virtual bool Store(void) const = 0;
 
     // Sets
-    enum dvbdev_t { kTypeSwitch = 0, kTypeRotor = 1, kTypeLNB = 2, };
+    enum dvbdev_t
+    {
+        kTypeSwitch = 0,
+        kTypeRotor = 1,
+        kTypeSCR = 2,
+        kTypeLNB = 3,
+    };
     void SetDeviceType(dvbdev_t type)        { m_dev_type = type;    }
     void SetParent(DiSEqCDevDevice* parent)  { m_parent   = parent;  }
     void SetOrdinal(uint ordinal)            { m_ordinal  = ordinal; }
@@ -201,7 +209,7 @@ class DiSEqCDevDevice
                                    const TypeTable *table);
 
   private:
-    static const TypeTable dvbdev_lookup[4];
+    static const TypeTable dvbdev_lookup[5];
 };
 
 class DiSEqCDevSwitch : public DiSEqCDevDevice
@@ -357,6 +365,67 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
 
     // statics
     static const TypeTable RotorTypeTable[3];
+};
+
+class DiSEqCDevSCR : public DiSEqCDevDevice
+{
+  public:
+    DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid);
+    ~DiSEqCDevSCR();
+
+    // Commands
+    virtual void Reset(void);
+    virtual bool Execute(const DiSEqCDevSettings&, const DTVMultiplex&);
+    bool         PowerOff(void) const;
+    virtual bool Load(void);
+    virtual bool Store(void) const;
+
+    // Sets
+    enum dvbdev_pos_t
+    {
+        kTypeScrPosA               = 0,
+        kTypeScrPosB               = 1,
+    };
+    void SetUserBand(uint userband)        { m_scr_userband  = userband;   }
+    void SetFrequency(uint freq)           { m_scr_frequency = freq;       }
+    void SetPIN(int pin)                   { m_scr_pin       = pin;        }
+    virtual bool SetChild(uint ordinal, DiSEqCDevDevice* device);
+
+    // Gets
+    uint         GetUserBand(void) const   { return m_scr_userband;        }
+    uint         GetFrequency(void) const  { return m_scr_frequency;       }
+    int          GetPIN(void) const        { return m_scr_pin;             }
+    virtual uint GetChildCount(void) const { return 1;                     }
+    virtual bool IsCommandNeeded(const DiSEqCDevSettings&,
+                                 const DTVMultiplex&) const { return false; }
+    virtual uint GetVoltage(const DiSEqCDevSettings&,
+                            const DTVMultiplex&) const;
+    uint32_t     GetIntermediateFrequency(const uint32_t frequency) const;
+
+    // Non-const Gets
+    virtual DiSEqCDevDevice *GetSelectedChild(const DiSEqCDevSettings&) const
+                                            { return m_child;              }
+    virtual DiSEqCDevDevice *GetChild(uint) { return m_child;              }
+
+    // statics
+    static QString SCRPositionToString(dvbdev_pos_t pos)
+        { return TableToString((uint)pos, SCRPositionTable); }
+
+    static dvbdev_pos_t SCRPositionFromString(const QString &pos)
+        { return (dvbdev_pos_t) TableFromString(pos, SCRPositionTable); }
+
+  protected:
+    bool         SendCommand(uint cmd, uint repeats, uint data_len = 0,
+                             unsigned char *data = NULL) const;
+
+  private:
+    uint         m_scr_userband;  /* 0-7 */
+    uint         m_scr_frequency;
+    int          m_scr_pin;       /* 0-255, -1=disabled */
+
+    DiSEqCDevDevice *m_child;
+
+    static const TypeTable SCRPositionTable[3];
 };
 
 class DiSEqCDevLNB : public DiSEqCDevDevice

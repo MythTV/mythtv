@@ -269,9 +269,23 @@ bool DVBChannel::Open(DVBChannel *who)
     // Turn on the power to the LNB
     if (tunerType.IsDiSEqCSupported())
     {
+
         diseqc_tree = diseqc_dev.FindTree(GetCardID());
         if (diseqc_tree)
-            diseqc_tree->Open(fd_frontend);
+        {
+            bool is_SCR = false;
+
+            DiSEqCDevSCR *scr = diseqc_tree->FindSCR(diseqc_settings);
+            if (scr)
+            {
+                is_SCR = true;
+                LOG(VB_CHANNEL, LOG_INFO, LOC + "Requested DVB channel is on SCR system");
+            }
+            else
+                LOG(VB_CHANNEL, LOG_INFO, LOC + "Requested DVB channel is on non-SCR system");
+
+            diseqc_tree->Open(fd_frontend, is_SCR);
+        }
     }
 
     first_tune = true;
@@ -685,51 +699,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     // Remove any events in queue before tuning.
     drain_dvb_events(fd_frontend);
 
-    // send DVB-S setup
-    if (diseqc_tree)
-    {
-        // configure for new input
-        if (!same_input)
-            diseqc_settings.Load(inputid);
-
-        // execute diseqc commands
-        if (!diseqc_tree->Execute(diseqc_settings, tuning))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Tune(): Failed to setup DiSEqC devices");
-            return false;
-        }
-
-        // retrieve actual intermediate frequency
-        DiSEqCDevLNB *lnb = diseqc_tree->FindLNB(diseqc_settings);
-        if (!lnb)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Tune(): No LNB for this configuration");
-            return false;
-        }
-
-        if (lnb->GetDeviceID() != last_lnb_dev_id)
-        {
-            last_lnb_dev_id = lnb->GetDeviceID();
-            // make sure we tune to frequency, if the lnb has changed
-            reset = first_tune = true;
-        }
-
-        intermediate_freq = lnb->GetIntermediateFrequency(
-            diseqc_settings, tuning);
-
-        // if card can auto-FEC, use it -- sometimes NITs are inaccurate
-        if (capabilities & FE_CAN_FEC_AUTO)
-            can_fec_auto = true;
-
-        // Check DVB-S intermediate frequency here since it requires a fully
-        // initialized diseqc tree
-        CheckFrequency(intermediate_freq);
-    }
-
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Old Params: " + prev_tuning.toString() +
-            "\n\t\t\t" + LOC + "New Params: " + tuning.toString());
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "\nOld Params: " + prev_tuning.toString() +
+            "\nNew Params: " + tuning.toString());
 
     // DVB-S is in kHz, other DVB is in Hz
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tunerType) ||
@@ -742,6 +713,56 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(intermediate_freq ? intermediate_freq : tuning.frequency)
                 .arg(suffix));
+
+        // send DVB-S setup
+        if (diseqc_tree)
+        {
+            // configure for new input
+            if (!same_input)
+                diseqc_settings.Load(inputid);
+
+            // execute diseqc commands
+            if (!diseqc_tree->Execute(diseqc_settings, tuning))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Tune(): Failed to setup DiSEqC devices");
+                return false;
+            }
+
+            // retrieve actual intermediate frequency
+            DiSEqCDevLNB *lnb = diseqc_tree->FindLNB(diseqc_settings);
+            if (!lnb)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Tune(): No LNB for this configuration");
+                return false;
+            }
+
+            if (lnb->GetDeviceID() != last_lnb_dev_id)
+            {
+                last_lnb_dev_id = lnb->GetDeviceID();
+                // make sure we tune to frequency, if the lnb has changed
+                reset = first_tune = true;
+            }
+
+            intermediate_freq = lnb->GetIntermediateFrequency(
+                diseqc_settings, tuning);
+
+            // retrieve scr intermediate frequency
+            DiSEqCDevSCR *scr = diseqc_tree->FindSCR(diseqc_settings);
+            if (lnb && scr)
+            {
+                intermediate_freq = scr->GetIntermediateFrequency(intermediate_freq);
+            }
+
+            // if card can auto-FEC, use it -- sometimes NITs are inaccurate
+            if (capabilities & FE_CAN_FEC_AUTO)
+                can_fec_auto = true;
+
+            // Check DVB-S intermediate frequency here since it requires a fully
+            // initialized diseqc tree
+            CheckFrequency(intermediate_freq);
+        }
 
 #if DVB_API_VERSION >=5
         if (DTVTunerType::kTunerTypeDVBS2 == tunerType)

@@ -47,6 +47,8 @@ class DeviceTypeSetting : public ComboBoxSetting, public Storage
                      QString::number((uint) DiSEqCDevDevice::kTypeSwitch));
         addSelection(DeviceTree::tr("Rotor"),
                      QString::number((uint) DiSEqCDevDevice::kTypeRotor));
+        addSelection(DeviceTree::tr("Unicable"),
+                     QString::number((uint) DiSEqCDevDevice::kTypeSCR));
         addSelection(DeviceTree::tr("LNB"),
                      QString::number((uint) DiSEqCDevDevice::kTypeLNB));
     }
@@ -107,12 +109,14 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
 {
   public:
     DeviceRepeatSetting(DiSEqCDevDevice &device) :
-        SpinBoxSetting(this, 0, 5, 1), m_device(device)
+        SpinBoxSetting(this, 0, 15, 1), m_device(device)
     {
         setLabel(DeviceTree::tr("Repeat Count"));
         QString help = DeviceTree::tr(
-            "Number of times to repeat DiSEqC commands sent to this device. "
-            "Larger values may help with less reliable devices.");
+            "Number of repeat (command with repeat flag ON) or resend (the same command) DiSEqC commands."
+            "If value is higher than 10, command will be resend N-10 times"
+            "If value is lower than 10, command will be repeated N times"
+            "Repeat useful for unreliable DiSEqC equipment; resend useful when unreliable DiSEq equipment has broken/unsuported repeat flag support.");
         setHelpText(help);
     }
 
@@ -559,6 +563,104 @@ void RotorConfig::RunRotorPositionsDialog(void)
     config.Save();
 }
 
+//////////////////////////////////////// SCRUserBandSetting
+
+class SCRUserBandSetting : public SpinBoxSetting, public Storage
+{
+  public:
+    SCRUserBandSetting(DiSEqCDevSCR &scr) :
+        SpinBoxSetting(this, 0, 8, 1), m_scr(scr)
+    {
+        setLabel(DeviceTree::tr("Userband"));
+        setHelpText(DeviceTree::tr("Unicable userband ID (0-7) or sometimes (1-8)"));
+    }
+
+    virtual void Load(void)
+    {
+        setValue(m_scr.GetUserBand());
+    }
+
+    virtual void Save(void)
+    {
+        m_scr.SetUserBand(intValue());
+    }
+
+    virtual void Save(QString /*destination*/) { }
+
+  private:
+    DiSEqCDevSCR &m_scr;
+};
+
+//////////////////////////////////////// SCRFrequencySetting
+
+class SCRFrequencySetting : public LineEditSetting, public Storage
+{
+  public:
+    SCRFrequencySetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    {
+        setLabel(DeviceTree::tr("Frequency (MHz)"));
+        setHelpText(DeviceTree::tr("Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)"));
+    }
+
+    virtual void Load(void)
+    {
+        setValue(QString::number(m_scr.GetFrequency()));
+    }
+
+    virtual void Save(void)
+    {
+        m_scr.SetFrequency(getValue().toUInt());
+    }
+
+    virtual void Save(QString /*destination*/) { }
+
+  private:
+    DiSEqCDevSCR &m_scr;
+};
+
+//////////////////////////////////////// SCRPINSetting
+
+class SCRPINSetting : public LineEditSetting, public Storage
+{
+  public:
+    SCRPINSetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    {
+        setLabel(DeviceTree::tr("PIN code"));
+        setHelpText(DeviceTree::tr("Unicable PIN code (-1 disabled, 0 - 255)"));
+    }
+
+    virtual void Load(void)
+    {
+        setValue(QString::number(m_scr.GetPIN()));
+    }
+
+    virtual void Save(void)
+    {
+        m_scr.SetPIN(getValue().toInt());
+    }
+
+    virtual void Save(QString /*destination*/) { }
+
+  private:
+    DiSEqCDevSCR &m_scr;
+};
+
+//////////////////////////////////////// SCRConfig
+
+SCRConfig::SCRConfig(DiSEqCDevSCR &scr) : m_scr(scr)
+{
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false);
+    group->setLabel(DeviceTree::tr("Unicable Configuration"));
+
+    group->addChild(new SCRUserBandSetting(scr));
+    group->addChild(new SCRFrequencySetting(scr));
+    group->addChild(new SCRPINSetting(scr));
+    group->addChild(new DeviceRepeatSetting(scr));
+
+    addChild(group);
+}
+
 //////////////////////////////////////// LnbPresetSetting
 
 class lnb_preset
@@ -951,6 +1053,17 @@ bool DeviceTree::EditNodeDialog(uint nodeid)
         }
         break;
 
+        case DiSEqCDevDevice::kTypeSCR:
+        {
+            DiSEqCDevSCR *scr = dynamic_cast<DiSEqCDevSCR*>(dev);
+            if (scr)
+            {
+                SCRConfig config(*scr);
+                changed = (config.exec() == MythDialog::Accepted);
+            }
+        }
+        break;
+
         case DiSEqCDevDevice::kTypeLNB:
         {
             DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>(dev);
@@ -980,6 +1093,7 @@ bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
     MythListBox *list = new MythListBox(popup);
     list->insertItem(tr("Switch"));
     list->insertItem(tr("Rotor"));
+    list->insertItem(tr("Unicable"));
     list->insertItem(tr("LNB"));
     list->setCurrentRow(0, QItemSelectionModel::Select);
 
@@ -1266,6 +1380,40 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
     DiSEqCDevSettings    &m_settings;
 };
 
+//////////////////////////////////////// SCRPositionSetting
+
+class SCRPositionSetting : public ComboBoxSetting, public Storage
+{
+  public:
+    SCRPositionSetting(DiSEqCDevDevice &node, DiSEqCDevSettings &settings)
+        : ComboBoxSetting(this), m_node(node), m_settings(settings)
+    {
+        setLabel("Position");
+        setHelpText(DeviceTree::tr("Unicable satellite position (A/B)"));
+        addSelection(DiSEqCDevSCR::SCRPositionToString(DiSEqCDevSCR::kTypeScrPosA),
+                     QString::number((uint)DiSEqCDevSCR::kTypeScrPosA), true);
+        addSelection(DiSEqCDevSCR::SCRPositionToString(DiSEqCDevSCR::kTypeScrPosB),
+                     QString::number((uint)DiSEqCDevSCR::kTypeScrPosB), false);
+    }
+
+    virtual void Load(void)
+    {
+        double value = m_settings.GetValue(m_node.GetDeviceID());
+        setValue(getValueIndex(QString::number((uint)value)));
+    }
+
+    virtual void Save(void)
+    {
+        m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
+    }
+
+    virtual void Save(QString /*destination*/) { }
+
+  private:
+    DiSEqCDevDevice      &m_node;
+    DiSEqCDevSettings    &m_settings;
+};
+
 //////////////////////////////////////// DTVDeviceConfigGroup
 
 DTVDeviceConfigGroup::DTVDeviceConfigGroup(
@@ -1306,6 +1454,11 @@ void DTVDeviceConfigGroup::AddNodes(
                 setting = new RotorSetting(*node, m_settings);
             else
                 setting = new USALSRotorSetting(*node, m_settings);
+            break;
+        }
+        case DiSEqCDevDevice::kTypeSCR:
+        {
+            setting = new SCRPositionSetting(*node, m_settings);
             break;
         }
         default:
@@ -1382,6 +1535,7 @@ enum OLD_DISEQC_TYPES
     DISEQC_POSITIONER_X_SWITCH_2   = 9,
     DISEQC_SW21                    = 10,
     DISEQC_SW64                    = 11,
+    DISEQC_SCR                     = 12,
 };
 
 // import old diseqc configuration into tree
@@ -1551,6 +1705,19 @@ bool convert_diseqc_db(void)
                 break;
             }
 
+            case DISEQC_SCR:
+            {
+                // SCR + LNB
+                root = DiSEqCDevDevice::CreateByType(
+                    tree, DiSEqCDevDevice::kTypeSCR);
+                DiSEqCDevSCR *scr = dynamic_cast<DiSEqCDevSCR*>(root);
+                if (scr)
+                {
+                    add_lnbs = 1;
+                }
+                break;
+            }
+
             default:
             {
                 LOG(VB_GENERAL, LOG_ERR, "Unknown DiSEqC device type " +
@@ -1617,6 +1784,7 @@ bool convert_diseqc_db(void)
 
                 case DISEQC_POSITIONER_1_2:
                 case DISEQC_POSITIONER_X:
+                case DISEQC_SCR:
                     lnb = dynamic_cast<DiSEqCDevLNB*>(root->GetChild(0));
                     set.SetValue(root->GetDeviceID(), pos);
                     break;
