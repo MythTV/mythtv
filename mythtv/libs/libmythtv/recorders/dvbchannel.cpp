@@ -55,6 +55,9 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_frontend_parameters&);
 
+int64_t concurrent_tunings_delay = 1000;
+QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
+
 #define LOC QString("DVBChan[%1](%2): ").arg(GetCardID()).arg(GetDevice())
 
 /** \class DVBChannel
@@ -713,6 +716,20 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(intermediate_freq ? intermediate_freq : tuning.frequency)
                 .arg(suffix));
+
+        tune_delay_lock.lock();
+
+        if (QDateTime::currentDateTime() < last_tuning)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next tuning after less than %1ms. Delaying by %1ms")
+                .arg(concurrent_tunings_delay));
+            usleep(concurrent_tunings_delay * 1000);
+        }
+
+        last_tuning = QDateTime::currentDateTime();
+        last_tuning = last_tuning.addMSecs(concurrent_tunings_delay);
+
+        tune_delay_lock.unlock();
 
         // send DVB-S setup
         if (diseqc_tree)

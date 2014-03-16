@@ -144,6 +144,9 @@ class DVBChannel : public DTVChannel
     int               fd_frontend; ///< File descriptor for tuning hardware
     QString           device;      ///< DVB Device
     bool              has_crc_bug; ///< true iff our driver munges PMT
+
+    static QDateTime  last_tuning;
+    QMutex            tune_delay_lock;
 };
 
 #endif
