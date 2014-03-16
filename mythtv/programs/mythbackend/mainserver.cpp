@@ -852,6 +852,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleMusicTagRemoveImage(listline, pbs);
     }
+    else if (command == "MUSIC_TAG_CHANGEIMAGE")
+    {
+        if (listline.size() < 5)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_CHANGEIMAGE");
+        else
+            HandleMusicTagChangeImage(listline, pbs);
+    }
     else if (command == "ALLOW_SHUTDOWN")
     {
         if (tokens.size() != 1)
@@ -5744,6 +5751,179 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
                                                           kMSAutoCleanup | kMSRunBackground |
                                                           kMSDontDisableDrawing | kMSProcessEvents |
                                                           kMSDontBlockInputDevs));
+    }
+
+    strlist << "OK";
+
+    if (pbssock)
+        SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSock *pbs)
+{
+// format: MUSIC_TAG_CHANGEIMAGE <hostname> <songid> <oldtype> <newtype>
+
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString hostname = slist[1];
+
+    if (ismaster && hostname != gCoreContext->GetHostName())
+    {
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicTagChangeImage: asking slave '%1' "
+                        "to update the metadata").arg(hostname));
+            strlist = slave->ForwardRequest(slist);
+            slave->DecrRef();
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicTagChangeImage: Failed to grab "
+                        "slave socket on '%1'").arg(hostname));
+
+            strlist << "ERROR: slave not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+    }
+    else
+    {
+        int songID = slist[2].toInt();
+        ImageType oldType = (ImageType)slist[3].toInt();
+        ImageType newType = (ImageType)slist[4].toInt();
+
+        // load the metadata from the database
+        MusicMetadata *mdata = MusicMetadata::createFromID(songID);
+
+        if (!mdata)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HandleMusicTagChangeImage: "
+                        "Cannot find metadata for trackid: %1")
+                    .arg(songID));
+
+            strlist << "ERROR: track not found";
+
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
+        }
+
+        mdata->setFilename(mdata->getLocalFilename());
+
+        AlbumArtImages *albumArt = mdata->getAlbumArtImages();
+        AlbumArtImage *image = albumArt->getImage(oldType);
+        if (image)
+        {
+            AlbumArtImage oldImage = *image;
+
+            image->imageType = (ImageType) newType;
+
+            if (image->imageType == oldImage.imageType)
+            {
+                // nothing to change
+                strlist << "OK";
+
+                if (pbssock)
+                    SendResponse(pbssock, strlist);
+
+                delete mdata;
+
+                return;
+            }
+
+            // rename any cached image to match the new type
+            if (image->embedded)
+            {
+                // change the image type in the tag if it supports it
+                MetaIO *tagger = mdata->getTagger();
+
+                if (tagger && tagger->supportsEmbeddedImages())
+                {
+                    if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->imageType))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
+
+                        strlist << "ERROR: failed to change image type";
+
+                        if (pbssock)
+                            SendResponse(pbssock, strlist);
+
+                        delete mdata;
+                        delete tagger;
+
+                        return;
+                    }
+                }
+
+                if (tagger)
+                    delete tagger;
+
+                // update the new cached image filename
+                StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
+                oldImage.filename = artGroup.FindFile("AlbumArt/" + image->filename);
+
+                QFileInfo fi(oldImage.filename);
+                image->filename = QString(fi.path() + "/%1-%2.jpg")
+                                          .arg(mdata->ID())
+                                          .arg(AlbumArtImages::getTypeFilename(image->imageType));
+
+                // remove any old cached file with the same name as the new one
+                if (QFile::exists(image->filename))
+                    QFile::remove(image->filename);
+
+                // rename the old cached file to the new one
+                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
+                    QFile::rename(oldImage.filename, image->filename);
+                else
+                {
+                    // extract the image from the tag and cache it
+                    QStringList paramList;
+                    paramList.append(QString("--songid='%1'").arg(mdata->ID()));
+                    paramList.append(QString("--imagetype='%1'").arg(image->imageType));
+
+                    QString command = "mythutil --extractimage " + paramList.join(" ");
+
+                    QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                   kMSAutoCleanup | kMSRunBackground |
+                                                   kMSDontDisableDrawing | kMSProcessEvents |
+                                                   kMSDontBlockInputDevs));
+                }
+            }
+            else
+            {
+                QFileInfo fi(oldImage.filename);
+
+                // get the new images filename
+                image->filename = QString(fi.absolutePath() + "/%1.jpg")
+                        .arg(AlbumArtImages::getTypeFilename(image->imageType));
+
+                if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
+                {
+                    // remove any old cached file with the same name as the new one
+                    QFile::remove(image->filename);
+                    // rename the old cached file to the new one
+                    QFile::rename(oldImage.filename, image->filename);
+                }
+            }
+        }
+
+        delete mdata;
     }
 
     strlist << "OK";
