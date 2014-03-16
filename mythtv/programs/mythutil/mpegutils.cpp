@@ -796,6 +796,11 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     int offset = 0;
     uint64_t totalBytes = 0ULL;
 
+    if (use_xml) {
+        /* using a random instance of a sub class of PrintOutput */
+        pmsl->Output(QString("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"));
+    }
+
     while (true)
     {
         int r = srcRB->Read(&buffer[offset], kBufSize - offset);
