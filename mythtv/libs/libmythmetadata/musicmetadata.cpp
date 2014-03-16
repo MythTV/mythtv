@@ -1738,6 +1738,8 @@ void AlbumArtImages::findImages(void)
                         image->filename = gCoreContext->GenMythURL(url.host(), url.port(),
                                                                    QString("AlbumArt/") + query.value(1).toString(),
                                                                    "MusicArt");
+                    else
+                        image->filename = query.value(1).toString();
                 }
                 else
                 {
@@ -1745,6 +1747,8 @@ void AlbumArtImages::findImages(void)
                         image->filename =  gCoreContext->GenMythURL(url.host(), url.port(),
                                                                     query.value(1).toString(),
                                                                     "Music");
+                    else
+                        image->filename = query.value(1).toString();
                 }
 
                 image->imageType = (ImageType) query.value(3).toInt();
