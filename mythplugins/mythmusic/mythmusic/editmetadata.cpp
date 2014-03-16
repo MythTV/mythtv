@@ -225,9 +225,9 @@ void EditMetadataCommon::saveAll()
     if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
     {
         QStringList strList;
-        strList << QString("MUSIC_TAG_UPDATE_METADATA %1 %2")
-                            .arg(m_metadata->Hostname())
-                            .arg(m_metadata->ID());
+        strList << "MUSIC_TAG_UPDATE_METADATA %1 %2"
+                << m_metadata->Hostname()
+                << QString::number(m_metadata->ID());
 
         SendStringListThread *thread = new SendStringListThread(strList);
         MThreadPool::globalInstance()->start(thread, "UpdateMetadata");
@@ -784,9 +784,11 @@ void EditMetadataDialog::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Check Track Length"))
             {
-                QString command = QString("MUSIC_CALC_TRACK_LENGTH %1 %2")
-                                          .arg(m_metadata->Hostname()).arg(m_metadata->ID());
-                QStringList strList(command);
+                QStringList strList;
+                strList << "MUSIC_CALC_TRACK_LENGTH"
+                        << m_metadata->Hostname()
+                        << QString::number(m_metadata->ID());
+
                 SendStringListThread *thread = new SendStringListThread(strList);
                 MThreadPool::globalInstance()->start(thread, "Send MUSIC_CALC_TRACK_LENGTH");
 

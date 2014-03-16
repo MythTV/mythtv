@@ -1092,10 +1092,10 @@ QString MusicMetadata::getAlbumArtFile(void)
                 if (albumart_image->embedded)
                 {
                     QStringList slist;
-                    slist << QString("MUSIC_TAG_GETIMAGE %1 %2 %3")
-                            .arg(Hostname())
-                            .arg(ID())
-                            .arg(albumart_image->imageType);
+                    slist << "MUSIC_TAG_GETIMAGE"
+                          << Hostname()
+                          << QString::number(ID())
+                          << QString::number(albumart_image->imageType);
                     gCoreContext->SendReceiveStringList(slist);
                 }
             }
@@ -1790,9 +1790,10 @@ void AlbumArtImages::scanForImages()
         busy = NULL;
     }
 
-    QStringList strList(QString("MUSIC_FIND_ALBUMART %1 %2 1")
-                                .arg(m_parent->Hostname())
-                                .arg(m_parent->ID()));
+    QStringList strList;
+    strList << "MUSIC_FIND_ALBUMART"
+            << m_parent->Hostname()
+            << QString::number(m_parent->ID());
 
     AlbumArtScannerThread *scanThread = new AlbumArtScannerThread(strList);
     scanThread->start();

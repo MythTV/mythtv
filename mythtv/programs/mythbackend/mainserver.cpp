@@ -812,31 +812,31 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MUSIC_CALC_TRACK_LENGTH")
     {
-        if (tokens.size() != 3)
+        if (listline.size() != 3)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_CALC_TRACK_LENGTH");
         else
-            HandleMusicCalcTrackLen(tokens, pbs);
+            HandleMusicCalcTrackLen(listline, pbs);
     }
     else if (command == "MUSIC_TAG_UPDATE_METADATA")
     {
-        if (tokens.size() != 3)
+        if (listline.size() != 3)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_UPDATE_METADATA");
         else
-            HandleMusicTagUpdateMetadata(tokens, pbs);
+            HandleMusicTagUpdateMetadata(listline, pbs);
     }
     else if (command == "MUSIC_FIND_ALBUMART")
     {
-        if (tokens.size() != 4)
+        if (listline.size() != 4)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_FIND_ALBUMART");
         else
-            HandleMusicFindAlbumArt(tokens, pbs);
+            HandleMusicFindAlbumArt(listline, pbs);
     }
     else if (command == "MUSIC_TAG_GETIMAGE")
     {
-        if (tokens.size() < 4)
+        if (listline.size() < 4)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_GETIMAGE");
         else
-            HandleMusicTagGetImage(tokens, pbs);
+            HandleMusicTagGetImage(listline, pbs);
     }
     else if (command == "MUSIC_TAG_ADDIMAGE")
     {
@@ -5398,8 +5398,7 @@ void MainServer::HandleMusicCalcTrackLen(const QStringList &slist, PlaybackSock 
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("HandleMusicCalcTrackLen: asking slave '%1' to update the track length").arg(hostname));
-            strlist << slist.join(" ");
-            strlist = slave->ForwardRequest(strlist);
+            strlist = slave->ForwardRequest(slist);
             slave->DecrRef();
 
             if (pbssock)
@@ -5462,8 +5461,7 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("HandleMusicTagUpdateMetadata: asking slave '%1' "
                         "to update the metadata").arg(hostname));
-            strlist << slist.join(" ");
-            strlist = slave->ForwardRequest(strlist);
+            strlist = slave->ForwardRequest(slist);
             slave->DecrRef();
 
             if (pbssock)
@@ -5553,8 +5551,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("HandleMusicFindAlbumArt: asking slave '%1' "
                         "to update the albumart").arg(hostname));
-            strlist << slist.join(" ");
-            strlist = slave->ForwardRequest(strlist);
+            strlist = slave->ForwardRequest(slist);
             slave->DecrRef();
 
             if (pbssock)
@@ -5698,58 +5695,42 @@ void MainServer::HandleMusicTagGetImage(const QStringList &slist, PlaybackSock *
     QString songid = slist[2];
     QString imagetype = slist[3];
 
-    QStringList paramList;
-    paramList.append(QString("--songid='%1'").arg(songid));
-    paramList.append(QString("--imagetype='%1'").arg(imagetype));
-
-    QString command = "mythutil --extractimage " + paramList.join(" ");
-
-    if (ismaster)
+    if (ismaster && hostname != gCoreContext->GetHostName())
     {
-
-        if (hostname == gCoreContext->GetHostName())
+        // forward the request to the slave BE
+        PlaybackSock *slave = GetMediaServerByHostname(hostname);
+        if (slave)
         {
-            // this is the master BE
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("HandleMusicTagGetImage: running %1 on master BE '%2'")
-                    .arg(command).arg(hostname));
+                QString("HandleMusicTagGetImage: asking slave '%1' to "
+                        "extract the image").arg(hostname));
+            strlist = slave->ForwardRequest(slist);
+            slave->DecrRef();
 
-            QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                              kMSAutoCleanup | kMSRunBackground |
-                                                              kMSDontDisableDrawing | kMSProcessEvents |
-                                                              kMSDontBlockInputDevs));
+            if (pbssock)
+                SendResponse(pbssock, strlist);
+
+            return;
         }
         else
         {
-            // forward the request to the slave BE
-            PlaybackSock *slave = GetMediaServerByHostname(hostname);
-            if (slave)
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("HandleMusicTagGetImage: asking slave '%1' to "
-                            "extract the image").arg(hostname));
-                strlist << slist.join(" ");
-                slave->ForwardRequest(strlist);
-                slave->DecrRef();
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("HandleMusicTagGetImage: Failed to grab slave "
-                            "socket on '%1'").arg(hostname));
-            }
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("HandleMusicTagGetImage: Failed to grab slave "
+                        "socket on '%1'").arg(hostname));
         }
     }
     else
     {
-        // must be a slave run mythutil to extract the image
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("HandleMusicTagGetImage: running %1 on slave BE '%2'")
-                .arg(command).arg(gCoreContext->GetHostName()));
+        QStringList paramList;
+        paramList.append(QString("--songid='%1'").arg(songid));
+        paramList.append(QString("--imagetype='%1'").arg(imagetype));
+
+        QString command = "mythutil --extractimage " + paramList.join(" ");
+
         QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                          kMSAutoCleanup | kMSRunBackground |
-                                                          kMSDontDisableDrawing | kMSProcessEvents |
-                                                          kMSDontBlockInputDevs));
+                                       kMSAutoCleanup | kMSRunBackground |
+                                       kMSDontDisableDrawing | kMSProcessEvents |
+                                       kMSDontBlockInputDevs));
     }
 
     strlist << "OK";
