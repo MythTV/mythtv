@@ -10,6 +10,8 @@
 PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
         m_resumeMode(NULL),
+        m_resumeModeEditor(),
+        m_resumeModeRadio(),
         m_exitAction(NULL),
         m_autoLookupCD(NULL),
         m_autoPlayCD(NULL),
