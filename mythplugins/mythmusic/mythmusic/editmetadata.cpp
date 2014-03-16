@@ -1078,7 +1078,7 @@ void EditAlbumartDialog::showMenu(void )
 
     if (m_coverartList->GetItemCurrent())
     {
-        //menu->AddButton(tr("Change Image Type"), NULL, true);
+        menu->AddButton(tr("Change Image Type"), NULL, true);
 
         if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
         {
@@ -1143,63 +1143,13 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                     AlbumArtImage *image = qVariantValue<AlbumArtImage*> (item->GetData());
                     if (image)
                     {
-                        AlbumArtImage oldImage = *image;
+                        QStringList strList("MUSIC_TAG_CHANGEIMAGE");
+                        strList << m_metadata->Hostname()
+                                << QString::number(m_metadata->ID())
+                                << QString::number(image->imageType)
+                                << QString::number(type);
 
-                        image->imageType = (ImageType) type;
-
-                        if (image->imageType == oldImage.imageType)
-                            return;
-
-                        // rename any cached image to match the new type
-                        if (image->embedded)
-                        {
-                            // update the new cached image filename
-                            image->filename = QString(GetConfDir() + "/MythMusic/AlbumArt/%1-%2.jpg")
-                                                .arg(m_metadata->ID())
-                                                .arg(AlbumArtImages::getTypeFilename(image->imageType));
-
-                            if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
-                            {
-                                // remove any old cached file with the same name as the new one
-                                QFile::remove(image->filename);
-                                // rename the old cached file to the new one
-                                QFile::rename(oldImage.filename, image->filename);
-
-                                // force the theme image cache to refresh the image
-                                GetMythUI()->RemoveFromCacheByFile(image->filename);
-                            }
-
-                            // change the image type in the tag if it supports it
-                            MetaIO *tagger = m_metadata->getTagger();
-
-                            if (tagger && tagger->supportsEmbeddedImages())
-                            {
-                                if (!tagger->changeImageType(m_metadata->Filename(), &oldImage, image->imageType))
-                                    LOG(VB_GENERAL, LOG_INFO, "EditAlbumartDialog: failed to change image type");
-                            }
-
-                            if (tagger)
-                                delete tagger;
-                        }
-                        else
-                        {
-                            QFileInfo fi(oldImage.filename);
-
-                            // get the new images filename
-                            image->filename = QString(fi.absolutePath() + "/%1.jpg")
-                                    .arg(AlbumArtImages::getTypeFilename(image->imageType));
-
-                            if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))
-                            {
-                                // remove any old cached file with the same name as the new one
-                                QFile::remove(image->filename);
-                                // rename the old cached file to the new one
-                                QFile::rename(oldImage.filename, image->filename);
-
-                                // force the theme image cache to refresh the image
-                                GetMythUI()->RemoveFromCacheByFile(image->filename);
-                            }
-                        }
+                        gCoreContext->SendReceiveStringList(strList);
 
                         m_albumArtChanged = true;
 
