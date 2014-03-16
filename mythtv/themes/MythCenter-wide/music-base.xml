@@ -759,6 +759,7 @@
     </group>
 
     <group name="baseplayliststatusgroup">
+        <area>0,0,1280,60</area>
         <textarea name="playlistposition" from="basetextarea">
             <area>40,0,170,30</area>
             <font>basesmall</font>
@@ -785,6 +786,7 @@
     </group>
 
     <group name="basesmallinfopanel">
+        <area>0,0,1260,50</area>
         <shape name="trackinfo_background" from="basebackground">
             <area>15,0,1250,50</area>
             <fill color="#000000" alpha="50" />
