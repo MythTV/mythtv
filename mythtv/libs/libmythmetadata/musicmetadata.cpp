@@ -1793,7 +1793,8 @@ void AlbumArtImages::scanForImages()
     QStringList strList;
     strList << "MUSIC_FIND_ALBUMART"
             << m_parent->Hostname()
-            << QString::number(m_parent->ID());
+            << QString::number(m_parent->ID())
+            << "1";
 
     AlbumArtScannerThread *scanThread = new AlbumArtScannerThread(strList);
     scanThread->start();
