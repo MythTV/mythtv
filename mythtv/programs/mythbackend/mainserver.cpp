@@ -5677,6 +5677,8 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
                                                     kMSDontBlockInputDevs));
             }
         }
+
+        delete images;
     }
 
     if (pbssock)
