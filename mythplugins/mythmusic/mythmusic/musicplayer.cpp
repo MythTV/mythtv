@@ -1639,7 +1639,8 @@ int MusicPlayer::getNotificationID (const QString& hostname)
 void MusicPlayer::sendNotification(int notificationID, const QString &title, const QString &author, const QString &desc)
 {
     QString image = "musicscanner.png";
-    GetMythUI()->FindThemeFile(image);
+    if (!GetMythUI()->FindThemeFile(image))
+        LOG(VB_GENERAL, LOG_ERR, "MusicPlayer: sendNotification failed to find the 'musicscanner.png' image");
 
     DMAP map;
     map["asar"] = title;
