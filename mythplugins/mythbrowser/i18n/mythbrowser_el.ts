@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="el_GR">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>BookmarkEditor</name>
     <message>
@@ -14,7 +15,7 @@
         <translation>Εισαγωγή Λεπτομερειών Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkeditor.cpp" line="138"/>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="146"/>
         <source>Select a category</source>
         <translation>Επιλέξτε κατηγορία</translation>
     </message>
@@ -31,52 +32,62 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Χρησιμοποιείστε την επιλογή &apos;Προσθήκη Σελιδοδείκτη&apos; για να προσθέσετε</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="286"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Actions</source>
         <translation>Ενέργειες</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="303"/>
+        <source>Set Homepage</source>
+        <translation>Ορισμός Αρχικής Σελίδας</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
         <source>Add Bookmark</source>
         <translation>Προσθήκη Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="305"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="308"/>
         <source>Edit Bookmark</source>
         <translation>Επεξεργασία Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="306"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="309"/>
         <source>Delete Bookmark</source>
         <translation>Διαγραφή Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="307"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="310"/>
         <source>Show Bookmark</source>
         <translation>Εμφάνιση Σελιδοδείκτη</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="312"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="315"/>
         <source>Delete Marked</source>
         <translation>Διαγραφή Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="313"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="316"/>
         <source>Show Marked</source>
         <translation>Εμφάνιση Σημειωμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="314"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="317"/>
         <source>Clear Marked</source>
         <translation>Εκκαθάριση Σημαδεμένου</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="496"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="320"/>
+        <source>Settings</source>
+        <translation>Ρυθμίσεις</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="526"/>
         <source>Are you sure you want to delete the selected bookmark?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τον επιλεγμένο σελειδοδείκτη;</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="540"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="570"/>
         <source>Are you sure you want to delete the marked bookmarks?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε τους σημαδεμένους σελειδοδείκτες;</translation>
     </message>
@@ -171,17 +182,27 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="65"/>
+        <location filename="../mythbrowser/main.cpp" line="106"/>
         <source>Move to next browser tab</source>
         <translation>Στην επόμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="67"/>
+        <location filename="../mythbrowser/main.cpp" line="108"/>
         <source>Move to previous browser tab</source>
         <translation>Στην προηγούμενη Καρτέλα</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/main.cpp" line="70"/>
+        <location filename="../mythbrowser/main.cpp" line="111"/>
+        <source>Show the bookmark manager</source>
+        <translation>Εμφάνιση του διαχειριστή σελιδοδεικτών</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="113"/>
+        <source>Show the webbrowser homepage</source>
+        <translation>Εμφάνιση αρχικής σελίδας φυλλομετρητή</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="116"/>
         <source>Internal Web Browser</source>
         <translation>Ενσωματωμένος Περιηγηγής</translation>
     </message>
