@@ -1208,12 +1208,12 @@ void EditAlbumartDialog::customEvent(QEvent *event)
             {
                 if (tokens.size() >= 2)
                 {
-                    int songID = tokens[1].toInt();
+                    MusicMetadata::IdType songID = (MusicMetadata::IdType)tokens[1].toInt();
 
                     if (m_metadata->ID() == songID)
                     {
                         // force all the image to reload
-                        for (int x = 0; x < m_metadata->getAlbumArtImages()->getImageCount(); x++)
+                        for (uint x = 0; x < m_metadata->getAlbumArtImages()->getImageCount(); x++)
                             removeCachedImage(m_metadata->getAlbumArtImages()->getImageAt(x));
 
                         updateImageGrid();
