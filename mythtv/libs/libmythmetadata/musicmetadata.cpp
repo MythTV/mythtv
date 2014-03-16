@@ -1841,6 +1841,8 @@ void AlbumArtImages::scanForImages()
 
         image->hostname = strList[x + 5];
         addImage(image);
+
+        delete image;
     }
 }
 
