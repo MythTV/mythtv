@@ -96,7 +96,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     /// Write out a copy of the raw MPTS
     void WriteMPTS(unsigned char * buffer, uint len);
     /// Called with _listener_lock locked just after adding new output file.
-    virtual void AddNamedOutputFile(const QString &filename);
+    virtual bool AddNamedOutputFile(const QString &filename);
     /// Called with _listener_lock locked just before removing old output file.
     virtual void RemoveNamedOutputFile(const QString &filename);
     /// At minimum this sets _running_desired, this may also send
@@ -125,8 +125,10 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     uint              _open_pid_filters;
     MythTimer         _cycle_timer;
 
-    ThreadedFileWriter                     *_mpts;
-    QMap<QString,int>                       _mpts_files;
+    ThreadedFileWriter *_mpts_tfw;
+    QSet<QString>       _mpts_files;
+    QString             _mpts_base_file;
+    QMutex              _mpts_lock;
 
     typedef QMap<MPEGStreamData*,QString> StreamDataList;
     mutable QMutex    _listener_lock;

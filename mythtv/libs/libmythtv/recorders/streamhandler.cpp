@@ -24,7 +24,7 @@ StreamHandler::StreamHandler(const QString &device) :
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
-    _mpts(NULL),
+    _mpts_tfw(NULL),
 
     _listener_lock(QMutex::Recursive)
 {
@@ -385,69 +385,70 @@ PIDPriority StreamHandler::GetPIDPriority(uint pid) const
 
 void StreamHandler::WriteMPTS(unsigned char * buffer, uint len)
 {
-    if (_mpts == NULL)
+    if (_mpts_tfw == NULL)
         return;
-    _mpts->Write(buffer, len);
+    _mpts_tfw->Write(buffer, len);
 }
 
-typedef ThreadedFileWriter* ThreadedFileWriterP;
-static bool named_output_file_common(
-    const QString &_device, ThreadedFileWriterP &tfw, QMap<QString,int> &files)
+bool StreamHandler::AddNamedOutputFile(const QString &file)
 {
-    if (tfw)
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    QMutexLocker lk(&_mpts_lock);
+
+    _mpts_files.insert(file);
+    QString fn = QString("%1.raw").arg(file);
+
+    if (_mpts_files.size() == 1)
     {
-        delete tfw;
-        tfw = NULL;
+        _mpts_base_file = fn;
+        _mpts_tfw = new ThreadedFileWriter(fn,
+                                           O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
+                                           0644);
+        if (!_mpts_tfw->Open())
+        {
+            delete _mpts_tfw;
+            _mpts_tfw = NULL;
+            return false;
+        }
     }
-
-    QMap<QString,int>::iterator it = files.begin();
-    if (it == files.end())
-        return true;
-
-    for (it = files.begin(); it != files.end(); ++it)
-        (*it)++;
-
-    QString fn = QString("%1.%2.raw")
-        .arg(files.begin().key()).arg(*files.begin());
-
-    tfw = new ThreadedFileWriter(
-        fn, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
-    if (!tfw->Open())
+    else
     {
-        delete tfw;
-        tfw = NULL;
-        return false;
-    }
-
-    bool ok = true;
-    const QByteArray ba = fn.toLocal8Bit();
-    for (; ok && it != files.end(); ++it)
-    {
-        int ret = link(ba.constData(), it.key().toLocal8Bit().constData());
-        if (ret < 0)
+        if (link(_mpts_base_file.toLocal8Bit(), fn.toLocal8Bit()) < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to link '%1' to '%2'").arg(it.key()).arg(fn) +
+                QString("Failed to link '%1' to '%2'")
+                .arg(_mpts_base_file)
+                .arg(fn) +
                 ENO);
         }
-        ok &= ret >= 0;
+        else
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("linked '%1' to '%2'")
+                .arg(_mpts_base_file)
+                .arg(fn) +
+                ENO);
+        }
     }
 
-    return ok;
-}
-
-void StreamHandler::AddNamedOutputFile(const QString &file)
-{
-    _mpts_files[file] = -1;
-    named_output_file_common(_device, _mpts, _mpts_files);
+#endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
+    return true;
 }
 
 void StreamHandler::RemoveNamedOutputFile(const QString &file)
 {
-    QMap<QString,int>::iterator it = _mpts_files.find(file);
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    QMutexLocker lk(&_mpts_lock);
+
+    QSet<QString>::iterator it = _mpts_files.find(file);
     if (it != _mpts_files.end())
     {
         _mpts_files.erase(it);
-        named_output_file_common(_device, _mpts, _mpts_files);
+        if (_mpts_files.isEmpty())
+        {
+            delete _mpts_tfw;
+            _mpts_tfw = NULL;
+        }
     }
+#endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )
 }
