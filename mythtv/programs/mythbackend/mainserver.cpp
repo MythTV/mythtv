@@ -805,10 +805,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MUSIC_TAG_UPDATE_VOLATILE")
     {
-        if (tokens.size() != 6)
+        if (listline.size() != 6)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Bad MUSIC_TAG_UPDATE_VOLATILE");
         else
-            HandleMusicTagUpdateVolatile(tokens, pbs);
+            HandleMusicTagUpdateVolatile(listline, pbs);
     }
     else if (command == "MUSIC_CALC_TRACK_LENGTH")
     {
@@ -5334,8 +5334,7 @@ void MainServer::HandleMusicTagUpdateVolatile(const QStringList &slist, Playback
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("HandleMusicTagUpdateVolatile: asking slave '%1' to update the metadata").arg(hostname));
-            strlist << slist.join(" ");
-            strlist = slave->ForwardRequest(strlist);
+            strlist = slave->ForwardRequest(slist);
             slave->DecrRef();
 
             if (pbssock)

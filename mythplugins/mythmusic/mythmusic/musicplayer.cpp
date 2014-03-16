@@ -1297,12 +1297,12 @@ void MusicPlayer::updateVolatileMetadata(void)
             if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
             {
                 QStringList strList;
-                strList << QString("MUSIC_TAG_UPDATE_VOLATILE %1 %2 %3 %4 %5")
-                                   .arg(getCurrentMetadata()->Hostname())
-                                   .arg(getCurrentMetadata()->ID())
-                                   .arg(getCurrentMetadata()->Rating())
-                                   .arg(getCurrentMetadata()->Playcount())
-                                   .arg(getCurrentMetadata()->LastPlay().toString(Qt::ISODate));
+                strList << QString("MUSIC_TAG_UPDATE_VOLATILE")
+                        << getCurrentMetadata()->Hostname()
+                        << QString::number(getCurrentMetadata()->ID())
+                        << QString::number(getCurrentMetadata()->Rating())
+                        << QString::number(getCurrentMetadata()->Playcount())
+                        << getCurrentMetadata()->LastPlay().toString(Qt::ISODate);
                 SendStringListThread *thread = new SendStringListThread(strList);
                 MThreadPool::globalInstance()->start(thread, "UpdateVolatile");
             }
