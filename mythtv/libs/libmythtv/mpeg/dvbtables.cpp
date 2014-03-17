@@ -249,6 +249,7 @@ bool DVBEventInformationTable::IsEIT(uint table_id)
  */
 QDateTime dvbdate2qt(const unsigned char *buf)
 {
+    /* FIXME what's wrong with QDate::fromJulianDay? */
     uint mjd = (buf[0] << 8) | buf[1];
     if (mjd >= 40587)
     {
@@ -266,8 +267,8 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     // "Specification for Service Information in Digital Video Broadcasting"
     // to convert from Modified Julian Date to Year, Month, Day.
 
-    const float tmpA = 1.0 / 365.25;
-    const float tmpB = 1.0 / 30.6001;
+    const float tmpA = (float)(1.0 / 365.25);
+    const float tmpB = (float)(1.0 / 30.6001);
 
     float mjdf = mjd;
     int year  = (int) truncf((mjdf - 15078.2f) * tmpA);
