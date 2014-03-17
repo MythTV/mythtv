@@ -662,8 +662,6 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
         return false;
     }
 
-    bool resend_cmd = false;
-
 #ifndef USING_DVB
 
     (void) adr;
@@ -672,6 +670,8 @@ bool DiSEqCDevTree::SendCommand(uint adr, uint cmd, uint repeats,
     return false;
 
 #else // if USING_DVB
+
+    bool resend_cmd = false;
 
     // prepare command
     dvb_diseqc_master_cmd mcmd;
