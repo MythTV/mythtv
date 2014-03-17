@@ -2155,8 +2155,8 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     uint32_t frequency  = lnb->GetIntermediateFrequency(settings, tuning);
     uint t = (frequency / 1000 + m_scr_frequency + 2) / 4 - 350;
 
-    // retrieve position settings
-    dvbdev_pos_t scr_position = (dvbdev_pos_t) settings.GetValue(GetDeviceID());
+    // retrieve position settings (value should be 0 or 1)
+    dvbdev_pos_t scr_position = (int) settings.GetValue(GetDeviceID());
 
     // check parameters
     if (m_scr_userband > 8)
