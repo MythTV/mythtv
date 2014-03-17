@@ -2123,7 +2123,7 @@ QStringList LCDProcClient::formatScrollerText(const QString &text)
 
     for (int x = 0; x < text.length(); x++)
     {
-        if (separators.contains(text[x]) > 0)
+        if (separators.contains(text[x]))
             lastSplit = line.length();
 
         line += text[x];
