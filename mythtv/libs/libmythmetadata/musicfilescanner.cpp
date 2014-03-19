@@ -13,7 +13,10 @@
 #include <metaio.h>
 #include <musicfilescanner.h>
 
-MusicFileScanner::MusicFileScanner()
+MusicFileScanner::MusicFileScanner():
+    m_tracksTotal(0), m_tracksUnchanged(0), m_tracksAdded (0), m_tracksRemoved(0),
+    m_tracksUpdated(0), m_coverartTotal(0), m_coverartUnchanged(0), m_coverartAdded(0),
+    m_coverartRemoved(0), m_coverartUpdated(0)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
