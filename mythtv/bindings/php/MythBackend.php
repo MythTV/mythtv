@@ -11,8 +11,8 @@ class MythBackend {
 
 // MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 // and should be the current MythTV protocol version.
-    static $protocol_version        = '79';
-    static $protocol_token          = 'BasaltGiant';
+    static $protocol_version        = '80';
+    static $protocol_token          = 'TaDah!';
 
 // The character string used by the backend to separate records
     static $backend_separator       = '[]:[]';

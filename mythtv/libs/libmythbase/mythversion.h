@@ -39,8 +39,8 @@
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol_Commands
  *       http://www.mythtv.org/wiki/Category:Myth_Protocol
  */
-#define MYTH_PROTO_VERSION "79"
-#define MYTH_PROTO_TOKEN "BasaltGiant"
+#define MYTH_PROTO_VERSION "80"
+#define MYTH_PROTO_TOKEN "TaDah!"
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *
