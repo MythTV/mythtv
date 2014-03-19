@@ -25,11 +25,10 @@ class MBASE_PUBLIC MythSingleDownload : public QObject
    Q_OBJECT
 
   public:
-   MythSingleDownload(void) : m_reply(NULL) { ; }
+   MythSingleDownload(void) : m_reply(NULL), m_errorcode(QNetworkReply::NoError) { ; }
    ~MythSingleDownload(void) { ; }
 
-   bool DownloadURL(const QString &url, QByteArray *buffer,
-		    uint timeout = 30000);
+   bool DownloadURL(const QString &url, QByteArray *buffer, uint timeout = 30000);
    void Cancel(void);
    QString ErrorString(void) const { return m_errorstring; }
    QNetworkReply::NetworkError ErrorCode(void) const { return m_errorcode; }
