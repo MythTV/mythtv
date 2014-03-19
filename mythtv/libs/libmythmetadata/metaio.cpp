@@ -26,6 +26,7 @@ const QString MetaIO::ValidFileExtensions(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.
 MetaIO::MetaIO()
 {
     m_filenameFormat = gCoreContext->GetSetting("NonID3FileNameFormat").toUpper();
+    memset(&m_fileinfo, 0, sizeof(m_fileinfo));
 }
 
 /*!
