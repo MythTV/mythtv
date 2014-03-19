@@ -1616,16 +1616,19 @@ void PlaylistEditorView::getPlaylistTracks(MusicGenericTree *node, int playlistI
 {
     Playlist *playlist = gMusicData->all_playlists->getPlaylist(playlistID);
 
-    for (int x = 0; x < playlist->getTrackCount(); x++)
+    if (playlist)
     {
-        MusicMetadata *mdata = playlist->getSongAt(x);
-        if (mdata)
+        for (int x = 0; x < playlist->getTrackCount(); x++)
         {
-            MusicGenericTree *newnode = new MusicGenericTree(node, mdata->Title(), "trackid");
-            newnode->setInt(mdata->ID());
-            newnode->setDrawArrow(false);
-            bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()) : false;
-            newnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
+            MusicMetadata *mdata = playlist->getSongAt(x);
+            if (mdata)
+            {
+                MusicGenericTree *newnode = new MusicGenericTree(node, mdata->Title(), "trackid");
+                newnode->setInt(mdata->ID());
+                newnode->setDrawArrow(false);
+                bool hasTrack = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()) : false;
+                newnode->setCheck(hasTrack ? MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
+            }
         }
     }
 
