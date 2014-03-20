@@ -210,6 +210,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
+    gCoreContext->SendSystemEvent(QString("AIRTUNES_NEW_CONNECTION"));
     MythNotification n(tr("New Connection"), tr("AirTunes"),
                        tr("from %1:%2").arg(client->peerAddress().toString()).arg(client->peerPort()));
     // Don't show it during playback
@@ -241,6 +242,7 @@ void MythRAOPDevice::deleteClient(void)
     QList<MythRAOPConnection *>::iterator it = m_clients.begin();
 
     MythNotification n(tr("Client disconnected"), tr("AirTunes"));
+    gCoreContext->SendSystemEvent(QString("AIRTUNES_DELETE_CONNECTION"));
     // Don't show it during playback
     n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
     GetNotificationCenter()->Queue(n);
