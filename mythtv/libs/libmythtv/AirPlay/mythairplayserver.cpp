@@ -520,6 +520,7 @@ void MythAirplayServer::newConnection(QTcpSocket *client)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")
         .arg(client->peerAddress().toString()).arg(client->peerPort()));
 
+    gCoreContext->SendSystemEvent(QString("AIRPLAY_NEW_CONNECTION"));
     m_sockets.append(client);
     connect(client, SIGNAL(disconnected()), this, SLOT(deleteConnection()));
     connect(client, SIGNAL(readyRead()), this, SLOT(read()));
@@ -543,6 +544,7 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
     // must have lock
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing connection %1:%2")
         .arg(socket->peerAddress().toString()).arg(socket->peerPort()));
+    gCoreContext->SendSystemEvent(QString("AIRPLAY_DELETE_CONNECTION"));
     m_sockets.removeOne(socket);
 
     QByteArray remove;
