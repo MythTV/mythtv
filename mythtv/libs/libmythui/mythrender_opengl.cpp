@@ -801,10 +801,12 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
     void *result;
     for (int i = 0; i < 4; i++)
     {
+#ifdef USING_OPENGLES
         result = reinterpret_cast<void*>(
             QLibrary::resolve("libGLESv2", (proc + exts[i]).toLatin1().data()));
         if (result)
             break;
+#endif
         result = reinterpret_cast<void*>(getProcAddress(proc + exts[i]));
         if (result)
             break;
