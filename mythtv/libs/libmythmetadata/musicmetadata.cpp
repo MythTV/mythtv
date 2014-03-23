@@ -1085,6 +1085,12 @@ QString MusicMetadata::getAlbumArtFile(void)
         {
             // check for the image in the storage group
             QUrl url(res);
+
+            if (url.path().isEmpty() || url.host().isEmpty() || url.userName().isEmpty())
+            {
+                return QString("");
+            }
+
             QString sUrl = RemoteFile::FindFile(url.path(), url.host(), url.userName());
 
             if (sUrl.isEmpty())
