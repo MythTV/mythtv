@@ -17,6 +17,7 @@ class MBASE_PUBLIC BonjourRegister : public QObject
 
     bool Register(uint16_t port, const QByteArray &type, const QByteArray &name,
                   const QByteArray &txt);
+    bool ReAnnounceService(void);
 
     QByteArray       m_name;
     QByteArray       m_type;
@@ -30,9 +31,12 @@ class MBASE_PUBLIC BonjourRegister : public QObject
                                           DNSServiceErrorType errorcode,
                                           const char *name, const char *type,
                                           const char *domain, void *object);
+    QByteArray RandomizeData(void);
+
     DNSServiceRef    m_dnssref;
     QSocketNotifier *m_socket;
     QMutexLocker    *m_lock;
     static QMutex    g_lock;
+    QByteArray       m_data;
 };
 #endif
