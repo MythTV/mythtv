@@ -88,6 +88,7 @@ class MTV_PUBLIC AudioPlayer
     int64_t LengthLastData(void);
     bool GetBufferStatus(uint &fill, uint &total);
     bool IsBufferAlmostFull(void);
+    int64_t GetAudioBufferedTime(void);
     
     /**
      * Return internal AudioOutput object

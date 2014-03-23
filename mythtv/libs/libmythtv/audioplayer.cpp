@@ -517,10 +517,18 @@ bool AudioPlayer::IsBufferAlmostFull(void)
     if (GetBufferStatus(ofill, ototal))
     {
         othresh =  ((ototal>>1) + (ototal>>2));
-        return ofill > othresh;
+        if (ofill > othresh)
+            return true;
+        return GetAudioBufferedTime() > 2000;
     }
     return false;
 }
+
+int64_t AudioPlayer::GetAudioBufferedTime(void)
+{
+    return m_audioOutput ? m_audioOutput->GetAudioBufferedTime() : 0;
+}
+
 
 bool AudioPlayer::CanProcess(AudioFormat fmt)
 {
