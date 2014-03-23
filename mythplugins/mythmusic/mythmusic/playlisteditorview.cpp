@@ -868,6 +868,15 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
         {
             artFile = findIcon("artist", mnode->GetText().toLower());
         }
+        else if (mnode->getAction() == "all tracks" || mnode->getAction() == "genres" ||
+                 mnode->getAction() == "albums"     || mnode->getAction() == "artists" ||
+                 mnode->getAction() == "compartists"|| mnode->getAction() == "ratings" ||
+                 mnode->getAction() == "years"      || mnode->getAction() == "compilations" ||
+                 mnode->getAction() == "cd"         || mnode->getAction() == "directory" ||
+                 mnode->getAction() == "playlists"  || mnode->getAction() == "smartplaylists")
+        {
+            artFile = "blank.png";
+        }
         else
         {
             artFile = findIcon(mnode->getAction(), mnode->GetText().toLower());
@@ -876,65 +885,29 @@ void PlaylistEditorView::treeItemVisible(MythUIButtonListItem *item)
         QString state = "default";
 
         if (mnode->getAction() == "all tracks")
-        {
             state = "alltracks";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "genres")
-        {
             state = "genres";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "albums")
-        {
             state = "albums";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "artists")
-        {
             state = "artists";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "compartists")
-        {
             state = "compartists";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "ratings")
-        {
             state = "ratings";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "years")
-        {
             state = "years";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "compilations")
-        {
             state = "compilations";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "cd")
-        {
             state = "cd";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "directory")
-        {
             state = "directory";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "playlists")
-        {
             state = "playlists";
-            artFile="blank.png";
-        }
         else if (mnode->getAction() == "smartplaylists")
-        {
             state = "smartplaylists";
-            artFile="blank.png";
-        }
 
         item->DisplayState(state, "nodetype");
 
