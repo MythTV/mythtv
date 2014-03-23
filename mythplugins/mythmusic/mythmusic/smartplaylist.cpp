@@ -200,11 +200,11 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     }
     else if (Operator->name == "starts with")
     {
-        result = result + " LIKE " + formattedFieldValue(QString("%") + value1);
+        result = result + " LIKE " + formattedFieldValue(value1 + QString("%"));
     }
     else if (Operator->name == "ends with")
     {
-        result = result + " LIKE " + formattedFieldValue(value1 + "%");
+        result = result + " LIKE " + formattedFieldValue(QString("%") + value1);
     }
     else if (Operator->name == "contains")
     {

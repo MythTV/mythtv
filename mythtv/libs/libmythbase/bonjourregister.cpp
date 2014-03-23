@@ -46,12 +46,16 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
     }
 
     m_lock = new QMutexLocker(&g_lock);
+    m_data = txt;
+
+    // add random fields to it
+    QByteArray data = RandomizeData();
 
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
         DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
                            (const char*)type.data(),
-                           NULL, 0, qport, txt.size(), (void*)txt.data(),
+                           NULL, 0, qport, data.size(), (void*)data.data(),
                            BonjourCallback, this);
 
     if (kDNSServiceErr_NoError != res)
@@ -122,3 +126,42 @@ void BonjourRegister::BonjourCallback(DNSServiceRef ref, DNSServiceFlags flags,
     }
 }
 
+QByteArray BonjourRegister::RandomizeData(void)
+{
+    QByteArray data = m_data;
+    QByteArray rnd;
+
+    data.append(7);
+    data.append("_rnd=");
+    rnd.append((random() % 80) + 33);
+    data.append(rnd.toHex());
+
+    return data;
+}
+
+bool BonjourRegister::ReAnnounceService(void)
+{
+    if (!m_dnssref)
+    {
+        // nothing to refresh
+        return false;
+    }
+
+    QByteArray data = RandomizeData();
+
+    DNSServiceErrorType res =
+        DNSServiceUpdateRecord(m_dnssref,           /* DNSServiceRef sdRef */
+                               NULL,                /* DNSRecordRef RecordRef */
+                               0,                   /* DNSServiceFlags flags */
+                               data.size(),         /* uint16_t rdlen */
+                               (void*)data.data(),  /* const void *rdata */
+                               0);                  /* uint32_t ttl */
+
+    if (kDNSServiceErr_NoError != res)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Error ReAnnounceService(%1): %2")
+            .arg(m_name.data()).arg(res));
+    }
+    return kDNSServiceErr_NoError != res;
+}

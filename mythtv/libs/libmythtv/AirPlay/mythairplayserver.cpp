@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QCryptographicHash>
+#include <QTimer>
 
 #include "mthread.h"
 #include "mythdate.h"
@@ -391,7 +392,8 @@ void MythAirplayServer::Cleanup(void)
 
 MythAirplayServer::MythAirplayServer()
   : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
-    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100), m_id(-1)
+    m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100), m_id(-1),
+    m_serviceRefresh(NULL)
 {
 }
 
@@ -412,6 +414,14 @@ void MythAirplayServer::Teardown(void)
 
     // invalidate
     m_valid = false;
+
+    // stop Bonjour Service Updater
+    if (m_serviceRefresh)
+    {
+        m_serviceRefresh->stop();
+        delete m_serviceRefresh;
+        m_serviceRefresh = NULL;
+    }
 
     // disconnect from mDNS
     delete m_bonjour;
@@ -492,9 +502,22 @@ void MythAirplayServer::Start(void)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to register service.");
             return;
         }
+        if (!m_serviceRefresh)
+        {
+            m_serviceRefresh = new QTimer();
+            connect(m_serviceRefresh, SIGNAL(timeout()), this, SLOT(timeout()));
+        }
+        // Will force a Bonjour refresh in two seconds
+        m_serviceRefresh->start(2000);
     }
     m_valid = true;
     return;
+}
+
+void MythAirplayServer::timeout(void)
+{
+    m_bonjour->ReAnnounceService();
+    m_serviceRefresh->start(10000);
 }
 
 void MythAirplayServer::Stop(void)
