@@ -33,33 +33,38 @@ QString fixFilename(const QString &filename)
 static QMap<QString, QString> iconMap;
 QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 {
+    LOG(VB_FILE, LOG_INFO, QString("findicon: looking for type: %1, name: %2").arg(type).arg(name));
+
     if (!ignoreCache)
     {
         QMap<QString, QString>::iterator i = iconMap.find(type + name);
         if (i != iconMap.end())
+        {
+            LOG(VB_FILE, LOG_INFO, QString("findicon: found in cache %1").arg(i.value()));
             return i.value();
+        }
     }
 
     QString cleanName = fixFilename(name);
     QString file = QString("Icons/%1/%2").arg(type).arg(cleanName);
     QStringList imageExtensions = QStringList() << ".jpg" << ".jpeg" << ".png" << ".gif";
+    QString filename;
 
     // TODO also look on any slave BEs?
-    QString filename = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),
-                                                0, file, "MusicArt");
-
     for (int x = 0; x < imageExtensions.count(); x++)
     {
-        if (RemoteFile::Exists(filename + imageExtensions[x]))
+        filename = RemoteFile::FindFile(file + imageExtensions[x], gCoreContext->GetMasterHostName(), "MusicArt");
+        if (!filename.isEmpty())
         {
-            iconMap.insert(type + name, filename + imageExtensions[x]);
-            return filename + imageExtensions[x];
+            LOG(VB_FILE, LOG_INFO, QString("findicon: found at %1").arg(filename));
+            iconMap.insert(type + name, filename);
+            return filename;
         }
     }
 
     iconMap.insert(type + name, QString());
 
-    LOG(VB_FILE, LOG_INFO, QString("findicon: not found for type: %1, name: %2").arg(type).arg(name));
+    LOG(VB_FILE, LOG_INFO, QString("findicon: not found type: %1, name: %2").arg(type).arg(name));
 
     return QString();
 }
