@@ -9,6 +9,7 @@
 #include "mythtvexp.h"
 
 class QMutex;
+class QTimer;
 class MThread;
 class BonjourRegister;
 
@@ -70,6 +71,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     void newConnection(QTcpSocket *client);
     void deleteConnection();
     void read(void);
+    void timeout(void);
 
   private:
     virtual ~MythAirplayServer(void);
@@ -118,6 +120,9 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
 
     // Notification
     int             m_id;
+
+    // Bonjour Service re-advertising
+    QTimer         *m_serviceRefresh;
 };
 
 #endif // MYTHAIRPLAYSERVER_H
