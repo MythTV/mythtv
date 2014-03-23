@@ -1,5 +1,7 @@
 #include "audiooutputgraph.h"
 
+#include <limits.h>
+#include <stdint.h>
 #include <math.h>
 
 #include <QtGlobal>
@@ -36,7 +38,7 @@ public:
     void SetMaxSamples(unsigned samples) { m_maxSamples = samples; }
     void SetSampleRate(unsigned sample_rate) { m_sample_rate = sample_rate; }
 
-    inline int BitsPerChannel() const { return m_bits; }
+    inline int BitsPerChannel() const { return sizeof(short) * CHAR_BIT; }
     inline int Channels() const { return m_channels; }
 
     inline int64_t Next() const { return m_tcNext; }
@@ -95,7 +97,7 @@ public:
 
         if (qAbs(timecode - m_tcNext) <= 1)
         {
-            append( reinterpret_cast< const char* >(b), len);
+            Append(b, len, bits);
             m_tcNext = tcNext;
         }
         else if (timecode >= m_tcFirst && tcNext <= m_tcNext)
@@ -109,7 +111,7 @@ public:
                 .arg(m_tcNext).arg(timecode));
 
             Resize(channels, bits);
-            append( reinterpret_cast< const char* >(b), len);
+            Append(b, len, bits);
             m_tcFirst = timecode;
             m_tcNext = tcNext;
         }
@@ -147,6 +149,46 @@ protected:
     inline unsigned MS2Samples(int64_t ms) const
     {
         return ms > 0 ? (ms * m_sample_rate) / 1000 : 0; // NB round down
+    }
+
+    void Append(const uchar *b, unsigned long len, int bits)
+    {
+        switch (bits)
+        {
+          case 8:
+            // 8bit unsigned to 16bit signed
+            {
+                unsigned long cnt = len;
+                int n = size();
+                resize(n + sizeof(int16_t) * cnt);
+                int16_t *p = reinterpret_cast< int16_t* >(data() + n);
+                while (cnt--)
+                    *p++ = (int16_t(*b++) - CHAR_MAX) << (16 - CHAR_BIT);
+            }
+            break;
+
+          case 16:
+            append( reinterpret_cast< const char* >(b), len);
+            break;
+
+          case 32:
+            // 32bit float to 16bit signed
+            {
+                unsigned long cnt = len / sizeof(float);
+                int n = size();
+                resize(n + sizeof(int16_t) * cnt);
+                const float f((1 << 15) - 1);
+                const float *s = reinterpret_cast< const float* >(b);
+                int16_t *p = reinterpret_cast< int16_t* >(data() + n);
+                while (cnt--)
+                    *p++ = int16_t(f * *s++);
+            }
+            break;
+
+          default:
+            append( reinterpret_cast< const char* >(b), len);
+            break;
+        }
     }
 
 private:
@@ -241,6 +283,8 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
     const unsigned range = 1U << m_buffer->BitsPerChannel();
     const double threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     const int height = (int)-ceil(threshold); // 96
+    if (height <= 0)
+        return 0;
 
     QImage image(width, height, QImage::Format_ARGB32);
     image.fill(0);
