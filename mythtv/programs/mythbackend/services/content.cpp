@@ -730,8 +730,8 @@ QFileInfo Content::GetMusic( int nId )
     // check to see if the file exists
     // ----------------------------------------------------------------------
 
-    if (QFile::exists( sFileName ))
-        return QFileInfo( sFileName );
+    if (!QFile::exists( sFileName ))
+        return GetFile( "Music", sFileName );
 
     return QFileInfo();
 }

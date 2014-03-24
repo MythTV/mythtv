@@ -12,6 +12,7 @@
 
 #include <QFileInfo>
 
+#include "storagegroup.h"
 #include "upnpcdsmusic.h"
 #include "httprequest.h"
 #include "mythcorecontext.h"
