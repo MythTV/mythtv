@@ -191,7 +191,7 @@ bool MythRAOPDevice::RegisterForBonjour(void)
     txt.append(8); txt.append("md=0,1,2");  // metadata-type: text, artwork, progress
     txt.append(8); txt.append("vs=115.2");
     txt.append(7); txt.append("da=true");
-//    txt.append(13); txt.append("am=AppleTV2,1");
+    txt.append(11); txt.append("am=MythTV,1");
 
     LOG(VB_GENERAL, LOG_INFO, QString("Registering service %1.%2 port %3 TXT %4")
         .arg(QString(name)).arg(QString(type)).arg(m_setupPort).arg(QString(txt)));

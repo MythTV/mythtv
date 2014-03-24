@@ -45,7 +45,7 @@ QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMute
 "<key>features</key>\r\n"\
 "<integer>119</integer>\r\n"\
 "<key>model</key>\r\n"\
-"<string>AppleTV2,1</string>\r\n"\
+"<string>MythTV,1</string>\r\n"\
 "<key>protovers</key>\r\n"\
 "<string>1.0</string>\r\n"\
 "<key>srcvers</key>\r\n"\
@@ -493,8 +493,8 @@ void MythAirplayServer::Start(void)
         txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress());
         // supposed to be: 0: video, 1:Phone, 3: Volume Control, 4: HLS
         // 9: Audio, 10: ? (but important without it it fails) 11: Audio redundant
-        txt.append(14); txt.append("features=0xE1B");
-        txt.append(16); txt.append("model=AppleTV2,1");
+        txt.append(13); txt.append("features=0x77");
+        txt.append(14); txt.append("model=MythTV,1");
         txt.append(13); txt.append("srcvers=115.2");
 
         if (!m_bonjour->Register(m_setupPort, type, name, txt))
