@@ -32,6 +32,7 @@ using namespace std;
 #include "mythdate.h"
 #include "mythmiscutil.h"
 #include "threadedfilewriter.h"
+#include "storagegroup.h"
 
 #define MAX_FILE_CHECK 500  // in ms
 
@@ -1076,12 +1077,22 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
     if (hostName.isEmpty())
         hostName = gCoreContext->GetMasterHostName();
 
-    // first check the given host
-    strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename << 0;
-    if (gCoreContext->SendReceiveStringList(strList))
+    if (gCoreContext->IsMasterBackend() &&
+        hostName == gCoreContext->GetMasterHostName())
     {
-        if (strList.size() > 0 && strList[0] != "EMPTY LIST" && !strList[0].startsWith("SLAVE UNREACHABLE"))
+        StorageGroup sGroup(storageGroup, hostName);
+        if (!sGroup.FindFile(filename).isEmpty())
             return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
+    }
+    else
+    {
+        // first check the given host
+        strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename << 0;
+        if (gCoreContext->SendReceiveStringList(strList))
+        {
+            if (strList.size() > 0 && strList[0] != "EMPTY LIST" && !strList[0].startsWith("SLAVE UNREACHABLE"))
+                return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
+        }
     }
 
     // not found so search all hosts that has a directory defined for the give storage group
@@ -1106,6 +1117,16 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
     while(query.next())
     {
         hostName = query.value(0).toString();
+
+        if (gCoreContext->IsMasterBackend() &&
+            hostName == gCoreContext->GetMasterHostName())
+        {
+            StorageGroup sGroup(storageGroup, hostName);
+            if (!sGroup.FindFile(filename).isEmpty())
+                return gCoreContext->GenMythURL(hostName, 0, filename, storageGroup);
+            else
+                continue;
+        }
 
         strList.clear();
         strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename << 0;
