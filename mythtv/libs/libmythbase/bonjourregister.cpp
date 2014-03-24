@@ -48,14 +48,11 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
     m_lock = new QMutexLocker(&g_lock);
     m_data = txt;
 
-    // add random fields to it
-    QByteArray data = RandomizeData();
-
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
         DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
                            (const char*)type.data(),
-                           NULL, 0, qport, data.size(), (void*)data.data(),
+                           NULL, 0, qport, txt.size(), (void*)txt.data(),
                            BonjourCallback, this);
 
     if (kDNSServiceErr_NoError != res)
