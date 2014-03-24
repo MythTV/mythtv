@@ -1077,7 +1077,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
         hostName = gCoreContext->GetMasterHostName();
 
     // first check the given host
-    strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename;
+    strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename << 0;
     if (gCoreContext->SendReceiveStringList(strList))
     {
         if (strList.size() > 0 && strList[0] != "EMPTY LIST" && !strList[0].startsWith("SLAVE UNREACHABLE"))
@@ -1108,7 +1108,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host, const
         hostName = query.value(0).toString();
 
         strList.clear();
-        strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename;
+        strList << "QUERY_SG_FILEQUERY" << hostName << storageGroup << filename << 0;
 
         if (gCoreContext->SendReceiveStringList(strList))
         {
