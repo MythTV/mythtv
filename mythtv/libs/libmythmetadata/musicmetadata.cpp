@@ -991,6 +991,8 @@ void MusicMetadata::setEmbeddedAlbumArt(AlbumArtList &albumart)
 
     for (int x = 0; x < albumart.size(); x++)
     {
+        AlbumArtImage *image = albumart.at(x);
+        image->filename = QString("%1-%2").arg(m_id).arg(image->filename);
         m_albumArt->addImage(albumart.at(x));
     }
 
