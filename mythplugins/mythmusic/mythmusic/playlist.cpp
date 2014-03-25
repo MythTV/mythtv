@@ -853,7 +853,7 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
 
 QString Playlist::toRawSonglist(bool shuffled, bool tracksOnly)
 {
-    QString rawList;
+    QString rawList = "";
 
     if (shuffled)
     {
