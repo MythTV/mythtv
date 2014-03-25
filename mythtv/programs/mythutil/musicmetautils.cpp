@@ -168,9 +168,8 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
 
     delete tagger;
 
-    // tell any clients that the metadata for this track has changed
-    // TODO check we need this
-    gCoreContext->SendMessage(QString("MUSIC_METADATA_CHANGED %1").arg(songID));
+    // tell any clients that the albumart for this track has changed
+    gCoreContext->SendMessage(QString("MUSIC_ALBUMART_CHANGED %1 %2").arg(songID).arg(type));
 
     return GENERIC_EXIT_OK;
 }
