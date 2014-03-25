@@ -137,7 +137,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
 
     // where are we going to save the image
     QString path;
-    StorageGroup artGroup("MusicArt", gCoreContext->GetHostName());
+    StorageGroup artGroup("MusicArt", gCoreContext->GetHostName(), false);
     QStringList dirList = artGroup.GetDirList();
     if (dirList.size())
         path = artGroup.FindNextDirMostFree();
