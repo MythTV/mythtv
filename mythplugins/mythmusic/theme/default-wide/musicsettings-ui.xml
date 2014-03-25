@@ -65,6 +65,11 @@
             <position>650,425</position>
         </checkbox>
 
+        <button name="resetdatabase" from="basewidebutton">
+            <position>650,470</position>
+            <value>Reset music database</value>
+        </button>
+
         <textarea name="helptext" from="basetextarea">
             <area>100,540,1080,100</area>
             <cutdown>yes</cutdown>
