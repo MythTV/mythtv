@@ -1204,7 +1204,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
         {
             if (tokens[0] == "BROWSER_DOWNLOAD_FINISHED")
                 rescanForImages();
-            else if (tokens[0] == "MUSIC_METADATA_CHANGED")
+            else if (tokens[0] == "MUSIC_ALBUMART_CHANGED")
             {
                 if (tokens.size() >= 2)
                 {
