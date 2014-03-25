@@ -249,7 +249,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;;
     }
 
-    uint duration = 0;
+    int duration = 0;
     long long time = 0;
 
     for (uint i = 0; i < inputFC->nb_streams; i++)
