@@ -93,6 +93,29 @@ static bool checkStorageGroup(void)
        return false;
     }
 
+    // get a list of hosts with a directory defined for the 'MusicArt' storage group
+    hostList.clear();
+    sql = "SELECT DISTINCT hostname "
+                  "FROM storagegroup "
+                  "WHERE groupname = 'MusicArt'";
+    if (!query.exec(sql) || !query.isActive())
+        MythDB::DBError("checkStorageGroup get host list", query);
+    else
+    {
+        while(query.next())
+        {
+            hostList.append(query.value(0).toString());
+        }
+    }
+
+    if (hostList.isEmpty())
+    {
+        ShowOkPopup(qApp->translate("(MythMusicMain)",
+                                    "No directories found in the 'MusicArt' storage group. "
+                                    "Please run mythtv-setup on the backend machine to add one."));
+       return false;
+    }
+
     return true;
 }
 
