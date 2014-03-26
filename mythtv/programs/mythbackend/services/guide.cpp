@@ -111,6 +111,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                 "AND program.chanid <= :EndChanId "
                 "AND program.endtime >= :StartDate "
                 "AND program.starttime <= :EndDate "
+                "AND program.manualid = 0 " // Exclude programmes created purely for 'manual' recording schedules
                 "GROUP BY program.starttime, channel.chanid "
                 "ORDER BY LPAD(CAST(channum AS UNSIGNED), 10, 0), "
                 "         LPAD(channum,  10, 0),             "
