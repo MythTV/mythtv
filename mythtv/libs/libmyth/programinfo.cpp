@@ -679,12 +679,17 @@ ProgramInfo::ProgramInfo(
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
     {
+        // If this showing is scheduled to be recorded, then we need to copy
+        // some of the information from the scheduler
+        //
+        // This applies even if the showing may be on a different channel
+        // to the one which is actually being recorded e.g. A regional or HD
+        // variant of the same channel
         if (!IsSameProgramAndStartTime(**it))
             continue;
 
         const ProgramInfo &s = **it;
         recordid    = s.recordid;
-        recstatus   = s.recstatus;
         rectype     = s.rectype;
         recpriority = s.recpriority;
         recstartts  = s.recstartts;
@@ -695,15 +700,25 @@ ProgramInfo::ProgramInfo(
         dupmethod   = s.dupmethod;
         findid      = s.findid;
 
-        if (chansign != s.chansign)
+        // This is the exact showing (same chanid or callsign)
+        // which will be recorded
+        if (IsSameChannel(s))
         {
-            if (s.recstatus == rsWillRecord)
-                recstatus = rsOtherShowing;
-            else if (s.recstatus == rsRecording)
-                recstatus = rsOtherRecording;
-            else if (s.recstatus == rsTuning)
-                recstatus = rsOtherTuning;
+            recstatus   = s.recstatus;
+            // We can stop looking at the scheduler list
+            // Aside from being more efficient, this avoids us accidentally
+            // overwriting values in the case where we have an override
+            // or channel specific rule for the same showing on a
+            // different channel
+            break;
         }
+
+        if (s.recstatus == rsWillRecord)
+            recstatus = rsOtherShowing;
+        else if (s.recstatus == rsRecording)
+            recstatus = rsOtherRecording;
+        else if (s.recstatus == rsTuning)
+            recstatus = rsOtherTuning;
     }
 }
 
@@ -2124,9 +2139,7 @@ bool ProgramInfo::IsSameTitleStartTimeAndChannel(const ProgramInfo& other) const
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
     if (startts == other.startts &&
-        (chanid == other.chanid ||
-         (!chansign.isEmpty() &&
-          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)))
+        IsSameChannel(other))
         return true;
 
     return false;
@@ -2142,11 +2155,25 @@ bool ProgramInfo::IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const
 {
     if (title.compare(other.title, Qt::CaseInsensitive) != 0)
         return false;
-    if ((chanid == other.chanid ||
-         (!chansign.isEmpty() &&
-          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0)) &&
+    if (IsSameChannel(other) &&
         startts < other.endts &&
         endts > other.startts)
+        return true;
+
+    return false;
+}
+
+/**
+ *  \brief Checks whether channel id or callsign are identical
+ *  \param other ProgramInfo to compare this one with.
+ *  \return true if this program's channel is likely to be the same
+ *          as the "other" program's channel
+ */
+bool ProgramInfo::IsSameChannel(const ProgramInfo& other) const
+{
+    if (chanid == other.chanid ||
+         (!chansign.isEmpty() &&
+          chansign.compare(other.chansign, Qt::CaseInsensitive) == 0))
         return true;
 
     return false;

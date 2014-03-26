@@ -1629,7 +1629,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row, int chanNum,
                 pginfo->GetRecordingStatus() == rsOffLine)
                 recStat = 2;
             else if (pginfo->GetRecordingStatus() <= rsWillRecord ||
-                     pginfo->GetRecordingStatus() == rsOtherShowing) // This should really be another colour entirely?
+                     pginfo->GetRecordingStatus() == rsOtherShowing) // This should really be another colour/state entirely?
                 recStat = 1;
             else
                 recStat = 0;
