@@ -1024,7 +1024,7 @@ bool Scheduler::IsSameProgram(
     if (it != cache_is_same_program.end())
         return *it;
 
-    return cache_is_same_program[X] = a->IsSameProgram(*b);
+    return cache_is_same_program[X] = a->IsDuplicateProgram(*b);
 }
 
 bool Scheduler::FindNextConflict(

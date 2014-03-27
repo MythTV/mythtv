@@ -2051,7 +2051,7 @@ bool ProgramInfo::IsSameProgramWeakCheck(const ProgramInfo &other) const
  *  \brief Checks for duplicates according to dupmethod.
  *  \param other ProgramInfo to compare this one with.
  */
-bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
+bool ProgramInfo::IsDuplicateProgram(const ProgramInfo& other) const
 {
     if (GetRecordingRuleType() == kOneRecord)
         return recordid == other.recordid;
@@ -2074,6 +2074,65 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if (!programid.isEmpty() && !other.programid.isEmpty())
     {
+        if (usingProgIDAuth)
+        {
+            int index = programid.indexOf('/');
+            int oindex = other.programid.indexOf('/');
+            if (index == oindex && (index < 0 ||
+                programid.leftRef(index) == other.programid.leftRef(oindex)))
+                return programid == other.programid;
+        }
+        else
+        {
+            return programid == other.programid;
+        }
+    }
+
+    if ((dupmethod & kDupCheckSub) &&
+        ((subtitle.isEmpty()) ||
+         (subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))
+        return false;
+
+    if ((dupmethod & kDupCheckDesc) &&
+        ((description.isEmpty()) ||
+         (description.compare(other.description, Qt::CaseInsensitive) != 0)))
+        return false;
+
+    if ((dupmethod & kDupCheckSubThenDesc) &&
+        ((subtitle.isEmpty() &&
+          ((!other.subtitle.isEmpty() &&
+            description.compare(other.subtitle, Qt::CaseInsensitive) != 0) ||
+           (other.subtitle.isEmpty() &&
+            description.compare(other.description, Qt::CaseInsensitive) != 0))) ||
+         (!subtitle.isEmpty() &&
+          ((other.subtitle.isEmpty() &&
+            subtitle.compare(other.description, Qt::CaseInsensitive) != 0) ||
+           (!other.subtitle.isEmpty() &&
+            subtitle.compare(other.subtitle, Qt::CaseInsensitive) != 0)))))
+        return false;
+
+    return true;
+}
+
+/**
+ *  \brief Checks whether this is the same program as "other", which may or may
+ *         not be a repeat or on another channel. Matches based on programid
+ *         with a fallback to dupmethod
+ *  \param other ProgramInfo to compare this one with.
+ */
+bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
+{
+    if (title.compare(other.title, Qt::CaseInsensitive) != 0)
+        return false;
+
+    if (!programid.isEmpty() && !other.programid.isEmpty())
+    {
+        if (catType == kCategorySeries)
+        {
+            if (programid.endsWith("0000"))
+                return false;
+        }
+
         if (usingProgIDAuth)
         {
             int index = programid.indexOf('/');

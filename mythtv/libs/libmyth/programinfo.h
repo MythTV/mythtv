@@ -298,7 +298,8 @@ class MPUBLIC ProgramInfo
     virtual void SubstituteMatches(QString &str);
 
     // Used for scheduling recordings
-    bool IsSameProgram(const ProgramInfo &other) const;
+    bool IsSameProgram(const ProgramInfo &other) const; // Exact same program
+    bool IsDuplicateProgram(const ProgramInfo &other) const; // Is this program considered a duplicate according to rule type and dup method (scheduler only)
     bool IsSameProgramAndStartTime(const ProgramInfo &other) const; // Exact same program and same starttime, Any channel
     bool IsSameTitleStartTimeAndChannel(const ProgramInfo &other) const; // Same title, starttime and channel
     bool IsSameTitleTimeslotAndChannel(const ProgramInfo &other) const;//sched only - Same title, starttime, endtime and channel
