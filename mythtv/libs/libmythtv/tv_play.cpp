@@ -12221,7 +12221,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
 
-    if (ctx->player)
+    if (ctx->player && ctx->player->GetVideoOutput())
     {
         for (int i = kTrackTypeUnknown ; i < kTrackTypeCount ; ++i)
         {
