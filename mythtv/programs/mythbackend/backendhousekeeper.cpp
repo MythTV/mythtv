@@ -579,12 +579,12 @@ bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
             // not yet time
             return false;
 
-        if (InWindow(now))
-            // we're inside our permitted window
-            return true;
-
-        return false;
+        return true;
     }
+    else if (InWindow(now))
+        // we're inside our permitted window
+        return true;
+
     else
     {
         // just let DailyHouseKeeperTask handle things
