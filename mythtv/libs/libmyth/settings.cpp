@@ -8,7 +8,6 @@ using namespace std;
 
 // Qt widgets
 #include <QLineEdit>
-#include <QLabel>
 #include <QSlider>
 #include <QLCDNumber>
 #include <QButtonGroup>
@@ -259,12 +258,12 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
     }
 
-    QLabel *value = new QLabel();
+    MythLabel *value = new MythLabel();
     value->setText(getValue());
     layout->addWidget(value);
 
@@ -297,7 +296,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
     }
@@ -401,7 +400,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setObjectName(QString(widgetName) + "-label");
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
@@ -474,7 +473,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
     }
@@ -590,13 +589,13 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
     }
 
 
-    QLabel *value = new QLabel();
+    MythLabel *value = new MythLabel();
     value->setText(labels[current]);
     layout->addWidget(value);
 
@@ -629,7 +628,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
     }
@@ -1051,7 +1050,7 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel *label = new QLabel();
+        MythLabel *label = new MythLabel();
         label->setText(getLabel());
         layout->addWidget(label);
     }
@@ -1217,7 +1216,7 @@ QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel();
+        MythLabel* label = new MythLabel();
         label->setObjectName(QString(widgetName) + "_label");
         label->setText(getLabel() + ":     ");
         layout->addWidget(label);
