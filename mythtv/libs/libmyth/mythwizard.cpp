@@ -48,8 +48,6 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QBoxLayout>
-#include <QGroupBox>
-#include <QLabel>
 
 #include "mythcorecontext.h"
 
@@ -74,14 +72,14 @@ public:
     Page * current;
     QStackedWidget * ws;
     QList<Page*> pages;
-    QLabel * title;
+    MythLabel * title;
     MythPushButton * backButton;
     MythPushButton * nextButton;
     MythPushButton * finishButton;
     MythPushButton * cancelButton;
 
-    QGroupBox *helpgroup;
-    QLabel *help;
+    MythGroupBox *helpgroup;
+    MythLabel *help;
 
     QFrame * hbar1, * hbar2;
 
@@ -103,7 +101,7 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
     d->current = 0; // not quite true, but...
     d->ws = new QStackedWidget(this);
     d->ws->setObjectName("MythWizard - stacked widget");
-    d->title = new QLabel(this);
+    d->title = new MythLabel(this);
     d->ws->setObjectName("MythWizard - title label");
 
     // create in nice tab order
@@ -512,10 +510,10 @@ void MythWizard::layOut()
 
     if (!d->helpgroup)
     {
-        d->helpgroup = new QGroupBox(this);
+        d->helpgroup = new MythGroupBox(this);
         d->helpgroup->setObjectName("MythWizard -- help group box");
 
-        d->help = new QLabel(d->helpgroup);
+        d->help = new MythLabel(d->helpgroup);
         d->help->setObjectName("MythWizard -- help text");
 
         d->help->setAlignment(Qt::AlignLeft | Qt::AlignTop);
