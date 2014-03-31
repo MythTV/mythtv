@@ -16,7 +16,7 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
                      const char *name)
          : MythDialog(parent, name)
 {
-    QLabel *maintext = new QLabel(text, this);
+    MythLabel *maintext = new MythLabel(text, this);
     maintext->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     maintext->setWordWrap(true);
 
