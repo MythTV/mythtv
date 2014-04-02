@@ -5615,11 +5615,14 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         // create an empty image list
         AlbumArtImages *images = new AlbumArtImages(mdata, false);
 
+        fi.setFile(mdata->Filename(false));
+        QString startDir = fi.path();
+
         for (int x = 0; x < files.size(); x++)
         {
             fi.setFile(files.at(x));
             AlbumArtImage *image = new AlbumArtImage();
-            image->filename = fi.fileName();
+            image->filename = startDir + '/' + fi.fileName();
             image->hostname = gCoreContext->GetHostName();
             image->embedded = false;
             image->imageType = AlbumArtImages::guessImageType(image->filename);
@@ -5628,7 +5631,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
             delete image;
         }
 
-        // find any embedded albumart in the the tracks tag
+        // find any embedded albumart in the tracks tag
         MetaIO *tagger = mdata->getTagger();
         if (tagger)
         {
