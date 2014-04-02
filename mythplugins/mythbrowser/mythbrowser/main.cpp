@@ -60,7 +60,7 @@ static int handleMedia(const QString &url, const QString &directory, const QStri
     return 0;
 }
 
-void runBookmarkManager()
+static void runBookmarkManager()
 {
     mythplugin_run();
 }
@@ -70,7 +70,7 @@ void runBookmarkManager()
  *         with an underscore) and calls handleMedia() if it exists.
  *  \return void.
  */
-void runHomepage()
+static void runHomepage()
 {
     // Get the homepage from the database. The url
     // that is set as a homepage starts with a space.
