@@ -61,7 +61,7 @@ bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
 
     if (extension.toLower() == "flac")
         m_fileType = kFLAC;
-    else if (extension.toLower() == "mp3")
+    else if (extension.toLower() == "mp3" || extension.toLower() == "mp2")
         m_fileType = kMPEG;
     else
         return false;
