@@ -1,4 +1,5 @@
 #include <signal.h> // for signal
+#include <stdlib.h>
 
 #ifndef _WIN32
 #include <QCoreApplication>
@@ -13,6 +14,9 @@
 #include <QFile>
 #include <QDir>
 #include <QMap>
+#ifdef Q_OS_MAC
+#include <QProcessEnvironment>
+#endif
 
 #include "signalhandling.h"
 #include "commandlineparser.h"
@@ -82,6 +86,15 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 #endif
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
+
+#ifdef Q_OS_MAC
+    QString path = QCoreApplication::applicationDirPath();
+    setenv("PYTHONPATH",
+           QString("%1/../Resources/lib/python2.6/site-packages:%2")
+           .arg(path)
+           .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
+           .toUtf8().constData(), 1);
+#endif
 
     pidfile = cmdline.toString("pidfile");
     int retval = cmdline.Daemonize();

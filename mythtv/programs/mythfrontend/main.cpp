@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <cerrno>
+#include <stdlib.h>
 
 #include <iostream>
 using namespace std;
@@ -16,6 +17,9 @@ using namespace std;
 #include <QWidget>
 #include <QApplication>
 #include <QTimer>
+#ifdef Q_OS_MAC
+#include <QProcessEnvironment>
+#endif
 
 #include "previewgeneratorqueue.h"
 #include "referencecounter.h"
@@ -1484,6 +1488,15 @@ int main(int argc, char **argv)
 #endif
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
+
+#ifdef Q_OS_MAC
+    QString path = QCoreApplication::applicationDirPath();
+    setenv("PYTHONPATH",
+           QString("%1/../Resources/lib/python2.6/site-packages:%2")
+           .arg(path)
+           .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
+           .toUtf8().constData(), 1);
+#endif
 
 #ifndef _WIN32
     QList<int> signallist;
