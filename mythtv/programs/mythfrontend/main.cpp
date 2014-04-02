@@ -810,7 +810,7 @@ static void TVMenuCallback(void *data, QString &selection)
     (void)data;
     QString sel = selection.toLower();
 
-    if (sel.startsWith("settings "))
+    if (sel.startsWith("settings ") || sel == "video_settings_general")
     {
         GetMythUI()->AddCurrentLocation("Setup");
         gCoreContext->ActivateSettingsCache(false);
