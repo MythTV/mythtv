@@ -580,11 +580,7 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_APPLEREMOTE
-    // We don't delete this, just disable its plumbing. If we create another
-    // MythMainWindow later, AppleRemote::get() will retrieve the instance.
-    if (d->appleRemote->isRunning())
-        d->appleRemote->stopListening();
-
+    delete d->appleRemote;
     delete d->appleRemoteListener;
 #endif
 

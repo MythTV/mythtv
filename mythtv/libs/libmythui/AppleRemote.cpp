@@ -58,8 +58,18 @@ AppleRemote * AppleRemote::Get()
 AppleRemote::~AppleRemote()
 {
     stopListening();
+
     if (mUsingNewAtv)
         delete mCallbackTimer;
+
+    if (isRunning())
+    {
+        exit(0);
+    }
+    if (this == _instance)
+    {
+        _instance = 0;
+    }
 }
 
 bool AppleRemote::isListeningToRemote()
