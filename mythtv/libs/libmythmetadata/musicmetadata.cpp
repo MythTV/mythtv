@@ -1867,6 +1867,16 @@ void AlbumArtImages::scanForImages()
         }
 
         image->hostname = strList[x + 5];
+
+        LOG(VB_FILE, LOG_INFO, "AlbumArtImages::scanForImages found image");
+        LOG(VB_FILE, LOG_INFO, QString("ID: %1").arg(image->id));
+        LOG(VB_FILE, LOG_INFO, QString("ImageType: %1").arg(image->imageType));
+        LOG(VB_FILE, LOG_INFO, QString("Embedded: %1").arg(image->embedded));
+        LOG(VB_FILE, LOG_INFO, QString("Description: %1").arg(image->description));
+        LOG(VB_FILE, LOG_INFO, QString("Filename: %1").arg(image->filename));
+        LOG(VB_FILE, LOG_INFO, QString("Hostname: %1").arg(image->hostname));
+        LOG(VB_FILE, LOG_INFO, "-------------------------------");
+
         addImage(image);
 
         delete image;
