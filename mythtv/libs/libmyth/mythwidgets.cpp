@@ -26,6 +26,10 @@ MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
     setEditable(rw);
 #ifdef Q_OS_MAC
     setStyleSheet("QComboBox { font: bold; } ");
+    if (lineEdit())
+    {
+        lineEdit()->setStyleSheet("QLineEdit:focus { background-color: #CBFAFC}");
+    }
 #endif
 }
 
@@ -340,7 +344,8 @@ MythSpinBox::MythSpinBox(QWidget* parent, const char* name,
     if (allowsinglestep)
         setSingleStep(10);
 #ifdef Q_OS_MAC
-    setStyleSheet("QSpinBox { font: bold; }");
+    setStyleSheet("QSpinBox { font: bold; }; ");
+    lineEdit()->setStyleSheet("QLineEdit:focus { background-color: #CBFAFC; };");
 #endif
 }
 
@@ -473,7 +478,7 @@ MythLineEdit::MythLineEdit(QWidget *parent, const char *name) :
     setObjectName(name);
 #ifdef Q_OS_MAC
     setStyleSheet("QLineEdit { font: bold; } "
-                  "QLineEdit:focus { color : white; } "
+                  "QLineEdit:focus { background-color: #CBFAFC}; "
                   );
 #endif
 }
@@ -486,7 +491,7 @@ MythLineEdit::MythLineEdit(
     setObjectName(name);
 #ifdef Q_OS_MAC
     setStyleSheet("QLineEdit { font: bold; } "
-                  "QLineEdit:focus { color : white; } "
+                  "QLineEdit:focus { background-color: #CBFAFC}; "
                   );
 #endif
 }
