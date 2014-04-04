@@ -166,6 +166,19 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
     QComboBox::focusOutEvent(e);
 }
 
+MythCheckBox::MythCheckBox(QWidget *parent, const char *name)
+    : QCheckBox(parent)
+{
+    setObjectName(name);
+}
+
+MythCheckBox::MythCheckBox(const QString &text,
+                           QWidget *parent, const char *name)
+    : QCheckBox(text, parent)
+{
+    setObjectName(name);
+};
+
 void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
@@ -217,6 +230,12 @@ void MythCheckBox::focusOutEvent(QFocusEvent *e)
     setPalette(QPalette());
     QCheckBox::focusOutEvent(e);
 }
+
+MythRadioButton:: MythRadioButton(QWidget* parent, const char* name)
+    : QRadioButton(parent)
+{
+    setObjectName(name);
+};
 
 void MythRadioButton::keyPressEvent(QKeyEvent* e)
 {
@@ -270,6 +289,14 @@ void MythRadioButton::focusOutEvent(QFocusEvent *e)
     QRadioButton::focusOutEvent(e);
 }
 
+MythSpinBox::MythSpinBox(QWidget* parent, const char* name,
+                         bool allow_single_step)
+    : QSpinBox(parent), allowsinglestep(allow_single_step)
+{
+    setObjectName(name);
+    if (allowsinglestep)
+        setSingleStep(10);
+}
 
 void MythSpinBox::setHelpText(const QString &help)
 {
@@ -329,6 +356,12 @@ void MythSpinBox::focusOutEvent(QFocusEvent *e)
 {
     setPalette(QPalette());
     QSpinBox::focusOutEvent(e);
+}
+
+MythSlider::MythSlider(QWidget* parent, const char* name)
+    : QSlider(parent)
+{
+    setObjectName(name);
 }
 
 void MythSlider::keyPressEvent(QKeyEvent* e)
@@ -1056,6 +1089,20 @@ void MythRemoteLineEdit::backspace()
     emit textChanged(toPlainText());
 }
 
+MythPushButton::MythPushButton(QWidget *parent, const char *name)
+    : QPushButton(parent)
+{
+    setObjectName(name);
+    setCheckable(false);
+}
+
+MythPushButton::MythPushButton(const QString &text, QWidget *parent)
+    : QPushButton(text, parent)
+{
+    setObjectName("MythPushButton");
+    setCheckable(false);
+}
+
 MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
                                QWidget *parent, bool isOn)
                                : QPushButton(ontext, parent)
@@ -1423,6 +1470,31 @@ bool MythListBox::itemVisible(uint row) const
 {
     QListWidgetItem *widget = item(row);
     return (widget) ? !isItemHidden(widget) : false;
+}
+
+MythLabel::MythLabel(QWidget* parent, const char* name)
+    : QLabel(parent)
+{
+    setObjectName(name);
+}
+
+MythLabel::MythLabel(const QString& text, QWidget* parent, const char* name)
+    : QLabel(text, parent)
+{
+    setObjectName(name);
+}
+
+MythGroupBox::MythGroupBox(QWidget* parent, const char* name)
+    : QGroupBox(parent)
+{
+    setObjectName(name);
+}
+
+MythGroupBox::MythGroupBox(const QString& text, QWidget* parent,
+                           const char* name)
+    : QGroupBox(text, parent)
+{
+    setObjectName(name);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
