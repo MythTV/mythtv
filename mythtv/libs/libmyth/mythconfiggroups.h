@@ -4,6 +4,7 @@
 #define MYTH_CONFIG_GROUPS_H
 
 #include <QVBoxLayout>
+#include <QGroupBox>
 
 // MythTV headers
 #include "mythexp.h"
@@ -14,7 +15,6 @@
 #undef MYTHCONFIG
 
 class QStackedWidget;
-class MythGroupBox;
 
 class MPUBLIC ConfigurationGroup : public Setting, public Storage
 {
@@ -93,7 +93,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
 
   private:
     vector<QWidget*>    childwidget;
-    MythGroupBox       *widget;
+    QGroupBox          *widget;
     ConfigurationGroup *confgrp;
     QVBoxLayout        *layout;
 };
