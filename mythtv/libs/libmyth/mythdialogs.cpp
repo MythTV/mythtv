@@ -9,6 +9,7 @@ using namespace std;
 #include <QDir>
 #include <QLayout>
 #include <QRegExp>
+#include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QFrame>
@@ -415,7 +416,7 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
          widget->setFont(font());
     }
 
-    if (widget->metaObject()->className() == QString("MythLabel"))
+    if (widget->metaObject()->className() == QString("QLabel"))
     {
         QPalette palette;
         palette.setColor(widget->foregroundRole(), popupForegroundColor);
@@ -425,9 +426,9 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
     vbox->addWidget(widget);
 }
 
-MythLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
+QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
 {
-    MythLabel *label = new MythLabel(caption, this);
+    QLabel *label = new QLabel(caption, this);
     switch (size)
     {
         case Large: label->setFont(defaultBigFont); break;
@@ -803,7 +804,7 @@ MythProgressDialog::MythProgressDialog(
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
     setFixedSize(QSize(screenwidth - xoff * 2, yoff));
 
-    msglabel = new MythLabel();
+    msglabel = new QLabel();
     msglabel->setText(message);
 
     QVBoxLayout *vlayout = new QVBoxLayout();

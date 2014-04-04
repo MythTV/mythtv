@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include <QGroupBox>
 #include <QStackedWidget>
 
 #include "mythconfiggroups.h"
@@ -144,7 +145,7 @@ QWidget *VerticalConfigurationGroup::configWidget(
     QWidget *widget = NULL;
     if (uselabel)
     {
-        MythGroupBox *groupbox = new MythGroupBox(parent);
+        QGroupBox *groupbox = new QGroupBox(parent);
         groupbox->setObjectName(QString("VCG(%1)_groupbox").arg(widgetName));
         groupbox->setTitle(getLabel());
         widget = groupbox;
@@ -258,7 +259,7 @@ QWidget *HorizontalConfigurationGroup::configWidget(
     QWidget *widget = NULL;
     if (uselabel)
     {
-        MythGroupBox *groupbox = new MythGroupBox(parent);
+        QGroupBox *groupbox = new QGroupBox(parent);
         groupbox->setObjectName(QString("HCG(%1)_groupbox").arg(widgetName));
         groupbox->setTitle(getLabel());
         widget = groupbox;
@@ -308,7 +309,7 @@ QWidget* GridConfigurationGroup::configWidget(
     QWidget *widget = NULL;
     if (uselabel)
     {
-        MythGroupBox *groupbox = new MythGroupBox(parent);
+        QGroupBox *groupbox = new QGroupBox(parent);
         groupbox->setObjectName(QString("GCG(%1)_groupbox").arg(widgetName));
         groupbox->setTitle(getLabel());
         widget = groupbox;
