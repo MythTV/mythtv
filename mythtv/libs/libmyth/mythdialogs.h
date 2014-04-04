@@ -3,7 +3,6 @@
 
 #include <QDomElement>
 #include <QDialog>
-#include <QLabel>
 #include <QAbstractButton>
 #include <QObject>
 #include <QFrame>
@@ -19,6 +18,7 @@ class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
 class MythListBox;
+class MythLabel;
 struct fontProp;
 class QVBoxLayout;
 class QProgressBar;
@@ -130,7 +130,7 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     typedef enum { Large, Medium, Small } LabelSize;
 
-    QLabel *addLabel(QString caption, LabelSize size = Medium,
+    MythLabel *addLabel(QString caption, LabelSize size = Medium,
                      bool wrap = false);
 
     QAbstractButton *addButton(QString caption, QObject *target = NULL,
@@ -242,7 +242,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
   protected:
     ~MythProgressDialog(); // use deleteLater() instead for thread safety
     QProgressBar *progress;
-    QLabel *msglabel;
+    MythLabel *msglabel;
 
   private:
     void setTotalSteps(int totalSteps);
