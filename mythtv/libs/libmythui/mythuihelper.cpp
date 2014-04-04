@@ -1206,6 +1206,10 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 {
     if (d->m_themeloaded)
     {
+#ifdef Q_OS_MAC
+        // the palette has already been loaded to the base application
+        return;
+#endif
         widget->setPalette(d->m_palette);
         return;
     }
