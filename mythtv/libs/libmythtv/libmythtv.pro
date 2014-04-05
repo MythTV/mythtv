@@ -50,7 +50,6 @@ INCLUDEPATH += $$POSTINC
 
 !win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
-    QMAKE_LFLAGS_SHLIB += $${FREETYPE_LIBS}
 }
 
 macx {
