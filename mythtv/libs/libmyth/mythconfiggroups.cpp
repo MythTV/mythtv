@@ -190,12 +190,6 @@ bool VerticalConfigurationGroup::replaceChild(
 
         *it = new_child;
 
-        if (!widget)
-        {
-            old_child->deleteLater();
-            return true;
-        }
-
         if (childwidget[i])
         {
             old_child->widgetInvalid(childwidget[i]);
