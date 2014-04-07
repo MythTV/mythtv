@@ -93,7 +93,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
 
   private:
     vector<QWidget*>    childwidget;
-    QGroupBox          *widget;
+    QWidget            *widget;
     ConfigurationGroup *confgrp;
     QVBoxLayout        *layout;
 };
