@@ -481,7 +481,17 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->appleRemote->setListener(d->appleRemoteListener);
     d->appleRemote->startListening();
     if (d->appleRemote->isListeningToRemote())
+    {
         d->appleRemote->start();
+    }
+    else
+    {
+        // start listening failed, no remote receiver present
+        delete d->appleRemote;
+        delete d->appleRemoteListener;
+        d->appleRemote = NULL;
+        d->appleRemoteListener = NULL;
+    }
 #endif
 
 #ifdef USING_LIBCEC
