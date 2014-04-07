@@ -141,7 +141,6 @@ QWidget *VerticalConfigurationGroup::configWidget(
         confgrp = cg;
     } 
 
-    QWidget *widget = NULL;
     if (uselabel)
     {
         MythGroupBox *groupbox = new MythGroupBox(parent);
