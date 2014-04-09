@@ -164,6 +164,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     categoryType    = other.categoryType;
     seriesId        = other.seriesId;
     programId       = other.programId;
+    inetref         = other.inetref;
     previouslyshown = other.previouslyshown;
     ratings         = other.ratings;
     listingsource   = other.listingsource;
@@ -185,6 +186,7 @@ void DBEvent::Squeeze(void)
     syndicatedepisodenumber.squeeze();
     seriesId.squeeze();
     programId.squeeze();
+    inetref.squeeze();
 }
 
 void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
@@ -257,7 +259,8 @@ uint DBEvent::GetOverlappingPrograms(
         "       airdate,        originalairdate, "
         "       previouslyshown,listingsource, "
         "       stars+0, "
-        "       season,         episode,       totalepisodes "
+        "       season,         episode,       totalepisodes, "
+        "       inetref "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -299,6 +302,7 @@ uint DBEvent::GetOverlappingPrograms(
             query.value(21).toUInt(),  // Episode
             query.value(22).toUInt()); // Total Episodes
 
+        prog.inetref    = query.value(23).toString();
         prog.partnumber = query.value(12).toUInt();
         prog.parttotal  = query.value(13).toUInt();
         prog.syndicatedepisodenumber = query.value(14).toString();
@@ -481,6 +485,7 @@ uint DBEvent::UpdateDB(
     uint16_t lairdate   = airdate;
     QString  lprogramId = programId;
     QString  lseriesId  = seriesId;
+    QString  linetref   = inetref;
     QDate loriginalairdate = originalairdate;
 
     if (match.title.length() >= ltitle.length())
@@ -506,6 +511,9 @@ uint DBEvent::UpdateDB(
 
     if (lseriesId.isEmpty() && !match.seriesId.isEmpty())
         lseriesId = match.seriesId;
+
+    if (linetref.isEmpty() && !match.inetref.isEmpty())
+        linetref= match.inetref;
 
     ProgramInfo::CategoryType tmp = categoryType;
     if (!categoryType && match.categoryType)
@@ -546,7 +554,7 @@ uint DBEvent::UpdateDB(
         "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
         "    listingsource  = :LSOURCE, "
         "    seriesid       = :SERIESID,  programid     = :PROGRAMID, "
-        "    previouslyshown = :PREVSHOWN "
+        "    previouslyshown = :PREVSHOWN, inetref      = :INETREF "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :OLDSTART ");
 
@@ -575,6 +583,7 @@ uint DBEvent::UpdateDB(
     query.bindValue(":SERIESID",    denullify(lseriesId));
     query.bindValue(":PROGRAMID",   denullify(lprogramId));
     query.bindValue(":PREVSHOWN",   lpreviouslyshown);
+    query.bindValue(":INETREF",     linetref);
 
     if (!query.exec())
     {
@@ -717,7 +726,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         "  syndicatedepisodenumber, "
         "  airdate,        originalairdate,listingsource, "
         "  seriesid,       programid,      previouslyshown, "
-        "  season,         episode,        totalepisodes ) "
+        "  season,         episode,        totalepisodes, "
+        "  inetref ) "
         "VALUES ("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
@@ -728,7 +738,8 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         " :SYNDICATENO, "
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
-        " :SEASON,        :EPISODE,       :TOTALEPISODES ) ");
+        " :SEASON,        :EPISODE,       :TOTALEPISODES, "
+        " :INETREF ) ");
 
     QString cattype = myth_category_type_to_string(categoryType);
     QString empty("");
@@ -760,6 +771,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":SEASON",      season);
     query.bindValue(":EPISODE",     episode);
     query.bindValue(":TOTALEPISODES", totalepisodes);
+    query.bindValue(":INETREF",     inetref);
 
     if (!query.exec())
     {
@@ -847,7 +859,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         "  airdate,        originalairdate,listingsource, "
         "  seriesid,       programid,      previouslyshown, "
         "  stars,          showtype,       title_pronounce, colorcode, "
-        "  season,         episode,        totalepisodes ) "
+        "  season,         episode,        totalepisodes, "
+        "  inetref ) "
 
         "VALUES("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
@@ -860,7 +873,8 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
         " :STARS,         :SHOWTYPE,      :TITLEPRON,      :COLORCODE, "
-        " :SEASON,        :EPISODE,       :TOTALEPISODES )");
+        " :SEASON,        :EPISODE,       :TOTALEPISODES, "
+        " :INETREF )");
 
     QString cattype = myth_category_type_to_string(categoryType);
 
@@ -899,6 +913,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     query.bindValue(":SEASON",      season);
     query.bindValue(":EPISODE",     episode);
     query.bindValue(":TOTALEPISODES", totalepisodes);
+    query.bindValue(":INETREF",     inetref);
 
     if (!query.exec())
     {
@@ -1252,7 +1267,8 @@ bool ProgramData::IsUnchanged(
         "      showtype        = :SHOWTYPE   AND "
         "      colorcode       = :COLORCODE  AND "
         "      syndicatedepisodenumber = :SYNDICATEDEPISODENUMBER AND "
-        "      programid       = :PROGRAMID");
+        "      programid       = :PROGRAMID  AND "
+        "      inetref         = :INETREF");
 
     QString cattype = myth_category_type_to_string(pi.categoryType);
 
@@ -1280,6 +1296,7 @@ bool ProgramData::IsUnchanged(
     query.bindValue(":SYNDICATEDEPISODENUMBER",
                     denullify(pi.syndicatedepisodenumber));
     query.bindValue(":PROGRAMID",  denullify(pi.programId));
+    query.bindValue(":INETREF",    pi.inetref);
 
     if (query.exec() && query.next())
         return query.value(0).toUInt() > 0;
