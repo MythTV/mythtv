@@ -211,39 +211,111 @@ bool DBEvent::HasTimeConflict(const DBEvent &o) const
             (o.endtime <= endtime     && starttime   < o.endtime));
 }
 
+// Processing new EIT entry starts here
 uint DBEvent::UpdateDB(
     MSqlQuery &query, uint chanid, int match_threshold) const
 {
+    // List the program that we are going to add
+    LOG(VB_EIT, LOG_DEBUG,
+        QString("EIT: new program: %1 %2 '%3' chanid %4")
+                .arg(starttime.toString(Qt::ISODate))
+                .arg(endtime.toString(Qt::ISODate))
+                .arg(title.left(35))
+                .arg(chanid));
+
+    // Do not insert or update when the program is in the past
+    QDateTime now = QDateTime::currentDateTimeUtc();
+    if (endtime < now)
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: skip '%1' endtime is in the past")
+                    .arg(title.left(35)));
+        return 0;
+    }
+
+    // Get all programs already in the database that overlap
+    // with our new program.
     vector<DBEvent> programs;
     uint count = GetOverlappingPrograms(query, chanid, programs);
     int  match = INT_MIN;
     int  i     = -1;
 
+    // If there are no programs already in the database that overlap
+    // with our new program then we can simply insert it in the database.
     if (!count)
         return InsertDB(query, chanid);
 
-    // move overlapping programs out of the way and update existing if possible
-    match = GetMatch(programs, i);
-
-    if (match >= match_threshold)
+    // List all overlapping programs with start- and endtime.
+    for (uint j=0; j<count; j++)
     {
         LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: overlap[%1] : %2 %3 '%4'")
+                .arg(j)
+                .arg(programs[j].starttime.toString(Qt::ISODate))
+                .arg(programs[j].endtime.toString(Qt::ISODate))
+                .arg(programs[j].title.left(35)));
+    }
+
+    // Determine which of the overlapping programs is a match with
+    // our new program; if we have a match then our new program is considered
+    // to be an update of the matching program.
+    // The 2nd parameter "i" is the index of the best matching program.
+    match = GetMatch(programs, i);
+
+    // Update an existing program or insert a new program.
+    if (match >= match_threshold)
+    {
+	// We have a good match; update program[i] in the database
+	// with the new program data and move the overlapping programs
+	// out of the way.
+        LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: accept match[%1]: %2 '%3' vs. '%4'")
-                .arg(i).arg(match).arg(title).arg(programs[i].title));
+                .arg(i).arg(match).arg(title.left(35))
+                .arg(programs[i].title.left(35)));
         return UpdateDB(query, chanid, programs, i);
     }
     else
     {
+	// If we are here then either we have a match but the match is
+	// not good enough (the "i >= 0" case) or we did not find
+	// a match at all.
         if (i >= 0)
         {
             LOG(VB_EIT, LOG_DEBUG,
                 QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
-                    .arg(i).arg(match).arg(title).arg(programs[i].title));
+                    .arg(i).arg(match).arg(title.left(35))
+                    .arg(programs[i].title.left(35)));
         }
+
+	// Move the overlapping programs out of the way and
+	// insert the new program.
         return UpdateDB(query, chanid, programs, -1);
     }
 }
 
+// Get all programs in the database that overlap with our new program.
+// We check for three ways in which we can have an overlap:
+// (1)   Start of old program is inside our new program:
+//           old program starts at or after our program AND
+//           old program starts before end of our program;
+//       e.g. new program  s-------------e
+//            old program      s-------------e
+//         or old program      s-----e
+//       This is the STIME1/ETIME1 comparison.
+// (2)   End of old program is inside our new program:
+//           old program ends after our program starts AND
+//           old program ends before end of our program
+//       e.g. new program      s-------------e
+//            old program  s-------------e
+//         or old program          s-----e
+//       This is the STIME2/ETIME2 comparison.
+// (3)   We can have a new program is "inside" the old program:
+//           old program starts before our program AND
+//          old program ends after end of our program
+//       e.g. new program      s---------e
+//            old program  s-----------------e
+//       This is the STIME3/ETIME3 comparison.
+//
 uint DBEvent::GetOverlappingPrograms(
     MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const
 {
@@ -265,12 +337,15 @@ uint DBEvent::GetOverlappingPrograms(
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
         "      ( ( starttime >= :STIME1 AND starttime <  :ETIME1 ) OR "
-        "        ( endtime   >  :STIME2 AND endtime   <= :ETIME2 ) )");
+        "        ( endtime   >  :STIME2 AND endtime   <= :ETIME2 ) OR "
+        "        ( starttime <  :STIME3 AND endtime   >  :ETIME3 ) )");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STIME1", starttime);
     query.bindValue(":ETIME1", endtime);
     query.bindValue(":STIME2", starttime);
     query.bindValue(":ETIME2", endtime);
+    query.bindValue(":STIME3", starttime);
+    query.bindValue(":ETIME3", endtime);
 
     if (!query.exec())
     {
@@ -418,7 +493,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
         {
             /* crappy providers apparently have events without duration
              * ensure that the minimal duration is 2 second to avoid
-             * muliplying and more importantly dividing by zero */
+             * multiplying and more importantly dividing by zero */
             int min_dur = max(2, min(duration, duration_loop));
             overlap = min(overlap, min_dur/2);
             mv *= overlap * 2;
@@ -429,10 +504,10 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Unexpected result: shows don't "
                         "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
-                    .arg(title.left(30), 30)
+                    .arg(title.left(35))
                     .arg(starttime.toString(Qt::ISODate))
                     .arg(endtime.toString(Qt::ISODate))
-                    .arg(programs[i].title.left(30), 30)
+                    .arg(programs[i].title.left(35), 35)
                     .arg(programs[i].starttime.toString(Qt::ISODate))
                     .arg(programs[i].endtime.toString(Qt::ISODate))
                 );
@@ -441,9 +516,9 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
         if (mv > match_val)
         {
             LOG(VB_EIT, LOG_DEBUG,
-                QString("GM : %1 new best match %2 with score %3")
-                    .arg(title.left(25))
-                    .arg(programs[i].title.left(25)).arg(mv));
+                QString("GM : '%1' new best match '%2' with score %3")
+                    .arg(title.left(35))
+                    .arg(programs[i].title.left(35)).arg(mv));
             bestmatch = i;
             match_val = mv;
         }
@@ -455,7 +530,7 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 uint DBEvent::UpdateDB(
     MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const
 {
-    // adjust/delete overlaps;
+    // Adjust/delete overlaps;
     bool ok = true;
     for (uint i = 0; i < p.size(); i++)
     {
@@ -463,20 +538,52 @@ uint DBEvent::UpdateDB(
             ok &= MoveOutOfTheWayDB(q, chanid, p[i]);
     }
 
-    // if we failed to move programs out of the way, don't insert new ones..
+    // If we failed to move programs out of the way, don't insert new ones..
     if (!ok)
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: cannot insert '%1' MoveOutOfTheWayDB failed")
+                    .arg(title.left(35)));
         return 0;
+    }
 
-    // if no match, insert current item
+    // No match, insert current item
     if ((match < 0) || ((uint)match >= p.size()))
+    {
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: insert '%1'")
+                    .arg(title.left(35)));
         return InsertDB(q, chanid);
+    }
 
-    // update matched item with current data
+    // Changing a starttime of a program that is being recorded can
+    // start another recording of the same program.
+    // Therefore we skip updates that change a starttime in the past
+    // unless the endtime is later.
+    if (starttime != p[match].starttime)
+    {
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        if (starttime < now && endtime <= p[match].endtime)
+        {
+            LOG(VB_EIT, LOG_DEBUG,
+                QString("EIT:  skip '%1' starttime is in the past")
+                        .arg(title.left(35)));
+	    return 0;
+        }
+    }
+
+    // Update matched item with current data
+    LOG(VB_EIT, LOG_DEBUG,
+         QString("EIT: update '%1' with '%2'")
+                 .arg(p[match].title.left(35))
+                 .arg(title.left(35)));
     return UpdateDB(q, chanid, p[match]);
 }
 
+// Update matched item with current data.
+//
 uint DBEvent::UpdateDB(
-    MSqlQuery &query, uint chanid, const DBEvent &match) const
+    MSqlQuery &query, uint chanid, const DBEvent &match)  const
 {
     QString  ltitle     = title;
     QString  lsubtitle  = subtitle;
@@ -649,6 +756,25 @@ static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
     return true;
 }
 
+static bool program_exists(MSqlQuery &query, uint chanid, const QDateTime &st)
+{
+    query.prepare(
+        "SELECT title FROM program "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    if (!query.exec())
+    {
+        MythDB::DBError("program_exists", query);
+    }
+    if (query.next())
+    {
+        return true;
+    }
+    return false;
+}
+
 static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
                            const QDateTime &new_st, const QDateTime &new_end)
 {
@@ -689,25 +815,62 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
     return true;
 }
 
+// Move the program "prog" (3rd parameter) out of the way
+// because it overlaps with our new program.
 bool DBEvent::MoveOutOfTheWayDB(
     MSqlQuery &query, uint chanid, const DBEvent &prog) const
 {
     if (prog.starttime >= starttime && prog.endtime <= endtime)
     {
-        // inside current program
+        // Old program completely inside our new program.
+	// Delete the old program completely.
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: delete '%1' %2 - %3")
+                    .arg(prog.title.left(35))
+                    .arg(prog.starttime.toString(Qt::ISODate))
+                    .arg(prog.endtime.toString(Qt::ISODate)));
         return delete_program(query, chanid, prog.starttime);
     }
     else if (prog.starttime < starttime && prog.endtime > starttime)
     {
-        // starts before, but ends during our program
+        // Old program starts before, but ends during or after our new program.
+	// Adjust the end time of the old program to the start time
+	// of our new program.
+	// This will leave a hole after our new program when the end time of
+	// the old program was after the end time of the new program!!
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: change '%1' endtime to %2")
+                    .arg(prog.title.left(35))
+                    .arg(starttime.toString(Qt::ISODate)));
         return change_program(query, chanid, prog.starttime,
-                              prog.starttime, starttime);
+                              prog.starttime, // Keep the start time
+			      starttime);     // New end time is our start time
     }
     else if (prog.starttime < endtime && prog.endtime > endtime)
     {
-        // starts during, but ends after our program
+        // Old program starts during, but ends after our new program.
+	// Adjust the starttime of the old program to the end time
+	// of our new program.
+	// If there is already a program starting just when our
+	// new program ends we cannot move the old program
+	// so then we have to delete the old program.
+        if (program_exists(query, chanid, endtime))
+        {
+            LOG(VB_EIT, LOG_DEBUG,
+                QString("EIT: delete '%1' %2 - %3")
+                        .arg(prog.title.left(35))
+                        .arg(prog.starttime.toString(Qt::ISODate))
+                        .arg(prog.endtime.toString(Qt::ISODate)));
+            return delete_program(query, chanid, prog.starttime);
+        }
+        LOG(VB_EIT, LOG_DEBUG,
+            QString("EIT: change '%1' starttime to %2")
+                    .arg(prog.title.left(35))
+                    .arg(endtime.toString(Qt::ISODate)));
+
         return change_program(query, chanid, prog.starttime,
-                              endtime, prog.endtime);
+                              endtime,        // New start time is our endtime
+			      prog.endtime);  // Keep the end time
     }
     // must be non-conflicting...
     return true;
