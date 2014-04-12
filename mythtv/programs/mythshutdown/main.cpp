@@ -231,7 +231,7 @@ static bool isRecording()
         }
     }
 
-    return RemoteGetRecordingStatus(NULL, false);
+    return RemoteGetRecordingStatus(NULL, false, gCoreContext->GetHostName());
 }
 
 static int getStatus(bool bWantRecStatus)
