@@ -286,7 +286,7 @@ static int getStatus(bool bWantRecStatus)
           MythDB::DBError("isAllowedToRunJobs -- select", query);
     bool isHostAllowedToRunJobs = query.size() == 1;
 
-    if (isHostAllowedToRunJobs &&JobQueue::HasRunningOrPendingJobs(15))
+    if (isHostAllowedToRunJobs && JobQueue::HasRunningOrPendingJobs(15))
     {
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
             QObject::tr("Has queued or pending jobs", "mythshutdown") + "\n");
