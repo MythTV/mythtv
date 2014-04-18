@@ -217,7 +217,21 @@ bool CDRipperThread::isCancelled(void)
 void CDRipperThread::run(void)
 {
     RunProlog();
+
     if (!m_tracks->size() > 0)
+    {
+        RunEpilog();
+        return;
+    }
+
+    m_totalSectors = 0;
+    m_totalSectorsDone = 0;
+    for (int trackno = 0; trackno < m_tracks->size(); trackno++)
+    {
+        m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
+    }
+
+    if (!m_totalSectors)
     {
         RunEpilog();
         return;
@@ -248,13 +262,6 @@ void CDRipperThread::run(void)
     QString textstatus;
     QString encodertype = gCoreContext->GetSetting("EncoderType");
     bool mp3usevbr = gCoreContext->GetNumSetting("Mp3UseVBR", 0);
-
-    m_totalSectors = 0;
-    m_totalSectorsDone = 0;
-    for (int trackno = 0; trackno < m_tracks->size(); trackno++)
-    {
-        m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
-    }
 
     QApplication::postEvent(m_parent,
         new RipStatusEvent(RipStatusEvent::kOverallStartEvent, m_totalSectors));
