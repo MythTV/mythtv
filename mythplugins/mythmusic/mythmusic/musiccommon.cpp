@@ -1514,12 +1514,12 @@ void MusicCommon::customEvent(QEvent *event)
             if (resulttext == tr("Replace Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
         }
         else if (resultid == "visualizermenu")
@@ -2494,7 +2494,7 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
     if (gPlayer->getCurrentPlaylist()->getTrackCount() == 0)
     {
         m_playlistOptions.insertPLOption = PL_REPLACE;
-        doUpdatePlaylist(true);
+        doUpdatePlaylist();
         return;
     }
 
@@ -2513,7 +2513,7 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
         delete menu;
 }
 
-void MusicCommon::doUpdatePlaylist(bool startPlayback)
+void MusicCommon::doUpdatePlaylist(void)
 {
     int curTrackID, trackCount = 0;
     int curPos = gPlayer->getCurrentTrackPos();
@@ -2549,7 +2549,9 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
 
     updateUIPlaylist();
 
-    if (startPlayback || gPlayer->isPlaying())
+    if (m_currentTrack == -1)
+        playFirstTrack();
+    else
     {
         switch (m_playlistOptions.playPLOption)
         {
@@ -2593,44 +2595,6 @@ void MusicCommon::doUpdatePlaylist(bool startPlayback)
                 break;
             }
         }
-    }
-    else
-    {
-        switch (m_playlistOptions.playPLOption)
-        {
-            case PL_CURRENT:
-                break;
-
-            case PL_FIRST:
-                m_currentTrack = 0;
-                break;
-
-            case PL_FIRSTNEW:
-            {
-                switch (m_playlistOptions.insertPLOption)
-                {
-                    case PL_REPLACE:
-                        m_currentTrack = 0;
-                        break;
-
-                    case PL_INSERTATEND:
-                        m_currentTrack = 0;
-                        break;
-
-                    case PL_INSERTAFTERCURRENT:
-                        // this wont work if the track are shuffled
-                        m_currentTrack = m_currentTrack + 1;
-                        break;
-
-                    default:
-                        m_currentTrack = 0;
-                }
-
-                break;
-            }
-        }
-
-        gPlayer->changeCurrentTrack(m_currentTrack);
     }
 
     if (gPlayer->getCurrentPlaylist())

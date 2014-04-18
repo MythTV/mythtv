@@ -318,13 +318,13 @@ void PlaylistEditorView::customEvent(QEvent *event)
             {
                 m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
         }
         else if (resultid == "playlistmenu")
@@ -352,12 +352,12 @@ void PlaylistEditorView::customEvent(QEvent *event)
             {
                 m_playlistOptions.playPLOption = PL_CURRENT;
                 m_playlistOptions.insertPLOption = PL_REPLACE;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
             else if (resulttext == tr("Add Tracks"))
             {
                 m_playlistOptions.insertPLOption = PL_INSERTATEND;
-                doUpdatePlaylist(false);
+                doUpdatePlaylist();
             }
         }
     }
@@ -503,7 +503,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                      {
                          m_playlistOptions.playPLOption = PL_FIRST;
                          m_playlistOptions.insertPLOption = PL_REPLACE;
-                         doUpdatePlaylist(true);
+                         doUpdatePlaylist();
                      }
                      else
                      {
