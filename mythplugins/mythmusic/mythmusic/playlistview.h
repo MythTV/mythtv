@@ -18,7 +18,7 @@ class PlaylistView : public MusicCommon
 {
     Q_OBJECT
   public:
-    PlaylistView(MythScreenStack *parent);
+    PlaylistView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~PlaylistView(void);
 
     bool Create(void);
@@ -26,9 +26,6 @@ class PlaylistView : public MusicCommon
 
   protected:
     void customEvent(QEvent *event);
-
-  private:
-//    void showMenu(void);
 };
 
 #endif

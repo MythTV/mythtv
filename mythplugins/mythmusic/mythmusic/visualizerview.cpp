@@ -19,8 +19,8 @@
 #include "musiccommon.h"
 #include "visualizerview.h"
 
-VisualizerView::VisualizerView(MythScreenStack *parent)
-         :MusicCommon(parent, "visualizerview")
+VisualizerView::VisualizerView(MythScreenStack *parent, MythScreenType *parentScreen)
+         :MusicCommon(parent, parentScreen, "visualizerview")
 {
     m_currentView = MV_VISUALIZER;
 }

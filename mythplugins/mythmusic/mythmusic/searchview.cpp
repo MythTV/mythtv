@@ -15,8 +15,8 @@
 #include "musiccommon.h"
 #include "searchview.h"
 
-SearchView::SearchView(MythScreenStack *parent)
-         :MusicCommon(parent, "searchview"),
+SearchView::SearchView(MythScreenStack *parent, MythScreenType *parentScreen)
+         :MusicCommon(parent, parentScreen,"searchview"),
             m_playTrack(false), m_fieldList(NULL), m_criteriaEdit(NULL),
             m_matchesText(NULL), m_tracksList(NULL)
 {
@@ -293,7 +293,7 @@ void SearchView::ShowMenu(void)
         if (GetFocusWidget() == m_tracksList || GetFocusWidget() == m_currentPlaylist)
             menu->AddItem(tr("Search List..."));
 
-        menu->AddItem(tr("More Options"), NULL, createMainMenu());
+        menu->AddItem(tr("More Options"), NULL, createSubMenu());
 
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

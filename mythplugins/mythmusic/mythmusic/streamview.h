@@ -20,7 +20,7 @@ class StreamView : public MusicCommon
   Q_OBJECT
 
   public:
-    StreamView(MythScreenStack *parent);
+    StreamView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~StreamView(void);
 
     bool Create(void);

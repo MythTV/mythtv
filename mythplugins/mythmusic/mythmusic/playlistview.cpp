@@ -10,8 +10,8 @@
 #include "musiccommon.h"
 #include "playlistview.h"
 
-PlaylistView::PlaylistView(MythScreenStack *parent)
-         :MusicCommon(parent, "playlistview")
+PlaylistView::PlaylistView(MythScreenStack *parent, MythScreenType *parentScreen)
+         :MusicCommon(parent, parentScreen, "playlistview")
 {
     m_currentView = MV_PLAYLIST;
 }
@@ -46,26 +46,8 @@ bool PlaylistView::Create(void)
 
 void PlaylistView::customEvent(QEvent *event)
 {
-    bool handled = false;
-
-#if 0
-    if (event->type() == DialogCompletionEvent::kEventType)
-    {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
-        QString resultid   = dce->GetId();
-        QString resulttext = dce->GetResultText();
-        //TODO::
-        if (resultid == "menu")
-        {
-        }
-    }
-#endif
-
-    if (!handled)
-        MusicCommon::customEvent(event);
+    MusicCommon::customEvent(event);
 }
-
 
 bool PlaylistView::keyPressEvent(QKeyEvent *event)
 {
@@ -73,25 +55,8 @@ bool PlaylistView::keyPressEvent(QKeyEvent *event)
         return true;
 
     bool handled = false;
-    QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
 
-#if 0
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "MENU")
-        {
-            showMenu();
-        }
-        else
-            handled = false;
-    }
-#endif
-
-    if (!handled && MusicCommon::keyPressEvent(event))
+    if (MusicCommon::keyPressEvent(event))
         handled = true;
 
     if (!handled && MythScreenType::keyPressEvent(event))

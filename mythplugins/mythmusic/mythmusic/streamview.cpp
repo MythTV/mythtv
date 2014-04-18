@@ -29,8 +29,8 @@
 
 using namespace std;
 
-StreamView::StreamView(MythScreenStack *parent)
-           :MusicCommon(parent, "streamview"),
+StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
+           :MusicCommon(parent, parentScreen, "streamview"),
             m_streamList(NULL), m_noStreams(NULL), m_bufferStatus(NULL),
             m_bufferProgress(NULL)
 {
@@ -85,7 +85,7 @@ void StreamView::ShowMenu(void)
 {
     MythMenu *menu = NULL;
 
-    menu = new MythMenu(tr("Stream Actions"), this, "streammenu");
+    menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
     menu->AddItem(tr("Add Stream"));
 
     if (m_streamList->GetItemCurrent())
@@ -94,7 +94,9 @@ void StreamView::ShowMenu(void)
         menu->AddItem(tr("Remove Stream"));
     }
 
-    menu->AddItem(tr("More Options"), NULL, createMainMenu());
+    menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
+
+    menu->AddItem(tr("More Options"), NULL, createSubMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -292,7 +294,7 @@ void StreamView::customEvent(QEvent *event)
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 
-        if (resultid == "streammenu")
+        if (resultid == "mainmenu")
         {
             if (resulttext == tr("Add Stream"))
             {
@@ -312,6 +314,8 @@ void StreamView::customEvent(QEvent *event)
             {
                 editStream();
             }
+            else
+                handled = false;
         }
         else
             handled = false;

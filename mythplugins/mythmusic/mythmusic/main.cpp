@@ -153,7 +153,7 @@ static void startPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaylistView *view = new PlaylistView(mainStack);
+    PlaylistView *view = new PlaylistView(mainStack, NULL);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -167,7 +167,7 @@ static void startStreamPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    StreamView *view = new StreamView(mainStack);
+    StreamView *view = new StreamView(mainStack, NULL);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -185,7 +185,7 @@ static void startDatabaseTree(void)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     QString lastView = gCoreContext->GetSetting("MusicPlaylistEditorView", "tree");
-    PlaylistEditorView *view = new PlaylistEditorView(mainStack, lastView);
+    PlaylistEditorView *view = new PlaylistEditorView(mainStack, NULL, lastView);
 
     if (view->Create())
         mainStack->AddScreen(view);

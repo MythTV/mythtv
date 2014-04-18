@@ -50,7 +50,8 @@ class MPUBLIC MusicCommon : public MythScreenType
 
   protected:
 
-    MusicCommon(MythScreenStack *parent, const QString &name);
+    MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
+                const QString &name);
     ~MusicCommon(void);
 
     bool CreateCommon(void);
@@ -63,6 +64,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     virtual void ShowMenu(void);
 
   protected slots:
+    void viewExited(void);
 
     void play(void);
     void stop(void);
@@ -77,7 +79,7 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     void searchButtonList(void);
     MythMenu* createMainMenu(void);
-    MythMenu* createViewMenu(void);
+    MythMenu* createSubMenu(void);
     MythMenu* createPlaylistMenu(void);
     MythMenu* createPlayerMenu(void);
     MythMenu* createQuickPlaylistsMenu(void);
@@ -103,6 +105,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void showPlaylistOptionsMenu(bool addMainMenu = false);
 
   protected:
+    void init(bool startPlayback = true);
     QString getTimeString(int exTime, int maxTime);
     void updateProgressBar(void);
     void setTrackOnLCD(MusicMetadata *mdata);
@@ -132,6 +135,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void playFirstTrack();
     bool restorePosition(int trackID);
 
+    MythScreenType        *m_parentScreen;
     MusicView              m_currentView;
 
     // visualiser stuff

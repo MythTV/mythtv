@@ -63,7 +63,8 @@ class PlaylistEditorView : public MusicCommon
 {
     Q_OBJECT
   public:
-    PlaylistEditorView(MythScreenStack *parent, const QString &layout, bool restorePosition = false);
+    PlaylistEditorView(MythScreenStack *parent, MythScreenType *parentScreen,
+                       const QString &layout, bool restorePosition = false);
     ~PlaylistEditorView(void);
 
     bool Create(void);

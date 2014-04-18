@@ -8,7 +8,7 @@
 #include "decoder.h"
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
-          : MusicCommon(parent, "music_miniplayer")
+          : MusicCommon(parent, NULL, "music_miniplayer")
 {
     m_currentView = MV_MINIPLAYER;
     m_displayTimer = new QTimer(this);

@@ -43,8 +43,10 @@ using namespace std;
 #include "visualizerview.h"
 #include "searchview.h"
 
-MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
+MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
+                         const QString &name)
             : MythScreenType(parent, name),
+    m_parentScreen(parentScreen),
     m_currentView(),            m_mainvisual(NULL),
     m_fullscreenBlank(false),   m_randomVisualizer(false),
     m_currentVisual(0),         m_moveTrackMode(false),
@@ -165,43 +167,63 @@ bool MusicCommon::CreateCommon(void)
     if (m_nextButton)
         connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(next()));
 
+    if (m_currentPlaylist)
+    {
+        connect(m_currentPlaylist, SIGNAL(itemClicked(MythUIButtonListItem*)),
+                this, SLOT(playlistItemClicked(MythUIButtonListItem*)));
+        connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
+                this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
+
+        m_currentPlaylist->SetSearchFields("**search**");
+    }
+
+    init();
+
+    return err;
+}
+
+void MusicCommon::init(bool startPlayback)
+{
     gPlayer->addListener(this);
 
-    if (!gPlayer->isPlaying())
+    if (startPlayback)
     {
-        if (m_currentView == MV_RADIO)
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
-        else if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
-        else
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSPLAYLIST);
-
-        gPlayer->restorePosition();
-    }
-    else
-    {
-        // if we are playing but we are switching to a view from a different playmode
-        // we need to restart playback in the new mode
-        if (m_currentView == MV_VISUALIZER || m_currentView == MV_MINIPLAYER)
+        if (!gPlayer->isPlaying())
         {
-            // this view can be used in both play modes
-        }
-        else if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO && m_currentView != MV_RADIO)
-        {
-            gPlayer->stop(true);
-
-            if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
+            if (m_currentView == MV_RADIO)
+                gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
+            else if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
                 gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
             else
                 gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSPLAYLIST);
 
             gPlayer->restorePosition();
         }
-        else if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO && m_currentView == MV_RADIO)
+        else
         {
-            gPlayer->stop(true);
-            gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
-            gPlayer->restorePosition();
+            // if we are playing but we are switching to a view from a different playmode
+            // we need to restart playback in the new mode
+            if (m_currentView == MV_VISUALIZER || m_currentView == MV_MINIPLAYER)
+            {
+                // these views can be used in both play modes
+            }
+            else if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO && m_currentView != MV_RADIO)
+            {
+                gPlayer->stop(true);
+
+                if (m_currentView == MV_PLAYLISTEDITORGALLERY || m_currentView == MV_PLAYLISTEDITORTREE)
+                    gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSEDITOR);
+                else
+                    gPlayer->setPlayMode(MusicPlayer::PLAYMODE_TRACKSPLAYLIST);
+
+                gPlayer->restorePosition();
+            }
+            else if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO && m_currentView == MV_RADIO)
+            {
+                gPlayer->stop(true);
+                gPlayer->setPlayMode(MusicPlayer::PLAYMODE_RADIO);
+                gPlayer->restorePosition();
+            }
         }
     }
 
@@ -214,21 +236,12 @@ bool MusicCommon::CreateCommon(void)
     updateProgressBar();
 
     if (m_currentPlaylist)
-    {
-        connect(m_currentPlaylist, SIGNAL(itemClicked(MythUIButtonListItem*)),
-                this, SLOT(playlistItemClicked(MythUIButtonListItem*)));
-        connect(m_currentPlaylist, SIGNAL(itemVisible(MythUIButtonListItem*)),
-                this, SLOT(playlistItemVisible(MythUIButtonListItem*)));
-
-        m_currentPlaylist->SetSearchFields("**search**");
-
         updateUIPlaylist();
-    }
 
     if (m_visualizerVideo)
     {
-        // Warm up the visualizer
         m_mainvisual = new MainVisual(m_visualizerVideo);
+
         m_visualModes = m_mainvisual->getVisualizations();
 
         m_fullscreenBlank = false;
@@ -288,7 +301,7 @@ bool MusicCommon::CreateCommon(void)
 
     updatePlaylistStats();
 
-    return err;
+    updateUIPlayedList();
 }
 
 void MusicCommon::updateRepeatMode(void)
@@ -383,6 +396,54 @@ void MusicCommon::updateShuffleMode(bool updateUIList)
 
 void MusicCommon::switchView(MusicView view)
 {
+    // can we switch to this view from the current view?
+    switch (m_currentView)
+    {
+        case MV_PLAYLIST:
+        {
+            if (view != MV_PLAYLISTEDITORTREE && view != MV_PLAYLISTEDITORGALLERY &&
+                    view != MV_SEARCH && view != MV_VISUALIZER)
+                return;
+            break;
+        }
+
+        case MV_PLAYLISTEDITORTREE:
+        {
+            if (view != MV_PLAYLISTEDITORGALLERY && view != MV_SEARCH && view != MV_VISUALIZER)
+                return;
+            break;
+        }
+
+        case MV_PLAYLISTEDITORGALLERY:
+        {
+            if (view != MV_PLAYLISTEDITORTREE && view != MV_SEARCH && view != MV_VISUALIZER)
+                return;
+            break;
+        }
+
+        case MV_SEARCH:
+        {
+            if (view != MV_VISUALIZER)
+                return;
+            break;
+        }
+
+        case MV_VISUALIZER:
+        {
+            return;
+        }
+
+        case MV_RADIO:
+        {
+            if (view != MV_VISUALIZER)
+                return;
+            break;
+        }
+
+        default:
+            return;
+    }
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     stopVisualizer();
@@ -400,12 +461,14 @@ void MusicCommon::switchView(MusicView view)
     {
         case MV_PLAYLIST:
         {
-            PlaylistView *view = new PlaylistView(mainStack);
+            PlaylistView *view = new PlaylistView(mainStack, this);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
@@ -419,12 +482,22 @@ void MusicCommon::switchView(MusicView view)
             if (oldView)
                 oldView->saveTreePosition();
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, "tree", restorePos);
+            MythScreenType *parentScreen = (oldView != NULL ? m_parentScreen : this);
+
+            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+
+            if (oldView)
+            {
+                disconnect(this , SIGNAL(Exiting()));
+                Close();
+            }
 
             break;
         }
@@ -438,48 +511,64 @@ void MusicCommon::switchView(MusicView view)
             if (oldView)
                 oldView->saveTreePosition();
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, "gallery", restorePos);
+            MythScreenType *parentScreen = (oldView != NULL ? m_parentScreen : this);
+
+            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+
+            if (oldView)
+            {
+                disconnect(this , SIGNAL(Exiting()));
+                Close();
+            }
 
             break;
         }
 
         case MV_SEARCH:
         {
-            SearchView *view = new SearchView(mainStack);
+            SearchView *view = new SearchView(mainStack, this);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
 
         case MV_VISUALIZER:
         {
-            VisualizerView *view = new VisualizerView(mainStack);
+            VisualizerView *view = new VisualizerView(mainStack, this);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
 
         case MV_RADIO:
         {
-            StreamView *view = new StreamView(mainStack);
+            StreamView *view = new StreamView(mainStack, this);
 
             if (view->Create())
                 mainStack->AddScreen(view);
             else
                 delete view;
+
+            connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
 
             break;
         }
@@ -488,9 +577,12 @@ void MusicCommon::switchView(MusicView view)
             return;
     }
 
-    Close();
-
     gPlayer->setAllowRestorePos(true);
+}
+
+void MusicCommon::viewExited(void)
+{
+    init(false);
 }
 
 bool MusicCommon::keyPressEvent(QKeyEvent *e)
@@ -546,26 +638,35 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            QString exit_action = gCoreContext->GetSetting("MusicExitAction", "prompt");
-
-            if (!gPlayer->isPlaying() || GetMythMainWindow()->IsExitingToMain())
+            // if we was started from another music view screen return to it
+            if (m_parentScreen || GetMythMainWindow()->IsExitingToMain())
             {
-                gPlayer->savePosition();
-                stopAll();
-                Close();
+                handled = false;
             }
             else
             {
-                if (exit_action == "stop")
+                // this is the top music view screen so prompt to continue playing
+                QString exit_action = gCoreContext->GetSetting("MusicExitAction", "prompt");
+
+                if (!gPlayer->isPlaying())
                 {
                     gPlayer->savePosition();
                     stopAll();
                     Close();
                 }
-                else if (exit_action == "play")
-                    Close();
                 else
-                    showExitMenu();
+                {
+                    if (exit_action == "stop")
+                    {
+                        gPlayer->savePosition();
+                        stopAll();
+                        Close();
+                    }
+                    else if (exit_action == "play")
+                        Close();
+                    else
+                        showExitMenu();
+                }
             }
         }
         else if (action == "THMBUP")
@@ -1241,20 +1342,29 @@ void MusicCommon::customEvent(QEvent *event)
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
-        if (resultid == "viewmenu")
+
+        if (resultid == "mainmenu")
         {
-            if (dce->GetResult() >= 0)
+            if (resulttext == tr("Fullscreen Visualizer"))
+                switchView(MV_VISUALIZER);
+            else if (resulttext == tr("Playlist Editor"))
             {
-                MusicView view = (MusicView)dce->GetData().toInt();
-                switchView(view);
+                if (gCoreContext->GetSetting("MusicPlaylistEditorView", "tree") ==  "tree")
+                    switchView(MV_PLAYLISTEDITORTREE);
+                else
+                    switchView(MV_PLAYLISTEDITORGALLERY);
             }
+            else if (resulttext == tr("Search for Music"))
+                switchView(MV_SEARCH);
+            else if (resulttext == tr("Switch To Gallery View"))
+                switchView(MV_PLAYLISTEDITORGALLERY);
+            else if (resulttext == tr("Switch To Tree View"))
+                switchView(MV_PLAYLISTEDITORTREE);
         }
-        else if (resultid == "actionmenu")
+        else if (resultid == "submenu")
         {
             if (resulttext == tr("Search List..."))
-            {
                 searchButtonList();
-            }
         }
         else if (resultid == "playlistmenu")
         {
@@ -1869,7 +1979,7 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
         return;
 
     MusicMetadata *mdata = qVariantValue<MusicMetadata*> (item->GetData());
-    if (mdata)
+    if (mdata && item->GetText() == " ")
     {
         if (item->GetImageFilename().isEmpty())
         {
@@ -1886,14 +1996,11 @@ void MusicCommon::playlistItemVisible(MythUIButtonListItem *item)
             }
         }
 
-        if (item->GetText() == " ")
-        {
-            InfoMap metadataMap;
-            mdata->toMap(metadataMap);
-            item->SetText("");
-            item->SetTextFromMap(metadataMap);
-            item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
-        }
+        InfoMap metadataMap;
+        mdata->toMap(metadataMap);
+        item->SetText("");
+        item->SetTextFromMap(metadataMap);
+        item->DisplayState(QString("%1").arg(mdata->Rating()), "ratingstate");
     }
 }
 
@@ -2081,15 +2188,34 @@ void MusicCommon::ShowMenu(void)
 
 MythMenu* MusicCommon::createMainMenu(void)
 {
+    QString label = tr("View Actions");
+
+    MythMenu *menu = new MythMenu(label, this, "mainmenu");
+
+    if (m_currentView == MV_PLAYLISTEDITORTREE)
+        menu->AddItem(tr("Switch To Gallery View"));
+    else if (m_currentView == MV_PLAYLISTEDITORGALLERY)
+        menu->AddItem(tr("Switch To Tree View"));
+    else if (m_currentView == MV_PLAYLIST)
+        menu->AddItem(MusicCommon::tr("Playlist Editor"));
+
+    menu->AddItem(tr("Search for Music"));
+    menu->AddItem(tr("Fullscreen Visualizer"));
+
+    menu->AddItem(tr("More Options"), NULL, createSubMenu());
+
+    return menu;
+}
+
+MythMenu* MusicCommon::createSubMenu(void)
+{
     QString label = tr("Actions");
 
-    MythMenu *menu = new MythMenu(label, this, "actionmenu");
+    MythMenu *menu = new MythMenu(label, this, "submenu");
 
     if (GetFocusWidget() && (GetFocusWidget()->inherits("MythUIButtonList") ||
                              GetFocusWidget()->inherits("MythUIButtonTree")))
         menu->AddItem(tr("Search List..."));
-
-    menu->AddItem(tr("Switch View"),      NULL, createViewMenu());
 
     if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
     {
@@ -2105,28 +2231,6 @@ MythMenu* MusicCommon::createMainMenu(void)
 
     if (m_visualizerVideo)
         menu->AddItem(tr("Change Visualizer"), NULL, createVisualizerMenu());
-
-    return menu;
-}
-
-MythMenu* MusicCommon::createViewMenu(void)
-{
-    QString label = tr("Switch View");
-
-    MythMenu *menu = new MythMenu(label, this, "viewmenu");
-
-    if (m_currentView != MV_PLAYLIST)
-        menu->AddItem(tr("Current Playlist"), qVariantFromValue((int)MV_PLAYLIST));
-    if (m_currentView != MV_PLAYLISTEDITORTREE)
-        menu->AddItem(tr("Playlist Editor - Tree"), qVariantFromValue((int)MV_PLAYLISTEDITORTREE));
-    if (m_currentView != MV_PLAYLISTEDITORGALLERY)
-        menu->AddItem(tr("Playlist Editor - Gallery"), qVariantFromValue((int)MV_PLAYLISTEDITORGALLERY));
-    if (m_currentView != MV_SEARCH)
-        menu->AddItem(tr("Search for Music"), qVariantFromValue((int)MV_SEARCH));
-    if (m_currentView != MV_RADIO)
-        menu->AddItem(tr("Play Radio Stream"), qVariantFromValue((int)MV_RADIO));
-    if (m_currentView != MV_VISUALIZER)
-        menu->AddItem(tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
 
     return menu;
 }

@@ -17,7 +17,7 @@ class VisualizerView : public MusicCommon
 {
     Q_OBJECT
   public:
-    VisualizerView(MythScreenStack *parent);
+    VisualizerView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~VisualizerView(void);
 
     bool Create(void);

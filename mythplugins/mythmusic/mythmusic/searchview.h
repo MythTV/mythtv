@@ -19,7 +19,7 @@ class SearchView : public MusicCommon
 {
     Q_OBJECT
   public:
-    SearchView(MythScreenStack *parent);
+    SearchView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~SearchView(void);
 
     bool Create(void);
