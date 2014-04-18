@@ -125,21 +125,36 @@ void GeneralSettings::slotDoResetDB(bool ok)
         MSqlQuery query(MSqlQuery::InitCon());
 
         query.prepare("TRUNCATE music_albumart");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_albumart table", query);
+
         query.prepare("TRUNCATE music_albums");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_albums table", query);
+
         query.prepare("TRUNCATE music_artists");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_artists table", query);
+
         query.prepare("TRUNCATE music_directories");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_directories table", query);
+
         query.prepare("TRUNCATE music_genres");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_genres table", query);
+
         query.prepare("TRUNCATE music_playlists");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_playlists table", query);
+
         query.prepare("TRUNCATE music_songs");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_songs table", query);
+
         query.prepare("TRUNCATE music_stats");
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("resetting music_stats table", query);
 
         gMusicData->reloadMusic();
 
