@@ -49,7 +49,6 @@ class SchedOptMixin
     MythUIButtonList *m_inputList;
     MythUICheckBox   *m_ruleactiveCheck;
     MythUIButtonList *m_newrepeatList;
-    MythUIButtonList *m_activeFilterList;
 
   private:
     MythScreenType   *m_screen;

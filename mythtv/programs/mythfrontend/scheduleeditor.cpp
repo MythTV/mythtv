@@ -1991,7 +1991,7 @@ SchedOptMixin::SchedOptMixin(MythScreenType &screen, RecordingRule *rule,
                              SchedOptMixin *other)
     : m_prioritySpin(NULL), m_startoffsetSpin(NULL), m_endoffsetSpin(NULL),
       m_dupmethodList(NULL), m_dupscopeList(NULL), m_inputList(NULL),
-      m_ruleactiveCheck(NULL), m_newrepeatList(NULL), m_activeFilterList(NULL),
+      m_ruleactiveCheck(NULL), m_newrepeatList(NULL),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false),
       m_haveRepeats(gCoreContext->GetNumSetting("HaveRepeats", 0))
 {
@@ -2038,7 +2038,6 @@ void SchedOptMixin::Create(bool *err)
         UIUtilW::Assign(m_screen, m_ruleactiveCheck, "ruleactive");
 
     UIUtilW::Assign(m_screen, m_newrepeatList, "newrepeat");
-    UIUtilW::Assign(m_screen, m_activeFilterList, "activefilters");
 }
 
 void SchedOptMixin::Load(void)
@@ -2164,19 +2163,6 @@ void SchedOptMixin::Load(void)
         m_newrepeatList->SetValueByData(ENUM_TO_QVARIANT
                                         (m_rule->m_dupIn & kDupsNewEpi));
     }
-
-    // Active filters
-    int idx, end = m_filtersList->GetCount();
-    for (idx = 0; idx < end; ++idx)
-    {
-        button = m_filtersList->GetItemAt(idx);
-        int filterid = button->GetData().value<int>();
-        bool checked = m_recordingRule->m_filter & (1 << filterid) ?
-                           MythUIButtonListItem::FullChecked :
-                           MythUIButtonListItem::NotChecked;
-        button->setChecked(checked);
-    }
-
 
     m_loaded = true;
 
