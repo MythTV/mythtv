@@ -4,9 +4,8 @@
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef USING_MINGW
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
 #include <poll.h>
-//#include <sys/select.h>
 #include <sys/ioctl.h>
 #endif
 
@@ -67,6 +66,10 @@ ExternIO::~ExternIO(void)
 
 bool ExternIO::Ready(int fd, int timeout)
 {
+#if defined( USING_MINGW ) || defined( _MSC_VER )
+    return false;
+#endif
+
     struct pollfd m_poll[2];
     memset(m_poll, 0, sizeof(m_poll));
 
