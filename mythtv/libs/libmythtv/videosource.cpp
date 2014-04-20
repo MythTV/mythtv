@@ -2243,6 +2243,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
     size->setValue(cs);
 }
 
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
 ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
@@ -2290,6 +2291,7 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 
     info->setValue(ci);
 }
+#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
@@ -2383,7 +2385,9 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     // for testing without any actual tuner hardware:
     addTarget("IMPORT",    new ImportConfigurationGroup(parent));
     addTarget("DEMO",      new DemoConfigurationGroup(parent));
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
     addTarget("EXTERNAL",  new ExternalConfigurationGroup(parent));
+#endif
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value)
@@ -2596,8 +2600,10 @@ void CardType::fillSelections(SelectSetting* setting)
 
     setting->addSelection(QObject::tr("Import test recorder"), "IMPORT");
     setting->addSelection(QObject::tr("Demo test recorder"),   "DEMO");
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
     setting->addSelection(QObject::tr("External (black box) recorder"),
                           "EXTERNAL");
+#endif
 }
 
 class CardID : public SelectLabelSetting, public CardInputDBStorage

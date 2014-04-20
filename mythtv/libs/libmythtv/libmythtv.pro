@@ -734,15 +734,17 @@ using_backend {
     using_hdpvr:SOURCES *= recorders/mpegrecorder.cpp
     using_hdpvr:DEFINES += USING_HDPVR
 
-    # External recorder
-    HEADERS += recorders/ExternalChannel.h
-    SOURCES += recorders/ExternalChannel.cpp
-    HEADERS += recorders/ExternalRecorder.h
-    SOURCES += recorders/ExternalRecorder.cpp
-    HEADERS += recorders/ExternalStreamHandler.h
-    SOURCES += recorders/ExternalStreamHandler.cpp
-    HEADERS += recorders/ExternalSignalMonitor.h
-    SOURCES += recorders/ExternalSignalMonitor.cpp
+    !mingw:!win32-msvc* {
+        # External recorder
+        HEADERS += recorders/ExternalChannel.h
+        SOURCES += recorders/ExternalChannel.cpp
+        HEADERS += recorders/ExternalRecorder.h
+        SOURCES += recorders/ExternalRecorder.cpp
+        HEADERS += recorders/ExternalStreamHandler.h
+        SOURCES += recorders/ExternalStreamHandler.cpp
+        HEADERS += recorders/ExternalSignalMonitor.h
+        SOURCES += recorders/ExternalSignalMonitor.cpp
+    }
 
     # Support for Linux DVB drivers
     using_dvb {
