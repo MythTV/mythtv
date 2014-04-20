@@ -21,6 +21,11 @@ contains(INCLUDEPATH, /usr/local/include) {
   POSTINC += /usr/local/include
   INCLUDEPATH -= /usr/local/include
 }
+contains(INCLUDEPATH, /usr/X11R6/include) {
+  POSTINC += /usr/X11R6/include
+  INCLUDEPATH -= /usr/X11R6/include
+}
+
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libmyth/audio
