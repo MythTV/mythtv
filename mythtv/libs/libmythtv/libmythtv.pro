@@ -51,7 +51,6 @@ DEPENDPATH  += ../libmythservicecontracts
 INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
-INCLUDEPATH += $$POSTINC
 
 !win32-msvc* {
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -851,6 +850,8 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
     using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 }
+
+INCLUDEPATH += $$POSTINC
 
 include ( ../libs-targetfix.pro )
 
