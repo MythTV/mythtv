@@ -54,6 +54,9 @@ extern "C" {
 #   include "cetonchannel.h"
 #endif
 
+#include "ExternalSignalMonitor.h"
+#include "ExternalChannel.h"
+
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SigMon[%1](%2)::%3: %4").arg(capturecardnum) \
@@ -154,6 +157,13 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
             signalMonitor = new ASISignalMonitor(db_cardnum, fc);
     }
 #endif
+
+    if (cardtype.toUpper() == "EXTERNAL")
+    {
+        ExternalChannel *fc = dynamic_cast<ExternalChannel*>(channel);
+        if (fc)
+            signalMonitor = new ExternalSignalMonitor(db_cardnum, fc);
+    }
 
     if (!signalMonitor && channel)
     {

@@ -1268,6 +1268,10 @@ void DTVRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
 {
     QMutexLocker change_lock(&_pid_lock);
 
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPMT(%1, %2)").arg(progNum)
+        .arg(_pmt == 0 ? "NULL" : "valid"));
+
+
     if ((int)progNum == _stream_data->DesiredProgram())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPMT(%1)").arg(progNum));

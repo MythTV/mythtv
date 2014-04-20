@@ -538,6 +538,22 @@ class DemoConfigurationGroup: public VerticalConfigurationGroup
     TransLabelSetting *size;
 };
 
+class ExternalConfigurationGroup: public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+    ExternalConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeApp(const QString & path);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *info;
+    InstanceCount     *instances;
+};
+
 class DVBCardNum;
 class DVBCardName;
 class DVBCardType;

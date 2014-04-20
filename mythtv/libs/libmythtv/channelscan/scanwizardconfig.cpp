@@ -180,6 +180,10 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("ASI Scan"),
                          QString::number(CurrentTransportScan), true);
             return;
+        case CardUtil::EXTERNAL:
+            addSelection(tr("MPTS Scan"),
+                         QString::number(CurrentTransportScan), true);
+            return;
         case CardUtil::ERROR_PROBE:
             addSelection(tr("Failed to probe the card"),
                          QString::number(Error_Probe), true);

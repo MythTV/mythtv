@@ -17,6 +17,7 @@ using namespace std;
 #include "cetonchannel.h"
 #include "asirecorder.h"
 #include "dvbrecorder.h"
+#include "ExternalRecorder.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
 #include "mythlogging.h"
@@ -25,6 +26,7 @@ using namespace std;
 #include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "v4lchannel.h"
+#include "ExternalChannel.h"
 #include "ringbuffer.h"
 #include "cardutil.h"
 #include "tv_rec.h"
@@ -656,6 +658,11 @@ RecorderBase *RecorderBase::CreateRecorder(
         recorder = new NuppelVideoRecorder(tvrec, channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L2
+    }
+    else if (genOpt.cardtype == "EXTERNAL")
+    {
+        recorder = new ExternalRecorder(tvrec,
+                                dynamic_cast<ExternalChannel*>(channel));
     }
 
     if (recorder)

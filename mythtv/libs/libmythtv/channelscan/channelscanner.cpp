@@ -42,6 +42,7 @@ using namespace std;
 #include "dvbchannel.h"
 #include "v4lchannel.h"
 #include "iptvchannel.h"
+#include "ExternalChannel.h"
 #include "cardutil.h"
 
 #define LOC QString("ChScan: ")
@@ -396,6 +397,11 @@ void ChannelScanner::PreScanCommon(
         channel = new IPTVChannel(NULL, device);
     }
 #endif
+
+    if ("EXTERNAL" == card_type)
+    {
+        channel = new ExternalChannel(NULL, device);
+    }
 
     if (!channel)
     {

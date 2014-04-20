@@ -38,6 +38,7 @@ using namespace std;
 #include "dtvchannel.h"
 #include "dvbchannel.h"
 #include "v4lchannel.h"
+#include "ExternalChannel.h"
 #include "sourceutil.h"
 #include "exitcodes.h"
 #include "cardutil.h"
@@ -1209,6 +1210,10 @@ ChannelBase *ChannelBase::CreateChannel(
 #endif
         if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))
             rbFileExt = "nuv";
+    }
+    else if (genOpt.cardtype == "EXTERNAL")
+    {
+        channel = new ExternalChannel(tvrec, genOpt.videodev);
     }
 
     if (!channel)

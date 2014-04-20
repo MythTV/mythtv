@@ -88,6 +88,10 @@ QString CardUtil::GetScanableCardTypes(void)
     cardTypes += "'CETON'";
 #endif // USING_CETON
 
+    if (!cardTypes.isEmpty())
+        cardTypes += ",";
+    cardTypes += "'EXTERNAL'";
+
     if (cardTypes.isEmpty())
         cardTypes = "'DUMMY'";
 
