@@ -42,13 +42,14 @@ class HLSReader
     HLSReader(void);
     ~HLSReader(void);
 
-    bool Open(const QString & uri);
+    bool Open(const QString & uri, int bitrate_index = 0);
     void Close(bool quiet = false);
     int Read(uint8_t* buffer, int len);
     void Throttle(bool val);
     bool IsThrottled(void) const { return m_throttle; }
     bool IsOpen(const QString& url) const
     { return m_curstream && m_m3u8 == url; }
+    bool FatalError(void) const { return m_fatal; }
 
     bool LoadMetaPlaylists(MythSingleDownload& downloader);
     void ResetStream(void)
@@ -66,7 +67,6 @@ class HLSReader
     static QString RelativeURI(const QString surl, const QString spath);
 
   protected:
-    bool FatalError(void) const { return m_fatal; }
     void Cancel(bool quiet = false);
     bool LoadSegments(MythSingleDownload& downloader);
     uint PercentBuffered(void) const;
@@ -128,6 +128,7 @@ class HLSReader
     SegmentContainer m_segments;
     HLSRecStream    *m_curstream;
     int64_t          m_cur_seq;
+    int              m_bitrate_index;
 
     bool m_fatal;
     bool m_cancel;

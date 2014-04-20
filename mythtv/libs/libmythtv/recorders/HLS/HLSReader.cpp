@@ -13,7 +13,8 @@ static uint64_t MDate(void)
 }
 
 HLSReader::HLSReader(void)
-    : m_curstream(NULL), m_cur_seq(-1), m_fatal(false), m_cancel(false),
+    : m_curstream(NULL), m_cur_seq(-1), m_bitrate_index(0),
+      m_fatal(false), m_cancel(false),
       m_throttle(true), m_aesmsg(false),
       m_playlistworker(NULL), m_streamworker(NULL),
       m_playlist_size(0), m_bandwidthcheck(false), m_prebuffer_cnt(10),
@@ -28,9 +29,11 @@ HLSReader::~HLSReader(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- end");
 }
 
-bool HLSReader::Open(const QString & m3u)
+bool HLSReader::Open(const QString & m3u, int bitrate_index)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Opening '%1'").arg(m3u));
+
+    m_bitrate_index = bitrate_index;
 
     if (IsOpen(m3u))
     {
@@ -77,18 +80,37 @@ bool HLSReader::Open(const QString & m3u)
     if (!ParseM3U8(buffer))
         return false;
 
-    // Select the highest bitrate stream
-    StreamContainer::iterator Istream;
-    for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
+    if (m_bitrate_index == 0)
     {
-        if (m_curstream == NULL ||
-            (*Istream)->Bitrate() > m_curstream->Bitrate())
-            m_curstream = *Istream;
+        // Select the highest bitrate stream
+        StreamContainer::iterator Istream;
+        for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
+        {
+            if (m_curstream == NULL ||
+                (*Istream)->Bitrate() > m_curstream->Bitrate())
+                m_curstream = *Istream;
+        }
+    }
+    else
+    {
+        if (m_streams.size() < m_bitrate_index)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("Open '%1': Only %2 bitrates, %3 is not a valid index")
+                .arg(m3u)
+                .arg(m_streams.size())
+                .arg(m_bitrate_index));
+            m_fatal = true;
+            return false;
+        }
+
+        m_curstream = *(m_streams.begin() + (m_bitrate_index - 1));
     }
 
     if (!m_curstream)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("No stream selected"));
+        m_fatal = true;
         return false;
     }
     LOG(VB_RECORD, LOG_INFO, LOC +
@@ -967,7 +989,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             EnableDebugging();
             Iseg = m_segments.begin() + (behind - max_behind);
             m_segments.erase(m_segments.begin(), Iseg);
-            m_bandwidthcheck = true;
+            m_bandwidthcheck = (m_bitrate_index == 0);
         }
         else if (m_debug_cnt > 0)
             --m_debug_cnt;
@@ -1125,7 +1147,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
     if (!m_curstream)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "LoadSegment: current stream not set.");
-        m_bandwidthcheck = true;
+        m_bandwidthcheck = (m_bitrate_index == 0);
         return false;
     }
 
@@ -1213,7 +1235,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
 
         if (m_prebuffer_cnt == 0)
         {
-            m_bandwidthcheck = true;
+            m_bandwidthcheck = (m_bitrate_index == 0);
             m_prebuffer_cnt = 2;
         }
         else

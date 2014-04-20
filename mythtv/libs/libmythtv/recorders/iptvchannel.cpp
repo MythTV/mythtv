@@ -187,6 +187,9 @@ bool IPTVChannel::Tune(const IPTVTuningData &tuning, bool scanning)
 
     m_firsttune = false;
 
+    LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tuned to (%1)")
+        .arg(tuning.GetDeviceName()));
+
     return true;
 }
 

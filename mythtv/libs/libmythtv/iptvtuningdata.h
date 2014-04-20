@@ -75,18 +75,19 @@ class MTV_PUBLIC IPTVTuningData
     {
         const QUrl u = GetDataURL();
         if (IsHLS())
-            return u.toString();
+            return QString("%1(%2)").arg(u.toString()).arg(GetBitrate(0));
         return QString("%1:%2:%3")
             .arg(u.host()).arg(u.userInfo()).arg(u.port()).toLower();
     }
 
     QString GetDeviceName(void) const
     {
-        return QString("[data]%1[fectype]%2[fec0]%3[fec1]%4")
+        return QString("[data]%1[fectype]%2[fec0]%3[fec1]%4%5")
             .arg(GetDataURL().toString())
             .arg(GetFECTypeString(1))
             .arg(GetFECURL1().toString())
-            .arg(GetFECURL1().toString());
+            .arg(GetFECURL1().toString())
+            .arg(GetBitrate(0) ? QString("-%1").arg(GetBitrate(0)) : "");
     }
 
     bool operator==(const IPTVTuningData &other) const

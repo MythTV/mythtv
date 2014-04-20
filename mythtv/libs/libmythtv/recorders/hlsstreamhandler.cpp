@@ -132,8 +132,10 @@ void HLSStreamHandler::run(void)
     {
         if (!m_hls->IsOpen(url))
         {
-            if (!m_hls->Open(url))
+            if (!m_hls->Open(url, m_tuning.GetBitrate(0)))
             {
+                if (m_hls->FatalError())
+                    break;
                 usleep(open_sleep);
                 if (open_sleep < 20000000)
                     open_sleep += 500000;
