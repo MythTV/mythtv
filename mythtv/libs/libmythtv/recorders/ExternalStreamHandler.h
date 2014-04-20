@@ -81,6 +81,7 @@ class ExternalStreamHandler : public StreamHandler
                         QString & result);
 
   private:
+    int StreamingCount(void) const;
     bool OpenApp(void);
     bool Open(void);
     void Close(void);

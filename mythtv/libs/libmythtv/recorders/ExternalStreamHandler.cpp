@@ -445,6 +445,15 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path) :
     }
 }
 
+int ExternalStreamHandler::StreamingCount(void) const
+{
+#if QT_VERSION >= 0x050000
+    return m_streaming_cnt.loadAcquire();
+#else
+    return m_streaming_cnt;
+#endif
+}
+
 void ExternalStreamHandler::run(void)
 {
     QString    cmd;
@@ -478,7 +487,7 @@ void ExternalStreamHandler::run(void)
             }
         }
 
-        if (m_streaming_cnt == 0)
+        if (StreamingCount() == 0)
         {
             usleep(5000);
             continue;
@@ -708,7 +717,7 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("StartStreaming with %1 current listeners")
-        .arg(m_streaming_cnt));
+        .arg(StreamingCount()));
 
     if (!IsOpen())
     {
@@ -716,7 +725,7 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
         return false;
     }
 
-    if (m_streaming_cnt == 0)
+    if (StreamingCount() == 0)
     {
         if (flush_buffer)
         {
@@ -768,7 +777,7 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("StartStreaming %1 listeners")
-        .arg(m_streaming_cnt));
+        .arg(StreamingCount()));
 
     return true;
 }
@@ -781,9 +790,9 @@ bool ExternalStreamHandler::StopStreaming(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("StopStreaming %1 listeners")
-        .arg(m_streaming_cnt));
+        .arg(StreamingCount()));
 
-    if (m_streaming_cnt == 0)
+    if (StreamingCount() == 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "StopStreaming requested, but we are not streaming!");
@@ -794,7 +803,7 @@ bool ExternalStreamHandler::StopStreaming(void)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("StopStreaming delayed, still have %1 listeners")
-            .arg(m_streaming_cnt));
+            .arg(StreamingCount()));
         return true;
     }
 
