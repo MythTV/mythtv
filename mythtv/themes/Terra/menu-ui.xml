@@ -637,7 +637,7 @@
                             <!--imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
                             </imagetype-->
-                        </state-->
+                        </state>
                         <state name="SETTINGS_THEMECHOOSER" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/themechooser.png</filename>
