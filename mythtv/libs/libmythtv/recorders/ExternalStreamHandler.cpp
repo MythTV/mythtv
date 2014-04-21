@@ -66,10 +66,7 @@ ExternIO::~ExternIO(void)
 
 bool ExternIO::Ready(int fd, int timeout)
 {
-#if defined( USING_MINGW ) || defined( _MSC_VER )
-    return false;
-#endif
-
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
     struct pollfd m_poll[2];
     memset(m_poll, 0, sizeof(m_poll));
 
@@ -96,7 +93,7 @@ bool ExternIO::Ready(int fd, int timeout)
             m_error = "poll overflow";
         return false;
     }
-
+#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
     return false;
 }
 
@@ -204,6 +201,7 @@ void ExternIO::Term(bool force)
 
 void ExternIO::Fork(void)
 {
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
     if (Error())
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternIO in bad state: '%1'")
@@ -342,6 +340,8 @@ void ExternIO::Fork(void)
                   << "execv() should not be here?: "
                   << strerror(errno) << endl;
     }
+
+#endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 
     /* Failed to exec */
     _exit(GENERIC_EXIT_DAEMONIZING_ERROR); // this exit is ok
@@ -802,7 +802,7 @@ bool ExternalStreamHandler::StopStreaming(void)
         return true;
     }
 
-    if (m_streaming_cnt.deref() > 0)
+    if (m_streaming_cnt.deref())
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("StopStreaming delayed, still have %1 listeners")
