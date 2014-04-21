@@ -229,13 +229,18 @@
                         <state name="SETTINGS_GENERAL" from="SETUP" />
                         <state name="SETTINGS_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
-                            <imagetype name="icon">
+                            <!--imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
-                            </imagetype>
+                            </imagetype-->
                         </state>
                         <state name="SETTINGS_AUDIOGENERAL" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/audio.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SETTINGS_THEMECHOOSER" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/themechooser.png</filename>
                             </imagetype>
                         </state>
                         <state name="SCREENSETUPWIZARD" from="default">
@@ -629,8 +634,13 @@
                         <state name="SETTINGS_GENERAL" from="SETUP" />
                         <state name="SETTINGS_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
-                            <imagetype name="icon">
+                            <!--imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
+                            </imagetype-->
+                        </state-->
+                        <state name="SETTINGS_THEMECHOOSER" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/themechooser.png</filename>
                             </imagetype>
                         </state>
                         <state name="SCREENSETUPWIZARD" from="default">
