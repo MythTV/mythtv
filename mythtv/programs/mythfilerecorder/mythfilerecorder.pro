@@ -2,6 +2,11 @@ include (../../settings.pro)
 include (../../version.pro)
 include ( ../programs-libs.pro )
 
+QT += network xml sql script
+contains(QT_VERSION, ^5\\.[0-9]\\..*) {
+QT += widgets
+}
+
 TEMPLATE = app
 CONFIG += thread
 target.path = $${PREFIX}/bin
