@@ -654,6 +654,11 @@
                                 <filename>watermarks/music_settings.png</filename>
                             </imagetype>
                         </state>
+                        <state name="SETTINGS_AUDIOGENERAL" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/audio.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="SETTINGS_VIDEO" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/video_settings.png</filename>
