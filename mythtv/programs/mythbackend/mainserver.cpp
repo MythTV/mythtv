@@ -2157,15 +2157,24 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         return;
     }
 
-    /* Delete all preview thumbnails. */
+    /* Delete all preview thumbnails and srt subtitles. */
 
     QFileInfo fInfo( ds->m_filename );
     QString nameFilter = fInfo.fileName() + "*.png";
+
     // QDir's nameFilter uses spaces or semicolons to separate globs,
     // so replace them with the "match any character" wildcard
     // since mythrename.pl may have included them in filenames
     nameFilter.replace(QRegExp("( |;)"), "?");
-    QDir      dir  ( fInfo.path(), nameFilter );
+
+    QStringList nameFilters(nameFilter);
+
+    nameFilter = fInfo.fileName() + "*.srt";
+    nameFilter.replace(QRegExp("( |;)"), "?");
+    nameFilters.append(nameFilter);
+
+    QDir      dir  ( fInfo.path() );
+    dir.setNameFilters(nameFilters);
 
     for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
     {
