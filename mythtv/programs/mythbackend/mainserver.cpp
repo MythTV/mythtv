@@ -271,7 +271,7 @@ MainServer::MainServer(bool master, int port,
     if (v4IsSet && !listenAddrs.contains(config_v4))
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Unable to find IPv4 address to bind");
-    
+
     if ((v4IsSet && !listenAddrs.contains(config_v4))
 #if !defined(QT_NO_IPV6)
         && (v6IsSet && !listenAddrs.contains(config_v6))
@@ -330,7 +330,7 @@ MainServer::MainServer(bool master, int port,
     masterFreeSpaceList << "0";
     masterFreeSpaceList << "0";
     masterFreeSpaceList << "0";
-    
+
     masterFreeSpaceListUpdater = (master ? new FreeSpaceUpdater(*this) : NULL);
     if (masterFreeSpaceListUpdater)
     {
@@ -1722,7 +1722,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             socket->WriteStringList(errlist);
             return;
         }
-            
+
 
         QFileInfo finfo(filename);
         if (finfo.isDir())
@@ -2738,7 +2738,7 @@ void MainServer::DoHandleDeleteRecording(
 
             if (forgetHistory)
                 recinfo.ForgetHistory();
-            else if (m_sched && 
+            else if (m_sched &&
                      recinfo.GetRecordingGroup() != "Deleted" &&
                      recinfo.GetRecordingGroup() != "LiveTV")
                 m_sched->RescheduleCheck(recinfo, "DoHandleDelete2");
@@ -2772,9 +2772,9 @@ void MainServer::DoHandleDeleteRecording(
     {
         recinfo.SaveDeletePendingFlag(true);
 
-        DeleteThread *deleteThread = new DeleteThread(this, filename, 
-            recinfo.GetTitle(), recinfo.GetChanID(), 
-            recinfo.GetRecordingStartTime(), recinfo.GetRecordingEndTime(), 
+        DeleteThread *deleteThread = new DeleteThread(this, filename,
+            recinfo.GetTitle(), recinfo.GetChanID(),
+            recinfo.GetRecordingStartTime(), recinfo.GetRecordingEndTime(),
             forceMetadataDelete);
         deleteThread->start();
     }
@@ -2798,7 +2798,7 @@ void MainServer::DoHandleDeleteRecording(
 
     if (forgetHistory)
         recinfo.ForgetHistory();
-    else if (m_sched && 
+    else if (m_sched &&
              recinfo.GetRecordingGroup() != "Deleted" &&
              recinfo.GetRecordingGroup() != "LiveTV")
         m_sched->RescheduleCheck(recinfo, "DoHandleDelete3");
@@ -2860,7 +2860,7 @@ void MainServer::DoHandleUndeleteRecording(
     SendResponse(pbssock, outputlist);
 }
 
-void MainServer::HandleRescheduleRecordings(const QStringList &request, 
+void MainServer::HandleRescheduleRecordings(const QStringList &request,
                                             PlaybackSock *pbs)
 {
     QStringList result;
@@ -4757,7 +4757,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
             if (diffUsed < 0)
                 diffUsed = 0 - diffUsed;
 
-            if (it2->getFSysID() == -1 && (diffSize <= bSize) && 
+            if (it2->getFSysID() == -1 && (diffSize <= bSize) &&
                 (diffUsed <= maxWriteFiveSec))
             {
                 if (!it1->getHostname().contains(it2->getHostname()))
@@ -4830,7 +4830,7 @@ void MainServer::GetFilesystemInfos(QList<FileSystemInfo> &fsInfos)
         "Determining unique filesystems");
     size_t maxWriteFiveSec = GetCurrentMaxBitrate()/12  /*5 seconds*/;
     // safety for NFS mounted dirs
-    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); 
+    maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec);
 
     FileSystemInfo::Consolidate(fsInfos, false, maxWriteFiveSec);
 
@@ -4881,7 +4881,7 @@ void TruncateThread::run(void)
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
-    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0)) 
+    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0))
     {
         TruncateAndClose(NULL, ds->m_fd, ds->m_filename, ds->m_size);
     }
@@ -4965,7 +4965,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     if (fd >= 0)
     {
         // Thread off the actual file truncate
-        TruncateThread *truncateThread = 
+        TruncateThread *truncateThread =
             new TruncateThread(this, fullfile, fd, size);
         truncateThread->run();
     }
@@ -6249,7 +6249,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
 
     ft->IncrRef();
     sockListLock.unlock();
-    
+
     if (command == "REQUEST_BLOCK")
     {
         int size = slist[2].toInt();
