@@ -57,7 +57,8 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetRequires("fifodir");
 
     add(QStringList( QStringList() << "-l" << "--honorcutlist" ), "usecutlist",
-            "", "Specifies whether to use the cutlist.",
+            "", "Specifies whether to use the cutlist. "
+            "(Takes an optional cutlist as argument when used with -i)",
             "Specifies whether transcode should honor the cutlist and "
             "remove the marked off commercials. Optionally takes a "
             "a cutlist as an argument when used with --infile.")
