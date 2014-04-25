@@ -85,8 +85,8 @@ void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
                                RecordingInfo *recInfo, TV *player)
           : ScheduleCommon(parent, "ScheduleEditor"),
-            SchedOptMixin(*this, NULL), StoreOptMixin(*this, NULL),
-            PostProcMixin(*this, NULL),
+            SchedOptMixin(*this, NULL), FilterOptMixin(*this, NULL),
+            StoreOptMixin(*this, NULL), PostProcMixin(*this, NULL),
             m_recInfo(new RecordingInfo(*recInfo)), m_recordingRule(NULL),
             m_sendSig(false),
             m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
@@ -99,6 +99,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
     m_recordingRule = new RecordingRule();
     m_recordingRule->m_recordID = m_recInfo->GetRecordingRuleID();
     SchedOptMixin::SetRule(m_recordingRule);
+    FilterOptMixin::SetRule(m_recordingRule);
     StoreOptMixin::SetRule(m_recordingRule);
     PostProcMixin::SetRule(m_recordingRule);
 }
@@ -107,6 +108,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
                                RecordingRule *recRule, TV *player)
           : ScheduleCommon(parent, "ScheduleEditor"),
             SchedOptMixin(*this, recRule),
+            FilterOptMixin(*this, recRule),
             StoreOptMixin(*this, recRule),
             PostProcMixin(*this, recRule),
             m_recInfo(NULL), m_recordingRule(recRule),
@@ -150,6 +152,7 @@ bool ScheduleEditor::Create()
     UIUtilW::Assign(this, m_filtersButton, "filters");
 
     SchedOptMixin::Create(&err);
+    FilterOptMixin::Create(&err);
     StoreOptMixin::Create(&err);
     PostProcMixin::Create(&err);
 
@@ -193,6 +196,9 @@ bool ScheduleEditor::Create()
     if (m_dupmethodList)
         connect(m_dupmethodList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(DupMethodChanged(MythUIButtonListItem *)));
+    if (m_filtersList)
+        connect(m_filtersList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+                SLOT(FilterChanged(MythUIButtonListItem *)));
     if (m_maxepSpin)
         connect(m_maxepSpin, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(MaxEpisodesChanged(MythUIButtonListItem *)));
@@ -241,6 +247,7 @@ void ScheduleEditor::Close()
 void ScheduleEditor::Load()
 {
     SchedOptMixin::Load();
+    FilterOptMixin::Load();
     StoreOptMixin::Load();
     PostProcMixin::Load();
 
@@ -354,6 +361,7 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
                                      !m_recordingRule->m_isTemplate);
 
     SchedOptMixin::RuleChanged();
+    FilterOptMixin::RuleChanged();
     StoreOptMixin::RuleChanged();
     PostProcMixin::RuleChanged();
 }
@@ -361,6 +369,11 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
 void ScheduleEditor::DupMethodChanged(MythUIButtonListItem *item)
 {
     SchedOptMixin::DupMethodChanged(item);
+}
+
+void ScheduleEditor::FilterChanged(MythUIButtonListItem *item)
+{
+    FilterOptMixin::ToggleSelected(item);
 }
 
 void ScheduleEditor::MaxEpisodesChanged(MythUIButtonListItem *item)
@@ -394,6 +407,7 @@ void ScheduleEditor::Save()
     }
 
     SchedOptMixin::Save();
+    FilterOptMixin::Save();
     StoreOptMixin::Save();
     PostProcMixin::Save();
     m_recordingRule->Save(true);
@@ -666,6 +680,7 @@ void ScheduleEditor::ShowPreview(void)
     }
 
     SchedOptMixin::Save();
+    FilterOptMixin::Save();
     StoreOptMixin::Save();
     PostProcMixin::Save();
 
@@ -716,6 +731,8 @@ void ScheduleEditor::ShowFilters(void)
 
     if (m_child)
         m_child->Close();
+
+    FilterOptMixin::Save();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     SchedFilterEditor *schedfilteredit = new SchedFilterEditor(mainStack,
@@ -779,6 +796,8 @@ void ScheduleEditor::ChildClosing(void)
 {
     if (m_view == kSchedOptView)
         SchedOptMixin::Load();
+    else if (m_view == kFilterView)
+        FilterOptMixin::Load();
     else if (m_view == kStoreOptView)
         StoreOptMixin::Load();
     else if (m_view == kPostProcView)
@@ -1047,7 +1066,7 @@ SchedFilterEditor::SchedFilterEditor(MythScreenStack *parent,
                                      RecordingRule &rule,
                                      RecordingInfo *recInfo)
     : SchedEditChild(parent, "ScheduleFilterEditor", editor, rule, recInfo),
-      m_filtersList(NULL), m_loaded(false)
+      FilterOptMixin(*this, &rule, &editor)
 {
 }
 
@@ -1066,7 +1085,7 @@ bool SchedFilterEditor::Create()
 
     bool err = false;
 
-    UIUtilE::Assign(this, m_filtersList, "filters", &err);
+    FilterOptMixin::Create(&err);
 
     if (err)
     {
@@ -1083,70 +1102,20 @@ bool SchedFilterEditor::Create()
     return true;
 }
 
-void SchedFilterEditor::Load()
+void SchedFilterEditor::Load(void)
 {
-    int filterid;
-    MythUIButtonListItem *button;
-
-    if (!m_loaded)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        query.prepare("SELECT filterid, description, newruledefault "
-                      "FROM recordfilter ORDER BY filterid");
-
-        if (query.exec())
-        {
-            while (query.next())
-            {
-                filterid = query.value(0).toInt();
-                QString description = tr(query.value(1).toString()
-                                         .toUtf8().constData());
-                // Fill in list of possible filters
-                button = new MythUIButtonListItem(m_filtersList, description,
-                                                  filterid);
-                button->setCheckable(true);
-            }
-        }
-    }
-
-    int idx, end = m_filtersList->GetCount();
-    for (idx = 0; idx < end; ++idx)
-    {
-        button = m_filtersList->GetItemAt(idx);
-        int filterid = button->GetData().value<int>();
-        button->setChecked(m_recordingRule->m_filter & (1 << filterid) ?
-                           MythUIButtonListItem::FullChecked :
-                           MythUIButtonListItem::NotChecked);
-    }
-
+    FilterOptMixin::Load();
     SetTextFromMaps();
-
-    m_loaded = true;
-}
-
-void SchedFilterEditor::ToggleSelected(MythUIButtonListItem *item)
-{
-    item->setChecked(item->state() == MythUIButtonListItem::FullChecked ?
-                     MythUIButtonListItem::NotChecked :
-                     MythUIButtonListItem::FullChecked);
 }
 
 void SchedFilterEditor::Save()
 {
-    // Iterate through button list, and build the mask
-    MythUIButtonListItem *button;
-    uint32_t filter_mask = 0;
-    int idx, end;
+    FilterOptMixin::Save();
+}
 
-    end = m_filtersList->GetCount();
-    for (idx = 0; idx < end; ++idx)
-    {
-        if ((button = m_filtersList->GetItemAt(idx)) &&
-            button->state() == MythUIButtonListItem::FullChecked)
-            filter_mask |= (1 << button->GetData().value<uint32_t>());
-    }
-    m_recordingRule->m_filter = filter_mask;
+void SchedFilterEditor::ToggleSelected(MythUIButtonListItem *item)
+{
+    FilterOptMixin::ToggleSelected(item);
 }
 
 /////////////////////////////
@@ -2243,6 +2212,141 @@ void SchedOptMixin::DupMethodChanged(MythUIButtonListItem *item)
     if (m_dupscopeList)
         m_dupscopeList->SetEnabled(m_rule->m_dupMethod != kDupCheckNone);
 }
+
+////////////////////////////////////////////////////////
+
+/** \class FilterOptMixin
+ *  \brief Mixin for Filters
+ *
+ */
+
+FilterOptMixin::FilterOptMixin(MythScreenType &screen, RecordingRule *rule,
+                         FilterOptMixin *other)
+    : m_filtersList(NULL), m_activeFiltersList(NULL),
+      m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
+{
+}
+
+void FilterOptMixin::Create(bool *err)
+{
+    if (!m_rule)
+        return;
+
+    if (m_other && !m_other->m_filtersList)
+        UIUtilE::Assign(m_screen, m_filtersList, "filters", err);
+    else
+        UIUtilW::Assign(m_screen, m_filtersList, "filters");
+
+    UIUtilW::Assign(m_screen, m_activeFiltersList, "activefilters");
+    if (m_activeFiltersList)
+        m_activeFiltersList->SetCanTakeFocus(false);
+}
+
+void FilterOptMixin::Load(void)
+{
+    if (!m_rule)
+        return;
+
+    if (!m_loaded)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT filterid, description, newruledefault "
+                      "FROM recordfilter ORDER BY filterid");
+
+        if (query.exec())
+        {
+            while (query.next())
+            {
+                m_descriptions << QObject::tr(query.value(1).toString()
+                                              .toUtf8().constData());
+            }
+        }
+        m_loaded = true;
+    }
+
+    if (m_activeFiltersList)
+        m_activeFiltersList->Reset();
+
+    MythUIButtonListItem *button;
+    QStringList::iterator Idesc;
+    int  idx;
+    bool active;
+    bool not_empty = m_filtersList && !m_filtersList->IsEmpty();
+    for (Idesc = m_descriptions.begin(), idx = 0;
+         Idesc != m_descriptions.end(); ++Idesc, ++idx)
+    {
+        active = m_rule->m_filter & (1 << idx);
+        if (m_filtersList)
+        {
+            if (not_empty)
+                button = m_filtersList->GetItemAt(idx);
+            else
+                button = new MythUIButtonListItem(m_filtersList, *Idesc, idx);
+            button->setCheckable(true);
+            button->setChecked(active ? MythUIButtonListItem::FullChecked
+                                      : MythUIButtonListItem::NotChecked);
+        }
+        if (active && m_activeFiltersList)
+        {
+            /* Create a simple list of active filters the theme can
+               use for informational purposes. */
+            button = new MythUIButtonListItem(m_activeFiltersList,
+                                              *Idesc, idx);
+            button->setCheckable(false);
+        }
+    }
+
+    if (m_activeFiltersList && m_activeFiltersList->IsEmpty())
+    {
+        button = new MythUIButtonListItem(m_activeFiltersList,
+                                          QObject::tr("None"), idx);
+        button->setCheckable(false);
+    }
+
+    RuleChanged();
+}
+
+void FilterOptMixin::Save()
+{
+    if (!m_rule || !m_filtersList)
+        return;
+
+    // Iterate through button list, and build the mask
+    MythUIButtonListItem *button;
+    uint32_t filter_mask = 0;
+    int idx, end;
+
+    end = m_filtersList->GetCount();
+    for (idx = 0; idx < end; ++idx)
+    {
+        if ((button = m_filtersList->GetItemAt(idx)) &&
+            button->state() == MythUIButtonListItem::FullChecked)
+            filter_mask |= (1 << button->GetData().value<uint32_t>());
+    }
+    m_rule->m_filter = filter_mask;
+}
+
+void FilterOptMixin::RuleChanged(void)
+{
+    if (!m_rule)
+        return;
+
+    bool enabled = m_rule->m_type != kNotRecording &&
+                   m_rule->m_type != kDontRecord;
+    if (m_filtersList)
+        m_filtersList->SetEnabled(enabled);
+    if (m_activeFiltersList)
+        m_activeFiltersList->SetEnabled(enabled);
+}
+
+void FilterOptMixin::ToggleSelected(MythUIButtonListItem *item)
+{
+    item->setChecked(item->state() == MythUIButtonListItem::FullChecked ?
+                     MythUIButtonListItem::NotChecked :
+                     MythUIButtonListItem::FullChecked);
+}
+
 
 ////////////////////////////////////////////////////////
 

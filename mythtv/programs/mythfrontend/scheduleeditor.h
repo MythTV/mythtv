@@ -117,8 +117,33 @@ class PostProcMixin
     bool              m_loaded;
 };
 
+class FilterOptMixin
+{
+  protected:
+    FilterOptMixin(MythScreenType &screen, RecordingRule *rule,
+                  FilterOptMixin *other = NULL);
+    void SetRule(RecordingRule *rule) { m_rule = rule; };
+    void Create(bool *err);
+    void Load(void);
+    void Save(void);
+    void RuleChanged(void);
+    void ToggleSelected(MythUIButtonListItem *item);
+
+    MythUIButtonList *m_filtersList;
+    MythUIButtonList *m_activeFiltersList;
+
+  private:
+    MythScreenType   *m_screen;
+    RecordingRule    *m_rule;
+    FilterOptMixin      *m_other;
+    bool              m_loaded;
+
+    QStringList       m_descriptions;
+};
+
 class ScheduleEditor : public ScheduleCommon,
-    public SchedOptMixin, public StoreOptMixin, public PostProcMixin
+    public SchedOptMixin, public FilterOptMixin,
+    public StoreOptMixin, public PostProcMixin
 {
   Q_OBJECT
   public:
@@ -161,6 +186,7 @@ class ScheduleEditor : public ScheduleCommon,
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
     void DupMethodChanged(MythUIButtonListItem *);
+    void FilterChanged(MythUIButtonListItem *);
     void MaxEpisodesChanged(MythUIButtonListItem *);
     void PromptForRecGroup(void);
     void TranscodeChanged(bool enable);
@@ -264,7 +290,7 @@ class SchedOptEditor : public SchedEditChild, public SchedOptMixin
     MythUIButton  *m_filtersButton;
 };
 
-class SchedFilterEditor : public SchedEditChild
+class SchedFilterEditor : public SchedEditChild, public FilterOptMixin
 {
   Q_OBJECT
   public:
@@ -280,9 +306,6 @@ class SchedFilterEditor : public SchedEditChild
   private:
     void Load(void);
     void Save(void);
-
-    MythUIButtonList *m_filtersList;
-    bool m_loaded;
 };
 
 class StoreOptEditor : public SchedEditChild, public StoreOptMixin
