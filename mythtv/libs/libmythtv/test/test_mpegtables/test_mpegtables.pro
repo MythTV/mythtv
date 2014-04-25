@@ -14,6 +14,10 @@ TARGET = test_mpegtables
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 
+LIBS += ../../dvbdescriptors.o
+LIBS += ../../iso6937tables.o
+LIBS += ../../freesat_huffman.o
+
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION

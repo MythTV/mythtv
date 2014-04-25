@@ -204,4 +204,56 @@ class TestMPEGTables: public QObject
         QCOMPARE (descriptor2.ContentId(), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
         QCOMPARE (descriptor.ContentId(1), QString("eventis.nl/00000000-0000-1000-0608-000000003F9C"));
     }
+
+    /* test for coverity 1047220: Incorrect deallocator used:
+     * Calling "PSIPTable::~PSIPTable()" frees "(&psip)->_fullbuffer"
+     * using "free" but it should have been freed using "operator delete[]".
+     *
+     * _allocSize should be 0 thus we are not freeing something we didn't
+     * allocate in the first place (false positive)
+     */
+    void clone_test(void)
+    {
+        unsigned char *si_data = new unsigned char[8];
+        si_data[0] = 0x70; /* pp....37 */
+        si_data[1] = 0x70;
+        si_data[2] = 0x05;
+        si_data[3] = 0xdc;
+        si_data[4] = 0xa9;
+        si_data[5] = 0x12;
+        si_data[6] = 0x33;
+        si_data[7] = 0x37;
+
+        const PSIPTable si_table(si_data);
+
+        QVERIFY (!si_table.IsClone());
+    }
+
+    /* test PrivateDataSpecifierDescriptor */
+    void PrivateDataSpecifierDescriptor_test (void)
+    {
+        /* from https://code.mythtv.org/trac/ticket/12091 */
+        const unsigned char si_data[] = { 
+            0x5f, 0x04, 0x00, 0x00, 0x06, 0x00
+        };
+        PrivateDataSpecifierDescriptor desc(si_data);
+        QCOMPARE (desc.PrivateDataSpecifier(), (uint32_t) PrivateDataSpecifierID::UPC1);
+    }
+
+    /* test for https://code.mythtv.org/trac/ticket/12091
+     * UPC Cablecom switched from standard DVB key/value set to
+     * custom descriptors
+     */
+    void PrivateUPCCablecomEpisodetitleDescriptor_test (void)
+    {
+        const unsigned char si_data[] = {
+            0xa7, 0x13, 0x67, 0x65, 0x72, 0x05, 0x4b, 0x72,  0x61, 0x6e, 0x6b, 0x20, 0x76, 0x6f, 0x72, 0x20,  /* ..ger.Krank vor  */
+            0x4c, 0x69, 0x65, 0x62, 0x65                                                                      /* Liebe            */
+        };
+
+        PrivateUPCCablecomEpisodeTitleDescriptor descriptor(si_data);
+        QCOMPARE (descriptor.CanonicalLanguageString(), QString("ger"));
+        QCOMPARE (descriptor.TextLength(), (uint) 16);
+        QCOMPARE (descriptor.Text(), QString("Krank vor Liebe"));
+    }
 };

@@ -586,6 +586,29 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
         }
 
+        /* if we don't have a subtitle, try to parse one from private descriptors */
+        if (subtitle.isEmpty()) {
+            bool isUPC = false;
+            /* is this event carrying UPC private data? */
+            desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
+            for (uint j = 0; j < private_data_specifiers.size(); j++) {
+                PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
+                if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
+                    isUPC = true;
+                }
+            }
+
+            if (isUPC) {
+                desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
+                for (uint j = 0; j < subtitles.size(); j++) {
+                    PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
+
+                    subtitle = desc.Text();
+                }
+            }
+        }
+
+
         QDateTime starttime = eit->StartTimeUTC(i);
         // fix starttime only if the duration is a multiple of a minute
         if (!(eit->DurationInSeconds(i) % 60))
