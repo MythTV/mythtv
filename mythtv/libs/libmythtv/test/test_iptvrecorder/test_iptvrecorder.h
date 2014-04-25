@@ -93,10 +93,16 @@ class TestIPTVRecorder: public QObject
                              "#EXTVLCOPT:program=1330\n"
                              "http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:\n");
 
-
-
-        /* # - FreeboxTV - France - Free */
-        QString rawdataRTSP ("");
+        /* #11949 - FreeboxTV - France - Free */
+        QString rawdataRTSP ("#EXTM3U\n"
+                             "#EXTINF:0,2 - France 2 (bas débit)\n"
+                             "rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201&flavour=ld\n"
+                             "#EXTINF:0,2 - France 2 (HD)\n"
+                             "rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201&flavour=hd\n"
+                             "#EXTINF:0,2 - France 2 (standard)\n"
+                             "rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201&flavour=sd\n"
+                             "#EXTINF:0,2 - France 2 (auto)\n"
+                             "rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201");
 
         /* #11963 - Movistar TV - Spain - Telefonica */
         QString rawdataUDP ("#EXTM3U\n"
@@ -121,5 +127,12 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (chanmap["1"].m_xmltvid, QString ("svt1hd.svt.se"));
         QCOMPARE (chanmap["1"].m_programnumber, (uint) 1330);
         QCOMPARE (chanmap["1"].m_tuning.m_data_url.toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
+
+        /* test playlist for FreeboxTV, last channel in playlist "wins" */
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataRTSP, NULL);
+        QVERIFY (chanmap["2"].IsValid ());
+        QVERIFY (chanmap["2"].m_tuning.IsValid ());
+        QCOMPARE (chanmap["2"].m_name, QString ("France 2 (auto)"));
+        QCOMPARE (chanmap["2"].m_tuning.GetDataURL().toString(), QString ("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201"));
     }
 };
