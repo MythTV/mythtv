@@ -228,4 +228,32 @@ class TestMPEGTables: public QObject
 
         QVERIFY (!si_table.IsClone());
     }
+
+    /* test PrivateDataSpecifierDescriptor */
+    void PrivateDataSpecifierDescriptor_test (void)
+    {
+        /* from https://code.mythtv.org/trac/ticket/12091 */
+        const unsigned char si_data[] = { 
+            0x5f, 0x04, 0x00, 0x00, 0x06, 0x00
+        };
+        PrivateDataSpecifierDescriptor desc(si_data);
+        QCOMPARE (desc.PrivateDataSpecifier(), (uint32_t) PrivateDataSpecifierID::UPC1);
+    }
+
+    /* test for https://code.mythtv.org/trac/ticket/12091
+     * UPC Cablecom switched from standard DVB key/value set to
+     * custom descriptors
+     */
+    void PrivateUPCCablecomEpisodetitleDescriptor_test (void)
+    {
+        const unsigned char si_data[] = {
+            0xa7, 0x13, 0x67, 0x65, 0x72, 0x05, 0x4b, 0x72,  0x61, 0x6e, 0x6b, 0x20, 0x76, 0x6f, 0x72, 0x20,  /* ..ger.Krank vor  */
+            0x4c, 0x69, 0x65, 0x62, 0x65                                                                      /* Liebe            */
+        };
+
+        PrivateUPCCablecomEpisodeTitleDescriptor descriptor(si_data);
+        QCOMPARE (descriptor.CanonicalLanguageString(), QString("ger"));
+        QCOMPARE (descriptor.TextLength(), (uint) 16);
+        QCOMPARE (descriptor.Text(), QString("Krank vor Liebe"));
+    }
 };

@@ -191,10 +191,26 @@ class PrivateDescriptorID
         dish_event_vchip            = 0x95, /* implemented */
         dish_event_tags             = 0x96, /* implemented */
 
+        // Private -- CH UPC Cablecom
+        upc_event_episode_title     = 0xA7,
+
         // Private -- premiere.de
         premiere_content_order        = 0xF0,
         premiere_parental_information = 0xF1,
         premiere_content_transmission = 0xF2,
+    };
+};
+
+/*
+ * Private_Data_Specifier_ID from http://www.dvbservices.com/identifiers/private_data_spec_id
+ */
+class PrivateDataSpecifierID
+{
+  public:
+    enum
+    {
+        /* UPC Cablecom */
+        UPC1 = 0x00000600,
     };
 };
 
