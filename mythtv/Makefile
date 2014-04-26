@@ -97,4 +97,4 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 	-rmdir $(INSTALL_ROOT)/${PREFIX}/share/mythtv
 
 test: libs/libmythbase/version.h subdirs
-	-cd libs ; $(MAKE) test
+	cd libs ; $(MAKE) test
