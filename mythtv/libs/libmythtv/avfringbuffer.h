@@ -32,7 +32,7 @@ public:
     static int          AVF_Write(URLContext *h, const uint8_t *buf, int buf_size);
     static int64_t      AVF_Seek(URLContext *h, int64_t offset, int whence);
     static int          AVF_Close(URLContext *h);
-    void                SetInInit(bool state) { m_initState = state; }
+    void                SetInInit(bool state);
     bool                IsInInit(void) { return m_initState; }
 
 private:

@@ -164,6 +164,64 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic);
 int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic);
 
+static int determinable_frame_size(AVCodecContext *avctx)
+{
+    if (/*avctx->codec_id == AV_CODEC_ID_AAC ||*/
+        avctx->codec_id == AV_CODEC_ID_MP1 ||
+        avctx->codec_id == AV_CODEC_ID_MP2 ||
+        avctx->codec_id == AV_CODEC_ID_MP3/* ||
+        avctx->codec_id == AV_CODEC_ID_CELT*/)
+        return 1;
+    return 0;
+}
+
+static int has_codec_parameters(AVStream *st)
+{
+    AVCodecContext *avctx = st->codec;
+
+#define FAIL(errmsg) do {                                     \
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + errmsg);                \
+    return 0;                                                 \
+} while (0)
+
+    switch (avctx->codec_type)
+    {
+        case AVMEDIA_TYPE_AUDIO:
+            if (!avctx->frame_size && determinable_frame_size(avctx))
+                FAIL("unspecified frame size");
+            if (avctx->sample_fmt == AV_SAMPLE_FMT_NONE)
+                FAIL("unspecified sample format");
+            if (!avctx->sample_rate)
+                FAIL("unspecified sample rate");
+            if (!avctx->channels)
+                FAIL("unspecified number of channels");
+            if (!st->nb_decoded_frames && avctx->codec_id == AV_CODEC_ID_DTS)
+                FAIL("no decodable DTS frames");
+            break;
+        case AVMEDIA_TYPE_VIDEO:
+            if (!avctx->width)
+                FAIL("unspecified size");
+            if (avctx->pix_fmt == AV_PIX_FMT_NONE)
+                FAIL("unspecified pixel format");
+            if (st->codec->codec_id == AV_CODEC_ID_RV30 || st->codec->codec_id == AV_CODEC_ID_RV40)
+                if (!st->sample_aspect_ratio.num && !st->codec->sample_aspect_ratio.num && !st->codec_info_nb_frames)
+                    FAIL("no frame in rv30/40 and no sar");
+            break;
+        case AVMEDIA_TYPE_SUBTITLE:
+            if (avctx->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && !avctx->width)
+                FAIL("unspecified size");
+            break;
+        case AVMEDIA_TYPE_DATA:
+            if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
+        default:
+            break;
+    }
+
+    if (avctx->codec_id == AV_CODEC_ID_NONE)
+        FAIL("unknown codec");
+    return 1;
+}
+
 static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
 {
     AVCodec *codec = c;
@@ -839,7 +897,7 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     return false;
 }
 
-void AvFormatDecoder::InitByteContext(void)
+void AvFormatDecoder::InitByteContext(bool forceseek)
 {
     int buf_size                = ringBuffer->BestBufferSize();
     int streamed                = ringBuffer->IsStreamed();
@@ -855,9 +913,10 @@ void AvFormatDecoder::InitByteContext(void)
                                                      AVFRingBuffer::AVF_Write_Packet,
                                                      AVFRingBuffer::AVF_Seek_Packet);
 
-    ic->pb->seekable            = !streamed;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1, streamed %2")
-        .arg(buf_size).arg(streamed));
+    // We can always seek during LiveTV
+    ic->pb->seekable            = !streamed || forceseek;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer size: %1 streamed %2 seekable %3")
+        .arg(buf_size).arg(streamed).arg(ic->pb->seekable));
 }
 
 extern "C" void HandleStreamChange(void *data)
@@ -912,10 +971,8 @@ int AvFormatDecoder::FindStreamInfo(void)
     // Suppress ffmpeg logging unless "-v libav --loglevel debug"
     if (!VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_DEBUG))
         silence_ffmpeg_logging = true;
-    avfRingBuffer->SetInInit(ringBuffer->IsStreamed());
     int retval = avformat_find_stream_info(ic, NULL);
     silence_ffmpeg_logging = false;
-    avfRingBuffer->SetInInit(false);
     return retval;
 }
 
@@ -961,6 +1018,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     else
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
 
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "OpenFile -- begin");
+
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)
     {
@@ -980,8 +1039,85 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
-    int err;
-    while (true)
+    int err = 0;
+    bool found = false;
+    bool scanned = false;
+
+    if (livetv)
+    {
+        // We try to open the file for up to 1.5 second using only buffer in memory
+        MythTimer timer; timer.start();
+
+        avfRingBuffer->SetInInit(true);
+
+        while (!found && timer.elapsed() < 1500)
+        {
+            ic = avformat_alloc_context();
+            if (!ic)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Could not allocate format context.");
+                return -1;
+            }
+
+            InitByteContext(true);
+
+            err = avformat_open_input(&ic, filename, fmt, NULL);
+            if (err < 0)
+            {
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                    QString("avformat_open_input failed for in ram data after %1ms, retrying in 50ms")
+                    .arg(timer.elapsed()));
+                usleep(50 * 1000);  // wait 50ms
+                continue;
+            }
+
+            // Test if we can find all streams details in what has been found so far
+            if (FindStreamInfo() < 0)
+            {
+                avformat_close_input(&ic);
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                    QString("FindStreamInfo failed for in ram data after %1ms, retrying in 50ms")
+                    .arg(timer.elapsed()));
+                usleep(50 * 1000);  // wait 50ms
+                continue;
+            }
+
+            found = true;
+
+            for (uint i = 0; i < ic->nb_streams; i++)
+            {
+                if (!has_codec_parameters(ic->streams[i]))
+                {
+                    avformat_close_input(&ic);
+                    found = false;
+                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                        QString("Invalid streams found in ram data after %1ms, retrying in 50ms")
+                        .arg(timer.elapsed()));
+                    usleep(50 * 1000);  // wait 50ms
+                    break;
+                }
+            }
+        }
+
+        avfRingBuffer->SetInInit(false);
+
+        if (found)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("File successfully opened after %1ms")
+                .arg(timer.elapsed()));
+        }
+        else
+        {
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("No streams found in ram data after %1ms, defaulting to in-file")
+                .arg(timer.elapsed()));
+        }
+        scanned = found;
+    }
+
+    // If we haven't opened the file so far, revert to old method
+    while (!found)
     {
         ic = avformat_alloc_context();
         if (!ic)
@@ -1010,24 +1146,29 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 break;
             }
         }
-        break;
+        found = true;
     }
     if (err < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("avformat err(%1) on avformat_open_input call.").arg(err));
-        return -1;
-    }
-
-    int ret = FindStreamInfo();
-    if (ret < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
-                QString("file was \"%1\".").arg(filename));
-        avformat_close_input(&ic);
         ic = NULL;
         return -1;
     }
+
+    if (!scanned)
+    {
+        int ret = FindStreamInfo();
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
+                    QString("file was \"%1\".").arg(filename));
+            avformat_close_input(&ic);
+            ic = NULL;
+            return -1;
+        }
+    }
+
     ic->streams_changed = HandleStreamChange;
     if (ringBuffer->IsDVD())
         ic->streams_changed = HandleDVDStreamChange;
@@ -1046,7 +1187,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     // Scan for the initial A/V streams
-    ret = ScanStreams(novideo);
+    int ret = ScanStreams(novideo);
     if (-1 == ret)
         return ret;
 
