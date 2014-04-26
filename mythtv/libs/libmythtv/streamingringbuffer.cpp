@@ -80,11 +80,11 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     }
 
     rwlock.unlock();
-    
+
     return true;
 }
 
-long long StreamingRingBuffer::Seek(long long pos, int whence, bool has_lock)
+long long StreamingRingBuffer::SeekInternal(long long pos, int whence)
 {
     if (!m_context)
         return 0;
@@ -127,7 +127,7 @@ int StreamingRingBuffer::safe_read(void *data, uint sz)
     return len;
 }
 
-long long StreamingRingBuffer::GetRealFileSize(void) const
+long long StreamingRingBuffer::GetRealFileSizeInternal(void) const
 {
     long long result = -1;
     rwlock.lockForRead();

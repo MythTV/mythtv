@@ -306,19 +306,9 @@ void DVDRingBuffer::ClearChapterCache(void)
     rwlock.unlock();
 }
 
-long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
+long long DVDRingBuffer::SeekInternal(long long pos, int whence)
 {
-    LOG(VB_FILE, LOG_INFO, LOC + QString("Seek(%1,%2,%3)")
-            .arg(pos).arg((whence == SEEK_SET) ? "SEEK_SET":
-                          ((whence == SEEK_CUR) ? "SEEK_CUR" : "SEEK_END"))
-            .arg(has_lock ? "locked" : "unlocked"));
-
     long long ret = -1;
-
-    // lockForWrite takes priority over lockForRead, so this will
-    // take priority over the lockForRead in the read ahead thread.
-    if (!has_lock)
-        rwlock.lockForWrite();
 
     poslock.lockForWrite();
 
@@ -330,8 +320,6 @@ long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
         ret = readpos;
 
         poslock.unlock();
-        if (!has_lock)
-            rwlock.unlock();
 
         return ret;
     }
@@ -376,9 +364,6 @@ long long DVDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     poslock.unlock();
 
     generalWait.wakeAll();
-
-    if (!has_lock)
-        rwlock.unlock();
 
     return ret;
 }

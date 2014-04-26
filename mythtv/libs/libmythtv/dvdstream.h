@@ -30,10 +30,10 @@ public:
     virtual long long GetReadPosition(void)  const;
     virtual bool IsOpen(void) const;
     virtual bool OpenFile(const QString &lfilename, uint retry_ms = 0);
-    virtual long long Seek(long long pos, int whence, bool has_lock);
 
 protected:
     virtual int safe_read(void *data, uint sz);
+    virtual long long SeekInternal(long long pos, int whence);
 
     // Implementation
 private:

@@ -234,7 +234,7 @@ int DVDStream::safe_read(void *data, uint size)
 }
 
 //virtual
-long long DVDStream::Seek(long long pos, int whence, bool has_lock)
+long long DVDStream::SeekInternal(long long pos, int whence)
 {
     if (!m_reader)
         return -1;
@@ -252,11 +252,6 @@ long long DVDStream::Seek(long long pos, int whence, bool has_lock)
         return -1;
     }
 
-    // lockForWrite takes priority over lockForRead, so this will
-    // take priority over the lockForRead in the read ahead thread.
-    if (!has_lock)
-        rwlock.lockForWrite();
-
     poslock.lockForWrite();
 
     m_pos = lb;
@@ -264,9 +259,6 @@ long long DVDStream::Seek(long long pos, int whence, bool has_lock)
     poslock.unlock();
 
     generalWait.wakeAll();
-
-    if (!has_lock)
-        rwlock.unlock();
 
     return pos;
 }

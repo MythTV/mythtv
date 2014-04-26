@@ -2790,13 +2790,13 @@ int HLSRingBuffer::DurationForBytes(uint size)
     return (int)((size * 1000.0) / byterate);
 }
 
-long long HLSRingBuffer::GetRealFileSize(void) const
+long long HLSRingBuffer::GetRealFileSizeInternal(void) const
 {
     QReadLocker lock(&rwlock);
     return SizeMedia();
 }
 
-long long HLSRingBuffer::Seek(long long pos, int whence, bool has_lock)
+long long HLSRingBuffer::SeekInternal(long long pos, int whence)
 {
     if (m_error)
         return -1;

@@ -173,8 +173,6 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     bool playTrack(int track);
     bool nextTrack(void);
     void prevTrack(void);
-    virtual int safe_read(void *data, uint sz);
-    virtual long long Seek(long long pos, int whence, bool has_lock);
     long long NormalSeek(long long time);
     bool SectorSeek(uint64_t sector);
     void SkipStillFrame(void);
@@ -201,6 +199,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void SetParent(MythDVDPlayer *p) { m_parent = p; }
 
   protected:
+    virtual int safe_read(void *data, uint sz);
+    virtual long long SeekInternal(long long pos, int whence);
 
     typedef enum
     {
