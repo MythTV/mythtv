@@ -15,9 +15,9 @@ TESTS=`find . -name "test_*.pro"`
 for TEST in $TESTS
 do
     FPATH=`$DIRNAME $TEST`
-    EXEC=`$BASENAME $TEST | $SED -e 's/.pro//'`
-    COV=`$BASENAME $TEST | $SED -e 's/test_//' | $SED -e 's/.pro/.cpp/'`
-    COVGCNO=`$BASENAME $TEST | $SED -e 's/test_//' | $SED -e 's/.pro/.gcno/'`
+    EXEC=`$BASENAME $TEST | $SED -e 's/\.pro//'`
+    COV=`$BASENAME $TEST | $SED -e 's/test_//' | $SED -e 's/\.pro/.cpp/'`
+    COVGCNO=`$BASENAME $TEST | $SED -e 's/test_//' | $SED -e 's/\.pro/.gcno/'`
     RUNNABLE=$FPATH/$EXEC
     if test -x $RUNNABLE -a -f $RUNNABLE ; then
         if ./$RUNNABLE ; then
