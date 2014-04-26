@@ -41,11 +41,7 @@ int64_t AVFRingBuffer::AVF_Seek(URLContext *h, int64_t offset, int whence)
         return 0;
 
     if (whence == AVSEEK_SIZE)
-    {
-        if (avfr->IsInInit())
-            return INT64_MAX >> 4;
         return avfr->GetRingBuffer()->GetRealFileSize();
-    }
 
     if (whence == SEEK_END)
         return avfr->GetRingBuffer()->GetRealFileSize() + offset;
@@ -101,6 +97,13 @@ URLProtocol *AVFRingBuffer::GetRingBufferURLProtocol(void)
         m_avrprotocol_initialised   = true;
     }
     return &m_avfrURL;
+}
+
+void AVFRingBuffer::SetInInit(bool state)
+{
+    m_initState = state;
+
+    GetRingBuffer()->SetReadInternalMode(state);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
