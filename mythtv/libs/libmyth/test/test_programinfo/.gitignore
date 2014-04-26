@@ -1,0 +1,6 @@
+Makefile
+moc_*
+test_programinfo
+*.gcda
+*.gcno
+*.gcov
