@@ -2170,7 +2170,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     QStringList nameFilters(nameFilter);
 
     nameFilter = fInfo.fileName();
-    nameFilter.replace(QRegExp("\.mpg$"), ".srt");
+    nameFilter.replace(QRegExp("\\.mpg$"), ".srt");
     nameFilters.append(nameFilter);
 
     QDir      dir  ( fInfo.path() );
