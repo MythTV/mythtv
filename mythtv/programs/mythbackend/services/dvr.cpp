@@ -994,6 +994,8 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
         sortingColumn = Scheduler::kSortPriority;
     else if (Sort.toLower() == "type")
         sortingColumn = Scheduler::kSortType;
+    else
+        sortingColumn = Scheduler::kSortTitle;
 
     RecList recList;
     Scheduler::GetAllScheduled(recList, sortingColumn, !Descending);
