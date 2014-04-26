@@ -80,19 +80,9 @@ void BDRingBuffer::close(void)
     ClearOverlays();
 }
 
-long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
+long long BDRingBuffer::SeekInternal(long long pos, int whence)
 {
-    LOG(VB_FILE, LOG_INFO, LOC + QString("Seek(%1,%2,%3)")
-            .arg(pos).arg((whence == SEEK_SET) ? "SEEK_SET" :
-                          ((whence == SEEK_CUR) ? "SEEK_CUR" : "SEEK_END"))
-            .arg(has_lock ? "locked" : "unlocked"));
-
     long long ret = -1;
-
-    // lockForWrite takes priority over lockForRead, so this will
-    // take priority over the lockForRead in the read ahead thread.
-    if (!has_lock)
-        rwlock.lockForWrite();
 
     poslock.lockForWrite();
 
@@ -104,8 +94,6 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
         ret = readpos;
 
         poslock.unlock();
-        if (!has_lock)
-            rwlock.unlock();
 
         return ret;
     }
@@ -124,7 +112,7 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
     }
     else
     {
-        Seek(new_pos);
+        SeekInternal(new_pos);
         m_currentTime = bd_tell_time(bdnav);
         ret = new_pos;
     }
@@ -152,13 +140,10 @@ long long BDRingBuffer::Seek(long long pos, int whence, bool has_lock)
 
     generalWait.wakeAll();
 
-    if (!has_lock)
-        rwlock.unlock();
-
     return ret;
 }
 
-uint64_t BDRingBuffer::Seek(uint64_t pos)
+uint64_t BDRingBuffer::SeekInternal(uint64_t pos)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to %1.").arg(pos));
     if (bdnav)

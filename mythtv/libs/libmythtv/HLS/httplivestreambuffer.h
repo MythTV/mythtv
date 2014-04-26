@@ -51,8 +51,6 @@ public:
     virtual long long GetReadPosition(void) const;
     virtual bool OpenFile(const QString &lfilename,
                           uint retry_ms = kDefaultOpenTimeout);
-    virtual long long Seek(long long pos, int whence, bool has_lock);
-    virtual long long GetRealFileSize(void) const;
     virtual bool IsStreamed(void)           { return false;   }
     virtual bool IsSeekingAllowed(void)     { return !m_error; }
     virtual bool IsBookmarkAllowed(void)    { return true; }
@@ -67,6 +65,8 @@ public:
 
 protected:
     virtual int safe_read(void *data, uint i_read);
+    virtual long long GetRealFileSizeInternal(void) const;
+    virtual long long SeekInternal(long long pos, int whence);
 
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;

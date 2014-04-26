@@ -111,9 +111,10 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     bool SwitchPlaylist(uint32_t index);
     bool SwitchAngle(uint angle);
 
+  protected:
     virtual int safe_read(void *data, uint sz);
-    virtual long long Seek(long long pos, int whence, bool has_lock);
-    uint64_t Seek(uint64_t pos);
+    virtual long long SeekInternal(long long pos, int whence);
+    uint64_t SeekInternal(uint64_t pos);
 
   private:
 
