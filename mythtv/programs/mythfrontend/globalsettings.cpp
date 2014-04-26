@@ -1079,10 +1079,14 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(items[i]);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
+        {
             LOG(VB_GENERAL, LOG_ERR, QString("edit #%1").arg(i) + " rejected");
-
-        InitLabel(i);
-        needs_save = true;
+        }
+        else
+        {
+            InitLabel(i);
+            needs_save = true;
+        }
     }
     else if (cmd.startsWith("del"))
     {
@@ -1099,11 +1103,15 @@ void PlaybackProfileConfig::pressed(QString cmd)
         PlaybackProfileItemConfig itemcfg(item);
 
         if (itemcfg.exec() != kDialogCodeAccepted)
+        {
             LOG(VB_GENERAL, LOG_ERR, "addentry rejected");
-
-        items.push_back(item);
-        InitUI();
-        needs_save = true;
+        }
+        else
+        {
+            items.push_back(item);
+            InitUI();
+            needs_save = true;
+        }
     }
 
     repaint();
@@ -1335,6 +1343,10 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
             removeTarget(name);
             VideoDisplayProfile::DeleteProfileGroup(
                 name, gCoreContext->GetHostName());
+            // This would be better done in TriggeredConfigurationGroup::removeTarget
+            // however, as removeTarget is used elsewhere, limit the changes to this
+            // case only
+            grouptrigger->setValue(grouptrigger->getSelectionLabel());
         }
     }
 

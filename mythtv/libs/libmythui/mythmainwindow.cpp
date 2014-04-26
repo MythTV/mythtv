@@ -264,6 +264,7 @@ class MythMainWindowPrivate
 
     /* compatibility only, FIXME remove */
     std::vector<QWidget *> widgetList;
+    QMap<QWidget *, bool> enabledWidgets;
 
     QWidget *paintwin;
 
@@ -480,7 +481,17 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->appleRemote->setListener(d->appleRemoteListener);
     d->appleRemote->startListening();
     if (d->appleRemote->isListeningToRemote())
+    {
         d->appleRemote->start();
+    }
+    else
+    {
+        // start listening failed, no remote receiver present
+        delete d->appleRemote;
+        delete d->appleRemoteListener;
+        d->appleRemote = NULL;
+        d->appleRemoteListener = NULL;
+    }
 #endif
 
 #ifdef USING_LIBCEC
@@ -580,11 +591,7 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_APPLEREMOTE
-    // We don't delete this, just disable its plumbing. If we create another
-    // MythMainWindow later, AppleRemote::get() will retrieve the instance.
-    if (d->appleRemote->isRunning())
-        d->appleRemote->stopListening();
-
+    delete d->appleRemote;
     delete d->appleRemoteListener;
 #endif
 
@@ -994,6 +1001,11 @@ void MythMainWindow::Init(QString forcedpainter)
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     GetMythUI()->ThemeWidget(this);
+#ifdef Q_OS_MAC
+    // QPalette inheritance appears broken on mac, so there's no point setting the palette
+    // to the top widget each time. Instead we apply the default palette to the whole application
+    qApp->setPalette(palette());
+#endif
     Show();
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
@@ -1321,7 +1333,22 @@ void MythMainWindow::attach(QWidget *child)
             .arg(::GetCurrentThreadId()));
 #endif
     if (currentWidget())
-        currentWidget()->setEnabled(false);
+    {
+        // don't disable the current widget, instead we disable all its children
+        // on mac, disabling the current active widget entirely prevent keyboard to
+        // work on the newly opened widget.
+        QList<QWidget*> list = currentWidget()->findChildren<QWidget *>();
+
+        foreach(QWidget *w, list)
+        {
+            if (w->isEnabled())
+            {
+                w->setEnabled(false);
+                // mark it as previously enabled
+                d->enabledWidgets[w] = true;
+            }
+        }
+    }
 
     d->widgetList.push_back(child);
     child->winId();
@@ -1345,9 +1372,25 @@ void MythMainWindow::detach(QWidget *child)
     d->widgetList.erase(it);
     QWidget *current = currentWidget();
     if (!current)
+    {
         current = this;
+        // We're be to the main window, enable it just in case
+        setEnabled(true);
+    }
+    else
+    {
+        QList<QWidget*> list = current->findChildren<QWidget *>();
 
-    current->setEnabled(true);
+        foreach(QWidget *w, list)
+        {
+            if (d->enabledWidgets.contains(w))
+            {
+                w->setEnabled(true);
+                d->enabledWidgets.remove(w);
+            }
+        }
+    }
+    current->raise();
     current->setFocus();
     current->setMouseTracking(true);
 
