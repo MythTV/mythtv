@@ -17,7 +17,7 @@
 
 static float fix_rate(int video_rate)
 {
-    static const float default_rate = 1000000.0 / 60.0;
+    static const float default_rate = 1000000.0f / 60.0f;
     float fixed = default_rate;
     if (video_rate > 0)
     {
