@@ -141,6 +141,7 @@ MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
             // if for whatever reason it's not a notification on our screen
             // it will be dropped as we don't know how it appears
             top = s;
+            continue;
         }
         if (s->m_fullscreen)
         {
