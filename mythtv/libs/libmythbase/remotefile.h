@@ -56,8 +56,13 @@ class MBASE_PUBLIC RemoteFile
         { return auxfiles; }
 
   private:
-    bool Open();
-    void Close(void);
+    bool Open(void);
+    bool OpenInternal(void);
+    void Close(bool haslock = false);
+    bool CheckConnection(bool repos = true);
+    bool IsConnected(void);
+    bool Resume(bool repos = true);
+    long long SeekInternal(long long pos, int whence, long long curpos = -1);
 
     MythSocket     *openSocket(bool control);
 
@@ -67,6 +72,7 @@ class MBASE_PUBLIC RemoteFile
     long long       filesize;
     bool            timeoutisfast;
     long long       readposition;
+    long long       lastposition;
     int             recordernum;
 
     mutable QMutex  lock;
