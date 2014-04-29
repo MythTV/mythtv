@@ -41,7 +41,7 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     path(_path),
     usereadahead(useRA),  timeout_ms(_timeout_ms),
     filesize(-1),         timeoutisfast(false),
-    readposition(0),      recordernum(0),
+    readposition(0LL),    lastposition(0LL),            recordernum(0),
     lock(QMutex::NonRecursive),
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1"),
@@ -238,7 +238,16 @@ bool RemoteFile::Open(void)
         return true;
 
     QMutexLocker locker(&lock);
+    return OpenInternal();
+}
 
+/** \fn RemoteFile::OpenInternal(void)
+ *  \brief Attempts to resume from a disconnected step. Must have lock
+ *  \return True if reconnection succeeded
+ *  \param bool indicating we own the lock
+ */
+bool RemoteFile::OpenInternal()
+{
     if (isLocal())
     {
         if (!Exists(path))
@@ -285,8 +294,7 @@ bool RemoteFile::Open(void)
     {
         // Close the sockets if we received an error so that isOpen() will
         // return false if the caller tries to use the RemoteFile.
-        locker.unlock();
-        Close();
+        Close(true);
         return false;
     }
     return true;
@@ -303,15 +311,18 @@ bool RemoteFile::ReOpen(QString newFilename)
         path = newFilename;
         return Open();
     }
-    lock.lock();
+
+    QMutexLocker locker(&lock);
     if (!sock)
     {
         LOG(VB_NETWORK, LOG_ERR, "RemoteFile::ReOpen(): Called with no socket");
         return false;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
-        return -1;
+    if (!CheckConnection(false))
+    {
+        return false;
+    }
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "REOPEN";
@@ -328,7 +339,7 @@ bool RemoteFile::ReOpen(QString newFilename)
     return retval;
 }
 
-void RemoteFile::Close(void)
+void RemoteFile::Close(bool haslock)
 {
     if (isLocal())
     {
@@ -344,8 +355,11 @@ void RemoteFile::Close(void)
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "DONE";
 
-    lock.lock();
-    if (!controlSock->SendReceiveStringList(
+    if (!haslock)
+    {
+        lock.lock();
+    }
+    if (controlSock->IsConnected() && !controlSock->SendReceiveStringList(
             strlist, 0, MythSocket::kShortTimeout))
     {
         LOG(VB_GENERAL, LOG_ERR, "Remote file timeout.");
@@ -362,7 +376,10 @@ void RemoteFile::Close(void)
         controlSock = NULL;
     }
 
-    lock.unlock();
+    if (!haslock)
+    {
+        lock.unlock();
+    }
 }
 
 bool RemoteFile::DeleteFile(const QString &url)
@@ -531,6 +548,11 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
     QMutexLocker locker(&lock);
 
+    return SeekInternal(pos, whence, curpos);
+}
+
+long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
+{
     if (isLocal())
     {
         if (!isOpen())
@@ -572,7 +594,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
         return -1;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
+    if (!CheckConnection(false))
     {
         return -1;
     }
@@ -590,9 +612,13 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 
     if (ok && !strlist.isEmpty())
     {
-        readposition = strlist[0].toLongLong();
+        lastposition = readposition = strlist[0].toLongLong();
         sock->Reset();
         return strlist[0].toLongLong();
+    }
+    else
+    {
+        lastposition = 0LL;
     }
 
     return -1;
@@ -630,7 +656,7 @@ int RemoteFile::Write(const void *data, int size)
         return -1;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
+    if (!CheckConnection())
     {
         return -1;
     }
@@ -693,7 +719,13 @@ int RemoteFile::Write(const void *data, int size)
         return recv;
 
     if (error || recv != sent)
+    {
         sent = -1;
+    }
+    else
+    {
+        lastposition += sent;
+    }
 
     return sent;
 }
@@ -728,8 +760,10 @@ int RemoteFile::Read(void *data, int size)
         return -1;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
+    if (!CheckConnection())
+    {
         return -1;
+    }
 
     if (sock->IsDataAvailable())
     {
@@ -740,7 +774,7 @@ int RemoteFile::Read(void *data, int size)
 
     while (controlSock->IsDataAvailable())
     {
-        LOG(VB_NETWORK, LOG_ERR,
+        LOG(VB_NETWORK, LOG_WARNING,
                 "RemoteFile::Read(): Control socket not empty to start!");
         controlSock->Reset();
     }
@@ -757,7 +791,7 @@ int RemoteFile::Read(void *data, int size)
 
     sent = size;
 
-    int waitms = 10;
+    int waitms = 30;
     MythTimer mtimer;
     mtimer.start();
 
@@ -778,12 +812,23 @@ int RemoteFile::Read(void *data, int size)
         {
             sent = strlist[0].toInt(); // -1 on backend error
             response = true;
+            if (ret < sent)
+            {
+                // We have received less than what the server sent, retry immediately
+                ret = sock->Read(((char *)data) + recv, sent - recv, waitms);
+                if (ret > 0)
+                    recv += ret;
+                else if (ret < 0)
+                    error = true;
+            }
         }
     }
 
     if (!error && !response)
     {
-        if (controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
+        // Wait up to 1.5s for the backend to send the size
+        // MythSocket::ReadString will drop the connection
+        if (controlSock->ReadStringList(strlist, 1500) &&
             !strlist.isEmpty())
         {
             sent = strlist[0].toInt(); // -1 on backend error
@@ -792,7 +837,21 @@ int RemoteFile::Read(void *data, int size)
         {
             LOG(VB_GENERAL, LOG_ERR,
                    "RemoteFile::Read(): No response from control socket.");
-            sent = -1;
+            // If no data was received from control socket, and we got what we asked for
+            // assume everything is okay
+            if (recv == size)
+            {
+                sent = recv;
+            }
+            else
+            {
+                sent = -1;
+            }
+            // The TCP socket is dropped if there's a timeout, so we reconnect
+            if (!Resume())
+            {
+                sent = -1;
+            }
         }
     }
 
@@ -804,7 +863,13 @@ int RemoteFile::Read(void *data, int size)
         return sent;
 
     if (error || sent != recv)
+    {
         recv = -1;
+    }
+    else
+    {
+        lastposition += recv;
+    }
 
     return recv;
 }
@@ -868,7 +933,7 @@ long long RemoteFile::GetRealFileSize(void)
         return -1;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
+    if (!CheckConnection())
     {
         return -1;
     }
@@ -938,8 +1003,10 @@ void RemoteFile::SetTimeout(bool fast)
         return;
     }
 
-    if (!sock->IsConnected() || !controlSock->IsConnected())
+    if (!CheckConnection())
+    {
         return;
+    }
 
     QStringList strlist( QString(query).arg(recordernum) );
     strlist << "SET_TIMEOUT";
@@ -997,4 +1064,57 @@ bool RemoteFile::SetBlocking(bool block)
     }
     return true;
 }
+
+/** \fn RemoteFile::CheckConnection(void)
+ *  \brief Check current connection and re-establish it if lost
+ *  \return True if connection is working
+ *  \param bool indicating if we are to reposition to the last known location if reconnection is required
+ */
+bool RemoteFile::CheckConnection(bool repos)
+{
+    if (IsConnected())
+    {
+        return true;
+    }
+    return Resume(repos);
+}
+
+/** \fn RemoteFile::IsConnected(void)
+ *  \brief Check if both the control and data sockets are currently connected
+ *  \return True if both sockets are connected
+ *  \param none
+ */
+bool RemoteFile::IsConnected(void)
+{
+    return sock && controlSock &&
+           sock->IsConnected() && controlSock->IsConnected();
+}
+
+/** \fn RemoteFile::Resume(void)
+ *  \brief Attempts to resume from a disconnected step. Must have lock
+ *  \return True if reconnection succeeded
+ *  \param bool indicating if we are to reposition to the last known location
+ */
+bool RemoteFile::Resume(bool repos)
+{
+    Close(true);
+    if (!OpenInternal())
+        return false;
+
+    if (repos)
+    {
+        readposition = lastposition;
+        if (SeekInternal(lastposition, SEEK_SET) < 0)
+        {
+            Close(true);
+            LOG(VB_FILE, LOG_ERR,
+                QString("RemoteFile::Resume: Enable to re-seek into last known "
+                        "position (%1").arg(lastposition));
+            return false;
+        }
+    }
+    readposition = lastposition = 0;
+    return true;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
