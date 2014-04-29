@@ -153,7 +153,7 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
-  --disable-mythlogserver  Do not use mythlogserver logging daemon facility
+  --enable-mythlogserver   Enable mythlogserver logging daemon facility
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
@@ -2644,7 +2644,7 @@ disable indevs
 disable sdl
 enable libfftw3
 enable taglib
-enable mythlogserver
+disable mythlogserver
 enable exiv2
 
 # mythtv paths
@@ -2858,6 +2858,8 @@ for opt do
         --enable-mac-bundle) enable mac_bundle
         ;;
         --disable-mythlogserver) disable mythlogserver
+        ;;
+        --enable-mythlogserver) enable mythlogserver
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
