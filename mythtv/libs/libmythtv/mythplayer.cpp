@@ -3914,13 +3914,13 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     bool need_clear = false;
     while (decoderSeek >= 0)
     {
-        usleep(1000);
+        usleep(50 * 1000);
 
         // provide some on screen feedback if seeking is slow
         count++;
-        if (!(count % 150) && !hasFullPositionMap)
+        if (!(count % 3) && !hasFullPositionMap)
         {
-            int num = (count / 150) % 4;
+            int num = count % 3;
             SetOSDMessage(tr("Searching") + QString().fill('.', num),
                           kOSDTimeout_Short);
             DisplayPauseFrame();
