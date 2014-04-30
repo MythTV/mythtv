@@ -170,6 +170,7 @@ class ScanSymbolRateDVBS: public ComboBoxSetting, public TransientStorage
                 "million symbols per second."));
         addSelection("3333000");
         addSelection("22000000");
+        addSelection("23000000");
         addSelection("27500000", "27500000", true);
         addSelection("28000000");
         addSelection("28500000");
