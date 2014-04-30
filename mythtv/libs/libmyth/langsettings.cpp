@@ -2,10 +2,9 @@
 #include "langsettings.h"
 
 // qt
-#include <QApplication>
+#include <QEventLoop>
 #include <QDir>
 #include <QFileInfo>
-#include <QApplication>
 
 // libmythbase
 #include "mythcorecontext.h"
@@ -24,14 +23,23 @@ LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),
                   m_languageList(NULL), m_countryList(NULL),
                   m_saveButton(NULL), m_cancelButton(NULL),
-                  m_exitOnFinish(exitOnFinish), m_loaded(false)
+                  m_exitOnFinish(exitOnFinish), m_loaded(false),
+                  m_loop(NULL)
 {
     m_language = gCoreContext->GetSetting("Language");
     m_country = gCoreContext->GetSetting("Country");
+    if (exitOnFinish)
+    {
+        m_loop = new QEventLoop();
+    }
 }
 
 LanguageSelection::~LanguageSelection()
 {
+    if (m_exitOnFinish)
+    {
+        delete m_loop;
+    }
 }
 
 bool LanguageSelection::Create(void)
@@ -186,7 +194,7 @@ bool LanguageSelection::prompt(bool force)
         if (langSettings->Create())
         {
             mainStack->AddScreen(langSettings, false);
-            qApp->exec();
+            langSettings->m_loop->exec();
             mainStack->PopScreen(langSettings, false);
         }
         else
@@ -220,7 +228,7 @@ void LanguageSelection::Save(void)
 void LanguageSelection::Close(void)
 {
     if (m_exitOnFinish)
-        qApp->quit();
+        m_loop->quit();
     else
         MythScreenType::Close();
 }
