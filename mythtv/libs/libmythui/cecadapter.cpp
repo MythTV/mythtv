@@ -1,6 +1,5 @@
 // Qt
 #include <QApplication>
-#include <QTimer>
 #include <QKeyEvent>
 #include <QString>
 
@@ -24,18 +23,31 @@ using namespace CEC;
 using namespace std;
 #include <libcec/cecloader.h>
 
-QMutex* CECAdapter::gLock = new QMutex(QMutex::Recursive);
+QMutex*         CECAdapter::gLock = new QMutex(QMutex::Recursive);
+QMutex*         CECAdapter::gHandleActionsLock = new QMutex();
+QWaitCondition* CECAdapter::gActionsReady = new QWaitCondition();
+
+// The libCEC callback functions
+static int CECLogMessageCallback(void *adapter, const cec_log_message &message);
+static int CECKeyPressCallback(void *adapter, const cec_keypress &keypress);
+static int CECCommandCallback(void *adapter, const cec_command &command);
 
 class CECAdapterPriv
 {
   public:
     CECAdapterPriv()
       : adapter(NULL), defaultDevice("auto"), defaultHDMIPort(1),
-        defaultDeviceID(CECDEVICE_PLAYBACKDEVICE1), timer(NULL), valid(false),
+        defaultDeviceID(CECDEVICE_PLAYBACKDEVICE1), valid(false),
         powerOffTV(false),  powerOffTVAllowed(false), powerOffTVOnExit(false),
         powerOnTV(false),   powerOnTVAllowed(false),  powerOnTVOnStart(false),
         switchInput(false), switchInputAllowed(true)
     {
+		// libcec2's ICECCallbacks has a constructor that clears
+		// all the entries. We're using 1.x....
+		memset(&callbacks, 0, sizeof(callbacks));
+		callbacks.CBCecLogMessage = &CECLogMessageCallback;
+		callbacks.CBCecKeyPress   = &CECKeyPressCallback;
+		callbacks.CBCecCommand    = &CECCommandCallback;
     }
 
     static QString addressToString(enum cec_logical_address addr, bool source)
@@ -101,7 +113,7 @@ class CECAdapterPriv
         if ("auto" != hdmi_port)
         {
             defaultHDMIPort = hdmi_port.toInt();
-            if (defaultHDMIPort < 1 || defaultHDMIPort > 3)
+            if (defaultHDMIPort < 1 || defaultHDMIPort > 4)
                 defaultHDMIPort = 1;
         }
         defaultHDMIPort = defaultHDMIPort << 12;
@@ -170,6 +182,12 @@ class CECAdapterPriv
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to open device %1 (%2).")
             .arg(path).arg(comm));
 
+        // set the callbacks
+        // don't error check - versions < 1.6.3 always return
+        // false. And newer versions always return true, so
+        // there's not much point anyway
+        adapter->EnableCallbacks(this, &callbacks);
+
         if (!adapter->Open(devices[devicenum].comm))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to open device.");
@@ -177,10 +195,6 @@ class CECAdapterPriv
         }
 
         LOG(VB_GENERAL, LOG_INFO, LOC + "Opened CEC device.");
-
-        // turn on tv (if configured)
-        powerOnTV = powerOnTVOnStart;
-        HandleActions();
 
         // get the vendor ID (for non-standard implementations)
         adapter->GetDeviceVendorId(CECDEVICE_TV);
@@ -191,11 +205,17 @@ class CECAdapterPriv
         // set the logical address
         adapter->SetLogicalAddress(defaultDeviceID);
 
+        // all good to go
+        valid = true;
+
+        // turn on tv (if configured)
+        powerOnTV = powerOnTVOnStart;
+
         // switch input (if configured)
         switchInput = true;
+
         HandleActions();
 
-        valid = true;
         return true;
     }
 
@@ -210,7 +230,6 @@ class CECAdapterPriv
 
             // delete adapter
             adapter->Close();
-            LogMessages();
             UnloadLibCec(adapter);
 
             LOG(VB_GENERAL, LOG_INFO, LOC + "Closing down CEC.");
@@ -219,70 +238,54 @@ class CECAdapterPriv
         adapter = NULL;
     }
 
-    void LogMessages(void)
+    int LogMessage(const cec_log_message &message)
     {
-        if (!adapter || !valid)
-            return;
-
-        cec_log_message message;
-        while (adapter->GetNextLogMessage(&message))
+        QString msg(message.message);
+        int lvl = LOG_UNKNOWN;
+        switch (message.level)
         {
-            QString msg(message.message);
-            int lvl = LOG_UNKNOWN;
-            switch (message.level)
-            {
             case CEC_LOG_ERROR:   lvl = LOG_ERR;     break;
             case CEC_LOG_WARNING: lvl = LOG_WARNING; break;
             case CEC_LOG_NOTICE:  lvl = LOG_INFO;    break;
             case CEC_LOG_DEBUG:   lvl = LOG_DEBUG;   break;
-            }
-            LOG(VB_GENERAL, lvl, LOC + QString("%1").arg(msg));
         }
+        LOG(VB_GENERAL, lvl, LOC + QString("%1").arg(msg));
+        return 1;
     }
 
-    void HandleCommands(void)
+    int HandleCommand(const cec_command &command)
     {
         if (!adapter || !valid)
-            return;
+            return 0;
 
-        LogMessages();
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
+            QString("Command %1 from '%2' (%3) - destination '%4' (%5)")
+            .arg(command.opcode)
+            .arg(addressToString(command.initiator, true))
+            .arg(command.initiator)
+            .arg(addressToString(command.destination, false))
+            .arg(command.destination));
 
-        cec_command command;
-        while (adapter->GetNextCommand(&command))
+        switch (command.opcode)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                QString("Command %1 from '%2' (%3) - destination '%4' (%5)")
-                .arg(command.opcode)
-                .arg(addressToString(command.initiator, true))
-                .arg(command.initiator)
-                .arg(addressToString(command.destination, false))
-                .arg(command.destination));
-
-            switch (command.opcode)
-            {
-                // TODO
-                default:
-                    break;
-            }
-            gCoreContext->SendSystemEvent(QString("CEC_COMMAND_RECEIVED COMMAND %1")
-                                          .arg(command.opcode));
+            // TODO
+            default:
+                break;
         }
+        gCoreContext->SendSystemEvent(QString("CEC_COMMAND_RECEIVED COMMAND %1")
+                                      .arg(command.opcode));
 
-        LogMessages();
+        return 1;
     }
 
-    void HandleKeyPresses(void)
+    int HandleKeyPress(const cec_keypress &key)
     {
         if (!adapter || !valid)
-            return;
-
-        cec_keypress key;
-        if (!adapter->GetNextKeypress(&key))
-            return;
+            return 0;
 
         // Ignore key down events and wait for the key 'up'
         if (key.duration < 1)
-            return;
+            return 1;
 
         QString code;
         int action = 0;
@@ -597,13 +600,13 @@ class CECAdapterPriv
             .arg(code).arg(0 == action ? "(Not actioned)" : ""));
 
         if (0 == action)
-            return;
+            return 1;
 
         GetMythUI()->ResetScreensaver();
         QKeyEvent* ke = new QKeyEvent(QEvent::KeyPress, action, Qt::NoModifier);
         qApp->postEvent(GetMythMainWindow(), (QEvent*)ke);
 
-        LogMessages();
+        return 1;
     }
 
     void HandleActions(void)
@@ -640,15 +643,13 @@ class CECAdapterPriv
         powerOffTV  = false;
         powerOnTV   = false;
         switchInput = false;
-
-        LogMessages();
     }
 
     ICECAdapter *adapter;
+    ICECCallbacks callbacks;
     QString      defaultDevice;
     int          defaultHDMIPort;
     cec_logical_address defaultDeviceID;
-    QTimer      *timer;
     bool         valid;
     bool         powerOffTV;
     bool         powerOffTVAllowed;
@@ -681,25 +682,28 @@ CECAdapter::CECAdapter() : MThread("CECAdapter"), m_priv(new CECAdapterPriv)
     if (!m_priv->Open())
         return;
 
-    // create process timer
-    m_priv->timer = new QTimer(this);
-    QObject::connect(m_priv->timer, SIGNAL(timeout()), this, SLOT(Process()));
-    m_priv->timer->start(10);
-
     // start thread
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Starting thread.");
     start();
 }
 
+void CECAdapter::run()
+{
+    for (;;) {
+        // Note that a lock is used because the QWaitCondition needs it
+        // None of the other HandleActions callers need the lock because
+        // they call HandleActions at open/close time, when
+        // nothing else can be calling it....
+        gHandleActionsLock->lock();
+        gActionsReady->wait(gHandleActionsLock);
+        m_priv->HandleActions();
+        gHandleActionsLock->unlock();
+    }
+}
+
 CECAdapter::~CECAdapter()
 {
     QMutexLocker lock(gLock);
-
-    // delete process timer
-    if (m_priv->timer)
-        m_priv->timer->stop();
-    delete m_priv->timer;
-    m_priv->timer = NULL;
 
     // stop thread
     if (isRunning())
@@ -725,13 +729,21 @@ void CECAdapter::Action(const QString &action)
         m_priv->powerOnTV = true;
     else if (ACTION_TVPOWEROFF == action)
         m_priv->powerOffTV = true;
+	gActionsReady->wakeAll();
 }
 
-void CECAdapter::Process(void)
+static int CECLogMessageCallback(void *adapter, const cec_log_message &message)
 {
-    gLock->lock();
-    m_priv->HandleCommands();
-    m_priv->HandleKeyPresses();
-    m_priv->HandleActions();
-    gLock->unlock();
+    return ((CECAdapterPriv*)adapter)->LogMessage(message);
 }
+
+static int CECKeyPressCallback(void *adapter, const cec_keypress &keypress)
+{
+    return ((CECAdapterPriv*)adapter)->HandleKeyPress(keypress);
+}
+
+static int CECCommandCallback(void *adapter, const cec_command &command)
+{
+    return ((CECAdapterPriv*)adapter)->HandleCommand(command);
+}
+

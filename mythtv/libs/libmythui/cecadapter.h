@@ -2,6 +2,7 @@
 #define CECADAPTER_H_
 
 #include <QMutex>
+#include <QWaitCondition>
 #include "mthread.h"
 
 #define LIBCEC_ENABLED     QString("libCECEnabled")
@@ -27,12 +28,14 @@ class CECAdapter : public QObject, public MThread
     bool IsValid();
     void Action(const QString &action);
 
-  public slots:
-    void Process();
+  protected:
+    virtual void run();
 
   private:
     CECAdapterPriv *m_priv;
     static QMutex  *gLock;
+    static QMutex  *gHandleActionsLock;
+    static QWaitCondition *gActionsReady;
 };
 
 #endif
