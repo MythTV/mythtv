@@ -10,6 +10,7 @@
 #include "configuration.h"
 #include "upnpdevice.h"
 
+class QEventLoop;
 class MythUIButtonList;
 class MythUIButton;
 
@@ -89,6 +90,7 @@ class BackendSelection : public MythScreenType
     QMutex  m_mutex;
 
     BackendDecision m_backendDecision;
+    QEventLoop *m_loop;
 };
 
 Q_DECLARE_METATYPE(DeviceLocation*)

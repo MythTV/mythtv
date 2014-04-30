@@ -12,6 +12,7 @@
 #include "mythscreentype.h"
 #include "mythscreenstack.h"
 
+class QEventLoop;
 class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIButton;
@@ -52,6 +53,7 @@ class MPUBLIC LanguageSelection : public MythScreenType
     static bool m_languageChanged;
     QString m_language;
     QString m_country;
+    QEventLoop *m_loop;
 };
 
 #endif
