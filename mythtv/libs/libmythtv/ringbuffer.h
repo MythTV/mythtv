@@ -67,6 +67,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     QString   GetFilename(void)      const;
     QString   GetSubtitleFilename(void) const;
     QString   GetLastError(void)     const;
+    bool      GetCommsError(void) const { return commserror; }
+    void      ResetCommsError(void) { commserror = 0; }
 
     /// Returns value of stopreads
     /// \sa StartReads(void), StopReads(void)

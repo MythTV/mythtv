@@ -2982,6 +2982,13 @@ void MythPlayer::EventLoop(void)
         return;
     }
 
+    // Check if we got a communication error, and if so pause playback
+    if (player_ctx->buffer->GetCommsError())
+    {
+        Pause();
+        player_ctx->buffer->ResetCommsError();
+    }
+
     // Handle end of file
     EofState eof = GetEof();
     if (HasReachedEof())
