@@ -1388,15 +1388,6 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         return -1;
     }
 
-    if (commserror)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + loc_desc +
-            ": Attempt to read after commserror set");
-        errno = EIO;
-        rwlock.unlock();
-        return -1;
-    }
-
     if (!readInternalMode &&
         (request_pause || stopreads || !readaheadrunning || (ignorereadpos>=0)))
     {
