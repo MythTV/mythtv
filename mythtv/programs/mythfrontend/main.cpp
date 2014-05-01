@@ -1486,6 +1486,7 @@ int main(int argc, char **argv)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
+    QApplication::setAttribute(Qt::AA_X11InitThreads);
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
