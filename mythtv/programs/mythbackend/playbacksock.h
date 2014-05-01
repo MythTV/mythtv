@@ -101,8 +101,6 @@ class PlaybackSock : public ReferenceCounter
 
     QStringList ForwardRequest(const QStringList&);
 
-    bool ReadStringList(QStringList &list);
-
   private:
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
