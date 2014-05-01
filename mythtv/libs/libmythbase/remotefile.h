@@ -70,6 +70,7 @@ class MBASE_PUBLIC RemoteFile
     bool            timeoutisfast;
     long long       readposition;
     long long       lastposition;
+    bool            canresume;
     int             recordernum;
 
     mutable QMutex  lock;

@@ -41,7 +41,8 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     path(_path),
     usereadahead(useRA),  timeout_ms(_timeout_ms),
     filesize(-1),         timeoutisfast(false),
-    readposition(0LL),    lastposition(0LL),            recordernum(0),
+    readposition(0LL),    lastposition(0LL),
+    canresume(false),     recordernum(0),
     lock(QMutex::NonRecursive),
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1"),
@@ -140,7 +141,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     QStringList strlist;
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
-    if (!gCoreContext->CheckProtoVersion(lsock))
+    if (!gCoreContext->CheckProtoVersion(lsock, 5000))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Failed validation to server %1:%2").arg(host).arg(port));
@@ -297,6 +298,8 @@ bool RemoteFile::OpenInternal()
         Close(true);
         return false;
     }
+    canresume = true;
+
     return true;
 }
 
@@ -313,14 +316,10 @@ bool RemoteFile::ReOpen(QString newFilename)
     }
 
     QMutexLocker locker(&lock);
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::ReOpen(): Called with no socket");
-        return false;
-    }
 
     if (!CheckConnection(false))
     {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::ReOpen(): Couldn't connect");
         return false;
     }
 
@@ -588,14 +587,9 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         return localFile->pos();
     }
 
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Seek(): Called with no socket");
-        return -1;
-    }
-
     if (!CheckConnection(false))
     {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Seek(): Couldn't connect");
         return -1;
     }
 
@@ -650,14 +644,10 @@ int RemoteFile::Write(const void *data, int size)
     }
 
     QMutexLocker locker(&lock);
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Write(): Called with no socket");
-        return -1;
-    }
 
     if (!CheckConnection())
     {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Write(): Couldn't connect");
         return -1;
     }
 
@@ -754,14 +744,10 @@ int RemoteFile::Read(void *data, int size)
         LOG(VB_FILE, LOG_ERR, "RemoteFile:Read() called when local file not opened");
         return -1;
     }
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Read(): Called with no socket");
-        return -1;
-    }
 
     if (!CheckConnection())
     {
+        LOG(VB_NETWORK, LOG_ERR, "RemoteFile::Read(): Couldn't connect");
         return -1;
     }
 
@@ -927,15 +913,16 @@ long long RemoteFile::GetRealFileSize(void)
         return filesize;
     }
 
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR, "RemoteFileque(): Called with no socket");
-        return -1;
-    }
-
     if (!CheckConnection())
     {
-        return -1;
+        // Can't establish a new connection, using system one
+        struct stat fileinfo;
+
+        if (Exists(path, &fileinfo))
+        {
+            filesize = fileinfo.st_size;
+        }
+        return filesize;
     }
 
     QStringList strlist(QString(query).arg(recordernum));
@@ -996,15 +983,11 @@ void RemoteFile::SetTimeout(bool fast)
         return;
 
     QMutexLocker locker(&lock);
-    if (!sock)
-    {
-        LOG(VB_NETWORK, LOG_ERR,
-            "RemoteFile::SetTimeout(): Called with no socket");
-        return;
-    }
 
     if (!CheckConnection())
     {
+        LOG(VB_NETWORK, LOG_ERR,
+            "RemoteFile::SetTimeout(): Couldn't connect");
         return;
     }
 
@@ -1075,6 +1058,10 @@ bool RemoteFile::CheckConnection(bool repos)
     if (IsConnected())
     {
         return true;
+    }
+    if (!canresume)
+    {
+        return false;
     }
     return Resume(repos);
 }
