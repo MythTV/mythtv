@@ -3660,6 +3660,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     picframe->frameNumber      = framesPlayed;
     picframe->aspect           = current_aspect;
     picframe->dummy            = 0;
+    picframe->directrendering  = directrendering ? 1 : 0;
 
     m_parent->ReleaseNextVideoFrame(picframe, temppts);
     if (private_dec)
