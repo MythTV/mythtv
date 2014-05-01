@@ -58,6 +58,7 @@ typedef struct VideoFrame_
     int offsets[3]; // Y, U, & V offsets
 
     int pix_fmt;
+    int directrendering; // 1 if managed by FFmpeg
 } VideoFrame;
 
 #ifdef __cplusplus
@@ -101,6 +102,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->forcekey         = 0;
     vf->dummy            = 0;
     vf->pix_fmt          = 0;
+    vf->directrendering  = 0;
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 

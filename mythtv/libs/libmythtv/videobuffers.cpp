@@ -309,7 +309,9 @@ void VideoBuffers::ReleaseFrame(VideoFrame *frame)
 
     vpos = vbufferMap[frame];
     limbo.remove(frame);
-    decode.enqueue(frame);
+    //non directrendering frames are ffmpeg handled
+    if (frame->directrendering != 0)
+        decode.enqueue(frame);
     used.enqueue(frame);
 }
 
