@@ -1020,6 +1020,7 @@ void RingBuffer::run(void)
             {
                 poslock.lockForWrite();
                 rbwlock.lockForWrite();
+
                 if (rbwposcopy == rbwpos)
                 {
                     internalreadpos += read_return;
@@ -1028,6 +1029,8 @@ void RingBuffer::run(void)
                         LOC + QString("rbwpos += %1K requested %2K in read")
                         .arg(read_return/1024,3).arg(totfree/1024,3));
                 }
+                numfailures = 0;
+
                 rbwlock.unlock();
                 poslock.unlock();
 
