@@ -2431,7 +2431,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             {
                 ShowNotificationError(ctx->player->GetError(),
                                       TV::tr( "TV Player" ),
-                                      buffer->GetFilename());
+                                      playbackURL);
                 // We're going to display this error as notification
                 // no need to display it later as popup
                 ctx->player->ResetErrored();
