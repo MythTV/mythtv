@@ -415,6 +415,7 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 
 class CetonDeviceID;
 class CetonSetting;
+class InstanceCount;
 class CetonConfigurationGroup : public VerticalConfigurationGroup
 {
     Q_OBJECT
@@ -428,6 +429,7 @@ class CetonConfigurationGroup : public VerticalConfigurationGroup
     CetonDeviceID       *deviceid;
     CetonSetting        *ip;
     CetonSetting        *tuner;
+    InstanceCount       *instances;
 };
 
 

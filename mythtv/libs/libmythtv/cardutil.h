@@ -157,7 +157,7 @@ class MTV_PUBLIC CardUtil
         return
             (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
             (rawtype == "ASI")       || (rawtype == "FREEBOX")   ||
-            (rawtype == "EXTERNAL");
+            (rawtype == "CETON")     || (rawtype == "EXTERNAL");
     }
 
     static bool         IsTunerShared(uint cardidA, uint cardidB);
