@@ -3519,7 +3519,7 @@ void TVRec::HandleTuning(void)
         request.input   = input;
 
         if (TuningOnSameMultiplex(request))
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "On same multiplex");
+            LOG(VB_CHANNEL, LOG_INFO, LOC + "On same multiplex");
 
         TuningShutdowns(request);
 
