@@ -1311,7 +1311,7 @@ void RecordingInfo::ForgetHistory(void)
 {
     uint erecid = parentid ? parentid : recordid;
     uint din = dupin ? dupin : kDupsInAll;
-    uint dmeth = dupmethod ? dupmethod : kDupCheckSubDesc;
+    uint dmeth = dupmethod ? dupmethod : kDupCheckSubThenDesc;
 
     MSqlQuery result(MSqlQuery::InitCon());
 

@@ -178,7 +178,7 @@ ProgramInfo::ProgramInfo(void) :
     oldrecstatus(rsUnknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
-    dupmethod(kDupCheckSubDesc),
+    dupmethod(kDupCheckSubThenDesc),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -658,7 +658,7 @@ ProgramInfo::ProgramInfo(
     oldrecstatus(rsUnknown),
     rectype(_rectype),
     dupin(kDupsInAll),
-    dupmethod(kDupCheckSubDesc),
+    dupmethod(kDupCheckSubThenDesc),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -815,7 +815,7 @@ ProgramInfo::ProgramInfo(
     oldrecstatus(rsUnknown),
     rectype(kNotRecording),
     dupin(kDupsInAll),
-    dupmethod(kDupCheckSubDesc),
+    dupmethod(kDupCheckSubThenDesc),
 
     // everything below this line is not serialized
     availableStatus(asAvailable),
@@ -1162,7 +1162,7 @@ void ProgramInfo::clear(void)
 
     rectype = kNotRecording;
     dupin = kDupsInAll;
-    dupmethod = kDupCheckSubDesc;
+    dupmethod = kDupCheckSubThenDesc;
 
     sourceid = 0;
     inputid = 0;
