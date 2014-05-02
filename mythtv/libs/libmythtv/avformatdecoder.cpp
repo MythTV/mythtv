@@ -236,6 +236,30 @@ static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
     return c;
 }
 
+static bool force_sw_decode(AVCodecContext *avctx)
+{
+    switch (avctx->codec_id)
+    {
+        case AV_CODEC_ID_H264:
+            switch (avctx->profile)
+            {
+                case FF_PROFILE_H264_HIGH_10:
+                case FF_PROFILE_H264_HIGH_10_INTRA:
+                case FF_PROFILE_H264_HIGH_422:
+                case FF_PROFILE_H264_HIGH_422_INTRA:
+                case FF_PROFILE_H264_HIGH_444_PREDICTIVE:
+                case FF_PROFILE_H264_HIGH_444_INTRA:
+                case FF_PROFILE_H264_CAVLC_444:
+                    return true;
+                default:
+                    break;
+            }
+        default:
+            break;
+    }
+    return false;
+}
+
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
     if (silence_ffmpeg_logging)
@@ -2302,6 +2326,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             int version = mpeg_version(enc->codec_id);
             if (version)
                 video_codec_id = (MythCodecID)(kCodec_MPEG1 + version - 1);
+
+                // Check it's a codec we can decode using GPU
+            if (force_sw_decode(enc))
+            {
+                dec = "ffmpeg";
+                if (FlagIsSet(kDecodeAllowGPU))
+                {
+                    LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                        QString("Unsupported Video Profile, "
+                                "forcing software decode"));
+                }
+            }
 
             if (version)
             {
