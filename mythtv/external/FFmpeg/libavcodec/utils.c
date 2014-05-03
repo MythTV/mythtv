@@ -1647,10 +1647,17 @@ static int add_metadata_from_side_data(AVCodecContext *avctx, AVFrame *frame)
     if (!side_metadata)
         goto end;
     end = side_metadata + size;
+    if (size && end[-1])
+        return AVERROR_INVALIDDATA;
     while (side_metadata < end) {
         const uint8_t *key = side_metadata;
         const uint8_t *val = side_metadata + strlen(key) + 1;
-        int ret = av_dict_set(ff_frame_get_metadatap(frame), key, val, 0);
+        int ret;
+
+        if (val >= end)
+            return AVERROR_INVALIDDATA;
+
+        ret = av_dict_set(ff_frame_get_metadatap(frame), key, val, 0);
         if (ret < 0)
             break;
         side_metadata = val + strlen(val) + 1;
@@ -1968,6 +1975,16 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
         AVPacket tmp = *avpkt;
         int did_split = av_packet_split_side_data(&tmp);
         //apply_param_change(avctx, &tmp);
+
+        if (did_split) {
+            /* FFMIN() prevents overflow in case the packet wasn't allocated with
+             * proper padding.
+             * If the side data is smaller than the buffer padding size, the
+             * remaining bytes should have already been filled with zeros by the
+             * original packet allocation anyway. */
+            memset(tmp.data + tmp.size, 0,
+                   FFMIN(avpkt->size - tmp.size, FF_INPUT_BUFFER_PADDING_SIZE));
+        }
 
         pkt_recoded = tmp;
         ret = recode_subtitle(avctx, &pkt_recoded, &tmp);

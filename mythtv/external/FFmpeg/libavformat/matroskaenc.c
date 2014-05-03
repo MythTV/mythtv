@@ -27,6 +27,7 @@
 #include "avc.h"
 #include "flacenc.h"
 #include "avlanguage.h"
+#include "subtitles.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/sha.h"
 #include "libavutil/intreadwrite.h"
@@ -500,8 +501,18 @@ static int mkv_write_codecprivate(AVFormatContext *s, AVIOContext *pb, AVCodecCo
         if (qt_id) {
             if (!codec->codec_tag)
                 codec->codec_tag = ff_codec_get_tag(ff_codec_movvideo_tags, codec->codec_id);
-            if (codec->extradata_size)
+            if (codec->extradata_size) {
+                if (   ff_codec_get_id(ff_codec_movvideo_tags, codec->codec_tag) == codec->codec_id
+                    && ff_codec_get_id(ff_codec_movvideo_tags, AV_RL32(codec->extradata+4)) != codec->codec_id
+                ) {
+                    int i;
+                    avio_wb32(dyn_cp, 0x5a + codec->extradata_size);
+                    avio_wl32(dyn_cp, codec->codec_tag);
+                    for(i=0; i<0x5a-8; i++)
+                        avio_w8(dyn_cp, 0);
+                }
                 avio_write(dyn_cp, codec->extradata, codec->extradata_size);
+            }
         } else {
             if (!codec->codec_tag)
                 codec->codec_tag = ff_codec_get_tag(ff_codec_bmp_tags, codec->codec_id);
@@ -511,7 +522,7 @@ static int mkv_write_codecprivate(AVFormatContext *s, AVIOContext *pb, AVCodecCo
                 ret = AVERROR(EINVAL);
             }
 
-            ff_put_bmp_header(dyn_cp, codec, ff_codec_bmp_tags, 0);
+            ff_put_bmp_header(dyn_cp, codec, ff_codec_bmp_tags, 0, 0);
         }
 
     } else if (codec->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -566,7 +577,7 @@ static int mkv_write_tracks(AVFormatContext *s)
             continue;
         }
 
-        if (!bit_depth)
+        if (!bit_depth && codec->codec_id != AV_CODEC_ID_ADPCM_G726)
             bit_depth = av_get_bytes_per_sample(codec->sample_fmt) << 3;
         if (!bit_depth)
             bit_depth = codec->bits_per_coded_sample;
@@ -816,6 +827,17 @@ static int mkv_write_tag(AVFormatContext *s, AVDictionary *m, unsigned int eleme
     return 0;
 }
 
+static int mkv_check_tag(AVDictionary *m)
+{
+    AVDictionaryEntry *t = NULL;
+
+    while ((t = av_dict_get(m, "", t, AV_DICT_IGNORE_SUFFIX)))
+        if (av_strcasecmp(t->key, "title") && av_strcasecmp(t->key, "stereo_mode"))
+            return 1;
+
+    return 0;
+}
+
 static int mkv_write_tags(AVFormatContext *s)
 {
     ebml_master tags = {0};
@@ -823,7 +845,7 @@ static int mkv_write_tags(AVFormatContext *s)
 
     ff_metadata_conv_ctx(s, ff_mkv_metadata_conv, NULL);
 
-    if (av_dict_get(s->metadata, "", NULL, AV_DICT_IGNORE_SUFFIX)) {
+    if (mkv_check_tag(s->metadata)) {
         ret = mkv_write_tag(s, s->metadata, 0, 0, &tags);
         if (ret < 0) return ret;
     }
@@ -831,7 +853,7 @@ static int mkv_write_tags(AVFormatContext *s)
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
 
-        if (!av_dict_get(st->metadata, "", 0, AV_DICT_IGNORE_SUFFIX))
+        if (!mkv_check_tag(st->metadata))
             continue;
 
         ret = mkv_write_tag(s, st->metadata, MATROSKA_ID_TAGTARGETS_TRACKUID, i + 1, &tags);
@@ -841,7 +863,7 @@ static int mkv_write_tags(AVFormatContext *s)
     for (i = 0; i < s->nb_chapters; i++) {
         AVChapter *ch = s->chapters[i];
 
-        if (!av_dict_get(ch->metadata, "", NULL, AV_DICT_IGNORE_SUFFIX))
+        if (!mkv_check_tag(ch->metadata))
             continue;
 
         ret = mkv_write_tag(s, ch->metadata, MATROSKA_ID_TAGTARGETS_CHAPTERUID, ch->id, &tags);
@@ -1168,7 +1190,7 @@ static int srt_get_duration(uint8_t **buf)
             s_hsec += 1000*s_sec;       e_hsec += 1000*e_sec;
             duration = e_hsec - s_hsec;
         }
-        *buf += strcspn(*buf, "\n") + 1;
+        *buf += ff_subtitles_next_line(*buf);
     }
     return duration;
 }
@@ -1403,7 +1425,6 @@ const AVCodecTag additional_audio_tags[] = {
 };
 
 const AVCodecTag additional_video_tags[] = {
-    { AV_CODEC_ID_PRORES,    0xFFFFFFFF },
     { AV_CODEC_ID_RV10,      0xFFFFFFFF },
     { AV_CODEC_ID_RV20,      0xFFFFFFFF },
     { AV_CODEC_ID_RV30,      0xFFFFFFFF },

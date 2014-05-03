@@ -151,7 +151,7 @@ typedef struct vorbis_context_s {
     uint8_t       mode_count;
     vorbis_mode  *modes;
     uint8_t       mode_number; // mode number for the current packet
-    uint8_t       previous_window;
+    int8_t       previous_window;
     float        *channel_residues;
     float        *saved;
 } vorbis_context;
@@ -701,8 +701,7 @@ static int vorbis_parse_setup_hdr_residues(vorbis_context *vc)
         res_setup->partition_size = get_bits(gb, 24) + 1;
         /* Validations to prevent a buffer overflow later. */
         if (res_setup->begin>res_setup->end ||
-            res_setup->end > (res_setup->type == 2 ? vc->audio_channels : 1) * vc->blocksize[1] / 2 ||
-            (res_setup->end-res_setup->begin) / res_setup->partition_size > V_MAX_PARTITIONS) {
+            (res_setup->end-res_setup->begin) / res_setup->partition_size > FFMIN(V_MAX_PARTITIONS, 65535)) {
             av_log(vc->avctx, AV_LOG_ERROR,
                    "partition out of bounds: type, begin, end, size, blocksize: %"PRIu16", %"PRIu32", %"PRIu32", %u, %"PRIu32"\n",
                    res_setup->type, res_setup->begin, res_setup->end,
@@ -989,7 +988,7 @@ static int vorbis_parse_id_hdr(vorbis_context *vc)
     if (!vc->channel_residues || !vc->saved)
         return AVERROR(ENOMEM);
 
-    vc->previous_window  = 0;
+    vc->previous_window  = -1;
 
     ff_mdct_init(&vc->mdct[0], bl0, 1, -1.0);
     ff_mdct_init(&vc->mdct[1], bl1, 1, -1.0);
@@ -1325,6 +1324,7 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
     uint8_t *classifs = vr->classifs;
     unsigned pass, ch_used, i, j, k, l;
     unsigned max_output = (ch - 1) * vlen;
+    int libvorbis_bug = 0;
 
     if (vr_type == 2) {
         for (j = 1; j < ch; ++j)
@@ -1339,8 +1339,13 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
     }
 
     if (max_output > ch_left * vlen) {
-        av_log(vc->avctx, AV_LOG_ERROR, "Insufficient output buffer\n");
-        return -1;
+        if (max_output <= ch_left * vlen + vr->partition_size*ch_used/ch) {
+            ptns_to_read--;
+            libvorbis_bug = 1;
+        } else {
+            av_log(vc->avctx, AV_LOG_ERROR, "Insufficient output buffer\n");
+            return AVERROR_INVALIDDATA;
+        }
     }
 
     av_dlog(NULL, " residue type 0/1/2 decode begin, ch: %d  cpc %d  \n", ch, c_p_c);
@@ -1466,6 +1471,14 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
                 voffset += vr->partition_size;
             }
         }
+        if (libvorbis_bug && !pass) {
+            for (j = 0; j < ch_used; ++j) {
+                if (!do_not_decode[j]) {
+                    get_vlc2(&vc->gb, vc->codebooks[vr->classbook].vlc.table,
+                                vc->codebooks[vr->classbook].nb_bits, 3);
+                }
+            }
+        }
     }
     return 0;
 }
@@ -1518,7 +1531,7 @@ static int vorbis_parse_audio_packet(vorbis_context *vc, float **floor_ptr)
 {
     GetBitContext *gb = &vc->gb;
     FFTContext *mdct;
-    unsigned previous_window = vc->previous_window;
+    int previous_window = vc->previous_window;
     unsigned mode_number, blockflag, blocksize;
     int i, j;
     uint8_t no_residue[255];
@@ -1551,9 +1564,11 @@ static int vorbis_parse_audio_packet(vorbis_context *vc, float **floor_ptr)
     blocksize = vc->blocksize[blockflag];
     vlen = blocksize / 2;
     if (blockflag) {
-        previous_window = get_bits(gb, 1);
-        skip_bits1(gb); // next_window
-    }
+        int code = get_bits(gb, 2);
+        if (previous_window < 0)
+            previous_window = code>>1;
+    } else if (previous_window < 0)
+        previous_window = 0;
 
     memset(ch_res_ptr,   0, sizeof(float) * vc->audio_channels * vlen); //FIXME can this be removed ?
     for (i = 0; i < vc->audio_channels; ++i)
@@ -1783,7 +1798,7 @@ static av_cold void vorbis_decode_flush(AVCodecContext *avctx)
         memset(vc->saved, 0, (vc->blocksize[1] / 4) * vc->audio_channels *
                              sizeof(*vc->saved));
     }
-    vc->previous_window = 0;
+    vc->previous_window = -1;
 }
 
 AVCodec ff_vorbis_decoder = {

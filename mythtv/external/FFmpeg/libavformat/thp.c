@@ -26,15 +26,15 @@
 
 typedef struct ThpDemuxContext {
     int              version;
-    int              first_frame;
-    int              first_framesz;
-    int              last_frame;
+    unsigned         first_frame;
+    unsigned         first_framesz;
+    unsigned         last_frame;
     int              compoff;
-    int              framecnt;
+    unsigned         framecnt;
     AVRational       fps;
-    int              frame;
-    int              next_frame;
-    int              next_framesz;
+    unsigned         frame;
+    int64_t          next_frame;
+    unsigned         next_framesz;
     int              video_stream_index;
     int              audio_stream_index;
     int              compcount;
@@ -158,7 +158,7 @@ static int thp_read_packet(AVFormatContext *s,
         avio_seek(pb, thp->next_frame, SEEK_SET);
 
         /* Locate the next frame and read out its size.  */
-        thp->next_frame += thp->next_framesz;
+        thp->next_frame += FFMAX(thp->next_framesz, 1);
         thp->next_framesz = avio_rb32(pb);
 
                         avio_rb32(pb); /* Previous total size.  */

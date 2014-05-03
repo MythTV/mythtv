@@ -543,7 +543,7 @@ int ff_h264_execute_ref_pic_marking(H264Context *h, MMCO *mmco, int mmco_count){
             if(!pic){
                 if(mmco[i].opcode != MMCO_SHORT2LONG || !h->long_ref[mmco[i].long_arg]
                    || h->long_ref[mmco[i].long_arg]->frame_num != frame_num) {
-                    av_log(h->avctx, AV_LOG_ERROR, "mmco: unref short failure\n");
+                    av_log(h->avctx, h->short_ref_count ? AV_LOG_ERROR : AV_LOG_DEBUG, "mmco: unref short failure\n");
                     err = AVERROR_INVALIDDATA;
                 }
                 continue;
@@ -586,6 +586,9 @@ int ff_h264_execute_ref_pic_marking(H264Context *h, MMCO *mmco, int mmco_count){
 
             if (h->long_ref[mmco[i].long_arg] != h->cur_pic_ptr) {
                 remove_long(h, mmco[i].long_arg, 0);
+                if (remove_short(h, h->cur_pic_ptr->frame_num, 0)) {
+                    av_log(h->avctx, AV_LOG_ERROR, "mmco: cannot assign current picture to short and long at the same time\n");
+                }
 
                 h->long_ref[ mmco[i].long_arg ]= h->cur_pic_ptr;
                 h->long_ref[ mmco[i].long_arg ]->long_ref=1;
@@ -686,7 +689,7 @@ int ff_h264_execute_ref_pic_marking(H264Context *h, MMCO *mmco, int mmco_count){
     print_short_term(h);
     print_long_term(h);
 
-    if(err >= 0 && h->long_ref_count==0 && h->short_ref_count<=2 && h->pps.ref_count[0]<=1 + (h->picture_structure != PICT_FRAME) && h->cur_pic_ptr->f.pict_type == AV_PICTURE_TYPE_I){
+    if(err >= 0 && h->long_ref_count==0 && h->short_ref_count<=2 && h->pps.ref_count[0]<=2 + (h->picture_structure != PICT_FRAME) && h->cur_pic_ptr->f.pict_type == AV_PICTURE_TYPE_I){
         h->cur_pic_ptr->sync |= 1;
         if(!h->avctx->has_b_frames)
             h->sync = 2;
@@ -699,7 +702,7 @@ int ff_h264_decode_ref_pic_marking(H264Context *h, GetBitContext *gb,
                                    int first_slice)
 {
     int i, ret;
-    MMCO mmco_temp[MAX_MMCO_COUNT], *mmco = first_slice ? h->mmco : mmco_temp;
+    MMCO mmco_temp[MAX_MMCO_COUNT], *mmco = mmco_temp;
     int mmco_index = 0;
 
     if (h->nal_unit_type == NAL_IDR_SLICE){ // FIXME fields
@@ -765,6 +768,7 @@ int ff_h264_decode_ref_pic_marking(H264Context *h, GetBitContext *gb,
     }
 
     if (first_slice && mmco_index != -1) {
+        memcpy(h->mmco, mmco_temp, sizeof(h->mmco));
         h->mmco_index = mmco_index;
     } else if (!first_slice && mmco_index >= 0 &&
                (mmco_index != h->mmco_index ||

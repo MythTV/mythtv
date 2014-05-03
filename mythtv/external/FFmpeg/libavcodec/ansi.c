@@ -112,7 +112,7 @@ static void hscroll(AVCodecContext *avctx)
     AnsiContext *s = avctx->priv_data;
     int i;
 
-    if (s->y < avctx->height - s->font_height) {
+    if (s->y <= avctx->height - 2*s->font_height) {
         s->y += s->font_height;
         return;
     }
@@ -165,7 +165,7 @@ static void draw_char(AVCodecContext *avctx, int c)
     ff_draw_pc_font(s->frame.data[0] + s->y * s->frame.linesize[0] + s->x,
                     s->frame.linesize[0], s->font, s->font_height, c, fg, bg);
     s->x += FONT_WIDTH;
-    if (s->x >= avctx->width) {
+    if (s->x > avctx->width - FONT_WIDTH) {
         s->x = 0;
         hscroll(avctx);
     }
@@ -239,6 +239,8 @@ static int execute_code(AVCodecContext * avctx, int c)
         default:
             av_log_ask_for_sample(avctx, "unsupported screen mode\n");
         }
+        s->x = av_clip(s->x, 0, width  - FONT_WIDTH);
+        s->y = av_clip(s->y, 0, height - s->font_height);
         if (width != avctx->width || height != avctx->height) {
             if (s->frame.data[0])
                 avctx->release_buffer(avctx, &s->frame);
@@ -335,6 +337,8 @@ static int execute_code(AVCodecContext * avctx, int c)
         av_log_ask_for_sample(avctx, "unsupported escape code\n");
         break;
     }
+    s->x = av_clip(s->x, 0, avctx->width  - FONT_WIDTH);
+    s->y = av_clip(s->y, 0, avctx->height - s->font_height);
     return 0;
 }
 
@@ -415,7 +419,7 @@ static int decode_frame(AVCodecContext *avctx,
             switch(buf[0]) {
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
-                if (s->nb_args < MAX_NB_ARGS)
+                if (s->nb_args < MAX_NB_ARGS && s->args[s->nb_args] < 6553)
                     s->args[s->nb_args] = FFMAX(s->args[s->nb_args], 0) * 10 + buf[0] - '0';
                 break;
             case ';':

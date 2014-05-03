@@ -757,6 +757,10 @@ static int v4l2_set_parameters(AVFormatContext *s1)
             standard.index = i;
             if (v4l2_ioctl(s->fd, VIDIOC_ENUMSTD, &standard) < 0) {
                 ret = AVERROR(errno);
+                if (ret == AVERROR(EINVAL)) {
+                    tpf = &streamparm.parm.capture.timeperframe;
+                    break;
+                }
                 av_log(s1, AV_LOG_ERROR, "ioctl(VIDIOC_ENUMSTD): %s\n", av_err2str(ret));
                 return ret;
             }
@@ -985,6 +989,9 @@ static int v4l2_read_header(AVFormatContext *s1)
     if (codec_id == AV_CODEC_ID_RAWVIDEO)
         st->codec->codec_tag =
             avcodec_pix_fmt_to_codec_tag(st->codec->pix_fmt);
+    else if (codec_id == AV_CODEC_ID_H264) {
+        st->need_parsing = AVSTREAM_PARSE_HEADERS;
+    }
     if (desired_format == V4L2_PIX_FMT_YVU420)
         st->codec->codec_tag = MKTAG('Y', 'V', '1', '2');
     else if (desired_format == V4L2_PIX_FMT_YVU410)

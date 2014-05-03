@@ -368,8 +368,15 @@ break_loop:
 
     avio_seek(pb, data_ofs, SEEK_SET);
 
-    if (!sample_count && st->codec->channels && av_get_bits_per_sample(st->codec->codec_id) && wav->data_end <= avio_size(pb))
-        sample_count = (data_size<<3) / (st->codec->channels * (uint64_t)av_get_bits_per_sample(st->codec->codec_id));
+    if (!sample_count || av_get_exact_bits_per_sample(st->codec->codec_id) > 0)
+        if (   st->codec->channels
+            && data_size
+            && av_get_bits_per_sample(st->codec->codec_id)
+            && wav->data_end <= avio_size(pb))
+            sample_count = (data_size << 3)
+                                  /
+                (st->codec->channels * (uint64_t)av_get_bits_per_sample(st->codec->codec_id));
+
     if (sample_count)
         st->duration = sample_count;
 
@@ -629,7 +636,7 @@ static int w64_read_header(AVFormatContext *s)
             uint32_t count, chunk_size, i;
 
             start = avio_tell(pb);
-            end = start + size;
+            end = start + FFALIGN(size, INT64_C(8)) - 24;
             count = avio_rl32(pb);
 
             for (i = 0; i < count; i++) {
@@ -655,7 +662,7 @@ static int w64_read_header(AVFormatContext *s)
             avio_skip(pb, end - avio_tell(pb));
         } else {
             av_log(s, AV_LOG_DEBUG, "unknown guid: "FF_PRI_GUID"\n", FF_ARG_GUID(guid));
-            avio_skip(pb, size - 24);
+            avio_skip(pb, FFALIGN(size, INT64_C(8)) - 24);
         }
     }
 

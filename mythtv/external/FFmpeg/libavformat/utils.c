@@ -656,7 +656,7 @@ int avformat_open_input(AVFormatContext **ps, const char *filename, AVInputForma
 
     /* e.g. AVFMT_NOFILE formats will not have a AVIOContext */
     if (s->pb)
-        ff_id3v2_read(s, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta);
+        ff_id3v2_read(s, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta, 0);
 
     if (!(s->flags&AVFMT_FLAG_PRIV_OPT) && s->iformat->read_header)
         if ((ret = s->iformat->read_header(s)) < 0)
@@ -1214,12 +1214,14 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
             if (pkt->dts != AV_NOPTS_VALUE) {
                 // got DTS from the stream, update reference timestamp
                 st->reference_dts = pkt->dts - pc->dts_ref_dts_delta * num / den;
-                pkt->pts = pkt->dts + pc->pts_dts_delta * num / den;
             } else if (st->reference_dts != AV_NOPTS_VALUE) {
                 // compute DTS based on reference timestamp
                 pkt->dts = st->reference_dts + pc->dts_ref_dts_delta * num / den;
-                pkt->pts = pkt->dts + pc->pts_dts_delta * num / den;
             }
+
+            if (st->reference_dts != AV_NOPTS_VALUE && pkt->pts == AV_NOPTS_VALUE)
+                pkt->pts = pkt->dts + pc->pts_dts_delta * num / den;
+
             if (pc->dts_sync_point > 0)
                 st->reference_dts = pkt->dts; // new reference
         }
@@ -2949,9 +2951,10 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
                 goto find_stream_info_err;
         }
 
-        read_size += pkt->size;
-
         st = ic->streams[pkt->stream_index];
+        if (!(st->disposition & AV_DISPOSITION_ATTACHED_PIC))
+            read_size += pkt->size;
+
         if (pkt->dts != AV_NOPTS_VALUE && st->codec_info_nb_frames > 1) {
             /* check for non-increasing dts */
             if (st->info->fps_last_dts != AV_NOPTS_VALUE &&
