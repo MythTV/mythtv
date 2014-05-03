@@ -2173,10 +2173,10 @@ void PlaybackBox::playSelectedPlaylist(bool _random)
     {
         m_playListPlay.clear();
         QStringList tmp = m_playList;
-        while (!tmp.empty())
+        while (!tmp.isEmpty())
         {
             uint i = random() % tmp.size();
-            m_playListPlay.push_back(tmp[i]);
+            m_playListPlay.append(tmp[i]);
             tmp.removeAll(tmp[i]);
         }
     }
@@ -2414,7 +2414,7 @@ void PlaybackBox::ShowGroupPopup()
         m_popupMenu->AddItem(tr("Change Group Password"),
                              SLOT(showRecGroupPasswordChanger()));
 
-    if (m_playList.size())
+    if (!m_playList.isEmpty())
     {
         m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
     }
@@ -2515,7 +2515,7 @@ void PlaybackBox::RemoveProgram(
         return;
     }
 
-    if (m_playList.filter(delItem->MakeUniqueKey()).size())
+    if (m_playList.contains(delItem->MakeUniqueKey()))
         togglePlayListItem(delItem);
 
     if (!forceMetadataDelete)
@@ -3147,12 +3147,12 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if ((asFileNotFound  == pginfo.GetAvailableStatus()) ||
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
-        if (m_playList.filter(pginfo.MakeUniqueKey()).size())
+        if (m_playList.contains(pginfo.MakeUniqueKey()))
             m_popupMenu->AddItem(tr("Remove from Playlist"), SLOT(togglePlayListItem()));
         else
             m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
 
-        if (m_playList.size())
+        if (!m_playList.isEmpty())
             m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
 
         m_popupMenu->AddItem(tr("Recording Options"), NULL, createRecordingMenu());
@@ -3181,13 +3181,13 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
     if (!m_player)
     {
-        if (m_playList.filter(pginfo.MakeUniqueKey()).size())
+        if (m_playList.contains(pginfo.MakeUniqueKey()))
             m_popupMenu->AddItem(tr("Remove from Playlist"),
                                  SLOT(togglePlayListItem()));
         else
             m_popupMenu->AddItem(tr("Add to Playlist"),
                                  SLOT(togglePlayListItem()));
-        if (m_playList.size())
+        if (!m_playList.isEmpty())
         {
             m_popupMenu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
         }
@@ -3685,28 +3685,18 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
     MythUIButtonListItem *item =
                     m_recordingList->GetItemByData(qVariantFromValue(pginfo));
 
-    if (m_playList.filter(key).size())
+    if (m_playList.contains(key))
     {
         if (item)
             item->DisplayState("no", "playlist");
 
-        QStringList tmpList;
-        QStringList::Iterator it;
-
-        tmpList = m_playList;
-        m_playList.clear();
-
-        for (it = tmpList.begin(); it != tmpList.end(); ++it )
-        {
-            if (*it != key)
-                m_playList << *it;
-        }
+        m_playList.removeAll(key);
     }
     else
     {
         if (item)
           item->DisplayState("yes", "playlist");
-        m_playList << key;
+        m_playList.append(key);
     }
 }
 
