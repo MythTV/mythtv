@@ -617,6 +617,10 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
 {
     long long ret = -1;
 
+    // Ticket 12128
+    StopReads();
+    StartReads();
+
     if (writemode)
     {
         ret = WriterSeek(pos, whence, true);
