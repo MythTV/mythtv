@@ -222,20 +222,6 @@ static int has_codec_parameters(AVStream *st)
     return 1;
 }
 
-static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
-{
-    AVCodec *codec = c;
-    while (codec)
-    {
-        if (codec->id == id && CODEC_IS_VDPAU(codec))
-            return codec;
-
-        codec = codec->next;
-    }
-
-    return c;
-}
-
 static bool force_sw_decode(AVCodecContext *avctx)
 {
     switch (avctx->codec_id)
@@ -1416,27 +1402,10 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     return fps;
 }
 
-static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
-{
-    return
-        fmt == PIX_FMT_VDPAU_H264  ||
-        fmt == PIX_FMT_VDPAU_MPEG1 ||
-        fmt == PIX_FMT_VDPAU_MPEG2 ||
-        fmt == PIX_FMT_VDPAU_MPEG4 ||
-        fmt == PIX_FMT_VDPAU_WMV3  ||
-        fmt == PIX_FMT_VDPAU_VC1;
-}
-
 static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
-    int i = 0;
-
-    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
-        if (IS_VDPAU_PIX_FMT(fmt[i]))
-            break;
-
-    return fmt[i];
+    return AV_PIX_FMT_VDPAU;
 }
 
 // Declared seperately to allow attribute
@@ -1516,9 +1485,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->error_rate = 0;
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
-    // look for a vdpau capable codec
-    if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
-        codec = find_vdpau_decoder(codec, enc->codec_id);
 
     if (selectedStream)
     {
@@ -1535,7 +1501,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (metatag && metatag->value && QString("180") == metatag->value)
         video_inverted = true;
 
-    if (CODEC_IS_VDPAU(codec))
+    if (codec_is_vdpau(video_codec_id))
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
         enc->get_format      = get_format_vdpau;
@@ -2360,7 +2326,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 if (vdpau_mcid >= video_codec_id)
                 {
-                    enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
                     video_codec_id = vdpau_mcid;
                 }
 #endif // USING_VDPAU
@@ -2449,11 +2414,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Using %1 for video decoding")
                 .arg(GetCodecDecoderName()));
-
-            if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
-            {
-                codec = find_vdpau_decoder(codec, enc->codec_id);
-            }
 
             if (!enc->codec)
             {
@@ -2815,8 +2775,7 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
 
     pic->data[0] = frame->buf;
-    pic->data[1] = frame->priv[0];
-    pic->data[2] = frame->priv[1];
+    pic->data[1] = pic->data[2] = NULL;
 
     pic->linesize[0] = 0;
     pic->linesize[1] = 0;
@@ -2830,6 +2789,12 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 #ifdef USING_VDPAU
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
+    pic->data[3] = (uint8_t*)(uintptr_t)render->surface;
+    static uint8_t *dummy[1] = { 0 };
+    if (nd->GetPlayer())
+    {
+        c->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+    }
 #endif
 
     pic->reordered_opaque = c->reordered_opaque;

@@ -25,6 +25,7 @@ class VideoOutputVDPAU : public VideoOutput
               const QSize &video_dim_disp,
               float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
+    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
     bool SetDeinterlacingEnabled(bool interlaced);
     bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;
@@ -34,6 +35,10 @@ class VideoOutputVDPAU : public VideoOutput
                       FrameScanType scan);
     void PrepareFrame(VideoFrame*, FrameScanType, OSD *osd);
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
+    static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
+                            VdpPictureInfo const *picture_info,
+                            uint32_t bitstream_buffer_count,
+                            VdpBitstreamBuffer const *bitstream_buffers);
     void Show(FrameScanType);
     void ClearAfterSeek(void);
     bool InputChanged(const QSize &video_dim_buf,
@@ -105,6 +110,7 @@ class VideoOutputVDPAU : public VideoOutput
 
     Window               m_win;
     MythRenderVDPAU     *m_render;
+    AVVDPAUContext       m_context;
 
     uint                 m_decoder_buffer_size;
     uint                 m_process_buffer_size;
@@ -136,5 +142,3 @@ class VideoOutputVDPAU : public VideoOutput
 };
 
 #endif // VIDEOOUT_VDPAU_H
-
-
