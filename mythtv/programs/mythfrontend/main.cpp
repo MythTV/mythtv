@@ -1378,8 +1378,6 @@ static void InitKeys(void)
          "Play selected item in alternate player"), "ALT+P");
      REG_KEY("Video","FILTER", QT_TRANSLATE_NOOP("MythControls",
          "Open video filter dialog"), "F");
-     REG_KEY("Video","BROWSE", QT_TRANSLATE_NOOP("MythControls",
-         "Change browsable in video manager"), "B");
      REG_KEY("Video","INCPARENT", QT_TRANSLATE_NOOP("MythControls",
          "Increase Parental Level"), "],},F11");
      REG_KEY("Video","DECPARENT", QT_TRANSLATE_NOOP("MythControls",
@@ -1390,10 +1388,6 @@ static void InitKeys(void)
          "Download metadata for current item"), "W");
      REG_KEY("Video","ITEMDETAIL", QT_TRANSLATE_NOOP("MythControls",
          "Display Item Detail Popup"), "");
-     REG_KEY("Video","HOME", QT_TRANSLATE_NOOP("MythControls",
-         "Go to the first video"), "Home");
-     REG_KEY("Video","END", QT_TRANSLATE_NOOP("MythControls",
-         "Go to the last video"), "End");
 
      // Gallery keybindings
      REG_KEY("Images", "PLAY", QT_TRANSLATE_NOOP("MythControls",
@@ -1402,10 +1396,6 @@ static void InitKeys(void)
          "Pause Slideshow"), "Ctrl+P");
      REG_KEY("Images", "STOP", QT_TRANSLATE_NOOP("MythControls",
          "Stop Slideshow"), "Alt+P");
-     REG_KEY("Images", "HOME", QT_TRANSLATE_NOOP("MythControls",
-         "Go to the first image in thumbnail view"), "Home");
-     REG_KEY("Images", "END", QT_TRANSLATE_NOOP("MythControls",
-         "Go to the last image in thumbnail view"), "End");
      REG_KEY("Images", "SLIDESHOW", QT_TRANSLATE_NOOP("MythControls",
          "Start Slideshow in thumbnail view"), "S");
      REG_KEY("Images", "RANDOMSHOW", QT_TRANSLATE_NOOP("MythControls",
