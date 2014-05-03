@@ -29,6 +29,7 @@ VideoOutputNullVDPAU::VideoOutputNullVDPAU()
     m_checked_surface_ownership(false), m_shadowBuffers(NULL),
     m_surfaceSize(QSize(0,0))
 {
+    m_context.bitstream_buffers_allocated = 0;
 }
 
 VideoOutputNullVDPAU::~VideoOutputNullVDPAU()
@@ -72,8 +73,16 @@ bool VideoOutputNullVDPAU::Init(const QSize &video_dim_buf,
 bool VideoOutputNullVDPAU::InitRender(void)
 {
     QMutexLocker locker(&m_lock);
+
+    if (m_context.bitstream_buffers_allocated)
+    {
+        av_freep(&m_context.bitstream_buffers);
+    }
+    memset(&m_context, 0, sizeof(AVVDPAUContext));
+    m_context.render = Render;
+
     m_render = new MythRenderVDPAU();
-    if (m_render && m_render->CreateDecodeOnly())
+    if (m_render->CreateDecodeOnly())
         return true;
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VDPAU");
     return false;
@@ -89,8 +98,14 @@ void VideoOutputNullVDPAU::DeleteRender(void)
         m_render->DecrRef();
     }
 
+    if (m_context.bitstream_buffers_allocated)
+    {
+        av_freep(&m_context.bitstream_buffers);
+        m_context.bitstream_buffers_allocated = 0;
+    }
+
     m_decoder = 0;
-    m_render = NULL;
+    m_render  = NULL;
     m_pix_fmt = -1;
 }
 
@@ -269,9 +284,9 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
         }
 
         uint max_refs = MIN_REFERENCE_FRAMES;
-        if (frame->pix_fmt == PIX_FMT_VDPAU_H264)
+        if (video_codec_id == kCodec_H264_VDPAU)
         {
-            max_refs = render->info.h264.num_ref_frames;
+            max_refs = m_context.info.h264.num_ref_frames;
             if (max_refs < 1 || max_refs > MAX_REFERENCE_FRAMES)
             {
                 uint32_t round_width  = (frame->width + 15) & ~15;
@@ -321,29 +336,29 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
         }
 
         VdpDecoderProfile vdp_decoder_profile;
-        switch (frame->pix_fmt)
+        switch (video_codec_id)
         {
-            case PIX_FMT_VDPAU_MPEG1:
+            case kCodec_MPEG1_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1;
                 break;
-            case PIX_FMT_VDPAU_MPEG2:
+            case kCodec_MPEG2_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
                 break;
-            case PIX_FMT_VDPAU_MPEG4:
+            case kCodec_MPEG4_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
                 break;
-            case PIX_FMT_VDPAU_H264:
+            case kCodec_H264_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH;
                 break;
-            case PIX_FMT_VDPAU_WMV3:
+            case kCodec_WMV3_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_MAIN;
                 break;
-            case PIX_FMT_VDPAU_VC1:
+            case kCodec_VC1_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
                 break;
             default:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Picture format is not supported.");
+                    "Codec is not supported.");
                 errorState = kError_Unknown;
                 return;
         }
@@ -372,7 +387,7 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
         return;
     }
 
-    m_render->Decode(m_decoder, render);
+    m_render->Decode(m_decoder, render, &m_context);
 }
 
 void VideoOutputNullVDPAU::ClearAfterSeek(void)
@@ -612,4 +627,17 @@ bool VideoOutputNullVDPAU::BufferSizeCheck(void)
         return false;
     }
     return true;
+}
+
+void* VideoOutputNullVDPAU::GetDecoderContext(unsigned char* buf, uint8_t*& id)
+{
+    return &m_context;
+}
+
+VdpStatus VideoOutputNullVDPAU::Render(VdpDecoder decoder, VdpVideoSurface target,
+                                       VdpPictureInfo const *picture_info,
+                                       uint32_t bitstream_buffer_count,
+                                       VdpBitstreamBuffer const *bitstream_buffers)
+{
+    return VDP_STATUS_OK;
 }

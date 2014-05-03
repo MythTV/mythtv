@@ -39,6 +39,7 @@ class VideoOutputNullVDPAU : public VideoOutput
                       const QSize &video_dim_disp,
                       float aspect, WId winid,
                       const QRect &win_rect, MythCodecID codec_id);
+    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id);
     virtual bool InputChanged(const QSize &video_dim_buf,
                               const QSize &video_dim_disp,
                               float        aspect,
@@ -70,6 +71,10 @@ class VideoOutputNullVDPAU : public VideoOutput
                                     const QString &name) { return false; }
     virtual MythPainter *GetOSDPainter(void) { return NULL; }
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
+    static VdpStatus Render(VdpDecoder decoder, VdpVideoSurface target,
+                            VdpPictureInfo const *picture_info,
+                            uint32_t bitstream_buffer_count,
+                            VdpBitstreamBuffer const *bitstream_buffers);
 
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
@@ -93,6 +98,7 @@ class VideoOutputNullVDPAU : public VideoOutput
 
   private:
     MythRenderVDPAU *m_render;
+    AVVDPAUContext   m_context;
     QMutex           m_lock;
     uint             m_decoder;
     int              m_pix_fmt;
