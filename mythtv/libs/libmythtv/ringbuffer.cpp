@@ -103,6 +103,7 @@ bool        RingBuffer::gAVformat_net_initialised = false;
  *                      Otherwise it's how long to try opening
  *                      the file after the first failure in
  *                      milliseconds before giving up.
+ *  \param stream_only  If true, prevent DVD and Bluray (used by FileTransfer)
  */
 RingBuffer *RingBuffer::Create(
     const QString &xfilename, bool write,
@@ -122,9 +123,9 @@ RingBuffer *RingBuffer::Create(
     bool dvdurl  = lower.startsWith("dvd:");
     bool dvdext  = lower.endsWith(".img") || lower.endsWith(".iso");
 
-    if (httpurl)
+    if (httpurl || iptvurl)
     {
-        if (HLSRingBuffer::TestForHTTPLiveStreaming(lfilename))
+        if (!iptvurl && HLSRingBuffer::TestForHTTPLiveStreaming(lfilename))
         {
             return new HLSRingBuffer(lfilename);
         }
