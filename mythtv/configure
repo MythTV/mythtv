@@ -741,6 +741,13 @@ check_cxx(){
     check_cmd $cxx $CPPFLAGS $CXXFLAGS "$@" -c -o $TMPO $TMPCPP
 }
 
+check_ecxx(){
+    log check_cxx "$@"
+    cat > $TMPCPP
+    log_file $TMPCPP
+    check_cmd $cxx $CPPFLAGS $CXXFLAGS $ECXXFLAGS "$@" $CXX_C -o $TMPO $TMPCPP
+}
+
 check_cpp(){
     log check_cpp "$@"
     cat > $TMPC
@@ -2288,6 +2295,7 @@ SLIB_INSTALL_LINKS='$(SLIBNAME_WITH_MAJOR) $(SLIBNAME)'
 
 AS_O='-o $@'
 CC_O='-o $@'
+CXX_C='-c'
 CXX_O='-o $@'
 
 host_cflags='-D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -O3 -g -Wall'
@@ -4469,7 +4477,7 @@ fi
 if $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
-    check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
+    check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 int main(void){ return 0; }
 EOF
@@ -4480,7 +4488,7 @@ enabled qtwebkit || die "Error! QtWebkit headers not found"
 if $(pkg-config --exists QtScript) ; then
     enable qtscript
 else
-    check_cxx ${qt_inc} <<EOF && enable qtscript
+    check_ecxx ${qt_inc} <<EOF && enable qtscript
 #include <QtScript/QtScript>
 int main(void){ return 0; }
 EOF
@@ -4493,7 +4501,7 @@ if ! disabled qtdbus; then
     if $(pkg-config --exists QtDBus) ; then
         enable qtdbus
     else
-        check_cxx ${qt_inc} <<EOF && enable qtdbus
+        check_ecxx ${qt_inc} <<EOF && enable qtdbus
 #include <QtDBus/QtDBus>
 #include <QtDBus/QDBusInterface>
 int main(void)
@@ -4506,7 +4514,8 @@ EOF
 fi
 
 # Disable OpenGL ES support if Qt does not support it
-if $(pkg-config --variable=qt_config QtOpenGL | grep -qv opengles2) ; then
+QTGL=$(pkg-config --list-all | grep Qt | grep OpenGL | awk '{print $1}')
+if $(pkg-config --variable=qt_config $QTGL | grep -qv opengles2) ; then
     disable opengles
 fi
 
@@ -5130,6 +5139,7 @@ CFLAGS=$CFLAGS
 ASFLAGS=$ASFLAGS
 AS_O=$AS_O
 CC_O=$CC_O
+CXX_C=$CXX_C
 CXX_O=$CXX_O
 CXXPPFLAGS=$CXXPPFLAGS
 ECXXFLAGS=$ECXXFLAGS
