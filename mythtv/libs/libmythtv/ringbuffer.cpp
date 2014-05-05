@@ -118,6 +118,9 @@ RingBuffer *RingBuffer::Create(
     bool dvddir  = false;
     bool bddir   = false;
     bool httpurl = lower.startsWith("http://") || lower.startsWith("https://");
+    bool iptvurl =
+        lower.startsWith("rtp://") || lower.startsWith("tcp://") ||
+        lower.startsWith("udp://");
     bool mythurl = lower.startsWith("myth://");
     bool bdurl   = lower.startsWith("bd:");
     bool dvdurl  = lower.startsWith("dvd:");
