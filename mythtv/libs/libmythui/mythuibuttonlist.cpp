@@ -27,6 +27,9 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
     m_showArrow = true;
     m_showScrollBar = true;
 
+    connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
+    connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
+
     Const();
 }
 
@@ -41,6 +44,9 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
 
     m_Initiator = true;
     m_EnableInitiator = true;
+
+    connect(this, SIGNAL(Enabling()), this, SLOT(ToggleEnabled()));
+    connect(this, SIGNAL(Disabling()), this, SLOT(ToggleEnabled()));
 
     Const();
 }
@@ -119,6 +125,12 @@ void MythUIButtonList::Select()
 void MythUIButtonList::Deselect()
 {
     SetActive(false);
+}
+
+void MythUIButtonList::ToggleEnabled()
+{
+    if (m_initialized)
+        Update();
 }
 
 void MythUIButtonList::SetDrawFromBottom(bool draw)
@@ -3402,7 +3414,9 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     QString state;
 
-    if (selected)
+    if (!m_parent->IsEnabled())
+        state = "disabled";
+    else if (selected)
     {
         button->MoveToTop();
         state = m_parent->m_active ? "selectedactive" : "selectedinactive";
@@ -3420,7 +3434,15 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to query buttonlist state: %1")
             .arg(state));
-        return;
+        if (state == "disabled")
+        {
+            state = "inactive";
+            if (!button->GetState(state))
+                state = "active";
+            buttonstate = dynamic_cast<MythUIGroup *>(button->GetState(state));
+        }
+        else
+            return;
     }
 
     buttonstate->Reset();

@@ -205,6 +205,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
   public slots:
     void Select();
     void Deselect();
+    void ToggleEnabled();
 
   signals:
     void itemSelected(MythUIButtonListItem* item);
