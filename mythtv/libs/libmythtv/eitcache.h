@@ -49,9 +49,11 @@ class EITCache
     uint        hitCnt;
     uint        tblChgCnt;
     uint        verChgCnt;
+    uint        endChgCnt;
     uint        entryCnt;
     uint        pruneCnt;
     uint        prunedHitCnt;
+    uint        futureHitCnt;
     uint        wrongChannelHitCnt;
 
     static const uint kVersionMax;
