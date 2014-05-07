@@ -14,7 +14,6 @@
         <parameter name="-acodec"      value="ac3"/>
         <parameter name="-b:a"         value="192k"/>
         <parameter name="-ac"          value="2"/>
-        <parameter name="-copyts"      value=""/>
         <parameter name="-aspect"      value="%aspect"/>
         <parameter name="-pass"        value="%passno"/>
         <parameter name="-passlogfile" value="%passlogfile"/>
@@ -35,7 +34,6 @@
         <parameter name="-acodec" value="ac3"/>
         <parameter name="-b:a"    value="192k"/>
         <parameter name="-ac"     value="2"/>
-        <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
         <parameter name=""        value="%outputfile"/>
     </profile>
@@ -54,7 +52,6 @@
         <parameter name="-acodec" value="ac3"/>
         <parameter name="-b:a"    value="192k"/>
         <parameter name="-ac"     value="2"/>
-        <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
         <parameter name=""        value="%outputfile"/>
     </profile>
@@ -73,7 +70,6 @@
         <parameter name="-acodec" value="ac3"/>
         <parameter name="-b:a"    value="128k"/>
         <parameter name="-ac"     value="2"/>
-        <parameter name="-copyts" value=""/>
         <parameter name="-aspect" value="%aspect"/>
         <parameter name=""        value="%outputfile"/>
     </profile>
