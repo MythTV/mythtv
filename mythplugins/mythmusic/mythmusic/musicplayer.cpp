@@ -560,7 +560,7 @@ void MusicPlayer::StartPlayback(void)
 
 void MusicPlayer::StopPlayback(void)
 {
-    if (m_isPlaying)
+    if (m_output)
     {
         m_wasPlaying = m_isPlaying;
 
