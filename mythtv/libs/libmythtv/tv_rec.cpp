@@ -3871,7 +3871,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             {
                 SetFlags(kFlagWaitingForSignal);
                 if (curRecording)
-                    signalMonitorDeadline = curRecording->GetScheduledEndTime();
+                {
+                    signalMonitorDeadline = curRecording->GetRecordingEndTime()
+                                            .addSecs(-50);
+                }
                 else
                 {
                     QDateTime expire = MythDate::current();
