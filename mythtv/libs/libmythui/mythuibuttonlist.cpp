@@ -3439,6 +3439,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
             state = "inactive";
             if (!button->GetState(state))
                 state = "active";
+            buttonstate = dynamic_cast<MythUIGroup *>(button->GetState(state));
         }
         else
             return;
