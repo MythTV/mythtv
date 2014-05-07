@@ -363,6 +363,21 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                     thumbnail = enclosure;
                     enclosure = QString::null;
                 }
+
+                // fix for broken feeds that don't add the enclosure type
+                if (enclosure_type == "" || enclosure_type.isNull())
+                {
+                    QStringList imageExtensions = QStringList() << ".jpg" << ".jpeg" << ".png" << ".gif";
+                    for (int x = 0; x < imageExtensions.count(); x++)
+                    {
+                        if (enclosure.toLower().endsWith(imageExtensions[x]))
+                        {
+                            thumbnail = enclosure;
+                            enclosure = QString::null;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
