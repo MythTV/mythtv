@@ -486,7 +486,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
             "Checking input group recorders - begin");
         vector<uint> &cardids = pendinfo.possibleConflicts;
 
-        uint mplexid = 0, sourceid = 0;
+        uint mplexid = 0, chanid = 0, sourceid = 0;
         vector<uint> cardids2;
         vector<TVState> states;
 
@@ -508,12 +508,15 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
             if (is_busy && !sourceid)
             {
                 mplexid  = pendinfo.info->QueryMplexID();
+                chanid   = pendinfo.info->GetChanID();
                 sourceid = pendinfo.info->GetSourceID();
             }
 
             if (is_busy &&
                 ((sourceid != busy_input.sourceid) ||
-                 (mplexid  != busy_input.mplexid)))
+                 (mplexid  != busy_input.mplexid) ||
+                 ((mplexid == 0 || mplexid == 32767) &&
+                  chanid != busy_input.chanid)))
             {
                 states.push_back((TVState) RemoteGetState(cardids[i]));
                 cardids2.push_back(cardids[i]);

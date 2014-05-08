@@ -171,7 +171,8 @@ class MTV_PUBLIC ChannelUtil
     static int     GetChanID(uint sourceid, const QString &channum)
         { return GetChannelValueInt("chanid", sourceid, channum); }
     static bool    GetChannelData(
-        uint    sourceid,         const QString &channum,
+        uint    sourceid,
+        uint    &chanid,          const QString &channum,
         QString &tvformat,        QString       &modulation,
         QString &freqtable,       QString       &freqid,
         int     &finetune,        uint64_t      &frequency,
@@ -208,6 +209,7 @@ class MTV_PUBLIC ChannelUtil
     static uint    GetNextChannel(const ChannelInfoList &sorted,
                                   uint old_chanid,
                                   uint mplexid_restriction,
+                                  uint chanid_restriction,
                                   ChannelChangeDirection direction,
                                   bool skip_non_visible = true,
                                   bool skip_same_channum_and_callsign = false);

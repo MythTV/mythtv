@@ -631,7 +631,8 @@ bool V4LChannel::SwitchToInput(int inputnum, bool setstarting)
             .arg(setstarting ? channum : QString("")));
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(inputnum, mplexid_restriction))
+    uint chanid_restriction;
+    if (!IsInputAvailable(inputnum, mplexid_restriction, chanid_restriction))
         return false;
 
     QString newFmt = mode_to_format((*it)->videoModeV4L2);

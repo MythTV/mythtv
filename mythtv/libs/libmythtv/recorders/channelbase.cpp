@@ -125,14 +125,16 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
     while (it != inputs.end() && !ok)
     {
         uint mplexid_restriction = 0;
+        uint chanid_restriction = 0;
 
         ChannelInfoList channels = GetChannels(*it);
         if (channels.size() &&
-            IsInputAvailable(GetInputByName(*it), mplexid_restriction))
+            IsInputAvailable(GetInputByName(*it), mplexid_restriction,
+                             chanid_restriction))
         {
             uint chanid = ChannelUtil::GetNextChannel(
                 channels, channels[0].chanid,
-                mplexid_restriction, CHANNEL_DIRECTION_UP);
+                mplexid_restriction, chanid_restriction, CHANNEL_DIRECTION_UP);
 
             ChannelInfoList::const_iterator cit =
                 find(channels.begin(), channels.end(), chanid);
@@ -141,7 +143,8 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
             {
                 if (!setchan)
                 {
-                    ok = IsTunable(*it, (mplexid_restriction) ?
+                    ok = IsTunable(*it, (mplexid_restriction ||
+                                         chanid_restriction) ?
                                    (*cit).channum : startchannel);
                 }
                 else
@@ -150,7 +153,7 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 if (ok)
                 {
                     inputname = *it;
-                    if (mplexid_restriction)
+                    if (mplexid_restriction || chanid_restriction)
                     {
                         startchannel = (*cit).channum;
                         startchannel.detach();
@@ -193,7 +196,8 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     }
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(inputid, mplexid_restriction))
+    uint chanid_restriction;
+    if (!IsInputAvailable(inputid, mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Requested channel is on input '%1' "
@@ -208,10 +212,10 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
-    uint atsc_major, atsc_minor, mplexid, tsid, netid;
+    uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
     bool commfree;
 
-    if (!ChannelUtil::GetChannelData((*it)->sourceid, channum,
+    if (!ChannelUtil::GetChannelData((*it)->sourceid, chanid, channum,
                                      tvformat, modulation, freqtable, freqid,
                                      finetune, frequency, dtv_si_std,
                                      mpeg_prog_num, atsc_major, atsc_minor,
@@ -224,12 +228,14 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
         return false;
     }
 
-    if (mplexid_restriction && (mplexid != mplexid_restriction))
+    if ((mplexid_restriction && (mplexid != mplexid_restriction)) ||
+        (chanid_restriction && (chanid != chanid_restriction)))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Channel is valid, but tuner is busy "
-                    "on different multiplex (%1 != %2)")
-            .arg(mplexid).arg(mplexid_restriction));
+                    "on different multiplex/channel (%1 != %2) / (%3 != %4)")
+            .arg(mplexid).arg(mplexid_restriction)
+            .arg(chanid).arg(chanid_restriction));
 
         return false;
     }
@@ -249,10 +255,13 @@ uint ChannelBase::GetNextChannel(uint chanid, ChannelChangeDirection direction) 
     }
 
     uint mplexid_restriction = 0;
-    (void)IsInputAvailable(m_currentInputID, mplexid_restriction);
+    uint chanid_restriction = 0;
+    (void)IsInputAvailable(m_currentInputID, mplexid_restriction,
+                           chanid_restriction);
 
     return ChannelUtil::GetNextChannel(
-        m_allchannels, chanid, mplexid_restriction, direction);
+        m_allchannels, chanid, mplexid_restriction, chanid_restriction,
+        direction);
 }
 
 uint ChannelBase::GetNextChannel(const QString &channum, ChannelChangeDirection direction) const
@@ -387,7 +396,9 @@ bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(newInputNum, mplexid_restriction))
+    uint chanid_restriction;
+    if (!IsInputAvailable(newInputNum, mplexid_restriction,
+                          chanid_restriction))
         return false;
 
     // input switching code would go here
@@ -405,7 +416,8 @@ static bool is_input_group_busy(
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,TunedInputInfo> &busyin,
-    uint                      &mplexid_restriction)
+    uint                      &mplexid_restriction,
+    uint                      &chanid_restriction)
 {
     static QMutex        igrpLock;
     static InputGroupMap igrp;
@@ -462,8 +474,6 @@ static bool is_input_group_busy(
     if (is_busy_input)
         return true;
 
-    // If the source's channels aren't digitally tuned then there is a conflict
-    is_busy_input = !SourceUtil::HasDigitalChannel(in.sourceid);
     if (!is_busy_input && conflicts[0].chanid)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -479,6 +489,10 @@ static bool is_input_group_busy(
             mplexid_restriction = query.value(0).toUInt();
             mplexid_restriction = (32767 == mplexid_restriction) ?
                 0 : mplexid_restriction;
+            if (mplexid_restriction)
+                chanid_restriction = 0;
+            else
+                chanid_restriction = conflicts[0].chanid;
         }
     }
 
@@ -492,20 +506,21 @@ static bool is_input_busy(
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
     QMap<uint,TunedInputInfo> &busyin,
-    uint                      &mplexid_restriction)
+    uint                      &mplexid_restriction,
+    uint                      &chanid_restriction)
 {
     bool is_busy = false;
     for (uint i = 0; i < groupids.size() && !is_busy; i++)
     {
         is_busy |= is_input_group_busy(
             inputid, groupids[i], excluded_cardids,
-            busygrp, busyrec, busyin, mplexid_restriction);
+            busygrp, busyrec, busyin, mplexid_restriction, chanid_restriction);
     }
     return is_busy;
 }
 
 bool ChannelBase::IsInputAvailable(
-    int inputid, uint &mplexid_restriction) const
+    int inputid, uint &mplexid_restriction, uint &chanid_restriction) const
 {
     if (inputid < 0)
         return false;
@@ -533,11 +548,14 @@ bool ChannelBase::IsInputAvailable(
     excluded_cardids.push_back(cid);
 
     mplexid_restriction = 0;
+    chanid_restriction = 0;
 
     vector<uint> groupids = CardUtil::GetInputGroups(inputid);
 
-    return !is_input_busy(inputid, groupids, excluded_cardids,
-                          busygrp, busyrec, busyin, mplexid_restriction);
+    bool res = !is_input_busy(inputid, groupids, excluded_cardids,
+                          busygrp, busyrec, busyin, mplexid_restriction,
+                          chanid_restriction);
+    return res;
 }
 
 /** \fn ChannelBase::GetFreeInputs(const vector<uint>&) const
@@ -597,7 +615,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
 
         bool is_busy_grp = is_input_busy(
             info.inputid, groupids, excluded_cardids,
-            busygrp, busyrec, busyin, info.mplexid);
+            busygrp, busyrec, busyin, info.mplexid, info.chanid);
 
         if (!is_busy_grp && info.livetvorder)
             new_list.push_back(info);

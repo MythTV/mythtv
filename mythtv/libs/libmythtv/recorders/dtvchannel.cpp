@@ -214,7 +214,9 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
+    uint chanid_restriction;
+    if (!IsInputAvailable(m_currentInputID, mplexid_restriction,
+                          chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_INFO, loc +
             QString("Requested channel '%1' is on input '%2' "
@@ -229,10 +231,10 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     int finetune;
     uint64_t frequency;
     int mpeg_prog_num;
-    uint atsc_major, atsc_minor, mplexid, tsid, netid;
+    uint atsc_major, atsc_minor, mplexid, chanid, tsid, netid;
 
     if (!ChannelUtil::GetChannelData(
-        (*it)->sourceid, channum,
+        (*it)->sourceid, chanid, channum,
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
@@ -243,7 +245,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    if (mplexid_restriction && (mplexid != mplexid_restriction))
+    if ((mplexid_restriction && (mplexid != mplexid_restriction)) ||
+        (chanid_restriction && (chanid != chanid_restriction)))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Requested channel '%1' is not available because "

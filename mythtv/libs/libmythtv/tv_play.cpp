@@ -1919,8 +1919,10 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetCardID()))
                 (*it).is_conflicting = true;
-            else if ((busy_input.sourceid == (uint)(*it).info->GetSourceID()) &&
-                     (busy_input.mplexid  == (uint)(*it).info->QueryMplexID()))
+            else if ((busy_input.mplexid &&
+                      (busy_input.mplexid  == (*it).info->QueryMplexID())) ||
+                     (!busy_input.mplexid &&
+                      (busy_input.chanid == (*it).info->GetChanID())))
                 (*it).is_conflicting = false;
             else
                 (*it).is_conflicting = true;
@@ -7535,7 +7537,7 @@ void TV::ChangeChannel(PlayerContext *ctx, ChannelChangeDirection direction)
             if (channelGroupId > -1)
             {
                 uint chanid = ChannelUtil::GetNextChannel(
-                    channelGroupChannelList, old_chanid, 0, direction);
+                    channelGroupChannelList, old_chanid, 0, 0, direction);
                 if (chanid)
                     ChangeChannel(ctx, chanid, "");
                 return;
@@ -8487,11 +8489,12 @@ QSet<uint> TV::IsTunableOn(TV *tv,
 
         for (uint j = 0; j < inputs.size(); j++)
         {
-            if (inputs[j].sourceid != sourceid)
-                continue;
-
             if (inputs[j].mplexid &&
                 inputs[j].mplexid != mplexid)
+                continue;
+
+            if (!inputs[j].mplexid && inputs[j].chanid &&
+                inputs[j].chanid != chanid)
                 continue;
 
             tunable_cards.insert(cardids[i]);

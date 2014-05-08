@@ -136,7 +136,8 @@ class ChannelBase
     ///        and sets the channel is setstarting is true.
     virtual bool SwitchToInput(int inputNum, bool setstarting);
     virtual bool IsInputAvailable(
-        int inputNum, uint &mplexid_restriction) const;
+        int inputNum, uint &mplexid_restriction,
+        uint &chanid_restrtiction) const;
     virtual bool IsExternalChannelChangeSupported(void) { return false; }
 
     int GetStartInput(uint cardid);

@@ -1239,14 +1239,14 @@ QList<InputInfo> CardUtil::GetAllInputInfo()
 
 uint CardUtil::GetCardID(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0, 0);
+    InputInfo info(QString::null, 0, inputid, 0, 0, 0, 0);
     GetInputInfo(info);
     return info.cardid;
 }
 
 QString CardUtil::GetInputName(uint inputid)
 {
-    InputInfo info(QString::null, 0, inputid, 0, 0, 0);
+    InputInfo info(QString::null, 0, inputid, 0, 0, 0, 0);
     GetInputInfo(info);
     return info.name;
 }
