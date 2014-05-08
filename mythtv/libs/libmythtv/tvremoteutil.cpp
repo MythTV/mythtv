@@ -332,7 +332,7 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
     return blank;
 }
 
-bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input)
+bool RemoteIsBusy(uint cardid, InputInfo &busy_input)
 {
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("RemoteIsBusy(%1) %2")

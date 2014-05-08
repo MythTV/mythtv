@@ -82,25 +82,6 @@ class MTV_PUBLIC InputInfo
     bool    quickTune;
 };
 
-class MTV_PUBLIC TunedInputInfo : public InputInfo
-{
-  public:
-    TunedInputInfo() { }
-    TunedInputInfo(const QString &name,
-                   uint _sourceid, uint _inputid,
-                   uint _cardid,   uint _mplexid, uint _livetvorder, 
-                   uint _chanid);
-    TunedInputInfo(const TunedInputInfo &other);
-    TunedInputInfo &operator=(const TunedInputInfo &other);
-    virtual ~TunedInputInfo() {}
-
-    virtual bool FromStringList(QStringList::const_iterator &it,
-                                QStringList::const_iterator  end);
-    virtual void ToStringList(QStringList &list) const;
-
-    virtual void Clear(void);
-};
-
 class MTV_PUBLIC ChannelInputInfo : public InputInfo
 {
   public:

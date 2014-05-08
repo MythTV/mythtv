@@ -4428,7 +4428,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "IS_BUSY")
     {
         int time_buffer = (slist.size() >= 3) ? slist[2].toInt() : 5;
-        TunedInputInfo busy_input;
+        InputInfo busy_input;
         retlist << QString::number((int)enc->IsBusy(&busy_input, time_buffer));
         busy_input.ToStringList(retlist);
     }

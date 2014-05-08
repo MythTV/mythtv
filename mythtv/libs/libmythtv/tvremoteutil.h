@@ -12,7 +12,6 @@ using namespace std;
 class ProgramInfo;
 class RemoteEncoder;
 class InputInfo;
-class TunedInputInfo;
 
 /// recording status stuff
 class TunerStatus
@@ -48,7 +47,7 @@ RemoteRequestFreeInputList(const vector<uint> &excluded_cardids);
 MTV_PUBLIC vector<InputInfo> RemoteRequestFreeInputList(
     uint cardid, const vector<uint> &excluded_cardids);
 MTV_PUBLIC InputInfo RemoteRequestBusyInputID(uint cardid);
-MTV_PUBLIC bool RemoteIsBusy(uint cardid, TunedInputInfo &busy_input);
+MTV_PUBLIC bool RemoteIsBusy(uint cardid, InputInfo &busy_input);
 
 MTV_PUBLIC bool RemoteGetRecordingStatus(
     vector<TunerStatus> *tunerList = NULL, bool list_inactive = false);

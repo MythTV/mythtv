@@ -1874,7 +1874,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         // get the currently used input on our card
         bool busy_input_grps_loaded = false;
         vector<uint> busy_input_grps;
-        TunedInputInfo busy_input;
+        InputInfo busy_input;
         RemoteIsBusy(cardid, busy_input);
 
         // check if current input can conflict

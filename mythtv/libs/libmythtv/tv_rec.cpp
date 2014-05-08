@@ -493,7 +493,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *pginfo)
         // Stop remote recordings if needed
         for (uint i = 0; i < cardids.size(); i++)
         {
-            TunedInputInfo busy_input;
+            InputInfo busy_input;
             bool is_busy = RemoteIsBusy(cardids[i], busy_input);
 
             // if the other recorder is busy, but the input is
@@ -2431,9 +2431,9 @@ bool TVRec::IsReallyRecording(void)
  *         the next time_buffer seconds.
  *  \sa EncoderLink::IsBusy(TunedInputInfo*, int time_buffer)
  */
-bool TVRec::IsBusy(TunedInputInfo *busy_input, int time_buffer) const
+bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 {
-    TunedInputInfo dummy;
+    InputInfo dummy;
     if (!busy_input)
         busy_input = &dummy;
 

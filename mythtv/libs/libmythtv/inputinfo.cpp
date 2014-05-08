@@ -71,47 +71,6 @@ void InputInfo::ToStringList(QStringList &list) const
     list.push_back(QString::number(chanid));
 }
 
-TunedInputInfo::TunedInputInfo(
-    const QString &_name,
-    uint _sourceid, uint _inputid, uint _cardid, uint _mplexid,
-    uint _livetvorder, uint _chanid) :
-    InputInfo(_name, _sourceid, _inputid, _cardid, _mplexid, _chanid,
-              _livetvorder)
-{
-}
-
-TunedInputInfo::TunedInputInfo(const TunedInputInfo &other) :
-    InputInfo(other)
-{
-}
-
-TunedInputInfo &TunedInputInfo::operator=(const TunedInputInfo &other)
-{
-    *((InputInfo*)this) = other;
-    chanid = other.chanid;
-    return *this;
-}
-
-void TunedInputInfo::Clear(void)
-{
-    TunedInputInfo blank;
-    *this = blank;
-}
-
-bool TunedInputInfo::FromStringList(QStringList::const_iterator &it,
-                                    QStringList::const_iterator end)
-{
-    if (!InputInfo::FromStringList(it, end))
-        return false;
-
-    return true;
-}
-
-void TunedInputInfo::ToStringList(QStringList &list) const
-{
-    InputInfo::ToStringList(list);
-}
-
 ChannelInputInfo::ChannelInputInfo(const ChannelInputInfo &other) :
     InputInfo(*this),
     startChanNum(other.startChanNum),

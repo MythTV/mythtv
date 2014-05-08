@@ -1738,7 +1738,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         return true;
 
     // now check other cards in the same input group as the recording.
-    TunedInputInfo busy_input;
+    InputInfo busy_input;
     uint inputid = rcinfo->GetInputID();
     vector<uint> cardids = CardUtil::GetConflictingCards(
         inputid, rcinfo->GetCardID());
@@ -5112,7 +5112,7 @@ void Scheduler::SchedLiveTV(void)
         if (kState_WatchingLiveTV != enc->GetState())
             continue;
 
-        TunedInputInfo in;
+        InputInfo in;
         enc->IsBusy(&in);
 
         if (!in.inputid)

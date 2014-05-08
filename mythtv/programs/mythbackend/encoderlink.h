@@ -79,7 +79,7 @@ class EncoderLink
     long long GetMaxBitrate(void);
     int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
-    bool IsBusy(TunedInputInfo *busy_input = NULL, int time_buffer = 5);
+    bool IsBusy(InputInfo *busy_input = NULL, int time_buffer = 5);
     bool IsBusyRecording(void);
 
     TVState GetState();

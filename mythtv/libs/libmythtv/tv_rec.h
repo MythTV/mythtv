@@ -174,7 +174,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     bool SetVideoFiltersForChannel(uint sourceid, const QString &channum);
 
-    bool IsBusy(TunedInputInfo *busy_input = NULL, int time_buffer = 5) const;
+    bool IsBusy(InputInfo *busy_input = NULL, int time_buffer = 5) const;
     bool IsReallyRecording(void);
 
     float GetFramerate(void);

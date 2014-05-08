@@ -415,7 +415,7 @@ static bool is_input_group_busy(
     const vector<uint>        &excluded_cardids,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
-    QMap<uint,TunedInputInfo> &busyin,
+    QMap<uint,InputInfo>      &busyin,
     uint                      &mplexid_restriction,
     uint                      &chanid_restriction)
 {
@@ -427,7 +427,7 @@ static bool is_input_group_busy(
     if ((bit != busygrp.end()) && !*bit)
         return false;
 
-    vector<TunedInputInfo> conflicts;
+    vector<InputInfo> conflicts;
     vector<uint> cardids = CardUtil::GetGroupCardIDs(groupid);
     for (uint i = 0; i < cardids.size(); i++)
     {
@@ -437,7 +437,7 @@ static bool is_input_group_busy(
             continue;
         }
 
-        TunedInputInfo info;
+        InputInfo info;
         QMap<uint,bool>::const_iterator it = busyrec.find(cardids[i]);
         if (it == busyrec.end())
         {
@@ -505,7 +505,7 @@ static bool is_input_busy(
     const vector<uint>        &excluded_cardids,
     QMap<uint,bool>           &busygrp,
     QMap<uint,bool>           &busyrec,
-    QMap<uint,TunedInputInfo> &busyin,
+    QMap<uint,InputInfo>      &busyin,
     uint                      &mplexid_restriction,
     uint                      &chanid_restriction)
 {
@@ -529,13 +529,13 @@ bool ChannelBase::IsInputAvailable(
     // input group which is attached to a busy recorder.
     QMap<uint,bool>           busygrp;
     QMap<uint,bool>           busyrec;
-    QMap<uint,TunedInputInfo> busyin;
+    QMap<uint,InputInfo>      busyin;
 
     uint cid = GetCardID();
     // Cache our busy input if applicable
     if (m_pParent)
     {
-        TunedInputInfo info;
+        InputInfo info;
         busyrec[cid] = m_pParent->IsBusy(&info);
         if (busyrec[cid])
         {
@@ -579,14 +579,14 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
     // input group which is attached to a busy recorder.
     QMap<uint,bool>           busygrp;
     QMap<uint,bool>           busyrec;
-    QMap<uint,TunedInputInfo> busyin;
+    QMap<uint,InputInfo>      busyin;
 
 
     uint cid = GetCardID();
     // Cache our busy input if applicable
     if (m_pParent)
     {
-        TunedInputInfo info;
+        InputInfo info;
         busyrec[cid] = m_pParent->IsBusy(&info);
         if (busyrec[cid])
         {
