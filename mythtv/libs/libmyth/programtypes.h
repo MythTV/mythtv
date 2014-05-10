@@ -45,7 +45,7 @@ MPUBLIC extern const char *kJobQueueInUseID;
 MPUBLIC extern const char *kCCExtractorInUseID;
 
 /// Frame # -> File offset map
-typedef QMap<uint64_t, uint64_t> frm_pos_map_t;
+typedef QMap<long long, long long> frm_pos_map_t;
 
 typedef enum {
     MARK_ALL           = -100,
