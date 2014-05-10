@@ -173,9 +173,9 @@ class DecoderBase
                                   const frm_pos_map_t &map = frm_pos_map_t(),
                                   float fallback_ratio = 1.0);
     static uint64_t TranslatePosition(const frm_pos_map_t &map,
-                                      uint64_t key,
+                                      long long key,
                                       float fallback_ratio);
-    uint64_t TranslatePositionFrameToMs(uint64_t position,
+    uint64_t TranslatePositionFrameToMs(long long position,
                                         float fallback_framerate,
                                         const frm_dir_map_t &cutlist);
     uint64_t TranslatePositionMsToFrame(uint64_t dur_ms,
@@ -219,7 +219,7 @@ class DecoderBase
     virtual bool FindPosition(long long desired_value, bool search_adjusted,
                               int &lower_bound, int &upper_bound);
 
-    uint64_t SavePositionMapDelta(uint64_t first_frame, uint64_t last_frame);
+    uint64_t SavePositionMapDelta(long long first_frame, long long last_frame);
     virtual void SeekReset(long long newkey, uint skipFrames,
                            bool doFlush, bool discardFrames);
 

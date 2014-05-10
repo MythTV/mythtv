@@ -262,7 +262,7 @@ bool DecoderBase::PosMapFromEnc(void)
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
 
-    uint64_t last_index = 0;
+    long long last_index = 0;
     if (!m_positionMap.empty())
         last_index = m_positionMap.back().index;
     for (frm_pos_map_t::const_iterator it = posMap.begin();
@@ -518,7 +518,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     return false;
 }
 
-uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
+uint64_t DecoderBase::SavePositionMapDelta(long long first, long long last)
 {
     MythTimer ttm, ctm, stm;
     ttm.start();
@@ -1226,7 +1226,7 @@ void DecoderBase::SaveTotalFrames(void)
 // key is outside the range of keys in the map, linearly extrapolate
 // using the fallback ratio.
 uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
-                                        uint64_t key,
+                                        long long key,
                                         float fallback_ratio)
 {
     uint64_t key1, key2;
@@ -1277,7 +1277,7 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
 
 // Convert from an absolute frame number (not cutlist adjusted) to its
 // cutlist-adjusted position in milliseconds.
-uint64_t DecoderBase::TranslatePositionFrameToMs(uint64_t position,
+uint64_t DecoderBase::TranslatePositionFrameToMs(long long position,
                                                  float fallback_framerate,
                                                  const frm_dir_map_t &cutlist)
 {

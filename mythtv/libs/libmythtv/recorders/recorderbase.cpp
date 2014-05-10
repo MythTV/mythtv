@@ -397,7 +397,7 @@ RecordingQuality *RecorderBase::GetRecordingQuality(
         timeOfFirstData, timeOfLatestData);
 }
 
-int64_t RecorderBase::GetKeyframePosition(uint64_t desired) const
+long long RecorderBase::GetKeyframePosition(long long desired) const
 {
     QMutexLocker locker(&positionMapLock);
     long long ret = -1;
@@ -418,7 +418,7 @@ int64_t RecorderBase::GetKeyframePosition(uint64_t desired) const
 }
 
 bool RecorderBase::GetKeyframePositions(
-    int64_t start, int64_t end, frm_pos_map_t &map) const
+    long long start, long long end, frm_pos_map_t &map) const
 {
     map.clear();
 
@@ -429,7 +429,7 @@ bool RecorderBase::GetKeyframePositions(
     frm_pos_map_t::const_iterator it = positionMap.lowerBound(start);
     end = (end < 0) ? INT64_MAX : end;
     for (; (it != positionMap.end()) &&
-             (it.key() <= (uint64_t)end); ++it)
+             (it.key() <= end); ++it)
         map[it.key()] = *it;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
@@ -440,7 +440,7 @@ bool RecorderBase::GetKeyframePositions(
 }
 
 bool RecorderBase::GetKeyframeDurations(
-    int64_t start, int64_t end, frm_pos_map_t &map) const
+    long long start, long long end, frm_pos_map_t &map) const
 {
     map.clear();
 
@@ -451,7 +451,7 @@ bool RecorderBase::GetKeyframeDurations(
     frm_pos_map_t::const_iterator it = durationMap.lowerBound(start);
     end = (end < 0) ? INT64_MAX : end;
     for (; (it != durationMap.end()) &&
-             (it.key() <= (uint64_t)end); ++it)
+             (it.key() <= end); ++it)
         map[it.key()] = *it;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +

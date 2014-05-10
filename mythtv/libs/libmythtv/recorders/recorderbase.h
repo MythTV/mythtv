@@ -189,11 +189,11 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *  \return Closest prior keyframe, or -1 if there is no prior
      *          known keyframe.
      */
-    int64_t GetKeyframePosition(uint64_t desired) const;
+    long long GetKeyframePosition(long long desired) const;
     bool GetKeyframePositions(
-        int64_t start, int64_t end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t&) const;
     bool GetKeyframeDurations(
-        int64_t start, int64_t end, frm_pos_map_t&) const;
+        long long start, long long end, frm_pos_map_t&) const;
 
     virtual void StopRecording(void);
     virtual bool IsRecording(void);
