@@ -7,46 +7,106 @@
 #include <QStringList>
 #include <QTcpSocket>
 #include <QUrl>
+#include <QVector>
 
 // MythTV includes
 #include "cetonrtsp.h"
 #include "mythlogging.h"
+#include "mythsocket.h"
 
 
-#define LOC QString("CetonRTSP(%1): ").arg(_requestUrl)
+#define LOC QString("CetonRTSP(%1): ").arg(_requestUrl.toString())
 
 QMutex CetonRTSP::_rtspMutex;
 
 CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
-    _ip(ip),
-    _port(port),
+    _socket(NULL),
     _sequenceNumber(0),
     _sessionId("0"),
-    _responseCode(-1)
+    _responseCode(-1),
+    _timeout(60),
+    _timer(0)
 {
-    _requestUrl = QString("rtsp://%1:%2/cetonmpeg%3")
-        .arg(ip).arg(port).arg(tuner);
+    _requestUrl.setHost(ip);
+    _requestUrl.setPort(port);
+    _requestUrl.setScheme("rtsp");
+    _requestUrl.setPath(QString("cetonmpeg%1").arg(tuner));
 }
 
 CetonRTSP::CetonRTSP(const QUrl &url) :
-    _ip(url.host()),
-    _port((url.port() >= 0) ? url.port() : 554),
+    _socket(NULL),
     _sequenceNumber(0),
     _sessionId("0"),
-    _responseCode(-1)
+    _requestUrl(url),
+    _responseCode(-1),
+    _timeout(60),
+    _timer(0)
 {
-    _requestUrl = url.toString();
+    if (url.port() < 0)
+    {
+        // default rtsp port
+        _requestUrl.setPort(554);
+    }
+}
+
+CetonRTSP::~CetonRTSP()
+{
+    StopKeepAlive();
 }
 
 bool CetonRTSP::ProcessRequest(
-    const QString &method, const QStringList* headers)
+    const QString &method, const QStringList* headers,
+    bool use_control, bool waitforanswer)
 {
     QMutexLocker locker(&_rtspMutex);
-    QTcpSocket socket;
-    socket.connectToHost(_ip, _port);
+
+    _responseHeaders.clear();
+    _responseContent.clear();
+
+    // Create socket if socket object has never been created or in non-connected state
+    if (!_socket || _socket->state() != QAbstractSocket::ConnectedState)
+    {
+        if (!_socket)
+        {
+            _socket = new QTcpSocket();
+        }
+        else
+        {
+            _socket->close();
+        }
+        _socket->connectToHost(_requestUrl.host(), _requestUrl.port(),
+                               QAbstractSocket::ReadWrite);
+        bool ok = _socket->waitForConnected();
+
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Could not connect to server %1:%2")
+                .arg(_requestUrl.host()).arg(_requestUrl.port()));
+            delete _socket;
+            _socket = NULL;
+            return false;
+        }
+    }
+    else
+    {
+        // empty socket's waiting data just in case
+        _socket->waitForReadyRead(30);
+        do
+        {
+            QVector<char> trash;
+            uint avail = _socket->bytesAvailable();
+            trash.resize(std::max((uint)trash.size(), avail));
+            _socket->read(trash.data(), avail);
+            _socket->waitForReadyRead(30);
+        }
+        while (_socket->bytesAvailable() > 0);
+    }
 
     QStringList requestHeaders;
-    requestHeaders.append(QString("%1 %2 RTSP/1.0").arg(method, _requestUrl));
+    requestHeaders.append(QString("%1 %2 RTSP/1.0")
+        .arg(method)
+        .arg(use_control ? _controlUrl.toString() :  _requestUrl.toString()));
     requestHeaders.append(QString("User-Agent: MythTV Ceton Recorder"));
     requestHeaders.append(QString("CSeq: %1").arg(++_sequenceNumber));
     if (_sessionId != "0")
@@ -64,10 +124,13 @@ bool CetonRTSP::ProcessRequest(
 
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("write: %1").arg(request));
-    socket.write(request.toLatin1());
+    _socket->write(request.toLatin1());
 
     _responseHeaders.clear();
     _responseContent.clear();
+
+    if (!waitforanswer)
+        return true;
 
     QRegExp firstLineRegex(
         "^RTSP/1.0 (\\d+) ([^\r\n]+)", Qt::CaseSensitive, QRegExp::RegExp2);
@@ -79,18 +142,18 @@ bool CetonRTSP::ProcessRequest(
     bool firstLine = true;
     while (true)
     {
-        if (!socket.canReadLine())
+        if (!_socket->canReadLine())
         {
-            bool ready = socket.waitForReadyRead();
+            bool ready = _socket->waitForReadyRead(30 * 1000);
             if (!ready)
             {
-                LOG(VB_RECORD, LOG_ERR, LOC + "RTSP server did not respond");
+                LOG(VB_RECORD, LOG_ERR, LOC + "RTSP server did not respond after 30s");
                 return false;
             }
             continue;
         }
 
-        QString line = socket.readLine();
+        QString line = _socket->readLine();
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("read: %1").arg(line));
 
         if (firstLine)
@@ -108,6 +171,13 @@ bool CetonRTSP::ProcessRequest(
             _responseCode = parts.at(1).toInt();
             _responseMessage = parts.at(2);
 
+            if (_responseCode != 200)
+            {
+                _responseMessage =
+                    QString("Server couldn't process the request: '%1'")
+                    .arg(_responseMessage);
+                return false;
+            }
             firstLine = false;
             continue;
         }
@@ -125,7 +195,25 @@ bool CetonRTSP::ProcessRequest(
         _responseHeaders.insert(parts.at(1), parts.at(2));
     }
 
-    QString cSeq = _responseHeaders.value("CSeq");
+    QString cSeq;
+
+    if (_responseHeaders.contains("CSeq"))
+    {
+        cSeq = _responseHeaders["CSeq"];
+    }
+    else
+    {
+        // Handle broken implementation, such as VLC
+        // doesn't respect the case of "CSeq", so find it regardless of the spelling
+        foreach (QString key, _responseHeaders.keys())
+        {
+            if (key.compare("CSeq", Qt::CaseInsensitive) == 0)
+            {
+                cSeq = _responseHeaders.value(key);
+                break;
+            }
+        }
+    }
     if (cSeq != QString("%1").arg(_sequenceNumber))
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -142,10 +230,10 @@ bool CetonRTSP::ProcessRequest(
         int bytesRead = 0;
         while (bytesRead < contentLength)
         {
-            if (socket.bytesAvailable() == 0)
-                socket.waitForReadyRead();
+            if (_socket->bytesAvailable() == 0)
+                _socket->waitForReadyRead();
 
-            int count = socket.read(data+bytesRead, contentLength-bytesRead);
+            int count = _socket->read(data+bytesRead, contentLength-bytesRead);
             if (count == -1)
             {
                 _responseCode = -1;
@@ -154,6 +242,8 @@ bool CetonRTSP::ProcessRequest(
             }
             bytesRead += count;
         }
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("received: %1").arg(_responseContent.constData()));
     }
     return true;
 }
@@ -168,22 +258,150 @@ bool CetonRTSP::GetOptions(QStringList &options)
     return false;
 }
 
+/**
+ * splitLines. prepare SDP content for easy read
+ */
+QStringList CetonRTSP::splitLines(const QByteArray &lines)
+{
+    QStringList list;
+    QTextStream stream(lines);
+    QString line;
+
+    do
+    {
+        line = stream.readLine();
+        if (!line.isNull())
+        {
+            list.append(line);
+        }
+    }
+    while (!line.isNull());
+
+    return list;
+}
+
+/**
+ * readParamaters. Scan a line like: Session: 1234556;destination=xx;client_port
+ * and return the first entry and fill the arguments in the provided Params
+ */
+QString CetonRTSP::readParamaters(const QString &key, Params &parameters)
+{
+    QString val;
+
+    if (!_responseHeaders.contains(key))
+    {
+        return val;
+    }
+
+    QStringList header = _responseHeaders.value(key).split(";");
+
+    for (int i = 0; i < header.size(); i++)
+    {
+        QString entry = header[i].trimmed();
+
+        if (i ==0)
+        {
+            val = entry;
+            continue;
+        }
+        QStringList args = entry.split("=");
+
+        parameters.insert(args[0].trimmed(),
+                          args.size() > 1 ? args[1].trimmed() : QString());
+    }
+    return val;
+}
+
+/**
+ * Return the base URL for the last DESCRIBE answer
+ */
+QUrl CetonRTSP::GetBaseUrl(void)
+{
+    if (_responseHeaders.contains("Content-Base"))
+    {
+        return _responseHeaders["Content-Base"];
+    }
+    if (_responseHeaders.contains("Content-Location"))
+    {
+        return _responseHeaders["Content-Location"];
+    }
+    return _requestUrl;
+}
+
 bool CetonRTSP::Describe(void)
 {
-    if (!ProcessRequest("DESCRIBE"))
+    QStringList headers;
+
+    headers.append("Accept: application/sdp");
+
+    if (!ProcessRequest("DESCRIBE", &headers))
         return false;
 
-    if (!_responseContent.contains("m=video 0 RTP/AVP 33"))
+    // find control url
+    QStringList lines = splitLines(_responseContent);
+    bool found = false;
+    QUrl base = _controlUrl = GetBaseUrl();
+
+    foreach (QString line, lines)
+    {
+        if (line.startsWith("m="))
+        {
+            if (found)
+            {
+                // another new stream, no need to parse further
+                break;
+            }
+            if (!line.startsWith("m=video"))
+            {
+                // not a video stream
+                continue;
+            }
+            QStringList args = line.split(" ");
+            if (args[2] == "RTP/AVP" && args[3] == "33")
+            {
+                found = true;
+            }
+            continue;
+        }
+        if (line.startsWith("c="))
+        {
+            // TODO, connection parameter
+            // assume we will always get a control entry
+            continue;
+        }
+        if (line.startsWith("a=control:"))
+        {
+            // Per RFC: a=control:rtsp://example.com/foo
+            // This attribute may contain either relative and absolute URLs,
+            // following the rules and conventions set out in RFC 1808 [25].
+            QString url = line.mid(10).trimmed();
+            _controlUrl = url;
+            if (url == "*")
+            {
+                _controlUrl = base;
+            }
+            else if (_controlUrl.isRelative())
+            {
+                _controlUrl = base.resolved(_controlUrl);
+            }
+            continue;
+        }
+    }
+
+    if (!found)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "expected content to be type "
             "\"m=video 0 RTP/AVP 33\" but it appears not to be");
+        _controlUrl = QUrl();
         return false;
     }
 
     return true;
 }
 
-bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2)
+bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
+                      ushort &rtpPort, ushort &rtcpPort,
+                      uint32_t &ssrc)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("CetonRTSP: ") +
         QString("Transport: RTP/AVP;unicast;client_port=%1-%2")
@@ -194,15 +412,43 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2)
         QString("Transport: RTP/AVP;unicast;client_port=%1-%2")
         .arg(clientPort1).arg(clientPort2));
 
-    if (!ProcessRequest("SETUP", &extraHeaders))
+    if (!ProcessRequest("SETUP", &extraHeaders, true))
         return false;
 
-    _sessionId = _responseHeaders.value("Session");
-    if (_sessionId.size() < 8)
+    Params params;
+    QString session = readParamaters("Session", params);
+
+    if (session.isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             "session id not found in SETUP response");
         return false;
+    }
+    if (session.size() < 8)
+    {
+        LOG(VB_RECORD, LOG_WARNING, LOC +
+            "invalid session id received");
+    }
+    _sessionId = session;
+
+    if (params.contains("timeout"))
+    {
+        _timeout = params["timeout"].toInt();
+    }
+
+    QString transport = readParamaters("Transport", params);
+    if (params.contains("ssrc"))
+    {
+        bool ok;
+        ssrc = params["ssrc"].toUInt(&ok, 16);
+    }
+    if (params.contains("server_port"))
+    {
+        QString line = params["server_port"];
+        QStringList val = line.split("-");
+
+        rtpPort = val[0].toInt();
+        rtcpPort = val.size() > 1 ? val[1].toInt() : 0;
     }
 
     return true;
@@ -210,12 +456,51 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2)
 
 bool CetonRTSP::Play(void)
 {
-    return ProcessRequest("PLAY");
+    bool result = ProcessRequest("PLAY");
+
+    StartKeepAlive();
+    return result;
 }
 
 bool CetonRTSP::Teardown(void)
 {
+    StopKeepAlive();
+
     bool result = ProcessRequest("TEARDOWN");
+
+    QMutexLocker locker(&_rtspMutex);
+
+    delete _socket;
+    _socket = NULL;
+
     _sessionId = "0";
     return result;
+}
+
+void CetonRTSP::StartKeepAlive()
+{
+    if (_timer)
+        return;
+    int timeout = std::max(_timeout - 5, 5);
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("Start KeepAlive, every %1s").arg(timeout));
+    _timer = startTimer(timeout * 1000);
+}
+
+void CetonRTSP::StopKeepAlive()
+{
+    if (_timer)
+    {
+        killTimer(_timer);
+        LOG(VB_RECORD, LOG_DEBUG, LOC + "Stop KeepAlive");
+    }
+    _timer = 0;
+}
+
+void CetonRTSP::timerEvent(QTimerEvent*)
+{
+    QStringList dummy;
+
+    LOG(VB_RECORD, LOG_DEBUG, LOC + "Sending KeepAlive");
+    ProcessRequest("GET_PARAMETER", NULL, false, false);
 }

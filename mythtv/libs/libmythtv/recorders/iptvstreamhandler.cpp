@@ -14,6 +14,8 @@
 
 // Qt headers
 #include <QUdpSocket>
+#include <QByteArray>
+#include <QHostInfo>
 
 // MythTV headers
 #include "iptvstreamhandler.h"
@@ -22,6 +24,7 @@
 #include "rtptsdatapacket.h"
 #include "rtpdatapacket.h"
 #include "rtpfecpacket.h"
+#include "rtcpdatapacket.h"
 #include "mythlogging.h"
 #include "cetonrtsp.h"
 
@@ -107,7 +110,10 @@ IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
     StreamHandler(tuning.GetDeviceKey()),
     m_tuning(tuning),
     m_write_helper(NULL),
-    m_buffer(NULL)
+    m_buffer(NULL),
+    m_rtsp_rtp_port(0),
+    m_rtsp_rtcp_port(0),
+    m_rtsp_ssrc(0)
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     memset(m_read_helpers, 0, sizeof(m_read_helpers));
@@ -133,9 +139,9 @@ void IPTVStreamHandler::run(void)
 
         // Check RTSP capabilities
         QStringList options;
-        if (!(rtsp->GetOptions(options)     && options.contains("OPTIONS")  &&
-              options.contains("DESCRIBE")  && options.contains("SETUP")    &&
-              options.contains("PLAY")      && options.contains("TEARDOWN")))
+        if (!(rtsp->GetOptions(options)     && options.contains("DESCRIBE") &&
+              options.contains("SETUP")     && options.contains("PLAY")     &&
+              options.contains("TEARDOWN")))
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 "RTSP interface did not support the necessary options");
@@ -155,31 +161,75 @@ void IPTVStreamHandler::run(void)
             return;
         }
 
-        tuning = IPTVTuningData(
-            QString("rtp://%1@%2:0")
-            .arg(m_tuning.GetURL(0).host())
-            .arg(QHostAddress(QHostAddress::Any).toString()), 0,
-            IPTVTuningData::kNone,
-            QString("rtp://%1@%2:0")
-            .arg(m_tuning.GetURL(0).host())
-            .arg(QHostAddress(QHostAddress::Any).toString()), 0,
-            "", 0);
+        m_use_rtp_streaming = true;
+
+        QUrl urltuned = m_tuning.GetURL(0);
+        urltuned.setScheme("rtp");
+        urltuned.setPort(0);
+        tuning = IPTVTuningData(urltuned.toString(), 0, IPTVTuningData::kNone,
+                                urltuned.toString(), 0, "", 0);
     }
 
     bool error = false;
+    int start_port = 0;
     for (uint i = 0; i < IPTV_SOCKET_COUNT; i++)
     {
         QUrl url = tuning.GetURL(i);
         if (url.port() < 0)
             continue;
 
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("setting up url[%1]:%2").arg(i).arg(url.toString()));
+
+        // always ensure we use consecutive port numbers
+        int port = start_port ? start_port + 1 : url.port();
+        QString host = url.host();
+        QHostAddress dest_addr(host);
+
+        if (!host.isEmpty() && dest_addr.isNull())
+        {
+            // address is a hostname, attempts to resolve it
+            QHostInfo info = QHostInfo::fromName(host);
+            QList<QHostAddress> list = info.addresses();
+
+            if (list.isEmpty())
+            {
+                LOG(VB_RECORD, LOG_ERR, LOC +
+                    QString("Can't resolve hostname:'%1'").arg(host));
+            }
+            else
+            {
+                for (int i=0; i < list.size(); i++)
+                {
+                    dest_addr = list[i];
+                    if (list[i].protocol() == QAbstractSocket::IPv6Protocol)
+                    {
+                        // We prefer first IPv4
+                        break;
+                    }
+                }
+                LOG(VB_RECORD, LOG_DEBUG, LOC +
+                    QString("resolved %1 as %2").arg(host).arg(dest_addr.toString()));
+            }
+        }
+        bool ipv6 = dest_addr.protocol() == QAbstractSocket::IPv6Protocol;
+        bool is_multicast = ipv6 ?
+            dest_addr.isInSubnet(QHostAddress::parseSubnet("ff00::/8")) :
+            (dest_addr.toIPv4Address() & 0xf0000000) == 0xe0000000;
+
         m_sockets[i] = new QUdpSocket();
+        if (!is_multicast)
+        {
+            // this allow to filter incoming traffic, and make sure it's from
+            // the requested server
+            m_sender[i] = dest_addr;
+        }
         m_read_helpers[i] = new IPTVStreamHandlerReadHelper(
             this, m_sockets[i], i);
 
         // we need to open the descriptor ourselves so we
         // can set some socket options
-        int fd = socket(AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
+        int fd = socket(ipv6 ? AF_INET6 : AF_INET, SOCK_DGRAM, 0); // create IPv4 socket
         if (fd < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -189,55 +239,44 @@ void IPTVStreamHandler::run(void)
         int buf_size = 2 * 1024 * max(tuning.GetBitrate(i)/1000, 500U);
         if (!tuning.GetBitrate(i))
             buf_size = 2 * 1024 * 1024;
-        int ok = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+        int err = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
                             (char *)&buf_size, sizeof(buf_size));
-        if (ok)
+        if (err)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Increasing buffer size to %1 failed")
                 .arg(buf_size) + ENO);
         }
-        /*
-          int broadcast = 1;
-          ok = setsockopt(fd, SOL_SOCKET, SO_BROADCAST,
-          (char *)&broadcast, sizeof(broadcast));
-          if (ok)
-          {
-          LOG(VB_GENERAL, LOG_INFO, LOC +
-          QString("Enabling broadcast failed") + ENO);
-          }
-        */
+
         m_sockets[i]->setSocketDescriptor(
             fd, QAbstractSocket::UnconnectedState, QIODevice::ReadOnly);
 
-        QHostAddress dest_addr(tuning.GetURL(i).host());
-
-        if (!m_sockets[i]->bind(dest_addr, url.port()))
+        // we bind to destination address if it's a multicast address, or
+        // the local ones otherwise
+        if (!m_sockets[i]->bind(is_multicast ?
+                                dest_addr :
+                                (ipv6 ? QHostAddress::AnyIPv6 : QHostAddress::Any),
+                                port))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Binding to port failed.");
             error = true;
         }
-
-        if (dest_addr != QHostAddress::Any)
+        else
         {
-            //m_sockets[i]->joinMulticastGroup(dest_addr); // needs Qt 4.8
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Joining %1")
-                .arg(dest_addr.toString()));
-            struct ip_mreq imr;
-            memset(&imr, 0, sizeof(struct ip_mreq));
-            imr.imr_multiaddr.s_addr = inet_addr(
-                dest_addr.toString().toLatin1().constData());
-            imr.imr_interface.s_addr = htonl(INADDR_ANY);
-            if (setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                           &imr, sizeof(imr)) < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "setsockopt - IP_ADD_MEMBERSHIP " + ENO);
-            }
+            start_port = m_sockets[i]->localPort();
         }
 
-        if (!url.userInfo().isEmpty())
-            m_sender[i] = QHostAddress(url.userInfo());
+        if (is_multicast)
+        {
+            m_sockets[i]->joinMulticastGroup(dest_addr);
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Joining %1")
+                .arg(dest_addr.toString()));
+        }
+
+        if (!is_multicast && rtsp && i == 1)
+        {
+            m_rtcp_dest = dest_addr;
+        }
     }
 
     if (!error)
@@ -246,20 +285,26 @@ void IPTVStreamHandler::run(void)
             m_buffer = new RTPPacketBuffer(tuning.GetBitrate(0));
         else
             m_buffer = new UDPPacketBuffer(tuning.GetBitrate(0));
-        m_write_helper = new IPTVStreamHandlerWriteHelper(this);
+        m_write_helper =
+            new IPTVStreamHandlerWriteHelper(this);
         m_write_helper->Start();
     }
 
     if (!error && rtsp)
     {
         // Start Streaming
-        if (!rtsp->Setup(m_sockets[0]->localPort(),
-                         m_sockets[1]->localPort()) ||
+        if (!rtsp->Setup(m_sockets[0]->localPort(), m_sockets[1]->localPort(),
+                         m_rtsp_rtp_port, m_rtsp_rtcp_port, m_rtsp_ssrc) ||
             !rtsp->Play())
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 "Starting recording (RTP initialization failed). Aborting.");
             error = true;
+        }
+        if (m_rtsp_rtcp_port > 0)
+        {
+            m_write_helper->SendRTCPReport();
+            m_write_helper->StartRTCPRR();
         }
     }
 
@@ -304,6 +349,8 @@ IPTVStreamHandlerReadHelper::IPTVStreamHandlerReadHelper(
             this,     SLOT(ReadPending()));
 }
 
+#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->_device)
+
 void IPTVStreamHandlerReadHelper::ReadPending(void)
 {
     QHostAddress sender;
@@ -320,7 +367,17 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
             m_socket->readDatagram(data.data(), data.size(),
                                    &sender, &senderPort);
             if (sender_null || sender == m_sender)
+            {
                 m_parent->m_buffer->PushDataPacket(packet);
+            }
+            else
+            {
+                LOG(VB_RECORD, LOG_WARNING, LOC_WH +
+                    QString("Received on socket(%1) %2 bytes from non expected "
+                            "sender:%3 (expected:%4) ignoring")
+                    .arg(m_stream).arg(data.size())
+                    .arg(sender.toString()).arg(m_sender.toString()));
+            }
         }
     }
     else
@@ -333,15 +390,51 @@ void IPTVStreamHandlerReadHelper::ReadPending(void)
             m_socket->readDatagram(data.data(), data.size(),
                                    &sender, &senderPort);
             if (sender_null || sender == m_sender)
+            {
                 m_parent->m_buffer->PushFECPacket(packet, m_stream - 1);
+            }
+            else
+            {
+                LOG(VB_RECORD, LOG_WARNING, LOC_WH +
+                    QString("Received on socket(%1) %2 bytes from non expected "
+                            "sender:%3 (expected:%4) ignoring")
+                    .arg(m_stream).arg(data.size())
+                    .arg(sender.toString()).arg(m_sender.toString()));
+            }
         }
     }
 }
 
-#define LOC_WH QString("IPTVSH(%1): ").arg(m_parent->_device)
-
-void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
+IPTVStreamHandlerWriteHelper::IPTVStreamHandlerWriteHelper(IPTVStreamHandler *p)
+  : m_parent(p),                m_timer(0),             m_timer_rtcp(0),
+    m_last_sequence_number(0),  m_last_timestamp(0),
+    m_lost(0),                  m_lost_interval(0)
 {
+}
+
+IPTVStreamHandlerWriteHelper::~IPTVStreamHandlerWriteHelper()
+{
+    if (m_timer)
+    {
+        killTimer(m_timer);
+    }
+    if (m_timer_rtcp)
+    {
+        killTimer(m_timer_rtcp);
+    }
+    m_timer = 0;
+    m_timer_rtcp = 0;
+    m_parent = NULL;
+}
+
+void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)
+{
+    if (event->timerId() == m_timer_rtcp)
+    {
+        SendRTCPReport();
+        return;
+    }
+
     if (!m_parent->m_buffer->HasAvailablePacket())
         return;
 
@@ -401,8 +494,17 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
                 LOG(VB_RECORD, LOG_INFO, LOC_WH +
                     QString("Sequence number mismatch %1!=%2")
                     .arg(seq_num).arg(exp_seq_num));
+                if (seq_num > exp_seq_num)
+                {
+                    m_lost_interval = seq_num - exp_seq_num;
+                    m_lost += m_lost_interval;
+                }
             }
             m_last_sequence_number = seq_num;
+            m_last_timestamp = ts_packet.GetTimeStamp();
+            LOG(VB_RECORD, LOG_DEBUG,
+                QString("Processing RTP packet(seq:%1 ts:%2)")
+                .arg(m_last_sequence_number).arg(m_last_timestamp));
 
             m_parent->_listener_lock.lock();
 
@@ -424,7 +526,29 @@ void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent*)
                     .arg(ts_packet.GetTSDataSize()).arg(remainder));
             }
         }
-
         m_parent->m_buffer->FreePacket(packet);
     }
+}
+
+void IPTVStreamHandlerWriteHelper::SendRTCPReport(void)
+{
+    if (m_parent->m_rtcp_dest.isNull())
+    {
+        // no point sending data if we don't know where to
+        return;
+    }
+    int seq_delta = m_last_sequence_number - m_previous_last_sequence_number;
+    RTCPDataPacket rtcp =
+        RTCPDataPacket(m_last_timestamp, m_last_timestamp + RTCP_TIMER * 1000,
+                       m_last_sequence_number, m_last_sequence_number + seq_delta,
+                       m_lost, m_lost_interval, m_parent->m_rtsp_ssrc);
+    QByteArray buf = rtcp.GetData();
+
+    LOG(VB_RECORD, LOG_DEBUG, LOC_WH +
+        QString("Sending RTCPReport to %1:%2")
+        .arg(m_parent->m_rtcp_dest.toString())
+        .arg(m_parent->m_rtsp_rtcp_port));
+    m_parent->m_sockets[1]->writeDatagram(buf.constData(), buf.size(),
+                                          m_parent->m_rtcp_dest, m_parent->m_rtsp_rtcp_port);
+    m_previous_last_sequence_number = m_last_sequence_number;
 }
