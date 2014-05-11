@@ -7,58 +7,40 @@
 #ifndef CETONRTSP_H
 #define CETONRTSP_H
 
-#include <QMap>
+#include <QObject>
+#include <QHash>
 #include <QString>
 #include <QMutex>
-#include <QUrl>
 
-class QTcpSocket;
-class QUdpSocket;
+class QUrl;
 
-typedef QMap<QString, QString> Params;
-
-class CetonRTSP : QObject
+class CetonRTSP
 {
-    Q_OBJECT
-
   public:
     explicit CetonRTSP(const QString &ip, uint tuner, ushort port);
     explicit CetonRTSP(const QUrl&);
-    ~CetonRTSP();
 
     bool GetOptions(QStringList &options);
     bool Describe(void);
-    bool Setup(ushort clientPort1, ushort clientPort2,
-               ushort &rtpPort, ushort &rtcpPort, uint32_t &ssrc);
+    bool Setup(ushort clientPort1, ushort clientPort2);
     bool Play(void);
     bool Teardown(void);
 
-    void StartKeepAlive(void);
-    void StopKeepAlive(void);
-
-protected:
+  protected:
     bool ProcessRequest(
-        const QString &method, const QStringList *headers = NULL,
-                        bool use_control = false, bool waitforanswer = true);
+        const QString &method, const QStringList *headers = NULL);
 
   private:
-    QStringList splitLines(const QByteArray &lines);
-    QString readParamaters(const QString &key, Params &parameters);
-    QUrl GetBaseUrl(void);
-    void timerEvent(QTimerEvent*);
-
-    QTcpSocket *_socket;
+    QString     _ip;
+    ushort      _port;
     uint        _sequenceNumber;
     QString     _sessionId;
-    QUrl        _requestUrl;
-    QUrl        _controlUrl;
+    QString     _requestUrl;
 
     int                     _responseCode;
     QString                 _responseMessage;
-    Params                  _responseHeaders;
+    QHash<QString,QString>  _responseHeaders;
     QByteArray              _responseContent;
-    int                     _timeout;
-    int                     _timer;
 
     static QMutex _rtspMutex;
 
