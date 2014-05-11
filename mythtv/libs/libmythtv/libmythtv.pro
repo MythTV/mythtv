@@ -653,6 +653,7 @@ using_backend {
     HEADERS += recorders/rtp/rtppacketbuffer.h
     HEADERS += recorders/rtp/rtpdatapacket.h
     HEADERS += recorders/rtp/rtpfecpacket.h
+    HEADERS += recorders/rtp/rtcpdatapacket.h
 
     SOURCES += recorders/cetonrtsp.cpp
     SOURCES += recorders/iptvchannel.cpp
