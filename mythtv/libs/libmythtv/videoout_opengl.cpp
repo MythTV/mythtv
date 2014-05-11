@@ -477,7 +477,10 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
         pauseframe = true;
     }
 
-    CropToDisplay(frame);
+    if (sw_frame)
+    {
+        CropToDisplay(frame);
+    }
 
     bool dummy = frame->dummy;
     if (filterList && sw_frame && !dummy)
