@@ -1163,6 +1163,14 @@ void VideoDialog::loadData()
             return;
 
         MythGenericTree *selectedNode = m_d->m_currentNode->getSelectedChild();
+        if ((m_d->m_type == DLG_BROWSER) && (selectedNode->getInt() == kUpFolder))
+        {
+            MythGenericTree *next = selectedNode->nextSibling(1);
+            if (next)
+            {
+                selectedNode = next;
+            }
+        }
 
         // restore the last saved position in the video tree if this is the first
         // time this method is called and the option is set in the database
