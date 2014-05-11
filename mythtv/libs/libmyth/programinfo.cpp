@@ -3879,11 +3879,17 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
                 "      recordedmarkup.type      >= :ASPECTSTART AND "
                 "      recordedmarkup.type      <= :ASPECTEND "
                 "GROUP BY recordedmarkup.type "
-                "ORDER BY SUM( ( SELECT IFNULL(rm.mark, recordedmarkup.mark)"
+                "ORDER BY SUM( ( SELECT IFNULL(rm.mark, ( "
+                "                  SELECT MAX(rmmax.mark) "
+                "                  FROM recordedmarkup AS rmmax "
+                "                  WHERE rmmax.chanid    = recordedmarkup.chanid "
+                "                    AND rmmax.starttime = recordedmarkup.starttime "
+                "                ) ) "
                 "                FROM recordedmarkup AS rm "
                 "                WHERE rm.chanid    = recordedmarkup.chanid    AND "
                 "                      rm.starttime = recordedmarkup.starttime AND "
-                "                      rm.type      = recordedmarkup.type      AND "
+                "                      rm.type      >= :ASPECTSTART2           AND "
+                "                      rm.type      <= :ASPECTEND2             AND "
                 "                      rm.mark      > recordedmarkup.mark "
                 "                ORDER BY rm.mark ASC LIMIT 1 "
                 "              ) - recordedmarkup.mark "
@@ -3893,6 +3899,8 @@ MarkTypes ProgramInfo::QueryAverageAspectRatio(void ) const
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":ASPECTSTART", MARK_ASPECT_4_3); // 11
     query.bindValue(":ASPECTEND", MARK_ASPECT_CUSTOM); // 14
+    query.bindValue(":ASPECTSTART2", MARK_ASPECT_4_3); // 11
+    query.bindValue(":ASPECTEND2", MARK_ASPECT_CUSTOM); // 14
 
     if (!query.exec())
     {

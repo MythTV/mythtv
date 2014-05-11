@@ -43,7 +43,7 @@ class Script( object ):
     _xp_info = lxml.etree.XPath("//span[@id='script-info']/text()")
     _xp_names = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/p/b/text()")
     _xp_code = lxml.etree.XPath("//div[@id='bodyContent']/div[@style='background: #EFEFEF; border: 1px dashed black; padding: 5px 5px 5px 5px;']/pre/text()")
-    _xp_cat = lxml.etree.XPath("//div[@id='mw-normal-catlinks']/span/a/text()")
+    _xp_cat = lxml.etree.XPath("//div[@id='mw-normal-catlinks']/ul/li/a/text()")
 
     @classmethod
     def getAll(cls, refresh=False):

@@ -2755,6 +2755,12 @@ def createDVDAuthorXML(screensize, numberofitems):
         post .appendChild(dvddom.createTextNode("{g3=1;g2=1;jump menu 2;}"))
         pgc.appendChild(post)
         del post
+    else:
+        # If there's no intro, we need to jump to the next menu
+        post = dvddom.createElement("post")
+        post .appendChild(dvddom.createTextNode("{g3=1;g2=1;jump menu 2;}"))
+        pgc.appendChild(post)
+        del post
 
     while itemnum <= numberofitems:
         write( "Menu page %s" % page)
