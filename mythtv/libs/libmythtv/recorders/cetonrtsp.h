@@ -7,6 +7,8 @@
 #ifndef CETONRTSP_H
 #define CETONRTSP_H
 
+#include <stdint.h>
+
 #include <QMap>
 #include <QString>
 #include <QMutex>
