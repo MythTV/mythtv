@@ -9,10 +9,12 @@
 
 #include <stdint.h>
 
+#include <QObject>
 #include <QMap>
 #include <QString>
 #include <QMutex>
 #include <QUrl>
+#include <QTimerEvent>
 
 class QTcpSocket;
 class QUdpSocket;
