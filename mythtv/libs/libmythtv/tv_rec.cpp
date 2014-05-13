@@ -802,7 +802,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
     if (curRec->IsCommercialFree())
         curRec->SaveCommFlagged(COMM_FLAG_COMMFREE);
 
-    AutoRunInitType t = (curRec->QueryRecordingGroup() == "LiveTV") ?
+    AutoRunInitType t = (curRec->GetRecordingGroup() == "LiveTV") ?
         kAutoRunNone : kAutoRunProfile;
     InitAutoRunJobs(curRec, t, NULL, __LINE__);
 
@@ -4510,7 +4510,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     }
 
     if (!pseudoLiveTVRecording)
-        prog->ApplyRecordRecGroupChange("LiveTV");
+        prog->SetRecordingGroup("LiveTV");
 
     StartedRecording(prog);
 
