@@ -636,7 +636,6 @@ uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
     m_outputSurfaces.insert(id, VDPAUOutputSurface(tmp, size, fmt));
     id_lock.unlock();
 
-    DrawBitmap(0, id, NULL, NULL);
     return id;
 }
 
@@ -796,7 +795,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 
     int count = 0;
     VdpVideoMixerFeature feat[6];
-    VdpBool enable = true;
+    VdpBool enable = VDP_TRUE;
     const VdpBool enables[6] = { enable, enable, enable, enable, enable, enable };
 
     bool temporal = (features & kVDPFeatTemporal) ||
@@ -854,13 +853,16 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
         return 0;
     }
 
-    vdp_st = vdp_video_mixer_set_feature_enables(
-        tmp, count, count ? feat : NULL, count ? enables : NULL);
-    CHECK_ST
+    if (count)
+    {
+        vdp_st = vdp_video_mixer_set_feature_enables(
+            tmp, count, feat, enables);
+        CHECK_ST
 
-    if (!ok)
-        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-            "WARNING: Failed to enable video mixer features.");
+        if (!ok)
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                "WARNING: Failed to enable video mixer features.");
+    }
 
     if (existing)
     {
