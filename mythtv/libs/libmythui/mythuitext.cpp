@@ -765,8 +765,9 @@ void MythUIText::FillCutMessage(void)
                                            QCoreApplication::UnicodeUTF8,
                                            qAbs(value));
 #else
-                        m_CutMessage = qApp->translate("ThemeUI",
-                                m_TemplateText.toUtf8(), NULL, qAbs(value));
+            m_CutMessage = qApp->translate("ThemeUI",
+                                           m_TemplateText.toUtf8(), NULL,
+                                           qAbs(value));
 #endif
 
         }
