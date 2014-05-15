@@ -95,8 +95,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
 }
 
 HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning) :
-    IPTVStreamHandler(tuning),
-    m_tuning(tuning)
+    IPTVStreamHandler(tuning)
 {
     m_hls       = new HLSReader();
     m_buffer    = new uint8_t[BUFFER_SIZE];
