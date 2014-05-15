@@ -308,37 +308,37 @@ class PTSListener :
     }
     bool ProcessTSPacket(const TSPacket &tspacket);
     bool ProcessVideoTSPacket(const TSPacket &tspacket)
-        { return ProcessTSPacket(tspacket); }
+    { return ProcessTSPacket(tspacket); }
     bool ProcessAudioTSPacket(const TSPacket &tspacket)
-        { return ProcessTSPacket(tspacket); }
+    { return ProcessTSPacket(tspacket); }
     int64_t GetFirstPTS(void) const
+    {
+        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+        int64_t pts = -1LL;
+        uint32_t pts_count = 0;
+        for (; it != m_pts_streams.end(); ++it)
         {
-            QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
-            int64_t pts = -1LL;
-            uint32_t pts_count = 0;
-            for (; it != m_pts_streams.end(); ++it)
-            {
-                if(m_pts_count[*it] > pts_count){
-                    pts = m_pts_first[*it];
-                    pts_count = m_pts_count[*it];
-                }
+            if(m_pts_count[*it] > pts_count){
+                pts = m_pts_first[*it];
+                pts_count = m_pts_count[*it];
             }
-            return pts;
         }
+        return pts;
+    }
     int64_t GetLastPTS(void) const
+    {
+        QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
+        int64_t pts = -1LL;
+        uint32_t pts_count = 0;
+        for (; it != m_pts_streams.end(); ++it)
         {
-            QMap<uint,uint>::const_iterator it = m_pts_streams.begin();
-            int64_t pts = -1LL;
-            uint32_t pts_count = 0;
-            for (; it != m_pts_streams.end(); ++it)
-            {
-                if(m_pts_count[*it] > pts_count){
-                    pts = m_pts_last[*it];
-                    pts_count = m_pts_count[*it];
-                }
+            if(m_pts_count[*it] > pts_count){
+                pts = m_pts_last[*it];
+                pts_count = m_pts_count[*it];
             }
-            return pts;
         }
+        return pts;
+    }
     int64_t GetElapsedPTS(void) const
     {
         int64_t elapsed = GetLastPTS() - GetFirstPTS();
