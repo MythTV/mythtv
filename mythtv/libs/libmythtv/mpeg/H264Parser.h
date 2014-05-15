@@ -114,6 +114,7 @@ class H264Parser {
     };
 
     H264Parser(void);
+    H264Parser(const H264Parser& rhs);
     ~H264Parser(void) {delete [] rbsp_buffer;}
 
     uint32_t addBytes(const uint8_t  *bytes,
