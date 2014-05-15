@@ -928,13 +928,13 @@ int MythPlayer::OpenFile(uint retries)
     int testreadsize = 2048;
 
     MythTimer bigTimer; bigTimer.start();
-    int timeout = (retries + 1) * 500;
+    int timeout = (retries + 1) * 600;
     while (testreadsize <= kDecoderProbeBufferSize)
     {
         MythTimer peekTimer; peekTimer.start();
         while (player_ctx->buffer->Peek(testbuf, testreadsize) != testreadsize)
         {
-            if (peekTimer.elapsed() > 1000 || bigTimer.elapsed() > timeout)
+            if (peekTimer.elapsed() > 1500 || bigTimer.elapsed() > timeout)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("OpenFile(): Could not read first %1 bytes of '%2'")
@@ -5499,4 +5499,3 @@ static unsigned dbg_ident(const MythPlayer *player)
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-
