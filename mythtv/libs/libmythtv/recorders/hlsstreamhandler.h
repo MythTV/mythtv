@@ -35,7 +35,7 @@ class HLSStreamHandler : public IPTVStreamHandler
 
   protected:
     HLSReader*     m_hls;
-    uint8_t*       m_buffer;
+    uint8_t*       m_readbuffer;
     bool           m_throttle;
 
     // for implementing Get & Return
