@@ -34,7 +34,6 @@ class HLSStreamHandler : public IPTVStreamHandler
     virtual void run(void); // MThread
 
   protected:
-    IPTVTuningData m_tuning;
     HLSReader*     m_hls;
     uint8_t*       m_buffer;
     bool           m_throttle;
