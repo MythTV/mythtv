@@ -296,17 +296,17 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     UPnpCDSRequest           request;
 
     DetermineClient( pRequest, &request );
-    request.m_sObjectId         = pRequest->m_mapParams[ "objectid"      ];
-    request.m_sContainerID      = pRequest->m_mapParams[ "containerid"   ];
+    request.m_sObjectId         = pRequest->m_mapParams[ "ObjectID"      ];
+    request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
     request.m_sParentId         = "0";
     request.m_eBrowseFlag       =
-        GetBrowseFlag( pRequest->m_mapParams[ "browseflag"    ] );
-    request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
+        GetBrowseFlag( pRequest->m_mapParams[ "BrowseFlag"    ] );
+    request.m_sFilter           = pRequest->m_mapParams[ "Filter"        ];
     request.m_nStartingIndex    =
-        pRequest->m_mapParams[ "startingindex" ].toLong();
+        pRequest->m_mapParams[ "StartingIndex" ].toLong();
     request.m_nRequestedCount   =
-        pRequest->m_mapParams[ "requestedcount"].toLong();
-    request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
+        pRequest->m_mapParams[ "RequestedCount"].toLong();
+    request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
 
 #if 0
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::ProcessRequest \n"
@@ -493,15 +493,15 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     QString       sResultXML;
 
     DetermineClient( pRequest, &request );
-    request.m_sObjectId         = pRequest->m_mapParams[ "objectid"      ];
-    request.m_sContainerID      = pRequest->m_mapParams[ "containerid"   ];
-    request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
+    request.m_sObjectId         = pRequest->m_mapParams[ "ObjectID"      ];
+    request.m_sContainerID      = pRequest->m_mapParams[ "ContainerID"   ];
+    request.m_sFilter           = pRequest->m_mapParams[ "Filter"        ];
     request.m_nStartingIndex    =
-        pRequest->m_mapParams[ "startingIndex" ].toLong();
+        pRequest->m_mapParams[ "StartingIndex" ].toLong();
     request.m_nRequestedCount   =
-        pRequest->m_mapParams[ "requestedcount"].toLong();
-    request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
-    request.m_sSearchCriteria   = pRequest->m_mapParams[ "searchcriteria"];
+        pRequest->m_mapParams[ "RequestedCount"].toLong();
+    request.m_sSortCriteria     = pRequest->m_mapParams[ "SortCriteria"  ];
+    request.m_sSearchCriteria   = pRequest->m_mapParams[ "SearchCriteria"];
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleSearch ObjectID=%1, ContainerId=%2")
