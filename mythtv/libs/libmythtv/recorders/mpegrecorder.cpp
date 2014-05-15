@@ -1337,15 +1337,12 @@ bool MpegRecorder::StartEncoding(void)
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding started");
     }
-    else if ((ENOTTY == errno) || (EINVAL == errno))
+    else if (errno != ENOTTY && errno != EINVAL)
     {
         // Some drivers do not support this ioctl at all.  It is marked as
         // "experimental" in the V4L2 API spec. These drivers return EINVAL
         // in older kernels and ENOTTY in 3.1+
-        started = true;
-    }
-    else
-    {
+
         LOG(VB_GENERAL, LOG_WARNING, LOC + "StartEncoding failed" + ENO);
     }
 
@@ -1381,15 +1378,12 @@ void MpegRecorder::StopEncoding(void)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Encoding stopped");
     }
-    else if ((ENOTTY == errno) || (EINVAL == errno))
+    else if (errno != ENOTTY && errno != EINVAL)
     {
         // Some drivers do not support this ioctl at all.  It is marked as
         // "experimental" in the V4L2 API spec. These drivers return EINVAL
         // in older kernels and ENOTTY in 3.1+
-        stopped = true;
-    }
-    else
-    {
+
         LOG(VB_GENERAL, LOG_WARNING, LOC + "StopEncoding failed" + ENO);
     }
 

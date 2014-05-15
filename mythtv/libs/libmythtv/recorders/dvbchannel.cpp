@@ -759,7 +759,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             {
                 last_lnb_dev_id = lnb->GetDeviceID();
                 // make sure we tune to frequency, if the lnb has changed
-                reset = first_tune = true;
+                first_tune = true;
             }
 
             intermediate_freq = lnb->GetIntermediateFrequency(
