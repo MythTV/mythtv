@@ -107,6 +107,7 @@ void H264Parser::Reset(void)
     state_changed = false;
     seen_sps = false;
     is_keyframe = false;
+    SPS_offset = 0;
 
     sync_accumulator = 0xffffffff;
     AU_pending = false;
