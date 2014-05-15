@@ -53,6 +53,8 @@ ExternIO::ExternIO(const QString & app,
     if (!m_args.contains("-q"))
         m_args << "-q";
     m_args.prepend(m_app.baseName());
+
+    m_appin = m_appout = m_apperr = -1;
 }
 
 ExternIO::~ExternIO(void)
