@@ -26,7 +26,8 @@ using namespace std;
 
 Streamer::Streamer(void) :
     m_fd(0), m_pkt_size(0), m_bufsize(188 * 1000 * 10),
-    m_remainder(0), m_paused(true), m_run(true), m_poll_mode(true)
+    m_remainder(0), m_paused(true), m_run(true), m_loop(false),
+    m_poll_mode(true)
 {
     m_data = new uint8_t[m_bufsize + 1];
 }
@@ -111,8 +112,6 @@ void Streamer::WakeUp(void)
     streamWait.wakeAll();
     streamlock.unlock();
 }
-
-static uint send_cnt = 0;
 
 void Streamer::Send(int sz)
 {
@@ -205,7 +204,8 @@ void Streamer::StreamData(void)
 }
 
 
-Commands::Commands(void) : m_run(true), m_poll_mode(true)
+Commands::Commands(void) : m_streamer(NULL), m_timeout(0),
+                           m_run(true), m_poll_mode(true)
 {
     setObjectName("Command");
 }
