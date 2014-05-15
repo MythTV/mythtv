@@ -64,7 +64,7 @@ class HLSReader
 #endif
     static void CancelURL(const QString &url);
     static void CancelURL(const QStringList &urls);
-    static QString RelativeURI(const QString surl, const QString spath);
+    static QString RelativeURI(const QString& surl, const QString& spath);
 
   protected:
     void Cancel(bool quiet = false);
@@ -80,7 +80,7 @@ class HLSReader
     int  PlaylistRetryCount(void) const;
 
   private:
-    static QString DecodedURI(const QString uri);
+    static QString DecodedURI(const QString& uri);
 
     bool IsValidPlaylist(QTextStream & text);
 

@@ -29,7 +29,7 @@ HLSRecSegment::HLSRecSegment(int seq, int duration,
 }
 
 HLSRecSegment::HLSRecSegment(int seq, int duration, const QString& title,
-           const QString& uri, const QString current_key_path)
+           const QString& uri, const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
       m_bitrate(0),

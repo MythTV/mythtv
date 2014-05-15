@@ -15,7 +15,7 @@ class HLSRecSegment
     HLSRecSegment(int seq, int duration, const QString& title,
 		  const QString& uri);
     HLSRecSegment(int seq, int duration, const QString& title,
-	       const QString& uri, const QString current_key_path);
+	       const QString& uri, const QString& current_key_path);
     ~HLSRecSegment();
 
     HLSRecSegment& operator=(const HLSRecSegment& rhs);

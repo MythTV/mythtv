@@ -220,14 +220,14 @@ int HLSReader::Read(uint8_t* buffer, int maxlen)
     return len;
 }
 
-QString HLSReader::DecodedURI(const QString uri)
+QString HLSReader::DecodedURI(const QString& uri)
 {
     QByteArray ba   = uri.toLatin1();
     QUrl url        = QUrl::fromEncoded(ba);
     return url.toString();
 }
 
-QString HLSReader::RelativeURI(const QString surl, const QString spath)
+QString HLSReader::RelativeURI(const QString& surl, const QString& spath)
 {
     QUrl url  = QUrl(surl);
     QUrl path = QUrl(spath);
