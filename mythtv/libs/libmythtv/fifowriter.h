@@ -32,7 +32,8 @@ class MTV_PUBLIC FIFOWriter
     friend class FIFOThread;
   public:
     FIFOWriter(int count, bool sync);
-   ~FIFOWriter();
+    FIFOWriter(const FIFOWriter& rhs);
+   ~FIFOWriter(void);
 
     int FIFOInit(int id, QString desc, QString name, long size, int num_bufs);
     void FIFOWrite(int id, void *buf, long size);

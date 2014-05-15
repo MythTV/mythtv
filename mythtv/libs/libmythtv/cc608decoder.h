@@ -42,6 +42,7 @@ class CC608Decoder
 {
   public:
     CC608Decoder(CC608Input *ccr);
+    CC608Decoder(const CC608Decoder& rhs);
     ~CC608Decoder();
 
     void FormatCC(int tc, int code1, int code2);
