@@ -69,7 +69,6 @@ QString StreamDescriptionToString(AudioStreamBasicDescription desc)
             .arg(fourCC)
             .arg((desc.mFormatFlags & kAudioFormatFlagIsBigEndian) ? "BE" : "LE")
             .arg((UInt32)desc.mSampleRate);
-
             break;
         default:
             str = QString("[%1]").arg(fourCC);
@@ -1251,6 +1250,7 @@ int CoreAudioData::OpenAnalog()
         case 6:
             //  3F2-LFE        L   R   C    LFE  LS   RS
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
+            break;
         case 8:
             // We need
             // 3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
