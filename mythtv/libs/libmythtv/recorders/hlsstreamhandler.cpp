@@ -97,9 +97,9 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
 HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning) :
     IPTVStreamHandler(tuning)
 {
-    m_hls       = new HLSReader();
-    m_buffer    = new uint8_t[BUFFER_SIZE];
-    m_throttle  = true;
+    m_hls        = new HLSReader();
+    m_readbuffer = new uint8_t[BUFFER_SIZE];
+    m_throttle   = true;
 }
 
 HLSStreamHandler::~HLSStreamHandler(void)
@@ -107,7 +107,7 @@ HLSStreamHandler::~HLSStreamHandler(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
     delete m_hls;
-    delete[] m_buffer;
+    delete[] m_readbuffer;
 }
 
 void HLSStreamHandler::run(void)
@@ -143,7 +143,7 @@ void HLSStreamHandler::run(void)
             m_throttle = false;
         }
 
-        int size = m_hls->Read(m_buffer, BUFFER_SIZE);
+        int size = m_hls->Read(m_readbuffer, BUFFER_SIZE);
 
         if (size < 0)
         {
@@ -167,11 +167,11 @@ void HLSStreamHandler::run(void)
         }
         nil_cnt = 0;
 
-        if (m_buffer[0] != 0x47)
+        if (m_readbuffer[0] != 0x47)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("Packet not starting with SYNC Byte (got 0x%1)")
-                .arg((char)m_buffer[0], 2, QLatin1Char('0')));
+                .arg((char)m_readbuffer[0], 2, QLatin1Char('0')));
             continue;
         }
 
@@ -182,7 +182,7 @@ void HLSStreamHandler::run(void)
             sit = _stream_data_list.begin();
             for (; sit != _stream_data_list.end(); ++sit)
             {
-                remainder = sit.key()->ProcessData(m_buffer, size);
+                remainder = sit.key()->ProcessData(m_readbuffer, size);
             }
         }
 
