@@ -15,6 +15,7 @@ class InteractiveTV
   public:
     // Interface to Myth
     InteractiveTV(MythPlayer *nvp);
+    InteractiveTV(const InteractiveTV& rhs);
     virtual ~InteractiveTV();
 
     void Restart(int chanid, int sourceid, bool isLive);

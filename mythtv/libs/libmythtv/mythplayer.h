@@ -133,6 +133,7 @@ class MTV_PUBLIC MythPlayer
 
   public:
     MythPlayer(PlayerFlags flags = kNoFlags);
+    MythPlayer(const MythPlayer& rhs);
     virtual ~MythPlayer();
 
     // Initialisation

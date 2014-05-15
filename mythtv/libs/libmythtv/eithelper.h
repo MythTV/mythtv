@@ -59,8 +59,9 @@ class PremiereContentInformationTable;
 class EITHelper
 {
   public:
-    EITHelper();
-    virtual ~EITHelper();
+    EITHelper(void);
+    EITHelper(const EITHelper& rhs);
+    virtual ~EITHelper(void);
 
     uint GetListSize(void) const;
     uint ProcessEvents(void);

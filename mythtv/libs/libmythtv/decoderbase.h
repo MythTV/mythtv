@@ -124,6 +124,7 @@ class DecoderBase
 {
   public:
     DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
+    DecoderBase(const DecoderBase& rhs);
     virtual ~DecoderBase();
 
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
