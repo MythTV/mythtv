@@ -22,6 +22,8 @@ class AVSubtitles
 class RawTextSubs
 {
   public:
+    RawTextSubs(void) { duration = 0; }
+
     QStringList buffers;
     uint64_t    duration;
     QMutex      lock;
