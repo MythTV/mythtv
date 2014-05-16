@@ -82,7 +82,7 @@ class MythDVDPlayer : public MythPlayer
     virtual void AutoDeint(VideoFrame* frame, bool allow_lock = true);
 
     // Complicated gets
-    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
+    virtual long long CalcMaxFFTime(long long ff, bool setjump = true);
 
     // Seek stuff
     virtual bool FastForward(float seconds);
