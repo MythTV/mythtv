@@ -993,7 +993,8 @@ long long RemoteFile::GetRealFileSize(void)
 
     QMutexLocker locker(&lock);
 
-    if (completed || lastSizeCheck.elapsed() < MAX_FILE_CHECK)
+    if (completed ||
+        (lastSizeCheck.isRunning() && lastSizeCheck.elapsed() < MAX_FILE_CHECK))
     {
         return filesize;
     }
