@@ -16,6 +16,8 @@ using namespace std;
 
 #define LOC QString("RemoteEncoder(%1): ").arg(recordernum)
 
+#define MAX_SIZE_CHECK 500  // in ms
+
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
       remoteport(port),       lastchannel(""),        lastinput(""),
@@ -196,20 +198,28 @@ float RemoteEncoder::GetFrameRate(void)
  *         instance.
  *
  *  \sa TVRec::GetFramesWritten(void), EncoderLink::GetFramesWritten(void)
- *  \return Number of frames if query succeeds, -1 otherwise.
+ *  \return Number of frames if query succeeds, return last known value otherwise.
  */
 long long RemoteEncoder::GetFramesWritten(void)
 {
+    if (lastTimeCheck.isRunning() && lastTimeCheck.elapsed() < MAX_SIZE_CHECK)
+    {
+        return cachedFramesWritten;
+    }
+
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FRAMES_WRITTEN";
 
     if (!SendReceiveStringList(strlist, 1))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "GetFramesWritten() -- network error");
-        return -1;
+    }
+    else
+    {
+        cachedFramesWritten = strlist[0].toLongLong();
+        lastTimeCheck.restart();
     }
 
-    cachedFramesWritten = strlist[0].toLongLong();
     return cachedFramesWritten;
 }
 
