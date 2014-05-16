@@ -13,6 +13,7 @@
 #include "tv.h"
 #include "mythtypes.h"
 #include "programtypes.h"
+#include "mythtimer.h"
 
 class QStringList;
 class ProgramInfo;
@@ -93,6 +94,7 @@ class MTV_PUBLIC RemoteEncoder
     bool backendError;
     long long cachedFramesWritten;
     QMap<QString,uint> cachedTimeout;
+    MythTimer lastTimeCheck;
 };
 
 #endif
