@@ -281,10 +281,10 @@ QStringList CetonRTSP::splitLines(const QByteArray &lines)
 }
 
 /**
- * readParamaters. Scan a line like: Session: 1234556;destination=xx;client_port
+ * readParameters. Scan a line like: Session: 1234556;destination=xx;client_port
  * and return the first entry and fill the arguments in the provided Params
  */
-QString CetonRTSP::readParamaters(const QString &key, Params &parameters)
+QString CetonRTSP::readParameters(const QString &key, Params &parameters)
 {
     QString val;
 
@@ -416,7 +416,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
         return false;
 
     Params params;
-    QString session = readParamaters("Session", params);
+    QString session = readParameters("Session", params);
 
     if (session.isEmpty())
     {
@@ -436,7 +436,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
         _timeout = params["timeout"].toInt();
     }
 
-    QString transport = readParamaters("Transport", params);
+    QString transport = readParameters("Transport", params);
     if (params.contains("ssrc"))
     {
         bool ok;

@@ -47,7 +47,7 @@ protected:
 
   private:
     QStringList splitLines(const QByteArray &lines);
-    QString readParamaters(const QString &key, Params &parameters);
+    QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
     void timerEvent(QTimerEvent*);
 
