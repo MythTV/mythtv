@@ -197,6 +197,8 @@ bool DecoderBase::PosMapFromDb(void)
     QMutexLocker locker(&m_positionMapLock);
     m_positionMap.clear();
     m_positionMap.reserve(posMap.size());
+    m_frameToDurMap.clear();
+    m_durToFrameMap.clear();
 
     for (frm_pos_map_t::const_iterator it = posMap.begin();
          it != posMap.end(); ++it)
@@ -667,6 +669,8 @@ void DecoderBase::ResetPosMap(void)
     QMutexLocker locker(&m_positionMapLock);
     posmapStarted = false;
     m_positionMap.clear();
+    m_frameToDurMap.clear();
+    m_durToFrameMap.clear();
 }
 
 long long DecoderBase::GetLastFrameInPosMap(void) const
