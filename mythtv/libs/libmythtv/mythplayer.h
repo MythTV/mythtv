@@ -424,7 +424,7 @@ class MTV_PUBLIC MythPlayer
     float ComputeSecs(uint64_t position, bool use_cutlist) const {
         return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
     }
-    uint64_t FindFrame(float offset, bool use_cutlist);
+    uint64_t FindFrame(float offset, bool use_cutlist) const;
 
     // Commercial stuff
     void SetAutoCommercialSkip(CommSkipMode autoskip)

@@ -2455,8 +2455,8 @@ bool MythPlayer::FastForward(float seconds)
             int64_t pos = TranslatePositionMsToFrame(seconds * 1000, false);
             if (CalcMaxFFTime(pos) < 0)
                 return true;
-            // Reach end of recording, go to 1 or 3s before the end
-            dest = (livetv || IsWatchingInprogress()) ? -3.0 : -1.0;
+            // duration may have been updated, use new value
+            dest = ComputeSecs(totalFrames - 1, true);
         }
         uint64_t target = FindFrame(dest, true);
         fftime = target - framesPlayed;
@@ -3750,12 +3750,13 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump)
         // If we attempt to seek past the known duration, check for up to date
         // data
         long long framesWritten = player_ctx->recorder->GetFramesWritten();
+        float old = secsWritten;
 
-        if (totalFrames < framesWritten)
+        secsWritten = ComputeSecs(framesWritten, true);
+        if (old < secsWritten)
         {
             // Known duration is less than what the backend reported, update with
             // what we've just fetched
-            secsWritten = ComputeSecs(framesWritten, true);
             SetFileLength(secsWritten, framesWritten);
         }
     }
@@ -4831,54 +4832,19 @@ uint64_t MythPlayer::GetCurrentFrameCount(void) const
 // positive offset or +0.0f indicate offset from the beginning.  A
 // negative offset or -0.0f indicate offset from the end.  Limit the
 // result to within bounds of the video.
-uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist)
+uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 {
-    bool islivetvcur = (livetv && player_ctx->tvchain &&
-                        !player_ctx->tvchain->HasNext());
     uint64_t length_ms = TranslatePositionFrameToMs(totalFrames, use_cutlist);
     uint64_t position_ms;
-
     if (signbit(offset))
     {
-        // Always get an updated totalFrame value for in progress recordings
-        if (islivetvcur || IsWatchingInprogress())
-        {
-            long long framesWritten = player_ctx->recorder->GetFramesWritten();
-
-            if (totalFrames < framesWritten)
-            {
-                // Known duration is less than what the backend reported, update with
-                // what we've just fetched
-                length_ms =
-                    TranslatePositionFrameToMs(framesWritten, use_cutlist);
-                SetFileLength(length_ms / 1000, framesWritten);
-            }
-        }
         uint64_t offset_ms = -offset * 1000 + 0.5;
         position_ms = (offset_ms > length_ms) ? 0 : length_ms - offset_ms;
     }
     else
     {
-        float secsPlayed = ComputeSecs(framesPlayed, use_cutlist);
         position_ms = offset * 1000 + 0.5;
-
-        if (offset > secsPlayed)
-        {
-            // Make sure we have an updated totalFrames
-            if ((islivetvcur || IsWatchingInprogress()) &&
-                (length_ms < offset))
-            {
-                long long framesWritten = player_ctx->recorder->GetFramesWritten();
-
-                if (totalFrames < framesWritten)
-                {
-                    length_ms =
-                        TranslatePositionFrameToMs(framesWritten, use_cutlist);
-                    SetFileLength(length_ms / 1000, framesWritten);
-                }
-            }
-            position_ms = min(position_ms, length_ms);
-        }
+        position_ms = min(position_ms, length_ms);
     }
     return TranslatePositionMsToFrame(position_ms, use_cutlist);
 }
