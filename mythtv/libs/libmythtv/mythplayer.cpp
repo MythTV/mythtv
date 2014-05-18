@@ -857,8 +857,6 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
 
 void MythPlayer::SetFileLength(int total, int frames)
 {
-    QMutexLocker lock(&durationLock);
-
     totalLength = total;
     totalFrames = frames;
 }
@@ -2455,8 +2453,7 @@ bool MythPlayer::FastForward(float seconds)
             int64_t pos = TranslatePositionMsToFrame(seconds * 1000, false);
             if (CalcMaxFFTime(pos) < 0)
                 return true;
-            // duration may have been updated, use new value
-            dest = ComputeSecs(totalFrames - 1, true);
+            dest = length;
         }
         uint64_t target = FindFrame(dest, true);
         fftime = target - framesPlayed;
@@ -3730,7 +3727,7 @@ long long MythPlayer::CalcRWTime(long long rw) const
  * CalcMaxFFTime(ffframes): forward ffframes forward.
  * Handle liveTV transitions if necessay
  */
-long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump)
+long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
 {
     float maxtime = 1.0;
     bool islivetvcur = (livetv && player_ctx->tvchain &&
@@ -3739,27 +3736,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump)
     if (livetv || IsWatchingInprogress())
         maxtime = 3.0;
 
-    long long ret       = ffframes;
-    float ff            = ComputeSecs(ffframes, true);
-    float secsPlayed    = ComputeSecs(framesPlayed, true);
-    float secsWritten   = ComputeSecs(totalFrames, true);
-
-    if ((islivetvcur || IsWatchingInprogress()) &&
-        ((ff + secsPlayed) > secsWritten))
-    {
-        // If we attempt to seek past the known duration, check for up to date
-        // data
-        long long framesWritten = player_ctx->recorder->GetFramesWritten();
-        float old = secsWritten;
-
-        secsWritten = ComputeSecs(framesWritten, true);
-        if (old < secsWritten)
-        {
-            // Known duration is less than what the backend reported, update with
-            // what we've just fetched
-            SetFileLength(secsWritten, framesWritten);
-        }
-    }
+    long long ret = ffframes;
+    float ff = ComputeSecs(ffframes, true);
+    float secsPlayed = ComputeSecs(framesPlayed, true);
 
     limitKeyRepeat = false;
 
@@ -3774,6 +3753,8 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump)
     }
     else if (islivetvcur || IsWatchingInprogress())
     {
+        float secsWritten =
+            ComputeSecs(player_ctx->recorder->GetFramesWritten(), true);
         float behind = secsWritten - secsPlayed;
 
         if (behind < maxtime) // if we're close, do nothing
@@ -3789,12 +3770,13 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump)
     {
         if (totalFrames > 0)
         {
-            float behind = secsWritten - secsPlayed;
+            float behind = ComputeSecs(totalFrames, true) - secsPlayed;
             if (behind < maxtime)
                 ret = 0;
             else if (behind - ff <= maxtime * 2)
             {
-                uint64_t ms = 1000 * (secsWritten - maxtime * 2);
+                uint64_t ms = 1000 *
+                    (ComputeSecs(totalFrames, true) - maxtime * 2);
                 ret = TranslatePositionMsToFrame(ms, true) - framesPlayed;
             }
         }
@@ -3927,8 +3909,6 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     if (islivetvcur || IsWatchingInprogress())
     {
         max = (uint64_t)player_ctx->recorder->GetFramesWritten();
-        LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("WaitForSeek:%1 max:%2").arg(frame).arg(max));
     }
     if (frame >= max)
         frame = max - 1;

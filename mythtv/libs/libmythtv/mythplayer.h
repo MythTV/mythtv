@@ -401,7 +401,7 @@ class MTV_PUBLIC MythPlayer
                                    bool absolute);
 
     // Complicated gets
-    virtual long long CalcMaxFFTime(long long ff, bool setjump = true);
+    virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
     uint64_t TranslatePositionFrameToMs(uint64_t position,
@@ -686,7 +686,6 @@ class MTV_PUBLIC MythPlayer
     // "Fake" frame counter for when the container frame rate doesn't
     // match the stream frame rate.
     uint64_t  framesPlayedExtra;
-    QMutex    durationLock;
     uint64_t  totalFrames;
     long long totalLength;
     int64_t   totalDuration;

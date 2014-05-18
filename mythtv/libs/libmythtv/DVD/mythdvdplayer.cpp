@@ -465,7 +465,7 @@ void MythDVDPlayer::AVSync(VideoFrame *frame, bool limit_delay)
     MythPlayer::AVSync(frame, true);
 }
 
-long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump)
+long long MythDVDPlayer::CalcMaxFFTime(long long ff, bool setjump) const
 {
     if ((totalFrames > 0) && player_ctx->buffer->IsDVD() &&
         player_ctx->buffer->DVD()->TitleTimeLeft() < 5)
