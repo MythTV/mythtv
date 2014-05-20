@@ -157,10 +157,12 @@ static float get_aspect(H264Parser &p)
 
 int  get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
+#ifdef USING_VDPAU
 int  get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
                         int offset[4], int y, int type, int height);
+#endif
 int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic);
 int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic);
 
@@ -221,6 +223,22 @@ static int has_codec_parameters(AVStream *st)
         FAIL("unknown codec");
     return 1;
 }
+
+#ifdef USING_VDPAU
+static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
+{
+    AVCodec *codec = c;
+    while (codec)
+    {
+        if (codec->id == id && CODEC_IS_VDPAU(codec))
+            return codec;
+
+        codec = codec->next;
+    }
+
+    return c;
+}
+#endif
 
 static bool force_sw_decode(AVCodecContext *avctx)
 {
@@ -1402,11 +1420,36 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
     return fps;
 }
 
+#ifdef USING_VDPAU
+static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
+{
+    return
+        fmt == PIX_FMT_VDPAU_H264  ||
+        fmt == PIX_FMT_VDPAU_MPEG1 ||
+        fmt == PIX_FMT_VDPAU_MPEG2 ||
+        fmt == PIX_FMT_VDPAU_MPEG4 ||
+        fmt == PIX_FMT_VDPAU_WMV3  ||
+        fmt == PIX_FMT_VDPAU_VC1;
+}
+
 static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                          const enum PixelFormat *fmt)
 {
+    int i = 0;
+
+    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
+        if (IS_VDPAU_PIX_FMT(fmt[i]))
+            break;
+
+    return fmt[i];
+}
+
+static enum PixelFormat get_format_vdpau_hwaccel(struct AVCodecContext *avctx,
+                                                 const enum PixelFormat *fmt)
+{
     return AV_PIX_FMT_VDPAU;
 }
+#endif
 
 // Declared seperately to allow attribute
 static enum PixelFormat get_format_dxva2(struct AVCodecContext *,
@@ -1486,11 +1529,21 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
+#ifdef USING_VDPAU
+    // When using non-nvidia vdpau driver, use older FFmpeg API
+    // which requires to use an explicit vdpau capable codec
+    if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec) &&
+        !VideoOutputVDPAU::IsNVIDIA())
+    {
+        codec = find_vdpau_decoder(codec, enc->codec_id);
+    }
+#endif
+
     if (selectedStream)
     {
         directrendering = true;
         if (!gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
-            !CODEC_IS_HWACCEL(codec, enc))
+            !(CODEC_IS_HWACCEL(codec, enc) || codec_is_vdpau(video_codec_id)))
         {
             SetLowBuffers(false);
         }
@@ -1501,15 +1554,27 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (metatag && metatag->value && QString("180") == metatag->value)
         video_inverted = true;
 
+#ifdef USING_VDPAU
     if (codec_is_vdpau(video_codec_id))
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
-        enc->get_format      = get_format_vdpau;
+        if (CODEC_IS_VDPAU(codec))
+        {
+            // Legacy FFmpeg VDPAU API
+            enc->get_format      = get_format_vdpau;
+        }
+        else
+        {
+            // FFmpeg hwaccel API
+            enc->get_format      = get_format_vdpau_hwaccel;
+        }
         enc->release_buffer  = release_avf_buffer_vdpau;
         enc->draw_horiz_band = render_slice_vdpau;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
-    else if (CODEC_IS_DXVA2(codec, enc))
+    else
+#endif
+        if (CODEC_IS_DXVA2(codec, enc))
     {
         enc->get_buffer      = get_avf_buffer_dxva2;
         enc->get_format      = get_format_dxva2;
@@ -2326,6 +2391,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 if (vdpau_mcid >= video_codec_id)
                 {
+                    enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
                     video_codec_id = vdpau_mcid;
                 }
 #endif // USING_VDPAU
@@ -2414,6 +2480,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Using %1 for video decoding")
                 .arg(GetCodecDecoderName()));
+
+#ifdef USING_VDPAU
+            if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec) &&
+                !VideoOutputVDPAU::IsNVIDIA())
+            {
+                codec = find_vdpau_decoder(codec, enc->codec_id);
+            }
+#endif
 
             if (!enc->codec)
             {
@@ -2769,6 +2843,7 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
+#ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
@@ -2786,7 +2861,6 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 
     frame->pix_fmt = c->pix_fmt;
 
-#ifdef USING_VDPAU
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
     pic->data[3] = (uint8_t*)(uintptr_t)render->surface;
@@ -2795,7 +2869,6 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     {
         c->hwaccel_context = nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-#endif
 
     pic->reordered_opaque = c->reordered_opaque;
 
@@ -2806,10 +2879,8 @@ void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
 {
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
-#ifdef USING_VDPAU
     struct vdpau_render_state *render = (struct vdpau_render_state *)pic->data[0];
     render->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE;
-#endif
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     if (nd && nd->GetPlayer())
@@ -2843,6 +2914,7 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
             "render_slice_vdpau called with bad avctx or src");
     }
 }
+#endif // USING_VDPAU
 
 int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic)
 {

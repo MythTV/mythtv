@@ -62,6 +62,7 @@ class VideoOutputVDPAU : public VideoOutput
                                              const QString &decoder,
                                              uint stream_type,
                                              bool no_acceleration);
+    static bool IsNVIDIA(void);
     virtual bool IsPIPSupported(void) const { return true;  }
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const

@@ -603,7 +603,9 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         uint max_refs = MIN_REFERENCE_FRAMES;
         if (video_codec_id == kCodec_H264_VDPAU)
         {
-            max_refs = m_context.info.h264.num_ref_frames;
+            max_refs = IsNVIDIA() ?
+                m_context.info.h264.num_ref_frames :
+                render->info.h264.num_ref_frames;
             if (max_refs < 1 || max_refs > MAX_REFERENCE_FRAMES)
             {
                 uint32_t round_width  = (frame->width + 15) & ~15;
@@ -698,7 +700,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         return;
     }
 
-    m_render->Decode(m_decoder, render, &m_context);
+    m_render->Decode(m_decoder, render, IsNVIDIA() ? &m_context : NULL);
 }
 
 void VideoOutputVDPAU::Show(FrameScanType scan)
@@ -956,6 +958,13 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
     return test_cid;
+}
+
+bool VideoOutputVDPAU::IsNVIDIA(void)
+{
+        // this forces the check of VDPAU capabilities
+    (void)MythRenderVDPAU::IsMPEG4Available();
+    return MythRenderVDPAU::gVDPAUNVIDIA;
 }
 
 void VideoOutputVDPAU::UpdateReferenceFrames(VideoFrame *frame)
