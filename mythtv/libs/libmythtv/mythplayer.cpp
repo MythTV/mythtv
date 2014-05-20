@@ -3089,7 +3089,8 @@ void MythPlayer::EventLoop(void)
     // Handle automatic commercial skipping
     uint64_t jumpto = 0;
     if (deleteMap.IsEmpty() && (ffrew_skip == 1) &&
-       (kCommSkipOff != commBreakMap.GetAutoCommercialSkip()))
+       (kCommSkipOff != commBreakMap.GetAutoCommercialSkip()) &&
+        commBreakMap.HasMap())
     {
         QString msg;
         uint64_t frameCount = GetCurrentFrameCount();
