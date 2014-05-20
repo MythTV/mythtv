@@ -72,21 +72,21 @@ typedef enum
 // MythCodecID convenience functions
 #define codec_is_std(id)      (id < kCodec_NORMAL_END)
 #define codec_is_std_mpeg(id) (id == kCodec_MPEG1 || id == kCodec_MPEG2)
-#define codec_is_vdpau(id)    (id > kCodec_VDPAU_BEGIN) &&\
-                              (id < kCodec_VDPAU_END)
-#define codec_is_vdpau_hw(id) (codec_is_vdpau(id) &&\
-                              (id != kCodec_H263_VDPAU) &&\
-                              (id != kCodec_VP8_VDPAU))
-#define codec_is_vaapi(id)    (id > kCodec_VAAPI_BEGIN) &&\
-                              (id < kCodec_VAAPI_END)
-#define codec_is_vaapi_hw(id) (codec_is_vaapi(id) &&\
-                              (id != kCodec_VP8_VAAPI))
-#define codec_is_dxva2(id)    (id > kCodec_DXVA2_BEGIN) &&\
-                              (id < kCodec_DXVA2_END)
+#define codec_is_vdpau(id)    ((id > kCodec_VDPAU_BEGIN) &&     \
+                               (id < kCodec_VDPAU_END))
+#define codec_is_vdpau_hw(id) ((codec_is_vdpau(id) &&           \
+                                (id != kCodec_H263_VDPAU) &&    \
+                                (id != kCodec_VP8_VDPAU)))
+#define codec_is_vaapi(id)    ((id > kCodec_VAAPI_BEGIN) &&     \
+                               (id < kCodec_VAAPI_END))
+#define codec_is_vaapi_hw(id) (codec_is_vaapi(id) &&            \
+                               (id != kCodec_VP8_VAAPI))
+#define codec_is_dxva2(id)    ((id > kCodec_DXVA2_BEGIN) &&     \
+                               (id < kCodec_DXVA2_END))
 #define codec_is_dxva2_hw(id) (codec_is_dxva2(id) &&\
-                             ((id == kCodec_H264_DXVA2)  ||\
-                              (id == kCodec_MPEG2_DXVA2) ||\
-                              (id == kCodec_VC1_DXVA2)))
+                               ((id == kCodec_H264_DXVA2)  ||   \
+                                (id == kCodec_MPEG2_DXVA2) ||   \
+                                (id == kCodec_VC1_DXVA2)))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
