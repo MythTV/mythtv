@@ -396,7 +396,8 @@ bool CetonStreamHandler::TuneProgram(uint program)
 
 bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("PerformTuneVChannel(%1)").arg(vchannel));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("PerformTuneVChannel(%1)")
+        .arg(vchannel));
 
     QUrl params;
     params.addQueryItem("instance_id", QString::number(_tuner));
@@ -420,6 +421,13 @@ bool CetonStreamHandler::PerformTuneVChannel(const QString &vchannel)
 
 bool CetonStreamHandler::TuneVChannel(const QString &vchannel)
 {
+    if (GetVar("cas", "VirtualChannelNumber") == vchannel)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Not Re-Tuning channel %1")
+            .arg(vchannel));
+        return true;
+    }
+
     if ((vchannel != "0") && (_last_vchannel != "0"))
         ClearProgramNumber();
 

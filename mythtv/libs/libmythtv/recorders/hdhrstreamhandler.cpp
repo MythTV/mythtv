@@ -485,7 +485,19 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
 {
     _tune_mode = hdhrTuneModeVChannel;
 
+    QString current = TunerGet("vchannel");
+    if (current == vchn)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Not Re-Tuning channel %1")
+            .arg(vchn));
+        return true;
+    }
+    else
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
+            .arg(vchn).arg(current));
+    }
+
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
-    return !TunerSet(
-        "vchannel", vchn).isEmpty();
+    return !TunerSet("vchannel", vchn).isEmpty();
 }
