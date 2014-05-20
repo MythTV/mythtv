@@ -913,13 +913,13 @@ void OSD::CheckExpiry(void)
                 MythDialogBox *dialog = dynamic_cast<MythDialogBox*>(m_Dialog);
                 if (dialog)
                 {
-                    // The disambiguation string must be an empty string and not a
-                    // NULL to get extracted by the Qt tools.
-                    QString replace = QCoreApplication::translate("(Common)", 
-                                          "%n second(s)", 
-                                          "", 
+                    // The disambiguation string must be an empty string
+                    // and not a NULL to get extracted by the Qt tools.
+                    QString replace = QCoreApplication::translate("(Common)",
+                                          "%n second(s)",
+                                          "",
 #if QT_VERSION < 0x050000
-                                          QCoreApplication::UnicodeUTF8, 
+                                          QCoreApplication::UnicodeUTF8,
 #endif
                                           now.secsTo(it.value()));
                     dialog->SetText(newtext.replace("%d", replace));
