@@ -2370,9 +2370,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
             }
 
-            if (version)
+            if (version && FlagIsSet(kDecodeAllowGPU))
             {
-#if defined(USING_VDPAU)
+                bool foundgpudecoder = false;
+
+#ifdef USING_VDPAU
                 // HACK -- begin
                 // Force MPEG2 decoder on MPEG1 streams.
                 // Needed for broken transmitters which mark
@@ -2381,58 +2383,60 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (enc->codec_id == AV_CODEC_ID_MPEG1VIDEO)
                     enc->codec_id = AV_CODEC_ID_MPEG2VIDEO;
                 // HACK -- end
-#endif // USING_VDPAU
-#ifdef USING_VDPAU
                 MythCodecID vdpau_mcid;
                 vdpau_mcid =
                     VideoOutputVDPAU::GetBestSupportedCodec(width, height, dec,
                                                             mpeg_version(enc->codec_id),
-                                                            !FlagIsSet(kDecodeAllowGPU));
+                                                            false);
 
                 if (vdpau_mcid >= video_codec_id)
                 {
-                    enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
                     video_codec_id = vdpau_mcid;
+                    foundgpudecoder = true;
                 }
 #endif // USING_VDPAU
 #ifdef USING_GLVAAPI
-                MythCodecID vaapi_mcid;
-                PixelFormat pix_fmt = PIX_FMT_YUV420P;
-                vaapi_mcid =
-                    VideoOutputOpenGLVAAPI::GetBestSupportedCodec(width, height, dec,
-                                                                  mpeg_version(enc->codec_id),
-                                                                  !FlagIsSet(kDecodeAllowGPU),
-                                                                  pix_fmt);
-
-                if (vaapi_mcid >= video_codec_id)
+                if (!foundgpudecoder)
                 {
-                    enc->codec_id = (CodecID)myth2av_codecid(vaapi_mcid);
-                    video_codec_id = vaapi_mcid;
-                    if (FlagIsSet(kDecodeAllowGPU) &&
-                        codec_is_vaapi(video_codec_id))
+                    MythCodecID vaapi_mcid;
+                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    vaapi_mcid =
+                        VideoOutputOpenGLVAAPI::GetBestSupportedCodec(width, height, dec,
+                                                                      mpeg_version(enc->codec_id),
+                                                                      false,
+                                                                      pix_fmt);
+
+                    if (vaapi_mcid >= video_codec_id &&
+                        codec_is_vaapi(vaapi_mcid))
                     {
+                        video_codec_id = vaapi_mcid;
                         enc->pix_fmt = pix_fmt;
+                        foundgpudecoder = true;
                     }
                 }
 #endif // USING_GLVAAPI
 #ifdef USING_DXVA2
-                MythCodecID dxva2_mcid;
-                PixelFormat pix_fmt = PIX_FMT_YUV420P;
-                dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
-                                                                   width, height, dec, mpeg_version(enc->codec_id),
-                                                                   !FlagIsSet(kDecodeAllowGPU), pix_fmt);
-
-                if (dxva2_mcid >= video_codec_id)
+                if (!foundgpudecode)
                 {
-                    enc->codec_id = (CodecID)myth2av_codecid(dxva2_mcid);
-                    video_codec_id = dxva2_mcid;
-                    if (FlagIsSet(kDecodeAllowGPU) &&
-                        codec_is_dxva2(video_codec_id))
+                    MythCodecID dxva2_mcid;
+                    PixelFormat pix_fmt = PIX_FMT_YUV420P;
+                    dxva2_mcid = VideoOutputD3D::GetBestSupportedCodec(
+                        width, height, dec, mpeg_version(enc->codec_id),
+                        false, pix_fmt);
+
+                    if (dxva2_mcid >= video_codec_id  &&
+                        codec_is_dxva2(dxva2_mcid))
                     {
+                        video_codec_id = dxva2_mcid;
                         enc->pix_fmt = pix_fmt;
+                        foundgpudecoder = true;
                     }
                 }
 #endif // USING_DXVA2
+                if (foundgpudecoder)
+                {
+                    enc->codec_id = (CodecID) myth2av_codecid(video_codec_id);
+                }
             }
 
             // default to mpeg2
