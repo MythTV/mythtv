@@ -95,7 +95,7 @@ void ExternalSignalMonitor::UpdateValues(void)
         if (!m_stream_handler->IsRunning())
         {
             error = QObject::tr("Error: stream handler died");
-            LOG(VB_CHANNEL, LOG_INFO, LOC + error);
+            LOG(VB_CHANNEL, LOG_ERR, LOC + error);
             update_done = true;
             return;
         }

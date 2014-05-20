@@ -179,13 +179,22 @@ int ExternIO::Write(const QByteArray & buffer)
     int len = write(m_appin, buffer.constData(), buffer.size());
     if (len != buffer.size())
     {
-        m_error = "ExternIO: Failed to write to app's stdin: " + ENO;
-        return -1;
+        if (len > 0)
+        {
+            LOG(VB_RECORD, LOG_WARNING,
+                QString("ExternIO::Write: only wrote %1 of %2 bytes '%3'")
+                .arg(len).arg(buffer.size()).arg(QString(buffer)));
+        }
+        else
+        {
+            m_error = QString("ExternIO: Failed to write '%1' to app's stdin: ")
+                      .arg(QString(buffer)) + ENO;
+            return -1;
+        }
     }
 
     return len;
 }
-
 
 bool ExternIO::Run(void)
 {
