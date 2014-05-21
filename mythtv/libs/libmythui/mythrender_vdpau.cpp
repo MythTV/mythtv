@@ -297,6 +297,19 @@ MythRenderVDPAU::~MythRenderVDPAU(void)
     Destroy();
 }
 
+bool MythRenderVDPAU::IsVDPAUAvailable(void)
+{
+    if (gVDPAUSupportChecked)
+        return true;
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Checking VDPAU support.");
+    MythRenderVDPAU *dummy = new MythRenderVDPAU();
+    bool supported = dummy->CreateDummy();
+    delete dummy;
+
+    return supported;
+}
+
 bool MythRenderVDPAU::IsMPEG4Available(void)
 {
     if (gVDPAUSupportChecked)
