@@ -4605,7 +4605,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
         if (!handled)
         {
             DoPlayerSeek(ctx, StopFFRew(ctx));
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Short);
             handled = true;
         }
     }
@@ -4613,7 +4613,7 @@ bool TV::FFRewHandleAction(PlayerContext *ctx, const QStringList &actions)
     if (ctx->ff_rew_speed)
     {
         NormalSpeed(ctx);
-        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
+        UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Short);
         handled = true;
     }
 
@@ -6220,7 +6220,7 @@ void TV::DoTogglePauseFinish(PlayerContext *ctx, float time, bool showOSD)
     {
         DoPlayerSeek(ctx, time);
         if (showOSD)
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Short);
         GetMythUI()->DisableScreensaver();
     }
 
@@ -6406,7 +6406,7 @@ bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                     actx->player->TranslatePositionRelToAbs(targetRel);
                 actx->UnlockDeletePlayer(__FILE__, __LINE__);
                 DoPlayerSeekToFrame(actx, targetAbs);
-                UpdateOSDSeekMessage(actx, message, kOSDTimeout_Med);
+                UpdateOSDSeekMessage(actx, message, kOSDTimeout_Short);
             }
         }
     }
@@ -8841,7 +8841,7 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
     {
         if (!allowEdit)
         {
-            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Med);
+            UpdateOSDSeekMessage(ctx, ctx->GetPlayMessage(), kOSDTimeout_Short);
         }
         else
         {
