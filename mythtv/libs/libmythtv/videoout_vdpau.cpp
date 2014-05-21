@@ -946,15 +946,20 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
     uint width, uint height, const QString &decoder,
     uint stream_type, bool no_acceleration)
 {
-    bool use_cpu = no_acceleration;
-
+    bool use_cpu = no_acceleration || (decoder != "vdpau") || getenv("NO_VDPAU");
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
-    use_cpu |= !codec_is_vdpau_hw(test_cid);
-    if (test_cid == kCodec_MPEG4_VDPAU)
-        use_cpu |= !MythRenderVDPAU::IsMPEG4Available();
-    if (test_cid == kCodec_H264_VDPAU)
-        use_cpu |= !MythRenderVDPAU::H264DecoderSizeSupported(width, height);
-    if ((decoder != "vdpau") || getenv("NO_VDPAU") || use_cpu)
+
+    if (!use_cpu)
+    {
+        use_cpu |= !MythRenderVDPAU::IsVDPAUAvailable();
+        use_cpu |= !codec_is_vdpau_hw(test_cid);
+        if (!use_cpu && test_cid == kCodec_MPEG4_VDPAU)
+            use_cpu |= !MythRenderVDPAU::IsMPEG4Available();
+        if (!use_cpu && test_cid == kCodec_H264_VDPAU)
+            use_cpu |= !MythRenderVDPAU::H264DecoderSizeSupported(width, height);
+    }
+
+    if (use_cpu)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
     return test_cid;

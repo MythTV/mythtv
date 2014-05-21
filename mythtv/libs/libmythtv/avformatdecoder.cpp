@@ -2389,7 +2389,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                                             mpeg_version(enc->codec_id),
                                                             false);
 
-                if (vdpau_mcid >= video_codec_id)
+                if (codec_is_vdpau(vdpau_mcid))
                 {
                     video_codec_id = vdpau_mcid;
                     foundgpudecoder = true;
@@ -2406,8 +2406,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                                                       false,
                                                                       pix_fmt);
 
-                    if (vaapi_mcid >= video_codec_id &&
-                        codec_is_vaapi(vaapi_mcid))
+                    if (codec_is_vaapi(vaapi_mcid))
                     {
                         video_codec_id = vaapi_mcid;
                         enc->pix_fmt = pix_fmt;
@@ -2424,8 +2423,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         width, height, dec, mpeg_version(enc->codec_id),
                         false, pix_fmt);
 
-                    if (dxva2_mcid >= video_codec_id  &&
-                        codec_is_dxva2(dxva2_mcid))
+                    if (codec_is_dxva2(dxva2_mcid))
                     {
                         video_codec_id = dxva2_mcid;
                         enc->pix_fmt = pix_fmt;
