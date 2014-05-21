@@ -317,11 +317,12 @@ bool MythRenderVDPAU::IsMPEG4Available(void)
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Checking VDPAU capabilities.");
     MythRenderVDPAU *dummy = new MythRenderVDPAU();
-    boot ok = dummy->CreateDummy();
-    delete dummy;
-
-    if (ok)
-        return gVDPAUMPEG4Accel;
+    if (dummy)
+    {
+        if (dummy->CreateDummy())
+            return gVDPAUMPEG4Accel;
+        delete dummy;
+    }
 
     return false;
 }
