@@ -64,7 +64,7 @@ EOF
     }
 
 # Check whether to force metadata deletion for non-existent files.
-    $command = $force ? 'FORCE_DELETE_RECORDING' : 'DELETE_RECORDING';
+    $argument_force = $force ? 'FORCE' : 'NO_FORCE';
 
 # Connect to the backend
     my $myth = new MythTV();
@@ -78,8 +78,15 @@ EOF
         my $show = $myth->new_recording(@$row);
         next unless ($show->{'recgroup'} eq 'Deleted');
         print "DELETE:  $show->{'title'}: $show->{'subtitle'}\n";
-        my $err = $myth->backend_command(join($MythTV::BACKEND_SEP, $command, $show->to_string(), '0'));
-        if ($err != -1) {
+
+        my $delete_command = 'DELETE_RECORDING ' .
+                             $show->{'chanid'} .
+                             ' ' .
+                             unix_to_myth_time ($show->{'recstartts'}) .
+                             ' ' .
+                             $argument_force;
+        my $err = $myth->backend_command($delete_command);
+        if ($err ne '-1') {
             print "  error:  $err\n";
         }
         else {
