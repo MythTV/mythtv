@@ -6475,7 +6475,13 @@ BLOCKQUOTE
 if enabled mythlogserver; then
     # configure zeromq
     echo "Configuring zeromq..."
+    if [ ! `which libtool` ]
+    then
+        echo libtool not found. please install it.
+        exit 1
+    fi
     (cd external/zeromq ; \
+             ./autogen.sh 2> /dev/null > /dev/null ; \
              ./configure --quiet --without-documentation --prefix=${prefix} \
                          --includedir=${prefix}/include/mythtv/zeromq)
     echo "Configuring nzmqt..."
