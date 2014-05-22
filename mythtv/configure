@@ -6480,8 +6480,17 @@ if enabled mythlogserver; then
         echo libtool not found. please install it.
         exit 1
     fi
+    if [ ! `which autoreconf` ]
+    then
+        echo autoreconf not found. please install it.
+        exit 1
+    fi
+    (cd external/zeromq ; ./autogen.sh 2> /dev/null > /dev/null)
+    if [ $? -ne 0 ]; then
+	echo external/zeromq/autogen.sh failed.
+	exit 1
+    fi
     (cd external/zeromq ; \
-             ./autogen.sh 2> /dev/null > /dev/null ; \
              ./configure --quiet --without-documentation --prefix=${prefix} \
                          --includedir=${prefix}/include/mythtv/zeromq)
     echo "Configuring nzmqt..."
