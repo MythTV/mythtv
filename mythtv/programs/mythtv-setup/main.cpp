@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
             cerr << "Valid cards: " << endl;
             for (uint i = 0; i < cardids.size(); i++)
             {
-                fprintf(stderr, "%5i: %s %s\n",
+                fprintf(stderr, "%5u: %s %s\n",
                         cardids[i],
                         CardUtil::GetRawCardType(cardids[i])
                         .toLatin1().constData(),

@@ -118,7 +118,7 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
         return false;
     for (frameno = 0; frameno < nframes; frameno++)
     {
-        (void)fprintf(fp, "%3u %10.6f %3u %10.6f %5u %5u %5u %5u",
+        (void)fprintf(fp, "%3u %10.6f %3u %10.6f %5d %5d %5d %5d",
                       monochromatic[frameno],
                       mean[frameno], median[frameno], stddev[frameno],
                       fwidth[frameno], fheight[frameno],
