@@ -11,6 +11,9 @@
 #if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
+#ifdef USING_SYSTEMD_NOTIFY
+    #include <systemd/sd-daemon.h>
+#endif
 
 // C headers
 #include <cstdlib>
@@ -702,6 +705,11 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (gCoreContext->IsMasterBackend())
         gCoreContext->SendSystemEvent("MASTER_STARTED");
+
+#ifdef USING_SYSTEMD_NOTIFY
+    // Provide systemd ready notification (for type=notify units)
+    (void)sd_notify(0, "READY=1");
+#endif
 
     ///////////////////////////////
     ///////////////////////////////

@@ -136,6 +136,7 @@ Advanced options (experts only):
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-opengl-video   disable OpenGL based video display
   --disable-libass         disable libass SSA/ASS subtitle support
+  --disable-systemd_notify disable systemd notify support
 
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
@@ -2259,6 +2260,7 @@ MYTHTV_CONFIG_LIST='
     profiletype
     debugtype
     mythlogserver
+    systemd_notify
 '
 
 MYTHTV_HAVE_LIST='
@@ -3414,6 +3416,7 @@ enable libfftw3
 enable taglib
 disable mythlogserver
 enable exiv2
+enable systemd_notify
 
 # mythtv paths
 dvb_path_default="${sysroot}/usr/include"
@@ -6930,6 +6933,14 @@ enabled asi && check_cc <<EOF || disable asi
 int main(void) { return 1; }
 EOF
 
+if enabled systemd_notify ; then
+   if check_pkg_config libsystemd-daemon systemd/sd-daemon.h sd_notify ; then
+        require_pkg_config libsystemd-daemon systemd/sd-daemon.h sd_notify
+   else
+        disable systemd_notify
+   fi
+fi
+
 # Check that all MythTV build "requirements" are met:
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
@@ -7722,6 +7733,7 @@ echo "OpenGL ES 2.0             ${opengles-no}"
 echo "mythlogserver             ${mythlogserver-no}"
 echo "BD-J (Bluray java)        ${bdjava-no}"
 echo "BD-J type                 ${bdj_type}"
+echo "systemd_notify            ${systemd_notify-no}"
 echo
 
 echo "# Bindings"
