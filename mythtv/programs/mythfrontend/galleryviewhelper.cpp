@@ -570,7 +570,7 @@ void GallerySyncStatusThread::run()
 
         // Wait some time before trying to get and update the status
         // This also avoids too many calls to the service api.
-        usleep(1000000);
+        usleep(999999);
 
         ++loopCounter;
     }
