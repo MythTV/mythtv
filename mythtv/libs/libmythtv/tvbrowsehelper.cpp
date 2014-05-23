@@ -412,7 +412,7 @@ void TVBrowseHelper::GetNextProgramDB(
     infoMap["dbstarttime"] = prog->GetScheduledStartTime(MythDate::ISODate);
 }
 
-inline static QString toString(const InfoMap &infoMap, const QString sep="\n")
+inline static QString toString(const InfoMap &infoMap, const QString &sep="\n")
 {
     QString str("");
     InfoMap::const_iterator it = infoMap.begin();
