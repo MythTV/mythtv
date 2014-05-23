@@ -1007,7 +1007,6 @@ void MythMainWindow::Init(QString forcedpainter)
                                         .arg(QString::number(d->screenheight)));
 
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
-    setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     GetMythUI()->ThemeWidget(this);
 #ifdef Q_OS_MAC
@@ -1016,6 +1015,7 @@ void MythMainWindow::Init(QString forcedpainter)
     qApp->setPalette(palette());
 #endif
     Show();
+    setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         setMouseTracking(true); // Required for mouse cursor auto-hide
