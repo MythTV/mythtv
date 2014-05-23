@@ -986,13 +986,18 @@ void MythMainWindow::Init(QString forcedpainter)
     flags |= Qt::MSWindowsOwnDC;
 #endif
 
-    setWindowFlags(flags);
-
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
     {
         LOG(VB_GENERAL, LOG_INFO, "Using Full Screen Window");
         setWindowState(Qt::WindowFullScreen);
     }
+
+    if (gCoreContext->GetNumSetting("AlwaysOnTop", false))
+    {
+        flags |= Qt::WindowStaysOnTopHint;
+    }
+
+    setWindowFlags(flags);
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);

@@ -2428,7 +2428,6 @@ static HostCheckBox *RunInWindow()
 
 static HostCheckBox *UseFixedWindowSize()
 {
-{
     HostCheckBox *gc = new HostCheckBox("UseFixedWindowSize");
 
     gc->setLabel(AppearanceSettings::tr("Use fixed window size"));
@@ -2439,6 +2438,18 @@ static HostCheckBox *UseFixedWindowSize()
                                            "window can be resized"));
     return gc;
 }
+
+static HostCheckBox *AlwaysOnTop()
+{
+    HostCheckBox *gc = new HostCheckBox("AlwaysOnTop");
+
+    gc->setLabel(AppearanceSettings::tr("Always On Top"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(AppearanceSettings::tr("If enabled, MythTV will always be "
+                                           "on top"));
+    return gc;
 }
 
 static HostComboBox *MythDateFormatCB()
@@ -4199,6 +4210,7 @@ AppearanceSettings::AppearanceSettings()
     column2->addChild(HideMouseCursor());
     column2->addChild(RunInWindow());
     column2->addChild(UseFixedWindowSize());
+    column2->addChild(AlwaysOnTop());
 #ifdef USING_AIRPLAY
     column2->addChild(AirPlayFullScreen());
 #endif
