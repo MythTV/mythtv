@@ -46,7 +46,7 @@ class MythFEXML : public Eventing
     void GetRemote        ( HTTPRequest *pRequest );
 
   public:
-    MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
+    MythFEXML( UPnpDevice *pDevice ,  const QString &sSharePath);
     virtual ~MythFEXML();
 
     virtual QStringList GetBasePaths();

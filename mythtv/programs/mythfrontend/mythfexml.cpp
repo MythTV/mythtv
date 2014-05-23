@@ -32,7 +32,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
+MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString &sSharePath)
   : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
 {
 

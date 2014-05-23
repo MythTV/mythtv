@@ -401,7 +401,7 @@ QWaitCondition        GuideHelper::s_wait;
 QMap<GuideGrid*,uint> GuideHelper::s_loading;
 
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
-                                const QDateTime startTime,
+                                const QDateTime &startTime,
                                 TV *player, bool embedVideo,
                                 bool allowFinder, int changrpid)
 {
@@ -475,7 +475,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 }
 
 GuideGrid::GuideGrid(MythScreenStack *parent,
-                     uint chanid, QString channum, const QDateTime startTime,
+                     uint chanid, const QString &channum, const QDateTime &startTime,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
          : ScheduleCommon(parent, "guidegrid"),
