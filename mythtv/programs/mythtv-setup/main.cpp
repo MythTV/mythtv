@@ -173,7 +173,7 @@ static bool RunMenu(QString themedir, QString themename)
 
 // If the theme specified in the DB is somehow broken, try a standard one:
 //
-static bool resetTheme(QString themedir, const QString badtheme)
+static bool resetTheme(QString themedir, const QString &badtheme)
 {
     QString themename = DEFAULT_UI_THEME;
 
