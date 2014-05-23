@@ -6,7 +6,7 @@
 
 #include "gamesettings.h"
 
-const QString GetGameTypeName(const QString GameType)
+const QString GetGameTypeName(const QString &GameType)
 {
     QString result = "";
 
@@ -21,7 +21,7 @@ const QString GetGameTypeName(const QString GameType)
     return result;
 }
 
-const QString GetGameTypeExtensions(const QString GameType)
+const QString GetGameTypeExtensions(const QString &GameType)
 {
     QString result = "";
 
