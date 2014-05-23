@@ -989,7 +989,10 @@ void MythMainWindow::Init(QString forcedpainter)
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
     {
         LOG(VB_GENERAL, LOG_INFO, "Using Full Screen Window");
-        setWindowState(Qt::WindowFullScreen);
+    }
+    else
+    {
+        setWindowState(Qt::WindowNoState);
     }
 
     if (gCoreContext->GetNumSetting("AlwaysOnTop", false))
@@ -1007,6 +1010,8 @@ void MythMainWindow::Init(QString forcedpainter)
                                         .arg(QString::number(d->screenheight)));
 
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+    // remove size constraints
+    setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
     GetMythUI()->ThemeWidget(this);
 #ifdef Q_OS_MAC
@@ -1316,7 +1321,15 @@ void MythMainWindow::ReinitDone(void)
 
 void MythMainWindow::Show(void)
 {
-    show();
+    if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
+    {
+        showFullScreen();
+    }
+    else
+    {
+        show();
+    }
+
 #ifdef Q_WS_MACX_OLDQT
     if (d->does_fill_screen)
         HideMenuBar();
