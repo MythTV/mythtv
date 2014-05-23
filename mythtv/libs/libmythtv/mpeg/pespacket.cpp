@@ -212,6 +212,7 @@ float SequenceHeader::aspect(bool mpeg1) const
 // Memory allocator to avoid malloc global lock and waste less memory. //
 /////////////////////////////////////////////////////////////////////////
 
+#ifndef USING_VALGRIND
 static vector<unsigned char*> mem188;
 static vector<unsigned char*> free188;
 static map<unsigned char*, bool> alloc188;
@@ -322,6 +323,7 @@ static void return_4096_block(unsigned char* ptr)
 #endif
     }
 }
+#endif
 
 static QMutex pes_alloc_mutex;
 
