@@ -87,6 +87,14 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
                         CurrentTime);
 
         XRRFreeScreenConfigInfo(cfg);
+
+        // Force refresh of xf86VidMode current modeline
+        cfg = XRRGetScreenInfo(display->GetDisplay(), root);
+        if (cfg)
+        {
+            XRRFreeScreenConfigInfo(cfg);
+        }
+
         delete display;
 
         if (RRSetConfigSuccess != status)
