@@ -85,7 +85,7 @@ typedef enum FrameScanType
 typedef enum PictureAttribute
 {
     kPictureAttribute_None = 0,
-    kPictureAttribute_MIN = 1,
+    kPictureAttribute_MIN = 0,
     kPictureAttribute_Brightness = 1,
     kPictureAttribute_Contrast,
     kPictureAttribute_Colour,
