@@ -20,6 +20,7 @@ class MPUBLIC VolumeBase
     bool SWVolume(void) const;
     virtual uint GetCurrentVolume(void) const;
     virtual void SetCurrentVolume(int value);
+    virtual void SaveCurrentVolume(void);
     virtual void AdjustCurrentVolume(int change);
     virtual void ToggleMute(void);
 

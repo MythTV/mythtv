@@ -38,10 +38,18 @@ void VolumeBase::SetCurrentVolume(int value)
 {
     volume = max(min(value, 100), 0);
     UpdateVolume();
+}
 
+void VolumeBase::SaveCurrentVolume(void)
+{
+    if (swvol)
+    {
+        SetSWVolume(GetCurrentVolume(), true);
+        return;
+    }
     QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
     controlLabel += "MixerVolume";
-    gCoreContext->SaveSetting(controlLabel, volume);    
+    gCoreContext->SaveSetting(controlLabel, GetCurrentVolume());
 }
 
 void VolumeBase::AdjustCurrentVolume(int change)
@@ -92,25 +100,24 @@ MuteState VolumeBase::NextMuteState(MuteState cur)
 
 void VolumeBase::UpdateVolume(void)
 {
-    int new_volume = volume;
-    bool save = true;
+    int new_volume = GetCurrentVolume();
+
     if (current_mute_state == kMuteAll)
     {
         new_volume = 0;
-        save = false;
     }
 
     if (swvol)
     {
-        SetSWVolume(new_volume, save);
+        SetSWVolume(new_volume, false);
         return;
     }
-    
+
     for (int i = 0; i < channels; i++)
     {
         SetVolumeChannel(i, new_volume);
     }
-    
+
     // Individual channel muting is handled in GetAudioData,
     // this code demonstrates the old method.
     // if (current_mute_state == kMuteLeft)
