@@ -343,6 +343,14 @@ uint AudioPlayer::SetVolume(int newvolume)
     return GetVolume();
 }
 
+void AudioPlayer::SaveVolume(void)
+{
+    if (!m_audioOutput || m_no_audio_out)
+        return;
+    QMutexLocker lock(&m_lock);
+    m_audioOutput->SaveCurrentVolume();
+}
+
 int64_t AudioPlayer::GetAudioTime(void)
 {
     if (!m_audioOutput || m_no_audio_out)
