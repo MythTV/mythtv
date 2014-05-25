@@ -102,7 +102,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->forcekey         = 0;
     vf->dummy            = 0;
     vf->pix_fmt          = 0;
-    vf->directrendering  = 0;
+    vf->directrendering  = 1;
 
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
