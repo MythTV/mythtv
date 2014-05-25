@@ -174,6 +174,9 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void ShowMouseCursor(bool show);
 
     MythMainWindowPrivate *d;
+
+  private slots:
+    void DelayedAction(void);
 };
 
 MUI_PUBLIC MythMainWindow *GetMythMainWindow();
