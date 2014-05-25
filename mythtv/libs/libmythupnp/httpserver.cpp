@@ -308,7 +308,7 @@ void HttpWorker::run(void)
                         // delegate processing to HttpServerExtensions.
                         // ------------------------------------------------------
 
-                        if ((pRequest->m_nResponseStatus != 400) ||
+                        if ((pRequest->m_nResponseStatus != 400) &&
                             (pRequest->m_nResponseStatus != 401))
                             m_httpServer.DelegateRequest(pRequest);
                     }
