@@ -16,6 +16,8 @@
 #include <QSize>
 #include <QFile>
 #include <QAtomicInt>
+#include <QEventLoop>
+#include <QTimer>
 
 #include "mythdirs.h"
 #include "mythlogging.h"
@@ -87,6 +89,7 @@ public:
     void StoreGUIsettings(void);
 
     double GetPixelAspectRatio(void);
+    void WaitForScreenChange(void) const;
 
     Settings *m_qtThemeSettings;   ///< Text/button/background colours, etc
 
@@ -388,6 +391,24 @@ double MythUIHelperPrivate::GetPixelAspectRatio(void)
     return m_pixelAspectRatio;
 }
 
+void MythUIHelperPrivate::WaitForScreenChange(void) const
+{
+    // Wait for screen signal change, so we later get updated screen resolution
+    QEventLoop loop;
+    QTimer timer;
+    QDesktopWidget *desktop = QApplication::desktop();
+
+    timer.setSingleShot(true);
+    QObject::connect(&timer, SIGNAL(timeout()),
+                     &loop, SLOT(quit()));
+    QObject::connect(desktop, SIGNAL(resized(int)),
+                     &loop, SLOT(quit()));
+    QObject::connect(desktop, SIGNAL(workAreaResized(int)),
+                     &loop, SLOT(quit()));
+    timer.start(300); //300ms maximum wait
+    loop.exec();
+}
+
 MythUIHelper::MythUIHelper()
 {
     d = new MythUIHelperPrivate(this);
@@ -441,7 +462,10 @@ void MythUIHelper::LoadQtConfig(void)
             // Make sure DisplayRes has current context info
             d->display_res->Initialize();
             // Switch to desired GUI resolution
-            d->display_res->SwitchToGUI();
+            if (d->display_res->SwitchToGUI())
+            {
+                d->WaitForScreenChange();
+            }
         }
     }
 
