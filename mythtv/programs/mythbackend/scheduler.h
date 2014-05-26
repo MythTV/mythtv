@@ -66,7 +66,8 @@ class Scheduler : public MThread, public MythScheduler
     virtual void GetAllPending(QStringList &strList) const;
     virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
 
-    enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortPriority, kSortType };
+    enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortNextRecording,
+                           kSortPriority, kSortType };
     static void GetAllScheduled(QStringList &strList,
                                 SchedSortColumn sortBy = kSortTitle,
                                 bool ascending = true);

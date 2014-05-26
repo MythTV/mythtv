@@ -92,6 +92,7 @@ import "/tv/js/tvutil.qjs"
     <select id="recRulesFilter" name="ViewFilter" onChange="submitForm(this.form)">
         <option value="title" <% if (sort === "title") {%>selected<%}%>><%=qsTr("Title")%></option>
         <option value="lastrecorded" <% if (sort === "lastrecorded") {%>selected<%}%>><%=qsTr("Last Recorded")%></option>
+        <option value="nextrecording" <% if (sort === "nextrecording") {%>selected<%}%>><%=qsTr("Next Recording")%></option>
         <option value="type" <% if (sort === "type") {%>selected<%}%>><%=qsTr("Type")%></option>
         <option value="priority" <% if (sort === "priority") {%>selected<%}%>><%=qsTr("Priority")%></option>
     </select>
