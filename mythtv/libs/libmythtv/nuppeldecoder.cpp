@@ -1211,7 +1211,6 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             buf->aspect = current_aspect;
             buf->frameNumber = framesPlayed;
             buf->dummy = 0;
-            buf->directrendering  = directrendering ? 1 : 0;
             GetPlayer()->ReleaseNextVideoFrame(buf, frameheader.timecode);
 
             // We need to make the frame available ourselves
