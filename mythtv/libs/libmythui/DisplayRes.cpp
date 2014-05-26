@@ -11,10 +11,6 @@
 #include "DisplayResOSX.h"
 #endif
 
-#include <QEventLoop>
-#include <QTimer>
-#include <QDesktopWidget>
-#include <QApplication>
 
 DisplayRes * DisplayRes::m_instance = NULL;
 bool         DisplayRes::m_locked   = false;
@@ -174,11 +170,6 @@ bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
         return false;
     }
 
-    if (chg)
-    {
-        WaitForScreenChange();
-    }
-
     m_curMode = next_mode;
 
     m_last = next;
@@ -230,11 +221,6 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     m_last = next;
     m_last.SetRefreshRate(target_rate);
 
-    if (chg)
-    {
-        WaitForScreenChange();
-    }
-
     LOG(VB_GENERAL, LOG_INFO, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
         .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate(), 0, 'f', 3));
 
@@ -283,22 +269,4 @@ const DisplayResVector GetVideoModes(void)
     DisplayResVector empty;
 
     return empty;
-}
-
-void DisplayRes::WaitForScreenChange(void) const
-{
-    // Wait for screen signal change, so we get updated screen resolution
-    QEventLoop loop;
-    QTimer timer;
-    QDesktopWidget *desktop = QApplication::desktop();
-
-    timer.setSingleShot(true);
-    QObject::connect(&timer, SIGNAL(timeout()),
-                     &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(resized(int)),
-                     &loop, SLOT(quit()));
-    QObject::connect(desktop, SIGNAL(workAreaResized(int)),
-                     &loop, SLOT(quit()));
-    timer.start(300); //300ms maximum wait
-    loop.exec();
 }
