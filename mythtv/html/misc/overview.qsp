@@ -148,7 +148,7 @@ function UTCDateString(d)
 }
 %>
 
-<script src="/3rdParty/jquery/galleria/galleria-1.2.3.min.js"></script>
+<script src="/3rdParty/jquery/galleria/galleria.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function($){
