@@ -27,7 +27,7 @@
 
 extern "C" {
 #if HAVE_BIGENDIAN
-#include "byteswap.h"
+#include "bswap.h"
 #endif
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
