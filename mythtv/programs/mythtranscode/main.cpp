@@ -70,6 +70,9 @@ static void UpdatePositionMap(frm_pos_map_t &posMap, frm_pos_map_t &durMap, QStr
 static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
                        frm_pos_map_t &posMap, frm_pos_map_t &durMap, int jobID)
 {
+    if (!m2f)
+        return 0;
+
     if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
     {
         if (jobID >= 0)
@@ -653,7 +656,11 @@ int main(int argc, char *argv[])
         {
             int err = BuildKeyframeIndex(m2f, infile, posMap, durMap, jobID);
             if (err)
+            {
+                delete m2f;
+                m2f = NULL;
                 return err;
+            }
             if (update_index)
                 UpdatePositionMap(posMap, durMap, NULL, pginfo);
             else
@@ -676,6 +683,7 @@ int main(int argc, char *argv[])
             }
         }
         delete m2f;
+        m2f = NULL;
     }
 
     if (result == REENCODE_OK)
