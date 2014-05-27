@@ -18,6 +18,7 @@
 #include "mythuiimageresults.h"
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
+#include "mythmiscutil.h"
 #include "remoteutil.h"
 #include "globals.h"
 #include "dbaccess.h"
@@ -213,7 +214,7 @@ namespace
     {
         bool operator()(const T &lhs, const T &rhs)
         {
-            return QString::localeAwareCompare(lhs.second, rhs.second) < 0;
+            return naturalCompare(lhs.second, rhs.second) < 0;
         }
     };
 

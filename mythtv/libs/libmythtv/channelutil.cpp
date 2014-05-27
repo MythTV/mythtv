@@ -15,6 +15,7 @@ using namespace std;
 #include "channelutil.h"
 #include "mythdb.h"
 #include "dvbtables.h"
+#include "mythmiscutil.h"
 
 #define LOC QString("ChanUtil: ")
 
@@ -2135,7 +2136,7 @@ vector<uint> ChannelUtil::GetChanIDs(int sourceid)
 
 inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
-    return QString::localeAwareCompare(a.callsign, b.callsign) < 0;
+    return naturalCompare(a.callsign, b.callsign) < 0;
 }
 
 inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
@@ -2219,7 +2220,7 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
-        cmp = QString::localeAwareCompare(a.channum, b.channum);
+        cmp = naturalCompare(a.channum, b.channum);
         if (cmp)
             return cmp < 0;
     }
