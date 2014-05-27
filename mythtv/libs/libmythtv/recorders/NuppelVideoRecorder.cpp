@@ -35,7 +35,7 @@ using namespace std;
 
 #if HAVE_BIGENDIAN
 extern "C" {
-#include "byteswap.h"
+#include "bswap.h"
 }
 #endif
 
