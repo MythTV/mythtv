@@ -6,6 +6,7 @@
 #include "mythuibutton.h"
 #include "mythuitext.h"
 #include "mythuitextedit.h"
+#include "mythmiscutil.h"
 #include "globals.h"
 #include "dbaccess.h"
 #include "videometadatalistmanager.h"
@@ -466,7 +467,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
                           lhs.GetFilename().toLower() : lhs.GetFilename());
             QString rhsfn(sort_ignores_case ?
                           rhs.GetFilename().toLower() : rhs.GetFilename());
-            ret = QString::localeAwareCompare(lhsfn, rhsfn) < 0;
+            ret = naturalCompare(lhsfn, rhsfn) < 0;
             break;
         }
         case kOrderByID:

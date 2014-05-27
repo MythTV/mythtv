@@ -34,13 +34,13 @@ struct SortData
 
 static bool operator<(const SortData &lhs, const SortData &rhs)
 {
-    int ret = QString::localeAwareCompare(lhs.m_title, rhs.m_title);
+    int ret = naturalCompare(lhs.m_title, rhs.m_title);
 
     if (ret == 0)
-        ret = QString::localeAwareCompare(lhs.m_filename, rhs.m_filename);
+        ret = naturalCompare(lhs.m_filename, rhs.m_filename);
 
     if (ret == 0)
-        ret = QString::localeAwareCompare(lhs.m_id, rhs.m_id);
+        ret = naturalCompare(lhs.m_id, rhs.m_id);
 
     return ret < 0;
 }
