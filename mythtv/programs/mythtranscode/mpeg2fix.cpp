@@ -201,6 +201,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        const char *fmt, int norp, int fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
+           : inputFC(NULL)
 {
     displayFrame = 0;
 
@@ -502,7 +503,9 @@ int MPEG2replex::WaitBuffers()
 void *MPEG2fixup::ReplexStart(void *data)
 {
     MThread::ThreadSetup("MPEG2Replex");
-    MPEG2fixup *m2f = (MPEG2fixup *) data;
+    MPEG2fixup *m2f = static_cast<MPEG2fixup *>(data);
+    if (!m2f)
+        return NULL;
     m2f->rx.Start();
     MThread::ThreadCleanup();
     return NULL;
@@ -737,7 +740,11 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
     // Open recording
     LOG(VB_GENERAL, LOG_INFO, QString("Opening %1").arg(inputfile));
 
-    inputFC = NULL;
+    if (inputFC)
+    {
+        avformat_close_input(&inputFC);
+        inputFC = NULL;
+    }
 
     ret = avformat_open_input(&inputFC, ifname, fmt, NULL);
     if (ret)
