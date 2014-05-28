@@ -380,7 +380,7 @@ class Videos(object):
                     for format in show.xpath('.//a'):
                         link = u'http://revision3.com%s' % format.attrib['href']
                         # If this is a "tekzilla" link without extra parameters that skip show
-                        # This forces the Tekzilla weekly show to be seperate from the daily show
+                        # This forces the Tekzilla weekly show to be separate from the daily show
                         if link.find('/tekzilla/') != -1 and link.find('?subshow=false') == -1:
                             continue
                         mp4Format = etree.SubElement(tmpShow, "mp4Format")

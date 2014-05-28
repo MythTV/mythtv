@@ -200,7 +200,7 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 # Used for debugging
 #import nv_python_libs.mtv.mtv_api as target
 
-# Verify that the tmdb_api modules are installed and accessable
+# Verify that the tmdb_api modules are installed and accessible
 try:
     import nv_python_libs.mtv.mtv_api as target
 except Exception, e:
@@ -216,7 +216,7 @@ if target.__version__ < '0.2.0':
     sys.exit(1)
 
 
-# Verify that the common process modules are installed and accessable
+# Verify that the common process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
 except Exception, e:

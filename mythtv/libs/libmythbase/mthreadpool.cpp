@@ -52,7 +52,7 @@
  *  requiring a name.
  *
  *  \li MThread does not inherit from QObject, if you need QObject services
- *  in a threading class you will need to inherit from QObject seperately. Note
+ *  in a threading class you will need to inherit from QObject separately. Note
  *  when you inherit from QObject, you must inherit from no more than one
  *  QObject based class and it must be first in the list of classes your class
  *  inherits from (a Qt restriction).

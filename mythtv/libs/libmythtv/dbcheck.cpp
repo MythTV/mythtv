@@ -2135,7 +2135,7 @@ NULL
                          .toLocal8Bit());
         }
 
-        // Convert DATETIME back to seperate DATE and TIME in record table
+        // Convert DATETIME back to separate DATE and TIME in record table
         const char *post_sql[] = {
             "UPDATE record, recordupdate "
             "SET record.startdate = DATE(recordupdate.starttime), "

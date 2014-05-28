@@ -1451,7 +1451,7 @@ static enum PixelFormat get_format_vdpau_hwaccel(struct AVCodecContext *avctx,
 }
 #endif
 
-// Declared seperately to allow attribute
+// Declared separately to allow attribute
 static enum PixelFormat get_format_dxva2(struct AVCodecContext *,
                                          const enum PixelFormat *) MUNUSED;
 
@@ -1474,7 +1474,7 @@ static bool IS_VAAPI_PIX_FMT(enum PixelFormat fmt)
            fmt == PIX_FMT_VAAPI_VLD;
 }
 
-// Declared seperately to allow attribute
+// Declared separately to allow attribute
 static enum PixelFormat get_format_vaapi(struct AVCodecContext *,
                                          const enum PixelFormat *) MUNUSED;
 

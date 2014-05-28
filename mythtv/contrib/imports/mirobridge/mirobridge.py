@@ -857,7 +857,7 @@ def getMythtvDirectories():
     # Stop processing if this local host has any storage groups
     global localhostname, vid_graphics_dirs, dir_dict, storagegroups, local_only, verbose
 
-    # When there is NO SG for Videos then ALL graphics paths MUST be local paths set in the FE and accessable
+    # When there is NO SG for Videos then ALL graphics paths MUST be local paths set in the FE and accessible
     # from the backend
     if storagegroups.has_key(u'mythvideo'):
         local_only = False
@@ -879,7 +879,7 @@ def getMythtvDirectories():
 
     if local_only:
         logger.warning(u'There is no "Videos" Storage Group set so ONLY MythTV Frontend local '\
-                       u'paths for videos and graphics that are accessable from this MythTV '\
+                       u'paths for videos and graphics that are accessible from this MythTV '\
                        u'Backend can be used.')
 
     for key in dir_dict.keys():

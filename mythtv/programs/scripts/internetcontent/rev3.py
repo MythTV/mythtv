@@ -239,7 +239,7 @@ if target.__version__ < '0.1.0':
     sys.stderr.write("\n! Error: Your current installed rev3_api.py version is (%s)\nYou must at least have version (0.1.0) or higher.\n" % target.__version__)
     sys.exit(1)
 
-# Verify that the main process modules are installed and accessable
+# Verify that the main process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
 except Exception, e:

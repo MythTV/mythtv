@@ -1401,7 +1401,7 @@ def main():
         print season_numbers[:-1]
         sys.exit(0) # Option (-n) is the only option honoured when used
 
-    # Dump information accessable for a Series and ONLY first season of episoded data
+    # Dump information accessible for a Series and ONLY first season of episoded data
     if opts.debug == True:
         print "#"*20
         print "# Starting Raw keys call"

@@ -238,7 +238,7 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
             QObject::tr("Transport Editor"), 
             QObject::tr(
                 "The Video Sources to which this Transport is connected "
-                "are incompatible, please create seperate video sources "
+                "are incompatible, please create separate video sources "
                 "for these cards. "));
 
         return CardUtil::ERROR_PROBE;

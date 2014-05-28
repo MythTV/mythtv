@@ -564,7 +564,7 @@ of the forthcoming command. This can be justified in any way
 The backend responds with a length, and the response to the command.
 This can be numbers (up to 32 bit, represented in ASCII),
 a single string, or an ASCII encoding of a QStringList.
-The 5 byte sequence "[]:[]" seperates items in the stringlist.
+The 5 byte sequence "[]:[]" separates items in the stringlist.
 Any 64 bit numbers are represented as a stringlist of two 32bit words
 (MSB first).
 
@@ -791,7 +791,7 @@ easy to use.
   QString safe = QDeepCopy<QString>(original);
 \endcode
 
-In this case safe and original can be used by two seperate
+In this case safe and original can be used by two separate
 threads, while unsafe can only be used in the same thread
 as originalStr.
 
@@ -837,7 +837,7 @@ few cotchas on installation: You must have APIC enabled to
 use performance counters. This is usually the default, but
 you may want to check this in your kernel configuration. You
 also need the oprofile module, this is part of the kernel
-config in Linux 2.6+, but must be compiled seperately for
+config in Linux 2.6+, but must be compiled separately for
 earlier kernels. Finally, some RedHat kernels does not work
 with the standard oprofile, so you must use the RedHat
 version of oprofile, or compile your own kernel.

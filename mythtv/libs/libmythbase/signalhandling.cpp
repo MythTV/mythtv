@@ -351,7 +351,7 @@ void SignalHandler::handleSignal(void)
         }
         else if (!allowNullHandler)
         {
-            LOG(VB_GENERAL, LOG_CRIT, QString("Recieved unexpected signal %1")
+            LOG(VB_GENERAL, LOG_CRIT, QString("Received unexpected signal %1")
                 .arg(signum));
         }
         break;

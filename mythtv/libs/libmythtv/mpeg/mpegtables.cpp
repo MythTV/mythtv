@@ -11,7 +11,7 @@ const unsigned char DEFAULT_PAT_HEADER[8] =
 {
     0x00, // TableID::PAT
     0xb0, // Syntax indicator
-    0x00, // Length (set seperately)
+    0x00, // Length (set separately)
     0x00, // Transport stream ID top bits
 
     0x00, // Transport stream ID bottom bits
@@ -24,10 +24,10 @@ const unsigned char DEFAULT_PMT_HEADER[12] =
 {
     0x02, // TableID::PMT
     0xb0, // Syntax indicator
-    0x00, // Length (set seperately)
-    0x00, // MPEG Program number top bits (set seperately)
+    0x00, // Length (set separately)
+    0x00, // MPEG Program number top bits (set separately)
 
-    0x00, // MPEG Program number bottom bits (set seperately)
+    0x00, // MPEG Program number bottom bits (set separately)
     0xc1, // Version + Current/Next
     0x00, // Current Section
     0x00, // Last Section

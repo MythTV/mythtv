@@ -545,7 +545,7 @@ class CECAdapterPriv
                 code = "TIMER_PROGRAMMING";
                 break;
             case CEC_USER_CONTROL_CODE_UNKNOWN:
-                code = "UNKOWN";
+                code = "UNKNOWN";
                 break;
             case CEC_USER_CONTROL_CODE_DATA:
                 code = "DATA";
