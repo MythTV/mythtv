@@ -16,7 +16,7 @@ Prüfen Sie ob das Verzeichnis existiert, lesbar ist und die MythGallery-Einstel
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="243"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="246"/>
         <source>Press SELECT to play again</source>
         <translation>Mit &apos;SELECT&apos; nochmals abspielen</translation>
     </message>
