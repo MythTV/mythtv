@@ -103,6 +103,7 @@ static MIMETypes g_MIMETypes[] =
     { "3g2" , "video/3gpp2"                }, // Also audio/3gpp2
     { "asf" , "video/x-ms-asf"             },
     { "avi" , "video/avi"                  },
+    { "m4v" , "video/mp4"                  },
     { "mpeg", "video/mpeg"                 },
     { "mpeg2","video/mpeg"                 },
     { "mpg" , "video/mpeg"                 },
