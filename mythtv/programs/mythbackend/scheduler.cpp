@@ -4379,7 +4379,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
             sortColumn = "record.last_record";
             break;
         case kSortNextRecording:
-            sortColumn = "record.next_record";
+            sortColumn = "record.next_record = '0000-00-00 00:00:00', record.next_record";
             break;
         case kSortType:
             sortColumn = "record.type";
