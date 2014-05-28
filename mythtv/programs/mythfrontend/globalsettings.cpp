@@ -2540,6 +2540,8 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(locale.toString(sampdate, "d ddd"), "d ddd");
     gc->addSelection(locale.toString(sampdate, "ddd M/d"), "ddd M/d");
     gc->addSelection(locale.toString(sampdate, "ddd d/M"), "ddd d/M");
+    gc->addSelection(locale.toString(sampdate, "ddd d.M"), "ddd d.M");
+    gc->addSelection(locale.toString(sampdate, "ddd dd.MM"), "ddd dd.MM");
     gc->addSelection(locale.toString(sampdate, "M/d ddd"), "M/d ddd");
     gc->addSelection(locale.toString(sampdate, "d/M ddd"), "d/M ddd");
 
