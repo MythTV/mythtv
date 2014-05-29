@@ -192,7 +192,7 @@
         left:               0px;
         height:             34px;
         border-bottom:      4px solid #004570;
-        z-index:            50;
+        z-index:            90;
     }
     #header_text {
         color:              #cdcccc;
@@ -282,7 +282,7 @@
                             radial-gradient(circle, #151515 2px, transparent 2px);
         background-size:    6px 6px;
         background-position: 0 0, 3px 3px;
-        z-index:            10;
+        z-index:            75;
     }
 
     #menu a, a:visited {
