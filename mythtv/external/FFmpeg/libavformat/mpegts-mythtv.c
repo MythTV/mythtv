@@ -2031,7 +2031,6 @@ static AVStream *new_section_av_stream(SectionContext *sect, enum AVMediaType ty
 {
     FF_ALLOCZ_OR_GOTO(NULL, sect->st, sizeof(AVStream), fail);
 
-    sect->st->codec = avcodec_alloc_context();
     sect->st = av_new_stream(sect->stream, sect->pid);
 
     av_set_pts_info(sect->st, 33, 1, 90000);
