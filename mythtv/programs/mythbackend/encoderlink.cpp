@@ -274,7 +274,11 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 
         if (tvrec)
         {
-            retval = tvrec->IsSameRecording(*rec);
+            retval = (rec->GetInputID() == 0 &&
+                      tvrec->IsSameRecording(*rec)) ||
+                (rec->GetInputID() == tvrec->GetInputID() &&
+                 tvrec->IsSameProgramWeakCheck(*rec))
+;
             delete tvrec;
         }
     }

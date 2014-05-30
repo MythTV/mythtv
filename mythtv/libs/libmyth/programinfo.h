@@ -312,7 +312,9 @@ class MPUBLIC ProgramInfo
     // Used for extending scheduled recordings
     bool IsSameProgramWeakCheck(const ProgramInfo &other) const;
     bool IsSameRecording(const ProgramInfo &other) const
-        { return chanid == other.chanid && recstartts == other.recstartts; }
+        { return title == other.title &&
+                chanid == other.chanid &&
+                recstartts == other.recstartts; }
     bool IsSameChannel(const ProgramInfo &other) const;
 
     // Quick gets
