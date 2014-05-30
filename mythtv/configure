@@ -7078,10 +7078,6 @@ if test x"$CONFIG_INCLUDEPATH" != x"" ; then
   echo "CONFIG_INCLUDEPATH=$CONFIG_INCLUDEPATH" >> $TMPMAK
 fi
 
-# TODO, Update to use new API audio decode
-echo "#define FF_API_OLD_DECODE_AUDIO 1" >> $TMPH
-echo "#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000" >> $TMPH
-
 echo "#endif /* MYTHTV_CONFIG_H */" >> $TMPH
 
 cat <<EOF >> $TMPMAK
