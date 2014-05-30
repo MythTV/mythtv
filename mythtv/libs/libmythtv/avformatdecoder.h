@@ -21,7 +21,7 @@
 #include "mythplayer.h"
 
 extern "C" {
-#include "frame.h"
+#include "mythframe.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/audioconvert.h"

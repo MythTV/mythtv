@@ -11,7 +11,7 @@
 
 // MythTV headers
 #include "programinfo.h"
-#include "frame.h"
+#include "mythframe.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"

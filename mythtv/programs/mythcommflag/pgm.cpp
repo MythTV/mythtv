@@ -5,7 +5,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
-#include "frame.h"
+#include "mythframe.h"
 #include "mythlogging.h"
 #include "myth_imgconvert.h"
 #include "pgm.h"

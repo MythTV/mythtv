@@ -10,11 +10,11 @@ using namespace std;
 
 #include "format.h"
 #include "decoderbase.h"
+#include "mythframe.h"
 
 #include "RTjpegN.h"
 
 extern "C" {
-#include "frame.h"
 #include "libavcodec/avcodec.h"
 }
 

@@ -13,7 +13,7 @@ extern "C" {
 }
 
 // MythTV headers
-#include "frame.h"          // VideoFrame
+#include "mythframe.h"          // VideoFrame
 #include "mythplayer.h"
 
 // Commercial Flagging headers

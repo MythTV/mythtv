@@ -5,7 +5,7 @@
 
 #include "datacontracts/liveStreamInfoList.h"
 
-#include "frame.h"
+#include "mythframe.h"
 
 typedef enum {
     kHLSStatusUndefined    = -1,

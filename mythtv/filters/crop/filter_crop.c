@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 #include "libavutil/mem.h"
 #include "libavcodec/dsputil.h"
 

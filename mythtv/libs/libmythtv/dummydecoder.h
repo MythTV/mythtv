@@ -4,10 +4,7 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
-
-extern "C" {
-#include "frame.h"
-}
+#include "mythframe.h"
 
 class DummyDecoder : public DecoderBase
 {

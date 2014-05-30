@@ -17,7 +17,7 @@
 #include <math.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 #define NREFS 2
 #define NCHANS 3

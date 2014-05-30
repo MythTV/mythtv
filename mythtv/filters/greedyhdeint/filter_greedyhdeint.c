@@ -16,7 +16,7 @@
 #include <math.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 #include "../mm_arch.h"
 

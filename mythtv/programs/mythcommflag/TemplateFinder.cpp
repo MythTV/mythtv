@@ -13,7 +13,7 @@
 // MythTV headers
 #include "mythplayer.h"
 #include "mythcorecontext.h"    /* gContext */
-#include "frame.h"          /* VideoFrame */
+#include "mythframe.h"          /* VideoFrame */
 #include "mythdate.h"
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"

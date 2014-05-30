@@ -34,7 +34,7 @@
 #include <pthread.h>
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 #define MAX(a,b) ((a) < (b) ? (b) : (a))

@@ -2,7 +2,7 @@
 #define FILTERMANAGER
 
 #include "filter.h"
-#include "frame.h"
+#include "mythframe.h"
 
 // C++ headers
 #include <vector>

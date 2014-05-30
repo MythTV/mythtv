@@ -3,9 +3,6 @@
 #ifndef __VIDEOBUFFERS_H__
 #define __VIDEOBUFFERS_H__
 
-extern "C" {
-#include "frame.h"
-}
 #include <vector>
 #include <map>
 using namespace std;
@@ -14,6 +11,7 @@ using namespace std;
 #include <QString>
 #include <QWaitCondition>
 
+#include "mythframe.h"
 #include "mythdeque.h"
 
 #ifdef USING_X11
