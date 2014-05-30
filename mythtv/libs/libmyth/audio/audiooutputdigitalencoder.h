@@ -40,6 +40,7 @@ class AudioOutputDigitalEncoder
     int             inlen;
     size_t          samples_per_frame;
     SPDIFEncoder   *m_spdifenc;
+    AVFrame        *m_frame;
 };
 
 #endif
