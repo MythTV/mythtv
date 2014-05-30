@@ -50,6 +50,7 @@ HEADERS += datacontracts/channelGroupList.h      datacontracts/input.h
 HEADERS += datacontracts/inputList.h
 HEADERS += datacontracts/recRuleFilter.h         datacontracts/recRuleFilterList.h
 HEADERS += datacontracts/castMember.h            datacontracts/castMemberList.h
+HEADERS += datacontracts/frontend.h              datacontracts/frontendList.h
 
 SOURCES += service.cpp
 

@@ -29,6 +29,7 @@
 #include <QScriptEngine>
 
 #include "services/mythServices.h"
+#include <datacontracts/frontend.h>
 
 class Myth : public MythServices
 {
@@ -79,6 +80,9 @@ class Myth : public MythServices
                                                   const QString   &Level,
                                                   const QString   &MsgContains
                                                 );
+
+
+        DTC::FrontendList*  GetFrontends        ( bool Connected );
 
         DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                   const QString   &Key,
@@ -234,6 +238,11 @@ class ScriptableMyth : public QObject
                                   Level, MsgContains );
         }
 
+        QObject* GetFrontends( bool OnLine )
+        {
+            return m_obj.GetFrontends( OnLine );
+        }
+
         QObject* GetSetting ( const QString   &HostName,
                               const QString   &Key,
                               const QString   &Default )
@@ -300,6 +309,8 @@ class ScriptableMyth : public QObject
         {
             return m_obj.ProfileText();
         }
+
+
 };
 
 

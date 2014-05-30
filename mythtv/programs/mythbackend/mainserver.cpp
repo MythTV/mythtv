@@ -74,6 +74,9 @@ using namespace std;
 #include "metaio.h"
 #include "musicmetadata.h"
 
+// mythbackend headers
+#include "backendcontext.h"
+
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
@@ -1551,6 +1554,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         controlSocketList.remove(socket);
         playbackList.push_back(pbs);
         sockListLock.unlock();
+
+        Frontend *frontend = new Frontend();
+        frontend->name = commands[2];
+        // On a combined mbe/fe the frontend will connect using the localhost
+        // address, we need the external IP which happily will be the same as
+        // the backend's external IP
+        if (frontend->name == gCoreContext->GetMasterHostName())
+            frontend->ip = QHostAddress(gCoreContext->GetBackendServerIP());
+        else
+            frontend->ip = socket->GetPeerAddress();
+        if (gBackendContext)
+            gBackendContext->SetFrontendConnected(frontend);
+        else
+            delete frontend;
 
         if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
             gCoreContext->SendSystemEvent(
@@ -6985,6 +7002,8 @@ void MainServer::connectionClosed(MythSocket *socket)
             }
             else if (ismaster && pbs->getHostname() != "tzcheck")
             {
+                if (gBackendContext)
+                    gBackendContext->SetFrontendDisconnected(pbs->getHostname());
                 gCoreContext->SendSystemEvent(
                     QString("CLIENT_DISCONNECTED HOSTNAME %1")
                             .arg(pbs->getHostname()));

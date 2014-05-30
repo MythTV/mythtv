@@ -35,7 +35,7 @@
 #include "channelutil.h"
 #include "channelgroup.h"
 
-#include "logging.h"
+#include "mythlogging.h"
 
 extern AutoExpire  *expirer;
 extern Scheduler   *sched;

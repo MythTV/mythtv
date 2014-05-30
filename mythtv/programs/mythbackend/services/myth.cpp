@@ -24,6 +24,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "myth.h"
+#include <backendcontext.h>
 
 #include <QDir>
 #include <QCryptographicHash>
@@ -554,6 +555,31 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
                                        (LogLevel_t)query.value(9).toInt()) );
             pLogMessage->setMessage( query.value(10).toString() );
         }
+    }
+
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+DTC::FrontendList *Myth::GetFrontends( bool Connected )
+{
+    DTC::FrontendList *pList = new DTC::FrontendList();
+    QMap<QString, Frontend*> frontends;
+    if (Connected)
+        frontends = gBackendContext->GetConnectedFrontends();
+    else
+        frontends = gBackendContext->GetFrontends();
+
+    QMap<QString, Frontend*>::const_iterator it;
+    for (it = frontends.begin(); it != frontends.end(); ++it)
+    {
+        DTC::Frontend *pFrontend = pList->AddNewFrontend();
+        pFrontend->setName((*it)->name);
+        pFrontend->setIP((*it)->ip.toString());
+        pFrontend->setConnectionCount((*it)->connectionCount);
     }
 
     return pList;

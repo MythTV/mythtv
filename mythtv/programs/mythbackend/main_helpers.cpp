@@ -263,11 +263,15 @@ void cleanup(void)
         delete rec;
     }
 
+
     delete gContext;
     gContext = NULL;
 
     delete mainServer;
     mainServer = NULL;
+
+     delete gBackendContext;
+     gBackendContext = NULL;
 
     if (pidfile.size())
     {
@@ -544,6 +548,8 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
 
 int run_backend(MythBackendCommandLineParser &cmdline)
 {
+    gBackendContext = new BackendContext();
+
     if (!DBUtil::CheckTimeZoneSupport())
     {
         LOG(VB_GENERAL, LOG_ERR,

@@ -22,6 +22,7 @@
 #include "datacontracts/timeZoneInfo.h"
 #include "datacontracts/logMessage.h"
 #include "datacontracts/logMessageList.h"
+#include <datacontracts/frontendList.h>
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -66,6 +67,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::TimeZoneInfo       ::InitializeCustomTypes();
             DTC::LogMessage         ::InitializeCustomTypes();
             DTC::LogMessageList     ::InitializeCustomTypes();
+            DTC::FrontendList       ::InitializeCustomTypes();
         }
 
     public slots:
@@ -108,6 +110,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
                                                 const QDateTime &ToTime,
                                                 const QString   &Level,
                                                 const QString   &MsgContains ) = 0;
+
+        virtual DTC::FrontendList*  GetFrontends        ( bool Connected ) = 0;
 
         virtual DTC::SettingList*   GetSetting          ( const QString   &HostName,
                                                           const QString   &Key,
