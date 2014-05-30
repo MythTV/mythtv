@@ -643,7 +643,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     tmp_pkt.size = len;
 
     uint32_t frames_added = 0;
-    uint8_t *samples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    uint8_t *samples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     while (tmp_pkt.size > 0)
     {
         int data_size;
@@ -658,7 +658,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
         if (data_size)
         {
             int num_samples = data_size /
-	      (ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt));
+                (ctx->channels * av_get_bytes_per_sample(ctx->sample_fmt));
 
             frames_added += num_samples;
             AudioData block;
@@ -1734,7 +1734,7 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     if (!m_audio)
         return 0;
 
-    int16_t *samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    int16_t *samples = (int16_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     int frames = AUDIOCARD_BUFFER * m_frameRate / 1000;
     m_audio->AddData((char *)samples,
                      frames * (m_sampleSize>>3) * m_channels,

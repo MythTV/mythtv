@@ -427,8 +427,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
     memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
 
-    audioSamples = (uint8_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                         sizeof(int32_t));
+    audioSamples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
@@ -464,7 +463,7 @@ AvFormatDecoder::~AvFormatDecoder()
 
     sws_freeContext(sws_ctx);
 
-    av_free(audioSamples);
+    av_freep(&audioSamples);
 
     if (avfRingBuffer)
         delete avfRingBuffer;

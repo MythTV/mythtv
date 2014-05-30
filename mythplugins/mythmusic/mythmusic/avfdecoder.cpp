@@ -189,7 +189,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     setFilename(file);
 
     m_outputBuffer =
-        (uint8_t *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(int32_t));
+        (uint8_t *)av_malloc(AudioOutput::MAX_SIZE_BUFFER);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
