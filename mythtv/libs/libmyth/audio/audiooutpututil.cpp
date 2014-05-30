@@ -243,20 +243,25 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
                                  uint8_t *buffer, int &data_size,
                                  const AVPacket *pkt)
 {
-    AVFrame frame;
+    AVFrame *frame;
     int got_frame = 0;
     int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
     data_size = 0;
-    avcodec_get_frame_defaults(&frame);
-    ret = avcodec_decode_audio4(ctx, &frame, &got_frame, pkt);
+    if (!(frame = av_frame_alloc()))
+    {
+        return AVERROR(ENOMEM);
+    }
+
+    ret = avcodec_decode_audio4(ctx, frame, &got_frame, pkt);
     if (ret < 0)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("audio decode error: %1 (%2)")
             .arg(av_make_error_string(error, sizeof(error), ret))
             .arg(got_frame));
+        av_frame_free(&frame);
         return ret;
     }
 
@@ -264,24 +269,26 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
     {
         LOG(VB_AUDIO, LOG_DEBUG, LOC +
             QString("audio decode, no frame decoded (%1)").arg(ret));
+        av_frame_free(&frame);
         return ret;
     }
 
-    AVSampleFormat format = (AVSampleFormat)frame.format;
+    AVSampleFormat format = (AVSampleFormat)frame->format;
 
-    data_size = frame.nb_samples * frame.channels * av_get_bytes_per_sample(format);
+    data_size = frame->nb_samples * frame->channels * av_get_bytes_per_sample(format);
 
     if (av_sample_fmt_is_planar(format))
     {
         InterleaveSamples(AudioOutputSettings::AVSampleFormatToFormat(format, ctx->bits_per_raw_sample),
-                          frame.channels, buffer, (const uint8_t **)frame.extended_data,
+                          frame->channels, buffer, (const uint8_t **)frame->extended_data,
                           data_size);
     }
     else
     {
         // data is already compacted... simply copy it
-        memcpy(buffer, frame.extended_data[0], data_size);
+        memcpy(buffer, frame->extended_data[0], data_size);
     }
+    av_frame_free(&frame);
 
     return ret;
 }
