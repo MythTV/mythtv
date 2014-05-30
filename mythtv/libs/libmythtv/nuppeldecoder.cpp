@@ -47,7 +47,7 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
-      directrendering(false),
+      m_mpa_pic(NULL), directrendering(false),
       lastct('1'), strm_buf(0), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -96,7 +96,8 @@ NuppelDecoder::~NuppelDecoder()
     if (strm_buf)
         delete [] strm_buf;
 
-    av_free(m_audioSamples);
+    av_freep(&m_audioSamples);
+    av_frame_free(&m_mpa_pic);
 
     while (!StoredData.empty())
     {
@@ -911,8 +912,18 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         if (!mpa_vidcodec)
             InitAVCodecVideo(frameheader->comptype - '3');
 
-        AVFrame mpa_pic;
-        avcodec_get_frame_defaults(&mpa_pic);
+        if (!m_mpa_pic)
+        {
+            if (!(m_mpa_pic = av_frame_alloc()))
+            {
+                LOG(VB_GENERAL, LOG_ERR, "DecodeFrame: Out of memory");
+                return false;
+            }
+        }
+        else
+        {
+            av_frame_unref(m_mpa_pic);
+        }
         AVPacket pkt;
         av_init_packet(&pkt);
         pkt.data = lstrm;
@@ -922,7 +933,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
-            int ret = avcodec_decode_video2(mpa_vidctx, &mpa_pic, &gotpicture,
+            int ret = avcodec_decode_video2(mpa_vidctx, m_mpa_pic, &gotpicture,
                                             &pkt);
             directframe = NULL;
             if (ret < 0)
@@ -964,7 +975,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                        video_height);
 
         myth_sws_img_convert(
-            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
+            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)m_mpa_pic,
                     mpa_vidctx->pix_fmt, video_width, video_height);
     }
 
