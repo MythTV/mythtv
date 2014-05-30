@@ -838,7 +838,6 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     int r;
     lzo_uint out_len;
     int compoff = 0;
-    AVPacket pkt;
 
     unsigned char *outbuf = frame->buf;
     directframe = frame;
@@ -914,6 +913,8 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             InitAVCodecVideo(frameheader->comptype - '3');
 
         AVFrame mpa_pic;
+        avcodec_get_frame_defaults(&mpa_pic);
+        AVPacket pkt;
         av_init_packet(&pkt);
         pkt.data = lstrm;
         pkt.size = frameheader->packetlength;
