@@ -50,10 +50,9 @@
     width: 98%;
     /* END HACK */
 
-    width: calc(100% - 20px); /* Need to subtract padding of parent */
+    width: calc(100% - 15px); /* Need to subtract padding of parent */
     position: absolute;
     padding: 0px;
-    /*overflow: visible;*/
 }
 
 .guideGrid div
@@ -72,6 +71,11 @@
     font-weight: bold;
     vertical-align: middle;
     position: relative;
+    /* We use this margin to align the timebar with the channel list when
+       the scrollbar is displayed but the scrollbar isn't displayed for mobile
+       browsers which causes it to be mis-aligned. Stuck on simple (non javascript)
+       solution for this problem. */
+    margin-right: 15px;
 }
 
 .guideGrid .timeBarDate
@@ -106,12 +110,32 @@
     height: 100%;
 }
 
+.guideGrid .channels
+{
+    /*
+       The fat finger, small screen problem.
+       Purely cosmetic, can be safely commented out if necessary, this just
+       prevents browsers, mobile browsers especially from trying to highlight the
+       text when you really wanted to click on a programme in the guide.
+    */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* */
+    overflow-y: scroll;
+    height: 50px;
+}
+
 .guideGrid .channelRow
 {
     clear: both;
     width: 100%;
-    height: 80px;
-    margin: 2px 0px; /* Vertical Horizontal */
+    height: 82px;
+    padding-bottom: 2px;
+    /*margin: 2px 0px;*/ /* Vertical Horizontal */
     overflow: visible;
 }
 

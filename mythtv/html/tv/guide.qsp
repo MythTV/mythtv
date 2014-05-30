@@ -34,7 +34,7 @@ import "/tv/js/constants.js"
     {
         var tmpDate = myth.ParseISODateString(getArg("GuideDate"));
         var tmpTime = myth.ParseISODateString(getArg("GuideTime"));
-        // get/setTime don't work as expected here, so set hours/minutes
+        // get/setTime do not work as expected here, so set hours/minutes
         // individually
         tmpDate.setHours(tmpTime.getHours());
         tmpDate.setMinutes(tmpTime.getMinutes());
@@ -107,6 +107,7 @@ import "/tv/js/constants.js"
 <link rel="stylesheet" type="text/css" href="/tv/css/guide.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/common.css">
 <link rel="stylesheet" type="text/css" href="/tv/css/category_colors.css">
+<!-- <link rel="stylesheet" type="text/css" href="/3rdParty/jquery/slick/slick.css"> -->
 <script src="/js/utility.js"></script> <!-- ECMA not JS -->
 <script src="/js/util.qjs"></script>
 <script src="/tv/js/common.js"></script>
@@ -160,7 +161,7 @@ if (chanGroups.length)
 {
 %>
     <label for="ChannelGroup"><%=qsTr("Group")%>:
-    <select id="ChannelGroup" name="ChannelGroup" onChange="submitForm(this.form, 'guideGrid', 'dissolve')">
+    <select id="ChannelGroup" name="ChannelGroup" onChange="submitGuideForm(this)">
         <option label="<%=qsTr("All Channels")%>" value="0"><%=qsTr("All Channels")%></option>
 <%
     for (var grpIdx = 0; grpIdx < chanGroups.length; grpIdx++)
@@ -256,7 +257,7 @@ if (chanGroups.length)
         </div>
     </div>
 
-
+    <div class="channels">
 <%
     // The nothing to display message
     if (!isValidObject(channelList) || channelList.length === 0)
@@ -276,12 +277,12 @@ if (chanGroups.length)
         var programList = channel.Programs;
 %>
 
-    <div class="channelRow">
-        <div class="channelBox">
-            <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
-            <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
-        </div>
-        <div class="programsBox">
+        <div class="channelRow">
+            <div class="channelBox">
+                <img class="channelIcon" height="57" alt="<%=escapeHTML(channel.ChannelName)%> Icon" src="/Guide/GetChannelIcon?ChanId=<%=channel.ChanId%>&amp;Height=57" />
+                <div class="channelText"><%=escapeHTML(channel.CallSign)%></div>
+            </div>
+            <div class="programsBox">
 
 <%
         var programNum = 0;
@@ -337,32 +338,33 @@ if (chanGroups.length)
             // and starttime for the AJAX scheduling stuff
             var programIdentifier = channel.ChanId + "_" + program.StartTime.toISOString();
 %>
-            <div class="programBox" style="width:<%=width%>%;">
-                <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
-                    <div class="programHeader">
-                        <div class="programTitle">
-                            <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                <div class="programBox" style="width:<%=width%>%;">
+                    <div class="programBoxInner <%=categoryClass%> <%=statusClass%> <%=startClass%> <%=endClass%>" id="<%=programIdentifier%>" data-recordid="<%=program.Recording.RecordId%>" onMouseOver="startDetailTimer(this, 'program');" onMouseOut="hideDetail(this);" onClick="showMenu(this, '<%=menu%>');">
+                        <div class="programHeader">
+                            <div class="programTitle">
+                                <% if (program.CatType == CategoryType.MOVIE) {%><img src="/tv/images/cat_movie.svg" width="18" height="13" alt="<%=qsTr("Movie")%>" title="<%=qsTr("Movie")%>" /><%}%> <%=escapeHTML(program.Title)%> <% if (isValidObject(program.Airdate) && program.Airdate.getFullYear() && program.CatType == "movie") {%>(<%=program.Airdate.getFullYear()%>)<%}%>
+                            </div>
+                        </div>
+                        <div class="programBody">
+                            <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
+                            <span class="programDescription"><%=escapeHTML(program.Description)%></span>
+                        </div>
+                        <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
+                            <%=qsTr("Scheduling")%> ...
                         </div>
                     </div>
-                    <div class="programBody">
-                        <span class="programSubtitle"><%=escapeHTML(program.SubTitle)%></span>
-                        <span class="programDescription"><%=escapeHTML(program.Description)%></span>
-                    </div>
-                    <div class="programSchedPopup" id="<%=programIdentifier%>_schedpopup">
-                        <%=qsTr("Scheduling")%> ...
-                    </div>
                 </div>
-            </div>
 <%
         }
 %>
-            <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
-
+                <div class="relentlessMarchOfTime" style="position:absolute;width:<%=darkVeilWidth%>%;">&nbsp;</div>
+            </div>
         </div>
-    </div>
 <%
     }
 %>
+
+    </div>
 
 <% if (nextStartIndex) { %>
 <a class="jscroll-next" href="/tv/guide.qsp?ChannelGroup=<%=channelGroup%>&amp;StartTime=<%=guideStartTime.toISOString()%>&amp;Start=<%=nextStartIndex%>&amp;GuideOnly=1" />
@@ -372,9 +374,35 @@ if (chanGroups.length)
 </div> <!-- End guideGrid -->
 </div> <!-- End guideGrid-container -->
 
-<!--<script>
-    loadJScroll();
-</script>-->
+<script type="text/javascript">
+
+    window.onresize = function(event)
+    {
+        fixGuideHeight();
+    };
+
+    fixGuideHeight();
+
+</script>
+
+<!--
+<script type="text/javascript" src="/3rdParty/jquery/slick/slick.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.channels').slick({
+            vertical: true,
+            slidesToShow:5,
+            slidesToScroll:5,
+            arrows:true,
+            dots:false,
+            speed:100,
+            touchMove:false,
+            centerMode:false
+        });
+    });
+</script>
+-->
 
 </body>
 </html>

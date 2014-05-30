@@ -114,9 +114,21 @@ function changeGuideStartTime(selectBox)
     var transition = (selectBox.selectedIndex > oldIndex) ? 'left' : 'right'
 
     submitForm(selectBox.form, 'guideGrid', transition);
+    fixGuideHeight();
+}
+
+function submitGuideForm(context)
+{
+    submitForm(context.form, 'guideGrid', 'dissolve');
+    fixGuideHeight();
 }
 
 function scrollCallback()
 {
     $("#NumPages").val(Number($("#NumPages").val())+1);
+}
+
+function fixGuideHeight()
+{
+    $('.channels').height($(window).height() - $('.channels').offset().top - 15);
 }
