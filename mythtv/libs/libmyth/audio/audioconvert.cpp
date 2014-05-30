@@ -758,6 +758,13 @@ void AudioConvert::DeinterleaveSamples(AudioFormat format, int channels,
                                           uint8_t* output, const uint8_t* input,
                                           int data_size)
 {
+    if (channels == 1)
+    {
+        // If channel count is 1, planar and non-planar formats are the same
+        memcpy(output, input, data_size);
+        return;
+    }
+
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
