@@ -206,7 +206,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        const char *fmt, int norp, int fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
                        int (*check_func)())
-           : inputFC(NULL)
+           : inputFC(NULL), picture(NULL)
 {
     displayFrame = 0;
 
@@ -284,6 +284,7 @@ MPEG2fixup::~MPEG2fixup()
 
     if (inputFC)
         avformat_close_input(&inputFC);
+    av_frame_free(&picture);
 
     MPEG2frame *tmpFrame;
 
@@ -1094,7 +1095,17 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
         WriteYUV(tmpstr, info);
     }
 
-    picture = avcodec_alloc_frame();
+    if (!picture)
+    {
+        if (!(picture = av_frame_alloc()))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        av_frame_unref(picture);
+    }
 
     pkt->data = (uint8_t *)av_malloc(outbuf_size);
 
@@ -1135,7 +1146,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (!out_codec)
     {
-        free(picture);
         LOG(VB_GENERAL, LOG_ERR, "Couldn't find MPEG2 encoder");
         return true;
     }
@@ -1178,7 +1188,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (avcodec_open2(c, out_codec, NULL) < 0)
     {
-        free(picture);
         LOG(VB_GENERAL, LOG_ERR, "could not open codec");
         return true;
     }
@@ -1196,7 +1205,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
         if (ret < 0)
         {
-            free(picture);
             LOG(VB_GENERAL, LOG_ERR,
                 QString("avcodec_encode_video2 failed (%1)").arg(ret));
             return true;
@@ -1221,7 +1229,6 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     avcodec_close(c);
     av_freep(&c);
-    av_freep(&picture);
 
     return false;
 }

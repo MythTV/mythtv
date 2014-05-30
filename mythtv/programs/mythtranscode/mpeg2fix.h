@@ -247,6 +247,8 @@ class MPEG2fixup
     pthread_t thread;
 
     AVFormatContext *inputFC;
+    AVFrame *picture;
+
     int vid_id;
     int ext_count;
     QMap <int, int> aud_map;
